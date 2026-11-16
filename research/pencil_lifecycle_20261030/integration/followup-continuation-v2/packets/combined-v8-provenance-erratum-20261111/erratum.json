@@ -1,0 +1,35 @@
+{
+  "schema": "research.provenance-erratum-and-closure/v1",
+  "task": "T-2190",
+  "reviewer": "root/mode_source_review",
+  "recorded_utc": "2026-11-11T03:13:30.423312+00:00",
+  "subject_manifest": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v8-20261111/manifest.json",
+    "sha256": "daaddc95e4b502a9a7ac44373363ce02e452d90f9a7f89fada1e18bcf34800cc"
+  },
+  "erratum": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v8-20261111/input-bindings.json",
+    "sha256": "aafd3c6f281e3407f5a3692fa6d8ee9a2f6b6fab7191ef356374afb8276287d1",
+    "field": "predecessor_manifest_sha256",
+    "recorded": "81099aee3c8ab5d2b17185889c7063694a11221e3c8c543922c20529f816031e",
+    "corrected": "81099aee131bbdf3f61117a6f4a20b29751ba0de6f795f980256488af93fc59e",
+    "verified_against": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v7-20261111/manifest.json",
+      "sha256": "81099aee131bbdf3f61117a6f4a20b29751ba0de6f795f980256488af93fc59e"
+    },
+    "correct_value_already_in_subject_manifest_header": true,
+    "sealed_source_changed": false,
+    "runtime_admission_source_pins_changed": false
+  },
+  "independent_closure_checks": {
+    "semantic_packet_files": 35,
+    "driver_external_source_files": 50,
+    "overlay_files": 8,
+    "direct_admission_pins": 29,
+    "all_sha256_matched": true,
+    "declared_byte_counts_matched": true
+  },
+  "status": "metadata_corrected_additively_runtime_source_closure_checked",
+  "native_execution": false,
+  "pcc_standing": "unverified"
+}

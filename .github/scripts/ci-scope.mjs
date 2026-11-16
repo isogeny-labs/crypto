@@ -75,8 +75,11 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       // ecbench.yml audits every committed session by schema, wherever it
       // lives (research/, taskq/deploy/, ...), so its files select the audit
       // anywhere in the tree (sheriff SHF-20261028-0f3f64, PPN-6). Large
-      // sessions commit their records gzip-compressed.
-      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?)$/.test(file);
+      // sessions commit their records gzip-compressed. Sessions whose records
+      // live in the artifact store keep only an .artifacts.json pointer in Git;
+      // re-pointing it changes the session's bytes, so it selects the audit too
+      // (sheriff SHF-20261106-a114e7, PPX-5).
+      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?|\.artifacts\.json)$/.test(file);
     result.actions ||= /^\.github\/(workflows|actions)\//.test(file);
     result.c_cpp ||= /\.(c|cc|cpp|cxx|h|hh|hpp|hxx|cu|cuh)$/.test(file)
       || /(^|\/)(Makefile|CMakeLists\.txt)$|\.cmake$/.test(file);
@@ -171,9 +174,18 @@ export function sourceFiles(cwd) {
   for (const source of pathDependencyFiles(cwd, tracked)) {
     if (!source.endsWith('/Cargo.toml')) sources.add(source);
   }
+  // Materialize the known sources in one batch before reading them. In the
+  // scope job's blob-less partial clone, `git show HEAD:<file>` fetches one
+  // missing blob per call, a round trip each; the path-dependency crates
+  // alone took the `scope` job past its 5-minute cap on every pull request
+  // on 2026-11-03. A sparse-checkout add fetches every missing blob at once.
+  materializeSources(cwd, sources);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
     const file = queue[index];
+    // Dependencies discovered while walking modules arrive in small groups;
+    // fetch everything still unread the first time one is missing.
+    if (!existsSync(path.join(cwd, file))) materializeSources(cwd, new Set(queue.slice(index)));
     const text = sourceText(cwd, file);
     const dir = path.posix.dirname(file);
     const add = dependency => {

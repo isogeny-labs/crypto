@@ -1,0 +1,158 @@
+{
+  "schema": "composite-tate-source-plan/v1",
+  "created": "2026-11-10T11:29:47.276403+00:00",
+  "status": "Preissue frozen sources; whole50gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/pairing_composite_order_audit_20261110/lean",
+    "theorem": "CompositeTateCertificateAudit.composite_tate_audit_certificate",
+    "statement": "theorem composite_tate_audit_certificate : SourceConditions 3 4 CompositeTateThreeAudit.curve ∧ Nat.card CompositeTateThreeAudit.curve.Point=4 ∧ addOrderOf CompositeTateThreeAudit.P=4 ∧ Nat.card CompositeTateThreeAudit.Left=4 ∧ Nat.card CompositeTateThreeAudit.Right=4 ∧ (¬∃ z : CompositeTateThreeAudit.U,IsPrimitiveRoot z 4) ∧ (∀ z : CompositeTateThreeAudit.Target,z^2=1) ∧ ¬PairingExists CompositeTateThreeAudit.curve 4 ∧ SourceConditions 5 6 CompositeTateFiveAudit.curve ∧ Nat.card CompositeTateFiveAudit.curve.Point=6 ∧ addOrderOf CompositeTateFiveAudit.P=3 ∧ Nat.card CompositeTateFiveAudit.Left=6 ∧ Nat.card CompositeTateFiveAudit.Right=6 ∧ (¬∃ z : CompositeTateFiveAudit.U,IsPrimitiveRoot z 6) ∧ (∀ z : CompositeTateFiveAudit.Target,z^2=1) ∧ ¬PairingExists CompositeTateFiveAudit.curve 6 ∧ ¬ (∀ (q : ℕ) [Fact (Nat.Prime q)] (n : ℕ) (E : WeierstrassCurve.Affine (ZMod q)), SourceConditions q n E→PairingExists E n)",
+    "decl_sha256": "f1d8132fb43f9efdc31f1a9c218a0634d6764c62d45e1f11c0a45ece206c7665",
+    "sources": [
+      {
+        "path": "research/pairing_composite_order_audit_20261110/lean/BilinearObstruction.lean",
+        "bytes": 2649,
+        "sha256": "48ee45d69fb4bbb136fef2269b55e6653309561e5bfcd1e0bd12b54b0b4fe3a2"
+      },
+      {
+        "path": "research/pairing_composite_order_audit_20261110/lean/CompositeTateCertificate.lean",
+        "bytes": 3836,
+        "sha256": "3eb54ddcdad19369819c50d3c4911182f348350d84ee63761bf9cd74a46e3dfe"
+      },
+      {
+        "path": "research/pairing_composite_order_audit_20261110/lean/CompositeTateFive.lean",
+        "bytes": 4161,
+        "sha256": "09fc80da535c34ad63bb3d492b263ddde01fe68d8015898ef96f586fd0811b59"
+      },
+      {
+        "path": "research/pairing_composite_order_audit_20261110/lean/CompositeTateThree.lean",
+        "bytes": 4692,
+        "sha256": "80a97c3041abbe727a161aa2dbaec892195adeedb16f67c5898c62a45f2bd889"
+      },
+      {
+        "path": "research/pairing_composite_order_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4086,
+        "sha256": "b8ded4aa6492ea60d20bb5a779c806b0db824040243e44b0400a2ed126c256e8"
+      },
+      {
+        "path": "research/pairing_composite_order_audit_20261110/lean/lakefile.toml",
+        "bytes": 310,
+        "sha256": "c43fac3022dd166540384bad214ad9ca5e715a9922a38efca9eaea74dc9b3d1d"
+      },
+      {
+        "path": "research/pairing_composite_order_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      }
+    ],
+    "scope": "Actual nonsingular F3 curve/card4/order4 point and F5 curve/card6/order3 point; actual torsion kernels and curve and field-unit quotients. Literal source conditions hold, target quotients nontrivial/exponent2, nonzero doubles obstruct every left-bilinear left-nondegenerate map. Direct universal negation of literal composite-n implication. Primitive-root absence and primitive2 controls. No canonical pairing implementation, corrected primitive-root/prime-order refutation, or Frey–Rück-original theorem claim."
+  },
+  "artifacts": [
+    {
+      "path": "research/pairing_composite_order_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 6076,
+      "sha256": "9beb1359d5bf1e2c9ad26ceda99ed118f5dafac542043a0eb0b8fcb9f6848795"
+    },
+    {
+      "path": "research/pairing_composite_order_audit_20261110/evidence/attempts.json",
+      "bytes": 4989,
+      "sha256": "87f6c6a75bf64bcab56700fc38f459b38477270ebc15d47144c76c0428d53de9"
+    },
+    {
+      "path": "research/pairing_composite_order_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 2373,
+      "sha256": "bd34a4885fed7cf21eb3f811a3bd39eecd323baa294811ccfbfc0fd18af3f8fb"
+    },
+    {
+      "path": "research/pairing_composite_order_audit_20261110/evidence/gate.json",
+      "bytes": 1209,
+      "sha256": "8e2efe8dd79b56a02cf74a6524af5191f44201c1bcd3c895115d24c03d0a286b"
+    },
+    {
+      "path": "research/pairing_composite_order_audit_20261110/evidence/source-review.json",
+      "bytes": 1339,
+      "sha256": "f7cdc0ed24ab7fcbfe2bc3d21be574e9ee6708edd53bc50c7af4997156306209"
+    }
+  ],
+  "gate": {
+    "archive": "research/pairing_composite_order_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 50,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/pairing_composite_order_audit_20261110/evidence/attempts.tar.gz",
+    "files": 22,
+    "roundtrip_equal": true
+  },
+  "proof_outline": [
+    "All actual curve nonsingularity/cardinality/point-order/source conditions are proved, not assumed.",
+    "Actual nth-power field-unit quotients are nontrivial and killed by squaring.",
+    "Actual n-torsion contains P with 2P nonzero.",
+    "Left bilinearity forces e(2P,Q)=e(P,Q)^2=1 for every Q, contradicting left nondegeneracy.",
+    "Both actual E/nE right quotients and unquotiented right point groups are covered; direct universal implication negation uses F3/n4."
+  ],
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "generic_obstruction_axioms": [],
+    "holes": false,
+    "native_decide": false,
+    "paid_compute": 0,
+    "native_experiment": false,
+    "lean4checker": "Unavailable; kernel/transitive axiom gate.",
+    "advisories": "Existing imported-source lints and legacy-module advisories retained, no waivers or altered issued parents."
+  },
+  "sources_checked": {
+    "schema": "composite-tate-source-review/v1",
+    "created": "2026-11-10T11:29:47.275339+00:00",
+    "primary": {
+      "title": "Galbraith, Mathematics of Public Key Cryptography v2.0, Chapter 26",
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+      "sha256": "c06cf2df9b8003e19694a4ebfe298a1557d61169f87ec01542258438ceac015e",
+      "read_scope": "Sections26.2–26.3 through theorem26.3.3 and Miller definitions; printed576–577 visually inspected. General natural n, coprimality and actual quotient domains checked; prime restriction is later.",
+      "theorem": "26.3.3(1–2)",
+      "literal_root_condition": "non-trivial n-th root of unity"
+    },
+    "errata": {
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/crypto-book.html",
+      "sha256": "bdba99cb397a95b1bd6b37d2f672d23b487038dd7a3737de76c6ccee8edf825c",
+      "bounded_check": "No chapter26 entry found in displayed official errata list. No global absence or novelty claim."
+    },
+    "unread_original": "Frey–Rück1994 direct AMS PDF access failed; not marked read or refuted.",
+    "KB": "MCP tools absent and repository wrapper status has no executable; bounded primary/repository/Mathlib fallback.",
+    "Mathlib": "Actual affine Point, finite cardinality, torsion-kernel/range quotient, group orders and primitive-root declarations read."
+  },
+  "identity_certificate": "Not applicable: the v1 schema expresses polynomial equality at a fixed 61-bit prime, not actual field-unit quotients or nondegeneracy quantifiers. Faithful Lean binding supplied."
+}

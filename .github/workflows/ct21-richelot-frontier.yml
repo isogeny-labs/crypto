@@ -1,0 +1,34 @@
+name: CT21 rational Richelot frontier regression
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/ct21_richelot_neighbors.py'
+      - 'research/chained_jacobian_transfers_20261110/CT21_RICHELOT_FRONTIER.md'
+      - '.github/workflows/ct21-richelot-frontier.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/ct21_richelot_neighbors.py
+      - name: Enumerate kernels and verify Richelot models, Frobenius and negative controls
+        run: |
+          set -euo pipefail
+          source=research/chained_jacobian_transfers_20261110/ct21_richelot_neighbors.py
+          python3 -S "$source" | tee "$RUNNER_TEMP/ct21-rational-frontier.txt"
+          python3 -m py_compile "$source"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ct21-frontier-${{ github.sha }}
+          path: ${{ runner.temp }}/ct21-rational-frontier.txt
+          if-no-files-found: ignore

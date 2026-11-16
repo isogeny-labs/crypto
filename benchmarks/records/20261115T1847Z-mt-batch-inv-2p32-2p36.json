@@ -1,0 +1,342 @@
+{
+  "branch": "aburan28/youthful-hopper-hfrwkd",
+  "closed_utc": "2026-11-15T19:44:05+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "setsid nohup python3 run.py main > main.out 2>&1 < /dev/null &"
+      ],
+      "cwd": "../../../tmp/claude-0/-home-user/05d5cba4-82d1-5d2e-a221-22d2307e4205/scratchpad/bi_payload",
+      "exit": 0,
+      "started_utc": "2026-11-15T18:47:38+00:00",
+      "wall_s": 0.003
+    }
+  ],
+  "commit": "399a97e763ed4504075281bb9f57c0c97c371a65",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T18:47:28+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/mt_batch_inv_20261115"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T1847Z-mt-batch-inv-2p32-2p36",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_ic_plain_2p32_t1024",
+      "note": "IC batched / IC unbatched whole solve; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4099,
+        0.4712
+      ],
+      "unit": "ratio",
+      "value": 0.4583
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_best_rho_2p32_t1024",
+      "note": "IC batched / best of 16 rho keys incl. batched rhodpb; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1424,
+        1.4359
+      ],
+      "unit": "ratio",
+      "value": 1.269
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_batched_over_unbatched_2p32_t1024",
+      "note": "best batched rho / best unbatched rho; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.354,
+        0.4044
+      ],
+      "unit": "ratio",
+      "value": 0.3808
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_ic_plain_2p32_t4096",
+      "note": "IC batched / IC unbatched whole solve; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4332,
+        0.4735
+      ],
+      "unit": "ratio",
+      "value": 0.4385
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_best_rho_2p32_t4096",
+      "note": "IC batched / best of 16 rho keys incl. batched rhodpb; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1458,
+        1.2999
+      ],
+      "unit": "ratio",
+      "value": 1.2676
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_batched_over_unbatched_2p32_t4096",
+      "note": "best batched rho / best unbatched rho; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.356,
+        0.3939
+      ],
+      "unit": "ratio",
+      "value": 0.3724
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_ic_plain_2p32_t16384",
+      "note": "IC batched / IC unbatched whole solve; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4422,
+        0.5065
+      ],
+      "unit": "ratio",
+      "value": 0.4556
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_best_rho_2p32_t16384",
+      "note": "IC batched / best of 16 rho keys incl. batched rhodpb; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1927,
+        1.3778
+      ],
+      "unit": "ratio",
+      "value": 1.2448
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_batched_over_unbatched_2p32_t16384",
+      "note": "best batched rho / best unbatched rho; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3535,
+        0.372
+      ],
+      "unit": "ratio",
+      "value": 0.3628
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_ic_plain_2p36_t1024",
+      "note": "IC batched / IC unbatched whole solve; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4296,
+        0.5816
+      ],
+      "unit": "ratio",
+      "value": 0.483
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_best_rho_2p36_t1024",
+      "note": "IC batched / best of 16 rho keys incl. batched rhodpb; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.6182,
+        1.9689
+      ],
+      "unit": "ratio",
+      "value": 1.8127
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_batched_over_unbatched_2p36_t1024",
+      "note": "best batched rho / best unbatched rho; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3274,
+        0.3544
+      ],
+      "unit": "ratio",
+      "value": 0.3395
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_ic_plain_2p36_t4096",
+      "note": "IC batched / IC unbatched whole solve; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4432,
+        0.5113
+      ],
+      "unit": "ratio",
+      "value": 0.5072
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_best_rho_2p36_t4096",
+      "note": "IC batched / best of 16 rho keys incl. batched rhodpb; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.4842,
+        1.9848
+      ],
+      "unit": "ratio",
+      "value": 1.7637
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_batched_over_unbatched_2p36_t4096",
+      "note": "best batched rho / best unbatched rho; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3294,
+        0.3445
+      ],
+      "unit": "ratio",
+      "value": 0.3305
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_ic_plain_2p36_t16384",
+      "note": "IC batched / IC unbatched whole solve; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3597,
+        0.4769
+      ],
+      "unit": "ratio",
+      "value": 0.4647
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_bi_over_best_rho_2p36_t16384",
+      "note": "IC batched / best of 16 rho keys incl. batched rhodpb; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.4458,
+        1.8209
+      ],
+      "unit": "ratio",
+      "value": 1.7537
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "rho_batched_over_unbatched_2p36_t16384",
+      "note": "best batched rho / best unbatched rho; median of 4 instances x 3 repeats; local Xeon [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3221,
+        0.3364
+      ],
+      "unit": "ratio",
+      "value": 0.3321
+    }
+  ],
+  "problem": "mt:batched-inversion",
+  "raw": [
+    {
+      "bytes": 947708,
+      "path": "research/mt_batch_inv_20261115/results/main/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/ed2edfbc74c14a2bd4e26fa0b619f97b4587f8a311ad653757003bd066dfb727",
+      "sha256": "ed2edfbc74c14a2bd4e26fa0b619f97b4587f8a311ad653757003bd066dfb727",
+      "uploaded": false
+    },
+    {
+      "bytes": 7932,
+      "path": "research/mt_batch_inv_20261115/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1bfb5246d8805bf3f1f3580482b52ce1074ca84bd501050f09087c2c69a1edef",
+      "sha256": "1bfb5246d8805bf3f1f3580482b52ce1074ca84bd501050f09087c2c69a1edef",
+      "uploaded": false
+    },
+    {
+      "bytes": 1157,
+      "path": "research/mt_batch_inv_20261115/check.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/24544f3e2330831fde57b7dad553a72ffee566014753e00af5725021e533f93a",
+      "sha256": "24544f3e2330831fde57b7dad553a72ffee566014753e00af5725021e533f93a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/mt_batch_inv_20261115/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/mt_batch_inv_20261115/fig_batch_inv.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "mt-batch-inv-2p32-2p36",
+  "status": "measured",
+  "summary": "Batched inversion: IC 0.44-0.51x of unbatched (same table and trials); best rho 0.33-0.38x of unbatched; IC / best rho 1.25-1.27x at 2^32, 1.75-1.81x at 2^36; 1296 executions, 0 errors [pcc:unverified]",
+  "validation": null
+}

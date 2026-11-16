@@ -1,0 +1,22 @@
+{
+ "schema":"formal-source-result/v1",
+ "task":"T-1242",
+ "component":"nonmonic native polynomial division",
+ "status":"producer_checked_pending_independent_review",
+ "main":19,
+ "controls":22,
+ "readbacks":41,
+ "modules":9,
+ "native_checker_negative_controls":6,
+ "native_false_control":{"native_exit":1,"gate_exit":1,"unsolved_goal":"False"},
+ "final_replay":"final-replay-C8pPVtSb",
+ "failed_attempts":["NonmonicCoefficient-attempt-rr4y2L2p","NonmonicLoop-attempt-XodWAvrX"],
+ "pdf_pages_visually_inspected":[1,2],
+ "pdf_visual_result":"legible and no clipping",
+ "scientific_execution":false,
+ "scope_targets":1260,
+ "campaign_deadline_unchanged":"2026-10-31T06:00:00Z",
+ "assumptions":["prime modulus","1<p<2^31","canonical input and divisor","actual nonzero leading divisor word","native correspondence: odd-prime n=1 no tables","fuel at least input length"],
+ "proved":["native inverse/shortcut decode","word remainder length descent","quotient loop invariant and totality","exact quotient endpoint","full native word-storage refinement and canonical exact output"],
+ "remaining_interfaces":["pegcd composition","other Field dispatches","physical allocation limits","compiled Rust equivalence"]
+}

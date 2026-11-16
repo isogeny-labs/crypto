@@ -1,0 +1,20 @@
+digraph EntryCost {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.25", ranksep="0.35", fontname="Helvetica", fontsize=17, label="Implicit entry cost audit | 2026-11-04\nUnverified source observations; arrows identify proof obligations", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, margin="0.12,0.1", color="#506378"];
+  edge [fontname="Helvetica", fontsize=10, color="#65768a"];
+  tuple [label="evaluate_at / next_tuple\nWeighted exponents + target-row usage", fillcolor="#e4edf8"];
+  prep [label="child preparation\nSelected ports, local table, mode coefficients", fillcolor="#e4edf8"];
+  entry [label="PacketTensor::entry\nPreparation, row-choice traversal, outgoing powers", fillcolor="#e4edf8"];
+  precision [label="Creation-precision description\nStored ring + coefficients; retained Arc references", fillcolor="#deeee4"];
+  arithmetic [label="Bit-cost ledger\nWidth-dependent integers, clones, ring operations", fillcolor="#fff0cf"];
+  retention [label="Peak live-state ledger\nAncestors + child tables + samples + jets", fillcolor="#fff0cf"];
+  obligation [label="Next audit packet\nUsage invariant + entry cost + path retention", fillcolor="#eae4f6"];
+  tuple -> prep [label="bind budget to selected rows"];
+  prep -> entry;
+  precision -> entry [label="evaluate before lifting"];
+  entry -> arithmetic;
+  prep -> retention;
+  precision -> retention;
+  arithmetic -> obligation;
+  retention -> obligation;
+}

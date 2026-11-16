@@ -1,0 +1,314 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "QT-CM8-F37-B3-20261030",
+  "created": "2026-10-30T15:58:46Z",
+  "protocol": {
+    "path": "../../CM8_37_B3_20261030.protocol.json",
+    "sha256": "7cf1e8c83c086e405f6e2918c4de3e19e5930043d2015278488807de101a87db",
+    "protocol_id": "QT-CM8-F37-B3-frontier-20261030",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "exact native full size-three cohort and independent arithmetic"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "7b7840b3948697208ff12c2894ed2e4c95ffcb24",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "Linux 5e67ff96e34d 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "cpp",
+      "role": "reference",
+      "binary_sha256": "374c06104ed89b48816e18d222894319ba5c4744480f77f417062034d4e4da38",
+      "commit": "7b7840b3948697208ff12c2894ed2e4c95ffcb24"
+    },
+    {
+      "id": "rust",
+      "role": "candidate",
+      "binary_sha256": "23d51cd82e0424cdcc2f2de58108987f956d504e094965b7ec81a46730c85b1c",
+      "commit": "7b7840b3948697208ff12c2894ed2e4c95ffcb24"
+    },
+    {
+      "id": "domain",
+      "role": "control_positive",
+      "binary_sha256": "23d51cd82e0424cdcc2f2de58108987f956d504e094965b7ec81a46730c85b1c",
+      "commit": "7b7840b3948697208ff12c2894ed2e4c95ffcb24"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "cm8-37-b3-cpp",
+      "arm": "cpp",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "blocked_setups": 2916,
+          "capped_response_queries": 52100,
+          "configurations": 3024,
+          "policy_target_cap_comparisons": 10287648,
+          "source_targets": 54432,
+          "strict_joint_recovery_admitted": 0,
+          "strongest_source_distinct_targets": 0,
+          "strongest_source_joint_pair_records": 0,
+          "verified_recoveries": 1944
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "exact finite arithmetic,no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent Rust full witness/point/log/original-scalar reconstruction and ten changed no-receipt controls"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "two existing local build workers",
+      "backend_ref": null
+    },
+    {
+      "run_id": "cm8-37-b3-rust",
+      "arm": "rust",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "blocked_setups": 2916,
+          "capped_response_queries": 52100,
+          "configurations": 3024,
+          "policy_target_cap_comparisons": 10287648,
+          "source_targets": 54432,
+          "strict_joint_recovery_admitted": 0,
+          "strongest_source_distinct_targets": 0,
+          "strongest_source_joint_pair_records": 0,
+          "verified_recoveries": 1944
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "exact finite arithmetic,no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent Rust full witness/point/log/original-scalar reconstruction and ten changed no-receipt controls"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "two existing local build workers",
+      "backend_ref": null
+    },
+    {
+      "run_id": "cm8-37-b3-domain",
+      "arm": "domain",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "changed_control_rejections": 10,
+          "backend_tests": 22,
+          "addition_pairs": 2888,
+          "scalar_images": 19
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "exact finite arithmetic,no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent Rust full witness/point/log/original-scalar reconstruction and ten changed no-receipt controls"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "two existing local build workers",
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 3,
+    "attempted": 3,
+    "completed": 3,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "../../native/cm8-37-b3-20261030/cases/index.json",
+      "sha256": "8d755acd08cc3edce94337754ae077162999fff9fe3b8bad04327e4e0f6df4bf",
+      "bytes": 360135,
+      "kind": "raw"
+    },
+    {
+      "path": "../../native/cm8-37-b3-20261030/audit.json",
+      "sha256": "54fe79798094ed94598406facb64d22f3bef4f03ae70919a62307a226161ba17",
+      "bytes": 41547,
+      "kind": "raw"
+    },
+    {
+      "path": "../../native/cm8-37-b3-20261030/transfer.json",
+      "sha256": "570ee292d14f384cd742334a9ec97d103b8b715f94615ec995dabcf4e8350065",
+      "bytes": 59345,
+      "kind": "raw"
+    },
+    {
+      "path": "../../native/cm8-37-b3-20261030/transfer-audit.json",
+      "sha256": "4fc95fb66bf24d5749d0f690fc83cadd5b467ee7c5cb5c6de73d61db5d852289",
+      "bytes": 221,
+      "kind": "raw"
+    },
+    {
+      "path": "runs.tar.xz",
+      "sha256": "1abfbe5a17b8e5b3db0afca7d5cc6c23cf377547aad20ac060957f03974558f1",
+      "bytes": 19212,
+      "kind": "raw"
+    },
+    {
+      "path": "RUNS.sha256",
+      "sha256": "f4e55a459f4d79764f6b36c38c67a593038e4dd4ee2bbe91a1b57492565bdac3",
+      "bytes": 10779,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-receipt.json",
+      "sha256": "61699b9633797862fd96186c0877ad7e2e4c22dfa45587fa9fcc8ea9306b638c",
+      "bytes": 336,
+      "kind": "raw"
+    },
+    {
+      "path": "control-layout.json",
+      "sha256": "00d51eba0173e3cc9ed7e554a77333b57b5a8aeb01333900018a9cb98cdca3a3",
+      "bytes": 2345,
+      "kind": "raw"
+    },
+    {
+      "path": "false-transfer.json",
+      "sha256": "25e84766e48499d8c8612e84cadc0644f155c8f7776ab4e8f7b229d1fa6e3157",
+      "bytes": 59347,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../native/cm8-37-b3-audit/main.rs",
+      "sha256": "8ab8f5da4b0a4b4264f037b36e4b6710c356c49e82e4b6045dbc082954a24265",
+      "bytes": 31637,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "exact native scope",
+      "text": "Three nested full-contract arm rows,3planned/3attempted/3completed,no exclusions;producer/auditor each invoke transfer+census,not independent statistical samples."
+    },
+    {
+      "kind": "observation",
+      "by": "exact native scope",
+      "text": "336arms/3024configs/54432separate attempts on18repeated source points,1944verified/2916blocked;one original encoding,independent cubic-remainder equality."
+    },
+    {
+      "kind": "observation",
+      "by": "exact native scope",
+      "text": "All four panels report0recoveries throughcap7 and486perrole atcap8,so no eligible recovered lower-cap candidate exists within0..8. Zerojoint count is boundary-limited,not universalnoadvantage."
+    },
+    {
+      "kind": "observation",
+      "by": "exact native scope",
+      "text": "Native explicit launcherexit0/allpositive stages0/alltenrejections101;outerPTYresult1 discrepancy retained without study rerun. Six named/seven audited polynomial control theorems finally pass after two retained source failures;not intrinsic regularity/actualsource global audit."
+    },
+    {
+      "kind": "observation",
+      "by": "exact native scope",
+      "text": "Current owner merge reviewed:all prior study paths unchanged,1921missing models persist;nativeCIcheckout26fb0d38syntheticmerge differsfromliteralafinput. Auto-merge dedicatednonmerge mutation restoredOFF. No paidcompute/arbitraryupload."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

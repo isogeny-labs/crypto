@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--offline",
+    "--locked"
+  ],
+  "timeout_s": 900,
+  "guard_count": 2133,
+  "guard_scope": "all811 native accepted inputs plus every physical Rust/Cargo input in root src/crates/declared local dependencies androotmanifest;not claimed a complete compiler include closure",
+  "fresh_cache": "/workspace/scratch/ct55-g3-root-regression-01-build-cache",
+  "cache_outside_raw": true,
+  "question": "existing rootlibrary regression required before publishing existing-source interface additions",
+  "prediction": "interface-only additions should not alter existing unit behavior;pre-existing infrastructure/compiler gaps unknown",
+  "acceptance": "originalnative0/finalguards0;otherwise preserve original failed run and discriminate own-source vs existing dependency gap",
+  "scope": "local correctness regression command,no timing or paid experiment"
+}

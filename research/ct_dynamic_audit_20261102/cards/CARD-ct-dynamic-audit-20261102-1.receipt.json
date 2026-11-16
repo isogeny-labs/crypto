@@ -1,0 +1,147 @@
+{
+  "card_id": "CARD-ct-dynamic-audit-20261102-1",
+  "card_path": "research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.yaml",
+  "card_sha256": "ae18c7378e0f2514e63fcd6347859652c4f9b4ab8c87eb1a7a54c1b28974a34e",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "CARGO_PROFILE_RELEASE_DEBUG=line-tables-only",
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--bin",
+        "ct_dynamic_audit"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.28,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.28,
+      "stderr_sha256": "78eb8a8ea9305b380271a602a8c1565f7679a2e1aa714ee8e148917b89ba0528",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized + debuginfo] target(s) in 0.19s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "target/release/ct_dynamic_audit"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.325,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.325,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0a10c4310a25bb8ecc081fcf724b858e54cc7514bdd49019ce05adabb0581346",
+      "stdout_tail": [
+        "ebdf722a792ec116fdcc694cbfbbcc3d91246ec5f54940a06d445022771e402b  target/release/ct_dynamic_audit"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/ct_dynamic_audit_20261102/run.sh",
+        "target/release/ct_dynamic_audit",
+        "research/ct_dynamic_audit_20261102/raw",
+        "research/ct_dynamic_audit_20261102/results"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2318.055,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-run",
+      "index": 3,
+      "outputs": {
+        "research/ct_dynamic_audit_20261102/raw/ENV.txt": "03169a9a9b50b76cfbc65ad7a53854210d5cae7115d0431a4d6e03808a3f9b42",
+        "research/ct_dynamic_audit_20261102/results/fig_ir_spread.svg": "309e8af79a27ce4d52d6fbb4645f2fb1f118bb9386368de2f60c13e9c866b5c5",
+        "research/ct_dynamic_audit_20261102/results/rows.jsonl": "2a5c921a3d42d52644811f3537a95df2c271e39531ed24368d18ab92f314c5d4",
+        "research/ct_dynamic_audit_20261102/results/summary.json": "7eb2fa01563106e227adc4d0df2106ce8824a0aa3aa5313acb8c581b4720d71f"
+      },
+      "seconds": 2318.055,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "43e55f25bd4f96c9670180d45fde8d50921d3f014947c1f6cc7b9eae78a76945",
+      "stdout_tail": [
+        "rows: 2290 lines; summary: 11 targets"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "research/ct_dynamic_audit_20261102/results/rows.jsonl",
+        "research/ct_dynamic_audit_20261102/results/summary.json",
+        "research/ct_dynamic_audit_20261102/results/fig_ir_spread.svg",
+        "research/ct_dynamic_audit_20261102/raw/ENV.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "output-sha256",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d17c075d2952226d6eb7fc1fa263c220dcee92e7871caef6d4fead59701fbc9d",
+      "stdout_tail": [
+        "2a5c921a3d42d52644811f3537a95df2c271e39531ed24368d18ab92f314c5d4  research/ct_dynamic_audit_20261102/results/rows.jsonl",
+        "7eb2fa01563106e227adc4d0df2106ce8824a0aa3aa5313acb8c581b4720d71f  research/ct_dynamic_audit_20261102/results/summary.json",
+        "309e8af79a27ce4d52d6fbb4645f2fb1f118bb9386368de2f60c13e9c866b5c5  research/ct_dynamic_audit_20261102/results/fig_ir_spread.svg",
+        "03169a9a9b50b76cfbc65ad7a53854210d5cae7115d0431a4d6e03808a3f9b42  research/ct_dynamic_audit_20261102/raw/ENV.txt"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "a1530967a1c6ea4e63bb9b470639ec0c73294117",
+  "dirty_after": [],
+  "dirty_before": [
+    "research/ct_dynamic_audit_20261102/cards/CARD-ct-dynamic-audit-20261102-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

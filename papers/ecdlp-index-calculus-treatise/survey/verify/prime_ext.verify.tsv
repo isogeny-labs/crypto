@@ -1,0 +1,246 @@
+claim	value	source (origin/main path:line or quoted snippet)
+Owner track split R1 option C, generic label	"bounded by sqrt(r) ... cannot beat rho"	research/prime_ic_program_20261029/DECISIONS.md: row R1 "Option C, two counted tracks ... cannot beat rho"
+D1 small-abscissa base counts as algebraic; deg F_V = |V|	yes, tentatively	DECISIONS.md row D1
+D-EKS reference arm ~49 CPU-hours, range 15-150, approved	49 / 15-150	DECISIONS.md row D-EKS
+D2 tracks may be ranked on same instances	amended R1	DECISIONS.md row D2 / R1 "Amended per D2"
+D3 msolve counter patch allowed	allowed	DECISIONS.md row D3
+D-FD7 two-cap bracket t>=12, 56/112Gi	adopted	DECISIONS.md row D-FD7
+D-MAC raw runs to be recovered; t<=10 at median level	recover	DECISIONS.md row D-MAC
+D-ROUTE command route, administrator implements	approved Option 1	DECISIONS.md row D-ROUTE
+D-REPLAY second-host replay of 20-bit holdout	approved	DECISIONS.md row D-REPLAY
+Root finding generic argument	"cost never depends on F_V ... runs identically on a random V"	DECISIONS.md "Why root-finding is generic"
+VALIDATION.json exists for N45 baseline	present	research/prime_base_oracle_tuning_20261029/VALIDATION.json (ls-tree)
+VALIDATION.json blindspots m4	present	benchmarks/20261018-blindspots-prime-m4-cells/VALIDATION.json
+VALIDATION.json packed filter	validated with caveats	docs/ic/LEADERBOARD.md:465 "validated with caveats ... VALIDATION.json"
+Residual dp-eq evidence dir has VALIDATION.json + validator report, not admitted row	not admitted	benchmarks/20261101-ic-residual-dp-eq/README.md "not an admitted row ... artifact store"
+No pcc claim for generic-track studies	none found	grep of pcc/claims/*.json statements (only curve25519 autolab, 1df881, 458dda, aca921, ac1e93 etc.)
+Arity gate a<m/2, e<m/2-1; m=3 gives a<1.5, e<0.5	derived	research/prime_ic_lead_review_20261031/PDP_ARITY_CORRECTION.md "a<m/2 and e<m/2-1 ... a<1.5 and e<0.5"
+DEC ids for arity correction	DEC-20261031-b51282, DEC-20261101-26f1fa	PDP_ARITY_CORRECTION.md "Decision provenance"
+Memo gate e<1 at m=4 wrong; MITM s=1.93, e=0.4, cost p^{2/3}; correct gate s<m-3	as stated	research/semaev_alternatives_audit_20261104/README.md "Headline"
+Seven Lean theorems Routes.lean Roots.lean	7	semaev_alternatives_audit README Contents table "seven Lean 4 theorems"
+Audit numbers single local run, unverified	"treat as unverified"	semaev_alternatives_audit README "Status / limits"
+Idea 10: 1 squarefree collision for B<=2^16; Ideas 2,3 m=2	as stated	semaev_alternatives_audit README Headline
+m=4 2+2 MITM base B=round(p^{1/5})	p^{1/5}	research/ic_m4_mitm_scaling_20261031/README.md "B = round(p^{1/5})"
+planted exponent 0.412 R^2 0.9986 8 sizes	0.412	ic_m4_mitm_scaling README:57
+three-rung 0.404 to 60-bit	0.404	ic_m4_mitm_scaling README:90
+big ladder fits 0.396/0.426/0.450	as stated	ic_m4_mitm_scaling README:111
+uniform 24-40 fit 0.469; 40->44 local 1.41	0.469 / 1.41	ic_m4_mitm_scaling README "The 24--40 fit is 0.469 ... = 1.41"
+"not an end-to-end sub-1/2 relation collector"	quote	ic_m4_mitm_scaling README Reading
+Blindspots m4 full IC 8.2-29.5x rho-neg at w=0.1; 6.5-35.6 across band; F4 |F|^11.03; 16/16 solves; REGRESSES	as stated	benchmarks/README.md row 20261018-blindspots-prime-m4-cells
+FRONTIER folded mitm exponent 0.841 [0.646,0.953]; subtract 1.005 [0.880,1.077]; bsgs 0.504 [0.316,0.585]; 17.7-24.0 bits; 96	as stated	docs/bounds/FRONTIER.md:178,179,20
+Campaign pair-table exponent 0.620 [0.557,0.663]	0.620	papers/.../prog_frontier.tex:117
+Arity sweep 234 rows; best exhaustive m=2 10.6/16.2/20.4/60.5; MITM 2.8/3.3/5.8/4.3	as stated	research/ic_arity_sweep_20261027/README.md best-arity table
+Arity sweep MITM exponents m3 0.63, m9 0.60; even-split explanation	as stated	ic_arity_sweep README exponent table
+k=4 table 83.7->11.6, 13.1x rho-neg at 40 bits (cross-ref only)	13.1	research/prime_ksum_table_20261028/README.md:75,103
+k-sum law 2^{k-1}C(A,k)+c_k A p/(2^k C(A,k)), exponent k/(2k-1)	as stated	prime_ksum_table README "Change"
+k=5: S 8.51 vs 11.56 at 40 bits, 0.74x; 0.71x at w=1; 0.67x at 48	as stated	research/prime_ksum_k5_20261028/README.md Result
+k=5 exponent 0.547 [0.543,0.554] vs 0.565 [0.560,0.571]	as stated	prime_ksum_k5 README Result
+k=5 distance 9.7x rho, 7.6x BSGS at 40; 11.0x rho, 10.6x BSGS at 48	as stated	prime_ksum_k5 README "Distance remaining"
+k=5 1,920 runs; 288/288 replication	as stated	prime_ksum_k5 README §2
+vs incumbent ratios 0.701/0.453/0.331/0.218 w=0 with CIs	as stated	research/prime_ksum_vs_incumbent_20261029/README.md table
+vs incumbent rho-neg 5.4/6.3/7.2/7.3; bsgs 7.3/6.6/6.7/7.4	as stated	prime_ksum_vs_incumbent README "Distance remaining"
+vs incumbent baseline falls 1.4x (20) to 4.6x (32); 32-bit base null by construction	as stated	prime_ksum_vs_incumbent README "What this is"
+vs incumbent 3,456 runs	3,456	benchmarks/README.md k-sum vs incumbent paragraph
+vs incumbent UNQUALIFIED; second-host not done	UNQUALIFIED	prime_ksum_vs_incumbent README Status; second-host/ holds only specs/
+pooled 0.700/0.446/0.324/0.217 with CIs	as stated	research/prime_ksum_pooled_20261029/README.md table
+pooled 16/16 curves; exponents 0.496/0.525/0.635; rho-neg 0.457, bsgs 0.501	as stated	prime_ksum_pooled README Result
+pooled distance 6.0/5.8/7.3/7.3 rho-neg	as stated	prime_ksum_pooled README "Distance remaining"
+pooled tuned-for-w0 incumbent 8-13% cheaper; k5 0.25-0.49 of it	as stated	prime_ksum_pooled README §1 Q3
+pooled 13,824 runs	13,824	benchmarks/README.md pooled paragraph
+pooled train rule chose k=5; at 20 bits k=4 cheaper w=0,0.1	as stated	prime_ksum_pooled README §1 Q4
+Precompute: online 142/157/229x; build 333-339x	as stated	research/prime_precompute_regime_20261028/README.md:139-140
+Precompute E*T^2 ~ N (6.96); kl about N/E above (1.4e5)	as stated	prime_precompute_regime README §4 item 1
+Precompute crossover 14.3k/13.1k/9.5k at 40; predicted 15k	as stated	prime_precompute_regime README:115,134
+Precompute no positive crossover vs pre-eqP at 36, 40	as stated	prime_precompute_regime README:117
+Precompute prediction table 5.3/5.01; 0.10/0.117; 1594/1668; 0.0006/0.0008; 0.19/0.33	as stated	prime_precompute_regime README "Predictions against measurement"
+Precompute class: control and accounting	quote	prime_precompute_regime README line 8
+Known-log: cheaper than abscissa at 16/20/24; rho cheaper at every size; 12-bit unresolved; L0, same-host	as stated	research/ecbench_known_log_targets_20261021/README.md opening
+Known-log table values (27.7819/25.0571/2.9177 ... 42.2267/2.6984/1.1584; ratios)	as stated	ecbench_known_log_targets README "Measured cold costs" table
+Known-log base 32 unsigned pairs; 8 targets x 5 rounds	as stated	ecbench_known_log_targets README
+Residual collector = |D|=r limit of large-prime variation; lead/hypothesis ids	as stated	research/ic_prime_residual_lp_20261026/README.md intro
+residual_lp res4/plan 0.119-0.426 at w=0; 1.33-3.89 at w=1 (as published)	as stated	ic_prime_residual_lp README table
+residual_lp exponents res4 0.470, rho 0.480, plan 0.634	as stated	ic_prime_residual_lp README exponent table
+residual_lp curve-free null: all nine intervals contain 1	9	ic_prime_residual_lp README "The gain is also generic"
+residual_lp res4/rho w=0 3.78-4.94	range of 3.78,4.94,4.05,4.54,4.01,3.95	ic_prime_residual_lp README last column
+residual_lp probe+insert per step	quote	ic_prime_residual_lp README "The collector buys its group-operation savings with a table probe and insert on every step"
+res4/rho w=1 bytes excluded 3.6-4.8; as published 41.2-57.6	as stated	research/ic_byte_counter_pricing_20261101/README.md p21-p32 table
+planner_exhaustive 14 sessions, 3,328 records, 2,428 verdicts Lean decide	as stated	research/ic_planner_exhaustive_20261026/README.md intro
+res4/plan w=1 0.888 [0.817,0.965], 0.865 [0.802,0.933]; R3 risky	as stated	ic_planner_exhaustive README:48-49,222
+w=1 ratio ladder 4.92 at 15.7 bits ... 0.865 at 36.25	as stated	ic_planner_exhaustive README:55-58
+curve-free null 15/16; slope 0.460 vs 0.619	as stated	ic_planner_exhaustive README "The gain is generic"
+36-bit: plan 41-47x -> res2 2.6-2.7x	as stated	ic_planner_exhaustive README distance table and bullets
+Leaderboard log row res2 2.59x	2.59	docs/ic/LEADERBOARD.md:33
+No validator on planner_exhaustive	"no validator has run"	ic_planner_exhaustive README:251
+KeyedInvariance.lean path	lean/KeyedInvariance.lean	ls-tree research/ic_planner_exhaustive_20261026/lean/
+Fused: 4x512 records, A/A 1.0000; gae/step 2.005 -> 1.004; w=0 0.56-0.92 range; 1.1-1.3x more steps; C1 not met	as stated	research/ic_residual_fused_20261031/README.md
+res4f distance p36 2.39, p37 2.51 (w=0)	as stated	ic_residual_fused README "Distance to matched rho"
+dp_eq 2x704 records; supersedes dp_20261101 w>0	as stated	research/ic_residual_dp_eq_20261101/README.md
+res1eq 1.54/1.75/2.66 p36; 1.64/1.86/2.83 p37; res1dp 2.13/2.14/2.22, 2.03/2.04/2.07	as stated	ic_residual_dp_eq README "Distance to matched rho"
+eq vs dp unresolved inside band	quote	ic_residual_dp_eq README "eq vs dp"
+Scale 3x288 records, 863 verified, one baseline exhausted at 1e8	as stated	research/ic_residual_scale_20261101/README.md
+Scale res1eq 1.32/2.27, 1.72/2.99, 1.39/2.42; res1dp 2.15/2.25, 2.27/2.28, 1.92/1.93	as stated	ic_residual_scale README
+Scale option B: C1 2 of 8 not 6 of 8; p40 res1eq 1.181 [0.859,1.625]	as stated	ic_residual_scale README "Note, 2026-11-01"
+Unreconciled 9 vs 8 of 12 tally	quote	ic_residual_scale README note "Nobody has reconciled the 9"
+Chain null 0.994 [0.953,1.037]; res1eqc 1.591/1.80/2.73	as stated	research/ic_res1eq_chain_20261101/README.md
+Batch L=64 1.0077 [0.9811,1.0350] holds; L=16 1.0465 [0.9886,1.1078] fails; 3.3-3.4x / 6.6-6.7x; 320/320; L0	as stated	research/ic_residual_batch_ecbench_20261102/README.md
+Multitarget T=64 4.4x below T=1; "multi-target rho reproduced"; k-sum k=4,5 note	as stated	research/ic_largeprime_multitarget_20261102/README.md
+Byte counter finding F1; emit residual.rs; band.rs priced_gae	as stated	research/ic_byte_counter_pricing_20261101/README.md "How a byte count becomes operations"
+Byte share 83-99% at w=1, 40-98% at w=0.1; 17-58x vs 2.6-5x	as stated	ic_byte_counter_pricing README Verdict
+res2 p36 23.3x -> 2.6x	as stated	ic_byte_counter_pricing README planner table
+Option B owner decision 2026-11-01; NON_OPERATION_COUNTERS	as stated	ic_byte_counter_pricing README Status
+136 weighted comparisons: 36 resolved, 12 unresolved, 88 kept	as stated	ic_planner_exhaustive README:327-333
+Second byte counter factor_base_vec_bytes_floor_uncharged 0.4-12% at w=1	as stated	ic_byte_counter_pricing README "A second byte counter"
+Cofactor A/B h=32; 448 pairs on 112 workloads; L1 VM	as stated	research/ic_cofactor_clear_ab_20261103/README.md
+G_0 6.180 [5.915,6.456], G_0.1 6.692, G_1 9.087; h=1 0.989; PC 1.227 [1.149,1.311]; invalid_controls	as stated	ic_cofactor_clear_ab README result table
+Distance ic-clear 9.80 [9.33,10.30]; raw 60.6	as stated	ic_cofactor_clear_ab README measured values table
+Trials per relation 5433 -> 162 (33.6x vs h=32)	as stated	ic_cofactor_clear_ab README mechanism
+Binary lever 1.29/1.58/3.36 at h=2,2,6	as stated	ic_cofactor_clear_ab README "What is new"
+N64 vs N45: 1.001 [0.979,1.022] / 0.967 / 0.834; 576 pairs; 4,704 records; 4,032 replays	as stated	research/p20_large_n_20261029/README.md:9-24
+N45/N32 replication 0.842/0.822/0.751 vs 0.818/0.798/0.726	as stated	p20_large_n README:43
+Profile: 71.8% relations, 27.8% setup; S_ic 9.93 vs S_rho 1.08; admitted L2 144/144	as stated	research/ic_profile_20261029/README.md:13-40
+Amortisation at most 28% (9.93 -> 7.17); 6.7x; relation phase 4.7x; ~7x needed	as stated	ic_profile README:139-144
+target_guard_probes uncharged -> lower bound	quote	ic_profile README:45
+Blocked builder 456/456 identical; S unchanged; L1 descriptive	as stated	docs/ic/LEADERBOARD.md:480
+Packed filter 0.9601 [0.9569,0.9633] -3.99%; S'' 1.0/1.0505/1.3586; 24-bit 1.0032; 28 undecidable; 31.47-31.63x; c8a.2xlarge AMD EPYC 9R45 L2	as stated	benchmarks/README.md row 20261029-ic-packed-filter
+Packed filter validator re-priced bitops with own code	quote	docs/ic/LEADERBOARD.md:465
+Line layout v1: exit code 23, inconclusive	exit 23	research/ic_line_layout_tournament_20261031/TERMINAL-OBSERVATION-20261101.md (digest said exit 42: source wins)
+Line layout v5 qualification stopped, no seed consumed	as stated	TERMINAL-OBSERVATION-V3A2-20261106.md
+Line layout v6 approved conditional on F6b; DEC-20261106-662e33	as stated	DECISION-V6-REDESIGN-20261106.md
+Weight rules W1-W3 withdrawn in ic-planner/4; W3 1.06-1.17x at 36.6-47.2 bits	as stated	ic_planner_exhaustive README §2
+Prime order search 4 sqrt(p); speedups 5x/239x/1,592x; 11 s, 218 s	as stated	research/prime_order_search_20261017/README.md
+Fixed-window generator 200,856 -> 50,490; 1.1606 [1.1268,1.1977]; A/A 1.0442; 5 of 54 slower; one machine	as stated	crypto-autoresearcher:ledger/evidence/EV-ICPERF-92c130.yaml observations/boundaries
+Four-family comparison 48 curves, 24 fields; 1,352/1,167/1,144/859; coset/random 1.020 [0.959,1.083]	as stated	research/factor_base_evaluation_20261015/README.md
+Norm solver 90 rows 229.902 s vs 115 rows 0.268 s; Sage vs native C; 26,497 identities, 402 ranks	as stated	factor_base_evaluation README
+Coincidence ladder slopes in [-0.006,+0.008]; kappa in [0.92,1.08]; 41x/25x/18x; Z/N 0.699/0.649	as stated	research/prime_coincidence_harvest_20261029/README.md Result
+Harvest need 1,874c/101c/29c at 32 bits; kappa <= 1.07; exhausted_at_scale	as stated	prime_coincidence_harvest README "Distance remaining"
+L03 hashed bases 1.000 +- 0.0003, p 2^14-2^22; L07 window 0.713/0.833/0.916 at m=4	as stated	research/ic_prime_eth_leads_20261031/SYNTHESIS.md L03, L07
+Obligation chain six edges; obligations.json, audit.py	as stated	research/ic_weak_assumptions_20261102/README.md Outcome and table
+m=2 yield sweep 0.764-1.108 in nine cells	as stated	ic_weak_assumptions README item 2
+842 rows rank 842 correctness control	as stated	ic_weak_assumptions README item 3
+PKM m=4 D 6,7,7; columns 1,049/9,452/76,837; muladds 4.84e7/8.55e10/2.70e13; 73.25-fold, 558,304-fold	as stated	ic_weak_assumptions README item 1
+All six m=4 natural rows inconsistent (unit ideal)	as stated	ic_weak_assumptions README item 4
+LEAD-ICP-generic-table-decomposition closed_obstructed	closed_obstructed	crypto-autoresearcher:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-generic-table-decomposition.yaml disposition
+Symmetric tower table values (m=2 N=12..18; m=3 N=9..15)	as stated	research/pkm_symmetric_tower_20261026/README.md Verdict table
+Symmetric tower ~10x narrower, ~50x faster at N=12 (14.8 s vs 0.3 s), >20x at N=15	as stated	pkm_symmetric_tower README Reading
+Lead1 m=3 N=18 D=6; 4,5,5,6,6; widest 33,153; 1,941 s; needs >13 GB; 3.1x width, 39x time	as stated	research/pkm_symmetric_lead1_20261026/README.md Verdict and m=3 table
+Lead1 m=4 N=12 plain D 7, width 21,619, 66.4/70.2 s; sym D 8, width 3,663, 8.7/7.9 ms; N=16 sym 13,926, 11.8 s; N=20 aborted 6 GB; 5.9x narrower	as stated	pkm_symmetric_lead1 README m=4 table and Verdict
+Instrument scope restriction (no discriminant/order check; base includes non-lifting abscissae; x_R uniform)	quote	research/prime_one_shot_20261029/README.md "Source inspection adds a more serious scope restriction"
+m=4 N=20 msolve three productive degree-8 rounds 1,241/2,507/3,578; exit 139	as stated	prime_one_shot README "Resource-censored F4" paragraph
+Busy host load 22-25; 19% of a core; 2,024/2,041 s wall vs 384/396 s CPU; planted 0	as stated	prime_one_shot README failures item 1
+N=21 dense block 79,330,205,871 entries ~317 GB; 192 GB floor	as stated	prime_one_shot README failures item 2
+RESTART.md raw runs not pushed (Mac worktree)	quote	prime_one_shot README failures item 3
+Lattes/isogeny null degree-s product polynomial s=16,24,32; p<=1031	as stated	prime_one_shot README failures item 5
+P-224 shape: 89 tower cells, 65 null cells; k/n 0.42-0.70; odd part 6-128 bits; m=2 N=24 OOM 6.0 GB, D>=6	as stated	research/pkm_p224_kummer_shape_20261022/README.md Verdict
+P-224 shape price 18-78x w=0, 19.9-134 w=1; 1,152 runs, 864 replays; 2-32% more GAE	as stated	pkm_p224_kummer_shape README Verdict
+P-224 shape F4 >= 2.4e9 S, ~1.9e9x rho w=0	as stated	pkm_p224_kummer_shape README "Derived"
+Radix verdicts gain_constant (0.173, 0.344, 0.234), no_material_effect 0.538; shape attribution; replicated at 786433; prediction falsified	as stated	research/pkm_radix_grading_20261104/REPORT.md §1
+Radix table values	as stated	pkm_radix_grading REPORT §2 table
+t=14: cap 5 no refutation, d_F >= 6; cap-6 112 GiB 86,400 s owed	as stated	research/prime_fall_degree_t14_20261101/README.md
+LEAD-ICP-pkm-tower-algebraic-oracle open_blocked	open_blocked	crypto-autoresearcher atlas yaml disposition
+Isogeny vs mu: p<=40961; Q1 null 15/15 (-0.020..+0.029); within 3%; lex 6.4-11.7 -> 1.9-2.6; grevlex 0/16; 0 of 11,811 reach density 1	as stated	research/isogeny_vs_mu_factor_base_20261102/reports/run-20261102T0139Z/REPORT.md Results
+Isogeny vs mu systems 6,144 and 6,828+4,704	as stated	same REPORT Run identity
+APS: tiny public fixtures; paper 11-22-bit ladder not reproduced	quote	research/aps_extensions_20261026/README.md lines 5-9
+APS extension details (labels, cubic H, S3 rewrite (e2-a)^2-4e1(e3+b), j=0 orbit, 2ceil(log2 s)(ceil(log2 s)-1) colourings, MAX_FIELD 65521)	as stated	aps_extensions README "The five extensions"
+APS replay: three fixtures, twelve arms	as stated	research/aps_independent_replay_20261029/README.md Scope
+APS 5,002 passed, 0 failed, 122 ignored; seven Lean lemmas	as stated	research/aps_followup_20261028/README.md:5-6
+APS instrument caps 65,521 / 32 / 128; total_gae lower bound; no benchmark launched	as stated	research/aps_measurement_20261029/README.md
+APS leads L1 chart U=t^2, V=c/t, H formula; PCC-20261105-aca921, -ac1e93 unverified	as stated	research/aps_leads_20261105/README.md
+Digit closed form d_ff = m2^{m-1}+floor((s-2^{m-1})/2)+1 (cross-ref)	in summer.tex	papers/.../summer.tex:201 area
+Digit d_last=4+floor(s/2) 106/106; m=3 ffd 13 on 8, d_last 13 on 4	as stated	research/prime_digit_presentation_20261029/README.md Result
+Digit support-matched null s+3 on 44/44; block null 44/44; plain p+2 32/32	as stated	prime_digit_presentation README Result
+Digit Macaulay span 100/98/96/83/81/60%, 60% at s=8	as stated	prime_digit_presentation README Result
+Digit table rows (draws, primes, d, D_null, cols)	as stated	prime_digit_presentation README §3 table (U arm)
+Digit limits u32 accumulators p<2^12; s=8 two planted draws, 39,203 columns, ~11 min; NullTable.lean; Wilson rank theorem	as stated	prime_digit_presentation README §5 Limits
+p3 second-digit carry protocol frozen, not run	as stated	research/p3_second_digit_carry_20261101/README.md
+Secant: d+1 vs 2d+1 theorem; Lean F17 5->3; 159 declarations, fourteen modules	as stated	research/prime_factor_base_degree_20261031/README.md "Concrete semantic/degree theorem", "Checked Lean continuation"
+Secant measured: 14,220 attempted, 14,194 verified, 26 caps (F127 d5 2,044/2,070)	as stated	prime_factor_base_degree_20261031/parallel_20261031/RESULTS.md
+Secant degrees F17 3/4/6; F83,F101,F127 d+1 / 2d / 2d+2	as stated	RESULTS.md degree table
+Secant work 976 pairs, 2,102 rows vs dense 344, 736	as stated	RESULTS.md work table
+Equal-size yield K^2-K	as stated	RESULTS.md last paragraph
+Boolean offset degree 7 vs 9; XOR 7->6, one-hot 7->5	as stated	prime_factor_base_degree README "Four complete selector presentations", "Boolean ordinate offsets"
+LEAD-ICP-split-graph-secant-presentation open_next_step	open_next_step	atlas yaml disposition
+One-shot: cannot deliver original sub-exponential; complexity lemma unproved	quote	research/prime_one_shot_20261029/README.md opening
+Direct IC F17: 90 cases 42 SAT 48 UNSAT 400 models; 18 targets; 230 attempts, 217 calls, 59,024 pairs	as stated	research/prime_one_shot_20261029/continuation/README.md:23-29
+Coverage rho_g >= 1/(192 m 16^m); conservative 1/(320 m 16^m)	as stated	continuation README:64,103
+p(p-1) pairs per call; Theta(2^{2n})	as stated	continuation README "Why this still is exponential"
+2^{4 sqrt n+O(log n)} calls; LA 2^{6 sqrt n+O(log n)}	as stated	continuation README "A sufficient oracle contract"
+LEAD-ICP-shared-coefficient-membership open_next_step; problems/prime-divisor-uniform-solver.md	as stated	atlas yaml; ls-tree problems/
+Norm encoding O(mb^2) edges	as stated	continuation/tensor-review/README.md "Why the tensor theorem does not automatically settle our norm candidate"
+SMT UNKNOWN at 120 s (cross-ref)	in prog_prime	papers/.../prog_prime.tex "Three frozen SMT formulations"
+Lead review: tensor route ranked first; O(mb)-edge network vs CNF	quote	research/prime_ic_lead_review_20261031/README.md Result
+CDCL(T) screen drafted not frozen	quote	prime_ic_lead_review README Status
+Shared-coefficient E0 18/18; 6 SAT 12 UNSAT; E1 36/36 and 42/42	as stated	research/prime_shared_coefficient_sat_20261031/README.md Outcome
+Elimination register rank 2: "representation gate passed; performance implementation-blocked"	quote	research/prime_ic_elimination_20261101/README.md register row 2
+ETH leads table values (L01..L12)	as stated	research/ic_prime_eth_leads_20261031/SYNTHESIS.md §2 table and §3
+SAT lane "closed for exponent purposes"; CaDiCaL ExternalPropagator untested	quote	SYNTHESIS.md §1
+m=3 SAT censored above b~12	as stated	SYNTHESIS.md §6 item 6
+Corrections g>16c; log2 b > 256c^2; 3,364 edges per slot-bit; 11.9k per bit at b=131; 1e5 is 9-30x high	as stated	SYNTHESIS.md §6 items 2-3
+Exponent question lives in PKM m>=4 cells and contractor exponent	quote	SYNTHESIS.md §1 and §7
+Raw lead dirs on external volume	quote	SYNTHESIS.md header "All paths ... /Volumes/SSD990-2/..."
+Small-root correction CORR-20261024-b2a799: 0.8408 -> 0.2803; -0.0481 -> -0.6086	as stated	crypto-autoresearcher:analysis/smallroot-reach/CORRECTION.md table
+Correction method eps_HG = eps_TOOL/n; EXP-ECDLP-64fa3d not run	as stated	CORRECTION.md "What was wrong" and status
+Demand eps_required(4,2)=8/9=0.8889	as stated	research/smallroot_optimal_reach_20261026/README.md verdict table
+Equal-bound reach 0.3293 (vol 14/3), 0.3536 (vol 4); 11/11 attained; margin -0.56 proved	as stated	smallroot_optimal_reach README verdict table
+Any monomial set: h_N(delta)<1; eps<3/4 (3 unknowns), <1/2 (2); 9,600 cases 0 violations; joint nu_s/s >= 2.08 s<=3 computed	as stated	research/smallroot_followups_20261026/README.md Verdict
+Theorem K sum delta_i W_i <= 1; eps <= 1/min W_i = 1/2	as stated	research/prime_eform_reach_20261029/README.md Result
+e-form delta_B <= 2/(m(m+1)2^{m-1}) = 1/6, 1/24, 1/80; z=0 counterexample 7/41=0.1707	as stated	prime_eform_reach README Result
+S4/S5 cap 1/21.8, 1/70.8; 5.5x, 14.2x short; no Lean	as stated	research/prime_s5_small_root_leads_20261028/README.md:60-70
+Bochum preprint v0.2, claimed 2^{O(b/(log b)^{1/4})}; Theorem 4 conditional on Theorem 2 / D.1	as stated	research/prime_one_shot_20261029/continuation/tensor-review/README.md
+Pins: bochum 1ee44e56..., PDF 82e27362...; openai 7ef5c0cc..., PDF 5b1612dc...	as stated	research/prime_ic_elimination_20261101/README.md "Primary sources checked"; tensor-review/source-triage.md:49,75,195-196
+Later publisher commit 42907c9e same PDF	as stated	research/hashed_ecdl_entry_cost_20261104/README.md "Scope and sources"
+D.1 bound (s+L_in)^{O(1)} 2^{O(s/sqrt(log s))}	as stated	tensor-review/README.md "The actual mathematical mechanism"
+Multiplication O(b) edges, degree O(b^{3/4}); O(mb) edges; total 2^{O(b/m+mb/sqrt(log b))}; m ~ (log b)^{1/4}	as stated	tensor-review/README.md
+Two readings found no concrete gap; scoped, not certification	quote	tensor-review/README.md "What the primary-proof checks actually support"
+Provenance labels not endorsement	quote	tensor-review/source-triage.md:22-27
+Crate 34 release tests	34	tensor-review/README.md; continuation/README.md
+GMP unit 72 cases, 308 charts, 8,832 node, 1,152 final, four negative controls	as stated	tensor-review/README.md "What has not been established here"
+Rust port 19 Go tests, byte-identical; exponential counters	as stated	research/ecdl_tensor_ic_rust_port_20261029/README.md
+Speed study instrument ready, not run; one relation ~|F1||F2| ~ 2r	as stated	research/ecdl_tensor_ic_speed_20261030/README.md
+Counts protocol v2; no session under either version	quote	research/hashed_ecdl_counts_20261031/README.md "No session has run under either version."
+Finite-size fallback; five routes; enumerating selectors stays generic	as stated	research/hashed_ecdl_finite_size_20261030/README.md
+ECCp-131 certified hash modulus s=3102808443644027376164572183694178153449	as stated	hashed_ecdl_finite_size README "Scope and identities"
+L09 margin -16.1..-16.3; lambda >= 2^85; 37x to 41,000x	as stated	SYNTHESIS.md §1, §2
+L06 MMD+ 15..51 vs enum 2..10.7	as stated	SYNTHESIS.md §2, §3 L06
+Elimination rank-1 row: fallback rejected; lambda=2^480; 154-354 edges; 7-15 classes; cap-1 nulls same rank; state string	quote	prime_ic_elimination README register row 1
+Rank-census portfolio E0-E5 and E1S; gates (20%, 2x, four sizes)	as stated	research/tensor_boolean_breakthrough_20261031/README.md Portfolio table
+E0 core implemented, nothing affected measured	quote	tensor_boolean_breakthrough README Status
+PCC-20261104-1df881 unverified; PCC-20261104-458dda	as stated	hashed_ecdl_entry_cost README; pcc/claims/*.json statements; pcc/ledger.jsonl has registration only
+EcGFp5 field p=2^64-2^32+1, z^5-3 irreducible; one rational 2-torsion point	as stated	research/ecgfp5_lead_evaluation_20261031/README.md:108-110
+summer stale statement DEC-20260923-d86ff2	quote	papers/.../summer.tex:237
+Desk: >=2^142 not a lower bound; 2^102.4; 5!=120	as stated	ecgfp5_lead_evaluation README item 1
+Desk: c^{1/3}, 2^{115.5+log2(c)/3}; 2^126-2^136	as stated	ecgfp5_lead_evaluation README item 2
+Desk: 32-45 bits below rho; rho 2^159.3 steps, 2^169 words	as stated	ecgfp5_lead_evaluation README item 3
+Desk: 2^57-2^63 columns; 2^64-2^71 bytes vs 2^35-2^45; 2^27 above rho at a petabyte	as stated	ecgfp5_lead_evaluation README item 4
+Desk verdicts REVISE/CLOSE/CLOSE/REVISE; genus 65/97; >= 2^206; 2^63 queries	as stated	ecgfp5_lead_evaluation README item 7 and table lines 97-100
+JV (n-1): 2^131.6 c~, c~ 2^33.5-2^34.4, +-2.5 bits, 2^71 bytes, loses for B <= 2^62.5	as stated	ecgfp5_lead_evaluation README:98
+Atlas dispositions gfp5-symmetrized-gaudry closed_dominated; odd-char-cover open_blocked	as stated	crypto-autoresearcher atlas yaml dispositions
+Quotient solve primes 4111, 262231, 33554371; msolve 0.6.5; 4-vCPU	as stated	research/ecgfp5_quotient_solve_20261101/README.md Answer
+D = 2^16 = 65,536 = 8^5*2 Bezout	as stated	ecgfp5_quotient_solve README Answer 1
+c_cyc 2^46.30/2^46.56/2^46.63; CLOSE margins 0.30/0.56/0.63	as stated	ecgfp5_quotient_solve README Answer 3
+F4 p-independent, final matrix 5578 x 71114; F4 alone 2^44.7-2^45.3; two-thirds parametrisation	as stated	ecgfp5_quotient_solve README Answer 4-5 (digest gave 2^44.72-2^45.29; source table gives 44.72 / 45.05 / 45.29, used)
+Weighted orders, sba no improvement	as stated	ecgfp5_quotient_solve README Answer 6
+m=3 30 solves; msolve SIGSEGV 65537-253229; 65551 replaced	as stated	ecgfp5_quotient_solve README §2
+BW: speed-up 1.83/1.97/1.72; CPU-s 16,912/18,823/22,516 vs 31,004/37,036/38,778	as stated	research/ecgfp5_quotient_bw_finish_20261102/README.md table
+BW: log2 c 45.43/45.58/45.84; bands; 0.57/0.42/0.16 below; PROMOTE distance 7.43/7.58/7.84	as stated	ecgfp5_quotient_bw_finish README Answer 4
+BW: 4,920 chains, stab_fail=0; finish 3.15/4.12/3.26x; 1.5x bar	as stated	ecgfp5_quotient_bw_finish README Answer 1-3
+HNF dev p=331 killed at 13.33 GiB on 15.7 GiB	as stated	research/ecgfp5_quotient_hnf_finish_20261102/README.md:9-31
+Representation audit: one 2-torsion point, no 4-torsion; u=x/y; D 16, 512 at m=3,4	as stated	research/ecgfp5_representation_audit_20261102/README.md
+CORR-20261102-7e3a91 scopes CORR-20260923-064d0d	as stated	crypto-autoresearcher:ledger/corrections/CORR-20261102-7e3a91.yaml header
+Gaudry D4 ecbench p=29: #E=708,208=16*44,263; S 7.17e8 vs 1.065; audit 3/3	as stated	research/gaudry_quartic_d4_ecbench_20261013/README.md
+C4 1.209e12 -> 8.69e10, 13.90x	as stated	benchmarks/README.md row 20261019-s5-plain-c4-options
+Shape replay 2-5% lever	quote	research/gaudry_quartic_replay_20261013/README.md title
+ECCp-131 v_2(p-1)=1	quote	research/eccp131_structured_ic_20261022/REPORT.md "v_2(p-1)=1"
+Full-width: 301 orders, 2 divisible by 256 (b=278,301), first accepted E' b=301; 256/256; 8/8 Velu; 115 lifted; 26,450 pair points; 8/8 planted; 0/0 rows, rank 0	as stated	research/eccp131_full_width_20261023/REPORT.md Observations table 
+Coset screen mu5 12 arms, mu10 16 arms; p-1=2*5*r; 0 rows rank 0; planted 192/192, 256/256	as stated	eccp131_structured_ic_20261022/REPORT.md Raw observations
+Representation filter 3,450 configs x 6 cells; lower ratios < 1; B=64, 256 post-add Theta(B^2); verdict string; 0 rows rank 0 arity 2,3	as stated	research/eccp131_representation_filter_20261102/REPORT.md Outcome and phase ledger
+CUDA port never run on GPU; compiles sm_80..sm_120	as stated	research/certicom131_cuda_port_20261023/README.md
+NIST skip filter: 21 candidates, 10 published, 21 new features negative, ~60 earlier	as stated	research/nist_seed_skip_filter_20261017/README.md
+Skip criterion two-test separator, calibration	as stated	research/nist_skip_criterion_20261025/README.md
+Dissection 8 of 9 integers; 444-bit composite	as stated	research/nist_skipped_curve_dissection_20261021/README.md
+P-224 2-rank 6 (P-256 4); h ~ 3.5185e32 = 2^108.1167; GRH interval 2^108.098-2^108.135	as stated	research/p224_class_number_20261022/README.md table lines 44-51
+2-rank null 91.5th percentile, 12.3% [10.3,14.5]	as stated	research/p224_two_rank_null_20261022/README.md
+Cheon P-224 H3 failed 5 of 84; ratios withdrawn; Cheon-only scaling stands	as stated	research/cheon_p224_shape_20261022/REPORT.md review qualification
+Special primes k > 4000; pairing-friendly 10-24	as stated	research/special_prime_curves_20261023/README.md Result
+BEST2 stays disabled	quote	research/nist_best2_small_batch_20261027/README.md
+Not verified / omitted: wide target batching (ic_wide_batching_20261028, ic_wide_ext_20261028 absent from origin/main); stride-renew prime PR #2826 (not on main); EcMasFp5 twist 101.9321 bits (source not located in crypto); arity sweep's exhaustive exponents 0.99/1.01 from digest (not in the README read)	omitted	ls-tree origin/main research/ (no such dirs)
+W0 CPU-s at p=33554371	38,778 (BW table) vs 38,779 (quotient-solve table)	ecgfp5_quotient_bw_finish README table vs ecgfp5_quotient_solve README table: 1 CPU-s rounding difference between the two sources; draft uses 38,778 from the BW study

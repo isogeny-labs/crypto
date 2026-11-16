@@ -1,0 +1,99 @@
+{
+  "candidate_id": "spike32",
+  "coordinate_bit": 32,
+  "created_utc": "2026-10-31T10:13Z",
+  "file_layout": "Source protocol and source index are JSON with SHA-256 sidecars. The inner launch command and producer are UTF-8 shell text. Submission and failed-verifier records are typed JSON with adjacent Markdown explanations. Generated binary factor-base shards, family manifests, and final S3 object index are described by the frozen protocol and FORMAT.json; they remain content-addressed in their per-job results prefixes and are not duplicated in this small index.",
+  "files": [
+    {
+      "bytes": 1035,
+      "path": "evidence/n83-factorbase-variants/r32-attempt-01/submission-20261031T1007Z/README.md",
+      "readback_byte_equal": true,
+      "role": "human-readable submission and current-state explanation",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/evidence/submission-20261031T1007Z/README.md",
+      "sha256": "1e84959b15884b1676f4e321d4f1d546c5654e5ba5e9e536e59508099cb8a0ba"
+    },
+    {
+      "bytes": 935,
+      "path": "evidence/n83-factorbase-variants/r32-attempt-01/submission-20261031T1007Z/submission-tool.json",
+      "readback_byte_equal": true,
+      "role": "typed Job identity, resource request, frozen hashes and S3 prefix",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/evidence/submission-20261031T1007Z/submission-tool.json",
+      "sha256": "9195ccd3aef8cba8a5bdb1ccb2a2e70510243d53f921f9b6aee0602c01605254"
+    },
+    {
+      "bytes": 511,
+      "path": "evidence/n83-factorbase-variants/r32-attempt-01/submission-20261031T1007Z/wrapper-command.sh.txt",
+      "readback_byte_equal": true,
+      "role": "exact shell wrapper that stages verified source assets before the frozen runner",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/evidence/submission-20261031T1007Z/wrapper-command.sh.txt",
+      "sha256": "c68125881726b3e5eac7af6689b8bc89d0daa5bb2c50058506d54c10e043bbf6"
+    },
+    {
+      "bytes": 82764,
+      "path": "protocol-factor-base-variants-v9-r29-39.json",
+      "readback_byte_equal": true,
+      "role": "frozen experiment scope, coordinate map, shard layout and run semantics",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/source-v9/protocol-factor-base-variants-v9-r29-39.json",
+      "sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2"
+    },
+    {
+      "bytes": 111,
+      "path": "protocol-factor-base-variants-v9-r29-39.sha256",
+      "readback_byte_equal": true,
+      "role": "checksum sidecar for frozen protocol",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/source-v9/protocol-factor-base-variants-v9-r29-39.sha256",
+      "sha256": "d94ee42ad9ed8864ac06242db81987a0f9a8bcae035436f56326cee20c43ef88"
+    },
+    {
+      "bytes": 2589,
+      "path": "factor-base-variant-source-index-v9-r29-39.json",
+      "readback_byte_equal": true,
+      "role": "source-file inventory, sizes and SHA-256 values",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/source-v9/factor-base-variant-source-index-v9-r29-39.json",
+      "sha256": "f87e444e174be8c1436b5380208a682c4b79c247b381ff6b3240d53f5730ece8"
+    },
+    {
+      "bytes": 114,
+      "path": "factor-base-variant-source-index-v9-r29-39.sha256",
+      "readback_byte_equal": true,
+      "role": "checksum sidecar for source index",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/source-v9/factor-base-variant-source-index-v9-r29-39.sha256",
+      "sha256": "8318b91ed8f688816bd2862f943183ba29ec24d3e189346d6479febd9472fdce"
+    },
+    {
+      "bytes": 2577,
+      "path": "evidence/n83-factorbase-variants/r32-attempt-01/frozen-20261031T0919Z/job-command.sh.txt",
+      "readback_byte_equal": true,
+      "role": "inner frozen coordinate-specific launch command",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/source-v9/job-command.sh.txt",
+      "sha256": "3a190a09edd4854899a69722d15ea682c5020f2f961f44fa6e1c4bc940913c3e"
+    },
+    {
+      "bytes": 6888,
+      "path": "run-base-variant-v2.sh",
+      "readback_byte_equal": true,
+      "role": "shard producer and S3 persistence runner",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r32-20261031-r1/source-v9/run-base-variant-v2.sh",
+      "sha256": "a880a3e5bc844b4391af27e170ac88da9a727a453aec463360f405bb970acd98"
+    },
+    {
+      "bytes": 699,
+      "path": "evidence/n83-factorbase-variants/r30-attempt-01/index-verification-attempt-02/README.md",
+      "readback_byte_equal": true,
+      "role": "verifier failure interpretation; no point data altered",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r30-20261031-r1/evidence/index-verification-attempt-02/README.md",
+      "sha256": "32f931acd305998ec22caf3faa7c9de6dffa13f085ec11beb2778eafb794efdf"
+    },
+    {
+      "bytes": 624,
+      "path": "evidence/n83-factorbase-variants/r30-attempt-01/index-verification-attempt-02/verification-job-status.json",
+      "readback_byte_equal": true,
+      "role": "typed terminal failure record, empty logs and empty results",
+      "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r30-20261031-r1/evidence/index-verification-attempt-02/verification-job-status.json",
+      "sha256": "5c4467fc7245d1ef8aaff3bec6436b8b5929b6f3a2f1e39e3c937a8fa00c0ef9"
+    }
+  ],
+  "job_name": "n83-fb-variants-r32-20261031-r1",
+  "job_state_at_capture": "pending; no output shards yet",
+  "schema": "n83.factorbase-artifact-index/v1"
+}

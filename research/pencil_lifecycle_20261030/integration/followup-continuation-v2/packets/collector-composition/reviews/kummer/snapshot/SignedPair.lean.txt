@@ -1,0 +1,35 @@
+import Product
+set_option autoImplicit false
+namespace SignedPair
+variable {A K : Type} [AddCommGroup A]
+-- The fiber property is a geometric obligation, not established here.
+theorem unique_signed_lift (pi : A → K)
+ (fiber : ∀x y, pi x=pi y ↔ y=x ∨ y= -x)
+ (g d e : A) (hg : g+g≠0)
+ (he : pi d=pi e) (hn : pi (g+d)=pi (g+e)) : e=d := by
+ rcases (fiber d e).mp he with h|h
+ · exact h
+ · rcases (fiber (g+d) (g+e)).mp hn with hplus|hminus
+   · exact add_left_cancel hplus
+   · exfalso
+     apply hg
+     calc
+       g+g = (g+e)+(g+d) := by rw [h, add_add_add_comm, neg_add_cancel, add_zero]
+       _ = 0 := by rw [hminus]; simp
+
+-- Directly fits the candidate filter: two valid fiber/neighbour matches coincide.
+theorem filter_unique (pi : A → K)
+ (fiber : ∀x y, pi x=pi y ↔ y=x ∨ y= -x)
+ (g d e : A) (k l : K) (hg : g+g≠0)
+ (hd : pi d=k) (he : pi e=k)
+ (hnd : pi (g+d)=l) (hne : pi (g+e)=l) : e=d :=
+ unique_signed_lift pi fiber g d e hg (hd.trans he.symm) (hnd.trans hne.symm)
+
+-- Quotient fibers are equal up to sign. At anchor zero both signs survive.
+theorem zero_anchor_ambiguity {A : Type} [AddCommGroup A] (d : A) (hd : d ≠ -d) :
+ ((-d)=d ∨ (-d)= -d) ∧ ((0+(-d))=(0+d) ∨ (0+(-d))= -(0+d)) ∧ (-d)≠d := by
+ exact ⟨Or.inr rfl,Or.inr (by simp),Ne.symm hd⟩
+end SignedPair
+#print axioms SignedPair.unique_signed_lift
+#print axioms SignedPair.filter_unique
+#print axioms SignedPair.zero_anchor_ambiguity

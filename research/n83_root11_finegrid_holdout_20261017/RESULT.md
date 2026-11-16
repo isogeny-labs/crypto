@@ -8,6 +8,11 @@ with **509,952 usable factor-base points**, **3,072 folded columns**, and a
 K3072 was already a fixed arm, so the 24-point Tier 1 holdout resolves to
 three distinct candidates: K2543, K2816, and K3072.
 
+
+## Source-linked reports
+
+Generated run and results reports, the plotting source, and the graph are in [reports/finegrid_benchmark/](reports/finegrid_benchmark/). Rebuild them from the committed arm records with [build_reports.py](reports/finegrid_benchmark/build_reports.py).
+
 | K | Usable points | Folded columns | Geometric online mean, ms | Median online, ms | Complete shared-setup process, s | Geometric online ratio K/K3072 | Descriptive 95% interval |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 2752 | 456,832 | 2,752 | 20.796 | 27.618 | 529.493 | 1.268 | [0.931, 1.727] |

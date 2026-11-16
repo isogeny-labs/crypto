@@ -1,0 +1,699 @@
+{
+  "argv": [
+    "/tmp/claude-0/-home-user/717e4727-b5a7-5b25-924a-7b31edb43331/scratchpad/r71_bin",
+    "modpoly",
+    "71",
+    "103",
+    "100000",
+    "103",
+    "research/isogeny_fibers_20261010/round7/r7_1_complete_cost/modpoly_grid_b.json"
+  ],
+  "counted": "Phi_l mod p: counted port of the library's q-series builder (same loops; lazy u128 accumulation with bulk M/A counts, tested equal to a per-operation port and to the library table); evaluation of Phi_l(j, Y); root finding (gcd with Y^p - Y, Cantor-Zassenhaus); Elkies kernel polynomial (counted port of kernel::elkies_isogeny without its verify_kernel certificate, partial derivatives from shared row sums); the library's Elkies kernel is compared for equality (uncounted wall time)",
+  "field_bits": 61,
+  "mode": "modpoly",
+  "rows": [
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 16838,
+          "I": 151,
+          "M": 19450,
+          "Meq": 33191,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1330772634996475028,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.078469437,
+        "eval": {
+          "A": 5329,
+          "I": 0,
+          "M": 5401,
+          "Meq": 5401,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 623131,
+          "I": 73,
+          "M": 492378,
+          "Meq": 499021,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 1389074817,
+        "I": 1,
+        "M": 1389267238,
+        "Meq": 1389267329,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 1.861401389,
+      "chi_m7": 1,
+      "crater_j": 1330772634996475028,
+      "desc": {
+        "crater_root_multiplicity": 1,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 16838,
+          "I": 151,
+          "M": 19450,
+          "Meq": 33191,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 992243332154110299,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.082822191,
+        "eval": {
+          "A": 5329,
+          "I": 0,
+          "M": 5401,
+          "Meq": 5401,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 71,
+        "roots": {
+          "A": 1834105,
+          "I": 77,
+          "M": 1479014,
+          "Meq": 1486021,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 71,
+      "floor_j": 992243332154110299,
+      "library_phi_wall_s_contended": 68.208627365,
+      "p": 1330772634996478403,
+      "phi_checks_passed": 2494,
+      "port_equals_library_phi": true
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 17785,
+          "I": 155,
+          "M": 20525,
+          "Meq": 34630,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1675389574605064808,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.045056122,
+        "eval": {
+          "A": 5625,
+          "I": 0,
+          "M": 5699,
+          "Meq": 5699,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 661885,
+          "I": 75,
+          "M": 526937,
+          "Meq": 533762,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 1589850199,
+        "I": 1,
+        "M": 1590058917,
+        "Meq": 1590059008,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 2.144307896,
+      "chi_m7": -1,
+      "crater_j": 1675389574605064808,
+      "desc": {
+        "crater_root_multiplicity": 0,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 17785,
+          "I": 155,
+          "M": 20525,
+          "Meq": 34630,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 682546252796916232,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.043154063,
+        "eval": {
+          "A": 5625,
+          "I": 0,
+          "M": 5699,
+          "Meq": 5699,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 74,
+        "roots": {
+          "A": 1848900,
+          "I": 69,
+          "M": 1503633,
+          "Meq": 1509912,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 73,
+      "floor_j": 682546252796916232,
+      "library_phi_wall_s_contended": 76.077114725,
+      "p": 1675389574605068183,
+      "phi_checks_passed": 2637,
+      "port_equals_library_phi": true
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 20784,
+          "I": 167,
+          "M": 23924,
+          "Meq": 39121,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1476584453352521282,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.183668347,
+        "eval": {
+          "A": 6561,
+          "I": 0,
+          "M": 6641,
+          "Meq": 6641,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 751745,
+          "I": 81,
+          "M": 606370,
+          "Meq": 613741,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 2335126661,
+        "I": 1,
+        "M": 2335389742,
+        "Meq": 2335389833,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 2.08811513,
+      "chi_m7": 1,
+      "crater_j": 1476584453352521282,
+      "desc": {
+        "crater_root_multiplicity": 1,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 20784,
+          "I": 167,
+          "M": 23924,
+          "Meq": 39121,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1182214488703823728,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.158263325,
+        "eval": {
+          "A": 6561,
+          "I": 0,
+          "M": 6641,
+          "Meq": 6641,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 79,
+        "roots": {
+          "A": 2226529,
+          "I": 84,
+          "M": 1832812,
+          "Meq": 1840456,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 79,
+      "floor_j": 1182214488703823728,
+      "library_phi_wall_s_contended": 159.915855766,
+      "p": 1476584453352524657,
+      "phi_checks_passed": 3090,
+      "port_equals_library_phi": true
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 22913,
+          "I": 175,
+          "M": 26335,
+          "Meq": 42260,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 2275777745638114784,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.144834443,
+        "eval": {
+          "A": 7225,
+          "I": 0,
+          "M": 7309,
+          "Meq": 7309,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 830765,
+          "I": 86,
+          "M": 676849,
+          "Meq": 684675,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 2970873699,
+        "I": 1,
+        "M": 2971177822,
+        "Meq": 2971177913,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 8.647068374,
+      "chi_m7": -1,
+      "crater_j": 2275777745638114784,
+      "desc": {
+        "crater_root_multiplicity": 0,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 22913,
+          "I": 175,
+          "M": 26335,
+          "Meq": 42260,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 2177624691710255131,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.129421518,
+        "eval": {
+          "A": 7225,
+          "I": 0,
+          "M": 7309,
+          "Meq": 7309,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 84,
+        "roots": {
+          "A": 2485660,
+          "I": 86,
+          "M": 2064156,
+          "Meq": 2071982,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 83,
+      "floor_j": 2177624691710255131,
+      "library_phi_wall_s_contended": 187.284378427,
+      "p": 2275777745638118159,
+      "phi_checks_passed": 3412,
+      "port_equals_library_phi": true
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 26301,
+          "I": 187,
+          "M": 30169,
+          "Meq": 47186,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1626714809642600716,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.152956058,
+        "eval": {
+          "A": 8281,
+          "I": 0,
+          "M": 8371,
+          "Meq": 8371,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 934452,
+          "I": 91,
+          "M": 770656,
+          "Meq": 778937,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 4177049871,
+        "I": 1,
+        "M": 4177423237,
+        "Meq": 4177423328,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 6.174517739,
+      "chi_m7": -1,
+      "crater_j": 1626714809642600716,
+      "desc": {
+        "crater_root_multiplicity": 0,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 26301,
+          "I": 187,
+          "M": 30169,
+          "Meq": 47186,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 470177380271566295,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.112805771,
+        "eval": {
+          "A": 8281,
+          "I": 0,
+          "M": 8371,
+          "Meq": 8371,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 90,
+        "roots": {
+          "A": 2738963,
+          "I": 85,
+          "M": 2295292,
+          "Meq": 2303027,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 89,
+      "floor_j": 470177380271566295,
+      "library_phi_wall_s_contended": 209.578881927,
+      "p": 1626714809642604091,
+      "phi_checks_passed": 3925,
+      "port_equals_library_phi": true
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 31183,
+          "I": 203,
+          "M": 35687,
+          "Meq": 54160,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1861522094205077312,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.247254192,
+        "eval": {
+          "A": 9801,
+          "I": 0,
+          "M": 9899,
+          "Meq": 9899,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 1074475,
+          "I": 99,
+          "M": 788537,
+          "Meq": 797546,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 6363480539,
+        "I": 1,
+        "M": 6363961573,
+        "Meq": 6363961664,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 9.697219768,
+      "chi_m7": -1,
+      "crater_j": 1861522094205077312,
+      "desc": {
+        "crater_root_multiplicity": 0,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 31183,
+          "I": 203,
+          "M": 35687,
+          "Meq": 54160,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1534247605781095699,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.156341021,
+        "eval": {
+          "A": 9801,
+          "I": 0,
+          "M": 9899,
+          "Meq": 9899,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 98,
+        "roots": {
+          "A": 3259890,
+          "I": 96,
+          "M": 2493288,
+          "Meq": 2502024,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 97,
+      "floor_j": 1534247605781095699,
+      "library_phi_wall_s_contended": 337.490421201,
+      "p": 1861522094205080687,
+      "phi_checks_passed": 4665,
+      "port_equals_library_phi": true
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 33780,
+          "I": 211,
+          "M": 38620,
+          "Meq": 57821,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1211860784581945172,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.183005162,
+        "eval": {
+          "A": 10609,
+          "I": 0,
+          "M": 10711,
+          "Meq": 10711,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 1113404,
+          "I": 104,
+          "M": 754775,
+          "Meq": 764239,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 7756068957,
+        "I": 1,
+        "M": 7756610833,
+        "Meq": 7756610924,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 10.322438831,
+      "chi_m7": -1,
+      "crater_j": 1211860784581945172,
+      "desc": {
+        "crater_root_multiplicity": 0,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 33780,
+          "I": 211,
+          "M": 38620,
+          "Meq": 57821,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1035347063693355630,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.11264063,
+        "eval": {
+          "A": 10609,
+          "I": 0,
+          "M": 10711,
+          "Meq": 10711,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 102,
+        "roots": {
+          "A": 3312620,
+          "I": 90,
+          "M": 2354461,
+          "Meq": 2362651,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 101,
+      "floor_j": 1035347063693355630,
+      "library_phi_wall_s_contended": 301.910749086,
+      "p": 1211860784581948547,
+      "phi_checks_passed": 5059,
+      "port_equals_library_phi": true
+    },
+    {
+      "asc": {
+        "cz_splits": 0,
+        "elkies": {
+          "A": 35118,
+          "I": 215,
+          "M": 40130,
+          "Meq": 59695,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 1914630251581032112,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.206901485,
+        "eval": {
+          "A": 11025,
+          "I": 0,
+          "M": 11129,
+          "Meq": 11129,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 1,
+        "roots": {
+          "A": 1147685,
+          "I": 105,
+          "M": 771164,
+          "Meq": 780719,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "asc_reaches_crater": true,
+      "build": {
+        "A": 8538317649,
+        "I": 1,
+        "M": 8538891782,
+        "Meq": 8538891873,
+        "W": 0,
+        "WA": 0
+      },
+      "build_wall_s_contended": 8.393439232,
+      "chi_m7": -1,
+      "crater_j": 1914630251581032112,
+      "desc": {
+        "crater_root_multiplicity": 0,
+        "cz_splits": 5,
+        "elkies": {
+          "A": 35118,
+          "I": 215,
+          "M": 40130,
+          "Meq": 59695,
+          "W": 0,
+          "WA": 0
+        },
+        "elkies_codomain_j": 398741418823522300,
+        "elkies_kernel_equals_library": true,
+        "elkies_ok": true,
+        "elkies_wall_s_contended": 0.223368183,
+        "eval": {
+          "A": 11025,
+          "I": 0,
+          "M": 11129,
+          "Meq": 11129,
+          "W": 0,
+          "WA": 0
+        },
+        "rational_roots": 104,
+        "roots": {
+          "A": 3401618,
+          "I": 89,
+          "M": 2409784,
+          "Meq": 2417883,
+          "W": 0,
+          "WA": 0
+        }
+      },
+      "ell": 103,
+      "floor_j": 398741418823522300,
+      "library_phi_wall_s_contended": 381.39168997,
+      "p": 1914630251581035487,
+      "phi_checks_passed": 5262,
+      "port_equals_library_phi": true
+    }
+  ],
+  "sutherland_crt": "not implemented",
+  "total_wall_s_contended": 1773.609204515,
+  "unit": "M = F_p mults+squarings (incl. schoolbook/Karatsuba coefficient products); W = word mults mod 62-bit NTT primes, counted as 1 M; I = F_p inversions; Meq = M + W + 91 I (R6.4's unit); A = F_p additions/subtractions/negations incl. fused schoolbook accumulations and the two u128 accumulations per NTT output coefficient; WA = additions/subtractions mod the NTT primes; cost(a) = Meq + a (A + WA)"
+}

@@ -4,10 +4,11 @@
 //! the statement is wrapped as a subquery (so it must be a SELECT / VALUES /
 //! WITH ... SELECT); the transaction is READ ONLY with a statement timeout;
 //! with ECDB_SQL_ROLE set it runs as that role (ecdb_reader: SELECT only);
-//! DISCARD ALL afterwards, on every exit path, drops session state a rollback
-//! would keep, and a connection it cannot clean leaves the pool. The login
-//! role must itself hold no more than ecdb_reader: a query can reset `role` to
-//! the session user inside its own transaction.
+//! a session reset afterwards ([`SESSION_RESET`]), on every exit path, drops
+//! session state a rollback would keep (advisory locks above all), and a
+//! connection it cannot clean leaves the pool. The login role must itself
+//! hold no more than ecdb_reader: a query can reset `role` to the session user
+//! inside its own transaction.
 
 use super::{ApiError, ApiResult, Shared};
 use crate::json::safe_numbers;
@@ -22,6 +23,32 @@ pub struct SqlRequest {
     pub limit: Option<usize>,
 }
 
+/// `DISCARD ALL` without its `DEALLOCATE ALL`: every SQL-level prepared
+/// statement goes (`from_sql`), the client's protocol-level ones stay.
+///
+/// tokio-postgres prepares named statements once per connection to look up
+/// non-built-in types (enums, domains, composites, their arrays) and keeps
+/// them for the connection's life. `DISCARD ALL` deallocated them behind the
+/// client's back, and the next result column of a type not yet in its cache
+/// failed with `26000 prepared statement "sN" does not exist`
+/// (`tests/sql_session.rs`). `Client::clear_type_cache` does not help: it
+/// empties the resolved types and keeps those statements. deadpool's
+/// `RecyclingMethod::Clean` uses the same list for the same reason.
+pub const SESSION_RESET: &str = "\
+    CLOSE ALL; \
+    SET SESSION AUTHORIZATION DEFAULT; \
+    RESET ALL; \
+    UNLISTEN *; \
+    SELECT pg_advisory_unlock_all(); \
+    DISCARD PLANS; \
+    DISCARD TEMP; \
+    DISCARD SEQUENCES; \
+    DO $$DECLARE n text; BEGIN \
+      FOR n IN SELECT name FROM pg_prepared_statements WHERE from_sql LOOP \
+        EXECUTE format('DEALLOCATE %I', n); \
+      END LOOP; \
+    END$$";
+
 fn quote_ident(s: &str) -> String {
     format!("\"{}\"", s.replace('"', "\"\""))
 }
@@ -35,7 +62,7 @@ pub async fn run(State(state): State<Shared>, Json(req): Json<SqlRequest>) -> Ap
     let result = query(&mut client, &state.config, sql, req.limit).await;
     // The transaction inside `query` is dropped (rolled back) on every path by
     // now; session advisory locks survive a rollback, so reset the session too.
-    if client.batch_execute("DISCARD ALL").await.is_err() {
+    if client.batch_execute(SESSION_RESET).await.is_err() {
         drop(deadpool_postgres::Object::take(client));
     }
     result.map(Json)

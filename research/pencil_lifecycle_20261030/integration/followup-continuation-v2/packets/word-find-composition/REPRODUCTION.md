@@ -1,0 +1,3 @@
+# Replay custody
+
+The original run.sh and before.sha256 retain exact source-host paths. replay1 contains observed exits, diagnostics, exact readback inventory and acceptance. source-path-map.json maps archived .lean.txt files back to their original .lean paths. Reconstruct in a fresh directory, never over original receipts. Restore replay1/source as source, supply the pinned Lean/Mathlib and helper caches, inspect the runner paths, then invoke run.sh with a fresh output directory. Compiled .olean files and check-native were intentionally omitted from publication; their original hashes remain in before.sha256. This archive is source plus receipts, not a self-contained toolchain distribution.

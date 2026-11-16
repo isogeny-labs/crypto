@@ -1,0 +1,92 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R61",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "check61-01",
+      "path": "runs/check61-01/protocol.json",
+      "sha256": "260471286e778b77896c59fbec00b0e9b40779bb492fac0c93cd5fd20b54f934",
+      "frozen_revision": "6748162baa4a07de291128639c7102eb3a5e8aad"
+    },
+    {
+      "attempt": "check61-02",
+      "path": "runs/check61-02/protocol.json",
+      "sha256": "e23cc29066adadfe05b1e98ac2faf6e847694dbd26062c726f9fc7dcab87abed",
+      "frozen_revision": "459f2dc9b2681bb1f016d8e95e3ce7d2daa5d0c0"
+    },
+    {
+      "attempt": "check61-03",
+      "path": "runs/check61-03/protocol.json",
+      "sha256": "410dfe4183bb19ff777a55c1917e1cf7e9abb1d1732bae2373934fe985d90d0c",
+      "frozen_revision": "b74a11dba113e184d80b04475655512f109fe21a"
+    },
+    {
+      "attempt": "cohort61-01",
+      "path": "runs/cohort61-01/protocol.json",
+      "sha256": "3044106e4cb688e67b0684d43f46b6f0ff4a3c0da1c4681043afe6c1d10f213e",
+      "frozen_revision": "084e1948cb7b84db1e7ad473d9b6ab8ea9cbba09"
+    },
+    {
+      "attempt": "cubic61-01",
+      "path": "runs/cubic61-01/protocol.json",
+      "sha256": "55619246d70f27fe04cff9333f3b5dac922706c259d77eeb7cb64cf6891adf4e",
+      "frozen_revision": "63c0095db8670ee6efc7869b841bf83b8e2dc421"
+    },
+    {
+      "attempt": "cubic61-02",
+      "path": "runs/cubic61-02/protocol.json",
+      "sha256": "5c93488f4cc6aa0b54c9557a2883462bdf1c211675fb76c0334cb12d8b8da3ae",
+      "frozen_revision": "843d5b3b2ec88ef610dd6cc395be8c7cfb8682a6"
+    },
+    {
+      "attempt": "field61-01",
+      "path": "runs/field61-01/protocol.json",
+      "sha256": "209b934fab59b00d892f51d09a84e6efd08b272fd6751a3ce2a3e3a43eb44a8d",
+      "frozen_revision": "955d4e2e96d440401410b6922b3af46a7d6176db"
+    },
+    {
+      "attempt": "fix61-01",
+      "path": "runs/fix61-01/protocol.json",
+      "sha256": "d85d000132d9584f8b614d106bac8892399a6a8713f1c796988f5d1011a3e26f",
+      "frozen_revision": "335013c5797db1b7f682839e00b12e3861b05e54"
+    },
+    {
+      "attempt": "fix61-02",
+      "path": "runs/fix61-02/protocol.json",
+      "sha256": "d85d000132d9584f8b614d106bac8892399a6a8713f1c796988f5d1011a3e26f",
+      "frozen_revision": "dcdaec2b0a1dfee94050638a1a9cb3b1a52b4aad"
+    },
+    {
+      "attempt": "rustcheck61-01",
+      "path": "runs/rustcheck61-01/protocol.json",
+      "sha256": "3a91b40f7156f6073eb27a501d750ae58387453157f581c68acca863c0c3ea7d",
+      "frozen_revision": "fc19ec43944d43244f0c25266ace24258d45a662"
+    },
+    {
+      "attempt": "scaling-lean61-01",
+      "path": "runs/scaling-lean61-01/LEAN-PROTOCOL.md",
+      "sha256": "fea624a7ce1e620b5b0b186123936163d908c63a1b227af96f23d939456d52d3",
+      "frozen_revision": "79fc67778e8821b2cc6bce28075aeffe42815e8f"
+    },
+    {
+      "attempt": "trace61-01",
+      "path": "runs/trace61-01/protocol.json",
+      "sha256": "5480108f52df6aca8674c5b5b0b047b3cbb77704525c5ee4be4936f5079770d1",
+      "frozen_revision": "80c5572c5370ba0510a0556792552aefb08bb5d9"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "114f9f14d8e964ea88cd15f7e5255b6315e9202f629a385bc915039de312fdca"
+  },
+  "flow": {
+    "accepted": 7,
+    "rejected": 4,
+    "interrupted": 1
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual source-byte and exact contract checks only",
+  "protocol_metadata_disclosure": "PROTOCOL-METADATA61.md; v5 descriptive repair, v6+ before affected data",
+  "notes": "Native exact certificates and six abstract Lean claims have distinct scope; proper-source/RR/normalization premises retained. Global holomorphic forms, Cartier matrix and order11 action remain construction tasks. Injected negative controls are changed inverse/source row; malformed sparse-input guards were not separately fuzz-tested."
+}

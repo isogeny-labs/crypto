@@ -1,0 +1,37 @@
+error: expected one of `,`, `:`, or `}`, found `.`
+ --> research/hec_zero_core_20261115/engine.rs:9:46
+  |
+9 |   for &(j,v)in places{if j as usize<self.h{on.push((j,v));}else{off.push((j as usize+1,v));}}
+  |                                          - --^ expected one of `,`, `:`, or `}`
+  |                                          | |
+  |                                          | while parsing this struct field
+  |                                          while parsing this struct
+  |
+help: try naming a field
+  |
+9 |   for &(j,v)in places{if j as usize<self.h{on: on.push((j,v));}else{off.push((j as usize+1,v));}}
+  |                                            +++
+
+error: expected one of `,`, `:`, or `}`, found `)`
+ --> research/hec_zero_core_20261115/engine.rs:9:56
+  |
+9 |   for &(j,v)in places{if j as usize<self.h{on.push((j,v));}else{off.push((j as usize+1,v));}}
+  |                                          -             ^ expected one of `,`, `:`, or `}`
+  |                                          |
+  |                                          while parsing this struct
+
+error: `<` is interpreted as a start of generic arguments for `usize`, not a comparison
+ --> research/hec_zero_core_20261115/engine.rs:9:36
+  |
+9 |   for &(j,v)in places{if j as usize<self.h{on.push((j,v));}else{off.push((j as usize+1,v));}}
+  |                                    ^----- interpreted as generic arguments
+  |                                    |
+  |                                    not interpreted as comparison
+  |
+help: try comparing the cast value
+  |
+9 |   for &(j,v)in places{if (j as usize)<self.h{on.push((j,v));}else{off.push((j as usize+1,v));}}
+  |                          +          +
+
+error: aborting due to 3 previous errors
+

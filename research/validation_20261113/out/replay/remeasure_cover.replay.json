@@ -1,0 +1,4725 @@
+{
+  "args": "Args { sections: [\"v3\", \"cover\"], out_dir: \"out\", tag: \"\", tower_primes: \"251,503,1009,2003,4001,8009,16001\", tower_instances: 3, tower_old_seeds: 8, tower_seeds: 4, tower_rho_seeds: 64, v3_seeds: 8, v3_rho_seeds: 32, cover_primes: \"211,419,821,1619,3203,6421,12841\", cover_seeds: 3, cover_ic_seeds: 8, cover_rho_seeds: 32, threads: 4, max_trials: 40000000, no_calibration: false }",
+  "calibration": {
+    "batch_len": 20000,
+    "batches": 25,
+    "calibrated_reading": "every native class at 0, 1 and 10 times its own w_cal",
+    "definition": "w_cal(class) = time(one native operation of the class) / time(one group addition of the arm's own group), same host and process",
+    "host": {
+      "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+      "cpus": 4,
+      "isolation": "none: shared VM, other processes may run"
+    },
+    "method": "best-of-N timing (not perf-ipc; no isolated host): minimum over batches of ns per operation"
+  },
+  "calibration_skipped": false,
+  "ok": true,
+  "rows": [
+    {
+      "arms": {
+        "A": {
+          "attempts": 1.125,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 115.0,
+          "core_cols": 33.5,
+          "exhausted": 0,
+          "group_ops": 824.375,
+          "la_add": 67069.5,
+          "la_mul": 34750.25,
+          "lower_bound": false,
+          "name": "A",
+          "native": {
+            "mul_p": 36088.75,
+            "mul_r": 34750.25
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            12.849488553336581,
+            109.23503258945917,
+            488.96119402985073
+          ],
+          "ratio_neg_band": [
+            12.849488553336581,
+            109.23503258945917,
+            488.96119402985073
+          ],
+          "ratio_neg_cal": [
+            12.849488553336581,
+            20.990527897280458,
+            83.21008089183161
+          ],
+          "ratio_plain_band": [
+            11.761034329023628,
+            99.85983742403916,
+            444.85509214354994
+          ],
+          "rel_add": 29269.5,
+          "rel_mul": 36088.75,
+          "relations": 118.0,
+          "runs": 8,
+          "setup_ops": 246.75,
+          "t_add_ns": 805.00705,
+          "total_band": [
+            824.375,
+            7908.275000000001,
+            71663.375
+          ],
+          "total_cal": [
+            824.375,
+            1370.5896303718705,
+            6286.521303718706
+          ],
+          "total_w1_with_additions": 168002.375,
+          "trials": 262.375,
+          "verify_ops": 3.0,
+          "walk_ops": 574.625
+        },
+        "B": {
+          "attempts": 1.125,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 71.0,
+          "core_cols": 13.75,
+          "exhausted": 0,
+          "group_ops": 761.875,
+          "la_add": 16460.875,
+          "la_mul": 11124.875,
+          "lower_bound": false,
+          "name": "B",
+          "native": {
+            "mul_p": 30841.25,
+            "mul_r": 11124.875
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            11.87530443253775,
+            68.49035265679632,
+            291.53432835820894
+          ],
+          "ratio_neg_band": [
+            11.87530443253775,
+            68.49035265679632,
+            291.53432835820894
+          ],
+          "ratio_neg_cal": [
+            11.87530443253775,
+            16.623821408000538,
+            52.91533052840769
+          ],
+          "ratio_plain_band": [
+            10.86937137761926,
+            62.612106384657885,
+            265.2368574199806
+          ],
+          "rel_add": 25422.75,
+          "rel_mul": 30841.25,
+          "relations": 91.125,
+          "runs": 8,
+          "setup_ops": 246.75,
+          "t_add_ns": 805.00705,
+          "total_band": [
+            761.875,
+            4958.4875,
+            42728.0
+          ],
+          "total_cal": [
+            761.875,
+            1085.462802577319,
+            3997.7530257731905
+          ],
+          "total_w1_with_additions": 84611.625,
+          "trials": 232.875,
+          "verify_ops": 3.0,
+          "walk_ops": 512.125
+        },
+        "C": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 30.0,
+          "core_cols": 3.75,
+          "exhausted": 0,
+          "group_ops": 670.5,
+          "la_add": 1947.0,
+          "la_mul": 1500.625,
+          "lower_bound": false,
+          "name": "C",
+          "native": {
+            "mul_p": 25174.0,
+            "mul_r": 1500.625
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            10.451047247929859,
+            46.106444511589764,
+            186.57654584221748
+          ],
+          "ratio_neg_band": [
+            10.451047247929859,
+            46.106444511589764,
+            186.57654584221748
+          ],
+          "ratio_neg_cal": [
+            10.451047247929859,
+            13.418675773527923,
+            36.099381825384505
+          ],
+          "ratio_plain_band": [
+            9.565760142666072,
+            42.14931733880515,
+            169.7466537342386
+          ],
+          "rel_add": 21066.875,
+          "rel_mul": 25174.0,
+          "relations": 88.125,
+          "runs": 8,
+          "setup_ops": 246.75,
+          "t_add_ns": 805.00705,
+          "total_band": [
+            670.5,
+            3337.9625,
+            27345.125
+          ],
+          "total_cal": [
+            670.5,
+            876.1808163434717,
+            2727.3081634347177
+          ],
+          "total_w1_with_additions": 50359.0,
+          "trials": 191.125,
+          "verify_ops": 3.0,
+          "walk_ops": 420.75
+        },
+        "birthday_e1_first_collision": {
+          "certified": 3,
+          "class_best_band": "unresolved (lower bound)",
+          "class_best_cal": "above",
+          "class_neg_band": "unresolved (lower bound)",
+          "class_neg_cal": "above",
+          "class_plain_band": "unresolved (lower bound)",
+          "group": "E1",
+          "group_ops": 131.33333333333334,
+          "lower_bound": true,
+          "median_ops": 149.0,
+          "name": "birthday_e1_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2.0470855658386102,
+            1.8140746176314013,
+            0.896090973702914
+          ],
+          "ratio_neg_band": [
+            2.0470855658386102,
+            1.8140746176314013,
+            0.896090973702914
+          ],
+          "ratio_neg_cal": [
+            2.0470855658386102,
+            2.011364989262468,
+            1.738363200009533
+          ],
+          "ratio_plain_band": [
+            1.8736810818843812,
+            1.6583800278851974,
+            0.8152602651147753
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.3378684807256236,
+            0.3378684807256236,
+            0.3378684807256236
+          ],
+          "seeds": 3,
+          "t_add_ns": 142.24605,
+          "total_band": [
+            131.33333333333334,
+            131.33333333333334,
+            131.33333333333334
+          ],
+          "total_cal": [
+            131.33333333333334,
+            131.33333333333334,
+            131.33333333333334
+          ]
+        },
+        "ic_e1_fibre_first_collision": {
+          "certified": 3,
+          "class_best_band": "unresolved (lower bound)",
+          "class_best_cal": "above",
+          "class_neg_band": "unresolved (lower bound)",
+          "class_neg_cal": "above",
+          "class_plain_band": "unresolved (lower bound)",
+          "group": "E1",
+          "group_ops": 131.33333333333334,
+          "lower_bound": true,
+          "median_ops": 149.0,
+          "name": "ic_e1_fibre_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2.0470855658386102,
+            1.8140746176314013,
+            0.896090973702914
+          ],
+          "ratio_neg_band": [
+            2.0470855658386102,
+            1.8140746176314013,
+            0.896090973702914
+          ],
+          "ratio_neg_cal": [
+            2.0470855658386102,
+            2.011364989262468,
+            1.738363200009533
+          ],
+          "ratio_plain_band": [
+            1.8736810818843812,
+            1.6583800278851974,
+            0.8152602651147753
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.3378684807256236,
+            0.3378684807256236,
+            0.3378684807256236
+          ],
+          "seeds": 3,
+          "t_add_ns": 142.24605,
+          "total_band": [
+            131.33333333333334,
+            131.33333333333334,
+            131.33333333333334
+          ],
+          "total_cal": [
+            131.33333333333334,
+            131.33333333333334,
+            131.33333333333334
+          ]
+        },
+        "ic_e1_fibre_full": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 3359.3333333333335,
+          "lower_bound": true,
+          "median_ops": 3354.0,
+          "name": "ic_e1_fibre_full",
+          "native": {
+            "mul_r": 3845.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            52.361747036856634,
+            51.71263722824133,
+            49.15536602700782
+          ],
+          "ratio_neg_band": [
+            52.361747036856634,
+            51.71263722824133,
+            49.15536602700782
+          ],
+          "ratio_neg_cal": [
+            52.361747036856634,
+            54.01761312686433,
+            66.6729073204437
+          ],
+          "ratio_plain_band": [
+            47.926289196017244,
+            47.2743535106411,
+            44.72137083737472
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            7.605442176870748,
+            8.477324263038549,
+            16.324263038548754
+          ],
+          "seeds": 3,
+          "t_add_ns": 142.24605,
+          "total_band": [
+            3359.3333333333335,
+            3743.8333333333335,
+            7204.333333333334
+          ],
+          "total_cal": [
+            3359.3333333333335,
+            3527.1137901544544,
+            5037.137901544542
+          ]
+        },
+        "ic_e1_two_term": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 761.6666666666666,
+          "lower_bound": true,
+          "median_ops": 761.0,
+          "name": "ic_e1_two_term",
+          "native": {
+            "lookup": 70.33333333333333,
+            "mul_r": 3969.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            11.872057152135087,
+            16.10014244399361,
+            32.75735607675906
+          ],
+          "ratio_neg_band": [
+            11.872057152135087,
+            16.10014244399361,
+            32.75735607675906
+          ],
+          "ratio_neg_cal": [
+            11.872057152135087,
+            14.348785945418609,
+            33.277690707618355
+          ],
+          "ratio_plain_band": [
+            10.866399167781244,
+            14.718333201799384,
+            29.802521823472357
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.7346938775510203,
+            2.6259825327510917,
+            10.373831775700934
+          ],
+          "seeds": 3,
+          "t_add_ns": 142.24605,
+          "total_band": [
+            761.6666666666666,
+            1165.6,
+            4801.0
+          ],
+          "total_cal": [
+            761.6666666666666,
+            936.9129409920346,
+            2514.1294099203456
+          ]
+        },
+        "ic_jc": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 3359.3333333333335,
+          "lower_bound": true,
+          "median_ops": 3354.0,
+          "name": "ic_jc",
+          "native": {
+            "mul_r": 14633.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            52.361747036856634,
+            66.61383289449073,
+            122.76218905472636
+          ],
+          "ratio_neg_band": [
+            52.361747036856634,
+            66.61383289449073,
+            122.76218905472636
+          ],
+          "ratio_neg_cal": [
+            52.361747036856634,
+            51.89186981423167,
+            48.30073734098119
+          ],
+          "ratio_plain_band": [
+            47.926289196017244,
+            60.89664062294479,
+            111.68858713223408
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            7.605442176870748,
+            10.92358276643991,
+            40.78684807256236
+          ],
+          "seeds": 3,
+          "t_add_ns": 3134.2918,
+          "total_band": [
+            3359.3333333333335,
+            4822.633333333333,
+            17992.333333333332
+          ],
+          "total_cal": [
+            3359.3333333333335,
+            3388.3120527525016,
+            3649.1205275250168
+          ]
+        },
+        "ic_jc_L": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 3359.3333333333335,
+          "lower_bound": true,
+          "median_ops": 3354.0,
+          "name": "ic_jc_L",
+          "native": {
+            "mul_r": 14993.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            52.361747036856634,
+            67.11109192673487,
+            125.21847903340439
+          ],
+          "ratio_neg_band": [
+            52.361747036856634,
+            67.11109192673487,
+            125.21847903340439
+          ],
+          "ratio_neg_cal": [
+            52.361747036856634,
+            51.90278834588085,
+            48.395102976847376
+          ],
+          "ratio_plain_band": [
+            47.926289196017244,
+            61.351221950385394,
+            113.92331070158421
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            7.605442176870748,
+            11.005215419501134,
+            41.6031746031746
+          ],
+          "seeds": 3,
+          "t_add_ns": 3134.2918,
+          "total_band": [
+            3359.3333333333335,
+            4858.633333333333,
+            18352.333333333332
+          ],
+          "total_cal": [
+            3359.3333333333335,
+            3389.02498509658,
+            3656.2498509658017
+          ]
+        },
+        "ic_jc_first_collision": {
+          "certified": 3,
+          "class_best_band": "unresolved (lower bound)",
+          "class_best_cal": "above",
+          "class_neg_band": "unresolved (lower bound)",
+          "class_neg_cal": "above",
+          "class_plain_band": "unresolved (lower bound)",
+          "group": "J(C), Cantor",
+          "group_ops": 131.33333333333334,
+          "lower_bound": true,
+          "median_ops": 149.0,
+          "name": "ic_jc_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2.0470855658386102,
+            1.8140746176314013,
+            0.896090973702914
+          ],
+          "ratio_neg_band": [
+            2.0470855658386102,
+            1.8140746176314013,
+            0.896090973702914
+          ],
+          "ratio_neg_cal": [
+            2.0470855658386102,
+            2.011364989262468,
+            1.738363200009533
+          ],
+          "ratio_plain_band": [
+            1.8736810818843812,
+            1.6583800278851974,
+            0.8152602651147753
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.3378684807256236,
+            0.3378684807256236,
+            0.3378684807256236
+          ],
+          "seeds": 3,
+          "t_add_ns": 3134.2918,
+          "total_band": [
+            131.33333333333334,
+            131.33333333333334,
+            131.33333333333334
+          ],
+          "total_cal": [
+            131.33333333333334,
+            131.33333333333334,
+            131.33333333333334
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "candidate": 9,
+      "class_times_ns": {
+        "canon": 2.2532,
+        "draw": 2.0699,
+        "hash": 2.07035,
+        "insert": 7.4238,
+        "inv_r": 64.153,
+        "lookup": 4.15605,
+        "mul_p": 6.2072,
+        "mul_r": 6.20705,
+        "word": 1.036
+      },
+      "e1_order": 218,
+      "e2_order": 226,
+      "gate_reproduces_record": true,
+      "jac_order": 49268,
+      "old_plain_rho_ops_mean": 442.3333333333333,
+      "old_plain_rho_ops_per_seed": [
+        428.0,
+        458.0,
+        441.0
+      ],
+      "p": 211,
+      "r": 109,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 63,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 18.03125,
+          "certified": 32,
+          "dp_inserts": 3.46875,
+          "dp_lookups": 4.46875,
+          "key_evaluations": 58.5625,
+          "kind": "negation",
+          "native": 82.40625,
+          "native_per_step": 7.107816711590297,
+          "other_ops": 50.625,
+          "partition_hashes": 18.03125,
+          "runs": 32,
+          "steps": 11.59375,
+          "total_ops": 64.15625,
+          "walk_ops": 13.53125,
+          "walk_share": 0.2109108621529469,
+          "walks": 4.5,
+          "word_ops": 38.40625
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 32,
+          "dp_inserts": 6.59375,
+          "dp_lookups": 7.625,
+          "key_evaluations": 31.59375,
+          "kind": "plain",
+          "native": 91.0,
+          "native_per_step": 5.610789980732177,
+          "other_ops": 53.78125,
+          "partition_hashes": 23.96875,
+          "runs": 32,
+          "steps": 16.21875,
+          "total_ops": 70.09375,
+          "walk_ops": 16.3125,
+          "walk_share": 0.23272403031654035,
+          "walks": 7.65625,
+          "word_ops": 52.8125
+        }
+      },
+      "t_add_ns": {
+        "E1": 142.24605,
+        "J_recorded_impl": 3134.2918,
+        "J_word_impl": 805.00705
+      },
+      "target": "cover_pushforward",
+      "wall_s": 2.159643705
+    },
+    {
+      "arms": {
+        "A": {
+          "attempts": 1.5,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 222.0,
+          "core_cols": 38.0,
+          "exhausted": 0,
+          "group_ops": 1752.25,
+          "la_add": 203696.75,
+          "la_mul": 103934.75,
+          "lower_bound": false,
+          "name": "A",
+          "native": {
+            "mul_p": 86432.625,
+            "mul_r": 103934.75
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            25.59196713829302,
+            271.37456147507544,
+            1282.133055265902
+          ],
+          "ratio_neg_band": [
+            23.122474226804123,
+            230.98874999999998,
+            881.4090322580645
+          ],
+          "ratio_neg_cal": [
+            23.122474226804123,
+            41.67466313732642,
+            177.4908344780114
+          ],
+          "ratio_plain_band": [
+            25.59196713829302,
+            271.37456147507544,
+            1282.133055265902
+          ],
+          "rel_add": 72174.5,
+          "rel_mul": 86432.625,
+          "relations": 231.0,
+          "runs": 8,
+          "setup_ops": 249.875,
+          "t_add_ns": 799.29285,
+          "total_band": [
+            1752.25,
+            20788.9875,
+            192119.625
+          ],
+          "total_cal": [
+            1752.25,
+            3230.599931567635,
+            16535.74931567635
+          ],
+          "total_w1_with_additions": 467990.875,
+          "trials": 670.875,
+          "verify_ops": 3.0,
+          "walk_ops": 1499.375
+        },
+        "B": {
+          "attempts": 1.125,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 112.0,
+          "core_cols": 2.75,
+          "exhausted": 0,
+          "group_ops": 1553.125,
+          "la_add": 4581.25,
+          "la_mul": 3924.75,
+          "lower_bound": false,
+          "name": "B",
+          "native": {
+            "mul_p": 73049.125,
+            "mul_r": 3924.75
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            22.68370607028754,
+            120.75401811209922,
+            524.059228362878
+          ],
+          "ratio_neg_band": [
+            20.49484536082474,
+            102.78347222222223,
+            360.2672401433692
+          ],
+          "ratio_neg_cal": [
+            20.49484536082474,
+            27.746356903737208,
+            80.83295164149142
+          ],
+          "ratio_plain_band": [
+            22.68370607028754,
+            120.75401811209922,
+            524.059228362878
+          ],
+          "rel_add": 62292.0,
+          "rel_mul": 73049.125,
+          "relations": 136.375,
+          "runs": 8,
+          "setup_ops": 249.875,
+          "t_add_ns": 799.29285,
+          "total_band": [
+            1553.125,
+            9250.5125,
+            78527.0
+          ],
+          "total_cal": [
+            1553.125,
+            2150.884301550114,
+            7530.718015501139
+          ],
+          "total_w1_with_additions": 145400.25,
+          "trials": 584.75,
+          "verify_ops": 3.0,
+          "walk_ops": 1300.25
+        },
+        "C": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 41.0,
+          "core_cols": 2.25,
+          "exhausted": 0,
+          "group_ops": 1993.125,
+          "la_add": 2574.375,
+          "la_mul": 1276.375,
+          "lower_bound": false,
+          "name": "C",
+          "native": {
+            "mul_p": 94729.375,
+            "mul_r": 1276.375
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            29.10999543587403,
+            151.34143754589215,
+            654.0070907194995
+          ],
+          "ratio_neg_band": [
+            26.30103092783505,
+            128.8188888888889,
+            449.6005734767025
+          ],
+          "ratio_neg_cal": [
+            26.30103092783505,
+            35.328916851174554,
+            101.41992677577738
+          ],
+          "ratio_plain_band": [
+            29.10999543587403,
+            151.34143754589215,
+            654.0070907194995
+          ],
+          "rel_add": 82429.0,
+          "rel_mul": 94729.375,
+          "relations": 269.0,
+          "runs": 8,
+          "setup_ops": 249.875,
+          "t_add_ns": 799.29285,
+          "total_band": [
+            1993.125,
+            11593.7,
+            97998.875
+          ],
+          "total_cal": [
+            1993.125,
+            2738.6807179621337,
+            9448.682179621335
+          ],
+          "total_w1_with_additions": 183002.25,
+          "trials": 784.5,
+          "verify_ops": 3.0,
+          "walk_ops": 1740.25
+        },
+        "birthday_e1_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "unresolved (lower bound)",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 177.66666666666666,
+          "lower_bound": true,
+          "median_ops": 147.0,
+          "name": "birthday_e1_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2.594857751407272,
+            2.3192189497158084,
+            1.1856795272853666
+          ],
+          "ratio_neg_band": [
+            2.34446735395189,
+            1.9740740740740739,
+            0.8151015531660692
+          ],
+          "ratio_neg_cal": [
+            2.34446735395189,
+            2.291895821489768,
+            1.9070321110696844
+          ],
+          "ratio_plain_band": [
+            2.594857751407272,
+            2.3192189497158084,
+            1.1856795272853666
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.35014005602240894,
+            0.35014005602240894,
+            0.35014005602240894
+          ],
+          "seeds": 3,
+          "t_add_ns": 148.44905,
+          "total_band": [
+            177.66666666666666,
+            177.66666666666666,
+            177.66666666666666
+          ],
+          "total_cal": [
+            177.66666666666666,
+            177.66666666666666,
+            177.66666666666666
+          ]
+        },
+        "ic_e1_fibre_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 296.0,
+          "lower_bound": true,
+          "median_ops": 275.0,
+          "name": "ic_e1_fibre_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            4.3231401186672755,
+            3.86391449783797,
+            1.975391032325339
+          ],
+          "ratio_neg_band": [
+            3.905979381443299,
+            3.2888888888888888,
+            1.3579928315412186
+          ],
+          "ratio_neg_cal": [
+            3.905979381443299,
+            3.818393038429482,
+            3.1771942113130955
+          ],
+          "ratio_plain_band": [
+            4.3231401186672755,
+            3.86391449783797,
+            1.975391032325339
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.7703081232492998,
+            0.7703081232492998,
+            0.7703081232492998
+          ],
+          "seeds": 3,
+          "t_add_ns": 148.44905,
+          "total_band": [
+            296.0,
+            296.0,
+            296.0
+          ],
+          "total_cal": [
+            296.0,
+            296.0,
+            296.0
+          ]
+        },
+        "ic_e1_fibre_full": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 8931.666666666666,
+          "lower_bound": true,
+          "median_ops": 8694.0,
+          "name": "ic_e1_fibre_full",
+          "native": {
+            "mul_r": 5776.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            130.4488057203712,
+            124.13173424709689,
+            98.15335418839068
+          ],
+          "ratio_neg_band": [
+            117.86116838487972,
+            105.65851851851852,
+            67.47603345280764
+          ],
+          "ratio_neg_cal": [
+            117.86116838487972,
+            118.33381264504179,
+            121.79392908364464
+          ],
+          "ratio_plain_band": [
+            130.4488057203712,
+            124.13173424709689,
+            98.15335418839068
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            23.73949579831933,
+            25.357422969187677,
+            39.19083969465649
+          ],
+          "seeds": 3,
+          "t_add_ns": 148.44905,
+          "total_band": [
+            8931.666666666666,
+            9509.266666666666,
+            14707.666666666666
+          ],
+          "total_cal": [
+            8931.666666666666,
+            9173.18049514856,
+            11346.8049514856
+          ]
+        },
+        "ic_e1_two_term": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 673.3333333333334,
+          "lower_bound": true,
+          "median_ops": 679.0,
+          "name": "ic_e1_two_term",
+          "native": {
+            "lookup": 80.0,
+            "mul_r": 3117.6666666666665
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            9.834170089761145,
+            12.963694215550298,
+            25.833576642335768
+          ],
+          "ratio_neg_band": [
+            8.885223367697595,
+            11.034444444444444,
+            17.759426523297492
+          ],
+          "ratio_neg_cal": [
+            8.885223367697595,
+            10.396543345252361,
+            21.46055816378192
+          ],
+          "ratio_plain_band": [
+            9.834170089761145,
+            12.963694215550298,
+            25.833576642335768
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.727735368956743,
+            2.4340966921119596,
+            8.791348600508906
+          ],
+          "seeds": 3,
+          "t_add_ns": 148.44905,
+          "total_band": [
+            673.3333333333334,
+            993.1,
+            3871.0
+          ],
+          "total_cal": [
+            673.3333333333334,
+            805.9350620072454,
+            1999.3506200724537
+          ]
+        },
+        "ic_jc": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 8931.666666666666,
+          "lower_bound": true,
+          "median_ops": 8694.0,
+          "name": "ic_jc",
+          "native": {
+            "mul_r": 51976.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            130.4488057203712,
+            184.44012944983817,
+            406.47452207160234
+          ],
+          "ratio_neg_band": [
+            117.86116838487972,
+            156.99185185185186,
+            279.43302270011947
+          ],
+          "ratio_neg_cal": [
+            117.86116838487972,
+            116.4955593188939,
+            106.49825949703154
+          ],
+          "ratio_plain_band": [
+            130.4488057203712,
+            184.44012944983817,
+            406.47452207160234
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            23.73949579831933,
+            37.71908396946565,
+            156.74809160305344
+          ],
+          "seeds": 3,
+          "t_add_ns": 3258.37835,
+          "total_band": [
+            8931.666666666666,
+            14129.266666666666,
+            60907.666666666664
+          ],
+          "total_cal": [
+            8931.666666666666,
+            9030.679977505783,
+            9921.799775057838
+          ]
+        },
+        "ic_jc_L": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 8931.666666666666,
+          "lower_bound": true,
+          "median_ops": 8694.0,
+          "name": "ic_jc_L",
+          "native": {
+            "mul_r": 52288.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            130.4488057203712,
+            184.8474069239346,
+            408.5566909975669
+          ],
+          "ratio_neg_band": [
+            117.86116838487972,
+            157.33851851851853,
+            280.86442054958184
+          ],
+          "ratio_neg_cal": [
+            117.86116838487972,
+            116.50322647386771,
+            106.5620560736407
+          ],
+          "ratio_plain_band": [
+            130.4488057203712,
+            184.8474069239346,
+            408.5566909975669
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            23.73949579831933,
+            37.79847328244275,
+            157.54198473282443
+          ],
+          "seeds": 3,
+          "t_add_ns": 3258.37835,
+          "total_band": [
+            8931.666666666666,
+            14160.466666666667,
+            61219.666666666664
+          ],
+          "total_cal": [
+            8931.666666666666,
+            9031.274331688133,
+            9927.743316881335
+          ]
+        },
+        "ic_jc_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 296.0,
+          "lower_bound": true,
+          "median_ops": 275.0,
+          "name": "ic_jc_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            4.3231401186672755,
+            3.86391449783797,
+            1.975391032325339
+          ],
+          "ratio_neg_band": [
+            3.905979381443299,
+            3.2888888888888888,
+            1.3579928315412186
+          ],
+          "ratio_neg_cal": [
+            3.905979381443299,
+            3.818393038429482,
+            3.1771942113130955
+          ],
+          "ratio_plain_band": [
+            4.3231401186672755,
+            3.86391449783797,
+            1.975391032325339
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.7703081232492998,
+            0.7703081232492998,
+            0.7703081232492998
+          ],
+          "seeds": 3,
+          "t_add_ns": 3258.37835,
+          "total_band": [
+            296.0,
+            296.0,
+            296.0
+          ],
+          "total_cal": [
+            296.0,
+            296.0,
+            296.0
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "candidate": 27,
+      "class_times_ns": {
+        "canon": 2.32425,
+        "draw": 2.0699,
+        "hash": 2.0704,
+        "insert": 7.1993,
+        "inv_r": 66.565,
+        "lookup": 4.1597,
+        "mul_p": 6.2071,
+        "mul_r": 6.20715,
+        "word": 1.03585
+      },
+      "e1_order": 452,
+      "e2_order": 414,
+      "gate_reproduces_record": true,
+      "jac_order": 187128,
+      "old_plain_rho_ops_mean": 394.6666666666667,
+      "old_plain_rho_ops_per_seed": [
+        357.0,
+        393.0,
+        434.0
+      ],
+      "p": 419,
+      "r": 113,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 357,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 30.09375,
+          "certified": 32,
+          "dp_inserts": 4.0625,
+          "dp_lookups": 5.0625,
+          "key_evaluations": 95.34375,
+          "kind": "negation",
+          "native": 142.1875,
+          "native_per_step": 7.520661157024794,
+          "other_ops": 51.03125,
+          "partition_hashes": 30.09375,
+          "runs": 32,
+          "steps": 18.90625,
+          "total_ops": 75.78125,
+          "walk_ops": 24.75,
+          "walk_share": 0.3265979381443299,
+          "walks": 5.34375,
+          "word_ops": 72.875
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 32,
+          "dp_inserts": 6.03125,
+          "dp_lookups": 7.03125,
+          "key_evaluations": 29.8125,
+          "kind": "plain",
+          "native": 81.375,
+          "native_per_step": 5.271255060728745,
+          "other_ops": 52.9375,
+          "partition_hashes": 22.78125,
+          "runs": 32,
+          "steps": 15.4375,
+          "total_ops": 68.46875,
+          "walk_ops": 15.53125,
+          "walk_share": 0.2268370607028754,
+          "walks": 7.25,
+          "word_ops": 45.53125
+        }
+      },
+      "t_add_ns": {
+        "E1": 148.44905,
+        "J_recorded_impl": 3258.37835,
+        "J_word_impl": 799.29285
+      },
+      "target": "cover_pushforward",
+      "wall_s": 2.488429278
+    },
+    {
+      "arms": {
+        "A": {
+          "attempts": 1.25,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 400.0,
+          "core_cols": 34.0,
+          "exhausted": 0,
+          "group_ops": 2185.5,
+          "la_add": 270643.25,
+          "la_mul": 134446.625,
+          "lower_bound": false,
+          "name": "A",
+          "native": {
+            "mul_p": 156163.75,
+            "mul_r": 134446.625
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            33.11363636363637,
+            429.69024495058017,
+            2208.738330975955
+          ],
+          "ratio_neg_band": [
+            33.11363636363637,
+            429.69024495058017,
+            2198.373533552323
+          ],
+          "ratio_neg_cal": [
+            33.11363636363637,
+            67.18421311531029,
+            336.22820267438135
+          ],
+          "ratio_plain_band": [
+            31.934246575342467,
+            417.45541082164334,
+            2208.738330975955
+          ],
+          "rel_add": 124799.125,
+          "rel_mul": 156163.75,
+          "relations": 406.0,
+          "runs": 8,
+          "setup_ops": 218.375,
+          "t_add_ns": 780.6924,
+          "total_band": [
+            2185.5,
+            31246.537500000002,
+            292795.875
+          ],
+          "total_cal": [
+            2185.5,
+            4496.112740121782,
+            25291.62740121782
+          ],
+          "total_w1_with_additions": 688238.25,
+          "trials": 867.25,
+          "verify_ops": 8.0,
+          "walk_ops": 1959.125
+        },
+        "B": {
+          "attempts": 1.125,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 176.0,
+          "core_cols": 4.25,
+          "exhausted": 0,
+          "group_ops": 1407.25,
+          "la_add": 8837.125,
+          "la_mul": 8253.75,
+          "lower_bound": false,
+          "name": "B",
+          "native": {
+            "mul_p": 92023.75,
+            "mul_r": 8253.75
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            21.321969696969695,
+            157.24967769660506,
+            767.0702498821311
+          ],
+          "ratio_neg_band": [
+            21.321969696969695,
+            157.24967769660506,
+            763.470671046457
+          ],
+          "ratio_neg_cal": [
+            21.321969696969695,
+            32.94201465019595,
+            124.7016369148276
+          ],
+          "ratio_plain_band": [
+            20.56255707762557,
+            152.77221108884436,
+            767.0702498821311
+          ],
+          "rel_add": 74959.25,
+          "rel_mul": 92023.75,
+          "relations": 199.125,
+          "runs": 8,
+          "setup_ops": 218.375,
+          "t_add_ns": 780.6924,
+          "total_band": [
+            1407.25,
+            11435.0,
+            101684.75
+          ],
+          "total_cal": [
+            1407.25,
+            2204.5508146358284,
+            9380.258146358283
+          ],
+          "total_w1_with_additions": 185481.125,
+          "trials": 521.625,
+          "verify_ops": 8.0,
+          "walk_ops": 1180.875
+        },
+        "C": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 58.0,
+          "core_cols": 1.0,
+          "exhausted": 0,
+          "group_ops": 1953.25,
+          "la_add": 2503.875,
+          "la_mul": 1028.5,
+          "lower_bound": false,
+          "name": "C",
+          "native": {
+            "mul_p": 127932.75,
+            "mul_r": 1028.5
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            29.59469696969697,
+            204.20283626987538,
+            987.5681282413956
+          ],
+          "ratio_neg_band": [
+            29.59469696969697,
+            204.20283626987538,
+            982.9338338808071
+          ],
+          "ratio_neg_cal": [
+            29.59469696969697,
+            44.508648361921935,
+            162.27915198150419
+          ],
+          "ratio_plain_band": [
+            28.54063926940639,
+            198.38844355377424,
+            987.5681282413956
+          ],
+          "rel_add": 107868.375,
+          "rel_mul": 127932.75,
+          "relations": 357.625,
+          "runs": 8,
+          "setup_ops": 218.375,
+          "t_add_ns": 780.6924,
+          "total_band": [
+            1953.25,
+            14849.375,
+            130914.5
+          ],
+          "total_cal": [
+            1953.25,
+            2978.614940420196,
+            12206.899404201962
+          ],
+          "total_w1_with_additions": 241286.75,
+          "trials": 769.375,
+          "verify_ops": 8.0,
+          "walk_ops": 1726.875
+        },
+        "birthday_e1_first_collision": {
+          "certified": 3,
+          "class_best_band": "unresolved (lower bound)",
+          "class_best_cal": "above",
+          "class_neg_band": "unresolved (lower bound)",
+          "class_neg_cal": "above",
+          "class_plain_band": "unresolved (lower bound)",
+          "group": "E1",
+          "group_ops": 117.66666666666667,
+          "lower_bound": true,
+          "median_ops": 114.0,
+          "name": "birthday_e1_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            1.7828282828282829,
+            1.61810628849735,
+            0.8876316203048876
+          ],
+          "ratio_neg_band": [
+            1.7828282828282829,
+            1.61810628849735,
+            0.8834662912560614
+          ],
+          "ratio_neg_cal": [
+            1.7828282828282829,
+            1.7582616066000574,
+            1.5642667520127187
+          ],
+          "ratio_plain_band": [
+            1.7193302891933029,
+            1.5720329547984861,
+            0.8876316203048876
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.3081081081081081,
+            0.3081081081081081,
+            0.3081081081081081
+          ],
+          "seeds": 3,
+          "t_add_ns": 158.38255,
+          "total_band": [
+            117.66666666666667,
+            117.66666666666667,
+            117.66666666666667
+          ],
+          "total_cal": [
+            117.66666666666667,
+            117.66666666666667,
+            117.66666666666667
+          ]
+        },
+        "ic_e1_fibre_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 163.0,
+          "lower_bound": true,
+          "median_ops": 150.0,
+          "name": "ic_e1_fibre_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2.4696969696969697,
+            2.241512677266867,
+            1.2296086751532296
+          ],
+          "ratio_neg_band": [
+            2.4696969696969697,
+            2.241512677266867,
+            1.2238385734396997
+          ],
+          "ratio_neg_cal": [
+            2.4696969696969697,
+            2.435665511692431,
+            2.1669304298419814
+          ],
+          "ratio_plain_band": [
+            2.3817351598173517,
+            2.1776887107548433,
+            1.2296086751532296
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.3978779840848806,
+            0.3978779840848806,
+            0.3978779840848806
+          ],
+          "seeds": 3,
+          "t_add_ns": 158.38255,
+          "total_band": [
+            163.0,
+            163.0,
+            163.0
+          ],
+          "total_cal": [
+            163.0,
+            163.0,
+            163.0
+          ]
+        },
+        "ic_e1_fibre_full": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 11426.333333333334,
+          "lower_bound": true,
+          "median_ops": 11353.0,
+          "name": "ic_e1_fibre_full",
+          "native": {
+            "mul_r": 7772.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            173.12626262626264,
+            167.81824953445067,
+            144.82476819110485
+          ],
+          "ratio_neg_band": [
+            173.12626262626264,
+            167.81824953445067,
+            144.14515876740185
+          ],
+          "ratio_neg_cal": [
+            173.12626262626264,
+            175.29207916164285,
+            192.39481051775547
+          ],
+          "ratio_plain_band": [
+            166.96012176560123,
+            163.03985749276333,
+            144.82476819110485
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            30.498687664041995,
+            32.53858267716536,
+            50.89763779527559
+          ],
+          "seeds": 3,
+          "t_add_ns": 158.38255,
+          "total_band": [
+            11426.333333333334,
+            12203.533333333335,
+            19198.333333333336
+          ],
+          "total_cal": [
+            11426.333333333334,
+            11730.924778539893,
+            14472.247785398918
+          ]
+        },
+        "ic_e1_two_term": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 467.3333333333333,
+          "lower_bound": true,
+          "median_ops": 469.0,
+          "name": "ic_e1_two_term",
+          "native": {
+            "lookup": 51.333333333333336,
+            "mul_r": 1666.6666666666667
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            7.08080808080808,
+            8.789113307549062,
+            16.485305673424488
+          ],
+          "ratio_neg_band": [
+            7.08080808080808,
+            8.789113307549062,
+            16.407946191146568
+          ],
+          "ratio_neg_cal": [
+            7.08080808080808,
+            7.979538527498693,
+            15.076513335944476
+          ],
+          "ratio_plain_band": [
+            6.828614916286149,
+            8.538855488755289,
+            16.485305673424488
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.2440318302387268,
+            1.6837270341207349,
+            5.545931758530184
+          ],
+          "seeds": 3,
+          "t_add_ns": 158.38255,
+          "total_band": [
+            467.3333333333333,
+            639.1333333333333,
+            2185.3333333333335
+          ],
+          "total_cal": [
+            467.3333333333333,
+            534.0079636298317,
+            1134.079636298317
+          ]
+        },
+        "ic_jc": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 11426.333333333334,
+          "lower_bound": true,
+          "median_ops": 11353.0,
+          "name": "ic_jc",
+          "native": {
+            "mul_r": 164828.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            173.12626262626264,
+            383.7955593754476,
+            1329.5942165645138
+          ],
+          "ratio_neg_band": [
+            173.12626262626264,
+            383.7955593754476,
+            1323.354919443141
+          ],
+          "ratio_neg_cal": [
+            173.12626262626264,
+            175.2587674670756,
+            192.09844747331925
+          ],
+          "ratio_plain_band": [
+            166.96012176560123,
+            372.86751280338456,
+            1329.5942165645138
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            30.498687664041995,
+            73.76062992125983,
+            467.19893899204243
+          ],
+          "seeds": 3,
+          "t_add_ns": 3383.73075,
+          "total_band": [
+            11426.333333333334,
+            27909.13333333333,
+            176254.33333333334
+          ],
+          "total_cal": [
+            11426.333333333334,
+            11728.695487946256,
+            14449.954879462559
+          ]
+        },
+        "ic_jc_L": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 11426.333333333334,
+          "lower_bound": true,
+          "median_ops": 11353.0,
+          "name": "ic_jc_L",
+          "native": {
+            "mul_r": 165008.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            173.12626262626264,
+            384.0430883827532,
+            1330.952066635235
+          ],
+          "ratio_neg_band": [
+            173.12626262626264,
+            384.0430883827532,
+            1324.7063976223997
+          ],
+          "ratio_neg_cal": [
+            173.12626262626264,
+            175.26370146531096,
+            192.14234361121535
+          ],
+          "ratio_plain_band": [
+            166.96012176560123,
+            373.1079937653084,
+            1330.952066635235
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            30.498687664041995,
+            73.80787401574803,
+            467.6763925729443
+          ],
+          "seeds": 3,
+          "t_add_ns": 3383.73075,
+          "total_band": [
+            11426.333333333334,
+            27927.13333333333,
+            176434.33333333334
+          ],
+          "total_cal": [
+            11426.333333333334,
+            11729.025681771518,
+            14453.25681771518
+          ]
+        },
+        "ic_jc_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 163.0,
+          "lower_bound": true,
+          "median_ops": 150.0,
+          "name": "ic_jc_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2.4696969696969697,
+            2.241512677266867,
+            1.2296086751532296
+          ],
+          "ratio_neg_band": [
+            2.4696969696969697,
+            2.241512677266867,
+            1.2238385734396997
+          ],
+          "ratio_neg_cal": [
+            2.4696969696969697,
+            2.435665511692431,
+            2.1669304298419814
+          ],
+          "ratio_plain_band": [
+            2.3817351598173517,
+            2.1776887107548433,
+            1.2296086751532296
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.3978779840848806,
+            0.3978779840848806,
+            0.3978779840848806
+          ],
+          "seeds": 3,
+          "t_add_ns": 3383.73075,
+          "total_band": [
+            163.0,
+            163.0,
+            163.0
+          ],
+          "total_cal": [
+            163.0,
+            163.0,
+            163.0
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "candidate": 2,
+      "class_times_ns": {
+        "canon": 2.2854,
+        "draw": 2.06995,
+        "hash": 2.07025,
+        "insert": 7.35585,
+        "inv_r": 59.326,
+        "lookup": 4.18535,
+        "mul_p": 6.20725,
+        "mul_r": 6.20715,
+        "word": 1.0356
+      },
+      "e1_order": 852,
+      "e2_order": 772,
+      "gate_reproduces_record": true,
+      "jac_order": 657744,
+      "old_plain_rho_ops_mean": 376.0,
+      "old_plain_rho_ops_per_seed": [
+        370.0,
+        377.0,
+        381.0
+      ],
+      "p": 821,
+      "r": 71,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 678,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 16.25,
+          "certified": 32,
+          "dp_inserts": 3.8125,
+          "dp_lookups": 4.84375,
+          "key_evaluations": 53.59375,
+          "kind": "negation",
+          "native": 67.1875,
+          "native_per_step": 7.190635451505017,
+          "other_ops": 54.75,
+          "partition_hashes": 16.25,
+          "runs": 32,
+          "steps": 9.34375,
+          "total_ops": 66.0,
+          "walk_ops": 11.25,
+          "walk_share": 0.17045454545454544,
+          "walks": 5.0,
+          "word_ops": 26.03125
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 32,
+          "dp_inserts": 4.625,
+          "dp_lookups": 5.625,
+          "key_evaluations": 24.3125,
+          "kind": "plain",
+          "native": 64.125,
+          "native_per_step": 5.221374045801527,
+          "other_ops": 55.78125,
+          "partition_hashes": 18.6875,
+          "runs": 32,
+          "steps": 12.28125,
+          "total_ops": 68.4375,
+          "walk_ops": 12.65625,
+          "walk_share": 0.18493150684931506,
+          "walks": 6.03125,
+          "word_ops": 35.1875
+        }
+      },
+      "t_add_ns": {
+        "E1": 158.38255,
+        "J_recorded_impl": 3383.73075,
+        "J_word_impl": 780.6924
+      },
+      "target": "cover_pushforward",
+      "wall_s": 2.418190421
+    },
+    {
+      "arms": {
+        "A": {
+          "attempts": 1.875,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 771.0,
+          "core_cols": 105.5,
+          "exhausted": 0,
+          "group_ops": 3658.375,
+          "la_add": 2348852.875,
+          "la_mul": 1197398.875,
+          "lower_bound": false,
+          "name": "A",
+          "native": {
+            "mul_p": 334834.0,
+            "mul_r": 1197398.875
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            39.363819771351714,
+            1413.7861387253936,
+            5621.470890998513
+          ],
+          "ratio_neg_band": [
+            39.363819771351714,
+            1413.7861387253936,
+            5621.470890998513
+          ],
+          "ratio_neg_cal": [
+            39.363819771351714,
+            158.55168134858198,
+            987.3029319253596
+          ],
+          "ratio_plain_band": [
+            36.56089943785134,
+            1288.6219005082396,
+            4846.994082840237
+          ],
+          "rel_add": 270692.875,
+          "rel_mul": 334834.0,
+          "relations": 805.25,
+          "runs": 8,
+          "setup_ops": 334.25,
+          "t_add_ns": 827.5127,
+          "total_band": [
+            3658.375,
+            156881.6625,
+            1535891.25
+          ],
+          "total_cal": [
+            3658.375,
+            15169.127199384673,
+            118765.89699384672
+          ],
+          "total_w1_with_additions": 4155437.0,
+          "trials": 1744.375,
+          "verify_ops": 14.0,
+          "walk_ops": 3310.125
+        },
+        "B": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 276.0,
+          "core_cols": 11.75,
+          "exhausted": 0,
+          "group_ops": 2993.375,
+          "la_add": 28824.75,
+          "la_mul": 27760.75,
+          "lower_bound": false,
+          "name": "B",
+          "native": {
+            "mul_p": 251513.0,
+            "mul_r": 27760.75
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            32.208473436449225,
+            278.65160945112507,
+            1033.1176941553242
+          ],
+          "ratio_neg_band": [
+            32.208473436449225,
+            278.65160945112507,
+            1033.1176941553242
+          ],
+          "ratio_neg_cal": [
+            32.208473436449225,
+            53.21391515828476,
+            199.27145713883922
+          ],
+          "ratio_plain_band": [
+            29.915053091817615,
+            253.98223728117458,
+            890.7838264299803
+          ],
+          "rel_add": 210831.0,
+          "rel_mul": 251513.0,
+          "relations": 318.5,
+          "runs": 8,
+          "setup_ops": 334.25,
+          "t_add_ns": 827.5127,
+          "total_band": [
+            2993.375,
+            30920.75,
+            282267.125
+          ],
+          "total_cal": [
+            2993.375,
+            5091.1389961145005,
+            23971.014961145003
+          ],
+          "total_w1_with_additions": 521922.875,
+          "trials": 1388.5,
+          "verify_ops": 14.0,
+          "walk_ops": 2645.125
+        },
+        "C": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 81.0,
+          "core_cols": 1.0,
+          "exhausted": 0,
+          "group_ops": 2583.25,
+          "la_add": 3635.625,
+          "la_mul": 1385.25,
+          "lower_bound": false,
+          "name": "C",
+          "native": {
+            "mul_p": 207186.75,
+            "mul_r": 1385.25
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            27.7955615332885,
+            211.24064321721255,
+            772.8431888367837
+          ],
+          "ratio_neg_band": [
+            27.7955615332885,
+            211.24064321721255,
+            772.8431888367837
+          ],
+          "ratio_neg_cal": [
+            27.7955615332885,
+            43.37596756174135,
+            151.71150450068944
+          ],
+          "ratio_plain_band": [
+            25.81636477201749,
+            192.5392473946301,
+            666.3676528599606
+          ],
+          "rel_add": 176590.125,
+          "rel_mul": 207186.75,
+          "relations": 547.25,
+          "runs": 8,
+          "setup_ops": 334.25,
+          "t_add_ns": 827.5127,
+          "total_band": [
+            2583.25,
+            23440.45,
+            211155.25
+          ],
+          "total_cal": [
+            2583.25,
+            4149.912279352329,
+            18249.87279352329
+          ],
+          "total_w1_with_additions": 391381.0,
+          "trials": 1166.5,
+          "verify_ops": 14.0,
+          "walk_ops": 2235.0
+        },
+        "birthday_e1_first_collision": {
+          "certified": 3,
+          "class_best_band": "unresolved (lower bound)",
+          "class_best_cal": "above",
+          "class_neg_band": "unresolved (lower bound)",
+          "class_neg_cal": "above",
+          "class_plain_band": "unresolved (lower bound)",
+          "group": "E1",
+          "group_ops": 227.0,
+          "lower_bound": true,
+          "median_ops": 109.0,
+          "name": "birthday_e1_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2.4425016812373905,
+            2.0456785603649776,
+            0.8308360974493881
+          ],
+          "ratio_neg_band": [
+            2.4425016812373905,
+            2.0456785603649776,
+            0.8308360974493881
+          ],
+          "ratio_neg_cal": [
+            2.4425016812373905,
+            2.3726633176092076,
+            1.8870548803977645
+          ],
+          "ratio_plain_band": [
+            2.268582136164897,
+            1.8645721032907232,
+            0.716370808678501
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.1670103092783505,
+            0.1670103092783505,
+            0.1670103092783505
+          ],
+          "seeds": 3,
+          "t_add_ns": 165.549,
+          "total_band": [
+            227.0,
+            227.0,
+            227.0
+          ],
+          "total_cal": [
+            227.0,
+            227.0,
+            227.0
+          ]
+        },
+        "ic_e1_fibre_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 567.3333333333334,
+          "lower_bound": true,
+          "median_ops": 109.0,
+          "name": "ic_e1_fibre_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            6.104460883210043,
+            5.112694434274879,
+            2.0764802318044913
+          ],
+          "ratio_neg_band": [
+            6.104460883210043,
+            5.112694434274879,
+            2.0764802318044913
+          ],
+          "ratio_neg_cal": [
+            6.104460883210043,
+            5.9299162504711775,
+            4.716251698145368
+          ],
+          "ratio_plain_band": [
+            5.669789714761608,
+            4.660061262556257,
+            1.7904010519395135
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.1670103092783505,
+            0.1670103092783505,
+            0.1670103092783505
+          ],
+          "seeds": 3,
+          "t_add_ns": 165.549,
+          "total_band": [
+            567.3333333333334,
+            567.3333333333334,
+            567.3333333333334
+          ],
+          "total_cal": [
+            567.3333333333334,
+            567.3333333333334,
+            567.3333333333334
+          ]
+        },
+        "ic_e1_fibre_full": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 34876.0,
+          "lower_bound": true,
+          "median_ops": 34521.0,
+          "name": "ic_e1_fibre_full",
+          "native": {
+            "mul_r": 74101.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            375.2629455279085,
+            381.0738685966938,
+            398.86354798124216
+          ],
+          "ratio_neg_band": [
+            375.2629455279085,
+            381.0738685966938,
+            398.86354798124216
+          ],
+          "ratio_neg_cal": [
+            375.2629455279085,
+            393.6186740253122,
+            521.2519140731165
+          ],
+          "ratio_plain_band": [
+            348.5421611492817,
+            347.3369269469685,
+            343.9116370808679
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            70.50103092783505,
+            85.77958762886598,
+            223.28659793814433
+          ],
+          "seeds": 3,
+          "t_add_ns": 165.549,
+          "total_band": [
+            34876.0,
+            42286.1,
+            108977.0
+          ],
+          "total_cal": [
+            34876.0,
+            37658.709662094,
+            62703.09662094002
+          ]
+        },
+        "ic_e1_two_term": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 2754.6666666666665,
+          "lower_bound": true,
+          "median_ops": 2754.0,
+          "name": "ic_e1_two_term",
+          "native": {
+            "lookup": 219.33333333333334,
+            "mul_r": 50509.333333333336
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            29.63999103340058,
+            70.54016352661768,
+            195.75279271035876
+          ],
+          "ratio_neg_band": [
+            29.63999103340058,
+            70.54016352661768,
+            195.75279271035876
+          ],
+          "ratio_neg_cal": [
+            29.63999103340058,
+            48.728979367752345,
+            181.46080914463477
+          ],
+          "ratio_plain_band": [
+            27.529460753695606,
+            64.29515546657085,
+            168.7836949375411
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            5.678350515463918,
+            16.490927835051547,
+            113.80412371134021
+          ],
+          "seeds": 3,
+          "t_add_ns": 165.549,
+          "total_band": [
+            2754.6666666666665,
+            7827.533333333335,
+            53483.333333333336
+          ],
+          "total_cal": [
+            2754.6666666666665,
+            4662.051389417433,
+            21828.513894174335
+          ]
+        },
+        "ic_jc": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 34876.0,
+          "lower_bound": true,
+          "median_ops": 34521.0,
+          "name": "ic_jc",
+          "native": {
+            "mul_r": 603721.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            375.2629455279085,
+            858.3568109493368,
+            2337.310305387167
+          ],
+          "ratio_neg_band": [
+            375.2629455279085,
+            858.3568109493368,
+            2337.310305387167
+          ],
+          "ratio_neg_cal": [
+            375.2629455279085,
+            375.677427500199,
+            378.5594529710114
+          ],
+          "ratio_plain_band": [
+            348.5421611492817,
+            782.3654191693619,
+            2015.2962524654831
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            70.50103092783505,
+            194.979587628866,
+            1315.2865979381443
+          ],
+          "seeds": 3,
+          "t_add_ns": 3520.15445,
+          "total_band": [
+            34876.0,
+            95248.1,
+            638597.0
+          ],
+          "total_cal": [
+            34876.0,
+            35942.215403943424,
+            45538.15403943426
+          ]
+        },
+        "ic_jc_L": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 34876.0,
+          "lower_bound": true,
+          "median_ops": 34521.0,
+          "name": "ic_jc_L",
+          "native": {
+            "mul_r": 605131.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            375.2629455279085,
+            859.6274747247177,
+            2342.471005375729
+          ],
+          "ratio_neg_band": [
+            375.2629455279085,
+            859.6274747247177,
+            2342.471005375729
+          ],
+          "ratio_neg_cal": [
+            375.2629455279085,
+            375.70345533498096,
+            378.7664606500486
+          ],
+          "ratio_plain_band": [
+            348.5421611492817,
+            783.5235895066482,
+            2019.7459566074951
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            70.50103092783505,
+            195.27030927835054,
+            1318.1938144329897
+          ],
+          "seeds": 3,
+          "t_add_ns": 3520.15445,
+          "total_band": [
+            34876.0,
+            95389.1,
+            640007.0
+          ],
+          "total_cal": [
+            34876.0,
+            35944.70556698158,
+            45563.05566981585
+          ]
+        },
+        "ic_jc_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 567.3333333333334,
+          "lower_bound": true,
+          "median_ops": 109.0,
+          "name": "ic_jc_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            6.104460883210043,
+            5.112694434274879,
+            2.0764802318044913
+          ],
+          "ratio_neg_band": [
+            6.104460883210043,
+            5.112694434274879,
+            2.0764802318044913
+          ],
+          "ratio_neg_cal": [
+            6.104460883210043,
+            5.9299162504711775,
+            4.716251698145368
+          ],
+          "ratio_plain_band": [
+            5.669789714761608,
+            4.660061262556257,
+            1.7904010519395135
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.1670103092783505,
+            0.1670103092783505,
+            0.1670103092783505
+          ],
+          "seeds": 3,
+          "t_add_ns": 3520.15445,
+          "total_band": [
+            567.3333333333334,
+            567.3333333333334,
+            567.3333333333334
+          ],
+          "total_cal": [
+            567.3333333333334,
+            567.3333333333334,
+            567.3333333333334
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "candidate": 1,
+      "class_times_ns": {
+        "canon": 3.6273,
+        "draw": 2.1706,
+        "hash": 3.8978,
+        "insert": 11.88645,
+        "inv_r": 79.192,
+        "lookup": 8.0092,
+        "mul_p": 6.21575,
+        "mul_r": 6.21685,
+        "word": 1.09415
+      },
+      "e1_order": 1604,
+      "e2_order": 1560,
+      "gate_reproduces_record": true,
+      "jac_order": 2502240,
+      "old_plain_rho_ops_mean": 571.3333333333334,
+      "old_plain_rho_ops_per_seed": [
+        847.0,
+        382.0,
+        485.0
+      ],
+      "p": 1619,
+      "r": 401,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 1157,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 32.5,
+          "certified": 32,
+          "dp_inserts": 4.25,
+          "dp_lookups": 5.25,
+          "key_evaluations": 102.75,
+          "kind": "negation",
+          "native": 180.28125,
+          "native_per_step": 7.979253112033195,
+          "other_ops": 65.8125,
+          "partition_hashes": 32.5,
+          "runs": 32,
+          "steps": 22.59375,
+          "total_ops": 92.9375,
+          "walk_ops": 27.125,
+          "walk_share": 0.29186281102891726,
+          "walks": 5.375,
+          "word_ops": 105.78125
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 32,
+          "dp_inserts": 6.5625,
+          "dp_lookups": 7.5625,
+          "key_evaluations": 47.1875,
+          "kind": "plain",
+          "native": 216.8125,
+          "native_per_step": 6.8761149653121905,
+          "other_ops": 68.09375,
+          "partition_hashes": 39.625,
+          "runs": 32,
+          "steps": 31.53125,
+          "total_ops": 100.0625,
+          "walk_ops": 31.96875,
+          "walk_share": 0.3194878201124297,
+          "walks": 7.65625,
+          "word_ops": 163.0625
+        }
+      },
+      "t_add_ns": {
+        "E1": 165.549,
+        "J_recorded_impl": 3520.15445,
+        "J_word_impl": 827.5127
+      },
+      "target": "cover_pushforward",
+      "wall_s": 2.9896738430000003
+    },
+    {
+      "arms": {
+        "A": {
+          "attempts": 2.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 1533.0,
+          "core_cols": 130.5,
+          "exhausted": 0,
+          "group_ops": 7325.375,
+          "la_add": 6205474.125,
+          "la_mul": 3131700.25,
+          "lower_bound": false,
+          "name": "A",
+          "native": {
+            "mul_p": 680173.0,
+            "mul_r": 3131700.25
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            86.94807121661721,
+            3925.48590192921,
+            16499.845551505332
+          ],
+          "ratio_neg_band": [
+            86.94807121661721,
+            3925.48590192921,
+            16499.845551505332
+          ],
+          "ratio_neg_cal": [
+            86.94807121661721,
+            418.1185546077733,
+            2942.1435730027893
+          ],
+          "ratio_plain_band": [
+            81.76212068364144,
+            3673.33620918895,
+            15197.01019646854
+          ],
+          "rel_add": 553507.25,
+          "rel_mul": 680173.0,
+          "relations": 1610.0,
+          "runs": 8,
+          "setup_ops": 310.875,
+          "t_add_ns": 829.05225,
+          "total_band": [
+            7325.375,
+            388512.7,
+            3819198.625
+          ],
+          "total_cal": [
+            7325.375,
+            35863.61426430753,
+            292707.76764307526
+          ],
+          "total_w1_with_additions": 10578180.0,
+          "trials": 3518.25,
+          "verify_ops": 11.0,
+          "walk_ops": 7003.5
+        },
+        "B": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 435.0,
+          "core_cols": 10.5,
+          "exhausted": 0,
+          "group_ops": 4499.875,
+          "la_add": 38971.875,
+          "la_mul": 38779.5,
+          "lower_bound": false,
+          "name": "B",
+          "native": {
+            "mul_p": 381995.5,
+            "mul_r": 38779.5
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            53.410979228486646,
+            470.6122320103565,
+            1837.2885108680978
+          ],
+          "ratio_neg_band": [
+            53.410979228486646,
+            470.6122320103565,
+            1837.2885108680978
+          ],
+          "ratio_neg_cal": [
+            53.410979228486646,
+            89.18878423025957,
+            361.8703167238186
+          ],
+          "ratio_plain_band": [
+            50.22532263690269,
+            440.3829221450731,
+            1692.2153693111165
+          ],
+          "rel_add": 321472.375,
+          "rel_mul": 381995.5,
+          "relations": 475.75,
+          "runs": 8,
+          "setup_ops": 310.875,
+          "t_add_ns": 829.05225,
+          "total_band": [
+            4499.875,
+            46577.375,
+            425274.875
+          ],
+          "total_cal": [
+            4499.875,
+            7650.060297699874,
+            36001.727976998736
+          ],
+          "total_w1_with_additions": 785719.125,
+          "trials": 2095.0,
+          "verify_ops": 11.0,
+          "walk_ops": 4178.0
+        },
+        "C": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 114.0,
+          "core_cols": 1.0,
+          "exhausted": 0,
+          "group_ops": 5931.5,
+          "la_add": 7004.125,
+          "la_mul": 1899.0,
+          "lower_bound": false,
+          "name": "C",
+          "native": {
+            "mul_p": 493623.25,
+            "mul_r": 1899.0
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            70.40356083086053,
+            560.600928294023,
+            2166.399351964358
+          ],
+          "ratio_neg_band": [
+            70.40356083086053,
+            560.600928294023,
+            2166.399351964358
+          ],
+          "ratio_neg_cal": [
+            70.40356083086053,
+            112.4036502620446,
+            432.5084960007444
+          ],
+          "ratio_plain_band": [
+            66.20439483780956,
+            524.5912837937658,
+            1995.339467794081
+          ],
+          "rel_add": 425514.625,
+          "rel_mul": 493623.25,
+          "relations": 1262.25,
+          "runs": 8,
+          "setup_ops": 310.875,
+          "t_add_ns": 829.05225,
+          "total_band": [
+            5931.5,
+            55483.725000000006,
+            501453.75
+          ],
+          "total_cal": [
+            5931.5,
+            9641.287406342604,
+            43029.37406342604
+          ],
+          "total_w1_with_additions": 933972.5,
+          "trials": 2811.875,
+          "verify_ops": 11.0,
+          "walk_ops": 5609.625
+        },
+        "birthday_e1_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 323.6666666666667,
+          "lower_bound": true,
+          "median_ops": 325.0,
+          "name": "birthday_e1_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            3.841740850642928,
+            3.270289328828687,
+            1.3983169074299087
+          ],
+          "ratio_neg_band": [
+            3.841740850642928,
+            3.270289328828687,
+            1.3983169074299087
+          ],
+          "ratio_neg_cal": [
+            3.841740850642928,
+            3.7734913677138184,
+            3.25332604186221
+          ],
+          "ratio_plain_band": [
+            3.6126031856760843,
+            3.0602255379918257,
+            1.2879051645527648
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.47307132459970885,
+            0.47307132459970885,
+            0.47307132459970885
+          ],
+          "seeds": 3,
+          "t_add_ns": 168.85775,
+          "total_band": [
+            323.6666666666667,
+            323.6666666666667,
+            323.6666666666667
+          ],
+          "total_cal": [
+            323.6666666666667,
+            323.6666666666667,
+            323.6666666666667
+          ]
+        },
+        "ic_e1_fibre_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 476.3333333333333,
+          "lower_bound": true,
+          "median_ops": 524.0,
+          "name": "ic_e1_fibre_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            5.653808110781404,
+            4.812815088461579,
+            2.0578731830250665
+          ],
+          "ratio_neg_band": [
+            5.653808110781404,
+            4.812815088461579,
+            2.0578731830250665
+          ],
+          "ratio_neg_cal": [
+            5.653808110781404,
+            5.553366801712715,
+            4.787850580660245
+          ],
+          "ratio_plain_band": [
+            5.31659109405883,
+            4.50366868567489,
+            1.8953825748155515
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.8534201954397395,
+            0.8534201954397395,
+            0.8534201954397395
+          ],
+          "seeds": 3,
+          "t_add_ns": 168.85775,
+          "total_band": [
+            476.3333333333333,
+            476.3333333333333,
+            476.3333333333333
+          ],
+          "total_cal": [
+            476.3333333333333,
+            476.3333333333333,
+            476.3333333333333
+          ]
+        },
+        "ic_e1_fibre_full": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 60062.666666666664,
+          "lower_bound": true,
+          "median_ops": 60059.0,
+          "name": "ic_e1_fibre_full",
+          "native": {
+            "mul_r": 124903.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            712.9099901088032,
+            733.0665066885583,
+            799.0956302596643
+          ],
+          "ratio_neg_band": [
+            712.9099901088032,
+            733.0665066885583,
+            799.0956302596643
+          ],
+          "ratio_neg_cal": [
+            712.9099901088032,
+            753.7714247686671,
+            1065.1979816070482
+          ],
+          "ratio_plain_band": [
+            670.3890245320312,
+            685.9787068498547,
+            735.9986736301086
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            97.12540716612378,
+            117.46791530944625,
+            300.5504885993485
+          ],
+          "seeds": 3,
+          "t_add_ns": 168.85775,
+          "total_band": [
+            60062.666666666664,
+            72552.96666666666,
+            184965.66666666666
+          ],
+          "total_cal": [
+            60062.666666666664,
+            64653.83399863692,
+            105974.33998636919
+          ]
+        },
+        "ic_e1_two_term": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 2202.6666666666665,
+          "lower_bound": true,
+          "median_ops": 2194.0,
+          "name": "ic_e1_two_term",
+          "native": {
+            "lookup": 176.33333333333334,
+            "mul_r": 33839.666666666664
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            26.144411473788328,
+            56.62484081125741,
+            156.47324602853155
+          ],
+          "ratio_neg_band": [
+            26.144411473788328,
+            56.62484081125741,
+            156.47324602853155
+          ],
+          "ratio_neg_cal": [
+            26.144411473788328,
+            40.23276774333168,
+            147.6075655461582
+          ],
+          "ratio_plain_band": [
+            24.585048250203464,
+            52.9876003348599,
+            144.1180469203349
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            3.6221498371335503,
+            8.475545851528386,
+            56.06550218340611
+          ],
+          "seeds": 3,
+          "t_add_ns": 168.85775,
+          "total_band": [
+            2202.6666666666665,
+            5604.266666666666,
+            36218.666666666664
+          ],
+          "total_cal": [
+            2202.6666666666665,
+            3450.91708375837,
+            14685.170837583704
+          ]
+        },
+        "ic_jc": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 60062.666666666664,
+          "lower_bound": true,
+          "median_ops": 60059.0,
+          "name": "ic_jc",
+          "native": {
+            "mul_r": 2368513.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            712.9099901088032,
+            2999.983244398135,
+            10492.023941316771
+          ],
+          "ratio_neg_band": [
+            712.9099901088032,
+            2999.983244398135,
+            10492.023941316771
+          ],
+          "ratio_neg_cal": [
+            712.9099901088032,
+            748.5321912761984,
+            1020.0277848330937
+          ],
+          "ratio_plain_band": [
+            670.3890245320312,
+            2807.2822967449647,
+            9663.568929785293
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            97.12540716612378,
+            482.8767100977199,
+            3954.6384364820847
+          ],
+          "seeds": 3,
+          "t_add_ns": 3549.44265,
+          "total_band": [
+            60062.666666666664,
+            296913.9666666667,
+            2428575.6666666665
+          ],
+          "total_cal": [
+            60062.666666666664,
+            64204.445070678914,
+            101480.45070678912
+          ]
+        },
+        "ic_jc_L": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 60062.666666666664,
+          "lower_bound": true,
+          "median_ops": 60059.0,
+          "name": "ic_jc_L",
+          "native": {
+            "mul_r": 2369713.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            712.9099901088032,
+            3001.1957100607287,
+            10497.208226452454
+          ],
+          "ratio_neg_band": [
+            712.9099901088032,
+            3001.1957100607287,
+            10497.208226452454
+          ],
+          "ratio_neg_cal": [
+            712.9099901088032,
+            748.5566558536,
+            1020.2387068652592
+          ],
+          "ratio_plain_band": [
+            670.3890245320312,
+            2808.416880878515,
+            9668.343861394345
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            97.12540716612378,
+            483.0721498371336,
+            3956.5928338762214
+          ],
+          "seeds": 3,
+          "t_add_ns": 3549.44265,
+          "total_band": [
+            60062.666666666664,
+            297033.9666666667,
+            2429775.6666666665
+          ],
+          "total_cal": [
+            60062.666666666664,
+            64206.54349027163,
+            101501.43490271634
+          ]
+        },
+        "ic_jc_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 476.3333333333333,
+          "lower_bound": true,
+          "median_ops": 524.0,
+          "name": "ic_jc_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            5.653808110781404,
+            4.812815088461579,
+            2.0578731830250665
+          ],
+          "ratio_neg_band": [
+            5.653808110781404,
+            4.812815088461579,
+            2.0578731830250665
+          ],
+          "ratio_neg_cal": [
+            5.653808110781404,
+            5.553366801712715,
+            4.787850580660245
+          ],
+          "ratio_plain_band": [
+            5.31659109405883,
+            4.50366868567489,
+            1.8953825748155515
+          ],
+          "recorded_class": "below",
+          "recorded_median_ratio_to_old_plain_rho": [
+            0.8534201954397395,
+            0.8534201954397395,
+            0.8534201954397395
+          ],
+          "seeds": 3,
+          "t_add_ns": 3549.44265,
+          "total_band": [
+            476.3333333333333,
+            476.3333333333333,
+            476.3333333333333
+          ],
+          "total_cal": [
+            476.3333333333333,
+            476.3333333333333,
+            476.3333333333333
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "candidate": 12,
+      "class_times_ns": {
+        "canon": 2.30585,
+        "draw": 2.06975,
+        "hash": 2.07025,
+        "insert": 7.23895,
+        "inv_r": 78.976,
+        "lookup": 4.19105,
+        "mul_p": 6.2068,
+        "mul_r": 6.20685,
+        "word": 1.0355
+      },
+      "e1_order": 3130,
+      "e2_order": 3142,
+      "gate_reproduces_record": true,
+      "jac_order": 9834460,
+      "old_plain_rho_ops_mean": 592.3333333333334,
+      "old_plain_rho_ops_per_seed": [
+        476.0,
+        687.0,
+        614.0
+      ],
+      "p": 3203,
+      "r": 313,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 2166,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 27.5,
+          "certified": 32,
+          "dp_inserts": 4.09375,
+          "dp_lookups": 5.09375,
+          "key_evaluations": 87.59375,
+          "kind": "negation",
+          "native": 147.21875,
+          "native_per_step": 7.672638436482084,
+          "other_ops": 61.90625,
+          "partition_hashes": 27.5,
+          "runs": 32,
+          "steps": 19.1875,
+          "total_ops": 84.25,
+          "walk_ops": 22.34375,
+          "walk_share": 0.26520771513353114,
+          "walks": 5.15625,
+          "word_ops": 83.03125
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 32,
+          "dp_inserts": 5.8125,
+          "dp_lookups": 6.8125,
+          "key_evaluations": 39.65625,
+          "kind": "plain",
+          "native": 161.71875,
+          "native_per_step": 6.265133171912833,
+          "other_ops": 63.59375,
+          "partition_hashes": 32.84375,
+          "runs": 32,
+          "steps": 25.8125,
+          "total_ops": 89.59375,
+          "walk_ops": 26.0,
+          "walk_share": 0.2901988140913847,
+          "walks": 6.84375,
+          "word_ops": 116.25
+        }
+      },
+      "t_add_ns": {
+        "E1": 168.85775,
+        "J_recorded_impl": 3549.44265,
+        "J_word_impl": 829.05225
+      },
+      "target": "cover_pushforward",
+      "wall_s": 3.66826326
+    },
+    {
+      "arms": {
+        "A": {
+          "attempts": 2.25,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 3140.0,
+          "core_cols": 428.75,
+          "exhausted": 0,
+          "group_ops": 10634.125,
+          "la_add": 45541245.625,
+          "la_mul": 23298105.875,
+          "lower_bound": false,
+          "name": "A",
+          "native": {
+            "mul_p": 1544468.125,
+            "mul_r": 23298105.875
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            67.0261965727792,
+            11215.35840415818,
+            31198.127255609605
+          ],
+          "ratio_neg_band": [
+            67.0261965727792,
+            11215.35840415818,
+            31198.127255609605
+          ],
+          "ratio_neg_cal": [
+            67.0261965727792,
+            1181.5438582189745,
+            8737.095123603032
+          ],
+          "ratio_plain_band": [
+            61.45782914935886,
+            9410.689895798952,
+            22720.98562980316
+          ],
+          "rel_add": 1241159.0,
+          "rel_mul": 1544468.125,
+          "relations": 3337.25,
+          "runs": 8,
+          "setup_ops": 473.25,
+          "t_add_ns": 842.8003,
+          "total_band": [
+            10634.125,
+            2494891.525,
+            24853208.125
+          ],
+          "total_cal": [
+            10634.125,
+            193600.2594623246,
+            1840295.469623246
+          ],
+          "total_w1_with_additions": 71635612.75,
+          "trials": 6773.25,
+          "verify_ops": 20.0,
+          "walk_ops": 10140.875
+        },
+        "B": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 691.0,
+          "core_cols": 15.5,
+          "exhausted": 0,
+          "group_ops": 7063.5,
+          "la_add": 81371.875,
+          "la_mul": 87710.625,
+          "lower_bound": false,
+          "name": "B",
+          "native": {
+            "mul_p": 938284.875,
+            "mul_r": 87710.625
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            44.520779988182,
+            492.971496804102,
+            1296.79460222815
+          ],
+          "ratio_neg_band": [
+            44.520779988182,
+            492.971496804102,
+            1296.79460222815
+          ],
+          "ratio_neg_cal": [
+            44.520779988182,
+            89.22522023494521,
+            392.2860883559765
+          ],
+          "ratio_plain_band": [
+            40.82210583348384,
+            413.6472252345702,
+            944.4301345598949
+          ],
+          "rel_add": 787442.125,
+          "rel_mul": 938284.875,
+          "relations": 808.0,
+          "runs": 8,
+          "setup_ops": 473.25,
+          "t_add_ns": 842.8003,
+          "total_band": [
+            7063.5,
+            109663.05,
+            1033059.0
+          ],
+          "total_cal": [
+            7063.5,
+            14619.876924506909,
+            82627.2692450691
+          ],
+          "total_w1_with_additions": 1901873.0,
+          "trials": 4388.125,
+          "verify_ops": 20.0,
+          "walk_ops": 6570.25
+        },
+        "C": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 161.0,
+          "core_cols": 1.25,
+          "exhausted": 0,
+          "group_ops": 8592.125,
+          "la_add": 13397.5,
+          "la_mul": 2947.875,
+          "lower_bound": false,
+          "name": "C",
+          "native": {
+            "mul_p": 1118676.625,
+            "mul_r": 2947.875
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            54.1556037029742,
+            542.8315515909251,
+            1418.756158794916
+          ],
+          "ratio_neg_band": [
+            54.1556037029742,
+            542.8315515909251,
+            1418.756158794916
+          ],
+          "ratio_neg_cal": [
+            54.1556037029742,
+            102.85271204180768,
+            432.9807227424751
+          ],
+          "ratio_plain_band": [
+            49.6564926855698,
+            455.4842755434014,
+            1033.2523497985887
+          ],
+          "rel_add": 955280.875,
+          "rel_mul": 1118676.625,
+          "relations": 2628.375,
+          "runs": 8,
+          "setup_ops": 473.25,
+          "t_add_ns": 842.8003,
+          "total_band": [
+            8592.125,
+            120754.57500000001,
+            1130216.625
+          ],
+          "total_cal": [
+            8592.125,
+            16852.7910319918,
+            91198.78531991804
+          ],
+          "total_w1_with_additions": 2098895.0,
+          "trials": 5406.125,
+          "verify_ops": 20.0,
+          "walk_ops": 8098.875
+        },
+        "birthday_e1_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 1462.6666666666667,
+          "lower_bound": true,
+          "median_ops": 1610.0,
+          "name": "birthday_e1_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            9.219092640010505,
+            6.575167989510899,
+            1.8360792928500445
+          ],
+          "ratio_neg_band": [
+            9.219092640010505,
+            6.575167989510899,
+            1.8360792928500445
+          ],
+          "ratio_neg_cal": [
+            9.219092640010505,
+            8.926665808306604,
+            6.944242384841771
+          ],
+          "ratio_plain_band": [
+            8.45319366684727,
+            5.517154667043865,
+            1.3371806226132998
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.051269035532995,
+            1.051269035532995,
+            1.051269035532995
+          ],
+          "seeds": 3,
+          "t_add_ns": 180.29745,
+          "total_band": [
+            1462.6666666666667,
+            1462.6666666666667,
+            1462.6666666666667
+          ],
+          "total_cal": [
+            1462.6666666666667,
+            1462.6666666666667,
+            1462.6666666666667
+          ]
+        },
+        "ic_e1_fibre_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 1749.6666666666667,
+          "lower_bound": true,
+          "median_ops": 1610.0,
+          "name": "ic_e1_fibre_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            11.028034928763706,
+            7.865327433213927,
+            2.196349181442544
+          ],
+          "ratio_neg_band": [
+            11.028034928763706,
+            7.865327433213927,
+            2.196349181442544
+          ],
+          "ratio_neg_cal": [
+            11.028034928763706,
+            10.67822899448527,
+            8.306820482687888
+          ],
+          "ratio_plain_band": [
+            10.11185359099392,
+            6.59971395791095,
+            1.5995581331124
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.3883248730964468,
+            1.3883248730964468,
+            1.3883248730964468
+          ],
+          "seeds": 3,
+          "t_add_ns": 180.29745,
+          "total_band": [
+            1749.6666666666667,
+            1749.6666666666667,
+            1749.6666666666667
+          ],
+          "total_cal": [
+            1749.6666666666667,
+            1749.6666666666667,
+            1749.6666666666667
+          ]
+        },
+        "ic_e1_fibre_full": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 188082.66666666666,
+          "lower_bound": true,
+          "median_ops": 188130.0,
+          "name": "ic_e1_fibre_full",
+          "native": {
+            "mul_r": 2454121.6666666665
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            1185.4727857658722,
+            1948.7019269040761,
+            3316.747947068361
+          ],
+          "ratio_neg_band": [
+            1185.4727857658722,
+            1948.7019269040761,
+            3316.747947068361
+          ],
+          "ratio_neg_cal": [
+            1185.4727857658722,
+            1663.5135742746172,
+            4904.25332099837
+          ],
+          "ratio_plain_band": [
+            1086.986695563181,
+            1635.1353984943498,
+            2415.5226313934995
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            198.20768431983385,
+            451.95898234683284,
+            2735.7206645898236
+          ],
+          "seeds": 3,
+          "t_add_ns": 180.29745,
+          "total_band": [
+            188082.66666666666,
+            433494.8333333333,
+            2642204.333333333
+          ],
+          "total_cal": [
+            188082.66666666666,
+            272572.75077721104,
+            1032983.5077721103
+          ]
+        },
+        "ic_e1_two_term": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 28507.666666666668,
+          "lower_bound": true,
+          "median_ops": 28546.0,
+          "name": "ic_e1_two_term",
+          "native": {
+            "lookup": 1618.0,
+            "mul_r": 3879217.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            179.6819644146806,
+            1872.7143827117136,
+            4907.3813483968825
+          ],
+          "ratio_neg_band": [
+            179.6819644146806,
+            1872.7143827117136,
+            4907.3813483968825
+          ],
+          "ratio_neg_cal": [
+            179.6819644146806,
+            989.2864608383702,
+            6477.766803428473
+          ],
+          "ratio_plain_band": [
+            164.75443982902897,
+            1571.3750451852202,
+            3573.9498138254817
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            29.46728971962617,
+            446.60384215991695,
+            4200.832814122534
+          ],
+          "seeds": 3,
+          "t_add_ns": 180.29745,
+          "total_band": [
+            28507.666666666668,
+            416591.1666666667,
+            3909342.6666666665
+          ],
+          "total_cal": [
+            28507.666666666668,
+            162098.18549569062,
+            1364412.854956906
+          ]
+        },
+        "ic_jc": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 188082.66666666666,
+          "lower_bound": true,
+          "median_ops": 188130.0,
+          "name": "ic_jc",
+          "native": {
+            "mul_r": 9897308.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            1185.4727857658722,
+            5294.659118259933,
+            12660.148334117892
+          ],
+          "ratio_neg_band": [
+            1185.4727857658722,
+            5294.659118259933,
+            12660.148334117892
+          ],
+          "ratio_neg_cal": [
+            1185.4727857658722,
+            1248.4275783767202,
+            1675.2114503077535
+          ],
+          "ratio_plain_band": [
+            1086.986695563181,
+            4442.69307055181,
+            9220.138311954213
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            198.20768431983385,
+            1225.9655244029077,
+            10475.786085150572
+          ],
+          "seeds": 3,
+          "t_add_ns": 3728.5949,
+          "total_band": [
+            188082.66666666666,
+            1177813.4666666668,
+            10085390.666666666
+          ],
+          "total_cal": [
+            188082.66666666666,
+            204559.400323895,
+            352850.0032389502
+          ]
+        },
+        "ic_jc_L": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 188082.66666666666,
+          "lower_bound": true,
+          "median_ops": 188130.0,
+          "name": "ic_jc_L",
+          "native": {
+            "mul_r": 9912096.333333334
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            1185.4727857658722,
+            5301.30696073611,
+            12678.712066530676
+          ],
+          "ratio_neg_band": [
+            1185.4727857658722,
+            5301.30696073611,
+            12678.712066530676
+          ],
+          "ratio_neg_cal": [
+            1185.4727857658722,
+            1248.5778293102792,
+            1676.3802841406625
+          ],
+          "ratio_plain_band": [
+            1086.986695563181,
+            4448.271205620255,
+            9233.657915035854
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            198.20768431983385,
+            1227.4946002076845,
+            10491.076843198338
+          ],
+          "seeds": 3,
+          "t_add_ns": 3728.5949,
+          "total_band": [
+            188082.66666666666,
+            1179292.3,
+            10100179.0
+          ],
+          "total_cal": [
+            188082.66666666666,
+            204584.01948595076,
+            353096.1948595077
+          ]
+        },
+        "ic_jc_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 1749.6666666666667,
+          "lower_bound": true,
+          "median_ops": 1610.0,
+          "name": "ic_jc_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            11.028034928763706,
+            7.865327433213927,
+            2.196349181442544
+          ],
+          "ratio_neg_band": [
+            11.028034928763706,
+            7.865327433213927,
+            2.196349181442544
+          ],
+          "ratio_neg_cal": [
+            11.028034928763706,
+            10.67822899448527,
+            8.306820482687888
+          ],
+          "ratio_plain_band": [
+            10.11185359099392,
+            6.59971395791095,
+            1.5995581331124
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.3883248730964468,
+            1.3883248730964468,
+            1.3883248730964468
+          ],
+          "seeds": 3,
+          "t_add_ns": 3728.5949,
+          "total_band": [
+            1749.6666666666667,
+            1749.6666666666667,
+            1749.6666666666667
+          ],
+          "total_cal": [
+            1749.6666666666667,
+            1749.6666666666667,
+            1749.6666666666667
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "candidate": 2,
+      "class_times_ns": {
+        "canon": 2.27,
+        "draw": 2.06985,
+        "hash": 2.0704,
+        "insert": 7.2845,
+        "inv_r": 100.006,
+        "lookup": 4.1781,
+        "mul_p": 6.20715,
+        "mul_r": 6.20725,
+        "word": 1.0359
+      },
+      "e1_order": 6382,
+      "e2_order": 6322,
+      "gate_reproduces_record": true,
+      "jac_order": 40347004,
+      "old_plain_rho_ops_mean": 1269.3333333333333,
+      "old_plain_rho_ops_per_seed": [
+        1970.0,
+        963.0,
+        875.0
+      ],
+      "p": 6421,
+      "r": 3191,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 1504,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 87.25,
+          "certified": 32,
+          "dp_inserts": 8.0,
+          "dp_lookups": 9.0,
+          "key_evaluations": 270.75,
+          "kind": "negation",
+          "native": 637.96875,
+          "native_per_step": 9.871856866537717,
+          "other_ops": 80.5625,
+          "partition_hashes": 87.25,
+          "runs": 32,
+          "steps": 64.625,
+          "total_ops": 158.65625,
+          "walk_ops": 78.09375,
+          "walk_share": 0.4922198148512901,
+          "walks": 9.15625,
+          "word_ops": 446.46875
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 32,
+          "dp_inserts": 9.09375,
+          "dp_lookups": 10.09375,
+          "key_evaluations": 111.71875,
+          "kind": "plain",
+          "native": 920.8125,
+          "native_per_step": 10.108404802744426,
+          "other_ops": 81.53125,
+          "partition_hashes": 101.625,
+          "runs": 32,
+          "steps": 91.09375,
+          "total_ops": 173.03125,
+          "walk_ops": 91.5,
+          "walk_share": 0.5288062127505869,
+          "walks": 10.125,
+          "word_ops": 800.0
+        }
+      },
+      "t_add_ns": {
+        "E1": 180.29745,
+        "J_recorded_impl": 3728.5949,
+        "J_word_impl": 842.8003
+      },
+      "target": "cover_pushforward",
+      "wall_s": 8.2526135
+    },
+    {
+      "arms": {
+        "A": {
+          "attempts": 2.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 6378.0,
+          "core_cols": 605.5,
+          "exhausted": 0,
+          "group_ops": 21489.375,
+          "la_add": 116531215.75,
+          "la_mul": 59144250.75,
+          "lower_bound": false,
+          "name": "A",
+          "native": {
+            "mul_p": 3355584.0,
+            "mul_r": 59144250.75
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            142.5497512437811,
+            29137.454439862944,
+            78581.39717203456
+          ],
+          "ratio_neg_band": [
+            142.5497512437811,
+            29137.454439862944,
+            78581.39717203456
+          ],
+          "ratio_neg_cal": [
+            142.5497512437811,
+            3077.3531474135366,
+            22928.00554608371
+          ],
+          "ratio_plain_band": [
+            124.37330439500813,
+            23484.81419243102,
+            56052.51371417365
+          ],
+          "rel_add": 2696168.875,
+          "rel_mul": 3355584.0,
+          "relations": 6697.0,
+          "runs": 8,
+          "setup_ops": 478.875,
+          "t_add_ns": 847.51015,
+          "total_band": [
+            21489.375,
+            6271472.850000001,
+            62521324.125
+          ],
+          "total_cal": [
+            21489.375,
+            479247.773156382,
+            4599073.3565638205
+          ],
+          "total_w1_with_additions": 181748708.75,
+          "trials": 14043.25,
+          "verify_ops": 15.0,
+          "walk_ops": 20995.5
+        },
+        "B": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 1097.0,
+          "core_cols": 12.75,
+          "exhausted": 0,
+          "group_ops": 13945.375,
+          "la_add": 103524.75,
+          "la_mul": 115520.5,
+          "lower_bound": false,
+          "name": "B",
+          "native": {
+            "mul_p": 2004798.875,
+            "mul_r": 115520.5
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            92.50663349917082,
+            1049.8974969510423,
+            2682.5008641005497
+          ],
+          "ratio_neg_band": [
+            92.50663349917082,
+            1049.8974969510423,
+            2682.5008641005497
+          ],
+          "ratio_neg_cal": [
+            92.50663349917082,
+            189.26337588488244,
+            843.7141860594738
+          ],
+          "ratio_plain_band": [
+            80.7111593416531,
+            846.2183162871253,
+            1913.441627209817
+          ],
+          "rel_add": 1690450.75,
+          "rel_mul": 2004798.875,
+          "relations": 1221.875,
+          "runs": 8,
+          "setup_ops": 478.875,
+          "t_add_ns": 847.51015,
+          "total_band": [
+            13945.375,
+            225977.3125,
+            2134264.75
+          ],
+          "total_cal": [
+            13945.375,
+            29474.69695154241,
+            169238.5945154241
+          ],
+          "total_w1_with_additions": 3928240.25,
+          "trials": 9000.0,
+          "verify_ops": 15.0,
+          "walk_ops": 13451.5
+        },
+        "C": {
+          "attempts": 1.0,
+          "certified": 8,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 227.0,
+          "core_cols": 1.0,
+          "exhausted": 0,
+          "group_ops": 15062.625,
+          "la_add": 22317.75,
+          "la_mul": 3627.25,
+          "lower_bound": false,
+          "name": "C",
+          "native": {
+            "mul_p": 2142706.75,
+            "mul_r": 3627.25
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            99.91791044776119,
+            1067.1747488239735,
+            2716.6021995286724
+          ],
+          "ratio_neg_band": [
+            99.91791044776119,
+            1067.1747488239735,
+            2716.6021995286724
+          ],
+          "ratio_neg_cal": [
+            99.91791044776119,
+            197.6608422702266,
+            858.7821175716435
+          ],
+          "ratio_plain_band": [
+            87.17742810634834,
+            860.143796662532,
+            1937.7662847056845
+          ],
+          "rel_add": 1825954.125,
+          "rel_mul": 2142706.75,
+          "relations": 4694.375,
+          "runs": 8,
+          "setup_ops": 478.875,
+          "t_add_ns": 847.51015,
+          "total_band": [
+            15062.625,
+            229696.02500000002,
+            2161396.625
+          ],
+          "total_cal": [
+            15062.625,
+            30782.4659570965,
+            172261.03457096504
+          ],
+          "total_w1_with_additions": 4009668.5,
+          "trials": 9738.625,
+          "verify_ops": 15.0,
+          "walk_ops": 14568.75
+        },
+        "birthday_e1_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 1963.3333333333333,
+          "lower_bound": true,
+          "median_ops": 1740.0,
+          "name": "birthday_e1_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            13.023770038695412,
+            9.121706641887837,
+            2.4676616915422884
+          ],
+          "ratio_neg_band": [
+            13.023770038695412,
+            9.121706641887837,
+            2.4676616915422884
+          ],
+          "ratio_neg_cal": [
+            13.023770038695412,
+            12.606986096070472,
+            9.787910317027581
+          ],
+          "ratio_plain_band": [
+            11.363115693012599,
+            7.352103665909924,
+            1.760195743329691
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.8471337579617835,
+            1.8471337579617835,
+            1.8471337579617835
+          ],
+          "seeds": 3,
+          "t_add_ns": 188.9249,
+          "total_band": [
+            1963.3333333333333,
+            1963.3333333333333,
+            1963.3333333333333
+          ],
+          "total_cal": [
+            1963.3333333333333,
+            1963.3333333333333,
+            1963.3333333333333
+          ]
+        },
+        "ic_e1_fibre_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 1963.3333333333333,
+          "lower_bound": true,
+          "median_ops": 1740.0,
+          "name": "ic_e1_fibre_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            13.023770038695412,
+            9.121706641887837,
+            2.4676616915422884
+          ],
+          "ratio_neg_band": [
+            13.023770038695412,
+            9.121706641887837,
+            2.4676616915422884
+          ],
+          "ratio_neg_cal": [
+            13.023770038695412,
+            12.606986096070472,
+            9.787910317027581
+          ],
+          "ratio_plain_band": [
+            11.363115693012599,
+            7.352103665909924,
+            1.760195743329691
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.8471337579617835,
+            1.8471337579617835,
+            1.8471337579617835
+          ],
+          "seeds": 3,
+          "t_add_ns": 188.9249,
+          "total_band": [
+            1963.3333333333333,
+            1963.3333333333333,
+            1963.3333333333333
+          ],
+          "total_cal": [
+            1963.3333333333333,
+            1963.3333333333333,
+            1963.3333333333333
+          ]
+        },
+        "ic_e1_fibre_full": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 372746.6666666667,
+          "lower_bound": true,
+          "median_ops": 372157.0,
+          "name": "ic_e1_fibre_full",
+          "native": {
+            "mul_r": 5150052.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2472.6147042564953,
+            4124.522291267398,
+            6941.459439643886
+          ],
+          "ratio_neg_band": [
+            2472.6147042564953,
+            4124.522291267398,
+            6941.459439643886
+          ],
+          "ratio_neg_cal": [
+            2472.6147042564953,
+            3480.01826177343,
+            10293.973115291565
+          ],
+          "ratio_plain_band": [
+            2157.3328510279134,
+            3324.368634977103,
+            4951.378626995022
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            393.59023354564755,
+            940.0788747346072,
+            5858.476645435244
+          ],
+          "seeds": 3,
+          "t_add_ns": 188.9249,
+          "total_band": [
+            372746.6666666667,
+            887751.8666666667,
+            5522798.666666667
+          ],
+          "total_cal": [
+            372746.6666666667,
+            541956.3249996868,
+            2064843.2499968682
+          ]
+        },
+        "ic_e1_two_term": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "E1",
+          "group_ops": 28904.0,
+          "lower_bound": true,
+          "median_ops": 28897.0,
+          "name": "ic_e1_two_term",
+          "native": {
+            "lookup": 1620.0,
+            "mul_r": 4554709.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            191.7346600331675,
+            2251.1732388640457,
+            5763.0579732914375
+          ],
+          "ratio_neg_band": [
+            191.7346600331675,
+            2251.1732388640457,
+            5763.0579732914375
+          ],
+          "ratio_neg_cal": [
+            191.7346600331675,
+            1146.7581024396293,
+            7606.420242852226
+          ],
+          "ratio_plain_band": [
+            167.2866702839573,
+            1814.447632644464,
+            4110.8188160143445
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            30.374734607218684,
+            485.5154162384378,
+            4585.043165467626
+          ],
+          "seeds": 3,
+          "t_add_ns": 188.9249,
+          "total_band": [
+            28904.0,
+            484536.9,
+            4585233.0
+          ],
+          "total_cal": [
+            28904.0,
+            178588.9498594415,
+            1525753.4985944151
+          ]
+        },
+        "ic_jc": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 372746.6666666667,
+          "lower_bound": true,
+          "median_ops": 372157.0,
+          "name": "ic_jc",
+          "native": {
+            "mul_r": 40755448.0
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2472.6147042564953,
+            20666.89803898794,
+            51692.93909400366
+          ],
+          "ratio_neg_band": [
+            2472.6147042564953,
+            20666.89803898794,
+            51692.93909400366
+          ],
+          "ratio_neg_cal": [
+            2472.6147042564953,
+            2818.0457662310478,
+            5154.49935896899
+          ],
+          "ratio_plain_band": [
+            2157.3328510279134,
+            16657.53819988922,
+            36872.838633158695
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            393.59023354564755,
+            4720.070912951169,
+            43658.39702760085
+          ],
+          "seeds": 3,
+          "t_add_ns": 3826.1979,
+          "total_band": [
+            372746.6666666667,
+            4448291.466666667,
+            41128194.666666664
+          ],
+          "total_cal": [
+            372746.6666666667,
+            438864.8599703638,
+            1033928.5997036379
+          ]
+        },
+        "ic_jc_L": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 372746.6666666667,
+          "lower_bound": true,
+          "median_ops": 372157.0,
+          "name": "ic_jc_L",
+          "native": {
+            "mul_r": 40771554.666666664
+          },
+          "native_not_emitted": [
+            "relation-phase field work (square tests, roots, Cantor reductions)"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            2472.6147042564953,
+            20674.381245523356,
+            51713.18313694684
+          ],
+          "ratio_neg_band": [
+            2472.6147042564953,
+            20674.381245523356,
+            51713.18313694684
+          ],
+          "ratio_neg_cal": [
+            2472.6147042564953,
+            2818.213553193222,
+            5155.802036488908
+          ],
+          "ratio_plain_band": [
+            2157.3328510279134,
+            16663.569671012086,
+            36887.27881283911
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            393.59023354564755,
+            4721.780042462846,
+            43675.488322717625
+          ],
+          "seeds": 3,
+          "t_add_ns": 3826.1979,
+          "total_band": [
+            372746.6666666667,
+            4449902.133333334,
+            41144301.33333333
+          ],
+          "total_cal": [
+            372746.6666666667,
+            438890.99006468017,
+            1034189.9006468013
+          ]
+        },
+        "ic_jc_first_collision": {
+          "certified": 3,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "group": "J(C), Cantor",
+          "group_ops": 1963.3333333333333,
+          "lower_bound": true,
+          "median_ops": 1740.0,
+          "name": "ic_jc_first_collision",
+          "native": {},
+          "native_not_emitted": [
+            "hash/table work of the collision search",
+            "relation-phase field work"
+          ],
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            13.023770038695412,
+            9.121706641887837,
+            2.4676616915422884
+          ],
+          "ratio_neg_band": [
+            13.023770038695412,
+            9.121706641887837,
+            2.4676616915422884
+          ],
+          "ratio_neg_cal": [
+            13.023770038695412,
+            12.606986096070472,
+            9.787910317027581
+          ],
+          "ratio_plain_band": [
+            11.363115693012599,
+            7.352103665909924,
+            1.760195743329691
+          ],
+          "recorded_class": "above",
+          "recorded_median_ratio_to_old_plain_rho": [
+            1.8471337579617835,
+            1.8471337579617835,
+            1.8471337579617835
+          ],
+          "seeds": 3,
+          "t_add_ns": 3826.1979,
+          "total_band": [
+            1963.3333333333333,
+            1963.3333333333333,
+            1963.3333333333333
+          ],
+          "total_cal": [
+            1963.3333333333333,
+            1963.3333333333333,
+            1963.3333333333333
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "candidate": 2,
+      "class_times_ns": {
+        "canon": 2.32165,
+        "draw": 2.0699,
+        "hash": 2.0705,
+        "insert": 7.27055,
+        "inv_r": 102.423,
+        "lookup": 4.1784,
+        "mul_p": 6.2072,
+        "mul_r": 6.2073,
+        "word": 1.03595
+      },
+      "e1_order": 12676,
+      "e2_order": 12924,
+      "gate_reproduces_record": true,
+      "jac_order": 163824624,
+      "old_plain_rho_ops_mean": 870.6666666666666,
+      "old_plain_rho_ops_per_seed": [
+        942.0,
+        697.0,
+        973.0
+      ],
+      "p": 12841,
+      "r": 3169,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 2341,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 84.0625,
+          "certified": 32,
+          "dp_inserts": 8.03125,
+          "dp_lookups": 9.03125,
+          "key_evaluations": 261.21875,
+          "kind": "negation",
+          "native": 644.875,
+          "native_per_step": 10.076171875,
+          "other_ops": 75.75,
+          "partition_hashes": 84.0625,
+          "runs": 32,
+          "steps": 64.0,
+          "total_ops": 150.75,
+          "walk_ops": 75.0,
+          "walk_share": 0.4975124378109453,
+          "walks": 9.0625,
+          "word_ops": 459.6875
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 32,
+          "dp_inserts": 10.21875,
+          "dp_lookups": 11.21875,
+          "key_evaluations": 117.3125,
+          "kind": "plain",
+          "native": 942.625,
+          "native_per_step": 9.958402112908551,
+          "other_ops": 77.96875,
+          "partition_hashes": 106.09375,
+          "runs": 32,
+          "steps": 94.65625,
+          "total_ops": 172.78125,
+          "walk_ops": 94.8125,
+          "walk_share": 0.548742991499367,
+          "walks": 11.28125,
+          "word_ops": 815.09375
+        }
+      },
+      "t_add_ns": {
+        "E1": 188.9249,
+        "J_recorded_impl": 3826.1979,
+        "J_word_impl": 847.51015
+      },
+      "target": "cover_pushforward",
+      "wall_s": 18.796824909
+    }
+  ],
+  "section": "cover",
+  "wall_s": 40.776056499
+}

@@ -1,0 +1,71 @@
+{
+  "schema": "research.controls-run-result/v1",
+  "task": "T-2110",
+  "status": "passed_native_workflow",
+  "source_commit": "201bf9f1c17224abb9e1255edf5fddb37084697f",
+  "freeze_sha256": "d20691095b0e6f932a5f34f9107e09c56629b57da85ea94dea35c007d87f3a40",
+  "release_sha256": "bcbe1b0b3a1da832b45e3d1fed9dabfc6c8d8fe2afdc8c60b4be9fb1c054bdfe",
+  "outer_elapsed_worker_seconds": 287.1954594349954,
+  "phases": [
+    {
+      "phase": "pre",
+      "worker_wall_seconds": 55.443576349993236,
+      "passed": true,
+      "terminal_owner_confirmed": true,
+      "invocation_id": "b849fedd7c0e40e78a36e4c116a6b62a"
+    },
+    {
+      "phase": "compiler",
+      "worker_wall_seconds": 185.60343303100672,
+      "passed": true,
+      "terminal_owner_confirmed": true,
+      "invocation_id": "68d2d234ab924a55bf26d35c4cca7590"
+    },
+    {
+      "phase": "post",
+      "worker_wall_seconds": 46.03922345099272,
+      "passed": true,
+      "terminal_owner_confirmed": true,
+      "invocation_id": "73e66093e7a846959095796cbef3826a"
+    }
+  ],
+  "modules": [
+    {
+      "module": "BranchRootMultiplicity",
+      "exit": 0
+    },
+    {
+      "module": "BranchCoefficientMultiplicity",
+      "exit": 0
+    },
+    {
+      "module": "IndependentControls",
+      "exit": 0
+    },
+    {
+      "module": "Readback",
+      "exit": 0
+    },
+    {
+      "module": "ExpectedFailure",
+      "exit": 1
+    }
+  ],
+  "named_readback_obligations": 13,
+  "native_axiom_parser_passed": true,
+  "readback_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "negative_result": "ExpectedFailure exited1 with exactly unsolved False goal",
+  "pre_post_custody_identical": true,
+  "charged_seconds": 600,
+  "campaign_total_charged_seconds": 1200,
+  "campaign_remaining_seconds": 128400,
+  "previous_attempt": "../branch-cast-renewal-results-20261111",
+  "previous_attempt_preserved": true,
+  "cost_ratio": null,
+  "cohort_targets_run": 0,
+  "independent_machine_review": "separate pending audit"
+}

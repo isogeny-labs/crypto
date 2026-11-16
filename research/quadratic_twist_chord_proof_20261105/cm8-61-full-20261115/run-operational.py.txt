@@ -1,0 +1,18 @@
+# Immutable process/file/hash qualifier only; all analysis arithmetic is native Rust.
+from pathlib import Path
+import json,hashlib,subprocess,sys,datetime
+root=Path('/workspace/crypto-twist-chord-proof');scope=root/'research/quadratic_twist_chord_proof_20261105/cm8-61-full-20261115';out=Path('/workspace/twist-cm8-61-operational-run01-20261115');src=Path('/workspace/twist-cm8-61-full-run01-20261115/casesA');checkpoint=sys.argv[1]
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==checkpoint;assert subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True)==''
+build=json.loads((out/'build.json').read_text());protocol=json.loads((scope/'operational.protocol.json').read_text());h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert h(src/'index.json')==build['dataset_index_sha256']==protocol['extensions']['dataset_index_sha256'];assert h(out/'auditor')==build['binary_sha256']==protocol['extensions']['binary_sha256'];assert h(scope/'auditor/audit-operational.rs')==build['source_sha256']==protocol['analysis_plan']['script']['sha256']
+started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat();stages=[]
+with(out/'precall.json').open('x')as f:f.write(json.dumps(dict(checkpoint=checkpoint,build=build,started_utc=started_utc,qualifier_sha256=h(Path(__file__)),protocol_sha256=h(scope/'operational.protocol.json')),indent=2)+'\n')
+def run(name,args,want=0):
+ with(out/(name+'.stdout')).open('wb')as a,(out/(name+'.stderr')).open('wb')as b:r=subprocess.run(['timeout','600',str(out/'auditor'),*args],cwd=root,stdout=a,stderr=b)
+ stages.append(dict(name=name,command=args,exit=r.returncode,expected=want));(out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n');assert r.returncode==want
+try:
+ run('audit',['audit',str(src),str(out/'audit.json')]);run('positive',['audit-check',str(src),str(out/'audit.json'),str(out/'positive.json')]);assert(out/'audit.json').read_bytes()==(out/'positive.json').read_bytes()
+ for mode,key in [('degree','cold_max_operation_degree'),('input','cold_max_input_degree')]:
+  j=json.loads((out/'audit.json').read_text());j['profiles'][0][key]=-2;p=out/('false-'+mode+'.json');p.write_text(json.dumps(j)+'\n');receipt=out/('false-'+mode+'-receipt.json');assert h(p)!=h(out/'audit.json');run('reject-'+mode,['audit-check',str(src),str(p),str(receipt)],101);assert not receipt.exists()
+finally:
+ with(out/'postcall.json').open('x')as f:f.write(json.dumps(dict(checkpoint=checkpoint,started_utc=started_utc,finished_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),stages=len(stages)),indent=2)+'\n')
