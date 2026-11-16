@@ -1,0 +1,62 @@
+{
+  "schema": "source.review/v1",
+  "task": "T-1961",
+  "reviewer": "/root/materializer_qualification",
+  "created_utc": "2026-11-09T17:31:09.612959+00:00",
+  "verdict": "bounded_software_qualification_source_supported",
+  "harness_sha256": "1cfb57c649e46b078061c7f1af04ed2cbb997eead75b727ea2e0c34b5925ee38",
+  "plan_sha256": "d63eee7fde911b8dce1cbb790490a3f411059fabf899a2f940d73000ea2180a2",
+  "source_pins": {
+    "durable_io.py": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c",
+    "durable-launcher.py": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c",
+    "durable-worker.py": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+  },
+  "supporting_inputs": {
+    "admission-draft.json": "aa3329a634336b5e420061cadb8fbc8c9dff72cc675720ee17cab7f9614e2f15",
+    "recipe-proposal.json": "90670a88ec6df8d3d58d84e36af27e55733a971e0b5b01f4ee3105e64b63e298",
+    "owner-dollar-waiver.json": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "status": "supported_source",
+      "finding": "Exactly26 cases:2valid admissions,7 waiver mutations,1nonnull dollar rejection,2ordinary numeric negatives,5structural negatives,4workerpermit cases,2heartbeat failures,3storage cases. Final requires26 rows and every assertion passed."
+    },
+    {
+      "id": "R2",
+      "status": "supported_source",
+      "finding": "Imported durable_io has no payload entrypoint. AST extraction selects only worker check_permit and launcher heartbeat; source hashes match current files. Synthetic admission paths are read, not launched. Both heartbeat invocations patch urlopen; no real network or child-process path."
+    },
+    {
+      "id": "R3",
+      "status": "supported_source",
+      "finding": "Positive waiver and ordinary finite admissions cover intended accepted branches. Mutation fixtures are created before reject evaluation, so setup failures do not falsely satisfy expected rejection. Rejection accepts several exception classes, so result supports rejection behavior rather than exact diagnostic classification."
+    },
+    {
+      "id": "R4",
+      "status": "supported_source",
+      "finding": "Permit checks bind invocation, lease, expiry; heartbeat loss409 and initial transport timeout are mocked. These are extracted function decisions, not actual systemd lifecycle tests."
+    },
+    {
+      "id": "R5",
+      "status": "supported_source",
+      "finding": "Fixed-prefix hash uses known6bytes. Atomic fsync exception retains old bytes; sealing fsync exception leaves no terminal manifest. Neither tests power-loss durability or final marker failure after successful native completion."
+    },
+    {
+      "id": "R6",
+      "status": "supported_source",
+      "finding": "50second alarm raises BaseException outside per-case Exception catch. Exact55second external timeout+5second KILL matches60second allocation. Subshell address-space512MiB and per-file1MiB are isolated from subsequent native validation."
+    }
+  ],
+  "blocking_findings": [],
+  "execution_performed": false,
+  "tests_executed": 0,
+  "compiler_invoked": false,
+  "release_performed": false,
+  "remaining_actions": [
+    "Root publishes exact harness, plan and bound inputs; serially execute once after materializer terminal reconciliation under existing60second allocation.",
+    "Read actual26case result and exit; preserve failures/incomplete outcomes."
+  ],
+  "independence": "Reviewer did not author root validation harness or wrappers. Only source/AST/digest inspection performed.",
+  "knowledge": "Existing source/prospective plan and reviewed materializer pattern used; KB unavailable, no new mechanism or novelty claim."
+}

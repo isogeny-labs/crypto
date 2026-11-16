@@ -1,0 +1,50 @@
+{
+  "schema": "prospective-command-source-review/v1",
+  "task": "T-1662",
+  "producer_commit": "b2cb81962e30d85a5bcfaf44af2094e7d58fec03",
+  "status": "source_adequate_for_bounded_materialization",
+  "native_materialization_executed_by_reviewer": false,
+  "compiler_executed_by_reviewer": false,
+  "checks": {
+    "packet_manifest_and_published_git_bytes_match": true,
+    "all_eight_input_hashes_match": true,
+    "materializer_sha256": "d99f29d81de5efdc6b5277181a713295ff174182ea173beb7ed43813efae34bb",
+    "helper_sha256": "2d506f0e676ff1db54036adc061680dd7f911b809b4519630fc02ff1606f9507",
+    "source_review_binding_matches": true,
+    "task1656_claimed_epoch1_attempt_matches": true,
+    "workspace_output_absent": true,
+    "unit_not_found": true,
+    "cache_deps_build_fingerprint_present": true,
+    "var_tmp_free_bytes_observed": 99545395200,
+    "norm_v3_all_three_terminal_owners_recorded": true,
+    "norm_v3_overall_status": "failed"
+  },
+  "limits": {
+    "cpu": 2,
+    "memory_bytes": 4294967296,
+    "swap": 0,
+    "tasks": 512,
+    "worker_seconds": 880,
+    "systemd_runtime_seconds": 885,
+    "systemd_stop_seconds": 5,
+    "gnu_timeout_seconds": 895,
+    "gnu_kill_grace_seconds": 5,
+    "parent_total_seconds": 900,
+    "attempts": 1,
+    "concurrency": 1,
+    "campaign_remaining_before_root": 43200,
+    "materialization_reservation": 900,
+    "validation_separate_reservation": 1800,
+    "remaining_after_reservations": 40500,
+    "absolute_deadline": "2026-11-06T04:00:00Z"
+  },
+  "operator_dependencies": [
+    "RemainAfterExit=yes leaves an exited successful payload active(exited). Use the already specified captured-invocation stop procedure, then verify terminal state and empty/absent captured cgroup; do not equate launch-client success with payload/terminal success.",
+    "Parent must establish monotonic start and finish capture/wait/stop/sealing within900seconds. This packet uses manual existing supervision, not a new automated wrapper.",
+    "Recheck lease and no-overlap immediately before launch. Expired/replaced lease identity requires published amendment.",
+    "No native input manifest is asserted known: preparation produces/hash-seals it before separately reviewed validation admission.",
+    "Dollars waiver only; source publication and resource/deadline/owner requirements remain."
+  ],
+  "findings": [],
+  "scope": "Exact launch/config and existing source binding; not source reimplementation, compiler validation, or actual runtime result"
+}

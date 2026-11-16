@@ -1,0 +1,15 @@
+[package]
+name = "lift-dense-conjugate-pair-cost"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[[bin]]
+name = "cpcost"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+
+[workspace]

@@ -1,0 +1,61 @@
+{
+  "schema": "root-library.failed-attempt-archive/v1",
+  "run": "t1958-root-library-20261109",
+  "status": "failed",
+  "compiler_invoked": false,
+  "commands_recorded": 0,
+  "worker_elapsed_seconds": 10.091595156001858,
+  "supervisor_elapsed_seconds": 0.4207382969907485,
+  "outer_elapsed_seconds": 0.537700398999732,
+  "charged_seconds": 1800,
+  "worker_error": "RuntimeError('supervisor ownership permit not received')",
+  "supervisor_errors": [
+    {
+      "durability_failure": "PermissionError"
+    },
+    {
+      "repr": "PermissionError(13, 'Permission denied')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 87, in <module>\n    d=show()\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 61, in show\n    value=call(['/usr/bin/systemctl','show',UNIT]+['--property='+k for k in KEYS]);d=dict(line.split('=',1) for line in value.splitlines() if '=' in line);R['observations'].append(d);return d\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 57, in call\n    checkpoint('query-recorded')\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 13, in checkpoint\n    atomic_json(OUT/'launch-receipt.json',R);flush_logs(OUT)\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable_io.py\", line 22, in flush_logs\n    with path.open('rb') as f:\n  File \"/usr/lib64/python3.9/pathlib.py\", line 1180, in open\n    return io.open(self, mode, buffering, encoding, errors, newline,\n  File \"/usr/lib64/python3.9/pathlib.py\", line 1038, in _opener\n    return self._accessor.open(self, flags, mode)\nPermissionError: [Errno 13] Permission denied: '/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor/unit.stderr'\n"
+    },
+    {
+      "durability_failure": "PermissionError"
+    },
+    {
+      "cleanup": "AssertionError('cannot stop unit without exact owned InvocationID')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-launcher.py\", line 110, in <module>\n    assert R.get('invocation_id') and current.get('InvocationID')==R['invocation_id'],'cannot stop unit without exact owned InvocationID'\nAssertionError: cannot stop unit without exact owned InvocationID\n"
+    },
+    {
+      "durability_failure": "PermissionError"
+    },
+    {
+      "sealing": "AssertionError('cannot seal before owned cleanup')"
+    }
+  ],
+  "supervisor_status": "failed",
+  "supervisor_phase": "terminal-unsealed",
+  "supervisor_seal_status": "failed",
+  "later_root_custody_recorded": true,
+  "invocation_join_verified": true,
+  "invocation_id": "4342ad37f3dd4cbbadf95ff27001cf69",
+  "terminal": {
+    "MainPID": "0",
+    "Result": "exit-code",
+    "ExecMainStatus": "1",
+    "ControlGroup": "",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "4342ad37f3dd4cbbadf95ff27001cf69"
+  },
+  "cgroup_absent_recorded": true,
+  "native_worker_controls": {
+    "cpu.max": "200000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "pids.max": "512"
+  },
+  "runtime_rerun": false,
+  "archived_file_count": 11,
+  "archive_sha256": "bdf179062b22a11b89f9d94ce20e077f5b98b9a81e4e0fc3508398a62b954385",
+  "archive_bytes": 4110,
+  "scope": "Failed admission/permit stage; no compilation or test outcome; original unsealed supervisor failure retained."
+}

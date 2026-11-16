@@ -663,6 +663,22 @@ pub fn fall_degrees(
     c_max: u32,
     limits: &HkyLimits,
 ) -> FallDegrees {
+    fall_degrees_with(ring, gens, c_min, c_max, limits, |_| {})
+}
+
+/// [`fall_degrees`], calling `on_closure` with each closure `V_{F,c}` as soon
+/// as it is computed, before the next degree starts. A caller that records
+/// these keeps every decided degree if the process is stopped during a later
+/// closure; a later run can resume at the first undecided degree with
+/// `c_min` set to it (each closure is computed independently).
+pub fn fall_degrees_with<F: FnMut(&Closure)>(
+    ring: &HkyRing,
+    gens: &[NfPoly],
+    c_min: u32,
+    c_max: u32,
+    limits: &HkyLimits,
+    mut on_closure: F,
+) -> FallDegrees {
     let mut closures: Vec<Closure> = Vec::new();
     let mut falls = Vec::new();
     let mut last_fall = None;
@@ -692,6 +708,7 @@ pub fn fall_degrees(
         if cl.contains_one {
             last_fall = Some(c);
         }
+        on_closure(&cl);
         closures.push(cl);
         if stop {
             break;
@@ -703,5 +720,53 @@ pub fn fall_degrees(
         last_fall,
         first_fall,
         falls,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // x² − 1 = 0, x² − 4 = 0 and x − 1 = 0 over F_101 have no common root:
+    // the closure reaches 1 only once the product x·(x − 1) is admitted.
+    fn inconsistent() -> (HkyRing, Vec<NfPoly>) {
+        let p = 101;
+        let ring = HkyRing::new(p, Vec::new(), 1);
+        let gens = vec![
+            ring.from_raw(&[(vec![2], 1), (vec![0], p - 1)]),
+            ring.from_raw(&[(vec![2], 1), (vec![0], p - 4)]),
+            ring.from_raw(&[(vec![1], 1), (vec![0], p - 1)]),
+        ];
+        (ring, gens)
+    }
+
+    #[test]
+    fn fall_degrees_with_reports_every_closure_before_returning() {
+        let (ring, gens) = inconsistent();
+        let limits = HkyLimits::default();
+        let plain = fall_degrees(&ring, &gens, 1, 6, &limits);
+        let mut seen: Vec<(u32, bool, Vec<u64>)> = Vec::new();
+        let with = fall_degrees_with(&ring, &gens, 1, 6, &limits, |cl| {
+            seen.push((cl.c, cl.contains_one, cl.dims.clone()));
+        });
+        assert!(plain.last_fall.is_some(), "the system is inconsistent");
+        assert_eq!(with.last_fall, plain.last_fall);
+        assert_eq!(with.falls, plain.falls);
+        let expect: Vec<(u32, bool, Vec<u64>)> = plain
+            .closures
+            .iter()
+            .map(|cl| (cl.c, cl.contains_one, cl.dims.clone()))
+            .collect();
+        assert_eq!(seen, expect);
+    }
+
+    #[test]
+    fn resuming_at_a_later_degree_gives_the_same_last_fall() {
+        let (ring, gens) = inconsistent();
+        let limits = HkyLimits::default();
+        let full = fall_degrees(&ring, &gens, 1, 6, &limits);
+        let d = full.last_fall.expect("inconsistent");
+        let resumed = fall_degrees(&ring, &gens, d, 6, &limits);
+        assert_eq!(resumed.last_fall, Some(d));
     }
 }

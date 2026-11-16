@@ -1,0 +1,65 @@
+def mixedClassifyWord (p : UInt64) (a : WordD1) (b : WeightedWord) : MixedCancellation.Branch :=
+ let m := mixedWords p a b
+ if m.k ≠ 0 then .common
+ else if m.l = wordNeg p m.ry then .cancellation
+ else if m.l ≠ m.ry then .mismatch else .positiveCoincidence
+
+theorem mixed_classifier_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hb : p.toNat<2^31) (a : WordD1) (b : WeightedWord)
+ (ha : a.canonical p) (hc : b.canonical p) :
+ mixedClassifyWord p a b = MixedCancellation.classify (a.decode p) (b.decodeTwo p) := by
+ obtain ⟨hk,hl,hr,hpnt,hkd,hld,hrd,hpd⟩ := mixed_decode p hfive hb a b ha hc
+ have hp : 0<p.toNat := by omega
+ have hn := wordNeg_composition p (mixedWords p a b).ry hp hr
+ have eqw (u v : UInt64) (hu : u.toNat<p.toNat) (hv : v.toNat<p.toNat) :
+   u=v ↔ (u.toNat:ZMod p.toNat)=(v.toNat:ZMod p.toNat) := by
+  rw [←UInt64.toNat_inj]
+  exact (canonical_equality p.toNat u.toNat v.toNat hu hv).symm
+ have ek := eqw (mixedWords p a b).k 0 hk (by simpa using hp)
+ have en := eqw (mixedWords p a b).l (wordNeg p (mixedWords p a b).ry) hl hn.1
+ have er := eqw (mixedWords p a b).l (mixedWords p a b).ry hl hr
+ unfold mixedClassifyWord MixedCancellation.classify
+ simp only [ne_eq,ek,en,er,hkd,hld,hrd,hn.2,UInt64.toNat_zero,Nat.cast_zero]
+
+theorem mixed_word_branch_invariant (p : UInt64) [Fact p.toNat.Prime]
+ (f : Polynomial (ZMod p.toNat)) (a : WordD1) (b : WeightedWord)
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31)
+ (ha : a.canonical p) (hb : b.canonical p)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (hva : a.normalizedValid p f) (hvb : b.normalizedValid p f) :
+ mixedClassifyWord p a b ≠ .mismatch ∧
+ (mixedClassifyWord p a b = .cancellation →
+   let c := (mixedWords p a b).point
+   c.canonical p ∧ c.z ≠ 0 ∧ c.w ≠ 0 ∧ c.normalizedValid p f) := by
+ have hp : 0<p.toNat := by omega
+ have az : (a.decode p).z ≠ 0 := canonical_word_nonzero p a.z hp ha.2.2.1 haz
+ have aw : (a.decode p).w ≠ 0 := canonical_word_nonzero p a.w hp ha.2.2.2 haw
+ have bz : (b.decodeTwo p).z ≠ 0 := canonical_word_nonzero p b.z hp hb.2.2.2.2.1 hbz
+ have bw : (b.decodeTwo p).w ≠ 0 := canonical_word_nonzero p b.w hp hb.2.2.2.2.2 hbw
+ have va : MixedCancellation.validPoint f (a.decode p) := hva
+ have vb : MixedCancellation.validTwo f (b.decodeTwo p) := hvb
+ have hd := mixed_classifier_decode p hfive hbound a b ha hb
+ constructor
+ · rw [hd]
+   exact MixedCancellation.mismatch_excluded f (a.decode p) (b.decodeTwo p) az aw bz bw va vb
+ · intro hcancel
+   rw [hd] at hcancel
+   have hk : MixedCancellation.rawK (a.decode p) (b.decodeTwo p)=0 := by
+    by_contra hn
+    simp [MixedCancellation.classify,hn] at hcancel
+   obtain ⟨_,hz,hw,hvalid⟩ := MixedCancellation.shared_support_conclusions f (a.decode p) (b.decodeTwo p) az aw bz bw va vb hk
+   obtain ⟨_,_,_,hc,_,_,_,hpoint⟩ := mixed_decode p hfive hbound a b ha hb
+   have hcz : ((mixedWords p a b).point.decode p).z ≠ 0 := by rw [hpoint]; exact hz
+   have hcw : ((mixedWords p a b).point.decode p).w ≠ 0 := by rw [hpoint]; exact hw
+   refine ⟨hc,?_,?_,?_⟩
+   · intro he
+     apply hcz
+     change (((mixedWords p a b).point.z).toNat:ZMod p.toNat)=0
+     rw [he]; simp
+   · intro he
+     apply hcw
+     change (((mixedWords p a b).point.w).toNat:ZMod p.toNat)=0
+     rw [he]; simp
+   · change MixedCancellation.validPoint f ((mixedWords p a b).point.decode p)
+     rw [hpoint]
+     exact hvalid

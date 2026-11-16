@@ -1,0 +1,17 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 64/64 | 1.140 | 1.242 | 2.164 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg-chained | 64/64 | 3.303 | 3.627 | 6.543 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | twcj | 64/64 | 1.652 | 1.653 | 1.663 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | twcj-cv0 | 64/64 | 1.571 | 1.572 | 1.582 | — |
+
+Table work listed, not priced: the pre-2026-11-08 reading (`--no-price-table-work`); counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs rho-neg-chained | rho-neg < rho-neg-chained |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs twcj | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs twcj-cv0 | unresolved inside the band |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg-chained vs twcj | twcj < rho-neg-chained |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg-chained vs twcj-cv0 | twcj-cv0 < rho-neg-chained |
+| icv1-fp24-tm1578-e83ed1b2 | twcj vs twcj-cv0 | twcj-cv0 < twcj |

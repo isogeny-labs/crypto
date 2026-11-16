@@ -1,0 +1,63 @@
+{
+  "schema": "branch-local-norm-construction/v1",
+  "pcc": "unverified",
+  "task": "T-1679",
+  "machine_status": "not_verified",
+  "compiler_invocations": 0,
+  "source_status": "prospective_no_holes",
+  "declarations": [
+    "actual_branch_conjugate_orders",
+    "numerator_root_from_norm",
+    "two_support_roots_force_b_zero"
+  ],
+  "scope": "actual rational simple branch stalk; source construction and hand derivation",
+  "normalization": {
+    "curve_y_order": 1,
+    "curve_x_minus_a_order": 2,
+    "base_x_minus_a_order": 1,
+    "curve_norm_order_at_support": 2,
+    "base_norm_order_at_support": 1
+  },
+  "fixture": {
+    "field": "Q",
+    "f": "X^5-X",
+    "branch_x": 0,
+    "input_coefficients": [
+      -1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "coefficientData": [
+      -2,
+      0,
+      0,
+      -4,
+      -4
+    ],
+    "n": "0",
+    "U": "-4(X+1)",
+    "curve_support_orders": [
+      2,
+      0,
+      0
+    ],
+    "base_support_multiplicities": [
+      1,
+      0,
+      0
+    ],
+    "verification": "hand algebra only"
+  },
+  "missing_lean_bridges": [
+    "branch E(f)=Y\u00b2 and mapped norm product identity",
+    "base root multiplicity versus normalized branch valuation",
+    "compiled exact declarations and named axiom audit"
+  ],
+  "execution_authorized": false,
+  "original_sources_modified": false
+}

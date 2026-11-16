@@ -1,0 +1,51 @@
+// weighted.sing: std() of a msolve .ms system under dp or natural-weight wp.
+// env: MS=<path to .ms>  ARM=F|G  ORDER=dp|wp
+// Weights (wp): F: e_i -> i; G: s*,-> 1, q* -> 2; all chain variables -> 1.
+string ms = read(system("getenv","MS"));
+string arm = system("getenv","ARM");
+string ordr = system("getenv","ORDER");
+// split into lines
+list L; string cur = ""; int i;
+for (i = 1; i <= size(ms); i++) {
+  if (ms[i] == newline) { L = L + list(cur); cur = ""; } else { cur = cur + ms[i]; }
+}
+if (cur != "") { L = L + list(cur); }
+string vars = string(L[1]); int p = int(string(L[2]));
+// polynomial text: lines 3.. joined, trailing comma stripped by ideal syntax
+string ptxt = "";
+for (i = 3; i <= size(L); i++) { ptxt = ptxt + string(L[i]); }
+while (ptxt[size(ptxt)] == ",") { ptxt = ptxt[1, size(ptxt)-1]; }
+// variable list -> weights
+list V; cur = "";
+for (i = 1; i <= size(vars); i++) {
+  if (vars[i] == ",") { V = V + list(cur); cur = ""; } else { cur = cur + vars[i]; }
+}
+V = V + list(cur);
+int n = size(V);
+intvec w = 1:n;
+for (i = 1; i <= n; i++) {
+  if (arm == "F") { if (string(V[i]) == "e1") {w[i]=1;} if (string(V[i]) == "e2") {w[i]=2;} if (string(V[i]) == "e3") {w[i]=3;} if (string(V[i]) == "e4") {w[i]=4;} }
+  if (arm == "G") { if (string(V[i])[1] == "q" && size(string(V[i])) == 2) {w[i]=2;} }
+}
+"vars:", vars; "weights:", w;
+string o = "dp";
+if (ordr == "wp") { o = "wp(" + string(w) + ")"; }
+execute("ring R = " + string(p) + ",(" + vars + ")," + o + ";");
+execute("ideal I = " + ptxt + ";");
+"ring:", string(ordr), " nvars", nvars(R), " gens", size(I);
+option(redSB);
+option(prot);
+int t = timer; 
+ideal G = std(I);
+"STD_DONE";
+"size(GB)", size(G);
+int mwd = 0; int msd = 0; int d1; int d2;
+for (i = 1; i <= size(G); i++) {
+  d1 = deg(G[i], w); d2 = deg(G[i]);
+  if (d1 > mwd) { mwd = d1; } if (d2 > msd) { msd = d2; }
+}
+"max_weighted_deg", mwd; "max_std_deg", msd;
+"dim", dim(G);
+"vdim", vdim(G);
+"unit_ideal", (size(G) == 1 && deg(G[1]) == 0);
+quit;

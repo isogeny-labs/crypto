@@ -1,0 +1,16 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.52", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, margin="0.16,0.12", color="#334155", fillcolor="#F8FAFC"];
+  edge [color="#64748B", arrowsize=0.7, penwidth=1.3];
+
+  protocol [label="Frozen protocol\nmain a91b8b66d0f1\nSpot cap $0.18/hour", fillcolor="#E0F2FE"];
+  dryrun [label="Exact Spot dry run\nDryRunOperation\nrequest shape permitted", fillcolor="#DCFCE7"];
+  launch [label="Real RunInstances\nBlocked: account invalid\nexit 254", fillcolor="#FEE2E2", color="#B91C1C", penwidth=2];
+  inventory [label="Post-error inventory\n0 instances; 0 Spot requests", fillcolor="#FEF3C7"];
+  worker [label="Linux host and full suite\nnot started", fillcolor="#E5E7EB", color="#94A3B8"];
+  ic [label="Factor-base runtime sweep\nnot measured", fillcolor="#E5E7EB", color="#94A3B8"];
+
+  protocol -> dryrun -> launch -> inventory;
+  launch -> worker [style=dashed, color="#94A3B8", label="stopped"];
+  worker -> ic [style=dashed, color="#94A3B8"];
+}

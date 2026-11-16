@@ -1,0 +1,21 @@
+import WordDoubling
+open PencilWordRefinement Polynomial
+instance : Fact (Nat.Prime (5:UInt64).toNat) := ⟨by decide⟩
+example : (5*(4:UInt64))%5 = ((5%5)*4)%5 := by decide
+example : (dblWordPayload 5 1 0 0 0 ⟨0,1,2,3⟩).s=0 ∧
+ (dblWordPayload 5 1 0 0 0 ⟨0,1,2,3⟩).t=4 ∧
+ (dblWordPayload 5 1 0 0 0 ⟨0,1,2,3⟩).z=2 ∧
+ (dblWordPayload 5 1 0 0 0 ⟨0,1,2,3⟩).w=2 := by decide
+example : wordGuard 5 ⟨0,1,2,3⟩ ⟨0,1,2,3⟩ = .doubling := by decide
+example : wordGuard 5 ⟨0,0,2,3⟩ ⟨0,0,2,3⟩ = .inverse := by decide
+example : ¬ WordD1.canonical 5 ⟨5,1,2,3⟩ := by decide
+-- Instantiate the complete composed theorem, not just direct payload simplification.
+example : let c := dblWordPayload 5 1 0 0 0 ⟨0,1,2,3⟩
+ c.canonical 5 ∧ (c.z.toNat:ZMod (5:UInt64).toNat) ≠ 0 ∧
+ (c.w.toNat:ZMod (5:UInt64).toNat) ≠ 0 ∧
+ (X^2+C ((c.q.toNat:ZMod (5:UInt64).toNat)/(c.z.toNat:ZMod (5:UInt64).toNat)^2)*X+
+ C ((c.r.toNat:ZMod (5:UInt64).toNat)/(c.z.toNat:ZMod (5:UInt64).toNat)^4)) ∣
+ WeightedDoubling.curve (1:ZMod (5:UInt64).toNat) 0 0 0-
+ (C ((c.s.toNat:ZMod (5:UInt64).toNat)/((c.z.toNat:ZMod (5:UInt64).toNat)^3*(c.w.toNat:ZMod (5:UInt64).toNat)))*X+
+ C ((c.t.toNat:ZMod (5:UInt64).toNat)/((c.z.toNat:ZMod (5:UInt64).toNat)^5*(c.w.toNat:ZMod (5:UInt64).toNat))))^2 := by
+ apply dbl_normalized_valid <;> norm_num [WordD1.canonical,WordD1.decode,WeightedDoubling.value]

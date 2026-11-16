@@ -1,0 +1,30 @@
+== D4_BIN_MVAR=3 RAYON_NUM_THREADS=1 target/release/examples/d4_char2_profile --m 8 --seed 1 --trials 50
+m 8 seed 1 trials 50: dim 64.0, chains 12.0
+component      baseline   frob_roots
+weil               1427         1427
+triang              126          126
+echelon           54441        54441
+nf                21779        21779
+charpoly          87417        87417
+roots             22575        14420
+eigvec             1871         1871
+verify              224          224
+split               379          241
+TOTAL            190239       181946
+total ratio frob/base 0.9564; wall per trial 6.066 ms vs 5.820 ms (ratio 0.9594)
+rational sols/trial 1.080; trials with 0 sols 16; relations 0 (0.00%); disagreements 0
+== D4_BIN_MVAR=2 RAYON_NUM_THREADS=1 target/release/examples/d4_char2_profile --m 8 --seed 1 --trials 50
+m 8 seed 1 trials 50: dim 64.0, chains 28.0
+component      baseline   frob_roots
+weil               1427         1427
+triang              126          126
+echelon           54441        54441
+nf                34696        34696
+charpoly         322246       322246
+roots             22019        14262
+eigvec             9864         9864
+verify              224          224
+split               379          241
+TOTAL            445423       437528
+total ratio frob/base 0.9823; wall per trial 6.912 ms vs 7.053 ms (ratio 1.0203)
+rational sols/trial 1.080; trials with 0 sols 16; relations 0 (0.00%); disagreements 0

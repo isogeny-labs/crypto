@@ -1,0 +1,79 @@
+{
+  "schema": "experiment.protocol-amendment/v1",
+  "id": "N83-FACTOR-BASE-TOP-DREG-20261031-V2-OPERATIONAL-CONTINUATION-06",
+  "created_utc": "2026-11-05T18:40:00Z",
+  "amends_protocol_id": "N83-FACTOR-BASE-TOP-DREG-20261031-V2",
+  "parent_protocol_freeze_sha256": "3d852e474eb7b129e51f68bb564f379d9d997148dbe9c3727e529102a6ef47c6",
+  "applies_to_attempt": "09",
+  "preceding_attempt": "08",
+  "amendment_precedes_affected_scientific_data": true,
+  "prior_attempt_reconciliation": {
+    "attempt08_exit_code": 101,
+    "candidate_input_systems_generated": 0,
+    "top_certificates_generated": 0,
+    "verified_shards": 384,
+    "cause": "openat trace shows pdp tried to open baseline/inputs.json/inputs.json; runner supplied a file where pdp expects its parent directory.",
+    "reconciliation_sha256": "486dd13d46d203b1646416d0a09b4ab84525cbe7ad2cc6c7bc17f490a3d509f8",
+    "trace_sha256": "a7fa7af71488334e39c892f91b5ca16e04faf37be41871f8c266f148d9559367",
+    "results_readback_verified": true,
+    "s3_results_preserved": true
+  },
+  "scientific_design_changes": [],
+  "operational_changes": [
+    "Pass MATCHED_DIR=/.../baseline to pdp generate and independently hash MATCHED_FILE=/.../baseline/inputs.json.",
+    "Require the local base s3-file-index sidecar, index, family manifests, and 384 shard hashes before generation.",
+    "Keep candidate-inputs and top-certificates paths nonexistent until their generators create them.",
+    "Preserve the file-open trace and all generated systems, certificates, replay, partial outputs and errors in S3 and Git."
+  ],
+  "unchanged_scientific_scope": {
+    "candidate": "spike38",
+    "families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "m_values": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "target_kinds": [
+      "natural",
+      "planted"
+    ],
+    "systems": 48,
+    "deterministic_seed": 20261027,
+    "factor_base_index_sha256": "3fb72aa61147882832bbb17fc65a3ccfb8f5f179c047a43e4ccf65cecfa34623",
+    "s3_file_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+    "recovery_audit_sha256": "ef4a4d3f7d42f55f3b7595369ab86dcc95d686ce796a7c80531b8b4ad3890d5a",
+    "protocol_file_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "metric": "top-form quotient Dreg certificates/intervals with fresh-process replay",
+    "claims_out_of_scope": [
+      "affine FFD",
+      "affine LFD",
+      "solving degree",
+      "CM regularity",
+      "ECDLP runtime"
+    ]
+  },
+  "execution_limits": {
+    "attempts": 1,
+    "retries": 0,
+    "aws_max_attempts": 1,
+    "cpu_cores": 1,
+    "memory_gib": 8,
+    "s3_fetch_concurrency": 4,
+    "wall_seconds": 12850,
+    "termination_grace_seconds": 45,
+    "compute_ceiling_usd": 2.9,
+    "artifacts_ceiling_usd": 0.25,
+    "total_ceiling_usd": 3.15
+  },
+  "fresh_s3_results_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-09/results/",
+  "analysis_and_decision": "Inherited unchanged from parent V2. Include all 48 cases, partial outputs, errors and fresh-process replay. No additional attempts after attempt09."
+}

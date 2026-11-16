@@ -1,0 +1,9 @@
+da3e7e5363c4 (E38 harness; controls 149dac81b9; registration c20e4fa066)
+Built from a clean `git archive` export of da3e7e5363 into /dev/shm/e38_src (export_tree.sh: Cargo.toml, Cargo.lock,
+src, examples, crates, tools, isogeny_algos, benches and Cargo path targets, plus the five include_str! files
+docs/ic/boundary_targets.json, docs/ecbench/schema.sql, docs/curves/registry.json, docs/ic/calibration.json,
+docs/curves/standards/parameters.json, all from the same commit); verify_tree.sh: files=4675 mismatches=0.
+cargo build --release -j 1, CARGO_PROFILE_RELEASE_DEBUG=0, CARGO_INCREMENTAL=0, default release profile,
+CARGO_TARGET_DIR=/dev/shm/e38. Pinned copies in /dev/shm/e38bin, run only from there.
+Note: 699c05df9a (the main session's rustfmt/clippy fix, no behaviour change) landed on the branch after
+da3e7e5363 and is not in these binaries.

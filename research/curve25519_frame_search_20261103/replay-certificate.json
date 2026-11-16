@@ -1,0 +1,171 @@
+{
+ "schema": "replay-certificate/v1 (validation-gate/v1 companion)",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "validator": "validator subagent (core tier, claude-opus-5-5), not the producer",
+ "date": "2026-11-03",
+ "validated_commit": "75f70b5ae5e071c1a2288621d946a56e519274cd",
+ "tree_state": "clean at 75f70b5ae5e071c1a2288621d946a56e519274cd (0 porcelain entries); replay inputs unchanged at 54ef4e9326 (which adds only REPORT.pdf, REPORT.typ, scripts/build_report.py)",
+ "binary": {
+  "path": "/home/user/ctarget/release/curve25519_family",
+  "sha256": "0459a725394163e619287f86d2071c5f0f6376c155226254a65edb292f11b4c5",
+  "matches_engine_binary_sha256": true,
+  "mtime": "2026-11-03T05:11:29Z",
+  "commit_binding": "none recorded; README says 'built from this branch'. Last change to src/bin/curve25519_family.rs is 5ea87e8518 (05:05:35Z), before the build time. Not rebuilt."
+ },
+ "host": "linux x86_64, 4 vCPU, kernel 6.18.44-fc-v230 (same host class as the producer; local run, no EKS)",
+ "scope": "all six engine cells of scripts/run_engine.sh (superset of the two mandatory t=5 G=3 cells), outputs written to the validator scratchpad, not to engine/",
+ "runs": [
+  {
+   "run": "bits_t5_g3",
+   "command": "/home/user/ctarget/release/curve25519_family f4cost 20 bits 5 3 100 2026111505 900 2 full 0 30000000",
+   "original": "engine/bits_t5_g3.json",
+   "original_sha256": "924b40111799c29d81ca5fe8bf216b1b2b245c92bd9c98b53ef0e4a320d8dcb2",
+   "replay_sha256": "9295607c63e74ed37f24128b27feb1a58e14acf38beb073b128e99301f2dc31c",
+   "byte_identical": false,
+   "field_identical_ignoring_wall_s": true,
+   "differing_fields": [],
+   "wall_s": {
+    "original": 3.499108187,
+    "replay": 3.4744248669999998
+   },
+   "hits_reported": 0,
+   "hits_verified_reported": 0
+  },
+  {
+   "run": "frame_t5_g3",
+   "command": "/home/user/ctarget/release/curve25519_family f4cost 20 bits@976503 5 3 100 2026111505 900 2 full 0 30000000",
+   "original": "engine/frame_t5_g3.json",
+   "original_sha256": "b0696451c4b82a93cc8603dcb8f57a08354c6722c6fa0f7a058e5d73ffcc3601",
+   "replay_sha256": "7ade3523d7b61f74cdd69e75a94d192edc43168f677e54ae6b076e7be54869e9",
+   "byte_identical": false,
+   "field_identical_ignoring_wall_s": true,
+   "differing_fields": [],
+   "wall_s": {
+    "original": 3.361721482,
+    "replay": 3.405139778
+   },
+   "hits_reported": 0,
+   "hits_verified_reported": 0
+  },
+  {
+   "run": "bits_t6_g3",
+   "command": "/home/user/ctarget/release/curve25519_family f4cost 20 bits 6 3 100 2026111506 900 2 full 0 30000000",
+   "original": "engine/bits_t6_g3.json",
+   "original_sha256": "156de8d24587ba77d4bd76d6b019a03f25fa0cafc097501183649eed86246f11",
+   "replay_sha256": "cee7474c6dd76b65139f5c99f597113fda23ae367e33cf83e94bad9e6383f69b",
+   "byte_identical": false,
+   "field_identical_ignoring_wall_s": true,
+   "differing_fields": [],
+   "wall_s": {
+    "original": 16.959075483,
+    "replay": 16.86523414
+   },
+   "hits_reported": 0,
+   "hits_verified_reported": 0
+  },
+  {
+   "run": "frame_t6_g3",
+   "command": "/home/user/ctarget/release/curve25519_family f4cost 20 bits@908172 6 3 100 2026111506 900 2 full 0 30000000",
+   "original": "engine/frame_t6_g3.json",
+   "original_sha256": "0e5c1be4c584719d3ede5baffde9486c951e916379609c480ed7a50ee552811a",
+   "replay_sha256": "63e4c00e81c82a8e9863ec32c7c0861ffa188a31d4b94e9398192960584ac212",
+   "byte_identical": false,
+   "field_identical_ignoring_wall_s": true,
+   "differing_fields": [],
+   "wall_s": {
+    "original": 16.709466821,
+    "replay": 15.89528696
+   },
+   "hits_reported": 1,
+   "hits_verified_reported": 1
+  },
+  {
+   "run": "bits_t5_g0",
+   "command": "/home/user/ctarget/release/curve25519_family f4cost 20 bits 5 0 100 2026111505 900 2 full 0 30000000",
+   "original": "engine/bits_t5_g0.json",
+   "original_sha256": "2ecf32210c161e2509a0ab1c7db71fa863efd6cc04665fcb99a3086f73de856f",
+   "replay_sha256": "8501a01cd5485b1f7315c9d9ffcac7a15b90419f540ea76949b124e76642154e",
+   "byte_identical": false,
+   "field_identical_ignoring_wall_s": true,
+   "differing_fields": [],
+   "wall_s": {
+    "original": 6.368469652,
+    "replay": 5.783952247
+   },
+   "hits_reported": 0,
+   "hits_verified_reported": 0
+  },
+  {
+   "run": "frame_t5_g0",
+   "command": "/home/user/ctarget/release/curve25519_family f4cost 20 bits@976503 5 0 100 2026111505 900 2 full 0 30000000",
+   "original": "engine/frame_t5_g0.json",
+   "original_sha256": "08efc4d103f3aa34e7f3a3b34380cf5c9be42b9c7116c12a0dac7bc4d9d28352",
+   "replay_sha256": "dc79a6a6934ea97c121e113460aae7fe11d6cf0f385a3ee7c1dd5f81f162be75",
+   "byte_identical": false,
+   "field_identical_ignoring_wall_s": true,
+   "differing_fields": [],
+   "wall_s": {
+    "original": 6.017990165,
+    "replay": 5.61192308
+   },
+   "hits_reported": 0,
+   "hits_verified_reported": 0
+  }
+ ],
+ "target_reconstruction": {
+  "method": "Validator's own code: family rule re-implemented (k=20: p=1048573, A=926, #E=8*131203); generator = smallest u>=2 of order r, y=min(y,p-y), giving (349837, 122), equal to ecbench curve icv1-fp20-tm1050-4295f05e's (gx, gy); the engine's LCG (st = st*6364136223846793005 + 1442695040888963407 mod 2^64, a = 1 + (st>>11) mod (r-1)) for 100 targets; covered set of each frame by short-Weierstrass point addition of all signed pairs with [r]R = O.",
+  "cells": {
+   "bits_t5": {
+    "covered_points": 42,
+    "targets_in_covered_set": 0,
+    "expected": 0.032
+   },
+   "frame_t5": {
+    "covered_points": 198,
+    "targets_in_covered_set": 0,
+    "expected": 0.1509
+   },
+   "bits_t6": {
+    "covered_points": 162,
+    "targets_in_covered_set": 0,
+    "expected": 0.1235
+   },
+   "frame_t6": {
+    "covered_points": 536,
+    "targets_in_covered_set": 1,
+    "expected": 0.4085
+   }
+  },
+  "agrees_with_engine_hits": true,
+  "note": "G=0 cells use the same targets as the t=5 G=3 cells (same seed), so they also have 0 covered targets, matching hits=0."
+ },
+ "relation_certificates": [
+  {
+   "cell": "frame_t6_g3 (bits@908172, t=6, G=3)",
+   "producer_certificate": "none recorded (engine JSON carries only hits_verified=1); reconstructed by the validator",
+   "target_index": 95,
+   "target_scalar": 16836,
+   "target": [
+    242835,
+    392958
+   ],
+   "P_i": [
+    908185,
+    448888
+   ],
+   "P_j": [
+    908188,
+    569523
+   ],
+   "x_offsets_in_frame": [
+    13,
+    16
+   ],
+   "check": "P_i + P_j == [16836]G and [r]T == O, recomputed with the validator's affine short-Weierstrass arithmetic; both x(P) in [908172, 908172+64)",
+   "verified": true
+  }
+ ],
+ "census_replay": "frame_census.py was not re-run (instructed not to import it); its rows were recomputed with independent code instead: see validator-report.json"
+}

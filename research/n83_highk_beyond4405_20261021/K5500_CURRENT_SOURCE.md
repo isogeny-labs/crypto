@@ -32,3 +32,40 @@ with SHA-256
 The split index's full build, rank, one-target recovery and Tier 1 pairing
 are the next gates. Its `candidate_id` remains `null` until the complete
 pipeline configuration is sealed.
+
+## Prepared full-process control
+
+`run_k5500_full_control.py` fixes the ID31 split at K4549, separate `wide3`
+Bloom filters, 80% table-request rule, 11-byte root states, four root-build
+threads, four rank threads and two target workers. It uses the earlier public
+fixture point 0, outside the sealed high-K holdout, and keeps the known scalar
+in the verifier-only sidecar. The runner bounds one child to 14,400 seconds,
+40 GiB sampled RSS and at least 8 GiB free output space. It records source,
+binary, command, flags, phase output and every cap or failure status.
+`verify_k5500_full_control.py` binds a completed run to the already replayed
+ordered base, checks the 1,255,377,750-state ID31 layout and exact table and
+Bloom allocations, requires rank 5,500, and independently replays the target
+scalar and four-point relation. The expected state, two-table and two-Bloom
+arrays total 33,136,508,082 bytes before other buffers; a completed process
+must still pass its actual peak-RSS gate.
+
+The no-launch preflight passed against the current-source macOS ARM64 binary
+`07f7b5b424d0f1ecea1cd7e6564522c4d9c64557a820441c381e7474b13a388a`:
+it fixed source SHA-256
+`58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8`,
+split K4549, 14,400 seconds and 42,949,672,960 RSS bytes. This preflight
+does not allocate the index. Run the control on a host with at least 48 GiB
+effective memory and enough free output space, then replay the output:
+
+```sh
+python3 -m research.n83_highk_beyond4405_20261021.run_k5500_full_control \
+  --binary /absolute/path/to/koblitz_orbit_dlp_fast \
+  --output /absolute/path/to/new-k5500-output
+python3 -m research.n83_highk_beyond4405_20261021.verify_k5500_full_control \
+  --output /absolute/path/to/new-k5500-output
+```
+
+This source bridge is a correctness and resource stage. A Tier 1 single-target
+comparison with K1107 and the selected fixed31 arm still needs its own frozen
+same-point workload, rho pair and complete-cost receipts before an N83
+factor-base choice can include K5500.

@@ -11,7 +11,50 @@ use std::collections::BTreeMap;
 use std::marker::PhantomData;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU8, Ordering};
+#[cfg(not(all(target_os = "linux", target_pointer_width = "64")))]
 use std::time::Instant;
+
+/// The monotonic clock in nanoseconds: `CLOCK_MONOTONIC`, the clock
+/// `std::time::Instant` reads on Linux, kept as a plain count.  A boundary
+/// runs once per relation (millions in a 32-bit child), and `Instant`'s
+/// checked difference, `Duration` normalisation and 128-bit nanosecond
+/// conversion cost more instructions than the clock read itself; the
+/// interval between two reads is the same number either way.
+///
+/// The C function is declared here rather than taken from the `libc` crate,
+/// because research crates compile this file by `#[path]` and do not all
+/// depend on `libc`.  Elsewhere the clock is `Instant` from a fixed anchor.
+#[inline]
+fn now_ns() -> u64 {
+    #[cfg(all(target_os = "linux", target_pointer_width = "64"))]
+    {
+        /// `struct timespec` on 64-bit Linux.
+        #[repr(C)]
+        struct Timespec {
+            tv_sec: i64,
+            tv_nsec: i64,
+        }
+        extern "C" {
+            fn clock_gettime(clock: i32, tp: *mut Timespec) -> i32;
+        }
+        /// `CLOCK_MONOTONIC` in `<linux/time.h>`.
+        const CLOCK_MONOTONIC: i32 = 1;
+        let mut ts = Timespec {
+            tv_sec: 0,
+            tv_nsec: 0,
+        };
+        // SAFETY: `ts` is a valid, writable `struct timespec` of the
+        // 64-bit Linux ABI, and CLOCK_MONOTONIC always exists there.
+        let rc = unsafe { clock_gettime(CLOCK_MONOTONIC, &mut ts) };
+        debug_assert_eq!(rc, 0);
+        (ts.tv_sec as u64) * 1_000_000_000 + ts.tv_nsec as u64
+    }
+    #[cfg(not(all(target_os = "linux", target_pointer_width = "64")))]
+    {
+        static ANCHOR: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
+        u64::try_from(ANCHOR.get_or_init(Instant::now).elapsed().as_nanos()).expect("bounded clock")
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(usize)]
@@ -89,26 +132,25 @@ impl Phase {
 
 struct Trace {
     generation: u64,
-    profiler_dumps: bool,
     phase: Phase,
-    started: Instant,
-    last: Instant,
+    /// [`now_ns`] at the session's start and at the last boundary.
+    started: u64,
+    last: u64,
     elapsed: [u64; 14],
     entered: [bool; 14],
     online_elapsed: [u64; 14],
     online_entered: [bool; 14],
-    online_start: Option<Instant>,
+    online_start: Option<u64>,
     online_ns: Option<u64>,
     error: Option<&'static str>,
 }
 
 impl Trace {
     fn boundary(&mut self, next: Phase) {
-        if self.profiler_dumps {
-            dump(self.phase.label());
-        }
-        let now = Instant::now();
-        let ns = u64::try_from(now.duration_since(self.last).as_nanos()).expect("bounded interval");
+        dump(self.phase.label());
+        let now = now_ns();
+        // The clock is monotonic, so the difference never wraps.
+        let ns = now - self.last;
         self.elapsed[self.phase as usize] += ns;
         if self.online_start.is_some() {
             self.online_elapsed[self.phase as usize] += ns;
@@ -165,13 +207,6 @@ pub struct Session {
 
 impl Session {
     pub fn begin() -> Result<Self, &'static str> {
-        // Whole-solve instruction censuses need only the external markers.
-        // Fine-grained relation callbacks can otherwise create millions of
-        // profile files. Keep their exclusive clocks, and keep collection on.
-        Self::begin_profiled(std::env::var("ECBENCH_CALLGRIND_PHASE_DUMPS").as_deref() != Ok("0"))
-    }
-
-    fn begin_profiled(profiler_dumps: bool) -> Result<Self, &'static str> {
         CURRENT.with(|slot| {
             let mut state = slot.borrow_mut();
             if state.trace.is_some() {
@@ -185,12 +220,11 @@ impl Session {
                 .checked_add(1)
                 .expect("bounded session count");
             let generation = state.generation;
-            let now = Instant::now();
+            let now = now_ns();
             let mut entered = [false; 14];
             entered[Phase::Setup as usize] = true;
             state.trace = Some(Trace {
                 generation,
-                profiler_dumps,
                 phase: Phase::Setup,
                 started: now,
                 last: now,
@@ -249,10 +283,7 @@ impl Session {
                         )
                     })
                     .collect(),
-                observed_wall_ns: u64::try_from(
-                    trace.last.duration_since(trace.started).as_nanos(),
-                )
-                .expect("bounded session"),
+                observed_wall_ns: trace.last - trace.started,
                 online_phases_ns: PHASES
                     .iter()
                     .filter(|p| p.online())
@@ -341,10 +372,7 @@ pub fn end_online() {
             };
             trace.boundary(Phase::Setup);
             trace.online_start = None;
-            trace.online_ns = Some(
-                u64::try_from(trace.last.duration_since(start).as_nanos())
-                    .expect("bounded online interval"),
-            );
+            trace.online_ns = Some(trace.last - start);
         } else {
             foreign_boundary();
         }
@@ -428,6 +456,17 @@ pub(crate) fn callgrind_dump(label: &'static [u8]) {
     dump(label);
 }
 
+/// Fixed, safe labels for a separately profiled native scalar verifier.
+/// Requests are inert outside Valgrind; this does not qualify an execution.
+pub fn callgrind_solve_frame_begin() {
+    dump(b"ecbench_before_solve\0");
+}
+
+/// Close the same complete-verifier frame, including an ordinary error return.
+pub fn callgrind_solve_frame_end() {
+    dump(b"ecbench_solve\0");
+}
+
 #[cfg(test)]
 thread_local! { static DUMPS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) }; }
 
@@ -435,30 +474,6 @@ thread_local! { static DUMPS: std::cell::Cell<usize> = const { std::cell::Cell::
 mod tests {
     use super::*;
     use std::time::Duration;
-
-    #[test]
-    fn whole_solve_mode_keeps_clocks_and_external_profiler_markers() {
-        let before = DUMPS.with(|count| count.get());
-        let session = Session::begin_profiled(false).unwrap();
-        mark(Phase::Precompute);
-        begin_online(Phase::TargetQuery);
-        {
-            let _scope = scope(Phase::TargetPdp);
-            std::thread::sleep(Duration::from_millis(1));
-        }
-        end_online();
-        let snapshot = session.finish().unwrap();
-        assert!(snapshot.online_wall_ns.unwrap() > 0);
-        assert!(snapshot.online_phases_ns["target_pdp"].unwrap() > 0);
-        assert_eq!(DUMPS.with(|count| count.get()), before);
-        callgrind_dump(b"ecbench_before_solve\0");
-        callgrind_dump(b"ecbench_solve\0");
-        assert_eq!(DUMPS.with(|count| count.get()), before + 2);
-        let session = Session::begin_profiled(true).unwrap();
-        mark(Phase::Precompute);
-        session.finish().unwrap();
-        assert!(DUMPS.with(|count| count.get()) > before + 2);
-    }
 
     #[test]
     fn exclusive_measurement_closes_online_and_observed_intervals() {

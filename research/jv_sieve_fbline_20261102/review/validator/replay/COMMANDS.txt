@@ -1,0 +1,9 @@
+# Validator replays, 2026-11-03, host: 4 vCPU (nproc 4), shared with other agents; counted metrics are host-independent.
+# Binary: /tmp/claude-0/-home-user/e05ef163-36d2-5181-b9b7-869571ded707/scratchpad/jv_cover_round3_frozen
+# sha256 d21002a309374e1a06caf3f93a4c6da212362a72e5987b4e80aa8a96fdc44f2c (identical to target/release/examples/jv_cover at review time;
+# built at main aa1c89ab2a per the task card -- build provenance attested by the caller, binary hash verified by the validator).
+# Seeds drawn from a nonce taken after publication (DRAW_sieve.txt). Each command is run.sh's arm() line for a single seed.
+env -u JV_FB_LINE -u JV_FB_LINE_MODE JV_LIN=sparse JV_FB_LINE=4096 JV_FB_LINE_MODE=horner $BIN --exp sieve --stop 64 --sizes 1511 --first-seed 27 --seeds 1 --rho-runs 0 --json H_1511_s27.json
+env -u JV_FB_LINE -u JV_FB_LINE_MODE JV_LIN=sparse JV_FB_LINE=32768 JV_FB_LINE_MODE=table $BIN --exp sieve --stop 64 --sizes 1511 --first-seed 21 --seeds 1 --rho-runs 0 --json U_1511_s21.json
+env -u JV_FB_LINE -u JV_FB_LINE_MODE JV_LIN=sparse $BIN --exp sieve --stop 64 --sizes 1511 --first-seed 32 --seeds 1 --rho-runs 0 --json P_1511_s32.json
+env -u JV_FB_LINE -u JV_FB_LINE_MODE JV_LIN=sparse JV_FB_LINE=4294967296 JV_FB_LINE_MODE=table $BIN --exp sieve --stop 64 --sizes 1511 --first-seed 18 --seeds 1 --rho-runs 0 --json T_1511_s18.json
