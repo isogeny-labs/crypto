@@ -8683,6 +8683,25 @@ impl PairTable {
         g: &BinaryGroup<'_>,
         fb: &FactorBase<FastPoint>,
     ) -> Self {
+        Self::build_negation_folded_binary_batch_inner(g, fb, false).0
+    }
+
+    /// Build the identical first-witness table while retaining every later
+    /// pair with the same sum abscissa. The four indices are current pair,
+    /// then first pair. A caller must resolve the sign and verify the full
+    /// group equation before using a collision as a relation.
+    pub fn build_negation_folded_binary_batch_with_collisions(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> (Self, Vec<[usize; 4]>) {
+        Self::build_negation_folded_binary_batch_inner(g, fb, true)
+    }
+
+    fn build_negation_folded_binary_batch_inner(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+        collect_collisions: bool,
+    ) -> (Self, Vec<[usize; 4]>) {
         let start = Instant::now();
         let groups: Vec<&Vec<usize>> = fb
             .abscissa_list
@@ -8693,6 +8712,7 @@ impl PairTable {
         let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
         let mut ops = GroupOps::default();
         let mut attempts = 0u64;
+        let mut collisions = Vec::new();
         let mut scratch = BatchScratch::default();
         let mut indices = Vec::new();
         let mut addends = Vec::new();
@@ -8777,11 +8797,21 @@ impl PairTable {
                 if s.infinity {
                     continue;
                 }
-                map.entry(s.x + 1).or_insert((i as u32, j as u32));
+                match map.entry(s.x + 1) {
+                    std::collections::hash_map::Entry::Vacant(slot) => {
+                        slot.insert((i as u32, j as u32));
+                    }
+                    std::collections::hash_map::Entry::Occupied(slot) => {
+                        if collect_collisions {
+                            let &(fi, fj) = slot.get();
+                            collisions.push([i, j, fi as usize, fj as usize]);
+                        }
+                    }
+                }
                 attempts += 1;
             }
         }
-        Self {
+        let table = Self {
             kind: "negation_folded_binary_batch",
             entries: map.len() as u64,
             map,
@@ -8794,7 +8824,8 @@ impl PairTable {
             insert_attempts: attempts,
             index_lookups: a as u64,
             filter_bit_sets: 0,
-        }
+        };
+        (table, collisions)
     }
 
     /// The same negation-folded table and emission order as

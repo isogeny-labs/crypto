@@ -66,6 +66,10 @@
 //! the first hit. Any wall benefit needs a
 //! separate controlled measurement. It has a separate method identity so
 //! the scalar arm remains reproducible.
+//! `rootfind-negfold-batch-harvest` keeps that table and query order while
+//! converting repeated sum keys into checked homogeneous setup rows. The
+//! extra point additions enter oracle setup; row elimination enters the
+//! linear-algebra phase. It is a separate engine id from the batch control.
 //!
 //! ## The base
 //!
@@ -367,6 +371,8 @@ pub enum Pdp3Engine {
     /// The same negation-folded table and probe, with batched binary
     /// additions during table construction.
     RootfindNegfoldBatch,
+    /// The batch table plus verified homogeneous rows from duplicate keys.
+    RootfindNegfoldBatchHarvest,
     /// Windowed `m = 3` scan on the negation-folded [`PairTable`].
     RootfindWindowNegfold,
 }
@@ -383,11 +389,13 @@ impl Pdp3Engine {
             "rootfind-window" => Ok(Self::RootfindWindow),
             "rootfind-negfold" => Ok(Self::RootfindNegfold),
             "rootfind-negfold-batch" => Ok(Self::RootfindNegfoldBatch),
+            "rootfind-negfold-batch-harvest" => Ok(Self::RootfindNegfoldBatchHarvest),
             "rootfind-window-negfold" => Ok(Self::RootfindWindowNegfold),
             other => Err(format!(
                 "unknown engine `{other}`; try inherited-f4, f6-ic, f6-ic-pair, matrix-f4, \
                  matrix-f5, \
-                 rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+                 rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch, \
+                 rootfind-negfold-batch-harvest \
                  or rootfind-window-negfold"
             )),
         }
@@ -404,6 +412,7 @@ impl Pdp3Engine {
             Self::RootfindWindow => "rootfind-window",
             Self::RootfindNegfold => "rootfind-negfold",
             Self::RootfindNegfoldBatch => "rootfind-negfold-batch",
+            Self::RootfindNegfoldBatchHarvest => "rootfind-negfold-batch-harvest",
             Self::RootfindWindowNegfold => "rootfind-window-negfold",
         }
     }
@@ -422,6 +431,7 @@ impl Pdp3Engine {
                 | Self::RootfindWindow
                 | Self::RootfindNegfold
                 | Self::RootfindNegfoldBatch
+                | Self::RootfindNegfoldBatchHarvest
                 | Self::RootfindWindowNegfold
         )
     }
@@ -430,7 +440,10 @@ impl Pdp3Engine {
     pub fn is_negfold(self) -> bool {
         matches!(
             self,
-            Self::RootfindNegfold | Self::RootfindNegfoldBatch | Self::RootfindWindowNegfold
+            Self::RootfindNegfold
+                | Self::RootfindNegfoldBatch
+                | Self::RootfindNegfoldBatchHarvest
+                | Self::RootfindWindowNegfold
         )
     }
 
@@ -452,6 +465,7 @@ impl Pdp3Engine {
             | Self::RootfindWindow
             | Self::RootfindNegfold
             | Self::RootfindNegfoldBatch
+            | Self::RootfindNegfoldBatchHarvest
             | Self::RootfindWindowNegfold => None,
         }
     }
@@ -462,6 +476,54 @@ impl Pdp3Engine {
 /// trade recorded on [`PairSumTable::decompose_fast_window`].
 pub fn rootfind_window_len(points: usize) -> usize {
     rootfind_window_len_div(points, 3)
+}
+
+/// Resolve a batch table's x-only collisions into checked group equations.
+/// The table itself keeps the same first witness and query behavior.
+fn verified_collision_rows(
+    g: &BinaryGroup<'_>,
+    fb: &FactorBase<FastPoint>,
+    r: u64,
+    collisions: &[[usize; 4]],
+    ops: &mut GroupOps,
+) -> Result<(Vec<Vec<u64>>, u64), String> {
+    let mut rows = Vec::with_capacity(collisions.len());
+    let mut zero_rows = 0u64;
+    for &[i, j, fi, fj] in collisions {
+        if [i, j, fi, fj].iter().any(|&index| index >= fb.points.len()) {
+            return Err("pair-table collision has an out-of-base witness".into());
+        }
+        let current = g.add(ops, fb.points[i], fb.points[j]);
+        let first = g.add(ops, fb.points[fi], fb.points[fj]);
+        if g.is_identity(&current) || g.is_identity(&first) || current.x != first.x {
+            return Err("pair-table collision has unequal or infinite sums".into());
+        }
+        let indices = if current == first {
+            [i, j, fb.neg_index[fi], fb.neg_index[fj]]
+        } else if current == g.neg(first) {
+            [i, j, fi, fj]
+        } else {
+            return Err("pair-table collision has unresolved sum sign".into());
+        };
+        let mut check = fb.points[indices[0]];
+        for &index in &indices[1..] {
+            check = g.add(ops, check, fb.points[index]);
+        }
+        if !g.is_identity(&check) {
+            return Err("pair-table collision failed full group verification".into());
+        }
+        let mut row = vec![0u64; fb.columns];
+        for &index in &indices {
+            let col = fb.col_of[index];
+            row[col] = (row[col] + fb.coef_of[index]) % r;
+        }
+        if row.iter().all(|&coefficient| coefficient == 0) {
+            zero_rows += 1;
+        } else {
+            rows.push(row);
+        }
+    }
+    Ok((rows, zero_rows))
 }
 
 /// Window length `⌈n/div⌉` for a configurable divisor (`div ≥ 1`).
@@ -518,6 +580,7 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch`, or
+/// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch-harvest`, or
 /// `pdp3-koblitz:m=3,engine=rootfind-window-negfold`.
 pub struct Pdp3KoblitzOracle<'i> {
     name: &'static str,
@@ -541,6 +604,11 @@ pub struct Pdp3KoblitzOracle<'i> {
     pair: Option<PairSumTable>,
     /// Negation-folded [`PairTable`] under `*-negfold` engines.
     pair_neg: Option<PairTable>,
+    /// Verified homogeneous rows harvested from duplicate batch-table keys.
+    setup_rows: Vec<Vec<u64>>,
+    collision_candidates: u64,
+    collision_zero_rows: u64,
+    collision_columns: usize,
     /// Reused by the batched `m = 3` scan; all completed additions are charged.
     scan_scratch: BatchScratch,
     scan_addends: Vec<FastPoint>,
@@ -584,6 +652,10 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             totals: SolverTotals::default(),
             pair: None,
             pair_neg: None,
+            setup_rows: Vec::new(),
+            collision_candidates: 0,
+            collision_zero_rows: 0,
+            collision_columns: 0,
             scan_scratch: BatchScratch::default(),
             scan_addends: Vec::new(),
             scan_sums: Vec::new(),
@@ -687,7 +759,11 @@ impl<'i> Pdp3KoblitzOracle<'i> {
     ) -> Option<Vec<usize>> {
         let table = self.pair_neg.as_ref()?;
         let g = ctx.group;
-        if self.engine == Pdp3Engine::RootfindNegfoldBatch && self.summands == 3 {
+        if matches!(
+            self.engine,
+            Pdp3Engine::RootfindNegfoldBatch | Pdp3Engine::RootfindNegfoldBatchHarvest
+        ) && self.summands == 3
+        {
             const SCAN_BLOCK: usize = 8;
             let paired_layout = *self.scan_pair_layout.get_or_insert_with(|| {
                 fb.points.len() % 2 == 1
@@ -850,6 +926,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  (m = {}); no Groebner search",
                 self.summands
             ),
+            Some("rootfind-negfold-batch-harvest") => format!(
+                "rootfind-negfold-batch with checked homogeneous seed rows from duplicate \
+                 pair sums (m = {}); no Groebner search",
+                self.summands
+            ),
             Some("rootfind-window-negfold") => format!(
                 "root finding with negation-folded PairTable and cyclic third-summand window \
                  of length ⌈|F|/window_div⌉ (div={}); m = {}; no Groebner search",
@@ -880,7 +961,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 "inherited-f4 (the control), f6-ic, matrix-f4, matrix-f5, rootfind (full \
                  PairSumTable), rootfind-window (m = 3 cyclic ⌈|F|/3⌉ window), \
                  rootfind-negfold (PairTable negation fold, ~half set-up), \
-                 rootfind-negfold-batch (same table with batched binary additions), or \
+                 rootfind-negfold-batch (same table with batched binary additions), \
+                 rootfind-negfold-batch-harvest (batch table plus verified seed rows), or \
                  rootfind-window-negfold (window + negation fold)",
             ),
             (
@@ -938,11 +1020,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         // Parameters that change the search have no default.
         let engine = params.get("engine").ok_or(
             "missing parameter `engine`; try inherited-f4, f6-ic, matrix-f4, matrix-f5, \
-             rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch \
+             rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch, \
+             rootfind-negfold-batch-harvest \
              or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
         self.scan_pair_layout = None;
+        self.setup_rows.clear();
+        self.collision_candidates = 0;
+        self.collision_zero_rows = 0;
+        self.collision_columns = 0;
         if self.engine == Pdp3Engine::F6IcPair {
             // Reuse within this pipeline solve, never across independent
             // records or replayed records in the auditor process.
@@ -1104,10 +1191,24 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                         "engine=rootfind-negfold needs a factor base with abscissa grouping".into(),
                     );
                 }
-                let table = if self.engine == Pdp3Engine::RootfindNegfoldBatch {
-                    PairTable::build_negation_folded_binary_batch(ctx.group, fb)
-                } else {
-                    PairTable::build_negation_folded(ctx.group, fb)
+                let table = match self.engine {
+                    Pdp3Engine::RootfindNegfoldBatch => {
+                        PairTable::build_negation_folded_binary_batch(ctx.group, fb)
+                    }
+                    Pdp3Engine::RootfindNegfoldBatchHarvest => {
+                        let (table, collisions) =
+                            PairTable::build_negation_folded_binary_batch_with_collisions(
+                                ctx.group, fb,
+                            );
+                        self.collision_candidates = collisions.len() as u64;
+                        self.collision_columns = fb.columns;
+                        let (rows, zero) =
+                            verified_collision_rows(ctx.group, fb, ctx.r, &collisions, ops)?;
+                        self.setup_rows = rows;
+                        self.collision_zero_rows = zero;
+                        table
+                    }
+                    _ => PairTable::build_negation_folded(ctx.group, fb),
                 };
                 ops.merge(table.build_ops);
                 self.pair_neg = Some(table);
@@ -1278,7 +1379,21 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             (None, None) => BTreeMap::new(),
         };
         c.insert("counted:table_insert_attempts".to_string(), 1);
+        if self.collision_candidates > 0 {
+            c.insert(
+                "row_build_words".to_string(),
+                self.collision_candidates * (self.collision_columns as u64 + 4),
+            );
+            c.insert(
+                "row_build_modr_adds".to_string(),
+                4 * self.collision_candidates,
+            );
+        }
         c
+    }
+
+    fn setup_rows(&self) -> &[Vec<u64>] {
+        &self.setup_rows
     }
 
     fn setup_native(&self) -> BTreeMap<String, u64> {
@@ -1294,6 +1409,14 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 "pair_table_build_adds".into(),
                 table.build_ops.adds + table.build_ops.doubles,
             );
+        }
+        if self.engine == Pdp3Engine::RootfindNegfoldBatchHarvest {
+            counts.insert("collision_candidates".into(), self.collision_candidates);
+            counts.insert(
+                "collision_nonzero_rows".into(),
+                self.setup_rows.len() as u64,
+            );
+            counts.insert("collision_zero_rows".into(), self.collision_zero_rows);
         }
         if self.pair_table_points > 0 {
             counts.insert("pair_table_points".into(), self.pair_table_points as u64);
@@ -1353,7 +1476,7 @@ pub fn plugins() -> BinaryPlugins {
 /// it.  The oracle lives in this binary, so the replays do too.
 #[cfg(test)]
 mod engine_names {
-    use super::{Pdp3Engine, Pdp3KoblitzOracle};
+    use super::{verified_collision_rows, Pdp3Engine, Pdp3KoblitzOracle};
 
     #[test]
     fn f6_ic_pair_parses_and_shares_the_f6_solver() {
@@ -1372,6 +1495,147 @@ mod engine_names {
         assert!(engine.is_negfold());
         assert!(!engine.is_window());
         assert_eq!(engine.solver(3), None);
+        let harvest = Pdp3Engine::parse("rootfind-negfold-batch-harvest").unwrap();
+        assert!(harvest.is_rootfind() && harvest.is_negfold());
+        assert_eq!(harvest.solver(3), None);
+    }
+
+    #[test]
+    fn batch_collision_rows_match_fixed_census_and_reject_tampering() {
+        use super::{BinaryGroup, ColumnFold, GroupOps, PairTable};
+        use crypto_lib::cryptanalysis::ic_boundary::{
+            koblitz_factor_base, koblitz_instance, IncrementalGauss, RowStatus,
+        };
+        use crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+
+        for (n, d, expected_candidates, expected_rank) in
+            [(13, 5, 27, 5), (19, 7, 99, 11), (23, 8, 201, 23)]
+        {
+            let inst = koblitz_instance(0, n).unwrap();
+            let frob =
+                build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), d).unwrap();
+            let fb = koblitz_factor_base(
+                &inst,
+                &frob,
+                ColumnFold::SignedFrobeniusOrbit,
+                format!("d={d}"),
+            )
+            .unwrap();
+            let group = BinaryGroup(&inst.fast);
+            let plain = PairTable::build_negation_folded_binary_batch(&group, &fb);
+            let (harvested, collisions) =
+                PairTable::build_negation_folded_binary_batch_with_collisions(&group, &fb);
+            assert_eq!(harvested.entries, plain.entries);
+            assert_eq!(harvested.insert_attempts, plain.insert_attempts);
+            assert_eq!(harvested.build_ops.adds, plain.build_ops.adds);
+            assert_eq!(collisions.len(), expected_candidates);
+            let mut ops = GroupOps::default();
+            let (rows, zero) =
+                verified_collision_rows(&group, &fb, inst.r, &collisions, &mut ops).unwrap();
+            assert_eq!(zero, 0);
+            assert_eq!(rows.len(), expected_candidates);
+            assert_eq!(ops.adds, 5 * expected_candidates as u64);
+            let mut matrix = IncrementalGauss::new(fb.columns + 1, inst.r);
+            for mut row in rows {
+                row.push(0);
+                assert_ne!(matrix.add_row(row, 0), RowStatus::Inconsistent);
+            }
+            assert_eq!(matrix.rank(), expected_rank);
+
+            let mut corrupt = collisions[0];
+            let mut rejected = false;
+            for replacement in 0..fb.points.len() {
+                corrupt[0] = replacement;
+                if verified_collision_rows(&group, &fb, inst.r, &[corrupt], &mut ops).is_err() {
+                    rejected = true;
+                    break;
+                }
+            }
+            assert!(rejected, "a modified collision witness must be rejected");
+        }
+    }
+
+    #[test]
+    fn harvested_rows_seed_a_same_target_k13_pipeline() {
+        use super::{BinaryGroup, GroupOps, KoblitzStandardSubspaceBase};
+        use crypto_lib::cryptanalysis::ic_boundary::{koblitz_instance, Calibration, CountedGroup};
+        use crypto_lib::cryptanalysis::ic_framework::stages::{InstanceCtx, Targets};
+        use crypto_lib::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+        let inst = koblitz_instance(0, 13).unwrap();
+        let group = BinaryGroup(&inst.fast);
+        let planted = 641u64;
+        let target = group.mul(&mut GroupOps::default(), inst.generator, planted);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let base = KoblitzStandardSubspaceBase::new("koblitz-standard-subspace", &inst);
+        let mut spec = PipelineSpec {
+            factor_base: "koblitz-standard-subspace".into(),
+            oracle: "pdp3-koblitz".into(),
+            targets: Targets::Walk,
+            max_trials: 20_000,
+            seed: 811,
+            linalg: "incremental-gauss".into(),
+            ..Default::default()
+        };
+        spec.factor_base_params.set("dimension", "5");
+        spec.oracle_params.set("engine", "rootfind-negfold-batch");
+        let mut old_oracle = Pdp3KoblitzOracle::new("pdp3-koblitz", 3, &inst);
+        let old = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut old_oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .unwrap();
+        spec.oracle_params
+            .set("engine", "rootfind-negfold-batch-harvest");
+        let mut new_oracle = Pdp3KoblitzOracle::new("pdp3-koblitz", 3, &inst);
+        let new = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut new_oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .unwrap();
+        assert!(old.verified && new.verified);
+        assert_eq!(old.recovered, Some(planted));
+        assert_eq!(new.recovered, Some(planted));
+        assert_eq!(
+            new.decomposition.setup.get("pair_table_entries"),
+            old.decomposition.setup.get("pair_table_entries")
+        );
+        assert_eq!(new.decomposition.setup.get("collision_candidates"), 27);
+        assert_eq!(new.linear_algebra.cost.get("setup_seed_independent"), 5);
+        assert!(new.decomposition.targets_tried <= old.decomposition.targets_tried);
+        eprintln!(
+            "old trials={} target_rows={} rank={} setup_adds={} total_gae={}; harvest trials={} target_rows={} rank={} setup_adds={} total_gae={} seed_rank={}",
+            old.decomposition.targets_tried,
+            old.decomposition.relations_found,
+            old.linear_algebra.rank,
+            old.decomposition.setup.group_ops.adds,
+            old.total_gae,
+            new.decomposition.targets_tried,
+            new.decomposition.relations_found,
+            new.linear_algebra.rank,
+            new.decomposition.setup.group_ops.adds,
+            new.total_gae,
+            new.linear_algebra.cost.get("setup_seed_independent"),
+        );
     }
 
     #[test]
