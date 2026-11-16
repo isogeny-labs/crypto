@@ -67,6 +67,9 @@ fn net_replay(ar: &mut Arithmetic, pts: &[Point], d: &Sig) -> Point {
     assert!(weight <= 8 && weight % 2 == 0, "not an eight-leaf net signature");
     let mut q = None;
     for (i, &v) in d.iter().enumerate() {
+        // Sig is always B31-wide, including small B4/B8 test bases. Skip
+        // zero coefficients BEFORE indexing the shorter signed-point slice.
+        if v == 0 { continue; }
         let leaf = pts[2 * i + usize::from(v < 0)];
         for _ in 0..v.unsigned_abs() {
             q = ar.add(PRIME31, q, leaf);
