@@ -41,3 +41,17 @@ Restore approved checkpoint access or receive an approved replacement, execute t
 
 ### Errors
 No scientific execution; same checkpointAllAccessDisabledcondition revalidated. The2011group-law PDF fetch403is recorded; primary2005LPcopy remains accessible. No source/hash mismatch, no report-render failure and no gate waiver. Shared log reserved; own handoff retained. Unrelated resume edit untouched.
+
+## Delivery and CI access receipt
+
+### What was done
+Pushed pole-six derivation43972040e7. PR-description edit hit TLS handshake timeout; checked live body was unchanged, retried successfully. Read completed current/recompute CI logs for thathead: both stop in required artifact pull with HeadObject403/exit2. CI-STATUS.md retains exact run URLs and scope. Scientific output paths remain absent.
+
+### Decisions made
+Do not call CI green or infer downstream validation after a failed artifact fetch. Do not rerun unchanged workflows while destination access denied. No gate waived. Theory derivation is separate from finite validation and full tenfold goal, which remains active.
+
+### Open threads
+Approved storage access/restoration and finite gate/bridge validation remain pending. No replacement destination supplied. PR unmerged.
+
+### Errors
+GitHub metadata-update timeout recovered; S3 artifact read/write issue remains external. No scientific execution, new data, hidden rerun or source change to the frozen experiment.
