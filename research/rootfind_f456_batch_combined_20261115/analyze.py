@@ -29,6 +29,9 @@ WARMUPS = 1
 RESAMPLES = 20_000
 SEED = 202611151603
 EXPECTED_PHASES = {"factor_base", "oracle_setup", "relations", "linear_algebra", "verify"}
+EXPECTED_CURVE = {"kind": "koblitz", "a": 0, "n": 13}
+EXPECTED_CURVE_UID = "urn:ec-record:1:sha256:1dfa32cdf623e34fb258128415cab472abaa51695380fa5d4f5d636ed5a3da60"
+TARGET_SEED = 202611151301
 
 
 def read_jsonl(path):
@@ -58,6 +61,20 @@ def interval(by_target, lower, upper, seed):
 
 def validity(record):
     reasons = []
+    workload = record.get("workload") or {}
+    if (workload.get("curve_spec") != EXPECTED_CURVE
+            or (workload.get("curve") or {}).get("curve_uid") != EXPECTED_CURVE_UID
+            or (workload.get("curve") or {}).get("registered") is not True
+            or workload.get("target_law") != "hash_to_subgroup_v1"
+            or workload.get("target_seed") != TARGET_SEED
+            or type(workload.get("target_index")) is not int
+            or workload["target_index"] not in range(TARGETS)
+            or workload.get("planted") is not None
+            or not workload.get("workload_id")
+            or not workload.get("workload_sha256")
+            or not isinstance(workload.get("target"), list)
+            or len(workload["target"]) != 2):
+        reasons.append("fixed_workload_identity_invalid")
     outcome = record.get("outcome") or {}
     if outcome.get("status") != "verified" or outcome.get("matches_target") is not True:
         reasons.append("scalar_not_verified")
@@ -78,7 +95,8 @@ def validity(record):
             reasons.append("ic_phase_missing")
     if not record.get("binary_sha256"):
         reasons.append("binary_hash_missing")
-    if not (record.get("isolation") or {}).get("node"):
+    node = (record.get("isolation") or {}).get("node")
+    if type(node) is not int or node < 0:
         reasons.append("host_node_missing")
     if not record.get("env_class_id") or not record.get("algorithm_seed"):
         reasons.append("pairing_identity_missing")
@@ -140,6 +158,7 @@ def analyze(records, work_rows):
     nodes = set()
     sessions = set()
     workloads = set()
+    workload_by_index = {}
     for record in records:
         rid = record.get("record_id")
         arm = record.get("arm")
@@ -150,6 +169,15 @@ def analyze(records, work_rows):
             invalid.append({"record_id": rid, "reasons": ["slot_identity_invalid"]})
             continue
         workloads.add(target)
+        workload = record["workload"]
+        index = workload.get("target_index")
+        if type(index) is int and index in range(TARGETS):
+            identity = (target, workload.get("workload_sha256"),
+                        json.dumps(workload.get("target"), sort_keys=True),
+                        workload.get("target_counter"))
+            previous = workload_by_index.setdefault(index, identity)
+            if identity != previous:
+                invalid.append({"record_id": rid, "reasons": ["workload_index_conflict"]})
         sessions.add(record.get("session_id"))
         binaries.add(record.get("binary_sha256"))
         nodes.add((record.get("isolation") or {}).get("node"))
@@ -177,6 +205,7 @@ def analyze(records, work_rows):
     expected_warmup = {(arm, target, round_no) for arm in ARMS for target in workloads
                        for round_no in range(WARMUPS)}
     panel_complete = (len(records) == expected and len(workloads) == TARGETS
+                      and set(workload_by_index) == set(range(TARGETS))
                       and set(rows) == expected_measured and warmup_slots == expected_warmup
                       and len(binaries) == 1 and None not in binaries
                       and len(nodes) == 1 and None not in nodes
