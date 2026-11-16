@@ -47,6 +47,14 @@ jobs:
           cp examples/prime31_wz_rho_frontier.rs aps-pinned/examples/prime31_wz_rho_frontier.rs
           test -f aps-pinned/crates/ecdl-tensor-ic/Cargo.toml
           test -f aps-pinned/crates/hashed-ecdl-tensor/Cargo.toml
+          # The immutable merged baseline contains actual metrics.rs, but
+          # hashed-ecdl-tensor's lib.rs omitted its module declaration.
+          # Expose the original metrics implementation; do not stub checks.
+          test -f aps-pinned/crates/hashed-ecdl-tensor/src/metrics.rs
+          if ! grep -q '^pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs; then
+            sed -i '/^pub mod joint;/a pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs
+          fi
+          grep -q '^pub mod metrics;' aps-pinned/crates/hashed-ecdl-tensor/src/lib.rs
 
       - name: Test pinned repository WZ runner and existing native Rust solver
         run: |
