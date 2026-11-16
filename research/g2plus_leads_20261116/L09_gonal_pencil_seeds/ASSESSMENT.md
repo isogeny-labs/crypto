@@ -67,7 +67,23 @@ Not part of the frozen rule. To see whether the union-find proxy inflates or def
 stopped each arm on its own reachable exact maximum: A at its final (saturation) dimension, B at
 `n_cols - 1` (B-censored seeds dropped).
 
-ASSESS_TABLE_PLACEHOLDER
+| cell (seeds) | match with raw/ | A deficiency `n_cols - dim_max` | A: `T_sat/T_uf - 1` median [range] | B uncensored at `n_cols-1` | B: `T_exact/T_uf - 1` median | median paired (B ratio - A ratio) | median r_B proxy | median r_B exact-stop [range] | median (exact - proxy) r_B |
+|---|---|---|---|---|---|---|---|---|---|
+| p = 251, beta 3/4 (0..19) | 20/20 exact | 2 + k (19/20), 3 + k (1/20) | -0.015 [-0.16, 1.20] | 12/20 | 0.199 | +0.172 | 0.439 | 0.325 [0.0, 0.583] (n = 12) | -0.100 |
+| p = 1021, beta 3/8 = beta* (0..9) | 10/10 exact | 2 + k (10/10) | -0.001 [-0.012, 0.095] | 10/10 | 0.000 | +0.001 | 0.303 | 0.302 [0.022, 0.393] (n = 10) | -0.001 |
+
+Commands (from the lead directory): `python3 assess/indep_check.py 251 5 0 20 > assess/indep_p251_b5.jsonl`;
+`python3 assess/indep_check.py 1021 3 0 5` and `... 1021 3 5 5` (seeds 0..9 only, for the CPU budget);
+`python3 assess/compare.py P B FILES...`. Deterministic (no randomness beyond the SPEC seeds).
+Files: `assess/indep_p251_b5.jsonl`, `assess/indep_p1021_b3_s0-4.jsonl`, `assess/indep_p1021_b3_s5-9.jsonl`,
+`assess/compare_p251_b5.txt`, `assess/compare_p1021_b3.txt`; hashes in `assess/SHA256SUMS`.
+
+Reading: at p = 251 (tiny, near pair exhaustion) the proxy overstates B's saving by about 0.10 and is not
+valid. At p = 1021 at its beta*, once A's target is corrected, the proxy and exact stopping agree to 0.001
+in the median for both arms; the exceptions are seeds with FB points on O's fibres (seed 3: r_B 0.309 proxy,
+0.022 exact, because B must also determine those columns, which A cannot reach at all). This suggests, on 10
+seeds of one cell, that the union-find proxy is adequate at p >= 1021 with corrected targets, but that is an
+exploratory reading on a target the assessor chose after seeing data, so it cannot rescue the frozen verdict.
 
 ## 5. Frozen decision rule applied
 
@@ -105,7 +121,25 @@ larger p.
 
 ## 7. Concerns
 
-CONCERNS_PLACEHOLDER
+1. **Protocol defect, not executor defect:** G5's exact target `n_cols - 1` is unreachable for arm A (O/K tie
+   plus FB points on O's fibres); G5 could never pass. The same defect means the proxy stops A at a state
+   where k FB logs (those on O's fibres) are unknowable from A's rows, which B can partly reach through
+   fibres. Arms therefore do not produce the same output at their stop; the comparison is of
+   proxy-stopping times, not of equal deliverables.
+2. **Proxy validity is measured only at p <= 1021.** The independent check suggests agreement at p = 1021
+   beta* (10 seeds) and disagreement at p = 251; the headline prime has no exact check at all.
+3. **Decision cell censoring:** at p = 251 PC4 is censored in 4/20 seeds at beta* (above the 2/20 limit),
+   an independent reason for INCONCLUSIVE at that prime.
+4. **Positive control is weak at large p in trial units:** r_PC4 = 0.495 at p = 16381 versus r_B = 0.155; it
+   clears the threshold, but PC rows are free (uncharged), so the control says the detector sees supply, not
+   that it prices it.
+5. **Scope:** synthetic (3,3) curves on the split quadric only; smoothness over F_pbar not certified (X4);
+   the result says nothing about non-split genus-4 curves (pencils not rational) or about any deployed curve.
+6. **Deviations:** the 12 items in DEVIATIONS.md were checked; none changes a number in the decision cells
+   (item 2 changes the pair-stream code path only where the original would hang; item 1 moves a unit test
+   off a pair-exhausted cell). The FPM positive control (item 5) is an executor choice the spec left open.
+7. **Assessor runs:** the two p = 1021 independent processes (5 seeds each, single thread) took roughly 6-9
+   CPU-minutes each by ps sampling (not recorded); no hook refused a command.
 
 ## 8. Single most valuable next step
 
@@ -116,5 +150,5 @@ or more simply exclude from FB the points on O's two fibres (and drop the `K`/`O
 arms' exact targets are `n_cols - 1` and `n_cols - 2` with no instance-dependent term. Then the proxy
 validity of both arms can be measured, and the frozen decision rule can be applied to the existing p = 16381
 cell data if the proxy gaps of A and B agree. If they do not, the decision must move to exact-rank stopping,
-which needs a sparse exact engine fast enough for p = 16381 (the Rust engine here is dense-pivot and was
-sized for p <= 1021).
+which needs an exact engine fast enough for p = 16381 (the Rust engine here densifies each incoming row
+and was sized for p <= 1021).
