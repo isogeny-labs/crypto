@@ -1,6 +1,6 @@
 {
   "schema": "trace-incidence-rho-preparation/v1",
-  "status": "pending; no benchmark submitted",
+  "status": "native implementation and small-field correctness checked; matched benchmark pending",
   "question": "Does an actually integrated trace translation kernel lower complete prime-field solving cost relative to the matched native baseline and strongest registered rho?",
   "hypotheses": [
     "If the affected translation phase has nonzero measured share f and speedup s, total speedup follows 1/((1-f)+f/s), with new setup and recovery charged.",
@@ -8,7 +8,13 @@
   ],
   "inputs": {
     "public_schema": "prime-pools/v1",
-    "B": [8,16,32,64,128],
+    "B": [
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
     "group_order_path": "r approximately 8 B^3",
     "curves_per_size": 3,
     "public_seeds_per_curve": 4,
@@ -16,15 +22,41 @@
     "solver_excludes": "*.validation.json and all target scalars"
   },
   "reference": {
-    "native_adapter": "examples/trace_incidence_rho.rs",
+    "native_adapter": "examples/trace_incidence_rho.rs (three source-exact native development tests passed; unsigned)",
     "engine": "crypto_lib::cryptanalysis::prime_fast::rho_parallel",
-    "features": ["u64 Montgomery arithmetic","r-adding table","batched additions","negation fold","fruitless-cycle escape"],
+    "features": [
+      "u64 Montgomery arithmetic",
+      "r-adding table",
+      "batched additions",
+      "negation fold",
+      "fruitless-cycle escape"
+    ],
     "selection": "Use the cheapest registered protocol-matched reference, including applicable automorphisms. Tune cold overhead on separate qualification inputs before held-out comparisons; do not select a post-hoc best seed.",
     "adapter_gap": "Aggregate engine timer only; exclusive walk/collision/recovery intervals still required for admission."
   },
-  "charged_work": ["curve and input validation","public mixed-label generation including rejected draws","every attempted pool and miss","polynomial and table setup","translation including collisions and exceptional points","incidence selection","witness and scalar recovery","verification on the original curve","memory peaks"],
+  "charged_work": [
+    "curve and input validation",
+    "public mixed-label generation including rejected draws",
+    "every attempted pool and miss",
+    "polynomial and table setup",
+    "translation including collisions and exceptional points",
+    "incidence selection",
+    "witness and scalar recovery",
+    "verification on the original curve",
+    "memory peaks"
+  ],
   "retry_policy": "fixed seed order; stop at first informative relation, retain preceding costs; four misses are censored, not a completed solve",
-  "controls": ["same-input native batched pairs","native quotient/GCD route","dense and trace translations on identical native backend","A/A repeats","collision and exceptional-point fixtures","uninformative-first witness regression"],
+  "controls": [
+    "same-input native batched pairs",
+    "native quotient/GCD route",
+    "dense and trace translations on identical native backend",
+    "A/A repeats",
+    "collision and exceptional-point fixtures",
+    "uninformative-first witness regression",
+    "native source-coordinate root finder",
+    "charged auxiliary two-isogeny/codomain datum construction",
+    "FLINT nmod_poly_roots external root control on identical inputs, separately labelled randomized"
+  ],
   "admission": {
     "backend": "isolab EKS Spot with native L2",
     "threads": 1,
@@ -37,9 +69,31 @@
     "new_launches_until_budget_readback": 0,
     "proposed_total_attempt_ceiling_usd": 1,
     "budget_note": "Proposal only. Includes build, idle, failed and interrupted attempts; launch requires an authorized finite balance covering all of them.",
-    "identities": ["published source commit","immutable pre-call qualifier hash","request hash","OCI digest","binary SHA-256","Job UID","Pod UID","post-call manifest"],
+    "identities": [
+      "published source commit",
+      "immutable pre-call qualifier hash",
+      "request hash",
+      "OCI digest",
+      "binary SHA-256",
+      "Job UID",
+      "Pod UID",
+      "post-call manifest"
+    ],
     "outputs": "approved S3 custody, all raw records, independent replay and recompute; PCC standing before promotion"
   },
-  "blocking_dependencies": ["confirm live monthly and daily headroom","authenticated checkpoint and artifact custody","compile and test native rho adapter","replace relevant historical Python execution paths with native code","integrate trace translation into an execution path that actually uses divisor translation","complete phase instrumentation and matched reference qualification"],
-  "claim_boundary": "No measured ratio to rho, new arithmetic exponent or extrapolation to 256-bit/binary fields is asserted."
+  "blocking_dependencies": [
+    "confirm live monthly/daily headroom and authenticated checkpoint/custody",
+    "bind field-specific auxiliary data and charge its construction for the growing-size panel",
+    "native L2 warmup, A/A, complete phase instrumentation and strongest matched reference qualification",
+    "independent-host replay, recomputation and signed standing before promotion"
+  ],
+  "claim_boundary": "No measured ratio to rho, new arithmetic exponent or extrapolation to 256-bit/binary fields is asserted.",
+  "completed_native_paths": [
+    "literal auxiliary-curve/twist Algorithms1-6 with dense and trace translation",
+    "source-coordinate Sylow splitting without image reconstruction",
+    "explicit two-isogeny and counted toy codomain-basis completion",
+    "incidence GCD plus original-curve mixed-label witness recovery",
+    "native rho adapter development tests"
+  ],
+  "scope_note": "Native correctness panel uses p83/p97 and B2/3/4; it is separate from the historical growing-B timing panel and is not a new scaling measurement."
 }

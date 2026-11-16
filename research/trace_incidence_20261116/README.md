@@ -1,4 +1,53 @@
-# Trace translation and implicit incidence: historical evidence import
+# Native auxiliary-curve root finding and incidence integration
+
+The current implementation follows the paper's complete auxiliary-curve and
+quadratic-twist root-finding pipeline in native C++. A source-coordinate
+variant keeps factors in the original quotient ring throughout Sylow descent,
+avoiding canonical image reconstruction. Its derived online allowance, with
+a valid datum supplied and fast polynomial arithmetic, is soft
+O(Xi² d log²p + d log³p). Construction and validation remain separate cold
+costs; the bound and priority status remain unsigned. [pcc:unverified]
+
+- [Build and run the native code](native/README.md).
+- [Source-coordinate derivation and cost chain](reports/PULLBACK.md).
+- [Two-page source-linked report](reports/NATIVE_REPORT.pdf).
+- [Independent-source correctness audit](native/audit-data/002-result.json).
+- [Complete incidence/isogeny integration check](native/audit-data/004-result.json).
+
+![Native auxiliary-curve flow](reports/native-flow.svg)
+
+Checks include95 pullback root-finding calls and244 integrated relation solves
+across four root backends, with original-curve scalar recovery. An explicit
+auxiliary2-isogeny and twist-compatible codomain construction are included;
+mapped generators alone span only36 of72 points, and complete basis
+construction is counted. The current Rust rho adapter's three development
+tests also pass after installing the native toolchain. These are unsigned
+development checks, not an isolated timing comparison. The native incidence
+panel uses p83/p97 and B2/3/4; it is separate from the historical growing-B
+timing panel. [pcc:unverified]
+
+The norm/GCD stage remains O(B²) degree-B quotient products. Matched native
+timing, stronger external root-finding controls, larger-field datum setup and
+rho comparisons remain pending budget/admission and independent replay.
+No overall runtime ratio is inferred from a component count. [pcc:unverified]
+
+| Requested deliverable | Current status and evidence |
+| --- | --- |
+| Full trace/dense translation, including collisions and exceptions | Implemented; native independent-source audit in `native/audit-data/002-result.json`. Unsigned development checks. |
+| Paper-guided auxiliary curve, twist and isogeny | Implemented; counted toy datum completion and original-curve recovery in `native/audit-data/004-result.json`. General efficient datum construction remains open. |
+| Stronger root-finding formulation | Implemented source-coordinate splitting; conditional cost derivation in `reports/PULLBACK.md`. Formal verification and priority review remain open. |
+| Growing labelled pools with r approximately B³ | Historical panel preserved below. New native scaling and complete memory/cost measurements remain pending admission; the small native correctness panel does not replace them. |
+| Repository quotient/GCD and pair controls | Pinned prior-art/control sources preserved under `historical/repo_controls/`; matched native performance comparison remains pending. |
+| Structured bases versus known mixed labels | Kept separate; public pool generation and rejected draws are charged. No free labelled structured-base construction is asserted. |
+| Full comparison with rho and external root finding | Protocol in `rho-protocol.json`; blocked on live EKS budget/checkpoint access, followed by qualification and independent replay. |
+
+Implementation and test outcomes in this table remain unsigned. [pcc:unverified]
+
+## Historical evidence import
+
+The sections below describe the original import and its tool availability
+at that stage. The native guide and current receipts above supersede the
+earlier execution status while preserving the old evidence bytes.
 
 This directory preserves the implementation and recorded evidence from the
 existing workspace study, and adds a native adapter for a future matched rho
@@ -25,8 +74,12 @@ self-checks are unsigned producer evidence. [pcc:unverified]
 - `../../examples/trace_incidence_rho.rs`: adapter for the existing Montgomery,
   batched, negation-aware `prime_fast::rho_parallel` engine.
 
-`IMPORT.json` identifies preserved and deferred objects. `SHA256SUMS` checks
-the materialized import and new native adapter from the repository root.
+`IMPORT.json` identifies preserved and deferred objects. `SHA256SUMS` is the
+current file inventory, checked from the repository root; `FROZEN_SHA256SUMS`
+preserves the original import inventory. Artifact-backed images require
+materialization from their directory's `.artifacts.json` before checking the
+frozen inventory. The native `SOURCES*.sha256` files retain claim-pinned source
+snapshots and are not regenerated with the current inventory.
 The oversized original `repo_controls/pair_benchmark.json` is **not in this
 PR**: its exact digest and length are retained pending the approved S3
 artifact route. Its derived CSV/summary and frozen producer sources are here;
