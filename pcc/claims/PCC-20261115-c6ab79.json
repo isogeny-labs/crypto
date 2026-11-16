@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-15T04:55:06Z",
+ "id": "PCC-20261115-c6ab79",
+ "kind": "statement",
+ "producer": {
+  "commit": "1e6eb180e3eb4de7e5eeb1326e3f93f3a286d6cd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_experiments_20261109/summary.json",
+    "sha256": "9b5d80a88a1503012124d23e60f1c1b950e301baa0f917c43de8f0ff6b82947d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_experiments_20261109/rows.jsonl",
+    "sha256": "8d133f7ba70d64f78d83b19a24b0ef15fa40a0cc407fa3e7e1d143ae3dad27f4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_experiments_20261109/export.json",
+    "sha256": "d03c84f3a041ccd2de1f7163d8f8d9ba51472502aab2ca189f5c49dc60dd180a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact local finite-panel execution of pinned3ae8b2124 instrument; repeated targets are not independent samples, UNKNOWN preserved, unsigned producer evidence.",
+ "statement": "The frozen original trace-zero panel completed264 valid executions with zero invalid decisions; per66 rows, explicit decides38, certified50, partial-trace50, certified-AA50. Eight A/A conflict discrepancies are retained, without outcome disagreements or a timing claim."
+}

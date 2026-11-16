@@ -1,0 +1,8 @@
+import Traversal
+namespace CoefficientTraversal
+ theorem schedule_source_order : ∀ n : Fin 7,
+ (schedule n.val).map Subtype.val =
+ (List.range n.val).flatMap (fun k => (List.range (k+1)).map (fun j => (k,j))) := by decide
+ theorem schedule_size : ∀ n : Fin 7, (schedule n.val).length=n.val*(n.val+1)/2 := by decide
+ theorem schedule_no_duplicates : ∀ n : Fin 7, ((schedule n.val).map Subtype.val).Nodup := by decide
+end CoefficientTraversal

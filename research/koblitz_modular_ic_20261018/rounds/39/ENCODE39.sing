@@ -1,0 +1,15 @@
+proc export39(string category,int slot,poly value,link out){
+ poly rebuilt=0;int k;intvec ex;
+ write(out,category+" "+string(slot)+" "+string(size(value)));
+ for(k=1;k<=size(value);k++){if(leadcoef(value[k])!=1){ERROR("ENC39_NONBINARY");}ex=leadexp(value[k]);if(size(ex)!=4){ERROR("ENC39_EXPONENT_WIDTH");}write(out,string(ex));rebuilt=rebuilt+n^ex[1]*l^ex[2]*b^ex[3]*c^ex[4];}
+ if(rebuilt!=value){ERROR("ENC39_RECONSTRUCTION");}return(1);
+}
+if(diff(nuEquation,n)!=nuCoefficient || nuCoefficient!=(1+c)^2*b^3*(b+c*(1+c)^3)){ERROR("ENC39_LINEAR_NU");}
+poly nuTail39=nuEquation+nuCoefficient*n;if(diff(nuTail39,n)!=0 || subst(nuTail39,n,0)!=nuTail39){ERROR("ENC39_NU_TAIL");}
+link out39="ASCII:w source-polynomials.txt";open(out39);int i39;int unused39;
+for(i39=1;i39<=5;i39++){unused39=export39("S",i39,original[i39],out39);}
+for(i39=1;i39<=8;i39++){unused39=export39("U",i39,registered[i39],out39);}
+unused39=export39("N",1,nuTail39,out39);unused39=export39("C",1,nuCoefficient,out39);
+for(i39=1;i39<=5;i39++){unused39=export39("L",i39,diff(original[i39],l),out39);unused39=export39("D",i39,diff(original[i39],n),out39);}
+close(out39);poly corrupt39=original[1]+1;if(corrupt39==original[1]){ERROR("ENC39_CORRUPT_CONTROL");}
+print("ENC39_RESULT source_polynomials=5 unit_polynomials=8 linear_nu_polynomials=2 derivatives=10 all_reconstructions=pass corrupt_control=rejected");print("ENC39_ALL_CHECKS_PASS");quit;

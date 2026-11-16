@@ -1,0 +1,46 @@
+intmat allPairsQuad33[2346][2];intmat pairIndexQuad33[68][68];intvec selectedMaskQuad33;intvec selectedIndicesQuad33;int iQuad33;int jQuad33;int kQuad33;int tQuad33;int colQuad33;int selectedQuad33;int countQuad33;poly relationQuad33;poly imageQuad33;poly termQuad33;ideal kernelsQuad33;
+for(iQuad33=1;iQuad33<=68;iQuad33++){for(jQuad33=iQuad33;jQuad33<=68;jQuad33++){countQuad33++;pairIndexQuad33[iQuad33,jQuad33]=countQuad33;allPairsQuad33[countQuad33,1]=iQuad33;allPairsQuad33[countQuad33,2]=jQuad33;selectedMaskQuad33[countQuad33]=0;}}
+for(iQuad33=1;iQuad33<=196;iQuad33++){
+ selectedQuad33=0;for(jQuad33=1;jQuad33<=2346;jQuad33++){if(allPairsQuad33[jQuad33,1]==sectionPairs2[iQuad33,1] && allPairsQuad33[jQuad33,2]==sectionPairs2[iQuad33,2]){selectedQuad33=jQuad33;}}
+ if(selectedQuad33==0 || sectionCoordinates2[selectedQuad33]!=w^(iQuad33-1)){ERROR("QUADRICS33_SELECTED_IDENTITY");}
+ selectedIndicesQuad33[iQuad33]=selectedQuad33;selectedMaskQuad33[selectedQuad33]=1;
+}
+countQuad33=0;link outQuad33="ASCII:w twist-quadrics.sing";open(outQuad33);write(outQuad33,"ring twistProjective33=2,(x(1..68),w),dp;ideal twistQuadrics33;");string equationQuad33;
+for(colQuad33=1;colQuad33<=2346;colQuad33++){
+ if(selectedMaskQuad33[colQuad33]==0){
+  relationQuad33=w^(colQuad33-1);termQuad33=sectionCoordinates2[colQuad33];imageQuad33=termQuad33;
+  for(tQuad33=1;tQuad33<=size(termQuad33);tQuad33++){
+   if(leadcoef(termQuad33[tQuad33])!=1){ERROR("QUADRICS33_NONBINARY_COORDINATE");}
+   kQuad33=deg(termQuad33[tQuad33])+1;relationQuad33=relationQuad33+w^(selectedIndicesQuad33[kQuad33]-1);imageQuad33=imageQuad33+sectionCoordinates2[selectedIndicesQuad33[kQuad33]];
+  }
+  if(imageQuad33!=0){ERROR("QUADRICS33_KERNEL_RECOMBINATION");}
+  countQuad33++;kernelsQuad33[countQuad33]=relationQuad33;
+  equationQuad33="twistQuadrics33["+string(countQuad33)+"]=0";
+  for(tQuad33=1;tQuad33<=size(relationQuad33);tQuad33++){
+   kQuad33=deg(relationQuad33[tQuad33])+1;
+   if(selectedMaskQuad33[kQuad33]==0 && kQuad33!=colQuad33){ERROR("QUADRICS33_INDEPENDENCE");}
+   equationQuad33=equationQuad33+"+x("+string(allPairsQuad33[kQuad33,1])+")*x("+string(allPairsQuad33[kQuad33,2])+")";
+  }
+  write(outQuad33,equationQuad33+";");
+ }
+}
+close(outQuad33);if(countQuad33!=2150){ERROR("QUADRICS33_COUNT");}
+imageQuad33=imageQuad33+sectionCoordinates2[selectedIndicesQuad33[1]];if(imageQuad33==0){ERROR("QUADRICS33_CORRUPTION_CONTROL");}
+execute(read("twist-quadrics.sing"));ideal expectedBitsQuad33=imap(quadCoordinates33,kernelsQuad33);
+poly decodedQuad33;poly monomialQuad33;poly equationForDecodeQuad33;intvec expsQuad33;int firstQuad33;int secondQuad33;int degreeQuad33;
+for(iQuad33=1;iQuad33<=2150;iQuad33++){
+ decodedQuad33=0;equationForDecodeQuad33=twistQuadrics33[iQuad33];
+ for(tQuad33=1;tQuad33<=size(equationForDecodeQuad33);tQuad33++){
+  monomialQuad33=equationForDecodeQuad33[tQuad33];expsQuad33=leadexp(monomialQuad33);degreeQuad33=0;firstQuad33=0;secondQuad33=0;
+  if(expsQuad33[69]!=0 || leadcoef(monomialQuad33)!=1){ERROR("QUADRICS33_SERIALIZED_TERM");}
+  for(jQuad33=1;jQuad33<=68;jQuad33++){
+   degreeQuad33=degreeQuad33+expsQuad33[jQuad33];
+   for(kQuad33=1;kQuad33<=expsQuad33[jQuad33];kQuad33++){if(firstQuad33==0){firstQuad33=jQuad33;}else{secondQuad33=jQuad33;}}
+  }
+  if(degreeQuad33!=2){ERROR("QUADRICS33_NOT_HOMOGENEOUS_TWO");}
+  selectedQuad33=pairIndexQuad33[firstQuad33,secondQuad33];
+  if(selectedQuad33==0){ERROR("QUADRICS33_UNKNOWN_MONOMIAL");}decodedQuad33=decodedQuad33+w^(selectedQuad33-1);
+ }
+ if(decodedQuad33!=expectedBitsQuad33[iQuad33]){ERROR("QUADRICS33_SERIALIZED_ROUNDTRIP");}
+}
+print("QUADRICS33_RESULT variables=68 monomials=2346 multiplication_rank=196 independent_equations=2150 native_roundtrip=all");print("QUADRICS33_ALL_CHECKS_PASS");quit;

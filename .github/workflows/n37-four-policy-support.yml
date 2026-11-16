@@ -61,6 +61,28 @@ jobs:
             research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
             research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_four_policy_support_20261003
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/n37_four_policy_support_20261003 research/notes/ecc2k130/n37_native_m6_mitm_20261002
       - uses: Swatinem/rust-cache@v2
       - name: Use frozen native lockfile
         run: cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh

@@ -1,0 +1,15 @@
+{
+ "id":"marked23-r116-four-xzero-series-v1", "claim_class":"exact_computation",
+ "precision_exclusive":640,
+ "inputs_sha256":{
+  "donor51":"7a92cf0f1665b80bef5a38c57ca45136e530bfcf8cd13a430942af75684b7409",
+  "parser105":"4306bbc6a7c5de1b21716a5fc5a1fd1a8030ff1340409c814c39d6217292a3e4",
+  "result98":"85ab8d922601e4eab2687d2c55ae15b8f910e0ea4cd5f1ac7bdb00bd833141f2",
+  "result111":"e35e271cb6c86fc440676f1884709430eb091482f8531635294bc7dbdf49c4e5",
+  "result112":"0ca85dd551bb1e288aea9f3d2175061750a19b58e9f94d1dbc58f4eb61171fab",
+  "result115":"fbbd1e37c16a2ef28d08410671eef8a1cd41837decaea49c8fb95753b7ffaff1"
+ },
+ "decision_rule":"Report four source-bound series only if each transformed and original residual vanishes mod s^640 and denominator pullbacks are below precision",
+ "controls":["R115 first 128 bits","R111/R112 leading edges","fresh replay","changed donor","independent source evaluator"],
+ "backend":"local exact F2 bit arithmetic","cloud_cost_usd":0
+}

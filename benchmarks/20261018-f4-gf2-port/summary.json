@@ -1,0 +1,41 @@
+{
+  "schema": "crypto.f4_gf2_port/v1",
+  "date": "2026-10-18",
+  "class": "engineering",
+  "claim": "kernel level: no end-to-end S, no rho claim, all 20 timed draws undecided",
+  "commit": "5a0db28a4",
+  "n": 15,
+  "m": 3,
+  "ell": 5,
+  "degree": 4,
+  "n_vars": 30,
+  "draws": 20,
+  "arms": [
+    {"key": "crate_full", "label": "crate full readback (matrix_f4_f2_counted_with)", "median_ms": 199.5, "min_ms": 175.0, "max_ms": 253.1, "median_word_xors": 154963841, "speedup_vs_crate_full": 1.00},
+    {"key": "crate_solver", "label": "crate solver path (SolverEngine::MatrixF4 call)", "median_ms": 396.7, "min_ms": 368.9, "max_ms": 420.7, "median_word_xors": 64342540, "speedup_vs_crate_full": 0.50},
+    {"key": "port_f5_on", "label": "port decide, F5 on", "median_ms": 35.6, "min_ms": 33.5, "max_ms": 55.7, "median_word_xors": 57472744, "speedup_vs_crate_full": 5.61},
+    {"key": "port_f5_off", "label": "port decide, F5 off", "median_ms": 40.1, "min_ms": 37.5, "max_ms": 85.5, "median_word_xors": 68746716, "speedup_vs_crate_full": 4.98}
+  ],
+  "four_run_ranges": {
+    "port_f5_on_vs_crate_full": "5.6-6.0x",
+    "port_f5_on_vs_crate_solver": "10.4-11.2x"
+  },
+  "agreement": {
+    "koblitz_decomposition_comparisons": 160,
+    "refuted": 37,
+    "forced": 73,
+    "undecided": 50,
+    "dense_random_draws_per_degree": 20,
+    "checks": "rows bit-identical to matrix_f4_f2, decisions equal with F5 on and off, crate solver path decision equal"
+  },
+  "host": "4-vCPU KVM guest, Xeon 2.80 GHz, no PMU, shared (L0)",
+  "caveats": [
+    "kernel level: no end-to-end S, no rho claim",
+    "all 20 timed draws undecided, so the timing is a full degree-4 pass that finds nothing; decisive cases are covered by the agreement tests only",
+    "one cell and one degree; unisolated shared host",
+    "word-XOR counts are within 1.1x, so the gain is the rank-indexed build and absent readback, not the elimination",
+    "the port's counter is elimination only (F5 plan XORs not counted)",
+    "default SolverEngine unchanged"
+  ],
+  "report": "docs/ic/perf/F4_GF2_PORT_COMPARISON_20261018.md"
+}
