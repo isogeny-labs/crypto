@@ -53,3 +53,10 @@ A focused Rust-only test/run step is added to `.github/workflows/prime31-s4-spli
 ## Decision
 
 This tests an **exact representation bridge**, not a speedup. We now have a concrete path from 48 tower coordinates to an eight-leaf rational quotient, and a four-pair expression that fits the four-variable *interface count* of compact root selection. The gigantic quotient dimension is the explicit obstruction; only a certified target-conditioned selected-root method that avoids exhaustive support expansion can advance this lead. No m8 solve or faster-than-frontier outcome is inferred.
+
+
+## Radical-quotient admission gate (new Rust source; execution pending)
+
+Extended `prime31_m8_quotient_bridge.rs` to compute `gcd(K,K')` **over Fp using a Rust polynomial Euclidean algorithm**, directly from the field-constructed K961, before ever using group arithmetic for witness checks. A zero-degree gcd is the necessary and sufficient squarefreeness test for K. Earlier #4188 producer-local Python arithmetic reported `gcd(K,K')=1` for B31; this Rust gate provides a future source-bound check instead of silently reusing that Python result. At the moment of authoring, **the new Rust GCD assertion has not been observed to compile or execute on its new commit**; the prior passing H/K semantic check in [Actions 43788581330](https://github.com/isogeny-labs/crypto/actions/runs/43788581330) predates this addition and does not prove it.
+
+If the new assertion passes, the quotient `Fp[U]/(K(U))` is reduced; since every S3 pair factor over the admitted rational curve points has all roots in Fp, it is a product of 961 copies of Fp (with distinct coordinate roots). That is **not an algorithmic speed win**: a fully split and enumerated pair-root quotient is mathematically just a generic MITM support catalogue. The scientifically interesting unresolved possibility is exploiting the **compact S3 product circuit and target-conditioned S5 identity** without decoding its 961 roots or expanding all `961^4` pair tuples. This distinction remains a hard admissibility criterion for any non-generic future solver.
