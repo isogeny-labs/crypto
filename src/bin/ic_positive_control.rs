@@ -17,8 +17,8 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::chained_transfer::ic_control as ic;
 use crypto_lib::cryptanalysis::chained_transfer::ic_control::{
-    fb_size, jacobian_order_bsgs, random_curve, run_ic_oracle, run_rho, split_order, Arm, IcParams,
-    IcResult, Instance, RhoOut, SplitOracle, RESTART_DEFAULT,
+    fb_size, jacobian_order_bsgs, random_curve, run_ic_cfg, run_rho, split_order, Arm, IcParams,
+    IcResult, Instance, LaMode, RhoOut, SplitOracle, RESTART_DEFAULT,
 };
 use crypto_lib::cryptanalysis::ic_boundary::CountedGroup;
 use serde_json::{json, Value};
@@ -479,12 +479,24 @@ fn main() -> ExitCode {
                             };
                             // L, M: arm C with the Cardano–Lucas splitting
                             // test (M also with Cardano root finding).
-                            let (oracle, label) = match a {
-                                'L' => (SplitOracle::Lucas, Some("C_lucas")),
-                                'M' => (SplitOracle::LucasRoots, Some("C_lucas_roots")),
-                                _ => (SplitOracle::Frobenius, None),
+                            // N, S: arm M with the coordinate Wiedemann
+                            // (S on a square row subset).
+                            let (oracle, label, la) = match a {
+                                'L' => (SplitOracle::Lucas, Some("C_lucas"), LaMode::Baseline),
+                                'M' => (
+                                    SplitOracle::LucasRoots,
+                                    Some("C_lucas_roots"),
+                                    LaMode::Baseline,
+                                ),
+                                'N' => (SplitOracle::LucasRoots, Some("C_coord"), LaMode::Coord),
+                                'S' => (
+                                    SplitOracle::LucasRoots,
+                                    Some("C_coord_square"),
+                                    LaMode::CoordSquare,
+                                ),
+                                _ => (SplitOracle::Frobenius, None, LaMode::Baseline),
                             };
-                            let o = run_ic_oracle(
+                            let o = run_ic_cfg(
                                 inst,
                                 IcParams {
                                     arm,
@@ -495,12 +507,15 @@ fn main() -> ExitCode {
                                 },
                                 RESTART_DEFAULT,
                                 oracle,
+                                la,
                             );
                             if !o.certified {
                                 *bad.lock().unwrap() = true;
                             }
                             let mut v = ic_json(&o, inst, j.seed, j.ci, w_rel, w_la);
                             v["oracle"] = json!(oracle.name());
+                            v["la_mode"] = json!(la.name());
+                            v["la_fallbacks"] = json!(o.la_fallbacks);
                             if let Some(l) = label {
                                 v["arm"] = json!(l);
                             }
