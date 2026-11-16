@@ -1,0 +1,40 @@
+ideal residueQC33=std(ideal(T^2+T+1));int casesQC33;
+proc inverseQC33(poly f){
+ ideal gens=residueQC33,f;if(std(gens)[1]!=1){ERROR("QUOTIENT33_REQUIRED_UNIT");}
+ matrix wit=lift(gens,ideal(1));poly ans=reduce(wit[nrows(wit),1],residueQC33);
+ if(reduce(f*ans+1,residueQC33)!=0){ERROR("QUOTIENT33_INVERSE_IDENTITY");}return(ans);
+}
+proc checkQuotient33(string label,number b,number c,number descentL,number descentN){
+ if(c==0){ERROR("QUOTIENT33_C_EXCEPTION");}number u0=(b+c)/c^2;if(u0==0 || u0==1){ERROR("QUOTIENT33_U_EXCEPTION");}
+ number v0=((b/c)*u0^3+1)/(u0+1);number rn=(u0+1)*v0+1;number cn=rn+u0^3;
+ if(v0^2+v0!=u0^3+u0 || b!=rn*cn/u0^7 || c!=cn/u0^4){ERROR("QUOTIENT33_PLANE_INVERSE");}
+ list family=quotientFamily33(u0,descentN+b*T,descentL+(1+c)*T,v0);
+ if(size(family)==2){
+  list domainValues34=family[2];int d34;int zeroCount34;link domainOut34="ASCII:w coefficient-domain-"+label+".sing";open(domainOut34);write(domainOut34,"list denominatorValues34;");
+  for(d34=1;d34<=size(domainValues34);d34++){if(number(domainValues34[d34])==0){zeroCount34++;}write(domainOut34,"denominatorValues34["+string(d34)+"]="+string(domainValues34[d34])+";");}close(domainOut34);casesQC33++;
+  print("PREFIX34_POINT "+label+" coefficient_domain=invalid zero_denominators="+string(zeroCount34)+" presentation=untested");return(0);
+ }
+ ideal values=reduce(family[1],residueQC33);if(size(values)!=0){ERROR("QUOTIENT33_SOURCE_POINT");}
+ matrix jac=family[2];poly hv=family[3];poly dv=family[4];poly hi=inverseQC33(hv);poly di=inverseQC33(dv);list gs=family[5];list ds=family[6];
+ int omit;int row;int col;int next;int k;int productCount;matrix mm[3][3];ideal products;ideal coefficientGenerators34;poly determinant;
+ for(omit=1;omit<=3;omit++){
+  next=0;for(row=1;row<=4;row++){if(row!=omit){next++;for(col=1;col<=3;col++){mm[next,col]=reduce(jac[row,col],residueQC33);}}}
+  determinant=reduce(det(mm),residueQC33);coefficientGenerators34=gs[omit];
+  for(k=1;k<=ncols(matrix(coefficientGenerators34));k++){productCount++;products[productCount]=reduce(coefficientGenerators34[k]*determinant,residueQC33);}
+ }
+ ideal gens=residueQC33,products;
+ if(productCount!=27){ERROR("PREFIX34_PRODUCT_COUNT");}
+ if(std(gens)[1]!=1){
+  link failOut34="ASCII:w nonunit-products-"+label+".sing";open(failOut34);write(failOut34,"ideal nonunitProducts34;");int f34;
+  for(f34=1;f34<=ncols(matrix(gens));f34++){write(failOut34,"nonunitProducts34["+string(f34)+"]="+string(gens[f34])+";");}close(failOut34);casesQC33++;
+  print("PREFIX34_POINT "+label+" coefficient_domain=valid presentation=not_certified products=27");return(0);
+ }
+ matrix witness=lift(gens,ideal(1));matrix reconstructed=matrix(gens)*witness;
+ if(reconstructed[1,1]!=1){ERROR("QUOTIENT33_UNIT_WITNESS_IDENTITY");}
+ if(std(residueQC33)[1]==1){ERROR("QUOTIENT33_ZERO_FAMILY_ACCEPTED");}
+ link out="ASCII:w quotient-local-"+label+".sing";open(out);
+ write(out,"poly localHValue33="+string(hv)+";poly localHInverse33="+string(hi)+";poly localDValue33="+string(dv)+";poly localDInverse33="+string(di)+";ideal localGenerators33;matrix localWitness33["+string(nrows(witness))+"][1];");
+ for(k=1;k<=ncols(matrix(gens));k++){write(out,"localGenerators33["+string(k)+"]="+string(gens[k])+";localWitness33["+string(k)+",1]="+string(witness[k,1])+";");}
+ close(out);casesQC33++;
+ print("PREFIX34_POINT "+label+" coefficient_denominators="+string(size(ds))+" products="+string(productCount)+" coefficient_domain=valid presentation=standard_etale_over_u");
+}

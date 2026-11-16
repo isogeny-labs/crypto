@@ -1,0 +1,32 @@
+use std::collections::BTreeMap;
+#[derive(Clone,Copy,Debug,PartialEq,Eq)]pub enum Mode{Full,Normalized}
+#[derive(Clone,Copy,Debug)]pub struct CostModel{pub multiplication:u64,pub inversion:u64}
+#[derive(Clone,Copy,Debug,PartialEq,Eq)]pub struct Stats{pub even:u64,pub odd:u64,pub even_reads:u64,pub nodes:usize}
+impl Stats{
+ pub fn choose(self,c:CostModel)->Mode{
+  let delta=self.odd as i128-self.even as i128+self.even_reads as i128+1;
+  let prefer=if delta<0{c.multiplication!=0||c.inversion!=0}else{(delta as u128).checked_mul(c.multiplication as u128).is_some_and(|extra|extra<c.inversion as u128)};
+  if prefer{Mode::Normalized}else{Mode::Full}
+ }
+}
+#[derive(Debug,PartialEq,Eq)]pub enum PlanError{Cap}
+#[derive(Clone,Debug)]pub enum Step{Odd{a:usize,b:usize,c:usize,d:usize,half_even:bool},Even{a:usize,b:usize,c:usize,d:usize,e:usize}}
+#[derive(Debug)]pub struct Schedule{pub(crate) steps:Vec<Step>,pub(crate) outputs:Vec<(usize,bool)>,stats:Stats}
+impl Schedule{
+ pub fn new(requests:&[u64],cap:usize)->Result<Self,PlanError>{
+  if cap<5{return Err(PlanError::Cap)}
+  let mut ids:BTreeMap<u64,usize>=(0..5).map(|i|(i,i as usize)).collect();let mut steps=Vec::new();
+  fn visit(n:u64,cap:usize,ids:&mut BTreeMap<u64,usize>,steps:&mut Vec<Step>)->Result<usize,PlanError>{
+   if let Some(&i)=ids.get(&n){return Ok(i)}
+   let m=n/2;
+   let step=if n&1!=0{Step::Odd{a:visit(m+2,cap,ids,steps)?,b:visit(m,cap,ids,steps)?,c:visit(m-1,cap,ids,steps)?,d:visit(m+1,cap,ids,steps)?,half_even:m&1==0}}
+    else{Step::Even{a:visit(m,cap,ids,steps)?,b:visit(m+2,cap,ids,steps)?,c:visit(m-1,cap,ids,steps)?,d:visit(m-2,cap,ids,steps)?,e:visit(m+1,cap,ids,steps)?}};
+   if ids.len()>=cap{return Err(PlanError::Cap)}let i=ids.len();ids.insert(n,i);steps.push(step);Ok(i)
+  }
+  let mut outputs=Vec::with_capacity(requests.len());let mut even_reads=0;
+  for &n in requests{outputs.push((visit(n,cap,&mut ids,&mut steps)?,n&1==0));if n&1==0{even_reads+=1}}
+  let even=steps.iter().filter(|s|matches!(s,Step::Even{..})).count()as u64;let odd=steps.len()as u64-even;
+  let stats=Stats{even,odd,even_reads,nodes:ids.len()};Ok(Self{steps,outputs,stats})
+ }
+ pub fn stats(&self)->Stats{self.stats}
+}

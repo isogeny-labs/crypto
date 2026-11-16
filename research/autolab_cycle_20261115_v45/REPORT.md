@@ -1,0 +1,11 @@
+# Exact root conditioning closes one actual norm chart
+
+New hypothesis: at fixed h,k=0, conditioning on one source root x adds a linear field equation to the 73-bit affine norm fiber. This replaces direct 2^73 enumeration by a complete union of 2^18 root-conditioned cells with all residual kernels retained.
+
+Independent complete small-field controls passed 96 conditioned cells, 2,560 affine states, 24 zero-root cells and two positive supported parameter states, using both Artin–Schreier choices. A frozen actual profile of four h values and 64 roots each found rank73 in252 cells and rank69 in the four x=0 cells. Five sampled cells were compatible. This motivated a separately frozen full source-root scan, not an assumption of uniform rank.
+
+The full scan used h=8880893757569661990207488, k=0, actual GF(2^83) and low18bit source domain. The pinned common-X certificate excluded supported x=0 cases. Every one of262,143 nonzero x values was visited. Rank histogram:261,647 cells of rank73 and496 of rank72. All249 compatible cells were full rank; they yielded249 distinct norm parameters. Exact support rejected all249. Thus this single fixed-h k=0 supported-norm family is empty. Other h,k and original intermediate coordinates remain open.
+
+Column elimination plus cached monomial evaluation took3.393048 seconds native subprocess wall; compilation1.472310 seconds; native peak RSS12,032KiB. These are diagnostic measurements, not a speed ratio. A newly frozen independent full scan used Horner evaluation and row elimination:7.924541 seconds native wall,1.460084 seconds compilation,12,032KiB native peak RSS. It reproduced every rank count, candidate (root,parameter) pair and supported output over the entire domain. Each implementation also passed65 independent Python row-system checkpoints and literal checks of emitted roots.
+
+Three experiments ran through the frozen ledger with90-second worker limits,4GiB and one core. Source, inputs and prior evidence were hash-pinned. No previous attempt was overwritten. Both native caps covered compilation, setup, child lifetime, filtering and final serialization; there was no baseline comparison. The reduction is based on standard evaluation and linear algebra; novelty clearance is open. This is substantial conditional search progress, not a full339-variable solve or qualified2x/8x F4/F5/F6 result.
