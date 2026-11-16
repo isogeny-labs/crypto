@@ -37,6 +37,10 @@ the store" and "Model tiers" before acting.
   compare. A script that reads only the phases' `native` maps prices rho's
   `canonicalisations_uncharged` (a top-level counter) at 0 and omits the
   counted `table_insert_attempts`.
+- **Identity scripts read real keys** (adopted lesson L-99ee952350b2): when a
+  producer's script compares record fields, check that every key it reads
+  exists in the records (index with `[]`, not `.get`); a missing key compares
+  `None == None` and the check passes silently.
 - Check the reporting contract: one table, one unit, progress stated as a
   ratio, phases separated, all arms priced including the reference, and the
   m=83 / ECC2K-130 disclosure rules respected.
