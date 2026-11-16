@@ -1,5 +1,84 @@
 # Vieta Rust port: continuation receipt
 
+## Final local publication checks — 16 November, 20:42 UTC
+
+Main672067a75a is now merged normally asbd24461be9, after reconciliation697964fedd.
+No conflicts or study/PCC/journal/progress changes in that advance. The merge
+commit/index trees matched; broad post-commit diffstat lazy fetching was stopped
+and merge bookkeeping cleared with merge --quit. Reports pruned by sparse merge
+were restored exactly from HEAD. See next-20261116/evidence/final-publication-check.json.
+
+Scoped closed1938 record validates with95 matching raw hashes,6 metrics and6
+new progress series; artifact policy passes against current main. Global records
+checking fails before completion on unchanged main record
+20261105T0828Z-icb-large-prime-n53-s1-archive command1 lacking an integer success
+exit. Do not close/edit another study's historical record. PCC's125 inherited
+claim-type errors remain unchanged. No global record/PCC pass is claimed.
+Publish this metadata with the completed results; final remote head/CI receipt
+and bounded automation carry the remaining publication status.
+
+## Publication reconciliation — 16 November, 20:39 UTC
+
+The normal mainb02431b26e merge preserves453 main journal blocks and all53 local
+blocks (50 genuinely missing blocks appended), and exact main ledger bytes as
+prefix plus6 unchanged local bodies (1221 entries). See
+next-20261116/evidence/final-main-merge.json. Main subsequently advanced to
+672067a75a without changing this study, PCC, journal or benchmark progress;
+integrate that clean advance before pushing.
+
+The official PCC ledger check FAILS with125 missing claim_type errors, reproduced
+on all2135 exact main claim blobs plus main ledger/keyring using the unchanged
+checker. Base/head errors are identical, chains/prefix valid; the three new
+claim types and all their proof pins match. See evidence/pcc-base-reproduction.json
+and both error logs under next-20261116. Do not rewrite unrelated frozen claims
+or weaken the gate. Two whole-pcc archives stalled on lazy fetch and were stopped;
+the reproduction instead uses individually Git-blob-checked claim files.
+
+Final local artifact policy,239-entry lessons verification, progress freshness,
+both file-verified exports,9-file frozen source/binary manifest and identical
+report copies pass. Final PDF pages1/4 inspected after the cosmetic rebuild;
+all4 pages reviewed. No benchmark is active or needs rerunning. Publish to4410,
+inspect its new head once, and preserve the bounded follow-up until gates pass
+or the unchanged limit is reached. General independent standing remains pending.
+
+## Half-GCD and general rational towers — 16 November, 20:26 UTC
+
+User authorized all four next steps. Source9d2106eb2a implements opt-in HalfGcd,
+generic homogeneous rational-map towers, every-sibling split certification,
+charged construction, poles/diagonal/identity cases and normalized Vélu2 maps.
+Full shared-source12 unit groups/5 CLI tests and two additional positive
+integration tests, formatting/clippy pass. Root full release-library preparation
+hit180s compiling; no full-root-suite pass. All original manifest files still match.
+
+New main panel240/240 successful/replayed,0 failed/missing;60 warmup calls and180
+retained, n3/population/configuration. Main supervisor19:51:06–20:11:42UTC exit0;
+unmodified isolation wall1233.621504883s, otherCPU1.17s, RSS12800KiB, detected
+contention=false. Clocks remain belowL2. Preflight60 calls separately replayed;
+its supervisors were lost on reconnect while original native processes continued,
+so aggregate exit/start/wall/isolation receipt are unknown. No retry; preserve
+null-exit command and supervision-loss receipt. Main uses persistent supervision.
+
+Mixed result: word62/m16384 half total809643807 vs Newton1168899513, paired1.4437;
+P224/m2048 half30590000 vs Newton22039580 (regression). All measured rational
+half counts regress; generic full-fiber certification dominates cold P224 cases.
+Keep default/backends explicit. Frozen native summary/replay,95 raw pointers,
+6 metrics and the closed censored1938 record are complete. Both exports pass
+with file verification. No new benchmark rerun or cloud/S3 operation is needed.
+
+Pending statements: c8911d primary data,9dc34f calibration supervision loss,
+640dba finite degree audit; all unverified. Original480062 hand bound unchanged;
+independent general proof review still external. See next-20261116/RESULTS.md,
+report.pdf, DEGREE_AUDIT.md and AUDIT_ADDENDUM.md. All figures have SVG/PNG copies
+under benchmarks/20261116-vieta-half-gcd-rational; no protected promotion.
+
+PR4410 is still open on da24eab090 before final publication. Main advanced to
+b02431b26e; integrate by documented normal timeout fallback, preserving exact
+main ledger prefix plus only unchanged missing local bodies, complete journal
+block multisets and append-only lessons. Regenerate progress after metadata
+merge and retain all frozen pins. Then push final results/update PR title/body,
+inspect actual current-head gates/reviews once, rearm bounded follow-up if needed.
+Prior gates failed shared artifact credentials; never bypass or claim green CI.
+
 ## Bounded follow-up — 16 November, 17:51 UTC
 
 PR4410 old headf4b8640f21 is open; its prior CI has size/PCC/replay/native

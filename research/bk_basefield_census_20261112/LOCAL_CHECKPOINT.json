@@ -1,0 +1,40 @@
+{
+  "schema": "local-zero-paid-checkpoint/v1",
+  "created": "2026-11-13T00:28:42.701233+00:00",
+  "backend": "local shared workspace only",
+  "remote_availability_verified": false,
+  "raw_records_committed_to_git": false,
+  "reason": "Original24987542-byte JSONL files exceed AGENTS.md13 tenMiB Git limit; no owner/reviewer waiver. Approved zero-paid local checkpoint; no agent S3 upload. Original records remain unchanged and accessible locally.",
+  "raw_files": [
+    {
+      "path": "research/bk_basefield_census_20261112/runs/main/aa.jsonl",
+      "bytes": 24987542,
+      "sha256": "feb6221d5f03c1fc3f49cc8d49a7352670f4320853eb79bac83e5e6ddffba447"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/runs/main/reference.jsonl",
+      "bytes": 24987542,
+      "sha256": "feb6221d5f03c1fc3f49cc8d49a7352670f4320853eb79bac83e5e6ddffba447"
+    }
+  ],
+  "local_bundle": {
+    "path": "research/bk_basefield_census_20261112/evidence/main-raw.tar.xz",
+    "bytes": 646608,
+    "sha256": "d6faf50935feae7bb0200957be98c9bd2586e888cb5e96dc38c07c921dd1bc71"
+  },
+  "bundle_members": [
+    {
+      "member": "runs/main/aa.jsonl",
+      "bytes": 24987542,
+      "sha256": "feb6221d5f03c1fc3f49cc8d49a7352670f4320853eb79bac83e5e6ddffba447"
+    },
+    {
+      "member": "runs/main/reference.jsonl",
+      "bytes": 24987542,
+      "sha256": "feb6221d5f03c1fc3f49cc8d49a7352670f4320853eb79bac83e5e6ddffba447"
+    }
+  ],
+  "roundtrip_equal": true,
+  "restore_from_bundle": "From this study directory: tar -xJf evidence/main-raw.tar.xz; sha256sum -c main-raw.sha256",
+  "fresh_checkout_limitation": "The source, reports, small evidence and hashes are published; rawmain records/localbundle are not in Git or claimed remotely available. Obtain the local bundle from the shared workspace before export file verification."
+}

@@ -1,0 +1,22 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean:40:50: error: failed to synthesize
+  Decidable
+    ((∀ (v : V4), iterate frobenius4 3 v = opposite4 v) ∧
+      (∀ (v : V4), iterate firstCycle4 3 v = v) ∧
+        (∀ (v : V4), iterate secondCycle4 4 v = iterate frobenius4 4 v) ∧ ∀ (v : V4), iterate secondCycle4 12 v = v)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean:45:73: error: failed to synthesize
+  Decidable
+    (∀ (n : Fin 2),
+      (∃ v, iterate secondCycle4 (4 * (↑n + 1)) v ≠ v) ∧ ∃ v, iterate secondCycle4 (4 * (↑n + 1)) v ≠ opposite4 v)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+'IsogenyCycles.quadratic_norm_multiplicative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'IsogenyCycles.first_cycle_polynomial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'IsogenyCycles.second_cycle_polynomial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'IsogenyCycles.cm_cycle_norms' does not depend on any axioms
+'IsogenyCycles.exact_finite_monodromy' depends on axioms: [propext, sorryAx]
+'IsogenyCycles.no_early_relative_sign' depends on axioms: [propext, sorryAx]
+'IsogenyCycles.noncentral_action_does_not_close_graph' does not depend on any axioms
+'IsogenyCycles.public_closed_walk_crt' does not depend on any axioms
+toolchain pin: leanprover/lean4:v4.35.0

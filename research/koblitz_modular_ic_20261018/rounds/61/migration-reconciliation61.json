@@ -1,0 +1,43 @@
+{
+  "schema": "koblitz.migration-reconciliation/v1",
+  "observed_utc": "2026-11-01T19:27:02.785221+00:00",
+  "approved_receipt": "/srv/experiments/agent-migration/handoff-receipt.json",
+  "receipt_access": "scoped sudo read after ordinary PermissionError",
+  "diem": {
+    "native_status": "/run/spot-legacy/diem.json",
+    "state": "deadline-expired",
+    "durable_records": 50,
+    "expected_records": 52,
+    "pending": false,
+    "launcher_pid": null,
+    "service": "spot-diem-recovery.service",
+    "service_state": "inactive/dead",
+    "action": "none"
+  },
+  "freeze_followup": {
+    "state_path": "/home/ec2-user/crypto-w2a-diem-relations/research/diem_quartic_relations_20261018/resume-20261019/freeze-followup-20261019T220044Z/state.json",
+    "config_path": "/home/ec2-user/crypto-w2a-diem-relations/research/diem_quartic_relations_20261018/resume-20261019/freeze-followup-config-v3.json",
+    "config_sha256": "183746b78ed4faea07377dbbd77a92922e4c410ee1f8acc72394cfac8bde6e5b",
+    "config_matches_saved_state": true,
+    "saved_state": "waiting_for_grid",
+    "saved_steps": [],
+    "last_checked_at": "2026-10-19T22:45:50.331242+00:00",
+    "managed_source_followup": "quiesced per migration instruction",
+    "action": "none; original script and complete authorization still required before continuing this lane"
+  },
+  "eks": {
+    "read_only_inventory": "isolab_k8s_overview",
+    "namespace": "isolab",
+    "koblitz_named_job_found": false,
+    "pending_suspended_job_preserved": "sat-hpo-metal-qualification-20261030",
+    "action": "none"
+  },
+  "conductor": {
+    "scope": "research/koblitz_modular_ic_20261018/rounds/61",
+    "check": "clear",
+    "new_claim": false
+  },
+  "interrupted_native_attempt": "runs/fix61-01/interrupted.json",
+  "fresh_attempt": "fix61-02",
+  "no_generator_or_eks_job_submitted": true
+}

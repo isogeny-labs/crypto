@@ -829,13 +829,14 @@ def vieta_component(ref, since):
     for slug in ("20261115T2104Z-vieta-coset-local-scale",
                  "20261115T2147Z-vieta-three-fixture-repair",
                  "20261116T1553Z-vieta-polynomial-backends",
-                 "20261116T1646Z-vieta-polynomial-registration"):
+                 "20261116T1646Z-vieta-polynomial-registration",
+                 "20261116T1938Z-vieta-half-gcd-rational"):
         path = f"benchmarks/records/{slug}.json"
         for date, commit, text in file_history(ref, path, since):
             record = json.loads(text)
             for metric in record.get("metrics", []):
                 emit(f"vieta.component.{metric['name']}", metric.get("value"),
-                     date=date, problem="vieta-coset-component",
+                     date=date, problem=("vieta-rational-component" if slug == "20261116T1938Z-vieta-half-gcd-rational" else "vieta-coset-component"),
                      unit=metric.get("unit", ""), better="neutral",
                      label="Generic-reference operation counts; censored epoch, PCC unverified",
                      source=f"{path}@{commit}")

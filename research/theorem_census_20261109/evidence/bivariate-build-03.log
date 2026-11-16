@@ -1,0 +1,9 @@
+BivariateMultiplicity.lean:25:2: error: Type mismatch: After simplification, term
+  h
+ has type
+  Polynomial.eval₂ (algebraMap K (Q K c)) (AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X))
+      (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X) =
+    0
+but is expected to have type
+  AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X) ^ 2 =
+    (algebraMap K (Q K c)) c * AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X)
