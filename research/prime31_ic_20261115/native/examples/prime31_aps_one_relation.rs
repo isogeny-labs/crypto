@@ -4091,9 +4091,9 @@ mod aps_window4_jump_tests {
                 };
                 let actual=aff(joint_public_jac_window4(a,b,&g,&qt));
                 let old=aff(joint_public_jac(a,b,q,gpq));
-                let independent=ar.add(PRIME31,
-                    ar.scalar(PRIME31,a,Some(PRIME31.g)),
-                    ar.scalar(PRIME31,b,Some(q)));
+                let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+                let bq=ar.scalar(PRIME31,b,Some(q));
+                let independent=ar.add(PRIME31,ag,bq);
                 assert_eq!(actual,old,"binary comparison i={i}");
                 assert_eq!(actual,independent,"arithmetic comparison i={i}");
             }
