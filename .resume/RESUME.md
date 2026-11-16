@@ -1,3 +1,35 @@
+# Resume: crypto @ claude/funny-brown-735uvs (Gröbner/F4 speed leads, parallel workflow)
+
+## Goal
+Owner (2026-11-16): "Pursue all the leads here in parallel workflow" after the
+Gröbner/F4 assessment (session log 2026-11-16 ~16:30Z, PR #4436). Find measured,
+output-identical speedups in the F4 engines used by index calculus.
+## Lead / hypothesis
+L1 f4_fp parallel RREF scaling (1.63x on 4 cores) + adaptive FL/thread cutoffs
+(FL and threads net-negative on cubic_n5). L2 f4_fp memory traffic (axpy is
+memory-bound: scalar only 1.40x slower than AVX-512). L3 GF(2) M4RI /
+inherited-F4 inner loop (koblitz_f4_kernel_bench). L4 crossbred vs InheritedF4
+for m>=3 (crossbred ~160x fewer bit ops than matrix-F4 at m=2). L5 isolab-eks
+readiness for a many-core confirmation run.
+## Spec
+Every change env-gated with a same-binary OLD toggle; correctness = identical
+basis/solve fingerprints and deterministic counters; wall-clock only in a serial
+interleaved A/B stage with an A/A noise control. Baseline numbers: session log.
+## State
+Workflow launched. Agents edit the shared checkout only under flock
+/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/repo.lock and revert after;
+patches kept under scratchpad/leads/<lead>/.
+## Next steps
+Integrate surviving patches, one build, serial A/B, adversarial review, then
+PR + bench records; isolab-eks confirmation only with owner-visible cost.
+## Runs in flight
+Local f4_fp_bench / crossbred_bench / koblitz_f4_kernel_bench only.
+## Stop and success conditions
+Success = any lead with a measured, output-identical speedup beyond the A/A
+noise floor. Stop a lead on fingerprint mismatch or no effect beyond noise.
+
+---
+
 # Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (positive control + Cardano–Lucas port)
 
 ## Goal
