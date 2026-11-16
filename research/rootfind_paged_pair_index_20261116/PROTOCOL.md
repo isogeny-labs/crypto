@@ -60,3 +60,4 @@ answers with the hash and flat layouts. A later frozen timing panel must charge
 cold setup, table insertion, scan, rank, verification, native writes and peak
 memory on matched public targets, with dense A/A and independent replay. The
 existing EKS L2 F4/F5/F6 panel and its admission gate remain unchanged.
+[pcc:unverified]
