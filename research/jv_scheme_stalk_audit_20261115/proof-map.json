@@ -1,0 +1,166 @@
+{
+  "main": "JVSchemeStalkAudit.jv_scheme_stalk_certificate",
+  "binding": "5f1d089fa3b6f010c51f4116714864ac15ade8c81061c64ca244732aa64dea06",
+  "custom_imports": {
+    "CanonicalPieces": "research/jv_graded_hilbert_audit_20261114/lean/CanonicalPieces.lean",
+    "GradedBasis": "research/jv_graded_hilbert_audit_20261114/lean/GradedBasis.lean",
+    "GradedCertificate": "research/jv_graded_hilbert_audit_20261114/lean/GradedCertificate.lean",
+    "CubicDual": "research/jv_hilbert_audit_20261113/lean/CubicDual.lean",
+    "DualBasis": "research/jv_hilbert_audit_20261113/lean/DualBasis.lean",
+    "QuotientBasis": "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+    "SharpCutoff": "research/jv_hilbert_audit_20261113/lean/SharpCutoff.lean",
+    "ActualIdeal": "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+    "CubicNormalForms": "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+    "LiteralQuadratics": "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+    "MacaulayCertificate": "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+    "Bivariate": "research/coordinate_length_audit_20261114/lean/Bivariate.lean",
+    "Solutions": "research/coordinate_length_audit_20261114/lean/Solutions.lean",
+    "Thickening": "research/coordinate_length_audit_20261114/lean/Thickening.lean",
+    "LocalLengthCertificate": "research/local_algebra_length_audit_20261114/lean/LocalLengthCertificate.lean",
+    "PowerBasisLength": "research/local_algebra_length_audit_20261114/lean/PowerBasisLength.lean",
+    "ResidueDegreeControl": "research/local_algebra_length_audit_20261114/lean/ResidueDegreeControl.lean",
+    "TruncatedLocal": "research/local_algebra_length_audit_20261114/lean/TruncatedLocal.lean",
+    "JVCharts": "research/jv_local_multiplicity_audit_20261115/lean/JVCharts.lean",
+    "JVConePoints": "research/jv_local_multiplicity_audit_20261115/lean/JVConePoints.lean",
+    "JVLocalCertificate": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalCertificate.lean",
+    "JVLocalization": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalization.lean",
+    "JVOrigin": "research/jv_local_multiplicity_audit_20261115/lean/JVOrigin.lean",
+    "JVTailFlags": "research/jv_local_multiplicity_audit_20261115/lean/JVTailFlags.lean",
+    "JVSchemeCertificate": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeCertificate.lean",
+    "JVSchemeCharts": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeCharts.lean",
+    "JVSchemeImports": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeImports.lean",
+    "JVSchemeStalk": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeStalk.lean"
+  },
+  "claims": [
+    {
+      "declaration": "JVSchemeStalkAudit.localizationStalkEquiv",
+      "conclusion": "Official actual origin prime-localization/stalk algebra comparison."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.official_stalk_comparison",
+      "conclusion": "Agreement with actual affine-scheme categorical comparison."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.coefficient_is_actual_germ",
+      "conclusion": "Actual coefficient map equals actual global-section germ map."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.canonical_map_bijective",
+      "conclusion": "Actual canonical coefficient map is bijective."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.actual_stalk_length",
+      "conclusion": "The actual scheme origin stalk has its own self-module length8."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.stalkResidueEquiv",
+      "conclusion": "The actual canonical stalk residue field is F101."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.actual_scheme_not_reduced",
+      "conclusion": "The actual affine scheme is nonreduced."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.actual_scheme_unique",
+      "conclusion": "The known unique prime is the actual unique scheme point."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.first_chart_scheme_empty",
+      "conclusion": "Actual first h=1 quotient scheme is empty."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.first_open_scheme_empty",
+      "conclusion": "Actual first principal-open localization scheme is empty."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.secondChartPoint",
+      "conclusion": "Explicit actual chart point induced by source-root evaluation."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.secondOpenPoint",
+      "conclusion": "Explicit actual localization-scheme point induced by source-root evaluation."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.first_basic_open_empty",
+      "conclusion": "Actual first principal basic open is empty."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.second_basic_open_contains",
+      "conclusion": "The actual second evaluation-induced point belongs to its principal basic open."
+    },
+    {
+      "declaration": "JVSchemeStalkAudit.stalk_length_not_point_count",
+      "conclusion": "Actual stalk self-module length8 differs from known one scheme point."
+    }
+  ],
+  "prior_reused_claims": [
+    {
+      "claim": "PCC-20261115-2e7ce0",
+      "credit": "Actual literal F101 quotient, own ring/localization length8, unit/locality/prime/residue facts, nilpotent nonreduced ring, actual first zero chart/open and actual second source-root-induced maps; known point population. Fresh prior gate73 credited separately."
+    },
+    {
+      "claim": "PCC-20261114-aec576",
+      "credit": "Actual basis/multiplication/scalar dimension/Hilbert function/all-field zero characterization; transitive credited dependency."
+    },
+    {
+      "claim": "PCC-20261114-81195a",
+      "credit": "Classical ideal flag/scalar length upper bound/residue-degree control; transitive credited dependency."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 21,
+    "fresh_project_modules": 4,
+    "new_concrete_modules": 3,
+    "import_only_adapter": 1,
+    "credited_dependency_modules": 24,
+    "credited_predecessor_gate": 73,
+    "copied_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "new_source_warnings": 0,
+    "inherited_module_advisories_per_build": 12,
+    "inherited_auditor_String_mk_deprecation": 1,
+    "all42dependency_formal_configs_pinned": true,
+    "all59predecessor_pins_checked_each_state": true,
+    "actual_Spec_origin_stalk": true,
+    "official_categorical_and_algebra_comparison": true,
+    "actual_coefficient_equals_global_section_germ": true,
+    "actual_stalk_self_module_length8": true,
+    "actual_stalk_canonical_residue_F101": true,
+    "actual_Spec_nonreduced": true,
+    "actual_first_chart_localization_schemes_empty": true,
+    "actual_second_root_induced_chart_localization_scheme_points": true,
+    "actual_first_basicopen_empty_second_nonempty": true,
+    "known_population_credited": true,
+    "qualified_Diem_bound_refuted": false,
+    "general_cycle_intersection_or_positive_components": false,
+    "explicit_localized_Spec_basicopen_scheme_isomorphism": false,
+    "second_unique_root_or_wholecurve_order_scalar_decomposition": false,
+    "new_native_solver_experiment": false,
+    "new_host_or_compiler_independence": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

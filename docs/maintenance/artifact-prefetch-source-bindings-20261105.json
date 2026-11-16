@@ -1,0 +1,57 @@
+{
+  "schema": "pr-maintenance/v1",
+  "date": "2026-11-05",
+  "standing": "unverified",
+  "shared_preparation": 3457,
+  "base_source": "d9c228db855c475da6ee11843654d6dca7bd97a3",
+  "source_entries": [
+    {
+      "path": ".github/scripts/artifact_prefetch.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a113e5a73efe276f0af9e58df8ac78ee4a092218"
+    },
+    {
+      "path": ".github/scripts/test_artifact_prefetch.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a4eac63f69b25a0f83122d0d8e8e1c0e03ffb078"
+    },
+    {
+      "path": ".github/workflows/artifact-autofix.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb7f4a733af43fe288ad706c19bc6fcbe152d5e5"
+    },
+    {
+      "path": ".github/workflows/artifacts.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3e64ba5ba20d5fd464118c7009ce54e80aa7713"
+    }
+  ],
+  "problem": {
+    "pr": 2706,
+    "retry_job": 127166719442,
+    "result": "cancelled at 60-minute limit with active Git fetch processes; no migration completion"
+  },
+  "repair": "Batch missing changed Git blobs before canonical migration; fail closed and leave custody checks intact.",
+  "trust": {
+    "execution": "New helper is taken from trusted base, never candidate code.",
+    "objects": "Only validated raw-diff object IDs go to the existing origin, at most256 per batch.",
+    "effects": "Object database only: no checkout, source/index/ref/config change intended.",
+    "s3": "Prefetch step has no S3 credentials. Canonical artifact tool unchanged."
+  },
+  "tests": {
+    "methods": 5,
+    "fixture": "Actual local file:// promisor repositories; no network/cloud write.",
+    "cases": [
+      "multiple bounded fetches of missing blobs",
+      "newline/space paths and symlink blobs; exclude gitlinks",
+      "head/index/ref/config retention and no path checkout",
+      "cached/empty diff without a usable remote",
+      "fetch/invalid-revision failures and batch bounds"
+    ],
+    "status": "Pending actual CI; no local pass asserted."
+  }
+}

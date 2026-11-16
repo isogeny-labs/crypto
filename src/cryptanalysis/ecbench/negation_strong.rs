@@ -51,6 +51,7 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use crate::cryptanalysis::gaudry_quartic_bin::{fq_muls_per_add, BinCurve, CurveB, Eb, PtB};
+use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
 
 /// Precomputed jumps of the additive walk.
 pub const JUMPS: usize = 32;
@@ -76,7 +77,7 @@ pub fn auto_dp_bits(ideal: f64) -> u32 {
 }
 
 /// `√(πr/4)`: the expected steps of a negation-map walk.
-pub fn ideal_steps(r: u64) -> f64 {
+pub fn ideal_steps(r: u128) -> f64 {
     (std::f64::consts::PI * r as f64 / 4.0).sqrt()
 }
 
@@ -85,7 +86,7 @@ pub fn ideal_steps(r: u64) -> f64 {
 pub struct NegStrongOutcome {
     /// The candidate logarithm, checked here by `[d]G = Q` (the runner
     /// checks it again in its own process).
-    pub scalar: Option<u64>,
+    pub scalar: Option<u128>,
     /// `F_q` multiplications of the jump table and the start points.
     pub setup_fq_muls: u64,
     /// `F_q` multiplications of the walk.
@@ -129,8 +130,8 @@ impl NegStrongOutcome {
 #[derive(Clone, Copy)]
 struct State {
     p: PtB,
-    a: u64,
-    b: u64,
+    a: u128,
+    b: u128,
 }
 
 #[derive(Clone, Copy)]
@@ -141,27 +142,40 @@ struct Lane {
     live: bool,
 }
 
-fn add_mod(a: u64, b: u64, r: u64) -> u64 {
-    ((a as u128 + b as u128) % r as u128) as u64
+// The walk's exponents live in `[0, r)` with `r` up to two words
+// (`m ≥ 16`, curves over `F_(2^m)^4` with a small cofactor).  The values,
+// and so every count, are those of the one-word code wherever `r` fits a
+// `u64`: the draws below use the `u64` stream there.
+fn add_mod(a: u128, b: u128, r: u128) -> u128 {
+    <u128 as RhoScalar>::add_mod(a, b, r)
 }
 
-fn sub_mod(a: u64, b: u64, r: u64) -> u64 {
-    add_mod(a, r - b % r, r)
+fn sub_mod(a: u128, b: u128, r: u128) -> u128 {
+    <u128 as RhoScalar>::sub_mod(a, b % r, r)
 }
 
-fn mul_mod(a: u64, b: u64, r: u64) -> u64 {
-    ((a as u128 * b as u128) % r as u128) as u64
+fn mul_mod(a: u128, b: u128, r: u128) -> u128 {
+    <u128 as RhoScalar>::mul_mod(a, b, r)
 }
 
-fn inv_mod(v: u64, r: u64) -> Option<u64> {
-    let (mut t, mut nt) = (0i128, 1i128);
-    let (mut rr, mut nr) = (r as i128, (v % r) as i128);
-    while nr != 0 {
-        let q = rr / nr;
-        (t, nt) = (nt, t - q * nt);
-        (rr, nr) = (nr, rr - q * nr);
+fn inv_mod(v: u128, r: u128) -> Option<u128> {
+    <u128 as RhoScalar>::inverse_mod(v % r, r)
+}
+
+/// Uniform in `[lo, r)`, drawn from the `u64` stream when `r` fits one word
+/// (so a one-word order reproduces the one-word walk) and the `u128`
+/// stream otherwise.
+fn draw(rng: &mut StdRng, lo: u128, r: u128) -> u128 {
+    match u64::try_from(r) {
+        Ok(r64) => u128::from(rng.gen_range(lo as u64..r64)),
+        Err(_) => rng.gen_range(lo..r),
     }
-    (rr == 1).then(|| t.rem_euclid(r as i128) as u64)
+}
+
+/// The 64-bit hash input of a class key: the key itself while it fits one
+/// word (the one-word code's value), else its two halves folded.
+fn fold(k: u128) -> u64 {
+    (k as u64) ^ ((k >> 64) as u64)
 }
 
 fn mix(v: u64, k: u64) -> u64 {
@@ -205,7 +219,7 @@ impl<'a> NegStrongRho<'a> {
         let f = &self.c().f;
         let ny = s.p.x.add(&s.p.y);
         if f.pack(&ny) < f.pack(&s.p.y) {
-            let r = u64::try_from(self.inst.r).expect("one-word negation order");
+            let r = self.inst.r;
             State {
                 p: PtB {
                     x: s.p.x,
@@ -220,22 +234,33 @@ impl<'a> NegStrongRho<'a> {
         }
     }
 
-    fn class_key(&self, p: &PtB) -> u64 {
+    /// The table key of `{P, −P}`: the packed abscissa, `4m` bits
+    /// (two words past `m = 16`).
+    fn class_key(&self, p: &PtB) -> u128 {
+        if p.inf {
+            u128::MAX
+        } else {
+            self.c().f.pack(&p.x)
+        }
+    }
+
+    /// The hash input of the partition and the distinguished-point test.
+    fn hash_key(&self, p: &PtB) -> u64 {
         if p.inf {
             u64::MAX
         } else {
-            u64::try_from(self.c().f.pack(&p.x)).expect("one-word negation point key")
+            fold(self.class_key(p))
         }
     }
 
     fn partition(&self, p: &PtB, out: &mut NegStrongOutcome) -> usize {
         out.partition_hashes += 1;
-        (mix(self.class_key(p), 0x9e37_79b9_7f4a_7c15) >> 59) as usize % JUMPS
+        (mix(self.hash_key(p), 0x9e37_79b9_7f4a_7c15) >> 59) as usize % JUMPS
     }
 
     fn distinguished(&self, p: &PtB, mask: u64, out: &mut NegStrongOutcome) -> bool {
         out.dp_tests += 1;
-        !p.inf && mix(self.class_key(p), 0x2545_f491_4f6c_dd1d) & mask == 0
+        !p.inf && mix(self.hash_key(p), 0x2545_f491_4f6c_dd1d) & mask == 0
     }
 
     /// An unbatched addition, counted as one inversion when it inverts.
@@ -285,27 +310,23 @@ impl<'a> NegStrongRho<'a> {
     }
 
     /// The jump table `[c_j]G`, `c_j` uniform in `[1, r)` from `jump_seed`.
-    fn jumps(&self, jump_seed: u64, out: &mut NegStrongOutcome) -> Vec<(PtB, u64)> {
+    fn jumps(&self, jump_seed: u64, out: &mut NegStrongOutcome) -> Vec<(PtB, u128)> {
         let mut rng = StdRng::seed_from_u64(jump_seed);
         let g = self.inst.generator;
-        let r = u64::try_from(self.inst.r).expect("one-word negation order");
+        let r = self.inst.r;
         (0..JUMPS)
             .map(|_| {
-                let c = rng.gen_range(1..r);
+                let c = draw(&mut rng, 1, r);
                 out.scalar_multiplications += 1;
-                (self.c().mul(&g, u128::from(c)), c)
+                (self.c().mul(&g, c), c)
             })
             .collect()
     }
 
     /// Solve `Q = [d]G`.  Deterministic in `(curve, q, seed, params)`.
     pub fn solve(&self, q: PtB, seed: u64, params: &NegStrongParams) -> NegStrongOutcome {
-        assert!(
-            self.inst.curve.f.f.m <= 16,
-            "rho.negation_strong requires a one-word packed point key"
-        );
         let c = self.c();
-        let r = u64::try_from(self.inst.r).expect("one-word negation order");
+        let r = self.inst.r;
         let g = self.inst.generator;
         let mut out = NegStrongOutcome {
             ideal_steps: ideal_steps(r),
@@ -317,10 +338,10 @@ impl<'a> NegStrongRho<'a> {
         let jump_seed = seed ^ 0x6a75_6d70_7321_0001;
         let jumps = self.jumps(jump_seed, &mut out);
         let mut rng = StdRng::seed_from_u64(seed);
-        let stride_a = rng.gen_range(1..r);
-        let stride = c.mul(&g, u128::from(stride_a));
-        let mut cursor_a = rng.gen_range(0..r);
-        let mut cursor = c.add(&c.mul(&g, u128::from(cursor_a)), &q);
+        let stride_a = draw(&mut rng, 1, r);
+        let stride = c.mul(&g, stride_a);
+        let mut cursor_a = draw(&mut rng, 0, r);
+        let mut cursor = c.add(&c.mul(&g, cursor_a), &q);
         out.scalar_multiplications += 2;
         let m1 = self.muls();
         out.setup_fq_muls = m1 - m0;
@@ -330,7 +351,7 @@ impl<'a> NegStrongRho<'a> {
         let step_cap = (out.ideal_steps.ceil() as u64)
             .saturating_mul(params.step_cap_factor)
             .max(1_000_000);
-        let mut table: HashMap<u64, (u64, u64)> = HashMap::new();
+        let mut table: HashMap<u128, (u128, u128)> = HashMap::new();
         let mut lanes = vec![
             Lane {
                 s: State {
@@ -395,7 +416,7 @@ impl<'a> NegStrongRho<'a> {
                 let d = mul_mod(sub_mod(ha, lane.s.a, r), inv, r);
                 let before = self.muls();
                 out.scalar_multiplications += 1;
-                let hit = c.mul(&g, u128::from(d)) == q;
+                let hit = c.mul(&g, d) == q;
                 check_muls += self.muls() - before;
                 if hit {
                     found = Some(d);
@@ -523,10 +544,10 @@ mod tests {
         for m in 4..=6u32 {
             let inst = find_bin_curve(m, 1, 16).unwrap();
             let rho = NegStrongRho::new(&inst);
-            let r = u64::try_from(inst.r).expect("small test subgroup order");
+            let r = inst.r;
             for seed in 0..4u64 {
-                let k = (1 + seed * 7919 + u64::from(m) * 104_729) % r;
-                let q = inst.curve.mul(&inst.generator, u128::from(k));
+                let k = (1 + u128::from(seed) * 7919 + u128::from(m) * 104_729) % r;
+                let q = inst.curve.mul(&inst.generator, k);
                 let dp = auto_dp_bits(ideal_steps(r));
                 let o = rho.solve(q, 0x5eed + seed, &params(4, dp));
                 assert_eq!(o.scalar, Some(k), "m = {m}, seed {seed}");
@@ -647,5 +668,104 @@ mod tests {
                 o.inversions
             );
         }
+    }
+
+    /// The two-word widening changes no value where the order fits one
+    /// word: these outcomes were recorded from the one-word code (commit
+    /// c82f9265, before the widening) and must replay exactly.
+    #[test]
+    fn one_word_orders_replay_the_one_word_walk() {
+        // (m, curve seed, solve seed, lanes, dp_bits) -> (setup, search,
+        // check, canonicalisations, inversions, batch inversions, steps, walks)
+        let cases: [((u32, u64, u64, usize, u32), [u64; 8]); 3] = [
+            (
+                (4, 1, 3, 4, 2),
+                [122_734, 30_293, 3_296, 212, 112, 52, 152, 60],
+            ),
+            (
+                (5, 3, 9, 8, 3),
+                [139_909, 243_663, 3_014, 2_009, 524, 247, 1_732, 252],
+            ),
+            (
+                (6, 1, 21, 16, 4),
+                [179_510, 191_372, 3_516, 1_366, 185, 83, 1_264, 80],
+            ),
+        ];
+        for ((m, cs, seed, lanes, dp), want) in cases {
+            let inst = find_bin_curve(m, cs, 16).unwrap();
+            let rho = NegStrongRho::new(&inst);
+            let q = inst.curve.mul(&inst.generator, 12_345 % inst.r);
+            let o = rho.solve(q, seed, &params(lanes, dp));
+            assert_eq!(o.scalar, Some(12_345 % inst.r), "m = {m}");
+            let got = [
+                o.setup_fq_muls,
+                o.search_fq_muls,
+                o.check_fq_muls,
+                o.canonicalisations,
+                o.inversions,
+                o.batch_inversions,
+                o.walk_steps,
+                o.walks,
+            ];
+            assert_eq!(got, want, "m = {m}");
+        }
+    }
+
+    /// Past `m = 16` (two-word order, 4m-bit point key): the walk keeps
+    /// `P = [a]G + [b]Q` through canonicalisation and steps, and a capped
+    /// solve runs to its cap with two-word keys in the table.
+    #[test]
+    fn two_word_orders_keep_the_walk_invariant() {
+        let inst = find_bin_curve(17, 1, 16).unwrap();
+        assert!(
+            u64::try_from(inst.r).is_err(),
+            "m = 17 needs a two-word order"
+        );
+        let c = &inst.curve;
+        let g = inst.generator;
+        let r = inst.r;
+        let rho = NegStrongRho::new(&inst);
+        let k = (u128::MAX / 3) % r;
+        let q = c.mul(&g, k);
+        let mut out = NegStrongOutcome::default();
+        let jumps = rho.jumps(7, &mut out);
+        assert!(jumps
+            .iter()
+            .all(|&(p, cj)| cj > 0 && cj < r && p == c.mul(&g, cj)));
+        let mut rng = StdRng::seed_from_u64(11);
+        let (a, b) = (draw(&mut rng, 0, r), draw(&mut rng, 1, r));
+        let mut s = State {
+            p: c.add(&c.mul(&g, a), &c.mul(&q, b)),
+            a,
+            b,
+        };
+        let holds = |s: &State| s.p == c.add(&c.mul(&g, s.a), &c.mul(&q, s.b));
+        let mut wide_keys = 0;
+        for step in 0..40 {
+            s = rho.canonical(s, &mut out);
+            assert!(holds(&s), "canonical form, step {step}");
+            if rho.class_key(&s.p) > u128::from(u64::MAX) {
+                wide_keys += 1;
+            }
+            let (jp, jc) = jumps[rho.partition(&s.p, &mut out)];
+            s = State {
+                p: c.add(&s.p, &jp),
+                a: add_mod(s.a, jc, r),
+                b: s.b,
+            };
+            assert!(holds(&s), "after the jump, step {step}");
+        }
+        assert!(wide_keys > 0, "the 68-bit keys exceed one word");
+        let o = rho.solve(
+            q,
+            5,
+            &NegStrongParams {
+                lanes: 8,
+                dp_bits: 4,
+                step_cap_factor: 0,
+            },
+        );
+        assert!(o.walk_steps >= 1_000_000 && o.table_entries > 0);
+        assert!(o.scalar.is_none_or(|d| c.mul(&g, d) == q));
     }
 }

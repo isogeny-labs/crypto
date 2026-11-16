@@ -1,0 +1,106 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "abs-a",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "abs-2a",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=512,scan_cap=8192",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "proj-a",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=1024,scan_cap=16384",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "proj-2a",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "abs-2a-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    }
+  ],
+  "description": "research/curve25519_ic_baseline_20261102/PROTOCOL.md (frozen before data). Curve 1: the k-bit Curve25519 miniature (Montgomery y^2 = x^3 + A x^2 + x, p = 5 mod 8, #E = 8r, #E' = 4r', smallest A by Curve25519's rule) in short Weierstrass form. Curve 2: cofactor-1 control, prime_search at the subgroup's bit length. Public synthetic curves and targets; no security claim.",
+  "label": "Curve25519-family index-calculus baseline, k = 32",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 2026110234,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1173263412,
+        "b": 337904346,
+        "group_order": 4295077112,
+        "gx": 1431665017,
+        "gy": 592057774,
+        "kind": "prime_explicit",
+        "p": 4294967197,
+        "r": 536884639
+      },
+      {
+        "bits": 30,
+        "kind": "prime_search",
+        "seed": 2025957377
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026110233,
+    "targets_per_curve": 24
+  }
+}

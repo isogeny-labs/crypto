@@ -1,0 +1,5 @@
+Fresh hypothesis: extend fixedGF83 cubic scan to general nonzeroB. Target check is y^2+zy=z^3+Az^2+B; constant remainder s^2+B h^2+z e3=0. Coefficients e1=h^2+h+z,e20=Ah^2+ze1,e30=h^2(y_src+Az+z^2)+z^3 are unchanged because B enters through the target equation. Gold necessity is coefficient-independent. Freeze a new variant and inputs/rules before evaluation.
+
+Validate all generalA/B norm coefficients and fibers on tiny odd/even binary degrees, including repeated/zero sources andh0. Then a separated positiveGF83 ordinary fixture, with every accepted factor/group and finite original3-source branch checked. Label cubic-chart completion separately from the main five-source h/k search. Preserve rank drops and all lifetime charges.
+
+Queue: expand fixed targets without selection by timings; study neighboring-h row updates; retain the571-bit dimension13 kernel; build genuine matchedGB interfaces and requested prime/odd-extension algorithms. No unchanged failed/noisy timing retry or release promotion from worker success.

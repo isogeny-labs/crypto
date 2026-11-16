@@ -2,6 +2,7 @@ name: L10 tensor route Lean proof
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/ic_prime_eth_leads_20261031/lean/**'
       - 'research/ic_prime_eth_leads_20261031/leads/L10/**'
@@ -17,6 +18,7 @@ concurrency:
 
 jobs:
   proof:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:

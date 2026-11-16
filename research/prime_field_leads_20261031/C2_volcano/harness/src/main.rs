@@ -290,7 +290,11 @@ fn base_poly(p: u64, base: &[(u64, u64)], var: &str) -> String {
 #[derive(Default, Clone, Debug)]
 struct MsolveOut { status: String, max_deg: u32, rounds: u32, max_rows: u64, max_cols: u64, sum_cells: u64, traj: Vec<(u32, u64, u64)> }
 fn run_msolve(path: &str, timeout_s: u64) -> MsolveOut {
-    let child = Command::new("timeout").args([&timeout_s.to_string(), "msolve", "-v", "2", "-g", "2", "-t", "1", "-f", path, "-o", &format!("{}.out", path)])
+    // MSOLVE_LA (added 2026-11-01 for the rerun): when set, passed as `-l <variant>`; unset keeps the original command.
+    let mut argv: Vec<String> = vec![timeout_s.to_string(), "msolve".into(), "-v".into(), "2".into(), "-g".into(), "2".into(), "-t".into(), "1".into()];
+    if let Ok(la) = std::env::var("MSOLVE_LA") { argv.push("-l".into()); argv.push(la); }
+    argv.extend(["-f".to_string(), path.to_string(), "-o".to_string(), format!("{}.out", path)]);
+    let child = Command::new("timeout").args(&argv)
         .stdout(Stdio::piped()).stderr(Stdio::null()).output();
     let mut o = MsolveOut::default();
     match child {

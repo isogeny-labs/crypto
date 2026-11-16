@@ -4,8 +4,13 @@ os.environ.setdefault("MPLCONFIGDIR", os.path.join(os.path.dirname(os.path.abspa
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 D = os.path.dirname(os.path.abspath(__file__))
-S = list(csv.DictReader(open(f"{D}/results/summary.csv")))
-C = list(csv.DictReader(open(f"{D}/results/cells.csv")))
+RES = os.environ.get("L2B_RESULTS", f"{D}/results")
+OUT = os.environ.get("L2B_PLOT_OUT", f"{D}/dreg_vs_log2p.svg")
+S = list(csv.DictReader(open(f"{RES}/summary.csv")))
+# cells.csv is written without a header (run_cell.sh appends rows); its columns are in results_header.txt.
+_hdr = open(f"{D}/results_header.txt").read().strip().split(",")
+_lines = open(f"{RES}/cells.csv").read().splitlines()
+C = list(csv.DictReader(_lines[1:] if _lines and _lines[0].startswith("p,") else _lines, fieldnames=_hdr))
 col = {"real": "#1f77b4", "ctrl": "#d95f02"}
 lab = {"real": "S_4 + interval membership", "ctrl": "random f + random membership"}
 fig, ax = plt.subplots(1, 2, figsize=(11, 4.2))
@@ -32,4 +37,4 @@ ax[1].set_xlabel("log2 p"); ax[1].set_ylabel("largest Macaulay matrix columns");
 ax[1].set_title("Largest matrix width (median of finished runs)", fontsize=9)
 ax[0].legend(fontsize=7); ax[0].grid(alpha=.3); ax[1].grid(alpha=.3)
 fig.suptitle("L2b: constrained prime-field Semaev system, m = 3, msolve", fontsize=10)
-fig.tight_layout(); fig.savefig(f"{D}/dreg_vs_log2p.svg")
+fig.tight_layout(); fig.savefig(OUT)

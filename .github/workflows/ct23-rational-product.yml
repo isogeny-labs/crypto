@@ -1,0 +1,34 @@
+name: CT23 rational product-coordinate acceptance
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/ct23_rational_product_transport.py'
+      - 'research/chained_jacobian_transfers_20261110/CT23_RATIONAL_PRODUCT_CONTROL.md'
+      - '.github/workflows/ct23-rational-product.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/ct23_rational_product_transport.py
+      - name: Reproduce rational product transport and BSGS controls
+        run: |
+          set -euo pipefail
+          source=research/chained_jacobian_transfers_20261110/ct23_rational_product_transport.py
+          python3 -S "$source" | tee /tmp/ct23-product.txt
+          python3 -m py_compile "$source"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ct23-product
+          path: /tmp/ct23-product.txt
+          if-no-files-found: ignore

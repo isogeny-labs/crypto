@@ -82,3 +82,17 @@ reached in any cell.
   is the quantity that would carry a decision.
 - No PDF renderer was available to the lead agent; `REPORT.pdf` was rendered
   by the synthesis step with Typst in a scratch virtualenv.
+
+## Rerun 2026-11-01: the frozen ladder, complete (appended; the sections above are unchanged)
+
+Plan `../rerun_20261101/RERUN_PLAN.md`, report `../rerun_20261101/REPORT.md`, data
+`../rerun_20261101/L2b/`. msolve 0.6.5 with the exact sparse/dense kernel (`-l 1`),
+which reproduces the three completed probe cells above and the one ladder cell in every
+column. The ladder of `run_ladder.sh` ran as listed: 70 cells, 68 completed, the two
+p = 1048573 cells stopped at the 1500 s cap.
+
+Largest p where both arms completed every run: 262139. Median maximal step degree
+18 at p = 1021 and 72 at p = 262139 in both arms: trajectory ratio 4.00 (real) and
+4.00 (control). **Decision: null_confirmed.** Every completed cell has maximal degree
+N + 8. Observed, not decided: the real arm does more F4 work than the control at every
+rung (median total rows 1.26 to 21.6 times the control's from p = 1021 to 262139).

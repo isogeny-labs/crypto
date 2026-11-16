@@ -1,0 +1,145 @@
+{
+  "review_attestation": {
+    "task_id": "TASK-N83-FILTERED",
+    "parent_archival_task": "T-995",
+    "source_revision": "c64f02c176787dbf40d455f95b75bd2dd5bfe5bf",
+    "published_plan_commit": "c92ca4f106a0",
+    "supplement_commit": "722e5a850107",
+    "joints_owned": [
+      "bounded representation descent",
+      "closure under allowed multiplication",
+      "coefficient functional annihilation and nonzero separation",
+      "connection to exact source and rational-point scope"
+    ],
+    "sources_read": [
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/PRIME_FILTERED_FUNCTIONAL_DESIGN.md",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/src/prime_linear_source_donor.rs",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/src/bin/prime_source_functional.rs",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/evidence/source-functional-r2/summary.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/evidence/source-functional-r2/original-prime-m3-natural.json",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/reviews/proof-bridge-20261030/checker-plan.json",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/reviews/proof-bridge-20261030/filtered-supplement.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/protocol.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/manifest.sha256",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/results/original-prime-m3-natural.poly",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/results/original-prime-m3-natural.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/source/Cargo.lock",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/source/Cargo.toml",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/top/original-prime-m3-natural.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/inputs/original-prime-m3-natural/system.sing",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/inputs/original-prime-m3-natural/input.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/source/src/prime_linear_source_donor.rs",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/source/src/prime_terminal_math.rs",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/source/src/prime_first_fall_donor.rs",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/terminal/original-prime-m3-natural/certificate.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/terminal/original-prime-m3-natural/A0.poly",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/terminal/original-prime-m3-natural/A1.poly",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/terminal/original-prime-m3-natural/A2.poly",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered/supplement/source/src/bin/prime_source_functional.rs",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/AGENTS.md",
+      "https://arxiv.org/html/2112.05579",
+      "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/59B877810708C90F6287972486A5BF0C/S0010437X10005075a.pdf/on-the-discrete-logarithm-problem-in-elliptic-curves.pdf",
+      "https://eprint.iacr.org/2004/031.pdf",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-check/src/main.rs",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-check/target/release/n83-filtered-independent-review",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-replay.json",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-build.log",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-check/Cargo.lock",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/workflow-deviation-python.py",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/workflow-deviation-python.log",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/report.md"
+    ],
+    "source_read_qualifications": {
+      "AGENTS.md": "Only implementation-language section and immediate surrounding lines, after the parent supplied the omitted rule.",
+      "prime_first_fall_donor.rs": "Semantic review of arithmetic/field/primality helpers and public adapters; entire file byte-hashed. Its graded-rank logic was not used as proof.",
+      "protocol.json": "Parsed for scope, freeze, one selected case, source hashes and instrument identity; entire file byte-hashed.",
+      "manifest.sha256": "All entries parsed for supplied-file hash joins; files outside the assigned supplement were not read.",
+      "source/Cargo.lock": "Byte-hashed only; native verifier has its own retained Cargo.lock.",
+      "https://eprint.iacr.org/2004/031.pdf": "Search-result excerpt read while locating primary literature; direct fetch returned 403. Not relied upon for a mathematical conclusion.",
+      "other_web_search_results": "Discovery snippets were returned; only the fully opened Caminata-Gorla and Diem primary sources were used for definitions and rational-point scope."
+    },
+    "read_sibling_reports": false,
+    "blind_from_respected": null,
+    "verdicts": {
+      "bounded representation descent": "holds",
+      "closure under allowed multiplication": "holds",
+      "coefficient functional annihilation and nonzero separation": "holds",
+      "connection to exact source and rational-point scope": "holds"
+    },
+    "verdict_qualifications": {
+      "bounded representation descent": "Complete conditional proof in the full polynomial ring, assuming full homogeneous top-syzygy Koszul generation through degree 16. Zero polynomials handled separately.",
+      "closure under allowed multiplication": "Conditional W_d=V_d through 16; valid for iterated reductions and multiplications. Explicit counterexample supplied when the hypothesis is removed.",
+      "coefficient functional annihilation and nonzero separation": "Symbolic annihilation for arbitrary multipliers and exact pairing formula hold. Exceptional zero pairing is inconclusive. Native replay confirms the actual saved one-case degree-16 witness and nonzero pairing.",
+      "connection to exact source and rational-point scope": "Holds for mathematical normalization/indexing and the supplemented original-prime-m3-natural case. Other 41 case bindings, archived binary execution, S3 custody, factor-base shards and signed rational point-sum relations were not independently verified."
+    },
+    "conditional_hypotheses": [
+      "Every homogeneous syzygy on the complete original top-generator list of weighted total degree at most 16 is generated homogeneously by Koszul relations in the full polynomial ring."
+    ],
+    "mathematical_status": "complete_conditional_argument",
+    "formal_machine_status": "No polynomial-algebra or filtered-space Lean artifact was reviewed or checked by this reviewer.",
+    "known_false_controls": {
+      "remove_syzygy_hypothesis_U2_U2_minus_U": "Rejected. U lies in W2 but not W1; in k[U,V], UV lies in V2 but not W2.",
+      "characteristic_2": "Rejected. X^2 vanishes modulo selector squares, yielding a non-Koszul weighted-degree-4 terminal relation; the pairing scalar also vanishes.",
+      "zero_scalar_pairing": "Inconclusive. Zero is not treated as membership; explicit U^16 example shows the functional kernel is larger than the tested space."
+    },
+    "initial_input_gap": "Initial packet lacked raw system/input/factors and imported arithmetic modules. Report preserves that finding. Later published supplement resolved one-case binding only.",
+    "projection_scope_note": "Older source.projection sets U=0 for the earlier syzygy-coordinate argument. The new terminal functional must explicitly retain U. They are distinct maps.",
+    "accepted_execution": {
+      "language": "Rust",
+      "source": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-check/src/main.rs",
+      "source_sha256": "ff8d2691292ab2afdea69395a9fa309405a2101c934e8a170d62b708bb165e18",
+      "binary": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-check/target/release/n83-filtered-independent-review",
+      "binary_sha256": "c4c4a1ca9375dd16033a291ca67a25d068ad60af090d0c70064574dbc6607401",
+      "producer_arithmetic_imported": false,
+      "build": "cargo build --offline --release --manifest-path /home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-check/Cargo.toml",
+      "build_exit_code": 0,
+      "build_timeout_seconds": 180,
+      "build_virtual_memory_cap_kib": 2097152,
+      "replay_exit_code": 0,
+      "replay_timeout_seconds": 60,
+      "replay_virtual_memory_cap_kib": 524288,
+      "case": "original-prime-m3-natural",
+      "supplement_file_hashes_checked": 17,
+      "protocol_source_hashes_checked_for_present_files": 6,
+      "g_degree": 16,
+      "g_terms": 208896,
+      "coefficient_degree": 14,
+      "pairing": "4087116827087420414291699",
+      "delta": "2258563150756227702862489",
+      "log": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-replay.json",
+      "log_sha256": "7765d8d53a80beec05dba2d8ddeb7b6e01628f1f3293272ee93432dd357956d7",
+      "build_log": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/native-build.log",
+      "build_log_sha256": "ba8b05d68af6f58897254cc8dd8e45833d14e7d1e4364a3ef34c4ca5810681f4",
+      "cargo_lock_sha256": "3cee1e1259408b961b6f336a9ac64668fcf2778bf9fa2d01d906ecb9f1be10ae",
+      "build_warning": "Unused import PathBuf; build succeeded."
+    },
+    "workflow_deviations": [
+      {
+        "kind": "initial_native_language_policy_omitted_from_handoff",
+        "description": "Reviewer initially ran a Python certificate replay before the parent supplied the repository no-Python research rule. The first attempt failed on unavailable int.bit_count; the corrected attempt passed. Both provenance and failure are retained and explicitly excluded from the final accepted arithmetic evidence.",
+        "resolution": "Read the repository rule, independently ported all arithmetic/codec/source checks to Rust without importing producer arithmetic, bounded native build and replay both passed.",
+        "historical_source": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/workflow-deviation-python.py",
+        "historical_source_sha256": "d2690c9f05e545cb0061a35da1f2e539c6552ccf3b6623c4e447f2f5df17e9fd",
+        "historical_log": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/workflow-deviation-python.log",
+        "historical_log_sha256": "88a5478081a1e186d3c5284a2f6d28a57358ddb25ff3e09b9f993925bd57f0d9"
+      }
+    ],
+    "literature_access_failures": [
+      {
+        "url": "https://eprint.iacr.org/2004/031.pdf",
+        "result": "Direct open 403; search excerpt only."
+      },
+      {
+        "url": "https://www.math.uni-leipzig.de/~diem/preprints/ind-cal-ell-curves.pdf",
+        "result": "Direct open 404; used the primary published Cambridge PDF instead."
+      }
+    ],
+    "no_new_parameter_sweeps": true,
+    "no_producer_source_edits": true,
+    "no_commits_by_reviewer": true,
+    "no_jobs_launched": true,
+    "no_agents_spawned": true,
+    "report_path": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-FILTERED/report.md",
+    "report_sha256": "c9abb94e1ac2623c440eba613c2f4dbeff6a9d13d9d113a18d240ee98b6cbf45"
+  }
+}

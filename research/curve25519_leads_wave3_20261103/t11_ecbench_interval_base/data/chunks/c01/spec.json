@@ -1,0 +1,105 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "proj-a",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t6-g4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=6",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t6-g4-s1093",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=6,seed=1093",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  },
+  {
+   "name": "pkm-int-t5-g3-lo0",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-interval:t=5,lo=0",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=3"
+    }
+   }
+  },
+  {
+   "name": "pkm-int-t5-g3-L976503",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-interval:t=5,lo=976503",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=3"
+    }
+   }
+  },
+  {
+   "name": "pkm-int-t5-g3-L541434",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-interval:t=5,lo=541434",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=3"
+    }
+   }
+  }
+ ],
+ "description": "research/curve25519_leads_wave3_20261103/t11_ecbench_interval_base/PROTOCOL.md (frozen before data). k=20 Curve25519 miniature as in curve25519_isogeny_seed_20261103 T5. New factor base prime-interval:t=T,lo=L (every point with x in [L, L+2^T)) priced end-to-end with pkm-semaev bits membership: lo=0 (incumbent bits frame), L=976503 (argmax J) and L=541434 (argmax J/cols) at t=5, guess=3; incumbent PKM isogeny arms seed 0 and 1093 at t=6, guess=4; rho-neg reference, proj-a baseline. Fresh target_seed, 6 targets, 2 measured rounds (alternate_measured), 0 warm-up. Public synthetic curve; no security claim. [chunk 1 of 6, Addendum C]",
+ "label": "Curve25519 k=20: prime-interval bits frames (lo=0, J, J/cols) vs PKM isogeny seeds 0/1093, ecbench counted unit",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate_measured",
+  "rounds": 2,
+  "seed": 3110311103,
+  "timeout_seconds": 3600,
+  "warmup": 0
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 63700,
+    "b": 872826,
+    "group_order": 1049624,
+    "gx": 349837,
+    "gy": 122,
+    "kind": "prime_explicit",
+    "p": 1048573,
+    "r": 131203
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 3110311102,
+  "targets_per_curve": 1
+ }
+}

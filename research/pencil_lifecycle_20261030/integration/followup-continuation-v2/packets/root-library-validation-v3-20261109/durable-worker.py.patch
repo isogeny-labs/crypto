@@ -1,0 +1,44 @@
+--- v2/durable-worker.py
++++ v3/durable-worker.py
+@@ -38,6 +38,32 @@
+   if 'resolved' in row:assert str(f.resolve())==row['resolved'],path
+   else:assert stat.S_ISREG(f.lstat().st_mode),path
+   assert H(f)==row['sha256'],path
++def traversal_error(error):
++ raise error
++def verify_current_cache():
++ manifest_path=P/'current-cache.json'
++ assert H(manifest_path)==F['current_cache_sha256'],'current cache binding'
++ snapshot=json.loads(manifest_path.read_text())
++ assert snapshot['schema']=='root-current-cache/v1'
++ roots=[STAGE/name for name in ['target','cargo-home','tmp']]
++ assert snapshot['roots']==[str(root) for root in roots]
++ actual={};directories=[]
++ for root in roots:
++  assert stat.S_ISDIR(root.lstat().st_mode),str(root)
++  for base,dirs,names in os.walk(root,followlinks=False,onerror=traversal_error):
++   guard();directories.append(base)
++   for name in dirs:assert stat.S_ISDIR((Path(base)/name).lstat().st_mode),str(Path(base)/name)
++   for name in names:
++    f=Path(base)/name;st=f.lstat()
++    assert stat.S_ISREG(st.st_mode),str(f)
++    actual[str(f)]=st.st_size
++ assert sorted(directories)==snapshot['directories'],'cache directory inventory changed'
++ assert set(actual)==set(snapshot['files']),'cache file inventory changed'
++ for path,row in snapshot['files'].items():
++  assert actual[path]==row['bytes'],path
++  assert H(Path(path))==row['sha256'],path
++ R['current_cache_sha256']=F['current_cache_sha256']
++
+ ENV={'PATH':F['toolchain']+'/bin:/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','CARGO_HOME':str(STAGE/'cargo-home'),'CARGO_TARGET_DIR':str(STAGE/'target'),'CARGO_BUILD_JOBS':'1','RUSTC':F['toolchain']+'/bin/rustc','TMPDIR':str(STAGE/'tmp'),'RUST_TEST_THREADS':'1','RUST_BACKTRACE':'0'}
+ def command(label,argv):
+  global ACTIVE
+@@ -100,7 +126,7 @@
+  PERMIT_REQUIRED=True;checkpoint('containment-and-permit-verified')
+  inputs=json.loads((P/'materialized-inputs.json').read_text());assert H(P/'materialized-inputs.json')==F['inputs_sha256']
+  for name,h in F['recipe_files'].items():assert H(P/name)==h,name
+- verify(inputs['immutable']);verify(inputs['initial_cache']);R['pre_inputs_verified']=True;checkpoint('inputs-verified')
++ verify(inputs['immutable']);verify_current_cache();R['pre_inputs_verified']=True;checkpoint('inputs-verified')
+  cargo=F['toolchain']+'/bin/cargo';base=[cargo,'test','--release','--lib','--locked','--offline']
+  output=command('compile',base+['--no-run','--message-format=json'])
+  binaries=[]

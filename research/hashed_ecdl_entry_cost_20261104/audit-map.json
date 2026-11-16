@@ -1,0 +1,109 @@
+{
+  "schema": "hashed-ecdl.source-cost-audit/v1",
+  "claim": "PCC-20261104-1df881",
+  "standing": "unverified",
+  "source_revision": "2d746d0577ddf797b8706de1f45489fb31ad3d31",
+  "mode": "source review only; no execution or cost measurement",
+  "entries": [
+    {
+      "id": "target_usage",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "anchor": "fn next_tuple(",
+      "line_start": 298,
+      "observation": "Target-group counter increments and carry/reset subtractions.",
+      "next_obligation": "Match usage to positive incoming exponents and selected rows.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "driver",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "anchor": "fn evaluate_at(",
+      "line_start": 324,
+      "observation": "Sequential tuples and group children; short circuit on zero products.",
+      "next_obligation": "Price every tuple transition and prepared child before short circuit.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "packet_entry",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "impl PacketTensor {",
+      "line_start": 275,
+      "observation": "Constants, coefficient lists, depth-first choices and outgoing powers.",
+      "next_obligation": "Count preparation, rejected choices, field widths and retained entry state.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "child",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "pub(super) fn child(",
+      "line_start": 406,
+      "observation": "Arc retention plus local coefficient/mode table construction.",
+      "next_obligation": "Bind the selected row budget and all mode scans; retain table allocation cost.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "modes",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "pub(super) fn modes(",
+      "line_start": 161,
+      "observation": "Weighted mode construction includes direct BigUint modular exponentiation.",
+      "next_obligation": "Include modular exponentiation and lookup/clone costs in bit model.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "creation_precision",
+      "path": "crates/hashed-ecdl-tensor/src/contraction.rs",
+      "anchor": "impl Tensor {",
+      "line_start": 468,
+      "observation": "Stored packet is evaluated at creation precision before coordinate lifting.",
+      "next_obligation": "Track old/new precision and description lifetime along ancestor paths.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "retention",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "anchor": "fn active(",
+      "line_start": 401,
+      "observation": "Interpolation nodes/values and tapered jets remain while children run.",
+      "next_obligation": "Sum peak ancestor state, not only one vector length.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "ring_mul",
+      "path": "crates/hashed-ecdl-tensor/src/ring.rs",
+      "anchor": "pub fn mul(",
+      "line_start": 226,
+      "observation": "Coordinate products/reduction are charged as diagnostic steps.",
+      "next_obligation": "Price arbitrary-precision coefficient operations and temporary widths.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "ring_pow",
+      "path": "crates/hashed-ecdl-tensor/src/ring.rs",
+      "anchor": "pub fn pow(",
+      "line_start": 265,
+      "observation": "Exponent is shifted in repeated-squaring loop.",
+      "next_obligation": "Include each retained outgoing exponent and operand-width cost.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    },
+    {
+      "id": "policy",
+      "path": "crates/hashed-ecdl-tensor/src/lib.rs",
+      "anchor": "impl Meter {",
+      "line_start": 93,
+      "observation": "Per-vector and supplied bit-width checks; diagnostic primitive-step total.",
+      "next_obligation": "Separate resource admission from aggregate live-byte and bit-time claims.",
+      "evidence_status": "unverified source inspection",
+      "paper_locator": "Appendix D.4.6-D.4.7"
+    }
+  ]
+}

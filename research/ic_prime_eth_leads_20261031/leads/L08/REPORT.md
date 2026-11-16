@@ -127,3 +127,8 @@ cd <this dir> && python3.13 -B c1.py ecc2k130 && python3.13 -B c1.py eccp131 && 
 (1) Build the O(n log n) barrel-shift/necklace canonicalisation and re-run t3.py with it (decides whether folding really costs only a log factor); (2) re-prove Lemma 10 with orbit-mates
 (second-moment bound with the m(n-1)/L term) and add it to the paper section; (3) hand the ECC2K-130 free27 network (787,740 edges) to L06/L09 as the smaller test graph.
 Blockers: Bochum paper text not on disk (Lemma 7 count and lemma numbers taken from LEADS.md); stray scanB.py processes (pids 79233, 83763) could not be killed (kill/pkill denied).
+
+
+## Refit 2026-11-02
+
+See refit/REFIT.md: with the integer gadget freed the same way, ECCp-131 m=2 drops 1,564,506 -> 567,346 edges, so the char-2 network is 1.39x larger like-for-like. The 3.42x figure above is freed-vs-fixed.

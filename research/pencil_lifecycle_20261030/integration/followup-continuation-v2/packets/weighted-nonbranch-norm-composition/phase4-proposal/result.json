@@ -1,0 +1,57 @@
+{
+  "schema": "research.component-result/v1",
+  "status": "theorem_module_compiled_controls_incomplete",
+  "theorem_module_exit": 0,
+  "declarations_in_module": 10,
+  "controls_exit": -9,
+  "expected_readbacks": 14,
+  "axiom_readbacks_completed": 0,
+  "all_started_children_reaped": true,
+  "cleanup_errors": [],
+  "phase_seconds": [
+    {
+      "phase": "pre",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/phase4-proposal/custody-phase4.py",
+        "pre"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 129.57388948500738
+    },
+    {
+      "phase": "compiler",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/phase4-proposal/compiler-phase4.py"
+      ],
+      "outer_exit": 1,
+      "elapsed_seconds": 271.8642984999751
+    },
+    {
+      "phase": "post",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "295s",
+        "python3",
+        "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/weighted-nonbranch-norm-composition/phase4-proposal/custody-phase4.py",
+        "post"
+      ],
+      "outer_exit": 0,
+      "elapsed_seconds": 152.23201477501425
+    }
+  ],
+  "bound": 900,
+  "scientific_trials": 0,
+  "proof_source_sha256": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1"
+}

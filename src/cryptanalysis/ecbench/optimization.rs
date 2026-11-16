@@ -115,8 +115,16 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v2", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v3", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.three_leads_genus2_pencil_symbolic_v3",
         NativeGrid,
         SpecializedDomain,
         StandardBand
@@ -214,6 +222,18 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "rho.multitarget_pooled",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "ic.residual_batch",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "ic.residual_batch_v2",
         ImplementationAb,
         DiagnosticOnly,
         StandardBand
@@ -420,6 +440,12 @@ const POLICIES: &[PolicyDecl] = &[
         FullPrice
     ),
     policy!(
+        "rho.signed_frobenius_v2_full",
+        ImplementationAb,
+        PricingSensitivity,
+        FullPrice
+    ),
+    policy!(
         "rho.signed_frobenius_strong_full",
         NativeGrid,
         PricingSensitivity,
@@ -456,6 +482,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "ic.tensor_contraction_cofactor_v1",
+        NativeGrid,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
         "ic.known_log_mitm2_v1",
         NativeAdaptive,
         DiagnosticOnly,
@@ -487,12 +519,113 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.koblitz_descent",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_batched",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_descent_v2",
         NativeAdaptive,
         SpecializedDomain,
         StandardBand
     ),
     policy!(
+        "ic.koblitz_batched_v2",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
         "rho.negation_v2",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    // Rejected by research/curve25519_engine_items_20261110 (1.53x and
+    // 2.74x rho.negation's cost): a diagnostic, never a frontier reference.
+    policy!(
+        "rho.negation_chained",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    // rho.negation's walk in lock-step lanes with a batched inversion
+    // (docs/perf/20261112-rust-deep-audit.md): a diagnostic until a reviewed
+    // paired session admits it.
+    policy!(
+        "rho.negation_lanes_v1",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v3",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v3",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v3",
         ImplementationAb,
         FrontierEligible,
         StandardBand
@@ -557,18 +690,37 @@ const POLICIES: &[PolicyDecl] = &[
         FrontierEligible,
         StandardBand
     ),
+    policy!(
+        "cheon.pminus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_naive",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pplus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
 ];
 
 fn parameter_role(name: &str) -> Option<ParameterRole> {
     use ParameterRole::*;
     Some(match name {
-        "base_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
+        "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
         "batch" => WorkloadScope,
         "backend" => ExternalBinding,
         "backend_sha256" | "c4" => IdentityOrPrice,
         "attempts"
         | "budget_ms"
         | "cap_multiple"
+        | "growth_ceiling"
         | "matrix_coefficient_cap"
         | "max_pair_work"
         | "max_descent_ops"
@@ -588,9 +740,12 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "step_cap_factor"
         | "target_max_attempts"
         | "trial_cap"
+        | "trace_entries"
+        | "trace_words"
         | "unit_trials"
         | "units" => ResourceEnvelope,
         "baby"
+        | "batch_trials"
         | "base"
         | "base_multiplier"
         | "base_scale"
@@ -612,6 +767,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "factor_base"
         | "factor_base_points"
         | "fb_size"
+        | "growth"
+        | "guess"
         | "independent"
         | "inner"
         | "jumps"
@@ -638,9 +795,11 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "solver"
         | "stop"
         | "subset_size"
+        | "subset_profile"
         | "summands"
         | "table_scale"
         | "targets"
+        | "trace"
         | "unique_relations"
         | "walks" => Knob,
         _ => return None,
@@ -1133,6 +1292,26 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn koblitz_batch_tuning_keeps_seed_and_resource_cap_out_of_the_grid() {
+        let profiles = profiles().unwrap();
+        let profile = profiles
+            .iter()
+            .find(|profile| profile.id == "ic.koblitz_batched_v2")
+            .unwrap();
+        assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
+        assert_eq!(profile.claim_scope, ClaimScope::SpecializedDomain);
+        assert_eq!(profile.accounting_scope, AccountingScope::StandardBand);
+        let roles: BTreeMap<_, _> = profile
+            .parameters
+            .iter()
+            .map(|parameter| (parameter.name, parameter.role))
+            .collect();
+        assert_eq!(roles["batch_trials"], ParameterRole::Knob);
+        assert_eq!(roles["fb_seed"], ParameterRole::Seed);
+        assert_eq!(roles["max_trials"], ParameterRole::ResourceEnvelope);
     }
 
     #[test]

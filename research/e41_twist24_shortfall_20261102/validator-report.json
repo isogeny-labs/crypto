@@ -1,0 +1,5425 @@
+{
+ "schema": "validator-report/v1",
+ "id": "VAL-20261102-918856",
+ "date": "2026-11-02",
+ "row": "E41 (GLV note §9.52 pre-registration, G2.216-G2.229; §9.53 results): the order-24 <±psi> walk's step shortfall on E18's eight j = 0 curves; arms O6B, O6C, O24, O24L, O24F on the main stream (8 curves x 5 arms x 128 seeds schoolbook, 32 Karatsuba), the A/A arm O24' on a disjoint stream (128), identity (E34's 1,280 Stage R records with the fix off), positive control F-slash (32 walks); a rho-against-rho reference correction for E18's psi rows; evidence directory research/e41_twist24_shortfall_20261102",
+ "status": "pass",
+ "status_rule": "pass iff every check holds, every headline figure agrees with its printed value within half a unit of the last printed digit (exact for counts), every replayed record is byte-identical to the committed one, and every claim named by the validation task passes. Headlines are the task's claims at the precision stated there and §9.53's figures that carry them. Every other printed figure is checked the same way under note_figures; a disagreement there is an erratum (errata) and fails the report only if it changes a registered verdict or a claim.",
+ "independent": true,
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E41. The recompute is its own standard-library Rust program (validate_e41.rs: own JSON parser keeping number text verbatim, own SHA-256, own statistics) and shares no code with examples/e41_run.rs, examples/e41_tables.rs, examples/e41_stage0.rs, experiments/48_twist24_shortfall/summary.json or tables.md. The replay ran the code under test (a fresh clean-export build of b0e307d9b8) through the recorded e41_run binary and through the validator's own driver (replay/v41_replay.rs) for nonce-drawn walks. Python computed no figure: it only ran the gate's own check functions (scripts/validation_gate.py) on the two files.",
+ "task": "validate E41 on branch claude/glv-endomorphism-index-calculus-pe7ige at 282ddceafd: pre-registration order, clean rebuild with binary hashes, nonce-sampled replay (schoolbook and Karatsuba) plus the identity and positive-control runs, own recompute of the headline numbers, pricing and class checks; E34's validation (research/e34_twist24_cheap_rep_20261031) as the model",
+ "script": "research/e41_twist24_shortfall_20261102/validate_e41.rs (rustc -O --edition 2021; `validate_e41 report <repo>` for the recompute, `validate_e41 draw <nonce> replay <repo>` for the selection, `validate_e41 compare <repo> replay` for the replay comparison)",
+ "cost_definition": "walk cost(w) = (fp_muls - verify_fp_muls) + w * 97 * (cmp + neg + modn + hash + table), the native counters taken from walk.ops (the representative's counters are a subset), w = 0, 0.1, 1 (registered, §9.52; GAE = 97 F_p multiplications for both arithmetics, Karatsuba also shown at its own 79); pooled = sum over the eight curves of mean cost / sqrt(n); ratio = first arm / second arm (> 1: the second arm is cheaper); 95 % interval = ratio +- 1.96 SE, SE by the delta method over the per-curve means' standard errors with the two arms independent (the seed-paired covariance version is reported alongside and changes no conclusion); resolved = interval excludes 1 at all three weights and |ratio - 1| > |O24/O24' - 1| at each weight (registered), and, for a rank, the ratio stays on one side of 1 at all three weights (§5a; this is what tables.md's 'resolved' column applies)",
+ "script_sha256": "69989901d6921bb96645fd3f48994b3fa826423cfeecff0d87e8e75fce8c34ca",
+ "replay_driver": {
+  "path": "replay/v41_replay.rs",
+  "sha256": "639441a58fa1b196a45dafd504a5bb855bbe8fc94218092eb40081c6b3fdafa6"
+ },
+ "claim_verdicts": [
+  {
+   "claim": "Pre-registration first: f99a56359e predates any fix code, run or record",
+   "verdict": "pass",
+   "evidence": "f99a56359e (18:15:10Z) is the parent of the fix-code commit b0e307d9b8 (18:17:54Z); at f99a56359e the instrument has no Jumps/PairSums and e41_run.rs does not exist; every registered record was written 19:01-19:25Z by the e41_run binary rebuilt here byte for byte from b0e307d9b8; §9.52 is unchanged since. Only Stage 0 (declared, seeds 41000+k, disjoint from the registered streams) came before it. See preregistration."
+  },
+  {
+   "claim": "E34's order-24 'step shortfall' was sampling noise",
+   "verdict": "pass",
+   "evidence": "The walk is E34's: with the fix off the E41 code reproduces all 1,280 E34 Stage R records byte for byte (replayed twice here: all 1,280 walks through the validator driver against the E34 files with the validator comparator, 1,280 / 1,280 byte-identical, and the rebuilt e41_run identity stage, whose identity.json and identity.log equal the committed ones byte for byte). E34's 16-seed records give steps ratio 1.7009 (order 6 0.9239 ± 0.0457, order 24 1.0864 ± 0.0451 of the ideal; z = 2.70 below 2). On fresh seeds it is 1.9270 ± 0.0439 (main stream, z = 1.66) and 1.9647 ± 0.0451 (against the A/A stream, z = 0.78); E41's 95 % interval [1.841, 2.013] excludes 1.701. The deviation from 2 falls from 0.299 to 0.073 and 0.035 as walks per curve and order go from 16 to 128, as noise must; ratio-of-sums weighting gives the same picture (1.766 -> 1.981, 1.970). Pooling every walk of each order: 1.950 ± 0.031. Stage 0 finds no order-24-specific cause (fruitless revisits 0.84·10⁻⁴ a step for order 24 against 3.57·10⁻⁴ for order 6, redirects 1/32 in both, no distinguished-point losses). Caveat: E34's draw was an unlucky one (2.7 SE from the ideal, 1.9 SE from E41's estimate), and E41's own main-stream ratio still sits 1.7 SE below 2 because its order-6 arm ran short (0.969; G2.219 falsified, as reported); 'noise' here means 'not reproduced by eight times the walks on two fresh streams'."
+  },
+  {
+   "claim": "On fresh seeds the order-24 <±psi> walk (O24) is cheaper than E29's order-6 walk (O6B) and the cheap order-6 walk (O6C) at 0, 0.1 and 1 GAE: pooled 1.761 / 1.418 / 1.275 and 1.696 / 1.320 / 1.162",
+   "verdict": "pass",
+   "evidence": "Recomputed from the 5,120 main-stream records: O6B/O24 1.7610 [1.6856, 1.8364], 1.4184 [1.3560, 1.4809], 1.2751 [1.2182, 1.3319]; O6C/O24 1.6959 [1.6233, 1.7685], 1.3196 [1.2616, 1.3776], 1.1621 [1.1103, 1.2138]. Both resolved under the registered rule (every interval excludes 1, |ratio - 1| > the A/A floor 0.0185 / 0.0192 / 0.0195) and on one side of 1 across the band (§5a). Per curve (registered point-estimate rule): 8/8 and 7/8 curves favour O24 at every weight; p = 241 changes order on O6C/O24 (0.995 at 1 GAE). Karatsuba (32 walks): 1.711 / 1.369 / 1.249 and 1.635 / 1.267 / 1.137, same orders (also at Karatsuba's own GAE of 79). The nonce-drawn replay reproduces 640 / 640 main-stream schoolbook and 320 / 320 Karatsuba records byte for byte, and the whole main_karatsuba.json, aa_school.json and main_school.json byte for byte (sha256 b379062e…b1f3, b0be4806…f47b and a7e4bd7d…8037, equal to the committed main_karatsuba.json.sha256, aa_school.json and main_school.json.sha256)."
+  },
+  {
+   "claim": "The jump-table fix F is not resolved",
+   "verdict": "pass",
+   "evidence": "O24/O24F 1.0213 [0.9783, 1.0643], 1.0192 [0.9746, 1.0638], 1.0184 [0.9731, 1.0636]: every interval contains 1, so not resolved (G2.222, null prediction, holds); per curve 4 / 4 / 0; Karatsuba 0.984 / 0.981 / 0.979 (the other side, also unresolved). F's step saving is 0.750 % of O24's steps/ideal (SE 2.28 points, z = 0.33), sign-reversed under ratio-of-sums weighting (erratum E5). Added work exactly 32 additions and 64 mod-n operations on all 1,280 F walks (and the 32 control walks), 0 elsewhere. The positive control F-slash is flagged on 32 / 32 walks, replayed byte for byte."
+  },
+  {
+   "claim": "Fix-off records are byte-identical to E34's (1,280 / 1,280)",
+   "verdict": "pass",
+   "evidence": "Replayed twice. (1) The rebuilt e41_run (byte-identical to the recorded binary) re-ran --stage identity: identity.json (compared 1280, byte_identical 1280, value_identical 1280, no differences) and identity.log are byte-identical to the committed files. (2) Independently of the producer comparator, the validator driver recomputed all 1,280 E34 Stage R walks (8 curves x 5 arms x 16 seeds x 2 arithmetics) through rho_j0_e41 with Jumps::E34 and the validator's own comparator found every serialized walk byte-identical to its record in experiments/38_twist24_cheap_rep/stage_r_p*.json (whose hashes equal those E34's validator pinned). No E41 commit touches quartic_folds.rs; twist24_rep.rs changed only in visibility (part, visit_digest made pub(crate))."
+  },
+  {
+   "claim": "The logs are correct on 7,424 walks",
+   "verdict": "pass",
+   "evidence": "7,424 = 5,120 main schoolbook + 1,024 A/A + 1,280 Karatsuba records, every one correct = true, recovered = 271 on every curve (E34's logarithm) and with the [d]G = Q check run (verify counters > 0); every replayed walk reproduces those fields byte for byte. The check can see a broken fix: F-slash gives a wrong logarithm on 32 / 32 walks (G2.218)."
+  },
+  {
+   "claim": "E18's psi-row distances to rho lengthen by 1.761x / 1.418x / 1.275x",
+   "verdict": "pass",
+   "evidence": "The factors are O6B/O24 pooled schoolbook, recomputed 1.7610 / 1.4184 / 1.2751 (Karatsuba 1.711 / 1.369 / 1.249), and the modelled handover shifts 4 log2 of them, 3.27 / 2.02 / 1.40 bits. They are the band-ranked arm's factors; G2.227 registered 'the strongest order-24 arm at each weight', whose point estimates are 1.838 / 1.446 / 1.298 (3.51 / 2.13 / 1.51 bits) but are not ranked against O24 (erratum E6, disclosed in §9.53). The factors apply to E18's modelled psi-arm distances (§9.3), not to a measured IC row."
+  },
+  {
+   "claim": "The GLS IC rows are unchanged",
+   "verdict": "pass",
+   "evidence": "tables.md lists the 20 GLS rows (E31 solver A/B with E27 products) with 'before' = 'after' = E27's dist_new (experiments/32_walk_karatsuba/summary.json, unchanged since E27's results commit b2a710d504; E27's validator recomputed the S/rho range of these rows) to the printed digits, factor 1. Order 24 does not apply on those curves (Aut = {±1}, §9.33), and no E41 commit touches a GLS walk: the commits touch only twist24_shortfall.rs (new), twist24_rep.rs (two functions made pub(crate)), mod.rs (registration), E41's examples, records, report, note and session log; quartic_folds.rs, docs/ic/ and benchmarks/ are untouched. A derived non-change, not a measurement."
+  },
+  {
+   "claim": "Every added operation is priced across the band, and no index-calculus claim is made",
+   "verdict": "pass",
+   "evidence": "See cost_model_checks: F's 32 additions are in fp_muls (3,104 F_p multiplications schoolbook, 2,528 Karatsuba) and its 64 mod-n additions in the native count priced at w · 97; nothing is added per step. §9.52 (G2.229), §9.53 and REPORT.typ class E41 as a reference correction, not an index-calculus improvement; no leaderboard, benchmarks or gate file is changed."
+  }
+ ],
+ "preregistration": {
+  "verdict": "pass",
+  "registration_commit": "f99a56359ee0c43ba16ea769758ad79035d8d998, 2026-11-02T18:15:10Z (§9.52, G2.216-G2.229, with Stage 0 records)",
+  "fix_code_commit": "b0e307d9b8e4ca8b2f06e2023125b7caeb751105, 2026-11-02T18:17:54Z, child of f99a56359e (Jumps option, e41_run.rs, e41_tables.rs); tables update 5d15482969 (19:01:56Z), results f0eb95af97 (19:36:03Z), records b70f356827 (19:36:14Z), session log 282ddceafd",
+  "checks": [
+   "git order: 089f7f7823 (Stage 0 instrument) -> 6115e0ea0a (module registration) -> ... -> f99a56359e (registration) -> b0e307d9b8 (fix) -> 5d15482969 -> f0eb95af97 -> b70f356827 -> 282ddceafd, each an ancestor of the next",
+   "contents: at f99a56359e twist24_shortfall.rs is 089f7f7823's blob 61388ea566 with no Jumps or PairSums, and examples/e41_run.rs and e41_tables.rs do not exist; the registered arms, seeds, band, noise rule, controls and every bound of G2.216-G2.229 are in §9.52 at that commit",
+   "§9.52 at HEAD equals its text at f99a56359e byte for byte (sha256 ab51dbe84c3d44bd36c075d3cf5664b300436e5a65eb8e35e8fc4a4c0d23e386 over the section; HEAD adds only the blank line before §9.53); the note's diff f99a56359e..282ddceafd has 71 insertions and no deletion",
+   "records: every registered record (identity, control, aa_school, main_school, main_karatsuba) was written 19:01:04-19:25:44Z (file times) by the e41_run binary whose hash this validator reproduces byte for byte from b0e307d9b8, which postdates the registration; the registered seed streams (48000+k, 49000+k) are disjoint from Stage 0's (41000+k)",
+   "Stage 0 (stage0_records, stage0_run: 18:07-18:11Z, binary from 6115e0ea0a) preceded the registration and is declared as such; it chose F and set the bounds openly, and it is not reused as evidence for any registered verdict",
+   "the fix code was committed 2 min 44 s after the registration, so it was probably drafted alongside it; what binds is that no registered run could use it before b0e307d9b8, and none did (binary identity)"
+  ]
+ },
+ "replay": {
+  "certificate": {
+   "path": "replay-certificate.json",
+   "sha256": "d466146915fac2d88b68bf2a97911f33502ffa0e8445f17f0ab44454f84d65af"
+  },
+  "comparison": {
+   "path": "replay/replay_comparison.json",
+   "sha256": "7811f3a24fc7d254400ac5f6e910e1e76294a06ce8246a25c6bae195c8016996"
+  },
+  "build": {
+   "path": "replay/build.json",
+   "sha256": "5cd695c554611c0a08edd66b6980dd00633228ac4a61377a2a4f573715f4b0e3"
+  },
+  "recompute": {
+   "path": "replay/recompute.json",
+   "sha256": "e020a87e6486e8ad9ebdbec9c36aff6ab0e8786bf8436c74e9dcb669c5743e0c"
+  },
+  "summary": "Fresh build of b0e307d9b8 from a clean export reproduces the recorded e41_run and both e41_tables binaries byte for byte. Nonce 7034b11684e23fe4ddfca2976dc96037 (drawn after the records commit) selected 16 of 128 main-stream seeds per curve (all five arms), 16 of 128 A/A seeds per curve, 8 of 32 Karatsuba seeds per curve (all five arms) and 2 of 64 Stage 0 seeds per curve and order; with all 1,280 E34 Stage R walks (fix off) that is 2400 records through the validator driver, 2400 byte-identical (91712 of 91712 leaves identical): main schoolbook 640/640, A/A 128/128, Karatsuba 320/320, Stage 0 32/32 (every field the Stage 0 record holds), E34 identity 1280/1280. The rebuilt e41_run binary re-ran whole stages, byte-identical to the committed files or their committed .sha256: identity.json, control.json, main_karatsuba.json, aa_school.json, main_school.json; identity.log and control.log are text-identical. Every replayed walk reports correct = true except the 32 F-slash control walks, which report false as committed."
+ },
+ "gate_refusal": "No VALIDATION.json is written for E41 (as for E29 and E34). E41 compares rho walks only: there is no measured index-calculus S in this unit for the gate's gae_band 'ic' slot. E18's psi arm, whose distances the result corrects, is linear algebra with a modelled handover (note §9.3), not a measured end-to-end S, and the 20 GLS IC rows are unchanged (factor 1) and already carry E27's validation. Putting a rho walk in the 'ic' slot would pass the gate by relabelling. This report and the replay certificate stand on their own as evidence that E41's records and figures are what they say; a leaderboard mention, if the main session wants one, is a note like E34's, not a row.",
+ "gate_response": "`python3 scripts/validation_gate.py evidence research/e41_twist24_shortfall_20261102` answers \"VALIDATION.json is missing\" (exit 1), as intended: no VALIDATION.json is written (see gate_refusal). Called directly on the two files, the gate's own check_replay_certificate and check_validator_report (scripts/validation_gate.py, imported with python3 -I; the same call accepts E34's pair) report no error: status pass/verified, independent, scalars_verified, non-empty runs, raw_data present with matching sha256, every headline numeric and within its rel_tol. A VALIDATION.json would still fail check_rho_reference, whose gae_band needs a measured index-calculus S in each 'ic' slot; E41 has none, and a rho walk must not stand in for it.",
+ "raw_data": [
+  {
+   "path": "../../experiments/48_twist24_shortfall/aa_school.json",
+   "sha256": "b0be4806ca721bdb7cc82b8f41f492f894e6dcd2644faa6941ed970198bbf47b"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/control.json",
+   "sha256": "7ceb1c1e9c7eecb9047411f241d1bfb2c12fc70b8dc2923a16eb31e7bf933689"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/identity.json",
+   "sha256": "e9bc170b5880acbc2c88061482168ce051c0928c30760e03f57b5806b3c0bc8d"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/stage0_records.json",
+   "sha256": "72bc8b23316442c72f964ee86d9817d1657e9758f9bf9fa6c60e7a549cb2c809"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/main_school.json.sha256",
+   "sha256": "ddcde6708f49fda6240ef6a9399f92b0bdbb63f0395d9957d452c880bdb50d73"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/main_karatsuba.json.sha256",
+   "sha256": "a0bb11ce16e03e765e29347d5789a680ab08bdfe8baef9772e827a7dda9361dd"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/stage0_run.json.sha256",
+   "sha256": "e08bbf397883bb33fa867520aa3b2de313f86fee8567faa7d116fc82b5ced15a"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/binary_sha256.txt",
+   "sha256": "4e37ff4a21022c2ab93337ef048de4cc6534798990d0b2b78642f49a559c4527"
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/tables.md",
+   "sha256": "8e33629393deb75d9bf37676315d03c56b14e9977e18827ec030f5701f5609ec"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p241.json",
+   "sha256": "eeeb357ba97c262cb88bc0ee45d749ebd3dd4d6e95c5afbf5ff5fa7b85a159c1"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p337.json",
+   "sha256": "7046ac5dbcb4f2f96ebc296ad11a4acfce3055002d310d36be177c2ea268110d"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p541.json",
+   "sha256": "9157d53db6e2d946590abc930a4a14ff913a666c3b6f172babae89dfb4c43986"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p601.json",
+   "sha256": "0cd28049524dd477171dfbfeedde23ade3cbe23c1e2dea54c3993ea092d3936d"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p733.json",
+   "sha256": "0159a1acda5b8fe5ada1e6568ca8190b6373eb9117d7bdc97115a57519be0153"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p769.json",
+   "sha256": "e57ebd0b2b336541ce87a863b70767618fe04b80efac21ae590b258b19fcf2bd"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p997.json",
+   "sha256": "6668ebb33c0f8c8eb7dde73a99e6d1a2168da630e9deb48b9a34f9bbeabd23ab"
+  },
+  {
+   "path": "../../experiments/38_twist24_cheap_rep/stage_r_p1069.json",
+   "sha256": "65803d2162a9d42387410c1a8d1cfb0fd67d2d91821dcbf2e68ec6f913e3e31f"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/summary.json",
+   "sha256": "b20666d943bd0c3e2ab593dedfeef63eb06ea7a66449fb89c341d147f23c46d2"
+  }
+ ],
+ "raw_data_local_only": [
+  {
+   "path": "../../experiments/48_twist24_shortfall/main_school.json",
+   "sha256": "a7e4bd7d576aa1ae3b8b6d7c7ba6df570e9f13bc7b671e979fc0b0775f518037",
+   "pinned_by": "../../experiments/48_twist24_shortfall/main_school.json.sha256 (committed; equal)",
+   "bytes": 4366798
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/main_karatsuba.json",
+   "sha256": "b379062e191be99ebd983bde13587709b11fb26a10089d7e974f322f1986b3f3",
+   "pinned_by": "../../experiments/48_twist24_shortfall/main_karatsuba.json.sha256 (committed; equal)",
+   "bytes": 1090375
+  },
+  {
+   "path": "../../experiments/48_twist24_shortfall/stage0_run.json",
+   "sha256": "86494e33fe3f21bf4e675df45e56c79b76bb00f37a07d642e544149120318d80",
+   "pinned_by": "../../experiments/48_twist24_shortfall/stage0_run.json.sha256 (committed; equal) and the blob at f99a56359e (equal)",
+   "bytes": 1530384
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.52 Stage 0 text: E34's order-6 seeds ran 7.6 % under their ideal and its order-24 seeds 8.6 % over, 'each ≈ 1.7 standard errors'",
+   "recomputed": "7.61 % (1.67 SE) and 8.64 % (1.91 SE); the order-24 deviation is 1.9 SE, not 1.7",
+   "effect": "none: the percentages reproduce, no verdict uses the SE count, and the conclusion (E34's arms drifted in opposite directions) stands"
+  },
+  {
+   "id": "E2",
+   "claim": "§9.52 breakdown and §9.53 Stage 0 sentence: 'fruitless cycles < 10⁻⁴ of the ideal'",
+   "recomputed": "holds for order 24 only. As printed in §9.52's table ('steps lost to fruitless cycles') the figures are 3.7·10⁻⁴ (order 6) and 0.95·10⁻⁴ (order 24); they reproduce as sum(steps - stored)/sum(ideal), which also counts each walk's final, useful collision step. Fruitless revisits alone are 3.65·10⁻⁴ and 0.87·10⁻⁴ of the ideal (ratio of sums), 3.67·10⁻⁴ and 0.90·10⁻⁴ (mean over walks). stage0_run.json's per-curve excess_from_fruitless uses per-curve means of (fruitless + 1)/ideal, its pooled value the ratio of sums; the session log's '< 4·10⁻⁴' is the correct bound for both orders",
+   "effect": "none: both orders lose far less than 0.1 % of steps to fruitless cycles, and the order-24 figure is below the order-6 one, so no order-24-specific loss; no verdict uses it"
+  },
+  {
+   "id": "E3",
+   "claim": "tables.md band table, row O24 / O24AA (schoolbook), per-curve column '0 / 0 / 8'",
+   "recomputed": "4 / 4 / 0: the main-stream O24 walk is dearer at every weight on 4 curves and cheaper at every weight on the other 4; no curve changes order inside the band. The printed '0 / 0 / 8' is a placeholder: e41_tables.rs (lines 304-315 at 5d15482969) skips the per-curve count for the A/A row and prints 8 - 0 - 0 (located after the recompute, by reading those lines only)",
+   "effect": "none: no registered claim is per curve on the A/A row; the A/A floor is the pooled ratio, which reproduces (1.0185 / 1.0192 / 1.0195)"
+  },
+  {
+   "id": "E4",
+   "claim": "tables.md header: 'Resolved = 95 % interval (delta method) excludes 1 at all three weights and |ratio − 1| exceeds the A/A deviation at each weight'",
+   "recomputed": "the column also requires the ratio to stay on one side of 1 at all three weights (e41_tables.rs line 302). Under the header's own wording the O24L / O24 (schoolbook) row would read 'true' (0.958 [0.918, 0.998], 1.120 [1.072, 1.168], 1.188 [1.136, 1.240], all beyond the A/A floor) with the order changing inside the band; the printed 'false' is the §5a ranking, which is the right reading",
+   "effect": "none: no headline row changes; every printed 'resolved' value reproduces under the rule the column applies"
+  },
+  {
+   "id": "E5",
+   "claim": "§9.53: F 'cuts steps by 0.75 % as theory predicts'",
+   "recomputed": "0.750 % (O24 1.0061 vs O24F 0.9986 steps/ideal, mean over walks), standard error 2.28 points (z = 0.33); weighting walks by sqrt(n) (ratio of sums) the sign reverses (O24 0.988, O24F 1.016: F 2.8 % more steps), and per curve the order splits 4 / 4. The point estimate is consistent with the theory's 0.8 % and equally with zero",
+   "effect": "none on G2.221, which holds under the registration's statistic (mean over walks, as in Stage 0 and G2.219); under the ratio-of-sums statistic it would sit outside [-2, +3] %. The wording should read 'consistent with theory and with no change'; G2.222 (F not resolved) is unaffected"
+  },
+  {
+   "id": "E6",
+   "claim": "G2.227 registered E18's psi-row factor as 'O6B / strongest order-24 arm at each weight'; §9.53 quotes O6B / O24 (the band-ranked arm), disclosed with the reason",
+   "recomputed": "registered definition: 1.838 / 1.446 / 1.298 (O24L at 0 GAE, O24F at 0.1 and 1), handover 3.51 / 2.13 / 1.51 bits; quoted: 1.761 / 1.418 / 1.275, 3.27 / 2.02 / 1.40 bits. O24L changes order against O24 inside the band and O24F is not resolved against O24, so only O24 is ranked across the band (§5a); the quoted, smaller factors are the defensible ones",
+   "effect": "none on any verdict (G2.227 is derived). The leaderboard's E34 sentence used the strongest-point-estimate convention (1.63 / 1.25 / 1.13; 2.8 / 1.3 / 0.7 bits): an E41 update there should say which convention it uses"
+  }
+ ],
+ "headline": [
+  {
+   "name": "steps / ideal O6B (mean over 1,024 walks)",
+   "source": "§9.53",
+   "printed": "0.969",
+   "claimed": 0.969,
+   "recomputed": 0.9693879105198925,
+   "rel_tol": 0.0005159963880288958,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O6B standard error",
+   "source": "§9.53",
+   "printed": "0.016",
+   "claimed": 0.016,
+   "recomputed": 0.01591740094929807,
+   "rel_tol": 0.03125003125,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24 (mean over 1,024 walks)",
+   "source": "§9.53",
+   "printed": "1.006",
+   "claimed": 1.006,
+   "recomputed": 1.0061161456851442,
+   "rel_tol": 0.0004970183896620278,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24 standard error",
+   "source": "§9.53",
+   "printed": "0.016",
+   "claimed": 0.016,
+   "recomputed": 0.01593123395397448,
+   "rel_tol": 0.03125003125,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24F (mean over 1,024 walks)",
+   "source": "§9.53",
+   "printed": "0.999",
+   "claimed": 0.999,
+   "recomputed": 0.9985697217761996,
+   "rel_tol": 0.0005005010010010009,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24F standard error",
+   "source": "§9.53",
+   "printed": "0.016",
+   "claimed": 0.016,
+   "recomputed": 0.016299418078621956,
+   "rel_tol": 0.03125003125,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24AA (mean over 1,024 walks)",
+   "source": "§9.53",
+   "printed": "0.987",
+   "claimed": 0.987,
+   "recomputed": 0.9868263198513645,
+   "rel_tol": 0.0005065861195542047,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24AA standard error",
+   "source": "§9.53",
+   "printed": "0.016",
+   "claimed": 0.016,
+   "recomputed": 0.015767723678725205,
+   "rel_tol": 0.03125003125,
+   "agrees": true
+  },
+  {
+   "name": "steps ratio order 6 / order 24, pooled per sqrt(n), main stream",
+   "source": "§9.53",
+   "printed": "1.927",
+   "claimed": 1.927,
+   "recomputed": 1.9269900690501913,
+   "rel_tol": 0.0002594709392838609,
+   "agrees": true
+  },
+  {
+   "name": "steps ratio order 6 / order 24 against the A/A stream",
+   "source": "§9.53",
+   "printed": "1.965",
+   "claimed": 1.965,
+   "recomputed": 1.964657591757878,
+   "rel_tol": 0.0002544531806615776,
+   "agrees": true
+  },
+  {
+   "name": "F's step saving, % (O24 - O24F)/O24 steps/ideal",
+   "source": "§9.53 / tables.md",
+   "printed": "0.75",
+   "claimed": 0.75,
+   "recomputed": 0.7500549455754532,
+   "rel_tol": 0.006666673333333333,
+   "agrees": true
+  },
+  {
+   "name": "E34 records, order 6 cheap steps/ideal (128 walks)",
+   "source": "§9.52 / §9.53",
+   "printed": "0.924",
+   "claimed": 0.924,
+   "recomputed": 0.9239086925611318,
+   "rel_tol": 0.0005411260822510822,
+   "agrees": true
+  },
+  {
+   "name": "E34 records, order 6 SE",
+   "source": "§9.52",
+   "printed": "0.046",
+   "claimed": 0.046,
+   "recomputed": 0.04567723536583407,
+   "rel_tol": 0.01086957608695652,
+   "agrees": true
+  },
+  {
+   "name": "E34 records, order 24 cheap steps/ideal (128 walks)",
+   "source": "§9.52 / §9.53",
+   "printed": "1.086",
+   "claimed": 1.086,
+   "recomputed": 1.0863587832913506,
+   "rel_tol": 0.0004604056169429097,
+   "agrees": true
+  },
+  {
+   "name": "E34 records, order 24 SE",
+   "source": "§9.52",
+   "printed": "0.045",
+   "claimed": 0.045,
+   "recomputed": 0.04511704749150903,
+   "rel_tol": 0.011111122222222223,
+   "agrees": true
+  },
+  {
+   "name": "E34 steps ratio order 6 / order 24 pooled per sqrt(n)",
+   "source": "§9.52 / tables.md (E34)",
+   "printed": "1.701",
+   "claimed": 1.701,
+   "recomputed": 1.700927367223997,
+   "rel_tol": 0.0002939450323339212,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap steps/ideal (512 fresh walks)",
+   "source": "§9.52",
+   "printed": "1.027",
+   "claimed": 1.027,
+   "recomputed": 1.0265099031667362,
+   "rel_tol": 0.00048685540408958136,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap SE",
+   "source": "§9.52",
+   "printed": "0.023",
+   "claimed": 0.023,
+   "recomputed": 0.022591227377483494,
+   "rel_tol": 0.02173915217391304,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap steps/ideal (512 fresh walks)",
+   "source": "§9.52",
+   "printed": "1.038",
+   "claimed": 1.038,
+   "recomputed": 1.0381850247527615,
+   "rel_tol": 0.00048169605009633907,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap SE",
+   "source": "§9.52",
+   "printed": "0.023",
+   "claimed": 0.023,
+   "recomputed": 0.022752694347074075,
+   "rel_tol": 0.02173915217391304,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.761",
+   "claimed": 1.761,
+   "recomputed": 1.7609677195790743,
+   "rel_tol": 0.0002839298693923907,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) 95% interval low at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.686",
+   "claimed": 1.686,
+   "recomputed": 1.6855744696447434,
+   "rel_tol": 0.00029656020166073544,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) 95% interval high at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.836",
+   "claimed": 1.836,
+   "recomputed": 1.836360969513405,
+   "rel_tol": 0.0002723314270152505,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.418",
+   "claimed": 1.418,
+   "recomputed": 1.4184422363030416,
+   "rel_tol": 0.00035260966149506346,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) 95% interval low at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.356",
+   "claimed": 1.356,
+   "recomputed": 1.3560305351611888,
+   "rel_tol": 0.0003687319321533923,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) 95% interval high at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.481",
+   "claimed": 1.481,
+   "recomputed": 1.4808539374448944,
+   "rel_tol": 0.0003376100607697501,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.275",
+   "claimed": 1.275,
+   "recomputed": 1.27505161303617,
+   "rel_tol": 0.0003921572549019608,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) 95% interval low at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.218",
+   "claimed": 1.218,
+   "recomputed": 1.2182294713546018,
+   "rel_tol": 0.0004105094417077176,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) 95% interval high at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.332",
+   "claimed": 1.332,
+   "recomputed": 1.3318737547177382,
+   "rel_tol": 0.00037537575075075074,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.696",
+   "claimed": 1.696,
+   "recomputed": 1.69590153738616,
+   "rel_tol": 0.0002948116155660377,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) 95% interval low at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.623",
+   "claimed": 1.623,
+   "recomputed": 1.6233403396071047,
+   "rel_tol": 0.00030807178065311153,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) 95% interval high at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.768",
+   "claimed": 1.768,
+   "recomputed": 1.7684627351652151,
+   "rel_tol": 0.00028280571266968326,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.320",
+   "claimed": 1.320,
+   "recomputed": 1.3195911040854111,
+   "rel_tol": 0.00037878825757575756,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) 95% interval low at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.262",
+   "claimed": 1.262,
+   "recomputed": 1.261557639503879,
+   "rel_tol": 0.0003961969096671949,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) 95% interval high at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.378",
+   "claimed": 1.378,
+   "recomputed": 1.3776245686669433,
+   "rel_tol": 0.00036284506531204645,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.162",
+   "claimed": 1.162,
+   "recomputed": 1.162057168050245,
+   "rel_tol": 0.0004302930292598967,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) 95% interval low at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.110",
+   "claimed": 1.110,
+   "recomputed": 1.1102762198588145,
+   "rel_tol": 0.00045045090090090083,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) 95% interval high at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.214",
+   "claimed": 1.214,
+   "recomputed": 1.2138381162416754,
+   "rel_tol": 0.0004118620263591433,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.021",
+   "claimed": 1.021,
+   "recomputed": 1.0212758602782785,
+   "rel_tol": 0.0004897164544564153,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) 95% interval low at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.978",
+   "claimed": 0.978,
+   "recomputed": 0.9782580816822799,
+   "rel_tol": 0.0005112479550102249,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) 95% interval high at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.064",
+   "claimed": 1.064,
+   "recomputed": 1.0642936388742772,
+   "rel_tol": 0.00046992528195488717,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.019",
+   "claimed": 1.019,
+   "recomputed": 1.0192167524514688,
+   "rel_tol": 0.0004906776251226694,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) 95% interval low at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.975",
+   "claimed": 0.975,
+   "recomputed": 0.9746294759368412,
+   "rel_tol": 0.0005128210256410255,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) 95% interval high at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.064",
+   "claimed": 1.064,
+   "recomputed": 1.0638040289660964,
+   "rel_tol": 0.00046992528195488717,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.018",
+   "claimed": 1.018,
+   "recomputed": 1.018357216527121,
+   "rel_tol": 0.0004911596267190569,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) 95% interval low at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.973",
+   "claimed": 0.973,
+   "recomputed": 0.9731157963030094,
+   "rel_tol": 0.0005138751284686536,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) 95% interval high at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.064",
+   "claimed": 1.064,
+   "recomputed": 1.063598636751233,
+   "rel_tol": 0.00046992528195488717,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.711",
+   "claimed": 1.711,
+   "recomputed": 1.711246545863831,
+   "rel_tol": 0.00029222706019871417,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.369",
+   "claimed": 1.369,
+   "recomputed": 1.3693550740221057,
+   "rel_tol": 0.0003652304601899196,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.249",
+   "claimed": 1.249,
+   "recomputed": 1.2485835303436508,
+   "rel_tol": 0.0004003206565252201,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.635",
+   "claimed": 1.635,
+   "recomputed": 1.6348851609539168,
+   "rel_tol": 0.0003058107033639143,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.267",
+   "claimed": 1.267,
+   "recomputed": 1.2667599002595116,
+   "rel_tol": 0.0003946333859510655,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.137",
+   "claimed": 1.137,
+   "recomputed": 1.1367213948776669,
+   "rel_tol": 0.0004397541776605101,
+   "agrees": true
+  },
+  {
+   "name": "E18 psi-row distance factor (O6B / O24, schoolbook) at 0 GAE",
+   "source": "task / §9.53",
+   "printed": "1.761",
+   "claimed": 1.761,
+   "recomputed": 1.7609677195790743,
+   "rel_tol": 0.0002839298693923907,
+   "agrees": true
+  },
+  {
+   "name": "E18 handover shift 4 log2(O6B/O24), bits, at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "3.27",
+   "claimed": 3.27,
+   "recomputed": 3.2654738530761875,
+   "rel_tol": 0.0015290535168195718,
+   "agrees": true
+  },
+  {
+   "name": "E18 psi-row distance factor (O6B / O24, schoolbook) at 0.1 GAE",
+   "source": "task / §9.53",
+   "printed": "1.418",
+   "claimed": 1.418,
+   "recomputed": 1.4184422363030416,
+   "rel_tol": 0.00035260966149506346,
+   "agrees": true
+  },
+  {
+   "name": "E18 handover shift 4 log2(O6B/O24), bits, at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "2.02",
+   "claimed": 2.02,
+   "recomputed": 2.0172296018259788,
+   "rel_tol": 0.00247525,
+   "agrees": true
+  },
+  {
+   "name": "E18 psi-row distance factor (O6B / O24, schoolbook) at 1 GAE",
+   "source": "task / §9.53",
+   "printed": "1.275",
+   "claimed": 1.275,
+   "recomputed": 1.27505161303617,
+   "rel_tol": 0.0003921572549019608,
+   "agrees": true
+  },
+  {
+   "name": "E18 handover shift 4 log2(O6B/O24), bits, at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.40",
+   "claimed": 1.40,
+   "recomputed": 1.4022225894792146,
+   "rel_tol": 0.003571432142857143,
+   "agrees": true
+  },
+  {
+   "name": "G2.225 curves where O6C/O24 favours order 24 at every weight",
+   "source": "§9.53",
+   "printed": "7",
+   "claimed": 7,
+   "recomputed": 7,
+   "rel_tol": 1E-12,
+   "agrees": true
+  }
+ ],
+ "headline_categorical": [
+  {
+   "name": "O6B / O24 (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "8/0/0",
+   "recomputed": "8/0/0",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "7/0/1",
+   "recomputed": "7/0/1",
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "4/4/0",
+   "recomputed": "4/4/0",
+   "agrees": true
+  }
+ ],
+ "checks": [
+  {
+   "check": "record layout: eight curves in E18's order; main stream seeds 48000+k (k < 128 schoolbook, k < 32 Karatsuba) x O6B, O6C, O24, O24L, O24F seed-major; A/A stream 49000+k (k < 128) x O24AA; karatsuba flag as named",
+   "holds": true,
+   "detail": "every record in place"
+  },
+  {
+   "check": "curves: canonical b0 = 3, 3, 3, 9, 9, 2, 17, 3 as registered; n prime (deterministic Miller-Rabin, own code) and n = 1 mod 24 on every curve; n and b0 equal across the three runs",
+   "holds": true,
+   "detail": "p=241 n=3373515841 prime=true n mod 24=1; p=337 n=12897718513 prime=true n mod 24=1; p=541 n=85662211249 prime=true n mod 24=1; p=601 n=130466877601 prime=true n mod 24=1; p=733 n=288680402833 prime=true n mod 24=1; p=769 n=349707394369 prime=true n mod 24=1; p=997 n=988052069713 prime=true n mod 24=1; p=1069 n=1305900486769 prime=true n mod 24=1"
+  },
+  {
+   "check": "arms as registered: O6B = Order6Built, O6C = Order6Cheap, O24/O24AA = Order24Cheap, O24L = Order24CheapMulLean (jumps E34, r = 32); O24F = Order24Cheap with PairSums (r = 64); control = PairSumsBroken (r = 64); fold Psi (class size 6) on order 6, Twist24 (24) on order 24",
+   "holds": true,
+   "detail": ""
+  },
+  {
+   "check": "G2.217 correctness: every walk of the three runs reports correct = true and recovers the same logarithm on its curve, equal to E34's recorded logarithm there; each ran the [d]G = Q check (verify counters > 0)",
+   "holds": true,
+   "detail": "7424 walks, 0 wrong; logarithms p=241: 271, p=337: 271, p=541: 271, p=601: 271, p=733: 271, p=769: 271, p=997: 271, p=1069: 271"
+  },
+  {
+   "check": "G2.218 positive control F-slash (b of each pair jump = b_j): wrong logarithm flagged on >= 31/32 walks at p = 241 and 541, seeds 48000-48015",
+   "holds": true,
+   "detail": "32/32; p=241: 16 walks seeds 48000-48015 true, flagged 16 , recovered != planted on 16; p=541: 16 walks seeds 48000-48015 true, flagged 16 , recovered != planted on 16"
+  },
+  {
+   "check": "instrument identities on every walk: classes = (n - 1)/m; stored + fruitless + 1 = steps (correct walks); fruitless = cycle escapes = sum of the length histogram; table = 2 steps - escapes - 1 and hash = 2 (steps - escapes - 1) (E34's counter identity); every cmp and neg is the representative's, which emits no hash or table operation",
+   "holds": true,
+   "detail": ""
+  },
+  {
+   "check": "ideal sqrt(pi (n - 1)/(2m)) recomputed here from n and m equals the recorded ideal_steps on every walk",
+   "holds": true,
+   "detail": "max relative difference 0e0"
+  },
+  {
+   "check": "G2.221 F's added work: every O24F (and control) walk adds exactly 32 group additions and 64 mod-n operations, charged (added F_p multiplications are inside fp_muls); every E34-jump walk adds nothing",
+   "holds": true,
+   "detail": "PairSums karatsuba=false: 1024 walks, added F_p multiplications 3104..3104 (97.000 per addition); PairSums karatsuba=true: 256 walks, added F_p multiplications 2528..2528 (79.000 per addition); PairSumsBroken karatsuba=false: 32 walks, added F_p multiplications 3104..3104 (97.000 per addition)"
+  },
+  {
+   "check": "set-up multiplications (cheap representative tables) charged on the cheap arms only",
+   "holds": true,
+   "detail": ""
+  },
+  {
+   "check": "same walk on the paired arms: O6C equals O6B and O24L equals O24 per seed (steps, escapes, visit digest, logarithm), both arithmetics",
+   "holds": true,
+   "detail": ""
+  },
+  {
+   "check": "Karatsuba walks equal the schoolbook walks of the same seed (steps, visit digest, group operations, every native counter, representative calls and multiplications); only the field arithmetic's F_p multiplications differ",
+   "holds": true,
+   "detail": "1,280 pairs; fp_muls differ on 1280"
+  },
+  {
+   "check": "G2.228 IC rows: tables.md lists 20 GLS rows (E31 solver A/B with E27 products); 'before' and 'after' columns are equal and each equals E27's dist_new (experiments/32_walk_karatsuba/summary.json, E27's evidence, unchanged since b2a710d504) to the printed digits; factor 1",
+   "holds": true,
+   "detail": "20 rows; p=101 s1 A: E27 dist_new 7.6640e4, 2.6715e5, 1.3710e6; printed 7.6640e4, 2.6715e5, 1.3710e6; p=101 s1 B: E27 dist_new 3.9317e4, 1.3737e5, 7.0550e5; printed 3.9317e4, 1.3737e5, 7.0550e5; p=397 s1 A: E27 dist_new 1.1027e4, 3.6635e4, 1.5626e5; printed 1.1027e4, 3.6635e4, 1.5626e5; p=397 s1 B: E27 dist_new 6.3917e3, 2.1252e4, 9.0670e4; printed 6.3917e3, 2.1252e4, 9.0670e4"
+  },
+  {
+   "check": "G2.216 identity record as committed: compared 1280, byte-identical 1280, value-identical 1280, no differences, source E34 Stage R (the replay re-establishes it independently)",
+   "holds": true,
+   "detail": "{\"byte_identical\":1280,\"compared\":1280,\"differences\":[],\"source\":\"experiments/38_twist24_cheap_rep\",\"value_identical\":1280}"
+  },
+  {
+   "check": "registered verdicts G2.217-G2.226 recomputed from the raw records agree with §9.53",
+   "holds": true,
+   "detail": ""
+  },
+  {
+   "check": "clean rebuild reproduces the recorded binaries byte for byte: e41_run ce0caf3f...b507, e41_tables a4d0c6f5...192c7f (b0e307d9b8) and a8a0326a...81c1 (e41_tables.rs at 5d15482969)",
+   "holds": true,
+   "detail": "replay/build.json"
+  },
+  {
+   "check": "nonce-drawn replay through the validator driver: every selected record byte-identical to the committed one",
+   "holds": true,
+   "detail": "2400/2400 records, 91712/91712 leaves"
+  },
+  {
+   "check": "G2.216 replayed independently: all 1,280 E34 Stage R walks recomputed with the fix off equal E34 records byte for byte (validator comparator), and the rebuilt binary rewrites identity.json byte for byte (1280/1280)",
+   "holds": true,
+   "detail": "driver 1280/1280; identity.json e9bc170b5880acbc2c88061482168ce051c0928c30760e03f57b5806b3c0bc8d"
+  },
+  {
+   "check": "G2.218 replayed: control.json byte-identical (32/32 F-slash walks flagged)",
+   "holds": true,
+   "detail": "7ceb1c1e9c7eecb9047411f241d1bfb2c12fc70b8dc2923a16eb31e7bf933689"
+  },
+  {
+   "check": "whole-stage replays by the rebuilt binary equal the committed records or their committed .sha256",
+   "holds": true,
+   "detail": "identity.json e9bc170b5880acbc2c88061482168ce051c0928c30760e03f57b5806b3c0bc8d; control.json 7ceb1c1e9c7eecb9047411f241d1bfb2c12fc70b8dc2923a16eb31e7bf933689; main_karatsuba.json b379062e191be99ebd983bde13587709b11fb26a10089d7e974f322f1986b3f3; aa_school.json b0be4806ca721bdb7cc82b8f41f492f894e6dcd2644faa6941ed970198bbf47b; main_school.json a7e4bd7d576aa1ae3b8b6d7c7ba6df570e9f13bc7b671e979fc0b0775f518037"
+  },
+  {
+   "check": "E41 committed records at HEAD equal the records commit b70f356827 and the working tree is clean for them; the three local-only records match their committed .sha256 (stage0_run.json also its blob at f99a56359e)",
+   "holds": true,
+   "detail": "git rev-parse / git hash-object per file"
+  },
+  {
+   "check": "§9.52 (G2.216-G2.229) at HEAD is byte-identical to its text at f99a56359e",
+   "holds": true,
+   "detail": "section sha256 ab51dbe84c3d44bd36c075d3cf5664b300436e5a65eb8e35e8fc4a4c0d23e386; HEAD adds only the blank line before §9.53"
+  },
+  {
+   "check": "pre-registration f99a56359e is an ancestor of the fix-code commit b0e307d9b8 and older; at f99a56359e there is no Jumps/PairSums code and no e41_run.rs",
+   "holds": true,
+   "detail": "git merge-base --is-ancestor; git grep at f99a56359e"
+  },
+  {
+   "check": "no E41 commit touches quartic_folds.rs, docs/ic/, docs/ic-leaderboard.html or benchmarks/; twist24_rep.rs only made part and visit_digest pub(crate)",
+   "holds": true,
+   "detail": "git show --name-only over 089f7f7823..282ddceafd E41 commits"
+  }
+ ],
+ "verdicts_recomputed": [
+  {
+   "id": "G2.217",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.218",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.219",
+   "printed": "falsified",
+   "recomputed": "falsified",
+   "agrees": true
+  },
+  {
+   "id": "G2.220",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.221",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.222",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.223",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.224",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.225",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  },
+  {
+   "id": "G2.226",
+   "printed": "holds",
+   "recomputed": "holds",
+   "agrees": true
+  }
+ ],
+ "note_figures": [
+  {
+   "name": "steps / ideal O6B (tables.md)",
+   "source": "tables.md",
+   "printed": "0.9694",
+   "claimed": 0.9694,
+   "recomputed": 0.9693879105198925,
+   "rel_tol": 0.00005157834743140086,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O6B SE (tables.md)",
+   "source": "tables.md",
+   "printed": "0.0159",
+   "claimed": 0.0159,
+   "recomputed": 0.01591740094929807,
+   "rel_tol": 0.0031446572327044025,
+   "agrees": true
+  },
+  {
+   "name": "fruitless revisits / step O6B (tables.md)",
+   "source": "tables.md",
+   "printed": "3.61e-4",
+   "claimed": 0.000361,
+   "recomputed": 0.00036147598281437415,
+   "rel_tol": 0.0013850429362880885,
+   "agrees": true
+  },
+  {
+   "name": "redirects / step O6B (tables.md)",
+   "source": "tables.md",
+   "printed": "0.03123",
+   "claimed": 0.03123,
+   "recomputed": 0.03123360981824941,
+   "rel_tol": 0.0001601026256804355,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24 (tables.md)",
+   "source": "tables.md",
+   "printed": "1.0061",
+   "claimed": 1.0061,
+   "recomputed": 1.0061161456851442,
+   "rel_tol": 0.000049696898916608684,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24 SE (tables.md)",
+   "source": "tables.md",
+   "printed": "0.0159",
+   "claimed": 0.0159,
+   "recomputed": 0.01593123395397448,
+   "rel_tol": 0.0031446572327044025,
+   "agrees": true
+  },
+  {
+   "name": "fruitless revisits / step O24 (tables.md)",
+   "source": "tables.md",
+   "printed": "8.29e-5",
+   "claimed": 0.0000829,
+   "recomputed": 0.00008289121474680342,
+   "rel_tol": 0.0006031369119420989,
+   "agrees": true
+  },
+  {
+   "name": "redirects / step O24 (tables.md)",
+   "source": "tables.md",
+   "printed": "0.03124",
+   "claimed": 0.03124,
+   "recomputed": 0.031237220355377723,
+   "rel_tol": 0.00016005137644046095,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24F (tables.md)",
+   "source": "tables.md",
+   "printed": "0.9986",
+   "claimed": 0.9986,
+   "recomputed": 0.9985697217761996,
+   "rel_tol": 0.00005007014820749048,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24F SE (tables.md)",
+   "source": "tables.md",
+   "printed": "0.0163",
+   "claimed": 0.0163,
+   "recomputed": 0.016299418078621956,
+   "rel_tol": 0.0030674877300613497,
+   "agrees": true
+  },
+  {
+   "name": "fruitless revisits / step O24F (tables.md)",
+   "source": "tables.md",
+   "printed": "2.30e-5",
+   "claimed": 0.0000230,
+   "recomputed": 0.000023005715722295755,
+   "rel_tol": 0.0021739152173913044,
+   "agrees": true
+  },
+  {
+   "name": "redirects / step O24F (tables.md)",
+   "source": "tables.md",
+   "printed": "0.01563",
+   "claimed": 0.01563,
+   "recomputed": 0.015627745939810905,
+   "rel_tol": 0.0003198979526551503,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24AA (tables.md)",
+   "source": "tables.md",
+   "printed": "0.9868",
+   "claimed": 0.9868,
+   "recomputed": 0.9868263198513645,
+   "rel_tol": 0.000050668879205512766,
+   "agrees": true
+  },
+  {
+   "name": "steps / ideal O24AA SE (tables.md)",
+   "source": "tables.md",
+   "printed": "0.0158",
+   "claimed": 0.0158,
+   "recomputed": 0.015767723678725205,
+   "rel_tol": 0.0031645601265822784,
+   "agrees": true
+  },
+  {
+   "name": "fruitless revisits / step O24AA (tables.md)",
+   "source": "tables.md",
+   "printed": "8.47e-5",
+   "claimed": 0.0000847,
+   "recomputed": 0.00008467171745857788,
+   "rel_tol": 0.000590319362455726,
+   "agrees": true
+  },
+  {
+   "name": "redirects / step O24AA (tables.md)",
+   "source": "tables.md",
+   "printed": "0.03128",
+   "claimed": 0.03128,
+   "recomputed": 0.03127776999429071,
+   "rel_tol": 0.0001598467071611253,
+   "agrees": true
+  },
+  {
+   "name": "steps ratio (tables.md)",
+   "source": "tables.md",
+   "printed": "1.9270",
+   "claimed": 1.9270,
+   "recomputed": 1.9269900690501913,
+   "rel_tol": 0.000025947093928386093,
+   "agrees": true
+  },
+  {
+   "name": "steps ratio A/A (tables.md)",
+   "source": "tables.md",
+   "printed": "1.9647",
+   "claimed": 1.9647,
+   "recomputed": 1.964657591757878,
+   "rel_tol": 0.000025449203440728866,
+   "agrees": true
+  },
+  {
+   "name": "fruitless revisits per step, O24 over O24F (REPORT: 3.6x)",
+   "source": "REPORT.typ",
+   "printed": "3.6",
+   "claimed": 3.6,
+   "recomputed": 3.6030704607233863,
+   "rel_tol": 0.013888902777777778,
+   "agrees": true
+  },
+  {
+   "name": "E34 steps ratio (stage0_records.log)",
+   "source": "stage0_records.log",
+   "printed": "1.7009",
+   "claimed": 1.7009,
+   "recomputed": 1.700927367223997,
+   "rel_tol": 0.000029396231406902227,
+   "agrees": true
+  },
+  {
+   "name": "E34 order-6 seeds under ideal, %",
+   "source": "§9.52",
+   "printed": "7.6",
+   "claimed": 7.6,
+   "recomputed": 7.609130743886816,
+   "rel_tol": 0.006578953947368421,
+   "agrees": true
+  },
+  {
+   "name": "E34 order-24 seeds over ideal, %",
+   "source": "§9.52",
+   "printed": "8.6",
+   "claimed": 8.6,
+   "recomputed": 8.63587832913506,
+   "rel_tol": 0.005813959302325582,
+   "agrees": true
+  },
+  {
+   "name": "E34 order-6 deviation in SE ('each ~1.7 standard errors')",
+   "source": "§9.52",
+   "printed": "1.7",
+   "claimed": 1.7,
+   "recomputed": 1.6658474802479704,
+   "rel_tol": 0.02941179411764706,
+   "agrees": true
+  },
+  {
+   "name": "E34 order-24 deviation in SE ('each ~1.7 standard errors')",
+   "source": "§9.52",
+   "printed": "1.7",
+   "claimed": 1.7,
+   "recomputed": 1.9141053790721394,
+   "rel_tol": 0.02941179411764706,
+   "agrees": false
+  },
+  {
+   "name": "Stage 0 Order6Cheap fruitless revisits / step",
+   "source": "§9.52",
+   "printed": "3.57e-4",
+   "claimed": 0.000357,
+   "recomputed": 0.00035733858032231333,
+   "rel_tol": 0.0014005616246498599,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap redirects / step",
+   "source": "§9.52",
+   "printed": "0.03124",
+   "claimed": 0.03124,
+   "recomputed": 0.031236688478188872,
+   "rel_tol": 0.00016005137644046095,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap steps lost to fruitless cycles, of the ideal, as printed: sum of (steps - stored) / sum of ideals, i.e. fruitless revisits plus the final collision step",
+   "source": "§9.52 table (stage0_run.json pooled excess_from_fruitless)",
+   "printed": "3.7e-4",
+   "claimed": 0.00037,
+   "recomputed": 0.00036874039673002394,
+   "rel_tol": 0.013513527027027027,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap 2-cycles",
+   "source": "§9.52",
+   "printed": "44784",
+   "claimed": 44784,
+   "recomputed": 44784,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap 4-cycles",
+   "source": "§9.52",
+   "printed": "3993",
+   "claimed": 3993,
+   "recomputed": 3993,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap other lengths",
+   "source": "§9.52",
+   "printed": "109",
+   "claimed": 109,
+   "recomputed": 109,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap escape re-hits ('1 in 512 walks per order')",
+   "source": "§9.52",
+   "printed": "1",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order6Cheap step excess over ideal, %",
+   "source": "§9.52",
+   "printed": "2.7",
+   "claimed": 2.7,
+   "recomputed": 2.650990316673618,
+   "rel_tol": 0.018518537037037035,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap fruitless revisits / step",
+   "source": "§9.52",
+   "printed": "0.84e-4",
+   "claimed": 0.000084,
+   "recomputed": 0.00008413526132092992,
+   "rel_tol": 0.005952386904761904,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap redirects / step",
+   "source": "§9.52",
+   "printed": "0.03123",
+   "claimed": 0.03123,
+   "recomputed": 0.03123406559094109,
+   "rel_tol": 0.0001601026256804355,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap steps lost to fruitless cycles, of the ideal, as printed: sum of (steps - stored) / sum of ideals, i.e. fruitless revisits plus the final collision step",
+   "source": "§9.52 table (stage0_run.json pooled excess_from_fruitless)",
+   "printed": "0.95e-4",
+   "claimed": 0.000095,
+   "recomputed": 0.00009501048158993774,
+   "rel_tol": 0.005263163157894736,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap 2-cycles",
+   "source": "§9.52",
+   "printed": "5733",
+   "claimed": 5733,
+   "recomputed": 5733,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap 4-cycles",
+   "source": "§9.52",
+   "printed": "116",
+   "claimed": 116,
+   "recomputed": 116,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap other lengths",
+   "source": "§9.52",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap escape re-hits ('1 in 512 walks per order')",
+   "source": "§9.52",
+   "printed": "1",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 Order24Cheap step excess over ideal, %",
+   "source": "§9.52",
+   "printed": "3.8",
+   "claimed": 3.8,
+   "recomputed": 3.818502475276153,
+   "rel_tol": 0.013157907894736842,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 order-24 fruitless revisits that are 2-cycles, % (REPORT: 98 %)",
+   "source": "REPORT.typ",
+   "printed": "98",
+   "claimed": 98,
+   "recomputed": 97.96650717703349,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "Stage 0 implied steps ratio 2 x O6/O24 ('~1.98')",
+   "source": "§9.52",
+   "printed": "1.98",
+   "claimed": 1.98,
+   "recomputed": 1.977508591806541,
+   "rel_tol": 0.0025252550505050503,
+   "agrees": true
+  },
+  {
+   "name": "r-adding factor 1/sqrt(1 - 1/r), r = 32",
+   "source": "§9.52",
+   "printed": "1.016",
+   "claimed": 1.016,
+   "recomputed": 1.016001016001524,
+   "rel_tol": 0.0004921264763779527,
+   "agrees": true
+  },
+  {
+   "name": "r-adding excess at r = 64, %",
+   "source": "§9.52",
+   "printed": "0.8",
+   "claimed": 0.8,
+   "recomputed": 0.790526135793912,
+   "rel_tol": 0.0625000625,
+   "agrees": true
+  },
+  {
+   "name": "O6B under its ideal on the main stream, % ('3 %')",
+   "source": "§9.53",
+   "printed": "3",
+   "claimed": 3,
+   "recomputed": 3.061208948010752,
+   "rel_tol": 1E-12,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.838",
+   "claimed": 1.838,
+   "recomputed": 1.8383814802143332,
+   "rel_tol": 0.00027203509249183896,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.760",
+   "claimed": 1.760,
+   "recomputed": 1.7597654189277008,
+   "rel_tol": 0.00028409119318181813,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.917",
+   "claimed": 1.917,
+   "recomputed": 1.9169975415009657,
+   "rel_tol": 0.00026082446531038077,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.266",
+   "claimed": 1.266,
+   "recomputed": 1.2663295389971654,
+   "rel_tol": 0.00039494510268562395,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.211",
+   "claimed": 1.211,
+   "recomputed": 1.210559944618491,
+   "rel_tol": 0.0004128823286540049,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.322",
+   "claimed": 1.322,
+   "recomputed": 1.3220991333758398,
+   "rel_tol": 0.00037821520423600603,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.073",
+   "claimed": 1.073,
+   "recomputed": 1.0732439840028056,
+   "rel_tol": 0.00046598369058713885,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.025",
+   "claimed": 1.025,
+   "recomputed": 1.0254064674789933,
+   "rel_tol": 0.0004878053658536586,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.121",
+   "claimed": 1.121,
+   "recomputed": 1.121081500526618,
+   "rel_tol": 0.0004460307760927743,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.770",
+   "claimed": 1.770,
+   "recomputed": 1.7704549288063964,
+   "rel_tol": 0.0002824861581920904,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.695",
+   "claimed": 1.695,
+   "recomputed": 1.6947920931452538,
+   "rel_tol": 0.0002949855457227138,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.846",
+   "claimed": 1.846,
+   "recomputed": 1.846117764467539,
+   "rel_tol": 0.0002708561755146262,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.178",
+   "claimed": 1.178,
+   "recomputed": 1.17807912915548,
+   "rel_tol": 0.0004244486417657046,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.126",
+   "claimed": 1.126,
+   "recomputed": 1.12622177472072,
+   "rel_tol": 0.00044405017761989344,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.230",
+   "claimed": 1.230,
+   "recomputed": 1.22993648359024,
+   "rel_tol": 0.0004065044715447154,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.978",
+   "claimed": 0.978,
+   "recomputed": 0.9781336315535358,
+   "rel_tol": 0.0005112479550102249,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "0.935",
+   "claimed": 0.935,
+   "recomputed": 0.9345402013998217,
+   "rel_tol": 0.0005347598930481283,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.022",
+   "claimed": 1.022,
+   "recomputed": 1.0217270617072498,
+   "rel_tol": 0.0004892372798434442,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.798",
+   "claimed": 1.798,
+   "recomputed": 1.7984338227353975,
+   "rel_tol": 0.0002780870411568409,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.720",
+   "claimed": 1.720,
+   "recomputed": 1.7202825775415818,
+   "rel_tol": 0.000290697965116279,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.877",
+   "claimed": 1.877,
+   "recomputed": 1.8765850679292133,
+   "rel_tol": 0.0002663827916888652,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.446",
+   "claimed": 1.446,
+   "recomputed": 1.445700089624785,
+   "rel_tol": 0.0003457818118948824,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.381",
+   "claimed": 1.381,
+   "recomputed": 1.3810819658164117,
+   "rel_tol": 0.0003620568428674873,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.510",
+   "claimed": 1.510,
+   "recomputed": 1.510318213433158,
+   "rel_tol": 0.0003311261589403973,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.298",
+   "claimed": 1.298,
+   "recomputed": 1.29845801157993,
+   "rel_tol": 0.0003852083975346687,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.240",
+   "claimed": 1.240,
+   "recomputed": 1.2396608654638988,
+   "rel_tol": 0.0004032262096774193,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.357",
+   "claimed": 1.357,
+   "recomputed": 1.3572551576959613,
+   "rel_tol": 0.0003684602063375092,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.732",
+   "claimed": 1.732,
+   "recomputed": 1.7319833015413058,
+   "rel_tol": 0.0002886838914549653,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.657",
+   "claimed": 1.657,
+   "recomputed": 1.6567663006525974,
+   "rel_tol": 0.0003017504526252263,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.807",
+   "claimed": 1.807,
+   "recomputed": 1.807200302430014,
+   "rel_tol": 0.00027670199225235197,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.345",
+   "claimed": 1.345,
+   "recomputed": 1.3449493596697806,
+   "rel_tol": 0.0003717475836431226,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.285",
+   "claimed": 1.285,
+   "recomputed": 1.2848633334982555,
+   "rel_tol": 0.0003891054474708171,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.405",
+   "claimed": 1.405,
+   "recomputed": 1.4050353858413056,
+   "rel_tol": 0.00035587224199288257,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.183",
+   "claimed": 1.183,
+   "recomputed": 1.1833893031010365,
+   "rel_tol": 0.0004226546914623837,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.130",
+   "claimed": 1.130,
+   "recomputed": 1.129808386893848,
+   "rel_tol": 0.0004424783185840708,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.237",
+   "claimed": 1.237,
+   "recomputed": 1.236970219308225,
+   "rel_tol": 0.0004042041228779304,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.958",
+   "claimed": 0.958,
+   "recomputed": 0.957890263001217,
+   "rel_tol": 0.0005219211899791232,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "0.918",
+   "claimed": 0.918,
+   "recomputed": 0.918226028163082,
+   "rel_tol": 0.000544662854030501,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "0.998",
+   "claimed": 0.998,
+   "recomputed": 0.9975544978393521,
+   "rel_tol": 0.00050100250501002,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.120",
+   "claimed": 1.120,
+   "recomputed": 1.120120942157235,
+   "rel_tol": 0.0004464290178571428,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.072",
+   "claimed": 1.072,
+   "recomputed": 1.0718709362264922,
+   "rel_tol": 0.0004664183768656716,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.168",
+   "claimed": 1.168,
+   "recomputed": 1.1683709480879776,
+   "rel_tol": 0.0004280826198630137,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.188",
+   "claimed": 1.188,
+   "recomputed": 1.1880351830910771,
+   "rel_tol": 0.00042087584175084174,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.136",
+   "claimed": 1.136,
+   "recomputed": 1.1361150468566787,
+   "rel_tol": 0.00044014128521126765,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.240",
+   "claimed": 1.240,
+   "recomputed": 1.2399553193254755,
+   "rel_tol": 0.0004032262096774193,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.019",
+   "claimed": 1.019,
+   "recomputed": 1.0185497454664383,
+   "rel_tol": 0.0004906776251226694,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "0.976",
+   "claimed": 0.976,
+   "recomputed": 0.9760639924721618,
+   "rel_tol": 0.000512295594262295,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.061",
+   "claimed": 1.061,
+   "recomputed": 1.0610354984607149,
+   "rel_tol": 0.0004712540056550424,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.019",
+   "claimed": 1.019,
+   "recomputed": 1.0192347692189778,
+   "rel_tol": 0.0004906776251226694,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "0.975",
+   "claimed": 0.975,
+   "recomputed": 0.9750884490390942,
+   "rel_tol": 0.0005128210256410255,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.063",
+   "claimed": 1.063,
+   "recomputed": 1.0633810893988613,
+   "rel_tol": 0.0004703673565380997,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.020",
+   "claimed": 1.020,
+   "recomputed": 1.019521812755822,
+   "rel_tol": 0.0004901965686274509,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "0.975",
+   "claimed": 0.975,
+   "recomputed": 0.9746793139473714,
+   "rel_tol": 0.0005128210256410255,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.064",
+   "claimed": 1.064,
+   "recomputed": 1.064364311564273,
+   "rel_tol": 0.00046992528195488717,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.564",
+   "claimed": 1.564,
+   "recomputed": 1.5642641749612876,
+   "rel_tol": 0.00031969341432225057,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.858",
+   "claimed": 1.858,
+   "recomputed": 1.8582289167663746,
+   "rel_tol": 0.00026910683530678145,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.248",
+   "claimed": 1.248,
+   "recomputed": 1.248321573124107,
+   "rel_tol": 0.00040064142628205124,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.490",
+   "claimed": 1.490,
+   "recomputed": 1.4903885749201042,
+   "rel_tol": 0.0003355708053691275,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.137",
+   "claimed": 1.137,
+   "recomputed": 1.1369880926335771,
+   "rel_tol": 0.0004397541776605101,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.360",
+   "claimed": 1.360,
+   "recomputed": 1.3601789680537244,
+   "rel_tol": 0.0003676474264705882,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.495",
+   "claimed": 1.495,
+   "recomputed": 1.4945616072539782,
+   "rel_tol": 0.00033444849498327756,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.775",
+   "claimed": 1.775,
+   "recomputed": 1.7752087146538553,
+   "rel_tol": 0.00028169042253521127,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.155",
+   "claimed": 1.155,
+   "recomputed": 1.1548471146880077,
+   "rel_tol": 0.00043290086580086574,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.379",
+   "claimed": 1.379,
+   "recomputed": 1.3786726858310154,
+   "rel_tol": 0.00036258194343727335,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.035",
+   "claimed": 1.035,
+   "recomputed": 1.0351377639361368,
+   "rel_tol": 0.00048309227053140095,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.238",
+   "claimed": 1.238,
+   "recomputed": 1.238305025819197,
+   "rel_tol": 0.0004038776252019386,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.802",
+   "claimed": 1.802,
+   "recomputed": 1.8018514192160628,
+   "rel_tol": 0.000277469755826859,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.647",
+   "claimed": 1.647,
+   "recomputed": 1.6473103372936566,
+   "rel_tol": 0.0003035825743776563,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.956",
+   "claimed": 1.956,
+   "recomputed": 1.956392501138469,
+   "rel_tol": 0.00025562397750511246,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.215",
+   "claimed": 1.215,
+   "recomputed": 1.2151687828101112,
+   "rel_tol": 0.0004115230452674897,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.108",
+   "claimed": 1.108,
+   "recomputed": 1.1076691570202386,
+   "rel_tol": 0.000451263989169675,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.323",
+   "claimed": 1.323,
+   "recomputed": 1.3226684085999838,
+   "rel_tol": 0.0003779293272864701,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.050",
+   "claimed": 1.050,
+   "recomputed": 1.0496984479127995,
+   "rel_tol": 0.00047619095238095235,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "0.956",
+   "claimed": 0.956,
+   "recomputed": 0.9558628224009598,
+   "rel_tol": 0.0005230130753138075,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.144",
+   "claimed": 1.144,
+   "recomputed": 1.1435340734246393,
+   "rel_tol": 0.0004370633741258741,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.721",
+   "claimed": 1.721,
+   "recomputed": 1.7214469502599095,
+   "rel_tol": 0.00029052905287623473,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.574",
+   "claimed": 1.574,
+   "recomputed": 1.5739074261084773,
+   "rel_tol": 0.0003176623252858958,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.869",
+   "claimed": 1.869,
+   "recomputed": 1.8689864744113416,
+   "rel_tol": 0.0002675230069555912,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.124",
+   "claimed": 1.124,
+   "recomputed": 1.1241255940942014,
+   "rel_tol": 0.00044484030249110313,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.025",
+   "claimed": 1.025,
+   "recomputed": 1.024726730197713,
+   "rel_tol": 0.0004878053658536586,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.224",
+   "claimed": 1.224,
+   "recomputed": 1.2235244579906899,
+   "rel_tol": 0.0004084971405228758,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.956",
+   "claimed": 0.956,
+   "recomputed": 0.9556546718055362,
+   "rel_tol": 0.0005230130753138075,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "0.870",
+   "claimed": 0.870,
+   "recomputed": 0.8702375240148083,
+   "rel_tol": 0.0005747132183908045,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.041",
+   "claimed": 1.041,
+   "recomputed": 1.041071819596264,
+   "rel_tol": 0.00048030787704130646,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.984",
+   "claimed": 0.984,
+   "recomputed": 0.9842945313584623,
+   "rel_tol": 0.0005081305894308944,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "0.898",
+   "claimed": 0.898,
+   "recomputed": 0.8983345661571238,
+   "rel_tol": 0.0005567934298440979,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.070",
+   "claimed": 1.070,
+   "recomputed": 1.0702544965598009,
+   "rel_tol": 0.0004672901869158878,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.981",
+   "claimed": 0.981,
+   "recomputed": 0.9807249722232942,
+   "rel_tol": 0.0005096845056065239,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "0.892",
+   "claimed": 0.892,
+   "recomputed": 0.891816130371652,
+   "rel_tol": 0.0005605386771300448,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.070",
+   "claimed": 1.070,
+   "recomputed": 1.0696338140749366,
+   "rel_tol": 0.0004672901869158878,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.979",
+   "claimed": 0.979,
+   "recomputed": 0.9794702225371977,
+   "rel_tol": 0.0005107257405515832,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "0.890",
+   "claimed": 0.890,
+   "recomputed": 0.8895276415026067,
+   "rel_tol": 0.0005617983146067416,
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.069",
+   "claimed": 1.069,
+   "recomputed": 1.0694128035717887,
+   "rel_tol": 0.0004677273152478952,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.684",
+   "claimed": 1.684,
+   "recomputed": 1.6843706168998271,
+   "rel_tol": 0.0002969124109263658,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.538",
+   "claimed": 1.538,
+   "recomputed": 1.5382160491367003,
+   "rel_tol": 0.0003250978543563069,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.831",
+   "claimed": 1.831,
+   "recomputed": 1.830525184662954,
+   "rel_tol": 0.00027307509557618787,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.343",
+   "claimed": 1.343,
+   "recomputed": 1.3429607169341566,
+   "rel_tol": 0.00037230119136262097,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.223",
+   "claimed": 1.223,
+   "recomputed": 1.223039414655469,
+   "rel_tol": 0.0004088311529026982,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.463",
+   "claimed": 1.463,
+   "recomputed": 1.4628820192128442,
+   "rel_tol": 0.0003417638414217361,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.223",
+   "claimed": 1.223,
+   "recomputed": 1.2229503883219757,
+   "rel_tol": 0.0004088311529026982,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.113",
+   "claimed": 1.113,
+   "recomputed": 1.112526423901578,
+   "rel_tol": 0.00044923674752920037,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.333",
+   "claimed": 1.333,
+   "recomputed": 1.3333743527423734,
+   "rel_tol": 0.0003750941485371343,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.609",
+   "claimed": 1.609,
+   "recomputed": 1.6092085233260398,
+   "rel_tol": 0.0003107523306401492,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.470",
+   "claimed": 1.470,
+   "recomputed": 1.4696732654702807,
+   "rel_tol": 0.00034013639455782315,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.749",
+   "claimed": 1.749,
+   "recomputed": 1.748743781181799,
+   "rel_tol": 0.00028587793024585477,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.242",
+   "claimed": 1.242,
+   "recomputed": 1.2423430679955925,
+   "rel_tol": 0.0004025768921095008,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.131",
+   "claimed": 1.131,
+   "recomputed": 1.1314576130305563,
+   "rel_tol": 0.0004420870910698497,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.353",
+   "claimed": 1.353,
+   "recomputed": 1.3532285229606287,
+   "rel_tol": 0.00036954951958610493,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.113",
+   "claimed": 1.113,
+   "recomputed": 1.1133847576036222,
+   "rel_tol": 0.00044923674752920037,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.013",
+   "claimed": 1.013,
+   "recomputed": 1.0128672248069015,
+   "rel_tol": 0.0004935839091806516,
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.214",
+   "claimed": 1.214,
+   "recomputed": 1.213902290400343,
+   "rel_tol": 0.0004118620263591433,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) pooled ratio at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "0.950",
+   "claimed": 0.950,
+   "recomputed": 0.9497156800022659,
+   "rel_tol": 0.0005263163157894737,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) 95% interval low at 0 GAE",
+   "source": "tables.md",
+   "printed": "0.868",
+   "claimed": 0.868,
+   "recomputed": 0.8677220026852974,
+   "rel_tol": 0.0005760374423963133,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) 95% interval high at 0 GAE",
+   "source": "tables.md",
+   "printed": "1.032",
+   "claimed": 1.032,
+   "recomputed": 1.0317093573192344,
+   "rel_tol": 0.00048449660852713174,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) pooled ratio at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.127",
+   "claimed": 1.127,
+   "recomputed": 1.126884670996431,
+   "rel_tol": 0.00044365616681455187,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) 95% interval low at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.026",
+   "claimed": 1.026,
+   "recomputed": 1.0256482928332136,
+   "rel_tol": 0.0004873299220272904,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) 95% interval high at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "1.228",
+   "claimed": 1.228,
+   "recomputed": 1.2281210491596486,
+   "rel_tol": 0.0004071665309446254,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) pooled ratio at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.189",
+   "claimed": 1.189,
+   "recomputed": 1.189468778225128,
+   "rel_tol": 0.0004205218671152228,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) 95% interval low at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.081",
+   "claimed": 1.081,
+   "recomputed": 1.0812951258261438,
+   "rel_tol": 0.00046253515263644773,
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) 95% interval high at 1 GAE",
+   "source": "tables.md",
+   "printed": "1.298",
+   "claimed": 1.298,
+   "recomputed": 1.2976424306241123,
+   "rel_tol": 0.0003852083975346687,
+   "agrees": true
+  },
+  {
+   "name": "A/A O24/O24AA at 0 GAE (tables.log)",
+   "source": "tables.log",
+   "printed": "1.0185",
+   "claimed": 1.0185,
+   "recomputed": 1.0185497454664383,
+   "rel_tol": 0.00004909185076092292,
+   "agrees": true
+  },
+  {
+   "name": "A/A O24/O24AA at 0.1 GAE (tables.log)",
+   "source": "tables.log",
+   "printed": "1.0192",
+   "claimed": 1.0192,
+   "recomputed": 1.0192347692189778,
+   "rel_tol": 0.00004905813383045525,
+   "agrees": true
+  },
+  {
+   "name": "A/A O24/O24AA at 1 GAE (tables.log)",
+   "source": "tables.log",
+   "printed": "1.0195",
+   "claimed": 1.0195,
+   "recomputed": 1.019521812755822,
+   "rel_tol": 0.00004904369789112309,
+   "agrees": true
+  },
+  {
+   "name": "O6B / strongest order-24 arm at 0 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.838",
+   "claimed": 1.838,
+   "recomputed": 1.8383814802143332,
+   "rel_tol": 0.00027203509249183896,
+   "agrees": true
+  },
+  {
+   "name": "O6B / strongest order-24 arm at 0.1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.446",
+   "claimed": 1.446,
+   "recomputed": 1.445700089624785,
+   "rel_tol": 0.0003457818118948824,
+   "agrees": true
+  },
+  {
+   "name": "O6B / strongest order-24 arm at 1 GAE",
+   "source": "§9.53 / tables.md",
+   "printed": "1.298",
+   "claimed": 1.298,
+   "recomputed": 1.29845801157993,
+   "rel_tol": 0.0003852083975346687,
+   "agrees": true
+  },
+  {
+   "name": "E34 (16 walks) O6B / O24 at 0 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "1.563",
+   "claimed": 1.563,
+   "recomputed": 1.5629500991459313,
+   "rel_tol": 0.0003198979526551504,
+   "agrees": true
+  },
+  {
+   "name": "E34 (16 walks) O6B / O24 at 0.1 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "1.254",
+   "claimed": 1.254,
+   "recomputed": 1.2544909848440318,
+   "rel_tol": 0.00039872448165869214,
+   "agrees": true
+  },
+  {
+   "name": "E34 (16 walks) O6B / O24 at 1 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "1.126",
+   "claimed": 1.126,
+   "recomputed": 1.1258433555918146,
+   "rel_tol": 0.00044405017761989344,
+   "agrees": true
+  },
+  {
+   "name": "E34 handover shift at 0 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "2.58",
+   "claimed": 2.58,
+   "recomputed": 2.577086870576308,
+   "rel_tol": 0.001937986434108527,
+   "agrees": true
+  },
+  {
+   "name": "E34 handover shift at 0.1 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "1.31",
+   "claimed": 1.31,
+   "recomputed": 1.3084084125458038,
+   "rel_tol": 0.0038167977099236635,
+   "agrees": true
+  },
+  {
+   "name": "E34 handover shift at 1 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "0.68",
+   "claimed": 0.68,
+   "recomputed": 0.6840244470376522,
+   "rel_tol": 0.007352948529411764,
+   "agrees": true
+  },
+  {
+   "name": "E34 (16 walks) O6C / O24 at 0 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "1.505",
+   "claimed": 1.505,
+   "recomputed": 1.5052945407857283,
+   "rel_tol": 0.0003322262458471761,
+   "agrees": true
+  },
+  {
+   "name": "E34 (16 walks) O6C / O24 at 0.1 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "1.167",
+   "claimed": 1.167,
+   "recomputed": 1.1671149200310922,
+   "rel_tol": 0.000428449443016281,
+   "agrees": true
+  },
+  {
+   "name": "E34 (16 walks) O6C / O24 at 1 GAE",
+   "source": "§9.53 (E34)",
+   "printed": "1.026",
+   "claimed": 1.026,
+   "recomputed": 1.0260718953503016,
+   "rel_tol": 0.0004873299220272904,
+   "agrees": true
+  },
+  {
+   "name": "F step saving in percentage points of the ideal",
+   "source": "tables.md (\"F lower by 0.75 %\")",
+   "printed": "0.75",
+   "claimed": 0.75,
+   "recomputed": 0.7546423908944555,
+   "rel_tol": 0.006666673333333333,
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "6/0/2",
+   "recomputed": "6/0/2",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "5/0/3",
+   "recomputed": "5/0/3",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "8/0/0",
+   "recomputed": "8/0/0",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "8/0/0",
+   "recomputed": "8/0/0",
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "0/0/8",
+   "recomputed": "0/0/8",
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24AA (school) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "0/0/8",
+   "recomputed": "4/4/0",
+   "agrees": false
+  },
+  {
+   "name": "O6B / O24 (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24 (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "8/0/0",
+   "recomputed": "8/0/0",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24 (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "8/0/0",
+   "recomputed": "8/0/0",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24L (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "5/0/3",
+   "recomputed": "5/0/3",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24L (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "3/0/5",
+   "recomputed": "3/0/5",
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O24 / O24F (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "3/5/0",
+   "recomputed": "3/5/0",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6B / O24F (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "8/0/0",
+   "recomputed": "8/0/0",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "true",
+   "recomputed": "true",
+   "agrees": true
+  },
+  {
+   "name": "O6C / O24F (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "7/0/1",
+   "recomputed": "7/0/1",
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) resolved (tables.md column; reproduced as: registered rule and the same side of 1 at all three weights)",
+   "source": "tables.md",
+   "printed": "false",
+   "recomputed": "false",
+   "agrees": true
+  },
+  {
+   "name": "O24L / O24 (kar) per curve: second arm cheaper at every weight / first / order changes",
+   "source": "tables.md",
+   "printed": "0/0/8",
+   "recomputed": "0/0/8",
+   "agrees": true
+  },
+  {
+   "name": "strongest order 6 / order 24 at 0 GAE",
+   "source": "tables.md",
+   "printed": "O6C / O24L",
+   "recomputed": "O6C / O24L",
+   "agrees": true
+  },
+  {
+   "name": "strongest order 6 / order 24 at 0.1 GAE",
+   "source": "tables.md",
+   "printed": "O6C / O24F",
+   "recomputed": "O6C / O24F",
+   "agrees": true
+  },
+  {
+   "name": "strongest order 6 / order 24 at 1 GAE",
+   "source": "tables.md",
+   "printed": "O6C / O24F",
+   "recomputed": "O6C / O24F",
+   "agrees": true
+  }
+ ],
+ "steps_over_ideal": [
+  {
+   "arm": "O6B",
+   "walks": 1024,
+   "steps_over_ideal_mean": 0.9693879105198925,
+   "standard_error": 0.01591740094929807,
+   "ratio_of_sums": 0.9788676828143883,
+   "fruitless_per_step": 0.00036147598281437415,
+   "redirects_per_step": 0.03123360981824941,
+   "per_curve": [
+    {
+     "p": 241,
+     "mean": 0.8916739924269472,
+     "se": 0.04228806467904154
+    },
+    {
+     "p": 337,
+     "mean": 0.9246838145069427,
+     "se": 0.03900125933192184
+    },
+    {
+     "p": 541,
+     "mean": 0.9759457332789281,
+     "se": 0.048329536435298935
+    },
+    {
+     "p": 601,
+     "mean": 1.0315294001966155,
+     "se": 0.045577912763288896
+    },
+    {
+     "p": 733,
+     "mean": 0.9939794373431011,
+     "se": 0.043373701182522754
+    },
+    {
+     "p": 769,
+     "mean": 1.0051361548992506,
+     "se": 0.04735388882004456
+    },
+    {
+     "p": 997,
+     "mean": 0.9880736480262987,
+     "se": 0.0473937176741593
+    },
+    {
+     "p": 1069,
+     "mean": 0.9440811034810517,
+     "se": 0.04602216351828244
+    }
+   ]
+  },
+  {
+   "arm": "O6C",
+   "walks": 1024,
+   "steps_over_ideal_mean": 0.9693879105198925,
+   "standard_error": 0.01591740094929807,
+   "ratio_of_sums": 0.9788676828143883,
+   "fruitless_per_step": 0.00036147598281437415,
+   "redirects_per_step": 0.03123360981824941,
+   "per_curve": [
+    {
+     "p": 241,
+     "mean": 0.8916739924269472,
+     "se": 0.04228806467904154
+    },
+    {
+     "p": 337,
+     "mean": 0.9246838145069427,
+     "se": 0.03900125933192184
+    },
+    {
+     "p": 541,
+     "mean": 0.9759457332789281,
+     "se": 0.048329536435298935
+    },
+    {
+     "p": 601,
+     "mean": 1.0315294001966155,
+     "se": 0.045577912763288896
+    },
+    {
+     "p": 733,
+     "mean": 0.9939794373431011,
+     "se": 0.043373701182522754
+    },
+    {
+     "p": 769,
+     "mean": 1.0051361548992506,
+     "se": 0.04735388882004456
+    },
+    {
+     "p": 997,
+     "mean": 0.9880736480262987,
+     "se": 0.0473937176741593
+    },
+    {
+     "p": 1069,
+     "mean": 0.9440811034810517,
+     "se": 0.04602216351828244
+    }
+   ]
+  },
+  {
+   "arm": "O24",
+   "walks": 1024,
+   "steps_over_ideal_mean": 1.0061161456851442,
+   "standard_error": 0.01593123395397448,
+   "ratio_of_sums": 0.9880721255380636,
+   "fruitless_per_step": 0.00008289121474680342,
+   "redirects_per_step": 0.031237220355377723,
+   "per_curve": [
+    {
+     "p": 241,
+     "mean": 1.0798028014085084,
+     "se": 0.045544406626760854
+    },
+    {
+     "p": 337,
+     "mean": 1.0928932367841206,
+     "se": 0.04855362182874955
+    },
+    {
+     "p": 541,
+     "mean": 0.9324440260481249,
+     "se": 0.04298259544493156
+    },
+    {
+     "p": 601,
+     "mean": 1.0289202710707839,
+     "se": 0.04357063538308864
+    },
+    {
+     "p": 733,
+     "mean": 0.9579729965998727,
+     "se": 0.04637619754231724
+    },
+    {
+     "p": 769,
+     "mean": 0.9738843282192617,
+     "se": 0.04484502393426737
+    },
+    {
+     "p": 997,
+     "mean": 0.9812885983385266,
+     "se": 0.04391494802926225
+    },
+    {
+     "p": 1069,
+     "mean": 1.0017229070119558,
+     "se": 0.043669982281254446
+    }
+   ]
+  },
+  {
+   "arm": "O24L",
+   "walks": 1024,
+   "steps_over_ideal_mean": 1.0061161456851442,
+   "standard_error": 0.01593123395397448,
+   "ratio_of_sums": 0.9880721255380636,
+   "fruitless_per_step": 0.00008289121474680342,
+   "redirects_per_step": 0.031237220355377723,
+   "per_curve": [
+    {
+     "p": 241,
+     "mean": 1.0798028014085084,
+     "se": 0.045544406626760854
+    },
+    {
+     "p": 337,
+     "mean": 1.0928932367841206,
+     "se": 0.04855362182874955
+    },
+    {
+     "p": 541,
+     "mean": 0.9324440260481249,
+     "se": 0.04298259544493156
+    },
+    {
+     "p": 601,
+     "mean": 1.0289202710707839,
+     "se": 0.04357063538308864
+    },
+    {
+     "p": 733,
+     "mean": 0.9579729965998727,
+     "se": 0.04637619754231724
+    },
+    {
+     "p": 769,
+     "mean": 0.9738843282192617,
+     "se": 0.04484502393426737
+    },
+    {
+     "p": 997,
+     "mean": 0.9812885983385266,
+     "se": 0.04391494802926225
+    },
+    {
+     "p": 1069,
+     "mean": 1.0017229070119558,
+     "se": 0.043669982281254446
+    }
+   ]
+  },
+  {
+   "arm": "O24F",
+   "walks": 1024,
+   "steps_over_ideal_mean": 0.9985697217761996,
+   "standard_error": 0.016299418078621956,
+   "ratio_of_sums": 1.0155935671972152,
+   "fruitless_per_step": 0.000023005715722295755,
+   "redirects_per_step": 0.015627745939810905,
+   "per_curve": [
+    {
+     "p": 241,
+     "mean": 0.948103118716542,
+     "se": 0.03905061215990165
+    },
+    {
+     "p": 337,
+     "mean": 0.9818101019676563,
+     "se": 0.04626723962327398
+    },
+    {
+     "p": 541,
+     "mean": 0.9651435515051315,
+     "se": 0.04747739231959624
+    },
+    {
+     "p": 601,
+     "mean": 0.9732246937245413,
+     "se": 0.047905978798481276
+    },
+    {
+     "p": 733,
+     "mean": 1.0033544702107913,
+     "se": 0.05003063501919058
+    },
+    {
+     "p": 769,
+     "mean": 1.0707335139774856,
+     "se": 0.045495322813517605
+    },
+    {
+     "p": 997,
+     "mean": 1.0515475259525762,
+     "se": 0.04308280654773613
+    },
+    {
+     "p": 1069,
+     "mean": 0.9946407981548763,
+     "se": 0.048752989090578326
+    }
+   ]
+  },
+  {
+   "arm": "O24AA",
+   "walks": 1024,
+   "steps_over_ideal_mean": 0.9868263198513645,
+   "standard_error": 0.015767723678725205,
+   "ratio_of_sums": 0.9935664082091834,
+   "fruitless_per_step": 0.00008467171745857788,
+   "redirects_per_step": 0.03127776999429071,
+   "per_curve": [
+    {
+     "p": 241,
+     "mean": 0.9648530428300822,
+     "se": 0.04971663639394248
+    },
+    {
+     "p": 337,
+     "mean": 1.0208439335479553,
+     "se": 0.0466113150688846
+    },
+    {
+     "p": 541,
+     "mean": 0.9595952923556659,
+     "se": 0.04629149654102264
+    },
+    {
+     "p": 601,
+     "mean": 0.960051216747136,
+     "se": 0.04584561998077572
+    },
+    {
+     "p": 733,
+     "mean": 0.9820233469111105,
+     "se": 0.04308719209245467
+    },
+    {
+     "p": 769,
+     "mean": 1.0064416827557023,
+     "se": 0.04306537094396803
+    },
+    {
+     "p": 997,
+     "mean": 0.9694610360044379,
+     "se": 0.03830145920540804
+    },
+    {
+     "p": 1069,
+     "mean": 1.0313410076588265,
+     "se": 0.04368726587331693
+    }
+   ]
+  }
+ ],
+ "f_step_saving": {
+  "relative_percent": 0.7500549455754532,
+  "percentage_points": 0.7546423908944555,
+  "se_points": 2.2791999583142712,
+  "z": 0.3310996861603138
+ },
+ "stage0_run_recomputed": [
+  {
+   "arm": "Order6Cheap",
+   "walks": 512,
+   "seeds_41000_plus_k_all_correct": true,
+   "steps_over_ideal_mean": 1.0265099031667362,
+   "standard_error": 0.022591227377483494,
+   "fruitless_per_step": 0.00035733858032231333,
+   "two_cycles": 44784,
+   "four_cycles": 3993,
+   "other_lengths": 109,
+   "redirects_per_step": 0.031236688478188872,
+   "escape_rehits": 1,
+   "fruitless_revisits_over_ideal_mean": 0.0003673901980948502,
+   "steps_minus_stored_over_ideal_mean": 0.0003765859089464076,
+   "fruitless_revisits_over_ideal_ratio_of_sums": 0.0003649184791802087,
+   "steps_minus_stored_over_ideal_ratio_of_sums": 0.00036874039673002394
+  },
+  {
+   "arm": "Order24Cheap",
+   "walks": 512,
+   "seeds_41000_plus_k_all_correct": true,
+   "steps_over_ideal_mean": 1.0381850247527615,
+   "standard_error": 0.022752694347074075,
+   "fruitless_per_step": 0.00008413526132092992,
+   "two_cycles": 5733,
+   "four_cycles": 116,
+   "other_lengths": 3,
+   "redirects_per_step": 0.03123406559094109,
+   "escape_rehits": 1,
+   "fruitless_revisits_over_ideal_mean": 0.0000900115674679976,
+   "steps_minus_stored_over_ideal_mean": 0.00010840298917111268,
+   "fruitless_revisits_over_ideal_ratio_of_sums": 0.0000873666464903073,
+   "steps_minus_stored_over_ideal_ratio_of_sums": 0.00009501048158993774
+  }
+ ],
+ "e34_records": {
+  "o6_cheap_steps_over_ideal": 0.9239086925611318,
+  "o6_se": 0.04567723536583407,
+  "o6_walks": 128,
+  "o24_cheap_steps_over_ideal": 1.0863587832913506,
+  "o24_se": 0.04511704749150903,
+  "o24_walks": 128,
+  "steps_ratio": 1.700927367223997
+ },
+ "shortfall_decay_null_control": {
+  "rule": "the shortfall 2 - (steps ratio order 6 / order 24, pooled per sqrt(n)) is the measured quantity; if it is sampling noise it must shrink like 1/sqrt(walks) as the seed count grows from 16 to 128 per curve and order, and fresh streams must not reproduce it",
+  "e34_16_walks": {
+   "ratio": 1.700927367223997,
+   "se_independent": 0.11091549159558985,
+   "se_paired": 0.11279925341635995,
+   "shortfall": 0.29907263277600293,
+   "z_from_2": 2.6964009127458484
+  },
+  "e41_main_128_walks": {
+   "ratio": 1.9269900690501913,
+   "se_independent": 0.043908665810507494,
+   "se_paired": 0.04439296829024684,
+   "shortfall": 0.07300993094980868,
+   "z_from_2": 1.6627681484308994
+  },
+  "e41_aa_stream_128_walks": {
+   "ratio": 1.964657591757878,
+   "se_independent": 0.04505311839281736,
+   "shortfall": 0.03534240824212209,
+   "z_from_2": 0.7844608653716764
+  },
+  "expected_se_scaling_16_to_128": 0.35355339059327373,
+  "steps_ratio_by_ratio_of_sums_e34_main_aa": [
+   1.7662188280605575,
+   1.9813688849512623,
+   1.9704121933403762
+  ],
+  "f_steps_ratio_of_sums_o24_o24f": [
+   0.9880721255380636,
+   1.0155935671972152
+  ],
+  "z_e34_vs_e41_main": 1.89506080469932
+ },
+ "all_walks_pooled": {
+  "rule": "every walk of each order across E34's records (16 per curve), Stage 0 (64), the main stream (128) and, for order 24, the A/A stream (128): mean steps/ideal over walks; ratio = 2 x order 6 / order 24; heterogeneity = sum over curves of ((curve mean - 1)/SE)^2 against chi-square with 8 degrees of freedom (95 % point 15.51)",
+  "order6_walks": 1664,
+  "order6_steps_over_ideal": 0.9834655068759413,
+  "order6_se": 0.01253004901814705,
+  "order24_walks": 2688,
+  "order24_steps_over_ideal": 1.0086970765044985,
+  "order24_se": 0.009820460356757502,
+  "steps_ratio_2x": 1.9499719584476367,
+  "steps_ratio_se": 0.031267194081983016,
+  "z_from_2": 1.6000169833336841,
+  "chi2_8df_main_O6B": 12.588084292578387,
+  "chi2_8df_main_O24": 10.98486807614286,
+  "chi2_8df_aa_O24AA": 3.5677155850602746,
+  "chi2_8df_main_O24F": 6.637459197817398
+ },
+ "aa_floor_0_0p1_1": [
+  1.0185497454664383,
+  1.0192347692189778,
+  1.019521812755822
+ ],
+ "band": [
+  {
+   "pair": "O6B / O24 (school)",
+   "ratio_0_0p1_1": [
+    1.7609677195790743,
+    1.4184422363030416,
+    1.27505161303617
+   ],
+   "se_independent_0_0p1_1": [
+    0.038465943844046384,
+    0.03184270466421061,
+    0.02899088861304502
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.6855744696447434,
+     1.836360969513405
+    ],
+    [
+     1.3560305351611888,
+     1.4808539374448944
+    ],
+    [
+     1.2182294713546018,
+     1.3318737547177382
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.03888806408558374,
+    0.03219278047257906,
+    0.02930980974059428
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "8/0/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 6,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4630934760732623,
+      1.2091434867264792,
+      1.091319876270675
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.5327794241124733,
+      1.2442841373682736,
+      1.1192533426967826
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.9162395624449393,
+      1.5409276972648205,
+      1.3850942907201138
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.8471234089865498,
+      1.478553006988301,
+      1.327168908175522
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.9184332176103285,
+      1.531501817252797,
+      1.3738604719532372
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.9109219811665263,
+      1.523997811210605,
+      1.3667447183700565
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.8724032557337025,
+      1.4884042494327383,
+      1.3336355869609413
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.755015618021112,
+      1.3937380621869384,
+      1.2484008959577104
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6C / O24 (school)",
+   "ratio_0_0p1_1": [
+    1.69590153738616,
+    1.3195911040854111,
+    1.162057168050245
+   ],
+   "se_independent_0_0p1_1": [
+    0.037021019275028225,
+    0.02960891050078165,
+    0.0264188511180767
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.6233403396071047,
+     1.7684627351652151
+    ],
+    [
+     1.261557639503879,
+     1.3776245686669433
+    ],
+    [
+     1.1102762198588145,
+     1.2138381162416754
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.03742733945781587,
+    0.029935009278462668,
+    0.02671028276706338
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "7/0/1",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 5,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4131244086056203,
+      1.1276511768110768,
+      0.9952019219596073
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.4777205656566685,
+      1.1585427206302652,
+      1.0202144309186563
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.8449332785571844,
+      1.4332689798329117,
+      1.2623416631805222
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.7780451612671948,
+      1.3750060052097282,
+      1.2094644449128913
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.8463066769685197,
+      1.4240171617616666,
+      1.251970418536396
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.8389912610223134,
+      1.4169747151464027,
+      1.2454594358697628
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.8016056859774063,
+      1.3836855148784317,
+      1.2152451157116728
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.6886168284768028,
+      1.2956411185948933,
+      1.1375522056556924
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6B / O24L (school)",
+   "ratio_0_0p1_1": [
+    1.8383814802143332,
+    1.2663295389971654,
+    1.0732439840028056
+   ],
+   "se_independent_0_0p1_1": [
+    0.04011023535032267,
+    0.028453874682997222,
+    0.024406896185618546
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.7597654189277008,
+     1.9169975415009657
+    ],
+    [
+     1.210559944618491,
+     1.3220991333758398
+    ],
+    [
+     1.0254064674789933,
+     1.121081500526618
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.04055025743766359,
+    0.028766834673978132,
+    0.0246755354254561
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "6/0/2",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 3,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    601,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.5203295135959418,
+      1.084107582665715,
+      0.9199252424363148
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.5975405101589877,
+      1.1124755930382144,
+      0.9426086282256233
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      2.0012490259000226,
+      1.3752473669751935,
+      1.1657745579011989
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.9300741754371393,
+      1.3190072538635516,
+      1.1168697807206873
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      2.0054077004855104,
+      1.3657523617139324,
+      1.1559858797824494
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.9977939152933186,
+      1.358930323432324,
+      1.149966327407473
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.958355274065919,
+      1.3267085823218212,
+      1.1219383281042346
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.8357549761260603,
+      1.2422261215788448,
+      1.0501994592747779
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6C / O24L (school)",
+   "ratio_0_0p1_1": [
+    1.7704549288063964,
+    1.17807912915548,
+    0.9781336315535358
+   ],
+   "se_independent_0_0p1_1": [
+    0.03860348758221566,
+    0.026457833895285717,
+    0.022241545996792886
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.6947920931452538,
+     1.846117764467539
+    ],
+    [
+     1.12622177472072,
+     1.22993648359024
+    ],
+    [
+     0.9345402013998217,
+     1.0217270617072498
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.03902704014552132,
+    0.02674935825469898,
+    0.022487028855214735
+   ],
+   "resolved_registered_rule": false,
+   "same_side_of_1_at_all_weights": false,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": false,
+   "per_curve_second_first_mixed": "5/0/3",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.4684056623312813,
+      1.0110422830730146,
+      0.8389028636226433
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.5401553734311844,
+      1.0358168697056986,
+      0.8592004048941617
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.92677940635577,
+      1.279164099770013,
+      1.062458927290391
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.8578937562193851,
+      1.226633665756649,
+      1.0178164068327311
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.930011216164499,
+      1.2699004205465727,
+      1.0534258429284356
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.9225931711273785,
+      1.263499129581904,
+      1.0479180158165757
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.8843077665652104,
+      1.2333661695223221,
+      1.0223408003571237
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.7663015153915325,
+      1.154793203526887,
+      0.9569495785726414
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O24 / O24F (school)",
+   "ratio_0_0p1_1": [
+    1.0212758602782785,
+    1.0192167524514688,
+    1.018357216527121
+   ],
+   "se_independent_0_0p1_1": [
+    0.021947846222448306,
+    0.02274861046664674,
+    0.023082357257199874
+   ],
+   "ci95_0_0p1_1": [
+    [
+     0.9782580816822799,
+     1.0642936388742772
+    ],
+    [
+     0.9746294759368412,
+     1.0638040289660964
+    ],
+    [
+     0.9731157963030094,
+     1.063598636751233
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.021883653937550342,
+    0.022683490651462166,
+    0.02301684763688904
+   ],
+   "resolved_registered_rule": false,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": false,
+   "per_curve_second_first_mixed": "4/4/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 1,
+   "per_curve_not_resolved_by_own_interval": [
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.1276309373237903,
+      1.1424983770819386,
+      1.1495302943677608
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.116462832200822,
+      1.1219941916137826,
+      1.1244084847086397
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      0.9814535650977673,
+      0.9780218349638122,
+      0.9766039854661942
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.0704108586424148,
+      1.0690063129433518,
+      1.068430486714113
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      0.9700448765836689,
+      0.9665192219269738,
+      0.9650901569114341
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      0.9249474857071617,
+      0.9209671821870882,
+      0.9193592870627195
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      0.9482034442482834,
+      0.9447008481217494,
+      0.9432964518615858
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.0222553685161753,
+      1.0191929197963612,
+      1.0179661065698264
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6B / O24F (school)",
+   "ratio_0_0p1_1": [
+    1.7984338227353975,
+    1.445700089624785,
+    1.29845801157993
+   ],
+   "se_independent_0_0p1_1": [
+    0.03987308428255903,
+    0.03296843051447605,
+    0.029998543936750683
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.7202825775415818,
+     1.8765850679292133
+    ],
+    [
+     1.3810819658164117,
+     1.510318213433158
+    ],
+    [
+     1.2396608654638988,
+     1.3572551576959613
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.03827904063521554,
+    0.03165011126487471,
+    0.028799041432426717
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "8/0/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 8,
+   "per_curve_not_resolved_by_own_interval": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.6498294678168155,
+      1.3814444712441991,
+      1.2545052586188175
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.711291256983757,
+      1.3960795748443688,
+      1.2584979550667692
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.8807001501429714,
+      1.5070609340255015,
+      1.3526886045637347
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.977180954231797,
+      1.5805824984918693,
+      1.4179877225138109
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.860966313810822,
+      1.4802259447909198,
+      1.3258992184517666
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.7675024818625267,
+      1.4035519698499208,
+      1.2565294498774324
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.7754192161083961,
+      1.4060967567871236,
+      1.2580137172565995
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.794074137351815,
+      1.420487965031628,
+      1.2708297994963536
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6C / O24F (school)",
+   "ratio_0_0p1_1": [
+    1.7319833015413058,
+    1.3449493596697806,
+    1.1833893031010365
+   ],
+   "se_independent_0_0p1_1": [
+    0.03837602086158592,
+    0.030656135801798493,
+    0.027337202146524787
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.6567663006525974,
+     1.807200302430014
+    ],
+    [
+     1.2848633334982555,
+     1.4050353858413056
+    ],
+    [
+     1.129808386893848,
+     1.236970219308225
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.036841804482895694,
+    0.029430563517161144,
+    0.02624452379079646
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "8/0/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 8,
+   "per_curve_not_resolved_by_own_interval": [],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.5934828014310825,
+      1.2883396394211932,
+      1.1440147583055886
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.649820087934445,
+      1.2998782032835867,
+      1.1471377623471335
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.8107163436074607,
+      1.4017683576528954,
+      1.232807899282122
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.903238847777009,
+      1.4698900999042186,
+      1.292228685541695
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.7910003325955315,
+      1.3763399591965435,
+      1.2082643276737643
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.7009703431200316,
+      1.3049872106387344,
+      1.1450246990267618
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.708288716621068,
+      1.3071688794394338,
+      1.1463364057929433
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.7261976182771692,
+      1.3205082546689528,
+      1.1579895898112438
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O24L / O24 (school)",
+   "ratio_0_0p1_1": [
+    0.957890263001217,
+    1.120120942157235,
+    1.1880351830910771
+   ],
+   "se_independent_0_0p1_1": [
+    0.020236854509252597,
+    0.024617349964664643,
+    0.02648986542571346
+   ],
+   "ci95_0_0p1_1": [
+    [
+     0.918226028163082,
+     0.9975544978393521
+    ],
+    [
+     1.0718709362264922,
+     1.1683709480879776
+    ],
+    [
+     1.1361150468566787,
+     1.2399553193254755
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.00003558243795490582,
+    0.000033382960728850776,
+    0.000009791124398911748
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": false,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "0/0/8",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      0.9623528734982573,
+      1.1153353283936207,
+      1.186313654553539
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      0.9594620069821771,
+      1.1184821897710895,
+      1.1873998488680049
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      0.9575217964606618,
+      1.1204731121602036,
+      1.1881322004605823
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      0.9570219800325538,
+      1.1209589656595278,
+      1.1882933275525944
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      0.9566300244812438,
+      1.1213612805551803,
+      1.1884751327687417
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      0.9565160683182692,
+      1.1214686911698026,
+      1.1885084682881948
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      0.9561100993928626,
+      1.1218773054350337,
+      1.188688855308488
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      0.9560184451874235,
+      1.1219680845348228,
+      1.1887274221411253
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O24 / O24AA (school)",
+   "ratio_0_0p1_1": [
+    1.0185497454664383,
+    1.0192347692189778,
+    1.019521812755822
+   ],
+   "se_independent_0_0p1_1": [
+    0.021676404588916582,
+    0.02252363274483856,
+    0.022878825922678953
+   ],
+   "ci95_0_0p1_1": [
+    [
+     0.9760639924721618,
+     1.0610354984607149
+    ],
+    [
+     0.9750884490390942,
+     1.0633810893988613
+    ],
+    [
+     0.9746793139473714,
+     1.064364311564273
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    null,
+    null,
+    null
+   ],
+   "resolved_registered_rule": false,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": null,
+   "per_curve_second_first_mixed": "4/4/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.0997586395966905,
+      1.1122929401257406,
+      1.1182059505913708
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.0641239491257863,
+      1.0683694482705894,
+      1.0702199429849624
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      0.9728834851153731,
+      0.9720584493415201,
+      0.9717162968511607
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.069049872785413,
+      1.0707990361678306,
+      1.0715191350644593
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      0.9761179809312927,
+      0.9757128736554682,
+      0.9755479235883627
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      0.9683248399844177,
+      0.9678358714116231,
+      0.9676372867023673
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.0120402523869998,
+      1.0121782063497435,
+      1.0122338185612327
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      0.971652100966525,
+      0.9713984569494194,
+      0.9712964566752559
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6B / O24 (kar)",
+   "ratio_0_0p1_1": [
+    1.711246545863831,
+    1.3693550740221057,
+    1.2485835303436508
+   ],
+   "se_independent_0_0p1_1": [
+    0.07499100556252224,
+    0.06175178617244821,
+    0.05693644781126206
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.5642641749612876,
+     1.8582289167663746
+    ],
+    [
+     1.248321573124107,
+     1.4903885749201042
+    ],
+    [
+     1.1369880926335771,
+     1.3601789680537244
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.07860663475668629,
+    0.06472934442033387,
+    0.0596820268087213
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "8/0/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 2,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.5201862671362203,
+      1.2504194322377922,
+      1.145457492338558
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.551444964442766,
+      1.2506199271364637,
+      1.1411622235870114
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.8590396780609773,
+      1.484808858158411,
+      1.3537840194311899
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.7835706503341513,
+      1.4189408456778654,
+      1.2923726718789257
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      2.021091700086322,
+      1.606591748739077,
+      1.4635195783864212
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.86902333514234,
+      1.4822273585522114,
+      1.3492809923841989
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.557846869838785,
+      1.2296105607152255,
+      1.1179182388488258
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.6789545881314591,
+      1.3251955492126886,
+      1.2049487117441744
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6C / O24 (kar)",
+   "ratio_0_0p1_1": [
+    1.6348851609539168,
+    1.2667599002595116,
+    1.1367213948776669
+   ],
+   "se_independent_0_0p1_1": [
+    0.07159364984690741,
+    0.05709835998546114,
+    0.05182838313343371
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.4945616072539782,
+     1.7752087146538553
+    ],
+    [
+     1.1548471146880077,
+     1.3786726858310154
+    ],
+    [
+     1.0351377639361368,
+     1.238305025819197
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.07504552691627012,
+    0.05985295355623297,
+    0.054329621884154085
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "8/0/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.456852347163722,
+      1.1591818274107442,
+      1.0433630121888886
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.4837597788082564,
+      1.1577101475184424,
+      1.0390742646687368
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.7754665352746675,
+      1.3733321370511165,
+      1.2325377613029431
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.7030853229292473,
+      1.312148659038385,
+      1.1764490015011788
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.929381606803038,
+      1.4854709099367331,
+      1.3322470877457007
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.7841447346823962,
+      1.3703763391942239,
+      1.2281592326455375
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.486788238750837,
+      1.136746303624217,
+      1.0176339586514909
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.6022812445443697,
+      1.2250500902371342,
+      1.0968248060474124
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6B / O24L (kar)",
+   "ratio_0_0p1_1": [
+    1.8018514192160628,
+    1.2151687828101112,
+    1.0496984479127995
+   ],
+   "se_independent_0_0p1_1": [
+    0.07884749077673783,
+    0.054846747851975866,
+    0.047875319138693744
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.6473103372936566,
+     1.956392501138469
+    ],
+    [
+     1.1076691570202386,
+     1.3226684085999838
+    ],
+    [
+     0.9558628224009598,
+     1.1435340734246393
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.08264921523865347,
+    0.05749110798053082,
+    0.05018377089471527
+   ],
+   "resolved_registered_rule": false,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": false,
+   "per_curve_second_first_mixed": "5/0/3",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.5923134293268748,
+      1.1138121679045847,
+      0.9641952701106368
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.6308343133918035,
+      1.11112593258969,
+      0.9598184775326769
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.958452369945686,
+      1.3171990532276305,
+      1.1380440141517494
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.8798636401499047,
+      1.2583848622483833,
+      1.086340369869614
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      2.130965305576645,
+      1.42441818139264,
+      1.2300188818751432
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.9711187307692284,
+      1.3139460020953377,
+      1.1339483408071673
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.6439291372117335,
+      1.0895843614164862,
+      0.9393778962612669
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.7718508555973096,
+      1.1742259640922572,
+      1.0124828833758024
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6C / O24L (kar)",
+   "ratio_0_0p1_1": [
+    1.7214469502599095,
+    1.1241255940942014,
+    0.9556546718055362
+   ],
+   "se_independent_0_0p1_1": [
+    0.07527526742420004,
+    0.05071370606963694,
+    0.04358017744424895
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.5739074261084773,
+     1.8689864744113416
+    ],
+    [
+     1.024726730197713,
+     1.2235244579906899
+    ],
+    [
+     0.8702375240148083,
+     1.041071819596264
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.07890481858175583,
+    0.05316004976660098,
+    0.045683189968993995
+   ],
+   "resolved_registered_rule": false,
+   "same_side_of_1_at_all_weights": false,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": false,
+   "per_curve_second_first_mixed": "3/0/5",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.5259745513325993,
+      1.0325421941606778,
+      0.8782566687019165
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.5596855934752716,
+      1.028579298488671,
+      0.8739534644100394
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.870410128843886,
+      1.2183061683336323,
+      1.0361196478417345
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.795032999700818,
+      1.1636764242730664,
+      0.9888974529037848
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      2.034269531233735,
+      1.3170313950040058,
+      1.119690571585719
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.881603636943323,
+      1.2147937371828432,
+      1.0321564833167514
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.5689440046178311,
+      1.0072953461025094,
+      0.8551098050126125
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.6909351891482933,
+      1.0854893258014817,
+      0.9216295526616288
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O24 / O24F (kar)",
+   "ratio_0_0p1_1": [
+    0.9842945313584623,
+    0.9807249722232942,
+    0.9794702225371977
+   ],
+   "se_independent_0_0p1_1": [
+    0.04385712510272375,
+    0.04536165400593996,
+    0.045889071956424006
+   ],
+   "ci95_0_0p1_1": [
+    [
+     0.8983345661571238,
+     1.0702544965598009
+    ],
+    [
+     0.891816130371652,
+     1.0696338140749366
+    ],
+    [
+     0.8895276415026067,
+     1.0694128035717887
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.04482357354443462,
+    0.04636196030596254,
+    0.046901241384114875
+   ],
+   "resolved_registered_rule": false,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": false,
+   "per_curve_second_first_mixed": "3/5/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 1,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.121281390334452,
+      1.134637309078792,
+      1.1399202641857298
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.1619940355996923,
+      1.170519683391708,
+      1.1736529368763278
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      0.9473782126601626,
+      0.9429003152634436,
+      0.9413425123897514
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      0.9863455052029296,
+      0.9829612348036771,
+      0.9817919298417556
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      0.8218516565489424,
+      0.8161754395310123,
+      0.8142343495960563
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      0.8081712835215877,
+      0.8028309788978407,
+      0.801011713721193
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.0735049954538654,
+      1.0706246725863666,
+      1.0696480770924885
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      0.9645867294227597,
+      0.9610812490453584,
+      0.9598954903262477
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6B / O24F (kar)",
+   "ratio_0_0p1_1": [
+    1.6843706168998271,
+    1.3429607169341566,
+    1.2229503883219757
+   ],
+   "se_independent_0_0p1_1": [
+    0.07456865702200345,
+    0.06118433789728962,
+    0.05633875735734579
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.5382160491367003,
+     1.830525184662954
+    ],
+    [
+     1.223039414655469,
+     1.4628820192128442
+    ],
+    [
+     1.112526423901578,
+     1.3333743527423734
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.07383418818681234,
+    0.06058027568747004,
+    0.055781929068532604
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "8/0/0",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 1,
+   "per_curve_not_resolved_by_own_interval": [
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.7045565711818418,
+      1.4187725398141198,
+      1.3057302072800925
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.8027697952436705,
+      1.4638752411551346,
+      1.3393283951652166
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.761213687465733,
+      1.4000267404635194,
+      1.2743744500844523
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.7592168941689563,
+      1.3947638457808884,
+      1.2688410595987565
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.6610375617532622,
+      1.311260726674014,
+      1.1916479120285624
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.5104909876937833,
+      1.1899780412156327,
+      1.080789880001099
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.6723563969241035,
+      1.3164514039744768,
+      1.1957790945312678
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.619497315015061,
+      1.2736205936666805,
+      1.1566248344776546
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O6C / O24F (kar)",
+   "ratio_0_0p1_1": [
+    1.6092085233260398,
+    1.2423430679955925,
+    1.1133847576036222
+   ],
+   "se_independent_0_0p1_1": [
+    0.07119145808967307,
+    0.05657421171685527,
+    0.051284455508531016
+   ],
+   "ci95_0_0p1_1": [
+    [
+     1.4696732654702807,
+     1.748743781181799
+    ],
+    [
+     1.1314576130305563,
+     1.3532285229606287
+    ],
+    [
+     1.0128672248069015,
+     1.213902290400343
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.07049080728772329,
+    0.056016302040301,
+    0.050778209496496765
+   ],
+   "resolved_registered_rule": true,
+   "same_side_of_1_at_all_weights": true,
+   "ranked_across_band": true,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "7/0/1",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      1.6335414253397478,
+      1.3152509493863636,
+      1.1893506404959766
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      1.7241200132379124,
+      1.3551225153326547,
+      1.2195125623610736
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      1.6820383128264462,
+      1.2949153049869164,
+      1.1602401928401522
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      1.679830553248343,
+      1.2897912661343602,
+      1.1550281355442487
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      1.5856654696661372,
+      1.212404872828146,
+      1.0847613409918608
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      1.4418945402165546,
+      1.1001805778537384,
+      0.9837699316639074
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      1.596074601481078,
+      1.2170286391314398,
+      1.0885102070555843
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      1.5455392252904827,
+      1.177372670868234,
+      1.0528371850028724
+     ]
+    }
+   ]
+  },
+  {
+   "pair": "O24L / O24 (kar)",
+   "ratio_0_0p1_1": [
+    0.9497156800022659,
+    1.126884670996431,
+    1.189468778225128
+   ],
+   "se_independent_0_0p1_1": [
+    0.04183350883518801,
+    0.05165121334858034,
+    0.055190638979073565
+   ],
+   "ci95_0_0p1_1": [
+    [
+     0.8677220026852974,
+     1.0317093573192344
+    ],
+    [
+     1.0256482928332136,
+     1.2281210491596486
+    ],
+    [
+     1.0812951258261438,
+     1.2976424306241123
+    ]
+   ],
+   "se_paired_by_seed_0_0p1_1": [
+    0.0000845542064086409,
+    0.00006253625897742466,
+    0.0000184927181801957
+   ],
+   "resolved_registered_rule": false,
+   "same_side_of_1_at_all_weights": false,
+   "ranked_across_band": false,
+   "resolved_with_paired_se": true,
+   "per_curve_second_first_mixed": "0/0/8",
+   "per_curve_resolved_by_own_95pct_interval_at_every_weight": 0,
+   "per_curve_not_resolved_by_own_interval": [
+    241,
+    337,
+    541,
+    601,
+    733,
+    769,
+    997,
+    1069
+   ],
+   "per_curve": [
+    {
+     "p": 241,
+     "ratio_0_0p1_1": [
+      0.954702911586229,
+      1.1226483856700962,
+      1.1879932704991616
+     ]
+    },
+    {
+     "p": 337,
+     "ratio_0_0p1_1": [
+      0.9513197948454224,
+      1.1255429204335612,
+      1.1889354605055107
+     ]
+    },
+    {
+     "p": 541,
+     "ratio_0_0p1_1": [
+      0.9492391577092755,
+      1.127247134379632,
+      1.1895708800333562
+     ]
+    },
+    {
+     "p": 601,
+     "ratio_0_0p1_1": [
+      0.9487766092395538,
+      1.1275889342332146,
+      1.1896572268910899
+     ]
+    },
+    {
+     "p": 733,
+     "ratio_0_0p1_1": [
+      0.948439514616785,
+      1.127893317935838,
+      1.1898350504630548
+     ]
+    },
+    {
+     "p": 769,
+     "ratio_0_0p1_1": [
+      0.9482043399856254,
+      1.1280732664725315,
+      1.189896350501958
+     ]
+    },
+    {
+     "p": 997,
+     "ratio_0_0p1_1": [
+      0.9476362664153806,
+      1.1285134077334789,
+      1.1900623202846812
+     ]
+    },
+    {
+     "p": 1069,
+     "ratio_0_0p1_1": [
+      0.9475710570263917,
+      1.1285694489281195,
+      1.1900929206098338
+     ]
+    }
+   ]
+  }
+ ],
+ "karatsuba_priced_at_gae79": [
+  {
+   "pair": "O6B / O24 (Karatsuba, GAE = 79)",
+   "ratio_0_0p1_1": [
+    1.711246545863831,
+    1.3905484031374917,
+    1.2526844139374265
+   ]
+  },
+  {
+   "pair": "O6C / O24 (Karatsuba, GAE = 79)",
+   "ratio_0_0p1_1": [
+    1.6348851609539168,
+    1.289579421798194,
+    1.1411369447417914
+   ]
+  },
+  {
+   "pair": "O24 / O24F (Karatsuba, GAE = 79)",
+   "ratio_0_0p1_1": [
+    0.9842945313584623,
+    0.9809454908598587,
+    0.9795127757926978
+   ]
+  }
+ ],
+ "e34_band_recomputed": [
+  {
+   "pair": "O6B / O24 (E34 records, schoolbook)",
+   "ratio_0_0p1_1": [
+    1.5629500991459313,
+    1.2544909848440318,
+    1.1258433555918146
+   ]
+  },
+  {
+   "pair": "O6C / O24 (E34 records, schoolbook)",
+   "ratio_0_0p1_1": [
+    1.5052945407857283,
+    1.1671149200310922,
+    1.0260718953503016
+   ]
+  }
+ ],
+ "strongest_walks": [
+  {
+   "weight_gae": 0,
+   "strongest_order6": "O6C",
+   "strongest_order24": "O24L",
+   "o6b_over_strongest": 1.8383814802143332,
+   "handover_shift_bits_4log2_strongest": 3.513744678057849,
+   "pooled_cost_per_sqrt_n": {
+    "O6B": 443.139104077168,
+    "O6C": 426.7655105341916,
+    "O24": 251.6452170872797,
+    "O24L": 241.0485031787327,
+    "O24F": 246.40278584349488
+   }
+  },
+  {
+   "weight_gae": 0.1,
+   "strongest_order6": "O6C",
+   "strongest_order24": "O24F",
+   "o6b_over_strongest": 1.445700089624785,
+   "handover_shift_bits_4log2_strongest": 2.127073185400754,
+   "pooled_cost_per_sqrt_n": {
+    "O6B": 1088.637741633631,
+    "O6C": 1012.7706597171998,
+    "O24": 767.4882443369729,
+    "O24L": 859.6796553413321,
+    "O24F": 753.0176898004999
+   }
+  },
+  {
+   "weight_gae": 1,
+   "strongest_order6": "O6C",
+   "strongest_order24": "O24F",
+   "o6b_over_strongest": 1.29845801157993,
+   "handover_shift_bits_4log2_strongest": 1.5071974485494266,
+   "pooled_cost_per_sqrt_n": {
+    "O6B": 6898.125479641798,
+    "O6C": 6286.817002364273,
+    "O24": 5410.075489584213,
+    "O24L": 6427.360024804729,
+    "O24F": 5312.551825413544
+   }
+  }
+ ],
+ "e18_psi_rows": [
+  {
+   "weight_gae": 0,
+   "factor_o6b_over_o24_schoolbook": 1.7609677195790743,
+   "factor_o6b_over_o24_karatsuba": 1.711246545863831,
+   "handover_shift_bits_4log2": 3.2654738530761875
+  },
+  {
+   "weight_gae": 0.1,
+   "factor_o6b_over_o24_schoolbook": 1.4184422363030416,
+   "factor_o6b_over_o24_karatsuba": 1.3693550740221057,
+   "handover_shift_bits_4log2": 2.0172296018259788
+  },
+  {
+   "weight_gae": 1,
+   "factor_o6b_over_o24_schoolbook": 1.27505161303617,
+   "factor_o6b_over_o24_karatsuba": 1.2485835303436508,
+   "handover_shift_bits_4log2": 1.4022225894792146
+  }
+ ],
+ "added_fp_muls": "PairSums karatsuba=false: 1024 walks, added F_p multiplications 3104..3104 (97.000 per addition); PairSums karatsuba=true: 256 walks, added F_p multiplications 2528..2528 (79.000 per addition); PairSumsBroken karatsuba=false: 32 walks, added F_p multiplications 3104..3104 (97.000 per addition)",
+ "heuristic_validation_checks": [
+  {
+   "check": "pre-registered prediction",
+   "result": "The ideal sqrt(pi (n - 1)/(2m)) (expected steps to the first repeat of a random mapping on (n - 1)/m classes) and G2.216-G2.229 with numeric bounds were committed in f99a56359e (2026-11-02T18:15:10Z), before the fix code (b0e307d9b8, 18:17:54Z) and every registered record (files written 19:01-19:25Z, committed b70f356827 19:36:14Z). §9.52 at HEAD is byte-identical to its registered text (only a trailing newline before §9.53 was added). Stage 0 (seeds 41000+k, instrument 089f7f7823/6115e0ea0a) was run before the registration and openly shaped it; the registered streams (48000+k, 49000+k) are disjoint from it."
+  },
+  {
+   "check": "sample integrity",
+   "result": "Seeds, curve, arm, arithmetic and jump table are in every record; layout checked (8 curves in E18's order, seeds 48000-48127 / 49000-49127 / 48000-48031, five arms seed-major). The empirical steps/ideal and every band ratio are recomputed from the 7,424 per-walk records, not copied: O6B 0.9694 ± 0.0159, O24 1.0061 ± 0.0159, O24F 0.9986 ± 0.0163, O24' 0.9868 ± 0.0158 (1,024 walks each); E34's records 0.9239 ± 0.0457 and 1.0864 ± 0.0451 (128 each); Stage 0 1.0265 ± 0.0226 and 1.0382 ± 0.0228 (512 each)."
+  },
+  {
+   "check": "null object",
+   "result": "The A/A arm O24' (the same walk on a disjoint seed stream) is the null object for any between-arm difference: O24/O24' = 1.0185 / 1.0192 / 1.0195 with 95 % intervals [0.976, 1.061], [0.975, 1.063], [0.975, 1.064], not resolved, and it sets the registered floor. For the shortfall itself the parameter that should destroy a noise artifact is the number of walks: 2 - (steps ratio) falls from 0.299 (16 walks per curve and order, z = 2.70 from 2) to 0.073 (128, main stream, z = 1.66) and 0.035 (128, A/A stream, z = 0.78); a real 15 % order-24 shortfall would not shrink (E41's interval [1.841, 2.013] excludes E34's 1.701). It decays as a noise artifact should."
+  },
+  {
+   "check": "correspondence validity",
+   "result": "No substitute sampler: the walks themselves are measured. The class sizes m = 6 and 24 rest on E29's kill test (order-24 group <lambda_p, lambda_omega, -1>) and its validation; this validator checked independently that every n is prime and n = 1 mod 24 (own Miller-Rabin), and that the recorded ideal equals sqrt(pi floor((n - 1)/m)/2) on every walk (max relative difference 0)."
+  },
+  {
+   "check": "scale binding",
+   "result": "p = 241-1069 (n = 2^31.65 to 2^40.25), 128 walks per curve and arm schoolbook, 32 Karatsuba, one stream each plus the A/A stream. The steps ideal is asymptotic in n; the per-step cost ratios (representative cost against walk cost) are counts that do not depend on n, but nothing here measures n beyond 2^40.3. The E18 handover shift (bits) is a model consequence (4 log2 of the factor applied to a modelled handover), not a measurement."
+  }
+ ],
+ "cost_model_checks": [
+  {
+   "check": "unit declared",
+   "result": "F_p multiplications (jump table, start point, the cheap arms' tables and F's added additions included; the [d]G = Q check excluded, verify_fp_muls subtracted on every arm) plus w · 97 · (cmp + neg + modn + hash + table), w = 0, 0.1, 1; the same unit as E34 (§9.38)."
+  },
+  {
+   "check": "every added operation priced",
+   "result": "F adds, per walk, exactly 32 group additions whose F_p multiplications are counted in fp_muls (3,104 = 32 × 97 schoolbook on all 1,024 + 32 control walks, 2,528 = 32 × 79 Karatsuba on all 256) and 64 mod-n additions counted in walk.ops.modn (native, priced at w · 97); nothing per step: the partition is still one hash per evaluation (mod 64 instead of mod 32), the look-ahead one table read. Every E34-jump walk adds 0. The 32 extra jump points' memory is not priced (32 F_p4 points per walk)."
+  },
+  {
+   "check": "arithmetic sensitivity",
+   "result": "The band prices native work at 97 F_p multiplications in both arithmetics, as registered; Karatsuba's own addition costs 79. At 79: O6B/O24 1.711 / 1.391 / 1.253, O6C/O24 1.635 / 1.290 / 1.141, O24/O24F 0.984 / 0.981 / 0.980: the same orders."
+  },
+  {
+   "check": "memory reported",
+   "result": "Not priced. Every arm stores every visited class (exhaustive storage, no distinguished points; stored + fruitless + 1 = steps on every correct walk), so memory is proportional to steps and the order-24 walk stores about 1.93× fewer classes than the order-6 walk; no time-memory trade-off is claimed."
+  },
+  {
+   "check": "cost bookkeeping",
+   "result": "Every walk succeeds (7,424 / 7,424 correct), so the expected cost is the mean per-walk cost; no success-probability factor is involved."
+  },
+  {
+   "check": "class",
+   "result": "A reference correction and a re-measurement (G2.229): rho walks only. No E41 commit touches docs/ic/, docs/ic-leaderboard.html or benchmarks/; §9.52, §9.53 and REPORT.typ state the class; the GLS IC rows keep factor 1; no index-calculus cost or improvement is claimed."
+  }
+ ],
+ "proof_architecture_checks": [],
+ "inventor_protocol_ladder": "Not a speedup claim for an index-calculus method: the measured quantity (order-24 walk against order-6 walks) is a ratio measured directly at the tested scale, with an A/A null arm and a broken-fix positive control. The only extrapolations are labelled as derived: the E18 handover shift in bits and the distance factor applied to E18's modelled psi rows.",
+ "observations": [
+  "The planted logarithm is 271 on all eight curves (E29's instances); every one of the 7,424 walks recovers it and ran the [d]G = Q check (verify counters > 0), and the replayed walks reproduce those fields byte for byte.",
+  "Same walk on the paired arms: O6C equals O6B, and O24L equals O24, seed by seed (steps, escapes, visit digest, logarithm); only the representative's counted work differs. Karatsuba walks equal the schoolbook walks of the same seed in every counter except F_p multiplications.",
+  "Pooling every walk of each order (E34's records, Stage 0, the main stream and, for order 24, the A/A stream): order 6 at 0.9835 ± 0.0125 of its ideal (1,664 walks), order 24 at 1.0087 ± 0.0098 (2,688 walks), steps ratio 1.950 ± 0.031 (1.6 SE below 2). E41's residual ratio deficit comes from the order-6 arm running short on the main stream (0.969), not from an order-24 excess; per-curve heterogeneity is within noise (sum of squared per-curve z: O6B 12.6, O24 11.0, O24' 3.6, O24F 6.6 on 8 degrees of freedom; 95 % point 15.5).",
+  "Per curve the order-6/order-24 ranking uses the registered point-estimate rule; with each curve's own 95 % interval required at every weight, O6B/O24 is resolved on 6 of 8 curves (not p = 241, 337) and O6C/O24 on 5 of 8 (not p = 241, 337, 1069); p = 241 changes order on O6C/O24 at 1 GAE (1.413 / 1.128 / 0.995).",
+  "The seed-paired delta method (the arms share seeds on the main stream) gives 95 % intervals within 0.001 of the independent ones on the schoolbook headline pairs (within 0.008 in Karatsuba, 32 walks) and changes no rank across the band. Only O24L / O24, which is one walk under two representatives, moves: its paired SE is near 0, so its registered-rule flag turns true in Karatsuba too, while the order still changes inside the band (not ranked).",
+  "F's step saving is estimator-dependent in sign (mean over walks -0.75 %, ratio of sums +2.8 %, per curve 4 / 4): nothing distinguishes F from no change, as registered (G2.222).",
+  "E41's three local-only records match their committed .sha256 files, and stage0_run.json also equals its blob at f99a56359e (it was committed there and untracked in f0eb95af97).",
+  "The report's figures script (figures/plot.py) lays out values from summary.json, stage0_records.json and stage0_run.json; its only arithmetic is error-bar extents and offsets for plotting. The leaderboard, benchmarks/ and the gate were not touched by any E41 commit."
+ ],
+ "limitations": [
+  "Local container (4 vCPU, shared with E39 and E40), not isolab-eks (no aws CLI or kubectl here); operation counts only, no wall time compared.",
+  "The in-crate unit tests (twist24_shortfall::tests, E34's twist24_rep test) were not run: release unit-test builds are excluded on this host (memory). The replayed identity (1,280 / 1,280 E34 records, both through the rebuilt binary and through the validator's own comparator) covers what e41_instrument_is_e34s_walk asserts; the pair-sum test's assertions (32 added additions, 64 mod-n, correct log, the broken control wrong) are covered by the records and the replayed control.",
+  "e41_stage0 (6115e0ea0a) was not rebuilt (a second full crypto_lib build on a shared host); its records' content was replayed for 32 nonce-drawn walks through the b0e307d9b8 library, whose fix-off path is the same walk.",
+  "main_school.json, main_karatsuba.json and stage0_run.json are not in Git (no aws CLI for the artifact store); they are pinned by committed .sha256 files, which the local copies match, and this replay regenerated them from committed code (see the certificate's whole-file runs). The validator's own replay outputs over 64 KiB are likewise kept local and pinned by SHA-256 in the certificate.",
+  "The E18 psi-row factor applies to modelled distances (E18's psi arm is linear algebra with a modelled handover, §9.3); the handover shift in bits is a model consequence, not a measurement.",
+  "The order-24 group itself is not recomputed from curve coefficients (they are not in E41's records); it rests on E29's kill test and its validation, as for E34. n prime and n = 1 mod 24 were checked here.",
+  "Scale: n from 2^31.65 to 2^40.25 only; nothing here measures larger n."
+ ],
+ "review_attestation": {
+  "joints_owned": [
+   "pre-registration ordering (f99a56359e before any fix code, run or record)",
+   "clean rebuild of the recorded commit and binary-hash comparison",
+   "replay of the identity and positive-control runs and of nonce-drawn main-stream, A/A, Karatsuba and Stage 0 walks",
+   "independent recompute of the pooled ratios and intervals, per-curve counts, A/A floor, F's step saving, steps against the ideal, the E18 factors, the GLS IC rows and G2.217-G2.226",
+   "pricing and class checks"
+  ],
+  "sources_read": [
+   "/home/user/crypto-autoresearcher/docs/agent-runtime-core.md",
+   "/home/user/crypto-autoresearcher/agents/validator.md",
+   "/home/user/crypto-autoresearcher/tools/allocate_id.py (header only)",
+   "docs/session-logs/2026-11-02.md (lines 1-746 and the E41 entries, lines 1733-1822)",
+   ".resume/RESUME.md (lines 80-130: E41 section and the E39 note on PR #3307)",
+   "AGENTS.md (§13, lines 1598-1632: artifact-store thresholds)",
+   "docs/VALIDATION_GATE.md (lines 1-60); scripts/validation_gate.py (lines 145-250 and a grep of its functions)",
+   "research/e34_twist24_cheap_rep_20261031/replay-certificate.json; validator-report.json (keys, top-level fields, first headline entries, errata, attestation); replay/build.json",
+   "research/e32_handover_ladder_20261031/replay-certificate.json (grep for the binary-hash note)",
+   "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.52 (HEAD and f99a56359e) and §9.53",
+   "src/cryptanalysis/twist24_shortfall.rs (HEAD = b0e307d9b8); examples/e41_run.rs (to run it and to mirror its record() in the driver); git show of 089f7f7823's twist24_rep.rs hunk and of d6d00182c5's quartic_folds.rs head; signatures in quartic_folds.rs and twist24_rep.rs (grep); Cargo.toml (path dependencies)",
+   "examples/e41_tables.rs: its path constants (grep) before the recompute, and lines 284-323 after it, only to locate errata E3 and E4",
+   "experiments/48_twist24_shortfall/: every record, log, .sha256, binary_sha256.txt, tables.md (printed figures), stage0_run.json pooled block (to locate E2's definition)",
+   "experiments/38_twist24_cheap_rep/stage_r_p*.json; experiments/32_walk_karatsuba/summary.json (rows)",
+   "research/e41_twist24_shortfall_20261102/REPORT.typ (lines 9-54) and figures/plot.py",
+   "docs/ic/LEADERBOARD.md (grep for E18)"
+  ],
+  "read_sibling_reports": false,
+  "sibling_note": "No other validator's report on E41 was opened or seen. E39's and E40's untracked files in the checkout were not opened.",
+  "verdict_on_joints": "holds"
+ },
+ "validation_report": {
+  "id": "VAL-20261102-918856",
+  "task_id": "none assigned (main-session brief: validate E41 at 282ddceafd on claude/glv-endomorphism-index-calculus-pe7ige)",
+  "run_ids": [
+   "E41 stage0_records",
+   "E41 stage0_run",
+   "E41 identity",
+   "E41 control",
+   "E41 main_school",
+   "E41 aa_school",
+   "E41 main_karatsuba"
+  ],
+  "artifact_checks": [
+   "committed records at HEAD equal the records commit b70f356827; working tree clean for them",
+   "main_school.json, main_karatsuba.json, stage0_run.json match their committed .sha256 (stage0_run.json also its blob at f99a56359e)",
+   "clean export of b0e307d9b8 (4,411 files, blob-checked) rebuilds e41_run and e41_tables byte for byte (ce0caf3f..., a4d0c6f5..., a8a0326a... with e41_tables.rs at 5d15482969)",
+   "§9.52 unchanged since f99a56359e; no E41 commit touches quartic_folds.rs, docs/ic or benchmarks"
+  ],
+  "metric_recomputations": [
+   "pooled band ratios and 95 % intervals for 17 pairs (both arithmetics); per-curve counts; A/A floor; steps/ideal per arm; steps ratios (main, A/A, E34); F step saving; E18 factors and handover shifts; GLS rows against E27; G2.217-G2.226 verdicts: all printed headline values reproduce; errata E1-E6 change no verdict"
+  ],
+  "control_checks": [
+   "positive control F-slash: 32/32 flagged, replayed byte for byte",
+   "A/A null arm: 1.0185 / 1.0192 / 1.0195, not resolved, used as floor",
+   "identity (fix off): 1,280/1,280 E34 records byte-identical, replayed through the rebuilt binary and the validator comparator"
+  ],
+  "heuristic_validation_checks": [
+   "prediction sqrt(pi (n-1)/2m) and bounds registered before runs",
+   "steps/ideal recomputed from raw walks",
+   "shortfall decays with walks as noise must",
+   "scale n = 2^31.65..2^40.25 recorded"
+  ],
+  "cost_model_checks": [
+   "unit F_p multiplications + w * 97 * native ops declared",
+   "F added work priced (32 additions in fp_muls, 64 mod-n in native)",
+   "memory not priced (noted)",
+   "every walk succeeds: expected cost = mean cost",
+   "no index-calculus claim"
+  ],
+  "proof_architecture_checks": [],
+  "verdict": "passed",
+  "limitations": [
+   "local shared container, counts only",
+   "unit tests not run (release test builds excluded)",
+   "e41_stage0 binary not rebuilt",
+   "large records local-only, pinned by committed sha256",
+   "E18 factor applies to modelled distances",
+   "n <= 2^40.25"
+  ],
+  "artifact_paths": [
+   "research/e41_twist24_shortfall_20261102/validator-report.json",
+   "research/e41_twist24_shortfall_20261102/replay-certificate.json",
+   "research/e41_twist24_shortfall_20261102/validate_e41.rs",
+   "research/e41_twist24_shortfall_20261102/replay/"
+  ]
+ }
+}

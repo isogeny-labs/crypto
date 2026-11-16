@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:13:40Z",
+ "id": "PCC-20261113-26cccb",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "997d740939b65672f34a9d09ac7732ac1f479196203b50157d08270917c6897b",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/ModelTransport.lean",
+   "theorem": "G3ModelTransport.primitive_shift_square"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem primitive_shift_square {K : Type} [CommRing K] (g s : K) : (g+s)^2=g^2+2*s*g+s^2"
+}

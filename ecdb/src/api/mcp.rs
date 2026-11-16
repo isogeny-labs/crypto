@@ -94,9 +94,11 @@ fn tools() -> Value {
         },
         {
             "name": "ecdb_results",
-            "description": "Measured results of the crypto repository as frozen there. kind=leaderboard: IC leaderboard rows (best recipe's cold cost over matched rho, per family A/B/C; filters family, regime, validation; recipes=true adds every recipe). kind=progress: the progress timeline (filter series). kind=boundary: the boundary ledger (filters regime, stage). kind=benchmarks: the benchmarks/ index with VALIDATION.json (filters listed=admitted|archive|unlisted, q, limit, offset). Ratios compare only within one family or series.",
+            "description": "Measured results of the crypto repository as frozen there. kind=leaderboard: IC leaderboard rows (best recipe's cold cost over matched rho, per family A/B/C; filters family, regime, validation; recipes=true adds every recipe). kind=progress: the progress timeline (filter series). kind=boundary: the boundary ledger (filters regime, stage). kind=benchmarks: the benchmarks/ index with VALIDATION.json (filters listed=admitted|archive|unlisted, q, limit, offset). kind=claims: IC tool-program claims, IC online against matched rho per target (filters rule_version, curve, candidate_id, validation_status; summary=true for per-candidate geometric means). online_speedup excludes the IC set-up; cold_ratio_ic_over_rho includes it and is the figure to quote. kind=designs: factor-base design grids (n83). Ratios compare only within one family or series.",
             "inputSchema": s(json!({
-                "kind": { "type": "string", "enum": ["leaderboard", "progress", "boundary", "benchmarks"] },
+                "kind": { "type": "string", "enum": ["leaderboard", "progress", "boundary", "benchmarks", "claims", "designs"] },
+                "rule_version": { "type": "string" }, "curve": { "type": "string" }, "candidate_id": { "type": "string" },
+                "validation_status": { "type": "string" }, "summary": { "type": "boolean" },
                 "family": { "type": "string", "enum": ["A", "B", "C"] }, "regime": { "type": "string" },
                 "validation": { "type": "string" }, "recipes": { "type": "boolean" },
                 "series": { "type": "string" }, "stage": { "type": "string" },
@@ -111,6 +113,18 @@ fn tools() -> Value {
                 "session_id": { "type": "string" }, "method": { "type": "string" }, "curve": { "type": "string" },
                 "label": { "type": "string" }, "path": { "type": "string" },
                 "limit": { "type": "integer" }, "offset": { "type": "integer" }
+            }), &[]),
+        },
+        {
+            "name": "ecdb_factor_bases",
+            "description": "Factor bases of the index-calculus work. Ids: FB1h... (ecbench point set), FBM1h... (measurement configuration), FBS1h... (ecdb id for a base known only by construction), or a cryptanalysis archive digest; plug-in strings, PS1 labels and cited digests resolve too. Without key: a page of bases with sizes, result counts, solved counts and best solved S (filters curve, family, scheme, min_columns, max_columns, solved; sort results|best_s|columns|key). With key: the base with aliases, FBM1 configurations and results by source; results=true pages its results (ecbench runs, large-prime cells, SECG small-x yields; filters source, fbm_id, solved); points=true pages its stored points.",
+            "inputSchema": s(json!({
+                "key": { "type": "string" }, "curve": { "type": "string" }, "family": { "type": "string" },
+                "scheme": { "type": "string", "enum": ["fb1", "fbarchive", "spec", "pointset"] }, "design": { "type": "string" },
+                "min_columns": { "type": "integer" }, "max_columns": { "type": "integer" }, "solved": { "type": "boolean" },
+                "sort": { "type": "string", "enum": ["results", "best_s", "columns", "key"] },
+                "results": { "type": "boolean" }, "points": { "type": "boolean" }, "source": { "type": "string" },
+                "fbm_id": { "type": "string" }, "limit": { "type": "integer" }, "offset": { "type": "integer" }
             }), &[]),
         },
         {
@@ -205,12 +219,26 @@ fn route(name: &str, args: &Map<String, Value>) -> Result<(Method, String, Optio
             "progress" => (Method::GET, format!("/v1/ic/progress{}", query(args, &["kind"])), None),
             "boundary" => (Method::GET, format!("/v1/ic/boundary{}", query(args, &["kind"])), None),
             "benchmarks" => (Method::GET, format!("/v1/benchmarks{}", query(args, &["kind"])), None),
+            "claims" => (Method::GET, format!("/v1/ic/claims{}", query(args, &["kind"])), None),
+            "designs" => (Method::GET, "/v1/factor-base-designs".into(), None),
             other => return Err(format!("unknown results kind {other:?}")),
         },
         "ecdb_ecbench" => match args.get("session_id").and_then(Value::as_str) {
             Some(id) => (Method::GET, format!("/v1/ecbench/sessions/{}", enc(id)), None),
             None => (Method::GET, format!("/v1/ecbench/sessions{}", query(args, &["session_id"])), None),
         },
+        "ecdb_factor_bases" => {
+            let wants_rows = |k: &str| args.get(k).and_then(Value::as_bool) == Some(true);
+            match args.get("key").and_then(Value::as_str) {
+                Some(k) if wants_rows("results") || wants_rows("points") => (
+                    Method::GET,
+                    format!("/v1/factor-bases/{}/results{}", enc(k), query(args, &["key", "results"])),
+                    None,
+                ),
+                Some(k) => (Method::GET, format!("/v1/factor-bases/{}", enc(k)), None),
+                None => (Method::GET, format!("/v1/factor-bases{}", query(args, &["key", "results", "points"])), None),
+            }
+        }
         "ecdb_sql" => (Method::POST, "/v1/sql".into(), Some(Value::Object(args.clone()))),
         "ecdb_record_evidence" => (Method::POST, "/v1/evidence".into(), Some(Value::Object(args.clone()))),
         other => return Err(format!("unknown tool {other:?}")),
@@ -356,6 +384,16 @@ mod tests {
         let mut e = Map::new();
         e.insert("session_id".into(), json!("ECBS1hffaa276d8a5c"));
         assert_eq!(route("ecdb_ecbench", &e).unwrap().1, "/v1/ecbench/sessions/ECBS1hffaa276d8a5c");
-        assert_eq!(tools().as_array().unwrap().len(), 11);
+        let mut fb = Map::new();
+        fb.insert("key".into(), json!("FB1h8e805e4ad71c"));
+        assert_eq!(route("ecdb_factor_bases", &fb).unwrap().1, "/v1/factor-bases/FB1h8e805e4ad71c");
+        fb.insert("results".into(), json!(true));
+        fb.insert("solved".into(), json!(true));
+        assert_eq!(route("ecdb_factor_bases", &fb).unwrap().1, "/v1/factor-bases/FB1h8e805e4ad71c/results?solved=true");
+        let mut c = Map::new();
+        c.insert("kind".into(), json!("claims"));
+        c.insert("summary".into(), json!(true));
+        assert_eq!(route("ecdb_results", &c).unwrap().1, "/v1/ic/claims?summary=true");
+        assert_eq!(tools().as_array().unwrap().len(), 12);
     }
 }
