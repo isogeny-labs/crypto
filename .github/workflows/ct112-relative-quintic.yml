@@ -1,0 +1,40 @@
+name: CT112 exact relative quintic
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct112/**'
+      - '.github/workflows/ct112-relative-quintic.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct112/**'
+      - '.github/workflows/ct112-relative-quintic.yml'
+  workflow_dispatch:
+jobs:
+  ct112:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct109
+            research/cross_characteristic_global_torsion_20261112/ct112
+      - name: Replay exact global divisibility in two independent arithmetic systems
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct112
+          python3 -B "$D/ct112_exact_quintic.py" > /tmp/ct112-py.json
+          python3 -O -B "$D/ct112_exact_quintic.py" > /tmp/ct112-pyopt.json
+          node "$D/ct112_exact_quintic_independent.js" > /tmp/ct112-js.json
+          node --no-opt "$D/ct112_exact_quintic_independent.js" > /tmp/ct112-jsopt.json
+          cmp /tmp/ct112-py.json /tmp/ct112-pyopt.json
+          cmp /tmp/ct112-py.json /tmp/ct112-js.json
+          cmp /tmp/ct112-py.json /tmp/ct112-jsopt.json
+          printf '%s  %s\n' 28239819cd788d819e0fe0d8819dd850b520a2ea90acd9926f75d5fbff12c7ce /tmp/ct112-py.json | sha256sum -c
+          python3 -B "$D/ct112_modular_interpolation.py" --full > /tmp/ct112-modular.json
+          python3 -O -B "$D/ct112_modular_interpolation.py" --full > /tmp/ct112-modular-opt.json
+          cmp /tmp/ct112-modular.json /tmp/ct112-modular-opt.json
+          python3 -c 'import json; r=json.load(open("/tmp/ct112-modular.json")); assert len(r["validated_primes"])==179 and r["excluded_bad_prime"]==[827]'
+          cat /tmp/ct112-py.json
