@@ -6,6 +6,26 @@ const PROTO_SEED: u64 = 20261012;
 const CUBIC_BUDGET: usize = 400;
 const RHO_R: usize = 20;
 
+// NEW 2026-10-18 (SCALING_20261018): diagnostic counters. They record phase
+// boundaries of the existing `Cost` total and a few sizes; they change no
+// algorithm and are printed only with the extra argument `--counters`.
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+static COUNTERS_ON: AtomicBool = AtomicBool::new(false);
+static C_ENUM2: AtomicU64 = AtomicU64::new(0); // ops in ic_full's enum_curve_k
+static C_REL: AtomicU64 = AtomicU64::new(0); // ops in the line-relation loop
+static C_TAB: AtomicU64 = AtomicU64::new(0); // ops from end of relations to end of ic_full (E0 build + phi table)
+static C_PAIRS: AtomicU64 = AtomicU64::new(0); // pairs (i<j) of F_q factor-base points tried
+static C_REL_N: AtomicU64 = AtomicU64::new(0); // distinct 4-point line relations
+static C_WIDTH: AtomicU64 = AtomicU64::new(0); // columns
+static C_RANK: AtomicU64 = AtomicU64::new(0); // rank mod ell of the relation rows (diagnostic elimination)
+static C_LA_OPS: AtomicU64 = AtomicU64::new(0); // row-op cost of that elimination, pinned units (mod-ell mult 9, add 3, inv 90)
+static C_NCLS: AtomicU64 = AtomicU64::new(0); // distinct deg-6 phi(nG) keys
+static C_NTRANS: AtomicU64 = AtomicU64::new(0); // n in 1..ell with valid_transfer
+static C_NOTHER: AtomicU64 = AtomicU64::new(0); // valid-transfer n whose deg-6 key collided
+static C_CANON3: AtomicU64 = AtomicU64::new(0); // valid-transfer n whose cubic reduction is a single degree-3 orbit
+static C_CANON3_DIST: AtomicU64 = AtomicU64::new(0); // distinct such orbits (collisions = C_CANON3 - this)
+static C_NPTS: AtomicU64 = AtomicU64::new(0); // |C(F_q)|
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 struct Pt([u32; 3]); // normalized projective W on F_q quartic
 
@@ -2048,7 +2068,13 @@ fn widen_rows(rows: &mut [Vec<u64>], width: usize) {
 fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
     let ell = inst.ell;
     let nfb = inst.fb.len();
+    let c_start = cost.total();
+    let t_wall = std::time::Instant::now();
     let curve_k = inst.enum_curve_k(cost);
+    C_ENUM2.store(cost.total() - c_start, Ordering::Relaxed);
+    if COUNTERS_ON.load(Ordering::Relaxed) { eprintln!("wall enum_CK {:.1}s", t_wall.elapsed().as_secs_f64()); }
+    C_NPTS.store(nfb as u64, Ordering::Relaxed);
+    let c_rel0 = cost.total();
     let p0 = inst.fb[inst.p0];
     let mut orb_ix: HashMap<(u32, u32, u32), usize> = HashMap::new();
     let mut next_var = nfb + 1;
@@ -2058,6 +2084,7 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
 
     for i in 0..nfb {
         for j in (i + 1)..nfb {
+            C_PAIRS.fetch_add(1, Ordering::Relaxed);
             if let Some(idx) = inst.line_relation(i, j, cost) {
                 if idx.len() != 4 {
                     continue;
@@ -2067,6 +2094,7 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
                 if !seen_line.insert(key) {
                     continue;
                 }
+                C_REL_N.fetch_add(1, Ordering::Relaxed);
                 let mut d = DivCls::zero();
                 for &p in &idx {
                     d.pieces.push(Piece::Fq(inst.fb[p]));
@@ -2088,6 +2116,15 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
 
     let width = next_var.max(nfb + 1);
     widen_rows(&mut rows, width);
+    C_REL.store(cost.total() - c_rel0, Ordering::Relaxed);
+    if COUNTERS_ON.load(Ordering::Relaxed) { eprintln!("wall relations {:.1}s", t_wall.elapsed().as_secs_f64()); }
+    let c_tab0 = cost.total();
+    if COUNTERS_ON.load(Ordering::Relaxed) {
+        let (rk, ops) = diag_rank(&rows, ell);
+        C_RANK.store(rk as u64, Ordering::Relaxed);
+        C_LA_OPS.store(ops, Ordering::Relaxed);
+        C_WIDTH.store(width as u64, Ordering::Relaxed);
+    }
 
     // Relation matrix is homogeneous on Jac[ℓ]; FB points are often 4-primary (λ=0).
     // Build class logs from cubic-reduced transfer divisors φ(nG), which generate Jac[ℓ].
@@ -2108,12 +2145,14 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
         if !e.valid_transfer(p) {
             continue;
         }
+        C_NTRANS.fetch_add(1, Ordering::Relaxed);
         let d = e.transfer_div(p, cost);
         if d.deg() != 6 {
             continue;
         }
         let key = div_key(inst, &d);
         if class_log.contains_key(&key) {
+            C_NOTHER.fetch_add(1, Ordering::Relaxed);
             continue; // keep first n; collisions would mean ker φ nontrivial on toys
         }
         class_log.insert(key, n % ell);
@@ -2145,10 +2184,13 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
             }
         }
     }
+    C_NCLS.store(n_cls as u64, Ordering::Relaxed);
+    if COUNTERS_ON.load(Ordering::Relaxed) { eprintln!("wall class_log loop {:.1}s", t_wall.elapsed().as_secs_f64()); }
     if n_cls < 3 {
         return (None, "rank_not_reached".into());
     }
 
+    let mut canon_seen: HashSet<(u32, u32, u32)> = HashSet::new();
     let mut logs = vec![0u64; next_var.max(width).max(nfb + 1)];
     logs[inst.p0] = 0;
     // Orbit piece logs: from each transfer D = O1+O2 with known λ(D)=n, leave underdetermined
@@ -2162,6 +2204,10 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
         if c.pieces.len() == 1 {
             if let Piece::Orb(w) = c.pieces[0] {
                 let id = orbit_id(&inst.f3, w);
+                C_CANON3.fetch_add(1, Ordering::Relaxed);
+                if canon_seen.insert(id) {
+                    C_CANON3_DIST.fetch_add(1, Ordering::Relaxed);
+                }
                 if let Some(&ix) = orb_ix.get(&id) {
                     if ix >= logs.len() {
                         logs.resize(ix + 1, 0);
@@ -2176,6 +2222,8 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
     }
     let _ = rows;
     let _ = rhs;
+    C_TAB.store(cost.total() - c_tab0, Ordering::Relaxed);
+    if COUNTERS_ON.load(Ordering::Relaxed) { eprintln!("wall ic_full end {:.1}s", t_wall.elapsed().as_secs_f64()); }
     (
         Some(IcSol {
             logs,
@@ -2184,6 +2232,43 @@ fn ic_full(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
         }),
         "ok".into(),
     )
+}
+
+/// Diagnostic only (not part of the recovery path): rank mod ell of the
+/// relation rows by dense Gaussian elimination, with its row-operation cost.
+fn diag_rank(rows: &[Vec<u64>], ell: u64) -> (usize, u64) {
+    let mut m: Vec<Vec<u64>> = rows.to_vec();
+    let w = m.first().map(|r| r.len()).unwrap_or(0);
+    let mut ops = 0u64;
+    let mut rank = 0usize;
+    for col in 0..w {
+        if rank >= m.len() {
+            break;
+        }
+        let Some(pv) = (rank..m.len()).find(|&r| m[r][col] % ell != 0) else {
+            continue;
+        };
+        m.swap(rank, pv);
+        let inv = inv_mod(m[rank][col] % ell, ell);
+        ops += 90;
+        for c in col..w {
+            m[rank][c] = m[rank][c] * inv % ell;
+        }
+        ops += 9 * (w - col) as u64;
+        let prow = m[rank].clone();
+        for r in (rank + 1)..m.len() {
+            let f = m[r][col] % ell;
+            if f == 0 {
+                continue;
+            }
+            for c in col..w {
+                m[r][c] = (m[r][c] + ell - f * prow[c] % ell) % ell;
+            }
+            ops += (9 + 3) * (w - col) as u64;
+        }
+        rank += 1;
+    }
+    (rank, ops)
 }
 
 fn ic_2lp(inst: &Inst, cost: &mut Cost) -> (Option<IcSol>, String) {
@@ -2654,12 +2739,17 @@ fn run_trial(q: u32, trial: u32, variant: &str) {
         let inst = Inst::build_first_split(q, &mut c).unwrap();
         let e = E0::build(inst.clone(), &mut c).unwrap();
         let g = e.find_generator().unwrap();
+        let c_pre = c.total();
         let curve_k = inst.enum_curve_k(&mut c);
+        let c_enum1 = c.total() - c_pre;
+        let c_ic0 = c.total();
         let (sol, status) = if v == "full" {
             ic_full(&inst, &mut c)
         } else {
             ic_2lp(&inst, &mut c)
         };
+        let c_ic = c.total() - c_ic0;
+        let c_tgt0 = c.total();
         let mut answer = None;
         let mut ok = false;
         let mut recovery = "";
@@ -2704,6 +2794,14 @@ fn run_trial(q: u32, trial: u32, variant: &str) {
             status.as_str()
         };
         let s = c.total() as f64 / sqrt_ell;
+        if COUNTERS_ON.load(Ordering::Relaxed) {
+            let g = |a: &AtomicU64| a.load(Ordering::Relaxed);
+            println!(
+                "{{\"rec\":\"counters\",\"q\":{},\"trial\":{},\"variant\":\"{}\",\"ell\":{},\"ord\":{},\"n_Cfq\":{},\"ops_total\":{},\"ops_enum_CK_run\":{},\"ops_ic_full\":{},\"ops_enum_CK_in_ic\":{},\"ops_relations\":{},\"ops_E0_phi_table\":{},\"ops_target\":{},\"pairs\":{},\"relations\":{},\"la_cols\":{},\"la_rank_mod_ell\":{},\"la_row_ops\":{},\"n_valid_transfer\":{},\"n_deg6_classes\":{},\"n_deg6_key_collisions\":{},\"n_canon3_single_orbit\":{},\"n_canon3_distinct\":{}}}",
+                q, trial, v, ell, inst.ord, g(&C_NPTS), c.total(), c_enum1, c_ic, g(&C_ENUM2), g(&C_REL), g(&C_TAB),
+                c.total() - c_tgt0, g(&C_PAIRS), g(&C_REL_N), g(&C_WIDTH), g(&C_RANK), g(&C_LA_OPS), g(&C_NTRANS), g(&C_NCLS), g(&C_NOTHER), g(&C_CANON3), g(&C_CANON3_DIST)
+            );
+        }
         println!(
             "{{\"rec\":\"trial\",\"q\":{},\"trial\":{},\"variant\":\"{}\",\"status\":\"{}\",\"recovery\":\"{}\",\"k_planted\":{},\"k_found\":{},\"correct\":{},\"ops\":{},\"S\":{:.6},\"hash_lookups\":{}}}",
             q,
@@ -2720,6 +2818,12 @@ fn run_trial(q: u32, trial: u32, variant: &str) {
         );
     };
 
+    if COUNTERS_ON.load(Ordering::Relaxed) && trial == 0 {
+        println!(
+            "{{\"rec\":\"instance\",\"q\":{},\"ell\":{},\"ord\":{},\"n_Cfq\":{}}}",
+            q, inst.ell, inst.ord, inst.fb.len()
+        );
+    }
     if variant == "rho" || variant == "all" {
         let mut c = Cost::new(q);
         let (found, steps) = rho(&e, g, qpt, PROTO_SEED ^ trial as u64, &mut c);
@@ -2761,6 +2865,9 @@ fn main() {
         eprintln!("usage: quartic_ic <q> <trials> <full|2lp|rho|all>");
         eprintln!("       quartic_ic <q> 1 --check-lin-equiv");
         std::process::exit(1);
+    }
+    if args.iter().any(|a| a == "--counters") {
+        COUNTERS_ON.store(true, Ordering::Relaxed);
     }
     let q: u32 = args[1].parse().expect("q");
     let trials: u32 = args[2].parse().expect("trials");
