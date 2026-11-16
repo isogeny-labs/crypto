@@ -103,7 +103,8 @@ fn relation_determinant(leaves: &[Point; 8], residual: Point) -> Result<u64, Str
 fn first_rational_points(ar: &mut Arithmetic) -> Vec<(u64, u64)> {
     let mut out = Vec::with_capacity(31);
     for x in 0..PRIME31.p {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), PRIME31.p) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
             if y == 0 { continue; }
             out.push((x, y.min(PRIME31.p - y)));
             if out.len() == 31 { break; }
