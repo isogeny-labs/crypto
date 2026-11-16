@@ -15,10 +15,10 @@ test "$(df -Pk / | awk 'NR == 2 {print $4}')" -ge 10485760 || { echo 'boot disk 
 test "$(df -Pk /Volumes/SSD990-2 | awk 'NR == 2 {print $4}')" -ge 83886080 || { echo 'SSD below 80 GiB' >&2; exit 95; }
 
 for item in \
-  'n83-cms-5.14.7-3c8e228.tar.gz 2ca8e47c3ab989c3b9842c3f230aca1c6f74a767797a24584c578dee264080a1 cryptominisat.tar.gz' \
-  'n83-cadical-818c956.tar.gz beaeb17a751db88d5384b35d65be82501d94cf60f758b768b59bfb2b437cb34b cadical.tar.gz' \
-  'n83-cadiback-802e1f6.tar.gz e9b29931f4d8e12a18eb12b862054af462332cf747be174eb9f7bdfdf4658918 cadiback.tar.gz'; do
-  read -r name expected renamed <<< "$item"
+  'n83-cms-5.14.7-3c8e228.tar.gz 2ca8e47c3ab989c3b9842c3f230aca1c6f74a767797a24584c578dee264080a1' \
+  'n83-cadical-818c956.tar.gz beaeb17a751db88d5384b35d65be82501d94cf60f758b768b59bfb2b437cb34b' \
+  'n83-cadiback-802e1f6.tar.gz e9b29931f4d8e12a18eb12b862054af462332cf747be174eb9f7bdfdf4658918'; do
+  read -r name expected <<< "$item"
   test "$(shasum -a 256 "/Volumes/SSD990-2/tmp/$name" | awk '{print $1}')" = "$expected" || { echo "archive hash mismatch: $name" >&2; exit 96; }
 done
 
