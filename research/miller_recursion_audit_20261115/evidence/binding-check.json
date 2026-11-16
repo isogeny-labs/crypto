@@ -1,0 +1,36 @@
+{
+  "schema": "native-miller-recursion-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "miller-recursion-certificate",
+      "expected_decl_sha256": "3be8f68d63b18ecd7bf18c28c045b53530c90948403c38146513bc3bcdb1d3bd",
+      "full_characters": 1244,
+      "full_decl_sha256": "3be8f68d63b18ecd7bf18c28c045b53530c90948403c38146513bc3bcdb1d3bd",
+      "full_normalized_signature": "theorem miller_recursion_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ), millerFunction W P n ≠ 0 ∧ principalPointDivisor W (millerFunction W P n) ((miller_has_point_divisor W P n).support_finite W) = millerDivisor W P n ∧ functionValuation W (parameter W ^ (-pointOrder W (millerFunction W P n) 0) * millerFunction W P n - 1) < 1 ∧ (n • P = 0 → principalPointDivisor W (millerFunction W P n) ((miller_has_point_divisor W P n).support_finite W) = (n : ℤ) • Finsupp.single P 1 - (n : ℤ) • Finsupp.single 0 1)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (i j : ℕ) (f g : W.FunctionField), IsMillerFunction W P i f → IsMillerFunction W P j g → IsMillerFunction W P (i + j) (f * g * stepFunction W (i • P) (j • P))) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point), millerFunction W P 1 = 1) ∧ controlCurve.Δ ≠ 0 ∧ twoPoint ≠ 0 ∧ twoPoint + twoPoint = 0 ∧ pointOrder controlCurve (stepFunction controlCurve twoPoint twoPoint) 0 = (-2 : ℤ) ∧ ¬ HasPointDivisor controlCurve (MillerNormValuationAudit.lineFunction controlCurve 4 0 (controlCurve.slope 4 4 0 0)) (chordDivisor controlCurve twoPoint twoPoint)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "miller_recursion_certificate",
+        "end_byte": 2057,
+        "file": "/workspace/scratch/miller-recursion-binding-input01/RecursionCertificate.lean",
+        "qualified_decl_id": "MillerRecursionAudit.miller_recursion_certificate",
+        "signature": "theorem miller_recursion_certificate :\n    (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ),\n      millerFunction W P n ≠ 0 ∧\n      principalPointDivisor W (millerFunction W P n)\n        ((miller_has_point_divisor W P n).support_finite W) = millerDivisor W P n ∧\n      functionValuation W\n        (parameter W ^ (-pointOrder W (millerFunction W P n) 0) * millerFunction W P n - 1) < 1 ∧\n      (n • P = 0 → principalPointDivisor W (millerFunction W P n)\n        ((miller_has_point_divisor W P n).support_finite W) =\n        (n : ℤ) • Finsupp.single P 1 - (n : ℤ) • Finsupp.single 0 1)) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point)\n      (i j : ℕ) (f g : W.FunctionField),\n      IsMillerFunction W P i f → IsMillerFunction W P j g →\n      IsMillerFunction W P (i + j) (f * g * stepFunction W (i • P) (j • P))) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point),\n      millerFunction W P 1 = 1) ∧\n    controlCurve.Δ ≠ 0 ∧ twoPoint ≠ 0 ∧ twoPoint + twoPoint = 0 ∧\n    pointOrder controlCurve (stepFunction controlCurve twoPoint twoPoint) 0 = (-2 : ℤ) ∧\n    ¬ HasPointDivisor controlCurve\n      (MillerNormValuationAudit.lineFunction controlCurve 4 0 (controlCurve.slope 4 4 0 0))\n      (chordDivisor controlCurve twoPoint twoPoint)",
+        "start_byte": 637
+      },
+      "recorded_statement": "theorem miller_recursion_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ), millerFunction W P n ≠ 0 ∧ principalPointDivisor W (millerFunction W P n) ((miller_has_point_divisor W P n).support_finite W) = millerDivisor W P n ∧ functionValuation W (parameter W ^ (-pointOrder W (millerFunction W P n) 0) * millerFunction W P n - 1) < 1 ∧ (n • P = 0 → principalPointDivisor W (millerFunction W P n) ((miller_has_point_divisor W P n).support_finite W) = (n : ℤ) • Finsupp.single P 1 - (n : ℤ) • Finsupp.single 0 1)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (i j : ℕ) (f g : W.FunctionField), IsMillerFunction W P i f → IsMillerFunction W P j g → IsMillerFunction W P (i + j) (f * g * stepFunction W (i • P) (j • P))) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point), millerFunction W P 1 = 1) ∧ controlCurve.Δ ≠ 0 ∧ twoPoint ≠ 0 ∧ twoPoint + twoPoint = 0 ∧ pointOrder controlCurve (stepFunction controlCurve twoPoint twoPoint) 0 = (-2 : ℤ) ∧ ¬ HasPointDivisor controlCurve (MillerNormValuationAudit.lineFunction controlCurve 4 0 (controlCurve.slope 4 4 0 0)) (chordDivisor controlCurve twoPoint twoPoint)",
+      "recorded_text_sha256": "3be8f68d63b18ecd7bf18c28c045b53530c90948403c38146513bc3bcdb1d3bd",
+      "source_plan": "research/miller_recursion_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "MillerRecursionAudit.miller_recursion_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

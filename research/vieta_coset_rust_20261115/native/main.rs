@@ -96,7 +96,8 @@ fn run<F: PrimeField + Clone>(
             .map(|p| (p.clone(), p.clone()))
             .collect::<Vec<_>>(),
     );
-    let scope = json!({"curve":name,"p_hex":field.modulus().to_str_radix(16),"a_hex":field.hex(&e.a),"b_hex":field.hex(&e.b),"m":m,"c_hex":"1","base_points":base.len(),"base_sha256":base_id,"timed":timed,"rounds":rounds,"fixture_seed_hex":format!("{:x}",0x76696574612d7631u64 ^ m as u64),"seconds_per_stage":seconds});
+    let panel = std::env::var("VIETA_PANEL").unwrap_or_else(|_| "development".into());
+    let scope = json!({"panel":panel,"curve":name,"p_hex":field.modulus().to_str_radix(16),"a_hex":field.hex(&e.a),"b_hex":field.hex(&e.b),"m":m,"c_hex":"1","base_points":base.len(),"base_sha256":base_id,"timed":timed,"rounds":rounds,"fixture_seed_hex":format!("{:x}",0x76696574612d7631u64 ^ m as u64),"seconds_per_stage":seconds});
     emit(
         json!({"schema":"vieta-coset/v1","kind":"descriptor","scope":scope,"work":descriptor.work(),"elapsed_ns":if timed{json!(descriptor_ns)}else{Value::Null}}),
     );
@@ -183,6 +184,9 @@ fn run<F: PrimeField + Clone>(
         );
         let table = table?;
         for i in 0..rounds + 2 {
+            // Fixture construction is outside the arm intervals. A fresh
+            // budget must not inherit elapsed time from previous benchmarks.
+            let fixtures = context(&field, seconds);
             let t = fixtures.group_add(
                 &e,
                 &Some(base[i % base.len()].clone()),

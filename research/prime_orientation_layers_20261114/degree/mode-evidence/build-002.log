@@ -1,0 +1,29 @@
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-002.lean.txt:111:25: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (?m.88 * ?m.89) ?m.90 ?m.91
+in the target expression
+  eval 1 (∑ j, A x j * B j y) = ((fun x j => eval 1 (A x j)) * fun j y => eval 1 (B j y)) x y
+
+a u i r : ℕ
+hu : u ≤ a
+m : ℕ → ℕ
+hi : i < u
+hm : ∀ j < u, 0 < m j
+A : Matrix (Ports a) (Fin r) ℚ[X]
+B : Matrix (Fin r) (Ports a) ℚ[X]
+happrox : ∀ (x y : Ports a), Content 1 (OrientationFullChart.normalizedChartMatrix a u i m x y - (A * B) x y)
+Ae : Matrix (Ports a) (Fin r) ℚ := fun x j => eval 1 (A x j)
+Be : Matrix (Fin r) (Ports a) ℚ := fun j y => eval 1 (B j y)
+x y : Ports a
+⊢ eval 1 (∑ j, A x j * B j y) = ((fun x j => eval 1 (A x j)) * fun j y => eval 1 (B j y)) x y
+
+Note: The target expression is not type-correct under the `implicit` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  function expected
+    A x
+'OrientationModeProfile.actual_weighted_left_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.actual_right_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.weight_fiber_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.negative_pole_polynomial_width' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
