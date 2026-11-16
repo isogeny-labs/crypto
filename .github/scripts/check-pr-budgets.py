@@ -83,9 +83,28 @@ NAMED_BUDGET_EXCEPTIONS = {
         "reason": "Polynomial-reuse correctness job; 15-minute runs that hit the 25-minute cap on slow shared runners (2026-10-17)",
     },
     (".github/workflows/ecbench.yml", "harness"): {
-        "timeout": 45,
-        # The workflow's pull_request budget expression evaluates to 45.
-        "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18)",
+        "timeout": 75,
+        # The workflow's pull_request budget expression evaluates to 75.
+        "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18), then at the 45-minute cap on #3890 and #2902 (2026-11-11)",
+    },
+    (".github/workflows/ecbench.yml", "evidence_audit_pr"): {
+        "timeout": 40,
+        # Each of the 16 shards spends ~8-10 min listing and pulling sessions
+        # before it audits; shard 8 of run 42063872441 was cancelled at the
+        # 25-minute cap mid-audit and took 24.3 min in run 42055249527.
+        "reason": "ecbench committed-evidence integrity audit shard; cancelled at the 25-minute cap on #2902 (2026-11-05)",
+    },
+    (".github/workflows/ecbench.yml", "exhaustive_replay"): {
+        "timeout": 350,
+        # 48 shards, each replaying its share of a nonce-chosen plan; the job
+        # bound is the workflow's own 350-minute exhaustive bound.
+        "reason": "ecbench exhaustive replay matrix over all sampled sessions, 48 shards (2026-11-06)",
+    },
+    (".github/workflows/ecbench.yml", "replay_sentinels_pr"): {
+        "timeout": 30,
+        # Sentinel coverage pulls only the sentinel sessions; run time is
+        # dominated by the artifact walk on a shared runner.
+        "reason": "ecbench sentinel coverage on routine PRs; 30-minute bound (2026-11-06)",
     },
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,

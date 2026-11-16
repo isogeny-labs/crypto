@@ -329,9 +329,12 @@ const retainedPanels = [
   ['drastic-conductor-gap-20261012','Drastic prime conductor gaps: ECDLP on both ends · 12 October 2026'],
   ['drastic-conductor-gap-round2-20261012','Drastic prime conductor gap round 2: the j = 0 crater · 12 October 2026'],
   ['drastic-conductor-gap-round3-20261012','Drastic prime conductor gap round 3: paired targets · 12 October 2026'],
+  ['conductor-gap-ir-20261014','Conductor gap: complete implementation instruction census · 15 October 2026'],
   ['n83-tier1-cold-20261016','N83 Tier 1 cold factor-base holdout · 16 October 2026'],
   ['lab-ecbench-all','Cross-method evidence · every measured candidate'],
   ['lab-pair-claw','Pair claw of cryptanalysis#175 · same-target strong rho'],
+  ['n83-matched-20261014','Matched legacy degree-83 process diagnostic · measured14October2026'],
+  ['n83-basis-setup-20261015','Bounded degree-83 basis/setup: cold results and unresolved batch reference · measured15October2026'],
   ['lab-progress','Research progress over time · separate regimes and references'],
   ['lab-currency','How new results update this dashboard']
 ].map(([id,label])=>{
@@ -355,6 +358,12 @@ const retainedPanels = [
       return `<tr><td>${escape(point.date)}</td><td>${escape(series.label)}<br><small>${escape(series.note)}</small></td><td>${escape(point.label)}<br><small>${escape(point.detail)}</small></td><td class="n">${point.value}&times;${unit}</td><td>${escape(point.reference)}</td><td><span class="chip">${escape(point.class)}</span></td><td><a href="${escape(point.anchor)}">panel</a> &middot; <a href="${escape(point.source)}">source</a></td></tr>`;
     })).join('\n');
     html = html.replace(table, (_, start, end) => start + '\n' + rows + '\n</tbody>' + end);
+  }
+  // Keep the native-value presenter and this overview renderer composable.
+  // The presenter replaces this delimited panel before the overview is refreshed.
+  if (id === 'n83-basis-setup-20261015') {
+    html = '<!-- BEGIN n83-basis-setup-20261015 -->\n' + html
+      + '\n<!-- END n83-basis-setup-20261015 -->';
   }
   return {id,label,html};
 });

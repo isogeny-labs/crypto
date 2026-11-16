@@ -1190,7 +1190,9 @@ mod tests {
                     let (rep, planted) = ecbench_run(&spec, index, seed, &method(fb, lp));
                     assert_eq!(
                         rep.recovered,
-                        Some(planted),
+                        Some(
+                            crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(planted)
+                        ),
                         "g {genus} p {p} index {index}"
                     );
                     assert!(!rep.exhausted);
@@ -1234,7 +1236,10 @@ mod tests {
         // A truncated base with large primes, through the same path.
         let spec = CurveSpec::HyperellipticThread { p: 41, genus: 2 };
         let (rep, planted) = ecbench_run(&spec, 3, 2, &method("12", "1"));
-        assert_eq!(rep.recovered, Some(planted));
+        assert_eq!(
+            rep.recovered,
+            Some(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(planted))
+        );
         assert!(rep.counters["combined_relations"] > 0);
     }
 

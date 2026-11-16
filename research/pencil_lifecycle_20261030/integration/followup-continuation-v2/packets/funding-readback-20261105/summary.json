@@ -1,0 +1,73 @@
+{
+  "schema": "research.admission-readback/v1",
+  "recorded_utc": "2026-11-05T15:48:05.613512+00:00",
+  "scope": "read-only funding and live-cap observation",
+  "budgets": [
+    {
+      "name": "isolab-daily-cost-100",
+      "period": "DAILY",
+      "limit_usd": "200.0",
+      "reported_spend_usd": "104.44",
+      "arithmetic_residual_usd": "95.56",
+      "last_updated": "2026-11-05T11:47:42.975000+00:00"
+    },
+    {
+      "name": "isolab-monthly-account-cost",
+      "period": "MONTHLY",
+      "limit_usd": "1000.0",
+      "reported_spend_usd": "538.72",
+      "arithmetic_residual_usd": "461.28",
+      "last_updated": "2026-11-05T11:55:08.334000+00:00"
+    },
+    {
+      "name": "spot-experiments-daily-25",
+      "period": "DAILY",
+      "limit_usd": "200.0",
+      "reported_spend_usd": "44.765",
+      "arithmetic_residual_usd": "155.235",
+      "last_updated": "2026-11-05T11:51:51.009000+00:00"
+    }
+  ],
+  "daily_allowances_additive": false,
+  "available_funds_usd": null,
+  "reserved_or_unreported_costs_usd": null,
+  "desired_limits": {
+    "cpu_spot": {
+      "cpu": 16,
+      "memory_gib": 128
+    },
+    "cpu_l2_spot": {
+      "cpu": 8,
+      "memory_gib": 32
+    },
+    "isolab_namespace_requests_and_limits": {
+      "cpu": 16,
+      "memory_gib": 128
+    },
+    "arc_pools_cpu": 0,
+    "arc_runners": 0
+  },
+  "live_enforcement_verified": false,
+  "kubectl_context": "spot-job-submitter",
+  "kubectl_failure": "Existing exec configuration requests legacy LauncherRole; sts:AssumeRole denied before Kubernetes RBAC evaluation. Empty stdout List alongside nonzero exit is not an empty-cluster result.",
+  "mcp_jobs": {
+    "count": 12,
+    "states": {
+      "failed": 10,
+      "succeeded": 1,
+      "pending": 1
+    },
+    "pencil_jobs_returned": [],
+    "scope": "returned overview list only; not a complete account-wide workload inventory"
+  },
+  "new_job_or_build_admitted": false,
+  "gaps": [
+    "Delayed billing snapshots do not include all committed or reserved spending.",
+    "Current lane dollar allocation and account-wide commitments need reconciliation; historical reserve is not new funds.",
+    "NodePool, ResourceQuota and ARC live enforcement unavailable through configured kubectl identity.",
+    "No current node/instance idle-cost inventory or projected cost through new deadline established.",
+    "No image/source/protocol/runtime qualification gate is changed by this readback."
+  ],
+  "cloud_mutations": 0,
+  "scientific_trials": 0
+}

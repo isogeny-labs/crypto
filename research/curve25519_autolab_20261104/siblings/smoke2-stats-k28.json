@@ -1,0 +1,99 @@
+{
+ "r": 33558059,
+ "sqrt_r": 5792.931813857298,
+ "field_bits": 28,
+ "prices": {
+  "group_add": 51044,
+  "group_double": 61264.0
+ },
+ "arms": {
+  "rho-neg": {
+   "n": 24,
+   "bitops_per_sqrt_r": 50247.77968276815,
+   "gae_per_sqrt_r": 0.9480806685017128,
+   "steps_per_sqrt_r": 0.8701912080640816,
+   "S": {
+    "0.0": 0.9480806685017128,
+    "0.1": 1.0364167678108571,
+    "1.0": 1.8314416615931561
+   }
+  },
+  "tw2cj-lazy": {
+   "n": 24,
+   "bitops_per_sqrt_r": 94705.05523719621,
+   "gae_per_sqrt_r": 1.8393895657194452,
+   "stored_points_per_sqrt_r": 1.7692394218789966,
+   "stored_se": 0.10587947565262941,
+   "setup_adds": 173.04166666666666,
+   "setup_doubles": 94,
+   "walk_adds": 10249.083333333334,
+   "post_hoc_bitops_per_sqrt_r": {
+    "setup": 2518.8549256576453,
+    "walk_additions": 90309.05705039151,
+    "second_points": 0.0,
+    "lift_products": 0.0,
+    "sign_resolutions": 0.0,
+    "table_inserts": 198.15481525044763,
+    "walk_total": 90507.21186564196,
+    "setup_share_of_oracle_setup": 0.027076872241719077
+   },
+   "S": {
+    "0.0": 1.8393895657194455,
+    "0.1": 2.017051476199976,
+    "1.0": 3.6160086705247516
+   }
+  },
+  "tw2cj-lazy-sib8-p64": {
+   "n": 24,
+   "bitops_per_sqrt_r": 65458.92448787035,
+   "gae_per_sqrt_r": 1.049598061115687,
+   "stored_points_per_sqrt_r": 1.932383640333734,
+   "stored_se": 0.10669864761986962,
+   "setup_adds": 149.375,
+   "setup_doubles": 100,
+   "walk_adds": 5651,
+   "post_hoc_bitops_per_sqrt_r": {
+    "setup": 2373.771682778302,
+    "walk_additions": 49793.378080162845,
+    "second_points": 9791.635621243528,
+    "lift_products": 1246.2001507994678,
+    "sign_resolutions": 357.22996572876815,
+    "table_inserts": 216.4269677173782,
+    "walk_total": 61404.87078565199,
+    "setup_share_of_oracle_setup": 0.03721891201985511
+   },
+   "S": {
+    "0.0": 1.0495980611156872,
+    "0.1": 1.3515867701516282,
+    "1.0": 4.069485151475102
+   }
+  }
+ },
+ "ratios": {
+  "bitops tw2cj-lazy-sib8-p64/tw2cj-lazy": [
+   0.6911872267422616,
+   0.6062945292041132,
+   0.7927047661312634
+  ],
+  "bitops tw2cj-lazy-sib8-p64/rho-neg": [
+   1.302722725285286,
+   1.0853116540990837,
+   1.5946993549439485
+  ],
+  "stored tw2cj-lazy-sib8-p64/tw2cj-lazy": [
+   1.0922114985893046,
+   0.944445833616129,
+   1.268988272046403
+  ],
+  "walk-only bitops tw2cj-lazy-sib8-p64/tw2cj-lazy": [
+   0.6784527942017216,
+   0.5881303936175662,
+   0.7854988983133685
+  ],
+  "bitops tw2cj-lazy/rho-neg": [
+   1.8847609951146582,
+   1.541951686720066,
+   2.361245101017255
+  ]
+ }
+}

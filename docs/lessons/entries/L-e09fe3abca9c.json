@@ -1,0 +1,14 @@
+{
+  "action": "cap CPU-heavy agents at cores/2, forbid pkill/killall patterns in every brief (kill own PIDs only), and have each agent commit its PROTOCOL.md alone before any measured row",
+  "created": "2026-11-16T03:29:58Z",
+  "evidence": [
+    "research/sat_smt_leads_20261115/README.md Limits"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "research-pilot"
+  ],
+  "trigger": "running several measuring agents on one container",
+  "why": "a pkill pattern killed sibling runs and file-time preregistration was unverifiable"
+}

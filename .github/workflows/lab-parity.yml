@@ -6,6 +6,7 @@ name: lab-parity
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
   workflow_dispatch:
@@ -19,6 +20,7 @@ concurrency:
 
 jobs:
   parity:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -29,3 +31,11 @@ jobs:
         run: python3 tools/check_lab_parity.py --repo crypto
       - name: Validation record validator
         run: python3 tools/test_validate_validation_json.py
+      # Tool tests that no pull-request workflow ran
+      # (docs/audits/2026-11-15-correctness-validation-assessment.md, C-2, V-19).
+      - name: Result-switch registry covers every environment variable the producers read
+        run: python3 tools/test_result_switches.py
+      - name: Task-card tool tests
+        run: python3 tools/test_task_card.py
+      - name: Loss-ledger tool tests
+        run: python3 tools/test_loss_ledger.py

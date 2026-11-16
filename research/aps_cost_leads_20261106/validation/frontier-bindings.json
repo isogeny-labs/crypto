@@ -1,0 +1,23 @@
+{
+  "schema": "aps.frontier-bindings/v1",
+  "source_commit": "62a2bc061ef1b43bc5d4f3f7451dcb0305d14b35",
+  "source_sha256": "49b5592f3812c094a860eba7b41108a08997115a1b839eb30837bf907c07dcf1",
+  "bindings": [
+    {
+      "theorem": "APSLeads.first_failure",
+      "normalized_declaration": "theorem first_failure (P : Nat \u2192 Prop) : \u2200 n, (\u00ac \u2200 i, i < n \u2192 P i) \u2192 \u2203 j, j < n \u2227 \u00ac P j \u2227 \u2200 i, i < j \u2192 P i",
+      "decl_sha256": "218d7ffe2d66fefa2d30251c36b5d706aef8ac62177c8b4c5c8e4f45e49b3e7f"
+    },
+    {
+      "theorem": "APSLeads.frontier_cover",
+      "normalized_declaration": "theorem frontier_cover (old new : Nat \u2192 Prop) (n : Nat) (subset : \u2200 i, i < n \u2192 old i \u2192 new i) : ((\u2200 i, i < n \u2192 new i) \u2227 \u00ac (\u2200 i, i < n \u2192 old i)) \u2194 \u2203 j, Region old new n j",
+      "decl_sha256": "9b8209ba97bef807d6961ce6e840e85ee9961e30b80f98f641201431f24c8e4f"
+    },
+    {
+      "theorem": "APSLeads.frontier_unique",
+      "normalized_declaration": "theorem frontier_unique (old new : Nat \u2192 Prop) (n j k : Nat) (a : Region old new n j) (b : Region old new n k) : j = k",
+      "decl_sha256": "107c44c4fe28e3aad1df6996565109365cb7d16b8d647bf5ca5f195a2c7c5a54"
+    }
+  ],
+  "implementation_refinement_proved": false
+}

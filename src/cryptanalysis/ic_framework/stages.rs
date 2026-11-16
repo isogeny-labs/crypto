@@ -42,9 +42,13 @@ use std::time::Duration;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
+    CompletionRule, CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
 };
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+
+/// The matrix contract consumed by the collector and [`RelationSolverFactory`].
+/// The older [`RelationSolver`] interface below additionally carries metadata.
+pub use crate::cryptanalysis::ic_boundary::RelationSolver as RelationMatrix;
 
 /// Free-form parameters a plug-in reads its configuration from.
 ///
@@ -101,6 +105,9 @@ impl Params {
     /// silently build a different factor base.
     pub fn parse_spec(spec: &str) -> Result<(String, Params), String> {
         let (name, rest) = spec.split_once(':').unwrap_or((spec, ""));
+        if name.is_empty() || name.chars().any(char::is_whitespace) {
+            return Err(format!("invalid plug-in name `{name}`"));
+        }
         let mut params = Params::default();
         let mut previous: Option<&str> = None;
         for kv in rest.split(',').filter(|s| !s.is_empty()) {
@@ -114,7 +121,16 @@ impl Params {
                     None => format!("parameter `{kv}` is not key=value"),
                 });
             };
-            params.set(k.trim(), v.trim());
+            let key = k.trim();
+            if key.is_empty() {
+                return Err(format!("empty parameter name in plug-in spec `{spec}`"));
+            }
+            if params.get(key).is_some() {
+                return Err(format!(
+                    "duplicate parameter `{key}` in plug-in spec `{spec}`"
+                ));
+            }
+            params.set(key, v.trim());
             previous = Some(kv);
         }
         Ok((name.to_string(), params))
@@ -188,6 +204,36 @@ pub trait FactorBaseBuilder<G: CountedGroup> {
     }
 }
 
+/// Constructs a fresh relation matrix after the factor base fixes its width.
+///
+/// A factory may borrow application state. It receives no planted logarithm.
+/// Completion and verification policy belong to this contract rather than to
+/// a hard-coded string comparison in the runner. Returned matrices must start
+/// empty and obey [`RelationMatrix`]'s accounting and incremental-query rules.
+pub trait RelationSolverFactory {
+    fn name(&self) -> &str;
+
+    fn create(&self, columns: usize, modulus: u64) -> Result<Box<dyn RelationMatrix + '_>, String>;
+
+    fn completion_rule(&self) -> CompletionRule {
+        CompletionRule::TargetPinned
+    }
+
+    /// Check a representative of every factor-base column after recovery.
+    /// Requires [`CompletionRule::FullRank`].
+    fn verify_base_columns(&self) -> bool {
+        false
+    }
+}
+
+/// All replaceable stages needed by the runner. The caller owns the plug-ins;
+/// there is no global registry, required allocator scheme, or thread model.
+pub struct PipelineStages<'a, G: CountedGroup> {
+    pub factor_base: &'a dyn FactorBaseBuilder<G>,
+    pub oracle: &'a mut dyn DecompositionOracle<G>,
+    pub matrix: &'a dyn RelationSolverFactory,
+}
+
 /// The shape of an algebraic system, for the report's degree columns.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SystemShape {
@@ -251,6 +297,14 @@ pub trait DecompositionOracle<G: CountedGroup> {
         BTreeMap::new()
     }
 
+    /// Verified homogeneous relations found during `prepare`. Each row has
+    /// one coefficient per factor-base column; the framework appends a zero
+    /// target coefficient and enters it with right-hand side zero before
+    /// drawing targets. Existing oracles seed no rows.
+    fn setup_rows(&self) -> &[Vec<u64>] {
+        &[]
+    }
+
     /// Decompose `point`, or decide it does not decompose.
     fn decompose(
         &mut self,
@@ -270,6 +324,14 @@ pub trait DecompositionOracle<G: CountedGroup> {
     /// run's hash-map path.
     fn line_guard(&self) -> bool {
         false
+    }
+
+    /// A stored ladder `[2^i]G` (already paid for in `prepare`) that the
+    /// pipeline's recovery check `[d]G` may read instead of a
+    /// double-and-add, charged to the same verification ops.  `None` (the
+    /// default) keeps every recorded run's check.
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        None
     }
 
     /// **The large-prime seam.**  Decompose `point = [a]G + [b]Q`, or
@@ -743,6 +805,10 @@ pub enum Targets {
     WalkPrimeBatch4,
     WalkPrimeBatch8,
     WalkPrimeBatch16,
+    /// Wide lane schedules: enough targets per round to fill a GPU batch
+    /// (`rootfind-subtract-gpu`).  The same walk per lane.
+    WalkPrimeBatch256,
+    WalkPrimeBatch1024,
     /// Residual matching (lead L3): the walk subtracts a base point at
     /// every step and relations come from collisions of the residuals;
     /// the oracle is not consulted.  See `ic_framework::residual`.
@@ -783,6 +849,8 @@ impl Targets {
             Targets::WalkPrimeBatch4 => "walk-prime-batch-4",
             Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
             Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
+            Targets::WalkPrimeBatch256 => "walk-prime-batch-256",
+            Targets::WalkPrimeBatch1024 => "walk-prime-batch-1024",
             Targets::Residual => "residual",
             Targets::ResidualFused => "residual-fused",
             Targets::ResidualFusedDp => "residual-fused-dp",
@@ -806,6 +874,8 @@ impl Targets {
             "walk-prime-batch-4" => Ok(Targets::WalkPrimeBatch4),
             "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
             "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
+            "walk-prime-batch-256" => Ok(Targets::WalkPrimeBatch256),
+            "walk-prime-batch-1024" => Ok(Targets::WalkPrimeBatch1024),
             "residual" => Ok(Targets::Residual),
             "residual-fused" => Ok(Targets::ResidualFused),
             "residual-fused-dp" => Ok(Targets::ResidualFusedDp),
@@ -816,7 +886,7 @@ impl Targets {
             "stride-generator" => Ok(Targets::StrideGenerator),
             "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16/256/1024, residual, residual-fused, residual-fused-dp, residual-fused-eq, residual-fused-eq-chain, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }
@@ -983,6 +1053,19 @@ mod tests {
         assert_eq!(fc.degree_bound, 14);
         assert_eq!(fc.cost.unit, "F_p multiplications");
         assert_eq!(fc.all_targets.predicted_degree, Some(14));
+    }
+
+    #[test]
+    fn ambiguous_plugin_parameters_are_rejected() {
+        for spec in [
+            "",
+            ":x=1",
+            "two words:x=1",
+            "engine:=1",
+            "engine:size=1, size=2",
+        ] {
+            assert!(Params::parse_spec(spec).is_err(), "accepted {spec:?}");
+        }
     }
 
     #[test]

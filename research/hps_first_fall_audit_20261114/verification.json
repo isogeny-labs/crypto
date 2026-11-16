@@ -1,0 +1,77 @@
+{
+  "schema": "hps-first-fall-verification/v1",
+  "source_commit": "93d469cd19cd08759348f38880fd0cb3d1c2b086",
+  "claim_id": "PCC-20261114-0c9bcf",
+  "declaration_sha256": "e1eb8e2ab8f67dad4a4467cb03e2437b6ff46b888c2c36fc6c36c6373abfea9e",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 10,
+  "gate_declarations": 45,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 136,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-0c9bcf",
+    "claim_sha256": "0b091480b57e10f7fc6e75e5cebd86e73f3de570fe3506e8906a164989c205ae",
+    "commit": "93d469cd19cd08759348f38880fd0cb3d1c2b086",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/hps_first_fall_audit_20261114/lean (HPSCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T22:48:00Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-0c9bcf",
+    "claim_sha256": "0b091480b57e10f7fc6e75e5cebd86e73f3de570fe3506e8906a164989c205ae",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 48268,
+    "sha256": "5030cccaa51adbc66220a3d84b6a1dc5f254bc69f627725e16deda2520e40faa",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 45,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "general_field_rank_bound_refuted": true,
+    "actual_quotient_homology_minimum_rank_proved": true,
+    "source_gamma_biinfinite_sum_counter_proved": true,
+    "one_variable_sharp_repair_proved": true,
+    "q3_positive_and_q2_invalid_domain_controls_proved": true,
+    "binary_q2_bound_refuted": false,
+    "binary_m_squared_plus_one_bound_refuted": false,
+    "abstract_all_V_tensor_comparison_verified": false,
+    "full_Weil_descent_or_solving_degree_verified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}
