@@ -489,7 +489,7 @@ fn main() -> ExitCode {
                                     LaMode::Baseline,
                                 ),
                                 'N' => (SplitOracle::LucasRoots, Some("C_coord"), LaMode::Coord),
-                                'S' | 'U' => (
+                                'S' | 'U' | 'V' => (
                                     SplitOracle::LucasRoots,
                                     Some(if a == 'S' {
                                         "C_coord_square"
@@ -500,7 +500,18 @@ fn main() -> ExitCode {
                                 ),
                                 _ => (SplitOracle::Frobenius, None, LaMode::Baseline),
                             };
-                            // U: arm S with the unit-T walk.
+                            // V: arm U with the deterministic fallback root finder.
+                            let oracle = if a == 'V' {
+                                SplitOracle::LucasRootsFast
+                            } else {
+                                oracle
+                            };
+                            let label = if a == 'V' {
+                                Some("C_unit_t_fast")
+                            } else {
+                                label
+                            };
+                            // U, V: arm S with the unit-T walk.
                             let walk = if a == 'U' {
                                 WalkMode::UnitT
                             } else {

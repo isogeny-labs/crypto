@@ -326,6 +326,11 @@ pub enum SplitOracle {
     /// root finder draws no randomness, so the walk differs from the
     /// baseline after the first split.
     LucasRoots,
+    /// [`SplitOracle::LucasRoots`], and where the Cardano cube root is not
+    /// available (`3 | n/3`) one deterministic Cantor–Zassenhaus split of the
+    /// cubic (shifts `b = 0, 1, 2, …`) plus the quadratic formula, instead of
+    /// the randomized recursive [`roots_of`].  Draws no randomness.
+    LucasRootsFast,
 }
 
 impl SplitOracle {
@@ -334,6 +339,7 @@ impl SplitOracle {
             SplitOracle::Frobenius => "frobenius",
             SplitOracle::Lucas => "lucas",
             SplitOracle::LucasRoots => "lucas_roots",
+            SplitOracle::LucasRootsFast => "lucas_roots_fast",
         }
     }
 }
@@ -470,6 +476,50 @@ impl CubicOracle {
         Some((split, split.then_some((t, pp))))
     }
 
+    /// Roots of a monic quadratic known to split: the quadratic formula.
+    fn quadratic_roots(&self, b: u64, c: u64, n: &mut Nat) -> [u64; 2] {
+        let p = self.p;
+        let d = ps(p, pm(p, b, b, n), pm(p, 4, c, n), n);
+        let sq = self.sqrt(d, n);
+        let inv2 = p.div_ceil(2);
+        let nb = ps(p, 0, b, n);
+        [
+            pm(p, pa(p, nb, sq, n), inv2, n),
+            pm(p, ps(p, nb, sq, n), inv2, n),
+        ]
+    }
+
+    /// Roots of a squarefree monic cubic known to split, without the
+    /// Cardano cube root: the first shift `b` with
+    /// `gcd(u, (x + b)^((p−1)/2) − 1)` of degree 1 or 2 splits `u`, and the
+    /// quadratic part is solved by the quadratic formula.
+    fn split_cubic_roots_det(&self, u: &Poly, n: &mut Nat) -> Option<Vec<u64>> {
+        let p = self.p;
+        let ctx = ModU {
+            p,
+            d: 3,
+            u: [u[0], u[1], u[2]],
+        };
+        for b in 0..p.min(64) {
+            let h = ctx.pow_xpa(b, (p - 1) / 2, n);
+            let mut hm1: Poly = h.to_vec();
+            hm1[0] = ps(p, hm1[0], 1, n);
+            ptrim(&mut hm1);
+            if hm1.is_empty() {
+                continue;
+            }
+            let g = pgcd_monic(p, u, &hm1, n);
+            let (lin, quad) = match g.len() - 1 {
+                1 => (g.clone(), pdiv_monic(p, u, &g, n)),
+                2 => (pdiv_monic(p, u, &g, n), g.clone()),
+                _ => continue,
+            };
+            let [r1, r2] = self.quadratic_roots(quad[1], quad[0], n);
+            return Some(vec![ps(p, 0, lin[0], n), r1, r2]);
+        }
+        None
+    }
+
     /// Roots of a split monic cubic from the Lucas data, when `3 ∤ m`.
     fn cubic_roots(&self, u: &Poly, t: u64, pp: u64, n: &mut Nat) -> Option<Vec<u64>> {
         let p = self.p;
@@ -527,11 +577,16 @@ fn split_and_roots(
         }
         Some((_, (false, _))) => None,
         Some((co, (true, info))) => {
-            if oracle == SplitOracle::LucasRoots {
+            if oracle != SplitOracle::Lucas {
                 if let Some((t, pp)) = info {
                     if let Some(rs) = co.cubic_roots(u, t, pp, n) {
                         return Some(rs);
                     }
+                }
+            }
+            if oracle == SplitOracle::LucasRootsFast {
+                if let Some(rs) = co.split_cubic_roots_det(u, n) {
+                    return Some(rs);
                 }
             }
             roots_of(p, u, rng, n)
@@ -1903,7 +1958,11 @@ mod tests {
                             .filter(|&x| (((x + a) * x % p + b) * x % p + c) % p == 0)
                             .collect();
                         assert_eq!(want, truth.len() == 3, "baseline p={p} u={u:?}");
-                        for oracle in [SplitOracle::Lucas, SplitOracle::LucasRoots] {
+                        for oracle in [
+                            SplitOracle::Lucas,
+                            SplitOracle::LucasRoots,
+                            SplitOracle::LucasRootsFast,
+                        ] {
                             let got = split_and_roots(oracle, Some(&co), p, &u, &mut rng, &mut nat);
                             assert_eq!(got.is_some(), want, "{oracle:?} p={p} u={u:?}");
                             if let Some(mut rs) = got {
