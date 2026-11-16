@@ -75,3 +75,5 @@ remains unread. All fourteen targets remain active, including the
 qualified adding-walk limiting constants/practicalhash/scalar-recovery
 runtime and the other recorded geometry/solver/counting obligations.
 [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `8703dc5ebdc43d7a49b12ca0b7890f4328e2601c` and local receipt `88e347f23c54fd947598118c43401ce6e46564f6` share tree `22d96c9bb002b005c89413320e3ae2072f7d7f94`. Anonymous fetch completed before exact fresh head/title/body/ready confirmation. All47 pinsets/6127 entries match. New-head CI, review and signing remain pending; next scheduled owner09:30UTC. [pcc:unverified]
