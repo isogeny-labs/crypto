@@ -769,8 +769,11 @@ def rel_tol_pre_cap_reports(repo: Path = REPO) -> dict[str, str]:
     """{digest: path} of every committed validator report, named by a VALIDATION.json, that
     states a tolerance above the cap.  Run once, when the cap begins."""
     out: dict[str, str] = {}
-    listed = subprocess.run(["git", "-C", str(repo), "ls-files", f"*{MANIFEST}"], text=True,
-                            capture_output=True, check=True).stdout.split()
+    # Hydration must not change the frozen snapshot: store-backed reports are
+    # not committed report files. Their admission still uses the cap above.
+    tracked = set(subprocess.run(["git", "-C", str(repo), "ls-files", "-z"], text=True,
+                                 capture_output=True, check=True).stdout.split("\0"))
+    listed = [p for p in tracked if p.endswith(MANIFEST)]
     for rel in sorted(listed):
         try:
             man = json.loads((repo / rel).read_text())
@@ -780,6 +783,12 @@ def rel_tol_pre_cap_reports(repo: Path = REPO) -> dict[str, str]:
         if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
             continue
         p = (repo / rel).parent / spec["path"]
+        try:
+            report_rel = p.resolve().relative_to(repo.resolve()).as_posix()
+        except ValueError:
+            continue
+        if report_rel not in tracked:
+            continue
         try:
             rep = json.loads(p.read_text())
         except (OSError, ValueError):

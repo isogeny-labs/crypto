@@ -586,6 +586,15 @@ def cmd_push(cfg: Config, args) -> int:
 
 def cmd_pull(cfg: Config, args) -> int:
     items = selected(cfg.root, [Path(p) for p in args.paths])
+    # A manifest may retain an old object after the path returns to Git.
+    # Git's index is authoritative, including for omitted sparse files and
+    # staged additions: hydration must never restore the historical object
+    # over it. Do not infer ownership from the working file's presence.
+    tracked = set(git(cfg.root, "ls-files", "-z").decode().split("\0"))
+    preserved = [item for item in items if rel(cfg.root, item[0] / item[1]) in tracked]
+    items = [item for item in items if rel(cfg.root, item[0] / item[1]) not in tracked]
+    if preserved:
+        print(f"preserved {len(preserved)} tracked files with historical store entries", file=sys.stderr)
     todo = []
     for d, name, e in items:
         f = d / name

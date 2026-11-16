@@ -212,6 +212,23 @@ class EvidenceDir(Scratch):
         self.assertEqual(g.rel_tol_pre_cap_reports(REPO), listed)
         self.assertTrue(listed)
 
+    def test_store_hydration_does_not_expand_the_committed_pre_cap_snapshot(self):
+        subprocess.run(["git", "init", "-q", str(self.repo)], check=True)
+        d = self.evidence("runs/hydrated")
+        self.headline(d, recomputed=1.25 * 1.0005, rel_tol=1e-3)
+        subprocess.run(["git", "-C", str(self.repo), "add", "runs/hydrated/VALIDATION.json"], check=True)
+        report = d / "validator-report.json"
+        original = report.read_bytes()
+        report.unlink()
+        self.assertEqual(g.rel_tol_pre_cap_reports(self.repo), {})
+        report.write_bytes(original)
+        self.assertEqual(g.rel_tol_pre_cap_reports(self.repo), {})
+        self.assertTrue(any("rel_tol" in x for x in self.errors(d)))
+        # A tracked report is included, proving discovery still reads reports.
+        subprocess.run(["git", "-C", str(self.repo), "add", "runs/hydrated/validator-report.json"], check=True)
+        self.assertEqual(g.rel_tol_pre_cap_reports(self.repo),
+                         {g.report_digest(json.loads(original)): "runs/hydrated/validator-report.json"})
+
     def test_rel_tol_up_to_the_maximum_is_honoured(self):
         d = self.evidence()
         near = 1.25 * (1 + 5e-7)

@@ -55,6 +55,28 @@ class RoundTrip(unittest.TestCase):
     def art(self, *a, check=True, cwd=None):
         return sh(cwd or self.repo, sys.executable, str(TOOL), *a, check=check, env=self.env)
 
+    def test_pull_preserves_tracked_successor_and_unstaged_edits(self):
+        self.art("push", "research")
+        path = self.repo / "research/r1/runs/a.jsonl"
+        successor = b"current authoritative tracked successor\n"
+        path.write_bytes(successor)
+        self.git("add", "-f", "research/r1/runs/a.jsonl")
+        # Siblings still hydrate, while the staged successor stays authoritative.
+        sibling = self.repo / "research/r1/blob.unknown"
+        sibling.unlink()
+        self.art("pull", "research")
+        self.assertEqual(path.read_bytes(), successor)
+        self.assertTrue(sibling.is_file())
+        edited = successor + b"local edit\n"
+        path.write_bytes(edited)
+        result = self.art("pull", "research/r1/runs/a.jsonl")
+        self.assertEqual(path.read_bytes(), edited)
+        self.assertIn("preserved 1 tracked files", result.stderr)
+        # An omitted tracked path is also authoritative, not a hydration target.
+        path.unlink()
+        self.art("pull", "research/r1/runs/a.jsonl")
+        self.assertFalse(path.exists())
+
     def test_push_commit_clone_pull_verify(self):
         plan = self.art("plan").stdout
         self.assertIn("research/r1/runs/a.jsonl", plan)
@@ -588,6 +610,25 @@ class GateEvidenceDerivation(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def test_historical_manifest_does_not_overwrite_a_path_restored_to_git(self):
+        sh(self.root, "git", "init", "-q", "-b", "main")
+        d = self.root / "pcc"
+        d.mkdir()
+        (d / ".artifacts.json").write_text(json.dumps({"schema": "artifacts.manifest/v1", "files": {
+            "ledger.jsonl": {"sha256": "0" * 64, "bytes": 9},
+            "old-records.jsonl": {"sha256": "1" * 64, "bytes": 9}}}))
+        (d / "ledger.jsonl").write_text("current ledger\n")
+        sh(self.root, "git", "add", "pcc/ledger.jsonl", "pcc/.artifacts.json")
+        moved = wire_workflows.moved_paths(self.root)
+        self.assertNotIn("pcc/ledger.jsonl", moved)
+        self.assertIn("pcc/old-records.jsonl", moved)
+        self.assertEqual(wire_workflows.needed("run: cat pcc/ledger.jsonl", moved,
+                                             wire_workflows.moved_dirs(moved)), ["pcc"])
+        # A broad explicit read may still pull siblings, but cannot select the
+        # tracked ledger itself as a moved file.
+        self.assertEqual(wire_workflows.cover({"pcc/old-records.jsonl"}, moved),
+                         ["pcc/old-records.jsonl"])
 
     def test_only_the_store_backed_raw_data_the_report_lists_is_derived(self):
         need, notes = wire_workflows.evidence_store_files(self.root, self.moved)

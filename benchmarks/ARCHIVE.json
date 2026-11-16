@@ -735,6 +735,28 @@
         "research/mt_rho_start_fix_20261111/validation/claim-report.json",
         "benchmarks/20261111-mt-fieldops-ic4/README.md"
       ]
+    },
+    {
+      "directory": "20261029-ic-aimed-gather",
+      "row": "| 2026-10-29 | [`20261029-ic-aimed-gather`](20261029-ic-aimed-gather/) | IC relation collection (`ic price`, rule v3 `k0n53/T01`, `icv1-f2m53-tm56619371-dac20a85`): the aimed subset's coordinates gathered once per unit instead of on every trial (#2448); 42 same-session rounds of main, main and candidate in all six orders, paired native ratios against a 42-round A/A; independent replay and validator report ([`VALIDATION.json`](20261029-ic-aimed-gather/VALIDATION.json)) | collect phase **1.093× [1.068, 1.136]** (main / candidate, 38/42 rounds above 1; 230.3 → 212.5 ms) against an A/A of [0.977, 1.026]: **established**; whole set-up 1.042× [1.020, 1.082] against [0.946, 1.015]: marginal (+0.005, only after the bootstrap correction), not claimed; intervals corrected: the as-run bootstrap drew only odd-numbered rounds, and a first correction drew every resample half odd and half even ([CORRECTION.md](../research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md)); counted operations and the recovered logarithm identical; Callgrind 1.023× fewer instructions at n53 (first session); the board's rule v7 row (IC 8.146 vs rho 1.159 S, 7.03×) predates the change and is not re-priced | Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, AVX-512, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 0 of 126 runs contended (71 launches refused and retried); local, not Iso Lab (build-vs-build A/A) | [`research/ic_aimed_gather_20261023/aa2_20261029/`](../research/ic_aimed_gather_20261023/aa2_20261029/), [report](../research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf) |",
+      "sha256": "ad572473b43b804a9ab1c8693d8d0fbaae1fb0691fbe348a6452ad3ccaee86d4",
+      "disposition": "incomplete",
+      "reason": "The frozen registry-binding-20261107 validator pins registry SHA256 33a16da0548b7b0c3482b3ba7198500a0285271794f63e9c46e10f9a02186e4f; the current registry has changed. CI rejects its raw input pin. Retain the historical result pending a versioned, independently checked custody successor; do not repin the old report.",
+      "provenance": [
+        "benchmarks/20261029-ic-aimed-gather/VALIDATION.json",
+        "docs/audits/2026-11-16-late-ci-evidence-boundaries.md"
+      ]
+    },
+    {
+      "directory": "20261029-ic-packed-filter",
+      "row": "| 2026-10-29 | [`20261029-ic-packed-filter`](20261029-ic-packed-filter/) ([PDF](20261029-ic-packed-filter/ic-packed-filter-report.pdf); [graph](20261029-ic-packed-filter/summary.svg); [validation](20261029-ic-packed-filter/VALIDATION.json)) | Prime-field index calculus component: whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table (`mitm-prime-blocked:m=2,filter=1` against `mitm-prime-blocked:m=2`), b = 32, two curves, 288 pairs, interleaved with position and A/A arms (backlog XP-20261029-packed-filter, frozen protocol); matched `rho-neg` in the counted session | corrected wall `dgbf / dgb` 0.9601 [0.9569, 0.9633] (−3.99%) at identical charged GAE; `bitop/v1` +0.301% (build-side only); S′ `dgbf / dgb` 1.0 / 1.0505 / 1.3586 at w = 0 / 0.1 / 1 (decides nothing; `dgbf` costlier at w > 0); distance remaining `dgbf / rho-neg` 31.47 / 31.50 / 31.63 (rho cheaper at every weight). Validated with caveats (independent replay and validator, TASK-20261029-654f73), single session, not replicated; 24 bits read a regression (1.0032), 28 bits undecidable ([details](20261029-ic-packed-filter/README.md)) | c8a.2xlarge (AMD EPYC 9R45) on EKS, L2 | [`research/ic_packed_filter_20261029`](../research/ic_packed_filter_20261029/README.md) ([report](../research/ic_packed_filter_20261029/REPORT.pdf)) |",
+      "sha256": "d5ccce3b08cd152d48f0245417ac27a545690a702fffaddaf433a3dfd6bf3669",
+      "disposition": "incomplete",
+      "reason": "The store-backed historical validator is not in the committed pre-cap exemption snapshot. CI rejects65 headline tolerances above1e-6 (first P32 corrected_dof8.887308922858158e-05). Preserve its frozen display-rounding checks and measurements as historical evidence; re-admission requires a new validator satisfying the current cap.",
+      "provenance": [
+        "benchmarks/20261029-ic-packed-filter/VALIDATION.json",
+        "docs/audits/2026-11-16-late-ci-evidence-boundaries.md"
+      ]
     }
   ]
 }
