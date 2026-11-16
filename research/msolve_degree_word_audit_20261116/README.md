@@ -59,3 +59,14 @@ fetched newer reviewed paths opaqueVLT1/unread. No novelty/absence claim.
 All14 remain active, including whole-C/row-trace refinement, completed
 normal boundary execution, physical-host independence and the existing
 geometric/counting/walk obligations. [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4389](https://github.com/isogeny-labs/crypto/pull/4389).
+The proof-packet local commit `fbd77e5a5fde243500d981425abe9ab5918171fc` and remote commit
+`1353313c8317f201be4d75f3bbd64ab056888e40` share tree
+`127ac1b9f909d9e4fdd79df8eb9fd209c6e4ac5f`. Completed anonymous fetch and fresh exact
+head/title/body/open/ready check are recorded in [publication.json](publication.json).
+Current-head CI/review/signing remain pending; local replay PASS does not
+establish signed standing. All14 targets remain active; boundary native
+execution is timeout124/notvalidated. [pcc:unverified]
