@@ -1,7 +1,7 @@
 name: Prime-field transfer goal correctness
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
     paths:
       - 'research/prime_field_transfer_goal_20261116/**'
       - '.github/workflows/prime-field-transfer-goal.yml'
@@ -10,7 +10,6 @@ permissions:
   contents: read
 jobs:
   native-correctness:
-    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -48,3 +47,13 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/target_precision.cpp" -o /tmp/target-precision
           /tmp/target-precision > /tmp/component-precision.jsonl
           cmp /tmp/component-precision.jsonl "$study/receipts/round-01/target-precision-01.jsonl"
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-02/fixture_driver.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/local-fixture
+          for fixture in p17 p257; do
+            timeout 60s /tmp/local-fixture "$fixture" > "/tmp/local-$fixture.jsonl"
+            cmp "/tmp/local-$fixture.jsonl" "$study/receipts/round-02/native-03-$fixture.jsonl"
+          done
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror "$study/round-02/public_fixture.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/local-public
+          for point in 0 1 2 3; do
+            timeout 60s /tmp/local-public "$point" > "/tmp/local-public-$point.jsonl"
+            cmp "/tmp/local-public-$point.jsonl" "$study/receipts/round-02/native-04-public-$point.jsonl"
+          done

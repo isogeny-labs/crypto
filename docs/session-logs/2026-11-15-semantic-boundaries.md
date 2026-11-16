@@ -85,3 +85,17 @@ Final46 artifact controls, parity/generator replay, current-head CI and owner-so
 Old code accepted relative parent paths and a symlinked parent could redirect writes. Reproductions were confined to temporary directories. [pcc:unverified]
 
 Final replay:46 artifact tests pass; parity21, generated workflow check and draft-tier check pass. The pinned original inputs remain byte-equal. [pcc:unverified]
+
+## 2026-11-16T04:43Z - current-main integration
+
+### What was done
+GitHub started only pull_request_target jobs for the latest owner head because it conflicted with moving main. Integrated88112c5a93. Upstream PR4398 now carries the evidence-discovery restoration, so this branch has no remaining wire_workflows.py diff. Upstream PR4394 restored the canonical registry and reverted the cap assessment. Keep its validation scripts and benchmark index byte-identical: the two-row archival proposal and its pre-cap inventory change are superseded; both benchmark rows remain admitted under current main policy. Preserve the removed policy snapshot as historical bytes in docs/audits/2026-11-16-policy-history/REL_TOL_PRE_CAP.json.
+
+### Decisions made
+Resolve the prime-transfer trigger with upstream's push-only policy. Keep the independent artifact guards, immutable PCC base, and draft-tier repair. Parsed workflow documents match upstream or its standard draft transformation after removing generated blocks; receipt docs/audits/2026-11-16-integrated-workflow-replay.json.
+
+### Open threads
+Current-head hosted CI and exact owner-source consumer sync. Full committed-tree validation needs hosted store inputs.
+
+### Errors
+Sparse merge omitted manually materialized receipts/helpers outside its patterns. Confirmed their committed objects and restored them; an absent worktree file is not an upstream deletion. Earlier stage receipts remain historical and are superseded by docs/audits/2026-11-16-current-main-integration.json. [pcc:unverified]
