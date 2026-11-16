@@ -1,0 +1,78 @@
+[
+  {
+    "id": "signed-prime-oracles-20261116-v78",
+    "time": "2026-11-16T03:33:44.120338+00:00",
+    "fingerprint": "02eefd7c7fbd7735e732282ef85b0311e9d8438fd6aa46c992e73e1d7af3ca27",
+    "preregistration_sha256": "5eca5ff2ffd494d931fc43320f6681eb88c439624ea9795a7b79562a96a93587",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.signed_prime_power_20261116_v78.oracles",
+      "signed-prime-oracles-20261116-v78",
+      "oracles_raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "selected_frozen_files_sha256": {
+      "lab/research/nist_presets.json": "a614dac35438fce60fb05d822d0e90f0149bdfde616986f32255f10722ea2a7c",
+      "research/signed_prime_power_20261116_v78/DATA.json": "3c91fe7d82603dd4f1f1d668756c05f8c73b8e54561984b53b4752cbeb3a998f",
+      "research/signed_prime_power_20261116_v78/F65537_BATCH.json": "7ba748845ead03107464ffd796751b2ec303049fc89e9fa12312098a97937e44",
+      "research/signed_prime_power_20261116_v78/P192_BATCH.json": "319f41f145bd7fc4d45c468bbf4216e0820b72ab496c675972e2b0807677888e",
+      "research/signed_prime_power_20261116_v78/P224_BATCH.json": "167359da4bb87cedfe629ec63d38e7177a01d96f2664b9a121663ab064b2949c",
+      "research/signed_prime_power_20261116_v78/P256_BATCH.json": "a9078eb5f977ff2d3f73809f6eb36bde40e0edb3c00e2982a558287143b2038a",
+      "research/signed_prime_power_20261116_v78/P384_BATCH.json": "fd65e40ff0b5dc264451fff888879584e3c100b680999e03c4d9f0d9f57ad7fa",
+      "research/signed_prime_power_20261116_v78/P521_BATCH.json": "c31e326ba7f28989ddb2e4573cdbb85bceb1cb2cc6a9d24aa83ad12709700f50",
+      "research/signed_prime_power_20261116_v78/PROOF.md": "e52547003f3ac82bace19a699b0e64d5908a33c1a482afc5a43fbe580e54437d",
+      "research/signed_prime_power_20261116_v78/SOURCE_DIFF.txt": "0e58e81fd93849cd637fe9511a0f7bfbe5761ef979f6725d255340438ac41f03",
+      "research/signed_prime_power_20261116_v78/child.py": "0eeaefed83d9e9970f61602a640c1c487f28cdd2ca59d337debc606ed5ba02fb",
+      "research/signed_prime_power_20261116_v78/cold.py": "522e3c84b54a09dd5a5bed1527e3304b2469923a2aa53325243e32246312b476",
+      "research/signed_prime_power_20261116_v78/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/signed_prime_power_20261116_v78/kernel.py": "a5ec5e53634db63e88c7c08bfe22d0016e9e104403d27b5f7e1fba6a5cbbf20f",
+      "research/signed_prime_power_20261116_v78/oracles.py": "5aae1d6cccf42f8131fc64b1394ca29cad1f4b0fc30b0373c4f0b8392f9c0999",
+      "research/signed_prime_power_20261116_v78/router.py": "a520a738b7a364530c290407245fe0ce0de74578607200897bdb897f6b8de8ec",
+      "research/signed_prime_power_20261116_v78/solver.py": "f469055cc924551fc1dc551dbc0d02b4c65d427ed1b4dec61eb77c25615729a7",
+      "research/signed_prime_power_review_20261116_v78/REVIEW.md": "9e088050ceb43984fd4d0c176d74c06507a4d498d6762284cbdd6ca46779eec8",
+      "research/torsion_cut_nist_20261116_v74b/raw.json": "4b21285b59b2de4f7687a6b075ba4f54d1bcc4ea7501d465a35004c9c92ddaac"
+    },
+    "scope": "Scientific excerpt; full frozen original plan retained in ledger"
+  },
+  {
+    "id": "signed-prime-cold-20261116-v78",
+    "time": "2026-11-16T03:33:50.349420+00:00",
+    "fingerprint": "d63197cc20bff221f6a6ae529c7977f02934ae8ef02017005ad0ca5286d68683",
+    "preregistration_sha256": "df21d5c18ac4925656190f6de65f789398727d786c9053f52aaa8d394419f75e",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.signed_prime_power_20261116_v78.cold",
+      "signed-prime-cold-20261116-v78",
+      "cold_raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "selected_frozen_files_sha256": {
+      "lab/research/nist_presets.json": "a614dac35438fce60fb05d822d0e90f0149bdfde616986f32255f10722ea2a7c",
+      "research/signed_prime_power_20261116_v78/DATA.json": "3c91fe7d82603dd4f1f1d668756c05f8c73b8e54561984b53b4752cbeb3a998f",
+      "research/signed_prime_power_20261116_v78/F65537_BATCH.json": "7ba748845ead03107464ffd796751b2ec303049fc89e9fa12312098a97937e44",
+      "research/signed_prime_power_20261116_v78/P192_BATCH.json": "319f41f145bd7fc4d45c468bbf4216e0820b72ab496c675972e2b0807677888e",
+      "research/signed_prime_power_20261116_v78/P224_BATCH.json": "167359da4bb87cedfe629ec63d38e7177a01d96f2664b9a121663ab064b2949c",
+      "research/signed_prime_power_20261116_v78/P256_BATCH.json": "a9078eb5f977ff2d3f73809f6eb36bde40e0edb3c00e2982a558287143b2038a",
+      "research/signed_prime_power_20261116_v78/P384_BATCH.json": "fd65e40ff0b5dc264451fff888879584e3c100b680999e03c4d9f0d9f57ad7fa",
+      "research/signed_prime_power_20261116_v78/P521_BATCH.json": "c31e326ba7f28989ddb2e4573cdbb85bceb1cb2cc6a9d24aa83ad12709700f50",
+      "research/signed_prime_power_20261116_v78/PROOF.md": "e52547003f3ac82bace19a699b0e64d5908a33c1a482afc5a43fbe580e54437d",
+      "research/signed_prime_power_20261116_v78/SOURCE_DIFF.txt": "0e58e81fd93849cd637fe9511a0f7bfbe5761ef979f6725d255340438ac41f03",
+      "research/signed_prime_power_20261116_v78/child.py": "0eeaefed83d9e9970f61602a640c1c487f28cdd2ca59d337debc606ed5ba02fb",
+      "research/signed_prime_power_20261116_v78/cold.py": "522e3c84b54a09dd5a5bed1527e3304b2469923a2aa53325243e32246312b476",
+      "research/signed_prime_power_20261116_v78/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/signed_prime_power_20261116_v78/kernel.py": "a5ec5e53634db63e88c7c08bfe22d0016e9e104403d27b5f7e1fba6a5cbbf20f",
+      "research/signed_prime_power_20261116_v78/oracles.py": "5aae1d6cccf42f8131fc64b1394ca29cad1f4b0fc30b0373c4f0b8392f9c0999",
+      "research/signed_prime_power_20261116_v78/router.py": "a520a738b7a364530c290407245fe0ce0de74578607200897bdb897f6b8de8ec",
+      "research/signed_prime_power_20261116_v78/solver.py": "f469055cc924551fc1dc551dbc0d02b4c65d427ed1b4dec61eb77c25615729a7",
+      "research/signed_prime_power_review_20261116_v78/REVIEW.md": "9e088050ceb43984fd4d0c176d74c06507a4d498d6762284cbdd6ca46779eec8",
+      "research/torsion_cut_nist_20261116_v74b/raw.json": "4b21285b59b2de4f7687a6b075ba4f54d1bcc4ea7501d465a35004c9c92ddaac"
+    },
+    "scope": "Scientific excerpt; full frozen original plan retained in ledger"
+  }
+]

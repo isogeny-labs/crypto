@@ -1,0 +1,88 @@
+{
+  "schema": "injective-box-source-review/v1",
+  "created": "2026-11-14T11:21:50.889189+00:00",
+  "scope": "Exact finite Hildebrand box-counting core for genuine uniform sampling without replacement: actual injective d-tuples have cardinality (card X).descFactorial d, actual point masses and event probability ratios, coordinate-product upper bound without independence assumption, and impossibility of a PMF when d exceeds population. Actual all injective prime-field supports with fixed first point are equivalent to nonzero injective tuples; actual mapped sampler equals uniform law on the full conditional space. Canonical centered coordinates for j nonzero give cardinality at most p*(U-L)+1, so actual source box probability is at most product(width+1)/(p-1).descFactorial d. For all primes p>=3, j=0 gives coordinate cardinality p-1 and actual one-coordinate zero-width source probability 1, directly refuting the deleted-index bound 1/(p-1). Standard foundations/default limits; no holes/custom axioms/native evaluation/raised limits/global flags/waivers/native experiment/paid compute/upload. Corrected asymptotic 1.1 approximation and stronger expected random-support mixing theorem remain open; qualified source theorems not refuted.",
+  "primaries": [
+    {
+      "url": "https://link.springer.com/content/pdf/10.1007/BF01199265.pdf",
+      "bytes": 576938,
+      "sha256": "4629e178e68096fa5b37193de34e3e55dfb3f12021721dea06080737b5901458",
+      "read_scope": "Priorfull13publishedpages191–203/proofs/discussion/referencesread/all13renderedpagesinspectedcredited. Rechecked originalLemma4p196/PDF6enlarged andproofp197/PDF7, sectionk>=2p195. Fixeda1/j, actualuniformdistinctsupport, printedclosedinterval/1.1constant faithfullyspecialized; no refutationofqualifiedTheorem1/2."
+    },
+    {
+      "url": "https://arxiv.org/pdf/math/0401189",
+      "bytes": 322419,
+      "sha256": "a43ec4cad3318fc072d601053ed8f60e6ec4d2bf145b99f9879e7d8434c7d570",
+      "read_scope": "Authorpreprintarxivmath/0401189v1. Selectedsection4.2/preprint13–16andreference14p36read; pages15–16rendered/visuallyinspected. Explicitseparatek2argument, thenk>=3Lemma2, exerciseacknowledgesfailureofolderpaper14whichreferencep36identifiesas1994paper. Knownissuecredited, notfull37pagepreprintread."
+    }
+  ],
+  "prior": [
+    {
+      "path": "research/hildebrand_cell_audit_20261114/README.md",
+      "commit": "1fe5cee934d4195b3151a8100173db323e34afdd",
+      "sha256": "de81d8066520abca0762877d624ac038fbb53b7fda8a07b6aedcff18c8a6c38e"
+    },
+    {
+      "path": "research/hildebrand_cell_audit_20261114/sources.json",
+      "commit": "1fe5cee934d4195b3151a8100173db323e34afdd",
+      "sha256": "0491714adf8ea4d1e1beee46835aaba2a31dfe8e33ff71305be645699c0f8a3a"
+    },
+    {
+      "path": "research/hildebrand_cell_audit_20261114/verification.json",
+      "commit": "1fe5cee934d4195b3151a8100173db323e34afdd",
+      "sha256": "e3b5fae9255b6750b75fdfa94237aaca3a73daf912df0df5901a507c6bcf5ac8"
+    }
+  ],
+  "official_mathlib": {
+    "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "sources": [
+      {
+        "path": "Mathlib/Data/Fintype/CardEmbedding.lean",
+        "sha256": "7a5ec78b96f06ffb65593ef94fc421d6a6b7c20398c937a6014213cd1f61c2f0"
+      },
+      {
+        "path": "Mathlib/Data/Fintype/EquivFin.lean",
+        "sha256": "891fdb687fc067b1511701992301e28de0d4fd6ab53d74a96f51be39d5aa8f92"
+      },
+      {
+        "path": "Mathlib/Data/Nat/Factorial/Basic.lean",
+        "sha256": "8728bc17da88bbf503a28686b362661a1449c567d5bba740669593d93054ded7"
+      },
+      {
+        "path": "Mathlib/Data/Fintype/BigOperators.lean",
+        "sha256": "d0201051dfa54e8b67710ff484c34dc57e75da0e0bced663d798f6df333da638"
+      },
+      {
+        "path": "Mathlib/Data/Int/Interval.lean",
+        "sha256": "9024ca70f7998144dada12a8e333fa3488be14221103f69d13c7c747bea5d9ea"
+      },
+      {
+        "path": "Mathlib/Data/Finset/Max.lean",
+        "sha256": "620b0e39a5a7d623087b9e9777d85281321f99c501600048c9154d42aaf01a7d"
+      },
+      {
+        "path": "Mathlib/Data/Finset/Card.lean",
+        "sha256": "300b99474dc58cca9b8724362a1a4673a217b2c66a0a7153ccc8eeb684ab51fa"
+      },
+      {
+        "path": "Mathlib/Algebra/Order/BigOperators/GroupWithZero/Finset.lean",
+        "sha256": "00067a68ba76c56cebe5f2a04d5ef39e3615088ce275bd1a76a1a07cc82a4cb3"
+      }
+    ]
+  },
+  "kb": "MCP absent; fresh status, two distinct corrected-box/without-replacement queries and card_embedding theorem query all returned 127. Primary/prior/official fallback before code recorded at 10:45 UTC. No absence or novelty claim.",
+  "source_connection": "Original 1994 proof p197 contains the product(width+1) numerator and (p-1)...(p-k+1) denominator. Later author preprint section4.2 restricts its asymptotic lemma to k>=3. This packet proves the exact finite counting core, retaining +1 and actual normalization.",
+  "attempts": "Every failed and successful source/config/log/exit retained; lake update completed before first snapshot. Generic named indicator avoids mismatched decidability data; explicit conditional proof and official nonnegative-product API resolve elaboration failures. No flags, limits or waivers.",
+  "exact_finite_counting_core": true,
+  "actual_full_uniform_conditional_support_space": true,
+  "actual_pointmass_and_cardinality_derived": true,
+  "canonical_centered_coordinate_count": true,
+  "deleted_zero_index_probability_bound_refuted": true,
+  "corrected_asymptotic_one_point_one_closed": false,
+  "qualified_theorem_one_or_two_refuted": false,
+  "full_later_preprint_read": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

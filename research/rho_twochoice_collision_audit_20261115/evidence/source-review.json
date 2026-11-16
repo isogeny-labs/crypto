@@ -1,0 +1,112 @@
+{
+  "schema": "rho-twochoice-source-review/v1",
+  "at": "2026-11-15T16:00:00.468831+00:00",
+  "kb": [
+    {
+      "call": "mechanism",
+      "stdout": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n",
+      "exit": 127
+    },
+    {
+      "call": "negative",
+      "stdout": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n",
+      "exit": 127
+    },
+    {
+      "call": "status",
+      "stdout": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n",
+      "exit": 127
+    },
+    {
+      "call": "theorems",
+      "stdout": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n",
+      "exit": 127
+    }
+  ],
+  "conductor": {
+    "exit": 127,
+    "stdout": "",
+    "stderr": "/bin/bash: line 1: conductor: command not found\n",
+    "before_code": true
+  },
+  "fallback": "Relevant MCP absent; bounded local/official/primary fallback; no absence/novelty claim.",
+  "prior_claims": [
+    {
+      "packet": "random_support_average_audit_20261114",
+      "scope": "Qualified Hildebrand expected mixing for all fixed positive weights/k≥2/uniform ordered distinct supports; no collision-time assertion."
+    },
+    {
+      "packet": "sidon_rho_counterfamily_audit_20261114",
+      "scope": "Actual fixed20 Sidon supports/local-degree-two and unbounded first-repeat-square/p; support table not averaged."
+    },
+    {
+      "packet": "static_hash_collision_audit_20261114",
+      "scope": "Actual static-hash/iid survival and least-repeat tail/expectation; postcollision chronological-word replacement counterexample."
+    },
+    {
+      "packet": "start_invariant_rho_audit_20261114",
+      "scope": "Actual translation/start-law invariance, credited; new theorem uses start0."
+    },
+    {
+      "packet": "hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+      "scope": "Existing actual uniform PMF and support-coordinate reductions, read/credited."
+    }
+  ],
+  "primary": [
+    {
+      "title": "Galbraith Mathematics of Public Key Cryptography corrected ch14v2",
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch14.pdf",
+      "bytes": 357706,
+      "sha256": "ab59d8013db88ca145a101ddf9a9e28876fc4d10c76aac115d11da7bbbe1fada",
+      "pages": 38,
+      "fresh_fulltext_and_visual_pdf": [
+        4,
+        5,
+        12,
+        13
+      ],
+      "printed": [
+        288,
+        289,
+        296,
+        297
+      ],
+      "qualification": "nS≥8 subject to a conjecture; Teske recommends nS≥20; original squaring walk is different. Actual deterministic adding selection not uniform randomfunction; firstrepeat distinct from Floyd/cyclealone."
+    },
+    {
+      "title": "Bernstein–Lange2013 Two grumpy giants and a baby",
+      "url": "https://msp.org/obs/2013/1-1/obs-v1-n1-p05-s.pdf",
+      "doi": "10.2140/obs.2013.1.87",
+      "bytes": 791394,
+      "sha256": "0613242a53e413e21516018f7d8921353d79b6da3b2f513790cd12d306eaec72",
+      "pages": 28,
+      "fresh_fulltext_and_visual_pdf": [
+        11,
+        12
+      ],
+      "printed": [
+        96,
+        97
+      ],
+      "qualification": "Local degree2 corrections assume specific distinct products; higher relations depend on support vector. No general rigorous collision constant claimed."
+    }
+  ],
+  "primary_copyright_files_committed": false,
+  "original_Teske_paper_read_this_stage": false,
+  "established_methods_credited": [
+    "Finite first-step stopped-square/maximal inequality",
+    "Finite union counting and unique field root",
+    "Uniform ordered-support coordinate bijection",
+    "Deferred decisions until repeat",
+    "Bertrand prime bound"
+  ],
+  "new_scope": "Actual support-averaged two-choice first-repeat lowerbound and failure of a uniform sqrt constant; r2 negativecalibration.",
+  "qualified_large_partition_conjecture_refuted": false,
+  "novelty_claim": false,
+  "open": [
+    "Qualified large-partition collision penalty/limiting constants",
+    "Practical fixed/keyed hash refinement",
+    "Floyd/scalar-recovery runtime",
+    "Remaining full14 proof/execution bridges"
+  ]
+}

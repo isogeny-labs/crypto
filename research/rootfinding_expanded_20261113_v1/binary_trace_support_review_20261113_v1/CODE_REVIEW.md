@@ -1,0 +1,7 @@
+# Independent static code review
+
+The complete new worker, proof and input rules were read before source admission. Reviewer performed no scientific algorithm execution or native compilation. Shift/reduce multiplication is compared to an independent coefficient-convolution table for GF4/GF8. The GF4 corpus is all1024monicquintics; GF8 uses a fixed SHA coefficient sample plus explicit supported and repeated controls. Product-index source tuples supply exact domain-support truth including all multiplicities. Three quotient squarings are compared with independent characteristic coefficients from principal-minor permutation determinants and matrix-power Newton identities. In characteristic two determinant signs correctly disappear.
+
+The actualGF83 fixture uses83bit arithmetic and18annihilatorbasissteps without a2^18domain enumeration. Coefficient and quotient recurrences are crosschecked at the supplied repeated factor. Lazy field products avoid an impossible full field table. Its field/modulus premise and affine-family nonmembership limitation are disclosed.
+
+All finite corpora, dimensions and200000predicate cap precede work;90s parent supervision and80/84/88internal acceptance cover work, raw serialization and final reporting. Raw creation is exclusive. Late completion is demoted; no numerical speed ratio is claimed. Memory is individual selfRSS, not aggregate tree memory. Admission does not assert experiment success.

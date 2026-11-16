@@ -1,0 +1,28 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 2673,
+  "date": "2026-11-05",
+  "standing": "unverified",
+  "parent": "78ad623a037454148e53f20016ea4190b394d06a",
+  "review_thread": "PRRT_kwDOSMdswM6weoST",
+  "behavior": "Reject a defective native replay before any output/comparison artifact is written.",
+  "tests": {
+    "added": 2,
+    "cases": [
+      "clean synthetic native receipts",
+      "tampered target coordinates accepted as Ok(Replayed) but rejected at comparison admission",
+      "tampered relation accepted as Ok(Replayed) but rejected at comparison admission"
+    ],
+    "status": "Pending actual current-head CI; no local execution."
+  },
+  "frozen_manifests_inspected": [
+    "research/phase_paired_native_20261026/SHA256SUMS",
+    "research/phase_paired_native_20261026/SHA256SUMS_CMS"
+  ],
+  "frozen_bytes_changed": false,
+  "remaining_reviews": [
+    "PRRT_kwDOSMdswM6weoSR",
+    "PRRT_kwDOSMdswM6weoSU"
+  ],
+  "scientific_measurement_performed": false
+}

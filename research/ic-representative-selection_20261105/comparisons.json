@@ -1,0 +1,593 @@
+{
+ "schema": "repsel.comparisons/v1",
+ "frozen_with": "PROTOCOL.md section 7",
+ "note": "x/y name a study arm (workload label) and an ecbench arm (method). theta = exp(mean over classes of ln(mean over units of X / mean over units of Y)); p one-sided by the alternative; p_iut = max over w in {0, 0.1, 1}.",
+ "family_alpha": 0.05,
+ "hypotheses": [
+  {
+   "id": "H_B24",
+   "comparison": "HB24",
+   "gates": [
+    {
+     "id": "check:determinism",
+     "rule": "check"
+    },
+    {
+     "id": "check:transport:24",
+     "rule": "check"
+    },
+    {
+     "id": "AA24",
+     "rule": "ci95_includes_1"
+    },
+    {
+     "id": "PC24",
+     "rule": "ci95_excludes_1"
+    }
+   ],
+   "power_control": "PWB24",
+   "vanish_margin": 0.03
+  },
+  {
+   "id": "H_B28",
+   "comparison": "HB28",
+   "gates": [
+    {
+     "id": "check:determinism",
+     "rule": "check"
+    },
+    {
+     "id": "check:transport:28",
+     "rule": "check"
+    },
+    {
+     "id": "AA28",
+     "rule": "ci95_includes_1"
+    },
+    {
+     "id": "PC28",
+     "rule": "ci95_excludes_1"
+    }
+   ],
+   "power_control": "PWB28",
+   "vanish_margin": 0.03
+  },
+  {
+   "id": "H_C24",
+   "comparison": "HC24",
+   "gates": [
+    {
+     "id": "check:determinism",
+     "rule": "check"
+    },
+    {
+     "id": "AAC24",
+     "rule": "ci95_includes_1"
+    },
+    {
+     "id": "NCC24",
+     "rule": "ci95_includes_1"
+    },
+    {
+     "id": "PC24",
+     "rule": "ci95_excludes_1"
+    }
+   ],
+   "power_control": "PWC24",
+   "vanish_margin": 0.03
+  }
+ ],
+ "secondary_family_alpha": 0.05,
+ "secondary_hypotheses": [
+  {
+   "id": "H_C28",
+   "comparison": "HC28",
+   "gates": [
+    {
+     "id": "check:determinism",
+     "rule": "check"
+    },
+    {
+     "id": "AAC28",
+     "rule": "ci95_includes_1"
+    },
+    {
+     "id": "NCC28",
+     "rule": "ci95_includes_1"
+    },
+    {
+     "id": "PC28",
+     "rule": "ci95_excludes_1"
+    }
+   ],
+   "power_control": "PWC28",
+   "vanish_margin": 0.03
+  }
+ ],
+ "comparisons": [
+  {
+   "id": "HB24",
+   "tier": "24",
+   "role": "primary",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "AA24",
+   "tier": "24",
+   "role": "gate_aa",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Aaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "PWB24",
+   "tier": "24",
+   "role": "power",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Aaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   },
+   "plant_x": 0.96
+  },
+  {
+   "id": "PC24",
+   "tier": "24",
+   "role": "gate_positive",
+   "metric": "yield",
+   "alternative": "greater",
+   "x": {
+    "arm": "ctlA",
+    "method": "ic-mitm-plus1"
+   },
+   "y": {
+    "arm": "ctlA",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "NCB24",
+   "tier": "24",
+   "role": "negative_control",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B0",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "MECH24",
+   "tier": "24",
+   "role": "mechanism",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "B0",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "RHOLVL24",
+   "tier": "24",
+   "role": "control_rho_level",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B",
+    "method": "rho-neg"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP24-A",
+   "tier": "24",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "A",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP24-B",
+   "tier": "24",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "B",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP24-B0",
+   "tier": "24",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "B0",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "HC24",
+   "tier": "24",
+   "role": "primary",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Csel",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "AAC24",
+   "tier": "24",
+   "role": "gate_aa",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Cdefaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "PWC24",
+   "tier": "24",
+   "role": "power",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Cdefaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   },
+   "plant_x": 0.96
+  },
+  {
+   "id": "NCC24",
+   "tier": "24",
+   "role": "negative_control",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Crho",
+    "method": "rho-neg"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP24-Csel",
+   "tier": "24",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "Csel",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP24-Cdef",
+   "tier": "24",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "HB28",
+   "tier": "28",
+   "role": "primary",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "AA28",
+   "tier": "28",
+   "role": "gate_aa",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Aaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "PWB28",
+   "tier": "28",
+   "role": "power",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Aaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   },
+   "plant_x": 0.96
+  },
+  {
+   "id": "PC28",
+   "tier": "28",
+   "role": "gate_positive",
+   "metric": "yield",
+   "alternative": "greater",
+   "x": {
+    "arm": "ctlA",
+    "method": "ic-mitm-plus1"
+   },
+   "y": {
+    "arm": "ctlA",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "NCB28",
+   "tier": "28",
+   "role": "negative_control",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B0",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "MECH28",
+   "tier": "28",
+   "role": "mechanism",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "B0",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "RHOLVL28",
+   "tier": "28",
+   "role": "control_rho_level",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "B",
+    "method": "rho-neg"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP28-A",
+   "tier": "28",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "A",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP28-B",
+   "tier": "28",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "B",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP28-B0",
+   "tier": "28",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "B0",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "A",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "HC28",
+   "tier": "28",
+   "role": "secondary",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Csel",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "AAC28",
+   "tier": "28",
+   "role": "gate_aa",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Cdefaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   }
+  },
+  {
+   "id": "PWC28",
+   "tier": "28",
+   "role": "power",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Cdefaa",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   },
+   "plant_x": 0.96
+  },
+  {
+   "id": "NCC28",
+   "tier": "28",
+   "role": "negative_control",
+   "metric": "S",
+   "alternative": "less",
+   "x": {
+    "arm": "Crho",
+    "method": "rho-neg"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP28-Csel",
+   "tier": "28",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "Csel",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "rho-neg"
+   }
+  },
+  {
+   "id": "GAP28-Cdef",
+   "tier": "28",
+   "role": "gap_to_matched_rho",
+   "metric": "S",
+   "alternative": "greater",
+   "x": {
+    "arm": "Cdef",
+    "method": "ic-mitm"
+   },
+   "y": {
+    "arm": "Cdef",
+    "method": "rho-neg"
+   }
+  }
+ ]
+}

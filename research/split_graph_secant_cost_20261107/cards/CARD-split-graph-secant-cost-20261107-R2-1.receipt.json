@@ -1,0 +1,472 @@
+{
+  "card_id": "CARD-split-graph-secant-cost-20261107-R2-1",
+  "card_path": "research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-R2-1.yaml",
+  "card_sha256": "c74e3a65f373eaa29144a785348e833d33b9050de9cd770c9acc02f1605611cb",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "7897a300a75d7e6458a04ab5852340efa1335152",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "7897a300a75d7e6458a04ab5852340efa1335152",
+        "HEAD",
+        "--",
+        "research/split_graph_secant_cost_20261107",
+        ":(exclude)research/split_graph_secant_cost_20261107/cards",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.009,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.009,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "20acbf94d87b87f47fa20b4866c79143e9df6154e64cc1a07de9e56e10a84ed1",
+        ".provenance.protocol_sha256 == $h",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--slurpfile",
+        "r",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request.json",
+        "--slurpfile",
+        "l",
+        "research/split_graph_secant_cost_20261107/eks/layer-receipt.json",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b",
+        "$r[0].job.image == $i and $l[0].image_uri == $i"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-equals-layer-receipt",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/split_graph_secant_cost_20261107/eks/r2img_validate.sh",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.076,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-request",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.076,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d1bdd93b05ecc3064daeaf2d330a03bd49c1c2a3636c59a39ccb8c8ef39dc1b6",
+      "stdout_tail": [
+        "validator: /home/user/crypto/taskq/deploy/eks-karpenter/remote/run-command (sha256 1cdaa7447893fd5c...), 22 jq lines",
+        "VALID    research/split_graph_secant_cost_20261107/eks/r2img_request.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "ecr",
+        "describe-images",
+        "--repository-name",
+        "isolab/tasks",
+        "--image-ids",
+        "imageDigest=sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b",
+        "--region",
+        "us-east-2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.892,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "image-exists-in-ecr",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.892,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fde514549dc67e65e22c51ff3f3fd0fc8a932cc22cee3db4b2a59a3ff45eb538",
+      "stdout_tail": [
+        "{",
+        "    \"imageDetails\": [",
+        "        {",
+        "            \"registryId\": \"104186811093\",",
+        "            \"repositoryName\": \"isolab/tasks\",",
+        "            \"imageDigest\": \"sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b\",",
+        "            \"imageTags\": [",
+        "                \"sgsecant-f13a690df016\"",
+        "            ],",
+        "            \"imageSizeInBytes\": 147664390,",
+        "            \"imagePushedAt\": 1794113076.392,",
+        "            \"imageManifestMediaType\": \"application/vnd.docker.distribution.manifest.v2+json\",",
+        "            \"artifactMediaType\": \"application/vnd.docker.container.image.v1+json\",",
+        "            \"lastRecordedPullTime\": 1794113227.342,",
+        "            \"imageStatus\": \"ACTIVE\"",
+        "        }",
+        "    ]",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.254,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 7,
+      "outputs": {},
+      "seconds": 9.254,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "161a5fcb8d685442da19f8faa9617f1a7faff692010fed0af6a07e6334a1f1d6",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261108T045859Z-6137209239d5/ (0 unpushed commit(s), 1 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0449Z-split-graph-secant-panel.json",
+        "--",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 133.226,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch",
+      "index": 8,
+      "outputs": {
+        "research/split_graph_secant_cost_20261107/receipts/R2/launch/result.json": "ab1206106bf577094b9a46dc4af8b41cf7b310ad0580585471a93f7d9e4c5cc4"
+      },
+      "seconds": 133.226,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0243ecf2d2e1d2dc23cb0f0c2da3d534228a7507a707eca61ddbabea3e7159b1",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"isolab.eks.command-result/v1\",",
+        "  \"state\": \"active\",",
+        "  \"job_name\": \"sgsecant-panel-20261107\",",
+        "  \"job_uid\": \"9fa397c5-ba1f-4537-9541-503eb63d0eb7\",",
+        "  \"pods\": [",
+        "    {",
+        "      \"uid\": \"7c8f6f3b-7fe8-4ec1-a3ca-1e7e7f95681b\",",
+        "      \"phase\": \"Pending\",",
+        "      \"node\": null,",
+        "      \"exit_code\": null",
+        "    }",
+        "  ],",
+        "  \"results_prefix\": \"s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261107/\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261107/launcher/727e67cd-f008-40af-8cde-f0082063df5e/\",",
+        "  \"request_sha256\": \"bacf8cb0c356c5b93f608de8dbcc38f26d40081992f1d3bf96393314b953bc18\",",
+        "  \"manifest_sha256\": \"1f282f4514ae0f0f834a92e0f90052b773c0283e5799b25a6218f9e03d3bbc94\",",
+        "  \"launcher\": \"isolab-experiment-launcher:727e67cd-f008-40af-8cde-f0082063df5e\",",
+        "  \"exit_code\": 0",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-c",
+        "{job_name, job_uid, pods, state, exit_code, launcher, receipt_uri, results_prefix, request_sha256, manifest_sha256}",
+        "research/split_graph_secant_cost_20261107/receipts/R2/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "record-launch",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2cc171bbeac644ade0838579558aa43d85298ef555d90f72acc24b50bb2ce3e2",
+      "stdout_tail": [
+        "{\"job_name\":\"sgsecant-panel-20261107\",\"job_uid\":\"9fa397c5-ba1f-4537-9541-503eb63d0eb7\",\"pods\":[{\"uid\":\"7c8f6f3b-7fe8-4ec1-a3ca-1e7e7f95681b\",\"phase\":\"Pending\",\"node\":null,\"exit_code\":null}],\"state\":\"active\",\"exit_code\":0,\"launcher\":\"isolab-experiment-launcher:727e67cd-f008-40af-8cde-f0082063df5e\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261107/launcher/727e67cd-f008-40af-8cde-f0082063df5e/\",\"results_prefix\":\"s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261107/\",\"request_sha256\":\"bacf8cb0c356c5b93f608de8dbcc38f26d40081992f1d3bf96393314b953bc18\",\"manifest_sha256\":\"1f282f4514ae0f0f834a92e0f90052b773c0283e5799b25a6218f9e03d3bbc94\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261108T0449Z-split-graph-secant-panel.json",
+        "--",
+        "research/split_graph_secant_cost_20261107/cards/wait_command_status.sh",
+        "research/split_graph_secant_cost_20261107/cards/status_request.json",
+        "sgsecant-panel-20261107",
+        "research/split_graph_secant_cost_20261107/receipts/R2/status",
+        "4500",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3535.069,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "wait",
+      "index": 10,
+      "outputs": {
+        "research/split_graph_secant_cost_20261107/receipts/R2/status/final-status.json": "0ed157741bc0d8ab43ca8610eb0477194e76ac260a8b96604e5f888bb213e293"
+      },
+      "seconds": 3535.069,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6fed98b12354630f4975358703945ee772217c110592198822b451484cc5d846",
+      "stdout_tail": [
+        "2026-11-08T05:30:35Z poll 18 launcher_exit 0 state active",
+        "2026-11-08T05:32:28Z poll 19 launcher_exit 0 state active",
+        "2026-11-08T05:34:21Z poll 20 launcher_exit 0 state active",
+        "2026-11-08T05:36:13Z poll 21 launcher_exit 0 state active",
+        "2026-11-08T05:37:17Z poll 22 launcher_exit 255 state none",
+        "2026-11-08T05:39:09Z poll 23 launcher_exit 0 state active",
+        "2026-11-08T05:41:02Z poll 24 launcher_exit 0 state active",
+        "2026-11-08T05:42:05Z poll 25 launcher_exit 255 state none",
+        "2026-11-08T05:43:57Z poll 26 launcher_exit 0 state active",
+        "2026-11-08T05:45:01Z poll 27 launcher_exit 255 state none",
+        "2026-11-08T05:46:53Z poll 28 launcher_exit 0 state active",
+        "2026-11-08T05:47:57Z poll 29 launcher_exit 255 state none",
+        "2026-11-08T05:49:00Z poll 30 launcher_exit 255 state none",
+        "2026-11-08T05:50:52Z poll 31 launcher_exit 0 state active",
+        "2026-11-08T05:52:45Z poll 32 launcher_exit 0 state active",
+        "2026-11-08T05:54:37Z poll 33 launcher_exit 0 state active",
+        "2026-11-08T05:56:30Z poll 34 launcher_exit 0 state active",
+        "2026-11-08T05:58:22Z poll 35 launcher_exit 0 state active",
+        "2026-11-08T06:00:15Z poll 36 launcher_exit 0 state failed",
+        "{\"state\":\"failed\",\"job_name\":\"sgsecant-panel-20261107\",\"job_uid\":\"9fa397c5-ba1f-4537-9541-503eb63d0eb7\",\"pods\":[],\"launcher\":\"isolab-experiment-launcher:14b54813-7a86-45b1-99f8-a1da049791aa\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261107/launcher/14b54813-7a86-45b1-99f8-a1da049791aa/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261107/",
+        "research/split_graph_secant_cost_20261107/results/R2",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.885,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.885,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/verify_results.sh",
+        "research/split_graph_secant_cost_20261107/receipts/R2/status/final-status.json",
+        "research/split_graph_secant_cost_20261107/receipts/R2/launch/result.json",
+        "research/split_graph_secant_cost_20261107/results/R2",
+        "SHA256SUMS",
+        "dc7c013bc2ac19aecc69f6cd5c9a253563ef02e49d72c5590b0d9e951ef88ee9  /opt/sgsecant/sgsecant"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 50,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 50,
+      "id": "verify",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e91dc4cc2a49cff50a7320cef7f3421b471b757544a9030eb7401bd3c659a2b2",
+      "stderr_tail": [
+        "FAIL: Job is not succeeded with exactly one pod and pod exit 0"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 15,
+  "commit": "6137209239d5e0b77ccd702e9ab499173466335c",
+  "dirty_after": [
+    "benchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json",
+    "enchmarks/records/20261108T0449Z-split-graph-secant-panel.json"
+  ],
+  "dirty_before": [
+    "research/ml_learnability_control_20261107/eks/image.json",
+    "research/ml_learnability_control_20261107/protocol.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 12"
+}

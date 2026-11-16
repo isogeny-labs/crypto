@@ -1,0 +1,238 @@
+warning: variant `Limit` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:6:115
+  |
+6 | #[derive(Debug,PartialEq)] pub enum Error { Domain, Geometry, Phase, Division, Polynomial, Degenerate, Character, Limit }
+  |                                     ----- variant in this enum                                                    ^^^^^
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `resultant`, `recurrence_updates`, and `partial_value` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:7:83
+  |
+7 | ...b struct Raw {pub value:u64,pub seed:u64,pub ratio:[u64;2],pub resultant:u64,pub recurrence_updates:u64,pub partial_value:Option<u...
+  |             --- fields in this struct                             ^^^^^^^^^         ^^^^^^^^^^^^^^^^^^         ^^^^^^^^^^^^^
+  |
+  = note: `Raw` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `base` and `seed_exponent` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:9:44
+  |
+9 | ...ct Source {p:u64,a:u64,b:u64,r:u64,base:[u64;2],curve:geometry::Curve,partition:[u64;4],calibration_inverse:u64,base_seed:u64,seed_exponent:u64}
+  |       ------ fields in this struct    ^^^^                                                                                       ^^^^^^^^^^^^^
+
+warning: function `seed_step` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:19:4
+   |
+19 | fn seed_step(delta:u64,square:u64,previous:[u64;2],older:[u64;2],p:u64)->Result<[u64;2],Error>{
+   |    ^^^^^^^^^
+
+warning: methods `unit_grid_parts`, `factored_grid_ratio`, `sign_grid_pair`, `normalize`, and `window` are never used
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:81:5
+    |
+ 40 | impl Source {
+    | ----------- methods in this implementation
+...
+ 81 |  fn unit_grid_parts(&self,q:[u64;2],grid:&[[u64;2]])->Result<RawParts,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+124 |  fn factored_grid_ratio(&self,q:[u64;2],grid:&[[u64;2]],seed:[u64;2])->Result<[u64;2],Error>{
+    |     ^^^^^^^^^^^^^^^^^^^
+...
+129 |  fn sign_grid_pair(&self,q:[u64;2],grid:&[[u64;2]],seed:[u64;2])->Result<i8,Error>{#[cfg(test)] SIGN_CALLS.with(|n|n.set(n.get()+1));
+    |     ^^^^^^^^^^^^^^
+...
+133 |  fn normalize(&self,raw:u64)->Result<i8,Error>{match mul(raw,self.calibration_inverse,self.p){1=>Ok(1),v if v==self.p-1=>Ok(-1),_=>...
+    |     ^^^^^^^^^
+...
+136 |  pub fn window(&self,q:Option<[u64;2]>,length:usize)->Result<Vec<i8>,Error>{
+    |         ^^^^^^
+
+warning: struct `PreparedSource` is never constructed
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:152:12
+    |
+152 | pub struct PreparedSource<'a>{source:&'a Source,geometry:geometry::Prepared<'a>,square:u64,anchors:[(Option<[u64;2]>,u64,&'static s...
+    |            ^^^^^^^^^^^^^^
+
+warning: struct `PairSeedWindow` is never constructed
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:153:39
+    |
+153 | #[derive(Debug,PartialEq)] pub struct PairSeedWindow {pub signs:Vec<i8>,pub seed_pairs:Vec<[u64;2]>,pub methods:Vec<&'static str>,p...
+    |                                       ^^^^^^^^^^^^^^
+
+warning: method `prepare` is never used
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:155:9
+    |
+154 | impl Source {
+    | ----------- method in this implementation
+155 |  pub fn prepare(&self)->Result<PreparedSource<'_>,Error>{
+    |         ^^^^^^^
+
+warning: method `window` is never used
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:165:9
+    |
+164 | impl PreparedSource<'_>{
+    | ----------------------- method in this implementation
+165 |  pub fn window(&self,q:Option<[u64;2]>,length:usize)->Result<PairSeedWindow,Error>{
+    |         ^^^^^^
+
+warning: struct `Cursor` is never constructed
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:265:12
+    |
+265 | pub struct Cursor<'b,'a>{prepared:&'b PreparedSource<'a>,tail:geometry::Tail<'b,'a>,count:usize,previous:[u64;2],older:[u64;2],midd...
+    |            ^^^^^^
+
+warning: struct `Extension` is never constructed
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:266:38
+    |
+266 | #[derive(Debug,PartialEq)]pub struct Extension{pub sign:Option<i8>,pub seed_pair:[u64;2],pub method:&'static str,pub point:Option<[...
+    |                                      ^^^^^^^^^
+
+warning: method `begin` is never used
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:268:9
+    |
+267 | impl<'a> PreparedSource<'a>{
+    | --------------------------- method in this implementation
+268 |  pub fn begin<'b>(&'b self,q:Option<[u64;2]>,length:usize,max_extra:usize)->Result<(PairSeedWindow,Cursor<'b,'a>),Error>{
+    |         ^^^^^
+
+warning: methods `advance`, `skip_sign`, and `step` are never used
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/source.rs:285:9
+    |
+284 | impl<'b,'a> Cursor<'b,'a>{
+    | ------------------------- methods in this implementation
+285 |  pub fn advance(self)->Result<(Extension,Self),Error>{self.step(true)}
+    |         ^^^^^^^
+286 |  pub fn skip_sign(self)->Result<(Extension,Self),Error>{self.step(false)}
+    |         ^^^^^^^^^
+287 |  fn step(self,evaluate:bool)->Result<(Extension,Self),Error>{
+    |     ^^^^
+
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:18:21
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Prepared` is never constructed
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:64:12
+   |
+64 | pub struct Prepared<'a>{curve:&'a Curve,r:u64,base:J,public_base:[u64;2],partition:[u64;4],labels:Vec<u64>,strides:Vec<J>,affine_str...
+   |            ^^^^^^^^
+
+warning: struct `Slot` is never constructed
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:66:12
+   |
+66 | pub struct Slot{pub offset:usize,pub lane:usize,pub label:u64,pub projective:[u64;3],pub affine:[u64;2],pub inverse_z:u64}
+   |            ^^^^
+
+warning: struct `Window` is never constructed
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:68:12
+   |
+68 | pub struct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pu...
+   |            ^^^^^^
+
+warning: methods `projective_only`, `mixed`, and `prepare` are never used
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:70:5
+   |
+69 | impl Curve{
+   | ---------- methods in this implementation
+70 |  fn projective_only(&self,r:u64,q:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<(Vec<u64>,Vec<J>),Error>{
+   |     ^^^^^^^^^^^^^^^
+...
+80 |  fn mixed(&self,a:J,b:Option<[F;2]>)->J{
+   |     ^^^^^
+...
+88 |  pub fn prepare(&self,r:u64,p:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<Prepared<'_>,Error>{
+   |         ^^^^^^^
+
+warning: method `window` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:97:9
+   |
+94 | impl Prepared<'_>{
+   | ----------------- method in this implementation
+...
+97 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: struct `JointWindow` is never constructed
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:126:12
+    |
+126 | pub struct JointWindow{pub shifts:Vec<Option<[u64;2]>>,pub geometry:Window,pub converted_points:usize}
+    |            ^^^^^^^^^^^
+
+warning: methods `joint_window` and `joint_window_tail` are never used
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:130:9
+    |
+127 | impl<'a> Prepared<'a>{
+    | --------------------- methods in this implementation
+...
+130 |  pub fn joint_window(&self,q:Option<[u64;2]>,length:usize)->Result<JointWindow,Error>{self.joint_window_tail(q,length).map(|(window...
+    |         ^^^^^^^^^^^^
+131 |  pub fn joint_window_tail<'b>(&'b self,q:Option<[u64;2]>,length:usize)->Result<(JointWindow,Tail<'b,'a>),Error>{
+    |         ^^^^^^^^^^^^^^^^^
+
+warning: struct `Tail` is never constructed
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:180:12
+    |
+180 | pub struct Tail<'b,'a>{prepared:&'b Prepared<'a>,current:J,lanes:Vec<J>}
+    |            ^^^^
+
+warning: struct `Step` is never constructed
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:181:12
+    |
+181 | pub struct Step{pub point:Option<[u64;2]>,pub grid:Vec<[u64;2]>,pub lane_updates:usize,pub converted_points:usize,pub batches:usize}
+    |            ^^^^
+
+warning: method `advance` is never used
+   --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-adaptive-extension/geometry.rs:184:9
+    |
+182 | impl<'b,'a> Tail<'b,'a>{
+    | ----------------------- method in this implementation
+183 |  /// Consumes the previous cursor. On failure no advanced state is returned.
+184 |  pub fn advance(mut self)->Result<(Step,Self),Error>{
+    |         ^^^^^^^
+
+warning: methods `value` and `retained_indices` are never used
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-division/lib.rs:61:9
+   |
+37 | impl Division {
+   | ------------- methods in this implementation
+...
+61 |  pub fn value(&mut self,n:u64)->u64{self.jet(n).v.v}
+   |         ^^^^^
+62 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: method `retained_indices` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-value-division/lib.rs:52:9
+   |
+25 | impl ValueDivision{
+   | ------------------ method in this implementation
+...
+52 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: variant `ZeroDivisor` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-low-product/polynomial.rs:4:37
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          ----- variant in this enum ^^^^^^^^^^^
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `divrem` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/../feature-native-quartic-recovery/routed/../../feature-native-low-product/polynomial.rs:55:9
+   |
+ 8 | impl Poly{
+   | --------- method in this implementation
+...
+55 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+   |         ^^^^^^
+
+warning: 28 warnings emitted
+

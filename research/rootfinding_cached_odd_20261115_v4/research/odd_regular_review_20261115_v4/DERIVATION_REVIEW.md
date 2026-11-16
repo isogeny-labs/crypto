@@ -1,0 +1,11 @@
+# Derivation review
+
+The reviewed prior odd-plan derivation applies unchanged. With selected P(a)=-G(a)ya and targetroot imposed by t, N=P²-CG² vanishes at target and selected source. For ya!=0,a!=z,G(a)!=0, derivativeN'=2PP'-C'G²-2CGh gives P'(a)=-C'G(a)/(2ya)-hya. The two r/s equations have determinant -(a-z)²; code v/w constants, r=(dw-v)/d², s=w-2ar and embeddedinteger signs match. No division bya or3, so a0/char3 stayvalid. Conversely the formulas implypoint+derivative constraints and exact double factor. Ya0 regularN'=-C'(a)G(a)² nonzero bysquarefreeness, so emptiness is correct on that guard only.
+
+P=P0+kP1 and G=hX+k give N0=P0²-C(hX)², N1=2(P0P1-ChX), N2=P1²-C. These are formal coefficient polynomials individually divisible byD=(X-z)(X-a)². Their quotients make Q quadratic ink; S=h²-z-2a-2r0-2r1k is checked without transferring binary squaring linearity. Distinctk yielding sameQ remain distinctnormparameters. No scalar quadratic root-recovery method via Delta is executed in this worker, only candidate enumeration.
+
+All cubic roots lie in finiteD with multiplicity iff Q divides A_D³, equivalently R³=0 inK[X]/Q, sinceA_D is squarefree split and maxmultiplicity3. The independent index of all4multisets on two distinctdomainvalues supplies necessary/sufficient support membership. Factor/root recovery is exact via index; no probabilistic factorization hidden in the output. This preserves supportmultiplicity, not local-scheme multiplicity or original curveauxiliaries.
+
+Declared rawstate ceiling is16*3³+16*5³+16*9³+8*25³=139096 beforea=z skips, below200000; selection<=100000perfield andwork/checkcaps additionallyboundcost. Selection formula construction and fieldsetup are charged. Globalpositive supportassertion prevents totalvacuity; perfieldpositive/guardcategory gaps must be reported exactly afterrun. Missingcategories are not proved impossible by selected-coverage summaries.
+
+Strongest supported output is complete selectedregular normparameter sets plus sourceorders for fixed frozeninputrules. Atmosttwo coefficient-triple preimages, largeallk supportsearch, NISTprofiling and end-to-end speed remain untested. Generic outer h/a/ordinate complexity canbeexponential. Classical Hermite/norm and existing primeparabola overlap retained; no novelty inference.

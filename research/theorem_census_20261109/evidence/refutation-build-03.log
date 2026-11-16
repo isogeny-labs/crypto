@@ -1,0 +1,114 @@
+⚠ [3155/3279] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [9048/9052] Built RationalCounterexample (4.1s)
+warning: RationalCounterexample.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [9050/9052] Building DescentCounterexample (6.9s)
+warning: DescentCounterexample.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/mathlib4/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/crypto-audit/research/theorem_census_20261109/lean/DescentCounterexample.lean -o /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/DescentCounterexample.olean -i /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/DescentCounterexample.ilean -c /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/DescentCounterexample.c --setup /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/DescentCounterexample.setup.json --json
+error: DescentCounterexample.lean:45:70: unsolved goals
+c : F
+i : ℕ
+⊢ 0 < (Polynomial.X ^ 2 - Polynomial.C 2).degree
+warning: DescentCounterexample.lean:49:27: This simp argument is unused:
+  eq_comm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Polynomial.coeff_C]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: DescentCounterexample.lean:55:4: Unknown constant `MvPolynomial.coeff`
+error: DescentCounterexample.lean:55:53: Unknown constant `MvPolynomial.coeff`
+error: DescentCounterexample.lean:59:59: unsolved goals
+case left
+g : MvPolynomial (Fin 2) F
+s : Fin 2 →₀ ℕ
+⊢ (descend 0 ((MvPolynomial.map (AdjoinRoot.of extensionPolynomial)) g)).coeff s = g.coeff s
+
+case right
+g : MvPolynomial (Fin 2) F
+s : Fin 2 →₀ ℕ
+⊢ (descend 1 ((MvPolynomial.map (AdjoinRoot.of extensionPolynomial)) g)).coeff s = 0
+warning: DescentCounterexample.lean:61:10: This simp argument is unused:
+  coeff_descend
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [MvPolynomial.coeff_map, coordinate_constant]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: DescentCounterexample.lean:61:25: This simp argument is unused:
+  MvPolynomial.coeff_map
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coeff_descend, coordinate_constant]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: DescentCounterexample.lean:61:49: This simp argument is unused:
+  coordinate_constant
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coeff_descend, MvPolynomial.coeff_map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: DescentCounterexample.lean:73:2: Tactic `decide` failed to reduce
+  @decide (target + target + target = 0) (WeierstrassCurve.Affine.instDecidableEqPoint (target + target + target) 0)
+to `true` or `false`.
+
+After unfolding the instances `instDecidableAnd`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `Bool.decEq`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, `WeierstrassCurve.Affine.instDecidableEqPoint`, `ZMod.decidableEq._aux_3`, and `WeierstrassCurve.Affine.instDecidableEqPoint.decEq`, reduction got stuck at
+  match target + target + target, 0 with
+  | WeierstrassCurve.Affine.Point.zero, WeierstrassCurve.Affine.Point.zero => isTrue ⋯
+  | WeierstrassCurve.Affine.Point.zero, WeierstrassCurve.Affine.Point.some x y h => isFalse ⋯
+  | WeierstrassCurve.Affine.Point.some x y h, WeierstrassCurve.Affine.Point.zero => isFalse ⋯
+  | WeierstrassCurve.Affine.Point.some a a_1 a_2, WeierstrassCurve.Affine.Point.some b b_1 b_2 =>
+    if h : a = b then
+      Eq.ndrec (motive := fun b =>
+        (b_3 : descentCurve.Nonsingular b b_1) →
+          Decidable (WeierstrassCurve.Affine.Point.some a a_1 a_2 = WeierstrassCurve.Affine.Point.some b b_1 b_3))
+        (fun b =>
+          if h : a_1 = b_1 then
+            Eq.ndrec (motive := fun b =>
+              (b_3 : descentCurve.Nonsingular a b) →
+                Decidable (WeierstrassCurve.Affine.Point.some a a_1 a_2 = WeierstrassCurve.Affine.Point.some a b b_3))
+              (fun b =>
+                have h := ⋯;
+                h ▸ isTrue ⋯)
+              h b
+          else isFalse ⋯)
+        h b_2
+    else isFalse ⋯
+error: DescentCounterexample.lean:96:39: Application type mismatch: The argument
+  hh
+has type
+  7 = 0
+but is expected to have type
+  -4 * 2 + 1 = 0
+in the application
+  ?m.45 hh
+warning: DescentCounterexample.lean:109:2: Try this: 
+  haveI̵
+
+The goal is a proposition, so `have` is preferred over `haveI`.
+The difference between `have` and `haveI` is that `haveI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+error: DescentCounterexample.lean:129:0: Unexpected name `SkepticalAudit` after `end`: The current section is unnamed
+
+Hint: Delete the name `SkepticalAudit` to end the current unnamed scope; outer named scopes can then be closed using additional `end` command(s):
+  end ̵S̵k̵e̵p̵t̵i̵c̵a̵l̵A̵u̵d̵i̵t̵
+Some required targets logged failures:
+- DescentCounterexample
+error: build failed

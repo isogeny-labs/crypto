@@ -50,7 +50,10 @@ own cold one-target, `F_q`-multiplication-equivalent comparison.  It is a real
 frontier for that restricted family, but not for generic curves, prime-order
 `E/F_{q^3}`, any standard curve, or ECC2K-130.  Combining that result with the
 generic ladders would compare different problem classes and give a false
-global ranking.
+global ranking. It is the historically admitted exception; the merged
+`strong-b8` same-family rho control is an unmeasured re-establishment round,
+not evidence that the historical boundary has already moved
+`[pcc:unverified]`.
 
 The newest validated factor-base improvement is the 20-bit prime row.  On the
 second-host EKS replay, `prime-abscissa:size=45` costs 0.836, 0.817, and 0.746
@@ -109,6 +112,15 @@ The deterministic analysis driver is now hash-bound and passes its 92-spec
 check-only gate. Exact-image runtime preflight still remains before freeze.
 These blockers are retained in `execution/BLOCKER.md`; no local wall result is
 substituted.
+
+The separate GHS re-establishment package is now frozen in
+`research/quartic_ghs_strong_rho_20261114/`. PR #4171 supplied the optimized
+same-target rho implementation. Round A keeps every scientific setting and
+changes only high/top active deadlines to 7,200/10,800 seconds, with low+mid
+then high+top waves. Its historical archive audit reads 261/261 successful IC
+units and all 33 targets from the pinned archive, but no primary strong-rho
+record exists. Live budget, checkpoint, and all-tenant pool receipts remain
+the explicit launch gate `[pcc:unverified]`.
 
 The follow-up establishment audit passed 19/19 cross-artifact checks. The
 optimized-rho session reproduced 720/720 deterministic rows with the current
