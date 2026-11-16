@@ -24,7 +24,7 @@ The triple counts are exactly $binom(B+2,3)$, not measured relation yields. The 
 
 == Execution state
 
-The science run requires a complete branch-specific S3 resume checkpoint and a passing `scripts/checkpoint.sh gate`. Conductor T-6814 currently reserves `.resume/RESUME.md`. The source is a prepared test only. A rank screen does not establish a complete-call improvement against F4/F5/F6 or matched rho; those comparisons require the separate frozen panel and independent replay. [pcc:unverified]
+The science run requires a complete branch-specific S3 resume checkpoint and a passing `scripts/checkpoint.sh gate`. Conductor T-6814 currently reserves `.resume/RESUME.md`; the existing `problems/rootfinding-complete-cost-calibration.md` tracks this obstruction. The source is a prepared test only. A rank screen does not establish a complete-call improvement against F4/F5/F6 or matched rho; those comparisons require the separate frozen panel and independent replay. [pcc:unverified]
 
 #pagebreak()
 == Planned data flow
