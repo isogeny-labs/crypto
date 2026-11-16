@@ -1,0 +1,36 @@
+name: CT97 scalar-blind cubic x-root recognition
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct97/**'
+      - '.github/workflows/ct97-global-x-recognizer.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct97/**'
+      - '.github/workflows/ct97-global-x-recognizer.yml'
+  workflow_dispatch:
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned symbolic ring arithmetic
+        run: python3 -m pip install sympy==1.14.0
+      - name: Check exact cubic and independent BigInt resolvent
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct97
+          python3 -B "$D/ct97_selective_x_root.py" > "$RUNNER_TEMP/ct97-py.json"
+          python3 -O -B "$D/ct97_selective_x_root.py" > "$RUNNER_TEMP/ct97-pyopt.json"
+          node "$D/ct97_discriminant_independent.js" > "$RUNNER_TEMP/ct97-js.json"
+          node --no-opt "$D/ct97_discriminant_independent.js" > "$RUNNER_TEMP/ct97-jsopt.json"
+          cmp "$RUNNER_TEMP/ct97-py.json" "$RUNNER_TEMP/ct97-pyopt.json"
+          cmp "$RUNNER_TEMP/ct97-py.json" "$RUNNER_TEMP/ct97-js.json"
+          cmp "$RUNNER_TEMP/ct97-py.json" "$RUNNER_TEMP/ct97-jsopt.json"
+          printf '%s  %s\n' 8b62b8a610d7be2a262dc82075b316e626dc35f668fb55517dcd4e61a10abcb5 "$RUNNER_TEMP/ct97-py.json" | sha256sum -c
+          cat "$RUNNER_TEMP/ct97-py.json"

@@ -1643,10 +1643,10 @@ fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) 
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
     if crate::cryptanalysis::koblitz_fast::cached_point_lifts_enabled() {
         let Some(root) = curve.half_trace_root_cached(rhs) else {
-            return Vec::new();
+            return (none, 0);
         };
         let point = FastPoint::affine(coordinate, field.mul(coordinate, root));
-        return vec![curve.lower(point), curve.lower(curve.neg(point))];
+        return ([point, curve.neg(point)], 2);
     }
     let mut root = rhs;
     let mut power = rhs;

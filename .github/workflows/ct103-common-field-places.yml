@@ -1,0 +1,33 @@
+name: CT103 common torsion field fixed residue places
+
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct103/**'
+      - '.github/workflows/ct103-common-field-places.yml'
+      - 'docs/session-logs/2026-11-14.md'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct103/**'
+      - '.github/workflows/ct103-common-field-places.yml'
+  workflow_dispatch:
+
+jobs:
+  fixed-places:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CT103 independent exact source and target quotient arithmetic
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct103
+          python3 -B "$D/ct103_fixed_places.py" >/tmp/ct103-py.json
+          python3 -O -B "$D/ct103_fixed_places.py" >/tmp/ct103-pyopt.json
+          node "$D/ct103_fixed_places_independent.js" >/tmp/ct103-js.json
+          node --no-opt "$D/ct103_fixed_places_independent.js" >/tmp/ct103-jsopt.json
+          cmp /tmp/ct103-py.json /tmp/ct103-pyopt.json
+          cmp /tmp/ct103-py.json /tmp/ct103-js.json
+          cmp /tmp/ct103-py.json /tmp/ct103-jsopt.json
+          printf '%s  %s\n' f6a26aa3c63ed6d2b7d1efb7c2c505cc76ecd5f39b60e6575c7ab489a65c4dc1 /tmp/ct103-py.json | sha256sum --check
