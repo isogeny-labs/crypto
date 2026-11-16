@@ -18,7 +18,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             maximum = maximum.max(v.parse()?);
         }
     }
-    let root = SVGBackend::new(&args[2], (1120, 490)).into_drawing_area();
+    let root = SVGBackend::new(&args[2], (1120, 520)).into_drawing_area();
     root.fill(&WHITE)?;
     root.draw(&Text::new(
         "Recorded primitive subtotals by phase (incomplete)",

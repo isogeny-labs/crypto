@@ -1,3 +1,52 @@
+# Current checkpoint:37COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE/Rust graphIC+cheap extension-field relationfinding towardrho parity.
+UserRustscience/allfuturemeasurementRunpod. No subagents/stopgoal.
+Allownedpaidpods32–37DELETED; no compiler/scientificjobactive. Privateauthpointer
+/tmp/ic-runpod-auth-location persists;NEVERprintkey/header/token/envresponses.
+Don'taskcredential/profileagain. Needconcreteactionloops/<=60seccommentary.
+
+37sourcef3e76f16a85c30cc4018183b864083fe030e6307beforeonePOST20218:53:43Z.
+p1009seed359/L263807419874170961,7/7actualscalar10013957165807875;copiedqualifier0.
+ICobservedincomplete3241959371026;graph75/32 4634237434948,75/128 4628340096078,
+85/32 4152078192556,85/128 4234576160840,95/32 4171549682926,95/128 4560298544450.
+No ratios/fullcost/band/ranking/parity/composition. Allgraphfullbase517/two
+accepteddescents/969residuals/onefullrankcheckpoint. Smallbases387/439/491.
+Bvalues500736/499712/365568/380928/303104/362496.85/32lowestobservedgraph,
+stillaboveIC; largerbasecutsrelationbutraisesLA; spacingnotmonotonic.
+Allaffinecerts/target/checkpoint/gateBFS+denseLPprefix/schedule/charge/common
+prefixesPASS.297committedsourcepostcallreconstruction+portablehashPASS.
+Onecoldround0warm/retry,215.886swholepracticality. PCC7fa174UNVERIFIED;
+lessonsO-07916303e648/T-0d411ade4ed1;newvisualoutcomeinledger.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-factor-base-balance-20261116-37/
+returned/task/run:76096Bsummary/3434418Bexport/six498081–593059Bgraphraws;
+7395BICraw/smallmetadataGitpacket. No truncation/rewrites.297f3sourceblobs
+reconstructedunderstage/committed-source-postcall. Ownnyebuop20aauuvCPU4/8/.12h,
+actualCPU1,v2DELETE204/GET40418:57:55Zaftercollection;privateguardmarkerset.
+FinalonepagePDFVIEWED(exactcopies/hashPASS)afterpresentation-onlySVGheight
+fix;initialfigures/sourceLOCALhashbound. Newbalance-compact Rustprojects
+originalsummaryto11344Bpresentation.json/new schema;originalsummaryunchanged.
+Packetresearch/.../runpod-factor-base-balance-20261116-37;benchmarks/
+20261116-runpod-factor-base-balance. Historicalf3renderer/studyREADMEchanged
+POSTCALLforpresentation/link;original297committedblobsPASS,don'trerun37.
+
+NEXTcommit/pushfinished37packet/PCC/lesson/journal/resume/studyREADME/native
+presentationhelper,thenPRactual37afterlint0. RegularPR4288/automerge/required
+CIreviewunconfirmed/no manualmerge. NewpublicationpermitsCIread.
+NextleadUNDERREVIEW(notselected38yet): retainhomogeneousRREFkernelinstead
+ofdiscarding/re-solvingfullaffinematrix. Rankn−1givesonefreefactor-logscalar,
+so projectaffinerowstoatmost2unknowns(includingtarget). Needactualmatrix/
+independentkernel+targetproofs/countedwork/nativecontrols and sourceprotocol
+publishedBEFOREnextRunpodcall. DoNOTcompose37with36or34. Couldfirstreplayexact
+savedmatrixcomponentincludingcheckpointinBOTHarmcosts,thenproductionintegration.
+37s85-r32raw557137B SHA8f0473a700564c9110fa4779282583e34354909c45e7bce2f28c26e2709f1a0c,
+checkpoint439columns/rank438/10726931products/459rows. InputchoiceNOTfrozen38.
+KBquotientexact/negativeunavailable/tmp/ic-quotient-kb-{exact,negative}.log.
+Readactualhomogeneous_rankandtargetsolve/CountedRelationSystem. Existingfull
+RREFalreadyforward/backwardzeroskips;36normalizationnotproductionintegratedyet.
+Keepgoalactiveandexecuteoneconcreteleadafterpublication;don'tlengthyspeculate.
+
 # Current checkpoint:37SOURCE READY; owned Runpod CPU provisioned/not dispatched
 
 GoalACTIVE/Rust graphIC+cheap extension-field relation finding towardrho parity.

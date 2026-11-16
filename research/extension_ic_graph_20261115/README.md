@@ -78,6 +78,17 @@ Observed LA primitive bitops fall903928056050to661359105264, including6171
 known gate events; other phases match. Native bookkeeping remains incomplete,
 with no full-cost ratio or parity assertion. [pcc:unverified]
 
+The [factor-base/checkpoint sweep](runpod-factor-base-balance-20261116-37/report.pdf)
+runs original IC and six graph configurations on a fresh p1009seed359
+Runpod fixture. All seven recover10013957165807875; the copied qualifier
+passes affine/rank/gate/prefix checks. Fraction85%/stride32 gives the lowest
+observed graph subtotal4152078192556, versus3241959371026for original IC.
+Relation work falls as the small base grows, while LA increases; spacing is
+not monotonic. Native gaps keep every arm unrankable and costs/bands/ratios
+null.297source/portable custody hashes pass; exact originals are retained,
+and collection precedes owned-pod DELETE204/GET404. PCC-20261116-7fa174 remains
+unverified. [pcc:unverified]
+
 The [recorded normalization replay](runpod-recorded-zero-normalization-20261116-36/report.pdf)
 measures the remaining dense-normalization candidate before a library change.
 It avoids105532modular products with150156added zero tests, with all390pivot
