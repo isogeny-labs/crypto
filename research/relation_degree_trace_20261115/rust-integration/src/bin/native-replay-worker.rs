@@ -45,6 +45,7 @@ pub(crate) fn run_kernel_variant(which: usize) -> Result<(), Box<dyn Error>> {
         5 => replay::NativeKernels::BothUpdatesSum,
         6 => replay::NativeKernels::BothUpdatesLead,
         7 => replay::NativeKernels::BothUpdatesFused,
+        8 => replay::NativeKernels::BothUpdatesFrontier,
         _ => return Err("unknown native kernel variant".into()),
     };
     run_with_exports(true, true, 0, Some(kernels))

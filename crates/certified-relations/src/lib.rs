@@ -21,7 +21,7 @@ fn native_kernel_bits() -> u8 {
     NATIVE_KERNELS.with(|v| v.get())
 }
 fn with_native_kernel_bits<T>(bits: u8, work: impl FnOnce() -> T) -> T {
-    assert!(bits <= 63);
+    assert!(bits <= 127);
     struct Restore(u8);
     impl Drop for Restore {
         fn drop(&mut self) {

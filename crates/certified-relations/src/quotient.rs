@@ -237,7 +237,58 @@ fn dependence(v: &[u64], columns: &[Vec<u64>], p: u64) -> Option<Vec<u64>> {
         Some((0..k).map(|j| matrix[j][k]).collect())
     }
 }
+// The new path changes enumeration only; the original grid remains the reference.
 fn change_order(h: &Row, rules: &[Option<Row>], t: usize, p: u64) -> Result<Vec<Row>, String> {
+    if native_kernel_bits() & 64 != 0 {
+        change_order_frontier(h, rules, t, p)
+    } else {
+        change_order_grid(h, rules, t, p)
+    }
+}
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct GrevlexMonomial(Mono);
+impl Ord for GrevlexMonomial {
+    fn cmp(&self, other: &Self) -> Ordering {
+        super::cmp(&self.0, &other.0)
+    }
+}
+impl PartialOrd for GrevlexMonomial {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+struct MonomialFrontier {
+    pending: BTreeSet<GrevlexMonomial>,
+    seen: BTreeSet<Mono>,
+    cap: usize,
+}
+impl MonomialFrontier {
+    fn new(n: usize, cap: usize) -> Self {
+        let zero = vec![0; n];
+        Self {
+            pending: BTreeSet::from([GrevlexMonomial(zero.clone())]),
+            seen: BTreeSet::from([zero]),
+            cap,
+        }
+    }
+    fn pop(&mut self) -> Option<Mono> {
+        self.pending.pop_first().map(|m| m.0)
+    }
+    // Call only for an independent standard; proper divisors precede children.
+    fn expand(&mut self, m: &Mono) {
+        if m.iter().sum::<usize>() >= self.cap {
+            return;
+        }
+        for i in 0..m.len() {
+            let mut child = m.clone();
+            child[i] = child[i].checked_add(1).expect("bounded frontier exponent");
+            if self.seen.insert(child.clone()) {
+                self.pending.insert(GrevlexMonomial(child));
+            }
+        }
+    }
+}
+fn change_order_grid(h: &Row, rules: &[Option<Row>], t: usize, p: u64) -> Result<Vec<Row>, String> {
     let n = rules.len();
     let d = degree(&h.poly);
     let mut hd = vec![0; d + 1];
@@ -307,6 +358,91 @@ fn change_order(h: &Row, rules: &[Option<Row>], t: usize, p: u64) -> Result<Vec<
                 standards.push(m);
                 columns.push(v);
             }
+        }
+    }
+    if columns.len() != d {
+        return Err("quotient: dimension mismatch".into());
+    }
+    basis.sort_by(|a, b| cmp(lead(&b.poly), lead(&a.poly)));
+    Ok(basis)
+}
+fn change_order_frontier(
+    h: &Row,
+    rules: &[Option<Row>],
+    t: usize,
+    p: u64,
+) -> Result<Vec<Row>, String> {
+    let n = rules.len();
+    let d = degree(&h.poly);
+    let mut hd = vec![0; d + 1];
+    for (m, c) in &h.poly {
+        hd[m[t]] = *c;
+    }
+    let mut coords = Vec::new();
+    for (i, rule) in rules.iter().enumerate() {
+        let mut c = vec![0; d];
+        if i == t {
+            c[1] = 1;
+        } else {
+            let rule = rule.as_ref().ok_or("quotient: missing coordinate")?;
+            let mut tail = rule.poly.clone();
+            axpy(&mut tail, &variable(n, i), p - 1, p);
+            for (m, value) in tail {
+                c[m[t]] = minus(value, p);
+            }
+        }
+        coords.push(c);
+    }
+    let mut standards: Vec<Mono> = Vec::new();
+    let mut columns = Vec::new();
+    let mut basis: Vec<Row> = Vec::new();
+    let mut frontier = MonomialFrontier::new(n, d);
+    let mut leading_monomials: Vec<Mono> = Vec::new();
+    while let Some(m) = frontier.pop() {
+        if leading_monomials.iter().any(|lm| divides(lm, &m)) {
+            continue;
+        }
+        let mut v = vec![0; d];
+        v[0] = 1;
+        for (i, e) in m.iter().enumerate() {
+            for _ in 0..*e {
+                v = qmul(&v, &coords[i], &hd, p);
+            }
+        }
+        if let Some(coeffs) = dependence(&v, &columns, p) {
+            let mut f = BTreeMap::from([(m.clone(), 1)]);
+            for (b, c) in standards.iter().zip(coeffs) {
+                if c != 0 {
+                    f.insert(b.clone(), minus(c, p));
+                }
+            }
+            let reduced = rewrite(
+                Row {
+                    poly: f.clone(),
+                    proof: Proof::new(),
+                },
+                h,
+                rules,
+                t,
+                p,
+            )?;
+            if !reduced.poly.is_empty() {
+                return Err("quotient: uncertified linear dependence".into());
+            }
+            let proof = reduced
+                .proof
+                .into_iter()
+                .map(|(key, c)| (key, minus(c, p)))
+                .collect();
+            leading_monomials.push(lead(&f).clone());
+            basis.push(Row { poly: f, proof });
+        } else {
+            if columns.len() >= d {
+                return Err("quotient: dimension overflow".into());
+            }
+            frontier.expand(&m);
+            standards.push(m);
+            columns.push(v);
         }
     }
     if columns.len() != d {
@@ -498,6 +634,141 @@ fn solve_impl(
 mod tests {
     use super::*;
     use crate::projection::product;
+
+    fn staircase_trace(
+        n: usize,
+        cap: usize,
+        ideal: &[Mono],
+        frontier: bool,
+    ) -> (Vec<Mono>, Vec<Mono>, usize) {
+        let mut border = MonomialFrontier::new(n, cap);
+        let mut grid = if frontier {
+            Vec::new()
+        } else {
+            (0..=cap)
+                .flat_map(|d| monomials_legacy(n, d, true).into_iter().rev())
+                .collect::<Vec<_>>()
+        }
+        .into_iter();
+        let mut known: Vec<Mono> = Vec::new();
+        let mut trace = Vec::new();
+        let mut standards = Vec::new();
+        loop {
+            let next = if frontier { border.pop() } else { grid.next() };
+            let Some(m) = next else {
+                break;
+            };
+            if known.iter().any(|lm| divides(lm, &m)) {
+                continue;
+            }
+            trace.push(m.clone());
+            if ideal.iter().any(|lm| divides(lm, &m)) {
+                known.push(m);
+            } else {
+                if frontier {
+                    border.expand(&m);
+                }
+                standards.push(m);
+            }
+        }
+        (trace, standards, border.seen.len())
+    }
+    #[test]
+    fn frontier_matches_exact_grid_order_on_mixed_nonradical_staircases() {
+        for n in [3, 8, 16] {
+            for active in [(0, n - 1), (n - 2, n - 1)] {
+                for mixed in [false, true] {
+                    let mut ideal = Vec::new();
+                    for i in 0..n {
+                        let mut m = vec![0; n];
+                        m[i] = if i == active.0 || i == active.1 { 2 } else { 1 };
+                        ideal.push(m);
+                    }
+                    if mixed {
+                        let mut m = vec![0; n];
+                        m[active.0] = 1;
+                        m[active.1] = 1;
+                        ideal.push(m);
+                    }
+                    let dimension = if mixed { 3 } else { 4 };
+                    let old = staircase_trace(n, dimension, &ideal, false);
+                    let new = staircase_trace(n, dimension, &ideal, true);
+                    assert_eq!(new.0, old.0);
+                    assert_eq!(new.1, old.1);
+                    assert_eq!(new.1.len(), dimension);
+                    assert!(new.2 <= 1 + n * dimension);
+                }
+            }
+        }
+        let ideal: Vec<_> = (0..3)
+            .map(|i| {
+                let mut m = vec![0; 3];
+                m[i] = 2;
+                m
+            })
+            .collect();
+        let old = staircase_trace(3, 8, &ideal, false);
+        let new = staircase_trace(3, 8, &ideal, true);
+        assert_eq!(new.0, old.0);
+        assert_eq!(new.1, old.1);
+        assert_eq!(new.1.len(), 8);
+        assert!(new.2 <= 25);
+    }
+    #[test]
+    fn frontier_full_bases_provenance_and_field_counters_equal_grid_on_both_fields() {
+        for p in [2147483647, 9007199254740881] {
+            for n in [3, MAX_VARIABLES] {
+                for root in [0, n - 1] {
+                    let edges: Vec<_> = (0..n).filter(|i| *i != root).map(|i| (root, i)).collect();
+                    #[cfg(feature = "scale-screen")]
+                    let system = workload::generate_scale_graph(p, n, 7, &edges)
+                        .unwrap()
+                        .system;
+                    #[cfg(not(feature = "scale-screen"))]
+                    let system = workload::generate_graph(p, n, 7, &edges).unwrap().system;
+                    let inputs = system.decode().unwrap();
+                    reset_counters();
+                    let old = with_native_kernel_bits(39, || solve_product(&inputs, n, p)).unwrap();
+                    let counts = serde_json::to_value(counters()).unwrap();
+                    reset_counters();
+                    let new =
+                        with_native_kernel_bits(103, || solve_product(&inputs, n, p)).unwrap();
+                    assert_eq!(new.0, old.0);
+                    assert_eq!(
+                        serde_json::to_value(new.1).unwrap(),
+                        serde_json::to_value(old.1).unwrap()
+                    );
+                    assert_eq!(serde_json::to_value(counters()).unwrap(), counts);
+                    assert_eq!(native_kernel_bits(), 0);
+                }
+            }
+        }
+    }
+    #[test]
+    fn frontier_keeps_coordinate_failure_and_forgery_checks() {
+        let p = 101;
+        let mut r0 = variable(3, 0);
+        axpy(&mut r0, &variable(3, 2), p - 1, p);
+        let mut r1 = variable(3, 1);
+        axpy(&mut r1, &variable(3, 2), p - 1, p);
+        axpy(&mut r1, &one(3), p - 1, p);
+        let h = BTreeMap::from([(vec![0, 0, 2], 1), (vec![0, 0, 0], 100)]);
+        let inputs = vec![r0, r1, h];
+        let rows = input_rows(&inputs, 3);
+        let mut rules = vec![Some(rows[0].clone()), Some(rows[1].clone()), None];
+        let old = change_order_grid(&rows[2], &rules, 2, p).unwrap();
+        assert_eq!(change_order_frontier(&rows[2], &rules, 2, p).unwrap(), old);
+        rules[0] = None;
+        assert_eq!(
+            change_order_frontier(&rows[2], &rules, 2, p).unwrap_err(),
+            change_order_grid(&rows[2], &rules, 2, p).unwrap_err()
+        );
+        rules[0] = Some(rows[0].clone());
+        axpy(&mut rules[0].as_mut().unwrap().poly, &one(3), 1, p);
+        let forged = change_order_frontier(&rows[2], &rules, 2, p).unwrap();
+        assert_eq!(forged, change_order_grid(&rows[2], &rules, 2, p).unwrap());
+        assert!(!check_reference(&forged, &inputs, 3, p));
+    }
     #[test]
     fn polynomial_containment_keeps_full_remainders_and_rejects_nonzero_inputs() {
         let p = 101;

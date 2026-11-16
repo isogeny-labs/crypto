@@ -58,6 +58,10 @@ pub(super) struct Paths {
     fused_baseline: Option<PathBuf>,
     #[serde(default)]
     fused_direct: Option<PathBuf>,
+    #[serde(default)]
+    frontier_baseline: Option<PathBuf>,
+    #[serde(default)]
+    frontier_direct: Option<PathBuf>,
     mature: PathBuf,
     singular: PathBuf,
     msolve: PathBuf,
@@ -111,6 +115,7 @@ fn kernel_candidate(samples: &[Value]) -> Option<usize> {
         26 => 24..26,
         28 => 27..28,
         30 => 29..30,
+        32 => 31..32,
         _ => return None,
     };
     eligible
@@ -121,13 +126,13 @@ fn kernel_candidate(samples: &[Value]) -> Option<usize> {
         .map(|(_, i)| i)
 }
 fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
-    if ![23, 26, 28, 30].contains(&routes.len()) {
+    if ![23, 26, 28, 30, 32].contains(&routes.len()) {
         return Value::Null;
     }
     let mut chosen = Value::Null;
     let mut best = 15.;
     for case in cases {
-        if [28,30].contains(&routes.len())
+        if [28,30,32].contains(&routes.len())
             && (case["id"] != "star-last-n16-s7"
                 || case["input_sha256"]
                     != "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3")
@@ -155,6 +160,8 @@ fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
             (27, "both_updates_lead"),
             (28, "both_updates"),
             (29, "both_updates_fused"),
+            (30, "both_updates_fused"),
+            (31, "both_updates_frontier"),
         ]
         .into_iter()
         .filter(|(i, _)| *i < routes.len())
@@ -262,6 +269,9 @@ pub(super) fn run_leads(prepared: &Path, out: &Path, config: &Path) -> Result<()
 pub(super) fn run_fused(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     run_impl(prepared, out, config, 6)
 }
+pub(super) fn run_frontier(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, 7)
+}
 fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<()> {
     let config_bytes = fs::read(config)?;
     let paths: Paths = serde_json::from_slice(&config_bytes)?;
@@ -270,7 +280,11 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     let kernels = mode >= 3;
     let updates = mode >= 4;
     let leads = mode >= 5;
-    let fused = mode == 6;
+    let fused = mode >= 6;
+    let frontier = mode == 7;
+    if [&paths.frontier_baseline, &paths.frontier_direct].into_iter().any(|p|p.is_some()!=frontier) {
+        return Err("exact two frontier paths required in32 mode".into());
+    }
     if [&paths.fused_baseline, &paths.fused_direct].into_iter().any(|p|p.is_some()!=fused) {
         return Err("exact two fused paths required in30 mode".into());
     }
@@ -333,6 +347,8 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("root-lead-cached", &paths.lead_cached),
         ("root-fused-baseline", &paths.fused_baseline),
         ("root-fused-direct", &paths.fused_direct),
+        ("root-frontier-baseline", &paths.frontier_baseline),
+        ("root-frontier-direct", &paths.frontier_direct),
     ] {
         if let Some(exe) = exe {
             routes.push(name);
@@ -388,6 +404,8 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("lead_cached", &paths.lead_cached),
         ("fused_baseline", &paths.fused_baseline),
         ("fused_direct", &paths.fused_direct),
+        ("frontier_baseline", &paths.frontier_baseline),
+        ("frontier_direct", &paths.frontier_direct),
     ] {
         if let Some(path) = path {
             identities.insert(name.into(), json!({"path":path,"sha256":file_hash(path)?}));
@@ -397,7 +415,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     write_new(&out.join("config.json"), &config_bytes)?;
     save(
         &out.join("pre-call.json"),
-        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if fused{"FUSED_PAID_SCREEN_PROTOCOL.md"}else if leads{"LEAD_PAID_SCREEN_PROTOCOL.md"}else if updates{"UPDATE_PAID_SCREEN_PROTOCOL.md"}else if kernels{"EXACT_KERNEL_PAID_SCREEN_PROTOCOL.md"}else if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
+        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if frontier{"FRONTIER_PAID_SCREEN_PROTOCOL.md"}else if fused{"FUSED_PAID_SCREEN_PROTOCOL.md"}else if leads{"LEAD_PAID_SCREEN_PROTOCOL.md"}else if updates{"UPDATE_PAID_SCREEN_PROTOCOL.md"}else if kernels{"EXACT_KERNEL_PAID_SCREEN_PROTOCOL.md"}else if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
     )?;
     let mut r = Runner {
         worker: paths.worker.clone(),
@@ -562,7 +580,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     };
     save(
         &out.join("summary.json"),
-        &json!({"schema":if fused{"exact-fused-paid-screen/v1"}else if leads{"exact-lead-paid-screen/v1"}else if updates{"exact-update-paid-screen/v1"}else if kernels{"exact-kernel-paid-screen/v1"}else if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"selected_kernel":kernel_selection,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
+        &json!({"schema":if frontier{"exact-frontier-paid-screen/v1"}else if fused{"exact-fused-paid-screen/v1"}else if leads{"exact-lead-paid-screen/v1"}else if updates{"exact-update-paid-screen/v1"}else if kernels{"exact-kernel-paid-screen/v1"}else if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"selected_kernel":kernel_selection,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
     )?;
     if !unchanged {
         return Err("changed executable identities".into());
@@ -874,6 +892,80 @@ mod tests {
         bad[2]["paid_wall_ns"] = json!(14);
         assert!(select(bad).is_null());
     }
+    fn frontier_fixture() -> (Vec<&'static str>, Vec<Value>) {
+        let (mut routes, mut rows) = fused_fixture();
+        for row in &mut rows {
+            row["paid_wall_ns"] = json!(20);
+        }
+        rows[1]["paid_wall_ns"] = json!(40);
+        rows[2]["paid_wall_ns"] = json!(40);
+        for (name, mode, cost) in [
+            ("root-frontier-baseline", "both_updates_fused", 3),
+            ("root-frontier-direct", "both_updates_frontier", 1),
+        ] {
+            routes.push(name);
+            let mut row = rows[24].clone();
+            row["pipeline"] = json!(name);
+            row["answer"]["kernel_mode"] = json!(mode);
+            row["paid_wall_ns"] = json!(cost);
+            rows.push(row);
+        }
+        (routes, rows)
+    }
+    fn select_frontier(rows: Vec<Value>, routes: &[&str], id: &str, hash: &str) -> Value {
+        selected_kernel(
+            &[json!({"id":id,"input_sha256":hash,"samples":rows})],
+            routes,
+        )
+    }
+    #[test]
+    fn frontier_selection_is_fixed_candidate_and_fixed_last_hash() {
+        let (routes, rows) = frontier_fixture();
+        let hash = "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3";
+        let s = select_frontier(rows.clone(), &routes, "star-last-n16-s7", hash);
+        assert_eq!(s["candidate_index"], 31);
+        assert_eq!(s["kernel"], "both_updates_frontier");
+        assert!(select_frontier(rows.clone(), &routes, "star-first-n16-s7", hash).is_null());
+        assert!(select_frontier(rows.clone(), &routes, "star-last-n16-s7", "wrong").is_null());
+        assert_eq!(comparisons_at(&rows, &routes, 31).unwrap().len(), 31);
+        let mut tie = rows;
+        tie[30]["paid_wall_ns"] = json!(1);
+        assert!(select_frontier(tie, &routes, "star-last-n16-s7", hash).is_null());
+    }
+    #[test]
+    fn frontier_selection_keeps_all32_checks_and_old_controls() {
+        let (routes, rows) = frontier_fixture();
+        let select = |r: Vec<Value>| {
+            select_frontier(
+                r,
+                &routes,
+                "star-last-n16-s7",
+                "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3",
+            )
+        };
+        for i in 0..32 {
+            let mut bad = rows.clone();
+            bad[i]["status"] = json!("failed");
+            assert!(select(bad).is_null());
+        }
+        for i in 19..32 {
+            let mut bad = rows.clone();
+            bad[i]["answer"]["kernel_mode"] = Value::Null;
+            assert!(select(bad).is_null());
+        }
+        let mut bad = rows.clone();
+        bad[24]["paid_wall_ns"] = json!(1);
+        assert!(select(bad).is_null());
+        let mut bad = rows.clone();
+        bad[31]["used_recovery"] = json!(true);
+        assert!(select(bad).is_null());
+        let mut bad = rows.clone();
+        bad[31]["answer"]["constructor"]["subset_succeeded"] = json!(false);
+        assert!(select(bad).is_null());
+        let mut bad = rows;
+        bad[2]["paid_wall_ns"] = json!(14);
+        assert!(select(bad).is_null());
+    }
     fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
         comparisons_for(samples, &ROUTES)
     }
@@ -1012,6 +1104,8 @@ mod tests {
             lead_cached: None,
             fused_baseline: None,
             fused_direct: None,
+            frontier_baseline: None,
+            frontier_direct: None,
             mature: "m".into(),
             singular: "s".into(),
             msolve: "ms".into(),

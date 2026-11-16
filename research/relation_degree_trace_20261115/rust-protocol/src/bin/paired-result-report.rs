@@ -103,6 +103,7 @@ fn check_kernel_mode(answer: &Value, expected: &str) -> Result<()> {
         "both_updates_sum",
         "both_updates_lead",
         "both_updates_fused",
+        "both_updates_frontier",
     ]
     .contains(&expected)
         || answer["kernel_mode"] != expected
@@ -122,6 +123,7 @@ fn kernel_guard_rejects_missing_wrong_and_unknown_modes() {
         "both_updates_sum",
         "both_updates_lead",
         "both_updates_fused",
+        "both_updates_frontier",
     ] {
         assert!(check_kernel_mode(&json!({"kernel_mode":mode}), mode).is_ok());
         assert!(check_kernel_mode(&json!({}), mode).is_err());

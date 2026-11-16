@@ -1,3 +1,27 @@
+# Latest: FGLM frontier fullyQUALIFIED; publication28pending, paid32 NOT RUN
+
+Productionc394bb471 core60/61/62/lint39 PCC1d67ff+e3dd43format/sourceclarification. Root9API/3worker/lint39 DONE PCC3d6110. Native30 through16 oldinput/wire/basis/consumer/freshSingular equal, n3all32 complete/no recovery/nullselection/pinsunchanged PCC113347. Capture6bd17982f31tests/guard3/lints/build40 PCCc9957d, nine-modeold108/latest45exact/wrongmodereject4bffa0. FRONTIER_QUALIFICATION_REPORT authoritative; archives40raw1081972/exes4934980 done, no jobsrunning.
+
+Publish28 nowbeforecleanpaid32. Priorplan27 treef7aaec21b35a2cbe7c40ffdd39f46d28b83ad0fb, ctx/tmp/frontier28-remote.json headb8d2502d48d4a6b9a3648071f32f245d2c5f487f/no newartifactmigrationat13:07. Bundle28 excludes8afde06aa8ee673085761dddf606f0978cc7ad8f; envelopefrontier-development/archives-40.json2raw. Newcommit/sourcebundle/plan28/uploadpending. PRbodyupdatedlinted.
+
+Afterpub28 cleanbenchrec init/defaultCPU0reserve/noheavyjobs: /workspace/relation-native-qualifiers/frontier-driver-6bd17982f-40 frontier-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/frontier-paid-results-6bd17982f-01 research/relation_degree_trace_20261115/frontier-development/capture-config-40.json; monitor /workspace/frontier-screen-isolation-6bd17982f-01.jsonl. Protocol99d979 only31/fixedLASThashe4d22ea9 all32/all6/31ratios/fulloldcost/gates/caps/recovery. READactualselection beforePCC. Reportprogram frontier-report6bd40RAW NEW_REPORT RESULTPCC, fullraw/report/archive/close/upload BEFOREfollowup/newalgorithm. Onlyifadmit freezepairedexactbinary/config/n3smoke/protocol/publication first, existingupdate-paired-driver6f3 supportsfixedLAST. Goal15ACTIVE/no15confirmation/L0/checkpointwaived/zero$/noagents/Rustmath/Pythonmetadataonly/freshseedsuntouched/no retry/gateweakening. Commentary<60sec.
+
+Historical follows:
+
+# Latest: FGLM frontier IMPLEMENTED/COREPASS; ROOTbuild39running, paid32 NOT RUN
+
+Productionc394bb4715a3e4dfd5ed6388b7935aa3a7857a85, native103=stream39|64. NeworderedBTreeSet frontier/dedup expandsindependentmonomialsonly/cachedimmutableleads; oldgridreference/defaults/fullnative+unchangedrootchecks retained. Core60/61/62/lint39 pass exactmixed/nonradicalprocessedorder/bound, bothprimefirst/laststar fullbasis/proof/metadata/fieldcounts. PCC1d67ff; wording/sourcebindingsiblinge3dd43 clarifiesformat-only/mutablequotient attestation, immutablequotient-core-source-39.rs.txt (do noteditpinnedquotientbytes). ROOT /tmp/build-frontier-root39.sh session58667 started~12:59UTC, rootbuild~7m20+tests9/3+lint~1m50. DO NOTeditproductionsource/restart. Checkfrontier-development/root-{build,tests,clippy}-39.log; frozenroot-frontier-{baseline,direct}-c394bb471-39.
+
+Capture6bd17982fd5867d0dc0a6292c8735efb7f6d0b03,31capture+3guardtests/lints/build40 PCCc9957d. FRONTIER_PAID_SCREEN_PROTOCOL99d979 ONLY31/fixedLASThashe4d22ea9, all30old+matched2=32/all6/31ratios/fulloldfees/gates/caps/recovery. Immutable /tmp/frontier-programs-40.json five programs. Read-onlyold108/latest45exact/wrongfrontiermode rejects PCC4bffa0.
+
+Afterrootfreeze /tmp/qualify-frontier40.sh (preparedNOTRUN): native30 through16 oldwire/input/basis/consumer counters+freshSingular/n3all32/no recovery/nullcomparisons+selection/pins/Rustcomposition. /tmp/frontier-identities40.py pre/post. Outputs /workspace/frontier-qualification-c394bb471-39-{baseline,direct}, frontier-capture-qualification-6bd17982f-40, frontier-audit-6bd17982f-40. Then /tmp/package-frontier40.py2archives raw/exes+oldreportcompat. RootPCC/fullFRONTIER_QUALIFICATION_REPORT/finalcommit/PR/log/resume+bundle28.
+
+Publish28 BEFOREpaidcalls. Priorpub27=b8d2502d48d4a6b9a3648071f32f245d2c5f487f/treef7aaec21b35a2cbe7c40ffdd39f46d28b83ad0fb exactlocal8afde06aa8ee673085761dddf606f0978cc7ad8f, bundle27233a9e89/269688. Priorplan27, newbundle28 excludes8afde06aa8ee673085761dddf606f0978cc7ad8f, envelopefrontier-development/archives-40.json2raw. Latestappheadsameb8d at13:01, refresh/mirrorartifactmigrations beforefinalpub. APIworksCLI401/PR4349ready/inheritedPCCprefixconflict/no force/merge/ledgerrewrite.
+
+Afterpub28 cleanbenchrec/defaultCPU0reserve/noheavyjobs: frontier-driver-6bd17982f-40 frontier-screen /workspace/root-paid-inputs-723f4c2dd-01 /workspace/frontier-paid-results-6bd17982f-01 frontier-development/capture-config-40.json; monitor /workspace/frontier-screen-isolation-6bd17982f-01.jsonl. READactualselection beforePCC; all192outputs/raw/report/archive/close/upload BEFOREfollowup/newalgorithm. Onlyadmitpermitsseparatelyfrozenpairedexactbinary/config/n3smoke/publication. Goal15ACTIVE/unconfirmed/L0/waivedcheckpoint/zero$/noagents/Rustmath/Pythonmetadataonly/freshseedsuntouched/no retry/runnerup/gateweakening. Commentary<60sec.
+
+Historical follows:
+
 # Latest: matched1243 profiles CLOSED; nextFGLMfrontier NOTimplemented, pub27pending
 
 1243baseline111865803/direct108491681guestIr, samecheckedbasis/modes/pins/0contention; PCC0e4eac/380191. Directleadself14074655, axpyself12410313, checkeraddself3480336. Two rawarchives andtwo completeRustself/summary/totals/Collected reports, A3PDFwarningfree/visualchecked, CLOSED1243/scopedintegrity/progresspass. No nativegain fromIr. Profiledata fused-profile-01.
