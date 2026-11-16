@@ -1,3 +1,47 @@
+# Current checkpoint: benchmark running, uncompiled prototype prepared
+
+Stage22STILLRUNNING session72120, run /workspace/ic-local-runs/local-cover-comparison-20261116-22,
+ORIGINALcopiedsource23b4c1a70 andplanUNCHANGED.36processes/900worker/3600cohort,
+started~07:04:40Z, bound~08:04:40Z. Checkactualexit-code/processbeforeanything.
+DO NOTrestartwrapper,compile,changebenchmarkparameters,binaries/source,orlaunchnewtrial.
+Afteractualexit ORIGINALcopiedanalyzer, fullflow/preposthashes/report/publish FIRST.
+Reporttemplate/tmp/ic-cover-comparison-report-template.typ (unrendered).
+
+IndependentUNCOMPILED Rust prototype /workspace/ic-mst-prototype. src/mst.rs now637lines
+formatted/parsedonly;5testgroups intended576randomprojection/64exhaustiveMST/caps/units/
+witness checks NOT RUN. src/lib.rs exactparentgenericfiltercopy+childmodule. parent-source.sha256.
+Integrationoverlays (alloutsidecheckout) in integration/:
+large_prime_filter.rs (+pubexports),large_prime_filter_mst.rs(exactdraft),jv_sieve_graph.rs
+(newMstOptionalStats/zero-skippedcostguardcounter, newproject_mst, proxyguardwidth*nnz,
+allwitnessreplay,targetpreserved),jv_sieve.rs(additivewith_mst_filterAPI/privatebool helper;
+OLDoptions&APIsunchanged),jv_sieve_graph_compare.rs(--mst-graph/workerflag/event&workerstrategy),
+run-local.sh(planstrategyflag),cover-{graph,validation}-analysis.rs(modebinding/MSTcounter/
+refusal-vs-projectiontests). RustfmtallmodifiedRustoverlaysparse;bashsyntaxpasses. NOBUILD/TEST.
+source-only-checkpoint.sha256 pinsdraft. MustNOTcopy/builduntil22ended+packetpreserved.
+Afterend firststandaloneprototypeCargo test/buildClippy, fixrealerrorsretainlogs,
+thenport/reviewnewcorechecks+fullgroupendpointvalidationbeforeanynewperformanceprotocol.
+No claimedwallgainfromdimension*nnzproxy. PrimaryMSTreviewreceipts inlatestjournal.
+GoalACTIVE/localworks, PR4288same. CIreview>=07:57absentevent,gatesunconfirmed.
+
+# Running comparison + isolated prototype checkpoint (16 November)
+
+Stage22 STILLRUNNING session72120. Originalcopiedsource23b4c1a70, plan unchanged,
+p1009seed257,36processes/3600cohort/900worker, bound~08:04:40Z. DO NOTcompile,
+changeitsparameters/source/binaries, restartwrapper orlaunchanothertrial. Afterexit
+originalcopiedRustanalyzer/flow/preposthashes/report/publish FIRST.
+
+Independent UNCOMPILED Rust draft outsidecheckout: /workspace/ic-mst-prototype.
+Parent lib.rs exactgenericfiltercopy+childmodule; src/mst.rs423lines contains
+Prim coefficient-normalizedMST projection with witnesses/caps and5testgroups
+(576randomrowspaces/64exhaustive4nodechecksplanned), NONE BUILT OR RUN.
+Integrationoverlays in /workspace/ic-mst-prototype/integration arepreparationONLY;
+do notcopytorepo/buildbefore22ends/preserved. Intendedfurthercostguard may reject
+projected dimension*nnz regression; do notclaimwallgain. ReadCavallarCWIprimary
+SHA2e511f1130d420143161357d50aaae129ebd51554270e3d09a61265e0c102dc5 pp6–9;
+CADOmergeblob0e41569a1e097a413ad9a25ce23372f9c3aeaae4 actualMSTcalls1035–1050,
+mst.hblobe967a31f37a63260b2ef82eba19fc236870a3ccf. KB2queriesunavailablelogs/tmp/ic-fill-cost-kb-*.
+GoalACTIVE/localworks. CIreviewnext>=07:57absentevent; gatesunconfirmed. PR4288same.
+
 # Running update (07:12Z, 16 November)
 
 Stage22ACTIVE session72120/runlocal-cover-comparison-20261116-22. FirstRHOwarmup
