@@ -1,4 +1,34 @@
-# Current checkpoint:26SOURCE READY,26NOTRUN (16 November11:18Z)
+# Current checkpoint:26FINISHED, publish packet/continue coverage (16 November11:26Z)
+
+26source d30b6e4a81c48e4c4a7302f0a1b535bb956ac70b PUBLISHED beforeSOLEcall.
+Run /workspace/ic-local-runs/local-cover-native-scans-validation-20261116-26
+exit0/73.538s/2starts2complete. Both actualscalar197564087855217396/native+outer
+groupreplay. Pivot509->382/382witnessreplays/0fallback/foreign0/OTHER0.
+Both3008descentresids->6016modradds, solverwordevents16843827/30794405 vsRNG509/382.
+Requiredmarkers/exercisedcounts pass; ORIGINALcopiedanalyzer global[]/criterionTRUE,
+butcompleteFALSE,totalNULL,eligibilityFALSE/followupFALSE. No speed/rhoparityclaim.
+Exactraw59502B/fullsummary40074B/progress/runtime/fullflow/hashesinGit+local.
+All101source/preposthashesPASS. Final1PDFpagevisuallyinspected;exactbenchPDF/SVG/
+150dpiPNGhashesPASS,originalsalsolocal. Study local-cover-native-scans-validation-20261116-26;
+bench20261116-cover-native-scans-validation. No activejobs/compilers.
+
+Nativecodechecks1BM/1eq/2Wiedemann/19sieve(twoignored)/1worker,27analyzer,
+actualbuilds+strictClippyPASS; old21/23/24/25summariesBYTEEXACT. Patchiscounting,
+notalgorithmperformanceimprovement. RNGstreams/legacyops/defaultserdefieldskept.
+NEXTcommit/push26packet/updatePRactualresult/checkpoint, thenexactRNGdraw/rejection
+source review +nativecontainers +complete strongestRhopricing. No nextscientific
+protocol or samplerrewrite selected yet. GoalACTIVE/localusable/no stopgoal/subagents.
+
+CurrentHEADd30+DIRTY26packet/journal/resume. LastPRbodypending26willberewritten
+aroundfinalimplementation/actualevidence(no historicalwallrank). CIlastd30 at11:19:
+appreview+migrateSUCCESS,otherlistsEMPTY,requiredgates/reviewUNCONFIRMED;
+NEXT>=12:09absentevent/newpublication. PR4288regular/automerge/no manualmerge.
+Valgrind3.28.0localinstalled/smokeonly, NOcrypto audit run. SourceRand0.8.8
+uniform.rs526-563read:loopmaydrawmultiple rawwords; currentnominalrng_words
+doesnotcloseRNGcoverage. Keepcompletecostunknown. Prior25fillnegative and23MST
+refusal/22censorunchanged. AllclaimsPCCunverified.
+
+# Previous checkpoint:26SOURCE READY,26NOTRUN (16 November11:18Z)
 
 Nativepatch countsWiedemann/BM data scans/comparisons;shortcircuitanswercompare;
 coverresidualscalarlabels useam (2modradds/residual,values/RNGunchanged). Old
