@@ -1,0 +1,8 @@
+cargo test --locked --release --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bin prime_centered_witness --no-run
+# Build cap180s, 2GiB virtual address space. Execution cap120s,512MiB; serial tests.
+N83_CENTERED_TEST_OUTPUT=/fresh/persistent/directory TEST_EXECUTABLE --test-threads=1
+cargo build --locked --release --manifest-path research/n83_candidate_pdp_20261028/Cargo.toml --bin prime_centered_witness
+prime_centered_witness verify /CASE_DIRECTORY
+# All24 exhaustive fixtures replayed freshly and from restored archive; mutated fixture exits101.
+# Production interface (not run for n83 width27 in this development task):
+prime_centered_witness generate INPUT_JSON FRESH_OUTPUT_DIRECTORY

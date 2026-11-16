@@ -1,0 +1,12 @@
+digraph independent {
+ graph [rankdir=LR,bgcolor="transparent",pad="0.12",nodesep="0.20",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fillcolor="#e8f1fa",color="#285b88",fontname="DejaVu Sans",fontsize=10];
+ edge [color="#285b88",arrowsize=0.7];
+ input [label="Every rational class\nT0 / T1 / T2"];
+ norm [label="Split finite supports\npointwise cover norms\npoles + multiplicities + infinities"];
+ seven [label="One public quarter\nfixed elliptic7 chain\nreverse scale29"];
+ fibre [label="Finite-fibre U,V\nEuclid inverses + jets\nsigned infinity drops"];
+ cantor [label="Quintic branch chart\nseparate old Cantor\nraw degree at most4"];
+ compare [label="All6 directions ×12,317\nexact old outputs",fillcolor="#e8f5e9",color="#397449"];
+ input -> norm -> seven -> fibre -> cantor -> compare;
+}

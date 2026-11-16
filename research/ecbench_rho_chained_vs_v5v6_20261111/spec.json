@@ -1,0 +1,86 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho.negation_chained against rho.negation_v5 and rho.negation_v6, prime ladder 2^18..2^28",
+  "description": "Two set-up routes to a cheap rho jump table, compared paired: rho.negation_chained (main, research/curve25519_engine_items_20261110: Fibonacci-chained jumps on the legacy walk) as the reference with an A/A control, rho.negation_v5 (ladder table, two-rung jumps) and rho.negation_v6 (G-only jumps), with legacy rho.negation as the common anchor; six prime curves, 32 planted targets each. Counted GAE; local L0 host.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 18,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 22,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 20261111
+  },
+  "arms": [
+    {
+      "name": "chained",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_chained"
+      }
+    },
+    {
+      "name": "v5",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v5"
+      }
+    },
+    {
+      "name": "v6",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v6"
+      }
+    },
+    {
+      "name": "chained-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_chained"
+      }
+    },
+    {
+      "name": "legacy",
+      "role": "baseline",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261111,
+    "isolation_required": "L0",
+    "timeout_seconds": 300
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "software.validation.recipe/v1",
+  "status": "prospective_unreleased",
+  "total_maximum_seconds": 900,
+  "phases": [
+    {
+      "name": "prehash",
+      "seconds": 300,
+      "work_seconds": 290
+    },
+    {
+      "name": "compiler",
+      "seconds": 300,
+      "work_seconds": 270
+    },
+    {
+      "name": "posthash",
+      "seconds": 300,
+      "work_seconds": 290
+    }
+  ],
+  "source_hashes": {
+    "compiler-phase3.unreleased.py": "a598eb41355915e139e954e79694822e54433a11c6712e9c5d957b86aafff9c0",
+    "custody-phase3.unreleased.py": "1579494d54b8bcfa3b57831064bf4570435303c0baaf0ecb182e13cf1bd7407c",
+    "runtime-pins.json": "5e3bb64e91e80b500b5f34fb0cca602c07d44b8163d3d4a3c440e29eab53cf86",
+    "Nonbranch.lean.txt": "bff60f06c035106ac4378a55a49320d15c01fc06a05bd5586366d4b5b68fa3a9",
+    "Controls.lean.txt": "06af5684064dd988d617db9fec2a9d1245dbc95ff6ebc70fa6e924486a6f9300",
+    "Readback.lean.txt": "03feb71dc3409c6f26fc3585aa11965d86cbecef976c4643955fa92fedb0102e",
+    "ExpectedFailure.lean.txt": "f933bec409a10d64325fd75505b09446f58b4cd8dcbec57cfffa29fa304de7b1",
+    "names.json": "a736c5964e50226110774a80fe82edf54d55b2fc1bda0d8b5e26476b3703aff2"
+  },
+  "source_theorems": 9,
+  "controls": 4,
+  "named_readbacks": 13,
+  "compiler_invocations_maximum": 4,
+  "expected_false_invocation_included": true,
+  "attempts": 1,
+  "compiler_AS_bytes": 8589934592,
+  "lean_heap_MiB": 3500,
+  "threads": 1,
+  "internal_stack_KiB": 16384,
+  "OS_stack_MiB": 10,
+  "output_aggregate_bytes": 268435456,
+  "output_per_file_bytes": 16777216,
+  "startup_free_bytes": 1073741824,
+  "sample_ceiling": 300,
+  "posthash_even_if_compiler_fails": true,
+  "cleanup_wait_max_seconds": 10,
+  "external_each": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "295s"
+  ],
+  "prior_failure_preserved": true
+}

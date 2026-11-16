@@ -1,0 +1,112 @@
+[
+  {
+    "theorem": "CubicFullFrobenius22302.frobenius_add",
+    "claim": "pcc/claims/PCC-20261116-40f44a.json",
+    "normalized_statement": "theorem frobenius_add {R : Type} [CommRing R] [IsCharP R 223] (a b : R) : (a+b)^223=a^223+b^223",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.frobenius_add",
+      "decl_sha256": "6ac6286b0aefd88edf915c00652518e43361e754614101dab0be755938970de0"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.base_fermat",
+    "claim": "pcc/claims/PCC-20261116-689c57.json",
+    "normalized_statement": "theorem base_fermat : \u2200 a : Fin 223, a^223=a",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.base_fermat",
+      "decl_sha256": "3f5b6291ae996dfe5c93a747eb9f21d73642bb2736cd6ddc83bc1d5e5430019a"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.embed_injective",
+    "claim": "pcc/claims/PCC-20261116-f7ec43.json",
+    "normalized_statement": "theorem embed_injective {R : Type} [CommRing R] [IsCharP R 223] : Function.Injective (embed (R",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.embed_injective",
+      "decl_sha256": "733dac9ac4972b0376cdfd4d9d9f216da93167b98a73fd248ca8a0a87ac7df14"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.embed_add",
+    "claim": "pcc/claims/PCC-20261116-f1b811.json",
+    "normalized_statement": "theorem embed_add {R : Type} [CommRing R] [IsCharP R 223] (a b : Fin 223) : embed (R",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.embed_add",
+      "decl_sha256": "367c5d716df0d3f965279f22085643b49040eea83d0af8f0260d62009704133e"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.embed_mul",
+    "claim": "pcc/claims/PCC-20261116-17ec3c.json",
+    "normalized_statement": "theorem embed_mul {R : Type} [CommRing R] [IsCharP R 223] (a b : Fin 223) : embed (R",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.embed_mul",
+      "decl_sha256": "176830fbcd74d802c2a273962730177ec53b93f14eedfbe6f5ac949029c40277"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.embed_pow",
+    "claim": "pcc/claims/PCC-20261116-44b51a.json",
+    "normalized_statement": "theorem embed_pow {R : Type} [CommRing R] [IsCharP R 223] (a : Fin 223) (n : Nat) : embed (R",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.embed_pow",
+      "decl_sha256": "b368da78b209ba588a735a0b789b8ae73c83cc5d5fd2c68bbe93ad7b1a0368fe"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.embedded_coefficients_fixed",
+    "claim": "pcc/claims/PCC-20261116-891920.json",
+    "normalized_statement": "theorem embedded_coefficients_fixed {R : Type} [CommRing R] [IsCharP R 223] (a : Fin 223) : (embed (R",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.embedded_coefficients_fixed",
+      "decl_sha256": "fdd27bdd9bb6bca089c5c3a0a8720a4724486bddfe7306df9654adc5ed2488cc"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.embedded_action_constants",
+    "claim": "pcc/claims/PCC-20261116-e01b59.json",
+    "normalized_statement": "theorem embedded_action_constants {R : Type} [CommRing R] : embed (R",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.embedded_action_constants",
+      "decl_sha256": "d6ec6cc55e81cace4dda7dfa594ed0403ef424287f34d0f09cb6bd0cf1d04fbc"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.full_expression",
+    "claim": "pcc/claims/PCC-20261116-294012.json",
+    "normalized_statement": "theorem full_expression {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : (encode z x)^223=encode z (CubicConstructorFrobenius22301.basisFrob x)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.full_expression",
+      "decl_sha256": "2251e4f814e779ea67344a6ad8aa2644f0b982bdfebb4bc3664b52634ce5dfb6"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.three_power_steps",
+    "claim": "pcc/claims/PCC-20261116-c03e0c.json",
+    "normalized_statement": "theorem three_power_steps {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : (((encode z x)^223)^223)^223=encode z x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.three_power_steps",
+      "decl_sha256": "9efdf39e372918681440ec2b5fc7f4078ab859b5d8a878c137d5e804385cd070"
+    }
+  },
+  {
+    "theorem": "CubicFullFrobenius22302.fixed_expression_iff",
+    "claim": "pcc/claims/PCC-20261116-d5aecf.json",
+    "normalized_statement": "theorem fixed_expression_iff {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (hinj : Function.Injective (encode z)) (a b c : Fin 223) : (encode z (a,b,c))^223=encode z (a,b,c) \u2194 b=0 \u2227 c=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-final-08/CubicFullFrobenius22302.lean",
+      "theorem": "CubicFullFrobenius22302.fixed_expression_iff",
+      "decl_sha256": "3d7e778b228838bba92018a610456daa7bfc0e0c78166d888b1efa3336815577"
+    }
+  }
+]

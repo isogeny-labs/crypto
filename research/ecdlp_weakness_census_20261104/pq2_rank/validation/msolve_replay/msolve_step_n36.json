@@ -1,0 +1,77 @@
+{
+ "schema": "validator.msolve-replay/v1",
+ "msolve_version": "0.6.5-1build2",
+ "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+ "command": "msolve -v 2 -g 2 -t 1 -f IN -o OUT",
+ "results": [
+  {
+   "file": "n36_i0.json",
+   "n": 36,
+   "N": 36,
+   "msolve_exit": 0,
+   "seconds": 2677.01,
+   "steps": [
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    4,
+    2,
+    3,
+    4
+   ],
+   "max_step_degree": 4,
+   "quotient_dim": 2,
+   "Z_size": 2,
+   "k_from_Z": 35,
+   "gb_size": 36,
+   "linear_in_gb": 35,
+   "checks": {
+    "exit_0": true,
+    "no_invalid_equations": true,
+    "characteristic_2": true,
+    "variable_order_unchanged": true,
+    "one_not_in_gb": true,
+    "gb_vanishes_on_Z": true,
+    "quotient_dim_eq_Z_size": true,
+    "linear_in_gb_eq_k": true
+   },
+   "failed_checks": [],
+   "raw": {
+    "n36_i0.ms": "4fdd3b9dc23f16c673daaec9b003d8d7f77754d3b1e989dd295f6d633609209a",
+    "n36_i0.gb": "122fed59b256a2f785ba38423c1f13f97148ea886e133495e3441f69a51070ca",
+    "n36_i0.stdout": "8f9c6c5c7deca033e76f6011aa190061659595e2020b79b45813da61ef0948f2"
+   },
+   "instance": 0,
+   "census": {
+    "k": 35,
+    "d_iter": "?"
+   },
+   "producer": {
+    "max_step_degree": 4,
+    "steps": [
+     2,
+     2,
+     3,
+     3,
+     4,
+     4,
+     4,
+     4,
+     4,
+     2,
+     3,
+     4
+    ],
+    "gb_size": 36,
+    "linear_in_gb": 35,
+    "k": 35
+   },
+   "mismatches": []
+  }
+ ]
+}

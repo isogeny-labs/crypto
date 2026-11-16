@@ -1,0 +1,16 @@
+[package]
+name = "b0-ext-solvers"
+version = "0.1.0"
+edition = "2021"
+description = "Reference external SAT arms for the B0 PDP baseline: CryptoMiniSat (XOR-DIMACS) and CaDiCaL (CNF), with counted conflicts and a conflict budget."
+
+[dependencies]
+cryptominisat = "5.8.0-rust1"
+cadical-sys = "=0.8.0"
+
+[patch.crates-io]
+cryptominisat = { path = "../../third_party/cryptominisat-rs" }
+
+[profile.release]
+opt-level = 3
+debug = false

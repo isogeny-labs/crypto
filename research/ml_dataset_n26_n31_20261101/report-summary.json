@@ -1,0 +1,135 @@
+{
+  "artifacts": [
+    {
+      "bytes": 30676,
+      "encoding": "jsonl",
+      "path": "coverage.jsonl",
+      "role": "restricted-coverage-report",
+      "sha256": "f1e5df56e31a3e316a792b6e37640b773be77164c2d7623bc1930e9e1327b74f"
+    },
+    {
+      "bytes": 1037709,
+      "encoding": "jsonl",
+      "path": "measurements.jsonl",
+      "role": "restricted-coverage-report",
+      "sha256": "1c67cfefbc3944c7f20f4b79b82fd7d6a3958b51cfad9cc1f21504fd17f1de3e"
+    },
+    {
+      "bytes": 369710,
+      "encoding": "jsonl",
+      "path": "artifacts.jsonl",
+      "role": "restricted-coverage-report",
+      "sha256": "43323277deaac7f102b6c3759574e6f630eec191537a51d2bd4c8d5a107a71b4"
+    },
+    {
+      "bytes": 638,
+      "encoding": "jsonl",
+      "path": "observed-cells.jsonl",
+      "role": "restricted-coverage-report",
+      "sha256": "17859e714cfbdb6a3a07f28421556c26228e5ca05135782acaab0a1b7133a469"
+    }
+  ],
+  "assigned_cells_without_observed_local_attempt": 0,
+  "assigned_method_cells": 36,
+  "axis_aggregate_scope": "active attempts with an actual saved config; retained attempts are counted separately; missing configs do not imply observed axes",
+  "binary_sha256": "c42ca1898aa11ae9cae29f190aabb90f10ee4fc3391eb5f9497fa6da2eeb2569",
+  "bounds": {
+    "input_json_bytes": 33554432,
+    "merge_fan_in": 8,
+    "serialized_row_bytes": 33554432,
+    "sort_chunk_bytes": 8388608,
+    "source_cell_values_materialized": true,
+    "total_process_rss_bound_claimed": false
+  },
+  "campaign_attempts_complete": true,
+  "certificate_replay_performed": false,
+  "clock_valid_for_comparison": false,
+  "complete_protocol_export_validation_performed": false,
+  "counts": {
+    "active_incomplete_cells": 0,
+    "active_sealed_cells": 36,
+    "by_family": {
+      "binary": 12,
+      "koblitz": 12,
+      "prime": 12
+    },
+    "by_m": {
+      "2": 36
+    },
+    "by_n": {
+      "26": 6,
+      "27": 6,
+      "28": 6,
+      "29": 6,
+      "30": 6,
+      "31": 6
+    },
+    "by_solver": {
+      "enumerate": 36
+    },
+    "by_status": {
+      "timeout": 1,
+      "verified": 35
+    },
+    "by_twist": {
+      "false": 18,
+      "true": 18
+    },
+    "recorded_independent_scalar_recovery_cells": 0,
+    "recorded_known_answer_verified_cells": 35,
+    "recorded_pdp_witness_verified_cells": 0,
+    "recorded_solver_completed_cells": 35,
+    "retained_interrupted_attempts": 0
+  },
+  "coverage_scope": "one bound local run/shard; includes retained interrupted attempts; unattempted slots produce no rows",
+  "exact_first_fall_degree": null,
+  "exact_last_fall_degree": null,
+  "experiment_export_schema": false,
+  "labels": "recorded producer labels with artifact/provenance hashes and required certificate presence checked",
+  "observed_distinct_cell_identities": 36,
+  "partial": false,
+  "plan_sha256": "b62a3522f53349cc45868345bd8daa0adf3189c8cd7b23355274ec53bf037861",
+  "planned_method_cells": 36,
+  "protocol_body_sha256": "ec6363c6ccdc41b2a6fc8a30844f27f3b5acf443bcfaa0cc65e9196b3b8e97a7",
+  "protocol_file_sha256": "f220293e3b19dda12617c85623316d3a9d4e3f6a78b90bb812dc529b5584f7f3",
+  "remote_rechecked": false,
+  "report_is_training_features": false,
+  "row_counts": {
+    "artifacts.jsonl": 1218,
+    "coverage.jsonl": 36,
+    "measurements.jsonl": 323,
+    "observed-cells.jsonl": 36
+  },
+  "schema": "crypto.ml-dataset.coverage/v1",
+  "shard_attempts_complete": true,
+  "shard_count": 1,
+  "shard_index": 0,
+  "shard_partial": false,
+  "solver_rerun_performed": false,
+  "source_commit": "1c869a18dc60d207393e50b4fda6f2c7bd399e35",
+  "source_files": [
+    {
+      "bytes": 538,
+      "encoding": "json",
+      "path": "plan.json",
+      "role": "source-provenance",
+      "sha256": "00e32c6909c1c03a1237cb6673a3656773648c41fbe75f04cd9c61f9670fd66b"
+    },
+    {
+      "bytes": 526,
+      "encoding": "json",
+      "path": "run.json",
+      "role": "source-provenance",
+      "sha256": "51471de0e7f781ae5754548b2b830d468ecf34ccd6dc18b0806446d114de6b93"
+    },
+    {
+      "bytes": 13499,
+      "encoding": "json",
+      "path": "protocol.json",
+      "role": "source-provenance",
+      "sha256": "f220293e3b19dda12617c85623316d3a9d4e3f6a78b90bb812dc529b5584f7f3"
+    }
+  ],
+  "source_run_sha256": "51471de0e7f781ae5754548b2b830d468ecf34ccd6dc18b0806446d114de6b93",
+  "whole_solve_instruction_count": null
+}

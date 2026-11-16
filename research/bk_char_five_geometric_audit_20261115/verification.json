@@ -1,0 +1,81 @@
+{
+  "schema": "bk-char-five-verification/v1",
+  "source_commit": "20aa112d862225c5012451722ec48c29c0f30e29",
+  "claim_id": "PCC-20261115-e8c175",
+  "declaration_sha256": "a625348a8083ec690a7a7b8d5f09b3330f7df44e6f814806b1bd4b61e14b4ee3",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 10,
+  "gate_declarations": 61,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 189,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-e8c175",
+    "claim_sha256": "167d18f13efc7409222d0632a2fcc4c48bbbd0e2b75782c9ba206e4f013487ac",
+    "commit": "20aa112d862225c5012451722ec48c29c0f30e29",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/bk_char_five_geometric_audit_20261115/lean (CharFiveCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T03:04:24Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-e8c175",
+    "claim_sha256": "167d18f13efc7409222d0632a2fcc4c48bbbd0e2b75782c9ba206e4f013487ac",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47593,
+    "sha256": "b7a7f19c865c19c140ebcf6a6670c468a5e85e9d704d9b6bba79af3e56a1b7ff",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 61,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 7,
+    "final_new_module_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "two_credited_argument_cores_module_wrappers_adapted": true,
+    "original_argument_bodies_equal": true,
+    "actual_base_curve_count_and_pointorders_derived": true,
+    "actual_characteristic5_coordinate_restriction_proved": true,
+    "actual_point_map_descent_for_every_extension_proved": true,
+    "actual_whole_geometric_point_kernel_cardinality5_proved": true,
+    "actual_inclusion_paraphrase_disproved": true,
+    "original_BK_count_criterion_survives": true,
+    "nonreduced_p_torsion_group_scheme_proved": false,
+    "generalprime_BK_Weil_rank_determinant_proved": false,
+    "full_population_allk_census_complete": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

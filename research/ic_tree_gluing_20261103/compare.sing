@@ -1,0 +1,48 @@
+// compare.sing -- literal equivalence check of two directories of msolve inputs.
+// Env: REFDIR, NEWDIR, LISTFILE (one file name per line).
+// For each file: var line and prime line must agree, then every polynomial is
+// parsed into one Singular ring and the difference must be 0.
+short = 0;
+string REFDIR = system("getenv", "REFDIR");
+string NEWDIR = system("getenv", "NEWDIR");
+string LF = system("getenv", "LISTFILE");
+
+proc firstline(string s)      // text up to the first newline
+{ int p = find(s, newline); return(s[1, p - 1]); }
+proc afterline(string s)      // text after the first newline
+{ int p = find(s, newline); return(s[p + 1, size(s) - p]); }
+
+proc cmpfile(string fa, string fb)
+{
+  string a = read(fa); string b = read(fb);
+  if (firstline(a) != firstline(b)) { return(1); }
+  a = afterline(a); b = afterline(b);
+  if (firstline(a) != firstline(b)) { return(2); }
+  string ba = afterline(a); string bb = afterline(b);
+  execute("ring Q = 786433,(" + firstline(read(fa)) + "),lp;");
+  execute("ideal IA = " + ba[1, size(ba) - 1] + ";");   // drop trailing newline
+  execute("ideal IB = " + bb[1, size(bb) - 1] + ";");
+  if (ncols(IA) != ncols(IB)) { return(3); }
+  int i;
+  for (i = 1; i <= ncols(IA); i++) { if (IA[i] - IB[i] != 0) { return(4); } }
+  return(0);
+}
+
+string L = read(LF);
+int ncmp = 0; int nbad = 0; int ii; string cur = ""; string ch; int r;
+for (ii = 1; ii <= size(L); ii++)
+{
+  ch = L[ii, 1];
+  if (ch == newline)
+  {
+    if (cur != "")
+    {
+      r = cmpfile(REFDIR + "/" + cur, NEWDIR + "/" + cur); ncmp++;
+      if (r != 0) { nbad++; print("MISMATCH " + cur + " code " + string(r)); }
+    }
+    cur = "";
+  }
+  else { cur = cur + ch; }
+}
+print("files compared: " + string(ncmp) + "  mismatches: " + string(nbad));
+quit;

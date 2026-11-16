@@ -1,0 +1,37 @@
+   Compiling hec-native-ic v0.1.0 (/Users/adamburan/pq-work/hec-followups/crates/hec-native-ic)
+warning: field `d` is never read
+ --> ../../research/hec_anchor_relations_20261114/rational.rs:6:9
+  |
+4 | pub struct SignedFamily {
+  |            ------------ field in this struct
+5 |     pub m: usize,
+6 |     pub d: usize,
+  |         ^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hec-native-ic` (example "heldout" test) generated 1 warning
+    Finished `release` profile [optimized + debuginfo] target(s) in 1.21s
+     Running unittests ../../research/hec_anchor_relations_20261114/heldout.rs (/Users/adamburan/pq-work/hec-followup-target/release/examples/heldout-eb5c700a5805dbf2)
+
+running 17 tests
+test anchor::dense::tests::dense_affine_forest_preserves_arbitrary_coefficient_invariants ... ok
+test rational::tests::duplicate_x_rejected - should panic ... ok
+test anchor::tests::planted_forest_invariants ... ok
+test rational::tests::all_zero_degenerate_control ... ok
+test rational::tests::branch_anchor_control ... ok
+test rational::tests::exhaustive_arbitrary_interpolation ... ok
+test tests::cohort_has_twenty_prime_field_slots ... ok
+test tests::fixture_roundtrip_and_target_replay ... ok
+test anchor::compact::tests::exhaustive_small_field_tuples_include_branch_places ... ok
+test anchor::dense::tests::incremental_target_matches_sparse_solver_at_every_prefix ... ok
+test rational::tests::curve_norms_and_jacobian_relations ... ok
+test table_factor::tests::exhaustive_all_small_polynomials ... ok
+test table_factor::tests::randomized_and_constructed ... ok
+test anchor::tests::checked_anchor_solves ... ok
+test anchor::tests::checked_orbit_anchor_solves ... ok
+test anchor::orbit::tests::every_gray_residual_matches_fresh_newton_interpolation ... ok
+test anchor::compact::tests::random_orbits_equal_reference_and_full_newton_norm ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s
+

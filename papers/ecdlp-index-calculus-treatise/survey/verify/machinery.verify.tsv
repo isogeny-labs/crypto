@@ -1,0 +1,227 @@
+claim	value	source (crypto origin/main 12a2b3d85f unless prefixed; path:line or quoted snippet)
+--- Chapter ch:engmeasure ---		
+calibration sizes for 7 generic methods	r=2^25.35 prime, 2^39 Koblitz	drafts/rho_side.tex sec:mr-calibration (from research/ecbench_calibration_20261002/README.md); cross-ref only
+accounting v2 is correction not improvement	"It is not an algorithmic improvement and not a speed result"	research/ecbench_accounting_v2_20261023/REPORT.typ:23
+accounting v2 verification phase = delta on matched pairs	40 of 40 per generic method; 16 of 16 ic.large_prime	REPORT.typ:34 (O3 a-c)
+1.5 log2 r prediction failed; scalar double-and-add count 19-29 GAE; post hoc (d') 240/240	as stated	REPORT.typ:36,115
+v2 ids cost 1.7-8.8% more S; fixed 19-29 GAE on 235-1500 GAE totals	as stated	REPORT.typ:118
+bsgs.textbook v2/frozen 1.022 [1.021,1.024]; ic.large_prime 1.0003	as stated	REPORT.typ:104,110
+504 of 504 matched records equal across binaries	504	REPORT.typ:38,133
+two committed sessions fail replay identically on both binaries (96 and 16 problems), root-finding and inherited-F4 arms	as stated	REPORT.typ:135
+ic-rootfind-m2 10.6-11.0x strong v2 at n=13 (2.0-2.3x frozen); 34-49x at n=19 (10-11x frozen)	as stated	REPORT.typ:141
+rho.cubic under first floor rule 0.720 [0.591,0.867]	0.720	REPORT.typ:68,73
+floor rule automorphisms/v2: A=6 j=0, A=4 j=1728	as stated	REPORT.typ:54
+stats v2 sub8-da-sat 1.351 (9/16) -> 1.429 [1.241,1.646], 7 censored	as stated	research/ecbench_statistics_v2_20261105/README.md:40
+stats v2 sub6-da-sat 1.892 -> 2.486 [1.442,4.288], 4 censored	as stated	README.md:41
+point estimates over verified pairs unchanged	"old ratio equals the new verified_only_ratio"	README.md:18
+sub8-mitm/rho-strong v1 median 20.26 vs 0.627 [0.489,0.804] ns/GAE; 45x the operations	as stated	README.md:83
+da-sat arms 5.1e7 and 8.8e6 ns/GAE flagged upper bounds	as stated	README.md:84
+tail flag 71/71 rows at 4 runs; 6/6 at 2 runs; threshold made n-dependent	as stated	README.md:93-97
+ic-sub6-mitm 6.981 -> 648.2	as stated	README.md:42
+allocator: counts identical 72/72 and 66/66 per pair, 10 pairs	as stated	research/ecbench_allocator_confound_20261023/REPORT.md:7
+small-set arms 5.26-6.77 ms vs 0.137-0.330 ms, ratio 18.4-38.8; ic-mitm ~1.9 ms ratio 1.03	as stated	REPORT.md:8
+IC online 127.1 vs 119.1 us, 1.067; by order 1.135, 0.983; "15% lower" not reproduced	as stated	REPORT.md:9
+attribution malloc_trim and /proc reads; both removed ratio 0.75-1.05	as stated	REPORT.md:10
+band IC 16.85/17.28/21.16 vs rho-strong 4.00/4.14/5.36; 4.21/4.17/3.95x	as stated	REPORT.md:12,121-125
+plain rho 1.541/1.635/2.478 cheaper than rho-strong on claim-koblitz	rho row	REPORT.md:122
+grader refuses wall time below 1 ms solve	"solve too short to admit wall time" (grading v3)	REPORT.md:41
+incomplete sessions: 4 gaudry quartic scratch sessions, pins session/plan/records sha256, since 18 Oct	4 rows; commit fa31c0ea37 2026-10-18	docs/ecbench/INCOMPLETE_SESSIONS.tsv; .github/scripts/ecbench-audit-sessions.sh:8-9
+defective session: curve25519 ladder smoke-k20, claims 7 records/stop seq 6, holds seq 0-3, 4 problem checks, owner approved 2026-11-05	as stated	docs/ecbench/DEFECTIVE_SESSIONS.md:17-57
+records_bound false reported as unbound prefix	as stated	.github/scripts/ecbench-audit-sessions.sh:10-15
+registry 79 methods, 11 system solvers, 9 PDP3, 4 PKM tower engines	as stated	research/ecbench_registry_optimization_20261101/README.md:10-15
+114 specs, 79/79, 24/24	as stated	README.md:18-20
+38 L0 sessions, 1,095 records, 1,042 verified, 854/854 replays	as stated	README.md:21-23
+73/73 runnable; six external CM wrappers	as stated	README.md:24-27
+pair-index F6 accounting-cache regression, corrected 16/16	as stated	README.md:43-46
+N83 chained-S3 lookup and chained-x outside 79+24	as stated	README.md:47-58
+e2e refresh: 92-shard campaign not run, checkpoint credential blocker	as stated	research/ecbench_e2e_frontier_20261031/README.md:101-111
+closest markers 2.28x, 2.59x, 3.43x, different studies	as stated	research/ecbench_e2e_frontier_20261031/REPORT.md:43-46
+pair-index F6 0.2792 [0.246,0.317], 139.30 [85.48,227.02]x strong rho; PKM 4.62-5.03x negation rho; wide FES 4.28x	as stated	REPORT.md:141-146
+F4/F5/F6 sessions reproduce 72/144; optimised rho 720/720	as stated	README.md:113-117
+GHS-weak E0/F_q^3 #E0=4l below matched rho, kept separate	as stated	README.md:47-53; REPORT.md:62-69
+generator orbit: layout 960/960 identical, 1.02-1.09x; net 1.26-3.20x; band order holds	as stated	research/ecbench_generator_orbit_20261022/README.md:20-25
+n29 S 0.546/0.611/1.196 vs 1.569; paired 0.366 [0.241,0.523]	as stated	README.md:26-28; VALIDATION.json gae_band
+VALIDATION.json present with replay certificate and validator report	present; validator status pass	research/ecbench_generator_orbit_20261022/VALIDATION.json; validation/validator-report.json
+n29 is Frobenius-folded BSGS; 133-GAE set-up at log2 r=15.4; gap 1.15x n31, 1.93x n23, 3.89x n37	as stated	README.md:29-32
+n13 unresolved, n17/23/31/37 rho ahead, n19 no calibration row	as stated	VALIDATION.json rho_reference.scope
+like-for-like band IC 0.413/0.478/1.063; rho 1.503, 1.582	as stated	VALIDATION.json bands_considered.like_for_like
+1 Nov snapshot 0.4405 [0.363,0.534]	as stated	research/ecbench_e2e_frontier_20261031/REPORT.md:138-140
+child overhead: registry 190M instr ~98% of rho/BSGS child; rho.negation child 4.26M after #2184, 4.64M on main	as stated (table lines 26-28)	research/ecbench_child_overhead_20261024/README.md (instructions table; #2184 bullet)
+IC child 169.47M on main -> 9.86M; alias table 2.8 MB, 25-row calibration table	as stated	same README, table and alias bullet
+wall per child 37.20 -> 2.92 ms, 0.0786 [0.0769,0.0802]; PR/main 0.9910 [0.9754,1.0083]	as stated	same README, wall table
+asm Euclid: default oracle Ir/GAE 537.0 -> 476.8 (-11.2%); prime-batch 427.2 -> 397.7; half not reached; counted record identical	as stated	research/ecbench_ic_asm_euclid_20261103/README.md:3-22
+--- Chapter ch:boolean ---		
+generic Boolean campaign: node/resource limits return UNKNOWN, not UNSAT	as stated	research/boolean_solve_trace_20260923/README.md:28-29
+packed construction 3.48-4.53x primary, 3.55-4.90x confirmation; construction only	as stated	research/boolean_packed_construction_20260922/CONCLUSION.md
+construction+reduction staged 1.38-1.50x at n=36; 0/9	as stated	research/boolean_construction_reduction_20260922/CONCLUSION.md
+fixed quadratic state 2.40-2.51x; confirmation 2.10-2.55x 7/9; 6,144 solves	as stated	research/boolean_quadratic_state_20260923/CONCLUSION.md
+packed residuals 1.56-1.67x vs fastest of 8; 18/18; 5,832 obs on 72 systems; 2x gate rejected	as stated	research/boolean_quadratic_frontier_20260923/CONCLUSION.md
+linear tail 3.59x [3.57,3.62]; small cells 0.969,0.975,0.969,0.964; rejected	as stated	research/boolean_linear_tail_20260923/CONCLUSION.md
+whole solve: hybrid slower than flat; specialisation 1.04-1.14x; 2x rejected	as stated	research/boolean_solve_trace_20260923/CONCLUSION.md
+row-space transport full-RREF 0.199-2.667, 3/18; affine-tail 0.235-0.952, 0/18	as stated	research/boolean_basis_transport_20260923/CONCLUSION.md
+affine substitution SIMD Gray 16/18, hybrid 15/18	as stated	research/boolean_affine_substitution_20260923/CONCLUSION.md
+pivot screen 0/64 eligible n>=12 pairs	as stated	research/boolean_pivot_screen_20261003/README.md:12-13
+24-var planted: flat 253.1 ms, sparse bucket 1,050 ms, search-only 53.8 ms, packed residuals 12.0 ms	253.129771, 1050.400459, 53.764896, 11.966916	research/boolean_quadratic_frontier_20260923/CONCLUSION.md table
+identical node counts/trace digests (same search tree)	as stated	quadratic_frontier CONCLUSION.md ("does not change the search-tree exponent"); quadratic_state CONCLUSION.md
+gate: 2 warmups, 5 A/A, 5 A/B, 22 processes, 7 cases; 3,125-resample bootstrap; 1.05 / 1.02 gates	as stated	research/f5_avx2_gather_unpack_20260929/RESULT.md (block description); research/f5_popcnt_unpack_20260929/RESULT.md:22
+AVX2 gather 0.9652 [0.9630,0.9874] 1T Intel; 0.9140 2T AMD	as stated	research/f5_avx2_gather_unpack_20260929/RESULT.md:15,19
+AVX2 nibble 0.912 (0.906-0.925)	as stated	research/f5_avx2_nibble_unpack_20260929/RESULT.md:35
+nibble subset 0.649 (0.646-0.650)	as stated	research/f5_nibble_subset_unpack_20260929/RESULT.md table
+AVX-512 prior/new 0.996-1.016	1.002,1.016,1.004,0.996	research/f5_avx512_unpack_20260929/RESULT.md:27-30
+POPCNT 1.0005 (0.9944-1.0067)	as stated	research/f5_popcnt_unpack_20260929/RESULT.md:13
+compact paired 0.9998 (0.9986-1.0045)	as stated	research/f5_compact_unrolled_unpack_20260929/RESULT.md:15
+bounds-free 1.004, 0.982	as stated	research/f5_bounds_free_unpack_20260930/README.md table
+one-pass 0.992, 0.953	as stated	research/f5_one_pass_unpack_20260929/README.md table
+x86 guarded 0.9984 (0.9927-1.0226)	as stated	research/f5_x86_guarded_unpack_20260930/RESULT.md:15
+flat rows 0.978, 1.002	as stated	research/f5_flat_rows_20260929/RESULT.md:26,28
+byte colex 1.0229-1.0262 (1 thread), build 1.46	as stated	research/f5_byte_colex_20260930/RESULT.md:26-29,45
+initial density 1.006, 0.987	as stated	research/f5_initial_density_order_20260929/RESULT.md:30-31
+bounded-weight terms 0.9843/0.9715/0.9792/0.9641; structural gate rejected; stratified rejected at structural gate	as stated	research/f5_bounded_weight_pivots_20260930/RESULT.md table; f5_stratified_weight_pivots_20260930/RESULT.md title
+always-echelon large 1.504-1.548; n12_m12_d4 0.830/0.821/0.823	as stated	research/f5_echelon_20260927/RESULT.md:9-13,21
+fused row build 4T: build 1.382, complete 0.865 (0.745-1.095)	as stated	research/f5_row_build_20260928/RESULT.md:28
+F4 unsorted 0.857, 0.876	as stated	research/boolean_f4_unsorted_products_20260926/RESULT.md table
+F4 degree queue 1.002, 1.008, 0.993	as stated	research/boolean_f4_degree_queue_20260927/RESULT.md table
+F4 six-column primary 1.074; holdout n20_m20 0.881	as stated	research/boolean_f4_wide_tables_20260926/RESULT.md:9,15
+cut-19 recheck 3.006-3.049x 1T (LB 2.970-3.024); 2T 2.415-2.476; XORs 28.078-28.095%; recheck not independent holdout	as stated	research/f5_support_cut19_final_recheck_20261003/README.md
+support split 33.7% work; seed lower bound 0.966	as stated	research/f5_support_split_call_20261002/RESULT.md:46-49
+mainline port 1.450x (0.582-1.664)	as stated	research/f5_mainline_port_20261002/RESULT.md:25
+defaults 17 Oct: direct pack on (1.006-2.173x); unpack 0.986x; reuse 0.955x; 1.11-1.27x combined; +-25%	as stated	research/f5_gf2_defaults_20261017/README.md:14-26
+arm64: lazy scatter 1.08-1.69x more CPU Linux; gate-first off 1.69-2.10x Linux, 1.62-2.15x macOS; no table count beats t4 on Linux	as stated	research/arm64_f4_defaults_20261022/README.md:22-35
+29 Oct followups: none landed; 976M->633M instr; per-site 0.88-1.08; B' tiled 0.87-1.02; direct unpack 1.087 vs 0.933	as stated	research/f4_f5_followups_20261029/README.md:9,33-40,49-51,63
+overhead round 0.847x instr (thr 0.90), 48/48 identical, ~120 -> ~95 instr per word XOR	as stated	research/inherited_f4_overhead_20261005/RESULT.md:2-9
+remap round 0.923x (thr 0.97), 95 -> 89, superseded not merged	as stated	research/inherited_f4_remap_20261007/RESULT.md:2-18
+eager runs 1.22-1.70x lower CPU on 6/9 cells; architectures charge same units	as stated	research/inherited_f4_eager_runs_20261016/README.md:14-26
+lane-batched replay 2.2-4.0x more stage units; Demin Groebner.jl	as stated	research/lit2026_w5_lane_batched_f4_20261011/README.md:14,20
+gate-first 1.57-1.78x lower stage unit	as stated	lit2026_w5 README.md:16
+gate-first x86: 1.336-1.733x fewer word XORs, 80/80 identical	as stated	research/f6_gate_first_x86_20261016/README.md:14-17
+online panel F5/F4 208.49x (181.29-223.86); ~315x slower than rho; >99.9% target_PDP; 2,546 vs 68 splits; capture defect, diagnostic	as stated	research/ic_solver_online_20261003/RESULT.md:13-27
+harvest re-measure 5 sessions x144, 144/144 replays; table values	n11 1.0958 [1.0940,1.0980] 24/0 7.17->7.86; n13 1.0699 36.9->39.5; n17 0.9969 6/18 424.1->422.8; n19 0.9593 0/24 1248->1198; K0 n19 0.9755 priced	research/f4_harvest_remeasure_20261024/README.md:2-5,47-58
+m=2 control 1.0000 on all five; n17 gain from #1891 root-rank gate; F4 arms 7-1,250x rho; harvest moves <=10%	as stated	f4_harvest_remeasure README.md:45-66
+dim V per curve 4,5,6,7	as stated	f4_harvest_remeasure README.md:35-40
+determinism: 48/48 F4 rows byte-identical across thread counts	as stated	research/inherited_f4_replay_determinism_20261018/README.md:25-28
+priced inherited F4 22-33x strong rho at n13; pair table 17-22x cheaper; closed_dominated	as stated	crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-boolean-f4-f5-f6-engines.yaml:11-27
+F4 and F6-IC grow faster in n than MITM floor at m=3,4 (slope-difference CI above 0)	as stated	same lead yaml:19-21
+chained-x inherited F4 24.71/144.09/794.37x at m=2,3,4 Koblitz n=13; F5 0.6276 of F4 at m=3, 16,296.76x rho; m=4 matrix censored	as stated	research/ecbench_registry_optimization_20261101/README.md:53-58; research/ecbench_e2e_frontier_20261031/REPORT.md:147-150
+E0 ladder F6 54.75x (37.81-84.22) m13; 2,091x m19; inh F4 1.105, 1.582; m23 2.721, 2.091; m31 cap 3600 s; no decision	as stated	research/f6_ic_ecbench_ladder_20261005/RESULT.md:1-41
+72 verified runs per arm and size; word XORs counted not charged	as stated	same RESULT.md:24-29
+online gap rho/IC 0.0219-0.0221 (T1), 0.000515-0.000530 (T7)	as stated	research/f6_ic_rho_online_gap_20261006/RESULT.md:2-7
+phase profile Macaulay 81-84% of PDP; build 98.5%; oracle 1.6-2.3%; save ~1.6%	81.43-84.36%; 98.55/98.50%; 1.56-2.34%	research/f6_ic_phase_profile_20261006/RESULT.md:20-38
+few candidates: <=64 base codes; CPU 2.67-10.29x; worst pairing >=1.66; XORs 1.84-10.13x; nodes 204-1,049 -> 5-16; inh F4 0.87-1.05	as stated	research/f6_few_candidates_20261105/README.md:10-25
+pair lookups and group additions identical; "in the limit it is that oracle [pcc:unverified]"	as stated	same README.md:21,26-28
+displaced rows median 36/61/48; pivots crossed 7.9-24.5; ~32 row ops per pivot vs ~1,500 row XORs per node	as stated	same README.md:47-56
+parallel split 1.59-2.88x wall refuting; 0.94/1.11x decomposing; work 1.12-1.49x and 2.67/2.86x; opt-in	as stated	same README.md:66-75
+MutantXL 92 UNSAT draws, 4 per cell (23 cells), degree 3-4 vs XL 5-7	as stated	research/dreg_closure_mutantxl_20261016/RESULTS.md:1-12
+closure (3,22,8): 124,314 deg-4 columns per branch, 124-331 s, 10.6 GB	as stated	research/dreg_closure_guess_20261022/RESULTS.md:26-27
+hybrid word ops 5.34e11 to 1.54e12 (2.56e12 with failed attempts)	as stated	research/dreg_hybrid_guess_20261024/RESULTS.md table
+engine suite contract: identical targets, fingerprints, timeouts never UNSAT	as stated	research/ic_framework_engines_20260922/README.md:1-25
+crossbred panel n9 m3: enumerate 19,696.3 rel/s; SAT 51.7; Groebner 33.2; crossbred 11.7; Theta(2^n)	as stated	research/crossbred_20260920/e2e_panel.txt
+solver selection: model chooses pairs; zero routing headroom	as stated	research/ic_solver_selection_20260915/README.md:11-16
+sat_pdp history: pilot Buchberger timeouts, low-bit GAE replay defect; counted pilot 56 per-call conflict-budget exits; main panel stopped	as stated	research/ecbench_sat_pdp_20261009/README.md:3-42
+count-qualified-main 240/240 verified, 200/200 replays; table S 3.998/387.277/17.073/3.413; ratios 96.880/4.271/0.854	as stated	README.md:44-60
+curve icv1-f2m17-tm101-00378d4e, r=65587, 8 targets, 5 rounds	as stated	research/ecbench_sat_pdp_20261009/PROTOCOL-3.md:26-31
+2,755,966 conflicts in 749 calls	as stated	README.md:72
+SAT relations 31,929.963 GAE; MITM 30,382.734/30,383.709; online windows 41,620,896,790 ns vs 1,222,546 ns	as stated	README.md:81-88
+CNF-XOR complete enumerator of V^m mod S_m; lead open_next_step	as stated	crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-sat-xor-pdp-oracle.yaml:5-15
+ML SAT: 4,200 labels agree; 0.963 and 0.998 conflicts per sorted triple; within 4.1%; ceiling 5.2-9.0x; AUC ~0.5; positive control 0.72-0.79; closed	as stated	research/pdp_ml_sat_ceiling_20261027/README.md:1-45
+n83 sign fold 1.261-1.618x at 258-4,054 points	1.261, 1.618, 1.330	research/f6_n83_sign_fold_20261004/RESULT.md:23-25
+PMULL query 6.110-6.868x; build 1.402/3.050x; 0.912x at 4,054	as stated	research/f6_n83_pmull_xonly_20261005/RESULT.md:27-31
+union-domain u64, first 64-bit word; UNSAT could not prove absence	as stated	research/f6_n83_domain_20261004/RESULT.md:1-8
+five-summand dim 18: 261,447 points; 130,722 columns; 339 vars, 332 eqs; six-summand 428/415; root pruning fails	as stated	research/f6_n83_fivesum_d18_20261005/RESULT.md:1-10
+Karatsuba circuit gate passed, solver timed out	as stated	research/f6_n83_karatsuba_sat_20261005/RESULT.md title
+FieldStructure truncation; engine list; builders refuse; regression test	as stated	research/n83_msweep_20261024/README.md:12-19
+53-bit subgroup fixture	as stated	n83_msweep README.md:3-4
+chain SAT m=2 17.3 s, 4/4 refuted, 2/2 planted; projection 2^75.9 s = 2^75.3 x rho	as stated	n83_msweep README.md:20-24
+m=4 rootfinder K=1107 188.5 and 175.2 s vs 1.509 s; 116-125x	as stated	n83_msweep README.md:25-28
+n=61 companion: SAT 0.79-2.41 ms at D>=12; inh F4 6.2-33.4 ms; m>=3 refused by 64-variable mask	as stated	n83_msweep README.md:29-32
+chain order: m2 conflicts 0.50-0.60 public; 12.8->6.2 s; m3 0 conflicts 0.38 s; m4 median 156 conflicts 0.98 s	as stated	research/n83_chain_sat_order_20261031/README.md:11-21
+meet: m5-8 public 3/3 0 conflicts; build 0.68 s d=3 to 958.8 s d=5; m9 cap; ~|B|^(m-d) per query	as stated	research/n83_chain_sat_meet_20261101/README.md:5-16
+rebuild 5/5 planted, 0 solver calls, 0.91-81.5 s	as stated	research/n83_chain_sat_rebuild_20261101/README.md:4-9
+indexed m8 78.4->39.7 s; m9 3/3, 5/5, 54.1/54.7 s; 372,406,144 fingerprints	as stated	research/n83_chain_sat_indexed_20261101/README.md:4-9
+parallel m8 41.7->11.4; m9 57.0->13.7	as stated	research/n83_chain_sat_parallel_20261101/README.md:5-8
+parbuild 1,006.8->287.7 s; 3.50x	as stated	research/n83_chain_sat_parbuild_20261101/README.md:5-7
+matched rho ~1.51 s online on fixture	"Matched rho on this curve: 1.51 s mean online"	research/n83_chain_sat_order_20261031/README.md:24-25
+--- Chapter ch:fpengines ---		
+narrow 1.113 [1.111,1.121] missed 1.2; mode 2 1.641 [1.631,1.649]; 4T 1.580; overdet 2.101; default-on 1.640/1.480; p<=65,536	as stated	research/fp_f4_narrow_20260926/RESULT.md:6,15,18,24,32-34
+lazy AVX2 1.059 [1.055,1.062]; 1.756 vs wide; gate 1.15; two smaller regressions	as stated	research/fp_f4_lazy_avx2_20260928/RESULT.md:6,10
+AVX-512 1.047 / 1.513; opt-in; different hosts not multiplied	as stated	research/fp_f4_lazy_avx512_20260928/RESULT.md:6,10,13
+f4_fp vs msolve quad_n8 47.8 vs 47.4 ms; faster on 7 others; 44% add_lazy_avx2; reduce 66-84% at 4T	as stated	research/f4_f5_followups_20261029/README.md:19-24,44
+cryptanalysis preprocessing 2.34x, 1.99x; F5B 1.36-1.49x; load >40; local progress	as stated	cryptanalysis:experiments/groebner-perf-20260924/README.md:6,11-14,28 (HEAD c273e62)
+msolve 12-24x faster a day earlier; parity 0.96-1.22	as stated	treatise sections/prog_groebner.tex Table prog_groebner-engineering
+Magma protocol 13 Oct: 26 PKM systems p=2,013,265,921, 5 k=4, 8 Boolean n=17 root systems; all unit ideals; no Magma output committed	as stated; directory listing has bundles, ours_*.jsonl, scripts only	research/magma_f4_comparison_20261013/PROTOCOL.md:1-30; git ls-tree (65 files)
+sweeper desk review 10^3-10^7 more ops than brute grid	as stated	drafts/corrections.tex sec:corr-engine (source research/ic_sweeper_20261024/README.md); cross-ref only
+f4_fp IC effect: JV cover genus 2 over E(F_p^6); S before/after 5.05,4.99,5.06,5.08; S/rho 4297->850, 1843->370, 981->194, 1897->373; F4 mults 7.7x, C_cov 5.0x; lower bound	as stated	research/f4_fp_ic_effect_20261018/README.md:6-15
+generic field F4: 182 rows 0 differences; u32/generic 1.091, 1.058	as stated	research/f4_generic_field_20261015/README.md:31-32
+2.18x (m2 N16), 2.24x (m3 N12); Fp52 IFMA 2.57x; 5/5 claims	as stated	same README.md:33
+D independent of v2 at 40,48,56, P-224; torus P-192, P-256	as stated	same README.md:34
+45,952,850,022 multiply-adds at 45,52,61,224 bits	as stated	same README.md:35
+4 PKM engines 4.62-5.03x negation rho	as stated	research/ecbench_e2e_frontier_20261031/REPORT.md:142-143
+GLV line note sections; E22 V4 line 18 Oct; E17 earlier	as stated	research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md section headings 9.2, 9.12
+solve 97.69-98.45% of S; LA <=0.006%	as stated	RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.36 (line ~3721)
+Macaulay 393x448, 176,064 cells, degree 11; 41.6% left of lead (73,237)	as stated	research/e40_macaulay_entries_20261102/REPORT.typ Outcome Stage 0
+band unit S(g)=total_muls+97g(entries+selection)	as stated	research/e39 note §9.49 band table header; E33 REPORT.typ "Counting rule"
+E31 A 2.62-2.69x, B 4.99-5.32x per call; S_E25/S_A 2.50-2.56/1.39-1.43/1.034-1.053; B unresolved; validated VAL-20261024-24ef8b	as stated	docs/ic/LEADERBOARD.md:1125; GLV note §9.24 (line 2951-2957)
+E32 33 paired curves log2 n 22.6-42.4; best 1,143x; beta -0.243 [-0.279,-0.205]; n* 85.5 [79.2,94.3], 91.2, 97.6; 37-66 bits past; validated 66/66	as stated	docs/ic/LEADERBOARD.md:1200; GLV note §9.36 fits table; research/e32_handover_ladder_20261031/validator-report.json status pass
+E33 B vs A 1.82-1.86/0.193-0.197/0.149-0.152; B'' 1.538-1.558/1.046-1.048/0.9465-0.9480; validated; claims no improvement	as stated	research/e33_solver_b_pivot_count_20261031/REPORT.typ:13-15,23; validator-report.json status pass
+B selection 1.049-1.057e6; reads matrix ~6x; B'' 12,696-12,804; 1.27e4 ops = 1.2e6 mults > 2.3e5 saving	as stated	E33 REPORT.typ:11,27
+E35 T vs A 1.093-1.252/1.020-1.055/0.9981-1.0028; 6 rows below 1 at 1 GAE; 997-1,000 distinct; 69.8-88.4%; other curve 69.3-90.2%; keeps 18.8-36.8%; no validation dir	as stated	research/e35_chain_trace_20261102/REPORT.typ Measured/Ranks; ls-tree shows no VALIDATION.json
+E36 F cuts C 1.47-1.55x; kill fired (S/H control)	as stated	GLV note §9.43 heading (line 4370)
+E37 kill fired on F control positive check	as stated	GLV note §9.45 heading
+E38 kill fired at pilot	as stated	GLV note §9.47 heading
+E39 F 1.4572-1.5372/1.0937-1.1064/1.0115-1.0130; S 1.4017-1.4492/1.0825-1.0908/1.0077-1.0086; H 1.4971-1.5415/1.0957-1.1028/1.0076-1.0083; 32/32; sigma1-3 same order	as stated	GLV note §9.49 band table (lines ~5600-5615)
+E39 validated VAL-20261102-E39 pass; benchmarks row	as stated	research/e39_pivot_rules_confirm3_20261102/validator-report.json; benchmarks/README.md:128
+E39 distance F 5.18e3-2.32e5 (0), 9.40e4-5.62e6 (1); H 5.15e3 best	as stated	GLV note §9.49 "Against the matched rho"
+E40 V 1.0000/1.2518-1.2618/1.3629-1.3807; validated VAL-20261102-E40; best 6.00e3/1.58e4/6.17e4	as stated	research/e40_macaulay_entries_20261102/REPORT.typ Outcome; validator-report.json id/status
+E42 range [900,960], G0 245.6, kill; E42b range [200,300], 246.3; W/V 1.0000/1.0219-1.0230/1.0319-1.0338 (ranked 1.022-1.023, 1.032-1.034); S_W/rho 6.00e3-1.98e5 (0), 5.97e4-2.29e6 (1); no validation	as stated	research/e42_macaulay_tails_20261103/REPORT.typ:8-25,32
+B'' worst at 1 GAE 7.01e6	as stated	E33 REPORT.typ:16
+trace: record_trace/replay in f4_fp_tower.rs; only refutation is result; fallback charged	as stated	research/curve25519_f4_trace_20261102/README.md:12-33
+trace table cells (t,G): 6,0 5.55e7/2.25e7/0.41/1.68/0/100; 6,4 7.10e5/3.23e5/0.45/1.83; 7,0 7.46e8/2.35e8/0.32/1.46/1/100; 7,4 9.70e6/4.13e6/0.43/1.74; 8,0 6.98e9/2.32e9/0.33/1.50/4/100; 8,4 8.64e7/3.85e7/0.45/1.86/6/1554	as stated	same README.md compact view table
+P1 failed: apply/plain 0.406/0.305/0.292 at G=0	as stated	same README.md predictions P1
+t4 trace 0.2837 [0.2413,0.3335] at w=0.1; 1.567x at w=0; 27.9x, 1.83e4x, 1.13e5x rho; t=4 G=3	as stated	research/curve25519_t4_candidate_ecbench_20261104/README.md:17,24,57,87
+t4 validator pass_with_errata	as stated	research/curve25519_t4_candidate_ecbench_20261104/validator-report.json status
+binary trace reuse 1.4-2.3x (cryptanalysis), closed dominated	as stated	LEAD-ICE-boolean-f4-f5-f6-engines.yaml:8-11
+E21 400 targets p=53,101; fallbacks 23.5%/13%; total 0.951/0.980x; net loss	as stated	GLV note §9.11 (lines 2336-2356)
+--- Chapter ch:instruments ---		
+prior summary (1/116-1/260; +8.43/+58.27; l=8 needed)	as stated	treatise sections/prog_binary.tex:52-70 (origin/main)
+guess (3,22,8) N=46, 44 eqs; vars 7,15,23,24; 64/64 branches refute; K_marginal favoured; k=4 upper bound; unspecialised l=8 not measured	as stated	research/dreg_closure_guess_20261022/RESULTS.md:23-60
+ECC2K-130 ratio 78.2 (k0), 5.09 (k4), 1.30 (k6), 0.66 (k7); k<=6; rules give k~105-108; k~1 at l=7 on 5/8; 2^+7.62; free-oracle floor	as stated	same RESULTS.md:66-82
+guess3: 1 of 4 suffice; closure ranks 129,221/128,213/129,893 of 136,698	as stated	research/dreg_closure_guess3_20261023/RESULTS.md:40-46
+null22_7: does not refute at 4 on 4/4; scorer defect fixed, verdict unchanged	as stated	research/dreg_closure_null22_7_20261028/RESULTS.md:1,27-37
+invariant guess never worse, not reliable at l=8; post hoc V3' amendment; killed branches 1,5,6	as stated	research/dreg_invariant_guess_20261029/RESULTS.md:1-40
+invariant more: 5/5 discordant, p=0.031, 8 fresh UNSAT draws	as stated	research/dreg_invariant_guess_more_20261029/RESULTS.md:1,26-30
+pair guess never better on 12 draws	as stated	research/dreg_invariant_pair_guess_20261029/RESULTS.md:1
+pair invariant does not refute below 4 at l=6	as stated	research/dreg_pair_invariant_20261028/RESULTS.md:1
+second link 6 vs 7 of 12; PCC-20261106-607061 unverified assertion	as stated	research/dreg_second_link_guess_20261105/RESULTS.md:1-3
+high arity protocol v4 frozen, launch blocked	as stated	research/dreg_high_arity_20261101/README.md:2-3
+specialise: null control refuted 6/8, needed >=7/8 fail; uninformative	as stated	research/dreg_closure_specialise_20261017/RESULTS.md:1,26-30
+linearization excess D=2+[e<-3.5]+[e<-8.5]; MAE 0.06 (0.08 held out); 656 bases, 7 families, 9 fields	as stated	cryptanalysis:experiments/pdp-degree-heuristics/README.md:12-19 (HEAD c273e62)
+dim V^(2)>=2l-1; progressions 15-40x cheaper, up to 100x; same yield	as stated	same README.md:20-25
+dreg exactly l+1; semi-regular misses 0.5-1.2; three summands formulation decides	as stated	same README.md:32-44
+none is an IC result	as stated	same README.md:50
+lead open_unexamined	as stated	crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-linearization-excess-fb-prior.yaml:9
+tree gluing T vs C: m2 D 4 for t=3-7, C 5 at t=6,7; 1.8-3.6x narrower; m3 t5 D=6; m4 t4 D=7 (697 s); kill not met	as stated	research/ic_tree_gluing_20261103/README.md:23-32
+T vs F: m3 F D5 vs 6 at t4; m4 F D=8, 59x faster (11.8 vs 697 s), different engine	as stated	same README.md:33-40
+coupling excess 0,2,3 at m=2,3,4; >=5 at m=5 (14.5 GiB); +1.5/summand, +0.5/level; closed at crypto sizes; pcc unverified; round-5 claims PCC-20261104-3d6b6c etc	as stated	research/ic_tree_gluing_20261103/STATUS.md:2-6,26-52
+GAG: n=m=3 over F_p^3, p in {1009,4099,32749}, 30 instances; monolithic 0.110x; tree 1.095 inconclusive; review replicate; correction (one instance two decompositions)	as stated	crypto-autoresearcher:research/gag_presentation_matched_20261031/README.md:1-26 and reports/run-20261101T1755Z.correction-1.md (origin/main d8b78d8e6e)
+dreg_forecast: Kaplan-Meier, Greenwood, median, prior at semi-regular; advisory; certified null	as stated	src/cryptanalysis/dreg_forecast.rs:1-40; .agents/skills/dreg-triage/SKILL.md
+advice after four solves; rho floor at 1, 10, 100 mults per addition	as stated	.agents/skills/dreg-triage/SKILL.md "What the forecast is"
+LA 0.11-1.9% of 27 ic logs runs; N73 600 cols 5.1 h, ms	as stated	research/la_engines_20261014/README.md:15-17
+block Wiedemann beats bwc, 1.86x at 131,072	as stated	same README.md:18-19
+CADO filter 5-8x smaller; port 86.57->8.35 s (10.40x [9.99,11.06]) at D=262,144; 1.93x [1.74,1.96] (7.83 vs 14.73 s); 0.40x at 1,024; IncrementalGauss 6-9x per doubling, 19.1 s at 8,192	as stated	same README.md:20-27
+filter default of ic logs	"(ic logs --filter-strategy cado|legacy, default cado)"	same README.md:31-32
+sparse LA null: 1.206x total S1; 5.72x -> 1.030x (128-4,096); completion rule; 1.75x and 5.5-10.5x relations; positive control; 1.47-1.97x row ops; unfiltered 10^3-10^4x, columns^2.2	as stated	research/sparse_la_timing_20261018/README.md:24-56
+quartic N4: B1/B0 0.81-0.91 to q=65,479, 1.53 at 262,111, trade; B2/B0 0.297 [0.295,0.299] at 262,111; ~q^1.0	as stated	research/quartic_n4_la_20261021/README.md:12-30,67-74
+planner: 14 curves, 3,328 records, 2,428 band verdicts, Lean decide; W1 failed w=0 clause, W2 failed w=1, W3 every weight; ic-planner/4	as stated	research/ic_planner_exhaustive_20261026/README.md:16-34; drafts/prime_ext.tex:641-650
+planner/2 1.41 N0 at w=1; planner/3 0.71 c0 Koblitz w>=0.3	as stated	drafts/corrections.tex:39 (tab:corr-xref)
+residual collector cheaper than plan from 36 bits as generic collision search; null 15/16; exponent 0.460 vs 0.619	as stated	ic_planner_exhaustive README.md:36-69
+autolab contract and enforced rules	as stated	.agents/skills/ic-autolab/SKILL.md "The Curve25519-family loop"
+Curve25519 autolab 35 rounds	35 round-NNN directories	git ls-tree research/curve25519_autolab_20261104 (round-001..round-035)
+norm-predicate autolab cycles in prog_binary	as stated	treatise sections/prog_binary.tex:200-207
+GPU explicit relations: v8 12/12 through 60 bits, 770.270416 and 845.179937 s; v9 one 61-bit recovery, one memory refusal; nine versions	as stated	research/explicit_relations_e2e_20261030/RESULTS.md:10-31
+full cache RTX 4090 63-bit 1053.896752 vs 1183.823571/1185.763838; 11.05%; 0.164% spread; LA 0.107 s	as stated	research/explicit_relations_fullcache_20261101/RESULTS.md:3-8,31-33
+normalisation 765 vs 4,608 field mults, no cold e2e gain; not admitted; L0 wall_valid=false	as stated	benchmarks/20261030-explicit-relations-gpu/README.md
+hashed ECDL: 120-exec panels; 45.993793->3.903194 ms; 80.536765->4.118365 ms; 0.315901->0.283191 ms; larger ladder 0 executions; no speedup claim	as stated	research/hashed_ecdl_cpu_20261030/README.md:3-60
+--- Not verified / caveats ---		
+generator-orbit validator report status	pass, independent true	research/ecbench_generator_orbit_20261022/validation/validator-report.json
+"largest verified end-to-end engine change ~5x" (summary)	derived from f4_fp_ic_effect (lower-bound comparison, no VALIDATION.json); E31 2.5x validated	author inference, stated as such in text
+survey digest said n83 = ECC2K-130 field: wrong; n83 is the degree-83 Koblitz target	not used	survey/ic-engine.md item 6 vs research/n83_msweep_20261024/README.md:3-5
+survey digest said t4 candidate G=4; source says t=4, G=3	used G=3	research/curve25519_t4_candidate_ecbench_20261104/README.md:87

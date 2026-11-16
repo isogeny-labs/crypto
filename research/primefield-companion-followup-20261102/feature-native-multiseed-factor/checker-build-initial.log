@@ -1,0 +1,16 @@
+error[E0282]: type annotations needed for `Option<_>`
+ --> research/primefield-companion-followup-20261102/feature-native-multiseed-factor/check.rs:8:136
+  |
+8 | ...,base).unwrap();let mut q=None;
+  |                        ^^^^^
+9 | ...en(),8);assert_eq!(&f[..3],&[p as i64,r as i64,k as i64]);let xy=q.map(|[x,y]|[x as i64,y as i64]).unwrap_or([-1,-1]);assert_eq!(&...
+  |                                                                            ----- type must be known at this point
+  |
+help: consider giving `q` an explicit type, where the type for type parameter `T` is specified
+  |
+8 |  for(p,a,b,r,base)in[(5,2,1,7,[0,1]),(7,0,3,13,[1,2]),(509,2,10,479,[3,68])]{let source=frozen::Source::new(p,a,b,r,base).unwrap();let mut q: Option<T>=None;
+  |                                                                                                                                             +++++++++++
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0282`.
