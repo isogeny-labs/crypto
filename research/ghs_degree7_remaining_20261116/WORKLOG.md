@@ -132,3 +132,28 @@ explicit trace-+22 transfer if any map is found.
 ### Errors
 
 None in the final v3 runs. Earlier interrupted receipts remain incomplete.
+
+## 2026-11-15 23:13 America/Los_Angeles
+
+### What was done
+
+Committed final cubic-square receipts and bounded result at `10c907330308`.
+Derived the two-pole linear-square identity by cancelling `S=Q_iQ_j` and
+`H²=(x-c)²` from the cover equation. Wrote its frozen protocol and Sage
+screen. The exact candidate count is 7,906,140 per target representative
+after the necessary nonzero-square leading-coefficient filter.
+
+### Decisions made
+
+Use ten necessary square evaluations to keep full polynomial checks small;
+all survivors still receive the complete identity check. Freeze and commit
+this source before any counted run.
+
+### Open threads
+
+Run b=68 and b=84, audit all coverage counters, then address the three-pole
+class.
+
+### Errors
+
+None in this preparation.
