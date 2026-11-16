@@ -64,3 +64,56 @@ held file. [pcc:unverified]
 ### Errors (what went wrong, how it was handled)
 
 - None before execution.
+
+## 2026-11-16T11:15Z — Dependency-free unit result
+
+### What was done (commands, files, features)
+
+- Built the source committed at `9f5e09d0ea` using Rust 1.99.1 and ran its
+  dependency-free unit binary. All three tests passed, including full K13
+  key lookup, first-witness preservation on promotion and explicit failure
+  controls. `unit.meta`, `unit-build.*` and `unit-test.*` retain UTC seconds,
+  exits, stdout/stderr and `/usr/bin/time -l` process counters. Source SHA-256
+  is `289e49654ec0343f344f3ce5c5367332913273a7891d546feefa4c62e1c83638`;
+  binary SHA-256 is
+  `7544b9bd4fb7e52f2ff782295254cd6c27aa8abf01477e08545725cbcea057a0`.
+
+### Decisions made (and why)
+
+- Proceed to the pinned actual-curve parity test on the unchanged source.
+  The earlier `11:17Z` worklog heading was rounded forward before checking
+  the clock; this entry records the accurate 11:15Z unit run window.
+
+### Open threads (unfinished, pick up next time)
+
+- Run the local Cargo harness, inspect exact K13/K19/K23 results and record
+  both successful and failed test outputs.
+
+### Errors (what went wrong, how it was handled)
+
+- None in the unit run.
+
+## 2026-11-16T11:16Z — Cargo lock admission correction
+
+### What was done (commands, files, features)
+
+- The first actual-curve harness command exited 101 before compilation:
+  `--locked` found the copied lockfile's old harness package name.
+  `curve.meta`, `curve.stdout` and `curve.stderr` retain that refusal.
+- Replaced only the lockfile's harness package name with the new package
+  name. A diff against the prior harness lock shows this is the sole
+  change; `cargo metadata --locked --offline --no-deps` exits zero.
+
+### Decisions made (and why)
+
+- Commit the corrected lockfile before rerunning the unchanged parity
+  test, preserving the original admission refusal separately.
+
+### Open threads (unfinished, pick up next time)
+
+- Run the same source-bound test after the lock correction and preserve
+  its own command outputs.
+
+### Errors (what went wrong, how it was handled)
+
+- No parity assertions executed in the refused launch.
