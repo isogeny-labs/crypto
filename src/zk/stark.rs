@@ -77,7 +77,17 @@
 //! `1 − (1 − (1 − k/n)^q)^G ≤ G · (1 − k/n)^q`.  Size `q` with
 //! [`spot_check_queries`]: `q = 20` at `n = 8` is grindable in a few
 //! hundred attempts (`tests::spot_check_at_q20_is_grindable`).  That
-//! is spot-check soundness, not succinct soundness.  Use
+//! is spot-check soundness, not succinct soundness.
+//!
+//! **Demo-only, unsound by design at small `q`.**  The query count is
+//! the caller's: [`prove`] and [`verify`] accept any `q ≥ 1` and set no
+//! floor, so the grinding demonstration above keeps working (owner
+//! ruling on sheriff case SHF-20261106-a114e7, finding V1: keep the
+//! caller-chosen `q`, add a warning).  Below
+//! [`v1_safe_query_count`]`(n)`, the `q` that [`spot_check_queries`]
+//! gives for [`V1_SAFE_BITS`] = 64 bits (the sizing
+//! `tests::grinding_fails_at_sized_query_count` uses), both entry
+//! points print a warning to stderr and otherwise behave as before.  Use
 //! [`super::stark_v2`] (coset LDE, composition polynomial, DEEP
 //! out-of-domain sample, degree-bounded FRI) for anything that needs a
 //! proof; neither module is audited, and neither may back a research
@@ -263,6 +273,8 @@ fn v1_folds(n: usize) -> usize {
 
 /// The Fiat-Shamir transcript state before any commitment: tag, AIR
 /// identifier, `n`, both boundary values, `q` and the FRI fold count.
+/// Like [`prove`] and [`verify`] it sets no floor on `q`; demo-only
+/// below [`v1_safe_query_count`] (module docs).
 /// `None` if `n` is not a power of two `≥ 2`, `q = 0`, or a boundary
 /// value is not canonical.
 pub fn statement_transcript(air: &Air, query_count: usize) -> Option<Vec<u8>> {
@@ -285,6 +297,47 @@ pub fn statement_transcript(air: &Air, query_count: usize) -> Option<Vec<u8>> {
     absorb_u64(&mut t, b"fri_folds", v1_folds(n) as u64);
     t.extend_from_slice(b"trace_commitment");
     Some(t)
+}
+
+/// The spot-check security level, in bits, that the v1 warning
+/// threshold is sized for: [`spot_check_queries`] at 64 bits is the
+/// verifier's sized `q` in `tests::grinding_fails_at_sized_query_count`
+/// (one-attempt escape `≤ 2^−64` for a single broken row; `2^g`
+/// grinding attempts succeed with probability `≤ 2^(g − 64)`, module
+/// docs).  It is a demo threshold, not an audited security level.
+pub const V1_SAFE_BITS: u32 = 64;
+
+/// The smallest `q` the v1 entry points accept without a warning at
+/// size `n`: [`spot_check_queries`]`(n, `[`V1_SAFE_BITS`]`)`.  Smaller
+/// `q` is still accepted (SHF-20261106-a114e7, V1 ruling) but is
+/// grindable; see the module docs.
+pub fn v1_safe_query_count(n: usize) -> usize {
+    spot_check_queries(n, V1_SAFE_BITS)
+}
+
+/// The warning [`prove`] and [`verify`] print for a query count below
+/// [`v1_safe_query_count`]; `None` at or above it, or for a size `n`
+/// the entry points reject anyway (not a power of two `≥ 2`).
+pub fn v1_query_count_warning(n: usize, query_count: usize) -> Option<String> {
+    if n < 2 || !n.is_power_of_two() {
+        return None;
+    }
+    let safe = v1_safe_query_count(n);
+    (query_count < safe).then(|| {
+        format!(
+            "WARNING: zk::stark v1 is a demo-only spot-check argument, unsound by design at \
+             small q: q = {query_count} is below the {V1_SAFE_BITS}-bit sizing q = {safe} for \
+             n = {n} (spot_check_queries), so a cheating prover can grind an accepted proof of \
+             a false statement. Use zk::stark_v2 for anything that needs a proof."
+        )
+    })
+}
+
+/// Print [`v1_query_count_warning`] to stderr, if any.
+fn warn_on_small_query_count(n: usize, query_count: usize) {
+    if let Some(w) = v1_query_count_warning(n, query_count) {
+        eprintln!("{w}");
+    }
 }
 
 /// Queries needed so that one proof with a single broken transition
@@ -679,7 +732,14 @@ fn subgroup(n: usize) -> Vec<BigUint> {
 /// Fiat-Shamir positions.  FRI on the trace adds no soundness here.
 /// `None` if `n` is not a power of two `≥ 2`, `n_queries = 0`, or a
 /// boundary value is not canonical.
+///
+/// **Demo-only; unsound by design at small `n_queries`.**  There is no
+/// floor on `n_queries`: below [`v1_safe_query_count`]`(n)` a cheating
+/// prover can grind an accepted proof of a false statement, and this
+/// prints a warning to stderr ([`v1_query_count_warning`]) but still
+/// proves.  Use [`super::stark_v2`] for real use.
 pub fn prove(air: &Air, n_queries: usize) -> Option<StarkProof> {
+    warn_on_small_query_count(air.n, n_queries);
     prove_trace(air, &air.execute(), n_queries, 1)
 }
 
@@ -758,9 +818,18 @@ fn prove_trace(
 /// and its successor; and the FRI openings (on the committed trace)
 /// fold consistently to the committed final layer.  Malformed input
 /// returns `false`; it never panics.
+///
+/// **Demo-only; unsound by design at small `query_count`.**  The
+/// verifier takes the caller's `query_count` with no floor (sheriff
+/// case SHF-20261106-a114e7, V1 ruling): below
+/// [`v1_safe_query_count`]`(n)` it can accept a ground forgery of a
+/// false statement, and it prints a warning to stderr
+/// ([`v1_query_count_warning`]) but otherwise decides as before.  Use
+/// [`super::stark_v2`] for real use.
 pub fn verify(air: &Air, query_count: usize, proof: &StarkProof) -> bool {
     let n = air.n;
     let q = query_count;
+    warn_on_small_query_count(n, q);
     // Checks n, q and that the statement's values are canonical.
     let Some(mut transcript_state) = statement_transcript(air, q) else {
         return false;
@@ -1228,5 +1297,32 @@ mod tests {
         let i = found.unwrap();
         let p = prove_trace(&fa, &two_break_trace(i), 20, 1).unwrap();
         assert!(!verify(&fa, spot_check_queries(8, 64), &p));
+    }
+
+    /// SHF-20261106-a114e7, V1 (owner ruling: keep the caller-chosen q,
+    /// add a warning).  The threshold is the 64-bit sizing of
+    /// `grinding_fails_at_sized_query_count`; the warning fires below it
+    /// and not at or above it, and not for sizes the entry points reject.
+    #[test]
+    fn v1_warns_below_the_sized_query_count_only() {
+        for n in [2usize, 8, 64, 1024] {
+            let safe = v1_safe_query_count(n);
+            assert_eq!(safe, spot_check_queries(n, 64));
+            assert!(safe > 1);
+            for q in [1, 20.min(safe - 1), safe - 1] {
+                let w = v1_query_count_warning(n, q).expect("warns below the threshold");
+                assert!(w.contains("demo-only") && w.contains("stark_v2"), "{w}");
+                assert!(w.contains(&format!("q = {q}")) && w.contains(&format!("q = {safe}")));
+            }
+            for q in [safe, safe + 1, 2 * safe] {
+                assert_eq!(v1_query_count_warning(n, q), None, "n {n} q {q}");
+            }
+        }
+        // q = 20 at n = 8, the grinding demo, is below the threshold.
+        assert!(v1_query_count_warning(8, 20).is_some());
+        assert_eq!(v1_safe_query_count(8), 333);
+        for n in [0usize, 1, 3, 12] {
+            assert_eq!(v1_query_count_warning(n, 1), None, "rejected size {n}");
+        }
     }
 }

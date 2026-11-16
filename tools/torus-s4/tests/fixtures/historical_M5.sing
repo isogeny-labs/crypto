@@ -1,0 +1,50 @@
+ring r=5309,(y0,y1,y2,x0,c0_2,c0_3,x1,c1_2,c1_3,x2,c2_2,c2_3,densq0,densq1,densq2,sx,sy,sz,qa,qb,ru,rv,rw),dp;
+short=0;
+option(redSB);
+option(prot);
+ideal I=-2*x0^2+1*c0_2+1,
+-2*x0*c0_2+1*x0+1*c0_3,
+-1*x0+2*c0_2*c0_3+2112,
+-2*x1^2+1*c1_2+1,
+-2*x1*c1_2+1*x1+1*c1_3,
+-1*x1+2*c1_2*c1_3+2112,
+-2*x2^2+1*c2_2+1,
+-2*x2*c2_2+1*x2+1*c2_3,
+-1*x2+2*c2_2*c2_3+2112,
+1177*y0^2+-571*y0+1*densq0+-622,
+563*y0^2+-1126*y0+1*x0*densq0+1*densq0+563,
+1177*y1^2+-571*y1+1*densq1+-622,
+563*y1^2+-1126*y1+1*x1*densq1+1*densq1+563,
+1177*y2^2+-571*y2+1*densq2+-622,
+563*y2^2+-1126*y2+1*x2*densq2+1*densq2+563,
+-1*y0^2+1*sx,
+-1*y1^2+1*sy,
+-1*y2^2+1*sz,
+1768*sx*sy+-1768*sx+-1768*sy+1*qa+1764,
+8*y0*y1+1*qb,
+1220*sx*sz+-1204*sx+1220*sy*sz+-1204*sy+-4*sz*qa+-736*qa+1*ru,
+1340*y2*qa+305*sz*qb+-301*qb+1*rv,
+-51*y2*sx+-51*y2*sy+1340*y2*qa+301*sz*qb+-1037*qb+1*rw,
+1*ru^2+-1*rv*rw;
+ideal G=slimgb(I);
+print("\nBEGIN_META");
+print(size(G));
+int md=0;
+for (int j=1;j<=size(G);j++) { if(deg(G[j])>md) {md=deg(G[j]);} }
+print(md);
+print("END_META");
+if(size(G)==1 && G[1]==1)
+{
+  print("BEGIN_LEX"); print("1"); print("END_LEX");
+}
+else
+{
+  ring q=5309,(y0,y1,y2,x0,c0_2,c0_3,x1,c1_2,c1_3,x2,c2_2,c2_3,densq0,densq1,densq2,sx,sy,sz,qa,qb,ru,rv,rw),lp;
+  short=0;
+  ideal L=fglm(r,G);
+  print("\nBEGIN_LEX");
+  for (int k=1;k<=size(L);k++) { print(string(L[k])); }
+  print("END_LEX");
+}
+print("NATIVE_DONE");
+quit;
