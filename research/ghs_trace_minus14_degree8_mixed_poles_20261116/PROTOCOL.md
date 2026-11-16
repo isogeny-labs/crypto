@@ -1,0 +1,13 @@
+# Frozen trace −14 degree-eight mixed-pole cover screen
+
+16 November 2026. Frozen `screen.sage` SHA-256: `5f6a832d6a72346b34f11b6c9cca40ad81f6e9f2fb85100986f1c6cb097c50b4`.
+
+Use K=F3[a]/(a⁵+2a+1). Search all eight products of carrier masks f=9735,17371 and source masks b=11,202,38,80. Each source is E_b: v²=u³+u²+b of K-order 258. The carrier Y_f is y²=f(x), with one K-linear factor L and five K-irreducible quadratics Qi. The eight cells represent 240 recorded exact equation pairs via the independently verified Frobenius/PGL2 orbit identities.
+
+The exact morphism identity is `f C² = B(A³+A²B+bB³)` for u=A/B and v=yC/B², with `deg A=8` and `gcd(A,B)=1`. Enumerate six denominator shapes for every nonbranch K-value c: `L(x-c)²`, `L(x-c)⁴`, `L(x-c)⁶`, `LQi(x-c)²`, `LQi(x-c)⁴`, and `L³Qi(x-c)²`. The first three use all 243 assignments of three roots of e over each of five quadratics, then solve the necessary x⁹ coefficient equation for c, including the zero-polynomial fallback. The last three use all five possible Qi, all 81 assignments on the other four factors, all 242 nonbranch c, and all 121 nonzero square leading coefficients λ. Ten dynamically selected nonbranch K-points filter λ; each necessary filter has a direct equivalence control. Every surviving candidate receives exact degree, gcd, divisibility, and squarehood checks; any squarehood hit receives the full polynomial identity check.
+
+Each cell has 3×58,806 + 3×11,859,210 = 35,754,048 logical numerator candidates. Across eight cells this is 286,032,384. These are candidate counts, not measured group operations or attack costs. Preserve JSON and stderr for every cell, including failure or timeout. Any positive map requires independent replay, selected-subgroup map and norm, full decomposition and descent, then same-target rho comparison before a vulnerability label.
+
+Literature screen before construction: Iijima–Momose–Chao 2015 classifies the direct odd-characteristic isogeny-condition GHS locus for small prime extension degrees; Joux–Vitse 2012 covers isogeny-assisted cover/decomposition. Neither establishes a new vulnerability for this finite trace −14 slice. See https://eprint.iacr.org/2015/805.pdf and https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf. A zero result here excludes these six named shapes only, not every degree-eight cover or correspondence. The previous degree-one-through-seven census gives [8,33] until a complete degree-eight proof or a positive map changes it.
+
+Run: `sage screen.sage FMASK BMASK > cell_FMASK_BMASK.json 2> cell_FMASK_BMASK.stderr`. Do not edit this source after counted execution; use a new version on correction.
