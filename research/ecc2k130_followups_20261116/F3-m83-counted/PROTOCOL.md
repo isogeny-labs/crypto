@@ -48,7 +48,7 @@ Deliverables:
 ## 4. Controls
 
 - **Positive control (pipeline end to end):** every smoke execution must recover its planted
-  scalar (the record's `verified`), and `ecbench verify --replay-all` must reproduce every count.
+  scalar (the record's `verified`), and `ecbench verify --replay-all` must reproduce every count. [pcc:unverified]
 - **A/A:** `rho-strong-aa` must equal `rho-strong` count for count on every target (the walk is
   deterministic per seed). Any difference voids the session.
 - **Negative control (the m = 83 gate):** `ecbench plan` on `specs/launch-k0n83.json` is expected
@@ -80,7 +80,7 @@ Notation: n field degree, r subgroup order, C columns, w the §5a weight.
 ## 6. Predictions and decision rule
 
 - P1 (smoke): IC/rho at w = 0 rises with log2 r and lies in [8, 80]× at n = 61.
-- P2 (smoke): every IC and rho execution verifies; A/A is exact.
+- P2 (smoke): every IC and rho execution verifies; A/A is exact. [pcc:unverified]
 - P3 (gate): `ecbench plan` refuses the IC arm at n = 83.
 - P4 (estimate): at m = 83 with C = c0 the model puts IC/rho above 100× and the pair table
   above 1 PiB.
@@ -109,3 +109,16 @@ Cores 0–2 only (`taskset -c 0-2`), at most 2 GB address space per process
 (`prlimit --as=2000000000`), `timeout` on every run, lane-private build directory, no commits.
 
 ## Amendments
+
+### Amendment 1 (2026-11-16, before any smoke or probe data)
+
+- Two lines (section 4 positive control, section 6 P2) gained a `[pcc:unverified]` tag because
+  `pcc.py lint-prose` flagged them. No content changed. Hash at freeze: `5d14d9bb…2d2b`.
+- Added after the freeze, before data: `requests/request-v1-rate-probe-l2.json` (the rate probe
+  of section 4 as an L2 `isolab.eks.request/v1` job: rounds 5, warm-up 1, A/A, 600 s per
+  execution, 1800 s job) and `requests/request-resumable-k0n83-ecbench-mode.json` (the launch
+  spec wrapped in `isolab.eks.resumable/v1`, with placeholders where no image exists). The
+  local probe keeps the frozen L0 spec.
+- Build source: `HEAD` (`c3655407dc`) does not compile (`koblitz_index_calculus.rs:1646`,
+  `lift_x_packed` returns `Vec::new()` where a tuple is expected). Every local run uses the
+  newest first-parent commit without that code, `70b57c2b81`, exported with `git archive`.
