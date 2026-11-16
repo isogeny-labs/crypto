@@ -342,8 +342,8 @@ mod tests {
     }
     #[test]
     fn chord_tangent_diagonal_and_vertical_exception() {
-        let x=PRIME31.g.0;
-        let y=PRIME31.g.1;
+        let x=super::PRIME31.g.0;
+        let y=super::PRIME31.g.1;
         let t=super::mul(
             super::add(super::mul(3,super::mul(x,x)),super::A),
             super::inv(super::mul(2,y))
@@ -351,6 +351,6 @@ mod tests {
         let w=super::sub(super::mul(t,t),super::add(x,x));
         assert_eq!(super::lift_residuals(x,x,w,y,t),[0,0,0]);
         let ar=prime31_algebraic_ic::Arithmetic::default();
-        assert_eq!(ar.neg(PRIME31,Some((x,y))).unwrap().0,x);
+        assert_eq!(ar.neg(super::PRIME31,Some((x,y))).unwrap().0,x);
     }
 }
