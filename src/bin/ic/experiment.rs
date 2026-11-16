@@ -1503,7 +1503,8 @@ pub fn run(args: RunArgs, quiet: bool) -> Result<Value, String> {
                     }
                     return;
                 }
-                KoblitzIcEvent::RelationAttemptFinished { .. } => return,
+                KoblitzIcEvent::RelationQueryStarted { .. }
+                | KoblitzIcEvent::RelationAttemptFinished { .. } => return,
                 KoblitzIcEvent::RelationCollectionFinished { collected, trials } => (
                     "relation_collection",
                     "stopped",

@@ -59,6 +59,9 @@ pub fn event(event: &KoblitzIcEvent, max_trials: usize) {
         RelationCollectionStarted { wanted } => line(format_args!(
             "[2/4] collection: started; {wanted} relations requested, trial budget {max_trials}"
         )),
+        RelationQueryStarted { trial, .. } => line(format_args!(
+            "[2/4] trial {trial}/{max_trials}: query started"
+        )),
         RelationBatchStarted {
             first_trial,
             trials,
