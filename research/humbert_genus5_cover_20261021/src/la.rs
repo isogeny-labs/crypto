@@ -212,3 +212,87 @@ pub fn kernel_wiedemann(rows_in: &[Vec<(usize, u64)>], ncols: usize, r: u64, see
     }
     Solve { kernel_dim: 0, x: None, rank: 0, mulmods: cnt }
 }
+
+/// Kernel vector by scalar Lanczos on A = M'^T M' (LaMacchia-Odlyzko), same
+/// framing as `kernel_wiedemann`: random diagonal column scaling, one coordinate
+/// fixed to 1, every returned vector checked against all rows (M x = 0).
+/// About n iterations of one A-product each, against about 3n for scalar
+/// Wiedemann (2n for the sequence, n to rebuild the solution).
+/// Every mulmod is counted: products, dot products and vector updates.
+pub fn kernel_lanczos(rows_in: &[Vec<(usize, u64)>], ncols: usize, r: u64, seed: u64) -> Solve {
+    let mut rng = crate::curve::Rng(seed);
+    let mut cnt = 0u64;
+    let dot = |a: &[u64], b: &[u64], cnt: &mut u64| -> u64 {
+        *cnt += a.len() as u64;
+        a.iter().zip(b).fold(0u64, |s, (&x, &y)| (s + mulr(x, y, r)) % r)
+    };
+    let dscale: Vec<u64> = (0..ncols).map(|_| 1 + rng.below(r - 1)).collect();
+    let scaled: Vec<Vec<(usize, u64)>> = rows_in.iter().map(|row| row.iter().map(|&(c, a)| (c, mulr(a, dscale[c], r))).collect()).collect();
+    cnt += scaled.iter().map(|x| x.len() as u64).sum::<u64>();
+    let rows = &scaled;
+    for fixed in (0..ncols).rev().take(6) {
+        let mut mp: Vec<Vec<(usize, u64)>> = Vec::with_capacity(rows.len());
+        let mut y = vec![0u64; rows.len()];
+        for (i, row) in rows.iter().enumerate() {
+            let mut nr = Vec::with_capacity(row.len());
+            for &(c, a) in row {
+                if c == fixed {
+                    y[i] = (r - a % r) % r;
+                } else {
+                    nr.push((if c > fixed { c - 1 } else { c }, a));
+                }
+            }
+            mp.push(nr);
+        }
+        let n = ncols - 1;
+        let b = matvec_t(&mp, &y, n, r, &mut cnt);
+        let mut x = vec![0u64; n];
+        let mut w = b.clone();
+        let mut w_prev = vec![0u64; n];
+        let mut v_prev = vec![0u64; n];
+        let mut d_prev = 0u64;
+        let mut ok_run = false;
+        for _ in 0..(n + 10) {
+            if w.iter().all(|&e| e == 0) {
+                ok_run = true;
+                break;
+            }
+            let mv = matvec(&mp, &w, r, &mut cnt);
+            let v = matvec_t(&mp, &mv, n, r, &mut cnt);
+            let d = dot(&w, &v, &mut cnt);
+            if d == 0 {
+                break; // breakdown (probability about n / r)
+            }
+            let dinv = invr(d, r);
+            let s = mulr(dot(&w, &b, &mut cnt), dinv, r);
+            let a = mulr(dot(&v, &v, &mut cnt), dinv, r);
+            let c = if d_prev == 0 { 0 } else { mulr(dot(&v, &v_prev, &mut cnt), invr(d_prev, r), r) };
+            let mut w_next = vec![0u64; n];
+            for i in 0..n {
+                x[i] = (x[i] + mulr(s, w[i], r)) % r;
+                let t = (mulr(a, w[i], r) + mulr(c, w_prev[i], r)) % r;
+                w_next[i] = (v[i] + r - t) % r;
+            }
+            cnt += 3 * n as u64;
+            w_prev = std::mem::replace(&mut w, w_next);
+            v_prev = v;
+            d_prev = d;
+        }
+        if !ok_run {
+            continue;
+        }
+        let mut full = vec![0u64; ncols];
+        for c in 0..ncols {
+            full[c] = if c == fixed { 1 } else { x[if c > fixed { c - 1 } else { c }] };
+        }
+        for c in 0..ncols {
+            full[c] = mulr(full[c], dscale[c], r);
+        }
+        let ok = rows_in.iter().all(|row| row.iter().fold(0u64, |s, &(c, a)| (s + mulr(a, full[c], r)) % r) == 0);
+        cnt += rows_in.iter().map(|x| x.len() as u64).sum::<u64>();
+        if ok {
+            return Solve { kernel_dim: 1, x: Some(full), rank: n, mulmods: cnt };
+        }
+    }
+    Solve { kernel_dim: 0, x: None, rank: 0, mulmods: cnt }
+}

@@ -21,6 +21,11 @@ pub struct Filtered {
     pub pruned_rows: u64,
     pub merges: u64,
     pub nnz_before_merge: u64,
+    /// rows removed by clique removal, and the trees they formed
+    pub clique_rows: u64,
+    pub cliques: u64,
+    /// rows minus columns after pruning, before clique removal
+    pub excess_before: i64,
 }
 
 fn combine(a: &[(usize, u64)], fa: u64, b: &[(usize, u64)], fb: u64, r: u64) -> Vec<(usize, u64)> {
@@ -52,6 +57,15 @@ fn combine(a: &[(usize, u64)], fa: u64, b: &[(usize, u64)], fb: u64, r: u64) -> 
 /// `ncols_small`: number of matrix columns besides the large primes (the cost
 /// estimate needs the total column count).
 pub fn build(raw: &[Vec<(usize, u64)>], is_lp: &dyn Fn(usize) -> bool, ncols_small: usize, merge: bool, r: u64) -> Filtered {
+    build_x(raw, is_lp, ncols_small, merge, r, None)
+}
+
+/// `keep_excess`: when set, remove whole trees of rows (rows linked by large primes of
+/// degree 2, with one fewer such large prime than rows) heaviest first, until rows minus
+/// columns is at most that value. Each tree removed lowers the excess by exactly one and
+/// takes its rows' non-zeros and its large-prime columns with it (Cavallar's clique
+/// removal). The removed rows are discarded: they are redundant, not needed for logs.
+pub fn build_x(raw: &[Vec<(usize, u64)>], is_lp: &dyn Fn(usize) -> bool, ncols_small: usize, merge: bool, r: u64, keep_excess: Option<i64>) -> Filtered {
     let mut rows: Vec<Option<Vec<(usize, u64)>>> = raw.iter().map(|x| Some(x.clone())).collect();
     let mut occ: HashMap<usize, BTreeSet<usize>> = HashMap::new();
     for (i, row) in raw.iter().enumerate() {
@@ -90,6 +104,81 @@ pub fn build(raw: &[Vec<(usize, u64)>], is_lp: &dyn Fn(usize) -> bool, ncols_sma
         }
     };
     prune(&mut rows, &mut occ, &mut backsub, &mut pruned_rows);
+    let excess_of = |rows: &Vec<Option<Vec<(usize, u64)>>>, occ: &HashMap<usize, BTreeSet<usize>>| -> i64 {
+        rows.iter().flatten().count() as i64 - (ncols_small + occ.len()) as i64
+    };
+    let excess_before = excess_of(&rows, &occ);
+    let (mut clique_rows, mut cliques) = (0u64, 0u64);
+    if let Some(keep) = keep_excess {
+        loop {
+            let need = excess_of(&rows, &occ) - keep;
+            if need <= 0 {
+                break;
+            }
+            // components of the alive rows under degree-2 large primes (union-find)
+            let n = rows.len();
+            let mut par: Vec<usize> = (0..n).collect();
+            fn find(par: &mut Vec<usize>, mut i: usize) -> usize {
+                while par[i] != i {
+                    par[i] = par[par[i]];
+                    i = par[i];
+                }
+                i
+            }
+            let mut edges: HashMap<usize, u64> = HashMap::new();
+            let mut deg2: Vec<(usize, usize)> = Vec::new();
+            for s in occ.values() {
+                if s.len() == 2 {
+                    let mut it = s.iter();
+                    deg2.push((*it.next().unwrap(), *it.next().unwrap()));
+                }
+            }
+            for &(a, b) in &deg2 {
+                let (ra, rb) = (find(&mut par, a), find(&mut par, b));
+                if ra != rb {
+                    par[ra] = rb;
+                }
+            }
+            for &(a, _) in &deg2 {
+                let ra = find(&mut par, a);
+                *edges.entry(ra).or_default() += 1;
+            }
+            let mut comp: HashMap<usize, (u64, u64, Vec<usize>)> = HashMap::new();
+            for i in 0..n {
+                if let Some(row) = &rows[i] {
+                    let ri = find(&mut par, i);
+                    let e = comp.entry(ri).or_default();
+                    e.0 += row.len() as u64;
+                    e.1 += 1;
+                    e.2.push(i);
+                }
+            }
+            // trees only: edges == rows - 1 (a cycle would not lower the excess)
+            let mut trees: Vec<(u64, usize)> = comp.iter().filter(|(k, v)| edges.get(k).copied().unwrap_or(0) + 1 == v.1).map(|(k, v)| (v.0, *k)).collect();
+            if trees.is_empty() {
+                break;
+            }
+            trees.sort_by(|a, b| b.cmp(a));
+            let take = ((need + 1) / 2).max(1) as usize;
+            for &(_, k) in trees.iter().take(take) {
+                for &i in &comp[&k].2 {
+                    let row = rows[i].take().unwrap();
+                    for &(k2, _) in &row {
+                        if is_lp(k2) {
+                            let s2 = occ.get_mut(&k2).unwrap();
+                            s2.remove(&i);
+                            if s2.is_empty() {
+                                occ.remove(&k2);
+                            }
+                        }
+                    }
+                    clique_rows += 1;
+                }
+                cliques += 1;
+            }
+            prune(&mut rows, &mut occ, &mut backsub, &mut pruned_rows);
+        }
+    }
     let nnz = |rows: &Vec<Option<Vec<(usize, u64)>>>| -> u64 { rows.iter().flatten().map(|x| x.len() as u64).sum() };
     let nnz_before_merge = nnz(&rows);
     let mut merges = 0u64;
@@ -163,7 +252,7 @@ pub fn build(raw: &[Vec<(usize, u64)>], is_lp: &dyn Fn(usize) -> bool, ncols_sma
     }
     let mut lp_cols: Vec<usize> = occ.keys().cloned().collect();
     lp_cols.sort();
-    Filtered { rows: rows.into_iter().flatten().collect(), lp_cols, backsub, pruned_rows, merges, nnz_before_merge }
+    Filtered { rows: rows.into_iter().flatten().collect(), lp_cols, backsub, pruned_rows, merges, nnz_before_merge, clique_rows, cliques, excess_before }
 }
 
 #[cfg(test)]
@@ -202,8 +291,11 @@ mod tests {
                 raw.push(row);
             }
         }
-        for merge in [false, true] {
-            let f = build(&raw, &is_lp, 4, merge, r);
+        for (merge, keep) in [(false, None), (true, None), (true, Some(2i64)), (false, Some(0i64))] {
+            let f = build_x(&raw, &is_lp, 4, merge, r, keep);
+            if let Some(k) = keep {
+                assert!(f.rows.len() as i64 - (4 + f.lp_cols.len()) as i64 <= k, "excess cut to the target");
+            }
             for row in f.rows.iter().chain(f.backsub.iter().map(|(_, row)| row)) {
                 let s = row.iter().fold(0, |a, &(k, v)| (a + mulr(v, y(k), r)) % r);
                 assert_eq!(s, 0, "every output row vanishes on the planted solution");

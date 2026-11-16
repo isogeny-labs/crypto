@@ -12,6 +12,7 @@ mod dlpsummary;
 mod field;
 mod filter;
 mod filtersummary;
+mod solversummary;
 mod ghsmagic;
 mod la;
 mod lpsummary;
@@ -52,6 +53,12 @@ fn main() {
         Some("summarize-filter") => {
             if let Err(e) = filtersummary::run(&args[2], &args[3..]) {
                 eprintln!("summarize-filter: {e}");
+                std::process::exit(1);
+            }
+        }
+        Some("summarize-solver") => {
+            if let Err(e) = solversummary::run(&args[2], &args[3..]) {
+                eprintln!("summarize-solver: {e}");
                 std::process::exit(1);
             }
         }
@@ -157,8 +164,8 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         "iota" => (true, None),
         a if a.starts_with("lp:") => (true, Some(a[3..].parse().expect("lp:<alpha>"))),
         a if a.starts_with("dlp:") => (true, Some(a[4..].parse().expect("dlp:<alpha>"))),
-        a if a.starts_with("dlpm:") || a.starts_with("dlpf:") => (true, Some(a[5..].parse().expect("dlpm|dlpf:<alpha>"))),
-        _ => panic!("arm must be full, iota, lp:<alpha>, dlp:<alpha>, dlpm:<alpha> or dlpf:<alpha>"),
+        a if a.starts_with("dlpm:") || a.starts_with("dlpf:") || a.starts_with("dlpx:") => (true, Some(a[5..].parse().expect("dlpm|dlpf:<alpha>"))),
+        _ => panic!("arm must be full, iota, lp:<alpha>, dlp:<alpha>, dlpm:<alpha>, dlpf:<alpha> or dlpx:<alpha>"),
     };
     // dlp: relations with up to two large primes, reduced by an incremental
     // elimination over the large-prime columns (one pivot row per large prime);
@@ -168,7 +175,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     // dlp (the reducer still runs, to count full relations), but the linear algebra
     // gets the raw rows with the surviving large primes as columns (dlpm: singletons
     // removed; dlpf: plus cost-guided merges, src/filter.rs)
-    let dlp_mode = if arm.starts_with("dlpm:") { 1u8 } else if arm.starts_with("dlpf:") { 2 } else { 0 };
+    let dlp_mode = if arm.starts_with("dlpm:") { 1u8 } else if arm.starts_with("dlpf:") { 2 } else if arm.starts_with("dlpx:") { 3 } else { 0 };
     let dlp = arm.starts_with("dlp:") || dlp_mode > 0;
     let mut rng = Rng(seed);
     let t_all = Instant::now();
@@ -325,9 +332,16 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let (mut la_cols, mut la_rows, mut la_nnz): (usize, usize, u64);
     let (mut filt_pruned, mut filt_merges, mut filt_nnz_pre, mut filt_lp_cols) = (0u64, 0u64, 0u64, 0usize);
     let mut filt_last: Option<filter::Filtered> = None;
-    let mut target = ncols + 5;
+    // dlpx: collect HUMBERT_EXCESS (default 0.10) x unknowns extra full relations, then
+    // spend the surplus on clique removal down to the usual 5 rows of excess
+    let excess_frac: f64 = if dlp_mode == 3 { std::env::var("HUMBERT_EXCESS").ok().and_then(|v| v.parse().ok()).unwrap_or(0.10) } else { 0.0 };
+    let mut target = ncols + 5 + (excess_frac * ncols as f64).round() as usize;
+    let (mut filt_clique_rows, mut filt_cliques, mut filt_excess_before) = (0u64, 0u64, 0i64);
     // HUMBERT_LA_PRECHECK=1: never start a Wiedemann solve while a column is empty
     let la_precheck = std::env::var("HUMBERT_LA_PRECHECK").map(|v| v == "1").unwrap_or(false);
+    // HUMBERT_LA_SOLVER: w2 (default: two Wiedemann solves compared), w1, l1 (one Lanczos solve)
+    let la_solver = std::env::var("HUMBERT_LA_SOLVER").unwrap_or_else(|_| "w2".to_string());
+    assert!(["w2", "w1", "l1"].contains(&la_solver.as_str()), "HUMBERT_LA_SOLVER must be w2, w1 or l1");
     let mut precheck_extensions = 0u64;
     let mut t_rel = 0.0;
     let mut t_la = 0.0;
@@ -462,7 +476,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         // the raw rows with the surviving large primes as extra columns
         let tf = Instant::now();
         let built: Option<(Vec<Vec<(usize, u64)>>, usize)> = if dlp_mode > 0 {
-            let f = filter::build(&raw_rows, &|k| k < nx && !is_small[k], ncols, dlp_mode == 2, r);
+            let f = filter::build_x(&raw_rows, &|k| k < nx && !is_small[k], ncols, dlp_mode >= 2, r, if dlp_mode == 3 { Some(5) } else { None });
             let lp_index: std::collections::HashMap<usize, usize> = f.lp_cols.iter().enumerate().map(|(i, &k)| (k, ncols + i)).collect();
             let m: Vec<Vec<(usize, u64)>> = f
                 .rows
@@ -490,6 +504,9 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
             filt_merges = f.merges;
             filt_nnz_pre = f.nnz_before_merge;
             filt_lp_cols = f.lp_cols.len();
+            filt_clique_rows = f.clique_rows;
+            filt_cliques = f.cliques;
+            filt_excess_before = f.excess_before;
             filt_last = Some(f);
             Some((m, n))
         } else {
@@ -523,6 +540,22 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
 
         let solve = if mcols <= DENSE_MAX {
             la::kernel_mod_r(mat, mcols, r)
+        } else if la_solver != "w2" {
+            // one solve (w1: Wiedemann, l1: Lanczos); a corank > 1 is not tested here:
+            // the end-to-end check x P == Q after the descent catches a wrong kernel vector
+            let a = if la_solver == "l1" {
+                la::kernel_lanczos(mat, mcols, r, seed ^ 0xA5A5 ^ la_rounds as u64)
+            } else {
+                la::kernel_wiedemann(mat, mcols, r, seed ^ 0xA5A5 ^ la_rounds as u64)
+            };
+            let mut used = vec![false; mcols];
+            for row in mat {
+                for &(c, _) in row {
+                    used[c] = true;
+                }
+            }
+            let empty = used.iter().filter(|u| !**u).count();
+            la::Solve { kernel_dim: if a.x.is_some() && empty == 0 { 1 } else { 1 + empty.max(1) }, x: a.x, rank: a.rank, mulmods: a.mulmods }
         } else {
             // two independent Wiedemann solves; a corank > 1 shows up as disagreement
             let a = la::kernel_wiedemann(mat, mcols, r, seed ^ 0xA5A5 ^ la_rounds as u64);
@@ -677,6 +710,8 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let tp_nonzero = lp != 0;
     let x_rec = if tp_nonzero { mulr(lq, invr(lp, r), r) } else { 0 };
     let solved = x_rec == x_true;
+    // what an attacker can check without x_true (timed: one scalar multiplication)
+    let e2e_ok = ce.mul(&gen, x_rec as u128) == q;
     let t_ic = t_all.elapsed().as_secs_f64();
     let rss_ic = peak_rss_kb();
     // ---- matched rho on E(F_{q^4})[r] --------------------------------------
@@ -693,7 +728,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     println!(
         "{{\"kind\":\"attack\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"arm\":\"{arm}\",\"E_order\":{},\"r\":{r},\"D_order\":{},\
 \"fb_x\":{nx},\"fb_points\":{nfb},\"small_x\":{nsmall},\"lp_alpha\":{},\"lp_partials\":{},\"lp_combined\":{lp_combined},\"lp_dropped\":{lp_dropped},\"dlp\":{dlp},\"dlp_cycles\":{dlp_cycles},\"dlp_reductions\":{dlp_reductions},\"lp_known\":{lp_known},\"unknowns\":{ncols},\
-\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\"la_cols\":{la_cols},\"la_rows\":{la_rows},\"la_nnz\":{la_nnz},\"dlp_mode\":{dlp_mode},\"filter_pruned_rows\":{filt_pruned},\"filter_merges\":{filt_merges},\"filter_nnz_before_merge\":{filt_nnz_pre},\"filter_lp_cols\":{filt_lp_cols},\"t_reduce\":{t_reduce:.4},\"t_filter\":{t_filter:.4},\
+\"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\"la_cols\":{la_cols},\"la_rows\":{la_rows},\"la_nnz\":{la_nnz},\"dlp_mode\":{dlp_mode},\"filter_pruned_rows\":{filt_pruned},\"filter_merges\":{filt_merges},\"filter_nnz_before_merge\":{filt_nnz_pre},\"filter_lp_cols\":{filt_lp_cols},\"la_solver\":\"{la_solver}\",\"excess_frac\":{excess_frac},\"filter_cliques\":{filt_cliques},\"filter_clique_rows\":{filt_clique_rows},\"filter_excess_before\":{filt_excess_before},\"e2e_ok\":{e2e_ok},\"t_reduce\":{t_reduce:.4},\"t_filter\":{t_filter:.4},\
 \"target_multipliers\":{:?},\"place_degrees\":{:?},\"descent_candidates\":{},\"descent_relations\":{},\
 \"pushforward_8P\":{push_ok},\"T_P_nonzero\":{tp_nonzero},\"iota_pairs_constant\":{iota_pairs_const},\"x_inf_eq_4c\":{xinf_eq_4c},\
 \"x_true\":{x_true},\"x_recovered\":{x_rec},\"solved\":{solved},\
@@ -770,7 +805,13 @@ mod tests {
         let d = la::kernel_mod_r(&rows, n, r);
         assert_eq!(d.kernel_dim, 1);
         let w = la::kernel_wiedemann(&rows, n, r, 11);
+        let l = la::kernel_lanczos(&rows, n, r, 13);
         let (xd, xw) = (d.x.unwrap(), w.x.unwrap());
+        let xl = l.x.unwrap();
+        let il = invr(xl[0], r);
+        for c in 0..n {
+            assert_eq!(mulr(xl[c], il, r), mulr(hidden[c], invr(hidden[0], r), r), "lanczos");
+        }
         let (id, iw) = (invr(xd[0], r), invr(xw[0], r));
         for c in 0..n {
             assert_eq!(mulr(xd[c], id, r), mulr(xw[c], iw, r));
