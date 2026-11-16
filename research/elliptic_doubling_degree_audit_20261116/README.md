@@ -58,3 +58,15 @@ Earlier175/176 visuals credited; no new/fullchapter/full external Silverman
 read claimed. Author char2/gcd/odd-m proof-gap corrections credited; no
 novelty claimed. No native experiments or paid spend. All14 stay active.
 [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4389](https://github.com/isogeny-labs/crypto/pull/4389).
+Local proof receipt `f3f6d84eb09c8091ac01ea4fe70dfd7cd4ce81c5` and remote proof
+`c6cfc06d5109e36849f3ea089795e70b0fa19637` share tree
+`c2c4811b9033c07ef89e097c57219396b41851d3`. Completed anonymous fetch and fresh exact
+head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Current-head CI/review/signing remain
+pending. Local replay PASS does not establish signed standing. The author
+correction is acknowledged; general corrected factorization/Weil nondegeneracy
+and Scheme API comparison remain open. All14 targets stay active. [pcc:unverified]
