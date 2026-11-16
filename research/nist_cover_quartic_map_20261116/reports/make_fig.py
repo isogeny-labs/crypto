@@ -35,8 +35,7 @@ cap = ("Each instance: a=-3 prime-order E, novel genus-3 cover H_gamma, "
 fig.text(0.5, -0.02, cap, ha="center", fontsize=7, wrap=True)
 fig.tight_layout()
 fig.savefig(os.path.join(outdir, "counts.svg"), bbox_inches="tight")
-fig.savefig(os.path.join(outdir, "counts.png"), dpi=150, bbox_inches="tight")
-print("wrote counts.svg/png for", len(ok), "instances")
+print("wrote counts.svg for", len(ok), "instances")
 
 # summary table to stdout
 for r in ok:
