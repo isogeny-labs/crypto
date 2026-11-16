@@ -11,3 +11,17 @@ Freeze before once-only native control; retain all exclusions/exceptions, compar
 
 ## Errors
 External primary source unavailable as above. Native build exits0; no compile errors. Preserve unrelated .resume/RESUME.md.
+
+## Completed finite gate and decision
+
+### What was done
+Once-only frozen control exits0, empty stderr. All69eligible divisor inputs pass regular-fibre/root, original group, point-add, duplicate decomposition, oriented-rank and signed graph-rank checks; three input exclusions and all exceptional parameters remain. Native reduction records genus2:487fibres/1461transitions; genus3:70/280; genus4:5/25. General closed-component formula has a written proof; this finite curve panel only exercises grounded components. Wrote results, Rust-reduced graph and two-page PDF; visually inspected both pages.
+
+### Decisions made
+Root-free grouping is exact but each fibre is one decomposition, and whole-catalogue construction has no complete tenfold premise against Compact. No timing campaign. Successor requires constructive anchor elimination, with exact rank law as a check. Full objective remains active.
+
+### Open threads
+Current PR CI exposed one missing producer-evidence tag in its artifact-link paragraph, to be corrected in PR prose. Benchmark CI has one historical open record (20261115T0609Z-genus-ladder-sge-scale), unrelated to this current closed direct-profile record; do not close someone else's scientific run. Shared daily log remains reserved.
+
+### Errors
+Initial force-add of ignored Cargo.lock lacked --sparse; corrected in de08f9286c6f before execution and a new S3 checkpoint passed. No scientific error or rerun. The direct-profile record is separately remotely validated. No novelty inference from unavailable primary PDF.
