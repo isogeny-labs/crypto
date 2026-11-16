@@ -56,4 +56,8 @@
 ### Errors
 
 - Rustup's 1.99.1 toolchain lacks rustfmt, so the installed rustfmt 1.8.0
-  formatted the file. No compile or timed result has been obtained.
+  formatted the file. The first locked release compile-only command exited
+  101 because the harness passed a `usize` dimension to an existing `u32`
+  factor-base API. Complete output and UTC/exit are retained in `build.*`;
+  a one-type source correction follows in a new commit. No timed result has
+  been obtained. [pcc:unverified]

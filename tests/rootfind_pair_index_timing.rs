@@ -174,7 +174,7 @@ fn checksum(index: &Index, probes: &[u32]) -> u64 {
 
 fn build_case(
     n: u32,
-    dimension: usize,
+    dimension: u32,
     abscissae: usize,
     points: usize,
     attempts_expected: usize,
