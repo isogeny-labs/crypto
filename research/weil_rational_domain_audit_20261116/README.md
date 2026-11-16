@@ -13,3 +13,18 @@ Local **PCC-20261116-a28bcb PASS at 2026-11-16T22:02:53Z**, signedunverified. Tw
 Fresh bounded ch26 lines159–371/583–622 before protocol/setup/code; canonical actual F19 and scalar/divisor proofs plus official point/cyclic/quotient APIs read. FR1994 original remains unread: two publisher paths403/55B, OpenAlex200 only publisherOA/no repository fulltext. Exact source identities and explicit command-record escaping correction are pinned; no HTTPrequest rerun or access bypass. SixKB and source/publicationConductor127; fallback does not establish absence or novelty. General canonicalTate/descent/Miller-expression identification, MOV/FR and Scheme/isogeny comparison remain open. Samehost checks do not establish parser/compiler/host independence or signed standing. All14active/zero spend. [pcc:unverified]
 
 Ready4444 is the current route; merged4389 stays closed. Main ledger-prefix integration blocker is preserved: actual fetched4cc03 snapshot1215rows/common274/neitherprefix; local653 preserves652prefix. No rechain/reissue/force/main merge. Current-head CI/review/signing remain unconfirmed; next owner00UTC17Nov, no busy polling. [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4444](https://github.com/isogeny-labs/crypto/pull/4444),
+now titled for the actual F19 rational Weil restriction and Tate quotient
+guards. Local proof receipt `bcdffd4e2436b83e00c2ddf4b9524a24a25ee95b`
+and remote proof `ff469969e735c7310c8a13bafea621d33b774fe4` share
+tree `9a8cc3289c67cf6e2c4b22d50997235c947862d2`. Completed anonymous fetch
+and fresh exact head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Local replay passes; signed standing
+and current-head CI/review remain unconfirmed. The latest lean4checker probe
+exited1 with no output, so no fresh checker pass is claimed. Auto-merge remains
+enabled under the owner default, with the explicit ledger prefix integration
+blocker. Full canonical Tate construction, general MOV/Frey–Ruck conditions
+and the unread original FR1994 source remain open. [pcc:unverified]
