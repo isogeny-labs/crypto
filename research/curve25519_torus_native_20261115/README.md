@@ -2,6 +2,15 @@
 
 ## Current reduction and revised scaling plan
 
+The [quadratic membership interface](reports/membership-circuit-v1/REPORT.md)
+now compiles public parameters into a140-variable/142-equation membership
+system or a159-variable/161-equation signed cofactor-image system. Fixed
+native controls cover6962 small-field candidate/selector assignments,18
+actual signed images and159 rejected single-variable mutations. Three
+separate numeric selector endpoints leave compiler and actual-field/map
+formalization open. Public-target aggregation and normalized indexing are
+next. PCC-20261116-688961,645f28 andc45ab0. [pcc:unverified]
+
 The [many-coset construction](reports/many-cosets-v1/REPORT.md) now supplies
 conditional cardinality/admissibility and complete q-power membership
 endpoints for the20633-by213156431 raw index family. Native Rust records43
