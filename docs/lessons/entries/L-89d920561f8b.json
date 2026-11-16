@@ -1,0 +1,14 @@
+{
+  "action": "rustfmt also formats every out-of-line submodule; pass leaf files only, then git status and revert any file you did not edit",
+  "created": "2026-11-16T08:10:20Z",
+  "evidence": [
+    "rustfmt src/cryptanalysis/mod.rs reformatted src/cryptanalysis/groebner_f4.rs (reverted), 2026-11-16"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-extend"
+  ],
+  "trigger": "running rustfmt on a mod.rs, lib.rs or a bin crate root (src/bin/ecbench.rs)",
+  "why": ""
+}
