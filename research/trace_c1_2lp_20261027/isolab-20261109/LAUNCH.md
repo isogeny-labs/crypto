@@ -39,3 +39,17 @@ Filled in after each dispatch: UTC time, workflow run ID, outcome.
 - **Fallback classification.** For a 403, `diagnose-failed-run` records `artifact_access = payload_read_unavailable` and classifies from the Kubernetes container exit code. With no exit code it reports `artifact_read_unavailable`. The classification is in the artifact and the run's step summary.
 - **Not read from this session.** The artifact download host (`*.blob.core.windows.net`) is refused by this session's egress proxy, so the classification has not been read here. It is still open.
 - **Lab-side problem.** Restoring the role's `s3:GetObject` on `runs/*/<pod>/{SHA256SUMS,job-exit.json,l2-gate.json,audit.json,control-comparison.json,...}` is a lab permission change and outside this PR.
+
+## Second dispatch (2026-11-16, user asked "Run them")
+
+The cause of the 2026-11-09 d5 failure is still unknown. The route has completed successful runs since then (for example 43634204883 on 2026-11-14).
+
+- **Source:** all four sizes dispatched against main `016b19ffa20767c5db2b7c52e0f4008998c2a765`. The specs under `research/trace_c1_2lp_20261027/` are unchanged since 2026-10-27; only this log changed.
+- **Settings and ceiling:** c8a.2xlarge, 1800 s, no resubmission. The USD 10 ceiling covers both attempts.
+
+| spec | workflow run | dispatched (UTC) |
+|---|---|---|
+| reference-d5.json | 43903192953 (#236) | 16:03:18 |
+| reference-d4.json | 43903240817 (#237) | 16:03:33 |
+| reference-d3.json | 43903281961 (#238) | 16:03:47 |
+| reference-d2.json | 43903325505 (#239) | 16:04:00 |
