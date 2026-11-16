@@ -1,0 +1,133 @@
+{
+  "schema": "trace-incidence-pullback-review/v1",
+  "standing": "pcc:unverified",
+  "review_type": "Independent mathematical adversarial derivation; no implementation certification, performance run, signed verifier or novelty claim",
+  "scope": "Offset-only source-coordinate refinement of Spaenlehauer Algorithms 4, 5 and 6. This does not implement the full canonical divisor-translation output required by Algorithm 3.",
+  "recommendation": "Proceed with a native correctness implementation of the offset-only variant under the listed conditions. No algebraic obstruction was found in the stated split, separable, characteristic-greater-than-three domain. The claims below remain unverified derivations.",
+  "knowledge_base_receipt": {
+    "status": "KB unavailable",
+    "evidence": "Parent handoff and newest session log report no loaded research-kb MCP tool and repository wrapper exit 127. Available tool-name discovery in this review exposed no research-kb tools.",
+    "fallback": "Bounded primary-source review of the supplied paper, a primary adjacent Mignotte-Schnorr formulation, and tracked repository rootfinding notes. No absence or novelty conclusion follows."
+  },
+  "sources_checked": [
+    {
+      "id": "Spa26-local",
+      "path": "/workspace/ecdlp_research/2610.32508.txt",
+      "sha256": "49d655459dc437807b063590ab3ef2a8806afc6a09c6ff2f1e04bb54e2cd5fcf",
+      "sections": ["Definition 1.2", "Algorithm 2", "Proposition 4.7", "Algorithm 4", "Remark 5.4", "Proposition 5.5", "Algorithm 5", "Proposition 5.6", "Algorithm 6", "Theorem 5.8", "Section 8.1", "Appendix A"],
+      "implication": "Algorithm 4 already computes subgroup tests by pullback to the source quotient. Canonical translated-divisor reconstruction is introduced between recursion levels in Algorithm 5. Section 8.1 discusses accelerating that reconstruction, rather than retaining a source parameter across levels."
+    },
+    {
+      "id": "GvdHL15-primary",
+      "url": "https://www.texmacs.org/joris/rmodroots/rmodroots.pdf",
+      "title": "Randomized root finding over finite fields using tangent Graeffe transforms",
+      "authors": ["Bruno Grenet", "Joris van der Hoeven", "Gregoire Lecerf"],
+      "version_read": "January 16, 2015",
+      "sections": ["Section 1.2", "Section 2.2, Algorithm 2"],
+      "implication": "The recalled Mignotte-Schnorr method keeps factors in the original input coordinate, tracks coset labels, and reduces h_i into current factors by a subproduct tree. Fixed-source coset splitting is therefore an established design pattern. This source does not establish priority for this exact elliptic offset-only adaptation."
+    },
+    {
+      "id": "crypto-notes",
+      "repository_head_read": "53c0d1e08ede752fc82ed3c1b8776be817ffbdb8",
+      "tracked_path": "papers/ecdlp-index-calculus-program/sections/rootfinding.tex",
+      "access": "git show HEAD:path; path is outside the materialized sparse checkout",
+      "implication": "Existing direct point-decomposition and pair-enumeration prior art is distinct from the present auxiliary-curve root-finding representation change. Do not describe the general relation-generation mechanism as new."
+    }
+  ],
+  "source_access_gaps": [
+    "Shoup 1994 fastirred.pdf was obtained from the author's site but its extracted PDF text is unusably encoded; no theorem-level independent check from it is asserted.",
+    "An AMS Schoof 1985 PDF request returned non-PDF content; no primary-text assertion is based on that request.",
+    "No cross-repository KB search or exhaustive literature review was available. No statement that this exact formulation is new or absent from the literature is made."
+  ],
+  "domain": {
+    "field": "F_q, characteristic p greater than 3; prime fields are included",
+    "polynomial": "Monic, split and separable f; d=deg(f). Remove roots shared with h first, as Algorithm 6 does.",
+    "datum": "A valid elliptic preprocessing datum with factored exact orders and genuine direct-product bases for E(F_q) and its quadratic twist, as Definition 1.2 requires.",
+    "no_degree_characteristic_assumption": "No p>d condition is used. No inverse of a polynomial degree or Newton-Girard reconstruction is used.",
+    "datum_cost": "Constructing and verifying the datum remains a separate, explicitly charged cost; small Xi is neither assumed to be uniformly constructible nor supplied for free."
+  },
+  "reviewed_variant": {
+    "node_state": "A monic source factor u(t), a source ordinate v(t) reduced modulo u, and a known group offset C. Original source point S(t)=(t,v(t)) remains the reference on the chosen curve.",
+    "level_invariant": "For prime ell, m and N_ell=N/ell^val_ell(N), every source point in u satisfies S(t)-C in E[N_ell*ell^m]. C belongs to the ell-primary subgroup.",
+    "representatives": "J is exactly the complete representative set from Algorithm 5 at level m; |J| is ell or ell^2. No representative enumeration is omitted from the accounting.",
+    "offset_test": "For P in J, set T=C+P and M=N_ell*ell^(m-1). Evaluate psi_M(S(t)-T) directly in F_q[t]/u and take gcd with u. The child offset is T. No current-point coordinate functions need be retained between nodes.",
+    "exception_first": "Before any affine inversions at a node, enumerate all finite points +T and -T for T=C+P, P in J; test u(x_T)=0 and v(x_T)=the candidate ordinate. Deduplicate accepted source abscissae, build one product of their linear factors, divide it from u, and reduce v once to the remainder. Emit these known roots directly. T=O has no finite exception and needs no translation inversion.",
+    "identity_test": "For T=O, evaluate psi_M(t,v(t)) directly.",
+    "finite_translation": "For T=(x_T,y_T), s=(v+y_T)/(t-x_T), x'=s^2-t-x_T, y'=y_T+s*(x_T-x'). All expressions are reduced in the residual source quotient. The plus y_T sign is correct for S-T.",
+    "child_ordinate": "For child g=gcd(u,test), retain v mod g from this parent. Do not repeatedly reduce the original global degree-d ordinate against every small child.",
+    "prime_reset": "At every new prime ell, restart C=O on each surviving source factor, retaining its original source ordinate. The source factors remain factors of the initial embedded source polynomial throughout.",
+    "termination": "Return degree-one factors immediately; otherwise decrease m after the gcd partition. At m=0 return the remaining factor for separation by subsequent primes."
+  },
+  "mathematical_checks": [
+    {
+      "name": "Reduced source algebra closure",
+      "derivation": "Since u is split and separable, A=F_q[t]/u is a product of copies of F_q indexed by distinct source roots. Every rational formula whose denominator is nonzero at each component defines an element of A. A gcd with a test polynomial selects exactly its zero components, and every selected factor is again split and separable. No assumption that A is a field is required."
+    },
+    {
+      "name": "Exceptional completeness and candidate count",
+      "derivation": "For direct source translation by -T, t-x_T vanishes only at source points T or -T. These are exactly the finite candidates enumerated above. There are at most 2|J| candidate point records and at most |J| candidate abscissae. A source graph has at most one supported point at each abscissa. Deduplicate abscissae before forming a removal product, including T/-T repeats and rational 2-torsion. The check against v is necessary to select the supported ordinate."
+    },
+    {
+      "name": "Infinity",
+      "derivation": "All original source points are finite. A translated point S-T is infinite exactly when S=T, which the exception pass removes. A translated current point S-C being infinite is included when P=O, since O belongs to J and T=C. Identity offsets themselves require no affine formula."
+    },
+    {
+      "name": "Subgroup partition",
+      "derivation": "Under the level invariant, the representative classes P+E[N_ell*ell^(m-1)] partition E[N_ell*ell^m]. Thus exactly one representative passes for each nonexceptional source point. The child test is psi_M(S-(C+P))=0, equivalent to the child's level invariant. This is the same test as translating the current point S-C by -P, by associativity."
+    },
+    {
+      "name": "Collisions of translated x",
+      "derivation": "The source parameter t still indexes separate components when S_1-T and S_2-T are opposite and have equal x. Both x' and y' are evaluated componentwise in A; y' may take opposite values at the two distinct source roots. No characteristic polynomial, image minimal polynomial, collision splitting or inverse composition is needed. Replacing the source modulus by an image polynomial would lose this property and reintroduce the original issue."
+    },
+    {
+      "name": "All roots after all primes",
+      "derivation": "If two source points S_1,S_2 survive together after processing every prime ell dividing N, their difference is killed by every N_ell. The gcd of the integers N_ell over these primes is 1, so S_1=S_2. Source abscissae are distinct, hence a surviving factor has degree at most one. Removed exceptions are already exact known linear roots. The same proof applies independently to the twist."
+    },
+    {
+      "name": "Division-polynomial evaluation in characteristic p",
+      "derivation": "Use the normalized division-free recurrences of Remark 5.4: odd psi_n=Psi_n(x), even psi_n=2y*Psi_n(x), replacing y^2 by the curve cubic. Never divide by 2y or expand degree-quadratic division polynomials. These polynomial identities remain valid when n is divisible by the characteristic and when y is a zero divisor. The usual torsion-zero equivalence used by Algorithm 4 is the required input lemma. No characteristic-dependent Newton identity is introduced by this adaptation."
+    }
+  ],
+  "twist_conventions": {
+    "paper_coordinate_option": "From beta*v1(t)^2=h(t) mod u1(t), set u_tw(z)=beta^-deg(u1)*u1(beta*z), v_tw(z)=v1(beta*z)/beta. Then E_tw:y^2=beta^-3*h(beta*x), source S(z)=(z,v_tw(z)), exception parameter z=x(T), and final original root beta*z.",
+    "original_parameter_option": "Alternatively retain u1(t) and original input t throughout: source S(t)=(t/beta,v1(t)/beta). Then exceptions are t=beta*x(T), and final original roots are t directly.",
+    "requirement": "Choose one option consistently. Mixing the paper-scaled modulus with original-parameter exception or output scaling is incorrect. Linear coefficient rescaling costs O(d) field operations."
+  },
+  "complexity_derivation": {
+    "notation": "M(s) is polynomial multiplication cost; gcd/inversion cost is O(M(s) log s). Polynomial arithmetic must use the standard fast algorithms, with M superadditive up to customary regularization.",
+    "per_node_exceptions": "For source degree s and j=|J|, forming offsets requires O(j) group additions once J is available. Scalar Horner membership and ordinate checks cost O(j*s) field operations. There are e<=min(s,j) distinct accepted abscissae; a product tree plus one exact division and one ordinate reduction costs soft O(s+j), not s separate global reconstructions.",
+    "per_node_tests": "Each representative needs a constant number of modular products, one invertible denominator inversion for finite T, O(log M)=O(log q) quotient-ring operations for the normalized psi recurrence, and a gcd. Child ordinate remainders are taken from the parent reduced v. Total soft O(j*s*log q), including failed representatives.",
+    "representative_construction": "The level bases can be scalar-multiplied in O(log q) group operations and enumerated by repeated additions in O(j). Cache by (ell,m), or charge reconstruction at each node inside the per-node logarithmic allowance. Explicit ell^2 enumeration remains present in the noncyclic case.",
+    "sum_over_nodes": "At each fixed ell,m, nonempty source factors partition a subset of the initial roots, so their degree sum is at most d. The number of such nodes is also at most d. Summing j*s*log q over levels uses sum_ell m_ell<=log_2 N=O(log q) on each curve. For Xi=max prime divisor of N*N_tw, separation is soft O(Xi^2*d*log^2 q). If both groups are cyclic, replace Xi^2 by Xi.",
+    "embedding": "Proposition 4.7 gives soft O(d*log^2 q) for Algorithm 2 with fixed cubic h. Torsion-root removal and twist rescaling fit below this allowance.",
+    "online_bound_given_valid_datum": "soft O(Xi^2*d*log^2 q), conditional on the stated fast polynomial arithmetic and recurrence implementation. The proposed soft O(Xi^2*d*log^2 q + d*log^3 q) is a conservative weaker bound.",
+    "why_log_cubed_can_disappear": "The paper's extra per-level d*log^2 q term comes from canonical translated-divisor collision lifting in Algorithm 3. This variant never calls Algorithm 3 or re-embeds translated points, so that source is absent. This sharper derivation has no signed proof standing.",
+    "charged_external_terms": "Cold total is C_construct_datum + C_verify_datum + input_validation + online_cost. Checking splitness by t^q=t mod f costs soft O(d log q); squarefreeness and monicity can also be charged. The existence/construction cost of a useful datum is not eliminated."
+  },
+  "memory_derivation": {
+    "safe_conservative_bound": "O(d*log q + Xi^2*log q) field elements plus polynomial-arithmetic workspace and integer bookkeeping for a depth-first implementation that retains ancestors and caches every representative level.",
+    "possible_linear_frontier": "Releasing a parent after all children and reduced ordinates have been materialized keeps pending factor degree mass at most d; a fixed-size iterative division-polynomial block avoids retaining O(log q) full ring polynomials. This permits soft O(d + Xi^2*log q) field elements with cached representatives, subject to actual backend workspace and traversal ownership.",
+    "not_automatic": "A breadth-first container retaining all historic factors, repeated global-ordinate copies, or memoizing every division-polynomial intermediate need separate accounting; linear memory must not be asserted from the mathematical formula alone."
+  },
+  "implementation_rejection_conditions": [
+    "Any call to characteristic-polynomial construction, inverse composition, canonical image-divisor reconstruction or translated-point square-root lifting inside the claimed offset-only online path.",
+    "Using only translated x values to represent the current point, thereby collapsing opposite translated points.",
+    "Inverting a denominator before the complete source +/-T exception pass, or removing a source root twice because candidate abscissae were not deduplicated.",
+    "Testing a source candidate's abscissa without checking the source ordinate sheet.",
+    "Evaluating a globally stored degree-d ordinate independently against every small child instead of restricting parent data or using remainder trees.",
+    "Expanded division polynomials, division by a zero-divisor 2y, exponentially duplicated recursive recurrence calls, or sequential CRT reconstruction presented with a fast balanced-CRT bound.",
+    "Calling the measured or proved algorithm a full faster divisor-translation routine: it returns original-coordinate root factors and serves a different output contract."
+  ],
+  "required_correctness_fixtures": [
+    "Identity offset and identity representative, empty factors and degree-one early returns.",
+    "A support containing original +T and -T candidates, including the opposite source y-sheet and rational 2-torsion; overlapping candidate abscissae must be removed once.",
+    "Two distinct source points whose translates have equal x and opposite y, retained in the same source quotient.",
+    "Multiple successive Sylow primes with offsets reset to O while original source factors and ordinates remain consistent.",
+    "Both twist coordinate conventions independently checked against original-root scaling, with one chosen for production.",
+    "Normalized psi tests with even n, y=0 and n divisible by p; the paper's F83 datum alone does not exercise the last condition.",
+    "Degree comparable to the characteristic, including a split full-field polynomial when feasible; no hidden p>d assumption.",
+    "Independent all-root equality against a separate scalar arithmetic oracle; ordinary operation counters must show all representative misses and exception processing."
+  ],
+  "novelty_assessment": "The bounded sources support an adaptation of an established fixed-source/GCD/coset-label pattern. The supplied paper already performs one-level elliptic pullback tests. This review does not establish whether retaining offsets across its entire recursion has appeared elsewhere. Treat the representation change and derived cost as a paper-guided candidate refinement pending external review, rather than a new-algorithm priority claim.",
+  "execution_scope": "Read-only source retrieval and reasoning, followed only by this scoped JSON artifact. No Python, scientific measurement, cloud execution, shared log/ledger edit, commit or publication was performed by this reviewer."
+}

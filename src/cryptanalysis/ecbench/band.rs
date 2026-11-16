@@ -439,7 +439,7 @@ pub fn priced_s(r: &Record, w: f64) -> Result<Option<f64>, String> {
 
 /// [`priced_s`] under `pricing`.
 pub fn priced_s_with(r: &Record, w: f64, pricing: Pricing) -> Result<Option<f64>, String> {
-    let sq = (r.workload.curve.r as f64).sqrt();
+    let sq = (r.workload.curve.r.to_f64()).sqrt();
     Ok(priced_gae_with(r, w, pricing)?.map(|g| g / sq))
 }
 
@@ -585,7 +585,12 @@ pub fn priced_s_split(
     }
     let rr = &r;
     let t = split_sums(&[rr], pricing)?;
-    Ok(split_mean_s(&t, (r.workload.curve.r as f64).sqrt(), wf, wo))
+    Ok(split_mean_s(
+        &t,
+        (r.workload.curve.r.to_f64()).sqrt(),
+        wf,
+        wo,
+    ))
 }
 
 /// The calibrated reading of one pair of arms pooled over matched runs
@@ -854,7 +859,7 @@ pub fn band_with_wcal(
         }
         rows.push(BandRow {
             curve: curve.clone(),
-            log2_r: (rs[0].workload.curve.r as f64).log2(),
+            log2_r: (rs[0].workload.curve.r.to_f64()).log2(),
             arm: arm.clone(),
             runs: rs.len() as u64,
             verified: ok.len() as u64,
@@ -905,8 +910,12 @@ pub fn band_with_wcal(
                 };
                 let (sa, sb) = (sums(a)?, sums(b)?);
                 let complete = a.verified == a.runs && b.verified == b.runs;
-                let sqrt_r =
-                    (by[&(a.curve.clone(), a.arm.clone())][0].workload.curve.r as f64).sqrt();
+                let sqrt_r = (by[&(a.curve.clone(), a.arm.clone())][0]
+                    .workload
+                    .curve
+                    .r
+                    .to_f64())
+                .sqrt();
                 let mut order_at = BTreeMap::new();
                 let mut dirs = Vec::new();
                 for (label, wf) in [("0", 0.0), ("w_cal", w.w_cal), ("10*w_cal", 10.0 * w.w_cal)] {
