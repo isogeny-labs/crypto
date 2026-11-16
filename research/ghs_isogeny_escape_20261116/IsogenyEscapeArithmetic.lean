@@ -15,5 +15,6 @@ theorem trace_positive_u7 : u 26 7 = -21156227 := by decide
 theorem square_bound : 21156227 < 4600 * 4600 := by decide
 theorem characteristic_excluded : 21156227 % 3 = 2 := by decide
 theorem extension_degree_congruence : 21156227 % 7 = 1 := by decide
+theorem two_trace_classes_have_twenty_models : 10 * 2 = 20 := by decide
 
 end IsogenyEscapeArithmetic

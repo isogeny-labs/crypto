@@ -21,6 +21,8 @@ R = PolynomialRing(F, 'Y')
 Y = R.gen()
 E = EllipticCurve(F, [0, 1, 0, 0, a^4 + 2*a + 1])
 assert E.cardinality() == 270 and 243 + 1 - E.cardinality() == -26
+CM = QuadraticField(-74, 's')
+assert CM.discriminant() == -296 and CM.class_number() == 10
 j = E.j_invariant()
 spot = {}
 for ell in [7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61]:
@@ -38,6 +40,8 @@ out = {
     'u7_is_prime': True,
     'rows': rows,
     'source_j': str(j),
+    'fundamental_discriminant': int(CM.discriminant()),
+    'class_number': int(CM.class_number()),
     'modular_polynomial_spot_degrees': spot,
 }
 (HERE / 'check.json').write_text(json.dumps(out, indent=2, sort_keys=True, default=int) + '\n')

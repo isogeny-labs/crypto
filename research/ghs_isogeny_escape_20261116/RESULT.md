@@ -2,6 +2,8 @@
 
 16 November 2026. Let `K=F243`, let `E/K` have Frobenius trace `t=±26`, and put `L=F_(243^7)`. A separable `L`-isogeny from `E_L` to a curve whose `j`-invariant is outside `K` has degree at least **21,156,227**. This is a bound on *isogeny transport to a primitive-j source*, not a bound on GHS covers or on all vulnerable curves. It applies to both five-model Frobenius orbits joined by the degree-two bridge in [the paired-orbit report](../ghs_twist_isogenous2_20261116/RESULT.md). [pcc:unverified]
 
+The discriminant `26²−4·243=−296` is fundamental and has class number **10**, checked in the arithmetic receipt. The earlier [ten-model census](../ghs_odd5_carrier_20261115/TRACE26_CLASS_THEOREM.md) lists all ten `K`-isomorphism classes of trace `+26`; their quadratic twists list all ten trace `−26` classes. The paired-orbit construction gives a degree-seven cover for one five-element Frobenius orbit per sign and a degree-fourteen cover through a two-isogeny for the other orbit. Thus these **twenty exact `K`-isomorphism classes have an explicit cover route**, with degree at most fourteen, in this finite field. Cover reachability does not by itself give a measured attack win for every class or extension degree. The native s=7 same-target measurement currently exists for one negative representative and its exact two-isogenous partner via a transported suffix.
+
 ## Frobenius criterion
 
 For a prime `ell≠3`, Frobenius `F` on `E[ell]` satisfies `F²−tF+243=0`. Define `U_0=0`, `U_1=1`, and `U_n=tU_(n−1)−243U_(n−2)`. Cayley–Hamilton gives `F^n=U_n F−243 U_(n−1) I`. An `ell`-isogeny defined over `L` but not `K` corresponds to an order-`ell` subgroup, hence a line of `E[ell]`, fixed by `F^7` but not by `F`.
