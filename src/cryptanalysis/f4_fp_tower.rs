@@ -144,7 +144,7 @@ impl Fp {
             self.p - a
         }
     }
-    fn pow(self, mut a: u64, mut e: u64) -> u64 {
+    pub(crate) fn pow(self, mut a: u64, mut e: u64) -> u64 {
         let mut r = 1u64;
         a %= self.p;
         while e > 0 {
@@ -839,18 +839,18 @@ impl RPoly {
 /// a divisor, so an entry costs four bytes where a sparse term costs twenty,
 /// and a new element is the echelon's own row, not a copy of it.
 #[derive(Clone, Debug)]
-struct Elem {
+pub(crate) struct Elem {
     /// Monomials, descending.
-    cols: Arc<[Mono]>,
-    start: u32,
+    pub(crate) cols: Arc<[Mono]>,
+    pub(crate) start: u32,
     /// `vals[i]` is the coefficient of `cols[start + i]`; `vals[0]` is not 0.
-    vals: Vec<u32>,
+    pub(crate) vals: Vec<u32>,
     /// Non-zero entries of `vals`.
-    len: u32,
+    pub(crate) len: u32,
 }
 
 impl Elem {
-    fn new(cols: Arc<[Mono]>, start: u32, vals: Vec<u32>) -> Self {
+    pub(crate) fn new(cols: Arc<[Mono]>, start: u32, vals: Vec<u32>) -> Self {
         debug_assert!(vals.first().is_some_and(|&v| v != 0));
         debug_assert!(start as usize + vals.len() <= cols.len());
         let len = vals.iter().filter(|&&v| v != 0).count() as u32;
@@ -862,7 +862,7 @@ impl Elem {
         }
     }
 
-    fn from_rpoly(p: RPoly) -> Self {
+    pub(crate) fn from_rpoly(p: RPoly) -> Self {
         let len = p.len() as u32;
         Elem {
             cols: p.monos.into(),
@@ -873,17 +873,17 @@ impl Elem {
     }
 
     /// Leading monomial.
-    fn lm(&self) -> Mono {
+    pub(crate) fn lm(&self) -> Mono {
         self.cols[self.start as usize]
     }
 
     /// Number of terms.
-    fn len(&self) -> usize {
+    pub(crate) fn len(&self) -> usize {
         self.len as usize
     }
 
     /// The terms, descending.
-    fn terms(&self) -> impl Iterator<Item = (Mono, u32)> + '_ {
+    pub(crate) fn terms(&self) -> impl Iterator<Item = (Mono, u32)> + '_ {
         self.cols[self.start as usize..]
             .iter()
             .zip(&self.vals)
@@ -891,7 +891,7 @@ impl Elem {
             .map(|(&m, &v)| (m, v))
     }
 
-    fn to_rpoly(&self) -> RPoly {
+    pub(crate) fn to_rpoly(&self) -> RPoly {
         let (monos, coefs) = self.terms().unzip();
         RPoly { monos, coefs }
     }
@@ -1305,7 +1305,7 @@ impl Acc {
 /// pivots so far and kept, monic, if anything survives. Rows are
 /// semi-reduced: once the lead is a new pivot column the rest is kept as it
 /// stands. Returns the pivots, or `None` past the deadline.
-fn echelon(
+pub(crate) fn echelon(
     fp: Fp,
     mut rows: Vec<Row>,
     n_cols: usize,
@@ -1388,6 +1388,38 @@ fn lazy_axpy(acc: &mut [u64], a: u32, b: &[u32], m: u64) {
     }
 }
 
+/// `acc += a · b` with no reduction at all: the caller has bounded the
+/// number of products an entry can take (see [`Kernel::with_budget`]) so
+/// the sum stays below `2⁶⁴`, and reads every entry through
+/// [`Fp::reduce`].
+#[inline(always)]
+fn exact_axpy(acc: &mut [u64], a: u32, b: &[u32]) {
+    let n = acc.len().min(b.len());
+    for (x, &y) in acc[..n].iter_mut().zip(&b[..n]) {
+        *x += u64::from(a) * u64::from(y);
+    }
+}
+
+/// [`exact_axpy`] compiled for AVX2.
+///
+/// # Safety
+/// The CPU must support AVX2.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn exact_axpy_avx2(acc: &mut [u64], a: u32, b: &[u32]) {
+    exact_axpy(acc, a, b)
+}
+
+/// [`exact_axpy`] compiled for AVX-512.
+///
+/// # Safety
+/// The CPU must support AVX-512F.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn exact_axpy_avx512(acc: &mut [u64], a: u32, b: &[u32]) {
+    exact_axpy(acc, a, b)
+}
+
 /// [`lazy_axpy`] compiled for AVX2.
 ///
 /// # Safety
@@ -1442,11 +1474,21 @@ struct Kernel {
     /// The largest multiple of `p` at most `2⁶³`, when `p < 2³¹`.
     lazy: Option<u64>,
     lanes: Lanes,
+    /// No entry can take enough products to reach `2⁶⁴`: nothing is
+    /// subtracted at all and every read goes through [`Fp::reduce`].
+    exact: bool,
 }
 
 impl Kernel {
-    fn new(fp: Fp) -> Self {
-        Self::with_lanes(fp, Lanes::detect())
+    /// A kernel for accumulators that take at most `max_products` products
+    /// each between two full reductions, all read through [`Fp::reduce`]:
+    /// when `max_products · (p − 1)² + p < 2⁶⁴` the entries are only added
+    /// to, with no conditional subtraction of a multiple of `p`.
+    fn with_budget(fp: Fp, max_products: usize) -> Self {
+        let mut k = Self::with_lanes(fp, Lanes::detect());
+        let worst = max_products as u128 * u128::from(fp.p - 1).pow(2) + u128::from(fp.p);
+        k.exact = worst < 1 << 64;
+        k
     }
 
     fn with_lanes(fp: Fp, lanes: Lanes) -> Self {
@@ -1454,6 +1496,7 @@ impl Kernel {
             fp,
             lazy: (fp.p < 1 << 31).then(|| ((1u64 << 63) / fp.p) * fp.p),
             lanes,
+            exact: false,
         }
     }
 
@@ -1461,6 +1504,18 @@ impl Kernel {
     /// below `2⁶³` (lazy) or below `p` (otherwise), and stays so.
     #[inline]
     fn axpy(self, acc: &mut [u64], a: u32, b: &[u32]) {
+        if self.exact {
+            match self.lanes {
+                #[cfg(target_arch = "x86_64")]
+                // SAFETY: `Lanes::detect` found AVX-512F on this CPU.
+                Lanes::Avx512 => unsafe { exact_axpy_avx512(acc, a, b) },
+                #[cfg(target_arch = "x86_64")]
+                // SAFETY: `Lanes::detect` found AVX2 on this CPU.
+                Lanes::Avx2 => unsafe { exact_axpy_avx2(acc, a, b) },
+                _ => exact_axpy(acc, a, b),
+            }
+            return;
+        }
         match (self.lazy, self.lanes) {
             #[cfg(target_arch = "x86_64")]
             // SAFETY: `Lanes::detect` found AVX-512F on this CPU.
@@ -1487,38 +1542,38 @@ impl Kernel {
 }
 
 /// Why an elimination stopped early.
-enum Stop {
+pub(crate) enum Stop {
     Deadline,
     Oversize,
 }
 
 /// Counters of one elimination, for the trace.
 #[derive(Default)]
-struct ElimStats {
+pub(crate) struct ElimStats {
     /// S-rows that the reducers alone do not reduce to zero, among those
     /// reduced.
-    residual_rows: usize,
+    pub(crate) residual_rows: usize,
     /// S-rows reduced when the echelon had a pivot on every `Q` column, if
     /// it did, and the S-rows then skipped.
-    full_rank_after: Option<usize>,
-    skipped_rows: usize,
+    pub(crate) full_rank_after: Option<usize>,
+    pub(crate) skipped_rows: usize,
     /// Columns no reducer leads: those without a divisor.
-    q_cols: usize,
+    pub(crate) q_cols: usize,
     /// Entries of the reduced reducer block `B'`.
-    dense_entries: u64,
-    muladds: u64,
+    pub(crate) dense_entries: u64,
+    pub(crate) muladds: u64,
     /// Time spent on `B'`, and on the S-rows and their echelon.
-    ms_reducers: f64,
-    ms_residues: f64,
+    pub(crate) ms_reducers: f64,
+    pub(crate) ms_residues: f64,
     /// Input: form `B'` only for the reducers the S-rows reach, directly or
     /// through other reducers (a replay; the plain run forms all of it).
-    prune_reducers: bool,
+    pub(crate) prune_reducers: bool,
     /// Output: the S-rows (indices) that gave a new pivot, in order.
-    useful: Vec<u32>,
+    pub(crate) useful: Vec<u32>,
 }
 
 /// Forms row `k` of a set of rows on demand.
-type FormRow<'a> = &'a (dyn Fn(usize) -> Row + Sync);
+pub(crate) type FormRow<'a> = &'a (dyn Fn(usize) -> Row + Sync);
 
 /// One step's matrix, eliminated in the manner of Faugère–Lachartre.
 ///
@@ -1546,7 +1601,7 @@ type FormRow<'a> = &'a (dyn Fn(usize) -> Row + Sync);
 /// rows over `Q` that step 3 leaves. `B'` larger than `max_dense` entries
 /// stops it as oversize.
 #[allow(clippy::too_many_arguments)]
-fn eliminate(
+pub(crate) fn eliminate(
     fp: Fp,
     n_cols: usize,
     piv_leads: &[u32],
@@ -1559,7 +1614,12 @@ fn eliminate(
     full_rank_exit: bool,
     st: &mut ElimStats,
 ) -> Result<Echelon, Stop> {
-    let kern = Kernel::new(fp);
+    // An entry of an accumulator takes at most one product per column of
+    // its row at a pivot column (at most `n_cols`), and later one per
+    // earlier lead (at most `nq ≤ n_cols`, the old and the chunk's new
+    // leads together), the rest being reduced in between: `2 · n_cols`
+    // products bound every entry between two reductions.
+    let kern = Kernel::with_budget(fp, 2 * n_cols + 4);
     // Q, ascending; `q_start[c]` is the first Q index at or after `c`.
     let mut q_of = vec![NONE; n_cols];
     let mut q_start = vec![0u32; n_cols];
@@ -1730,7 +1790,9 @@ fn eliminate(
                         }
                     }
                 }
-                ents.sort_unstable();
+                // (column, row) is unique, so the key orders the entries
+                // exactly as the whole tuple did
+                ents.sort_unstable_by_key(|&(c, r, _)| u64::from(c) << 32 | u64::from(r));
                 for &(c, r, v) in &ents {
                     let (off, end) = (
                         r as usize * nq + q_start[c as usize] as usize,
@@ -1830,10 +1892,10 @@ fn eliminate(
 /// `l` of `leads` (ascending), is the pivot whose lead is the `Q` column `l`,
 /// which is column `q_col[l]` of the step: monic, dense over the `Q` columns
 /// from `l` on. The other `rows` are empty.
-struct Echelon {
-    q_col: Vec<u32>,
-    leads: Vec<u32>,
-    rows: Vec<Vec<u32>>,
+pub(crate) struct Echelon {
+    pub(crate) q_col: Vec<u32>,
+    pub(crate) leads: Vec<u32>,
+    pub(crate) rows: Vec<Vec<u32>>,
 }
 
 impl Echelon {
@@ -2147,15 +2209,15 @@ pub(crate) fn staircase_at_most(
 
 /// A row of a step's matrix, kept as the product that forms it.
 #[derive(Clone, Copy, Debug)]
-struct RowDesc {
-    mult: Mono,
-    g: u32,
+pub(crate) struct RowDesc {
+    pub(crate) mult: Mono,
+    pub(crate) g: u32,
     /// The product's leading monomial and number of terms.
-    lead: Mono,
-    len: u32,
+    pub(crate) lead: Mono,
+    pub(crate) len: u32,
     /// Where the product itself is held in the step's [`ProductCache`], or
     /// [`NONE`] when it is not and must be formed again.
-    at: u32,
+    pub(crate) at: u32,
 }
 
 /// The most terms a step keeps of the products its symbolic preprocessing
@@ -2168,7 +2230,7 @@ struct RowDesc {
 /// products do not fit in memory together, which is why a row is formed on
 /// demand at all. A product that would pass the limit is not kept and is
 /// formed again when its row is eliminated.
-const PRODUCT_CACHE_TERMS: usize = 1 << 23;
+pub(crate) const PRODUCT_CACHE_TERMS: usize = 1 << 23;
 
 /// The products a step's scan has formed, one after another, so that the
 /// elimination reads each row back instead of multiplying again. A row is
@@ -2180,15 +2242,15 @@ const PRODUCT_CACHE_TERMS: usize = 1 << 23;
 /// not known until the scan is over, and a number is turned into its column
 /// by an array read where a monomial needs a hash lookup.
 #[derive(Default)]
-struct ProductCache {
-    ids: Vec<u32>,
-    coefs: Vec<u32>,
+pub(crate) struct ProductCache {
+    pub(crate) ids: Vec<u32>,
+    pub(crate) coefs: Vec<u32>,
     /// Terms this cache may hold.
     limit: usize,
 }
 
 impl ProductCache {
-    fn new(limit: usize) -> Self {
+    pub(crate) fn new(limit: usize) -> Self {
         ProductCache {
             // A position is a `u32` below `NONE`.
             limit: limit.min(NONE as usize - 1),
@@ -2197,12 +2259,12 @@ impl ProductCache {
     }
 
     /// Whether a product of `terms` terms fits.
-    fn has_room(&self, terms: usize) -> bool {
+    pub(crate) fn has_room(&self, terms: usize) -> bool {
         self.ids.len() + terms <= self.limit
     }
 
     /// Keeps a product, which must fit: its position.
-    fn keep(&mut self, ids: &[u32], coefs: &[u32]) -> u32 {
+    pub(crate) fn keep(&mut self, ids: &[u32], coefs: &[u32]) -> u32 {
         debug_assert!(self.has_room(ids.len()) && ids.len() == coefs.len());
         let at = self.ids.len() as u32;
         self.ids.extend_from_slice(ids);
@@ -2952,6 +3014,17 @@ mod tests {
                     }
                     let got: Vec<u128> = acc.iter().map(|&x| u128::from(f.reduce(x))).collect();
                     assert_eq!(got, exact, "p = {p}, {l:?}");
+                }
+                // the unreduced kernel, where the budget allows it
+                let kern = Kernel::with_budget(f, steps.len() + 1);
+                assert_eq!(kern.exact, p == 3 || p == 786433, "p = {p}");
+                if kern.exact {
+                    let mut acc = init.clone();
+                    for (a, b) in &steps {
+                        kern.axpy(&mut acc, *a, b);
+                    }
+                    let got: Vec<u128> = acc.iter().map(|&x| u128::from(f.reduce(x))).collect();
+                    assert_eq!(got, exact, "p = {p}, exact");
                 }
             }
         }

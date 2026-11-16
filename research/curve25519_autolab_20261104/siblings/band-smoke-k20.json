@@ -1,0 +1,90 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "log2_r": 17.000429204845545,
+      "arm": "rho-neg",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.3372502709561422,
+        1.4278003301778444,
+        2.2427508631731543
+      ],
+      "charged_sum": 11621.0,
+      "native_sum": 7869,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "log2_r": 17.000429204845545,
+      "arm": "tw2cj-lazy",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        2.5336525656924835,
+        2.718699649482568,
+        4.384123403593329
+      ],
+      "charged_sum": 22018.0,
+      "native_sum": 16081,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 631.7083333333334
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "log2_r": 17.000429204845545,
+      "arm": "tw2cj-lazy-sib8",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        5.681098517950673,
+        5.941678781144905,
+        8.286901149893007
+      ],
+      "charged_sum": 49370.0,
+      "native_sum": 22645,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "sibling_second_points": 303.0416666666667,
+        "table_insert_attempts": 602.5
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "rho-neg",
+      "b": "tw2cj-lazy",
+      "verdict": "rho-neg < tw2cj-lazy"
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "rho-neg",
+      "b": "tw2cj-lazy-sib8",
+      "verdict": "rho-neg < tw2cj-lazy-sib8"
+    },
+    {
+      "curve": "icv1-fp20-tm898-793f1c4c",
+      "a": "tw2cj-lazy",
+      "b": "tw2cj-lazy-sib8",
+      "verdict": "tw2cj-lazy < tw2cj-lazy-sib8"
+    }
+  ]
+}

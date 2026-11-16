@@ -1,0 +1,55 @@
+{
+  "namespace": "BinarySemaevIrreducibilityAudit",
+  "proofs": [
+    {
+      "file": "ASDegree.lean",
+      "claim": "Actual rationalfunction unequaldegree sum/degree1ASobstruction/simplePoledegree1",
+      "declarations": [
+        "intDegree_add_of_lt",
+        "degree_one_not_artin_schreier",
+        "simplePole_degree",
+        "simplePole_not_artin_schreier"
+      ]
+    },
+    {
+      "file": "BinaryFunctionField.lean",
+      "claim": "Actual binary root change/genericquadratic/no-root/irreducibility",
+      "declarations": [
+        "binary_root_reduction",
+        "binary_function_field_no_root",
+        "binary_function_field_irreducible"
+      ]
+    },
+    {
+      "file": "BinaryPrimitive.lean",
+      "claim": "Actual primitive source/injective algebraicclosure coefficient map/Gauss with no sqrtpremise",
+      "declarations": [
+        "binaryLiteral_primitive",
+        "baseCoefficientMap_injective",
+        "binaryLiteral_map",
+        "binaryLiteral_irreducible"
+      ]
+    },
+    {
+      "file": "BinaryActualPolynomial.lean",
+      "claim": "ActualMV polynomial/evaluation/symmetry/allscalar extensions",
+      "declarations": [
+        "ordinaryMv_eval",
+        "ordinaryMv_symmetric",
+        "ordinaryMv_as_literal",
+        "ordinaryMv_irreducible_after_field_map"
+      ]
+    },
+    {
+      "file": "BinaryCertificate.lean",
+      "claim": "Complete allfield/group/main and directmodeldistinction",
+      "declarations": [
+        "ordinary_not_short",
+        "actual_binary_S3_certificate"
+      ]
+    }
+  ],
+  "local_gate": "43/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "Generalhigherarity absoluteirreducibility and splitsk>=3."
+}

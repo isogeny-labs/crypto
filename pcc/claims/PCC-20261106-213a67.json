@@ -1,0 +1,20 @@
+{
+ "created_at": "2026-11-06T23:17:37Z",
+ "id": "PCC-20261106-213a67",
+ "kind": "measurement",
+ "producer": {
+  "commit": "a0358b2d1d740a8959c4a0f6b11b4dbd687802d9",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/lift_dense_conjugate_pair_infinity_20261106/reports/run-20261106T1550Z/validator-report-a2.json",
+   "sha256": "397e03e2b4fd0e42c073697ddbd28eb2d6ab972d704f3031b5007bcd3a4d95f5"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Amendment A2 of research/lift_dense_conjugate_pair_infinity_20261106: counted k=4 Gaudry solver (gaudry_quartic, chains+sparsest, Macaulay degree 29), p=29, curve 1, the 4 conjugate-pair targets with a decomposition into at most 3 factor-base points, 3 fresh random projective charts each (12 solves)",
+ "statement": "On curve 1's three conjugate-pair targets whose first random chart gave quotient dimension 4095, 4094 and 4095, at least one of three fresh charts gives 4096, so the shortfall depends on the chart. The control target (4096 with the first chart) drops to 4095 under one fresh chart. 11 of 12 fresh-chart solves return exactly the oracle's decompositions; one (planted target, chart A1, dimension 4095) fails with border unreachable and returns nothing. Post hoc: within each target, every unit of missing dimension matches one missing F_p-rational solution."
+}

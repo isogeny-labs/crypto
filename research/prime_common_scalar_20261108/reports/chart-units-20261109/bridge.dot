@@ -1,0 +1,11 @@
+digraph chartunits {
+ graph[rankdir=TB,bgcolor="white",pad="0.2"];
+ node[shape=box,style="rounded,filled",fillcolor="#edf4fb",fontname="Helvetica"];
+ A[label="Actual bounded node differences\nalpha/(m-j) is even in the actual integral ring"];
+ B[label="Actual polynomial reductions modulo2\nD -> rho_m; R -> rho_m inverse"];
+ C[label="Actual even remainders\nUnit evaluation at every substitution when2 is nilpotent",fillcolor="#d9f0dc"];
+ D[label="Constructed finite entry comparison\nOne actual common unit; divisibility thresholds equal",fillcolor="#d9f0dc"];
+ E[label="Still required: actual recursive mode and entry evaluator\nUniform enumeration, precision and bit-arithmetic costs",fillcolor="#fff1d6"];
+ F[label="Still required: prime-field reduction tied to input bits n\nComplete exp(o(n)) bound or applicable universal lower bound",fillcolor="#fff1d6"];
+ A->B;B->C;C->D;D->E;E->F;
+}

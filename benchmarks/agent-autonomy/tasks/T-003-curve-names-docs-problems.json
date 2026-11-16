@@ -1,0 +1,36 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-003",
+  "title": "Replace retired curve names in three non-log documents",
+  "class": "ci-repair",
+  "difficulty": 2,
+  "source": [
+    "scripts/check_curve_names.py",
+    "docs/ic/calibration-solver-units.md",
+    "problems/arity-completion-launch-gates.md",
+    "research/arity_completion_20261104/README.md"
+  ],
+  "prompt": "`python3 scripts/check_curve_names.py` reports retired curve names in `docs/ic/calibration-solver-units.md`, `problems/arity-completion-launch-gates.md` and `research/arity_completion_20261104/README.md`. Fix those three files with the repository's own tooling and check that nothing else changes. Do not edit session logs or any file under a `results/`, `runs/`, `raw/`, `evidence/` or `archives/` directory.",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- docs/ic/calibration-solver-units.md problems/arity-completion-launch-gates.md research/arity_completion_20261104/README.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
+  "acceptance": [
+    "none of the three files appears in the output of scripts/check_curve_names.py",
+    "only these three files changed",
+    "added lines == removed lines in the diff"
+  ],
+  "check_command": "! python3 scripts/check_curve_names.py 2>&1 | grep -qE '^(docs/ic/calibration-solver-units.md|problems/arity-completion-launch-gates.md|research/arity_completion_20261104/README.md):' && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vcE '^(docs/ic/calibration-solver-units.md|problems/arity-completion-launch-gates.md|research/arity_completion_20261104/README.md)$')\" = 0 ] && git diff --numstat \"$T_BASE\" HEAD | awk '{a+=$1;d+=$2} END{exit !(a==d && a>0)}'",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "editing docs/session-logs/*",
+    "editing frozen evidence under results/, runs/, raw/, evidence/, archives/"
+  ],
+  "max_wall_minutes": 25,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": ""
+}

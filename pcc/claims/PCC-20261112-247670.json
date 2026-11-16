@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T23:13:00Z",
+ "id": "PCC-20261112-247670",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5bec81e36ac9b6f7b91ddc5437766248bf7aacfe",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "96294185bdb509e83144c464d6a4ae048e531ab9544140d90e418b571fa71b1a",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/T20DirectNorms.lean",
+   "theorem": "T20DirectNorms.actual_second_cover_coprime_witness"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Explicit Bezout identities in every commutative ring with 101=0;specialization to F101[z] excludes common numerator/denominator roots and supports the written degree-four function-field tower. Actual curves/Picard/polarization/descent remain written/native;no signature.",
+ "statement": "theorem actual_second_cover_coprime_witness {K : Type} [CommRing K] (z : K) (characteristic : (101 : K)=0) : (38+50*z)*(49+92*z^2+96*z^3+71*z^4) + (32+17*z+77*z^2+86*z^3)*(z^2+46)=1"
+}

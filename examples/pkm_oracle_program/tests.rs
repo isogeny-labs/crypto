@@ -21,6 +21,58 @@ pub(super) fn fixture() -> Request {
 }
 
 #[test]
+fn native_window_metadata_binds_attempt_state_and_keeps_legacy_records_readable() {
+    let mut request = fixture();
+    request.limits.solver_millis = 0;
+    let mut record = serde_json::to_value(run(&request).unwrap()).unwrap();
+    assert_eq!(record["ledger"]["f4_native_work"]["attempted"], false);
+    assert!(replay(&request, &record).is_ok());
+    let mut bad = record.clone();
+    bad["ledger"]["f4_native_work"]["attempted"] = serde_json::json!(true);
+    bad["ledger"]["f4_native_work"]["result_state"] = serde_json::json!("returned");
+    assert!(replay(&request, &bad).is_err());
+    record["ledger"]
+        .as_object_mut()
+        .unwrap()
+        .remove("f4_native_work");
+    assert!(replay(&request, &record).is_ok());
+}
+
+#[test]
+fn validation_counts_survive_acceptance_refusal_and_serialization() {
+    let mut r = fixture();
+    let mut counts = reference::Counts::default();
+    r.validate_counted(&mut counts).unwrap();
+    assert_eq!(counts.point_tests, 1);
+    assert_eq!(counts.field_multiplications, 4);
+    assert_eq!(counts.field_additions, 2);
+    r.target = Point { x: 0, y: 0 }; // canonical but off this curve
+    assert!(r.validate_counted(&mut counts).is_err());
+    assert_eq!(counts.point_tests, 2);
+    assert_eq!(counts.field_multiplications, 8);
+    assert_eq!(counts.field_additions, 4);
+    r.target.x = r.p; // noncanonical: point test, no field arithmetic
+    assert!(r.validate_counted(&mut counts).is_err());
+    assert_eq!(counts.point_tests, 3);
+    assert_eq!(counts.field_multiplications, 8);
+    r.schema = "unknown".into();
+    let before = counts;
+    assert!(r.validate_counted(&mut counts).is_err());
+    assert_eq!(counts, before);
+
+    let mut r = fixture();
+    r.limits.solver_millis = 0;
+    let result = run(&r).unwrap();
+    assert_eq!(result.ledger.validation_reference_counts.point_tests, 1);
+    let value = serde_json::to_value(result).unwrap();
+    assert_eq!(
+        value["ledger"]["validation_reference_counts"]["field_multiplications"],
+        4
+    );
+    assert_eq!(value["comparison_admissible"], false);
+}
+
+#[test]
 fn complete_m4_sets_match_independent_affine_control_on_all_finite_targets() {
     // Fixed public development fixtures, not a measured or blind panel. The
     // second curve includes y=0 in this base; duplicate sign lifts must collapse.

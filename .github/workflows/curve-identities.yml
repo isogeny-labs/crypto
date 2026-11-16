@@ -13,6 +13,8 @@ on:
       - 'scripts/test_prime_model_normalization.py'
       - 'scripts/check_curve_names.py'
       - 'scripts/test_curve_names_archived_labels.py'
+      - 'scripts/test_standard_panel.py'
+      - 'docs/ic/standard_panel.json'
       - 'research/f4_f5_history_20261012/reports/run-20261012T0009Z/REPORT.md'
       - 'tools/isogeny-cli/src/bin/registry_models.rs'
       - 'isogeny_algos/src/field.rs'
@@ -59,3 +61,4 @@ jobs:
           python tests/test_curve_identity.py
           python scripts/test_prime_model_normalization.py
           python scripts/test_curve_names_archived_labels.py
+          python scripts/test_standard_panel.py

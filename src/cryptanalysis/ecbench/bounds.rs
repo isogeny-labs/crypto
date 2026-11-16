@@ -33,7 +33,6 @@ use crate::cryptanalysis::ecbench::methods::expected_s;
 use crate::cryptanalysis::ecbench::record::{floor_s, Record};
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::stats::{bootstrap_ci, cluster_bootstrap_ci, mean};
-use crate::cryptanalysis::ecbench::work::CostBasis;
 
 pub const BOUND_SCHEMA: &str = "ecbench.bound/v1";
 pub const BOUND_PREFIX: &str = "ECBND1h";
@@ -149,6 +148,12 @@ pub struct Envelope {
     /// `none`: every run starts cold.
     pub precomputation: String,
     pub threads: u32,
+    /// An auxiliary-input oracle the problem provides, named by a label
+    /// (`static_dh:...`): the problem is then the DLP with that oracle,
+    /// not the plain ECDLP, and its bounds sit in a domain of their own.
+    /// Omitted when unset, so every plain domain keeps its id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle: Option<String>,
 }
 
 impl Default for Envelope {
@@ -157,6 +162,7 @@ impl Default for Envelope {
             targets: 1,
             precomputation: "none".into(),
             threads: 1,
+            oracle: None,
         }
     }
 }
@@ -255,6 +261,13 @@ pub struct SizeRow {
     pub memory_entries_per_sqrt_r: Option<f64>,
     pub uncharged_per_sqrt_r: Option<f64>,
     pub levels: BTreeMap<String, u64>,
+    /// Mean static-DH oracle queries per run, and the mean group
+    /// operations the server spent answering them; only in an oracle
+    /// domain (see [`Envelope::oracle`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle_queries: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle_server_group_ops: Option<f64>,
     /// Fit version 2: the other axes on this size alone, each with a
     /// two-stage interval over the size's workloads, so two bounds can be
     /// compared on the sizes they share.  Keys are `memory`, `uncharged`
@@ -266,6 +279,30 @@ pub struct SizeRow {
     /// priced.  Empty for a bound fitted at a weight.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub band: Vec<BandPoint>,
+    /// Fit version 2 on sessions that carry a `w_cal`
+    /// ([`super::runner::read_wcal`]) and a fit not at a weight; absent
+    /// otherwise, so every earlier bound re-derives with the same id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<CalibratedPoint>,
+}
+
+/// The calibrated reading of AGENTS.md §5a (2026-11-12) on one size: mean `S`
+/// over the verified runs with the field-multiplication counters at
+/// `field_weights` and every other native counter at `other_weights`
+/// (`mean_s[i][j]`; `None` where a run's counter has no count).  A point
+/// reading beside [`BandPoint`]; it replaces nothing.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct CalibratedPoint {
+    pub w_cal: f64,
+    pub method: String,
+    pub host: String,
+    pub field_weights: Vec<f64>,
+    pub other_weights: Vec<f64>,
+    pub mean_s: Vec<Vec<Option<f64>>>,
+    /// `override` when the reading came from [`FitOptions::w_cal`]; absent
+    /// when it is the sessions' own.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 /// One axis on one size.
@@ -443,18 +480,24 @@ pub struct FitOptions {
     /// Omitted from the record when unset (see `weight`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub param_rule: Option<String>,
-    /// What of each run the fit counts ([`CostBasis`]): every gate (the
-    /// default), the gates a further target pays again, or the search
-    /// phases only.  Needs `unit = bitop/v1`; the domain's unit then names
-    /// the basis (`bitop/v1+per_target`), so the bound never shares an id
-    /// with a total-cost one.  Omitted from the record at the default, so a
-    /// bound fitted before the option existed keeps its id.
-    #[serde(default, skip_serializing_if = "CostBasis::is_total")]
-    pub cost: CostBasis,
+    /// The oracle label of the domain the arm is fitted in (see
+    /// [`Envelope::oracle`]).  An arm that queries an oracle (its records
+    /// carry `counters.oracle_queries`) must name it; an arm that does not
+    /// may name it too, to be fitted in the same domain as a reference
+    /// that queries nothing.  Omitted when unset.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle: Option<String>,
     /// The fit procedure ([`FIT_VERSION`]).  A record that predates the
     /// field is version 1 and is not written with it, so its seal stands.
     #[serde(default = "legacy_fit_version", skip_serializing_if = "is_legacy_fit")]
     pub fit_version: u32,
+    /// A `w_cal` override (`bound fit --w-cal`): the calibrated reading
+    /// (`sizes[].calibrated`) uses it instead of the sessions' own and
+    /// records `source: "override"`.  Kept here so `bound check` fits it
+    /// again.  Fit version 2, no `weight`, no `unit` only.  Omitted when
+    /// unset, so every earlier bound keeps its id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub w_cal: Option<super::band::WCal>,
 }
 
 fn legacy_fit_version() -> u32 {
@@ -463,13 +506,6 @@ fn legacy_fit_version() -> u32 {
 
 fn is_legacy_fit(v: &u32) -> bool {
     *v == LEGACY_FIT_VERSION
-}
-
-/// `bitop/v1` or `bitop/v2`, also read on a partial cost basis
-/// (`bitop/v1+per_target`, `bitop/v1+search`; [`CostBasis`]).
-fn is_bitop_unit(unit: &str) -> bool {
-    let base = unit.split_once('+').map_or(unit, |(base, _)| base);
-    crate::cryptanalysis::bitops::is_bitop_unit(base)
 }
 
 impl Default for FitOptions {
@@ -482,10 +518,32 @@ impl Default for FitOptions {
             unit: None,
             weight: None,
             param_rule: None,
-            cost: CostBasis::Total,
+            oracle: None,
             fit_version: FIT_VERSION,
+            w_cal: None,
         }
     }
+}
+
+/// The oracle a bound's arm queried, as a resource of its own: the
+/// queries per run against `r`, fitted like `gae` (`queries = C · r^α`),
+/// and the server's work behind them.  Not part of `ops`.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct OracleResource {
+    /// The domain's oracle label.
+    pub label: String,
+    pub model: String,
+    pub model_fit: String,
+    pub points: u64,
+    pub alpha: Option<f64>,
+    pub alpha_ci95: Option<(f64, f64)>,
+    pub log2_c: Option<f64>,
+    pub r_squared: Option<f64>,
+    /// Same fit for the server's group operations.
+    pub server_alpha: Option<f64>,
+    pub server_alpha_ci95: Option<(f64, f64)>,
+    pub server_log2_c: Option<f64>,
+    pub note: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -507,6 +565,9 @@ pub struct Bound {
     pub provenance: Provenance,
     pub admissibility: Admissibility,
     pub fit_options: FitOptions,
+    /// Present when the arm queried an oracle.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle: Option<OracleResource>,
     /// Bounds this one was measured against and beat or traded with, set
     /// by the verdict that produced it.
     pub improves_on: Vec<String>,
@@ -1088,6 +1149,15 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     let unverified_before_filter = recs.iter().filter(|r| !r.counts()).count();
     let runs_before_filter = recs.len();
 
+    if let Some(w) = &opts.w_cal {
+        w.validate()?;
+        if !v2 || opts.weight.is_some() || opts.unit.is_some() {
+            return Err(
+                "a w_cal override needs fit version 2 without --weight or --unit: the calibrated reading is in GAE beside the band, and bitop units price field multiplications at their frozen primitive weights"
+                    .into(),
+            );
+        }
+    }
     if opts.unit.is_some() && opts.weight.is_some() {
         return Err(
             "--unit and --weight exclude each other: bitop/v1 prices every operation, \
@@ -1096,17 +1166,11 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         );
     }
     match opts.unit.as_deref() {
-        None if !opts.cost.is_total() => {
-            return Err(
-                "--cost per-target and --cost search read the bitop/v1 work block; pass --unit bitop/v1"
-                    .into(),
-            )
-        }
         None => {}
         Some(crate::cryptanalysis::bitops::UNIT) => {
             recs = recs
                 .iter()
-                .map(|r| crate::cryptanalysis::ecbench::work::basis_view(r, opts.cost))
+                .map(crate::cryptanalysis::ecbench::work::bitop_view)
                 .collect::<Result<_, _>>()?;
         }
         Some(crate::cryptanalysis::bitops::UNIT_V2) => {
@@ -1192,13 +1256,32 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             tiers.into_iter().collect::<Vec<_>>().join(" and ")
         ));
     }
+    // An arm that queries an oracle is a method for the DLP with that
+    // oracle, not for the plain ECDLP: it must say so, and its bound goes
+    // to the domain of that problem.
+    let n_querying = recs
+        .iter()
+        .filter(|r| r.counters.contains_key("oracle_queries"))
+        .count();
+    if n_querying > 0 && n_querying != recs.len() {
+        return Err("some runs of the arm report oracle_queries and some do not".into());
+    }
+    if n_querying > 0 && opts.oracle.is_none() {
+        return Err(
+            "the arm queries a static-DH oracle (counters.oracle_queries); name the oracle in the domain with --oracle LABEL, so its bound is not set beside plain-ECDLP bounds"
+                .into(),
+        );
+    }
     let domain = Domain {
         problem: PROBLEM.into(),
         family: families.into_iter().next().unwrap().to_string(),
         target_kind: kinds.into_iter().next().unwrap(),
         unit: units.into_iter().next().unwrap(),
         tier: tiers.into_iter().next().unwrap().to_string(),
-        envelope: Envelope::default(),
+        envelope: Envelope {
+            oracle: opts.oracle.clone(),
+            ..Envelope::default()
+        },
     };
     let domain_id = domain.id()?;
 
@@ -1211,6 +1294,19 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             .push(r);
     }
     let mut sizes: Vec<SizeRow> = Vec::new();
+    // The calibrated reading is in GAE: not at a weight, and not in a bitop
+    // unit (whose records are re-priced in gates by `bitop_view`).
+    let wcal = if v2 && opts.weight.is_none() && opts.unit.is_none() {
+        match &opts.w_cal {
+            Some(w) => Some((
+                w.clone(),
+                Some(super::band::WCAL_SOURCE_OVERRIDE.to_string()),
+            )),
+            None => super::runner::shared_wcal(inputs.dirs)?.map(|w| (w, None)),
+        }
+    } else {
+        None
+    };
     // Intervals fit version 2 refused for excluding their estimate.
     let mut refused: Vec<String> = Vec::new();
     for (slug, rs) in &by_slug {
@@ -1273,8 +1369,34 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             },
             uncharged_per_sqrt_r: mean(&unch),
             levels,
+            oracle_queries: opts.oracle.as_ref().and_then(|_| {
+                mean(
+                    &ok.iter()
+                        .map(|r| r.counters.get("oracle_queries").copied().unwrap_or(0) as f64)
+                        .collect::<Vec<_>>(),
+                )
+            }),
+            oracle_server_group_ops: opts.oracle.as_ref().and_then(|_| {
+                mean(
+                    &ok.iter()
+                        .map(|r| {
+                            r.counters
+                                .get("oracle_server_group_ops")
+                                .copied()
+                                .unwrap_or(0) as f64
+                        })
+                        .collect::<Vec<_>>(),
+                )
+            }),
             axes: size_axes,
             band: size_band,
+            calibrated: match &wcal {
+                Some((w, source)) => Some(CalibratedPoint {
+                    source: source.clone(),
+                    ..calibrated_point(&ok, w)?
+                }),
+                None => None,
+            },
         });
     }
     sizes.sort_by_key(|a| a.r);
@@ -1348,7 +1470,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     };
     // The same fit in additions, in bitop/v1: each run's gates over one
     // affine addition's gates on its curve.
-    let (alpha_add, alpha_add_ci) = if is_bitop_unit(&domain.unit) {
+    let (alpha_add, alpha_add_ci) = if crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) {
         let add_strata: Vec<Vec<(f64, f64)>> = sizes
             .iter()
             .map(|row| {
@@ -1381,7 +1503,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         n_sizes >= MIN_SIZES_FOR_SCALING && alpha.is_some() && (!v2 || alpha_ci.is_some());
     let fit = Fit {
         size_parameter: "r".into(),
-        model: if is_bitop_unit(&domain.unit) {
+        model: if crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) {
             "bitops = C * r^alpha".into()
         } else {
             "gae = C * r^alpha".into()
@@ -1518,6 +1640,84 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         );
     }
 
+    // The oracle as a resource of its own: queries per sqrt(r) as an axis
+    // (zero, known, for an arm that does not query), and the fit of the
+    // queries and of the server's work against r.
+    let mut oracle_resource = None;
+    if let Some(label) = &opts.oracle {
+        let q_of = |r: &Record| r.counters.get("oracle_queries").copied().unwrap_or(0) as f64;
+        let srv_of = |r: &Record| {
+            r.counters
+                .get("oracle_server_group_ops")
+                .copied()
+                .unwrap_or(0) as f64
+        };
+        let mut q_strata: Vec<Vec<f64>> = Vec::new();
+        let mut q_pts: Vec<Vec<(f64, f64)>> = Vec::new();
+        let mut s_pts: Vec<Vec<(f64, f64)>> = Vec::new();
+        for row in &sizes {
+            let mine: Vec<&&Record> = verified
+                .iter()
+                .filter(|r| r.workload.curve.slug == row.slug)
+                .collect();
+            let ln_r = (row.r as f64).ln();
+            q_strata.push(
+                mine.iter()
+                    .map(|r| q_of(r) / (r.workload.curve.r as f64).sqrt())
+                    .collect(),
+            );
+            q_pts.push(
+                mine.iter()
+                    .map(|r| q_of(r))
+                    .filter(|q| *q > 0.0)
+                    .map(|q| (ln_r, q.ln()))
+                    .collect(),
+            );
+            s_pts.push(
+                mine.iter()
+                    .map(|r| srv_of(r))
+                    .filter(|q| *q > 0.0)
+                    .map(|q| (ln_r, q.ln()))
+                    .collect(),
+            );
+        }
+        let q_est = estimate_v(
+            &q_strata,
+            opts.resamples,
+            opts.seed ^ 0x13,
+            opts.fit_version,
+        );
+        dimensions.insert(
+            "oracle_queries".to_string(),
+            Dimension {
+                statistic: "mean static-DH oracle queries / sqrt(r) over verified runs (0 for an arm that does not query)".into(),
+                source: "counters.oracle_queries, workload.curve.r".into(),
+                lower_is_better: true,
+                known: q_est.is_some(),
+                value: q_est.as_ref().map(|e| e.value),
+                ci95: q_est.as_ref().and_then(|e| e.ci95),
+            },
+        );
+        if q_pts.iter().any(|s| !s.is_empty()) {
+            let (a, ci, c, r2, _) = power_law(&q_pts, opts.resamples, opts.seed ^ 0x21);
+            let (sa, sci, sc, _, _) = power_law(&s_pts, opts.resamples, opts.seed ^ 0x23);
+            oracle_resource = Some(OracleResource {
+                label: label.clone(),
+                model: "static_dh".into(),
+                model_fit: "oracle_queries = C * r^alpha (per run, least squares on every verified run, two-stage bootstrap)".into(),
+                points: q_pts.iter().map(|s| s.len() as u64).sum(),
+                alpha: a,
+                alpha_ci95: ci,
+                log2_c: c,
+                r_squared: r2,
+                server_alpha: sa,
+                server_alpha_ci95: sci,
+                server_log2_c: sc,
+                note: "queries are the problem's second resource: not in ops (gae), priced apart; the server spends one scalar multiplication by alpha per query".into(),
+            });
+        }
+    }
+
     // Stages.
     let mut names: Vec<String> = Vec::new();
     for r in &verified {
@@ -1641,7 +1841,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     // every structure held: a lower bound ranks nothing against a complete
     // one, so it is inadmissible, with what it misses named
     // (docs/units/BITOPS.md).
-    let incomplete_bitops = is_bitop_unit(&domain.unit) && bounded;
+    let incomplete_bitops = crate::cryptanalysis::bitops::is_bitop_unit(&domain.unit) && bounded;
     if incomplete_bitops {
         reasons.push(format!(
             "{} pricing is incomplete (missing: {}); a lower bound is not admissible in this unit",
@@ -1751,6 +1951,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         },
         admissibility,
         fit_options: opts.clone(),
+        oracle: oracle_resource,
         improves_on: vec![],
         verdict_id: None,
         notes: inputs.notes.to_string(),
@@ -1839,7 +2040,10 @@ fn size_axes_and_band(
         put(axis, &|r| field_axis(r, axis), 0x111 + 2 * i as u64);
     }
     let mut band = Vec::new();
-    if opts.weight.is_none() {
+    // Fit version 2 records the price band on a weighted fit too, so the
+    // frontier can test a dominance across the band in that fit's own
+    // domain; version 1 left it out there.
+    if opts.weight.is_none() || opts.fit_version >= 2 {
         for (i, w) in BAND_WEIGHTS.iter().enumerate() {
             let point =
                 strata_of(&|r| super::band::priced_s(r, *w).ok().flatten()).and_then(|st| {
@@ -1861,6 +2065,36 @@ fn size_axes_and_band(
         }
     }
     (axes, band)
+}
+
+fn calibrated_point(ok: &[&&Record], w: &super::band::WCal) -> Result<CalibratedPoint, String> {
+    w.validate()?;
+    let fw = [0.0, w.w_cal, 10.0 * w.w_cal];
+    let mut mean_s = Vec::new();
+    for wf in fw {
+        let mut row = Vec::new();
+        for wo in BAND_WEIGHTS {
+            let mut vals = Vec::new();
+            let mut all = !ok.is_empty();
+            for r in ok {
+                match super::band::priced_s_split(r, wf, wo, super::band::Pricing::default())? {
+                    Some(v) => vals.push(v),
+                    None => all = false,
+                }
+            }
+            row.push(all.then(|| vals.iter().sum::<f64>() / vals.len() as f64));
+        }
+        mean_s.push(row);
+    }
+    Ok(CalibratedPoint {
+        w_cal: w.w_cal,
+        method: w.method.clone(),
+        host: w.host.clone(),
+        field_weights: fw.to_vec(),
+        other_weights: BAND_WEIGHTS.to_vec(),
+        mean_s,
+        source: None,
+    })
 }
 
 /// Re-derive a committed bound from the sessions it names and require the
@@ -2061,128 +2295,6 @@ mod tests {
         // the first occurrence in the pretty text because keys sort.
         assert!(text.find("\"doc_id\": \"T1h").unwrap() < text.find("nested keys").unwrap());
     }
-
-    #[test]
-    fn a_cost_basis_is_its_own_domain_and_total_is_unwritten() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-        let dirs: Vec<PathBuf> = (16..=18)
-            .map(|b| {
-                root.join(format!(
-                    "research/bitop_ladder_20261019/sessions/holdout-P{b}"
-                ))
-            })
-            .collect();
-        let fit = |cost: CostBasis| {
-            let mut b = bound_from_sessions(&FitInputs {
-                dirs: &dirs,
-                arm: "rho-neg",
-                audits: &[],
-                label: Some("cost basis test"),
-                notes: "",
-                root,
-                audit_refs: &[],
-                options: FitOptions {
-                    resamples: 50,
-                    unit: Some(crate::cryptanalysis::bitops::UNIT.into()),
-                    cost,
-                    // The study's bounds are sealed under version 1; version 2
-                    // withholds the addition exponent without an audit.
-                    fit_version: 1,
-                    ..Default::default()
-                },
-            })
-            .unwrap();
-            b.seal().unwrap();
-            b
-        };
-        let total = fit(CostBasis::Total);
-        let per = fit(CostBasis::PerTarget);
-        let search = fit(CostBasis::Search);
-        assert_eq!(total.domain.unit, "bitop/v1");
-        assert_eq!(per.domain.unit, "bitop/v1+per_target");
-        assert_eq!(search.domain.unit, "bitop/v1+search");
-        let ids: BTreeSet<&str> = [&total, &per, &search]
-            .iter()
-            .flat_map(|b| [b.bound_id.as_str(), b.domain_id.as_str()])
-            .collect();
-        assert_eq!(ids.len(), 6);
-        // The default is not written, so a bound fitted before the option
-        // existed re-derives byte for byte.
-        let opts = serde_json::to_value(&total.fit_options).unwrap();
-        assert!(opts.get("cost").is_none(), "{opts}");
-        let opts = serde_json::to_value(&per.fit_options).unwrap();
-        assert_eq!(opts["cost"], "per-target");
-        // Rho's whole run is per target: the two bases count the same gates.
-        assert_eq!(total.fit.alpha, per.fit.alpha);
-        assert!(search.sizes[0].mean_gae.unwrap() < total.sizes[0].mean_gae.unwrap());
-        assert!(search.fit.alpha_in_additions.is_some());
-        // A partial basis needs the bitop/v1 work block.
-        let err = bound_from_sessions(&FitInputs {
-            dirs: &dirs,
-            arm: "rho-neg",
-            audits: &[],
-            label: None,
-            notes: "",
-            root,
-            audit_refs: &[],
-            options: FitOptions {
-                cost: CostBasis::Search,
-                ..Default::default()
-            },
-        })
-        .unwrap_err();
-        assert!(err.contains("--unit bitop/v1"), "{err}");
-    }
-
-    /// The stage table of a partial-cost bound is the basis's own phases,
-    /// so its shares sum to one on every basis (a BSGS search fit once
-    /// showed set-up at 101.56%, search at 100% and natives at 4.42%).
-    #[test]
-    fn stage_shares_sum_to_one_on_every_cost_basis() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-        let dirs: Vec<PathBuf> = (16..=18)
-            .map(|b| {
-                root.join(format!(
-                    "research/bitop_ladder_20261019/sessions/holdout-P{b}"
-                ))
-            })
-            .collect();
-        for arm in ["rho-neg", "bsgs-neg", "kangaroo"] {
-            for cost in [CostBasis::Total, CostBasis::PerTarget, CostBasis::Search] {
-                let b = bound_from_sessions(&FitInputs {
-                    dirs: &dirs,
-                    arm,
-                    audits: &[],
-                    label: Some("stage share test"),
-                    notes: "",
-                    root,
-                    audit_refs: &[],
-                    options: FitOptions {
-                        resamples: 20,
-                        unit: Some(crate::cryptanalysis::bitops::UNIT.into()),
-                        cost,
-                        ..Default::default()
-                    },
-                })
-                .unwrap();
-                let sum: f64 = b.stages.iter().map(|s| s.share_of_gae).sum();
-                assert!(
-                    (sum - 1.0).abs() < 1e-9,
-                    "{arm} {cost:?}: shares sum to {sum}"
-                );
-                for s in &b.stages {
-                    assert!(s.share_of_gae <= 1.0 + 1e-12, "{arm} {cost:?}: {}", s.name);
-                }
-                if cost == CostBasis::Search {
-                    assert!(b.stages.iter().all(|s| s.name == "search"), "{arm}");
-                }
-                if arm == "bsgs-neg" && cost == CostBasis::PerTarget {
-                    assert!(b.stages.iter().all(|s| s.name != "setup"));
-                }
-            }
-        }
-    }
-
     // ── Fit version 2 ──────────────────────────────────────────────
 
     fn repo() -> PathBuf {
@@ -2389,6 +2501,103 @@ mod tests {
         let _ = std::fs::remove_dir_all(same_bytes);
     }
 
+    /// `bound fit --w-cal`: the override fills `sizes[].calibrated` with
+    /// `source: "override"`, is kept in `fit_options` so `bound check`
+    /// re-derives the same id, and is refused where there is no GAE
+    /// calibrated reading.  Without it nothing changes.
+    #[test]
+    fn a_w_cal_override_is_recorded_re_derives_and_is_refused_where_meaningless() {
+        use super::super::band::WCal;
+        let src = repo().join(CANDIDATES).join("sessions/prime");
+        let w = |v: f64| WCal {
+            w_cal: v,
+            method: "best-of-N timing".into(),
+            host: "h".into(),
+        };
+        let mut plain = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            &[],
+            FitOptions::default(),
+        )
+        .unwrap();
+        assert!(plain.sizes.iter().all(|s| s.calibrated.is_none()));
+        let plain_text = plain.seal().unwrap();
+        assert!(!plain_text.contains("w_cal"));
+        let mut over = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            &[],
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(!over.sizes.is_empty());
+        for s in &over.sizes {
+            let c = s.calibrated.as_ref().unwrap();
+            assert_eq!((c.w_cal, c.source.as_deref()), (0.02, Some("override")));
+        }
+        assert_eq!(over.fit_options.w_cal, Some(w(0.02)));
+        let text = over.seal().unwrap();
+        assert_ne!(over.bound_id, plain.bound_id);
+        // Everything but the calibrated points and the option is unchanged.
+        let strip = |t: &str| {
+            let mut v: serde_json::Value = serde_json::from_str(t).unwrap();
+            for k in ["bound_id", "fit_options"] {
+                v.as_object_mut().unwrap().remove(k);
+            }
+            for s in v["sizes"].as_array_mut().unwrap() {
+                s.as_object_mut().unwrap().remove("calibrated");
+            }
+            v
+        };
+        assert_eq!(strip(&text), strip(&plain_text));
+        // `bound check` fits it again from the recorded option.
+        let f = std::env::temp_dir().join(format!("wcal-bound-{}.json", std::process::id()));
+        std::fs::write(&f, &text).unwrap();
+        assert_eq!(check(&f, &repo()).unwrap().bound_id, over.bound_id);
+        let _ = std::fs::remove_file(&f);
+        // Refused: a bad value, a bitop unit, a weight, fit version 1.
+        let refuse = |o: FitOptions, want: &str| {
+            let e = fit(std::slice::from_ref(&src), "rho-neg", &[], o).unwrap_err();
+            assert!(e.contains(want), "{e}");
+        };
+        for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+            refuse(
+                FitOptions {
+                    w_cal: Some(w(bad)),
+                    ..Default::default()
+                },
+                "finite and > 0",
+            );
+        }
+        refuse(
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                unit: Some(crate::cryptanalysis::bitops::UNIT.into()),
+                ..Default::default()
+            },
+            "w_cal override",
+        );
+        refuse(
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                weight: Some(0.1),
+                ..Default::default()
+            },
+            "w_cal override",
+        );
+        refuse(
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                ..v1()
+            },
+            "w_cal override",
+        );
+    }
+
     #[test]
     fn admissibility_needs_a_complete_session_an_audit_and_the_default_resamples() {
         let src = repo().join(CANDIDATES).join("sessions/prime");
@@ -2571,6 +2780,36 @@ mod tests {
             let v: Vec<f64> = s.band.iter().filter_map(|p| p.s).collect();
             assert!(v.windows(2).all(|w| w[0] <= w[1] + 1e-12), "{v:?}");
         }
+    }
+
+    #[test]
+    fn a_weighted_version_2_fit_carries_the_same_pricing_band() {
+        // The band prices each size at the fixed band weights, whatever
+        // weight the fit itself charges, so a weighted fit records the
+        // same band as the unweighted one; version 1 left it out.
+        let src = repo().join(CANDIDATES).join("sessions/prime");
+        let audit = repo().join(CANDIDATES).join("audit-prime.json");
+        let run = |weight, fit_version| {
+            fit(
+                std::slice::from_ref(&src),
+                "bsgs-neg",
+                std::slice::from_ref(&audit),
+                FitOptions {
+                    weight,
+                    fit_version,
+                    ..Default::default()
+                },
+            )
+            .unwrap()
+        };
+        let plain = run(None, 2);
+        let weighted = run(Some(1.0), 2);
+        assert_eq!(plain.sizes.len(), weighted.sizes.len());
+        for (p, w) in plain.sizes.iter().zip(&weighted.sizes) {
+            assert_eq!(w.band.len(), BAND_WEIGHTS.len());
+            assert_eq!(p.band, w.band);
+        }
+        assert!(run(Some(1.0), 1).sizes.iter().all(|s| s.band.is_empty()));
     }
 
     #[test]

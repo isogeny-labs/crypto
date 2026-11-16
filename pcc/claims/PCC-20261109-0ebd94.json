@@ -1,0 +1,50 @@
+{
+ "created_at": "2026-11-09T17:50:21Z",
+ "id": "PCC-20261109-0ebd94",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round65-p192/report.md",
+    "sha256": "162a26ea2e00a1fa22cd4b1a4c20c7087e80f45d2ca1e5f0635f9ec8ef4acbde"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round65-p192/audit-summary.json",
+    "sha256": "d8eebca7b723ffbe40d54cf896208c602641b460173e632bbc9303563552f6f7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round65-p192/denominators.json",
+    "sha256": "0524d61b578897e9c4e5d51bdcf29a9957fc2485a63926a28762823903cc5d38"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round65-p192/P192-denominators.json",
+    "sha256": "0d76f35c9038376c609b06a0d53999c706cf53996b9662aeee9ef0da1d7d51dc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round65-p192/validation.json",
+    "sha256": "a382e271395208f700a52ae6ea8a6a426bd17f41675de8aeb273f087dd1fd39c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "11382 complete baby blocks and72 prescribed degree4 P192 denominator norms; independent denominator contract, not integrated full-response costs. Wrong-exponent control, negative r7 case and byte-identical fresh-copy checks retained.",
+ "statement": "Round65 derives and implements Norm(D^2)=H_G(x(A))^4 H_Q(x(B))^4 for signed baby denominators, qualifying two Horner evaluations against field resultants with separate setup and preparation costs."
+}

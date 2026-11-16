@@ -2396,7 +2396,12 @@ pub(crate) fn solve_system_w_inner<const N: usize>(
         }
     }
     if low.iter().any(|&c| !is_std[c]) {
-        st.outcome = "1 or a variable is not standard".into();
+        st.outcome = if is_std[low[0]] {
+            "a variable is not standard"
+        } else {
+            "1 is not standard: inconsistent"
+        }
+        .into();
         return Ok(None);
     }
     let idx: Vec<usize> = low.iter().map(|&c| std_index[c] as usize).collect();

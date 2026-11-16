@@ -1,0 +1,15 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\sloppy
+\begin{document}
+\section*{Concrete materializer admission: independent review}
+Recommendation: ready for coordinator release after final live and publication receipts. No source/configuration blocking finding. Exact revision \texttt{8febc4ff2947} was inspected after the preread plan. No launch, compiler or tests occurred.
+\paragraph{Exact bindings.} All 15 packet files matched the published revision; all 10 referenced local input hashes matched. Native guard \texttt{4e01f95c...} and helper \texttt{2d506f0e...} are unchanged from the independent source review. The guard still precedes all child commands.
+\paragraph{Command and caps.} Exact argv uses python3 -B without optimization. CPU 2, RAM 4 GiB, swap 0 and tasks 512 are unchanged. Native 880, systemd 885 plus 5 stop, timeout 895 plus 5 kill and parent total 900 seconds remain distinct. RemainAfterExit requires owned stop and empty-cgroup confirmation.
+\paragraph{Current ownership observation.} T1716 is claimed at epoch 1 and its current attempt matches the configured fence. The new unit is not found, inactive, MainPID 0; workspace, control directory and worker output are absent. Known prior materializer and norm units are failed with MainPID 0 and empty ControlGroup. Repeat these observations and lease validation immediately before release.
+\paragraph{Accounting and authority.} Total 46,800 minus 4,500 charged leaves 42,300 before this 900-second allocation; 41,400 afterward. A separate 1,800 validation would leave 39,600. Historical 1/1 remains consumed; the new version allows one attempt with no automatic retry. Deadline remains 2026-11-06 04:00 UTC. Existing user authorization applies; no new user permission is needed. Root must serialize and charge this allocation before invocation.
+\paragraph{Publication completion.} Frozen publication.json records source/review readbacks but leaves its own admission, this review and root-release receipts unresolved. Preserve frozen bytes. Store exact admission/current-review GitHub readbacks and explicit coordinator release as external durable control receipts before invocation.
+\paragraph{Acceptance.} Materialized-inputs.json remains future output. Require native passed status, no errors, actual manifest digest, captured invocation terminal proof and empty cgroup. Failure or incomplete custody blocks subsequent payloads. This preparation does not release the separate compiler stage.
+\paragraph{Next step.} Publish this review, refresh exact lease and no-overlap/path checks, record the 900-second debit and serial coordinator release, then use the reviewed command once within the original supervision bound.
+\end{document}

@@ -1,0 +1,49 @@
+{
+  "schema": "independent-native-source-review/v1",
+  "producer_commit": "c531856dcb725a35e5b463d67cc1e37f73d8790e",
+  "candidate_sha256": "d8c496084c1e0397a8e961b94b85575888502403dc99e0d4df13a093c009328a",
+  "status": "scoped_preflight_source_fidelity_supported",
+  "compiled": false,
+  "runtime_runs": 0,
+  "checks": {
+    "manifest_git_bytes_match": true,
+    "prefix_before_changed_function_identical": true,
+    "entire_tail_from_chart_construction_identical": true,
+    "false_opt_in_original_assertion_order_preserved": true,
+    "no_new_field_arithmetic_on_false_branch": true
+  },
+  "L1_disposition": "Addressed for enumerated early-domain guards; total panic-free Result interface not claimed or established.",
+  "guard_order": [
+    "metadata bounds before constructor",
+    "existing is_prime(p) and is_prime(r) before constructor",
+    "nonzero/canonical coordinates and coefficients before constructor",
+    "generated coefficient equality after constructor before transfer",
+    "source validity and rG=O before transfer",
+    "nonzero images checked after transfer"
+  ],
+  "mathematical_scope": [
+    "Under unchanged group arithmetic and prime predicate correctness, nonzero G and rG=O with prime r imply exact orderr.",
+    "Target membership Q in generated subgroup remains premise; validity alone does not prove it.",
+    "Conditional transfer homomorphism plus nonzero image preserves prime order.",
+    "Collision signs, both zero-denominator cases and source kG=Q validation unchanged."
+  ],
+  "bounds": [
+    "p<2^31 implies p*p<2^62 withinu64",
+    "r<=2^63 and canonical a,b<r imply a+b<=2^64-2",
+    "scalar products useu128; existing primality implementation and arithmetic remain dependencies"
+  ],
+  "cost_scope": [
+    "Primality comparisons/control work unpriced outside field Counts",
+    "rG and validity checks move to named counted preflight phase",
+    "Err still lacks Outcome/phases; external failure receipts must charge all work",
+    "No timing/memory/full-cost equivalence established",
+    "Named preflight mixes target-independent curve/G/order checks with target-dependent Q validation; no online/cold/reuse boundary is established by its phase name. Future accounting must define and split these costs."
+  ],
+  "remaining_panic_surfaces": [
+    "Scholten internal assertions and construction arithmetic",
+    "tau assertions and inversions",
+    "validity/order arithmetic invariants",
+    "observer/allocation/counter and later arithmetic failures"
+  ],
+  "new_execution_authorized": false
+}

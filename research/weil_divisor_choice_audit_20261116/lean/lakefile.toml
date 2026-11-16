@@ -1,0 +1,11 @@
+name = "weil_divisor_choice_audit"
+version = "0.1.0"
+defaultTargets = ["WeilDivisorChoiceAudit"]
+
+[[require]]
+name = "elliptic_global_reciprocity_audit"
+path = "../../elliptic_global_reciprocity_audit_20261116/lean"
+
+[[lean_lib]]
+name = "WeilDivisorChoiceAudit"
+roots = ["ChoiceEvaluation", "ChoiceMoving", "ChoicePairing", "ChoiceChange", "ChoiceGeneral", "ChoiceControls", "ChoiceZero", "ChoiceCertificate", "ChoiceImports"]

@@ -1,0 +1,8 @@
+spec ECS1hcff5cb881f11 (F=1 walk table, single target, k=20, session 2): 390 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm rho-aa           control    ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm f2-inc           baseline   ECM1h3b0ad3332667 ic.pipeline {"factor_base": "prime-projected-abscissa:size=2,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  arm f1-x05           candidate  ECM1h7f99be6f0f75 ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=0.5,g=1,grow=2,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  arm f1-x07           candidate  ECM1h45f5f937a79c ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=0.7,g=1,grow=2,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  arm f1-x09           candidate  ECM1h1781055c63b7 ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  workload Wcbc5e205b75f icv1-fp20-tm1050-4295f05e r=2^17.00 A=2 registered=true ec1=-

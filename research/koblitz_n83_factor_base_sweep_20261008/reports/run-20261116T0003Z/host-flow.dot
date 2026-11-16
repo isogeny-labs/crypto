@@ -1,0 +1,16 @@
+digraph n83_host_admission {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.48", ranksep="0.58", fontname="Arial", label="N83 Linux ARM64 host admission | 2026-11-16T00:03Z", labelloc=t, fontsize=17];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=14, color="#44637d", fillcolor="#ecf3f8", margin="0.17,0.12"];
+  edge [fontname="Arial", fontsize=11, color="#425466"];
+  inputs [label="Pinned source + archives\nSHA-256 checks passed"];
+  vm [label="Colima ARM64 VM\nDocker + cgroup v2 PASS", fillcolor="#e1f2e7", color="#287d45"];
+  attempt1 [label="Control attempt 1\nexit 125: truncated digest", fillcolor="#fbeae7", color="#b9564e"];
+  attempt2 [label="Control attempt 2\n4 GiB / 0 swap / 1 CPU / 64 PIDs\nexit 0 PASS", fillcolor="#e1f2e7", color="#287d45"];
+  build [label="New toolchain image ID\n+ amended build plan\nPENDING", fillcolor="#fff4df", color="#bc8a2b"];
+  {rank=same; inputs; vm; attempt1;}
+  {rank=same; attempt2; build;}
+  inputs -> vm;
+  vm -> attempt1;
+  attempt1 -> attempt2 [label="new write-once script"];
+  attempt2 -> build [style=dashed];
+}
