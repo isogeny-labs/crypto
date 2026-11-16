@@ -228,17 +228,14 @@ Preserve the same support, split, dimensions, nonzero pattern, and target/model
 count stratum wherever applicable. Record full block ranks, certified nonzero
 minors, peak memory, and all cap/censoring outcomes.
 
-Before a scaling panel, try to prove or refute the sharper compound-Vandermonde
-statement
-
-```
-rank C_(a,v-a) = min(binomial(|L|,a), binomial(|R|,v-a))
-```
-
-for every fixed-cardinality block under explicit distinct-abscissa and
-characteristic hypotheses. A proof closes this linear coefficient-tensor
-compression for the whole guarded family. A counterexample, with its exact
-minor/rank certificate, selects the family for the scaling panel.
+The proposed universal compound-Vandermonde full-rank statement is now
+refuted as written `[pcc:unverified]` by the exact `d=5` certificate in
+[`NORM_BRANCH_COUNTEREXAMPLE.md`](NORM_BRANCH_COUNTEREXAMPLE.md). Its
+all-nonzero `2 x 2` block has rank one over `Q` and after reduction modulo
+every prime `p>7`. This clears only the theorem-or-counterexample subgate:
+the certificate is fixed-size, is not yet realized by the frozen natural
+curve sampler, and supplies no held-out rank-slope gap. The next B1 task is
+therefore the preregistered natural and growing-defect census, not SAT tuning.
 
 - **ADVANCE to B2:** the compound-Vandermonde full-rank statement is refuted,
   and on both largest held-out sizes natural normalized rank is at most half

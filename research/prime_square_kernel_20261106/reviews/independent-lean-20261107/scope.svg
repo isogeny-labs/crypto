@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1020" height="410" viewBox="0 0 1020 410">
+<rect width="1020" height="410" fill="#fff"/>
+<style>text{font-family:Arial,sans-serif;fill:#172b4d} .title{font-size:22px;font-weight:bold}.sub{font-size:14px}.box{fill:#e5f5ea;stroke:#198754;stroke-width:2}.open{fill:#fff4df;stroke:#ad7400;stroke-width:2}.lab{font-size:16px;font-weight:bold}.small{font-size:13px}</style>
+<text x="30" y="38" class="title">Square-kernel Lean review: exact proof scope</text>
+<text x="30" y="61" class="sub">crypto a2be6609 · Lean 4.35.0 · 24 named theorems · fresh build, axiom audit and replay passed</text>
+<rect x="30" y="95" rx="8" width="285" height="90" class="box"/><text x="48" y="124" class="lab">Puncture normalizer</text><text x="48" y="150" class="small">valid k ⇒ v₂(rho(k)) = 0</text><text x="48" y="170" class="small">independent a=0,1,2 controls</text>
+<rect x="365" y="95" rx="8" width="285" height="90" class="box"/><text x="383" y="124" class="lab">Square kernel at nodes</text><text x="383" y="150" class="small">S_k(m-L) = B_k(m-L)</text><text x="383" y="170" class="small">matrix entry at T=0 is identity</text>
+<rect x="700" y="95" rx="8" width="285" height="90" class="box"/><text x="718" y="124" class="lab">Pointwise valuation</text><text x="718" y="150" class="small">B_k(t) ≠ 0 ⇒ v₂(S)=2v₂(B)</text><text x="718" y="170" class="small">valid k, rational t</text>
+<path d="M315 140 H365 M650 140 H700" stroke="#198754" stroke-width="2" marker-end="url(#arr)"/>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#198754"/></marker></defs>
+<text x="30" y="225" class="sub">Open bridges (not theorem consequences):</text>
+<rect x="30" y="245" rx="8" width="285" height="100" class="open"/><text x="48" y="275" class="lab">Native refinement</text><text x="48" y="301" class="small">GMP / bounds / conversion</text><text x="48" y="322" class="small">sentinels / serialization</text>
+<rect x="365" y="245" rx="8" width="285" height="100" class="open"/><text x="383" y="275" class="lab">Coefficient and degree</text><text x="383" y="301" class="small">chart content / mode counts</text><text x="383" y="322" class="small">Polynomial degree / recovery</text>
+<rect x="700" y="245" rx="8" width="285" height="100" class="open"/><text x="718" y="275" class="lab">Algorithm and cost</text><text x="718" y="301" class="small">recursive tensor implementation</text><text x="718" y="322" class="small">end-to-end correctness and runtime</text>
+<text x="30" y="389" class="small">Green = independently reviewed theorem scope. Amber = explicit remaining proof or execution bridge.</text>
+</svg>
