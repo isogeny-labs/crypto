@@ -16,10 +16,10 @@ Actual local pilot is complete: PCC-20261116-1075bb (unsigned L0 observation). F
 
 ## Next steps
 Graph/order screen completed all18 cases at source86fb80a50, exact three-native/three-CAS bases and unchanged hashes. NO eligible family; selected_followup_family=null. Path-n8 singlecall paid expanded/compact18.826, F4/compact0.882; do not claim15x or automatically promote it. Trace source735985b59/corrected report58e0ddc5b: all F4 productive degrees5 despite graph widths1..7. Read graph-screen-01/report-03/report.md/traces.json. Supplied-top-form first-zero Hilbert statistic unavailable; no intrinsic regularity claim. PCC-c431fc/ab3f8e unsigned L0.
-Close/publish separate screen record20261116T0253Z-graph-order-screen-20261116 with raw/new-executable archives; reference prior local-pilot CAS/library archive by frozen hash rather than duplicate. Then pursue a genuinely different prospectively defined mechanism; no screen family meets current confirmation gate. Do not rerun unchanged passing suites or original fresh targets.
+Closed/published screen record20261116T0253Z-graph-order-screen-20261116 with raw/new-executable archives at1935620e5 and updated ready PR4349. Prior local-pilot CAS/library archive is referenced by frozen hash. Pursue a genuinely different prospectively defined mechanism; no screen family meets current confirmation gate. Do not rerun unchanged passing suites or original fresh targets.
 
 ## Runs in flight
-No benchmark or qualification process running. Current work is screen report/artifact publication. User checkpoint waiver persists; no credentials required. Primary full-cost15x target is unestablished.
+No benchmark or qualification process running. Screen report/artifact publication completed; automatic artifact migration and independent review/CI remain pending. User checkpoint waiver persists; no credentials required. Primary full-cost15x target is unestablished.
 
 ## Stop and success conditions
 User waived checkpoint for local exploration. Immutable source identity, declared isolation, controls and known remaining budget govern local work. Formal protocol remains frozen. Proposed ceiling $5, original campaign deadline two hours, 20 minutes per case panel, 30 seconds/2 GiB per child, one allowed core/one Rayon thread. Retain every failure and capped/incomplete case without replacement. Fifteenfold requires adjusted paired lower endpoints above 15 against both controls, paid external validation and conditional fresh-family confirmation. Never rewrite frozen PCC history to merge.
