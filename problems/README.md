@@ -11,8 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Cover-assessment catalog population](catalog-cover-assessment-population-stale.md) | open | current catalog-wide assessment freshness check | review current model membership, update older population guards and regenerate typed evidence bindings |
-| [Weighted Weil complete cost and rho reference](weil-weighted-complete-cost.md) | open | interpreting larger cubic-field decomposition gains as a full IC speedup | complete native accounting, matched ecbench strong rho, independent-host replay and external solver comparison |
+| [Original evidence for three ECDLP leads is unlocated](three-leads-original-evidence-unlocated.md) | open for historical provenance; fresh rebuild complete | exact authentication of the historical statistics only; all three routes now have fresh complete solves and cost verdicts | original immutable producers and raw records; see the [fresh two-cohort genus-2 rebuild](../research/three_leads_e2e_20261018/README.md) |
 | [PQC cross-platform performance and leakage validation](pqc-cross-platform-validation.md) | open | ML-KEM/ML-DSA speed and side-channel claims across platforms | qualified PQC benchmark route, native target correctness, emitted-code audit and target-specific leakage evidence |
 | [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
@@ -46,7 +45,6 @@ Keep resolved and superseded records in the index.
 | [Sign-safe Kummer relation labels for a genus-2 collector](genus2-kummer-relation-labels.md) | partly resolved; fixed-difference 1,260-target matched collector measured | constant-size signed sidecar for the original arbitrary-jump walk | checked recurrence, full source replay and matched cost for that walk |
 | [Generic Kummer two-torsion action identity](kummer-generic-action-identity.md) | open; all-state chart nonvanishing proved | all-state geometric action law for 105 recorded model/root pairs | exact Mumford-ideal cross-product certificates and exceptional-branch proofs |
 | [Complete algebraic mixed-fiber PKM solver and DLP pipeline](mixed-fiber-pkm-full-solver.md) | open | L3 F4/msolve solver and complete IC/rho comparison | complete polynomial systems, all-roots references, then full source-checked DLPs |
-| [Original evidence for three ECDLP leads is unlocated](three-leads-original-evidence-unlocated.md) | open for historical provenance; fresh rebuild complete | exact authentication of the historical statistics only; all three routes now have fresh complete solves and cost verdicts | original immutable producers and raw records; see the [fresh two-cohort genus-2 rebuild](../research/three_leads_e2e_20261018/README.md) |
 | [Isogeny-class rho statistical and admission gap](isogeny-class-rho-statistical-admission.md) | investigating | blanket empirical null and merge of the source/evidence/paper stack | corrected native statistics, exact producer/row lineage, covariance assessment, refreshed graphs, sealed native admission and concrete proof bridges |
 | [NIST extension-twist composite cofactors](nist-extension-twist-composite-cofactors.md) | open | complete P-256 block-876 degree-2 extension-twist factorization; one timeout field | proper split of the exact remaining 444-bit residual followed by prime-certificate and exact-product replay |
 | [Low-degree decomposition complete cost and scaling](ic-low-degree-complete-cost-and-scaling.md) | investigating | guess minima, larger closure and complete-price IC conclusions | all-branch replay, larger fixed points, native construction/split accounting and matched full-pipeline controls |
@@ -151,6 +149,22 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
+
+
+
+
+| [Cover-assessment catalog population](catalog-cover-assessment-population-stale.md) | open | current catalog-wide assessment freshness check | review current model membership, update older population guards and regenerate typed evidence bindings |
+| [Weighted Weil complete cost and rho reference](weil-weighted-complete-cost.md) | open | interpreting larger cubic-field decomposition gains as a full IC speedup | complete native accounting, matched ecbench strong rho, independent-host replay and external solver comparison |
+
+
+
+
+
+
+
+
+
+
 
 
 
