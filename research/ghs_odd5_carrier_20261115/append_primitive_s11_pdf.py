@@ -23,6 +23,10 @@ styles.add(ParagraphStyle(name='S11Small', parent=styles['Normal'], fontName='He
 story = [Paragraph('Primitive degree-55 source: verified elliptic isogeny, open Jacobian transfer', styles['S11Title'])]
 def body(s): story.append(Paragraph(s, styles['S11Body']))
 body('<b>Exact source.</b> Let K=F3[a]/(a^5+2a+1), L=F_(3^55), and E/L: y^2=x^3+2x^2+a. The fixed Sage modulus and embedding, all five Weierstrass coefficients of E and E\', the 23-isogeny kernel polynomials, and checked point coordinates are encoded in <font face="Courier">primitive_isogeny_s11.json</font> (SHA-256 f4d2e1726dd845e0e40e9a0a1f75f4451d1fe384bff227bc4d864c91048f7ca9). The selected E\' has j-invariant of full degree 55 over F3. [pcc:unverified]')
+mask = lambda cs: sum(int(c)*3**i for i,c in enumerate(cs))
+assert mask(d['field_modulus']) == 174449211009120179077969027
+assert [mask(x) for x in d['codomain_ainvs']] == [0,2,0,98508613566632171830685024,148846024471906721819616997]
+body('<b>Compact exact equation.</b> Encode a polynomial h(z)=sum d_i z^i over F3 by M(h)=sum d_i 3^i. Then L=F3[z]/(h), M(h)=174449211009120179077969027; the chosen embedding has M(a)=55689533628558890459602395. The selected E\': y^2=x^3+2x^2+A x+B has M(A)=98508613566632171830685024 and M(B)=148846024471906721819616997. The JSON supplies every coefficient explicitly.')
 rows = [['Measured or checked item','Result'],['Rational 23-isogenies from E','24'],['Codomains with j outside F243','22'],['Selected j field degree over F3','55'],['#E(L)=#E\'(L)','174449211009094048378706606'],['Selected prime subgroup r','333566377062870325133 (69 bits)'],['Forward and signed reverse on subgroup','Q != 0; [r]Q = 0; reverse(Q) = [23]P']]
 t=Table(rows,colWidths=[270,270],hAlign='LEFT')
 t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#233b57')),('TEXTCOLOR',(0,0),(-1,0),colors.white),('FONTNAME',(0,0),(-1,0),'Helvetica-Bold'),('FONTSIZE',(0,0),(-1,-1),8),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4),('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#edf2f7')])]))
