@@ -1039,6 +1039,11 @@ fn execute_unequal_profile(q:(u64,u64),sizes:[usize;3],round_limit:usize)
 }
 fn execute_unequal_profile_variant(q:(u64,u64),sizes:[usize;3],
     round_limit:usize,x_fibre:bool) ->Result<serde_json::Value,String>{
+    execute_unequal_profile_source(q,sizes,round_limit,x_fibre,false)
+}
+fn execute_unequal_profile_source(q:(u64,u64),sizes:[usize;3],
+    round_limit:usize,x_fibre:bool,jac:bool)
+    ->Result<serde_json::Value,String>{
     if sizes.iter().any(|&n|n<16 || n>32_768) ||
         sizes.iter().sum::<usize>()>40_000 ||
         round_limit==0 || round_limit>8 {
@@ -1055,7 +1060,11 @@ fn execute_unequal_profile_variant(q:(u64,u64),sizes:[usize;3],
         let seed=SEED.wrapping_add((round as u64).wrapping_mul(0xd1b5_4a32_d192_ed03));
         let setup_begin=Instant::now();
         let additions_before=ar.counts.group_additions;
-        let (parts,identities,duplicates)=source_walk_profile(q,seed,&mut ar,sizes)?;
+        let (parts,identities,duplicates)=if jac{
+            source_walk_profile_jac(q,seed,&mut ar,sizes)?
+        }else{
+            source_walk_profile(q,seed,&mut ar,sizes)?
+        };
         let setup_ns=setup_begin.elapsed().as_nanos();
         let source_additions=ar.counts.group_additions-additions_before;
         let root_begin=Instant::now();
@@ -1073,7 +1082,7 @@ fn execute_unequal_profile_variant(q:(u64,u64),sizes:[usize;3],
             "source_setup_ns":setup_ns,"source_group_additions":source_additions,
             "rejected_identity":identities,"rejected_duplicate_x":duplicates,
             "s3_query_ns":root_ns,"s3_pair_quadratics":stats.pair_s3,
-            "x_fibre_precompute":x_fibre,
+            "x_fibre_precompute":x_fibre,"jacobian_source":jac,
             "s3_sqrts":stats.s3_sqrt,"s3_batch_inversions":stats.batch_inversions,
             "signed_candidates":stats.signed_candidates,
             "verification_group_additions":verification_additions,
