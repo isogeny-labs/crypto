@@ -1,0 +1,20 @@
+{
+  "schema": "relation-rust-build/v1",
+  "class": "development correctness, not benchmark",
+  "source_commit": "6cf33f1c39579dd3e5564824c597ef2fa1baf245",
+  "manifest": "research/relation_degree_trace_20261115/rust-integration/Cargo.toml",
+  "command": "cargo test --locked --manifest-path research/relation_degree_trace_20261115/rust-integration/Cargo.toml --target-dir target --no-run --message-format=json",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "original_executable": {
+    "path": "/workspace/crypto-integrate/target/debug/build/relation-native-qualification/7bb26e4afc70f70a/out/native_api-7bb26e4afc70f70a",
+    "sha256": "dc43b4e22f6230f8998dd776c84ad39c5924d887a2142470956beca318bfcb68",
+    "bytes": 939744080
+  },
+  "qualifier": {
+    "path": "/workspace/relation-native-qualifiers/native-api-6cf33f1c3957-01",
+    "sha256": "1d667de758ff763b8d29b05ea9b509b58b6b2856d9502d55f3b703dd0a0e35d5",
+    "bytes": 18883840
+  },
+  "transform": "separate copy, then strip --strip-debug before freezing; no later edits"
+}

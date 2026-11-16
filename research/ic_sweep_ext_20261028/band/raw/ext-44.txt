@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp44-tm3897653-1a12283c | 43.02 | b2-dp4 | 12/12 | 8.221 | 8.426 | 10.276 | — |
+| icv1-fp44-tm3897653-1a12283c | 43.02 | b2-dp6 | 12/12 | 14.236 | 14.539 | 17.261 | — |
+| icv1-fp44-tm3897653-1a12283c | 43.02 | b8-dp4 | 12/12 | 12.644 | 12.792 | 14.131 | — |
+| icv1-fp44-tm3897653-1a12283c | 43.02 | b8-dp6 | 12/12 | 21.365 | 21.522 | 22.936 | — |
+| icv1-fp44-tm3897653-1a12283c | 43.02 | bsgs-neg | 12/12 | 0.823 | 0.905 | 1.646 | — |
+| icv1-fp44-tm3897653-1a12283c | 43.02 | kangaroo | 12/12 | 2.129 | 2.129 | 2.133 | — |
+| icv1-fp44-tm3897653-1a12283c | 43.02 | rho-lanes16 | 12/12 | 1.290 | 1.419 | 2.580 | — |
+| icv1-fp44-tm3897653-1a12283c | 43.02 | rho-neg | 12/12 | 1.281 | 1.409 | 2.561 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp44-tm3897653-1a12283c | b2-dp4 vs b2-dp6 | b2-dp4 < b2-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp4 vs b8-dp4 | b2-dp4 < b8-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp4 vs b8-dp6 | b2-dp4 < b8-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp4 vs bsgs-neg | bsgs-neg < b2-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp4 vs kangaroo | kangaroo < b2-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp4 vs rho-lanes16 | rho-lanes16 < b2-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp4 vs rho-neg | rho-neg < b2-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp6 vs b8-dp4 | b8-dp4 < b2-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp6 vs b8-dp6 | b2-dp6 < b8-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp6 vs bsgs-neg | bsgs-neg < b2-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp6 vs kangaroo | kangaroo < b2-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp6 vs rho-lanes16 | rho-lanes16 < b2-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b2-dp6 vs rho-neg | rho-neg < b2-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp4 vs b8-dp6 | b8-dp4 < b8-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp4 vs bsgs-neg | bsgs-neg < b8-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp4 vs kangaroo | kangaroo < b8-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp4 vs rho-lanes16 | rho-lanes16 < b8-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp4 vs rho-neg | rho-neg < b8-dp4 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp6 vs bsgs-neg | bsgs-neg < b8-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp6 vs kangaroo | kangaroo < b8-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp6 vs rho-lanes16 | rho-lanes16 < b8-dp6 |
+| icv1-fp44-tm3897653-1a12283c | b8-dp6 vs rho-neg | rho-neg < b8-dp6 |
+| icv1-fp44-tm3897653-1a12283c | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp44-tm3897653-1a12283c | bsgs-neg vs rho-lanes16 | bsgs-neg < rho-lanes16 |
+| icv1-fp44-tm3897653-1a12283c | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp44-tm3897653-1a12283c | kangaroo vs rho-lanes16 | unresolved inside the band |
+| icv1-fp44-tm3897653-1a12283c | kangaroo vs rho-neg | unresolved inside the band |
+| icv1-fp44-tm3897653-1a12283c | rho-lanes16 vs rho-neg | rho-neg < rho-lanes16 |

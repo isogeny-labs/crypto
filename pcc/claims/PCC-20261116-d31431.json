@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:29:12Z",
+ "id": "PCC-20261116-d31431",
+ "kind": "execution",
+ "producer": {
+  "commit": "bf563ba265139a5e0ea1619f8a9c1158436a3dc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/workspace/ablation-qualification-report-47/audit.json",
+    "sha256": "3aa467297b817aa47523d5784ef46340ae505299cc1e285d95f135a5f0181a64"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/ablation-development/negative-47.json",
+    "sha256": "bade37253ffca74e9b863474ec99bcdf9df313b06b566e4da87a605552673064"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/workspace/ablation-qualification-monitor-47.jsonl",
+    "sha256": "37354026667eec600be95c8517268edf31294210a1f81bef4f2910f31c587ad3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Correctness-only oldn3 seed7 six fixed ablation classes: all complete Rust F4 bases and fresh std/slimgb/msolve bases match per input; point/scalar identities, projection/trace certificates, fee sums, raw outputs and CPU0 zero-contention/pins audit pass. All six same-ideal labels true in calibration only. Copied zero-coefficient projection tamper is refused before report creation. Calibration timings excluded from development."
+}

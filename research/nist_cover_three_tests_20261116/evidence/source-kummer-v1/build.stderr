@@ -1,0 +1,4 @@
+source_kummer.cpp: In constructor ‘SourceKummer::SourceKummer(Level2Input&, QuotientSection&, const std::string&)’:
+source_kummer.cpp:21:249: error: ‘read_t24’ was not declared in this scope
+   21 |         alpha=sk_normalization(i,s,normalization_checks);require(normalization_checks==384,"all source normalization controls");auto r=read_json(root+"/evidence/quotient-theta2-v1/result.json");for(auto& c:r.at("theta_squares").arr)theta.push_back(read_t24(c));require(theta.size()==64,"source theta constants");
+      |                                                                                                                                                                                                                                                         ^~~~~~~~

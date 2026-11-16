@@ -1,0 +1,92 @@
+"""Static readable proof/diagram/CI documentation from frozen37/0 metadata."""
+from pathlib import Path
+import hashlib,json,subprocess
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';e=p/'evidence/finite-cubic-norm-final-04';b=json.loads((e/'exact-twenty-complete-statement-bindings.json').read_text());scope=json.loads((e/'ACTUAL_FINITE_NORM_SCOPE.json').read_text());sha=scope['source_sha256'];o=p/'report-finite-cubic-norm-08';o.mkdir();g=p/'evidence/finite-cubic-norm-report-CI-05';g.mkdir()
+md='''# Universal finite cubic norm and explicit coefficient inverse
+
+For every x=(a,b,c) in Fin223³, the exact full04 coefficient norm vanishes iff x=(0,0,0). Every nonzero tuple therefore has the derived norm unit N^221*N=1 and the explicit two-sided schoolbook coefficient inverse N^221*P. Both unchanged original Lean4.35/4.34.1 gates audit37 declarations/0 failing/0 trusted each; twenty new statements have complete original-extractor bindings121d9f. Claims remain unsigned. [pcc:unverified]
+
+## Exact representation and primary review
+
+The source preserves the complete Constructor01 prefixe81532c9, including no_base_cubic_root_three, and copies four full04 definitions byte-for-byte: coefficientProduct, cofactor, coefficientNorm and scale. Put N=a³+3b³+9c³−9abc and P=(a²−3bc,3c²−ab,b²−ac). The product is the schoolbook reduction by z³=3. No ambient field/domain assumption or norm inverse is supplied as a hypothesis. The final theorem requires only that the input tuple is nonzero. [pcc:unverified]
+
+Sources checked before new codee9d4fe: complete Constructor01/full04/Word07 and the already retained official Arkworks algebra v0.5.0 cubic-extension implementation. Arkworks already uses the established cofactor inverse and calls the base inverse on the denominator; the new component discharges this mathematical finite norm/unit condition at223. The paper cited by that source was not reviewed, and no novelty claim is made. KB status/exact/negative/adjacent/theorem wrappers and conductor127, locked atlas unread; no absence inference. [pcc:unverified]
+
+## Why zero norm forces zero coordinates
+
+The base certificates are checked only on223 base elements: t=0 or t^221*t=1, and t³=0 implies t=0. The earlier no-cube-root certificate excludes u³=3 in Fin223. No223³ coefficient population is enumerated. [pcc:unverified]
+
+Let p1=3c²−ab and p2=b²−ac. The source proves the ring identity
+
+    p1³ − 3*p2³ = N*(3*c³ − b³).
+
+If N=0 and p2!=0, its explicit base inverse u gives (u*p1)³=3, contradicting no_base_cubic_root_three. Thus p2=0; the same identity and cube-zero certificate give p1=0. The two cofactor relations imply b³=3c³. If c!=0, its base inverse v gives (v*b)³=3, the same contradiction. Hence c=0, then b=0 and finally a=0. The converse follows by substitution. Each ratio step is a low-degree generic commutative-ring lemma with the actual base-unit certificate instantiated afterward, so automation need not expand a variable221st power. [pcc:unverified]
+
+## Explicit inverse without a supplied unit
+
+For nonzero x, norm_zero_iff gives N!=0, and base_unit_certificate then supplies N^221*N=1. Independently, the exact finite schoolbook product satisfies x*P=(N,0,0), scalar multiplication transports through the product, and the product is commutative. Consequently both x*(N^221*P) and (N^221*P)*x equal(1,0,0). The norm-unit assumption in the earlier conditional formula is derived here rather than renamed or assumed. [pcc:unverified]
+
+This proves coefficient-operation identities on every nonzero finite tuple. It does not instantiate a complete cubic CommRing/field typeclass or prove Rust norm/Fp.inv/compiler execution, actual Jacobian/group maps, counters or cost. Full04 and Word07 remain unchanged, so the exact mathematical-to-native interfaces are available for a separate refinement. [pcc:unverified]
+
+## Controls, proof map and rejected attempts
+
+The zero tuple has norm0 and the unit axis has norm1/product1. For reducible parameter d=1, the nonzero tuple(222,1,0) has zero cubic norm. This preserves a genuine zero-divisor case outside the specific noncube3/q223 setting, rather than asserting all cubic parameters work. [pcc:unverified]
+
+| New declaration | Complete unsigned binding |
+| --- | --- |
+'''
+for x in b:md+=f"| `{x['theorem']}` | `{Path(x['claim']).stem}`. [pcc:unverified] |\n"
+md+='''
+The audits include13 old constructor declarations,20 new named and4 new generated equations. Both original gates use one worker/120s/default memory and unchanged default tactic limits; only propext,Classical.choice,Quot.sound occur, no native decision/custom axiom. Source SHA256SOURCEHASH. All complete sources/builds/audits/callers/pins/times remain in evidence/finite-cubic-norm-final-04. [pcc:unverified]
+
+Firste5bbb1 fails because simpa leaves9*a*0*0; second7faa57 adds mul_zero but leavesa³−0. Both entire sources/logs and printed downstream sorryAx are preserved and rejected, Consumer not attempted after each Root failure. The accepted source changes only that one low-degree zero-term normalization to the original grind tactic; no theorem/hypothesis/gate/resource/limit is weakened. [pcc:unverified]
+
+Canonical chain.dot,cubic.dot and F101 psi.dot are unchanged. Original full LP60/240/62/360/witness/seven controls/feedback/post, actual runtime/ABI/admission and matched solving-cost requirements remain open. Active Root278/Consumer12cc CI observation20:55 and authenticated store/full whole-object replay still gate normal integration; no scientific/native/paid/signed promotion follows from a publication or component proof. [pcc:unverified]
+'''.replace('SOURCEHASH',sha)
+(p/'FINITE_CUBIC_NORM_08.md').write_text(md)
+(o/'zero-norm-contradiction.dot').write_text('''digraph N {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf3fa",color="#456987",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.10"];
+ edge [color="#456987",fontname="DejaVu Sans",fontsize=10];
+ n [label="Assume N(a,b,c)=0"];
+ p [label="p1³ = 3 p2³\nBase units + no cube root3"];
+ z [label="p2=p1=0\nb³=3c³"];
+ a [label="c=b=a=0",fillcolor="#eaf5ed"];
+ n -> p; p -> z; z -> a [label="same ratio contradiction"];
+}'''+ '\n');subprocess.run(['dot','-Tsvg',str(o/'zero-norm-contradiction.dot'),'-o',str(o/'zero-norm-contradiction.svg')],check=True);f=o/'zero-norm-contradiction.svg';f.write_text('\n'.join(x.rstrip()for x in f.read_text().splitlines()).rstrip()+'\n')
+(o/'report.typ').write_text('''#set page(paper: "a4", margin: 17mm)
+#set text(size: 10pt, font: "DejaVu Sans")
+#set par(justify: false, leading: 0.6em, spacing: 0.7em)
+#set heading(numbering: none)
+= Universal finite cubic norm at223
+#text("Every nonzero Fin223 coefficient triple has nonzero norm and a derived two-sided coefficient inverse. Both unchanged original Lean4.35/4.34.1 gates audit37 declarations/0 failing/0 trusted each, with twenty new complete original-extractor bindings121d9f. Claims remain unsigned. [pcc:unverified]")
+== Exact representation
+#text("For x=(a,b,c), write N=a³+3b³+9c³−9abc and P=(a²−3bc,3c²−ab,b²−ac). The source preserves the full Constructor01 prefix and four byte-identical full04 schoolbook/cofactor/norm/scale definitions. No ambient field/domain or norm-unit assumption is supplied. [pcc:unverified]")
+#image("zero-norm-contradiction.svg", width: 100%)
+== Structural proof of N=0 iff x=0
+#text("Only223 base elements are checked per finite certificate: t=0 or t^221*t=1; t³=0 implies t=0. Constructor01 already excludes u³=3. No223³ coefficient population is enumerated. [pcc:unverified]")
+#text("Set p1=3c²−ab,p2=b²−ac. A generic ring identity gives p1³−3p2³=N(3c³−b³). If N=0 and p2!=0, its explicit base inverse u yields (u*p1)³=3, impossible. Thus p2=0, and cube-zero gives p1=0. These relations imply b³=3c³. If c!=0, its base inverse v yields (v*b)³=3, again impossible. Thus c=b=0, and N=a³=0 forces a=0. The converse is direct substitution. [pcc:unverified]")
+#text("Ratio lemmas use free base-unit witnesses in low-degree generic ring identities; the221st-power certificate is instantiated afterward. This avoids expanding a variable221st power in polynomial automation. The accepted repair changes no statement, hypothesis, resource, tactic limit or gate. [pcc:unverified]")
+== Genuine controls
+#text("The zero tuple has norm0, the unit axis norm1/product1. For reducible d=1, nonzero(222,1,0) has norm0. The theorem stays specific to noncube3/q223; other cubic parameters are not silently admitted. [pcc:unverified]")
+#pagebreak()
+= A derived coefficient inverse
+#text("For every x!=0, norm_zero_iff implies N!=0 and the base certificate derives N^221*N=1. The exact schoolbook product gives x*P=(N,0,0). Scalar transport and commutativity then give both x*(N^221*P)=(1,0,0) and (N^221*P)*x=(1,0,0). The earlier supplied norm-unit condition is derived here. [pcc:unverified]")
+#table(columns: (36%,64%), inset: 6pt,
+ [Central declarations], [norm_zero_iff; nonzero_input_nonzero_norm; derived_norm_unit; every_nonzero_coefficient_inverse. Complete hypotheses/bindings in final04.],
+ [Exact audit coverage], [13 old constructor+20 new named+4 new generated equations=37,0 failing/0 trusted in both original gates.],
+ [Resources/foundations], [One worker/120s/original memory/default tactic limits; propext,Classical.choice,Quot.sound only. No native decision/custom axiom.],
+ [Proof boundary], [Finite coefficient-operation identities. Full cubic field typeclass, Rust norm/Fp.inv/compiler, Jacobian/group maps, counters/cost remain separate.],
+)
+== Rejected attempts retained
+#text("Firste5bbb1 simpa leaves9*a*0*0. Second7faa57 adds mul_zero but leavesa³−0. Both full sources/logs/printed downstream sorryAx remain rejected; Consumer not attempted after Root rejection. Final uses original grind only for that one low-degree normalization. No hypothesis or gate weakened. [pcc:unverified]")
+== Sources and reproducibility
+#text("Primary preregistratione9d4fe checked complete Constructor01/full04/Word07 and official Arkworks algebra v0.5.0 cubic-extension inverse. Arkworks already uses this established cofactor and assumes the base inverse; no novelty claim. Its cited paper was not reviewed. KB status/exact/negative/adjacent/theorem wrappers/conductor127, locked atlas unread, no absence inference. [pcc:unverified]")
+#text("Source SHA256 SOURCEHASH. Exact constructor prefixe81532c9 and four full04 definitions are pinned. Complete source/callers/builds/audits/pins/times/twenty complete bindings remain in finite-cubic-norm-final-04; additive exact-source CI replays both unchanged original gates. [pcc:unverified]")
+#text("Canonical chain/cubic/F101 diagrams are unchanged: this adds arithmetic structure, no geometric edge. Active Root278/Consumer12cc ownCI20:55/original authenticated whole store replay still gate normal merge. Original full scientific/runtime/ABI/admission/matched-cost obligations remain fixed and open under paid STOP. [pcc:unverified]")
+'''.replace('SOURCEHASH',sha))
+s=(r/'.github/workflows/chained-transfer-cubic-frobenius-trace-proof-05.yml').read_text()
+for a,z in [('Cubic Frobenius trace descent original dual gates05','Finite cubic norm original dual gates08'),('CubicFrobeniusTraceDescent05','CubicFiniteNorm22308'),('cubic-Frobenius-trace-descent-final-04','finite-cubic-norm-final-04'),('chained-transfer-cubic-frobenius-trace-proof-05','chained-transfer-finite-cubic-norm-proof-08'),('cubic-frobenius-trace-proof-custody','finite-cubic-norm-proof-custody'),('cubic-frobenius-trace-original-gates','finite-cubic-norm-original-gates'),('46e4993775a2c0c64f1aa079b28fb1d13b6e671df035a182f038a16f2e07ef43',sha)]:s=s.replace(a,z)
+assert 'CubicFrobeniusTraceDescent05'not in s and 'cubic-Frobenius-trace-descent-final-04'not in s
+wf=r/'.github/workflows/chained-transfer-finite-cubic-norm-proof-08.yml';wf.write_text(s)
+(g/'ACTUAL_FROZEN_REPORT_CI_INPUTS.json').write_text(json.dumps(dict(source=sha,workflow_sha256=hashlib.sha256(wf.read_bytes()).hexdigest(),claim='121d9f',canonical_graphs=[dict(path=str((p/x).relative_to(r)),sha256=hashlib.sha256((p/x).read_bytes()).hexdigest())for x in ['chain.dot','cubic.dot','reports/prime-field-actual-04/psi.dot']],scope='static report/CI, no repeated proof/native/scientific run'),indent=2)+'\n');print('documented',sha)
