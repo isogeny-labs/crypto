@@ -64,3 +64,5 @@ arbitrary divisor representatives/multiplication-isogeny comparison/general
 geometric descent/canonical Tate/general MOV-FR/full14 remain open. No holes/
 customaxioms/nativeproofeval/raisedlimits/newglobalflags/waivers/frozenedit/
 cryptoPython/paidcompute/uploads. [pcc:unverified]
+
+Publication: ready [PR #4369](https://github.com/isogeny-labs/crypto/pull/4369), new follow-up stacked on #3739 after external merge #4355. Remote proof `2cc1753128c808096ace517b3a9f277aac6731bc` and local receipt `c3913ada4a4bffb67f2c3b72f67453103026cd65` share tree `737ac337c174c76df3d226dbd21f606bf617f29c`. Anonymous fetch completed; fresh exact head/body/title/open/ready matched. Body has3879characters. All36pinsets2909entries/75scope links match;629nonemptyledgerprefix preserved through630. Current-head CI/review/signing pending. [pcc:unverified]
