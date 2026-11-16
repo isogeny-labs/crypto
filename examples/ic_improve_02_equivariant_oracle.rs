@@ -27,7 +27,7 @@ use crypto_lib::cryptanalysis::gf2_elim;
 use crypto_lib::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, solve_boolean_system, split_rule_default, SolveOptions, SolverEngine,
 };
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, masks_low64, F2BoolMono, F2BoolPoly};
 
 const WORDS: usize = 3;
 type Mask = [u64; WORDS];
@@ -1248,7 +1248,7 @@ fn to_u64(p: &Poly, nv: usize) -> F2BoolPoly {
         .iter()
         .map(|m| {
             assert!(m[1] == 0 && m[2] == 0, "gauge system exceeds 64 unknowns");
-            F2BoolMono::from_mask(m[0])
+            F2BoolMono::from_mask(mask_from64(m[0]))
         })
         .collect();
     F2BoolPoly::from_monos(monos, nv)
@@ -1355,7 +1355,7 @@ fn solve(sys: &[F2BoolPoly], nv: usize) -> (Vec<u64>, f64, u64, usize, bool) {
     let cpu = tcpu() - c0;
     roots.sort_unstable();
     (
-        roots,
+        masks_low64(&roots),
         cpu,
         f4_word_ops_thread() - w0,
         stats.splits,

@@ -51,6 +51,7 @@ relation, the full D₄ base gets that saving with no rejected trials.
   - The frozen rule would first leave plain D₄ at **#E ≈ 2^116.5**
     (α = 0.90, modelled ratio 0.943). This is an extrapolation, not a
     measurement. Item 01 put its handover at 2^128.9.
+    - **Annotation 2026-10-19 ([R10 ledger](../../ic_tool_program/ledger/r10-20261019/README.md)):** DERIVED on a superseded input: both handovers are priced at C₄ = 2.54e10, which #1792 measured 311–370× too high. Not refitted.
 - **Item 01's arm** reproduces its regression on the 3 new p = 1601 curves:
   1.035 [1.029, 1.046].
 
@@ -175,7 +176,7 @@ GAE on log₂ #E:
 
 The rule keeps plain D₄ until #E ≈ 2^116.5, so at every measured size it is
 the incumbent (ratio exactly 1). It also flips at 2^20–2^21.5, below the
-smallest training size (2^26.3). That is a fit artefact and is not used.
+smallest training size (2^26.3). That is a fit artefact and is not used. **Annotation 2026-10-19 ([R10 ledger](../../ic_tool_program/ledger/r10-20261019/README.md)):** the 2^116.5 handover is DERIVED on a superseded input (C₄ = 2.54e10; #1792 measured C₄ 311–370× cheaper).
 
 The recommended component is the composition: `d4-ed` as the plain arm,
 switching to 2LP only past the modelled handover. In the measured range it

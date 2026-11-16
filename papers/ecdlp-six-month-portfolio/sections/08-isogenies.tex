@@ -1,0 +1,355 @@
+\section{Isogenies, graphs, fibres, conductors, and transfer}\label{sec:isogenies}
+
+The isogeny work is not a single failed shortcut. It contains several
+different objects: explicit walks and map certificates, conductor and
+endomorphism-ring calculations, fibre-aware bases, gluing and
+higher-genus constructions, weak-node searches, graph-wide experiments,
+and cryptographic scheme prototypes. Their obligations differ.
+
+\subsection{What transport conserves}
+
+For a homomorphism $\varphi:E(\F_q)\to E'(\F_q)$, let
+$\kappa=\ker\varphi\cap E(\F_q)$. Suppose
+$\B'\subset\varphi(E(\F_q))$ and take the complete rational pullback
+$\B=\varphi^{-1}(\B')\cap E(\F_q)$. The recorded transport argument
+states that the number of ordered $m$-decompositions of $R$ over $\B$
+is $|\kappa|^{m-1}$ times the number of decompositions of $\varphi(R)$
+over $\B'$. Each image tuple has $|\kappa|^m$ lifts, and exactly
+$|\kappa|^{m-1}$ have the required sum.\src{TRANSFER}
+
+This is a useful scoped statement. It applies to the declared
+homomorphism and complete pullback domain. It does not prove that every
+alternative factor-base geometry has the same cost, nor that every
+non-homomorphic or higher-dimensional reduction is impossible. It
+directs attention to three things that can still change: rational
+kernel symmetry, destination geometry, and arithmetic/solver cost.
+Map evaluation and source recovery remain additional costs.
+
+Isogeny loops act as endomorphisms; on a fixed prime cyclic subgroup an
+applicable endomorphism acts by a scalar. Faster evaluation can help
+known-scalar multiplication or a generic walk. Turning it into a
+non-generic unknown-log advantage requires another mechanism. The
+portfolio correctly keeps these claims distinct in its newer transfer
+and curve-identity rules.\src{FIBRES}\src{C-RULES}
+
+\subsection{Conductor gaps and fibre-aware IC}
+
+The conductor-gap programme examines whether endomorphism-ring levels
+change the measured difficulty of a decomposition method. Two fixed CM
+pairs with large prime gaps give recorded floor/crater counted-$S$
+ratios 0.975 with 99\% interval [0.603,1.451] and 1.127 with interval
+[0.922,1.342], across 192 verified records and 96 stored exact replays.
+These observations do not resolve the general conductor-gap question;
+they fail to detect an effect in those exact comparisons. Both sides'
+unpriced work remains relevant.\src{CONDUCTOR}
+
+Fibre closure and two-torsion symmetrisation can reduce redundant algebra
+on a matched abscissa base. A later correction shows why the domain
+must be specified: at matched column count, an apparent symmetry saving
+can disappear. Similarly, the fibre-aware scaling panels improve a
+specific method but show its IC/rho envelope widening with size at
+fixed cofactor. The reported ratios rise roughly from 8--9 to 35--37
+at cofactor four, and from 13--20 to 60--63 at cofactor 72.
+\src{FIBRE-SCALE}\src{PRIOR}
+
+The right question is therefore a controlled comparison on the same
+transported target, base convention, subgroup and resource envelope.
+Comparing two curves with different subgroup sizes or comparing an
+orbit-redundant base to an already-quotiented base does not isolate
+intrinsic hardness.
+
+\subsection{Replicated rho controls and a withheld deeper experiment}
+
+The autoresearcher contains a much larger control programme than the two
+IC comparisons above. Its degree-37/41 replication reports 160,000
+verified toy recoveries across 392 jobs. All six family-adjusted 95\%
+level/crater contrast intervals include zero. Only the three degree-37
+contrasts meet the study's $\pm3\%$ equivalence band; the wider degree-41
+intervals do not. ``No detected effect'' therefore does not become a
+global equivalence verdict. These are repeated solver observations across
+arms, not 160,000 independent curve classes.\src{VOL-REPL}
+
+The degree-51 follow-up uses $r=17,192,986,687$ (about 34 bits), cofactor
+130,972, and all sixteen size-seventeen action orbits in a fixed panel.
+Its 25,600 verified recoveries give a floor/crater $\log_2$ walk-count
+contrast of 0.00576 with 95\% interval [$-0.03217$,0.04337]. The five
+A/A gates pass and the declared $\pm0.10$-bit equivalence criterion holds
+under its fixed-orbit analysis. Orbit canonicalisation, map transport,
+setup and final verification are outside that walk-count boundary.
+This does not establish equivalent complete attack costs.\src{VOL-51}
+
+The deeper degree-51 experiment must retain a different verdict. All
+20,480 toy solves verify, and execution-integrity checks pass, but two
+simultaneous A/A intervals extend outside the $\pm0.15$-bit control band.
+Its inferential labels are consequently \texttt{WITHHELD\_AA\_ALERT}.
+The candidate contrasts and their intervals remain diagnostics; neither
+absence of an effect nor equivalence is admitted. Shared scalar labels
+also do not constitute serialized isogeny transport. The audit notes
+missing stored collision transcripts and a relocation-sensitive replay
+path. Correct returned keys and an admitted comparative inference are
+separate requirements.\src{VOL-DEEP}\src{VOL-DEEP-AUDIT}
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\linewidth]{figures/conductor-controls.pdf}
+\caption{Recorded conductor-level rho controls. Left: six degree-37/41
+contrasts with the study's simultaneous 95\% intervals; inclusion of zero
+does not by itself prove equivalence. Upper right: the degree-51 matched-action
+walk-count contrast. Lower right: deeper degree-51 diagnostic intervals, shown
+in grey because the A/A admission gate fails. Panels have distinct
+populations and inference rules. Sources: \src{VOL-REPL}, \src{VOL-51},
+\src{VOL-DEEP}. No new statistical resampling was performed here.}
+\end{figure}
+
+\subsection{Large conductor directions: construction is still a stage}
+
+The later conductor panel certifies 43 prime directions, spanning twenty
+trace classes and seventeen geometries after twist deduplication. Its
+102 order levels and 131 conditional placements are not independent
+experiments. A K163 direction of degree 45,641 has an explicit kernel
+abscissa orbit of degree 3,260, whereas the K283 degree-1,697 direction
+has abstract orbit degree 239,984. Isogeny degree alone can therefore
+mis-rank construction work.\src{CONDUCTOR-PANEL}
+
+The retained K163 relative-tower probe enumerates 22,820 half-kernel
+abscissae, using ninety inverse batches. Its recorded 56.65 seconds and
+23,724 KiB peak RSS stop before the kernel polynomial or map evaluator.
+A 0.36-second replay checks the retained line certificate, not a complete
+map. A same-degree horizontal endomorphism control is a different
+construction and supplies no vertical timing ratio. The panel has zero
+complete NIST-scale map/dual/transport/recovery cost packages. Its small
+field-degree-37, isogeny-degree-73 positive control does recover 1,024 transported
+targets, establishing a toy capability rather than filling that gap.
+\src{CONDUCTOR-PANEL}
+
+\subsection{Corrections inside the fibre programme}
+
+The full fibre report contains changes of interpretation that its early
+sections do not capture. Identical formal Semaev degrees or Macaulay
+dimensions do not imply identical ranks, Gr\"obner behaviour or solving
+degree. Its early class-invariance arguments therefore do not establish
+a general hardness theorem. The later report explicitly leaves
+prime-field exponent equality as Conjecture~10 and retracts a universal
+``isogenies only change constants'' statement: composite binary fields
+can contain weaker isogenous representatives through GHS mechanisms.
+\src{FIBRES}
+
+Its saturation penalty also depends on the oracle. Enumeration on the
+unquotiented base incurs the reported multiplicity; a quotient-coordinate
+oracle can avoid much of it. The reported $m=3$ quotient ratios are
+0.93--1.07 against 2.67--3.62 for enumeration on eight curves. Conversely,
+the degree-31 $m=3$ quotient construction loses to a matched projected-$x$
+comparison, and an unchanged-yield doubling prediction is falsified.
+The class-wide batch study verifies 40,800 toy logs but concerns 64-target
+batching, not a one-target gain. These refinements identify usable
+representations and failed predictions without closing the whole lead.
+\src{FIBRES}
+
+A later main revision also lands the R6.10 literature audit, whose full
+report was read during integration. Of forty-seven grouped reference rows,
+it marks thirteen confirmed at its declared text/abstract boundary, four
+confirmed through secondary sources, fourteen bibliography-only, eight
+corrected, seven mismatched and one unverified. Those statuses are not
+forty-seven independently checked full publications.\src{FIBRES-LIT}
+
+The load-bearing priority correction is concrete: FHJRV, EUROCRYPT 2014
+\S3.2, already gives the torsion-invariant base's decomposition loss,
+smaller relation count and compensation through easier polynomial systems.
+The programme's exact census and measured class factors remain useful;
+the saturation law and qualitative oracle dependence should not be claimed
+as new. The audit also changes the quarter-test comparison from avoiding
+a square root to avoiding an inversion, and distinguishes constructing an
+isogeny between given endpoints from discovering an advantageous weak
+endpoint. Its GHS cost-attribution corrections separate a mixed local
+model from published bounds. This review reads the audit, not all primary
+publications it discusses.\src{FIBRES-LIT}
+
+\subsection{The graph-building capability and its measured coverage}
+
+The full-volcano work builds explicit finite graphs and routes, exports
+explorers, verifies kernel maps, assigns conductor strata, and runs
+bounded IC and generic solvers on selected vertices. This is a
+substantial implemented capability. Graph generation, graph completeness
+for a declared edge set, and graph-wide attack execution are three
+different completion claims.\src{VOLCANO}
+
+The earlier downloaded checkpoint covers three smaller classes with 24,823
+declared vertices and 51 strata. That repaired checkpoint has 2,935
+audited vertices: 989 in the mixed-conductor graph, 970 in the
+three-power graph, and 976 in the two-power graph. All 51 strata have
+samples. This is about 11.8\% of the declared vertex population,
+not a completed graph-wide measurement.
+
+\begin{table}[htbp]\small
+\caption{Outcomes in the downloaded repaired checkpoint. They are
+attempts across multiple arms and two target workloads per selected
+vertex, not 46,960 independent curves. Source: \src{VOL-ARCHIVE}.}
+\begin{tabular}{@{}lr@{}}\toprule
+Quantity & Recorded count \\\midrule
+Audited vertices / declared graph vertices & 2,935 / 24,823 \\
+Strata sampled & 51 / 51 \\
+Attempt records & 46,960 \\
+Verified recoveries & 30,270 \\
+Exhausted budgets & 14,626 \\
+Timeouts & 2,064 \\
+Relations found & 1,530,557 \\
+Source relation trials & 74,829,850 \\
+Actual decomposition calls & 71,296,000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Source trials and oracle calls differ because repeated queries can be
+skipped before invoking the oracle. Timeout counters are unknown where
+not emitted; they are not zero. Earlier report versions labelled source
+trials as decompositions, and the corrected summary exposes both
+denominators. Those corrections are a practical example of why raw
+records and versioned summaries matter.
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\linewidth]{figures/volcano-coverage.pdf}
+\caption{Coverage and outcomes of the actual 2,935-vertex checkpoint.
+The left panel compares audited with remaining vertices in each of the
+three finite graphs; the right panel preserves unsuccessful attempts.
+This is a coverage chart, not an inference that unsampled vertices share
+the same outcomes. All 51 strata are sampled. Source: \src{VOL-ARCHIVE}.}
+\end{figure}
+
+The three source models have very different largest prime subgroups:
+61,751; 19,768,889,568,671; and 4,253. Their roughly 57--59-bit field
+sizes must not be used as common subgroup security sizes. The original
+A--E ambitions are much larger---about 7.83 billion expected vertices
+and 515 strata---and remain separate incomplete work. The smaller
+checkpoint cannot be described as completing those populations.
+
+This review downloaded the archive and checked every one of its 29,409
+manifest entries, with no missing entry or hash mismatch. That proves
+byte consistency of this delivery. The checkpoint's solver audits are
+same-implementation replays, not new independent validation by this
+review. Its unqualified wall times and incomplete operation counts do
+not establish a fastest-method or asymptotic claim.
+
+\subsection{Later immutable delivery: 7,937 vertices}
+
+The expanded source search located the 19 October v7 delivery, which
+advances the same bounded survey to 7,937 audited vertices: 2,656 mixed,
+2,638 three-power and 2,643 two-power vertices. This is approximately
+32.0\% of 24,823 vertices, with all fifty-one strata sampled. The older
+2,935-vertex archive above remains historical evidence and is not pooled
+with this cumulative successor.\src{VOL-V7-GUIDE}\src{VOL-V7-REPORT}
+
+\begin{table}[htbp]\small
+\caption{Separate cumulative survey deliveries. Repeated arms and target
+workloads are not independent curves; successor counts include the earlier
+survey population. Sources: \src{VOL-ARCHIVE}, \src{VOL-V7}.}
+\begin{tabular}{@{}lrr@{}}\toprule
+Quantity & Earlier 2,935 & Later 7,937 \\\midrule
+Accepted attempts & 46,960 & 126,992 \\
+Verified recoveries & 30,270 & 81,666 \\
+Exhausted budgets & 14,626 & 39,550 \\
+Timeouts & 2,064 & 5,776 \\
+Relations & 1,530,557 & 4,117,173 \\
+Source relation trials & 74,829,850 & 202,646,648 \\
+Actual decomposition calls & 71,296,000 & 193,153,057 \\
+\bottomrule\end{tabular}
+\end{table}
+
+The review freshly checks the later archive's published outer hash and
+all 79,462 manifest entries, with no missing, extra, unsafe or mismatched
+file. The native summary agrees with the outcome and coverage counts.
+These are byte and accounting checks; its frozen executables were not
+run. All timing epochs remain unqualified, unknown timeout counters remain
+unknown, and complete transported-target comparisons and independent
+arithmetic replay remain open. A dated worker observation in a delivery
+guide does not establish that the worker is currently alive.
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\linewidth]{figures/volcano-latest.pdf}
+\caption{The later, separately hash-checked delivery. Graph topology is
+complete for its declared finite edge sets; attack measurements cover
+7,937 of 24,823 vertices. The unsuccessful attempt populations remain
+visible. Larger sample counts establish coverage progress, not a speedup.
+Sources: \src{VOL-V7}, \src{VOL-V7-REPORT}.}
+\end{figure}
+
+\subsection{Two distinct advances in the original large-class work}
+
+The original-C full-selected-point-order diagnostic covers 1,869 retained
+models and 3,738 public one-target workloads per arm. Both direct EC
+Pohlig--Hellman/BSGS and reduced Tate/Miller followed by finite-field
+Pohlig--Hellman and checked factor-base relations recover every selected
+target: 7,476 primary method records. Selected point orders range from
+2,600,529,297,408 to 1,637,958,981,148,213,248, but every prime divisor is
+2, 3 or 7. This is a working smooth-order transfer pipeline, not a
+large-prime or large-embedding-degree IC result. Maximal point order and
+whole-group cyclicity are not certified.\src{VOL-C-REPORT}
+
+Setup records include 26,166 relation equations/queries and target-digit
+work includes 161,336. Identity and dependent equations remain counted;
+rank is separate. Both cold solver intervals include their declared
+certification, projections, transfer, relation algebra, reconstruction and
+EC verification, while shared fixture construction is separate. Unpriced
+field/integer categories and unqualified clocks prevent a complete cost
+ranking. The review checks all 125 entries of this archive's manifest;
+the report's full same-implementation replay remains a historical claim,
+not a new independent replay here.\src{VOL-C-FULL}\src{VOL-C-REPORT}
+
+The separate Prime61 disk-backed continuation fixes
+$p=2^{61}-1$, $a=p-3$, $b=111$ and prime subgroup order
+$r=2,305,843,010,818,082,053$. It expands 1,024 sources,
+discovers 4,184 curves and retains 15,360 maps. Its 12,288 streams make
+1,228,800,000 capped target trials and find zero relations and zero solves.
+This is traversal/storage progress with a bounded negative relation-stage
+result, not a completed IC method. Its later exact form certificate
+describes the selected component as $C_{34,081,013}\times C_2^4$, of
+size 545,296,208, using explicit relations and a fixed-witness checker.
+That cardinality certificate is not an enumerated vertex count or a
+whole-class upper bound. Native class arithmetic and CM interpretation
+remain outside its partial Lean coordinate proof. The underlying raw
+certificate was not independently replayed in this review.
+\src{PRIME61-REPORT}
+
+\subsection{GHS mechanisms and the scope of a trapdoor demonstration}
+
+The pinned main branch of \texttt{ghs-trapdoor} is a scaffold, but another
+captured branch contains a Sage mechanism prototype. It describes a
+composite-degree binary field $\F_{2^{20}}$ over $\F_{2^5}$, a weak curve,
+an Artin--Schreier tower, a genus-four model, an explicit transfer, and a
+small protected subgroup of order 7,717. The branch reports
+homomorphism and subgroup-order checks, isogeny pullback, and end-to-end
+toy ElGamal recovery.\src{GHS-MAIN}\src{GHS-BRANCH}
+
+Those are mechanism claims on the branch, not a demonstrated scalable
+escrow system. The toy destination solver is BSGS, whose square-root
+cost is comparable to source rho at that tiny subgroup order. The
+general claim that the public curve forces outsiders to use rho, or
+that a secret chain is hard to replace with any useful public route,
+requires additional analysis. Working-field ambiguity in the README's
+Jacobian description also needs checking against the actual code and
+certificates before a stronger transport claim is made. No fresh Sage
+or Lean replay was performed here.
+
+The distinction is especially important for ECC2K-130, whose extension
+degree 131 is prime. A construction exploiting a degree-four extension
+cannot simply be scaled by changing that parameter. The ten-lead
+register contains finite order and map-class obstructions for particular
+candidate Jacobians, but leaves other destinations and constructions
+open.\src{TEN}
+
+\subsection{What remains of the structural and hidden-route leads}
+
+The structural-completeness draft organises seven families of known
+isogeny/CM mechanisms. Its own correction now describes case-analysis
+proof sketches that have not received independent review; an earlier
+unconditional-proof sentence was removed. This paper therefore treats
+it as an organised argument and source catalogue, not a proof that every
+prime-field attack route has been exhausted.\src{STRUCTURAL}
+
+A hypothetical hidden route should be assessed through separate
+questions: mathematical existence, explicit construction, public
+discoverability, subgroup action, destination advantage, evaluation and
+recovery costs, and the availability of an equivalent public shortcut.
+No inference about secret agency capability follows merely from a
+large degree or a sparse weak class. Conversely, failing to make a
+route practical in a toy study is not a proof of its universal
+impossibility. These are the appropriate remaining obligations of the
+programme's speculative endomorphism and isogeny leads.

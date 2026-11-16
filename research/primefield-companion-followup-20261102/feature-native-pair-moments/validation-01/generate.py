@@ -1,0 +1,3 @@
+from pathlib import Path
+import json,hashlib
+D=Path(__file__).resolve().parent;src=D.parent/'feature-native-moment-root/lib.rs';text=src.read_text();decl=text.split('pub struct RootSet{',1)[1].split('\nimpl Projector',1)[0];impl=text.split('impl RootSet{',1)[1].split('\nenum Representation',1)[0];out='pub struct RootSet{'+decl+'\nimpl RootSet{'+impl+'\n';(D/'roots.rs').write_text(out);(D/'generation.json').write_text(json.dumps({'source_sha256':hashlib.sha256(src.read_bytes()).hexdigest(),'output_sha256':hashlib.sha256(out.encode()).hexdigest(),'transformation':'extract RootSet declaration and implementation unchanged; no dense projector or Hybrid imported'},indent=2)+'\n')

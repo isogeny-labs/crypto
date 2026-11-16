@@ -1,0 +1,146 @@
+{
+  "main": "RhoTwoChoiceCollisionAudit.twochoice_collision_certificate",
+  "binding": "ce864beb518e06e523e89e965cc96ef0d00e05836cae76e1e4d229659cb0d339",
+  "custom_imports": {
+    "FirstCollision": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+    "CollisionCertificate": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+    "CollisionTails": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+    "Cylinder": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+    "PathAgreement": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+    "PostCollisionControl": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+    "Survival": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+    "WalkBoundary": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+    "WalkWeighted": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+    "WalkWeightedGeneral": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+    "BalancedPaths": "research/rho_twochoice_collision_audit_20261115/lean/BalancedPaths.lean",
+    "BinaryEnsemble": "research/rho_twochoice_collision_audit_20261115/lean/BinaryEnsemble.lean",
+    "BinaryMaximal": "research/rho_twochoice_collision_audit_20261115/lean/BinaryMaximal.lean",
+    "BinaryUnbounded": "research/rho_twochoice_collision_audit_20261115/lean/BinaryUnbounded.lean",
+    "SupportCounting": "research/rho_twochoice_collision_audit_20261115/lean/SupportCounting.lean",
+    "TwoChoiceCertificate": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceCertificate.lean",
+    "TwoChoiceImports": "research/rho_twochoice_collision_audit_20261115/lean/TwoChoiceImports.lean"
+  },
+  "claims": [
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.squared_maximal",
+      "conclusion": "Actual finite-word squared-boundary hitting mass bound."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.one_step_controls",
+      "conclusion": "Actual binary one-step hit masses1and0."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.goodMass_three_quarters",
+      "conclusion": "Actual no-hit word mass at least3/4."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.actual_path_count",
+      "conclusion": "Actual Zp chronological path equals time times first increment plus count times difference."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.balanced_no_relation_survives",
+      "conclusion": "Actual balanced path survives if no short balanced-count relation."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.supportEquiv",
+      "conclusion": "Actual firstpoint/nonzero-difference bijection with ordered distinct embeddings."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.support_mean_genuine",
+      "conclusion": "Actual support-coordinate finite mean equals uniform embedding PMF mean."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.relation_mass",
+      "conclusion": "Exact actual distinct-support relation mass1/p for0<d<p."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.relation_zero_guard",
+      "conclusion": "Degenerate d0/k0 relation mass1."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.short_relation_mass_le",
+      "conclusion": "Actual support union bound T(2W+1)/p."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.averaged_survival_half",
+      "conclusion": "Actual ensemble survival at least1/2."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.ensembleMean_actual_law",
+      "conclusion": "Actual uniform-support and static-vertex product PMF first-repeat mean."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.ensemble_mean_lower",
+      "conclusion": "Actual E≥m²/2 at stated cubic threshold."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.ensemble_ratio_unbounded",
+      "conclusion": "For every naturalC some prime has actual E²>Cp."
+    },
+    {
+      "declaration": "RhoTwoChoiceCollisionAudit.no_uniform_sqrt_bound",
+      "conclusion": "No realnonnegative uniform square-root constant for actualtwochoice ensemble."
+    }
+  ],
+  "prior_reused_claims": [
+    {
+      "packet": "random_support_average_audit_20261114",
+      "scope": "Qualified Hildebrand expected mixing for all fixed positive weights/k≥2/uniform ordered distinct supports; no collision-time assertion."
+    },
+    {
+      "packet": "sidon_rho_counterfamily_audit_20261114",
+      "scope": "Actual fixed20 Sidon supports/local-degree-two and unbounded first-repeat-square/p; support table not averaged."
+    },
+    {
+      "packet": "static_hash_collision_audit_20261114",
+      "scope": "Actual static-hash/iid survival and least-repeat tail/expectation; postcollision chronological-word replacement counterexample."
+    },
+    {
+      "packet": "start_invariant_rho_audit_20261114",
+      "scope": "Actual translation/start-law invariance, credited; new theorem uses start0."
+    },
+    {
+      "packet": "hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+      "scope": "Existing actual uniform PMF and support-coordinate reductions, read/credited."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 70,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_uniform_distinct_support_ensemble": true,
+    "actual_static_hash_first_repeat": true,
+    "nonasymptotic_ensemble_lower_bound": true,
+    "no_uniform_twochoice_sqrt_bound": true,
+    "qualified_large_partition_source_conjecture_refuted": false,
+    "limiting_large_partition_collision_constant": false,
+    "practical_hash_refinement": false,
+    "new_solver_or_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

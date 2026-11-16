@@ -1,0 +1,15 @@
+/workspace/crypto/research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/timeout_print.c: In function ‘main’:
+/workspace/crypto/research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/timeout_print.c:21:12: error: format ‘%f’ expects argument of type ‘double’, but argument 3 has type ‘uint32_t’ {aka ‘unsigned int’} [-Werror=format=]
+   21 |     printf("nfs: elapsed time of %6.4f seconds exceeds specified "
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   22 |            "nfs timeout of %1.4f sec, exiting\n", t_time, timeout);
+      |                                                           ~~~~~~~
+      |                                                           |
+      |                                                           uint32_t {aka unsigned int}
+/workspace/crypto/research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/timeout_print.c:22:32: note: format string is defined here
+   22 |            "nfs timeout of %1.4f sec, exiting\n", t_time, timeout);
+      |                            ~~~~^
+      |                                |
+      |                                double
+      |                            %1.4d
+cc1: some warnings being treated as errors

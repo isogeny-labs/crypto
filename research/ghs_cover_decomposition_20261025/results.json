@@ -1,0 +1,836 @@
+{
+  "schema": "ghs-cover-decomposition-audit/v1",
+  "method": "Count points of each exact degree-five genus-two model over k and k^2 via Artin-Schreier trace; derive and factor its degree-four Frobenius polynomial over Z.",
+  "criterion": "Irreducible degree-four Frobenius polynomial excludes a proper elliptic isogeny factor over the base field k; factorization alone would not certify that the transferred source subgroup projects nontrivially.",
+  "source_note": "Cover coefficients and field basis are exact receipt inputs; point counts, Frobenius coefficients, integer factorization, source curve order and comparisons are recomputed independently in Sage. Divisor-decomposition counts and ranks are copied from each bound attack receipt, not recomputed by this script.",
+  "cases": [
+    {
+      "receipt": "exact-n6-a0-b32-direct.json",
+      "receipt_sha256": "c8c76329fad84b689ad650b4d7fea7af8941223de3ae70f0b07d32679c0b9ff2",
+      "absolute_degree": 6,
+      "base_degree": 3,
+      "base_field_size": 8,
+      "source_modulus": "0x43",
+      "source_a": 0,
+      "source_b": 32,
+      "source_group_order_independent_sage": 76,
+      "source_subgroup_order": 19,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x7",
+        "0x7",
+        "0x3",
+        "0x0",
+        "0x3"
+      ],
+      "cover_n1": 9,
+      "cover_n2": 87,
+      "brute_force_equation_crosscheck": true,
+      "frobenius_coefficients_low_to_high": [
+        64,
+        0,
+        11,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            64,
+            0,
+            11,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 5,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -27,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -135
+      },
+      "jacobian_order_from_point_counts": 76,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 8,
+        "smooth": 10,
+        "attempts": 18,
+        "matrix_rank": 7,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        64,
+        0,
+        11,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        4096,
+        1408,
+        249,
+        22,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 5776,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n6-a0-b32-two_isogeny.json",
+      "receipt_sha256": "359eb058ef4daf13708579e213da98008a8452429447519611cc2d8fe898298d",
+      "absolute_degree": 6,
+      "base_degree": 3,
+      "base_field_size": 8,
+      "source_modulus": "0x43",
+      "source_a": 0,
+      "source_b": 32,
+      "source_group_order_independent_sage": 76,
+      "source_subgroup_order": 19,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x5",
+        "0x5",
+        "0x7",
+        "0x0",
+        "0x7"
+      ],
+      "cover_n1": 9,
+      "cover_n2": 87,
+      "brute_force_equation_crosscheck": true,
+      "frobenius_coefficients_low_to_high": [
+        64,
+        0,
+        11,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            64,
+            0,
+            11,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 5,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -27,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -135
+      },
+      "jacobian_order_from_point_counts": 76,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 8,
+        "smooth": 10,
+        "attempts": 18,
+        "matrix_rank": 7,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        64,
+        0,
+        11,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        4096,
+        1408,
+        249,
+        22,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 5776,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n8-a0-b32-direct.json",
+      "receipt_sha256": "0b195de3a34bd4ae5fd9c350dff80ce15808672f79e276bac9f82e92e936aa46",
+      "absolute_degree": 8,
+      "base_degree": 4,
+      "base_field_size": 16,
+      "source_modulus": "0x11b",
+      "source_a": 0,
+      "source_b": 32,
+      "source_group_order_independent_sage": 268,
+      "source_subgroup_order": 67,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x5",
+        "0x5",
+        "0x9",
+        "0x0",
+        "0x9"
+      ],
+      "cover_n1": 17,
+      "cover_n2": 279,
+      "brute_force_equation_crosscheck": true,
+      "frobenius_coefficients_low_to_high": [
+        256,
+        0,
+        11,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            256,
+            0,
+            11,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 21,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -43,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -903
+      },
+      "jacobian_order_from_point_counts": 268,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 16,
+        "smooth": 50,
+        "attempts": 66,
+        "matrix_rank": 16,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        256,
+        0,
+        11,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        65536,
+        5632,
+        633,
+        22,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 71824,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n8-a0-b32-two_isogeny.json",
+      "receipt_sha256": "a9619272ec7b0a55d9c1b4190f16cd7a9b059f92385fc4c1545a441e1f64d8f4",
+      "absolute_degree": 8,
+      "base_degree": 4,
+      "base_field_size": 16,
+      "source_modulus": "0x11b",
+      "source_a": 0,
+      "source_b": 32,
+      "source_group_order_independent_sage": 268,
+      "source_subgroup_order": 67,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x3",
+        "0x3",
+        "0xe",
+        "0x0",
+        "0xe"
+      ],
+      "cover_n1": 17,
+      "cover_n2": 279,
+      "brute_force_equation_crosscheck": true,
+      "frobenius_coefficients_low_to_high": [
+        256,
+        0,
+        11,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            256,
+            0,
+            11,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 21,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -43,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -903
+      },
+      "jacobian_order_from_point_counts": 268,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 16,
+        "smooth": 50,
+        "attempts": 66,
+        "matrix_rank": 16,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        256,
+        0,
+        11,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        65536,
+        5632,
+        633,
+        22,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 71824,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n10-a0-b32-direct.json",
+      "receipt_sha256": "5809b8d1e81e00e119a90cbd4eaf870970c39271e996c59311b1da216c8af282",
+      "absolute_degree": 10,
+      "base_degree": 5,
+      "base_field_size": 32,
+      "source_modulus": "0x409",
+      "source_a": 0,
+      "source_b": 32,
+      "source_group_order_independent_sage": 1032,
+      "source_subgroup_order": 43,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x6",
+        "0x6",
+        "0x1c",
+        "0x0",
+        "0x1c"
+      ],
+      "cover_n1": 33,
+      "cover_n2": 1039,
+      "brute_force_equation_crosscheck": null,
+      "frobenius_coefficients_low_to_high": [
+        1024,
+        0,
+        7,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            1024,
+            0,
+            7,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 57,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -71,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -4047
+      },
+      "jacobian_order_from_point_counts": 1032,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 32,
+        "smooth": 26,
+        "attempts": 42,
+        "matrix_rank": 22,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        1024,
+        0,
+        7,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        1048576,
+        14336,
+        2097,
+        14,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 1065024,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n10-a0-b32-two_isogeny.json",
+      "receipt_sha256": "3f5614db15369035963a2fb3e768dd13aa7c87de4ba6a965f7e3f38858cde2a7",
+      "absolute_degree": 10,
+      "base_degree": 5,
+      "base_field_size": 32,
+      "source_modulus": "0x409",
+      "source_a": 0,
+      "source_b": 32,
+      "source_group_order_independent_sage": 1032,
+      "source_subgroup_order": 43,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x1d",
+        "0x1d",
+        "0x17",
+        "0x0",
+        "0x17"
+      ],
+      "cover_n1": 33,
+      "cover_n2": 1039,
+      "brute_force_equation_crosscheck": null,
+      "frobenius_coefficients_low_to_high": [
+        1024,
+        0,
+        7,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            1024,
+            0,
+            7,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 57,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -71,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -4047
+      },
+      "jacobian_order_from_point_counts": 1032,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 32,
+        "smooth": 26,
+        "attempts": 42,
+        "matrix_rank": 22,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        1024,
+        0,
+        7,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        1048576,
+        14336,
+        2097,
+        14,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 1065024,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n10-a0-b32-three_isogeny.json",
+      "receipt_sha256": "3ec2b722a9d4d64acc364c29e4bd5b9f8623463fa963a2268c50afbd3fb36d79",
+      "absolute_degree": 10,
+      "base_degree": 5,
+      "base_field_size": 32,
+      "source_modulus": "0x409",
+      "source_a": 0,
+      "source_b": 32,
+      "source_group_order_independent_sage": 1032,
+      "source_subgroup_order": 43,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x1f",
+        "0x1f",
+        "0x1a",
+        "0x0",
+        "0x1a"
+      ],
+      "cover_n1": 33,
+      "cover_n2": 1039,
+      "brute_force_equation_crosscheck": null,
+      "frobenius_coefficients_low_to_high": [
+        1024,
+        0,
+        7,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            1024,
+            0,
+            7,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 57,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -71,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -4047
+      },
+      "jacobian_order_from_point_counts": 1032,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 32,
+        "smooth": 26,
+        "attempts": 42,
+        "matrix_rank": 18,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        1024,
+        0,
+        7,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        1048576,
+        14336,
+        2097,
+        14,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 1065024,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n12-a1-b512-direct.json",
+      "receipt_sha256": "f03fa0e59887fae6e50576bbe199c38f7be9cd508eedc95e2269e9f20733343b",
+      "absolute_degree": 12,
+      "base_degree": 6,
+      "base_field_size": 64,
+      "source_modulus": "0x1009",
+      "source_a": 1,
+      "source_b": 512,
+      "source_group_order_independent_sage": 3980,
+      "source_subgroup_order": 199,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x8",
+        "0x9",
+        "0x9",
+        "0x1",
+        "0x9"
+      ],
+      "cover_n1": 65,
+      "cover_n2": 3863,
+      "brute_force_equation_crosscheck": null,
+      "frobenius_coefficients_low_to_high": [
+        4096,
+        0,
+        -117,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            4096,
+            0,
+            -117,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 245,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -11,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -2695
+      },
+      "jacobian_order_from_point_counts": 3980,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 64,
+        "smooth": 132,
+        "attempts": 198,
+        "matrix_rank": 56,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        4096,
+        0,
+        -117,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        16777216,
+        -958464,
+        21881,
+        -234,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 15840400,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n12-a1-b512-two_isogeny.json",
+      "receipt_sha256": "5e6398f50e03a0170aca76da9db591ccec9af605f557869e57517506495e1f91",
+      "absolute_degree": 12,
+      "base_degree": 6,
+      "base_field_size": 64,
+      "source_modulus": "0x1009",
+      "source_a": 1,
+      "source_b": 512,
+      "source_group_order_independent_sage": 3980,
+      "source_subgroup_order": 199,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x9",
+        "0x8",
+        "0x8",
+        "0x1",
+        "0x8"
+      ],
+      "cover_n1": 65,
+      "cover_n2": 3863,
+      "brute_force_equation_crosscheck": null,
+      "frobenius_coefficients_low_to_high": [
+        4096,
+        0,
+        -117,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            4096,
+            0,
+            -117,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 245,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -11,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -2695
+      },
+      "jacobian_order_from_point_counts": 3980,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 64,
+        "smooth": 132,
+        "attempts": 198,
+        "matrix_rank": 56,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        4096,
+        0,
+        -117,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        16777216,
+        -958464,
+        21881,
+        -234,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 15840400,
+      "source_order_squared_matches_extension_jacobian_order": true
+    },
+    {
+      "receipt": "exact-n12-a1-b512-five_isogeny.json",
+      "receipt_sha256": "bdcff8794675bee6a2e3b3016a9b02004f5e88ef057cd2e5297848f674c845f4",
+      "absolute_degree": 12,
+      "base_degree": 6,
+      "base_field_size": 64,
+      "source_modulus": "0x1009",
+      "source_a": 1,
+      "source_b": 512,
+      "source_group_order_independent_sage": 3980,
+      "source_subgroup_order": 199,
+      "cover_h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "cover_f": [
+        "0x0",
+        "0x8",
+        "0x9",
+        "0x9",
+        "0x1",
+        "0x9"
+      ],
+      "cover_n1": 65,
+      "cover_n2": 3863,
+      "brute_force_equation_crosscheck": null,
+      "frobenius_coefficients_low_to_high": [
+        4096,
+        0,
+        -117,
+        0,
+        1
+      ],
+      "frobenius_factors_over_Z": [
+        {
+          "coefficients_low_to_high": [
+            4096,
+            0,
+            -117,
+            0,
+            1
+          ],
+          "multiplicity": 1
+        }
+      ],
+      "irreducible_over_Q": true,
+      "irreducibility_certificate": {
+        "plus_candidate": 245,
+        "plus_candidate_is_square": false,
+        "minus_candidate": -11,
+        "minus_candidate_is_square": false,
+        "zero_linear_discriminant": -2695
+      },
+      "jacobian_order_from_point_counts": 3980,
+      "source_order_equals_jacobian_order": true,
+      "source_subgroup_divides_jacobian_order": true,
+      "divisor_decomposition_receipt_metadata": {
+        "factor_base_size": 64,
+        "smooth": 132,
+        "attempts": 198,
+        "matrix_rank": 56,
+        "exhausts_nonzero_selected_subgroup": true
+      },
+      "restriction_coefficients_low_to_high": [
+        4096,
+        0,
+        -117,
+        0,
+        1
+      ],
+      "restriction_polynomial_matches": true,
+      "extension_frobenius_coefficients_low_to_high": [
+        16777216,
+        -958464,
+        21881,
+        -234,
+        1
+      ],
+      "jacobian_order_over_extension_from_frobenius": 15840400,
+      "source_order_squared_matches_extension_jacobian_order": true
+    }
+  ],
+  "summary": {
+    "cases": 10,
+    "irreducible_over_Q": 10,
+    "restriction_polynomial_matches": 10,
+    "source_order_matches": 10,
+    "extension_source_square_matches": 10,
+    "brute_force_crosschecked": 4
+  }
+}

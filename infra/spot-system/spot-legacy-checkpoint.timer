@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh private local legacy experiment snapshots
+[Timer]
+OnActiveSec=15min
+OnUnitInactiveSec=15min
+Unit=spot-legacy-checkpoint.service
+[Install]
+WantedBy=timers.target

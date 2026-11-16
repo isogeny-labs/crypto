@@ -1,0 +1,22 @@
+⚠ [1945/1947] Built CryptoLean.Polynomial.ProjectiveVelu (2.2s)
+warning: CryptoLean/Polynomial/ProjectiveVelu.lean: imports `Mathlib.RingTheory.Coprime.Lemmas` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Polynomial/ProjectiveVelu.lean: imports `Mathlib.Tactic.Ring` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [1946/1947] Building ProjectiveAuxInstances (2.1s)
+warning: ProjectiveAuxInstances.lean: imports `Mathlib.RingTheory.AdjoinRoot` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ProjectiveAuxInstances.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/scratch/mathlib4/.lake/packages/Cli/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/batteries/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/Qq/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/aesop/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/plausible/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/build/lib/lean:/workspace/crypto-audit/research/projective_aux_norm_20261115/lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/crypto-audit/research/projective_aux_norm_20261115/lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/crypto-audit/research/projective_aux_norm_20261115/lean/ProjectiveAuxInstances.lean -o /workspace/crypto-audit/research/projective_aux_norm_20261115/lean/.lake/build/lib/lean/ProjectiveAuxInstances.olean -i /workspace/crypto-audit/research/projective_aux_norm_20261115/lean/.lake/build/lib/lean/ProjectiveAuxInstances.ilean -c /workspace/crypto-audit/research/projective_aux_norm_20261115/lean/.lake/build/ir/ProjectiveAuxInstances.c --setup /workspace/crypto-audit/research/projective_aux_norm_20261115/lean/.lake/build/ir/ProjectiveAuxInstances.setup.json --json
+error: ProjectiveAuxInstances.lean:18:4: Type mismatch: After simplification, term
+  IsUnit.map (AdjoinRoot.of U) ((ZMod.isUnit_iff_coprime 5 19).mpr (of_decide_eq_true (id (Eq.refl true))))
+ has type
+  @IsUnit (AdjoinRoot U) CommRing.toCommSemiring.toMonoid ((AdjoinRoot.of U) ↑5)
+but is expected to have type
+  @IsUnit (AdjoinRoot U) CommRing.toCommSemiring.toMonoid 5
+error: ProjectiveAuxInstances.lean:21:4: Type mismatch: After simplification, term
+  IsUnit.map (AdjoinRoot.of U) ((ZMod.isUnit_iff_coprime 3 19).mpr (of_decide_eq_true (id (Eq.refl true))))
+ has type
+  @IsUnit (AdjoinRoot U) CommRing.toCommSemiring.toMonoid ((AdjoinRoot.of U) ↑3)
+but is expected to have type
+  @IsUnit (AdjoinRoot U) CommRing.toCommSemiring.toMonoid 3
+Some required targets logged failures:
+- ProjectiveAuxInstances
+error: build failed

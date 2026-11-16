@@ -1,0 +1,87 @@
+// Full RR equivariant map equations, over F32. Input actual sigma/68jets.
+if(size(sigmaColumns)!=68 || size(basisJets389)!=68 || size(invariantCoefficients)!=34){ERROR("map inputs not complete");}
+proc mpApply(poly bits,ideal values){
+ poly answer=0;int j;
+ for(j=1;j<=size(bits);j++){if(leadcoef(bits[j])!=1){ERROR("nonbinary map input");}answer=answer+values[deg(bits[j])+1];}
+ return(answer);
+}
+proc mpSolve(poly value,list pivots,list coordinates){
+ poly combination=0;int position;
+ while(value!=0){position=deg(value)+1;if(pivots[position]==0){break;}
+ value=value+pivots[position];combination=combination+coordinates[position];}
+ return(list(value,combination));
+}
+list mpTracePivots;list mpTraceCoordinates;list mpInvariantPivots;list mpInvariantCoordinates;
+int mpI;int mpJ;int mpPosition;poly mpValue;poly mpBits;list mpSolved;
+for(mpI=1;mpI<=68;mpI++){
+ mpTracePivots=insert(mpTracePivots,poly(0),size(mpTracePivots));
+ mpTraceCoordinates=insert(mpTraceCoordinates,poly(0),size(mpTraceCoordinates));
+ mpInvariantPivots=insert(mpInvariantPivots,poly(0),size(mpInvariantPivots));
+ mpInvariantCoordinates=insert(mpInvariantCoordinates,poly(0),size(mpInvariantCoordinates));
+}
+ideal mpTrace;
+for(mpI=1;mpI<=68;mpI++){
+ mpTrace[mpI]=sigmaColumns[mpI]+w^(mpI-1);
+ mpSolved=mpSolve(mpTrace[mpI],mpTracePivots,mpTraceCoordinates);mpValue=mpSolved[1];mpBits=mpSolved[2]+w^(mpI-1);
+ if(mpValue!=0){mpPosition=deg(mpValue)+1;mpTracePivots[mpPosition]=mpValue;mpTraceCoordinates[mpPosition]=mpBits;}
+}
+// Basis change puts actual constant1 FIRST; all other coefficients test nonconstancy.
+list mpCandidates=list(coordinateCoefficients[1]);
+for(mpI=1;mpI<=34;mpI++){mpCandidates=insert(mpCandidates,invariantCoefficients[mpI],size(mpCandidates));}
+ideal mpH;ideal mpL;ideal mpHCoeff;ideal mpLCoeff;int mpCount=0;
+for(mpI=1;mpI<=35;mpI++){
+ mpBits=mpCandidates[mpI];mpSolved=mpSolve(mpBits,mpInvariantPivots,mpInvariantCoordinates);mpValue=mpSolved[1];
+ if(mpValue!=0){
+  mpCount=mpCount+1;mpPosition=deg(mpValue)+1;mpInvariantPivots[mpPosition]=mpValue;mpInvariantCoordinates[mpPosition]=0;
+  mpHCoeff[mpCount]=mpBits;mpH[mpCount]=mpApply(mpBits,basisJets389);
+  mpSolved=mpSolve(mpBits,mpTracePivots,mpTraceCoordinates);
+  if(mpSolved[1]!=0 || mpApply(mpSolved[2],mpTrace)!=mpBits){ERROR("trace preimage failed for invariant section");}
+  mpLCoeff[mpCount]=mpSolved[2];mpL[mpCount]=mpApply(mpSolved[2],basisJets389);
+ }
+}
+if(mpCount!=34 || mpH[1]!=1){ERROR("map invariant basis constant framing failed");}
+list mapConstraints;for(mpI=1;mpI<=385;mpI++){mapConstraints=insert(mapConstraints,"0",size(mapConstraints));}
+mapConstraints[1]="1";
+int mpTermCount=0;
+proc mpAdd(poly coefficients,string symbolText27){
+ int term;int index;coefficients=jet(coefficients,384);
+ for(term=1;term<=size(coefficients);term++){
+  if(leadcoef(coefficients[term])!=1){ERROR("map coefficient not binary");}
+  mpTermCount=mpTermCount+1;index=deg(coefficients[term])+1;mapConstraints[index]=mapConstraints[index]+"+"+symbolText27;
+ }
+}
+string mpAI;string mpAJ;string mpBI;string mpBJ;
+for(mpI=1;mpI<=34;mpI++){
+ mpAI="a("+string(mpI)+")";mpBI="b("+string(mpI)+")";
+ mpAdd(mpL[mpI]^2,mpAI+"^2");mpAdd(mpH[mpI]^2,mpBI+"^2");mpAdd(mpH[mpI]^2,"c0*"+mpAI+"^2");
+ for(mpJ=1;mpJ<=34;mpJ++){
+  mpAJ="a("+string(mpJ)+")";mpBJ="b("+string(mpJ)+")";
+  mpAdd(mpH[mpI]*mpL[mpJ],mpAI+"*"+mpAJ);
+  mpAdd(mpH[mpI]*mpH[mpJ],mpAI+"*"+mpBJ);
+  mpAdd(mpH[mpI]^2*mpH[mpJ],mpAI+"^2*"+mpAJ);
+ }
+}
+print("MAPBUILD27_BINARY_COEFFICIENT_TERM_COUNT");mpTermCount;
+if(mpTermCount<1000){ERROR("map equation term construction unexpectedly empty");}
+link mpOut="ASCII:w map-equations.sing";open(mpOut);
+write(mpOut,"ring mapTarget27=(2,beta32),(a(1..34),b(1..34),c0,v(1..33)),dp;minpoly=beta32^5+beta32^2+1;ideal mapEquations;");
+for(mpI=1;mpI<=385;mpI++){write(mpOut,"mapEquations["+string(mpI)+"]="+mapConstraints[mpI]+";");}
+int mpIndex=385;
+for(mpI=1;mpI<=34;mpI++){
+ mpIndex=mpIndex+1;write(mpOut,"mapEquations["+string(mpIndex)+"]=a("+string(mpI)+")^32+a("+string(mpI)+");");
+ mpIndex=mpIndex+1;write(mpOut,"mapEquations["+string(mpIndex)+"]=b("+string(mpI)+")^32+b("+string(mpI)+");");
+}
+mpIndex=mpIndex+1;write(mpOut,"mapEquations["+string(mpIndex)+"]=c0^2+c0;");
+string mpNonconstant="1";
+for(mpI=2;mpI<=34;mpI++){mpNonconstant=mpNonconstant+"+a("+string(mpI)+")*v("+string(mpI-1)+")";}
+mpIndex=mpIndex+1;write(mpOut,"mapEquations["+string(mpIndex)+"]="+mpNonconstant+";");close(mpOut);
+print("MAPBUILD27_EQUATION_COUNTS");mpCount;mpIndex;
+if(mpIndex!=455){ERROR("map equation framing mismatch");}
+link mpBasis="ASCII:w map-basis-coefficients.sing";open(mpBasis);
+write(mpBasis,"ideal hCoordinates;ideal lCoordinates;");
+for(mpI=1;mpI<=34;mpI++){
+ write(mpBasis,"hCoordinates["+string(mpI)+"]="+string(mpHCoeff[mpI])+";");
+ write(mpBasis,"lCoordinates["+string(mpI)+"]="+string(mpLCoeff[mpI])+";");
+}
+close(mpBasis);
+print("MAPBUILD27_ALL_CHECKS_PASS");quit;

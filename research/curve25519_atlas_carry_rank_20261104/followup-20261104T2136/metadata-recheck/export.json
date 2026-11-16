@@ -1,0 +1,1224 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "script": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "mixed-carry",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "mixed-mod",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "positive-carry",
+      "role": "control_positive"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "positive-mod",
+      "role": "control_positive"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "random-carry",
+      "role": "control_negative"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "random-mod",
+      "role": "control_negative"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "same_support-carry",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "same_support-mod",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "source-aa-mod",
+      "role": "control_aa"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "source-carry",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "source-mod",
+      "role": "reference"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "target_native-carry",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "f6aa070c73728253a404a4a6f3f97b6d5306f61c215150f3ccaaaa709b326470",
+      "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+      "id": "target_native-mod",
+      "role": "candidate"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-11-04T22:32:37Z",
+  "export_id": "EXAMPLE-ATLAS-runner-unit-export",
+  "files": [
+    {
+      "bytes": 658,
+      "path": "solver-run/identity.json",
+      "sha256": "fa4fada1d708216c88044801dbcd24c9705148c4662e7d9968f88c3790baf06f"
+    },
+    {
+      "bytes": 1183,
+      "path": "../unit-example2/inputs/queries.tsv",
+      "sha256": "e8620bf6141bf16f3c6b579d9217ba022dc90df87b6ba0d5c0eebe518778503d"
+    },
+    {
+      "bytes": 174,
+      "path": "../unit-example2/inputs/configuration.json",
+      "sha256": "b2e972f9449e6da02c9429322403cc1a5368ba903cb9cf21ca67634fbec899bc"
+    },
+    {
+      "bytes": 447,
+      "path": "../unit-example2/inputs/generic.csv",
+      "sha256": "05098ce55ea1a0dca5d0f7a8e3342fc8cf1813d8d4e3f575bf5124e0a33a3bbb"
+    },
+    {
+      "bytes": 135,
+      "path": "../unit-example2/inputs/selection.txt",
+      "sha256": "0f7e9fd92b4b1482405fecb09c3ca9351d9c3dec2b75f88e57a11afafa105807"
+    },
+    {
+      "bytes": 141,
+      "path": "solver-run/export-host.json",
+      "sha256": "3ebc95c86dfbe2dd3a762db0a4d2dc0327b36e015fafa55a66e32b198e0e7803"
+    },
+    {
+      "bytes": 20963,
+      "path": "solver-run/summary.json",
+      "sha256": "629f88a86d3acd329c782bc5bb46e11397520945ca18fad3b43ff8eaa0d986af"
+    },
+    {
+      "bytes": 18930,
+      "path": "../unit-example2/protocol.json",
+      "sha256": "4df2494e268fe3cb3e69edf33d04c22c97b736b7c779d56cc3170e0518e149c8"
+    }
+  ],
+  "flow": {
+    "attempted": 13,
+    "completed": 10,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 3,
+    "planned": 13,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": null,
+    "path": "solver-run/export-host.json",
+    "sha256": "3ebc95c86dfbe2dd3a762db0a4d2dc0327b36e015fafa55a66e32b198e0e7803",
+    "summary": {
+      "cpu_model": null,
+      "hypervisor": null,
+      "isolation_tier_max": "none",
+      "kernel": null,
+      "logical_cpus": 4,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "native-atlas-control",
+      "kind": "observation",
+      "text": "Producer-native checks only; verification.status=no_claim preserves unverified standing. Local unit examples are format/integration tests, not scientific or timing evidence. Unknown host facts and all clocks remain null."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "executor",
+    "runtime": "native-atlas-control",
+    "session": null
+  },
+  "protocol": {
+    "path": "../unit-example2/protocol.json",
+    "protocol_id": "EXAMPLE-ATLAS-runner-unit",
+    "sha256": "ebe1188c8dc7ea32c1713978daab19f255569c58b08cd86b4621db524a7ccedc",
+    "version": 1
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "source-mod",
+      "artifacts": [
+        {
+          "bytes": 9395,
+          "path": "../unit-example2/inputs/source-holdout-0-mod.smt2",
+          "sha256": "25b6f8164f852a34bdc3af1206c87e52ef88801c0d887970dca377f20ccc4267"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/source-base.csv",
+          "sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0"
+        },
+        {
+          "bytes": 1347,
+          "path": "solver-run/0000.json",
+          "sha256": "7f6fa0f3ea87fa93e2d90f2a7849c7fad29a8c58d79eca2709a6911daafda4ea"
+        },
+        {
+          "bytes": 1012,
+          "path": "solver-run/0000.solver.out",
+          "sha256": "4e9f68f4bc9fcd950c1c358d22b9b871a351ce076ee195f0f3c3708edfa5a189"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0000.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0000.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0000.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 9076608
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0000",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "source-aa-mod",
+      "artifacts": [
+        {
+          "bytes": 9395,
+          "path": "../unit-example2/inputs/source-aa-holdout-0-mod.smt2",
+          "sha256": "25b6f8164f852a34bdc3af1206c87e52ef88801c0d887970dca377f20ccc4267"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/source-base.csv",
+          "sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0"
+        },
+        {
+          "bytes": 1356,
+          "path": "solver-run/0001.json",
+          "sha256": "441c191e1ce338d42a952d38e3bcba0e72b722cc57ae54f5b85c644dca5f9037"
+        },
+        {
+          "bytes": 1012,
+          "path": "solver-run/0001.solver.out",
+          "sha256": "48a3ebd4c67026502f5df63d919270aede33805b6746c77a1919203f1fd5649c"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0001.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0001.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0001.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 9076608
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0001",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "positive-mod",
+      "artifacts": [
+        {
+          "bytes": 9395,
+          "path": "../unit-example2/inputs/positive-holdout-0-mod.smt2",
+          "sha256": "65298cc5b918ece05ae7abc3e4b39c1417dc00007903519746bf86e293e75da9"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/source-base.csv",
+          "sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0"
+        },
+        {
+          "bytes": 1641,
+          "path": "solver-run/0002.json",
+          "sha256": "1ff9aaf466bc33ac7ec23e65003a309646996b2966d24412712cc36d1a321059"
+        },
+        {
+          "bytes": 2955,
+          "path": "solver-run/0002.solver.out",
+          "sha256": "b286602e35b9c7f30f744064426167fa0fef32bbb4dd35f7501167c42dc7da41"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0002.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 78,
+          "path": "solver-run/0002.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0002.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0002.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0002.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 2592765
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0002",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "source-carry",
+      "artifacts": [
+        {
+          "bytes": 50117,
+          "path": "../unit-example2/inputs/source-holdout-0-carry.smt2",
+          "sha256": "15add47e3244ca873ffadf9e165f3d1165da5b7d08757a05b906fa1bc1bb9e36"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/source-base.csv",
+          "sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0"
+        },
+        {
+          "bytes": 1354,
+          "path": "solver-run/0003.json",
+          "sha256": "0fe281aa7b42d514715eade5efd3d3ca0ca37043dff8ea63a37684e0f9c7ca9a"
+        },
+        {
+          "bytes": 1087,
+          "path": "solver-run/0003.solver.out",
+          "sha256": "d3b2cb98566b2493833e64cc873887fdd3f1d6999e1ce44f79dcbc0fe0d08e16"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0003.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0003.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0003.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 85409974
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0003",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "positive-carry",
+      "artifacts": [
+        {
+          "bytes": 50117,
+          "path": "../unit-example2/inputs/positive-holdout-0-carry.smt2",
+          "sha256": "ee013e9f8dec91db7e1fcb9a08c28e80231107a6bc7fe816c9ef4e7e56766138"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/source-base.csv",
+          "sha256": "8e75f236fdb916af137d228f3aaf5f594ca022f0a560347893de1bd75fe5bda0"
+        },
+        {
+          "bytes": 1649,
+          "path": "solver-run/0004.json",
+          "sha256": "ae62007ca98d0f2eb6b193afe1d02a681aebbaaae64d8d079876d9a06133c0e3"
+        },
+        {
+          "bytes": 13015,
+          "path": "solver-run/0004.solver.out",
+          "sha256": "83517d52ded6aa121f0be149ba6efc3e81c51bdd0f22db6993b908bbd758ab2b"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0004.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 78,
+          "path": "solver-run/0004.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0004.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0004.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0004.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 68772253
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0004",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "same_support-mod",
+      "artifacts": [
+        {
+          "bytes": 9397,
+          "path": "../unit-example2/inputs/same_support-holdout-0-mod.smt2",
+          "sha256": "587e356113e569f3bd96c4933622b37f23292f51fc896e17dc57d342b69df177"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/same_support-base.csv",
+          "sha256": "85e49993de89f918c3b5347bf95113087032387314021d43f86956cda95bf5b5"
+        },
+        {
+          "bytes": 1365,
+          "path": "solver-run/0005.json",
+          "sha256": "dc1a4ae2286102c861abe7feb36f5d6e9dc887acdc46f40fc7378abef7955eb9"
+        },
+        {
+          "bytes": 1012,
+          "path": "solver-run/0005.solver.out",
+          "sha256": "d8482b96b81311f66737dd35799163e99d53a455aa6e1dc03b70523a6df4a85e"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0005.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0005.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0005.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 8048476
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0005",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "same_support-carry",
+      "artifacts": [
+        {
+          "bytes": 50119,
+          "path": "../unit-example2/inputs/same_support-holdout-0-carry.smt2",
+          "sha256": "04afd7c042c266fab48ce9100fc5ac1a81b748d02b4185f73a41e0fefa6a0fc2"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/same_support-base.csv",
+          "sha256": "85e49993de89f918c3b5347bf95113087032387314021d43f86956cda95bf5b5"
+        },
+        {
+          "bytes": 1372,
+          "path": "solver-run/0006.json",
+          "sha256": "0efc56a53d66523410b1c940c389ec2c16d876f29a2a3f122d0dba842baf3666"
+        },
+        {
+          "bytes": 1087,
+          "path": "solver-run/0006.solver.out",
+          "sha256": "f790f6acb0bb27095e6a1d2909fcddff246a94911ceea528600fab265b58c6f8"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0006.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0006.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0006.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 92132058
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0006",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "target_native-mod",
+      "artifacts": [
+        {
+          "bytes": 9388,
+          "path": "../unit-example2/inputs/target_native-holdout-0-mod.smt2",
+          "sha256": "666036dbfaa58109cbeb666e21cff61c5ad916c053c9b49c5a44acace41256a3"
+        },
+        {
+          "bytes": 80,
+          "path": "../unit-example2/inputs/target_native-base.csv",
+          "sha256": "5bd01ca00efcec04102e160e86f9ce6539d93e8686d083808b665f552a29c7d4"
+        },
+        {
+          "bytes": 1368,
+          "path": "solver-run/0007.json",
+          "sha256": "72e1f58a8bf318bffa10e50cbeb054f587db0f2a704e640dfd031b497399b143"
+        },
+        {
+          "bytes": 1012,
+          "path": "solver-run/0007.solver.out",
+          "sha256": "821e1e65f7836e12077dfb96e63cee6f505301852f19d278e3904fcba6368bf2"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0007.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0007.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0007.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 8810116
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0007",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "target_native-carry",
+      "artifacts": [
+        {
+          "bytes": 50110,
+          "path": "../unit-example2/inputs/target_native-holdout-0-carry.smt2",
+          "sha256": "30413ddcca48e8e8bdd766a861526d00a57474e4a0aec070d8e183c5e124d854"
+        },
+        {
+          "bytes": 80,
+          "path": "../unit-example2/inputs/target_native-base.csv",
+          "sha256": "5bd01ca00efcec04102e160e86f9ce6539d93e8686d083808b665f552a29c7d4"
+        },
+        {
+          "bytes": 1080,
+          "path": "solver-run/0008.json",
+          "sha256": "1d8184b3b29f0bd63fd908d9ad24d38c8788c096d70ce2739b0716878445f42d"
+        },
+        {
+          "bytes": 264,
+          "path": "solver-run/0008.solver.out",
+          "sha256": "48dfb8836d5e61848b0a6f6604c6900320f6d08d98cb58c6c5a007149058176c"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0008.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 0,
+          "solver_rlimit": 68506090
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0008",
+      "seed": 42,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "mixed-mod",
+      "artifacts": [
+        {
+          "bytes": 9395,
+          "path": "../unit-example2/inputs/mixed-holdout-0-mod.smt2",
+          "sha256": "8d51e45cfa8caceec0fcf2f2a32cdcf6d27b0364ddf0d53ecbd3c6f311670aef"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/mixed-base.csv",
+          "sha256": "41a6fe5944ff202970bb5045895893d4d9a7a0fed69eaaacd6ec652347d7dac8"
+        },
+        {
+          "bytes": 1632,
+          "path": "solver-run/0009.json",
+          "sha256": "34fb1d8074f478f8906fbffa67cb45dcb6f6a5bbaf120550eecf2c512ca49343"
+        },
+        {
+          "bytes": 2960,
+          "path": "solver-run/0009.solver.out",
+          "sha256": "f1bd8a6e7ca7a9cc1e6a071317c0d7517ca65ecc8a8877f3bc5028cfb2053f06"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0009.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 78,
+          "path": "solver-run/0009.replay.out",
+          "sha256": "43d3dddb04cb7c19c78bd2b7babe7897a8f60924f6e32480cbb345580675c4b9"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0009.replay.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0009.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0009.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 6348943
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0009",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "mixed-carry",
+      "artifacts": [
+        {
+          "bytes": 50117,
+          "path": "../unit-example2/inputs/mixed-holdout-0-carry.smt2",
+          "sha256": "d2a1dacf90ed23c0c0ddf503371ebcc29b4db031da3afc4c30454d65f3cad1ba"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/mixed-base.csv",
+          "sha256": "41a6fe5944ff202970bb5045895893d4d9a7a0fed69eaaacd6ec652347d7dac8"
+        },
+        {
+          "bytes": 1055,
+          "path": "solver-run/0010.json",
+          "sha256": "c3f458a1ec0571bc53529792e7a24d5e2b4289bc4ca42873648448f3c220b2a5"
+        },
+        {
+          "bytes": 264,
+          "path": "solver-run/0010.solver.out",
+          "sha256": "978c232c848b627c7e6084dc9e5a3684aacdafceb37ca30ba83eb256947df8b3"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0010.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 0,
+          "solver_rlimit": 99314202
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0010",
+      "seed": 42,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "random-mod",
+      "artifacts": [
+        {
+          "bytes": 9395,
+          "path": "../unit-example2/inputs/random-holdout-0-mod.smt2",
+          "sha256": "a0af290679e4b9da481dff9b3073129dd7cc425d81f0dc757ea03a1ed3339622"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/random-base.csv",
+          "sha256": "dc59bc1e0d22ddb5b564901f26711e76db2bf95b9b9af09598f3ec0854451fff"
+        },
+        {
+          "bytes": 1348,
+          "path": "solver-run/0011.json",
+          "sha256": "3fbac552b5a4a4080c275da75e13b0b129290638ee1194fdd53dd435973e0cc8"
+        },
+        {
+          "bytes": 1012,
+          "path": "solver-run/0011.solver.out",
+          "sha256": "e1d5bf5cdca1f14495d273db26dbb578bead2a97607de00282f60c42545b6876"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0011.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 100,
+          "path": "solver-run/0011.openssl.out",
+          "sha256": "ef83e13226b523e0826b8bf944d90f15f2e5d830bbbf07a57e1e990bd4a3b9a5"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0011.openssl.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 1,
+          "solver_rlimit": 7939734
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0011",
+      "seed": 42,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "random-carry",
+      "artifacts": [
+        {
+          "bytes": 50117,
+          "path": "../unit-example2/inputs/random-holdout-0-carry.smt2",
+          "sha256": "b48dc356c48ba0d31e067df4d93cec0b614b10fd4126b0812744ea0d1e308dda"
+        },
+        {
+          "bytes": 81,
+          "path": "../unit-example2/inputs/random-base.csv",
+          "sha256": "dc59bc1e0d22ddb5b564901f26711e76db2bf95b9b9af09598f3ec0854451fff"
+        },
+        {
+          "bytes": 1061,
+          "path": "solver-run/0012.json",
+          "sha256": "46475147a3071f7e9d21bf5bae5526ae82a5d7c59f11ad3722c451baf56ee3b3"
+        },
+        {
+          "bytes": 265,
+          "path": "solver-run/0012.solver.out",
+          "sha256": "163d5edfdae22dce0f8002204c64a89d5b89bdce74a6e6e8853336ceeee60e25"
+        },
+        {
+          "bytes": 0,
+          "path": "solver-run/0012.solver.err",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "i0",
+      "isolation": {
+        "blockers": [
+          "No clock or independent execution standing is admitted"
+        ],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "producer_check_passed": 0,
+          "solver_rlimit": 103499681
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "atlas-0012",
+      "seed": 42,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": null
+      },
+      "warmup": false,
+      "worker": null
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "ecb2e20aac22d99fd628f4c8b4861dcd57645135",
+    "dirty": true,
+    "repo": "crypto"
+  }
+}

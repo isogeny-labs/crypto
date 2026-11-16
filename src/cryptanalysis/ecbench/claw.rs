@@ -78,6 +78,8 @@ pub struct ClawOutcome {
     pub table: GroupOps,
     pub search: GroupOps,
     pub recover: GroupOps,
+    /// The final `[d]G = Q` check, in the `_v2` accounting only.
+    pub verification: GroupOps,
     pub counters: BTreeMap<String, u64>,
     pub exhausted: bool,
 }
@@ -326,8 +328,45 @@ pub fn pair_claw_wide(
     pair_claw_on(&WideClaw::new(wi), target, seed, shape)
 }
 
+/// [`pair_claw`] under the `_v2` accounting ([`pair_claw_with`]).
+pub fn pair_claw_v2(
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    shape: ClawShape,
+) -> Option<ClawOutcome> {
+    let g = NarrowClaw::new(inst)?;
+    Some(pair_claw_with(&g, target, seed, shape, true))
+}
+
+/// [`pair_claw_wide`] under the `_v2` accounting ([`pair_claw_with`]).
+pub fn pair_claw_wide_v2(
+    wi: &WideInstance,
+    target: RawPointG<u128>,
+    seed: u64,
+    shape: ClawShape,
+) -> ClawOutcome {
+    pair_claw_with(&WideClaw::new(wi), target, seed, shape, true)
+}
+
 /// The claw on any [`ClawGroup`].
 pub fn pair_claw_on<G: ClawGroup>(g: &G, target: G::P, seed: u64, shape: ClawShape) -> ClawOutcome {
+    pair_claw_with(g, target, seed, shape, false)
+}
+
+/// The claw on any [`ClawGroup`].  With `v2` (the `claw.pair_table_v2`
+/// accounting) the charged-addition budget `shape.max_adds` counts the
+/// recover phase beside the base, table and search (the first rule leaves it
+/// out, so a run can spend past the cap by its recover additions), and the
+/// candidate is checked `[d]G = Q` on `out.verification`, one counted scalar
+/// multiplication.  The walk is the same either way.
+pub fn pair_claw_with<G: ClawGroup>(
+    g: &G,
+    target: G::P,
+    seed: u64,
+    shape: ClawShape,
+    v2: bool,
+) -> ClawOutcome {
     type Sc<G> = <G as ClawGroup>::S;
     let (n, r) = (g.n(), g.r());
     let lambda = g.lambda();
@@ -374,7 +413,22 @@ pub fn pair_claw_on<G: ClawGroup>(g: &G, target: G::P, seed: u64, shape: ClawSha
             l
         }
     };
-    let charged = |o: &ClawOutcome| o.base.gae() + o.table.gae() + o.search.gae();
+    let charged = |o: &ClawOutcome| {
+        o.base.gae() + o.table.gae() + o.search.gae() + if v2 { o.recover.gae() } else { 0.0 }
+    };
+    // The `_v2` final check: one scalar multiplication of the candidate.
+    let verify = |o: &mut ClawOutcome| {
+        if let (true, Some(d)) = (v2, o.recovered) {
+            let d = <G::S as RhoScalar>::from_biguint(&num_bigint::BigUint::from(d))
+                .expect("a candidate is below the subgroup order");
+            o.count("verification_checks", 1);
+            let mut ops = GroupOps::default();
+            if g.counted_mul(&mut ops, g.generator(), d) != target {
+                o.count("failed_candidates", 1);
+            }
+            o.verification.merge(ops);
+        }
+    };
 
     // 2. Table: descriptor d ∈ [0, S·B) ↦ (i = d / B, b = d mod B), the sum
     // P_i + F_b with i ≤ seed(b); keyed by class, first descriptor wins.
@@ -446,6 +500,7 @@ pub fn pair_claw_on<G: ClawGroup>(g: &G, target: G::P, seed: u64, shape: ClawSha
             out.count("queries_visited", qi);
             out.count("direct_pair_hits", 1);
             out.recovered = Some(pair_log.to_u128());
+            verify(&mut out);
             measurement::end_online();
             return out;
         }
@@ -483,6 +538,7 @@ pub fn pair_claw_on<G: ClawGroup>(g: &G, target: G::P, seed: u64, shape: ClawSha
         out.count("queries_visited", qi);
         out.count("relations", 1);
         out.recovered = Some(addmod(pair_log, y_log).to_u128());
+        verify(&mut out);
         measurement::end_online();
         return out;
     }

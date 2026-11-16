@@ -1,0 +1,573 @@
+{
+  "cells": [],
+  "ecbench": {
+    "pricing": "priced S = recorded S + F4 word XORs * pinned ns_per_word_xor (docs/ic/calibration.json, another host) / sqrt(r); a sensitivity, not the recorded S",
+    "rows": [
+      {
+        "arm": "ic-mitm-frob",
+        "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_f4_word_xors": null,
+        "median_priced_over_signed_frobenius_rho": 18.29060577859314,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 4.179212251354105,
+        "median_priced_s": 17.098694386581585,
+        "median_s_recorded": 17.098694386581585,
+        "median_systems": null,
+        "n": 17,
+        "per_workload": [
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.055722404471634,
+            "s": 17.055722404471634,
+            "systems": null,
+            "verified": true,
+            "workload": "W060ff29f5a49"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.109956731827666,
+            "s": 17.109956731827666,
+            "systems": null,
+            "verified": true,
+            "workload": "W172d54fbb598"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.121895485809883,
+            "s": 17.121895485809883,
+            "systems": null,
+            "verified": true,
+            "workload": "W2b297827a860"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.05185882936795,
+            "s": 17.05185882936795,
+            "systems": null,
+            "verified": true,
+            "workload": "W5a3db0c5255e"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.145261673158785,
+            "s": 17.145261673158785,
+            "systems": null,
+            "verified": true,
+            "workload": "W94ef488a8f88"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.19371785381814,
+            "s": 17.19371785381814,
+            "systems": null,
+            "verified": true,
+            "workload": "Wc28a3fa54b4c"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.035995867619587,
+            "s": 17.035995867619587,
+            "systems": null,
+            "verified": true,
+            "workload": "We6255589f628"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 17.087432041335507,
+            "s": 17.087432041335507,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfa3967bfcd34"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.001954,
+        "priced_over_strong_rho_per_workload": [
+          3.6526453504939576,
+          3.8836860861020233,
+          3.976994293793744,
+          4.134329110403676,
+          4.224095392304534,
+          4.358296474178956,
+          4.517099753739372,
+          4.526420405117522
+        ],
+        "runs": 8,
+        "verified": 8
+      },
+      {
+        "arm": "ic-sat-xor",
+        "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_f4_word_xors": null,
+        "median_priced_over_signed_frobenius_rho": 3.677006824142423,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 0.8569600964348728,
+        "median_priced_s": 3.42959200554649,
+        "median_s_recorded": 3.42959200554649,
+        "median_systems": null,
+        "n": 17,
+        "per_workload": [
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.4471301417845734,
+            "s": 3.4471301417845734,
+            "systems": null,
+            "verified": true,
+            "workload": "W060ff29f5a49"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.473468106636082,
+            "s": 3.473468106636082,
+            "systems": null,
+            "verified": true,
+            "workload": "W172d54fbb598"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.519318820414406,
+            "s": 3.519318820414406,
+            "systems": null,
+            "verified": true,
+            "workload": "W2b297827a860"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.3146119874231155,
+            "s": 3.3146119874231155,
+            "systems": null,
+            "verified": true,
+            "workload": "W5a3db0c5255e"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.3662069157860053,
+            "s": 3.3662069157860053,
+            "systems": null,
+            "verified": true,
+            "workload": "W94ef488a8f88"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.577325902736531,
+            "s": 3.577325902736531,
+            "systems": null,
+            "verified": true,
+            "workload": "Wc28a3fa54b4c"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.412053869308407,
+            "s": 3.412053869308407,
+            "systems": null,
+            "verified": true,
+            "workload": "We6255589f628"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.326803279880696,
+            "s": 3.326803279880696,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfa3967bfcd34"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.001954,
+        "priced_over_strong_rho_per_workload": [
+          0.7111444541736146,
+          0.7730648659499069,
+          0.7982719872766415,
+          0.8537314458617546,
+          0.860188747007991,
+          0.8729012652897151,
+          0.8886926290145273,
+          0.9170100295999651
+        ],
+        "runs": 8,
+        "verified": 8
+      },
+      {
+        "arm": "pdp-m2-g0",
+        "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_f4_word_xors": 1650078244.5,
+        "median_priced_over_signed_frobenius_rho": 11705.063711831219,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 2919.3024992078117,
+        "median_priced_s": 12593.320029783958,
+        "median_s_recorded": 3.432226588053985,
+        "median_systems": 21.5,
+        "n": 17,
+        "per_workload": [
+          {
+            "f4_word_xors": 1687124595.0,
+            "priced_s": 12875.93731485454,
+            "s": 3.43932067984841,
+            "systems": 22.0,
+            "verified": true,
+            "workload": "W060ff29f5a49"
+          },
+          {
+            "f4_word_xors": 1309980436.0,
+            "priced_s": 9998.360414170285,
+            "s": 3.4136362068669888,
+            "systems": 17.0,
+            "verified": true,
+            "workload": "W172d54fbb598"
+          },
+          {
+            "f4_word_xors": 1919417914.0,
+            "priced_s": 14648.394952247321,
+            "s": 3.535099470433969,
+            "systems": 25.0,
+            "verified": true,
+            "workload": "W2b297827a860"
+          },
+          {
+            "f4_word_xors": 996578150.0,
+            "priced_s": 7607.042931399433,
+            "s": 3.306802525486952,
+            "systems": 13.0,
+            "verified": true,
+            "workload": "W5a3db0c5255e"
+          },
+          {
+            "f4_word_xors": 1319238850.0,
+            "priced_s": 10069.009074020725,
+            "s": 3.422038664676351,
+            "systems": 17.0,
+            "verified": true,
+            "workload": "W94ef488a8f88"
+          },
+          {
+            "f4_word_xors": 1613031894.0,
+            "priced_s": 12310.702744713373,
+            "s": 3.52052379696277,
+            "systems": 21.0,
+            "verified": true,
+            "workload": "Wc28a3fa54b4c"
+          },
+          {
+            "f4_word_xors": 1768843128.0,
+            "priced_s": 13499.426997507955,
+            "s": 3.429319168327192,
+            "systems": 23.0,
+            "verified": true,
+            "workload": "We6255589f628"
+          },
+          {
+            "f4_word_xors": 1764402873.0,
+            "priced_s": 13465.554357993464,
+            "s": 3.435134007780778,
+            "systems": 23.0,
+            "verified": true,
+            "workload": "Wfa3967bfcd34"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.001954,
+        "priced_over_strong_rho_per_workload": [
+          1774.185831207761,
+          2639.60874200421,
+          2658.2602820995044,
+          2878.425172288458,
+          2960.179826127166,
+          3188.9113925200513,
+          3322.6325734156344,
+          3453.5406995784856
+        ],
+        "runs": 8,
+        "verified": 8
+      },
+      {
+        "arm": "pdp-m2-g4",
+        "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_f4_word_xors": 24262294.0,
+        "median_priced_over_signed_frobenius_rho": 222.34152500955878,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 45.929995573637655,
+        "median_priced_s": 188.53093694263902,
+        "median_s_recorded": 3.415608193624144,
+        "median_systems": 19.0,
+        "n": 17,
+        "per_workload": [
+          {
+            "f4_word_xors": 20990139.0,
+            "priced_s": 163.51549943682133,
+            "s": 3.3640067873125785,
+            "systems": 17.0,
+            "verified": true,
+            "workload": "W060ff29f5a49"
+          },
+          {
+            "f4_word_xors": 22452369.0,
+            "priced_s": 174.70609718030065,
+            "s": 3.3980172829946618,
+            "systems": 17.0,
+            "verified": true,
+            "workload": "W172d54fbb598"
+          },
+          {
+            "f4_word_xors": 36148786.0,
+            "priced_s": 279.3848093938797,
+            "s": 3.5752001593880456,
+            "systems": 27.0,
+            "verified": true,
+            "workload": "W2b297827a860"
+          },
+          {
+            "f4_word_xors": 17589449.0,
+            "priced_s": 137.51936938480904,
+            "s": 3.3146119874231155,
+            "systems": 13.0,
+            "verified": true,
+            "workload": "W5a3db0c5255e"
+          },
+          {
+            "f4_word_xors": 18018879.0,
+            "priced_s": 140.91119738417393,
+            "s": 3.429955944044005,
+            "systems": 17.0,
+            "verified": true,
+            "workload": "W94ef488a8f88"
+          },
+          {
+            "f4_word_xors": 32594015.0,
+            "priced_s": 252.2610169625721,
+            "s": 3.573757021583745,
+            "systems": 26.0,
+            "verified": true,
+            "workload": "Wc28a3fa54b4c"
+          },
+          {
+            "f4_word_xors": 26072219.0,
+            "priced_s": 202.3557767049774,
+            "s": 3.428804876211386,
+            "systems": 21.0,
+            "verified": true,
+            "workload": "We6255589f628"
+          },
+          {
+            "f4_word_xors": 27596771.0,
+            "priced_s": 213.96147774478965,
+            "s": 3.402411511036902,
+            "systems": 21.0,
+            "verified": true,
+            "workload": "Wfa3967bfcd34"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.001954,
+        "priced_over_strong_rho_per_workload": [
+          32.073555898056405,
+          37.20114229272986,
+          40.49696936673664,
+          45.73685472332918,
+          46.12313642394613,
+          51.76841289444838,
+          60.657623599237915,
+          63.37165752533227
+        ],
+        "runs": 8,
+        "verified": 8
+      },
+      {
+        "arm": "rho-frob",
+        "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_f4_word_xors": null,
+        "median_priced_over_signed_frobenius_rho": 1.0,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 0.23216886265603578,
+        "median_priced_s": 0.9371354323396155,
+        "median_s_recorded": 0.9371354323396155,
+        "median_systems": null,
+        "n": 17,
+        "per_workload": [
+          {
+            "f4_word_xors": null,
+            "priced_s": 1.089419940094803,
+            "s": 1.089419940094803,
+            "systems": null,
+            "verified": true,
+            "workload": "W060ff29f5a49"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.7106610361908751,
+            "s": 0.7106610361908751,
+            "systems": null,
+            "verified": true,
+            "workload": "W172d54fbb598"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.9176117774992069,
+            "s": 0.9176117774992069,
+            "systems": null,
+            "verified": true,
+            "workload": "W2b297827a860"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.6638042645738943,
+            "s": 0.6638042645738943,
+            "systems": null,
+            "verified": true,
+            "workload": "W5a3db0c5255e"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.9566590871800241,
+            "s": 0.9566590871800241,
+            "systems": null,
+            "verified": true,
+            "workload": "W94ef488a8f88"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 1.062086823318231,
+            "s": 1.062086823318231,
+            "systems": null,
+            "verified": true,
+            "workload": "Wc28a3fa54b4c"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 0.8278029652333271,
+            "s": 0.8278029652333271,
+            "systems": null,
+            "verified": true,
+            "workload": "We6255589f628"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 1.1870382142968463,
+            "s": 1.1870382142968463,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfa3967bfcd34"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.001954,
+        "priced_over_strong_rho_per_workload": [
+          0.1548186504957233,
+          0.18761746986762057,
+          0.20813794218464404,
+          0.2117757466441208,
+          0.25256197866795077,
+          0.2537437810328315,
+          0.25538493237782384,
+          0.269810544526255
+        ],
+        "runs": 8,
+        "verified": 8
+      },
+      {
+        "arm": "rho-strong",
+        "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_f4_word_xors": null,
+        "median_priced_over_signed_frobenius_rho": 4.340700095977016,
+        "median_priced_over_standard_twin": null,
+        "median_priced_over_strong_rho": 1.0,
+        "median_priced_s": 4.0982452137353995,
+        "median_s_recorded": 4.0982452137353995,
+        "median_systems": null,
+        "n": 17,
+        "per_workload": [
+          {
+            "f4_word_xors": null,
+            "priced_s": 4.037721883730132,
+            "s": 4.037721883730132,
+            "systems": null,
+            "verified": true,
+            "workload": "W060ff29f5a49"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.787819101772902,
+            "s": 3.787819101772902,
+            "systems": null,
+            "verified": true,
+            "workload": "W172d54fbb598"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 4.408671325697897,
+            "s": 4.408671325697897,
+            "systems": null,
+            "verified": true,
+            "workload": "W2b297827a860"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 4.287624665687363,
+            "s": 4.287624665687363,
+            "systems": null,
+            "verified": true,
+            "workload": "W5a3db0c5255e"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.787819101772902,
+            "s": 3.787819101772902,
+            "systems": null,
+            "verified": true,
+            "workload": "W94ef488a8f88"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 4.158768543740666,
+            "s": 4.158768543740666,
+            "systems": null,
+            "verified": true,
+            "workload": "Wc28a3fa54b4c"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 3.9088657617834355,
+            "s": 3.9088657617834355,
+            "systems": null,
+            "verified": true,
+            "workload": "We6255589f628"
+          },
+          {
+            "f4_word_xors": null,
+            "priced_s": 4.678097762495536,
+            "s": 4.678097762495536,
+            "systems": null,
+            "verified": true,
+            "workload": "Wfa3967bfcd34"
+          }
+        ],
+        "pinned_ns_per_word_xor": 0.001954,
+        "priced_over_strong_rho_per_workload": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "runs": 8,
+        "verified": 8
+      }
+    ],
+    "sessions": [
+      "research/pdp_split_slots_20261012/sessions/C-n17"
+    ]
+  },
+  "inputs": {
+    "calibration": "docs/ic/calibration.json",
+    "replica": null,
+    "rho_session": "research/pdp_split_dreg_20261011/sessions/rho-01",
+    "runs": ""
+  },
+  "ladder": {
+    "cells": [],
+    "files": [],
+    "rows": [],
+    "rule": "growth = (cost_k2/cost_k1)^(1/(k2-k1)) on mean XORs per branch; enumeration is 2"
+  },
+  "projection_rule": "S_relations = (F+1)/lambda * mean_word_xors * ns_per_word_xor / sqrt(r); relation phase only; pinned ratio from another host",
+  "replica_runs_compared": 0,
+  "replica_runs_mismatched": 0,
+  "schema": "pdp_split_dreg.analysis/v1"
+}

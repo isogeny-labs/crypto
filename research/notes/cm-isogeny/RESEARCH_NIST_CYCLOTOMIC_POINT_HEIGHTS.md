@@ -37,7 +37,10 @@ classes: **[exact]** computation or certified identity, unaffected;
    above the pre-registered α = 0.05/18.  It is within the control
    distribution, more extreme than 99.6% of controls before correction.  The
    Dickman `ρ(256/92)` figure used random integers as the null and is
-   withdrawn.  [measured]
+   withdrawn.  A second run with ECM-completed factoring (Amendment 2)
+   gives the same verdict (rank 796/800, p = 0.0125 > 0.05/9).  ECM changed
+   the metric for none of 2400 controls, so the verdict does not depend on
+   the factoring budget.  [measured]
 2. **Other `n ± 1` and twist orders unremarkable: supported**, p ≥ 0.20.
    [measured]
 3. **"No small points" on the canonical lift: supported only within the
@@ -50,11 +53,15 @@ classes: **[exact]** computation or certified identity, unaffected;
    random point can be" is replaced by "as large as a random point
    typically is".  [measured]
 5. **Two-point lift: "independent" supported, "orthogonal, cos < 0.002"
-   withdrawn.**  det/(ĥĥ) is 1.0000 for random pairs against −0.005 to
-   −0.002 for exactly dependent pairs.  But the height routine reads
-   `|cos|` = 1.0011–1.0025 on dependent pairs, and random pairs pile up at
-   0.0013, so cosines below about 0.003 are below its resolution.
-   [measured]
+   replaced by a measured value.**  det/(ĥĥ) is 1.0000 for random pairs
+   against −0.005 to −0.002 for exactly dependent pairs.  The original
+   height routine could not resolve the cosine: it read 1.0011–1.0025 on
+   dependent pairs because it took naive heights on the denominator-cleared
+   model.  With rational-model heights (Amendment 2; dependent pairs exact
+   to 1e-16, parallelogram law to 3e-3 nats), `|cos(G̃, R̃)|` is 5.9e-4 /
+   0 / 4.4e-4 for P-192 / P-224 / P-256.  That is within the random-pair
+   distribution, where the canonical pairing is exactly 0 for 59–66% of
+   pairs and `|cos|` ≤ 0.013 for all.  [measured]
 6. **§3.3's "model invariant only up to rescaling": wrong.**  The canonical
    height is invariant under every `Q`-isomorphism, rescaling included.
    `E_2` and `E_1` are different curves, so `G̃` simply has a different
@@ -337,8 +344,9 @@ heights differ; correction 6.)  Xedni
 needs the lifted points to be *dependent*; the regulator is as large as
 the product of the heights allows (exactly dependent pairs give ≈ 0 with
 the same routine).  ~~and the pairing is zero to three decimals.~~
-*(Withdrawn 2026-10-11: the routine's cosine floor is about 0.003;
-correction 5.)*  This is Jacobson–Koblitz–Silverman–Stein–Teske (2000) seen in
+*(Corrected 2026-10-18: the cosine column above came from a routine
+biased by about 0.001.  Rational-model heights give `|cos|` = 5.9e-4 / 0 /
+4.4e-4, typical of random two-point lifts; correction 5.)*  This is Jacobson–Koblitz–Silverman–Stein–Teske (2000) seen in
 the numbers, and it is the same obstruction
 [`RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md`](../../../RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md)
 §(d) states through the parallelogram law `ĥ(P + Q) + ĥ(P − Q) = 2ĥ(P) +

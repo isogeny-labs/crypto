@@ -1,0 +1,68 @@
+{
+  "schema": "koblitz.exact-computation-export/v1",
+  "round": 25,
+  "source_revision": "1631b6462592f3ec5c4ffb597ae97b0afb9f2132",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "sha256": "aa1c2b3d182203e81de1cb67be2bf6e0b91b4d1ed8d87a1791ee1ffe904ebb9b",
+    "machine_index": "protocol.json",
+    "generic_checker_available": false
+  },
+  "flow": {
+    "native_original_planned": 2,
+    "native_attempted": 8,
+    "native_accepted": 2,
+    "native_implementation_rejections": 5,
+    "native_expected_rejections": 1,
+    "gate_only_refusals": 2,
+    "checkpoint_storage_prelaunch_failures": 1,
+    "native_timeouts": 0,
+    "lean_attempted": 2,
+    "lean_failed": 1,
+    "lean_passed": 1
+  },
+  "accepted_native": [
+    "deck25-positive-04",
+    "q25-registered-05"
+  ],
+  "rejected_implementation": [
+    "deck25-positive-01",
+    "deck25-positive-02",
+    "deck25-positive-03",
+    "q25-registered-01",
+    "q25-registered-03"
+  ],
+  "expected_rejection": "deck25-corrupt-01",
+  "gate_only": [
+    "q25-registered-02",
+    "q25-registered-04"
+  ],
+  "checkpoint_prelaunch_failure": "runs/prelaunch-checkpoint-storage.log",
+  "raw": {
+    "path": "runs.tar.xz",
+    "sha256": "fab118704456ad4002755c4847edfe6b993732a4d18d7f89d5549764bd92e3e4",
+    "bytes": 101780,
+    "members": 87,
+    "manifest": "runs.sha256",
+    "local_extraction_verified": true,
+    "fresh_s3_download_verified": true,
+    "fresh_extraction_verified": true,
+    "deterministic_repack_verified": true
+  },
+  "proof": {
+    "theorems": 14,
+    "failing": 0,
+    "trusted_native": 0,
+    "lean": "4.34.1",
+    "mathlib": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+    "source_sha256": "7bddbb6754283aa6e781b490e9398237bbadbc7512f4303573c2d2da4f32af25",
+    "full_geometry_formalized": false
+  },
+  "source_pins": "source.sha256",
+  "written_bridge_scope": "CM.md and PROOF_MAP.md",
+  "software_validation": "../24/validation.json and VALIDATION.md",
+  "performance_measured": false,
+  "new_relation_rank_claim": false,
+  "full_modular_factor_transfer": false,
+  "merge_authorized": false
+}

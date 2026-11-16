@@ -1,0 +1,514 @@
+{
+  "a": 1,
+  "arm_wall_s": 600.0,
+  "experiment": "R6.1 end-to-end through ic_framework::run_pipeline (the ic bench pipeline)",
+  "h": 2,
+  "instance": "icv1-f2m17-tm101-00378d4e",
+  "max_trials": 20000,
+  "n": 17,
+  "node_budget": 4096,
+  "planted": 36919,
+  "r": 65587,
+  "rho_floor_S_derived": 0.8862269254527579,
+  "rows": [
+    {
+      "S": 6698.779866414629,
+      "arm": "chained-m4",
+      "call_outcomes": {
+        "budget": 6,
+        "found": 25
+      },
+      "columns": 26,
+      "ell": 6,
+      "exhausted": false,
+      "extra": null,
+      "full_report": {
+        "decomposition": {
+          "cost": {
+            "gae": 1715514.447963,
+            "group_ops": {
+              "adds": 1082,
+              "doubles": 863,
+              "scalar_mults": 62
+            },
+            "native": {
+              "canonicalisations": 0,
+              "direct_relations_skipped": 0,
+              "frobfold_mismatches": 0,
+              "inversions": 0,
+              "lift_failures": 0,
+              "lookups": 0,
+              "relations": 25,
+              "repeated_targets_skipped": 0,
+              "s4_hits": 0,
+              "s4_pairs": 0,
+              "solver_budget_exceeded": 6,
+              "solver_calls": 31,
+              "solver_ops": 876954513,
+              "sqrt_solves": 0,
+              "target_guard_probes": 31,
+              "trials": 31,
+              "unliftable_systems": 0
+            },
+            "wall_ns": 10984189125
+          },
+          "description": "chained x-frame descent: 3 S3 links over the base's subspace, inherited-f4 (Macaulay cap 3, 4096 reduction calls)",
+          "gae_before_solver": 1945.329561,
+          "hit_rate": 0.8064516129032258,
+          "name": "chained-x",
+          "relations_found": 25,
+          "setup": {
+            "gae": 0.0,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {},
+            "wall_ns": 557405
+          },
+          "solver": {
+            "budget_exceeded": 6,
+            "calls": 31,
+            "degree_over_bound": null,
+            "extra": {
+              "oversize": 0,
+              "reductions": 42725,
+              "splits": 18354
+            },
+            "gae": 1713569.118402,
+            "name": "chained-x inherited-f4 (cap 3, budget 4096)",
+            "ns_per_op": 0.24684228387,
+            "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+            "ops": 876954513,
+            "peak_bytes": 0,
+            "priced_by": "pinned",
+            "semi_regular_degree": 13,
+            "solving_degree_max": 0,
+            "solving_degree_mean": null,
+            "wall_ns": 10983419818
+          },
+          "summands": 4,
+          "system": {
+            "degrees": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "n_equations": 51,
+            "n_vars": 58,
+            "semi_regular_degree": 13
+          },
+          "targets_tried": 31
+        },
+        "exhausted": false,
+        "factor_base": {
+          "abscissae": 27,
+          "columns": 26,
+          "cost": {
+            "gae": 2.817374,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "abscissae_scanned": 0,
+              "as_solves": 0,
+              "cofactor_multiplications": 27,
+              "derived_counts": 1,
+              "frobenius_coordinate_squarings": 1768,
+              "frobenius_maps": 53
+            },
+            "wall_ns": 712745
+          },
+          "description": "F_x random V",
+          "name": "r6-fixed-subspace",
+          "points_per_column": 2.0384615384615383,
+          "signed_points": 53
+        },
+        "group_order": 131174,
+        "instance": "icv1-f2m17-tm101-00378d4e",
+        "label": "r6-fixed-subspace + chained-x[m=4,node_budget=4096,trace=1] + — + random",
+        "linear_algebra": {
+          "cost": {
+            "gae": 16.511976,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "columns": 27,
+              "pinned_by_repeated_row": 0,
+              "rank": 25,
+              "repeated_column_rows": 0,
+              "row_ops": 1196,
+              "rows": 25,
+              "single_column_rows": 0,
+              "two_column_rows": 0
+            },
+            "wall_ns": 214855
+          },
+          "dependent": 0,
+          "name": "incremental-gauss",
+          "rank": 25,
+          "rows": 25,
+          "work": 1196,
+          "work_unit": "row_ops"
+        },
+        "log2_r": 16.001122266128682,
+        "r": 65587,
+        "recovered": 36919,
+        "rho_s": null,
+        "s": 6698.779866414629,
+        "s_over_rho": null,
+        "spec": {
+          "factor_base": "r6-fixed-subspace",
+          "factor_base_params": {},
+          "linalg": "",
+          "max_trials": 20000,
+          "oracle": "chained-x",
+          "oracle_params": {
+            "m": "4",
+            "node_budget": "4096",
+            "trace": "1"
+          },
+          "seed": 123212651130,
+          "solver": null,
+          "solver_budget_seconds": 0,
+          "solver_params": {},
+          "targets": "Random"
+        },
+        "total_gae": 1715554.777313,
+        "verified": true,
+        "verify": {
+          "gae": 21.0,
+          "group_ops": {
+            "adds": 6,
+            "doubles": 15,
+            "scalar_mults": 1
+          },
+          "native": {},
+          "wall_ns": 3121
+        },
+        "wall_seconds": 10.98501796
+      },
+      "hit_rate": 0.8064516129032258,
+      "instance": "icv1-f2m17-tm101-00378d4e",
+      "label": "r6-fixed-subspace + chained-x[m=4,node_budget=4096,trace=1] + — + random",
+      "m": 4,
+      "per_call": [
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 2185,
+          "splits": 935,
+          "wall_ms_contended": 589.911851,
+          "word_xors": 44248286
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 368,
+          "splits": 160,
+          "wall_ms_contended": 92.579694,
+          "word_xors": 8373918
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 668,
+          "splits": 288,
+          "wall_ms_contended": 161.14953,
+          "word_xors": 14130787
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 176,
+          "splits": 78,
+          "wall_ms_contended": 63.949451,
+          "word_xors": 4725916
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1396,
+          "splits": 598,
+          "wall_ms_contended": 331.050407,
+          "word_xors": 28976878
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 330,
+          "splits": 144,
+          "wall_ms_contended": 82.173038,
+          "word_xors": 7812205
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 401,
+          "splits": 176,
+          "wall_ms_contended": 95.87702,
+          "word_xors": 8688221
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1107,
+          "splits": 478,
+          "wall_ms_contended": 346.259626,
+          "word_xors": 22826721
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1940,
+          "splits": 832,
+          "wall_ms_contended": 501.586053,
+          "word_xors": 39482188
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 1751,
+          "wall_ms_contended": 1012.060651,
+          "word_xors": 82232378
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 368,
+          "splits": 162,
+          "wall_ms_contended": 86.136856,
+          "word_xors": 8210776
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 200,
+          "splits": 88,
+          "wall_ms_contended": 51.518261,
+          "word_xors": 5109019
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 1754,
+          "wall_ms_contended": 928.602144,
+          "word_xors": 82048524
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 365,
+          "splits": 160,
+          "wall_ms_contended": 86.792028,
+          "word_xors": 8147011
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 541,
+          "splits": 237,
+          "wall_ms_contended": 164.18758,
+          "word_xors": 11644640
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 27,
+          "splits": 15,
+          "wall_ms_contended": 16.969231,
+          "word_xors": 1723123
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 624,
+          "splits": 269,
+          "wall_ms_contended": 147.054672,
+          "word_xors": 13737031
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1255,
+          "splits": 540,
+          "wall_ms_contended": 291.170503,
+          "word_xors": 25776266
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1912,
+          "splits": 818,
+          "wall_ms_contended": 501.752056,
+          "word_xors": 38686131
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 69,
+          "splits": 33,
+          "wall_ms_contended": 69.778414,
+          "word_xors": 2410477
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 29,
+          "splits": 16,
+          "wall_ms_contended": 14.548468,
+          "word_xors": 1790445
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 1755,
+          "wall_ms_contended": 1058.746575,
+          "word_xors": 82182615
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 351,
+          "splits": 153,
+          "wall_ms_contended": 89.533085,
+          "word_xors": 8047533
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 1754,
+          "wall_ms_contended": 1096.451927,
+          "word_xors": 81941759
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1632,
+          "splits": 700,
+          "wall_ms_contended": 431.634493,
+          "word_xors": 32843596
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 1750,
+          "wall_ms_contended": 998.31222,
+          "word_xors": 81741042
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 239,
+          "splits": 107,
+          "wall_ms_contended": 60.340247,
+          "word_xors": 5737971
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 329,
+          "splits": 144,
+          "wall_ms_contended": 105.788454,
+          "word_xors": 7681166
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 985,
+          "splits": 425,
+          "wall_ms_contended": 261.044205,
+          "word_xors": 20373554
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "budget",
+          "reductions": 4096,
+          "splits": 1753,
+          "wall_ms_contended": 1083.67895,
+          "word_xors": 81626199
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 652,
+          "splits": 281,
+          "wall_ms_contended": 162.782128,
+          "word_xors": 13998137
+        }
+      ],
+      "r": 65587,
+      "reductions_total": 42725,
+      "relations_found": 25,
+      "solver_budget_exceeded": 6,
+      "solver_calls": 31,
+      "solver_ops": 876954513,
+      "targets_tried": 31,
+      "total_gae": 1715554.777313,
+      "verified": true,
+      "wall_s_contended": 10.98501796,
+      "wall_truncated": false
+    }
+  ],
+  "seed": 123212651130,
+  "v_seed": 370935120
+}

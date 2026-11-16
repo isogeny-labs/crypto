@@ -1,0 +1,45 @@
+READ-ONLY REPOSITORY CONTEXT
+
+aburan28/crypto
+  src/cryptanalysis/ec_index_calculus.rs
+    Two-/higher-summand Semaev decomposition, relation collection and linear
+    algebra architecture. Our IC2 and IC3 counters are independent models;
+    none is an execution or measured extrapolation of this implementation.
+
+  src/cryptanalysis/koblitz_index_calculus.rs
+    Invariant factor bases, signed Frobenius orbits, separate decomposition
+    oracles. Our surface orbit discount is assumed, not computed from a base.
+
+  RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md
+    Supplied context about isogeny neighbors and preserving versus losing
+    Frobenius symmetry. Its numerical results are not used as synthetic data.
+
+  .agents/skills/isogeny-volcano/SKILL.md
+  .agents/skills/report-evidence/SKILL.md
+  .agents/skills/research-visuals/SKILL.md
+    Ten-target reporting, honest scope, ordinary-volcano geometry, costed
+    transport, paired seeds, independent replay, report/figure/PDF conventions.
+    User explicitly requested invented data, so real-curve measurement gates
+    were replaced by visibly labeled simulation checks, not reported passed.
+
+  tools/volcano-diagram/volcano_diagram.py
+    Retained plot renderer. Changes: use 'abstract vertices' and 'simulated
+    range' when the diagram's synthetic flag is set. Standard positions are
+    reused in the interactive explorer. The static diagram displays only the
+    degree-3 skeleton; the explorer and edge table contain the overlays.
+
+aburan28/cryptanalysis
+  include/cryptanalysis/ca_volcano.h
+    Prime-field degree-2/3 volcano API, explicit Velu maps, point transport,
+    graph/conductor distinction. Its API cannot be labeled a measured binary
+    extension-field pipeline without additional real implementations.
+
+The package is standalone and changes neither repository. No existing measured
+scoreboard or boundary row is affected by an invented dataset. An integration
+PR, if wanted later, should identify this as a synthetic planning tool, retain
+the banners, and keep its outputs out of measured benchmark ledgers.
+
+For a real successor run, replace abstract vertices with certified field,
+curve, subgroup and order identities; determine levels rather than using BFS
+distance as a proof; verify kernel maps, transport, relations and recovered
+logs; measure all stages on the same host and retain unsuccessful runs.

@@ -1,0 +1,23 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "smoke (accounting v2): every generic method on a registered 20-bit prime-order curve",
+  "description": "smoke-prime.json under the accounting v2 ids (README section 7): rho.negation_v2 (Brent cycle detection, lost-walk counters), bsgs.*_v2 and kangaroo.vow_v2 (one charged final [d]G = Q check each, restarts in their own phase), beside the frozen index-calculus arm and the frozen negation rho as the unchanged-id control. Two single-target workloads, three interleaved rounds. Not a performance claim.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 20, "seed": 59297}],
+    "targets_per_curve": 2,
+    "target_seed": 20261002
+  },
+  "arms": [
+    {"name": "rho-neg-v2", "role": "reference", "method": {"id": "rho.negation_v2"}},
+    {"name": "rho-neg", "role": "baseline", "method": {"id": "rho.negation"}},
+    {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}},
+    {"name": "bsgs-v2", "role": "candidate", "method": {"id": "bsgs.textbook_v2"}},
+    {"name": "bsgs-il-v2", "role": "candidate", "method": {"id": "bsgs.interleaved_v2"}},
+    {"name": "bsgs-neg-v2", "role": "candidate", "method": {"id": "bsgs.negation_v2"}},
+    {"name": "kangaroo-v2", "role": "candidate", "method": {"id": "kangaroo.vow_v2"}},
+    {"name": "ic-mitm", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "prime-abscissa:size=32", "oracle": "mitm:negation_folded=1"}}},
+    {"name": "rho-neg-v2-aa", "role": "control", "method": {"id": "rho.negation_v2"}}
+  ],
+  "measurement": {"rounds": 3, "warmup": 1, "order": "alternate", "seed": 1, "isolation_required": "L2", "timeout_seconds": 120}
+}

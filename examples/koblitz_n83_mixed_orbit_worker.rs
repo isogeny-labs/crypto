@@ -1,20 +1,23 @@
 //! Replay two pinned N83 bases and collect bounded one/two-residual relations.
 //!
 //! `verify` and `verify-alt` import pinned S3 objects and check their exact
-//! orbit-labelled prefix. `run` and `run-alt` additionally require a 4 GiB, zero-swap Linux cgroup and
-//! an external budget supervisor. Neither mode downloads an object.
+//! orbit-labelled prefix. `run`, `run-alt`, and the opt-in cross-pilot canonical
+//! arm additionally require a 4 GiB, zero-swap Linux cgroup and an external
+//! budget supervisor. Neither mode downloads an object.
 //! `verify-control` and `control-run` use a pinned known-answer witness only;
 //! their outcomes are not natural-target relation-yield measurements.
 
 use crypto_lib::binary_ecc::curve::point_neg;
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
+use crypto_lib::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_explicit_frobenius_point_factor_base, ChainS3Limits, FrobeniusFactorBase, KoblitzCurve,
 };
 use crypto_lib::cryptanalysis::koblitz_large_prime::{
     build_exact_residual_difference_factor_base, build_exact_residual_suffix_factor_base,
-    FeedOutcome, LargePrimeLimits, MixedOrbitDomains, WideLargePrimeEliminator,
+    FeedOutcome, LargePrimeLimits, MixedOrbitDomains, MixedOrbitOrdering, WideLargePrimeEliminator,
 };
+use crypto_lib::cryptanalysis::sat::to_dimacs_xor;
 use flate2::read::GzDecoder;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -858,11 +861,382 @@ fn require_distinct_pilot_streams(base_row: &Value, pool_row: &Value) -> Result<
     Ok(())
 }
 
+/// One exact first-pattern instance for an external XOR-aware SAT solver.
+/// Export and verification rebuild it from the same pinned archive bytes.
+struct CrossXcnfInstance {
+    curve: KoblitzCurve,
+    base: FrobeniusFactorBase,
+    residual: FrobeniusFactorBase,
+    encoding: ChainedS3Encoding,
+    group_target: BinaryPoint,
+    coef_a: BigUint,
+    coef_b: BigUint,
+    base_hash: String,
+    pool_hash: String,
+    base_summands: usize,
+    residual_summands: usize,
+    shared_signed_orbits: usize,
+    trial: u64,
+    identity_mask: u32,
+    extended_metadata: bool,
+}
+
+fn external_trial_pattern(args: &[String], extended: bool) -> Result<(u64, u32)> {
+    if !extended {
+        return Ok((0, 0));
+    }
+    if args.len() < 12 {
+        return Err("external trial and identity mask missing".into());
+    }
+    let trial: u64 = args[10].parse()?;
+    let identity_mask: u32 = args[11].parse()?;
+    if trial == u64::MAX {
+        return Err("external trial source ID overflow".into());
+    }
+    Ok((trial, identity_mask))
+}
+
+fn cross_xcnf_instance(args: &[String], extended: bool) -> Result<CrossXcnfInstance> {
+    if args.len() < if extended { 12 } else { 10 } {
+        return Err("external instance arguments missing".into());
+    }
+    let (trial, identity_mask) = external_trial_pattern(args, extended)?;
+    let base_summands: usize = args[8].parse()?;
+    let residual_summands: usize = args[9].parse()?;
+    if base_summands < 3
+        || !(1..=2).contains(&residual_summands)
+        || !(5..=6).contains(&(base_summands + residual_summands))
+    {
+        return Err("invalid external mixed-orbit shape".into());
+    }
+    let curve = KoblitzCurve::known_n83_k0().ok_or("pinned Koblitz curve")?;
+    if curve.label() != CURVE || curve.cofactor != BigUint::from(4u8) {
+        return Err("curve identity mismatch".into());
+    }
+    let (base_row, base) =
+        import_pilot(&args[1], Path::new(&args[2]), Path::new(&args[3]), &curve)?;
+    let (pool_row, pool) =
+        import_pilot(&args[4], Path::new(&args[5]), Path::new(&args[6]), &curve)?;
+    require_distinct_pilot_streams(&base_row, &pool_row)?;
+    let residual = build_exact_residual_difference_factor_base(&curve, &base, &pool)?;
+    let shared_signed_orbits = pool
+        .signed_orbits
+        .len()
+        .checked_sub(residual.signed_orbits.len())
+        .ok_or("residual orbit count exceeds pool")?;
+    let (public_point, _) = public_target(Path::new(&args[7]), &curve)?;
+    let coef_a = trial_coefficient(b"a", trial, &curve.subgroup_order);
+    let coef_b = trial_coefficient(b"b", trial, &curve.subgroup_order);
+    let domains = MixedOrbitDomains::new(&curve, &base, &residual)?;
+    let limits = ChainS3Limits {
+        max_variables: 150_000,
+        max_domain_clauses: 12_000_000,
+        max_models: 1,
+        conflict_budget: 1,
+    };
+    let (encoding, group_target) = domains.pattern_encoding(
+        &coef_a,
+        &coef_b,
+        &public_point,
+        base_summands,
+        residual_summands,
+        identity_mask,
+        limits,
+        true,
+    )?;
+    Ok(CrossXcnfInstance {
+        curve,
+        base,
+        residual,
+        encoding,
+        group_target,
+        coef_a,
+        coef_b,
+        base_hash: args[1].clone(),
+        pool_hash: args[4].clone(),
+        base_summands,
+        residual_summands,
+        shared_signed_orbits,
+        trial,
+        identity_mask,
+        extended_metadata: extended,
+    })
+}
+
+fn cross_xcnf_metadata(instance: &CrossXcnfInstance, xcnf: &[u8]) -> Result<Value> {
+    let mut metadata = json!({
+        "schema":"n83.cross-stream-first-pattern-xcnf/v1",
+        "study":STUDY, "curve_slug":CURVE,
+        "base_object_blake3":instance.base_hash,
+        "pool_object_blake3":instance.pool_hash,
+        "pilot_manifest_blake3":blake3::hash(SMALL_600_MANIFEST).to_hex().to_string(),
+        "source_files_blake3":{
+            "examples/koblitz_n83_mixed_orbit_worker.rs":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
+            "src/cryptanalysis/binary_semaev_chain_sat.rs":blake3::hash(include_bytes!("../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string(),
+            "src/cryptanalysis/koblitz_large_prime.rs":blake3::hash(include_bytes!("../src/cryptanalysis/koblitz_large_prime.rs")).to_hex().to_string(),
+            "src/cryptanalysis/sat.rs":blake3::hash(include_bytes!("../src/cryptanalysis/sat.rs")).to_hex().to_string()
+        },
+        "public_corpus_canonical_json_blake3":PUBLIC_CORPUS_HASH,
+        "coef_a":instance.coef_a.to_string(), "coef_b":instance.coef_b.to_string(),
+        "group_target":point_json(&instance.group_target)?,
+        "base_summands":instance.base_summands,
+        "residual_summands":instance.residual_summands,
+        "base_points":instance.base.points.len(),
+        "residual_points":instance.residual.points.len(),
+        "shared_signed_orbits":instance.shared_signed_orbits,
+        "identity_mask":instance.identity_mask, "order_first_pair":true,
+        "variables":instance.encoding.solver.n_vars(),
+        "original_clauses":instance.encoding.solver.n_original_clauses(),
+        "xor_rows":instance.encoding.solver.n_xors(),
+        "xcnf_bytes":xcnf.len(),
+        "xcnf_blake3":blake3::hash(xcnf).to_hex().to_string(),
+        "new_n83_solver_search_executed":false,
+        "selected_best_total_runtime":null
+    });
+    if instance.extended_metadata {
+        metadata["schema"] = json!("n83.cross-stream-pattern-xcnf/v2");
+        metadata["trial"] = json!(instance.trial);
+        metadata["source_id"] = json!(instance.trial + 1);
+    }
+    Ok(metadata)
+}
+
+/// Parse a complete CryptoMiniSat DIMACS model. Missing, repeated, and
+/// out-of-range variables fail closed before any curve-level interpretation.
+fn parse_external_sat_model(output: &[u8], variables: u32) -> Result<Vec<bool>> {
+    let text = std::str::from_utf8(output)?;
+    let mut values = vec![None; variables as usize];
+    let mut status_count = 0usize;
+    let mut terminated = false;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line == "c" || line.starts_with("c ") {
+            continue;
+        }
+        if line == "s SATISFIABLE" {
+            status_count += 1;
+            continue;
+        }
+        let Some(words) = line.strip_prefix("v ") else {
+            return Err("unexpected external solver output line".into());
+        };
+        for word in words.split_whitespace() {
+            let literal: i32 = word.parse()?;
+            if literal == 0 {
+                if terminated {
+                    return Err("duplicate external model terminator".into());
+                }
+                terminated = true;
+                continue;
+            }
+            if terminated || literal.unsigned_abs() == 0 || literal.unsigned_abs() > variables {
+                return Err("external model literal outside exact variable domain".into());
+            }
+            let slot = &mut values[(literal.unsigned_abs() - 1) as usize];
+            if slot.replace(literal > 0).is_some() {
+                return Err("duplicate external model variable".into());
+            }
+        }
+    }
+    if status_count != 1 || !terminated {
+        return Err("external SAT status or model terminator missing".into());
+    }
+    values
+        .into_iter()
+        .collect::<Option<Vec<bool>>>()
+        .ok_or_else(|| "external SAT model is incomplete".into())
+}
+
+fn export_cross_xcnf(args: &[String]) -> Result<()> {
+    let extended = args[0] == "export-cross-xcnf-pattern";
+    if args.len() != if extended { 13 } else { 11 } {
+        return Err("usage: export-cross-xcnf[-pattern] BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS [TRIAL IDENTITY_MASK] OUTPUT_DIR".into());
+    }
+    let instance = cross_xcnf_instance(args, extended)?;
+    let xcnf = to_dimacs_xor(&instance.encoding.solver).into_bytes();
+    let metadata = cross_xcnf_metadata(&instance, &xcnf)?;
+    let output = Path::new(&args[if extended { 12 } else { 10 }]);
+    fs::create_dir(output)?;
+    let mut stream = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(output.join("instance.xcnf"))?;
+    stream.write_all(&xcnf)?;
+    stream.sync_all()?;
+    write_new(&output.join("export.json"), &metadata)?;
+    println!(
+        "{}",
+        json!({"status":"PASS_XCNF_EXPORTED_NO_SOLVER","variables":metadata["variables"],"original_clauses":metadata["original_clauses"],"xor_rows":metadata["xor_rows"]})
+    );
+    Ok(())
+}
+
+fn verify_cross_xcnf(args: &[String]) -> Result<()> {
+    let extended = args[0] == "verify-cross-xcnf-pattern";
+    if args.len() != if extended { 15 } else { 13 } {
+        return Err("usage: verify-cross-xcnf[-pattern] BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS [TRIAL IDENTITY_MASK] EXPORT_DIR SOLVER_STDOUT OUTPUT_DIR".into());
+    }
+    let instance = cross_xcnf_instance(args, extended)?;
+    let xcnf = to_dimacs_xor(&instance.encoding.solver).into_bytes();
+    let metadata = cross_xcnf_metadata(&instance, &xcnf)?;
+    let export_dir = Path::new(&args[if extended { 12 } else { 10 }]);
+    if fs::read(export_dir.join("instance.xcnf"))? != xcnf
+        || serde_json::from_slice::<Value>(&fs::read(export_dir.join("export.json"))?)? != metadata
+    {
+        return Err("external XCNF bytes or metadata differ from pinned input replay".into());
+    }
+    let solver_output = fs::read(&args[if extended { 13 } else { 11 }])?;
+    let assignment = parse_external_sat_model(&solver_output, instance.encoding.solver.n_vars())?;
+    if !instance.encoding.verify_external_assignment(&assignment) {
+        return Err("external model fails original CNF, XOR, or S3 equations".into());
+    }
+    let xs = instance
+        .encoding
+        .decode_summands_assignment(&assignment)
+        .ok_or("external model cannot decode summand x-coordinates")?;
+    let domains = MixedOrbitDomains::new(&instance.curve, &instance.base, &instance.residual)?;
+    let candidate = domains.lift(&xs, instance.base_summands, &instance.group_target);
+    let (status, candidate_json) = if let Some((base_indices, residual_points)) = candidate {
+        (
+            "PASS_ONE_EXTERNAL_PARTIAL",
+            Some(json!({
+                "source_id":instance.trial + 1,
+                "a":instance.coef_a.to_string(), "b":instance.coef_b.to_string(),
+                "base_point_indices":base_indices,
+                "residual_points":residual_points.iter().map(point_json).collect::<Result<Vec<_>>>()?
+            })),
+        )
+    } else {
+        ("GROUP_REJECTED_EXTERNAL_MODEL", None)
+    };
+    let mut result = json!({
+        "schema":"n83.cross-stream-first-pattern-external-model/v1",
+        "status":status,
+        "xcnf_blake3":metadata["xcnf_blake3"],
+        "solver_stdout_blake3":blake3::hash(&solver_output).to_hex().to_string(),
+        "base_object_blake3":instance.base_hash,
+        "pool_object_blake3":instance.pool_hash,
+        "base_summands":instance.base_summands,
+        "residual_summands":instance.residual_summands,
+        "variables":assignment.len(),
+        "candidate":candidate_json,
+        "new_n83_solver_search_executed":true,
+        "selected_best_total_runtime":null
+    });
+    if extended {
+        result["schema"] = json!("n83.cross-stream-pattern-external-model/v2");
+        result["trial"] = json!(instance.trial);
+        result["identity_mask"] = json!(instance.identity_mask);
+    }
+    let output = Path::new(&args[if extended { 14 } else { 12 }]);
+    fs::create_dir(output)?;
+    write_new(&output.join("result.json"), &result)?;
+    println!(
+        "{}",
+        json!({"status":status,"xcnf_blake3":metadata["xcnf_blake3"]})
+    );
+    Ok(())
+}
+
 /// One bounded natural-target call after exact replay of two different pilot streams.
 /// A separate supervisor must supply the local archive bytes and account for the run.
 fn run_cross_pilot(args: &[String]) -> Result<()> {
+    run_cross_pilot_with_ordering(args, MixedOrbitOrdering::FirstPair)
+}
+
+/// Export exactly one natural-query identity pattern from the canonical arm.
+/// The same encoder is called by the native search before its first solve.
+fn export_cross_pilot_canonical(args: &[String]) -> Result<()> {
+    if args.len() != 12 {
+        return Err("usage: export-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS IDENTITY_MASK NEW_XOR_DIMACS_PATH".into());
+    }
+    let base_summands: usize = args[8].parse()?;
+    let residual_summands: usize = args[9].parse()?;
+    let identity_mask: u32 = args[10].parse()?;
+    let m = base_summands
+        .checked_add(residual_summands)
+        .ok_or("summand overflow")?;
+    if !(5..=6).contains(&m)
+        || base_summands < 3
+        || !(1..=2).contains(&residual_summands)
+        || identity_mask >= (1u32 << (m - 2))
+    {
+        return Err("invalid natural-query export configuration".into());
+    }
+    let base_row = pinned_pilot_row(SMALL_600_MANIFEST, &args[1])?;
+    let pool_row = pinned_pilot_row(SMALL_600_MANIFEST, &args[4])?;
+    require_distinct_pilot_streams(&base_row, &pool_row)?;
+    let started = Instant::now();
+    let curve = KoblitzCurve::known_n83_k0().ok_or("pinned Koblitz curve")?;
+    if curve.label() != CURVE || curve.cofactor != BigUint::from(4u8) {
+        return Err("curve identity mismatch".into());
+    }
+    let (base_row, base) =
+        import_pilot(&args[1], Path::new(&args[2]), Path::new(&args[3]), &curve)?;
+    let (pool_row, pool) =
+        import_pilot(&args[4], Path::new(&args[5]), Path::new(&args[6]), &curve)?;
+    require_distinct_pilot_streams(&base_row, &pool_row)?;
+    let residual = build_exact_residual_difference_factor_base(&curve, &base, &pool)?;
+    let (public_target, corpus_hash) = public_target(Path::new(&args[7]), &curve)?;
+    let a = trial_coefficient(b"a", 0, &curve.subgroup_order);
+    let b = trial_coefficient(b"b", 0, &curve.subgroup_order);
+    let target = curve.add(
+        &curve.mul(curve.generator(), &a),
+        &curve.mul(&public_target, &b),
+    );
+    let domains = MixedOrbitDomains::new(&curve, &base, &residual)?;
+    let limits = ChainS3Limits {
+        max_variables: 150_000,
+        max_domain_clauses: 12_000_000,
+        max_models: 1,
+        conflict_budget: 1,
+    };
+    let enc = domains
+        .export_pattern_encoding(
+            &a,
+            &b,
+            &public_target,
+            base_summands,
+            residual_summands,
+            identity_mask,
+            limits,
+            MixedOrbitOrdering::EqualDomainRuns,
+        )
+        .map_err(|error| format!("natural-query export failed: {error:?}"))?;
+    let dimacs = to_dimacs_xor(&enc.solver);
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&args[11])?;
+    file.write_all(dimacs.as_bytes())?;
+    file.sync_all()?;
+    println!(
+        "{}",
+        json!({
+            "schema":"n83.mixed-orbit-natural-xor-dimacs-export/v1",
+            "status":"EXPORTED_ONE_IDENTITY_PATTERN",
+            "study":STUDY, "curve_slug":curve.label(),
+            "base_object_blake3":args[1], "pool_object_blake3":args[4],
+            "public_corpus_canonical_json_blake3":corpus_hash,
+            "source_blake3":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
+            "a":a.to_string(), "b":b.to_string(), "target":point_json(&target)?,
+            "base_summands":base_summands, "residual_summands":residual_summands,
+            "identity_mask":identity_mask, "ordering":"equal_domain_runs",
+            "small_signed_orbits":base.signed_orbits.len(),
+            "residual_signed_orbits":residual.signed_orbits.len(),
+            "variables":enc.solver.n_vars(), "clauses":enc.solver.n_original_clauses(),
+            "xors":enc.solver.n_xors(), "dimacs_bytes":dimacs.len(),
+            "dimacs_blake3":blake3::hash(dimacs.as_bytes()).to_hex().to_string(),
+            "export_wall_ms_L0":started.elapsed().as_secs_f64()*1000.0,
+            "selected_best_total_runtime":Value::Null
+        })
+    );
+    Ok(())
+}
+
+fn run_cross_pilot_with_ordering(args: &[String], ordering: MixedOrbitOrdering) -> Result<()> {
     if args.len() != 14 {
-        return Err("usage: run-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR".into());
+        return Err("usage: run-cross-pilot|run-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR".into());
     }
     let budget: u64 = args[8].parse()?;
     let conflicts: u64 = args[9].parse()?;
@@ -885,22 +1259,26 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
     let start = Instant::now();
     let output = Path::new(&args[13]);
     fs::create_dir(output)?;
-    write_new(
-        &output.join("config.json"),
-        &json!({
-            "schema":"n83.cross-stream-pilot-partial-config/v1", "study":STUDY,
-            "base_object_blake3":args[1], "pool_object_blake3":args[4],
-            "pilot_manifest_blake3":blake3::hash(SMALL_600_MANIFEST).to_hex().to_string(),
-            "source_blake3":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
-            "public_corpus_path":args[7], "public_corpus_canonical_json_blake3":PUBLIC_CORPUS_HASH,
-            "budget_seconds":budget, "conflict_budget":conflicts,
-            "max_models":models, "base_summands":base_summands,
-            "residual_summands":residual_summands, "order_first_pair":true,
-            "max_variables":150000, "max_domain_clauses":12000000,
-            "memory_cgroup_limit_bytes":4294967296u64,
-            "memory_cgroup_swap_limit_bytes":0
-        }),
-    )?;
+    let canonical = ordering == MixedOrbitOrdering::EqualDomainRuns;
+    let mut config = json!({
+        "schema":"n83.cross-stream-pilot-partial-config/v1", "study":STUDY,
+        "base_object_blake3":args[1], "pool_object_blake3":args[4],
+        "pilot_manifest_blake3":blake3::hash(SMALL_600_MANIFEST).to_hex().to_string(),
+        "source_blake3":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
+        "public_corpus_path":args[7], "public_corpus_canonical_json_blake3":PUBLIC_CORPUS_HASH,
+        "budget_seconds":budget, "conflict_budget":conflicts,
+        "max_models":models, "base_summands":base_summands,
+        "residual_summands":residual_summands, "order_first_pair":true,
+        "max_variables":150000, "max_domain_clauses":12000000,
+        "memory_cgroup_limit_bytes":4294967296u64,
+        "memory_cgroup_swap_limit_bytes":0
+    });
+    if canonical {
+        config["schema"] = json!("n83.cross-stream-pilot-partial-config/v2");
+        config["ordering"] = json!("equal_domain_runs");
+        config.as_object_mut().unwrap().remove("order_first_pair");
+    }
+    write_new(&output.join("config.json"), &config)?;
     let cap_path = output.join("cap.json");
     std::thread::spawn(move || {
         std::thread::sleep(Duration::from_secs(budget));
@@ -940,7 +1318,7 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
         max_models: models,
         conflict_budget: conflicts,
     };
-    let (candidate, stats) = domains.search(
+    let (candidate, stats) = domains.search_with_ordering(
         1,
         &a,
         &b,
@@ -948,7 +1326,7 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
         base_summands,
         residual_summands,
         limits,
-        true,
+        ordering,
     );
     let candidate_record = candidate.as_ref().map(|row| -> Result<Value> {
         if row.source_id != 1 || row.coef_a != a || row.coef_b != b {
@@ -987,29 +1365,31 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
     } else {
         "PRODUCER_FAILURE_unclassified_solver_result"
     };
-    write_new(
-        &output.join("result.json"),
-        &json!({
-            "schema":"n83.cross-stream-pilot-partial-result/v1", "study":STUDY,
-            "status":status, "base_object_blake3":args[1],
-            "pool_object_blake3":args[4],
-            "base_policy":base_row["policy"], "base_seed":base_row["seed"],
-            "pool_policy":pool_row["policy"], "pool_seed":pool_row["seed"],
-            "public_corpus_canonical_json_blake3":corpus_hash,
-            "base_signed_orbits":base.signed_orbits.len(),
-            "pool_signed_orbits":pool.signed_orbits.len(),
-            "shared_signed_orbits":shared_orbits,
-            "residual_signed_orbits":residual.signed_orbits.len(),
-            "base_import_elapsed_ms_L0":import_ms,
-            "worker_wall_ms_L0":start.elapsed().as_secs_f64()*1000.0,
-            "memory_cgroup_peak_bytes":cgroup_peak_bytes()?,
-            "trial":0, "a":a.to_string(), "b":b.to_string(),
-            "search":stats, "candidate":candidate_record,
-            "graph_rows":Value::Null, "matrix_rank":Value::Null,
-            "total_index_calculus_runtime_ms":Value::Null,
-            "selected_best_total_runtime":Value::Null
-        }),
-    )?;
+    let mut result = json!({
+        "schema":"n83.cross-stream-pilot-partial-result/v1", "study":STUDY,
+        "status":status, "base_object_blake3":args[1],
+        "pool_object_blake3":args[4],
+        "base_policy":base_row["policy"], "base_seed":base_row["seed"],
+        "pool_policy":pool_row["policy"], "pool_seed":pool_row["seed"],
+        "public_corpus_canonical_json_blake3":corpus_hash,
+        "base_signed_orbits":base.signed_orbits.len(),
+        "pool_signed_orbits":pool.signed_orbits.len(),
+        "shared_signed_orbits":shared_orbits,
+        "residual_signed_orbits":residual.signed_orbits.len(),
+        "base_import_elapsed_ms_L0":import_ms,
+        "worker_wall_ms_L0":start.elapsed().as_secs_f64()*1000.0,
+        "memory_cgroup_peak_bytes":cgroup_peak_bytes()?,
+        "trial":0, "a":a.to_string(), "b":b.to_string(),
+        "search":stats, "candidate":candidate_record,
+        "graph_rows":Value::Null, "matrix_rank":Value::Null,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null
+    });
+    if canonical {
+        result["schema"] = json!("n83.cross-stream-pilot-partial-result/v2");
+        result["ordering"] = json!("equal_domain_runs");
+    }
+    write_new(&output.join("result.json"), &result)?;
     Ok(())
 }
 
@@ -1070,6 +1450,14 @@ fn main() -> Result<()> {
         Some("run") => run(&args, &SMALL),
         Some("run-alt") => run(&args, &SMALL_600),
         Some("run-cross-pilot") => run_cross_pilot(&args),
+        Some("export-cross-pilot-canonical") => export_cross_pilot_canonical(&args),
+        Some("run-cross-pilot-canonical") => {
+            run_cross_pilot_with_ordering(&args, MixedOrbitOrdering::EqualDomainRuns)
+        }
+        Some("export-cross-xcnf") => export_cross_xcnf(&args),
+        Some("export-cross-xcnf-pattern") => export_cross_xcnf(&args),
+        Some("verify-cross-xcnf") => verify_cross_xcnf(&args),
+        Some("verify-cross-xcnf-pattern") => verify_cross_xcnf(&args),
         Some("verify-control") if args.len() == 6 => {
             let (curve, small, residual) = import_pair(&args, &SMALL)?;
             let target = control_target(Path::new(&args[5]), &curve, &small, &residual)?;
@@ -1079,7 +1467,7 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some("control-run") => control_run(&args),
-        _ => Err("usage: verify|verify-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT | verify-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT | verify-control SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE | run|run-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT CORPUS BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS SMALL_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | run-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | control-run SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
+        _ => Err("usage: verify|verify-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT | verify-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT | export-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS IDENTITY_MASK NEW_XOR_DIMACS_PATH | verify-control SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE | run|run-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT CORPUS BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS SMALL_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | run-cross-pilot|run-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | control-run SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
     }
 }
 
@@ -1179,6 +1567,12 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("distinct policy or seed"));
+        assert!(
+            run_cross_pilot_with_ordering(&args, MixedOrbitOrdering::EqualDomainRuns)
+                .unwrap_err()
+                .to_string()
+                .contains("distinct policy or seed")
+        );
         let mut invalid = args;
         invalid[8] = "0".into();
         assert!(run_cross_pilot(&invalid)
@@ -1197,6 +1591,20 @@ mod tests {
     }
 
     #[test]
+    fn external_pattern_requires_explicit_finite_trial_and_mask() {
+        let mut args = vec!["placeholder".to_string(); 12];
+        args[10] = "7".into();
+        args[11] = "3".into();
+        assert_eq!(external_trial_pattern(&args, true).unwrap(), (7, 3));
+        assert_eq!(external_trial_pattern(&args, false).unwrap(), (0, 0));
+        args[10] = u64::MAX.to_string();
+        assert!(external_trial_pattern(&args, true).is_err());
+        args[10] = "1".into();
+        args[11] = "4294967296".into();
+        assert!(external_trial_pattern(&args, true).is_err());
+    }
+
+    #[test]
     fn matched_public_corpus_digest_is_pinned() {
         let corpus: Value = serde_json::from_slice(include_bytes!(
             "../research/koblitz_n83_factor_base_sweep_20261008/pilot-01/probe-corpus.json"
@@ -1208,5 +1616,26 @@ mod tests {
                 .as_str(),
             PUBLIC_CORPUS_HASH
         );
+    }
+
+    #[test]
+    fn external_sat_model_parser_requires_one_complete_assignment() {
+        assert_eq!(
+            parse_external_sat_model(b"c solver\ns SATISFIABLE\nv 1 -2\nv 3 0\n", 3).unwrap(),
+            vec![true, false, true]
+        );
+        for bad in [
+            "s UNSATISFIABLE\n",
+            "s SATISFIABLE\nv 1 -2 0\n",
+            "s SATISFIABLE\nv 1 -2 2 3 0\n",
+            "s SATISFIABLE\nv 1 -2 4 0\n",
+            "s SATISFIABLE\nv 1 -2 3 0\ns SATISFIABLE\n",
+            "s SATISFIABLE\nv 1 -2 3 0 0\n",
+        ] {
+            assert!(
+                parse_external_sat_model(bad.as_bytes(), 3).is_err(),
+                "{bad}"
+            );
+        }
     }
 }

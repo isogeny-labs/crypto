@@ -1,0 +1,114 @@
+{
+  "created_utc": "2026-10-21T03:40:56.476713+00:00",
+  "base_results_sha256": "5f8ceb0cff9632cbd8c727a78602f289eec1dfe85b6f8b717ccbeb6c9e406803",
+  "original_default_calls": 292,
+  "original_incomplete_calls": 5,
+  "newly_resolved_calls": 3,
+  "remaining_incomplete_calls": 2,
+  "assessed_records_with_all_fields": 290,
+  "corrected_original_records": 10,
+  "coordinate_verified_torsion_corrections": 6,
+  "patched_implementation_checks": 14,
+  "remaining": [
+    {
+      "curve": "icv1-fp224-t3224555599954095973222272472665529-b7920759",
+      "source_label": "P224-candidate-5736",
+      "trait": "twist_order",
+      "params": {
+        "deg": 2
+      },
+      "partial_factorizations": {
+        "factorization": {
+          "integer": "726838724295606890549323807888004534349369386615476240116700155768310581643015986703039916619305911501794990835762733471269619794104241",
+          "proven_prime_factors": [
+            "8581",
+            "8548615513285513",
+            "51858865004599249"
+          ],
+          "unresolved_composite_factors": [
+            "191065098939256385908764793072579096806928265579390414297273038469196604289033778266005978480168453"
+          ],
+          "evidence": "factor-89b00a5b7cb0-residual.json"
+        }
+      }
+    },
+    {
+      "curve": "icv1-fp256-t105867235723906477692553525193676385009-a67f0bc0",
+      "source_label": "P256-candidate-876",
+      "trait": "twist_order",
+      "params": {
+        "deg": 2
+      },
+      "partial_factorizations": {
+        "factorization": {
+          "integer": "13407807923699100001122556707991011683559799356310572525877692089795444101264636116614088762119235329004250208791887503577802765387104512377084849930532581",
+          "proven_prime_factors": [
+            "1657",
+            "45294121",
+            "5333949541"
+          ],
+          "unresolved_composite_factors": [
+            "33492266050798185653682380062483799213318454801653963493134064721059735936944520907295931496614455858076048437184499090478420204888353"
+          ],
+          "evidence": "factor-13f681ed97f8-residual.json"
+        }
+      }
+    }
+  ],
+  "recovered": [
+    {
+      "curve": "icv1-fp256-t105867235723906477692553525193676385009-a67f0bc0",
+      "source_label": "P256-candidate-876",
+      "trait": "kn_factorization",
+      "params": {
+        "k": 4
+      },
+      "assessed_result": {
+        "(+)factorization": [
+          163,
+          12323,
+          5990840032136313028240367,
+          38489928571121988243187554441375461428534836731
+        ],
+        "(+)largest_factor_bitlen": 155,
+        "(-)factorization": [
+          3,
+          67,
+          23018193957033146776015481233579,
+          100108643953214792974549337988281222252807849
+        ],
+        "(-)largest_factor_bitlen": 147
+      }
+    },
+    {
+      "curve": "icv1-fp224-t160144979725177297209579645503161-eb89557e",
+      "source_label": "P224-candidate-1485",
+      "trait": "conductor",
+      "params": {
+        "deg": 4
+      },
+      "assessed_result": {
+        "ratio_sqrt": 8630893080270282008741777483896564118278310205130248819399459900389970784323754969832460778911563401,
+        "factorization": [
+          7,
+          73,
+          337070527,
+          2337651866969,
+          6508331846973894381391,
+          1302110757232751599462674649,
+          2529394712175491540603448023
+        ]
+      }
+    },
+    {
+      "curve": "icv1-fp256-t105867235723906477692553525193676385009-a67f0bc0",
+      "source_label": "P256-candidate-876",
+      "trait": "square_4p1",
+      "params": {},
+      "assessed_result": {
+        "p": 1,
+        "order": 1
+      }
+    }
+  ]
+}

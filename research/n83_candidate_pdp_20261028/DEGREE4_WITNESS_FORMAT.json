@@ -1,0 +1,53 @@
+{
+  "schema": "n83.degree-four-witness-format/v1",
+  "scope": "All raw finite-family candidates, including zero remainders, preserved separately from immutable complete V3 parents",
+  "run_layout": {
+    "protocol-degree4-witness.json": "Frozen case, source, binary, budget and two-parent-archive identities",
+    "case-specs/KEY.json": "Exact selected frozen protocol case, including input/base and parent/suffix file hashes",
+    "inputs/ARM/ID/{input.json,system.sing}": "Byte-identical retained n83,m3,ell27 input and equation source",
+    "v2/ARM/ID/": "Retained complete V2 rows, operations and verdict required by V3 replay",
+    "parent-reference.json": "Immutable V3 prefix and continuation archive locations; both required for replay",
+    "cases/KEY/source.fieldpoly": "Complete first83 coordinate equations assembled into one GF(2^83)-coefficient polynomial",
+    "cases/KEY/BLOCK.ordinary.fieldpoly": "Ordinary product L*F before Boolean field reductions, BLOCK=X0,X1,U",
+    "cases/KEY/BLOCK.normal.fieldpoly": "Exact multilinear normal form, checked degree<=3",
+    "cases/KEY/candidates.rows.u64le": "249 coordinate-polynomial rows, block order X0,X1,U, coordinate order0..82",
+    "cases/KEY/remainders.rows.u64le": "249 corresponding deterministic highest-pivot remainders against the complete V3",
+    "cases/KEY/candidates.jsonl": "One record per candidate with byte offset, degree, row hashes, ordered V3 reducer IDs, remainder pivot and strictness",
+    "cases/KEY/partial-NNN.json": "Immutable progress totals after each complete83-coordinate block; raw rows flush after every candidate",
+    "cases/KEY/family.json": "Finite-family totals and complete multiplier coefficient/provenance records",
+    "cases/KEY/result.json": "Family result plus full input binding, verified parent replay and inherited/new lower-bound distinction",
+    "status/KEY.json": "Producer and fresh-replay exit codes; unsuccessful cases remain in summaries",
+    "summary.json": "Native12-case join with explicit statuses and null unknown exact/upper degrees",
+    "status/summary-after-KEY.json": "Write-once cumulative summary after each attempted case",
+    "controls/": "Independent tiny V3/V4 positive/null controls and native replay artifacts",
+    "development-validation/": "Tests, build records and retained failed control setup",
+    "logs/,replay/,host.txt,terminal.json": "Commands' outputs, process outcomes and non-secret host identity; no valid performance clock",
+    "manifest.sha256": "Final SHA256 inventory of every retained raw file except the inventory itself"
+  },
+  "field_polynomial_binary": {
+    "magic": "N83F4P1\n",
+    "header_bytes": 20,
+    "header_after_magic": ["field degree n:u32le", "nonzero term count:u64le"],
+    "record": ["ordinary total degree:u8", "degree entries of zero-based variable index:u16le", "nonzero field coefficient:u128le"],
+    "order": "Lexicographic ascending variable-index vectors; vectors sorted internally, duplicates retained in ordinary products",
+    "coefficients": "Polynomial coefficient bits modulo z^83+z^45+z^2+z+1; tiny controls specify their field degree separately",
+    "boolean_correction": "An ordinary monomial has at most one repeated variable i. Its difference from its squarefree normal form is (v_i^2+v_i) times the other factors, with the saved field coefficient. All such products have ordinary degree<=4."
+  },
+  "dense_rows_binary": {
+    "magic": "N83F4R1\n",
+    "header_bytes": 36,
+    "header_after_magic": ["variables:u32le", "columns:u64le", "u64 words per row:u64le", "declared candidate count:u64le"],
+    "production_dimensions": {"variables": 164, "columns": 735295, "words": 11489, "bytes_per_row": 91912, "declared_rows": 249},
+    "columns": "Graded colex squarefree monomials through degree3: constant0; singleton i at1+i; pair i<j at1+n+C(j,2)+i; triple i<j<k at1+n+C(n,2)+C(k,3)+C(j,2)+i",
+    "bits": "LSB-first per u64, little-endian words; unused final-word bits zero",
+    "partial": "Header declares planned rows; an interrupted file may have fewer complete records and cannot be treated as a complete result"
+  },
+  "reducer_ids": "Zero-based global insertion IDs in concatenated immutable32768-row prefix and completed suffix; IDs do not refer to candidates from this phase",
+  "remainder_convention": "Repeatedly cancel the current highest pivot if V3 has that pivot; stop at zero or first pivot absent from V3. Nonzero remainders need not have every lower pivot eliminated; this is sufficient for strict nonmembership in a row-echelon basis.",
+  "claims": {
+    "positive": "Degree<=3 candidate has a degree<=4 membership derivation and nonzero remainder against complete V3, establishing LFD>=4 for that exact input",
+    "null": "All named candidates reduce to zero; no global upper bound follows",
+    "unknown": "Exact LFD and global upper bound remain JSON null; absent numeric measurements are omitted from the unified export",
+    "review": "Producer, fresh and restored replay do not constitute independent scientific review"
+  }
+}

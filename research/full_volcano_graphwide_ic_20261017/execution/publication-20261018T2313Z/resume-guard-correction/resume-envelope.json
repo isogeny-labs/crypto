@@ -1,0 +1,72 @@
+{
+  "schema": "volcano-preserved-deadline-resume/v1",
+  "created_utc": "2026-10-19T01:42:16.085033+00:00",
+  "baseline_vertices": 7937,
+  "queue_vertices": 24823,
+  "argv": [
+    "nohup",
+    "/workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver",
+    "run",
+    "/workspace/volcano_ic_repaired_survey_20261017",
+    "24823",
+    "153088",
+    "6442450944"
+  ],
+  "original_deadline_ms": "1792527222570",
+  "original_deadline_utc": "2026-10-20T20:13:42.570Z",
+  "remaining_seconds": 153088,
+  "max_spool_bytes": 6442450944,
+  "free_bytes_before": 8710086656,
+  "spool_logical_bytes_before": 1182084660,
+  "frozen_sha256": {
+    "ecbench": "35d89073f4d666b094c213a1d31b0c819b63600123e067c111af3c947d7609a9",
+    "volcano-ic-driver": "b8b489c7225c64ed492ffce39286c995f5ca820960956cf706c0d3110f5bdd2d",
+    "queue.jsonl": "45e277bede6017c30a49405096afefab3d34a18553ecd6b1a79238f2b9559728",
+    "driver.rs": "4be4a900afee3f7256c634b9af45bc0c9f65ad134073dbdcaaff99634cf4ec8d"
+  },
+  "before_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 2656
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 7414
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 2638
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 3923
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 2643
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 5549
+      }
+    ]
+  },
+  "previous_clean_stop": {
+    "elapsed_seconds": 15231,
+    "finished_ms": "1792365234932",
+    "pid": 50943,
+    "reason": "stop_requested",
+    "spool_bytes": 1186044468,
+    "vertices_this_invocation": 1800
+  },
+  "authoring_head": "59a109d5ae67eb15aef5232396691c12611539b4",
+  "scope": "Unchanged frozen bounded survey; original deadline and child budgets preserved, clocks unqualified; no survival guarantee."
+}

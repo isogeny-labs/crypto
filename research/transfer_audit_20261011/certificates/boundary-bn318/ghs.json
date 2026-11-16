@@ -1,0 +1,143 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation and the order-3 endomorphism of j = 0 (p = 1 mod 3): classes of size 6",
+    "equivalence_class_size": 6,
+    "log2_cost_of_one_group_operation": 16.492,
+    "log2_group_operations": 157.619,
+    "log2_r": 317.17,
+    "log2_total": 174.111,
+    "log2_total_negation_only": 174.903
+  },
+  "candidate": {
+    "id": "ghs",
+    "label": "Weil/GHS descent (binary fields)",
+    "transfer_type": "ghs_weil_descent"
+  },
+  "carried": false,
+  "checks": [],
+  "costs": {
+    "destination_solver": null,
+    "log2_baseline": 174.111,
+    "log2_cost_ratio": null,
+    "log2_total": null,
+    "repo_ratio_log2": null,
+    "rows": [
+      {
+        "formula": "no descent exists: the base field has no proper subfield",
+        "log2": null,
+        "phase": "destination_solve_unsplit",
+        "status": "not_applicable"
+      }
+    ],
+    "solvers_considered": [],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "prime",
+    "field": {
+      "a": "0",
+      "b": "2",
+      "degree": 1,
+      "kind": "prime",
+      "log2_size": 317.17,
+      "model": "y^2=x^3+a*x+b",
+      "p": "300391510669785740008207650393722453451551004041839877989597999344720209212220677955394396491803"
+    },
+    "instance_checks": [
+      {
+        "evidence": "p passes Miller-Rabin (Probable), 4a^3+27b^2 != 0 mod p",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2 = x^3+ax+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Probable); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "BN318",
+    "registered": true,
+    "slug": "icv1-fp318-t548079839685593379889100768354473324754975588407-f4d63804",
+    "subgroup": {
+      "cofactor": "1",
+      "generator": [
+        "0x24009000d800900024075015f015f0075000008f411e808f4000000004e484e4800000000000101a",
+        "0x1"
+      ],
+      "order": "300391510669785740008207650393722453451551004041291798149912405964831108443866204630639420903397",
+      "r": "300391510669785740008207650393722453451551004041291798149912405964831108443866204630639420903397",
+      "r_log2": 317.17,
+      "trace": "548079839685593379889100768354473324754975588407"
+    }
+  },
+  "evaluation": {
+    "reason": "the subgroup is not carried (subgroup preservation not_applicable): the route solves a different problem or does not exist, so there is no attack cost to compare with the baseline",
+    "status": "excluded"
+  },
+  "executed": null,
+  "invariants": {},
+  "lead_class": "not_carried",
+  "map": {
+    "construction_status": "not applicable",
+    "degrees": {},
+    "destination": "none",
+    "explicit_formulas": "none",
+    "field_of_definition": "n/a",
+    "source": "E(F_p)",
+    "type": "GHS conorm-norm map to a Jacobian over a subfield"
+  },
+  "notes": [
+    "the odd-characteristic analogues need E over F_(p^k) with k > 1 (Diem; Joux-Vitse); base change to F_(p^k) and descent back to a genus-k cover over F_p is priced in the genus-cover candidate"
+  ],
+  "obligations": {
+    "computational_advantage": "not_applicable",
+    "existence": "not_applicable",
+    "explicit_construction": "not_applicable",
+    "map_correctness": "not_applicable",
+    "scaling_support": "not_applicable",
+    "subgroup_preservation": "not_applicable"
+  },
+  "open_obligations": [],
+  "references": [],
+  "schema": "transfer-audit/certificate/v2",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "the base field is F_p; characteristic is odd",
+        "name": "prime_field",
+        "result": "PASS"
+      }
+    ],
+    "argument": "F_p is a prime field: it has no proper subfield and Weil restriction is trivial",
+    "executed": null,
+    "image_order": null,
+    "kernel_meets_subgroup": null,
+    "method": "none",
+    "status": "not_applicable"
+  },
+  "tool": "transfer-audit/2",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "subgroup preservation is NotApplicable: the transfer is not shown to carry <G>",
+    "the map is not constructed (existence or construction missing)",
+    "a required cost phase is unpriced"
+  ]
+}

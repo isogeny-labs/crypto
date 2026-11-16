@@ -90,6 +90,17 @@ is sharp for `m ≥ 3` and measured `d_ff = 7 (m=3), 13 (m=4)` at
 at those sizes, which is the whole empirical basis of the "first fall
 degree assumption".
 
+*Sharpness at `m = 3`, 2026-11-11*
+(`research/first_fall_closure_20261111/kw_sharpness/`, `[pcc:unverified]`):
+in the top-form convention `d_ff ∈ {6, 7}`, and `d_ff = 7` iff
+`dim_{F_2} span{e_p e_q e_r} = dim V` with `e_{ab} = ν_a ν_b (ν_a + ν_b)`
+(Theorem A there, proved given KW Lemma 3.1). Hence `d_ff = 6`, not 7,
+whenever `n > ρ(n')` (`ρ(3..7) = 10, 49, 170, 475, 1141`) or `V` lies in a
+proper subfield; so the bound is not attained for every `n' ≥ m`. In KW's
+regime `n' ≈ n/3` the value 7 was measured on all 1,276 independent
+instances (every KW `m = 3` cell reproduced) but the generic rank condition
+is unproved; the note names the obstruction.
+
 ### 2.2 First fall degree — lower bounds
 
 Nothing beyond the trivial `d_ff ≥ 2` is proved for `m ≥ 3`. For `m = 2`
@@ -109,6 +120,16 @@ So any lower bound that matters must be on `d_F`, not `d_ff`.
 | `sd(Weil(F)) ≤ n·reg(F^h) − n + 1` | THEOREM, but `reg(F^h) ≥ 2^{n'}` here, so exponential | Caminata–Ceria–Gorla, arXiv:2112.10506, Thm 4.7 / Cor 4.9 |
 | any `n`-independent bound | **none proved** for the subspace factor base; HKYY §6 explain why: the big-field system is not zero-dimensional until the subspace constraint (degree `2^{n'}`) is added | — |
 | quasi-subfield variant: replace `V` by the roots of `X^{q^{n'}} − λ(X)`, `deg λ = q^{n'·α}` small | not a fall-degree bound at all: Thm 3.2 prices Rojas' resultant method, `m!·q^{n−n'm+n'}·Õ(m^{5.188}(3d)^{4.876 m²} + m q^{2n'})`, under a zero-dimensionality assumption; `RESEARCH_QUASI_SUBFIELD.md` shows the needed `λ` do not exist in the useful range | Huang–Kosters–Petit–Yeo–Yun, JMC 2020, Thm 3.2 |
+
+**Correction, 2026-11-06 (derived, not machine-checked; `[pcc:unverified]`).** The
+injective-projection hypothesis in the row above is not a real obstacle. A generic
+coordinate `t = X_1 + c·X_2` separates every pair of the at most `s` solutions unless
+`c` is one of at most `C(s,2)` bad values. An `F_{2^n}`-linear change of the `X`
+descends to an invertible `F_2`-linear change of variables, which in characteristic 2
+fixes the field-equation ideal. The last fall degree is invariant under such a change
+(HKYY Prop. 2.6). So the bound `d_{F'} ≤ 4n' + 6` holds whenever `C(s,2) < 2^n` (and
+the ideal is radical), without the projection condition. It stays linear in `n'`, so no
+cost estimate moves. Details: `research/dreg_guess_scaling_20261106/SURVEY.md` §1.
 
 So the only *proved* upper bounds on the last fall degree of the actual
 index-calculus system are linear in `n`, i.e. they certify nothing better
@@ -291,18 +312,53 @@ E1 matches this exactly on 39 of 40 subfield draws:
 | 0 | `n' − 1` | 23 |
 | 0, with `x_3 ∈ F_{2^{n'}}` | 2 (`n = 16`, seed 112005) | 1 |
 
-The outlier has every coefficient of `S_3` in the subfield. The descent
-then has only `n'` independent coordinates, and the target is refuted at
-degree 2.
+The outlier has `x_3 ∈ F_{2^{n'}}` (its `b` is *not* in the subfield;
+corrected 2026-11-11 by the exact-count proof below). The descent then has
+only `n' + 1` independent coordinates, two of degree ≤ 1, and the target is
+refuted at degree 2.
 
 This is the algebraic reason the subfield case is easy. At degree 2 the
 system already pins all but about one bit of `X_1 + X_2`, as in the
 classical subfield decomposition.
 
 - The inequality is a THEOREM.
-- The exact count `n' − 1 + Tr(b/x_3²)` for `x_3 ∉ F_{2^{n'}}` is
-  TOY-EVIDENCE. Its proof needs the dependency of the `n` equations to be
-  exactly the one from Prop. A.
+- The exact count `n' − 1 + Tr(b/x_3²)` for `x_3 ∉ F_{2^{n'}}` is a
+  THEOREM since 2026-11-11 (Prop. B′ below); until then it was toy evidence.
+
+**Proposition B′ (exact count, subfield base; proved 2026-11-11).** With
+`n = 2n'`, `V = F_{2^{n'}}`, `x_3 ≠ 0`, let `N = dim(span_{F_2}(F) ∩ R_{≤1})`,
+`φ(s) = s² + x_3 s`, `ψ(t) = x_3² t²` (`F_2`-linear maps `V → F`) and
+`U = im φ + im ψ`. Then
+
+1. `N = dim(U + ⟨b⟩) − dim im φ` for every `x_3, b`;
+2. if `x_3 ∉ V`: `U = ker Tr(x_3^{−2}·)` is a hyperplane, `dim im φ = n'`,
+   so `N = n' − 1 + Tr(b/x_3²)`, and the constant `1` lies in the span iff
+   `Tr(b/x_3²) = 1`;
+3. if `x_3 ∈ V`: `N = 1` when `b ∈ V` and `N = 2` when `b ∉ V`; the descended
+   equations have rank `n'` resp. `n' + 1`.
+
+So the exceptional set is exactly `{x_3 ∈ V*}`. The proof (the quadratic
+part of `λ(S_3)` vanishes iff `λ∘φ = 0`; `V^⊥ = V` for the absolute trace
+when `[F : V] = 2`; the `ψ`-condition forces `λ = Tr(w x_3^{−2}·)` with
+`w ∈ V` and the `φ`-condition then forces `(w + √w)/x_3 ∈ V`, hence `w ∈ F_2`
+when `x_3 ∉ V`) and an exhaustive check on 122,752 `(x_3, b)` pairs at
+`n' = 2…6` with zero disagreements, plus the recomputation of all 40 E1
+draws, are in `research/first_fall_closure_20261111/propB_exact_count/`
+(`[pcc:unverified]`, prose proof; not in Lean).
+
+**Lean (Prop. A, 2026-11-11).** The algebraic content of Prop. A is
+machine-checked in
+`research/first_fall_closure_20261111/propA_lean/TraceRelation.lean`: for
+any commutative ring of characteristic 2 with an additive `Tr` to `F_2`
+satisfying `Tr(a²) = Tr(a)`, and any `x_3` with inverse `w`,
+`Tr(S_3(X_1, X_2, x_3) w²) = Tr X_1 + Tr X_2 + Tr(b w²)`; that functional is
+an `F_2`-combination of the coordinate functionals of `S_3` (the descended
+equations); and `Tr X_i` is affine-linear in the bits of `X_i`, constant
+iff `Tr|_V ≡ 0`. Axioms: `propext`, `Classical.choice`, `Quot.sound`; no
+`sorry`. Not formalised: polynomial degree, the first-fall-degree
+definitions, Boolean reduction, the "every descended equation has degree
+exactly 2" hypothesis of the treatise's Cor. ffd2, and the concrete
+`F_{2^n}` trace (the hypotheses are instantiated only for `F_2` itself).
 
 ## References
 

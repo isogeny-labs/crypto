@@ -1,0 +1,306 @@
+{
+  "card_id": "CARD-HEIC-ROUND15-1",
+  "card_path": "research/notes/index-calculus/round15/CARD-HEIC-ROUND15-1.yaml",
+  "card_sha256": "11af6013511a9508d9aac714f81452bf67b1771da86f63ff7b7e3ee072c4f7bf",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-mkdir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--wait",
+        "--cpus",
+        "3",
+        "--max-other-cpu",
+        "1.0",
+        "--out",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/isolated_bench.jsonl",
+        "--label",
+        "R15",
+        "--",
+        "sh",
+        "-c",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/hyperelliptic_rho_collide_first > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt 2>&1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 435.945,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-rho",
+      "index": 2,
+      "outputs": {},
+      "seconds": 435.945,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "wc",
+        "-l",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-lines",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e9a408200012232ff83b930f2a341a49bb71e42d62e789d2b1635e373f83c61e",
+      "stdout_tail": [
+        "26 /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "1,20p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-lines-1-20",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8d53a12bde585ae2fee00e0d28ffbfe466221b749ad48ab7c0bffedb02aa05be",
+      "stdout_tail": [
+        "Round fifteen. Full-width DP rho: plain, folded with the active cycle window, folded with collide-first (40 seeds from 0xc0ffee; walk ops are means per run).",
+        " g    p         N    plain   active    first   act/pl   1st/pl  S plain  fruit %  ok",
+        " 2   41      1321       50       47       36    0.935    0.715    0.991     4.1%   y",
+        " 2   61      1399       46       50       35    1.082    0.753    0.933     3.9%   y",
+        " 2  101      4663       85       86       59    1.012    0.690    0.859     4.4%   y",
+        " 2  151      7949      114      114       70    0.998    0.616    0.791     4.1%   y",
+        " 2  211     11813      182      116       94    0.639    0.515    0.863     4.3%   y",
+        " 2  251     61667      325      285      266    0.877    0.818    1.070     4.1%   y",
+        " 3   23      6299      106      110       92    1.037    0.864    1.157     3.5%   y",
+        " 3   31      7333      113       94       68    0.830    0.601    0.791     4.4%   y",
+        " 3   41      6679      109      100       70    0.921    0.642    0.856     4.2%   y",
+        " 3   61    124459      491      369      331    0.752    0.675    0.938     3.8%   y",
+        " 3  101    364747      896      642      641    0.717    0.716    1.062     3.7%   y",
+        " 3  151   1180351     1583     1023     1004    0.646    0.634    0.925     3.9%   y",
+        " 3  211   4620611     2604     2556     2484    0.981    0.954    1.156     3.9%   y",
+        " 4   17      5639      101       93       71    0.924    0.705    0.948     3.4%   y",
+        " 4   23     30223      224      181      159    0.808    0.710    0.912     3.7%   y",
+        " 4   31    239753      630      561      544    0.889    0.863    1.111     4.0%   y",
+        " 4   41    333041      766      594      575    0.775    0.751    0.997     3.7%   y",
+        " 4   61  16790591     6069     4164     4130    0.686    0.680    1.008     3.8%   y"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "21,40p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-lines-21-40",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "64aa160d3404809af0ef2b945a6d69a77742f2030ebb30d0c0bdd50fa37f1abc",
+      "stdout_tail": [
+        "",
+        "R15-1 (collide-first median folded/plain, N <= 6e4, 10 rows): 0.698 (<= 0.85) -> HOLDS",
+        "R15-2 (collide-first median folded/plain, N >= 1e5, 7 rows): 0.716 (<= 0.80) -> HOLDS",
+        "R15-3 (collide-first median folded S_walk, N >= 1e5): 1.008 (<= 1.05) -> HOLDS",
+        "R15-4 (fruitless share <= 10% on every row: max 4.4%; every run verified: yes; active arm reproduces round fourteen: yes) -> HOLDS",
+        "Ideal S_walk: plain 1.2533, folded 0.8862, ratio 0.7071."
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "41,60p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-lines-41-60",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "61,80p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.001,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-lines-61-80",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.001,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "81,100p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.001,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-lines-81-100",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.001,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "tail",
+        "-n",
+        "1",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/isolated_bench.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r15-record",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "9174fb390b64251bf7ba149f0a83109e394be59fdf491ff7bc2ce4b29871c91b",
+      "stdout_tail": [
+        "{\"host\": {\"cpu_model\": \"Intel(R) Xeon(R) Processor @ 2.30GHz\", \"kernel\": \"6.18.44-fc-v153\", \"logical_cpus\": 4, \"machine\": \"x86_64\", \"python\": \"3.11.17\"}, \"label\": \"R15\", \"left_on_reserved\": {\"kernel_threads\": 30, \"user_threads\": []}, \"mode\": \"run\", \"preflight\": {\"conditions\": {\"loadavg\": [0.77, 1.8, 1.69], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.58, \"avg300\": 0.08, \"avg60\": 0.23, \"total\": 7657873.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792872589.4263668}, \"settle\": {\"other_cpu_seconds\": 0.12, \"seconds\": 2.0, \"top\": {\"claude[1314]\": 0.12}}}, \"reserved_cpus\": [3], \"run\": {\"after\": {\"loadavg\": [1.06, 1.19, 1.42], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 7709443.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792873023.3312173}, \"before\": {\"loadavg\": [0.77, 1.8, 1.69], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.58, \"avg300\": 0.08, \"avg60\": 0.23, \"total\": 7657873.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792872589.4306045}, \"command\": [\"sh\", \"-c\", \"/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/hyperelliptic_rho_collide_first > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt 2>&1\"], \"contended\": false, \"cpus\": [3], \"exit_status\": 0, \"involuntary_switches\": 490, \"major_faults\": 0, \"max_rss_kib\": 13568, \"minor_faults\": 2136, \"other_cpu_seconds\": 4.709999999999998, \"other_top\": {\"6[85]\": 0.02, \"claude[1314]\": 4.2, \"environment-man[1271]\": 0.23, \"kcompactd0[46]\": 0.02, \"kworker/3:1-events[52]\": 0.02, \"kworker/u16:0-kvfree_rcu_reclaim[12]\": 0.01, \"migration/0[18]\": 0.01, \"process_api[1]\": 0.17}, \"system_seconds\": 0.012003, \"user_seconds\": 432.782883, \"voluntary_switches\": 4, \"wall_seconds\": 433.90051091199985}, \"schema\": \"isolated-bench/1\", \"threads_moved\": 54}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "16e7f5487d5145583fe5c08040874543b10d2a7b",
+  "dirty_after": [],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

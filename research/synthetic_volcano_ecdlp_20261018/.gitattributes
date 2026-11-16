@@ -1,0 +1,6 @@
+# Preserve the original generated artifacts byte-for-byte.
+run-final/reports/*.pdf binary
+run-final/reports/*.png binary
+runs.tar.xz binary
+# Matplotlib emits insignificant trailing spaces in SVG path data.
+run-final/reports/*.svg -whitespace

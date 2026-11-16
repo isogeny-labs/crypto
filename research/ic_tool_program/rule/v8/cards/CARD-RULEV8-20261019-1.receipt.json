@@ -1,0 +1,136 @@
+{
+  "card_id": "CARD-RULEV8-20261019-1",
+  "card_path": "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-1.yaml",
+  "card_sha256": "2016e15f822ad1bcd3e27c38f888ef6a0620de4b14c6f0a3afaecbf0d091b4d6",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/icprog",
+        "rule",
+        "manifest",
+        "--comparison",
+        "v8",
+        "--ic",
+        "/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/ic",
+        "--ic-commit",
+        "370e19193f6f30bf04ca2e82a2c3626932dc069e",
+        "--isolate",
+        "/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/isolated_bench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.443,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "v8-manifest",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.443,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "71516db209aa59deb9d4525c3111cd668593245cbc58f930be4974e382262614",
+      "stdout_tail": [
+        "   \"sha256\": \"3500e56bcb8d62caaa733e35deb0e7cb5d622ab19058dc1cffac00770c582982\",",
+        "   \"built_from\": \"370e19193f6f30bf04ca2e82a2c3626932dc069e\"",
+        "  }",
+        " },",
+        " \"isolation_tool\": {",
+        "  \"path\": \"src/bin/isolated_bench.rs\",",
+        "  \"binary_sha256\": \"1bc76f0a599ceaa7a379255d838307a55229085574244534e1ebcffa4f09b410\"",
+        " },",
+        " \"pinning\": \"isolated_bench run --wait --cpus 2 with RAYON_NUM_THREADS=1, after PSI some avg10 falls below 4.0; the tool's defaults (settle 2 s, other processes at most 0.10 CPUs, PSI at most 5); pins untimed under taskset -c 2\",",
+        " \"smt_siblings\": {",
+        "  \"0\": \"0\",",
+        "  \"1\": \"1\",",
+        "  \"2\": \"2\",",
+        "  \"3\": \"3\"",
+        " },",
+        " \"uptime\": \"18:25:38 up  1:59,  0 user,  load average: 0.60, 1.91, 3.33\",",
+        " \"hardware_class\": \"one x86-64 cloud container; no claim for Arm64, GPUs or other hosts\",",
+        " \"runner\": \"icprog (native)\",",
+        " \"note\": \"the host the rule's comparison ran on, at its start\"",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/icprog",
+        "rule",
+        "all",
+        "--comparison",
+        "v8",
+        "--ic",
+        "/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/ic",
+        "--ic-commit",
+        "370e19193f6f30bf04ca2e82a2c3626932dc069e",
+        "--isolate",
+        "/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/isolated_bench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 17.301,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "v8-all",
+      "index": 2,
+      "outputs": {},
+      "seconds": 17.301,
+      "stderr_sha256": "0cefec9b57ea812c96ea182f1ac0f385546595a323bf0763c55cd5a33058cbf4",
+      "stderr_tail": [
+        "icprog: the pin failed: the binary does not decide as the earlier comparison did, or a name disagrees; stopped"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 2,
+  "commit": "b425c4b4cd6e12391f02e57b6b0393bc46cc7062",
+  "dirty_after": [
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-1.v8-all.stderr",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-1.v8-all.stdout",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-1.v8-manifest.stderr",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-1.v8-manifest.stdout",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-1.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-2.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-3.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-4.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-5.yaml",
+    "research/ic_tool_program/rule/v8/runs/host.json",
+    "research/ic_tool_program/rule/v8/runs/k0n41/T01.params.json",
+    "research/ic_tool_program/rule/v8/runs/k0n53/T01.params.json",
+    "research/ic_tool_program/rule/v8/runs/k0n57/T01.params.json",
+    "research/ic_tool_program/rule/v8/runs/k0n61/T01.params.json",
+    "research/ic_tool_program/rule/v8/runs/k1n47/T01.params.json",
+    "research/ic_tool_program/rule/v8/runs/k1n59/T01.params.json",
+    "research/ic_tool_program/rule/v8/runs/pin/icv1-f2m41-tm2308219-7f48b14a-T01.price.json",
+    "research/ic_tool_program/rule/v8/runs/pin/icv1-f2m47-t22705043-f4e44623-T01.price.json",
+    "research/ic_tool_program/rule/v8/runs/pin/icv1-f2m53-tm56619371-dac20a85-T01.price.json",
+    "research/ic_tool_program/rule/v8/runs/pin/icv1-f2m57-tm747311035-c1f545af-T01.price.json",
+    "research/ic_tool_program/rule/v8/runs/pin/icv1-f2m59-tm943548413-98844ecc-T01.price.json",
+    "research/ic_tool_program/rule/v8/runs/pin/icv1-f2m61-t158598901-ab42b6c5-T01.price.json",
+    "research/ic_tool_program/rule/v8/runs/pin/pin.json"
+  ],
+  "dirty_before": [
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-1.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-2.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-3.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-4.yaml",
+    "research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-5.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 2"
+}

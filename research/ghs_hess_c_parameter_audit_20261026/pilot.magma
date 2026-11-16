@@ -1,0 +1,24 @@
+K<w> := GF(512);
+k<a> := GF(8);
+Embed(k,K);
+print "K_polynomial", DefiningPolynomial(K);
+print "k_polynomial", DefiningPolynomial(k);
+sources := [<482,1,43,241>, <524,0,9,131>, <548,0,155,137>,
+            <554,1,105,277>, <556,0,32,139>];
+for row in sources do
+    order := row[1];
+    a2 := row[2];
+    bint := row[3];
+    ell := &+[(Integers()!((bint div 2^i) mod 2))*w^i : i in [0..8]];
+    E := EllipticCurve([K|1,a2,0,0,ell]);
+    print "source", order, a2, bint, #E;
+    assert #E eq order;
+    for j in [0..15] do
+        try
+            genus := WeilDescentGenus(E,k,w^j);
+            print "row", order, bint, j, genus;
+        catch err
+            print "error", order, bint, j, err;
+        end try;
+    end for;
+end for;

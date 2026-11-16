@@ -1,0 +1,54 @@
+{
+  "schema": "mumford-count-verification/v1",
+  "created": "2026-11-09T20:04:21.852Z",
+  "formal_source_commit": "6fee3178454f22d911349ca37b8d25a4d229dd79",
+  "formal_source": "research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean",
+  "formal_source_sha256": "1ebb9df7ecd8c67df17b2a58e44afd95576ccf8f1c218e284260f8773d817bd7",
+  "binding": "MumfordSmoothnessAudit.mumford_count_audit_certificate",
+  "decl_sha256": "e81b758c8e060f8b35cb7616197a5512522832c403d9ebd309896926a079e7c2",
+  "gate": {
+    "path": "evidence/mumford-count-gate.log",
+    "declarations": 80,
+    "failing": 0,
+    "trusted_native": 0,
+    "sha256": "54aaed3686bb946a410c59518c747a759109bad3dfcc2af625fa41d6b78b485b"
+  },
+  "packet": {
+    "id": "PCC-20261109-07eb0d",
+    "path": "evidence/pcc-mumford-count-check.json",
+    "sha256": "636be5f4886093ef082dfb079adad41979e41a8641b91a4c1a4b7d1c7e4c6127",
+    "verdict": "pass",
+    "verified_at": "2026-11-09T20:00:58Z",
+    "standing": "Unsigned producer check; no signed or separate-host promotion"
+  },
+  "identity": {
+    "id": "IDC1h7d12c937b3b1482b",
+    "path": "identity-certificate.json",
+    "sha256": "d8556458f60cc79e9653f2cee6733d9c2722c2242eb25b76dd82dd0ff496573b",
+    "source_sha256": "a6f57faa3fc00fce42fd09e37ba12ee8aa3c60ef101e4d32f6c8e14f85b50401",
+    "variables": 5,
+    "degree_bound": 5,
+    "points": 32,
+    "extra_points": 11,
+    "seed_hex": "0x202611091950",
+    "extra_seed_hex": "0x5e4ae095",
+    "modulus_decimal": "2305843009213693951",
+    "proof_pointer_matches": true,
+    "issue_and_extra_check_exit": 0,
+    "scope": "Scalar quotient/remainder rewrite only; not a proof of F3 model completeness/counts/splitting or geometry. Native population still not run.",
+    "independence": "Producer-issued on one host with unchanged repository checker; no signed or independent-host standing"
+  },
+  "counts": {
+    "coefficient_candidates": 91,
+    "valid_reduced_polynomial_pairs": 8,
+    "split_u_pairs_including_identity": 7,
+    "nonsplit_u_pairs": 1,
+    "fraction": "7/8",
+    "difference_from_half": "3/8",
+    "status": "Derived by Lean kernel proofs, not native census observations"
+  },
+  "scope": "Finite polynomial-pair model only. Does not prove a Picard/Jacobian identification, ambient Cantor group law, subgroup proportion counterexample, asymptotic failure or a scaling-family theorem.",
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

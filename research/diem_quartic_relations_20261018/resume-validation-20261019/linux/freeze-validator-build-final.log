@@ -1,0 +1,37 @@
+warning: variable does not need to be mutable
+    --> src/cryptanalysis/diem_quartic.rs:2617:9
+     |
+2617 |     let mut start_walker = |i: usize, rng: &mut SplitMix64, px: &mut Vec<K>, py: &mut Vec<K>, wa: &mut Vec<u64>, wb: &mut Vec<u64>...
+     |         ----^^^^^^^^^^^^
+     |         |
+     |         help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `crypto` (lib) generated 1 warning (run `cargo fix --lib -p crypto` to apply 1 suggestion)
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-w2a-diem-relations)
+warning: field `save_lock` is never read
+  --> examples/diem_support/checkpoint.rs:51:5
+   |
+43 | pub struct Store {
+   |            ----- field in this struct
+...
+51 |     save_lock: std::sync::Mutex<()>,
+   |     ^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `save` and `publish` are never used
+   --> examples/diem_support/checkpoint.rs:175:12
+    |
+ 54 | impl Store {
+    | ---------- methods in this implementation
+...
+175 |     pub fn save(&self, k: u32, i: u32, payload: &str) -> io::Result<()> {
+    |            ^^^^
+...
+218 |     pub fn publish(&self) -> io::Result<()> {
+    |            ^^^^^^^
+
+warning: `crypto` (example "diem_freeze_validate") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 1.11s

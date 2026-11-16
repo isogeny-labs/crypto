@@ -1,0 +1,78 @@
+rustc 1.90.0 (1159e78c4 2025-09-14)
+1.5.1 (1f227d9 (release tag v1.5.1))
+src/pqc/fast/ml_dsa.rs: OK
+src/pqc/ml_dsa.rs: OK
+src/pqc/fast/keccak.rs: OK
+src/pqc/fast/keccak4.rs: OK
+src/hash/sha3.rs: OK
+rustc 1.90.0 (1159e78c4 2025-09-14)
+binary: rustc
+commit-hash: 1159e78c4747b02ef996e55082b704c09b970588
+commit-date: 2025-09-14
+host: x86_64-unknown-linux-gnu
+release: 1.90.0
+LLVM version: 20.1.8
+1.5.1 (1f227d9 (release tag v1.5.1))
+upstream=6b0096f4a2bda9cf07c7347094affc85d9eb24ff
+cb4b9e17edab87da6a4e5642948da97d21ebaa8751ef7647162f595c0ee5c19a  sources.sha256
+8d3a1f863ec1651d8aec3b6ff27e9695a79f71b100e91bff0c1507061b79e1c3  harness.rs
+c48a28ca87256e2f0922eb03f1b14ea16ef1554bcad82bd13d81ee2d2931d262  exports.rs
+5d647c80446f67d64d6e281554a657f5a757a6f9c3e15593382d6e6040c11f88  reduce.saw
+f6e4dea6022d75c63625bf3b4b4eb3b21f5ba4bb66bd7338a29b53f5773798c0  build/native.bc
+Loading file "reduce.saw"
+----------Counterexample----------
+  a: 13374444708715635
+----------------------------------
+== Anticipated failure message ==
+Stack trace:
+   (builtin) in z3
+   reduce.saw:35:64-35:66 in (callback)
+   (builtin) in llvm_verify
+   reduce.saw:35:12-35:66 in (callback)
+   (builtin) in fails
+   reduce.saw:35:5-35:66 in check
+   reduce.saw:38:1-38:42 (at top level)
+Proof failed.
+
+----------Counterexample----------
+  a: 3481272321
+----------------------------------
+== Anticipated failure message ==
+Stack trace:
+   (builtin) in z3
+   reduce.saw:35:64-35:66 in (callback)
+   (builtin) in llvm_verify
+   reduce.saw:35:12-35:66 in (callback)
+   (builtin) in fails
+   reduce.saw:35:5-35:66 in check
+   reduce.saw:39:1-39:35 (at top level)
+Proof failed.
+
+----------Counterexample----------
+  a: 0
+----------------------------------
+== Anticipated failure message ==
+Stack trace:
+   (builtin) in z3
+   reduce.saw:35:64-35:66 in (callback)
+   (builtin) in llvm_verify
+   reduce.saw:35:12-35:66 in (callback)
+   (builtin) in fails
+   reduce.saw:35:5-35:66 in check
+   reduce.saw:40:1-40:31 (at top level)
+Proof failed.
+
+----------Counterexample----------
+  a: 4227923959
+----------------------------------
+== Anticipated failure message ==
+Stack trace:
+   (builtin) in z3
+   reduce.saw:35:64-35:66 in (callback)
+   (builtin) in llvm_verify
+   reduce.saw:35:12-35:66 in (callback)
+   (builtin) in fails
+   reduce.saw:35:5-35:66 in check
+   reduce.saw:41:1-41:31 (at top level)
+Proof failed.
+

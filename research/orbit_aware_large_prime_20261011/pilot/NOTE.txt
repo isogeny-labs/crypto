@@ -1,0 +1,9 @@
+Pilot / calibration receipts (seeds 9001-9004), produced by an earlier build of
+examples/orbit_large_prime_bench.rs whose collector code is the same as the
+committed one (the later edits were rustfmt, receipt naming and the summarizer).
+p1_n17_first  : n=17, small=5, env=9, m=4, 1000 trials, arms none/dlp/dlp_orbit (seed 9001),
+                plus an early cap sweep (seed 9002) that is not kept.
+p2_calibration: (small, env, m) calibration at n=17,19,23 (cap 300) and n=29,31 (cap 60), seed 9003.
+p3_cap_sweep  : dlp and dlp_orbit across caps for all five n, seed 9004.
+They chose the parameters in PROTOCOL.md section 4 and are not measurements.
+Directory names encode n, small, env, m and cap; file names encode arm and seed.

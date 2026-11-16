@@ -20,6 +20,8 @@
 //!   leading terms);
 //! - `<case>.magma`: a Magma script that times `GroebnerBasis` (F4, the
 //!   default) and compares with our basis;
+//! - `<case>.m4gb`: M4GB's default text input (`$fieldsize p`, `$vars n X`,
+//!   one polynomial per line, variables `X0 … X{n-1}`);
 //!
 //! and prints one JSON line with our timing and basis shape.
 //!
@@ -27,13 +29,15 @@
 //! dump (`KIC_F4_NODE_DUMP=<file>`, one line per reduced node; a root is
 //! a line on which every variable occurs).  Each is written with the
 //! field equations `x² + x` (msolve, Singular) or in Magma's Boolean
-//! polynomial ring; the decision to compare is whether the ideal is the
+//! polynomial ring, and as a `<root>.m4gb` input (no field equations: M4GB adds
+//! them); the decision to compare is whether the ideal is the
 //! unit ideal (no decomposition of the target).
 //!
 //! The exporter only writes inputs and our own measured timings; the
 //! external tools are run by `research/gb_cas_comparison_20261011/run.sh`.
 
 use crypto_lib::cryptanalysis::f4_fp::{f4, F4Options, Ordering, Poly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use serde_json::json;
 use std::collections::hash_map::DefaultHasher;
@@ -104,6 +108,16 @@ const FP_CASES: &[(&str, usize, usize, u32, u64, u32)] = &[
     ("overdet_n12_m24_p65521", 12, 24, 2, 65521, 10),
 ];
 
+/// Larger cases, run after [`FP_CASES`] when `GB_CAS_LARGE=1`: where the
+/// engines' scaling separates.
+const FP_LARGE_CASES: &[(&str, usize, usize, u32, u64, u32)] = &[
+    ("quad_n10_p65521", 10, 10, 2, 65521, 16),
+    ("quad_n11_p65521", 11, 11, 2, 65521, 16),
+    ("cubic_n6_p65521", 6, 6, 3, 65521, 18),
+    ("quart_n4_p65521", 4, 4, 4, 65521, 18),
+    ("overdet_n14_m28_p65521", 14, 28, 2, 65521, 10),
+];
+
 // ── writers ────────────────────────────────────────────────────────────
 
 /// A term `c·x1^e1·…` in the shared syntax of msolve, Singular and Magma
@@ -170,6 +184,37 @@ fn vars(n: usize) -> String {
         .join(",")
 }
 
+/// M4GB's default input: `$fieldsize p`, `$vars n X`, then one polynomial
+/// a line.  The shared syntax writes `x1 … xn`; M4GB names them `X0 … X{n-1}`.
+fn write_m4gb(path: &Path, n: usize, p: u64, polys: &[String]) {
+    let mut s = format!("$fieldsize {p}\n$vars {n} X\n");
+    for poly in polys {
+        s.push_str(&rename_vars_m4gb(poly));
+        s.push('\n');
+    }
+    std::fs::write(path, s).expect("write M4GB input");
+}
+
+/// `x7` -> `X6` in a polynomial string of the shared syntax.
+fn rename_vars_m4gb(poly: &str) -> String {
+    let mut out = String::with_capacity(poly.len());
+    let mut chars = poly.chars().peekable();
+    while let Some(c) = chars.next() {
+        if c == 'x' {
+            let mut digits = String::new();
+            while let Some(d) = chars.peek().filter(|d| d.is_ascii_digit()) {
+                digits.push(*d);
+                chars.next();
+            }
+            let i: usize = digits.parse().expect("variable index");
+            write!(out, "X{}", i - 1).unwrap();
+        } else {
+            out.push(c);
+        }
+    }
+    out
+}
+
 fn write_msolve(path: &Path, n: usize, p: u64, polys: &[String]) {
     let mut s = format!("{}\n{p}\n", vars(n));
     s.push_str(&polys.join(",\n"));
@@ -226,7 +271,14 @@ fn write_magma(path: &Path, n: usize, p: u64, input: &[String], ours: &[String])
 }
 
 fn run_fp(outdir: &Path, repeats: usize) {
-    for &(name, n, m, d, p, dmax) in FP_CASES {
+    let large = std::env::var("GB_CAS_LARGE").is_ok_and(|v| v == "1");
+    // `GB_CAS_ONLY=<case>` runs that case alone (for profiling)
+    let only = std::env::var("GB_CAS_ONLY").ok();
+    let cases = FP_CASES
+        .iter()
+        .chain(FP_LARGE_CASES.iter().filter(|_| large))
+        .filter(|c| only.as_deref().is_none_or(|o| o == c.0));
+    for &(name, n, m, d, p, dmax) in cases {
         let sys = system(
             n,
             m,
@@ -248,6 +300,7 @@ fn run_fp(outdir: &Path, repeats: usize) {
         write_msolve(&outdir.join(format!("{name}.ms")), n, p, &input);
         write_singular(&outdir.join(format!("{name}.sing")), n, p, &input, &ours);
         write_magma(&outdir.join(format!("{name}.magma")), n, p, &input, &ours);
+        write_m4gb(&outdir.join(format!("{name}.m4gb")), n, p, &input);
         println!(
             "{}",
             json!({
@@ -271,7 +324,7 @@ fn run_bool(dump: &Path, outdir: &Path) {
         let occurring = system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |a, t| a | t.mask);
+            .fold(0u64, |a, t| a | mask_low64(t.mask));
         if occurring.count_ones() as usize != n {
             continue; // not a root: some variable already assigned
         }
@@ -281,6 +334,7 @@ fn run_bool(dump: &Path, outdir: &Path) {
         let mut with_field = input.clone();
         with_field.extend((1..=n).map(|i| format!("x{i}^2+x{i}")));
         write_msolve(&outdir.join(format!("{name}.ms")), n, 2, &with_field);
+        write_m4gb(&outdir.join(format!("{name}.m4gb")), n, 2, &input);
         let sing = format!(
             "ring r = 2,({vars}),dp;\noption(redSB);\nsystem(\"--ticks-per-sec\",1000);\n\
              ideal I = {input};\n\

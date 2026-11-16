@@ -1,0 +1,263 @@
+#!/usr/bin/env python3
+"""Reproduce explicit GHS maps and a complete relation solve on q16 frontier sources."""
+
+import argparse
+import hashlib
+import json
+import ssl
+import urllib.request
+from pathlib import Path
+
+import certifi
+
+HERE = Path(__file__).resolve().parent
+FRONTIER = HERE.parent / "ghs_nonsplit_order4222_20261028" / "frontier_q16.json"
+
+
+def bits(n):
+    return "+".join(
+        "1" if i == 0 else "w" if i == 1 else f"w^{i}"
+        for i in range(12) if n >> i & 1
+    ) or "0"
+
+
+def magma_code(row, limit):
+    n, b, r = row["source_order"], row["source_b"], row["subgroup_prime"]
+    gx, gy = row["G"]
+    qx, qy = row["Q_equals_7G"]
+    return f"""SetSeed(20261028);
+F2 := GF(2); P<X> := PolynomialRing(F2);
+K<w> := ext<F2|X^12+X^7+X^6+X^5+X^3+X+1>;
+k := FiniteField(2,4); Embed(k,K);
+E := EllipticCurve([K|1,w^5,0,0,{bits(b)}]);
+G := E![{bits(gx)},{bits(gy)}];
+Q := E![{bits(qx)},{bits(qy)}];
+assert #E eq {n} and G ne E!0 and {r}*G eq E!0 and Q eq 7*G;
+assert WeilDescentGenus(E,k,K!1) eq 4;
+all_tic := Cputime();
+C,h := WeilDescent(E,k,K!1); J := Jacobian(C);
+D := h(G); T := h(Q);
+assert D ne J!0 and {r}*D eq J!0 and T eq 7*D;
+print "SOURCE",{n},"PRIME",{r},"MAP_CPU",Cputime(all_tic);
+print "CURVE",C;
+print "SOURCE_GENERATOR",G,"SOURCE_TARGET",Q;
+print "IMAGE_GENERATOR",D,"IMAGE_TARGET",T;
+R<x> := PolynomialRing(k);
+f,hyp := HyperellipticPolynomials(C);
+assert Degree(f) eq 9 and Genus(C) eq 4;
+fbx := [k|]; fby := [k|]; fb := [J|];
+for xx in k do
+    for root in Roots(R.1^2+Evaluate(hyp,xx)*R.1+Evaluate(f,xx)) do
+        yy := root[1];
+        Append(~fbx,xx); Append(~fby,yy);
+        Append(~fb,J![x-xx,R!yy]);
+    end for;
+end for;
+assert #fb+1 eq #RationalPoints(C);
+print "FACTOR_BASE",#fb;
+F := GF({r});
+rows := []; rhs := [F|];
+walk := J!0; aa := 0; bb := 0; smooth := 0;
+seen_smooth := AssociativeArray();
+tic := Cputime(); used := 0;
+for step in [1..{limit if r != 17 else 0}] do
+    z := Random(1,3);
+    if z eq 1 then walk +:= D; aa +:= 1;
+    elif z eq 2 then walk +:= T; bb +:= 1;
+    else walk +:= D+T; aa +:= 1; bb +:= 1;
+    end if;
+    aa mod:= {r}; bb mod:= {r};
+    if Degree(walk[1]) lt 3 then continue; end if;
+    factors := Factorization(walk[1]);
+    if &or[Degree(tup[1]) ne 1 or tup[2] ne 1:tup in factors] then continue; end if;
+    coeffs := [F!0:i in [1..#fb+1]];
+    check := J!0; valid := true;
+    for tup in factors do
+        xx := -Coefficient(tup[1],0)/Coefficient(tup[1],1);
+        yy := Evaluate(walk[2],xx);
+        ix := 0;
+        for j in [1..#fb] do
+            if fbx[j] eq xx and fby[j] eq yy then ix := j; break; end if;
+        end for;
+        if ix eq 0 then valid := false; break; end if;
+        coeffs[ix] +:= 1;
+        check +:= fb[ix];
+    end for;
+    if not valid then continue; end if;
+    assert check eq walk;
+    smooth +:= 1;
+    key := Sprint(walk);
+    if IsDefined(seen_smooth,key) then continue; end if;
+    seen_smooth[key] := true;
+    coeffs[#fb+1] := -(F!bb);
+    Append(~rows,coeffs); Append(~rhs,F!aa);
+    if #rows ge #fb then
+        mat := Matrix(F,rows);
+        sol_now,ker_now := Solution(Transpose(mat),Vector(F,rhs));
+        if &and[v[#fb+1] eq 0:v in Basis(ker_now)] then
+            used := step; break;
+        end if;
+    end if;
+end for;
+if {r} eq 17 then
+    subgroup_smooth := 0;
+    for j in [1..{r-1}] do
+        u := (j*D)[1];
+        facts := Factorization(u);
+        if Degree(u) ge 3 and &and[Degree(t[1]) eq 1 and t[2] eq 1:t in facts] then
+            subgroup_smooth +:= 1;
+        end if;
+    end for;
+    print "SUBGROUP_SMOOTH",subgroup_smooth;
+    assert subgroup_smooth eq 0;
+    offset_steps := 0;
+    for oi in [1..#fb] do
+      if used ne 0 then break; end if;
+      for oj in [oi..#fb] do
+        if used ne 0 then break; end if;
+        offset := fb[oi]+fb[oj]; walk := offset; aa := 0; bb := 0;
+        for step in [1..{r*4}] do
+          offset_steps +:= 1;
+          z := Random(1,3);
+          if z eq 1 then walk +:= D; aa +:= 1;
+          elif z eq 2 then walk +:= T; bb +:= 1;
+          else walk +:= D+T; aa +:= 1; bb +:= 1;
+          end if;
+          aa mod:= {r}; bb mod:= {r};
+          if Degree(walk[1]) lt 3 then continue; end if;
+          factors := Factorization(walk[1]);
+          if &or[Degree(tup[1]) ne 1 or tup[2] ne 1:tup in factors] then continue; end if;
+          coeffs := [F!0:i in [1..#fb+1]];
+          check := J!0; valid := true;
+          for tup in factors do
+            xx := -Coefficient(tup[1],0)/Coefficient(tup[1],1);
+            yy := Evaluate(walk[2],xx); ix := 0;
+            for j in [1..#fb] do
+              if fbx[j] eq xx and fby[j] eq yy then ix := j; break; end if;
+            end for;
+            if ix eq 0 then valid := false; break; end if;
+            coeffs[ix] +:= 1; check +:= fb[ix];
+          end for;
+          if not valid then continue; end if;
+          assert check eq walk;
+          smooth +:= 1;
+          key := Sprint(walk);
+          if IsDefined(seen_smooth,key) then continue; end if;
+          seen_smooth[key] := true;
+          coeffs[oi] -:= 1; coeffs[oj] -:= 1;
+          coeffs[#fb+1] := -(F!bb);
+          Append(~rows,coeffs); Append(~rhs,F!aa);
+          if #rows ge #fb then
+            mat := Matrix(F,rows);
+            sol_now,ker_now := Solution(Transpose(mat),Vector(F,rhs));
+            if &and[v[#fb+1] eq 0:v in Basis(ker_now)] then
+              used := offset_steps; break;
+            end if;
+          end if;
+        end for;
+      end for;
+    end for;
+    print "OFFSET_WALK_STEPS",offset_steps;
+end if;
+print "RELATIONS",#rows,"SMOOTH",smooth,"WALK_STEPS",used,"REL_CPU",Cputime(tic);
+if #rows gt 0 then
+    tic := Cputime();
+    mat := Matrix(F,rows);
+    print "REL_RANK",Rank(mat),"VARS",#fb+1;
+    sol,ker := Solution(Transpose(mat),Vector(F,rhs));
+    target_free := &or[v[#fb+1] ne 0:v in Basis(ker)];
+    print "KERNEL_DIM",Dimension(ker),"TARGET_FREE",target_free;
+    assert not target_free;
+    print "RELATION_MATRIX",mat;
+    print "RELATION_RHS",rhs;
+    ans := Integers()!sol[#fb+1];
+    print "INDEX_LOG",ans,"LINEAR_CPU",Cputime(tic),"VERIFIED",ans*G eq Q and ans*D eq T;
+end if;
+print "FULL_CPU",Cputime(all_tic);
+print "J_ORDER",#J;
+rho_tic := Cputime(); rho_steps := 0; rho_success := 0; rho_attempts := 0;
+for trial in [1..2000] do
+    if rho_success eq 1000 then break; end if;
+    rho_attempts +:= 1;
+    seen := AssociativeArray();
+    ra := Random(0,{r-1}); rb := Random(0,{r-1});
+    salt := Random(0,1000000);
+    rp := ra*G+rb*Q;
+    for iter in [1..10000] do
+        key := Sprint(rp);
+        present,old := IsDefined(seen,key);
+        if present then
+            den := F!(rb-old[2]);
+            if den ne 0 then
+                log := (F!(old[1]-ra))/den;
+                assert (Integers()!log)*G eq Q;
+                rho_success +:= 1;
+                break;
+            end if;
+            break;
+        else
+            seen[key] := <ra,rb>;
+        end if;
+        if rp eq E!0 then z := (salt mod 97) mod 3;
+        else
+            xp := Eltseq(rp[1]);
+            mask := &+[Integers()!xp[i]*2^(i-1):i in [1..#xp]];
+            z := ((mask+salt) mod 97) mod 3;
+        end if;
+        if z eq 0 then rp +:= G; ra := (ra+1) mod {r};
+        elif z eq 1 then rp +:= Q; rb := (rb+1) mod {r};
+        else rp +:= rp; ra := (2*ra) mod {r}; rb := (2*rb) mod {r};
+        end if;
+        rho_steps +:= 1;
+    end for;
+end for;
+print "RHO_TRIALS",rho_success,"RHO_ATTEMPTS",rho_attempts,
+      "RHO_STEPS",rho_steps,"RHO_CPU",Cputime(rho_tic);
+"""
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--order", type=int, choices=[3974, 3978, 4178], required=True)
+    ap.add_argument("--limit", type=int, default=20000)
+    args = ap.parse_args()
+    frontier = json.loads(FRONTIER.read_text())
+    row = next(x for x in frontier["candidates"] if x["source_order"] == args.order)
+    code = magma_code(row, args.limit)
+    path = HERE / f"order_{args.order}.magma"
+    path.write_text(code)
+    req = urllib.request.Request(
+        "https://calculator.magma-maths.org/execute",
+        json.dumps({"code": code}).encode(),
+        {"Content-Type": "application/json"}, method="POST",
+    )
+    try:
+        with urllib.request.urlopen(
+            req, timeout=180,
+            context=ssl.create_default_context(cafile=certifi.where()),
+        ) as response:
+            payload = json.load(response)
+            http_status = response.status
+    except Exception as exc:
+        payload, http_status = {"error": repr(exc)}, None
+    receipt = {
+        "schema": "ghs-q16-genus4-end-to-end-v1",
+        "frontier_sha256": hashlib.sha256(FRONTIER.read_bytes()).hexdigest(),
+        "input_sha256": hashlib.sha256(code.encode()).hexdigest(),
+        "http_status": http_status,
+        "response": payload,
+    }
+    (HERE / f"order_{args.order}_receipt.json").write_text(
+        json.dumps(receipt, indent=2) + "\n"
+    )
+    print(payload.get("stdout", payload))
+    assert http_status == 200 and payload.get("truncated") is False
+    assert payload.get("success") is True and payload.get("exit_code") == 0
+    out = payload.get("stdout", "")
+    assert f"SOURCE {args.order} " in out
+    assert "TARGET_FREE false" in out and "VERIFIED true" in out
+    assert "RHO_TRIALS 1000 " in out and "RELATION_MATRIX" in out
+
+
+if __name__ == "__main__":
+    main()

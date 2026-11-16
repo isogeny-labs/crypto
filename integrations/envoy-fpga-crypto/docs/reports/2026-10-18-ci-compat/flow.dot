@@ -1,0 +1,16 @@
+digraph validation {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", nodesep=0.3, ranksep=0.3,
+         label="Envoy RTL CI compatibility — 2026-10-18", labelloc=t];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3f8", color="#43556b", fontname="Helvetica", fontsize=11];
+  edge [color="#43556b", fontname="Helvetica", fontsize=10];
+  before [label="Parent source + Ubuntu Verilator 5.020\n7 loop errors, 4 fatal width warnings", fillcolor="#fff0df"];
+  fix [label="Unroll 200-byte state loops (limit 256)\nExplicit 23-to-32-bit zero extension\nFatal lint and assertions retained"];
+  source [label="Corrected source, Verilator 5.020\n16/16 core groups; 15/15 RTL groups", fillcolor="#e5f3ec"];
+  synthesis [label="sv2v 0.0.13 → Yosys 0.33\nStructural checks; no combinational loops"];
+  replay [label="Generated Verilog, Verilator 5.020\nSame 15/15 RTL groups", fillcolor="#e5f3ec"];
+  newer [label="Verilator 5.032\nFatal source lint passes", fillcolor="#e5f3ec"];
+  before -> fix;
+  fix -> source;
+  fix -> newer;
+  source -> synthesis -> replay;
+}

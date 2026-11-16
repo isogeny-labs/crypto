@@ -1,0 +1,20 @@
+Source evidence checkout: e063d98475589d9aba7ae265a8cba830927e3156 plus the preregistered study commits.
+Current-main commands (after sparse compile fixtures were materialized):
+  cargo test --release --lib -j2
+  Result: compilation fails, exit 101, 26 pre-existing ecbench errors.
+
+Pinned execution checkout: b68341cd72b51acf9c5ce6c4f755351cc83053db; clean detached worktree.
+  CARGO_HOME=/workspace/crypto-toolchain/cargo
+  RUSTUP_HOME=/workspace/crypto-toolchain/rustup
+  CARGO_TARGET_DIR=/workspace/prime61-frozen-target
+  PATH=/workspace/crypto-toolchain/cargo/bin:$PATH
+  cargo build --release --no-default-features --example isogeny_disk_walk --example prime61_isogeny_experiment -j2
+  cargo test --release --no-default-features --example isogeny_disk_walk --example prime61_isogeny_experiment -j2
+  cargo test --release --lib -j2
+  The first full suite retained six missing-fixture failures. Restore the tracked runtime fixtures and rerun that exact whole-library command.
+
+All worker phase commands are recorded individually in results/runs/*.command.
+The continuation uses an absolute WORKER override pointing to the pinned build.
+The archive's checkpoint bytes and the public prior dump were compared to the Drive-restored input before continuation.
+Helpers use rustc --edition=2021 -O -L dependency=/workspace/prime61-frozen-target/release/deps --extern serde_json=<pinned serde_json rlib>, as scripted in replay_helpers.sh.
+Drive upload/download are connector actions with sanitized local byte/hash/manifest comparison receipts; no credentials or private object IDs are embedded.

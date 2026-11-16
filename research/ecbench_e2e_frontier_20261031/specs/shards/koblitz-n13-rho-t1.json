@@ -1,0 +1,69 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Koblitz E0 n=13 rho frontier, target block 2/2",
+  "description": "The two preregistered strong-rho references, signed-Frobenius rho, and generic negation rho. Candidate ranking uses the paired minimum of the two common-accounting strong references, fixed before data. This prospectively selected target block has four public targets, one warmup and six balanced measured rounds. Per-child censoring is fixed so the sum of child timeout ceilings is at most 2400s inside the 3,600-second EKS deadline; timeouts are retained and never retried.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 202610340131,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-escape",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_escape"
+      }
+    },
+    {
+      "name": "rho-strong-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-escape-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_escape"
+      }
+    },
+    {
+      "name": "rho-frob-v2",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_v2"
+      }
+    },
+    {
+      "name": "rho-neg-v2",
+      "role": "baseline",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610350131,
+    "isolation_required": "L2",
+    "timeout_seconds": 14
+  }
+}

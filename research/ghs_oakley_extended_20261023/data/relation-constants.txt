@@ -1,0 +1,12 @@
+split probability over F_(2^8), trials per g:
+  g=2 measured=0.497940 (n_split=99588) 1/g!=0.500000 ratio=0.996
+  g=3 measured=0.164740 (n_split=32948) 1/g!=0.166667 ratio=0.988
+  g=4 measured=0.040850 (n_split=8170) 1/g!=0.041667 ratio=0.980
+  g=5 measured=0.008108 (n_split=3243) 1/g!=0.008333 ratio=0.973
+  g=6 measured=0.001255 (n_split=1004) 1/g!=0.001389 ratio=0.904
+splits() vs root finding on 5000 random degree-4 polys over F_(2^8): 0 disagreements
+deg-16 root finding over F_(2^31): 688232 ns/trial (30 trials, 30 roots seen)
+deg-16 splitting test (x^q mod u) over F_(2^31): 632348 ns/trial (0 of 30 split)
+affine-add proxy over F_(2^155): 7379 ns/step (sink=false)
+g=16: relation-phase trials 2^75.3 x 632348 ns = 2^94.5 ns (LOWER bound, no LA)
+Oakley 3 rho 2^76.5 x 7379 ns = 2^89.3 ns; gap = +5.2 bits (positive = Gaudry relation phase slower)

@@ -1,0 +1,75 @@
+{
+  "schema": "hildebrand-box-asymptotic-verification/v1",
+  "source_commit": "828a1b5d5cdaf279e1a68110733d5c74ee7e97e7",
+  "claim_id": "PCC-20261114-cbcb79",
+  "declaration_sha256": "ac4b0f9ca0aed6dcff2ab1d2c9f94db4b35439e81fd4401d449e0a85e544ce54",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 32,
+  "gate_declarations": 21,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 97,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-cbcb79",
+    "claim_sha256": "0b16be51d5ac11bc9cecd16bc214c18f1691f8aea17f999f05a8292d67221df9",
+    "commit": "828a1b5d5cdaf279e1a68110733d5c74ee7e97e7",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/hildebrand_box_asymptotic_audit_20261114/lean (BoxAsymptoticCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T11:39:39Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-cbcb79",
+    "claim_sha256": "0b16be51d5ac11bc9cecd16bc214c18f1691f8aea17f999f05a8292d67221df9",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47466,
+    "sha256": "38d73d35531b9ebd4552d6ccbb1cce35bf33dbcf611570730141e73e670296a7",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 21,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "corrected_source_box_lemma_closed": true,
+    "literal_real_power_endpoints_and_decimal_constant": true,
+    "actual_full_uniform_conditional_support_space": true,
+    "normalized_actual_descending_factorial_limit_derived": true,
+    "source_width_growth_and_power_derived": true,
+    "threshold_uniform_in_cell_and_index_and_first_point": true,
+    "known_k_two_counter_retained": true,
+    "stronger_expected_random_support_mixing_closed": false,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_later_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

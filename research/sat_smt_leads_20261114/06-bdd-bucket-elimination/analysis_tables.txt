@@ -1,0 +1,108 @@
+
+### m=2 cell medians (all targets; ok/runs)
+| order | sched | l | n | ok/runs | sat/unsat | pool_initial | max_single | peak_work | peak_live | elim apply calls | 2^l | 2^(ceil(m/2)l) | 2^((m-1)l) | match |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| blk | bottom_up | 4 | 11 | 8/8 | 4/4 | 180 | 37 | 48 | 195 | 328 | 16 | 16 | 16 | True |
+| blk | bottom_up | 5 | 11 | 8/8 | 6/2 | 374 | 77 | 119 | 428 | 1025 | 32 | 32 | 32 | True |
+| blk | bottom_up | 6 | 13 | 8/8 | 6/2 | 855 | 157 | 337 | 1078 | 3558 | 64 | 64 | 64 | True |
+| blk | bottom_up | 7 | 17 | 8/8 | 4/4 | 2289 | 317 | 906 | 2926 | 11442 | 128 | 128 | 128 | True |
+| blk | bottom_up | 8 | 17 | 8/8 | 4/4 | 4701 | 637 | 2505 | 6530 | 37120 | 256 | 256 | 256 | True |
+| int | bottom_up | 4 | 11 | 8/8 | 4/4 | 279 | 57 | 40 | 290 | 332 | 16 | 16 | 16 | True |
+| int | bottom_up | 5 | 11 | 8/8 | 6/2 | 663 | 115 | 138 | 733 | 1380 | 32 | 32 | 32 | True |
+| int | bottom_up | 6 | 13 | 8/8 | 6/2 | 1850 | 249 | 436 | 2064 | 4760 | 64 | 64 | 64 | True |
+| int | bottom_up | 7 | 17 | 8/8 | 4/4 | 4671 | 491 | 934 | 5268 | 12614 | 128 | 128 | 128 | True |
+| int | bottom_up | 8 | 17 | 8/8 | 4/4 | 12441 | 1017 | 4598 | 15543 | 55744 | 256 | 256 | 256 | True |
+| rev | bottom_up | 4 | 11 | 8/8 | 4/4 | 283 | 53 | 46 | 293 | 370 | 16 | 16 | 16 | True |
+| rev | bottom_up | 5 | 11 | 8/8 | 6/2 | 715 | 113 | 134 | 748 | 1336 | 32 | 32 | 32 | True |
+| rev | bottom_up | 6 | 13 | 8/8 | 6/2 | 1864 | 245 | 386 | 2086 | 4720 | 64 | 64 | 64 | True |
+| rev | bottom_up | 7 | 17 | 8/8 | 4/4 | 4810 | 489 | 1078 | 5626 | 14420 | 128 | 128 | 128 | True |
+| rev | bottom_up | 8 | 17 | 8/8 | 4/4 | 12552 | 1015 | 4284 | 15527 | 57094 | 256 | 256 | 256 | True |
+
+### m=2 fitted slopes (bits per l, least squares on log2 of cell median; only fully completed cells)
+| order | sched | sizes l | peak_live | peak_live sat | peak_live unsat | peak_live/n | peak_work | peak_work/n | max_single | pool_initial | elim calls |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| blk | bottom_up | [4, 5, 6, 7, 8] | 1.29 | 1.28 | 1.30 | 1.10 | 1.43 | 1.24 | 1.03 | 1.20 | 1.71 |
+| int | bottom_up | [4, 5, 6, 7, 8] | 1.43 | 1.41 | 1.46 | 1.24 | 1.65 | 1.46 | 1.04 | 1.38 | 1.80 |
+| rev | bottom_up | [4, 5, 6, 7, 8] | 1.44 | 1.40 | 1.45 | 1.25 | 1.61 | 1.42 | 1.06 | 1.37 | 1.80 |
+
+### m=3 cell medians (all targets; ok/runs)
+| order | sched | l | n | ok/runs | sat/unsat | pool_initial | max_single | peak_work | peak_live | elim apply calls | 2^l | 2^(ceil(m/2)l) | 2^((m-1)l) | match |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| t_xint | t_first | 3 | 11 | 8/8 | 5/3 | 4556 | 1661 | 1249 | 5569 | 15764 | 8 | 64 | 64 | True |
+| t_xint | t_first | 4 | 13 | 8/8 | 5/3 | 45966 | 13405 | 6536 | 51893 | 93976 | 16 | 256 | 256 | True |
+| t_xint | t_first | 5 | 17 | 8/8 | 4/4 | 409408 | 130717 | 112119 | 519607 | 1566267 | 32 | 1024 | 1024 | True |
+| t_xint | t_first | 6 | 19 | 0/8 | 0/0 | - | - | - | - | - | 64 | 4096 | 4096 | True |
+| t_xint | x3_t_x12 | 3 | 11 | 8/8 | 5/3 | 4556 | 1661 | 1249 | 5569 | 15110 | 8 | 64 | 64 | True |
+| t_xint | x3_t_x12 | 4 | 13 | 8/8 | 5/3 | 45966 | 13405 | 6536 | 51893 | 89918 | 16 | 256 | 256 | True |
+| t_xint | x3_t_x12 | 5 | 17 | 8/8 | 4/4 | 409408 | 130717 | 112119 | 519607 | 1540979 | 32 | 1024 | 1024 | True |
+| t_xint | x3_t_x12 | 6 | 19 | 0/8 | 0/0 | - | - | - | - | - | 64 | 4096 | 4096 | True |
+| t_xint | x_first | 3 | 11 | 8/8 | 5/3 | 4556 | 1661 | 3425 | 6512 | 70391 | 8 | 64 | 64 | True |
+| t_xint | x_first | 4 | 13 | 8/8 | 5/3 | 45966 | 13405 | 22445 | 63454 | 666675 | 16 | 256 | 256 | True |
+| t_xint | x_first | 5 | 17 | 0/8 | 0/0 | - | - | - | - | - | 32 | 1024 | 1024 | True |
+| t_xint | x_first | 6 | 19 | 0/8 | 0/0 | - | - | - | - | - | 64 | 4096 | 4096 | True |
+| xblk_t | t_first | 3 | 11 | 8/8 | 5/3 | 1489 | 238 | 441 | 1797 | 11026 | 8 | 64 | 64 | True |
+| xblk_t | t_first | 4 | 13 | 8/8 | 5/3 | 6844 | 1089 | 1664 | 8216 | 61222 | 16 | 256 | 256 | True |
+| xblk_t | t_first | 5 | 17 | 8/8 | 4/4 | 38738 | 4810 | 13511 | 51050 | 460378 | 32 | 1024 | 1024 | True |
+| xblk_t | t_first | 6 | 19 | 8/8 | 4/4 | 176332 | 20909 | 54393 | 228154 | 3155371 | 64 | 4096 | 4096 | True |
+| xblk_t | t_first | 7 | 23 | 0/4 | 0/0 | - | - | - | - | - | 128 | 16384 | 16384 | True |
+| xblk_t | x3_t_x12 | 3 | 11 | 8/8 | 5/3 | 1489 | 238 | 441 | 1797 | 9288 | 8 | 64 | 64 | True |
+| xblk_t | x3_t_x12 | 4 | 13 | 8/8 | 5/3 | 6844 | 1089 | 1664 | 8216 | 47523 | 16 | 256 | 256 | True |
+| xblk_t | x3_t_x12 | 5 | 17 | 8/8 | 4/4 | 38738 | 4810 | 13511 | 51050 | 365338 | 32 | 1024 | 1024 | True |
+| xblk_t | x3_t_x12 | 6 | 19 | 8/8 | 4/4 | 176332 | 20909 | 54393 | 228154 | 2151324 | 64 | 4096 | 4096 | True |
+| xblk_t | x3_t_x12 | 7 | 23 | 0/4 | 0/0 | - | - | - | - | - | 128 | 16384 | 16384 | True |
+| xblk_t | x_first | 3 | 11 | 8/8 | 5/3 | 1489 | 238 | 733 | 1797 | 14448 | 8 | 64 | 64 | True |
+| xblk_t | x_first | 4 | 13 | 8/8 | 5/3 | 6844 | 1089 | 6161 | 10520 | 131190 | 16 | 256 | 256 | True |
+| xblk_t | x_first | 5 | 17 | 8/8 | 4/4 | 38738 | 4810 | 88093 | 113794 | 1901560 | 32 | 1024 | 1024 | True |
+| xblk_t | x_first | 6 | 19 | 0/8 | 0/0 | - | - | - | - | - | 64 | 4096 | 4096 | True |
+| xblk_t | x_first | 7 | 23 | 0/4 | 0/0 | - | - | - | - | - | 128 | 16384 | 16384 | True |
+| xint_t | t_first | 3 | 11 | 8/8 | 5/3 | 1497 | 238 | 441 | 1805 | 11658 | 8 | 64 | 64 | True |
+| xint_t | t_first | 4 | 13 | 8/8 | 5/3 | 6850 | 1089 | 1664 | 8222 | 65648 | 16 | 256 | 256 | True |
+| xint_t | t_first | 5 | 17 | 8/8 | 4/4 | 38826 | 4810 | 13511 | 51138 | 506955 | 32 | 1024 | 1024 | True |
+| xint_t | t_first | 6 | 19 | 8/8 | 4/4 | 176362 | 20909 | 54393 | 228184 | 3534482 | 64 | 4096 | 4096 | True |
+| xint_t | t_first | 7 | 23 | 0/4 | 0/0 | - | - | - | - | - | 128 | 16384 | 16384 | True |
+| xint_t | x3_t_x12 | 3 | 11 | 8/8 | 5/3 | 1497 | 238 | 441 | 1805 | 9340 | 8 | 64 | 64 | True |
+| xint_t | x3_t_x12 | 4 | 13 | 8/8 | 5/3 | 6850 | 1089 | 1664 | 8222 | 47551 | 16 | 256 | 256 | True |
+| xint_t | x3_t_x12 | 5 | 17 | 8/8 | 4/4 | 38826 | 4810 | 13511 | 51138 | 365376 | 32 | 1024 | 1024 | True |
+| xint_t | x3_t_x12 | 6 | 19 | 8/8 | 4/4 | 176362 | 20909 | 54393 | 228184 | 2151356 | 64 | 4096 | 4096 | True |
+| xint_t | x3_t_x12 | 7 | 23 | 0/4 | 0/0 | - | - | - | - | - | 128 | 16384 | 16384 | True |
+| xint_t | x_first | 3 | 11 | 8/8 | 5/3 | 1497 | 238 | 733 | 1805 | 14762 | 8 | 64 | 64 | True |
+| xint_t | x_first | 4 | 13 | 8/8 | 5/3 | 6850 | 1089 | 6161 | 10520 | 131166 | 16 | 256 | 256 | True |
+| xint_t | x_first | 5 | 17 | 8/8 | 4/4 | 38826 | 4810 | 88093 | 113794 | 1901506 | 32 | 1024 | 1024 | True |
+| xint_t | x_first | 6 | 19 | 0/8 | 0/0 | - | - | - | - | - | 64 | 4096 | 4096 | True |
+| xint_t | x_first | 7 | 23 | 0/4 | 0/0 | - | - | - | - | - | 128 | 16384 | 16384 | True |
+
+### m=3 fitted slopes (bits per l, least squares on log2 of cell median; only fully completed cells)
+| order | sched | sizes l | peak_live | peak_live sat | peak_live unsat | peak_live/n | peak_work | peak_work/n | max_single | pool_initial | elim calls |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| t_xint | t_first | [3, 4, 5] | 3.27 | 3.27 | 3.28 | 2.96 | 3.24 | 2.93 | 3.15 | 3.24 | 3.32 |
+| t_xint | x3_t_x12 | [3, 4, 5] | 3.27 | 3.27 | 3.28 | 2.96 | 3.24 | 2.93 | 3.15 | 3.24 | 3.34 |
+| t_xint | x_first | [3, 4] | - | - | - | - | - | - | - | - | - |
+| xblk_t | t_first | [3, 4, 5, 6] | 2.36 | 2.36 | 2.36 | 2.08 | 2.39 | 2.11 | 2.15 | 2.32 | 2.74 |
+| xblk_t | x3_t_x12 | [3, 4, 5, 6] | 2.36 | 2.36 | 2.36 | 2.08 | 2.39 | 2.11 | 2.15 | 2.32 | 2.65 |
+| xblk_t | x_first | [3, 4, 5] | 2.99 | 2.99 | 2.98 | 2.68 | 3.45 | 3.14 | 2.17 | 2.35 | 3.52 |
+| xint_t | t_first | [3, 4, 5, 6] | 2.36 | 2.36 | 2.35 | 2.08 | 2.39 | 2.11 | 2.15 | 2.31 | 2.77 |
+| xint_t | x3_t_x12 | [3, 4, 5, 6] | 2.36 | 2.36 | 2.35 | 2.08 | 2.39 | 2.11 | 2.15 | 2.31 | 2.65 |
+| xint_t | x_first | [3, 4, 5] | 2.99 | 2.99 | 2.98 | 2.68 | 3.45 | 3.14 | 2.17 | 2.35 | 3.50 |
+
+### blow-ups
+m=3 t_xint t_first l=6: 8/8 (['blowup_build_A:node cap'])
+m=3 t_xint x3_t_x12 l=6: 8/8 (['blowup_build_A:node cap'])
+m=3 t_xint x_first l=5: 8/8 (['blowup:node cap'])
+m=3 t_xint x_first l=6: 8/8 (['blowup_build_A:node cap'])
+m=3 xblk_t t_first l=7: 4/4 (['blowup_build_A:node cap'])
+m=3 xblk_t x3_t_x12 l=7: 4/4 (['blowup_build_A:node cap'])
+m=3 xblk_t x_first l=6: 8/8 (['blowup:node cap'])
+m=3 xblk_t x_first l=7: 4/4 (['blowup_build_A:node cap'])
+m=3 xint_t t_first l=7: 4/4 (['blowup_build_A:node cap'])
+m=3 xint_t x3_t_x12 l=7: 4/4 (['blowup_build_A:node cap'])
+m=3 xint_t x_first l=6: 8/8 (['blowup:node cap'])
+m=3 xint_t x_first l=7: 4/4 (['blowup_build_A:node cap'])
+
+### off-protocol extension: m=3 l=7 n=23, order xint_t, node cap 24e6, 2 targets
+xint_t t_first l=7: runs=2 peak_live=1347664 peak_work=430602 pool_initial=925952 max_single_constraint=97360 elim_calls=26289686 match= True
+   extended slopes l=[3, 4, 5, 6, 7]: peak_live=2.39 peak_work=2.49 pool_initial=2.32 max_single_constraint=2.16 elim_calls=2.80
+   local (successive-l) slopes peak_live: [2.19, 2.64, 2.16, 2.56]  peak_work: [1.92, 3.02, 2.01, 2.98]  max_single: [2.19, 2.14, 2.12, 2.22]
+xint_t x3_t_x12 l=7: runs=2 peak_live=1347664 peak_work=430602 pool_initial=925952 max_single_constraint=97360 elim_calls=15567842 match= True
+   extended slopes l=[3, 4, 5, 6, 7]: peak_live=2.39 peak_work=2.49 pool_initial=2.32 max_single_constraint=2.16 elim_calls=2.69
+   local (successive-l) slopes peak_live: [2.19, 2.64, 2.16, 2.56]  peak_work: [1.92, 3.02, 2.01, 2.98]  max_single: [2.19, 2.14, 2.12, 2.22]
+no plot: No module named 'matplotlib'

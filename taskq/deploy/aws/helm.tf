@@ -56,7 +56,7 @@ locals {
 }
 
 resource "helm_release" "nvidia_device_plugin" {
-  count      = var.gpu_node.enabled ? 1 : 0
+  count      = length(var.gpu_spot_instance_types) > 0 ? 1 : 0
   name       = "nvidia-device-plugin"
   repository = "https://nvidia.github.io/k8s-device-plugin"
   chart      = "nvidia-device-plugin"
@@ -66,7 +66,7 @@ resource "helm_release" "nvidia_device_plugin" {
     nodeSelector = { "taskq/pool" = "gpu" }
     tolerations  = [{ key = "nvidia.com/gpu", operator = "Exists", effect = "NoSchedule" }]
   })]
-  depends_on = [module.eks]
+  depends_on = [helm_release.spot_nodepools]
 }
 
 resource "helm_release" "keda" {
@@ -74,7 +74,7 @@ resource "helm_release" "keda" {
   name             = "keda"
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
-  version          = "2.15.1"
+  version          = "2.21.0"
   namespace        = "keda"
   create_namespace = true
   depends_on       = [module.eks]
@@ -88,5 +88,5 @@ resource "helm_release" "taskq" {
   wait      = true
   timeout   = 900
 
-  depends_on = [helm_release.keda, helm_release.nvidia_device_plugin, aws_efs_mount_target.results]
+  depends_on = [helm_release.keda, helm_release.nvidia_device_plugin, helm_release.spot_nodepools, aws_efs_mount_target.results]
 }

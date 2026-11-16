@@ -37,6 +37,11 @@ def fixture(root: Path, corrupt_cold: bool = False) -> tuple[Path, Path]:
              "pod_id": "pod123", "allocation_sha256": digest,
              "recorded_utc": "2030-01-01T00:02:00Z",
              "retire_at_utc": "2030-01-01T09:55:00Z"}
+    pod_guard = {"schema": "n83.fixed31-pod-deadline-guard/v1",
+                 "status": "ARMED", "pod_id": "pod123",
+                 "allocation_sha256": digest,
+                 "stop_after_utc": "2030-01-01T10:00:00Z",
+                 "recorded_utc": "2030-01-01T00:03:00Z"}
     transfer = {"pod_id": "pod123", "recorded_utc": "2030-01-01T02:00:00Z",
                 "reason": "PRODUCER_DONE", "spool_succeeded": True,
                 "archive_ready": True, "error_type": None}
@@ -44,6 +49,7 @@ def fixture(root: Path, corrupt_cold: bool = False) -> tuple[Path, Path]:
               "pod_present": False}
     for name, data in (("watchdog_started", started),
                        ("watchdog_ready", ready),
+                       ("pod_deadline_guard", pod_guard),
                        ("watchdog_transfer", transfer),
                        ("provider_post_terminate", absent)):
         write(archive / f"{name}.json", data)
@@ -80,6 +86,8 @@ def fixture(root: Path, corrupt_cold: bool = False) -> tuple[Path, Path]:
     }
     files = {
         "watchdog_ready.json": (archive / "watchdog_ready.json").read_bytes(),
+        "pod_deadline_guard.json":
+            (archive / "pod_deadline_guard.json").read_bytes(),
         "results/runpod_allocation.json":
             (archive / "results" / "runpod_allocation.json").read_bytes(),
         "results/source.json": b"{}\n",
@@ -150,6 +158,16 @@ class ProviderCustodyTests(unittest.TestCase):
                 modified = verify_provider_custody.validate(allocation, archive)
         self.assertEqual(modified["status"], "BOUNDED_UNKNOWN")
         self.assertFalse(modified["checks"]["archive_sha256"])
+
+    def test_missing_pod_side_guard_blocks_promotion(self):
+        with tempfile.TemporaryDirectory() as temp:
+            allocation, archive = fixture(Path(temp))
+            (archive / "pod_deadline_guard.json").unlink()
+            with mock.patch.object(verify_provider_custody.runpod_runner,
+                                   "read_allocation", return_value=RECEIPT):
+                result = verify_provider_custody.validate(allocation, archive)
+        self.assertEqual(result["status"], "BOUNDED_UNKNOWN")
+        self.assertEqual(result["final_primary_status"], "BOUNDED_UNKNOWN")
 
 
 if __name__ == "__main__":

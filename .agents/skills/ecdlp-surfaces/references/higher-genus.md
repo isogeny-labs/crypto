@@ -11,6 +11,8 @@ constructor to `tools/ecdlp-surfaces`.
 | Case | Existing entry point | Boundary |
 | --- | --- | --- |
 | Genus-2 cover of `y^2=x^3+a*x+b`, characteristic greater than three | `crypto`: `hyperelliptic-cover construct` / `verify` | The fixed degree-two cover is a smooth sextic with two rational infinity points. Its construction is checked; pullback, norm, and its two-infinity Jacobian arithmetic are not implemented. |
+| Genus-3 cover of an ordinary binary elliptic curve | Same CLI, plus `OrdinaryBinaryCover` in the native libraries | Both repositories support one-infinity Mumford arithmetic, rational elliptic point-class pullbacks, rational source-point pushforward, and typed pull/push witnesses. Current `crypto` source alone supports arbitrary Jacobian-class pushforward for the exact polynomial-basis GF(8) fixture `a=1`, `b=3`, `d=7`; every other crypto field/model is structured unsupported, and the retained `cryptanalysis` source remains pre-norm pending a current mirror/integration receipt. |
+| Binary genus-2 cover of `y^2+x*y=x^3+a*x^2+1` | `tools/binary-genus2-cover`: `GenusTwoCover`, `binary_genus2_check` | Same-field separable degree-three cover; checked reduced point-class pullback and inverse on the image. CLI pins the two n=83 fixtures. A generic norm is unsupported. |
 | Genus-3 cover of an ordinary binary elliptic curve | Same CLI, plus `OrdinaryBinaryCover` in both native libraries | One-infinity Mumford arithmetic, rational elliptic point-class pullbacks, rational source-point pushforward, and typed pull/push witnesses are supported. Arbitrary Jacobian-class pushforward is unsupported. |
 | Arithmetic on a supplied odd-prime genus-g hyperelliptic curve | `crypto`: `hyperelliptic-cover arithmetic` with `odd_curve` | Monic squarefree `f` of degree `2g+1`, one rational infinity point, positive genus, and deterministically checked odd prime of at most 64 bits. This alone supplies no elliptic transfer. |
 | Other checked binary hyperelliptic models | `HyperellipticCurve::try_new`, `MumfordDivisor` in both libraries | Use the checked odd-degree, one-infinity API; binary field degree is bounded by 4096. The cover CLI's binary `model` selector reconstructs only its fixed genus-3 family. |
@@ -152,6 +154,12 @@ The CLI has no pullback or transfer subcommand. In native Rust, import
 `OrdinaryBinaryCover` and the field/point types from `crypto_lib::binary_ecc`
 or `cryptanalysis_suite::binary_ecc`, then use these checked entry points:
 
+For the exact fixed-F8 fixture, the standalone construction receipt's
+`implemented_in_library_only_for_exact_fixed_f8_fixture` value declares the
+capability compiled into the library. The construction command itself only
+replays geometry; it does not run the 486-class norm and is not a transfer
+proof receipt.
+
 1. `OrdinaryBinaryCover::new(m, irreducible, a, b)` and `verify_certificate()`.
 2. `pullback_point_class(&P)` and `pullback_point_class(&Q)` to obtain divisor
    classes; `pull_push_composition_certificate(&P)` for the typed degree-three
@@ -165,10 +173,19 @@ or `cryptanalysis_suite::binary_ecc`, then use these checked entry points:
    separately, including the ramified two-torsion and infinity cases.
 
 `pushforward_rational_point_divisor` handles rational source-point classes.
-`pushforward_arbitrary_jacobian_class` returns an explicit unsupported result.
-Do not use the typed pullback witness as a norm for arbitrary classes produced
-by a relation collector. An end-to-end solver requiring that norm needs its
-own verified implementation.
+In current `crypto`, `pushforward_arbitrary_jacobian_class` handles every valid
+reduced class only for the exact polynomial-basis GF(8) model with modulus `z^3+z+1` (`0xb`),
+`a=1`, `b=3`, and `d=7`; its exhaustive native fixture covers 486 classes and
+236,196 ordered additivity pairs. The target has order 6 with six norm fibers
+of size 81, so `gcd(3,6)=3`; treat this as norm mechanics, not an injective
+full-target-group ECDLP transfer. This remains same-implementation evidence:
+the separate point-count certificate checks the ambient order 486 but not the
+divisor presentation, group law, or norm. Every other model returns an explicit
+unsupported result. Do not use the typed pullback witness as a general norm for
+classes produced by a relation collector. A catalog-general or end-to-end
+solver path still needs its own independently verified implementation. The
+retained `cryptanalysis` parity receipt binds a pre-norm source digest, so do
+not claim this exception there until a current mirror/integration replay passes.
 
 For separate genus-2 odd-prime arithmetic, this complete request validates the
 branch-point divisor on `v^2=u^5+u` over F5. It is a demonstration, not an n=83
@@ -183,6 +200,28 @@ For higher genus, use the caller's checked monic squarefree polynomial of exact
 degree `2g+1`; changing only the `genus` field does not change the curve.
 
 ## Search other genus-2 and higher targets
+
+For the supported binary b=1 family, construct directly before treating an
+explicit genus-2 target as an unresolved gluing search:
+
+```
+C: v^2+u^2*v=u^5+a*u^4+u^3+u
+pi(u,v)=(u^3/(u+1)^2,(u*(u+1)*v+u^2+u+1)/(u+1)^3)
+U=u^2+(1/x)*u+x
+V=(x+(y+1)/x^2)*u+x+y+1.
+```
+
+The U,V formulas apply to finite elliptic P=(x,y) with x nonzero. O maps
+to the identity and (0,1) to (u,0). The inverse reads x=U(0),
+y=V(0)+x+1 and must validate and compare the entire reconstructed pair;
+do not apply it to arbitrary classes. The group law is native Cantor
+arithmetic on J(C). The
+[tool README](../../../../tools/binary-genus2-cover/README.md) gives the
+commands and field bounds; the
+[report](../../../../research/binary_genus2_cover_20261014/REPORT.md)
+proves smoothness, genus, degree, exceptional fibers, and the divisor formula.
+Its Lean proof covers the affine map equation; the geometric and Picard
+arguments remain a written proof, with the formalization gap recorded.
 
 For genus 2, separate two search routes:
 

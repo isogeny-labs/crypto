@@ -1,0 +1,9 @@
+digraph capacity_gate {
+  graph [rankdir=LR, fontname="Helvetica", label="N83 D18 attempt 6: corrected verifier, host gate", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fillcolor="#e8f2ff"];
+  input [label="Fresh full-D18 S3 GET\nthree SHA-256 values match", fillcolor="#e4f4e8"];
+  verifier [label="Terminal-exit verifier\n5 tests pass; exit 1 rejected", fillcolor="#e4f4e8"];
+  gate [label="Host load 65.77 -> 69.31\nlaunch maximum 24", fillcolor="#ffe8de"];
+  stopped [label="Worker not launched\npositive and natural held", fillcolor="#eeeeee"];
+  input -> verifier -> gate -> stopped;
+}

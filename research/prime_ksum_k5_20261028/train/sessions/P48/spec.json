@@ -1,0 +1,159 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime k-sum extension: train panel, 48-bit a=-3 curve",
+  "description": "PROTOCOL.md selection: k-sum grids around the model optimum, train target seed. Counts only; AGENTS.md 5a band. Public synthetic; no security claim.",
+  "workloads": {
+    "targets_per_curve": 4,
+    "target_seed": 20261015100,
+    "target_kind": "public",
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 281474976710591,
+        "a": 281474976710588,
+        "b": 9,
+        "group_order": 281474991897067,
+        "r": 281474991897067,
+        "gx": 1,
+        "gy": 111984877719828
+      }
+    ]
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ksum4-A105",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=105",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum4-A126",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=126",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum4-A140",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=140",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum4-A161",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=161",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum4-A84",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=84",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum5-A35",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=35",
+          "oracle": "ksum:m=5",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum5-A44",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=44",
+          "oracle": "ksum:m=5",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum5-A53",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=53",
+          "oracle": "ksum:m=5",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum5-A59",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=59",
+          "oracle": "ksum:m=5",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum5-A68",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=68",
+          "oracle": "ksum:m=5",
+          "max_trials": "13528399621"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261015201,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

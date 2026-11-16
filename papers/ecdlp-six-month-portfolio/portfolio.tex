@@ -1,0 +1,98 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=24mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\usepackage{lmodern,amsmath,amssymb,booktabs,longtable,tabularx,array,graphicx,xcolor,xurl}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{enumitem,caption,hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black,citecolor=blue!45!black,
+ pdftitle={A Six-Month ECDLP Research Programme: Implementations, Experiments, and Evidence},pdfauthor={Anonymous}}
+\setlist{nosep,leftmargin=1.4em}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{5em}
+\sloppy
+\newcommand{\F}{\mathbb F}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\B}{\mathcal B}
+\newcommand{\src}[1]{\hyperref[art:#1]{\textsf{[#1]}}}
+\newcommand{\file}[1]{\path{#1}}
+\newcommand{\status}[1]{\textsc{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\title{A Six-Month ECDLP Research Programme:\\
+Implementations, Experiments, Structural Leads, and Evidence\\[5pt]
+\large A comprehensive retrospective of the aburan28 research portfolio,\\
+19 April--19 October 2026}
+\author{Anonymous}
+\date{19 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+This paper reviews six months of work across the \texttt{aburan28}
+cryptographic research portfolio, centred on \texttt{crypto},
+\texttt{cryptanalysis}, \texttt{crypto-autoresearcher}, and
+\texttt{ml-cryptanalysis}. Nineteen pinned repository snapshots contain
+305,367 tracked entries. Their reachable histories contain 34,276 commits
+in the review window; metadata across 5,144 current branch heads contains
+49,936 distinct commits. These are measures of recorded activity, including
+merges, imports and upstream history, not counts of discoveries. A companion
+catalogue indexes 4,075 research, experiment, benchmark and manuscript
+directories and 16,587 safely parsed ledger files.
+
+The technical record spans prime fields, ordinary binary curves, Koblitz
+curves, small extension fields, higher-genus transfers, summation
+polynomials, Boolean and prime-field algebraic solvers, isogeny graphs,
+endomorphisms, GPU arithmetic, learning, and formal verification. Concrete
+progress includes substantially cheaper decomposition and elimination
+stages, complete toy pipelines, modest held-out improvements to production
+IC, a 2.645-second cold-process saving in an N83 holdout, and reproducible
+structural-discovery experiments. A later downloaded isogeny checkpoint contains
+126,992 accepted attempts at 7,937 audited vertices; all 79,462 archive-manifest
+entries pass a fresh byte check. A separate smooth-order diagnostic verifies
+3,738 targets in both arms. Nineteen frontier sessions have 3,178
+verified measured executions and 54 exhausted executions, with matching
+record hashes. These checks are distinguished from fresh cryptographic
+replay.
+
+The record establishes engineering and methodological progress. It does
+not establish a general prime-field ECDLP algorithm below rho, a
+cryptographic-scale index-calculus break, or a proof of intrinsic hardness
+variation across an isogeny class. Stage results, retained-precomputation
+online results, complete cold solves, finite observations, conditional
+arguments and checked-proof claims are kept separate. Open branches are
+reported independently, including large-memory PKM runs and an Semaev
+defect-impact audit. The result is an evidence map, an assessment of leads,
+and a set of explicit next proof and measurement obligations.
+The review is not an exhaustive reading of the archive: a line-range ledger
+records 94 pinned files read in full and 50 previously focused sources,
+while remaining files and historical content lack complete reading receipts.
+\end{abstract}
+\tableofcontents
+\clearpage
+\input{sections/01-scope}
+\input{sections/02-mathematics}
+\input{sections/03-measurement}
+\input{sections/04-prime}
+\input{sections/05-binary}
+\input{sections/06-solvers}
+\input{sections/07-extensions}
+\input{sections/08-isogenies}
+\input{sections/09-learning}
+\input{sections/10-systems}
+\input{sections/11-proofs-corrections}
+\input{sections/12-assessment}
+\appendix
+\input{sections/13-reproduction}
+\input{sections/14-reading-coverage}
+\clearpage
+\section{Pinned source register}\label{app:sources}
+The keys used throughout the paper resolve below to immutable repository
+revisions or explicitly identified external artifacts. Source hashes bind
+bytes; they do not establish scientific truth. Open-PR entries record their
+observed head and state, rather than treating a mutable PR page as a frozen
+experiment. Full source metadata is in \file{evidence/sources.json}.
+\input{sections/source-register}
+\bibliographystyle{plainnat}
+\bibliography{refs}
+\end{document}

@@ -168,8 +168,12 @@ fn spread32(x: u64) -> u64 {
     x
 }
 
+// `#[inline]`: without it LLVM leaves this target-feature function as a
+// call from the wide field's folds (three per `Gf2_128::reduce_fold`, with
+// the operands shuffled through general registers around each), T22.
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
+#[inline]
 unsafe fn clmul_u64(a: u64, b: u64) -> u128 {
     use std::arch::x86_64::*;
     let x = _mm_set_epi64x(0, a as i64);
@@ -651,8 +655,9 @@ impl Gf2 {
     /// trick in miniature, still with one field inversion.  Same inverses,
     /// same multiplication count, a quarter of the dependent chain.
     ///
-    /// Both passes walk `xs` and `scratch` as zipped chunks, so the loops
-    /// carry no bounds checks and no `Vec` growth checks.
+    /// Both passes walk `xs` and `scratch` as zipped chunks (fixed-width
+    /// arrays in the `pclmulqdq` copy), so the loops carry no bounds
+    /// checks and no `Vec` growth checks.
     pub fn batch_inv(&self, xs: &mut [u64], scratch: &mut Vec<u64>) {
         #[cfg(target_arch = "x86_64")]
         if self.folds() {
@@ -706,14 +711,26 @@ impl Gf2 {
         // longer batch than the last zero-fills, and only its new tail.
         scratch.truncate(xs.len());
         scratch.resize(xs.len(), 0);
-        let mut acc = [shifted(1); LANES];
-        for (xc, pc) in xs.chunks(LANES).zip(scratch.chunks_mut(LANES)) {
-            for ((&x, prefix), a) in xc.iter().zip(pc.iter_mut()).zip(acc.iter_mut()) {
-                *prefix = plain(*a);
-                if x != 0 {
-                    *a = self.fold_shifted(_mm_cvtsi64_si128(x as i64), *a);
-                }
+        // Whole chunks as `[u64; LANES]`, so each lane is a fixed index:
+        // zipping variable-length `chunks` cost 18 instructions an element
+        // in iterator bookkeeping, a fifth of the whole inversion.  The
+        // short tail goes last forward and first backward, as before.
+        let forward = |x: u64, prefix: &mut u64, a: &mut __m128i| {
+            *prefix = plain(*a);
+            if x != 0 {
+                *a = self.fold_shifted(_mm_cvtsi64_si128(x as i64), *a);
             }
+        };
+        let mut acc = [shifted(1); LANES];
+        let (xh, xt) = xs.as_chunks::<LANES>();
+        let (ph, pt) = scratch.as_chunks_mut::<LANES>();
+        for (xc, pc) in xh.iter().zip(ph.iter_mut()) {
+            for l in 0..LANES {
+                forward(xc[l], &mut pc[l], &mut acc[l]);
+            }
+        }
+        for ((&x, prefix), a) in xt.iter().zip(pt.iter_mut()).zip(acc.iter_mut()) {
+            forward(x, prefix, a);
         }
         let [a0, a1, a2, a3] = acc.map(plain);
         let p01 = self.mul(a0, a1);
@@ -727,13 +744,21 @@ impl Gf2 {
             shifted(self.mul(i23, a3)),
             shifted(self.mul(i23, a2)),
         ];
-        for (xc, pc) in xs.chunks_mut(LANES).zip(scratch.chunks(LANES)).rev() {
-            for ((x, &prefix), ia) in xc.iter_mut().zip(pc.iter()).zip(inv_acc.iter_mut()) {
-                if *x != 0 {
-                    let xi = _mm_cvtsi64_si128(*x as i64);
-                    *x = plain(self.fold_shifted(_mm_cvtsi64_si128(prefix as i64), *ia));
-                    *ia = self.fold_shifted(xi, *ia);
-                }
+        let backward = |x: &mut u64, prefix: u64, ia: &mut __m128i| {
+            if *x != 0 {
+                let xi = _mm_cvtsi64_si128(*x as i64);
+                *x = plain(self.fold_shifted(_mm_cvtsi64_si128(prefix as i64), *ia));
+                *ia = self.fold_shifted(xi, *ia);
+            }
+        };
+        let (xh, xt) = xs.as_chunks_mut::<LANES>();
+        let (ph, pt) = scratch.as_chunks::<LANES>();
+        for ((x, &prefix), ia) in xt.iter_mut().zip(pt.iter()).zip(inv_acc.iter_mut()) {
+            backward(x, prefix, ia);
+        }
+        for (xc, pc) in xh.iter_mut().zip(ph.iter()).rev() {
+            for l in 0..LANES {
+                backward(&mut xc[l], pc[l], &mut inv_acc[l]);
             }
         }
     }
@@ -827,6 +852,12 @@ pub struct Gf2_128 {
     /// `n + d ≤ 129` so the first fold fits one `u128`); zero selects
     /// the byte-table reduction.
     fold_tail: u64,
+    /// Modulus-specialised reduction (`reduce_fold` by constant shifts), off
+    /// until `set_sparse_reduce(true)`: 0 off, 1 for tail `{0,2,3,4}` (n = 73), 2 for tail `{0,2,4,7}`
+    /// (n = 83).  Only ever non-zero where `fold_tail` is, and equal to the
+    /// carry-less fold for every input.
+    sparse: u8,
+    sparse_detected: u8,
 }
 
 /// `x` times `cur`, reduced: one step of the `z^t mod irr` ladder.
@@ -928,6 +959,14 @@ impl Gf2_128 {
         } else {
             0
         };
+        let mut terms = irr.low_terms.clone();
+        terms.sort_unstable();
+        let sparse_detected = match (n, terms.as_slice()) {
+            _ if fold_tail == 0 => 0,
+            (73, [0, 2, 3, 4]) => 1,
+            (83, [0, 2, 4, 7]) => 2,
+            _ => 0,
+        };
 
         Self {
             n,
@@ -938,7 +977,15 @@ impl Gf2_128 {
             red_hi,
             has_clmul,
             fold_tail,
+            sparse: 0,
+            sparse_detected,
         }
+    }
+
+    /// Switch the modulus-specialised reduction on or off (same results
+    /// either way; the A/B control of the wide producer's T21 cut).
+    pub fn set_sparse_reduce(&mut self, on: bool) {
+        self.sparse = if on { self.sparse_detected } else { 0 };
     }
 
     /// `a·b mod irr` by two carry-less folds instead of the byte tables.
@@ -980,6 +1027,19 @@ impl Gf2_128 {
         // H = P >> n, at most n − 1 ≤ 126 bits (n ≤ 127 keeps the shift in range).
         let h = (lo >> n) | (hi << (128 - n));
         let acc = lo & self.mask;
+        match self.sparse {
+            1 => {
+                let ht = h ^ (h << 2) ^ (h << 3) ^ (h << 4);
+                let h1 = ht >> n;
+                return acc ^ (ht & self.mask) ^ h1 ^ (h1 << 2) ^ (h1 << 3) ^ (h1 << 4);
+            }
+            2 => {
+                let ht = h ^ (h << 2) ^ (h << 4) ^ (h << 7);
+                let h1 = ht >> n;
+                return acc ^ (ht & self.mask) ^ h1 ^ (h1 << 2) ^ (h1 << 4) ^ (h1 << 7);
+            }
+            _ => {}
+        }
         // H·t in one u128: n − 1 + d ≤ 128 bits.
         let ht = clmul_u64(h as u64, tail) ^ (clmul_u64((h >> 64) as u64, tail) << 64);
         // Above zⁿ at most d − 1 bits remain; their fold has degree < n.
@@ -3940,6 +4000,50 @@ mod wide_tests {
                     gf.from_element(&ea.flt_inverse(&irr).unwrap()),
                     "inv vs F2mElement"
                 );
+            }
+        }
+    }
+
+    /// The modulus-specialised reduction (n = 73 and 83) is detected on the
+    /// pentanomials the wide producer uses and agrees with the carry-less
+    /// fold, and with the byte tables, with the switch on and off.
+    #[test]
+    fn wide_sparse_reduction_matches_fold_and_table() {
+        for (n, kind) in [(73u32, 1u8), (83, 2)] {
+            let irr = crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide(n)
+                .expect("sparse irreducible exists");
+            let mut on = Gf2_128::new(&irr);
+            let mut off = Gf2_128::new(&irr);
+            let table = Gf2_128::portable(&irr);
+            off.set_sparse_reduce(false);
+            on.set_sparse_reduce(true);
+            if on.fold_tail == 0 {
+                continue; // no carry-less multiply on this host
+            }
+            assert_eq!(on.sparse, kind, "n={n} tail {:?}", irr.low_terms);
+            assert_eq!(off.sparse, 0);
+            let mut state = 0xD1B5_4A32_D192_ED03_7F4A_7C15_9E37_79B9u128 ^ (n as u128);
+            let mut step = || {
+                state = state
+                    .wrapping_mul(0x2360_ED05_1FC6_5DA4_4385_DF64_9FCC_F645)
+                    .wrapping_add(0x1442_6950_4088_9634_07E6_F4B7_D32B_4C2Du128);
+                state & on.mask
+            };
+            for i in 0..20_000 {
+                let a = match i % 5 {
+                    0 => on.mask,
+                    1 => 1u128 << (n - 1),
+                    _ => step(),
+                };
+                let b = match i % 7 {
+                    0 => on.mask,
+                    1 => 0,
+                    _ => step(),
+                };
+                let want = off.mul(a, b);
+                assert_eq!(on.mul(a, b), want, "mul n={n}");
+                assert_eq!(table.mul(a, b), want, "table mul n={n}");
+                assert_eq!(on.sqr(a), off.sqr(a), "sqr n={n}");
             }
         }
     }

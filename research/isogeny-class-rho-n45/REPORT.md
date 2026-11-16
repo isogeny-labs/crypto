@@ -1,0 +1,210 @@
+# Isogeny-class rho at 46 bits (replica of P1)
+
+Classification: replication of a null result (rho against rho on one instrument); not an index-calculus improvement, no leaderboard change, no claim about any deployed curve.
+
+Protocol: `PROTOCOL.md` (frozen before data, sha256 `f1a2fbd5…6287`), decision rules R1–R6 inherited from `research/isogeny-class-rho/`. Run: `runs/run-20261019-n45/` (command card `run.sh`, outputs under `P2/`). Tool: `src/bin/isoclass_rho` (merged in #2174).
+
+**Replica at 46 bits: the null holds at 1,773× the group order.** 4,400 class-mode rho solves on 38 isogenous curves of one prime-field class (P2, `n` = 46,339,405,405,021), every solve returning the planted `k`. Pooled mean 1.0097 × √(πn/2) (bootstrap 95% CI 0.993 to 1.026 of √(πn/2)); Kruskal–Wallis p = 0.38, ANOVA p = 0.67, no curve flagged (max |z| 2.39 against Bonferroni 3.21). The mean ratio P2/P1 is 41.68 against √(n_P2/n_P1) = 42.11 (0.990). Replay reproduces 220/220 iteration counts exactly. **One deviation:** the generators family (20 generators × 2 vertices) failed the frozen rule (KW p = 1.2e-4, two arms flagged); an unplanned fresh-seed repeat written down before running (`ADDENDUM-generators.md`) did **not** replicate it (KW p = 0.97). Both are reported; the first is unexplained.
+
+
+## What was measured
+
+One class, P2: `F_p`, p = 46339417407469, a = 4184642753251, b = 42214793703111, `#E = n` = 46,339,405,405,021 (46 bits, prime order). The walk carries one ECDLP instance by verified isogenies; rho (32-adding walk, distinguished points, 8 bits) is run on 38 isogenous curves × 100 seeds, plus 3 isomorphism/representation controls, an A/A replica, a planted negation fold and a planted 4-adding walk.
+
+| item | value | expected |
+|:--|--:|--:|
+| solves in class mode, all correct | 4,400 | |
+| pooled mean / √(πn/2) | 1.0097 | 1.016 (32-adding) |
+| Kruskal–Wallis / ANOVA across curves | p 0.38 / 0.67 | |
+| flagged curves | 0 of 38 | |
+| controls iso0, iso1, iso2, A/A | 1.107, 0.996, 0.984, 0.974 | 1 |
+| planted negation fold | 0.732 | 0.707 |
+| planted 4-adding walk | 1.291 | 1.137 (Teske); P1 read 1.27 to 1.36 |
+| replay, first 5 seeds | 220 of 220 iteration counts identical | R6 |
+| mean ratio P2/P1 | 41.68 | √(n_P2/n_P1) = 42.11 |
+
+## Generators family and its repeat
+
+| run | seed | solves | KW p | ANOVA p | variance ratio | max abs z (crit 3.23) | flagged |
+|:--|--:|--:|--:|--:|--:|--:|:--|
+| generators (frozen card) | 20261018 | 400 | 1.2e-4 | 2.7e-5 | 2.34 | 4.76 | v158g12 (1.64×), v158g17 (0.61×) |
+| gen-rep1 (`ADDENDUM-generators.md`, sha256 `571e9361…f17baf`) | 20261019 | 400 | 0.97 | 0.98 | 0.58 | 1.97 | none |
+
+By the frozen verdict wording the first is "more extreme than the family". The repeat is a different draw of generators and not a preregistered confirmation; it did not reproduce the effect and had under-dispersed arm means. This does not explain the first result. The first study had one flagged generator in 384 (B1); the same family type here has two in 40. Treat generator-level heterogeneity as unresolved, with more generator draws as the next measurement.
+
+## Limits
+
+- One class at one larger size, one seed set; power about 18 % per curve, 2 % class-wide at 100 seeds. A null does not exclude smaller effects.
+- Same shared VM as the first run (Xeon @ 2.10 GHz, 4 threads, isolation L0). Wall-time columns are unisolated observations, not admitted performance evidence.
+- The reviewer-noted native KS tie defect and shared-seed covariance concerns on the first study apply to this tool too; the Kruskal–Wallis and ANOVA values above do not depend on the KS routine.
+- No ecbench spec/session/audit records exist for this run (AGENTS.md §12); it cannot support a comparison claim.
+
+## Results
+
+### The four classes
+
+| class | field | root curve | `#E = h·n` | `t` | `D = f²·D_K` | `h(D_K)` | class size | strata walked / measured | walked / measured curves | edges verified |
+|:--|:--|:--|:--|--:|:--|--:|--:|:--|:--|--:|
+| P2 | `F_p`, p = 46339417407469 | a = 4184642753251, b = 42214793703111 (j = 11686938476036) | 1 · 46339405405021 (46 bits) | 12002449 | 315² · (-416214539), f = 3²·5·7 | 8,332 | 2,624,580 | 10 / 12 | 469 / 38 | 53 |
+
+Class size is `Σ_{d | f} h(d²D_K)` with `h(D_K)` counted from reduced forms and the other class numbers from the conductor formula; `h(f²D_K)` was also counted directly and agrees in every class (`h_full_order_counted` = `h_full_order_formula` in each `walk.json`).
+
+### The isogenies walked, easy and hard
+
+| class | ℓ | role | volcano depth, crater | route | kernel field degree `d` | tree edges realised (neighbour searches) | mean ms per kernel search |
+|:--|--:|:--|:--|:--|--:|--:|--:|
+| P2 | 3 | everywhere | 2, split | elkies | 1 (eigen-orbit 1) | 7 (1644) | 1.0 |
+| P2 | 5 | everywhere | 1, split | elkies | 2 (eigen-orbit 2) | 16 (814) | 0.9 |
+| P2 | 7 | everywhere | 1, split | elkies | 3 (eigen-orbit 3) | 18 (796) | 1.2 |
+| P2 | 13 | everywhere | 0, ramified | elkies | 6 (eigen-orbit 6) | 4 (107) | 1.2 |
+| P2 | 23 | hard (first vertices only) | 0, split | elkies | 11 (eigen-orbit 11) | 3 (6) | 50.2 |
+| P2 | 41 | hard (first vertices only) | 0, split | elkies | 2, 10 (eigen-orbit 10) | 2 (4) | 913.1 |
+| P2 | 47 | hard (first vertices only) | 0, split | elkies | 23 (eigen-orbit 23) | 1 (4) | 1,794.8 |
+| P2 | 59 | hard (first vertices only) | 0, split | elkies | 29 (eigen-orbit 29) | 2 (5) | 4,212.0 |
+| P2 | 2 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 11 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 17 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 19 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 29 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 31 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 37 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 43 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 53 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+| P2 | 61 | inactive | 0, inert | inert and ℓ ∤ f: no rational ℓ-isogeny | | | |
+
+### P2: every measured curve, one instance, 100 paired seeds per arm
+
+Reference `√(πn/2)` = 8,531,692 (×1.016 for the 32-adding walk: 8,668,208); 4400 solves, all returned the planted `k`; rho wall 4,036.4 s on 4 threads.
+
+| arm | kind | curves | solves | min | mean ± 95 % CI | median | max | sd / mean | mean ms | e2e ms | ratio to √(πn/2) | z vs rest |
+|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| all isogenous | pooled | 38 | 3800 | 124,133 | 8,614,326 ± 143,001 | 8,118,256 | 32,970,081 | 0.522 | 3,664.0 | | 1.010 | |
+| controls | iso / representation | 3 | 300 | 311,784 | 8,778,216 ± 491,454 | 8,462,148 | 23,412,682 | 0.495 | 3,723.7 | | 1.029 | |
+| iso0 | iso-control | 1 | 100 | 311,784 | 9,443,666 ± 908,618 | 9,336,226 | 20,569,743 | 0.491 | 4,009.1 | 4,009.1 | 1.107 [1.009, 1.214] | 1.77 |
+| iso1 | iso-control | 1 | 100 | 1,184,106 | 8,493,398 ± 855,326 | 7,952,922 | 23,412,682 | 0.514 | 3,612.5 | 3,612.5 | 0.996 [0.902, 1.099] | -0.27 |
+| iso2 | iso-control | 1 | 100 | 415,793 | 8,397,585 ± 777,985 | 8,213,201 | 18,729,450 | 0.473 | 3,549.5 | 3,549.5 | 0.984 [0.899, 1.080] | -0.54 |
+| aa | aa-replica | 1 | 100 | 850,318 | 8,313,456 ± 714,366 | 8,635,492 | 18,285,782 | 0.438 | 3,586.1 | 3,586.1 | 0.974 [0.896, 1.062] | -0.81 |
+| plant-neg | plant (expected 0.707) | 1 | 100 | 211,921 | 6,244,080 ± 731,949 | 6,094,106 | 21,785,029 | 0.598 | 2,774.2 | 2,774.2 | 0.732 [0.651, 0.823] | -6.23 |
+| plant-r4 | plant (expected 1.137) | 1 | 100 | 471,364 | 11,018,469 ± 1,096,548 | 10,286,566 | 24,124,986 | 0.508 | 4,663.3 | 4,663.3 | 1.291 [1.173, 1.422] | 4.26 |
+
+Pooled by endomorphism-ring stratum (conductor of End relative to the walked primes), by level in each volcano, by distance from the root, by the degree and kernel field of the edge that reached the curve:
+
+| group | curves | solves | min | mean ± 95 % CI | median | max | sd / mean | ratio to √(πn/2) | z vs rest |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| conductor:1 | 1 | 100 | 962,643 | 8,762,579 ± 804,022 | 8,434,716 | 19,007,148 | 0.468 | 1.027 | 0.37 |
+| conductor:105 | 7 | 700 | 318,590 | 8,596,690 ± 342,549 | 7,837,885 | 32,970,081 | 0.538 | 1.008 | -0.11 |
+| conductor:15 | 3 | 300 | 258,501 | 8,817,782 ± 494,522 | 8,547,081 | 23,626,980 | 0.496 | 1.034 | 0.84 |
+| conductor:21 | 3 | 300 | 518,996 | 8,116,111 ± 503,308 | 7,490,892 | 25,150,503 | 0.548 | 0.951 | -2.02 |
+| conductor:3 | 3 | 300 | 266,288 | 8,590,737 ± 512,312 | 8,521,565 | 22,595,695 | 0.527 | 1.007 | -0.09 |
+| conductor:315 | 3 | 300 | 570,978 | 8,594,920 ± 503,404 | 8,188,677 | 22,240,447 | 0.518 | 1.007 | -0.08 |
+| conductor:35 | 3 | 300 | 270,157 | 8,307,934 ± 500,341 | 7,632,532 | 24,197,893 | 0.532 | 0.974 | -1.25 |
+| conductor:45 | 3 | 300 | 124,133 | 8,601,602 ± 509,890 | 8,130,973 | 26,293,936 | 0.524 | 1.008 | -0.05 |
+| conductor:5 | 3 | 300 | 517,281 | 8,786,835 ± 500,439 | 8,380,401 | 22,178,203 | 0.503 | 1.030 | 0.70 |
+| conductor:63 | 3 | 300 | 153,958 | 8,863,114 ± 506,783 | 8,398,579 | 24,878,026 | 0.505 | 1.039 | 1.00 |
+| conductor:7 | 3 | 300 | 858,106 | 8,786,666 ± 518,912 | 8,456,013 | 23,827,598 | 0.522 | 1.030 | 0.68 |
+| conductor:9 | 3 | 300 | 224,426 | 8,669,300 ± 521,924 | 8,252,741 | 23,716,356 | 0.532 | 1.016 | 0.22 |
+| dist:0 | 1 | 100 | 1,208,721 | 8,719,464 ± 843,204 | 8,109,277 | 20,506,203 | 0.493 | 1.022 | 0.25 |
+| dist:1 | 8 | 800 | 518,996 | 8,623,455 ± 318,912 | 8,086,108 | 32,970,081 | 0.534 | 1.011 | 0.06 |
+| dist:2 | 6 | 600 | 424,340 | 8,542,611 ± 360,306 | 8,128,124 | 23,827,598 | 0.527 | 1.001 | -0.43 |
+| dist:3 | 23 | 2300 | 124,133 | 8,625,289 ± 182,693 | 8,123,997 | 26,293,936 | 0.518 | 1.011 | 0.19 |
+| ell3:level0 | 10 | 1000 | 270,157 | 8,640,688 ± 275,194 | 8,115,243 | 24,197,893 | 0.514 | 1.013 | 0.22 |
+| ell3:level1 | 16 | 1600 | 258,501 | 8,546,920 ± 221,855 | 8,027,050 | 32,970,081 | 0.530 | 1.002 | -0.79 |
+| ell3:level2 | 12 | 1200 | 124,133 | 8,682,234 ± 255,028 | 8,231,478 | 26,293,936 | 0.519 | 1.018 | 0.63 |
+| ell5:level0 | 16 | 1600 | 153,958 | 8,615,023 ± 220,771 | 8,252,741 | 25,150,503 | 0.523 | 1.010 | 0.01 |
+| ell5:level1 | 22 | 2200 | 124,133 | 8,613,820 ± 187,740 | 8,047,607 | 32,970,081 | 0.522 | 1.010 | -0.01 |
+| ell7:level0 | 16 | 1600 | 124,133 | 8,697,584 ± 218,507 | 8,346,504 | 26,293,936 | 0.513 | 1.019 | 0.98 |
+| ell7:level1 | 22 | 2200 | 153,958 | 8,553,775 ± 189,095 | 7,991,823 | 32,970,081 | 0.529 | 1.003 | -0.98 |
+| field_degree:1 | 3 | 300 | 570,978 | 8,460,583 ± 504,558 | 7,978,601 | 22,762,702 | 0.527 | 0.992 | -0.62 |
+| field_degree:10 | 1 | 100 | 590,366 | 8,750,325 ± 888,182 | 7,837,885 | 21,864,753 | 0.518 | 1.026 | 0.30 |
+| field_degree:11 | 2 | 200 | 1,044,901 | 8,563,652 ± 649,854 | 8,086,108 | 25,137,985 | 0.548 | 1.004 | -0.16 |
+| field_degree:2 | 11 | 1100 | 153,958 | 8,644,006 ± 271,789 | 8,035,300 | 32,970,081 | 0.532 | 1.013 | 0.26 |
+| field_degree:3 | 16 | 1600 | 124,133 | 8,697,584 ± 218,507 | 8,346,504 | 26,293,936 | 0.513 | 1.019 | 0.98 |
+| field_degree:6 | 4 | 400 | 270,157 | 8,280,037 ± 426,320 | 7,745,654 | 24,197,893 | 0.525 | 0.971 | -1.62 |
+| parent_ell:13 | 4 | 400 | 270,157 | 8,280,037 ± 426,320 | 7,745,654 | 24,197,893 | 0.525 | 0.971 | -1.62 |
+| parent_ell:23 | 2 | 200 | 1,044,901 | 8,563,652 ± 649,854 | 8,086,108 | 25,137,985 | 0.548 | 1.004 | -0.16 |
+| parent_ell:3 | 3 | 300 | 570,978 | 8,460,583 ± 504,558 | 7,978,601 | 22,762,702 | 0.527 | 0.992 | -0.62 |
+| parent_ell:41 | 2 | 200 | 590,366 | 8,620,820 ± 653,992 | 7,824,010 | 32,970,081 | 0.547 | 1.010 | 0.02 |
+| parent_ell:5 | 10 | 1000 | 153,958 | 8,659,275 ± 283,145 | 8,076,650 | 25,150,503 | 0.528 | 1.015 | 0.36 |
+| parent_ell:7 | 16 | 1600 | 124,133 | 8,697,584 ± 218,507 | 8,346,504 | 26,293,936 | 0.513 | 1.019 | 0.98 |
+
+Across the 38 measured curves: Kruskal–Wallis H = 39.08 (df 37, p = 0.377); ANOVA F = 0.882 (p = 0.674); between-curve variance ratio 0.882 (observed sd of curve means 422,588 against 449,754 expected from the pooled single-solve spread); largest |z| 2.39 against the Bonferroni threshold 3.21; curves beyond it: none.
+
+Per curve (iterations = group operations; `d` = kernel field degree of the edge that reached it; transport = ms to find and apply the isogenies from the root):
+
+| curve | stratum f | levels | path (ℓ) | d | transport ms | min | mean ± CI | median | max | p10 | p90 | sd/mean | skew | ns/op | e2e ms | ratio | z |
+|:--|--:|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| v218 | 1 | 3:0,5:0,7:0 | 3·5·7 | 3 | 3.4 | 962,643 | 8,762,579 ± 804,022 | 8,434,716 | 19,007,148 | 3,748,323 | 14,144,903 | 0.468 | 0.40 | 423.1 | 3,711.4 | 1.027 | 0.37 |
+| v52 | 3 | 3:1,5:0,7:0 | 5·7 | 3 | 1.4 | 1,377,977 | 8,490,494 ± 850,566 | 8,725,589 | 20,463,878 | 3,064,513 | 13,882,837 | 0.511 | 0.56 | 423.9 | 3,597.2 | 0.995 | -0.29 |
+| v254 | 3 | 3:1,5:0,7:0 | 5·7·7 | 3 | 6.7 | 266,288 | 8,575,391 ± 903,791 | 8,662,256 | 19,965,117 | 3,163,324 | 14,319,000 | 0.538 | 0.55 | 423.9 | 3,643.3 | 1.005 | -0.09 |
+| v363 | 3 | 3:1,5:0,7:0 | 41·5·7 | 3 | 31.7 | 576,611 | 8,706,326 ± 914,801 | 8,497,198 | 22,595,695 | 2,695,668 | 14,927,592 | 0.536 | 0.36 | 422.8 | 3,717.8 | 1.020 | 0.20 |
+| v45 | 5 | 3:0,5:1,7:0 | 3·7 | 3 | 2.8 | 890,559 | 8,433,792 ± 908,621 | 7,980,204 | 21,849,340 | 2,878,618 | 15,309,551 | 0.550 | 0.72 | 427.1 | 3,609.2 | 0.989 | -0.39 |
+| v225 | 5 | 3:0,5:1,7:0 | 3·7·7 | 3 | 8.1 | 1,576,576 | 8,261,884 ± 787,398 | 8,160,413 | 22,099,292 | 3,151,440 | 13,401,582 | 0.486 | 0.56 | 425.1 | 3,520.0 | 0.968 | -0.89 |
+| v353 | 5 | 3:0,5:1,7:0 | 41·3·7 | 3 | 32.7 | 517,281 | 9,664,828 ± 882,102 | 9,622,994 | 22,178,203 | 4,174,205 | 15,256,278 | 0.466 | 0.44 | 426.1 | 4,138.4 | 1.133 | 2.37 |
+| v44 | 7 | 3:0,5:0,7:1 | 3·5 | 2 | 2.5 | 1,008,007 | 8,886,516 ± 981,714 | 8,652,227 | 23,827,598 | 2,597,742 | 15,133,380 | 0.564 | 0.64 | 427.7 | 3,796.6 | 1.042 | 0.55 |
+| v215 | 7 | 3:0,5:0,7:1 | 3·5·5 | 2 | 5.7 | 878,780 | 8,685,856 ± 924,324 | 8,101,166 | 23,151,699 | 2,920,147 | 15,223,846 | 0.543 | 0.53 | 424.8 | 3,699.1 | 1.018 | 0.15 |
+| v352 | 7 | 3:0,5:0,7:1 | 41·3·5 | 2 | 32.5 | 858,106 | 8,787,625 ± 787,926 | 8,638,860 | 17,787,557 | 3,488,654 | 14,306,413 | 0.457 | -0.00 | 424.1 | 3,760.2 | 1.030 | 0.44 |
+| v107 | 9 | 3:2,5:0,7:0 | 3·5·7 | 3 | 3.3 | 224,426 | 8,231,188 ± 942,481 | 7,762,692 | 21,651,223 | 2,872,408 | 15,820,182 | 0.584 | 0.61 | 427.1 | 3,511.7 | 0.965 | -0.81 |
+| v146 | 9 | 3:2,5:0,7:0 | 3·5·7 | 3 | 3.1 | 666,256 | 9,321,601 ± 902,718 | 9,260,902 | 19,575,416 | 3,577,003 | 15,846,076 | 0.494 | 0.30 | 424.6 | 3,962.2 | 1.093 | 1.56 |
+| v185 | 9 | 3:2,5:0,7:0 | 3·5·7 | 3 | 3.5 | 439,305 | 8,455,110 ± 859,791 | 7,879,701 | 23,716,356 | 3,403,636 | 13,705,757 | 0.519 | 0.76 | 424.5 | 3,595.9 | 0.991 | -0.37 |
+| v6 | 15 | 3:1,5:1,7:0 | 7 | 3 | 0.8 | 970,152 | 9,285,022 ± 914,332 | 9,367,019 | 23,626,980 | 3,793,833 | 14,836,504 | 0.502 | 0.45 | 426.4 | 3,948.4 | 1.088 | 1.46 |
+| v244 | 15 | 3:1,5:1,7:0 | 5·5·7 | 3 | 4.1 | 258,501 | 8,691,731 ± 812,062 | 8,985,211 | 18,946,021 | 3,012,605 | 13,998,252 | 0.477 | 0.07 | 430.1 | 3,753.2 | 1.019 | 0.19 |
+| v365 | 15 | 3:1,5:1,7:0 | 41·7·7 | 3 | 33.8 | 1,143,490 | 8,476,592 ± 840,677 | 7,823,724 | 19,958,933 | 3,357,060 | 14,527,031 | 0.506 | 0.56 | 426.7 | 3,663.9 | 0.994 | -0.32 |
+| v5 | 21 | 3:1,5:0,7:1 | 5 | 2 | 0.6 | 518,996 | 8,203,783 ± 807,452 | 7,919,278 | 20,530,951 | 3,280,858 | 13,932,132 | 0.502 | 0.62 | 425.1 | 3,481.9 | 0.962 | -1.01 |
+| v238 | 21 | 3:1,5:0,7:1 | 5·5·5 | 2 | 5.6 | 835,864 | 7,523,549 ± 907,473 | 6,600,507 | 25,150,503 | 2,429,717 | 14,129,846 | 0.615 | 1.14 | 426.5 | 3,202.6 | 0.882 | -2.39 |
+| v340 | 21 | 3:1,5:0,7:1 | 41·5·13 | 6 | 18.7 | 604,319 | 8,621,001 ± 892,146 | 8,655,692 | 21,020,678 | 2,925,384 | 14,802,469 | 0.528 | 0.43 | 428.6 | 3,705.4 | 1.010 | 0.01 |
+| v4 | 35 | 3:0,5:1,7:1 | 3 | 1 | 1.9 | 679,102 | 8,044,880 ± 865,482 | 7,038,015 | 22,762,702 | 3,570,131 | 14,291,532 | 0.549 | 1.06 | 423.7 | 3,419.7 | 0.943 | -1.31 |
+| v213 | 35 | 3:0,5:1,7:1 | 3·5·5 | 2 | 5.2 | 845,322 | 8,723,958 ± 912,587 | 7,927,579 | 18,847,252 | 2,790,159 | 14,593,579 | 0.534 | 0.13 | 424.4 | 3,715.1 | 1.023 | 0.24 |
+| v333 | 35 | 3:0,5:1,7:1 | 41·3·13 | 6 | 20.4 | 270,157 | 8,154,963 ± 822,229 | 7,745,654 | 24,197,893 | 3,206,687 | 14,400,466 | 0.514 | 0.71 | 425.7 | 3,498.3 | 0.956 | -1.11 |
+| v17 | 45 | 3:2,5:1,7:0 | 3·7 | 3 | 2.3 | 667,336 | 8,638,410 ± 922,161 | 8,074,743 | 21,472,285 | 2,913,268 | 14,941,361 | 0.545 | 0.59 | 427.9 | 3,717.2 | 1.013 | 0.05 |
+| v136 | 45 | 3:2,5:1,7:0 | 3·59·7 | 3 | 50.2 | 124,133 | 8,237,870 ± 903,311 | 7,697,781 | 26,293,936 | 3,164,380 | 13,581,234 | 0.559 | 1.26 | 424.8 | 3,548.5 | 0.966 | -0.83 |
+| v178 | 45 | 3:2,5:1,7:0 | 3·59·7 | 3 | 123.9 | 1,281,144 | 8,928,526 ± 824,596 | 9,097,302 | 19,696,424 | 4,196,682 | 14,679,506 | 0.471 | 0.44 | 425.7 | 3,921.1 | 1.047 | 0.76 |
+| v16 | 63 | 3:2,5:0,7:1 | 3·5 | 2 | 2.4 | 424,340 | 8,554,593 ± 820,873 | 8,592,585 | 19,989,231 | 2,662,157 | 13,538,865 | 0.490 | 0.15 | 427.0 | 3,649.5 | 1.003 | -0.14 |
+| v135 | 63 | 3:2,5:0,7:1 | 3·59·5 | 2 | 50.0 | 153,958 | 8,904,979 ± 910,771 | 7,906,343 | 24,815,198 | 3,536,863 | 15,013,467 | 0.522 | 0.74 | 422.3 | 3,818.5 | 1.044 | 0.63 |
+| v177 | 63 | 3:2,5:0,7:1 | 3·59·5 | 2 | 123.9 | 440,510 | 9,129,770 ± 903,976 | 8,588,996 | 24,878,026 | 3,068,756 | 14,247,769 | 0.505 | 0.49 | 425.2 | 3,998.2 | 1.070 | 1.13 |
+| v0 | 105 | 3:1,5:1,7:1 | root | — | 0.0 | 1,208,721 | 8,719,464 ± 843,204 | 8,109,277 | 20,506,203 | 3,827,226 | 14,894,437 | 0.493 | 0.50 | 425.6 | 3,712.6 | 1.022 | 0.25 |
+| v8 | 105 | 3:1,5:1,7:1 | 23 | 11 | 4.7 | 1,243,917 | 8,200,940 ± 969,852 | 7,717,905 | 25,137,985 | 2,919,520 | 14,820,869 | 0.603 | 0.92 | 423.1 | 3,478.1 | 0.961 | -0.85 |
+| v9 | 105 | 3:1,5:1,7:1 | 23 | 11 | 8.1 | 1,044,901 | 8,926,364 ± 864,264 | 8,299,106 | 21,584,874 | 3,391,351 | 14,313,271 | 0.494 | 0.43 | 424.4 | 3,796.5 | 1.046 | 0.72 |
+| v10 | 105 | 3:1,5:1,7:1 | 41 | 10 | 16.4 | 590,366 | 8,750,325 ± 888,182 | 7,837,885 | 21,864,753 | 3,510,993 | 14,819,376 | 0.518 | 0.73 | 424.3 | 3,733.8 | 1.026 | 0.30 |
+| v11 | 105 | 3:1,5:1,7:1 | 41 | 2 | 30.3 | 2,038,509 | 8,491,315 ± 963,999 | 7,777,558 | 32,970,081 | 3,307,435 | 13,855,630 | 0.579 | 1.42 | 425.5 | 3,654.4 | 0.995 | -0.25 |
+| v257 | 105 | 3:1,5:1,7:1 | 7·7·13 | 6 | 5.5 | 318,590 | 7,896,295 ± 835,929 | 6,729,880 | 21,485,859 | 3,715,327 | 14,024,953 | 0.540 | 0.72 | 425.9 | 3,354.7 | 0.926 | -1.70 |
+| v358 | 105 | 3:1,5:1,7:1 | 41·5·5 | 2 | 33.1 | 1,144,800 | 9,192,125 ± 968,973 | 8,017,046 | 23,142,860 | 4,022,689 | 16,864,134 | 0.538 | 0.90 | 425.6 | 3,946.6 | 1.077 | 1.19 |
+| v1 | 315 | 3:2,5:1,7:1 | 3 | 1 | 1.6 | 666,813 | 9,085,008 ± 931,133 | 8,867,891 | 22,017,266 | 2,585,750 | 14,544,636 | 0.523 | 0.47 | 423.3 | 3,829.0 | 1.065 | 1.01 |
+| v87 | 315 | 3:2,5:1,7:1 | 47·3 | 1 | 45.5 | 570,978 | 8,251,861 ± 816,730 | 7,978,601 | 22,240,447 | 3,327,101 | 13,118,212 | 0.505 | 0.87 | 423.5 | 3,549.5 | 0.967 | -0.88 |
+| v158 | 315 | 3:2,5:1,7:1 | 3·23·13 | 6 | 10.0 | 798,175 | 8,447,891 ± 864,476 | 8,190,021 | 22,212,375 | 3,599,054 | 14,498,916 | 0.522 | 0.75 | 427.5 | 3,607.0 | 0.990 | -0.38 |
+
+### P2: 20 generators of ⟨P⟩ per curve, the same secret, 10 paired seeds each
+
+| curve | generators | solves | mean ± CI | min / max of generator means | sd of generator means (expected) | variance ratio | KW p | ANOVA p | max |z| (Bonferroni) | Spearman ρ of generator mean with r / bits(r) / popcount(r) / x(P) |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|
+| v0 | 20 | 200 | 8,530,702 ± 625,427 | 5,609,911 / 12,180,728 | 1,951,735 (1,427,038) | 2.060 | 0.021 | 0.008 | 2.70 (3.23) | -0.13 / 0.03 / -0.25 / -0.33 |
+| v158 | 20 | 200 | 9,253,752 ± 692,614 | 5,244,503 / 13,999,895 | 2,357,968 (1,580,338) | 2.557 | 0.001 | 0.001 | 4.76 (3.23) | -0.07 / -0.15 / 0.01 / -0.02 |
+
+All generator arms together: KW p = 0.000, variance ratio 2.336, flagged arms (family 40): ['v158g12', 'v158g17']; pooled mean 8,892,227 = 1.042 × √(πn/2); 400 solves, all correct.
+
+### Figures
+
+Every figure draws recorded values only (`plot.py`). The standard volcano diagrams (`tools/volcano-diagram`) place each measured curve at its level in one ℓ-volcano with every walked edge drawn; the 3D heat maps stack the endomorphism-ring strata (rings, crater on top) and colour each measured curve by its mean operations or its mean end-to-end time (transport + solve).
+
+#### P2
+
+![P2 3D class heat map, mean group operations per solve](runs/run-20261019-n45/P2/volcano3d-ops.svg)
+
+![P2 3D class heat map, mean end-to-end ms (transport + solve)](runs/run-20261019-n45/P2/volcano3d-e2e.svg)
+
+![P2 volcano-ell3: standard volcano diagram](runs/run-20261019-n45/P2/volcano-ell3.svg)
+
+![P2 volcano-ell5: standard volcano diagram](runs/run-20261019-n45/P2/volcano-ell5.svg)
+
+![P2 volcano-ell7: standard volcano diagram](runs/run-20261019-n45/P2/volcano-ell7.svg)
+
+![P2 every solve, min–max, mean ± CI per arm](runs/run-20261019-n45/P2/per_curve.svg)
+
+![P2 pooled groups](runs/run-20261019-n45/P2/per_group.svg)
+
+![P2 each arm against the pooled isogenous solves](runs/run-20261019-n45/P2/z_scores.svg)
+
+![P2 generator sweep per curve](runs/run-20261019-n45/P2/generators.svg)
+
+![P2 distribution of generator means](runs/run-20261019-n45/P2/generator_means.svg)
+
+

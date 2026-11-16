@@ -1,0 +1,118 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "pdp_split_round3_20261018 Part A, n=17",
+  "description": "Preregistered (PROTOCOL.md Part A): hybrid guess 4 vs 8 on the standard subspace and its Frobenius closure, the fully charged pair-table bracket on the same closure, and matched rho. F4 arms' S are counted lower bounds; the table arms are fully charged.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610181101,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong",
+        "params": {
+          "lanes": "32",
+          "dp_bits": "4",
+          "step_cap_factor": "2000"
+        }
+      }
+    },
+    {
+      "name": "rho-frob",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius"
+      }
+    },
+    {
+      "name": "std-unsplit-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "clo-unsplit-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-closure:dimension=4",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=all,max_free=24",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "std-unsplit-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "clo-unsplit-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-closure:dimension=4",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=all,max_free=24",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "clo-mitm3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-closure:dimension=4",
+          "oracle": "mitm-frobenius:m=3",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "inv-mitm2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "mitm-frobenius:m=2",
+          "max_trials": "200000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202610181102,
+    "isolation_required": "L0",
+    "timeout_seconds": 7200
+  }
+}

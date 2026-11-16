@@ -1,0 +1,8 @@
+ring r=1000003,(x,y,z),dp;
+ideal T=x^2,y^2,z^2;resolution M=mres(T,0);print("CONVENTION "+string(regularity(M)));
+poly A=1;poly B=1;int i;for(i=0;i<12;i++){A=A*(x-i*z);B=B*(y-i*z);}
+poly F;ideal J;
+F=x^2*y^2+x^2*z^2+y^2*z^2+z^4;J=A,B,F;M=mres(J,0);print("TOY 0 REG_IDEAL "+string(regularity(M)));print(betti(M));
+F=x^2*y^2+x^2*z^2+y^2*z^2;J=A,B,F;M=mres(J,0);print("TOY 1 REG_IDEAL "+string(regularity(M)));print(betti(M));
+F=x^2*y^2+(x+y-z)^2*z^2;J=A,B,F;M=mres(J,0);print("TOY 2 REG_IDEAL "+string(regularity(M)));print(betti(M));
+print("TOY_COMPLETE 3");quit;

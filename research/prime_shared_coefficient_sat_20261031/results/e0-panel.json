@@ -1,0 +1,68 @@
+{
+  "schema": "prime-shared-coefficient.e0-panel/v1",
+  "kind": "development correctness census; no performance claim",
+  "generated_at": null,
+  "code_state": {
+    "branch": "codex/prime-shared-coeff-sat-20261031",
+    "commit": null,
+    "note": "working-tree E0 gate; exact wall-clock start was not recorded; final source hashes are pinned in inputs.sha256"
+  },
+  "modulus": 17,
+  "curve": [
+    2,
+    2
+  ],
+  "arity": 3,
+  "depth": 3,
+  "terminal_c": 1,
+  "projection": [
+    "a0",
+    "a1",
+    "c0",
+    "u0_0",
+    "u0_1",
+    "u0_2"
+  ],
+  "candidate": "coefficient enumeration, norm division, split-root extraction",
+  "oracle": "algorithmically separate same-author curve enumeration, group addition, linear interpolation and root product; shares basic finite-field/polynomial primitives",
+  "targets": 18,
+  "sat_targets": 6,
+  "unsat_targets": 12,
+  "candidate_models": 6,
+  "oracle_models": 6,
+  "exact_model_set_matches": 18,
+  "legacy_conformance": [
+    {
+      "arity": 3,
+      "depth": 4,
+      "variables": 33,
+      "equations": 35,
+      "witness_valid": true,
+      "a0_mutation_rejected": true
+    },
+    {
+      "arity": 5,
+      "depth": 4,
+      "variables": 58,
+      "equations": 60,
+      "witness_valid": true,
+      "a0_mutation_rejected": true
+    },
+    {
+      "arity": 7,
+      "depth": 4,
+      "variables": 83,
+      "equations": 85,
+      "witness_valid": true,
+      "a0_mutation_rejected": true
+    }
+  ],
+  "test_summary": {
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0
+  },
+  "timing_collected": false,
+  "solver_runs": 0,
+  "interpretation": "E0 correctness gate passed; SAT/F4 performance remains unknown"
+}

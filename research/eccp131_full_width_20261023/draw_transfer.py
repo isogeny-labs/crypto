@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""Editable typed-path figure for the exact auxiliary-tower audit."""
+from pathlib import Path
+
+out = Path(__file__).resolve().parent / "transfer_path.svg"
+out.write_text('''<svg xmlns="http://www.w3.org/2000/svg" width="920" height="290" viewBox="0 0 920 290">
+<rect width="920" height="290" fill="white"/>
+<style>text{font-family:Arial,sans-serif;fill:#172635}.title{font-size:17px;font-weight:bold}.body{font-size:13px}.small{font-size:11px}.box{fill:#f1f6fa;stroke:#326a91;stroke-width:2}.aux{fill:#f7f3e9;stroke:#9a6c22;stroke-width:2}</style>
+<text x="20" y="27" class="title">Exact Fp objects and typed operations</text>
+<rect x="20" y="57" width="235" height="105" rx="7" class="box"/>
+<text x="35" y="83" class="body">Published ECCp-131 E/Fp</text><text x="35" y="107" class="small">#E(Fp) = n, prime and odd</text><text x="35" y="130" class="small">G, Qpub in E(Fp)</text>
+<rect x="354" y="57" width="235" height="105" rx="7" class="aux"/>
+<text x="369" y="83" class="body">Auxiliary E': y²=x³+x+301</text><text x="369" y="107" class="small">#E'(Fp) = m; 256 divides m</text><text x="369" y="130" class="small">gcd(n,m) = 1</text>
+<rect x="686" y="57" width="214" height="105" rx="7" class="aux"/>
+<text x="701" y="83" class="body">Eight 2-isogeny steps</text><text x="701" y="107" class="small">256 coset x-coordinates</text><text x="701" y="130" class="small">one terminal x-image</text>
+<line x1="255" y1="105" x2="354" y2="105" stroke="#bb3d3d" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="264" y="91" class="small">no nontrivial Fp map</text><text x="279" y="124" class="small">gcd = 1</text>
+<line x1="589" y1="105" x2="686" y2="105" stroke="#9a6c22" stroke-width="3"/>
+<polygon points="686,105 674,99 674,111" fill="#9a6c22"/><text x="611" y="92" class="small">degree 2 over Fp</text>
+<path d="M 790 164 Q 780 218 466 218 L 140 218 Q 120 218 120 164" fill="none" stroke="#326a91" stroke-width="2" stroke-dasharray="5 4"/>
+<polygon points="120,164 114,177 126,177" fill="#326a91"/>
+<text x="235" y="208" class="body">partial x-coordinate lift: 115 points on E</text>
+<text x="290" y="243" class="small">Coordinate selection only; no relation or scalar transport certificate</text>
+<text x="20" y="275" class="small">Source: runs/replay.json; runs/identity_check.stdout; runs/transfer-order-screen.json. Field p = 0x48e1d43f293469e33194c43186b3abc0b.</text>
+</svg>''')

@@ -1,0 +1,24 @@
+import UInt64Residue
+import Mathlib.Algebra.Field.ZMod
+set_option autoImplicit false
+namespace PencilWordRefinement
+open ProjectiveLawRuntime
+
+def classifyNat (p s₁ t₁ s₂ t₂ : ℕ) : Branch22Prelude :=
+  if s₁ = residueNeg p s₂ ∧ t₁ = residueNeg p t₂ then .sameUInverse
+  else if s₁ = s₂ ∧ t₁ = t₂ then .sameUDouble
+  else if residueSub p s₁ s₂ = 0 then .sameUMixedZeroSlope
+  else .sameUMixed
+
+theorem classifier_decode (p s₁ t₁ s₂ t₂ : ℕ) [Fact p.Prime] (hp : 0 < p)
+    (hs₁ : s₁ < p) (ht₁ : t₁ < p) (hs₂ : s₂ < p) (ht₂ : t₂ < p) :
+    classifyNat p s₁ t₁ s₂ t₂ =
+      classifySameU22 (s₁ : ZMod p) (t₁ : ZMod p) (s₂ : ZMod p) (t₂ : ZMod p) := by
+  unfold classifyNat classifySameU22
+  simp only [neg_equality_reflection p s₁ s₂ hp hs₁ hs₂,
+    neg_equality_reflection p t₁ t₂ hp ht₁ ht₂,
+    sub_zero_reflection p s₁ s₂ hp hs₁ hs₂,
+    canonical_equality p s₁ s₂ hs₁ hs₂,
+    canonical_equality p t₁ t₂ ht₁ ht₂,
+    sub_eq_zero]
+end PencilWordRefinement

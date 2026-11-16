@@ -1,0 +1,107 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hfa7f1de676984669",
+  "statement": {
+    "name": "GLS orbit row covariance with characteristic-polynomial remainder",
+    "source": "research/twist_index_calculus_20261020/GLS_SYMMETRY_REPORT.md",
+    "variables": [
+      "a",
+      "b",
+      "lambda"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "neg",
+          "args": {
+            "op": "var",
+            "args": "b"
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "lambda"
+            },
+            {
+              "op": "var",
+              "args": "a"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "lambda"
+                    },
+                    {
+                      "op": "var",
+                      "args": "lambda"
+                    }
+                  ]
+                },
+                {
+                  "op": "const",
+                  "args": 1
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "b"
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "var",
+          "args": "lambda"
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "lambda"
+                },
+                {
+                  "op": "var",
+                  "args": "b"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 7452458336968993892,
+  "value_digest": "5dee02caa0279c6a59b8f8dd4c6d399f41f66780c68f37503f4fe543ff421f30",
+  "independence": "native identity_certificate_gls_fold issuer; native checker with 32 independent extra points; subgroup lambda^2=-1 checked separately by the GLS verifier",
+  "proof": null
+}

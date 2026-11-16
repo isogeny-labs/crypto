@@ -1,0 +1,75 @@
+runs.tar.xz: OK
+runs/build-01.log: OK
+runs/build-02.log: OK
+runs/build-03.log: OK
+runs/build-04.log: OK
+runs/build-05.log: OK
+runs/build-06.log: OK
+runs/build-07.log: OK
+runs/build-08.log: OK
+runs/build-09.log: OK
+runs/build-10.log: OK
+runs/collision-01.log: OK
+runs/collision-02.log: OK
+runs/dashboard-check-01.log: OK
+runs/dashboard-render-01.log: OK
+runs/diagonal-01.log: OK
+runs/divisors-01.log: OK
+runs/expansion-01.log: OK
+runs/lean-axioms-01.log: OK
+runs/lean-axioms-02.log: OK
+runs/lean-axioms-03.log: OK
+runs/lean-build-01.log: OK
+runs/lean-build-02.log: OK
+runs/lean-build-03.log: OK
+runs/lean-build-04.log: OK
+runs/lean-full-gate-01.log: OK
+runs/lean-full-project-audit-01.log: OK
+runs/lean-full-project-build-01.log: OK
+runs/lean-full-project-cache-01.log: OK
+runs/m1-modular-base.json: OK
+runs/m13-coupled-cusp-valuations.json: OK
+runs/m13b-complete-product-divisor.json: OK
+runs/m14-Phi11-collision-resultant.json: OK
+runs/m15-supersingular-diagonal-component.json: OK
+runs/native-tests-01.log: OK
+runs/native-tests-02.log: OK
+runs/polynomial-check-01.log: OK
+runs/polynomial-check-02.log: OK
+runs/polynomials-01.log: OK
+runs/prior-round09-replay-01.log: OK
+runs/projective-control-01.log: OK
+runs/q6-intrinsic-Kummer-charts.json: OK
+runs/q7-Frobenius-coordinate-circuits.json: OK
+runs/q7c-invariant-rational-generators.json: OK
+runs/q8-F2-polynomial-templates.json: OK
+runs/q8-F2-presentations-summary.json: OK
+runs/q8-graph-0-F2-relations.json: OK
+runs/q8-graph-1-F2-relations.json: OK
+runs/q8-graph-2-F2-relations.json: OK
+runs/q8-graph-3-F2-relations.json: OK
+runs/q8b-original-counter-label-attempt.json: OK
+runs/q8b-parsed-F2-presentation-check.json: OK
+runs/q8c-expanded-F2-equations.json: OK
+runs/q8p-projective-saturation-prototype.json: OK
+runs/record-01.log: OK
+runs/record-raw-hash-check-01.log: OK
+runs/record-source-hash-check-01.log: OK
+runs/replay-01.log: OK
+runs/replay-02.log: OK
+runs/root-lib-tests-01.log: OK
+runs/site-tests-01.log: OK
+runs/workflow-tests-01.log: OK
+    Finished `release` profile [optimized] target(s) in 0.02s
+Q8 graph0:1171 gates,421560 variables,424080 F2 equations;two split fixtures pass
+Q8 graph1:1171 gates,421560 variables,424080 F2 equations;two split fixtures pass
+Q8 graph2:1148 gates,413280 variables,415800 F2 equations;two split fixtures pass
+Q8 graph3:1148 gates,413280 variables,415800 F2 equations;two split fixtures pass
+Q8b:all four parsed systems and all coefficient recoveries pass
+Q8c:72 scalar polynomials expanded and4608 local gate controls pass
+Q8p:naive homogenization has a false boundary point;three-generator saturated prototype passes all S pairs
+M13:480 cusps,all eight pole divisors;complete x0*xinf divisor,22 closed cusps;residuals [2100, 2520, 3420, 3780, 0, 2640, 3450, 3900]
+M14:degree96 collision resultant;2046 finite-field gcd controls;remaining 1
+M15:400 matching SS labels,lower multiplicity sum400,remaining diagonal degree860,complete=false
+PASS:all13 new JSON records replay byte for byte;all equation,divisor and bounded support checks pass.
+PASS:archive digest,all member hashes,13-output fresh replay and deterministic byte-identical repack.

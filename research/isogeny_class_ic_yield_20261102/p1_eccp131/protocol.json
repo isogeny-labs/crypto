@@ -1,0 +1,832 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "P1-eccp131-isogeny-class-ic-systems-20261102",
+  "version": 1,
+  "created": "2026-11-02",
+  "repository": "crypto",
+  "study_dir": "research/isogeny_class_ic_yield_20261102/p1_eccp131",
+  "authors": [
+    "P1 builder (PROTOCOL.md, rust/)",
+    "experiment-director (machine-readable record of PROTOCOL.md and amendment A1, no design change)"
+  ],
+  "links": {
+    "note": "research/isogeny_class_ic_yield_20261102/p1_eccp131/PROTOCOL.md is the narrative; this file records it. Section 14 of the narrative is amendment A1: the run scope is tier 1 (m2t3, m3t2) only, route local, isolation L0 on a loaded host, 2 workers, clock descriptive only. Tier 2 (m2t4) is deferred, not dropped.",
+    "runner": "research/isogeny_class_ic_yield_20261102/p1_eccp131/run_full.sh",
+    "engine": "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/engine.rs",
+    "crosscheck": "research/isogeny_class_ic_yield_20261102/p1_eccp131/CROSSCHECK.md",
+    "targets": "research/isogeny_class_ic_yield_20261102/p1_eccp131/targets.json",
+    "tower": "research/isogeny_class_ic_yield_20261102/p1_eccp131/tower.json",
+    "neighbours": "research/isogeny_class_ic_yield_20261102/p1_eccp131/neighbours.json",
+    "parent_design": "research/isogeny_class_ic_yield_20261102/DESIGN.md"
+  },
+  "question": "Across the 28 curves of ECCp-131's isogeny class that can be built (E0 and the 27 Elkies l-neighbours, l <= 150), do the algebraic parameters of the PKM-tower plus Semaev decomposition system at toy tower sizes (XL/Macaulay closure degree D_solve of this study's engine, first fall degree, Macaulay matrix size and rank profile, field-operation count, CPU time) and the per-trial relation yield differ from curve to curve beyond what presentation and noise explain?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The 27 neighbours, their isogenies and the transported planted DLP are correct (kernel degree (l-1)/2, x-map degrees (l, l-1), homomorphism on random points, #E' = n, image of the generator has order n, phi(kP) = k phi(P)).",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Full-width per-trial yield of any fixed-size factor base is the same formula on every curve of the class and astronomically small; it is predicted analytically (PROTOCOL.md section 3), not observed.",
+      "class": "heuristic_estimate",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "For the PKM isogeny-tower factor base and the Semaev systems at m = 2 (t = 3) and m = 3 (t = 2), the XL/Macaulay closure degree D_solve (refutation degree for null targets; not F4's solving degree), first fall degree, rank profile and operation count of the transported-target systems on the 27 neighbours are inside the A/A band of E0.",
+      "class": "comparative",
+      "decided_by": [
+        "C-nb"
+      ],
+      "if_supported": "null for the counted metrics at toy size: lead closed at this resolution; nothing about ECCp-131 at full width (C5)",
+      "if_not_supported": "an anomaly with its arm and target is reported; a class effect is detected only under the decision rule and triggers a follow-up protocol, not a claim"
+    },
+    {
+      "id": "C4",
+      "text": "The instrument can see an algebraic change: adding a known quadric to a planted E0 system lowers D_solve by at least 1 on every planted target, and every planted row has n_standard_monomials = K and planted_verified = true.",
+      "class": "comparative",
+      "decided_by": [
+        "C-ladder"
+      ],
+      "if_supported": "a null in C3 is informative at this resolution",
+      "if_not_supported": "a null in C3 is not informative; the instrument is reported as insensitive"
+    },
+    {
+      "id": "C5",
+      "text": "No statement about ECCp-131 at full width (p about 2^131, a real factor base), security, speed, or an improvement over the index-calculus baseline; no rho reference or section 5a band applies.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H0",
+      "statement": "For null (inconsistent) targets the counted metrics are structure-determined and identical on every arm (D_solve, first fall, rank profile, rows, cols, field multiplications); only cpu_s varies, inside the A/A band; the per-curve factor-base size B_c is a presentation effect.",
+      "mechanism": "The system's monomial support and degrees depend on the family (m, t, tower) only; the curve enters through the coefficients a, b, x_R of S3, and a prime-field curve of about 131 bits offers no subfield or endomorphism to align them. All 28 curves have order n.",
+      "predictions": [
+        {
+          "id": "P-D",
+          "metric": "D_solve",
+          "direction": "equal_within",
+          "minimum_effect": "D_solve of every neighbour equals E0's on every null target; any difference is reported as an anomaly with arm and target",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "first_recorded_in": "research/isogeny_class_ic_yield_20261102/p1_eccp131/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p1_eccp131/smoke",
+                "measured": "smoke run on 2 neighbours (n5_0, n149_1), E0, iso, A/A and 2 random arms, 2 null targets, configs m2t3 and m3t2: every counted metric identical on every arm for null targets except the AA_perm operation count; instrument test, not data of this protocol"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "the 25 neighbours not in the smoke run, the 25 random curves not in the smoke run, null targets 2..31 and all planted targets"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-fall",
+          "metric": "first_fall_degree_obs",
+          "direction": "equal_within",
+          "minimum_effect": "first fall degree of every neighbour equals E0's on every null target",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "first_recorded_in": "research/isogeny_class_ic_yield_20261102/p1_eccp131/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p1_eccp131/smoke",
+                "measured": "smoke run on 2 neighbours (n5_0, n149_1), E0, iso, A/A and 2 random arms, 2 null targets, configs m2t3 and m3t2: every counted metric identical on every arm for null targets except the AA_perm operation count; instrument test, not data of this protocol"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "the 25 neighbours not in the smoke run, the 25 random curves not in the smoke run, null targets 2..31 and all planted targets"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-rank",
+          "metric": "final_rank",
+          "direction": "equal_within",
+          "minimum_effect": "final rank and rank profile of every neighbour equal E0's on every null target",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "first_recorded_in": "research/isogeny_class_ic_yield_20261102/p1_eccp131/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p1_eccp131/smoke",
+                "measured": "smoke run on 2 neighbours (n5_0, n149_1), E0, iso, A/A and 2 random arms, 2 null targets, configs m2t3 and m3t2: every counted metric identical on every arm for null targets except the AA_perm operation count; instrument test, not data of this protocol"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "the 25 neighbours not in the smoke run, the 25 random curves not in the smoke run, null targets 2..31 and all planted targets"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-ops",
+          "metric": "field_mults",
+          "direction": "equal_within",
+          "minimum_effect": "field_mults of every neighbour inside the AA_perm re-encoding band around E0's",
+          "provenance": {
+            "written_at": "2026-11-02",
+            "first_recorded_in": "research/isogeny_class_ic_yield_20261102/p1_eccp131/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/isogeny_class_ic_yield_20261102/p1_eccp131/smoke",
+                "measured": "smoke run on 2 neighbours (n5_0, n149_1), E0, iso, A/A and 2 random arms, 2 null targets, configs m2t3 and m3t2: every counted metric identical on every arm for null targets except the AA_perm operation count; instrument test, not data of this protocol"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "the 25 neighbours not in the smoke run, the 25 random curves not in the smoke run, null targets 2..31 and all planted targets"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "E0",
+      "role": "reference",
+      "description": "ECCp-131 itself, icv1-fp131-t29529377007934231835-9681b699; null targets R_tau = k_tau P0 (target 0 is the planted-DLP point), planted instances per curve.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "--workers": "2"
+        },
+        "env": {},
+        "threads": 2
+      },
+      "parameters": {
+        "method": "p1_eccp131 run (XL/Macaulay sparse echelon over F_p, p = 131 bits)",
+        "configs": "m2t3,m3t2",
+        "family": "PKM isogeny tower + chained Semaev S3",
+        "arm_name_in_targets_json": "E0"
+      }
+    },
+    {
+      "id": "neighbours",
+      "role": "candidate",
+      "description": "The 27 Elkies l-neighbours of E0 (l = 5, 7, 13, 17, 29, 37, 61, 73, 83, 89, 107, 131, 149 two each, l = 67 one), built by verified Velu; null targets are the images of E0's targets under the verified isogenies (paired across arms).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "--workers": "2"
+        },
+        "env": {},
+        "threads": 2
+      },
+      "parameters": {
+        "method": "p1_eccp131 run (XL/Macaulay sparse echelon over F_p, p = 131 bits)",
+        "configs": "m2t3,m3t2",
+        "family": "PKM isogeny tower + chained Semaev S3",
+        "arm_names_in_targets_json": "n{l}_{0,1}"
+      },
+      "same_instrument_as": "E0"
+    },
+    {
+      "id": "iso",
+      "role": "control_aa",
+      "description": "Isomorphic model of E0, (a u^4, b u^6): expected identical to E0 on every counted metric; the model-presentation control.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "--workers": "2"
+        },
+        "env": {},
+        "threads": 2
+      },
+      "parameters": {
+        "method": "p1_eccp131 run (XL/Macaulay sparse echelon over F_p, p = 131 bits)",
+        "configs": "m2t3,m3t2",
+        "family": "PKM isogeny tower + chained Semaev S3",
+        "arm_name_in_targets_json": "iso"
+      },
+      "same_instrument_as": "E0"
+    },
+    {
+      "id": "AA_repeat",
+      "role": "control_aa",
+      "description": "The E0 instance again in a separate run slot: determinism and clock noise floor.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "--workers": "2"
+        },
+        "env": {},
+        "threads": 2
+      },
+      "parameters": {
+        "method": "p1_eccp131 run (XL/Macaulay sparse echelon over F_p, p = 131 bits)",
+        "configs": "m2t3,m3t2",
+        "family": "PKM isogeny tower + chained Semaev S3",
+        "arm_name_in_targets_json": "AA_repeat"
+      },
+      "same_instrument_as": "E0"
+    },
+    {
+      "id": "AA_perm",
+      "role": "control_aa",
+      "description": "The E0 instance with a SHA-256-seeded permutation of the variable order: the re-encoding noise floor (moves leading terms and the operation count).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "--workers": "2"
+        },
+        "env": {},
+        "threads": 2
+      },
+      "parameters": {
+        "method": "p1_eccp131 run (XL/Macaulay sparse echelon over F_p, p = 131 bits)",
+        "configs": "m2t3,m3t2",
+        "family": "PKM isogeny tower + chained Semaev S3",
+        "arm_name_in_targets_json": "AA_perm"
+      },
+      "same_instrument_as": "E0"
+    },
+    {
+      "id": "rnd",
+      "role": "control_negative",
+      "description": "27 random (a, b) curves over the same p (rnd0..rnd26), same system shape, each with its own random point per target (not paired); the negative-control population for the class effect.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "--workers": "2"
+        },
+        "env": {},
+        "threads": 2
+      },
+      "parameters": {
+        "method": "p1_eccp131 run (XL/Macaulay sparse echelon over F_p, p = 131 bits)",
+        "configs": "m2t3,m3t2",
+        "family": "PKM isogeny tower + chained Semaev S3",
+        "arm_names": "rnd0..rnd26",
+        "derivation": "SHA-256(20261102|rnd|i|a) and (.|b)"
+      },
+      "same_instrument_as": "E0"
+    },
+    {
+      "id": "ladder",
+      "role": "control_positive",
+      "description": "Planted E0 instance plus one random quadric vanishing at the planted point (E0 and AA_repeat only): a known algebraic change the instrument must see.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "--workers": "2"
+        },
+        "env": {},
+        "threads": 2
+      },
+      "parameters": {
+        "method": "p1_eccp131 run (XL/Macaulay sparse echelon over F_p, p = 131 bits)",
+        "configs": "m2t3,m3t2",
+        "family": "PKM isogeny tower + chained Semaev S3",
+        "kind": "ladder",
+        "ladder_g": "2"
+      },
+      "same_instrument_as": "E0"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "ladder",
+      "expected_detection": "On every planted E0 target the ladder row has D_solve at least 1 lower than the planted row of the same target, n_standard_monomials_final = K and planted_verified = true; a miss makes a C3 null uninformative.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "rnd",
+      "null_population": {
+        "description": "27 random (a, b) over the same p; same system shape and engine; the population range of every counted metric.",
+        "generator": "p1_eccp131 run --rnd 27: a, b = SHA-256(seed|rnd|i|a), (seed|rnd|i|b) reduced mod p, seed 20261102; target abscissa is a random point per target",
+        "n": 27,
+        "why_n": "equal to the number of neighbours, so the random population and the neighbour set have the same size for the range comparison",
+        "matched_on": [
+          "field p",
+          "system family (m, t, tower)",
+          "engine and caps",
+          "schedule and seed policy",
+          "number of curves"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "curve",
+        "levels": [
+          "E0",
+          "27 Elkies neighbours",
+          "iso",
+          "27 random curves"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "one p1_eccp131 binary per run, built --locked at the commit named in the card",
+        "how": "binary sha256 in every row header and bound by the card"
+      },
+      {
+        "name": "host_and_isolation",
+        "treatment": "measured",
+        "how": "isolation L0 on a loaded host; header cpu and nproc recorded; the clock is descriptive only; counted metrics do not depend on the host"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "per (rep, config, kind, tau) slot the arm order is a SHA-256-derived shuffle (seed 20261102); slots run in a fixed order"
+      },
+      {
+        "name": "targets_and_seeds",
+        "treatment": "randomized",
+        "how": "32 null targets k_tau = SHA256(seed|target-k|tau) mod (n-2) + 1, paired across arms; 8 planted per curve; every random choice SHA-256(seed|label), nothing chosen after a look"
+      },
+      {
+        "name": "config",
+        "treatment": "crossed",
+        "value": "m2t3 and m3t2 (tier 1); m2t4 deferred",
+        "how": "separate analyses per config"
+      },
+      {
+        "name": "workers",
+        "treatment": "fixed",
+        "value": "2",
+        "how": "amendment A1; the job list and order do not depend on it"
+      },
+      {
+        "name": "added_quadric",
+        "treatment": "crossed",
+        "value": "ladder rows only",
+        "how": "one random quadric through the planted point, E0 and AA_repeat only"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-nb",
+        "arms": [
+          "E0",
+          "neighbours"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "E0",
+          "AA_repeat",
+          "AA_perm",
+          "iso"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-rnd",
+        "arms": [
+          "E0",
+          "rnd"
+        ],
+        "differs_in": [
+          "curve"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-ladder",
+        "arms": [
+          "E0",
+          "ladder"
+        ],
+        "differs_in": [
+          "added_quadric"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "every random choice is SHA-256(\"20261102|label\"): targets, planted points and signs, random curves, the A/A permutation, ladder coefficients, schedule order; master seed 20261102 passed as --seed; no seed chosen after a look"
+    },
+    "instance_sampling": {
+      "rule": "32 null targets per config seeded by k_tau = SHA256(seed|target-k|tau) mod (n-2) + 1 (target 0 is the planted-DLP point), 8 planted targets; the curve set is enumerated completely (E0, the 27 neighbours l <= 150, iso, 27 random curves)",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "analyze --mask replaces neighbour and random-curve names by hashes; E0 and the A/A arms stay labelled; the key is written next to the output and opened only after the analysis output is frozen",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 40,
+    "replicates": 3,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 108,
+      "correction": "bonferroni",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "instances = 32 null + 8 planted targets per arm and config; replicates = 3 reps (counts are deterministic, so reps buy the clock only); decisions use percentile bootstrap over targets at level 0.9995 with 40000 resamples (Bonferroni over 27 neighbours x 4 primary metrics = 108 tests at family alpha 0.05, PROTOCOL.md section 8); a single target with a different D_solve is visible (1 of 32 pairs); the ladder control is the instrument-sensitivity check; the 108-test divisor is unchanged by amendment A1 (tier 2 deferred)."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 2,
+      "estimated_total_seconds": 12720,
+      "measured_on": "research/isogeny_class_ic_yield_20261102/p1_eccp131/smoke/smoke_timings.txt and PROTOCOL.md section 10: single-thread CPU per attempt on the 3-core builder sandbox (m2t3 null 0.38 s, planted 0.17 s, ladder 0.03 s; m3t2 null 1.74 s, planted 1.76 s, ladder 0.31 s); total = tier 1 thread CPU 2,370 s (m2t3) + 10,350 s (m3t2) = 12,720 s = 3.5 CPU-hours; wall with 2 uncontended workers about 6,360 s"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "D_solve",
+        "name": "XL/Macaulay closure degree",
+        "unit": "degree",
+        "kind": "exact",
+        "definition": "First Macaulay degree D at which n_std = K and every variable has a pure power as a leading monomial (K = exact solution count over the closure); for K = 0 the refutation degree (first D with the constant 1 as a leading monomial). It is not F4's solving degree and not a degree of regularity: on the 147 comparable systems of CROSSCHECK.md it is strictly above F4's top step degree.",
+        "source": "rows jsonl field D_solve",
+        "aggregation": "paired_ratio",
+        "resolution": "1 degree",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "first_fall_degree_obs",
+        "name": "observed first fall degree",
+        "unit": "degree",
+        "kind": "exact",
+        "definition": "First D at which a new pivot has leading degree below D.",
+        "source": "rows jsonl field first_fall_degree_obs",
+        "aggregation": "paired_ratio",
+        "resolution": "1 degree",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "final_rank",
+        "name": "Macaulay matrix rank at D_solve",
+        "unit": "rows",
+        "kind": "exact",
+        "definition": "Rank of the Macaulay matrix at D_solve (rank profile by leading degree is recorded beside it).",
+        "source": "rows jsonl field final_rank",
+        "aggregation": "paired_ratio",
+        "resolution": "1",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "field_mults",
+        "name": "F_p multiplications",
+        "unit": "multiplications",
+        "kind": "counted",
+        "definition": "Counted F_p multiplications of the engine call, including reduction and pivot inversions.",
+        "source": "rows jsonl field field_mults",
+        "aggregation": "paired_ratio",
+        "resolution": "1",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "final_rows",
+        "name": "Macaulay rows at D_solve",
+        "unit": "rows",
+        "kind": "exact",
+        "definition": "Cumulative rows of the Macaulay matrix at D_solve.",
+        "source": "rows jsonl field final_rows",
+        "aggregation": "paired_ratio",
+        "resolution": "1",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "final_cols",
+        "name": "Macaulay columns at D_solve",
+        "unit": "columns",
+        "kind": "exact",
+        "definition": "C(N+D, D) at D_solve.",
+        "source": "rows jsonl field final_cols",
+        "aggregation": "paired_ratio",
+        "resolution": "1",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "row_ops",
+        "name": "pivot applications",
+        "unit": "operations",
+        "kind": "counted",
+        "definition": "Counted pivot applications of the engine call.",
+        "source": "rows jsonl field row_ops",
+        "aggregation": "paired_ratio",
+        "resolution": "1",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "n_standard_monomials_final",
+        "name": "standard monomials at D_solve",
+        "unit": "monomials",
+        "kind": "exact",
+        "definition": "Number of standard monomials of the staircase at D_solve (equals K on a solved row).",
+        "source": "rows jsonl field n_standard_monomials_final",
+        "aggregation": "paired_ratio",
+        "resolution": "1",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "cpu_s",
+        "name": "thread CPU time of the engine call",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "CLOCK_THREAD_CPUTIME_ID of the engine call; descriptive only under amendment A1 (L0, loaded host, co-tenants); decides nothing.",
+        "source": "rows jsonl field cpu_s",
+        "aggregation": "paired_ratio",
+        "resolution": "about 1 ms",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "wall_s",
+        "name": "wall time of the engine call",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Wall time of the engine call; descriptive only under amendment A1.",
+        "source": "rows jsonl field wall_s",
+        "aggregation": "per_row",
+        "resolution": "about 1 ms",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "predicted_yield_log2_per_trial",
+        "name": "predicted full-width yield",
+        "unit": "log2 relations per trial",
+        "kind": "derived",
+        "definition": "Analytic prediction of PROTOCOL.md section 3 (never observed at full width), reported with B_c per curve.",
+        "source": "rows jsonl field predicted_yield_log2_per_trial",
+        "formula": "log2( 2^m * C(B_c, m) / (n - 1) )",
+        "aggregation": "per_row",
+        "resolution": "none",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "randomized",
+    "clock": "cputime",
+    "counters": [
+      "D_solve",
+      "first_fall_degree_obs",
+      "final_rank",
+      "field_mults",
+      "row_ops",
+      "n_standard_monomials_final"
+    ],
+    "record": [
+      "binary_sha256",
+      "targets_sha256",
+      "tower_sha256",
+      "cpu (model name)",
+      "nproc",
+      "workers",
+      "seed",
+      "args"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "timeout_seconds": 21600,
+    "measurement_class": "measurement",
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design, amended by A1: configs m2t3 and m3t2, 58 arms, 32 null and 8 planted targets, 3 reps, 27 random curves, kinds null, planted, ladder (the arguments of run_full.sh tier1); then stop; no interim looks, no change of N, metric, null or threshold after data; m2t4 (tier 2) is deferred, no data are taken for it, reported as not run",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "a config where more than 5 percent of null attempts end cap_time is declared unresolved for that config (reported, not dropped); capped rows are kept as censored rows",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a clock (cpu_s, wall_s) is descriptive only at L0 on a loaded host; counted metrics remain",
+    "an AA_repeat row whose counted metrics differ from E0's on the same target and rep invalidates the determinism assumption and is reported first",
+    "a planted row with n_standard_monomials_final != K_exact_solutions or planted_verified false is an instrument failure, reported first"
+  ],
+  "decision_rule": {
+    "text": "A class effect is detected for a counted metric iff some neighbour's paired bootstrap interval excludes 1 and lies outside the interval of AA_perm (the re-encoding floor) and outside the range of the random-curve arms and the same neighbour repeats on the rep replicates. A difference in an exact count (D_solve, rank profile) on any target of any neighbour that is absent from the A/A arms is reported as an anomaly with its target and arm, even when the intervals include 1. Otherwise: null (H0 stands). The clock never decides under amendment A1. A null says nothing about full width (C5) and is informative only if the ladder positive control passes (C4).",
+    "comparison_ids": [
+      "C-nb",
+      "C-ladder"
+    ],
+    "threshold": "paired bootstrap interval at level 0.9995 excludes 1 for a counted primary metric; ladder lowers D_solve by at least 1 on every planted E0 target",
+    "statistic": "per arm and metric, geometric mean of the per-target ratio arm/E0 (paired by target); exact agreement fraction identical_count_profile_fraction; crossed two-way random-effects ICC (curves x targets) with target-resampling bootstrap",
+    "interval": "percentile bootstrap over targets, level 0.9995, 40000 resamples",
+    "multiple_comparison_correction": "bonferroni",
+    "effect_size_measure": "paired geometric-mean ratio vs E0 against the AA_perm and random-curve ranges; curve variance share (ICC)",
+    "verdict_vocabulary": [
+      "null_supported",
+      "anomaly_reported",
+      "class_effect_detected",
+      "instrument_insensitive",
+      "unresolved"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/isogeny_class_ic_yield_20261102/p1_eccp131/rust/src/analyze.rs",
+      "sha256": "df8a7e93612d88db6900f319a70de184ce1346a8d84a123f4fbc5a01d6352178"
+    },
+    "inputs": [
+      "runs/tier1_rows.jsonl"
+    ],
+    "outputs": [
+      "runs/tier1_analysis.json",
+      "runs/tier1_analysis.txt",
+      "runs/tier1_analysis.key.json"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "per config and kind: paired ratio vs E0 per neighbour with the AA_perm and random-curve bands",
+      "ladder versus planted D_solve on E0"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "reading any result as a statement about ECCp-131 at full width, security or speed",
+    "calling D_solve F4's solving degree or a degree of regularity",
+    "ranking curves by cpu_s or wall_s at L0 on a loaded host",
+    "reading a null as informative when the ladder control failed",
+    "dropping or filling a config that did not run (m2t4 is reported as not run, deferred)",
+    "changing N, caps, thresholds or seeds after seeing results",
+    "comparing to rho or entering any row on the IC leaderboard or benchmarks/README.md (no matched rho reference applies)"
+  ],
+  "literature": [
+    {
+      "ref": "research/isogeny_class_difficulty_20261008",
+      "provenance": "internal",
+      "claim": "within an isogeny class only transport cost, automorphisms and model presentation can differ",
+      "verified_by": "repository review 2026-11-02"
+    },
+    {
+      "ref": "research/isogeny_class_ic_yield_20261102/p1_eccp131/CROSSCHECK.md",
+      "provenance": "internal",
+      "claim": "the engine agrees with an independent dense elimination, the exact solution enumeration and f4_fp (p < 2^32) on 252 mirror systems; D_solve is strictly above F4's top step degree on 147 of 147 systems",
+      "verified_by": "P1 follow-up builder, 2026-11-02"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A1-local-tier1-l0-20261102",
+      "filed": "2026-11-02",
+      "filed_before_affected_data": true,
+      "reason": "Owner decision (2026-11-02, relayed by the main session): local route, reduced scope. P1 runs tier 1 only (m2t3 and m3t2, about 3.5 CPU-hours); tier 2 (m2t4, about 6.3 CPU-hours) is deferred, not dropped. Isolation L0 on a loaded host; P2's ecbench cells run one at a time in the same 4-core sandbox, so P1 uses 2 workers. No data of this protocol exist: runs/ does not exist; smoke/ and crosscheck/ are instrument tests.",
+      "changes": [
+        "Run scope: tier 1 only, the arguments of run_full.sh tier1 with WORKERS=2; tier 2 (m2t4) deferred: recorded as not run, no data taken, not dropped from the preregistered design.",
+        "Route: local backend (no isolab-eks, no ecbench), isolation L0 on a loaded host; execution.timeout_seconds 21600.",
+        "Workers 2 instead of 4 (scheduling only; the job list and its order do not depend on it).",
+        "Clock (cpu_s, wall_s) descriptive only; counted metrics decide; the section 8 decision rule applies to counted metrics only.",
+        "The four primary metrics of the 108-test family are named: D_solve, first_fall_degree_obs, final_rank, field_mults (the four of claim C3).",
+        "Wording: D_solve is the XL/Macaulay closure degree, strictly above F4's top step degree on 147 of 147 comparable systems; it is not F4's solving degree.",
+        "Multiplicity family stays 108 tests; the tier 2 tests are not run and not removed from the divisor."
+      ],
+      "supersedes_fields": [
+        "PROTOCOL.md sections 10 and 13 (route and workers)"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "7bf084c220c9af62eeb3f807f1d3365bee12ebb82cbf1f80ae24cc80889eeee5",
+    "commit": "c4ae8a1f6def4d3bc924b7f0bf122dd49412f8b4",
+    "frozen_at": "2026-11-02T04:31:53Z",
+    "filed_before_affected_data": true
+  }
+}

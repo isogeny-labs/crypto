@@ -1,0 +1,1 @@
+The two `development-pilot-*` receipts precede the fast point enumerator and negation-folded rho change. They are retained as historical implementation diagnostics; the `exact-*` receipts and `MANIFEST.json` are the current ten complete controls. Do not aggregate pilot and exact samples or treat their different source generators as the same instance.

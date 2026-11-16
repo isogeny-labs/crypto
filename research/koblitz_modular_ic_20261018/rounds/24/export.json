@@ -1,0 +1,19 @@
+{
+  "schema":"koblitz.exact-computation-export/v1",
+  "round":24,
+  "source_revision":"19b8ef5e8833f3cc62350941a01afd70a52fbd78",
+  "protocol":{"path":"PROTOCOL.md","sha256":"3d954fc0887ef6d7317fafe8bac06a148879fd228b194cf348b9ec77711c55c7","machine_record":"protocol.json","generic_checker_available":false},
+  "flow":{"native_planned":6,"native_attempted":6,"native_accepted":3,"native_implementation_failures":2,"native_expected_rejections":1,"native_timeouts":0,"native_interrupted":0,"lean_attempted":2,"lean_failed":1,"lean_passed":1},
+  "native_accepts":["cf24-factor-01","o24-charts-02","o24-series-02"],
+  "native_failures":["o24-charts-01","o24-series-01"],
+  "negative_control":"cf24-corrupt-01:product residual1;native exit0;wrapper rejects",
+  "source_pins":"source.sha256",
+  "results":"results.json",
+  "raw":{"path":"runs.tar.xz","sha256":"2e3e7a3eba9d9730f3dd751c712becc8233264267de076aec846be9c40c1b403","bytes":840200,"members":70,"manifest":"runs.sha256","fresh_extraction_verified":true},
+  "proof":{"module":"KoblitzRound24Geometry","theorems":14,"failing":0,"trusted_native":0,"source_sha256":"4540cb83f06a20a2a3c5c05105887dcc3a3757981c14fbafdfc13a11f21d4285","lean":"4.34.1","mathlib":"d13f23b723b8a846827a245b89c10fc7d3f11612","scope":"exact chart/inverse/residue identities and conditional degree/order consequences;full geometry/Hensel bridge written"},
+  "software_validation":"VALIDATION.md;separate publication receipt",
+  "statistical_or_timing_comparison":false,
+  "new_relation_rank_claim":false,
+  "full_modular_factor_transfer":false,
+  "merge_authorized":false
+}

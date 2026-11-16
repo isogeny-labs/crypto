@@ -1,0 +1,73 @@
+{
+  "schema": "pencil-native-observation-ratio-svg-v3-independent-review/v1",
+  "created_utc": "2026-10-30T03:12:50Z",
+  "review_kind": "read-only caption-only source, XML, extracted numerical primitive, native raster, and validation review",
+  "source": {
+    "lib_sha256": "a4b5846d09e66b8ce505b2a61de173c5f7f1ef53804fad17c5ead52e9687dc26"
+  },
+  "producer_validation": {
+    "receipt_sha256": "05024a375b9c3fcda07f37e62d8e36bbf7dc083f3102a5a20d11fd331bc26e83",
+    "test_log_sha256": "a12dc45c66140851054d13dd9bd89755beb14b47e45c13646ac3be6ec5d317b1",
+    "clippy_log_sha256": "5dd83bf811e1f0682d4c110d5d35da6acc28e3f39d0f2ae841fe77ada22dce98",
+    "fmt_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests_passed": 9,
+    "tests_failed": 0,
+    "solver_executions": 0,
+    "empirical_observations": 0
+  },
+  "artifacts": {
+    "finite_cost_ratios_svg_sha256": "b0264cf9434d13c3bed9ac06160bcf7bb948a192b113e8e08420787a28bf5477",
+    "independent_native_raster_sha256": "36dff18bb656aa5f00301239c56565dee2041a1b510465a6aa7eadcccf49c1eb"
+  },
+  "caption_contract": {
+    "visible_fields": [
+      "title",
+      "run_id",
+      "scope"
+    ],
+    "visible_prefixes": true,
+    "visible_limit_codepoints": 130,
+    "ellipsis_on_truncation": true,
+    "full_values_in_nested_svg_title": true,
+    "xml_escaped_visible_and_full_values": true,
+    "caption_y_coordinates": [
+      1810,
+      1840,
+      1870
+    ],
+    "svg_height": 1920,
+    "caption_clipping_observed": false
+  },
+  "numerical_projection": {
+    "changed_from_v2": false,
+    "proof": "Extracted v2 and v3 line, circle, cell-group, series-null, and exact-fraction-title primitives are byte-identical",
+    "extracted_projection_sha256": "549a9d707c51671b29712ed863880ed552d0314a5673aa5e4df5d77b59fb49e2",
+    "v2_extracted_projection_sha256": "549a9d707c51671b29712ed863880ed552d0314a5673aa5e4df5d77b59fb49e2",
+    "v3_extracted_projection_sha256": "549a9d707c51671b29712ed863880ed552d0314a5673aa5e4df5d77b59fb49e2",
+    "cell_groups": 36,
+    "series_entries": 72,
+    "points": 4,
+    "null_labels": 68
+  },
+  "visual_inspection": {
+    "method": "independent native rsvg-convert to 1400x1920 PNG followed by direct image inspection",
+    "all36_rows_visible": true,
+    "title_and_legend_visible": true,
+    "footer_visible": true,
+    "caption_visible_and_readable": true,
+    "obvious_overlap_or_clipping_found": false
+  },
+  "reviewed_properties": [
+    "caption identifies the standalone visualization by caller title, run ID, and scope",
+    "caller strings are XML escaped before visible or title-metadata insertion",
+    "visible truncation is presentation-only and full text remains in title metadata",
+    "caption extension changes canvas/background height but not numerical plot coordinates",
+    "finite-model, exact-authority, shared-observation, null, and no-timing labels remain unchanged",
+    "all v2 numerical projection primitives remain byte-identical"
+  ],
+  "findings": [],
+  "conclusion": "No concrete defect found in the caption-only v3 change. The standalone SVG now carries visible run context while preserving the v2 numerical projection and observation-only epistemic limits.",
+  "mutations_performed_by_reviewer": 0,
+  "cloud_actions": 0,
+  "trial_executions": 0
+}

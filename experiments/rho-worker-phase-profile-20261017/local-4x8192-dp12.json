@@ -1,0 +1,42 @@
+{
+  "profile": {
+    "branch_points": 32,
+    "branch_table_ns": 58997886667,
+    "build_finalization_ns": 208,
+    "build_total_ns": 59551554209,
+    "build_validation_ns": 553666167,
+    "curve": "secp256k1",
+    "distinguished_points": 4,
+    "dp_bits": 12,
+    "independent_replay": "passed_for_every_walker",
+    "job_id": "034b30f621f253f78a3a83216f3a4e4217cd0fe820195161500c88de6344cdad",
+    "negation_map": false,
+    "other_walk_ns": 48737652,
+    "restart_and_setup_fraction_of_profiled_ns": 0.7561915531167153,
+    "schema": "rho-worker-phase-profile-v1",
+    "starts": 4,
+    "step_cap": 8192,
+    "tier": "local_diagnostic",
+    "transcript_blake3": "7ea1107534b3fc8e1ab9e6a348c69069fd9b180b2e88702c0142ecf0e464e0ef",
+    "walk_step_calls_ns": 21270454264,
+    "walk_steps": 10152,
+    "walk_total_ns": 28444497666,
+    "walker_starts_ns": 7125305750,
+    "walkers": 4
+  },
+  "provenance": {
+    "base_commit": "667799c6a621a67779e98b79940f3c571f935120",
+    "command": "cargo run --offline --release --example rho_worker_phase_profile -- 4 8192 12",
+    "host_arch": "arm64",
+    "host_os": "Darwin",
+    "isolation": "none",
+    "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)",
+    "source_and_binary_sha256": {
+      "examples/rho_worker_phase_profile.rs": "4266f7c3a4179be35a28f7ee52dea0c0c61b5c1e571fedff4f0f56e4155945cf",
+      "src/cryptanalysis/pollard_collab/job.rs": "e81d9acaa9079674478ba6cdd6d7394e21a0c5b1981f662ddd099d258a08b7c2",
+      "target/release/examples/rho_worker_phase_profile": "2dd03260732f68240c6c04b8699bf83fc4294a8d54cbdd07f887eaab1f5fe982"
+    },
+    "timing_tier": "local_diagnostic"
+  },
+  "schema": "rho-worker-phase-receipt-v1"
+}

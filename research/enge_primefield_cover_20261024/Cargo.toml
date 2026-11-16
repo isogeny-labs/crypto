@@ -1,0 +1,17 @@
+[package]
+name = "enge-primefield-cover-toy"
+version = "0.1.0"
+edition = "2021"
+default-run = "enge-primefield-cover-toy"
+
+[dependencies]
+serde_json = "1"
+crypto = { path = "../..", optional = true }
+
+[features]
+certificate = ["dep:crypto"]
+
+[[bin]]
+name = "issue_cover_identity"
+path = "src/bin/issue_cover_identity.rs"
+required-features = ["certificate"]

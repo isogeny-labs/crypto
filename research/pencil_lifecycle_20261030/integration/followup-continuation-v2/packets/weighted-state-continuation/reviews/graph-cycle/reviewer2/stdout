@@ -1,0 +1,20 @@
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:10:66: error: Tactic `decide` failed for proposition
+  4 ≠ 0 * 2⁻¹ + 2 * 2⁻¹ * 3
+because its `Decidable` instance
+  instDecidableNot
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableNot`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑4).beq ↑(0 * 2⁻¹ + 2 * 2⁻¹ * 3) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:17:67: error: Tactic `decide` failed for proposition
+  1 * 1 + 1 * 1 = 0 + 0 * 1 ∧ 1 ≠ 0 * (2 * 1)⁻¹ + 0 * (2 * 1)⁻¹ * 1
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableNot`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑1).beq ↑(0 * (2 * 1)⁻¹ + 0 * (2 * 1)⁻¹ * 1) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯

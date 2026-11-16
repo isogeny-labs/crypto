@@ -1,0 +1,264 @@
+{
+  "control": {
+    "a": {
+      "arm": "rho-neg",
+      "deterministic": true,
+      "lower_bound": true,
+      "mean_ratio_to_floor": 0.9409937692494494,
+      "mean_s": 0.8339340149921417,
+      "measured": 5,
+      "method": "rho.negation",
+      "method_id": "ECM1hefea4e0ebe79",
+      "session_id": "ECBS1hb1592b312e6a",
+      "statuses": {
+        "verified": 5
+      },
+      "verified": 5
+    },
+    "b": {
+      "arm": "rho-neg-aa",
+      "deterministic": true,
+      "lower_bound": true,
+      "mean_ratio_to_floor": 0.9409937692494494,
+      "mean_s": 0.8339340149921417,
+      "measured": 5,
+      "method": "rho.negation",
+      "method_id": "ECM1hefea4e0ebe79",
+      "session_id": "ECBS1hb1592b312e6a",
+      "statuses": {
+        "verified": 5
+      },
+      "verified": 5
+    },
+    "comparison_id": "ECC1h108319d0470a",
+    "curves": [
+      {
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "ci_method": "within",
+        "log2_r": 31.69088403413618,
+        "pairs": 5,
+        "ratio_b_over_a": 1.0,
+        "slug": "icv1-fp32-t74357-b7396dac",
+        "workloads": 1
+      }
+    ],
+    "ops": {
+      "bounded": true,
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "ci_method": "within",
+      "pairs": 5,
+      "pooled_curves": 1,
+      "ratio_b_over_a": 1.0,
+      "resamples": 4000,
+      "same_seeds": true,
+      "same_session": true,
+      "status": "ok",
+      "unit": "ecbench.gae",
+      "unpaired_runs": 0
+    },
+    "quality": {
+      "admitted_pairs": 5,
+      "contention_observed_runs": 10,
+      "levels": {
+        "L2": 5
+      },
+      "notes": [],
+      "p95_foreign_busy_percent": 21.81974014435063,
+      "p95_run_queue_percent": 0.0,
+      "paired_attempts": 5,
+      "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+      "score": 75,
+      "verified_pairs": 5
+    },
+    "resample_seed": 20261002,
+    "schema": "ecbench.comparison/v1",
+    "verdict": "ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (within) over 5 pairs on 1 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); wall: admitted median 0.8856 [0.675, 1.115]",
+    "wall": {
+      "aa_arms": [
+        "rho-neg",
+        "rho-neg-aa"
+      ],
+      "aa_ci95": [
+        0.6745746118547916,
+        1.1151742577553083
+      ],
+      "aa_median_ratio": 0.8855610422019323,
+      "aa_pairs": 5,
+      "ci95": [
+        0.6745746118547916,
+        1.1151742577553083
+      ],
+      "median_ratio": 0.8855610422019323,
+      "outside_noise": false,
+      "pairs": 5,
+      "pairs_below_level": 0,
+      "reasons": [],
+      "required_level": "L2",
+      "status": "admitted"
+    },
+    "workloads": [
+      {
+        "a_mean_s": 0.8339340149921417,
+        "b_mean_s": 0.8339340149921417,
+        "floor_s": 0.8862269254527579,
+        "pairs": 5,
+        "r": 3466623553,
+        "ratio_b_over_a": 1.0,
+        "slug": "icv1-fp32-t74357-b7396dac",
+        "workload_id": "W1f9e5fbf5a84"
+      }
+    ]
+  },
+  "job_name": "ic-criu-n32-20261026-v3-epoch-1",
+  "job_uid": "202db63d-05c6-4c72-b292-ac7d2828b233",
+  "l2": {
+    "accepted": true,
+    "below_l2": [],
+    "executions": 18,
+    "grades": [
+      {
+        "count": 18,
+        "level": "L2"
+      }
+    ],
+    "invalid_outcomes": [],
+    "required": "L2"
+  },
+  "native_audit": {
+    "audited_unix_ms": 1793050854898,
+    "auditor_binary_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+    "auditor_env_class_id": "ECBENV2h3a51beea0bc2",
+    "auditor_hardware_class_id": "ECBHW1hef96e8cddc74",
+    "checks": {
+      "arms": true,
+      "env_class": true,
+      "executions": true,
+      "host_hash": true,
+      "plan_hash": true,
+      "record_count": true,
+      "records": true,
+      "records_hash": true,
+      "replays": true,
+      "session_complete": true,
+      "spec_id": true,
+      "workloads": true
+    },
+    "files": {
+      "host.json": "2acf72c125917e4757e3c6d8a48c300c4a22ebcbb3715e7d771c2e8fccd95100",
+      "plan.json": "208fee64ceea09f70d1e4e3e797404596edd755620783fd9b0e059aed4998e8d",
+      "records.jsonl": "cb6876d9f127ef1b7ba7a00d127583f96f7ddcdf9fc64953ddecaba0e49a0821",
+      "session.json": "c4ce57af14b89821b2e8c0082b1a6c37ae52a65d47d11216810181ad7c50a1c3",
+      "spec.json": "265b354ca37f09dfc6f36d24614cb788fc4f9e8b6f098eaa423e1cf50919ddeb"
+    },
+    "ok": true,
+    "problems": [],
+    "records": 18,
+    "records_bound": true,
+    "regraded": true,
+    "replays": [
+      {
+        "detail": "identical",
+        "record_id": "ECR1h98e01a0dcb75",
+        "reproduced": true,
+        "seq": 3
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h2336ff4d3a96",
+        "reproduced": true,
+        "seq": 4
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h8f4f048cda96",
+        "reproduced": true,
+        "seq": 5
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h515a78f928bd",
+        "reproduced": true,
+        "seq": 6
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h964944b3cb5e",
+        "reproduced": true,
+        "seq": 7
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h8f18162bf44f",
+        "reproduced": true,
+        "seq": 8
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1ha7395ab7fd1c",
+        "reproduced": true,
+        "seq": 9
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h1e92e7c0105c",
+        "reproduced": true,
+        "seq": 10
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1he008f281edd8",
+        "reproduced": true,
+        "seq": 11
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1hfac533598fd3",
+        "reproduced": true,
+        "seq": 12
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1hab262e0edd7e",
+        "reproduced": true,
+        "seq": 13
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h8102c31c4e76",
+        "reproduced": true,
+        "seq": 14
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1hf86fe21f0c25",
+        "reproduced": true,
+        "seq": 15
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h37d90581e9ae",
+        "reproduced": true,
+        "seq": 16
+      },
+      {
+        "detail": "identical",
+        "record_id": "ECR1h3c9838ca97f6",
+        "reproduced": true,
+        "seq": 17
+      }
+    ],
+    "schema": "ecbench.audit/v1",
+    "session_id": "ECBS1hb1592b312e6a",
+    "session_status": "complete",
+    "verified_records": 18
+  },
+  "payload_hashes_verified": 19,
+  "pod_uid": "12621392-9782-44c3-a21b-2c319c2b7594",
+  "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/ic-criu-n32-20261026-v3-epoch-1/12621392-9782-44c3-a21b-2c319c2b7594/"
+}

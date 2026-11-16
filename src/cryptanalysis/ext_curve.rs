@@ -41,6 +41,13 @@ pub fn take_field_counters() -> (u64, u64) {
     FIELD_COUNTERS.with(|c| c.replace((0, 0)))
 }
 
+/// The thread's `(multiplications, inversions)` so far, without resetting
+/// them: a caller that tallies a difference does not disturb another
+/// caller's [`take_field_counters`] window.
+pub fn peek_field_counters() -> (u64, u64) {
+    FIELD_COUNTERS.with(|c| c.get())
+}
+
 #[inline]
 fn mulm(a: u64, b: u64, p: u64) -> u64 {
     FIELD_COUNTERS.with(|c| {
@@ -562,11 +569,22 @@ impl<F: ExtField> CountedGroup for ExtCurve<F> {
     }
     fn add(&self, ops: &mut GroupOps, p: Self::Elt, q: Self::Elt) -> Self::Elt {
         ops.adds += 1;
-        self.add_raw(p, q)
+        let before = peek_field_counters();
+        let r = self.add_raw(p, q);
+        tally(ops, before);
+        r
     }
     fn double(&self, ops: &mut GroupOps, p: Self::Elt) -> Self::Elt {
         ops.doubles += 1;
-        self.double_raw(p)
+        let before = peek_field_counters();
+        let r = self.double_raw(p);
+        tally(ops, before);
+        r
+    }
+    /// Every `F_p` multiplication (squarings included) and inversion of
+    /// the group law is tallied into the ledger's `field_ops`.
+    fn counts_field_ops(&self) -> bool {
+        true
     }
     fn neg(&self, p: Self::Elt) -> Self::Elt {
         if p.infinity {
@@ -582,6 +600,13 @@ impl<F: ExtField> CountedGroup for ExtCurve<F> {
         let sign = u64::from(self.f.pack(p.y) > self.f.pack(self.f.neg(p.y)));
         ((self.f.pack(p.x) + 1) << 1) | sign
     }
+}
+
+/// Add the field work done since `before` to the ledger.
+fn tally(ops: &mut GroupOps, before: (u64, u64)) {
+    let (m, i) = peek_field_counters();
+    ops.field_ops.muls += m - before.0;
+    ops.field_ops.invs += i - before.1;
 }
 
 /// `(x, y) ↦ (cx·x, cy·y)` on a curve over an extension field: the

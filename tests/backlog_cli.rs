@@ -397,11 +397,11 @@ fn concurrent_claims_resolve_to_one_holder_after_sync() {
         assert_eq!(cols[1], "held", "{row}");
         assert_eq!(cols[3], "1", "one contended claim: {row}");
         holders.push(cols[2].to_string());
-        // The other shard was never claimed.
+        // Only the contended task is held; any other shard was never claimed.
         assert!(
             text.lines()
-                .any(|l| l.starts_with("XP-20261015-pkm-m3-n21-m4-n20/shard-1")
-                    && l.contains("unclaimed")),
+                .filter(|l| l.starts_with("XP-20261015-pkm-m3-n21-m4-n20/shard-") && *l != row)
+                .all(|l| l.contains("unclaimed")),
             "{text}"
         );
     }
@@ -832,11 +832,31 @@ fn every_seed_card_publishes_unchanged() {
     }
     let w = tmp("publish-all");
     let (a, _b, id1, _id2) = two_replicas(&w);
-    for entry in fs::read_dir(repo().join("backlog")).unwrap().flatten() {
-        let id = entry.file_name().to_string_lossy().to_string();
-        if !id.starts_with("XP-") {
-            continue;
-        }
+    // Enumerate tracked descriptors, rather than every XP directory: some
+    // directories contain only a protocol/specification. A tracked card that
+    // is missing from the checkout must still fail, not disappear from coverage.
+    let inventory = run(Command::new("git").arg("-C").arg(repo()).args([
+        "ls-files",
+        "-z",
+        "--",
+        ":(glob)backlog/XP-*/card.json",
+    ]));
+    assert!(inventory.status.success(), "cannot enumerate seed cards");
+    let mut published = 0;
+    for path in inventory
+        .stdout
+        .split(|byte| *byte == 0)
+        .filter(|p| !p.is_empty())
+    {
+        let card_path = repo().join(std::str::from_utf8(path).expect("UTF-8 card path"));
+        let id = card_path
+            .parent()
+            .unwrap()
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .into_owned();
+        assert!(card_path.is_file(), "{id}: card.json is not a file");
         let o = run(Command::new(bin())
             .arg("--root")
             .arg(repo())
@@ -858,10 +878,11 @@ fn every_seed_card_publishes_unchanged() {
         )
         .unwrap();
         let local: serde_json::Value =
-            serde_json::from_str(&fs::read_to_string(entry.path().join("card.json")).unwrap())
-                .unwrap();
+            serde_json::from_str(&fs::read_to_string(card_path).unwrap()).unwrap();
         assert_eq!(doc["card"], local, "{id} round-trips through the lab");
+        published += 1;
     }
+    assert!(published > 0, "the committed seed-card inventory is empty");
 }
 
 #[test]

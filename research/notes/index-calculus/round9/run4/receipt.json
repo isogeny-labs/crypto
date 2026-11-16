@@ -1,0 +1,87 @@
+{
+  "card_id": "CARD-HEIC-ROUND9-4",
+  "card_path": "research/notes/index-calculus/round9/CARD-HEIC-ROUND9-4.yaml",
+  "card_sha256": "9d914a728b666349b4d71bd4a98c697f2371ff28d5ec2e2b2b9af0ca6f1d78c7",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt4"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r9-mkdir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--wait",
+        "--cpus",
+        "3",
+        "--out",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt4/isolated_bench.jsonl",
+        "--label",
+        "R9",
+        "--",
+        "sh",
+        "-c",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt2/rho_neg_bin > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt4/R9.txt 2>&1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 2.053,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "r9-rho",
+      "index": 2,
+      "outputs": {},
+      "seconds": 2.053,
+      "stderr_sha256": "77f6836b706d489de91bc4dfb1599f6caf71b06fe5cbd1952629b65dba255270",
+      "stderr_tail": [
+        "machine is busy: other processes used 0.21 CPU s in 2.0 s (limit 0.20), PSI some avg10 0.63 (limit 5.0); top: {'claude[481]': 0.21}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "e2bd4e93d62bf5bcef4daef8cfd73bc294b93da6",
+  "dirty_after": [
+    "research/notes/index-calculus/round9/CARD-HEIC-ROUND9-4.yaml",
+    "research/notes/index-calculus/round9/run4/cmd1.stderr",
+    "research/notes/index-calculus/round9/run4/cmd1.stdout",
+    "research/notes/index-calculus/round9/run4/cmd2.stderr",
+    "research/notes/index-calculus/round9/run4/cmd2.stdout"
+  ],
+  "dirty_before": [
+    "research/notes/index-calculus/round9/CARD-HEIC-ROUND9-4.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 2"
+}

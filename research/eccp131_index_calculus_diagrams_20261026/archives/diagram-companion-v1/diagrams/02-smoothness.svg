@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title2 desc2">
+<title id="title2">Testing smoothness and solving decompositions</title><desc id="desc2">The relation-finding step is where the elliptic and hyperelliptic methods differ most.</desc>
+<defs>
+<marker id="a2ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#192b3b"/></marker>
+<marker id="a2blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2864ad"/></marker>
+<marker id="a2green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#087d68"/></marker>
+<marker id="a2purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7555a5"/></marker>
+<marker id="a2muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#586879"/></marker>
+</defs><style>
+text{font-family:DejaVu Sans,Arial,sans-serif;fill:#192b3b} .math{font-family:DejaVu Sans,Arial,sans-serif;font-weight:500}
+</style>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#f7f6f2" stroke="none" stroke-width="1.5" />
+<text x="56" y="48" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.7" >ELLIPTIC CURVES · JACOBIANS · INDEX CALCULUS</text>
+<text x="56" y="101" font-size="36" font-weight="700" text-anchor="start" style="fill:#192b3b"  >Testing smoothness and solving decompositions</text>
+<text x="56" y="140" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >The relation-finding step is where the elliptic and hyperelliptic methods differ most.</text>
+<text x="1382" y="48" font-size="15" font-weight="400" text-anchor="end" style="fill:#586879"  >02 / 04</text>
+<rect x="56" y="180" width="640" height="616" rx="18" fill="white" stroke="#087d68" stroke-width="1.5" />
+<rect x="744" y="180" width="640" height="616" rx="18" fill="white" stroke="#2864ad" stroke-width="1.5" />
+<text x="84" y="222" font-size="16" font-weight="700" text-anchor="start" style="fill:#087d68" letter-spacing="1" >HYPERELLIPTIC</text>
+<text x="84" y="259" font-size="27" font-weight="650" text-anchor="start" style="fill:#192b3b"  >Test a candidate divisor</text>
+<text x="772" y="222" font-size="16" font-weight="700" text-anchor="start" style="fill:#2864ad" letter-spacing="1" >ELLIPTIC</text>
+<text x="772" y="259" font-size="27" font-weight="650" text-anchor="start" style="fill:#192b3b"  >Search for a decomposition</text>
+<rect x="84" y="286" width="584" height="90" rx="18" fill="#eaf6f1" stroke="none" stroke-width="1.5" />
+<text x="108" y="323" font-size="23" font-weight="400" text-anchor="start" style="fill:#192b3b"  >D is represented by (u(X), v(X))</text>
+<text x="108" y="355" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >Typically deg u ≤ g; g is the genus.</text>
+<path d="M376 386 L376 414" fill="none" stroke="#087d68" stroke-width="2.5" marker-end="url(#a2green)" />
+<text x="376" y="447" font-size="25" font-weight="500" text-anchor="middle" style="fill:#087d68"  >u(X) = (X − r₁)(X − r₂)</text>
+<text x="376" y="479" font-size="17" font-weight="400" text-anchor="middle" style="fill:#586879"  >Example: a divisor with two rational constituents</text>
+<path d="M288 493 L222 531" fill="none" stroke="#087d68" stroke-width="2.5" marker-end="url(#a2green)" />
+<path d="M464 493 L530 531" fill="none" stroke="#087d68" stroke-width="2.5" marker-end="url(#a2green)" />
+<rect x="108" y="543" width="242" height="98" rx="18" fill="#eaf6f1" stroke="none" stroke-width="1.5" />
+<text x="229" y="577" font-size="25" font-weight="600" text-anchor="middle" style="fill:#087d68"  >D₁</text>
+<text x="229" y="611" font-size="21" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >(r₁, v(r₁))</text>
+<rect x="404" y="543" width="242" height="98" rx="18" fill="#eaf6f1" stroke="none" stroke-width="1.5" />
+<text x="525" y="577" font-size="25" font-weight="600" text-anchor="middle" style="fill:#087d68"  >D₂</text>
+<text x="525" y="611" font-size="21" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >(r₂, v(r₂))</text>
+<text x="376" y="683" font-size="28" font-weight="500" text-anchor="middle" style="fill:#087d68"  >[D] = D₁ + D₂</text>
+<text x="84" y="727" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.8" >SMOOTH WHEN</text>
+<text x="84" y="758" font-size="17" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Every constituent class belongs to the chosen factor base.</text>
+<rect x="772" y="286" width="584" height="90" rx="18" fill="#edf3fc" stroke="none" stroke-width="1.5" />
+<text x="796" y="323" font-size="25" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Seek R = ε₁P₁ + ··· + εₘPₘ</text>
+<text x="796" y="355" font-size="18" font-weight="400" text-anchor="start" style="fill:#586879"  >Each x(Pᵢ) must lie in a selected set V.</text>
+<path d="M1064 386 L1064 414" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a2blue)" />
+<rect x="804" y="429" width="94" height="68" rx="12" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="851" y="471" font-size="23" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >x₁ ?</text>
+<rect x="953" y="429" width="94" height="68" rx="12" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="1000" y="471" font-size="23" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >x₂ ?</text>
+<rect x="1203" y="429" width="94" height="68" rx="12" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="1250" y="471" font-size="23" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >xₘ ?</text>
+<text x="1124" y="470" font-size="28" font-weight="400" text-anchor="start" style="fill:#586879"  >···</text>
+<path d="M1064 508 L1064 536" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a2blue)" />
+<text x="1064" y="573" font-size="25" font-weight="500" text-anchor="middle" style="fill:#2864ad"  >Sₘ₊₁(x₁, …, xₘ, x(R)) = 0</text>
+<text x="1064" y="611" font-size="19" font-weight="400" text-anchor="middle" style="fill:#586879"  >Solve the polynomial system with xᵢ ∈ V.</text>
+<path d="M1064 629 L1064 656" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a2blue)" />
+<text x="1064" y="690" font-size="20" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >Lift x-coordinates to points,</text>
+<text x="1064" y="722" font-size="20" font-weight="400" text-anchor="middle" style="fill:#192b3b"  >then verify the signed group sum.</text>
+<text x="772" y="766" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  >Writing S is easier than solving its constrained roots.</text>
+<rect x="56" y="816" width="1328" height="51" rx="12" fill="#fff4dd" stroke="none" stroke-width="1.5" />
+<text x="720" y="849" font-size="20" font-weight="500" text-anchor="middle" style="fill:#a66a13"  >Fast smoothness testing still needs enough relations over a sufficiently small factor base.</text>
+<path d="M56 886 L1384 886" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="56" y="918" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >Divisor classes use an infinity/base-divisor convention.  The displayed split assumes valid points and factor-base membership.</text>
+</svg>

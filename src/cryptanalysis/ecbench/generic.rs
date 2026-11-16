@@ -15,7 +15,9 @@
 
 use std::collections::BTreeMap;
 
-use crate::cryptanalysis::ic_boundary::{addmod, mulmod, CountedGroup, GroupOps};
+use crate::cryptanalysis::ic_boundary::{
+    addmod, fast_map, mulmod, CountedGroup, FastMap, GroupOps,
+};
 
 /// What one generic solve did.
 #[derive(Clone, Debug, Default)]
@@ -23,6 +25,16 @@ pub struct GenericOutcome {
     pub recovered: Option<u64>,
     pub setup: GroupOps,
     pub search: GroupOps,
+    /// Kangaroo re-placements after a same-kind collision.  What they cost
+    /// is charged one of two ways, chosen by [`kangaroo_with`]: in `search`
+    /// (frozen `kangaroo.vow`; this field is then only the part of `search`
+    /// spent re-placing, informational and not added again) or in this
+    /// ledger alone (`restarts_apart`, `kangaroo.vow_v2`, reported as its own
+    /// `restarts` phase).  Zero for every other method.
+    pub restarts: GroupOps,
+    /// The final `[d]G = Q` check of [`verify_candidate`]; zero for the
+    /// ids that do not run it.
+    pub verification: GroupOps,
     /// Native work the group-operation unit does not charge, and the
     /// shape of the run (`baby_steps`, `giant_steps`, `restarts`, …).
     pub counters: BTreeMap<String, u64>,
@@ -31,8 +43,34 @@ pub struct GenericOutcome {
 }
 
 impl GenericOutcome {
+    /// Called on every baby, giant or kangaroo step: the key is only
+    /// allocated the first time a counter is seen, not per step.
     fn count(&mut self, name: &str, by: u64) {
-        *self.counters.entry(name.to_string()).or_insert(0) += by;
+        if let Some(c) = self.counters.get_mut(name) {
+            *c += by;
+        } else {
+            self.counters.insert(name.to_string(), by);
+        }
+    }
+}
+
+/// Charge the check `[d]G = Q` of the candidate a solve returned to
+/// `out.verification`, one scalar multiplication (`≈ 1.5·log₂ r` additions,
+/// counted exactly), and book it in `verification_checks`; a candidate that
+/// fails is booked in `failed_candidates` and kept for the runner to
+/// grade.  A solve with no candidate (exhausted) pays nothing.  This is the
+/// rule of every `_v2` method: rho and index calculus have always paid it
+/// for the answer they return, BSGS, the kangaroo and the claw had not.
+pub fn verify_candidate<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    out: &mut GenericOutcome,
+) {
+    let Some(d) = out.recovered else { return };
+    out.count("verification_checks", 1);
+    if g.mul(&mut out.verification, gen, d) != target {
+        out.count("failed_candidates", 1);
     }
 }
 
@@ -52,6 +90,35 @@ pub fn ceil_sqrt(r: u64) -> u64 {
     s.max(1)
 }
 
+/// The per-step counters of the three BSGS forms, kept in words during the
+/// search and written to [`GenericOutcome::counters`] once at the end.
+/// Every per-step call adds 1, so a counter is in the map exactly when it
+/// is non-zero, and [`StepCounters::flush`] writes only those: the map
+/// ends with the keys and values the per-step `count` calls produced,
+/// without a string-keyed map lookup per step.
+#[derive(Default)]
+struct StepCounters {
+    inserts: u64,
+    baby: u64,
+    lookups: u64,
+    giant: u64,
+}
+
+impl StepCounters {
+    fn flush(self, out: &mut GenericOutcome) {
+        for (name, v) in [
+            ("inserts_uncharged", self.inserts),
+            ("baby_steps", self.baby),
+            ("lookups_uncharged", self.lookups),
+            ("giant_steps", self.giant),
+        ] {
+            if v > 0 {
+                out.count(name, v);
+            }
+        }
+    }
+}
+
 /// **Textbook BSGS.**  Baby steps `jG`, `0 ≤ j < m = ⌈√r⌉`, all stored
 /// first; giant steps `Q − i·mG` until one lands in the table.  Worst
 /// case `2√r` operations, average `1.5√r`.
@@ -62,14 +129,14 @@ pub fn bsgs_textbook<G: CountedGroup>(
     r: u64,
 ) -> GenericOutcome {
     let mut out = GenericOutcome::default();
+    let mut c = StepCounters::default();
     let m = ceil_sqrt(r);
-    let mut table: std::collections::HashMap<u64, u64> =
-        std::collections::HashMap::with_capacity(m as usize);
+    let mut table: FastMap<u64> = fast_map(m as usize);
     let mut p = g.identity();
     for j in 0..m {
         table.entry(g.key(&p)).or_insert(j);
-        out.count("inserts_uncharged", 1);
-        out.count("baby_steps", 1);
+        c.inserts += 1;
+        c.baby += 1;
         if j + 1 < m {
             p = g.add(&mut out.setup, p, gen);
         }
@@ -77,16 +144,20 @@ pub fn bsgs_textbook<G: CountedGroup>(
     let stride = g.mul(&mut out.setup, gen, m);
     let back = g.neg(stride);
     let mut y = target;
-    for i in 0..=m {
-        out.count("lookups_uncharged", 1);
-        if let Some(&j) = table.get(&g.key(&y)) {
-            out.recovered = Some(addmod(mulmod(i, m, r), j, r));
-            return out;
+    let found = 'search: {
+        for i in 0..=m {
+            c.lookups += 1;
+            if let Some(&j) = table.get(&g.key(&y)) {
+                break 'search Some(addmod(mulmod(i, m, r), j, r));
+            }
+            c.giant += 1;
+            y = g.add(&mut out.search, y, back);
         }
-        out.count("giant_steps", 1);
-        y = g.add(&mut out.search, y, back);
-    }
-    out.exhausted = true;
+        None
+    };
+    c.flush(&mut out);
+    out.recovered = found;
+    out.exhausted = found.is_none();
     out
 }
 
@@ -104,33 +175,39 @@ pub fn bsgs_interleaved<G: CountedGroup>(
     let m = ceil_sqrt(r);
     let stride = g.mul(&mut out.setup, gen, m);
     let back = g.neg(stride);
-    let mut baby: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
-    let mut giant: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
+    // Each table holds at most the steps taken before the collision, on
+    // average about √r · 2/3; sized for the expectation, grown past it.
+    let mut baby: FastMap<u64> = fast_map((m as usize).div_ceil(3) * 2);
+    let mut giant: FastMap<u64> = fast_map((m as usize).div_ceil(3) * 2);
     let mut b = g.identity();
     let mut y = target;
-    for t in 0..m {
-        // Baby step t: tG against the giant table.
-        out.count("lookups_uncharged", 1);
-        if let Some(&i) = giant.get(&g.key(&b)) {
-            out.recovered = Some(addmod(mulmod(i, m, r), t, r));
-            return out;
+    let mut c = StepCounters::default();
+    let found = 'search: {
+        for t in 0..m {
+            // Baby step t: tG against the giant table.
+            c.lookups += 1;
+            if let Some(&i) = giant.get(&g.key(&b)) {
+                break 'search Some(addmod(mulmod(i, m, r), t, r));
+            }
+            baby.entry(g.key(&b)).or_insert(t);
+            c.inserts += 1;
+            // Giant step t: Q − t·mG against the baby table.
+            c.lookups += 1;
+            if let Some(&j) = baby.get(&g.key(&y)) {
+                break 'search Some(addmod(mulmod(t, m, r), j, r));
+            }
+            giant.entry(g.key(&y)).or_insert(t);
+            c.inserts += 1;
+            c.baby += 1;
+            c.giant += 1;
+            b = g.add(&mut out.search, b, gen);
+            y = g.add(&mut out.search, y, back);
         }
-        baby.entry(g.key(&b)).or_insert(t);
-        out.count("inserts_uncharged", 1);
-        // Giant step t: Q − t·mG against the baby table.
-        out.count("lookups_uncharged", 1);
-        if let Some(&j) = baby.get(&g.key(&y)) {
-            out.recovered = Some(addmod(mulmod(t, m, r), j, r));
-            return out;
-        }
-        giant.entry(g.key(&y)).or_insert(t);
-        out.count("inserts_uncharged", 1);
-        out.count("baby_steps", 1);
-        out.count("giant_steps", 1);
-        b = g.add(&mut out.search, b, gen);
-        y = g.add(&mut out.search, y, back);
-    }
-    out.exhausted = true;
+        None
+    };
+    c.flush(&mut out);
+    out.recovered = found;
+    out.exhausted = found.is_none();
     out
 }
 
@@ -150,15 +227,29 @@ pub fn bsgs_negation<G: CountedGroup>(
     target: G::Elt,
     r: u64,
 ) -> GenericOutcome {
+    bsgs_negation_table(g, gen, target, r, ceil_sqrt(r).div_ceil(2).max(1))
+}
+
+/// [`bsgs_negation`] with the baby table's half-width `m` given: the table
+/// holds `jG` for `0 ≤ j ≤ m` (so `m + 1` classes covering `±j`) and the
+/// giant stride is `2m + 1`.  `m = ⌈√r / 2⌉` is `bsgs_negation`; a smaller
+/// `m` is the equal-memory comparator for a known-log base.
+pub fn bsgs_negation_table<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    r: u64,
+    m: u64,
+) -> GenericOutcome {
     let mut out = GenericOutcome::default();
-    let m = ceil_sqrt(r).div_ceil(2).max(1);
-    let mut table: std::collections::HashMap<u64, (u64, u64)> =
-        std::collections::HashMap::with_capacity(m as usize + 1);
+    let mut c = StepCounters::default();
+    let m = m.max(1);
+    let mut table: FastMap<(u64, u64)> = fast_map(m as usize + 1);
     let mut p = g.identity();
     for j in 0..=m {
         table.entry(class_key(g, &p)).or_insert((j, g.key(&p)));
-        out.count("inserts_uncharged", 1);
-        out.count("baby_steps", 1);
+        c.inserts += 1;
+        c.baby += 1;
         if j < m {
             p = g.add(&mut out.setup, p, gen);
         }
@@ -168,21 +259,25 @@ pub fn bsgs_negation<G: CountedGroup>(
     let back = g.neg(stride);
     let mut y = target;
     let giants = r / s + 1;
-    for i in 0..=giants {
-        out.count("lookups_uncharged", 1);
-        if let Some(&(j, key)) = table.get(&class_key(g, &y)) {
-            let is = mulmod(i, s, r);
-            out.recovered = Some(if g.key(&y) == key {
-                addmod(is, j, r)
-            } else {
-                submod(is, j, r)
-            });
-            return out;
+    let found = 'search: {
+        for i in 0..=giants {
+            c.lookups += 1;
+            if let Some(&(j, key)) = table.get(&class_key(g, &y)) {
+                let is = mulmod(i, s, r);
+                break 'search Some(if g.key(&y) == key {
+                    addmod(is, j, r)
+                } else {
+                    submod(is, j, r)
+                });
+            }
+            c.giant += 1;
+            y = g.add(&mut out.search, y, back);
         }
-        out.count("giant_steps", 1);
-        y = g.add(&mut out.search, y, back);
-    }
-    out.exhausted = true;
+        None
+    };
+    c.flush(&mut out);
+    out.recovered = found;
+    out.exhausted = found.is_none();
     out
 }
 
@@ -211,6 +306,37 @@ impl KangarooShape {
     }
 }
 
+/// `h mod d` for a fixed `d ≥ 1` without a division instruction: Lemire,
+/// Kaser and Kurz, "Faster remainder by direct computation" (2019), the
+/// 64-bit case with the 128-bit constant `M = ⌈2^128 / d⌉`, which is exact
+/// for every 64-bit `h` and every `d < 2^64` (their Theorem 1 with
+/// `F = 128 ≥ N + log₂ d`).  `d = 1` wraps `M` to 0 and returns 0.  The
+/// kangaroo's jump index was a 64-bit `div` per step; the value is the
+/// same remainder.
+#[derive(Clone, Copy)]
+struct FastMod {
+    m: u128,
+    d: u64,
+}
+
+impl FastMod {
+    fn new(d: u64) -> Self {
+        assert!(d > 0, "FastMod of a zero modulus");
+        Self {
+            m: (u128::MAX / d as u128).wrapping_add(1),
+            d,
+        }
+    }
+
+    #[inline]
+    fn rem(self, h: u64) -> u64 {
+        let low = self.m.wrapping_mul(h as u128);
+        let bottom = ((low as u64) as u128 * self.d as u128) >> 64;
+        let top = (low >> 64) * self.d as u128;
+        ((bottom + top) >> 64) as u64
+    }
+}
+
 fn mix(v: u64) -> u64 {
     crate::cryptanalysis::ecbench::canonical::splitmix64(v)
 }
@@ -233,10 +359,29 @@ pub fn kangaroo<G: CountedGroup>(
     seed: u64,
     max_steps: u64,
 ) -> GenericOutcome {
+    kangaroo_with(g, gen, target, r, seed, max_steps, false)
+}
+
+/// [`kangaroo`], with the scalar multiplications of a restart charged to
+/// `out.restarts` alone when `restarts_apart` (the `_v2` phase attribution:
+/// a restart is neither jump-table set-up nor a jump, so it has its own
+/// ledger).  Without it a restart is charged to `out.search`, as frozen
+/// `kangaroo.vow` has done since 2026-10-18, and `out.restarts` only tallies
+/// the part of `search` it was.  The walk is the same either way.
+pub fn kangaroo_with<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    restarts_apart: bool,
+) -> GenericOutcome {
     let mut out = GenericOutcome::default();
     let shape = KangarooShape::of(r);
     out.count("jump_count", shape.jumps as u64);
     out.count("dp_bits", shape.dp_bits as u64);
+    let jump_of = FastMod::new(shape.jumps as u64);
     let mut jumps: Vec<(G::Elt, u64)> = Vec::with_capacity(shape.jumps as usize);
     let mut p = gen;
     for i in 0..shape.jumps {
@@ -251,59 +396,102 @@ pub fn kangaroo<G: CountedGroup>(
         (1u64 << shape.dp_bits) - 1
     };
     // kind 0 = tame (position = distance), kind 1 = wild (position = k + distance).
-    let mut table: std::collections::HashMap<u64, (u8, u64)> = std::collections::HashMap::new();
+    let mut table: FastMap<(u8, u64)> = fast_map(64);
     let mut rng = seed;
     let mut next = || {
         rng = mix(rng);
         rng
     };
-    let start = |kind: u8, out: &mut GenericOutcome, off: u64| -> (G::Elt, u64) {
+    // The two initial placements are set-up.  A placement after a same-kind
+    // collision is part of the search that produced the collision: frozen
+    // `kangaroo.vow` charges it to `search` (before 2026-10-18 to `setup`;
+    // the total is the same) and tallies it in `out.restarts` for `detail`;
+    // `restarts_apart` (`kangaroo.vow_v2`) charges it to `out.restarts`
+    // alone, which that id reports as its own phase.
+    let start = |kind: u8, out: &mut GenericOutcome, off: u64, restart: bool| -> (G::Elt, u64) {
         out.count("starts", 1);
-        if kind == 0 {
+        let mut ops = GroupOps::default();
+        let point = if kind == 0 {
             let d = addmod(r / 2, off, r);
-            (g.mul(&mut out.setup, gen, d), d)
+            (g.mul(&mut ops, gen, d), d)
         } else {
-            let z = g.mul(&mut out.setup, gen, off);
-            (g.add(&mut out.setup, target, z), off)
+            let z = g.mul(&mut ops, gen, off);
+            (g.add(&mut ops, target, z), off)
+        };
+        if !restart {
+            out.setup.merge(ops);
+        } else if restarts_apart {
+            out.restarts.merge(ops);
+        } else {
+            out.search.merge(ops);
+            out.restarts.adds += ops.adds;
+            out.restarts.doubles += ops.doubles;
+            out.restarts.scalar_mults += ops.scalar_mults;
         }
+        point
     };
-    let mut roo = [start(0, &mut out, 0), start(1, &mut out, 0)];
+    // Each kangaroo carries the mixed key of its point (the jump index's
+    // input), computed once when the point is reached rather than again at
+    // the start of its next step.
+    let place = |(p, d): (G::Elt, u64)| (p, d, mix(g.key(&p)));
+    let mut roo = [
+        place(start(0, &mut out, 0, false)),
+        place(start(1, &mut out, 0, false)),
+    ];
+    // The per-distinguished-point counters, kept in words and written to
+    // the map once at each exit: a counter is in the map exactly when the
+    // per-event `count` calls would have created it (it is non-zero), so
+    // the map ends with the same keys and values.  `steps` is always
+    // written, as before.
+    let (mut dps, mut inserts, mut collisions) = (0u64, 0u64, 0u64);
+    let flush = |out: &mut GenericOutcome, steps: u64, dps: u64, inserts: u64, collisions: u64| {
+        for (name, v) in [
+            ("distinguished_points", dps),
+            ("lookups_uncharged", dps),
+            ("same_kind_collisions", collisions),
+            ("inserts_uncharged", inserts),
+        ] {
+            if v > 0 {
+                out.count(name, v);
+            }
+        }
+        out.count("steps", steps);
+    };
     let mut steps = 0u64;
     while steps < max_steps {
         for kind in 0..2u8 {
-            let (pos, dist) = roo[kind as usize];
-            let h = mix(g.key(&pos));
-            let (jp, jd) = jumps[(h % shape.jumps as u64) as usize];
+            let (pos, dist, h) = roo[kind as usize];
+            let (jp, jd) = jumps[jump_of.rem(h) as usize];
             let np = g.add(&mut out.search, pos, jp);
             let nd = addmod(dist, jd, r);
             steps += 1;
-            roo[kind as usize] = (np, nd);
-            if mix(g.key(&np) ^ 0xD15C) & dp_mask != 0 {
+            let nk = g.key(&np);
+            roo[kind as usize] = (np, nd, mix(nk));
+            if mix(nk ^ 0xD15C) & dp_mask != 0 {
                 continue;
             }
-            out.count("distinguished_points", 1);
-            out.count("lookups_uncharged", 1);
-            match table.get(&g.key(&np)) {
+            dps += 1;
+            match table.get(&nk) {
                 Some(&(other, od)) if other != kind => {
                     // tame: P = [dt]G; wild: P = Q + [dw]G  ⇒  k = dt − dw.
                     let (dt, dw) = if kind == 0 { (nd, od) } else { (od, nd) };
-                    out.count("steps", steps);
+                    flush(&mut out, steps, dps, inserts, collisions);
                     out.recovered = Some(submod(dt, dw, r));
                     return out;
                 }
                 Some(_) => {
-                    out.count("same_kind_collisions", 1);
+                    collisions += 1;
                     let off = next() % r.max(2);
-                    roo[kind as usize] = start(kind, &mut out, off);
+                    roo[kind as usize] = place(start(kind, &mut out, off, true));
                 }
                 None => {
-                    table.insert(g.key(&np), (kind, nd));
-                    out.count("inserts_uncharged", 1);
+                    table.insert(nk, (kind, nd));
+                    inserts += 1;
                 }
             }
         }
     }
-    out.count("steps", steps);
+    flush(&mut out, steps, dps, inserts, collisions);
     out.exhausted = true;
     out
 }
@@ -314,6 +502,39 @@ mod tests {
     use crate::cryptanalysis::ic_boundary::{
         find_prime_order_curve, koblitz_instance, BinaryGroup,
     };
+
+    #[test]
+    fn fast_mod_is_the_remainder() {
+        let mut s = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        let edges = [
+            0u64,
+            1,
+            2,
+            3,
+            u64::MAX,
+            u64::MAX - 1,
+            1 << 63,
+            (1 << 63) - 1,
+        ];
+        let mut moduli: Vec<u64> = (1..=64).collect();
+        moduli.extend([u64::MAX, u64::MAX - 1, 1 << 63, (1 << 63) + 1, 1_000_003]);
+        for d in moduli {
+            let f = FastMod::new(d);
+            for &h in &edges {
+                assert_eq!(f.rem(h), h % d, "d={d} h={h}");
+            }
+            for _ in 0..4096 {
+                let h = next();
+                assert_eq!(f.rem(h), h % d, "d={d} h={h}");
+            }
+        }
+    }
 
     fn check_all_prime(bits: u32, seed: u64) {
         let inst = find_prime_order_curve(bits, seed);
@@ -330,6 +551,109 @@ mod tests {
             ] {
                 assert_eq!(out.recovered, Some(k), "{name} k={k} r={}", inst.r);
             }
+        }
+    }
+
+    /// Kangaroo's set-up is the jump table and the two initial placements,
+    /// a function of `r` alone; any re-placement after a same-kind
+    /// collision is charged to `search`.  So the set-up charge is the same
+    /// on every seed.  (A same-kind collision needs a kangaroo to land on
+    /// its own trail; none occurs on these seeds.  The restart itself is
+    /// exercised by `a_kangaroo_restart_is_charged_to_search`.)
+    #[test]
+    fn kangaroo_setup_is_a_function_of_r_alone() {
+        let inst = find_prime_order_curve(14, 59297);
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let mut setups = Vec::new();
+        for seed in 0..200u64 {
+            let k = 1 + (seed * 7919 + 13) % (inst.r - 1);
+            let q = g.mul(&mut GroupOps::default(), gen, k);
+            let out = kangaroo(g, gen, q, inst.r, seed, 64 * inst.r);
+            assert_eq!(out.recovered, Some(k), "seed {seed}");
+            assert_eq!(
+                out.setup.gae() + out.search.gae(),
+                (out.setup.adds + out.setup.doubles + out.search.adds + out.search.doubles) as f64
+            );
+            setups.push(out.setup.gae());
+        }
+        assert!(
+            setups.iter().all(|&s| s == setups[0]),
+            "set-up varies with the seed: {setups:?}"
+        );
+    }
+
+    /// Positive control for the re-placement accounting.  On this 11-bit
+    /// curve (r = 1553) the walk from Q = G is periodic before it meets the
+    /// tame kangaroo's trail, so the wild kangaroo lands on its own
+    /// distinguished point and is re-placed; this happens on every seed
+    /// (the walk does not depend on it, only the re-placement offset does).
+    /// The re-placement must be in `search`, `setup` must equal a run with
+    /// no restart on the same group, and the logarithm must still be right.
+    #[test]
+    fn a_kangaroo_restart_is_charged_to_search() {
+        let inst = find_prime_order_curve(11, 0);
+        assert_eq!(inst.r, 1553, "the pinned control curve moved");
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let plain = (2..inst.r)
+            .map(|k| {
+                let q = g.mul(&mut GroupOps::default(), gen, k);
+                (k, kangaroo(g, gen, q, inst.r, 0, 64 * inst.r))
+            })
+            .find(|(_, o)| !o.counters.contains_key("same_kind_collisions"))
+            .expect("some target has no restart");
+        assert_eq!(plain.1.recovered, Some(plain.0));
+        assert_eq!(plain.1.restarts, GroupOps::default());
+        for seed in 0..32u64 {
+            let out = kangaroo(g, gen, gen, inst.r, seed, 64 * inst.r);
+            assert_eq!(out.recovered, Some(1), "seed {seed}");
+            assert!(out.counters["same_kind_collisions"] >= 1, "seed {seed}");
+            assert_eq!(
+                out.counters["starts"],
+                2 + out.counters["same_kind_collisions"]
+            );
+            // A re-placement is one scalar multiplication (plus the wild
+            // kangaroo's addition of Q), all of it in `search`.
+            assert!(out.restarts.scalar_mults >= 1, "seed {seed}");
+            assert!(out.search.adds >= out.restarts.adds);
+            assert!(out.search.doubles >= out.restarts.doubles);
+            assert!(out.search.scalar_mults >= out.restarts.scalar_mults);
+            assert_eq!(
+                out.setup, plain.1.setup,
+                "seed {seed}: a restart leaked into setup"
+            );
+        }
+    }
+
+    /// The `_v2` placement: the same walk, a re-placement charged to
+    /// `restarts` alone, so `search` holds jumps only, and `search +
+    /// restarts` is the frozen id's `search`.
+    #[test]
+    fn a_kangaroo_restart_is_its_own_ledger_when_kept_apart() {
+        let inst = find_prime_order_curve(11, 0);
+        assert_eq!(inst.r, 1553, "the pinned control curve moved");
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        for seed in 0..32u64 {
+            let cap = 64 * inst.r;
+            let frozen = kangaroo(g, gen, gen, inst.r, seed, cap);
+            let apart = kangaroo_with(g, gen, gen, inst.r, seed, cap, true);
+            assert_eq!(apart.recovered, Some(1), "seed {seed}");
+            assert_eq!(apart.counters, frozen.counters, "the same walk");
+            assert!(apart.counters["same_kind_collisions"] >= 1, "seed {seed}");
+            assert!(apart.restarts.scalar_mults >= 1, "seed {seed}");
+            assert_eq!(apart.setup, frozen.setup, "seed {seed}");
+            assert_eq!(
+                apart.search.gae() + apart.restarts.gae(),
+                frozen.search.gae(),
+                "seed {seed}"
+            );
+            assert_eq!(
+                apart.setup.gae() + apart.search.gae() + apart.restarts.gae(),
+                frozen.setup.gae() + frozen.search.gae(),
+                "the total does not move"
+            );
         }
     }
 

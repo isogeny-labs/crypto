@@ -1,0 +1,28 @@
+import StageControls
+set_option autoImplicit false
+namespace IndependentSuffix
+open Solve4Stage Solve4Controls
+-- Actual deliberately incorrect finite mutation: recompute multiplier each iteration.
+def recapture (p : UInt64) (col : Fin 4) (v pivot : WRow) : WRow :=
+ (List.finRange 5).foldl (fun current j =>
+  if col.val ≤ j.val then
+   fun k => if k=j then nativeSub p (current j) (WordComparator.mul p (current col.castSucc) (pivot j)) else current k
+  else current) v
+theorem recapture_counterexample : recapture 7 1 target pivot ≠ eliminate 7 1 target pivot := by decide
+theorem recapture_exact : recapture 7 1 target pivot = (fun j => (#[0,0,5,0,0] : Array UInt64)[j.val]!) := by decide
+theorem pivot_equation_needed :
+ let v : WRow := fun j => (#[0,1,0,0,1] : Array UInt64)[j.val]!
+ let u : WRow := fun j => (#[0,1,0,0,0] : Array UInt64)[j.val]!
+ let x : Vector (ZMod 7) := fun j => (#[0,1,0,0] : Array (ZMod 7))[j.val]!
+ residual (decode 7 v) x=0 ∧ residual (decode 7 u) x≠0 ∧ residual (decode 7 (eliminate 7 1 v u)) x≠0 := by decide
+theorem noncanonical_sub_counterexample :
+ ((nativeSub 7 18446744073709551615 0).toNat : ZMod 7) ≠ (18446744073709551615 : ZMod 7) := by decide
+theorem large_modulus_mul_counterexample :
+ ((WordComparator.mul 4294967297 4294967296 4294967296).toNat : ZMod 4294967297) ≠
+ (4294967296 : ZMod 4294967297)*(4294967296 : ZMod 4294967297) := by decide
+#print axioms IndependentSuffix.recapture_counterexample
+#print axioms IndependentSuffix.recapture_exact
+#print axioms IndependentSuffix.pivot_equation_needed
+#print axioms IndependentSuffix.noncanonical_sub_counterexample
+#print axioms IndependentSuffix.large_modulus_mul_counterexample
+end IndependentSuffix

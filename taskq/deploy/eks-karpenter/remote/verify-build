@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Independent launcher check after downloading and hashing the pod artifacts.
+set -euo pipefail
+[[ $# == 4 ]] || { echo 'Usage: verify-build REQUEST STATUS POD_UID ARTIFACTS' >&2; exit 2; }
+request=$1 status=$2 pod=$3 artifacts=$4
+if ! jq -e '.job|has("build")' "$request" >/dev/null; then exit 0; fi
+jq -e --slurpfile request "$request" '
+  .source_revision==$request[0].job.build.source_revision
+  and .ecbench_sha256==$request[0].job.build.ecbench_sha256
+' "$artifacts/build-info.json" >/dev/null
+[[ $(cut -d' ' -f1 "$artifacts/binary.sha256") == "$(jq -r .job.build.ecbench_sha256 "$request")" ]]
+jq -e --arg pod "$pod" --slurpfile request "$request" '
+  [.pods[] | select(.uid==$pod) | .status.containerStatuses[] |
+    select(.name=="task" and .state.terminated.exitCode==0) |
+    .imageID | sub("^docker-pullable://";"")] == [$request[0].job.build.image_uri]
+' "$status" >/dev/null
+if jq -e '.job|has("spec")' "$request" >/dev/null; then
+  jq -e --slurpfile request "$request" '.==$request[0].job.spec' "$artifacts/input-spec.json" >/dev/null
+fi

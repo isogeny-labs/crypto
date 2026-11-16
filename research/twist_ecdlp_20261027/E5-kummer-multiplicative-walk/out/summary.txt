@@ -1,0 +1,319 @@
+=== E5 analysis: cells loaded 89, bootstrap resamples 2000 (setrand(31337), stratified by cell, percentile 95%) ===
+--- per-cell table (arm b inst : trials ok / n / Marm / index / meanT / R [CI] / M,S,I per step / mean wasted / us per step)
+a0 b20 i1 : trials 80/80 ok 80 n=939487 Marm=939487 idx=1 meanT=1276.7 R=1.317 [1.188, 1.451] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=4.563
+a0 b20 i2 : trials 80/80 ok 80 n=802007 Marm=802007 idx=1 meanT=1191.4 R=1.330 [1.183, 1.470] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=5.162
+a0 b24 i1 : trials 80/80 ok 80 n=10529767 Marm=10529767 idx=1 meanT=4396.0 R=1.355 [1.206, 1.499] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=3.532
+a0 b24 i2 : trials 80/80 ok 80 n=13767389 Marm=13767389 idx=1 meanT=4673.8 R=1.260 [1.115, 1.417] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=3.249
+a0 b28 i1 : trials 60/60 ok 60 n=199490989 Marm=199490989 idx=1 meanT=20141.1 R=1.426 [1.275, 1.573] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=2.794
+a0 b28 i2 : trials 60/60 ok 60 n=238099447 Marm=238099447 idx=1 meanT=21350.0 R=1.384 [1.224, 1.541] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=2.972
+a0 b32 i1 : trials 40/40 ok 40 n=3068515327 Marm=3068515327 idx=1 meanT=68017.8 R=1.228 [1.051, 1.406] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=2.875
+a0 b32 i2 : trials 40/40 ok 40 n=3089330611 Marm=3089330611 idx=1 meanT=75548.6 R=1.359 [1.153, 1.583] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=3.063
+a0 b36 i1 : trials 24/24 ok 24 n=34755553717 Marm=34755553717 idx=1 meanT=252729.7 R=1.356 [1.077, 1.655] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=3.335
+a0 b36 i2 : trials 24/24 ok 24 n=48736889989 Marm=48736889989 idx=1 meanT=298986.0 R=1.354 [1.145, 1.571] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=3.027
+a0 b40 i1 : trials 12/12 ok 12 n=713345741413 Marm=713345741413 idx=1 meanT=1301421.1 R=1.541 [1.151, 1.943] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=2.876
+a0 b40 i2 : trials 12/12 ok 12 n=850502415509 Marm=850502415509 idx=1 meanT=1207213.8 R=1.309 [0.931, 1.718] M/S/I per step=2.000/1.000/1.000 wasted=0.000 us/step=2.809
+a1 b20 i1 : trials 80/80 ok 80 n=939487 Marm=469743 idx=1 meanT=1478.8 R=2.158 [1.881, 2.454] M/S/I per step=2.058/1.038/1.019 wasted=0.000 us/step=4.539
+a1 b20 i2 : trials 80/80 ok 80 n=802007 Marm=401003 idx=1 meanT=1434.8 R=2.266 [1.960, 2.568] M/S/I per step=2.059/1.039/1.020 wasted=0.000 us/step=5.096
+a1 b24 i1 : trials 80/80 ok 80 n=10529767 Marm=5264883 idx=1 meanT=12592.3 R=5.488 [4.753, 6.278] M/S/I per step=2.027/1.018/1.009 wasted=0.000 us/step=3.729
+a1 b24 i2 : trials 80/80 ok 80 n=13767389 Marm=6883694 idx=1 meanT=14849.8 R=5.660 [4.931, 6.439] M/S/I per step=2.027/1.018/1.009 wasted=0.000 us/step=3.557
+a1 b28 i1 : trials 60/60 ok 56 n=199490989 Marm=99745494 idx=1 meanT=167885.6 R=16.810 [14.365, 19.289] M/S/I per step=2.009/1.006/1.003 wasted=0.000 us/step=3.306
+a1 b28 i2 : trials 60/60 ok 58 n=238099447 Marm=119049723 idx=1 meanT=220241.7 R=20.185 [17.680, 22.738] M/S/I per step=2.009/1.006/1.003 wasted=0.000 us/step=3.265
+a1 b32 i1 : trials 40/40 ok 4 n=3068515327 Marm=1534257663 idx=1 meanT=1502373.0 R=38.356 [36.020, 39.951] M/S/I per step=2.002/1.002/1.001 wasted=0.000 us/step=3.311
+a1 b32 i2 : trials 40/40 ok 5 n=3089330611 Marm=1544665305 idx=1 meanT=1496648.9 R=38.081 [35.985, 39.576] M/S/I per step=2.002/1.002/1.001 wasted=0.000 us/step=3.269
+a1 b36 i1 : trials 24/24 ok 0 n=34755553717 Marm=17377776858 idx=1 meanT=5272991.0 R=40.000 [40.000, 40.000] M/S/I per step=2.001/1.000/1.000 wasted=0.000 us/step=3.390
+a1 b36 i2 : trials 24/24 ok 0 n=48736889989 Marm=24368444994 idx=1 meanT=6244158.0 R=40.000 [40.000, 40.000] M/S/I per step=2.001/1.000/1.000 wasted=0.000 us/step=3.417
+a1c b20 i1 : trials 80/80 ok 80 n=939487 Marm=469743 idx=1 meanT=908.5 R=1.325 [1.189, 1.459] M/S/I per step=2.092/1.061/1.031 wasted=0.000 us/step=7.127
+a1c b20 i2 : trials 80/80 ok 80 n=802007 Marm=401003 idx=1 meanT=835.1 R=1.319 [1.149, 1.505] M/S/I per step=2.090/1.060/1.030 wasted=0.000 us/step=6.376
+a1c b24 i1 : trials 80/80 ok 80 n=10529767 Marm=5264883 idx=1 meanT=3606.8 R=1.572 [1.423, 1.725] M/S/I per step=2.091/1.060/1.030 wasted=0.000 us/step=5.244
+a1c b24 i2 : trials 80/80 ok 80 n=13767389 Marm=6883694 idx=1 meanT=4022.3 R=1.533 [1.343, 1.732] M/S/I per step=2.091/1.060/1.030 wasted=0.000 us/step=5.137
+a1c b28 i1 : trials 60/60 ok 60 n=199490989 Marm=99745494 idx=1 meanT=16381.0 R=1.640 [1.440, 1.843] M/S/I per step=2.088/1.059/1.029 wasted=0.000 us/step=4.828
+a1c b28 i2 : trials 60/60 ok 60 n=238099447 Marm=119049723 idx=1 meanT=17753.5 R=1.627 [1.395, 1.851] M/S/I per step=2.087/1.058/1.029 wasted=0.000 us/step=5.108
+a1c b32 i1 : trials 40/40 ok 40 n=3068515327 Marm=1534257663 idx=1 meanT=65400.1 R=1.670 [1.331, 2.005] M/S/I per step=2.080/1.053/1.027 wasted=0.000 us/step=4.968
+a1c b32 i2 : trials 40/40 ok 40 n=3089330611 Marm=1544665305 idx=1 meanT=77028.0 R=1.960 [1.610, 2.318] M/S/I per step=2.071/1.047/1.024 wasted=0.000 us/step=4.624
+a1c b36 i1 : trials 24/24 ok 24 n=34755553717 Marm=17377776858 idx=1 meanT=345909.8 R=2.624 [1.816, 3.538] M/S/I per step=2.047/1.031/1.016 wasted=0.000 us/step=4.653
+a1c b36 i2 : trials 24/24 ok 24 n=48736889989 Marm=24368444994 idx=1 meanT=386113.5 R=2.473 [1.903, 3.088] M/S/I per step=2.053/1.035/1.018 wasted=0.000 us/step=4.845
+a1c b40 i1 : trials 12/12 ok 12 n=713345741413 Marm=356672870706 idx=1 meanT=3172929.4 R=5.313 [3.498, 7.119] M/S/I per step=2.023/1.015/1.008 wasted=0.000 us/step=4.664
+a1c b40 i2 : trials 12/12 ok 12 n=850502415509 Marm=425251207754 idx=1 meanT=5478791.4 R=8.402 [6.120, 10.715] M/S/I per step=2.020/1.013/1.007 wasted=0.000 us/step=4.729
+cross b20 i1 : trials 24/24 ok 0 n=939487 Marm=469743 idx=1 meanT=20561.0 R=30.000 [30.000, 30.000] M/S/I per step=21.338/11.907/1.000 wasted=96.708 us/step=13.432
+cross b20 i2 : trials 24/24 ok 0 n=802007 Marm=401003 idx=1 meanT=18997.0 R=29.999 [29.999, 29.999] M/S/I per step=21.433/11.962/1.000 wasted=141.292 us/step=13.134
+cross b24 i1 : trials 24/24 ok 0 n=10529767 Marm=5264883 idx=1 meanT=68835.0 R=30.000 [30.000, 30.000] M/S/I per step=21.530/12.017/1.000 wasted=115.292 us/step=12.796
+cross b24 i2 : trials 24/24 ok 0 n=13767389 Marm=6883694 idx=1 meanT=78710.0 R=30.000 [30.000, 30.000] M/S/I per step=21.508/12.004/1.000 wasted=120.458 us/step=13.058
+cross b28 i1 : trials 24/24 ok 0 n=199490989 Marm=99745494 idx=1 meanT=299617.0 R=30.000 [30.000, 30.000] M/S/I per step=21.481/11.989/1.000 wasted=119.125 us/step=13.217
+cross b28 i2 : trials 24/24 ok 0 n=238099447 Marm=119049723 idx=1 meanT=327329.0 R=30.000 [30.000, 30.000] M/S/I per step=21.496/11.998/1.000 wasted=95.500 us/step=13.139
+kmix b20 i1 : trials 80/80 ok 80 n=939487 Marm=469743 idx=1 meanT=1048.7 R=1.530 [1.380, 1.687] M/S/I per step=21.269/11.868/1.000 wasted=0.000 us/step=12.742
+kmix b20 i2 : trials 80/80 ok 80 n=802007 Marm=401003 idx=1 meanT=1029.5 R=1.626 [1.451, 1.798] M/S/I per step=21.467/11.981/1.000 wasted=0.000 us/step=13.938
+kmix b24 i1 : trials 80/80 ok 80 n=10529767 Marm=5264883 idx=1 meanT=3219.6 R=1.403 [1.252, 1.546] M/S/I per step=21.536/12.021/1.000 wasted=0.000 us/step=12.991
+kmix b24 i2 : trials 80/80 ok 80 n=13767389 Marm=6883694 idx=1 meanT=3989.6 R=1.521 [1.337, 1.723] M/S/I per step=21.501/12.001/1.000 wasted=0.000 us/step=12.661
+kmix b28 i1 : trials 60/60 ok 60 n=199490989 Marm=99745494 idx=1 meanT=15026.9 R=1.505 [1.320, 1.688] M/S/I per step=21.488/11.993/1.000 wasted=0.000 us/step=12.429
+kmix b28 i2 : trials 60/60 ok 60 n=238099447 Marm=119049723 idx=1 meanT=16681.1 R=1.529 [1.378, 1.680] M/S/I per step=21.492/11.995/1.000 wasted=0.000 us/step=11.658
+kmix b32 i1 : trials 40/40 ok 40 n=3068515327 Marm=1534257663 idx=1 meanT=57330.0 R=1.464 [1.181, 1.747] M/S/I per step=21.491/11.995/1.000 wasted=0.000 us/step=12.892
+kmix b32 i2 : trials 40/40 ok 40 n=3089330611 Marm=1544665305 idx=1 meanT=57497.9 R=1.463 [1.200, 1.730] M/S/I per step=21.522/12.012/1.000 wasted=0.000 us/step=12.641
+kmix b36 i1 : trials 24/24 ok 24 n=34755553717 Marm=17377776858 idx=1 meanT=189136.4 R=1.435 [1.198, 1.692] M/S/I per step=21.506/12.004/1.000 wasted=0.000 us/step=12.448
+kmix b36 i2 : trials 24/24 ok 24 n=48736889989 Marm=24368444994 idx=1 meanT=223207.4 R=1.430 [1.065, 1.816] M/S/I per step=21.444/11.968/1.000 wasted=0.000 us/step=12.670
+kmix b40 i1 : trials 12/12 ok 12 n=713345741413 Marm=356672870706 idx=1 meanT=1105615.3 R=1.851 [1.289, 2.477] M/S/I per step=21.496/11.998/1.000 wasted=0.000 us/step=12.407
+kmix b40 i2 : trials 12/12 ok 12 n=850502415509 Marm=425251207754 idx=1 meanT=988770.5 R=1.516 [1.039, 1.986] M/S/I per step=21.521/12.012/1.000 wasted=0.000 us/step=12.044
+kmix_sa b28 i1 : trials 60/60 ok 60 n=199490989 Marm=99745494 idx=1 meanT=16555.2 R=1.658 [1.455, 1.862] M/S/I per step=14.489/7.994/1.000 wasted=0.000 us/step=9.622
+kmix_sc b28 i1 : trials 60/60 ok 60 n=199490989 Marm=99745494 idx=1 meanT=14771.7 R=1.479 [1.302, 1.666] M/S/I per step=28.930/16.245/1.000 wasted=0.000 us/step=15.738
+kmixidx b24 i1 : trials 40/40 ok 40 n=10529767 Marm=1754961 idx=3 meanT=3759.5 R=2.838 [2.409, 3.285] M/S/I per step=53.624/30.356/1.000 wasted=0.000 us/step=28.155
+kmixidx b24 i2 : NO TRIALS RECORDED (expected 40)
+kmixidx b24 i4 : trials 40/40 ok 40 n=15232957 Marm=2538826 idx=3 meanT=3581.2 R=2.248 [1.903, 2.586] M/S/I per step=52.924/29.956/1.000 wasted=0.000 us/step=23.470
+kpure b20 i1 : trials 80/80 ok 80 n=939487 Marm=469743 idx=1 meanT=1430.6 R=2.087 [1.830, 2.363] M/S/I per step=21.403/11.944/1.000 wasted=0.988 us/step=12.469
+kpure b20 i2 : trials 80/80 ok 80 n=802007 Marm=401003 idx=1 meanT=1375.0 R=2.171 [1.887, 2.454] M/S/I per step=21.408/11.947/1.000 wasted=1.100 us/step=12.945
+kpure b24 i1 : trials 80/80 ok 80 n=10529767 Marm=5264883 idx=1 meanT=4370.1 R=1.905 [1.688, 2.114] M/S/I per step=21.528/12.016/1.000 wasted=0.688 us/step=13.941
+kpure b24 i2 : trials 80/80 ok 80 n=13767389 Marm=6883694 idx=1 meanT=5209.9 R=1.986 [1.734, 2.266] M/S/I per step=21.528/12.016/1.000 wasted=0.975 us/step=13.870
+kpure b28 i1 : trials 60/60 ok 60 n=199490989 Marm=99745494 idx=1 meanT=20544.1 R=2.057 [1.791, 2.349] M/S/I per step=21.481/11.989/1.000 wasted=0.867 us/step=12.717
+kpure b28 i2 : trials 60/60 ok 60 n=238099447 Marm=119049723 idx=1 meanT=19082.7 R=1.749 [1.513, 2.006] M/S/I per step=21.496/11.998/1.000 wasted=0.733 us/step=13.578
+kpure b32 i1 : trials 40/40 ok 40 n=3068515327 Marm=1534257663 idx=1 meanT=96122.3 R=2.454 [1.984, 2.979] M/S/I per step=21.488/11.993/1.000 wasted=1.150 us/step=12.626
+kpure b32 i2 : trials 40/40 ok 40 n=3089330611 Marm=1544665305 idx=1 meanT=79210.2 R=2.015 [1.673, 2.397] M/S/I per step=21.525/12.014/1.000 wasted=0.650 us/step=12.573
+kpure b36 i1 : trials 24/24 ok 24 n=34755553717 Marm=17377776858 idx=1 meanT=252277.1 R=1.914 [1.609, 2.251] M/S/I per step=21.511/12.007/1.000 wasted=0.375 us/step=12.140
+kpure b36 i2 : trials 24/24 ok 24 n=48736889989 Marm=24368444994 idx=1 meanT=303506.0 R=1.944 [1.503, 2.430] M/S/I per step=21.461/11.978/1.000 wasted=0.625 us/step=12.082
+kpure b40 i1 : trials 12/12 ok 12 n=713345741413 Marm=356672870706 idx=1 meanT=1372688.8 R=2.298 [1.904, 2.701] M/S/I per step=21.498/11.999/1.000 wasted=1.167 us/step=12.459
+kpure b40 i2 : trials 12/12 ok 12 n=850502415509 Marm=425251207754 idx=1 meanT=1280671.3 R=1.964 [1.318, 2.665] M/S/I per step=21.533/12.019/1.000 wasted=0.500 us/step=12.424
+kpureT b20 i1 : trials 80/80 ok 80 n=1881641 Marm=940820 idx=1 meanT=1926.5 R=1.986 [1.763, 2.207] M/S/I per step=21.466/11.980/1.000 wasted=0.975 us/step=14.158
+kpureT b20 i2 : trials 80/80 ok 80 n=534851 Marm=267425 idx=1 meanT=1033.5 R=1.998 [1.781, 2.220] M/S/I per step=21.450/11.971/1.000 wasted=1.063 us/step=13.402
+kpureT b24 i1 : trials 80/80 ok 80 n=10529803 Marm=5264901 idx=1 meanT=4322.7 R=1.884 [1.691, 2.102] M/S/I per step=21.512/12.007/1.000 wasted=0.725 us/step=11.752
+kpureT b24 i2 : trials 80/80 ok 80 n=9181511 Marm=4590755 idx=1 meanT=5083.5 R=2.373 [2.128, 2.661] M/S/I per step=21.512/12.007/1.000 wasted=0.750 us/step=12.076
+kpureT b28 i1 : trials 60/60 ok 60 n=199497019 Marm=99748509 idx=1 meanT=21748.1 R=2.178 [1.894, 2.470] M/S/I per step=21.485/11.991/1.000 wasted=1.150 us/step=13.161
+kpureT b28 i2 : trials 60/60 ok 60 n=476175493 Marm=238087746 idx=1 meanT=31151.3 R=2.019 [1.754, 2.295] M/S/I per step=21.492/11.995/1.000 wasted=0.900 us/step=12.957
+kpureT b32 i1 : trials 40/40 ok 40 n=3068511331 Marm=1534255665 idx=1 meanT=78097.7 R=1.994 [1.631, 2.361] M/S/I per step=21.507/12.004/1.000 wasted=0.900 us/step=12.368
+kpureT b32 i2 : trials 40/40 ok 40 n=6178748677 Marm=3089374338 idx=1 meanT=97563.6 R=1.755 [1.349, 2.198] M/S/I per step=21.504/12.002/1.000 wasted=1.250 us/step=12.594
+kpureT b36 i1 : trials 24/24 ok 24 n=34755344233 Marm=17377672116 idx=1 meanT=219317.4 R=1.664 [1.237, 2.150] M/S/I per step=21.494/11.997/1.000 wasted=0.792 us/step=12.671
+kpureT b36 i2 : trials 24/24 ok 24 n=48736657817 Marm=24368328908 idx=1 meanT=351088.0 R=2.249 [1.867, 2.654] M/S/I per step=21.502/12.001/1.000 wasted=1.125 us/step=12.721
+kpureT b40 i1 : trials 12/12 ok 12 n=713345776189 Marm=356672888094 idx=1 meanT=1713775.4 R=2.870 [2.119, 3.658] M/S/I per step=21.488/11.993/1.000 wasted=0.917 us/step=12.270
+kpureT b40 i2 : trials 12/12 ok 12 n=850502054671 Marm=425251027335 idx=1 meanT=1112931.1 R=1.707 [1.151, 2.214] M/S/I per step=21.500/12.000/1.000 wasted=0.583 us/step=12.281
+kpure_sa b28 i1 : trials 60/60 ok 60 n=199490989 Marm=99745494 idx=1 meanT=23974.6 R=2.401 [2.104, 2.700] M/S/I per step=14.496/7.998/1.000 wasted=0.750 us/step=9.438
+kpure_sc b28 i1 : trials 60/60 ok 60 n=199490989 Marm=99745494 idx=1 meanT=20375.7 R=2.040 [1.766, 2.330] M/S/I per step=28.931/16.246/1.000 wasted=1.000 us/step=14.873
+nc1 b24 i1 : trials 40/40 ok 0 n=10529767 Marm=1754961 idx=3 meanT=52989.0 R=39.999 [39.999, 39.999] M/S/I per step=53.310/30.177/1.000 wasted=190.875 us/step=26.435
+nc1 b24 i2 : NO TRIALS RECORDED (expected 40)
+nc1 b24 i4 : trials 40/40 ok 0 n=15232957 Marm=2538826 idx=3 meanT=63734.0 R=40.000 [40.000, 40.000] M/S/I per step=52.979/29.988/1.000 wasted=205.375 us/step=25.558
+pc1 b24 i1 : trials 40/40 ok 40 n=10529767 Marm=1754961 idx=3 meanT=2146.9 R=1.621 [1.384, 1.871] M/S/I per step=53.397/30.227/1.000 wasted=0.600 us/step=22.730
+pc1 b24 i2 : NO TRIALS RECORDED (expected 40)
+pc1 b24 i4 : trials 40/40 ok 40 n=15232957 Marm=2538826 idx=3 meanT=3635.4 R=2.282 [1.957, 2.607] M/S/I per step=53.018/30.010/1.000 wasted=1.175 us/step=23.203
+--- pooled R per (arm,b) over good instances
+Rb kpure b20 : 2.129 [1.937, 2.322]
+Rb kpure b24 : 1.945 [1.775, 2.119]
+Rb kpure b28 : 1.903 [1.728, 2.102]
+Rb kpure b32 : 2.235 [1.933, 2.549]
+Rb kpure b36 : 1.929 [1.668, 2.220]
+Rb kpure b40 : 2.131 [1.749, 2.533]
+Rb kmix b20 : 1.578 [1.462, 1.689]
+Rb kmix b24 : 1.462 [1.344, 1.583]
+Rb kmix b28 : 1.517 [1.397, 1.638]
+Rb kmix b32 : 1.463 [1.272, 1.659]
+Rb kmix b36 : 1.432 [1.212, 1.667]
+Rb kmix b40 : 1.684 [1.318, 2.059]
+Rb a0 b20 : 1.324 [1.225, 1.421]
+Rb a0 b24 : 1.307 [1.205, 1.412]
+Rb a0 b28 : 1.405 [1.293, 1.516]
+Rb a0 b32 : 1.294 [1.161, 1.429]
+Rb a0 b36 : 1.355 [1.171, 1.543]
+Rb a0 b40 : 1.425 [1.155, 1.728]
+Rb a1 b20 : 2.212 [2.005, 2.420]
+Rb a1 b24 : 5.574 [5.037, 6.101]
+Rb a1 b28 : 18.498 [16.710, 20.231]
+Rb a1 b32 : 38.218 [36.794, 39.467]
+Rb a1 b36 : 40.000 [40.000, 40.000]
+Rb kpureT b20 : 1.992 [1.836, 2.146]
+Rb kpureT b24 : 2.128 [1.970, 2.307]
+Rb kpureT b28 : 2.098 [1.913, 2.293]
+Rb kpureT b32 : 1.875 [1.615, 2.154]
+Rb kpureT b36 : 1.956 [1.668, 2.274]
+Rb kpureT b40 : 2.288 [1.806, 2.762]
+Rb a1c b20 : 1.322 [1.213, 1.438]
+Rb a1c b24 : 1.552 [1.430, 1.683]
+Rb a1c b28 : 1.634 [1.480, 1.791]
+Rb a1c b32 : 1.815 [1.573, 2.054]
+Rb a1c b36 : 2.549 [2.066, 3.099]
+Rb a1c b40 : 6.857 [5.402, 8.316]
+Rge24 kpure : 2.029 [1.909, 2.155]   Rge28 : 2.049 [1.904, 2.206]
+Rge24 kmix : 1.512 [1.414, 1.609]   Rge28 : 1.524 [1.403, 1.647]
+Rge24 a0 : 1.357 [1.282, 1.436]   Rge28 : 1.370 [1.281, 1.466]
+Rge24 a1 : 25.572 [24.978, 26.139]   Rge28 : 32.239 [31.481, 32.981]
+Rge24 kpureT : 2.069 [1.935, 2.203]   Rge28 : 2.054 [1.892, 2.220]
+Rge24 a1c : 2.881 [2.570, 3.201]   Rge28 : 3.214 [2.829, 3.613]
+--- slopes of log2(mean T) on b and on log2 n
+slope kpure : 0.494 [0.482, 0.505]   vs log2 n : 0.501 [0.489, 0.513]
+slope kmix : 0.495 [0.480, 0.506]   vs log2 n : 0.502 [0.487, 0.514]
+slope a0 : 0.496 [0.484, 0.508]   vs log2 n : 0.504 [0.491, 0.516]
+slope a1 : 0.767 [0.759, 0.775]   vs log2 n : 0.786 [0.778, 0.795]
+slope kpureT : 0.493 [0.479, 0.505]   vs log2 n : 0.501 [0.486, 0.513]
+slope a1c : 0.592 [0.576, 0.605]   vs log2 n : 0.602 [0.585, 0.614]
+--- step ratios (normalised by sqrt n, good cells)
+SR kpure/a0 b>=28 : 1.058 [0.959, 1.170]   b32 1.222 [1.029, 1.457] b36 1.007 [0.826, 1.236] b40 1.058 [0.808, 1.384]
+SR kpure/a1 b>=28 : 0.063 [0.058, 0.068]   b32 0.058 [0.050, 0.067] b36 0.048 [0.042, 0.056] b40 NA
+SR kmix/a0 b>=28 : 0.787 [0.709, 0.872]   b32 0.800 [0.674, 0.947] b36 0.747 [0.604, 0.920] b40 0.836 [0.618, 1.111]
+SR kmix/a1 b>=28 : 0.046 [0.042, 0.049]   b32 0.038 [0.033, 0.044] b36 0.036 [0.030, 0.042] b40 NA
+SR a1/a0 b>=28 : 16.872 [15.784, 18.077]   b32 20.891 [18.817, 23.439] b36 20.874 [18.319, 24.147] b40 NA
+SR kpure/kmix b>=28 : 1.345 [1.209, 1.504]   b32 1.527 [1.275, 1.866] b36 1.347 [1.096, 1.668] b40 1.266 [0.949, 1.706]
+SR kpure/a1c b>=28 : 0.638 [0.556, 0.736]   b32 1.231 [1.019, 1.491] b36 0.757 [0.594, 0.976] b40 0.311 [0.237, 0.415]
+SR kmix/a1c b>=28 : 0.474 [0.412, 0.549]   b32 0.806 [0.669, 0.979] b36 0.562 [0.435, 0.724] b40 0.246 [0.181, 0.331]
+SR a1c/a0 b>=28 : 1.659 [1.436, 1.901]   b32 0.992 [0.833, 1.173] b36 1.330 [1.029, 1.699] b40 3.403 [2.544, 4.543]
+--- cost ratios K/A (b>=28 pooled); counted cost = M + w S + rho I
+CR kpure/a0 rho=3 w0.8 : 6.221 [5.634, 6.875]  w1.0 : 6.437 [5.830, 7.113]  [sens. xADD=3M] : 5.765 [5.221, 6.371]
+CR kpure/a0 rho=10 w0.8 : 3.397 [3.077, 3.755]  w1.0 : 3.541 [3.207, 3.913]  [sens. xADD=3M] : 3.191 [2.890, 3.526]
+CR kpure/a0 rho=30 w0.8 : 1.971 [1.785, 2.178]  w1.0 : 2.036 [1.844, 2.250]  [sens. xADD=3M] : 1.890 [1.712, 2.089]
+CR kpure/a0 rho=100 w0.8 : 1.349 [1.222, 1.491]  w1.0 : 1.371 [1.242, 1.516]  [sens. xADD=3M] : 1.324 [1.199, 1.463]
+CR kpure/a1 rho=3 w0.8 : 0.368 [0.341, 0.400]  w1.0 : 0.381 [0.353, 0.413]  [sens. xADD=3M] : 0.341 [0.316, 0.370]
+CR kpure/a1 rho=10 w0.8 : 0.201 [0.186, 0.218]  w1.0 : 0.210 [0.194, 0.227]  [sens. xADD=3M] : 0.189 [0.175, 0.205]
+CR kpure/a1 rho=30 w0.8 : 0.117 [0.108, 0.127]  w1.0 : 0.121 [0.112, 0.131]  [sens. xADD=3M] : 0.112 [0.104, 0.121]
+CR kpure/a1 rho=100 w0.8 : 0.080 [0.074, 0.087]  w1.0 : 0.081 [0.075, 0.088]  [sens. xADD=3M] : 0.078 [0.073, 0.085]
+CR kmix/a0 rho=3 w0.8 : 4.625 [4.166, 5.130]  w1.0 : 4.786 [4.310, 5.308]  [sens. xADD=3M] : 4.286 [3.860, 4.754]
+CR kmix/a0 rho=10 w0.8 : 2.526 [2.275, 2.802]  w1.0 : 2.632 [2.371, 2.920]  [sens. xADD=3M] : 2.372 [2.137, 2.631]
+CR kmix/a0 rho=30 w0.8 : 1.466 [1.320, 1.625]  w1.0 : 1.514 [1.364, 1.679]  [sens. xADD=3M] : 1.406 [1.266, 1.559]
+CR kmix/a0 rho=100 w0.8 : 1.003 [0.904, 1.113]  w1.0 : 1.020 [0.919, 1.131]  [sens. xADD=3M] : 0.984 [0.887, 1.091]
+CR kmix/a1 rho=3 w0.8 : 0.268 [0.249, 0.288]  w1.0 : 0.277 [0.257, 0.298]  [sens. xADD=3M] : 0.248 [0.230, 0.267]
+CR kmix/a1 rho=10 w0.8 : 0.146 [0.136, 0.157]  w1.0 : 0.152 [0.141, 0.164]  [sens. xADD=3M] : 0.137 [0.128, 0.148]
+CR kmix/a1 rho=30 w0.8 : 0.085 [0.079, 0.091]  w1.0 : 0.088 [0.081, 0.094]  [sens. xADD=3M] : 0.081 [0.076, 0.087]
+CR kmix/a1 rho=100 w0.8 : 0.058 [0.054, 0.062]  w1.0 : 0.059 [0.055, 0.063]  [sens. xADD=3M] : 0.057 [0.053, 0.061]
+CR kpure/a1c rho=3 w0.8 : 3.681 [3.214, 4.239]  w1.0 : 3.807 [3.324, 4.385]  [sens. xADD=3M] : 3.411 [2.978, 3.928]
+CR kpure/a1c rho=10 w0.8 : 2.015 [1.759, 2.321]  w1.0 : 2.099 [1.833, 2.418]  [sens. xADD=3M] : 1.892 [1.652, 2.180]
+CR kpure/a1c rho=30 w0.8 : 1.170 [1.022, 1.348]  w1.0 : 1.209 [1.055, 1.393]  [sens. xADD=3M] : 1.123 [0.980, 1.293]
+CR kpure/a1c rho=100 w0.8 : 0.802 [0.700, 0.924]  w1.0 : 0.815 [0.711, 0.939]  [sens. xADD=3M] : 0.786 [0.687, 0.906]
+CR kmix/a1c rho=3 w0.8 : 2.737 [2.379, 3.163]  w1.0 : 2.831 [2.461, 3.272]  [sens. xADD=3M] : 2.536 [2.204, 2.931]
+CR kmix/a1c rho=10 w0.8 : 1.498 [1.302, 1.732]  w1.0 : 1.561 [1.357, 1.805]  [sens. xADD=3M] : 1.407 [1.223, 1.627]
+CR kmix/a1c rho=30 w0.8 : 0.870 [0.756, 1.006]  w1.0 : 0.899 [0.781, 1.039]  [sens. xADD=3M] : 0.835 [0.725, 0.965]
+CR kmix/a1c rho=100 w0.8 : 0.596 [0.518, 0.689]  w1.0 : 0.606 [0.527, 0.700]  [sens. xADD=3M] : 0.585 [0.508, 0.676]
+--- cost ratios per b at w=0.8 (F5 uses rho=3, A1)
+CRb kpure/a0 b32 rho=3 : 7.183 [6.053, 8.566]
+CRb kpure/a0 b32 rho=10 : 3.923 [3.305, 4.678]
+CRb kpure/a0 b32 rho=30 : 2.276 [1.917, 2.714]
+CRb kpure/a0 b32 rho=100 : 1.558 [1.313, 1.858]
+CRb kpure/a0 b36 rho=3 : 5.915 [4.853, 7.262]
+CRb kpure/a0 b36 rho=10 : 3.231 [2.650, 3.967]
+CRb kpure/a0 b36 rho=30 : 1.875 [1.538, 2.302]
+CRb kpure/a0 b36 rho=100 : 1.284 [1.053, 1.577]
+CRb kpure/a0 b40 rho=3 : 6.222 [4.748, 8.139]
+CRb kpure/a0 b40 rho=10 : 3.397 [2.593, 4.445]
+CRb kpure/a0 b40 rho=30 : 1.971 [1.504, 2.578]
+CRb kpure/a0 b40 rho=100 : 1.349 [1.030, 1.765]
+CRb kpure/a1 b32 rho=3 : 0.343 [0.296, 0.395]
+CRb kpure/a1 b32 rho=10 : 0.188 [0.162, 0.216]
+CRb kpure/a1 b32 rho=30 : 0.109 [0.094, 0.125]
+CRb kpure/a1 b32 rho=100 : 0.075 [0.064, 0.086]
+CRb kpure/a1 b36 rho=3 : 0.283 [0.245, 0.326]
+CRb kpure/a1 b36 rho=10 : 0.155 [0.134, 0.178]
+CRb kpure/a1 b36 rho=30 : 0.090 [0.078, 0.103]
+CRb kpure/a1 b36 rho=100 : 0.061 [0.053, 0.071]
+CRb kpure/a1 b40 rho=3 : NA
+CRb kpure/a1 b40 rho=10 : NA
+CRb kpure/a1 b40 rho=30 : NA
+CRb kpure/a1 b40 rho=100 : NA
+CRb kmix/a0 b32 rho=3 : 4.704 [3.965, 5.568]
+CRb kmix/a0 b32 rho=10 : 2.569 [2.165, 3.041]
+CRb kmix/a0 b32 rho=30 : 1.490 [1.256, 1.764]
+CRb kmix/a0 b32 rho=100 : 1.020 [0.860, 1.207]
+CRb kmix/a0 b36 rho=3 : 4.390 [3.551, 5.402]
+CRb kmix/a0 b36 rho=10 : 2.398 [1.939, 2.951]
+CRb kmix/a0 b36 rho=30 : 1.392 [1.125, 1.712]
+CRb kmix/a0 b36 rho=100 : 0.953 [0.771, 1.173]
+CRb kmix/a0 b40 rho=3 : 4.914 [3.630, 6.528]
+CRb kmix/a0 b40 rho=10 : 2.684 [1.983, 3.566]
+CRb kmix/a0 b40 rho=30 : 1.557 [1.150, 2.069]
+CRb kmix/a0 b40 rho=100 : 1.066 [0.788, 1.416]
+CRb kmix/a1 b32 rho=3 : 0.225 [0.194, 0.257]
+CRb kmix/a1 b32 rho=10 : 0.123 [0.106, 0.140]
+CRb kmix/a1 b32 rho=30 : 0.071 [0.061, 0.081]
+CRb kmix/a1 b32 rho=100 : 0.049 [0.042, 0.056]
+CRb kmix/a1 b36 rho=3 : 0.210 [0.178, 0.245]
+CRb kmix/a1 b36 rho=10 : 0.115 [0.097, 0.134]
+CRb kmix/a1 b36 rho=30 : 0.067 [0.056, 0.078]
+CRb kmix/a1 b36 rho=100 : 0.046 [0.039, 0.053]
+CRb kmix/a1 b40 rho=3 : NA
+CRb kmix/a1 b40 rho=10 : NA
+CRb kmix/a1 b40 rho=30 : NA
+CRb kmix/a1 b40 rho=100 : NA
+CRb kpure/a1c b32 rho=3 : 7.011 [5.805, 8.481]
+CRb kpure/a1c b32 rho=10 : 3.845 [3.183, 4.653]
+CRb kpure/a1c b32 rho=30 : 2.235 [1.850, 2.705]
+CRb kpure/a1c b32 rho=100 : 1.531 [1.268, 1.853]
+CRb kpure/a1c b36 rho=3 : 4.353 [3.422, 5.602]
+CRb kpure/a1c b36 rho=10 : 2.384 [1.874, 3.069]
+CRb kpure/a1c b36 rho=30 : 1.385 [1.089, 1.784]
+CRb kpure/a1c b36 rho=100 : 0.949 [0.746, 1.222]
+CRb kpure/a1c b40 rho=3 : 1.812 [1.380, 2.420]
+CRb kpure/a1c b40 rho=10 : 0.991 [0.754, 1.323]
+CRb kpure/a1c b40 rho=30 : 0.575 [0.438, 0.768]
+CRb kpure/a1c b40 rho=100 : 0.394 [0.300, 0.526]
+CRb kmix/a1c b32 rho=3 : 4.591 [3.812, 5.563]
+CRb kmix/a1c b32 rho=10 : 2.518 [2.090, 3.051]
+CRb kmix/a1c b32 rho=30 : 1.464 [1.215, 1.774]
+CRb kmix/a1c b32 rho=100 : 1.003 [0.832, 1.216]
+CRb kmix/a1c b36 rho=3 : 3.230 [2.503, 4.152]
+CRb kmix/a1c b36 rho=10 : 1.769 [1.371, 2.275]
+CRb kmix/a1c b36 rho=30 : 1.028 [0.797, 1.322]
+CRb kmix/a1c b36 rho=100 : 0.705 [0.546, 0.906]
+CRb kmix/a1c b40 rho=3 : 1.431 [1.054, 1.928]
+CRb kmix/a1c b40 rho=10 : 0.782 [0.576, 1.054]
+CRb kmix/a1c b40 rho=30 : 0.454 [0.335, 0.612]
+CRb kmix/a1c b40 rho=100 : 0.311 [0.229, 0.419]
+--- NC3 (A0 inst1/inst2 normalised mean T ratio)
+NC3 b20 : 0.990 [0.859, 1.157]  contains 1
+NC3 b24 : 1.075 [0.912, 1.268]  contains 1
+NC3 b28 : 1.031 [0.883, 1.202]  contains 1
+NC3 b32 : 0.903 [0.727, 1.117]  contains 1
+NC3 b36 : 1.001 [0.772, 1.289]  contains 1
+NC3 b40 : 1.177 [0.787, 1.758]  contains 1
+--- PC4 (A0 raw mean T ratio b+4 / b, expected 4, band [3.0, 5.3])
+PC4 24->28 : 4.575 [4.084, 5.122]
+PC4 28->32 : 3.460 [3.036, 3.947]
+PC4 32->36 : 3.843 [3.198, 4.529]
+PC4 36->40 : 4.547 [3.532, 5.760]
+--- F3 twist/E normalised R ratio
+F3 RT/RE ge28 : 1.002 [0.896, 1.114]
+F3 RT/RE b28 : 1.103 [0.959, 1.260]
+F3 RT/RE b32 : 0.839 [0.684, 1.017]
+F3 RT/RE b36 : 1.014 [0.827, 1.265]
+F3 RT/RE b40 : 1.074 [0.802, 1.408]
+--- exact checks (raw/identity.txt, raw/exhaustive.txt)
+LADDER: x on E 6054, x on E' 5946, ladder-vs-ellmul tests 624000, mismatches 0, infinity cases consistent 0
+NC4: tests 24000, true a verified 24000, wrong a+1 accepted 0 (special a with 2a+1=0 mod n: 0)
+CLASSES curve 1: p=4643 A=3912 x with f!=0 4642 step evaluations 37120 class crossings 0 E-only comps 2 E'-only comps 2 mixed comps 0
+CLASSES curve 2: p=6221 A=2113 x with f!=0 6218 step evaluations 49678 class crossings 0 E-only comps 1 E'-only comps 2 mixed comps 0
+CLASSES curve 3: p=6101 A=5113 x with f!=0 6098 step evaluations 48762 class crossings 0 E-only comps 3 E'-only comps 2 mixed comps 0
+PC1 SB   : n=829 |H|=828 N=414 index=1 in-set a=828 orbit-vs-+-H mismatches=0 closure-vs-znlog mismatches=0
+PC1 SB   walks: 400/400 verified (budget 4069 steps, N=414, dpbits 3); out-of-set a walked 0 solved 0
+PC1 SIDX : n=829 |H|=276 N=138 index=3 in-set a=276 orbit-vs-+-H mismatches=0 closure-vs-znlog mismatches=0
+PC1 SIDX walks: 165/274 verified (budget 2349 steps, N=138, dpbits 3, total trails 4027, DPs 1147, steps 457232); out-of-set a walked 100 solved 0
+PC2: orbit-size checks 60, mismatches (N vs ellmul-orbit vs ladder-BFS) 0
+--- PC5 counter identity, NC1, NC2, PC3
+PC5: trials checked 4152, counter/histogram mismatches 0 (A arms: successful trials with T != adds+degenerate doublings: 1)
+NC1: cells 3, trials 80, cross-side x matches 0, verified solves 0
+NC2: cross cells 6, trials 144, E-vs-E' x matches 0, verified solves 0
+PC3 pc1 b24 i1: 40/40 verified (N=1754961, index 3)
+PC3 pc1 b24 i2: 0/0 verified (N=2, index 3441847)
+PC3 pc1 b24 i4: 40/40 verified (N=2538826, index 3)
+SKIPPED degenerate cell kmixidx b24 i2 : N=2
+SKIPPED degenerate cell nc1 b24 i2 : N=2
+SKIPPED degenerate cell pc1 b24 i2 : N=2
+--- ideal-chain step cost (SB multipliers, S = 0.8 M)
+ideal chain: mean differential ops/step 4.000, mean M 14.625 + 1 (conversion), mean S 8.000, M-equiv excl. I (S=0.8) 22.025
+ladder (analytic) : mean ops/step 6.000, mean M 20.500 + 1, mean S 12.000, M-equiv excl. I (S=0.8) 31.100
+--- measured per-step counters (K arms, SB, E; pooled over all trials and cells)
+STEPCOST kpure : M/step 21.505 (cell range 21.403-21.533), S/step 12.003 (11.944-12.019), I/step 1.000 ; predicted 21.5 M, 12 S, 1 I ; dev M 0.023% S 0.024%
+STEPCOST kmix : M/step 21.498 (cell range 21.269-21.536), S/step 11.999 (11.868-12.021), I/step 1.000 ; predicted 21.5 M, 12 S, 1 I ; dev M -0.009% S -0.009%
+STEPCOST kpureT : M/step 21.495 (cell range 21.450-21.512), S/step 11.997 (11.971-12.007), I/step 1.000 ; predicted 21.5 M, 12 S, 1 I ; dev M -0.021% S -0.022%
+STEPCOST a0 : M/step 2.000, S/step 1.000, I/step 1.000 ; predicted 2 M, 1 S, 1 I (+ doublings)
+STEPCOST a1 : M/step 2.002, S/step 1.001, I/step 1.001 ; predicted 2 M, 1 S, 1 I (+ doublings)
+=== VERDICTS per PREREGISTRATION section 8 ===
+H1/F1: F1 TRIGGERED: ["PC1 S_idx walk recovery 165/274 < 98%"]   [exact orbit/exhaustive mismatches: 0]
+H2/F2: kpure cells (b>=24, good) with R CI entirely outside [1.4,3.0]: 0  []
+       slope kpure: 0.494 [0.482, 0.505] ; inside [0.40,0.60]: YES
+       SR|kpure/a0|ge28 = 1.058 [0.959, 1.170] band [0.8000000000000000000000000000,1.300000000000000000000000000] : not entirely outside
+       SR|kmix/a0|ge28 = 0.787 [0.709, 0.872] band [0.5500000000000000000000000000,0.9000000000000000000000000000] : not entirely outside
+       SR|kmix/a1|ge28 = 0.046 [0.042, 0.049] band [0.7500000000000000000000000000,1.150000000000000000000000000] : CI ENTIRELY OUTSIDE (F2 trigger)
+H3/F3: ladder mismatches 0 of 624000; class crossings 0, mixed components 0; cross-curve x matches 0 in 144 trials; F3 twist ratio b>=28 1.002 [0.896, 1.114]
+H4/F4: measured kpure per-step M 21.505 (pred 21.5) S 12.003 (pred 12) I 1.000; relative deviation M 0.023%, S 0.024% (F4 if |dev| > 3%)
+       kmix/a0 cost ratio at rho=3 (w=0.8, b>=28): 4.625 [4.166, 5.130]  not an improvement
+       kmix/a1 cost ratio at rho=3 (w=0.8, b>=28): 0.268 [0.249, 0.288]  UPPER BOUND < 1 (improvement condition)
+       ordering kpure vs a0 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [1, 1, 1, 1]  => K dearer across the whole band
+       ordering kpure vs a1 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [-1, -1, -1, -1]  => K cheaper across the whole band
+       ordering kmix vs a0 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [1, 1, 1, 0]  => UNRANKED across the band
+       ordering kmix vs a1 over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [-1, -1, -1, -1]  => K cheaper across the whole band
+       ordering kpure vs a1c over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [1, 1, 1, -1]  => UNRANKED across the band
+       ordering kmix vs a1c over rho in {3,10,30,100} (-1 K cheaper (CI<1), +1 K dearer (CI>1), 0 unresolved): [1, 1, 0, -1]  => UNRANKED across the band
+H5/F5: kmix/a1 at rho=3 (w=0.8) per b: b32 0.225 [0.194, 0.257] b36 0.210 [0.178, 0.245] b40 NA  => CI entirely below 1 at all of b32,36,40: NO; verified-solves-only validity (all trials of both arms solved at b32,36,40): NOT VALID (A1 solved at b32 [9, 80], b36 [0, 48], b40 [0, 0] [solved, trials])
+H5/F5: kpure/a1 at rho=3 (w=0.8) per b: b32 0.343 [0.296, 0.395] b36 0.283 [0.245, 0.326] b40 NA  => CI entirely below 1 at all of b32,36,40: NO; verified-solves-only validity (all trials of both arms solved at b32,36,40): NOT VALID (A1 solved at b32 [9, 80], b36 [0, 48], b40 [0, 0] [solved, trials])
+SUPP (a1c = A1 with 8-point cycle test, not preregistered): kmix/a1c at rho=3 w0.8 : b32 4.591 [3.812, 5.563] b36 3.230 [2.503, 4.152] b40 1.431 [1.054, 1.928] ; a1c solved b32 [80, 80] b36 [48, 48] b40 [24, 24]
+SUPP (a1c = A1 with 8-point cycle test, not preregistered): kpure/a1c at rho=3 w0.8 : b32 7.011 [5.805, 8.481] b36 4.353 [3.422, 5.602] b40 1.812 [1.380, 2.420] ; a1c solved b32 [80, 80] b36 [48, 48] b40 [24, 24]
+H5 headline (no improvement over matched A1, F5 as amended): NOT falsified
+wrote out/summary.csv out/costs.csv out/results.json

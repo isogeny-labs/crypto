@@ -1,0 +1,491 @@
+Cloning into '/workspace/assay-standalone-worktree/verification/pqc-assay/upstream'...
+From https://github.com/amarshat/pqc-assay
+ * branch            6b0096f4a2bda9cf07c7347094affc85d9eb24ff -> FETCH_HEAD
+Submodule path 'verification/pqc-assay/upstream': checked out '6b0096f4a2bda9cf07c7347094affc85d9eb24ff'
+upstream=6b0096f4a2bda9cf07c7347094affc85d9eb24ff
+command=check
+argument=
+./scripts/check_target_identity.sh
+>> verifying vendored target bytes (PQClean 202a8f96315f9ed219387a50f7e40d04af037ea8, tracks pq-crystals cbcd8753a43402885c90343cd6335fb54712cda1; HQC f46e54222ffb76706678a9ec8a43cd2188a12ab1)
+   ok    target/pqclean/reduce.c
+   ok    target/pqclean/ntt.c
+   ok    target/pqclean/reduce.h
+   ok    target/pqclean/ntt.h
+   ok    target/pqclean/params.h
+   ok    target/pqclean/poly.c
+   ok    target/pqclean/poly.h
+   ok    target/pqclean/rounding.h
+   ok    target/pqclean/symmetric.h
+   ok    target/pqclean/fips202.h
+   ok    target/pqclean/polyvec.c
+   ok    target/pqclean/polyvec.h
+   ok    target/pqclean/sign.c
+   ok    target/pqclean/sign.h
+   ok    target/pqclean/packing.h
+   ok    target/pqclean/randombytes.h
+   ok    target/hqc/LICENSE
+   ok    target/hqc/gf2x.c
+   ok    target/hqc/gf2x.h
+   ok    target/hqc/hqc-1/api.h
+   ok    target/hqc/hqc-1/parameters.h
+   ok    target/hqc/hqc-3/api.h
+   ok    target/hqc/hqc-3/parameters.h
+   ok    target/hqc/hqc-5/api.h
+   ok    target/hqc/hqc-5/parameters.h
+   ok    target/hqc/gf.c
+   ok    target/hqc/gf.h
+   ok    target/hqc/reed_solomon.c
+   ok    target/hqc/fft.h
+   ok    target/hqc/crypto_memset.h
+   ok    target/hqc/hqc-1/reed_solomon.h
+   ok    target/hqc/hqc-3/reed_solomon.h
+   ok    target/hqc/hqc-5/reed_solomon.h
+   ok    target/hqc/avx2/gf2x.h
+   ok    target/hqc/avx2/hqc-1/gf2x.c
+   ok    target/hqc/avx2/hqc-3/gf2x.c
+   ok    target/hqc/avx2/hqc-5/gf2x.c
+   ok    target/hqc/avx2/hqc-1/parameters.h
+   ok    target/hqc/avx2/hqc-3/parameters.h
+   ok    target/hqc/avx2/hqc-5/parameters.h
+   ok    target/hqc/reed_muller.c
+   ok    target/hqc/reed_muller.h
+   ok    target/hqc/data_structures.h
+   ok    target/hqc/code.c
+   ok    target/hqc/code.h
+   ok    target/hqc/crypto_memset.c
+>> target identity OK: vendored bytes match the pinned snapshot.
+>> to confirm against pq-crystals: diff target/pqclean against pq-crystals/dilithium@cbcd8753a43402885c90343cd6335fb54712cda1
+   (ref/reduce.c, ref/ntt.c, ...), modulo the PQCLEAN_MLDSA44_CLEAN_ prefix.
+== 1. every SAW obligation has a mutant paired to the SAME spec ==
+  invntt_nsw_dump.saw      exempt: dump-only variant of invntt_nsw_probe.saw: it writes SMT-LIB2 goals and solves nothing, so there is no obligation here for a mutant to falsify
+  invntt_nsw_probe.saw     exempt: preserved negative result, not in the pipeline: the verification itself did not complete in ~55 h, so a mutant of it could not complete either
+  mldsa_ntt.saw            acc_spec               obligations=1 mutants=1
+  mldsa_ntt.saw            caddq_spec             obligations=1 mutants=1
+  mldsa_ntt.saw            freeze_spec            obligations=1 mutants=1
+  mldsa_ntt.saw            invntt_spec            obligations=1 mutants=1
+  mldsa_ntt.saw            matrix_amut_spec       obligations=0 mutants=1
+  mldsa_ntt.saw            matrix_spec            obligations=1 mutants=1
+  mldsa_ntt.saw            mont_reduce_uncond_spec obligations=1 mutants=1
+  mldsa_ntt.saw            montgomery_reduce_spec obligations=1 mutants=1
+  mldsa_ntt.saw            ntt_spec               obligations=1 mutants=1
+  mldsa_ntt.saw            pointwise_alias_b_spec obligations=1 mutants=1
+  mldsa_ntt.saw            pointwise_spec         obligations=1 mutants=1
+  mldsa_ntt.saw            poly_add_alias_spec    obligations=1 mutants=1
+  mldsa_ntt.saw            poly_invntt_spec       obligations=1 mutants=1
+  mldsa_ntt.saw            poly_ntt_spec          obligations=1 mutants=1
+  mldsa_ntt.saw            poly_reduce_spec       obligations=1 mutants=1
+  mldsa_ntt.saw            poly_shiftl_spec       obligations=1 mutants=1
+  mldsa_ntt.saw            poly_sub_alias_spec    obligations=1 mutants=1
+  mldsa_ntt.saw            polyveck_invntt_spec   obligations=1 mutants=1
+  mldsa_ntt.saw            polyveck_ntt_spec      obligations=1 mutants=1
+  mldsa_ntt.saw            polyveck_pwpoly_alias_spec obligations=1 mutants=1
+  mldsa_ntt.saw            polyveck_pwpoly_amut_spec obligations=0 mutants=1
+  mldsa_ntt.saw            polyveck_pwpoly_spec   obligations=1 mutants=1
+  mldsa_ntt.saw            polyveck_pwpoly_vmut_spec obligations=0 mutants=1
+  mldsa_ntt.saw            polyveck_reduce_spec   obligations=1 mutants=1
+  mldsa_ntt.saw            polyveck_shiftl_spec   obligations=1 mutants=1
+  mldsa_ntt.saw            polyveck_sub_alias_spec obligations=1 mutants=1
+  mldsa_ntt.saw            polyvecl_invntt_spec   obligations=1 mutants=1
+  mldsa_ntt.saw            polyvecl_ntt_spec      obligations=1 mutants=1
+  mldsa_ntt.saw            polyvecl_pwpoly_spec   obligations=1 mutants=1
+  mldsa_ntt.saw            reduce32_spec          obligations=1 mutants=1
+  mldsa_ntt.saw            reduce32_uncond_spec   obligations=1 mutants=1
+  mlkem_ntt.saw            barrett_reduce_spec    obligations=1 mutants=1
+  mlkem_ntt.saw            invntt_spec            obligations=1 mutants=1
+  mlkem_ntt.saw            mont_reduce_uncond_spec obligations=1 mutants=1
+  mlkem_ntt.saw            montgomery_reduce_spec obligations=1 mutants=1
+  mlkem_ntt.saw            ntt_spec               obligations=1 mutants=1
+  mlkem_reduce.saw         barrett_reduce_spec    obligations=1 mutants=1
+  mlkem_reduce.saw         montgomery_reduce_spec obligations=1 mutants=1
+  ntt_nsw.saw              exempt: the single obligation here took 44966 s (12.5 h) with bitwuzla, so a paired
+  poly_nsw.saw             acc_nsw_spec           obligations=1 mutants=2
+  poly_nsw.saw             matrix_nsw_spec        obligations=1 mutants=1
+  poly_nsw.saw             mont_nsw_spec          obligations=1 mutants=1
+  poly_nsw.saw             pointwise_alias_b_nsw_spec obligations=1 mutants=1
+  poly_nsw.saw             pointwise_nsw_spec     obligations=1 mutants=1
+  poly_nsw.saw             poly_add_nsw_spec      obligations=1 mutants=1
+  poly_nsw.saw             poly_add_tight_spec    obligations=1 mutants=1
+  poly_nsw.saw             poly_reduce_nsw_spec   obligations=1 mutants=1
+  poly_nsw.saw             poly_sub_nsw_spec      obligations=1 mutants=1
+  poly_nsw.saw             polyveck_pwpoly_alias_nsw_spec obligations=1 mutants=1
+  poly_nsw.saw             polyveck_pwpoly_nsw_spec obligations=1 mutants=1
+  poly_nsw.saw             polyveck_reduce_nsw_spec obligations=1 mutants=1
+  poly_nsw.saw             polyveck_sub_nsw_spec  obligations=1 mutants=1
+  poly_nsw.saw             polyvecl_pwpoly_nsw_spec obligations=1 mutants=1
+  poly_nsw.saw             reduce32_nsw_spec      obligations=1 mutants=1
+  sign_compose.saw         keypair_spec           obligations=1 mutants=5
+  sign_compose.saw         sign_spec              obligations=5 mutants=8
+  sign_compose.saw         verify_spec            obligations=1 mutants=7
+  avx_1.saw                toom_spec              obligations=1 mutants=1
+  avx_1.saw                vm_spec                obligations=1 mutants=1
+  avx_3.saw                toom_spec              obligations=1 mutants=1
+  avx_3.saw                vm_spec                obligations=1 mutants=1
+  avx_5.saw                toom_spec              obligations=1 mutants=1
+  avx_5.saw                vm_spec                obligations=1 mutants=1
+  code_1.saw               clmul8_spec            obligations=1 mutants=1
+  code_1.saw               code_spec              obligations=1 mutants=1
+  code_1.saw               gfmul_spec             obligations=1 mutants=1
+  code_1.saw               reduce_spec            obligations=1 mutants=1
+  code_1.saw               rm_spec                obligations=1 mutants=1
+  code_1.saw               rs_spec                obligations=1 mutants=1
+  code_3.saw               clmul8_spec            obligations=1 mutants=1
+  code_3.saw               code_spec              obligations=1 mutants=1
+  code_3.saw               gfmul_spec             obligations=1 mutants=1
+  code_3.saw               reduce_spec            obligations=1 mutants=1
+  code_3.saw               rm_spec                obligations=1 mutants=1
+  code_3.saw               rs_spec                obligations=1 mutants=1
+  code_5.saw               clmul8_spec            obligations=1 mutants=1
+  code_5.saw               code_spec              obligations=1 mutants=1
+  code_5.saw               gfmul_spec             obligations=1 mutants=1
+  code_5.saw               reduce_spec            obligations=1 mutants=1
+  code_5.saw               rm_spec                obligations=1 mutants=1
+  code_5.saw               rs_spec                obligations=1 mutants=1
+  gf.saw                   clmul8_spec            obligations=1 mutants=1
+  gf.saw                   inverse_spec           obligations=1 mutants=1
+  gf.saw                   mul_spec               obligations=1 mutants=1
+  gf.saw                   reduce_spec            obligations=1 mutants=1
+  gf.saw                   square_spec            obligations=1 mutants=1
+  karatsuba_1.saw          kara_138_spec          obligations=1 mutants=1
+  karatsuba_1.saw          kara_139_spec          obligations=1 mutants=1
+  karatsuba_1.saw          kara_17_spec           obligations=1 mutants=1
+  karatsuba_1.saw          kara_18_spec           obligations=1 mutants=1
+  karatsuba_1.saw          kara_277_spec          obligations=1 mutants=1
+  karatsuba_1.saw          kara_34_spec           obligations=1 mutants=1
+  karatsuba_1.saw          kara_35_spec           obligations=1 mutants=1
+  karatsuba_1.saw          kara_69_spec           obligations=1 mutants=1
+  karatsuba_1.saw          kara_70_spec           obligations=1 mutants=1
+  karatsuba_1.saw          kara_8_spec            obligations=1 mutants=1
+  karatsuba_1.saw          kara_9_spec            obligations=1 mutants=1
+  karatsuba_1.saw          sb_8_spec              obligations=1 mutants=1
+  karatsuba_1.saw          sb_9_spec              obligations=1 mutants=1
+  karatsuba_1.saw          vect_mul_spec          obligations=1 mutants=1
+  karatsuba_3.saw          kara_140_spec          obligations=1 mutants=1
+  karatsuba_3.saw          kara_141_spec          obligations=1 mutants=1
+  karatsuba_3.saw          kara_17_spec           obligations=1 mutants=1
+  karatsuba_3.saw          kara_18_spec           obligations=1 mutants=1
+  karatsuba_3.saw          kara_280_spec          obligations=1 mutants=1
+  karatsuba_3.saw          kara_281_spec          obligations=1 mutants=1
+  karatsuba_3.saw          kara_35_spec           obligations=1 mutants=1
+  karatsuba_3.saw          kara_36_spec           obligations=1 mutants=1
+  karatsuba_3.saw          kara_561_spec          obligations=1 mutants=1
+  karatsuba_3.saw          kara_70_spec           obligations=1 mutants=1
+  karatsuba_3.saw          kara_71_spec           obligations=1 mutants=1
+  karatsuba_3.saw          kara_8_spec            obligations=1 mutants=1
+  karatsuba_3.saw          kara_9_spec            obligations=1 mutants=1
+  karatsuba_3.saw          sb_8_spec              obligations=1 mutants=1
+  karatsuba_3.saw          sb_9_spec              obligations=1 mutants=1
+  karatsuba_3.saw          vect_mul_spec          obligations=1 mutants=1
+  karatsuba_5.saw          kara_112_spec          obligations=1 mutants=1
+  karatsuba_5.saw          kara_113_spec          obligations=1 mutants=1
+  karatsuba_5.saw          kara_14_spec           obligations=1 mutants=1
+  karatsuba_5.saw          kara_15_spec           obligations=1 mutants=1
+  karatsuba_5.saw          kara_225_spec          obligations=1 mutants=1
+  karatsuba_5.saw          kara_226_spec          obligations=1 mutants=1
+  karatsuba_5.saw          kara_28_spec           obligations=1 mutants=1
+  karatsuba_5.saw          kara_29_spec           obligations=1 mutants=1
+  karatsuba_5.saw          kara_450_spec          obligations=1 mutants=1
+  karatsuba_5.saw          kara_451_spec          obligations=1 mutants=1
+  karatsuba_5.saw          kara_56_spec           obligations=1 mutants=1
+  karatsuba_5.saw          kara_57_spec           obligations=1 mutants=1
+  karatsuba_5.saw          kara_901_spec          obligations=1 mutants=1
+  karatsuba_5.saw          sb_14_spec             obligations=1 mutants=1
+  karatsuba_5.saw          sb_15_spec             obligations=1 mutants=1
+  karatsuba_5.saw          vect_mul_spec          obligations=1 mutants=1
+  assertion.saw            create_spec            obligations=1 mutants=1
+  evidence.saw             reasm_spec             obligations=1 mutants=1
+  hybrid.saw               accept_spec            obligations=1 mutants=2
+  hybrid_plain_z3.saw      exempt: this script exists to show the obligations passing when they should not, so a
+  nonce.saw                accept_spec            obligations=1 mutants=1
+  nonce_exp.saw            accept_spec            obligations=1 mutants=1
+  tbs_v1.saw               parse_reject_spec      obligations=1 mutants=1
+  tbs_v1.saw               parse_spec             obligations=1 mutants=1
+  tbs_v1.saw               serialize_spec         obligations=1 mutants=1
+  tbs_v2.saw               parse_reject_spec      obligations=1 mutants=1
+  tbs_v2.saw               parse_spec             obligations=1 mutants=1
+  tbs_v2.saw               serialize_spec         obligations=1 mutants=1
+  validate.saw             checked_spec           obligations=1 mutants=2
+  validate.saw             validate_spec          obligations=1 mutants=1
+  hint_canonical.saw       canonical_spec         obligations=1 mutants=1
+  eid.saw                  valid_spec             obligations=1 mutants=3
+== 2. the ProVerif gate derives its own witness and ablates its guard ==
+  witness and ablation are generated from the model, not checked in
+== 2b. every mutant guard names a function that exists ==
+  PQCLEAN_MLDSA44_CLEAN_montgomery_reduce        exists
+  PQCLEAN_MLDSA44_CLEAN_reduce32                 exists
+  PQCLEAN_MLDSA44_CLEAN_caddq                    exists
+  PQCLEAN_MLDSA44_CLEAN_freeze                   exists
+  PQCLEAN_MLDSA44_CLEAN_montgomery_reduce        exists
+  PQCLEAN_MLDSA44_CLEAN_ntt                      exists
+  PQCLEAN_MLDSA44_CLEAN_invntt_tomont            exists
+  PQCLEAN_MLDSA44_CLEAN_poly_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_poly_add                 exists
+  PQCLEAN_MLDSA44_CLEAN_reduce32                 exists
+  PQCLEAN_MLDSA44_CLEAN_poly_reduce              exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_pointwise_acc_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_poly_ntt                 exists
+  PQCLEAN_MLDSA44_CLEAN_poly_invntt_tomont       exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_ntt             exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_ntt             exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_invntt_tomont   exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_invntt_tomont   exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_reduce          exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyvec_matrix_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyvec_matrix_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_poly_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_poly_sub                 exists
+  PQCLEAN_MLDSA44_CLEAN_poly_shiftl              exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_shiftl          exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_sub             exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  PQCLEAN_MLKEM512_CLEAN_montgomery_reduce       exists
+  PQCLEAN_MLKEM512_CLEAN_montgomery_reduce       exists
+  PQCLEAN_MLKEM512_CLEAN_ntt                     exists
+  PQCLEAN_MLKEM512_CLEAN_barrett_reduce          exists
+  PQCLEAN_MLKEM512_CLEAN_invntt                  exists
+  PQCLEAN_MLKEM512_CLEAN_montgomery_reduce       exists
+  PQCLEAN_MLKEM512_CLEAN_barrett_reduce          exists
+  PQCLEAN_MLDSA44_CLEAN_montgomery_reduce        exists
+  PQCLEAN_MLDSA44_CLEAN_reduce32                 exists
+  PQCLEAN_MLDSA44_CLEAN_poly_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_poly_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_poly_add                 exists
+  PQCLEAN_MLDSA44_CLEAN_poly_sub                 exists
+  PQCLEAN_MLDSA44_CLEAN_poly_reduce              exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_pointwise_acc_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_poly_add                 exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_pointwise_acc_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyvec_matrix_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_sub             exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_reduce          exists
+  PQCLEAN_MLDSA44_CLEAN_caddq                    exists
+  PQCLEAN_MLDSA44_CLEAN_poly_caddq               exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_sub             exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyvec_matrix_pointwise_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_verify       exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_verify       exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_verify       exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_verify       exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_verify       exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_verify       exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_verify       exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_add             exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_keypair      exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_keypair      exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_keypair      exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_keypair      exists
+  PQCLEAN_MLDSA44_CLEAN_crypto_sign_keypair      exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_add             exists
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_pointwise_poly_montgomery exists
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pointwise_poly_montgomery exists
+  karat_mult_1                                   exists
+  karat_mult_2                                   exists
+  karat_mult_4                                   exists
+  karat_mult_8                                   exists
+  karat_mult3                                    exists
+  toom_3_mult                                    exists
+  vect_mul                                       exists
+  karat_mult_1                                   exists
+  karat_mult_2                                   exists
+  karat_mult_4                                   exists
+  karat_mult_8                                   exists
+  karat_mult_16                                  exists
+  karat_mult3                                    exists
+  toom_3_mult                                    exists
+  vect_mul                                       exists
+  karat_mult_1                                   exists
+  karat_mult_2                                   exists
+  karat_mult_4                                   exists
+  karat_mult_8                                   exists
+  karat_mult_16                                  exists
+  karat_mult_5                                   exists
+  toom_3_mult                                    exists
+  vect_mul                                       exists
+  gf_carryless_mul                               exists
+  gf_reduce                                      exists
+  gf_mul                                         exists
+  reed_solomon_encode                            exists
+  reed_muller_encode                             exists
+  code_encode                                    exists
+  gf_carryless_mul                               exists
+  gf_reduce                                      exists
+  gf_mul                                         exists
+  reed_solomon_encode                            exists
+  reed_muller_encode                             exists
+  code_encode                                    exists
+  gf_carryless_mul                               exists
+  gf_reduce                                      exists
+  gf_mul                                         exists
+  reed_solomon_encode                            exists
+  reed_muller_encode                             exists
+  code_encode                                    exists
+  gf_carryless_mul                               exists
+  gf_reduce                                      exists
+  gf_mul                                         exists
+  gf_square                                      exists
+  gf_inverse                                     exists
+  schoolbook_mul                                 exists
+  karatsuba_mul                                  exists
+  schoolbook_mul                                 exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  vect_mul                                       exists
+  schoolbook_mul                                 exists
+  karatsuba_mul                                  exists
+  schoolbook_mul                                 exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  vect_mul                                       exists
+  schoolbook_mul                                 exists
+  karatsuba_mul                                  exists
+  schoolbook_mul                                 exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  karatsuba_mul                                  exists
+  vect_mul                                       exists
+  qseal_create_assertion_unbound_nonce           exists
+  qseal_evidence_reassemble_nocomplete           exists
+  qseal_hybrid_accept_downgrade                  exists
+  qseal_hybrid_accept_othertbs                   exists
+  qseal_nonce_accept_noconsume                   exists
+  qseal_nonce_exp_accept_evictlive               exists
+  qseal_tbs_serialize_aliased                    exists
+  qseal_tbs_parse_shifted                        exists
+  qseal_tbs_parse_nomagic                        exists
+  qseal_tbs_v2_serialize_nocommit                exists
+  qseal_tbs_v2_parse_nomagic                     exists
+  qseal_tbs_v2_parse_shifted                     exists
+  qseal_create_assertion_checked_nosuitecheck    exists
+  qseal_create_assertion_checked_allowobserved   exists
+  qseal_validate_request_wideorigin              exists
+  qseal_hint_canonical_lax                       exists
+  gsma_eid_valid_noe118                          exists
+  gsma_eid_valid_latereduce                      exists
+  gsma_eid_valid_nodigits                        exists
+== 3. every assumed spec is justified in docs/ASSUMPTIONS.md ==
+  llvm.x86.avx.ldu.dq.256            justified (avx_1.saw)
+  llvm.x86.avx2.psrli.q              justified (avx_1.saw)
+  llvm.x86.avx2.pslli.q              justified (avx_1.saw)
+  llvm.x86.avx.ldu.dq.256            justified (avx_3.saw)
+  llvm.x86.avx2.psrli.q              justified (avx_3.saw)
+  llvm.x86.avx2.pslli.q              justified (avx_3.saw)
+  llvm.x86.avx.ldu.dq.256            justified (avx_5.saw)
+  llvm.x86.avx2.psrli.q              justified (avx_5.saw)
+  llvm.x86.avx2.pslli.q              justified (avx_5.saw)
+  PQCLEAN_MLDSA44_CLEAN_unpack_pk    justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_unpack_sig   justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_chknorm justified (sign_compose.saw)
+  shake256                           justified (sign_compose.saw)
+  shake256_inc_init                  justified (sign_compose.saw)
+  shake256_inc_absorb                justified (sign_compose.saw)
+  shake256_inc_absorb                justified (sign_compose.saw)
+  shake256_inc_absorb                justified (sign_compose.saw)
+  shake256_inc_absorb                justified (sign_compose.saw)
+  shake256_inc_absorb                justified (sign_compose.saw)
+  shake256_inc_finalize              justified (sign_compose.saw)
+  shake256_inc_squeeze               justified (sign_compose.saw)
+  shake256_inc_squeeze               justified (sign_compose.saw)
+  shake256_inc_ctx_release           justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_poly_challenge justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyvec_matrix_expand justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_use_hint justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_pack_w1 justified (sign_compose.saw)
+  PQCLEAN_randombytes                justified (sign_compose.saw)
+  shake256                           justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_uniform_eta justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_uniform_eta justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_power2round justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_pack_pk      justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_pack_sk      justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_unpack_sk    justified (sign_compose.saw)
+  shake256                           justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_uniform_gamma1 justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_decompose justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_pack_sig     justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyvecl_chknorm justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_chknorm justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_chknorm justified (sign_compose.saw)
+  PQCLEAN_MLDSA44_CLEAN_polyveck_make_hint justified (sign_compose.saw)
+  qseal_verify_ecdsa                 justified (hybrid.saw)
+  qseal_verify_mldsa                 justified (hybrid.saw)
+  qseal_verify_ecdsa                 justified (hybrid_plain_z3.saw)
+  qseal_verify_mldsa                 justified (hybrid_plain_z3.saw)
+  47 assumed spec(s) in the Q-SEAL artifact
+  (not gated here) bit_unpack_smoke.saw: ml_dsa::param::{impl#5}::split_hint::_inst3119af6124a351f4
+  (not gated here) hint.saw: core::hint::black_box::_inst2efc261c2cb07b6c
+  (not gated here) hint.saw: cmov::backends::aarch64::{impl#1}::cmovnz
+  (not gated here) hint.saw: cmov::backends::aarch64::{impl#4}::cmoveq
+  (not gated here) field_ops_bridged.saw: ml_dsa::algebra::{impl#6}::barrett_reduce
+  (not gated here) layer_assumed_barrett.saw: module_lattice::algebra::{impl#3}::neg::_instd1dae7dc341bae50
+  (not gated here) layer_assumed_barrett.saw: module_lattice::algebra::{impl#4}::add::_instd1dae7dc341bae50
+  (not gated here) layer_assumed_barrett.saw: module_lattice::algebra::{impl#5}::sub::_instd1dae7dc341bae50
+  (not gated here) layer_assumed_barrett.saw: module_lattice::algebra::{impl#6}::mul::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_fwd.saw: module_lattice::algebra::{impl#3}::neg::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_fwd.saw: module_lattice::algebra::{impl#4}::add::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_fwd.saw: module_lattice::algebra::{impl#5}::sub::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_fwd.saw: module_lattice::algebra::{impl#6}::mul::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_inv.saw: module_lattice::algebra::{impl#3}::neg::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_inv.saw: module_lattice::algebra::{impl#4}::add::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_inv.saw: module_lattice::algebra::{impl#5}::sub::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_inv.saw: module_lattice::algebra::{impl#6}::mul::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_smoke.saw: module_lattice::algebra::{impl#3}::neg::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_smoke.saw: module_lattice::algebra::{impl#4}::add::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_smoke.saw: module_lattice::algebra::{impl#5}::sub::_instd1dae7dc341bae50
+  (not gated here) layer_ntt_smoke.saw: module_lattice::algebra::{impl#6}::mul::_instd1dae7dc341bae50
+  (not gated here) reduce.saw: core::hint::black_box::_inst2efc261c2cb07b6c
+  (not gated here) reduce.saw: cmov::backends::aarch64::{impl#1}::cmovnz
+  (not gated here) scalar.saw: core::hint::black_box::_inst2efc261c2cb07b6c
+  (not gated here) scalar.saw: cmov::backends::aarch64::{impl#1}::cmovnz
+  (not gated here) scalar.saw: cmov::backends::aarch64::{impl#4}::cmoveq
+== 3b. the by-eval oracle surface matches what is declared ==
+  by-eval uses: 88, matching the declared count
+  README by-eval figures: 88 total, 85 in make verify, matching the script
+== 4. every mutation figure in the docs agrees ==
+  all mutation figures agree: 55/58
+== 5. paths cited in comments exist ==
+  all cited paths resolve
+== 6. SAW preconditions that assume attacker-controlled shape (review each) ==
+  qseal/proof/tbs_v1.saw:61:    llvm_precond {{ (take`{5} inp) == "QSEAL" }};
+  qseal/proof/tbs_v1.saw:87:    llvm_precond {{ ~ (well_formed inp) }};
+  qseal/proof/tbs_v2.saw:64:    llvm_precond {{ (take`{5} inp) == "QSEAL" }};
+  qseal/proof/tbs_v2.saw:87:    llvm_precond {{ ~ (well_formed2 inp) }};
+  (each of these narrows the verified domain: check the rejecting direction is verified too)
+
+claim-lint OK
+hqc-1: 277 words, sizes [8, 9, 17, 18, 34, 35, 69, 70, 138, 139, 277], tmp_buffer 4313 of 4432 words
+hqc-3: 561 words, sizes [8, 9, 17, 18, 35, 36, 70, 71, 140, 141, 280, 281, 561], tmp_buffer 8865 of 8976 words
+hqc-5: 901 words, sizes [14, 15, 28, 29, 56, 57, 112, 113, 225, 226, 450, 451, 901], tmp_buffer 14217 of 14416 words

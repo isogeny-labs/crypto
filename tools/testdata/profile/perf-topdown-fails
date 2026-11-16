@@ -1,0 +1,12 @@
+#!/bin/bash
+# Test double for tools/test_profile.sh: a perf that reports a hardware PMU
+# (cycles:u counts) but cannot schedule the top-down metric group.  It writes
+# only the "# started on" header to -o FILE, as perf 6.8 did on the GitHub
+# ubuntu-24.04 runner, and exits 1.  Its numbers are invented.
+case "$1" in
+  --version) echo "perf version 6.8.12";;
+  list) echo "TopdownL1";;
+  stat) o=""; prev=""; for a in "$@"; do [ "$prev" = -o ] && o=$a; prev=$a; done
+        if [ -n "$o" ]; then echo "# started on Tue Oct 20 19:37:28 2026" > "$o"; echo "" >> "$o"; echo "Cannot find metric or group TopdownL1" >&2; exit 1; fi
+        echo "123,,cycles:u,100,100.00,,";;
+esac

@@ -1,0 +1,124 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "XP-20261029-srenew-deferred-guard P24: deferred-guard stride-renew at N 130 against the walk baseline N 162",
+ "description": "Frozen confirmatory test (PROTOCOL.md): ic.pipeline targets stride-renew-deferred-guard with prime-abscissa:size=130 against the 24-bit prime-field baseline (walk, prime-abscissa:size=162), oracle mitm:negation_folded=1, 2x2 descriptive factorial (guard placement x N), on two fresh 24-bit prime-order curves with matched rho and A/A arms. Public synthetic curves and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 24,
+    "seed": 20261029243
+   },
+   {
+    "kind": "prime_search",
+    "bits": 24,
+    "seed": 20261029244
+   }
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 20261029246,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "walk",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=162",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "4243777",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "srenew",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=162",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "4243777",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "dg",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=162",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "4243777",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "srenew-small",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=130",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "4243777",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "dg-small",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=130",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "4243777",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "walk-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=162",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "4243777",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 6,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261029248,
+  "isolation_required": "L2",
+  "timeout_seconds": 1800
+ }
+}

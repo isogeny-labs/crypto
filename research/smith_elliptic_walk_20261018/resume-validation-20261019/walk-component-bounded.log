@@ -1,0 +1,35 @@
+   Compiling smith-resume-validation v0.1.0 (/Volumes/SSD990-2/research-resume-2026-10-19/smith-native-validation)
+    Finished `release` profile [optimized] target(s) in 1.91s
+     Running `/Volumes/SSD990-2/research-resume-2026-10-19/smith-native-target/release/examples/walk_diagnostic`
+node 0 key=Some((0, 183684, 1)) back=None weak=false
+node 1 key=Some((0, 48150, -1)) back=Some(0) weak=false
+node 2 key=Some((0, 226412, 1)) back=Some(0) weak=false
+reflect
+node 3 key=Some((0, 48150, -1)) back=Some(0) weak=false
+node 4 key=Some((0, 183684, 1)) back=Some(0) weak=false
+reflect
+node 5 key=Some((0, 48150, -1)) back=Some(0) weak=false
+node 6 key=Some((0, 5043, 1)) back=Some(0) weak=false
+reflect
+node 7 key=Some((0, 48150, -1)) back=Some(0) weak=false
+node 8 key=Some((0, 226412, 1)) back=Some(0) weak=false
+reflect
+node 9 key=Some((0, 48150, -1)) back=Some(0) weak=false
+node 10 key=Some((0, 183684, 1)) back=Some(0) weak=false
+reflect
+node 11 key=Some((0, 48150, -1)) back=Some(0) weak=false
+closed-component key=(0, 183684, 1) edges=1 weak=false
+closed-component key=(0, 48150, -1) edges=3 weak=false
+closed-component key=(0, 226412, 1) edges=1 weak=false
+closed-component key=(0, 5043, 1) edges=1 weak=false
+component closed with 4 classes
+fixture seed=0 passed=false nodes=2 hits=0
+fixture seed=1 passed=false nodes=2000 hits=0
+fixture seed=2 passed=true nodes=4 hits=1
+fixture seed=3 passed=false nodes=2000 hits=0
+fixture seed=4 passed=true nodes=31 hits=1
+fixture seed=5 passed=false nodes=2000 hits=0
+fixture seed=6 passed=true nodes=1 hits=1
+fixture seed=7 passed=false nodes=2 hits=0
+p=7 sampled kind counts=[6, 9, 9]
+p=11 sampled kind counts=[0, 11, 13]

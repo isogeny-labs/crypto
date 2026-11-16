@@ -25,16 +25,47 @@
 #   GITHUB_OWNER        owner of the repositories              (aburan28)
 #   CONDUCTOR_VERSION   go module version of conductor         (main)
 #   CAIRN_REV           cairn git revision                     (default branch)
+#   CAIRN_GIT           cairn repository        (https://github.com/aburan28/cairn)
 #   SAGE_VERSION        SageMath version                       (10.9)
 #   SAGE_PREFIX         micromamba root for the Sage env       (/opt/conda-sage, or ~/.local/conda-sage without root)
+#   SAGE_LEAN=1         install sagelib + maxima (~3 GiB) instead of the full
+#                       sage metapackage (~8 GiB); for cloud sessions
+#   SAGE_MIN_FREE_GB    free space Sage needs before it installs  (10, lean 4)
+#   GITHUB_LAZY=1       configure the git credential helper even when no
+#                       credential is set yet: it reads GH_APP_* or
+#                       GH_SERVICE_TOKEN at use time (cloud setup scripts,
+#                       which run before the session's variables exist)
 #   GO_VERSION          Go installed when go is missing/old    (1.26.9)
+#   GO_INSTALL_DIR      where that Go goes                     (/usr/local/go)
 #   NODE_MAJOR          Node.js major version                  (22)
 #   WITH_GEMINI=1       also install @google/gemini-cli
 #   WITH_LATEX=1        also install a TeX Live (papers/, iacr-eprint skill)
 #   WITH_RUST_BUILD=1   also `cargo build --release` the crypto workspace (slow)
+#   CLONE_KEEP_RE       ERE of paths a partial clone keeps on disk even when
+#                       over CLONE_BLOB_LIMIT (src/, include/, source files)
+#   CLONE_REPOS         space-separated repos to clone when missing (all three);
+#                       repos already in $WORKSPACE are set up either way
+#
+# GitHub service-account credentials (the `github` step). Never commit them:
+# set them as secrets in the environment (cloud: environment settings, Network
+# secrets or environment variables; elsewhere: your shell or a secrets manager).
+#   GH_APP_ID, GH_APP_INSTALLATION_ID   a GitHub App and its installation, with
+#   GH_APP_PRIVATE_KEY                  the App's PEM private key (or
+#   GH_APP_PRIVATE_KEY_FILE             a path to it); tokens are minted per use
+#   GH_SERVICE_TOKEN                    otherwise: a machine-user token (PAT)
+#   GH_SERVICE_HOST                     host the credential is for (github.com)
+#   GH_SERVICE_API                      tests only: a loopback stand-in for its API
+#
+# .claude/hooks/session-start.sh runs this in cloud sessions (docs/CONDUCTOR.md).
 set -uo pipefail   # no -e: one failed component warns and the rest still run
 
-ALL_COMPONENTS=(system rust go node python conductor cairn sage agents repos control-plane)
+case "${WORKSPACE_OFFLINE:-0}" in
+  0|'') ;;
+  1) exec bash "$(cd "$(dirname "$0")/.." && pwd)/scripts/private-workspace.sh" check ;;
+  *) echo "WORKSPACE_OFFLINE must be 0 or 1" >&2; exit 2 ;;
+esac
+
+ALL_COMPONENTS=(system rust go node python conductor cairn sage agents cloud-cli github repos isolab control-plane)
 
 WORKSPACE="${WORKSPACE:-$HOME/src}"
 GITHUB_OWNER="${GITHUB_OWNER:-aburan28}"
@@ -43,7 +74,8 @@ SAGE_VERSION="${SAGE_VERSION:-10.9}"
 GO_VERSION="${GO_VERSION:-1.26.9}"
 GO_MIN="1.25"
 NODE_MAJOR="${NODE_MAJOR:-22}"
-REPOS=(crypto cryptanalysis crypto-autoresearcher)
+REPOS=(crypto cryptanalysis crypto-autoresearcher cryptanalysis-rl)
+CLONE_REPOS="${CLONE_REPOS-${REPOS[*]}}"
 
 DRY_RUN=0
 declare -A SKIP=()
@@ -99,12 +131,16 @@ LOCAL_BIN="$HOME/.local/bin"
 mkdir -p "$LOCAL_BIN"
 export PATH="$LOCAL_BIN:$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$PATH"
 
-# Every PATH entry this script relies on, written once to the user's shell rc.
+# Every PATH entry this script relies on, written once to the user's shell rc,
+# and to $CLAUDE_ENV_FILE when a Claude Code SessionStart hook runs this.
 persist_path() {
   local line="$1" rc
+  if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+    grep -qxF -- "$line" "$CLAUDE_ENV_FILE" 2>/dev/null || run sh -c 'printf "%s\n" "$1" >> "$2"' sh "$line" "$CLAUDE_ENV_FILE"
+  fi
   for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
     [ -f "$rc" ] || [ "$rc" = "$HOME/.bashrc" ] || continue
-    grep -qxF "$line" "$rc" 2>/dev/null || run sh -c "printf '%s\n' '$line' >> '$rc'"
+    grep -qxF -- "$line" "$rc" 2>/dev/null || run sh -c 'printf "%s\n" "$1" >> "$2"' sh "$line" "$rc"
   done
 }
 
@@ -120,6 +156,12 @@ install_system() {
         pari-gp libpari-dev postgresql postgresql-contrib libpq-dev
         poppler-utils ghostscript graphviz)
       [ "${WITH_LATEX:-0}" = 1 ] && pkgs+=(texlive-latex-extra texlive-science texlive-fonts-recommended latexmk)
+      local missing=() p
+      for p in "${pkgs[@]}"; do
+        dpkg-query -W -f='${Status}' "$p" 2>/dev/null | grep -q 'install ok installed' || missing+=("$p")
+      done
+      if [ "${#missing[@]}" -eq 0 ]; then ok "all ${#pkgs[@]} apt packages present"; return; fi
+      pkgs=("${missing[@]}")
       as_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq || true
       as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends "${pkgs[@]}" \
         || warn "some apt packages failed; re-run or install them by hand"
@@ -147,8 +189,13 @@ install_rust() {
     run sh -c 'curl --proto =https --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile default'
     export PATH="$HOME/.cargo/bin:$PATH"
   fi
-  run rustup toolchain install stable --profile default --component clippy,rustfmt
-  run rustup default stable
+  # Install a toolchain only when there is none: re-running must not move an
+  # existing one to a newer stable under a session's builds.
+  if ! rustup show active-toolchain >/dev/null 2>&1; then
+    run rustup toolchain install stable --profile default
+    run rustup default stable
+  fi
+  run rustup component add clippy rustfmt
   have cargo-deny || run cargo install --locked cargo-deny || warn "cargo-deny not installed (cryptanalysis 'make suite-lint')"
   persist_path 'export PATH="$HOME/.cargo/bin:$PATH"'
   have cargo && ok "$(cargo --version)"
@@ -162,10 +209,79 @@ install_go() {
   if [ -n "$cur" ] && version_ge "$cur" "$GO_MIN"; then ok "go $cur"; return; fi
   if [ "$PKG" = brew ]; then run brew install go; return; fi
   local os=linux; [ "$OS" = Darwin ] && os=darwin
-  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz"
-  run sh -c "curl -fsSL https://go.dev/dl/$tgz -o /tmp/$tgz"
-  as_root rm -rf /usr/local/go && as_root tar -C /usr/local -xzf "/tmp/$tgz" && run rm -f "/tmp/$tgz"
-  persist_path 'export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"'
+  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz" dest="${GO_INSTALL_DIR:-/usr/local/go}"
+  if [ "$DRY_RUN" = 1 ]; then
+    log "would verify and stage $tgz before replacing $dest"
+    return
+  fi
+  local download expected
+  download="$(mktemp -d "${TMPDIR:-/tmp}/go-download.XXXXXXXX")" || return 1
+  # The official release index supplies the checksum for this exact archive.
+  # A failed download or validation must leave the installed toolchain intact.
+  if ! curl -fsSL --retry 2 "https://go.dev/dl/?mode=json&include=all" -o "$download/releases.json" ||
+     ! curl -fsSL --retry 2 "https://go.dev/dl/$tgz" -o "$download/$tgz"; then
+    rm -rf "$download"
+    warn "Go download failed; existing installation preserved"
+    return 1
+  fi
+  expected="$(jq -er --arg name "$tgz" \
+    '[.[].files[] | select(.filename == $name) | .sha256] | if length == 1 then .[0] else error("archive not found uniquely") end' \
+    "$download/releases.json")"
+  if [[ ! "$expected" =~ ^[0-9a-f]{64}$ ]]; then
+    rm -rf "$download"
+    warn "Go release checksum unavailable; existing installation preserved"
+    return 1
+  fi
+  # All renames occur on the destination filesystem. Keep the old installation
+  # until checksum, extraction and the staged binary's version all pass. The
+  # lock also serializes setup hooks from sibling repositories.
+  if ! as_root bash -c '
+    set -euo pipefail
+    archive=$1 expected=$2 version=$3 dest=$4
+    root=$(dirname "$dest")
+    name=$(basename "$dest")
+    case "$name" in .|..|/) echo "invalid Go installation directory" >&2; exit 1 ;; esac
+    mkdir -p "$root"
+    exec 9>"$root/.$name-install.lock"
+    flock -x 9
+    stage=$(mktemp -d "$root/.go-install.XXXXXXXX")
+    cleanup() {
+      status=$?
+      trap - EXIT
+      if [ "$status" -ne 0 ] && { [ -e "$stage/previous" ] || [ -L "$stage/previous" ]; }; then
+        if [ ! -e "$dest" ] && [ ! -L "$dest" ]; then
+          if ! mv -T "$stage/previous" "$dest"; then
+            echo "Go rollback failed; original installation retained at $stage/previous" >&2
+            exit 1
+          fi
+        else
+          echo "Go destination changed; original installation retained at $stage/previous" >&2
+          exit 1
+        fi
+      fi
+      rm -rf "$stage"
+      exit "$status"
+    }
+    trap cleanup EXIT
+    trap "exit 1" HUP INT TERM
+    cp "$archive" "$stage/archive.tar.gz"
+    printf "%s  %s\n" "$expected" "$stage/archive.tar.gz" | sha256sum -c -
+    tar -C "$stage" -xzf "$stage/archive.tar.gz"
+    [ "$(env GOROOT="$stage/go" "$stage/go/bin/go" env GOVERSION)" = "go$version" ]
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+      mv -T "$dest" "$stage/previous"
+    fi
+    mv -T "$stage/go" "$dest"
+  ' workstation-go "$download/$tgz" "$expected" "$GO_VERSION" "$dest"; then
+    rm -rf "$download"
+    warn "Go installation failed; prior installation preserved or rollback location reported above"
+    return 1
+  fi
+  rm -rf "$download"
+  local escaped_bin
+  printf -v escaped_bin '%q' "$dest/bin"
+  persist_path "export PATH=$escaped_bin:\"\$HOME/go/bin:\$PATH\""
+  export PATH="$dest/bin:$PATH"
   have go && ok "$(go version)"
 }
 
@@ -220,14 +336,21 @@ install_cairn() {
   if have cairn; then ok "$(cairn --version 2>/dev/null | head -n1)"; return; fi
   have cargo || { warn "cargo missing; run with --only rust first"; return 1; }
   run cargo install --locked --root "$HOME/.local" \
-    --git "https://github.com/$GITHUB_OWNER/cairn" ${CAIRN_REV:+--rev "$CAIRN_REV"} cairn \
+    --git "${CAIRN_GIT:-https://github.com/aburan28/cairn}" ${CAIRN_REV:+--rev "$CAIRN_REV"} cairn \
     || warn "cairn install failed"
   mkdir -p "$HOME/.cairn"
 }
 
 # ------------------------------------------------------------------- sage ---
 install_sage() {
-  log "SageMath $SAGE_VERSION (conda-forge, ~8 GiB)"
+  local sage_pkgs=("sage=$SAGE_VERSION") need_gb="${SAGE_MIN_FREE_GB:-10}"
+  # sagelib carries bin/sage and the libraries (PARI, FLINT, Singular, GAP
+  # core, giac); the metapackage adds Jupyter, openjdk, jmol and a compiler.
+  if [ "${SAGE_LEAN:-0}" = 1 ]; then
+    sage_pkgs=("sagelib=$SAGE_VERSION" maxima)
+    need_gb="${SAGE_MIN_FREE_GB:-4}"
+  fi
+  log "SageMath $SAGE_VERSION (conda-forge: ${sage_pkgs[*]})"
   if [ -z "${SAGE_PREFIX:-}" ]; then
     if [ -w /opt ] || [ "${#SUDO[@]}" -gt 0 ]; then SAGE_PREFIX=/opt/conda-sage; else SAGE_PREFIX="$HOME/.local/conda-sage"; fi
   fi
@@ -238,8 +361,8 @@ install_sage() {
   else
     local parent; parent="$(dirname "$SAGE_PREFIX")"
     local free_kb; free_kb="$(df -Pk "$parent" 2>/dev/null | awk 'NR==2{print $4}')"
-    if [ -n "$free_kb" ] && [ "$free_kb" -lt 10485760 ]; then
-      warn "<10 GiB free under $parent, skipping SageMath (set SAGE_PREFIX elsewhere)"; return
+    if [ -n "$free_kb" ] && [ "$free_kb" -lt $((need_gb * 1048576)) ]; then
+      warn "<$need_gb GiB free under $parent, skipping SageMath (set SAGE_PREFIX elsewhere)"; return
     fi
     if [ ! -d "$SAGE_PREFIX" ]; then
       if [ -w "$parent" ]; then run mkdir -p "$SAGE_PREFIX"; else as_root install -d -o "$(id -u)" -g "$(id -g)" "$SAGE_PREFIX"; fi
@@ -250,8 +373,10 @@ install_sage() {
       run sh -c "curl -fsSL https://micro.mamba.pm/api/micromamba/${plat}-${MMARCH}/latest | tar xj -C '$HOME/.local' bin/micromamba"
     fi
     have micromamba && mm="$(command -v micromamba)"
-    run "$mm" create -y -r "$SAGE_PREFIX" -p "$env" -c conda-forge "sage=$SAGE_VERSION" \
-      || { warn "SageMath install failed"; return; }
+    run "$mm" create -y -r "$SAGE_PREFIX" -p "$env" -c conda-forge "${sage_pkgs[@]}" \
+      || { warn "SageMath install failed"; run rm -rf "$SAGE_PREFIX/pkgs"; return; }
+    # The environment hard-links the extracted packages; this drops the archives.
+    run env MAMBA_ROOT_PREFIX="$SAGE_PREFIX" "$mm" clean -a -y >/dev/null || true
   fi
   # `sage -python script.py` is the upstream CLI convention frozen trial plans
   # use; conda-forge's `sage` has no -python, so wrap it.
@@ -281,11 +406,215 @@ install_agents() {
   have gh || case "$PKG" in brew) run brew install gh ;; apt) as_root apt-get install -y -qq gh || warn "gh not installed" ;; esac
 }
 
+# -------------------------------------------------------------- cloud-cli ---
+# aws (S3 checkpoints, scripts/checkpoint.sh; Iso Lab on EKS) and kubectl.
+# Both read their credentials (AWS_*, KUBECONFIG) when they run.
+install_cloud_cli() {
+  log "cloud CLIs (aws, kubectl)"
+  local os=linux; [ "$OS" = Darwin ] && os=darwin
+  if have aws; then ok "$(aws --version 2>&1 | head -n1)"
+  elif [ "$PKG" = brew ]; then run brew install awscli
+  elif [ "$os" = linux ]; then
+    local d; d="$(mktemp -d)"
+    run curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "$d/awscliv2.zip" \
+      && run unzip -q "$d/awscliv2.zip" -d "$d" \
+      && { if [ -w /usr/local ]; then run "$d/aws/install" --update; else run "$d/aws/install" -i "$HOME/.local/aws-cli" -b "$LOCAL_BIN" --update; fi; } \
+      || warn "aws CLI not installed"
+    rm -rf "$d"
+  fi
+  if have kubectl; then ok "kubectl $(kubectl version --client -o json 2>/dev/null | jq -r .clientVersion.gitVersion)"
+  elif [ "$PKG" = brew ]; then run brew install kubectl
+  else
+    local v; v="$(curl -fsSL https://dl.k8s.io/release/stable.txt)" \
+      && run curl -fsSL "https://dl.k8s.io/release/$v/bin/$os/$GOARCH/kubectl" -o "$LOCAL_BIN/kubectl" \
+      && run chmod 755 "$LOCAL_BIN/kubectl" \
+      || warn "kubectl not installed"
+  fi
+}
+
+# ----------------------------------------------------------------- github ---
+# A GitHub service account for git and gh, from secrets in the environment and
+# never from this file. With a GitHub App, git asks ~/.local/bin/gh-app-token
+# for a credential each time a github.com request needs one, and the helper
+# mints a one-hour installation token (cached until five minutes before it
+# expires). With a token, the helper hands that token out. The helper is scoped
+# to https://$host, and git only consults it when the server asks for
+# credentials, so public and proxy-served repositories are unaffected.
+write_gh_app_token_helper() {
+  local helper="$LOCAL_BIN/gh-app-token"
+  cat >"$helper" <<'HELPER'
+#!/usr/bin/env bash
+# Generated by scripts/setup-workstation.sh. Prints a GitHub token for the
+# service account named by GH_APP_ID/GH_APP_INSTALLATION_ID/GH_APP_PRIVATE_KEY
+# (or _FILE), or by GH_SERVICE_TOKEN. Usage:
+#   gh-app-token            print a token
+#   gh-app-token git get    git credential-helper protocol
+#   gh-app-token gh-login   (re)log gh in with a fresh token
+set -euo pipefail
+set +x
+host="${GH_SERVICE_HOST:-github.com}"
+case "$host" in
+  github.com) trusted="https://api.github.com" ;;
+  *[!A-Za-z0-9.-]*|'') echo "gh-app-token: invalid GH_SERVICE_HOST" >&2; exit 1 ;;
+  *) trusted="https://$host/api/v3" ;;
+esac
+# The signed App JWT goes to this URL, so an override may only name the
+# service host's own API or a loopback server (tests), never anywhere else.
+api="${GH_SERVICE_API:-$trusted}"
+api="${api%/}"
+if [ "$api" != "$trusted" ] \
+    && ! [[ "$api" =~ ^http://(127\.0\.0\.1|localhost|\[::1\])(:[0-9]{1,5})?$ ]]; then
+  echo "gh-app-token: GH_SERVICE_API must be $trusted or a loopback URL" >&2
+  exit 1
+fi
+cache_root="${XDG_CACHE_HOME:-$HOME/.cache}/gh-app-token"
+umask 077
+
+b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
+
+mint() (
+  if [ -n "${GH_APP_ID:-}" ] && [ -n "${GH_APP_INSTALLATION_ID:-}" ]; then
+    local identity cache tok now cached
+    identity=$(printf '%s\n' "$host" "$api" "$GH_APP_ID" "$GH_APP_INSTALLATION_ID" |
+      openssl dgst -sha256 | awk '{print $NF}')
+    cache="$cache_root/$identity"
+    mkdir -p "$cache" || return 1
+    chmod 700 "$cache" || return 1
+    tok="$cache/token.json"
+    now=$(date +%s)
+    if [ -s "$tok" ] && cached=$(jq -er --argjson now "$now" \
+      'select((.expires_at | fromdateiso8601) > ($now + 300)) | .token |
+       select(type == "string" and length > 0)' "$tok" 2>/dev/null); then
+      printf '%s\n' "$cached"; return
+    fi
+    local dir key jwt head body sig resp
+    dir=$(mktemp -d "$cache/mint.XXXXXXXX") || return 1
+    trap 'rm -rf "$dir"' EXIT
+    key="$dir/key.pem"
+    if [ -n "${GH_APP_PRIVATE_KEY_FILE:-}" ]; then cp "$GH_APP_PRIVATE_KEY_FILE" "$key" || return 1
+    elif [ -n "${GH_APP_PRIVATE_KEY:-}" ]; then
+      case "$GH_APP_PRIVATE_KEY" in
+        *$'\n'*) printf '%s\n' "$GH_APP_PRIVATE_KEY" >"$key" ;;
+        *) printf '%b\n' "$GH_APP_PRIVATE_KEY" >"$key" ;;   # "\n"-escaped one-line form
+      esac
+    else echo "gh-app-token: GH_APP_PRIVATE_KEY or GH_APP_PRIVATE_KEY_FILE is not set" >&2; return 1
+    fi
+    head=$(printf '{"alg":"RS256","typ":"JWT"}' | b64url)
+    body=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' $((now - 60)) $((now + 540)) "$GH_APP_ID" | b64url)
+    sig=$(printf '%s.%s' "$head" "$body" | openssl dgst -sha256 -sign "$key" -binary | b64url) || return 1
+    jwt="$head.$body.$sig"
+    # The JWT goes in a header file, not argv, so it never shows in `ps`.
+    printf 'Authorization: Bearer %s\n' "$jwt" >"$dir/auth"
+    resp=$(curl -fsS -X POST -H @"$dir/auth" -H 'Accept: application/vnd.github+json' \
+      "$api/app/installations/$GH_APP_INSTALLATION_ID/access_tokens") \
+      || { echo "gh-app-token: GitHub refused the App credentials" >&2; return 1; }
+    jq -e --argjson now "$now" \
+      'select((.expires_at | fromdateiso8601) > $now) |
+       select(.token | type == "string" and length > 0) |
+       {token, expires_at}' <<<"$resp" >"$dir/token.json" || return 1
+    mv "$dir/token.json" "$tok" || return 1
+    jq -r .token "$tok"
+  elif [ -n "${GH_SERVICE_TOKEN:-}" ]; then
+    printf '%s\n' "$GH_SERVICE_TOKEN"
+  elif [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ]; then
+    # The token gh itself would use; still handed only to https://$host.
+    printf '%s\n' "${GH_TOKEN:-$GITHUB_TOKEN}"
+  else
+    echo "gh-app-token: no GitHub credential (GH_APP_*, GH_SERVICE_TOKEN, GH_TOKEN or GITHUB_TOKEN) in the environment" >&2
+    return 1
+  fi
+)
+
+case "${1:-}" in
+  git)
+    [ "${2:-}" = get ] || exit 0   # store/erase: nothing to persist
+    protocol= request_host=
+    while IFS='=' read -r name value && [ -n "$name" ]; do
+      case "$name" in protocol) protocol="$value" ;; host) request_host="$value" ;; esac
+    done
+    [ "$protocol" = https ] && [ "$request_host" = "$host" ] || exit 0
+    t=$(mint) || exit 0            # no credential: let git fall through
+    printf 'username=x-access-token\npassword=%s\n' "$t" ;;
+  gh-login)
+    mint | env -u GH_TOKEN -u GITHUB_TOKEN gh auth login --hostname "${GH_SERVICE_HOST:-github.com}" --with-token ;;
+  *) mint ;;
+esac
+HELPER
+  chmod 755 "$helper"
+}
+
+install_github_auth() {
+  log "GitHub service-account credentials"
+  local host="${GH_SERVICE_HOST:-github.com}" kind
+  if [ -n "${GH_APP_ID:-}" ] && [ -n "${GH_APP_INSTALLATION_ID:-}" ] \
+      && { [ -n "${GH_APP_PRIVATE_KEY:-}" ] || [ -n "${GH_APP_PRIVATE_KEY_FILE:-}" ]; }; then
+    kind="GitHub App $GH_APP_ID (installation $GH_APP_INSTALLATION_ID)"
+  elif [ -n "${GH_SERVICE_TOKEN:-}" ]; then
+    kind="service token"
+  elif [ "${GITHUB_LAZY:-0}" = 1 ]; then
+    kind="credentials read from the environment at use time"
+  else
+    warn "no GitHub service credential set (GH_APP_ID + GH_APP_INSTALLATION_ID + GH_APP_PRIVATE_KEY[_FILE], or GH_SERVICE_TOKEN); skipped"
+    return 0
+  fi
+  if [ "$DRY_RUN" = 1 ]; then
+    printf '   + write %s/gh-app-token, git credential helper for https://%s (%s)\n' "$LOCAL_BIN" "$host" "$kind"
+    return
+  fi
+  have git || { warn "git missing; cannot configure GitHub credentials"; return 1; }
+  write_gh_app_token_helper
+  # Mint once now, so a bad key or ID fails here and not on the first push.
+  if [ -n "${GH_APP_ID:-}${GH_SERVICE_TOKEN:-}" ] && ! "$LOCAL_BIN/gh-app-token" >/dev/null; then
+    warn "GitHub credential check failed for $kind; git and gh left unconfigured"
+    return 1
+  fi
+  local section="credential.https://$host.helper"
+  git config --global --unset-all "$section" 2>/dev/null || true
+  git config --global --add "$section" ""   # drop helpers inherited for this host
+  git config --global --add "$section" "!$LOCAL_BIN/gh-app-token git"
+  if have gh && [ -n "${GH_APP_ID:-}${GH_SERVICE_TOKEN:-}" ]; then
+    GH_SERVICE_HOST="$host" "$LOCAL_BIN/gh-app-token" gh-login \
+      || warn "gh login with $kind failed"
+    # An installation token lasts an hour: `gh-app-token gh-login` refreshes it.
+    # In a shell where GH_TOKEN is set, gh uses that variable over this login.
+    [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ] && warn "GH_TOKEN/GITHUB_TOKEN is set in this environment and takes precedence for gh; git still uses $kind"
+  fi
+  ok "git (https://$host) and gh use $kind"
+}
+
 # ------------------------------------------------------------------ repos ---
 clone_repo() {
   local name="$1" dir="$WORKSPACE/$1"
   if [ -d "$dir/.git" ]; then ok "$name present at $dir"; return; fi
-  run git clone "https://github.com/$GITHUB_OWNER/$name.git" "$dir" || { warn "clone of $name failed"; return 1; }
+  case " $CLONE_REPOS " in *" $name "*) ;; *) return 0 ;; esac
+  local free_kb; free_kb="$(df -Pk "$WORKSPACE" 2>/dev/null | awk 'NR==2{print $4}')"
+  if [ -n "$free_kb" ] && [ "$free_kb" -lt 5242880 ]; then
+    warn "<5 GiB free under $WORKSPACE, not cloning $name"; return 1
+  fi
+  local url="https://github.com/$GITHUB_OWNER/$name.git"
+  if [ "${CLONE_FULL:-0}" = 1 ]; then
+    run git clone "$url" "$dir" || { warn "clone of $name failed"; return 1; }
+    return 0
+  fi
+  # Partial clone: files over CLONE_BLOB_LIMIT stay on the server and off disk
+  # (sparse, skip-worktree) until a command needs them; `git sparse-checkout
+  # disable` fetches them all. CLONE_FULL=1 clones everything.
+  local limit="${CLONE_BLOB_LIMIT:-1m}"
+  run git clone --filter="blob:limit=$limit" --no-checkout "$url" "$dir" \
+    || { warn "clone of $name failed"; return 1; }
+  # A dry run has no clone to inspect or configure.
+  [ "$DRY_RUN" = 1 ] && return 0
+  # Large sources stay on disk anyway (fetched by the checkout): a build reads
+  # them, e.g. cryptanalysis's generated src/generated/*.h tables.
+  local skipped keep="${CLONE_KEEP_RE:-(^|/)(src|include)/|\.(c|h|cc|cpp|hpp|rs|py|go|lean|sage|sh)\$}"
+  skipped="$(join <(git -C "$dir" rev-list --objects --missing=print -1 HEAD | sed -n 's/^?//p' | sort) \
+      <(git -C "$dir" ls-tree -r HEAD --format='%(objectname) %(path)' | sort) | cut -d' ' -f2- |
+      grep -Ev -- "$keep")" || true
+  { echo '/*'; [ -n "$skipped" ] && printf '%s\n' "$skipped" | sed 's/[][*?!#\\]/\\&/g; s#^#!/#'; } |
+    git -C "$dir" sparse-checkout set --no-cone --stdin \
+    && run git -C "$dir" checkout -q \
+    || { warn "checkout of $name failed"; return 1; }
+  ok "$name cloned; $(printf '%s' "$skipped" | grep -c . || true) files over $limit left on the server (git sparse-checkout disable fetches them)"
 }
 
 setup_crypto() {
@@ -332,6 +661,22 @@ install_repos() {
   setup_crypto; setup_cryptanalysis; setup_autoresearcher
 }
 
+# ------------------------------------------------------------- Iso Lab ---
+install_isolab() {
+  local launcher
+  launcher="$(cd "$(dirname "$0")" && pwd)/isolab-agent.sh"
+  log "Iso Lab agent clients (configured backends only)"
+  if [ -n "${ISOLAB_URL:-}" ]; then
+    run bash "$launcher" setup nats || warn "Iso Lab NATS client setup failed; see docs/ISOLAB_AGENTS.md"
+  fi
+  if [ -n "${KUBECONFIG:-}" ] && [ -n "${ISOLAB_KUBE_CONTEXT:-}" ]; then
+    run bash "$launcher" setup eks || warn "Iso Lab EKS client setup failed; see docs/ISOLAB_AGENTS.md"
+  fi
+  if [ -z "${ISOLAB_URL:-}" ] && { [ -z "${KUBECONFIG:-}" ] || [ -z "${ISOLAB_KUBE_CONTEXT:-}" ]; }; then
+    ok "no Iso Lab connection configured; see docs/ISOLAB_AGENTS.md"
+  fi
+}
+
 # ---------------------------------------------------------- control plane ---
 start_control_plane() {
   log "Conductor control plane"
@@ -356,12 +701,15 @@ want conductor     && install_conductor || true
 want cairn         && install_cairn || true
 want sage          && install_sage || true
 want agents        && install_agents || true
+want cloud-cli     && install_cloud_cli || true
+want github        && install_github_auth || true
 want repos         && install_repos || true
+want isolab        && install_isolab || true
 want control-plane && start_control_plane || true
 
 echo
 log "summary"
-for c in gcc clang cmake cargo go node uv psql gp conductor conductor-mcp cairn sage claude codex opencode gh; do
+for c in gcc clang cmake cargo go node uv psql gp conductor conductor-mcp cairn sage claude codex opencode gh aws kubectl; do
   if have "$c"; then printf '   %-14s %s\n' "$c" "$(command -v "$c")"; else printf '   %-14s \033[1;33mmissing\033[0m\n' "$c"; fi
 done
 if [ "${#WARNINGS[@]}" -gt 0 ]; then

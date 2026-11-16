@@ -1,0 +1,244 @@
+{
+  "schema": "pencil-protocol-source-bindings/v1",
+  "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+  "all_sources_match_commit": true,
+  "files": {
+    "native_price/src/analyzer.rs": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+    "native_price/src/aggregate.rs": "1aa3622a7a32e903a7eae42c3596e20b3c7aaeac07621e9c9ebd2a79182cfc84",
+    "native_price/src/importer.rs": "53a622d46dc2950144999f5aeaa9dac00d5b458952f835f6162a6c484c85d229",
+    "native_price/src/lib.rs": "71222c3e8c9c826d43eff82bb776a36cd53a5bf932488c343618b4138e7dd1a7",
+    "native_price/src/bin/analyze_pair.rs": "1ff553390e3584017edde1d27e15f1b6d3a6f1a2ec9d196899582530d964bac1",
+    "native_price/src/bin/analyze_cohort.rs": "34206c8aaa2eb0c89ebbf7d55f48f15f76bb98be177e099ac27aad1f3480e507",
+    "native_price/Cargo.toml": "85dbb703cd29656e9916ae7aaa299790f1967ba8d4b931e1c6b19f031374b077",
+    "native_price/Cargo.lock": "d7d2479f3a9c691991bb13c7d8398602df198a94b3b73ef136c901d1285e1957",
+    "paired_export/src/lib.rs": "d8ef61a5db60874e3c9de2539c0f1201d75a2589c410687d3509b147b06288fe",
+    "paired_export/src/plan.rs": "fb8f3dd4fbcc42119d2f3f435b32eadaf6a7beb3fd7f2abcc13c67dd8fba2720",
+    "paired_export/src/main.rs": "638a3fc180f24ae7e2494d28cb4544f2e70564b16a3e65d38b33ca51f05560e6",
+    "paired_export/Cargo.lock": "310199aab018093643475dac1a38e5e1ddf88d261c560c82c006ae06eb08676f",
+    "validation/accounting/COST_BOUNDARY.md": "186ebceb5281612f62442a3e005fa92b019f80f8309afe2fe5245ef9c0f4d402",
+    "validation/accounting/kernel-primitive-registry.json": "a973bf6222125f37a5d37fa25dbaac434ea3c418fae7bbf8abbda67036c15e2f",
+    "TIMING_CONTRACT.json": "3719de558181e663192bfca9ea1fce05df535603f2acd187058de55e4a8b4585",
+    "prepared_specs/manifest.json": "31ac091fac15821fd86fbb3019e7a625376e3f86ae7da62a84bf60e654169179",
+    "prepared_native_plans/result.json": "1892db0ad5937bba74894c5be9f3b6f1e48dcf20ddb0284f043686a2f822ef1e",
+    "paired_export/Cargo.toml": "0a198bb240dee5fe2900d3e6323951e75a246459161c16046a6ed857c464e67f"
+  },
+  "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+  "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+  "image_digest": null,
+  "analysis_build": {
+    "status": "built_and_hash_verified_analysis_only",
+    "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "receipt": "../../validation/native_analysis_build_20261029/receipt.json",
+    "receipt_sha256": "dd1f6084d437491400e4618aa5a0466d28a4b3be506ac7f203d5f615b0df34c3",
+    "build_command": "cargo +1.99.1 build --locked --offline --release --manifest-path research/pencil_large_prime_20261029/native_price/Cargo.toml",
+    "build_exit_code": 0,
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+    "binaries": {
+      "analyze_pair": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_pair",
+        "bytes": 843944,
+        "sha256": "eb2b2ce773c7300edcfd4e0bb0804251d4cca604379d94be40964cd4b278871e"
+      },
+      "analyze_cohort": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_cohort",
+        "bytes": 1388376,
+        "sha256": "337e089f74426caa1d67c08d411b5034c67b50706738d399a41d79ac93a5c160"
+      }
+    },
+    "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+    "plan_only_check": {
+      "exit_code": 0,
+      "expected_workloads": 1260,
+      "expected_pairs": 6300,
+      "expected_slots": 22680,
+      "observed_slots": 0,
+      "all_36_ratios_null": true,
+      "output_sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+    },
+    "experiment_executions": 0,
+    "scope": "Analysis executables only; not ecbench, not an empirical instrument binding, independent review, protocol freeze or launch authorization."
+  },
+  "instrument_build": {
+    "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "workflow_commit": "7d7f5495c5b85ae426efdbcb721b6faf72c1be14",
+    "workflow_run": 40938439022,
+    "status": "completed_verified_binary_and_plan_parity_image_pending",
+    "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+    "image_digest": null,
+    "artifact_id": 12926168934,
+    "receipt": "../../validation/instrument_build_40938439022/receipt.json",
+    "receipt_sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1",
+    "note": "Completed static ecbench build and plan-only parity bound; container image/runtime, independent review and resource/launch authorization remain pending.",
+    "binary_path": "/home/ec2-user/pencil-build-40938439022/ecbench",
+    "binary_bytes": 76970952,
+    "build_info": {
+      "source_repository": "https://github.com/aburan28/crypto",
+      "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+      "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+      "built_at": "2026-10-29T19:31:18Z",
+      "architecture": "linux/amd64",
+      "target": "x86_64-unknown-linux-musl",
+      "default_features": false,
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+      "rustflags": "-C target-cpu=x86-64"
+    },
+    "evidence_sha256": {
+      "build-info.json": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5",
+      "archive-parity.json": "a78b31214c136f82d5dc4ed6454b59df7abea471a7d1d5d8d970f763a70016d3",
+      "prepared-plan-parity.json": "06bce13aa3c5ed866238173ed5edd64365a92f589371df2b17b7653af6f877d6",
+      "elf-headers.txt": "611d9351cc4b69fd0bb2758b5b16a23cbeb0432ab9ba66c0eeadf30ef2199c2a"
+    },
+    "archive_targets_matched": 1260,
+    "prepared_plans_exactly_equal": 9,
+    "solver_executions_performed": 0
+  },
+  "canonical_packaging": {
+    "status": "native_software_validated_packaging_only_not_qualification",
+    "language": "Rust",
+    "adapter": "research/pencil_large_prime_20261029/native_canonical_export",
+    "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
+    "canonical_tool": "research/pencil_large_prime_20261029/native_canonical_export/tools/experiment_protocol.reference.txt",
+    "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "canonical_reference_execution": false,
+    "export_schema": "research/pencil_large_prime_20261029/native_canonical_export/schemas/experiment-export.v1.json",
+    "software_tests": 40,
+    "receipt": "../../native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+    "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
+    "explicit_execution_history_required": true,
+    "wall_valid": false,
+    "experiment_executions": 0,
+    "required_contract": {
+      "analysis_provenance": "sources exact protocol analysis_support_sha256 map; hash-bound build_receipt and both analyze_pair/analyze_cohort binaries",
+      "compiled_source_pins": "all13 linked native analysis sources must match declared protocol pins",
+      "request_binding": "CLI attaches hash-bound _request_binding; check_export reconstructs complete export from immutable request",
+      "deterministic_replay": "public package/check_export execute linked native aggregate over bound records/plans and require exact output equality; private unit test callbacks are not runtime bypasses",
+      "limits": "Source-linked software consistency, not independent mathematical implementation, original analyzer binary execution attestation, clock qualification or cost-ratio qualification"
+    }
+  },
+  "resource_authorizations": [
+    {
+      "path": "first_gate_authorization.json",
+      "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600",
+      "scope": "first p739 gate only; all60targets,25000000coefficients,3600seconds per execution",
+      "authority": "explicit_user_approval"
+    },
+    {
+      "path": "first_gate_four_hour_authorization.json",
+      "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+      "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+      "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
+    }
+  ],
+  "native_tools": {
+    "canonical_export": {
+      "receipt": "../../native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+      "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
+      "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
+      "source_manifest": {
+        "path": "validation/review-fixes-source-files.sha256",
+        "sha256": "6a1cfa53e9e490022090a81f6b4a745edaaaabd6aaaef0bca369e54af00be05d"
+      },
+      "software_tests": 40,
+      "test_scopes": {
+        "command": "cargo +1.99.1 test --release --locked",
+        "passed": 40,
+        "failed": 0,
+        "ignored": 0,
+        "private_unit_contracts": 37,
+        "native_protocol_cli": 1,
+        "historical_digest_semantics": 1,
+        "production_full_denominator_replay": 1,
+        "production_seconds": 205.38,
+        "log": "validation/review-fixes-final-tests.log",
+        "sha256": "8cbcfd0d790c4f4a91e4866540dbc9cb4cf4f1df67500e683d16dae744b30e83"
+      },
+      "independent_corrected_source_review": {
+        "path": "../../validation/native_export_correction_fc96a3d1/review.json",
+        "sha256": "ed436aef0cbe8ea7f380767bcade130ded56c54de875950bf6c80a081ad65927",
+        "scope": "Software packaging and deterministic source-linked replay only; not independent mathematical implementation or empirical qualification"
+      }
+    },
+    "preparation": {
+      "receipt": "../../native_preparation/validation/receipt.json",
+      "receipt_sha256": "46843c028008698dc4eaa47370191904cf274791402d8953e23868e725d62ea3",
+      "source_files": {
+        "Cargo.toml": "0d5fafc970dbb9b9d9fea33fcd0344c130c7184f732858b26fa1b2290c0a200e",
+        "Cargo.lock": "22228eb5115c49911bc588d440baf7528eba4a6dd69eda763598b52308225726",
+        "README.md": "028fa02346a36a8f9a1fd7f2ae1f43b1802e263d41f736dcda82228404641642",
+        "src/lib.rs": "2f7d71644f0e8f1ea48a3c10cb840dc3ece761ae29721920550b83156d8bb45a",
+        "src/main.rs": "42b328416d52f0416ed700446fd0f948a5a6d2da75aba9ba30985b9861bb0eed"
+      },
+      "binary_sha256": "11fb2aa25fe7cd737271c4a13236c0ae9be0346a437b776d3acaa8e4a1890360",
+      "software_tests": 3,
+      "current_instrument": {
+        "path_at_validation": "/home/ec2-user/pencil-build-40938439022/ecbench",
+        "sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "build_info_sha256": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5"
+      },
+      "execution_boundary": {
+        "ecbench_subcommand": "plan --doc",
+        "solver_executions_performed": 0,
+        "cohorts_launched": 0,
+        "cloud_jobs_launched": 0
+      }
+    },
+    "review_report": {
+      "receipt": "../../native_review_report/validation-layout.json",
+      "receipt_sha256": "37da6488934ed19fb48102e16de777a0c7935519f36245bd31399e4708864023",
+      "source_files": {
+        "src/lib.rs": "80762786c36dcb56a3148b38e70974375432425f240087af786d65f10cceeeba",
+        "src/main.rs": "08a18c3648ae4581949e811d8f5d185052ef17c8a96e443173131d9864dfd895",
+        "Cargo.lock": "48a5ed9c7e282b9cd62f1ef17a0cf970a635028fb624c2b89d4897d17be2326e"
+      },
+      "software_tests": 8
+    },
+    "boundary": "Native tooling validation and preparation only; no solver runs, empirical price qualification, freeze or launch authorization"
+  },
+  "first_gate_execution_envelope": {
+    "authorization": {
+      "path": "first_gate_four_hour_authorization.json",
+      "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+      "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+      "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
+    },
+    "cap_seconds": 14400,
+    "accounting": {
+      "aggregation": "Sum worker-execution elapsed seconds across all attempts; concurrent workers consume additive elapsed budget",
+      "includes": [
+        "candidate executions",
+        "reference and A/A controls",
+        "warmups",
+        "retries",
+        "recovery",
+        "fresh validation"
+      ],
+      "stop_rule": "Stop admission or work when cumulative14400worker-seconds or fixed UTCdeadline is reached, whichever comes first; enforce remaining budget on each admitted execution",
+      "missing_policy": "Retain the full60-target plan and record missing, capped or interrupted outcomes; do not replace the denominator with survivors"
+    },
+    "absolute_deadline_utc": "2026-10-30T03:32:22Z",
+    "per_execution_timeout_seconds": 3600,
+    "legacy_Diem_deadline_unchanged": true,
+    "remaining_later_stage_envelopes": "unresolved"
+  },
+  "infrastructure_authorization": {
+    "path": "infrastructure_authorization.json",
+    "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+    "authority": "explicit_user_approval",
+    "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
+  },
+  "publisher_trust_readback": {
+    "question_item_id": [
+      "request_user_input_async",
+      "call_9923900bc777410b80b32ae8a2f7d55c",
+      0
+    ],
+    "action": "Correct the reviewed GitHub OIDC trust subject only",
+    "receipt": {
+      "path": "../../validation/publisher_trust_20261029/receipt.json",
+      "sha256": "b98edaa8ed29b23601fbbe6f6da35546d779f7480c5018b87552502938da814a"
+    },
+    "observed_status": "Applied and live readback verified; permissions policy and RBAC unchanged",
+    "oidc_workflow_execution_verified": false
+  }
+}

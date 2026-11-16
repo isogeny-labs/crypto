@@ -1,0 +1,196 @@
+{
+  "schema": "isolab.criu.generation/v1",
+  "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+  "generation": 1,
+  "runtime": {
+    "kernel": "6.18.54-121.166.amzn2023.x86_64",
+    "cpu_identity": [
+      "vendor_id\t: AuthenticAMD",
+      "cpu family\t: 26",
+      "model\t\t: 2",
+      "stepping\t: 1",
+      "flags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq monitor ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch topoext perfctr_core ssbd perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 clzero xsaveerptr rdpru wbnoinvd arat avx512vbmi pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid movdiri movdir64b fsrm avx512_vp2intersect flush_l1d"
+    ],
+    "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+    "tools": {
+      "criu": "8dbd38dfe73ac1cbdf7d060e91b8e6bc85a07897c3e880e4df62a545aafc59b5",
+      "isolab-criu-progress": "144db760cf6d59103380f59f7855625459a1927e0cacd3a444512ba8ca097dd4",
+      "isolab-eks-recovery": "091437d2ce6a763b1e432ba702526b30ae0a398b7a2f0faefa93ee276266b1b0"
+    }
+  },
+  "root_pid": 531,
+  "pids": [
+    531,
+    5521
+  ],
+  "files": {
+    "compute/original-spec.json": [
+      "fe8bd304123990ee84b67bd0de1fe3caa1a003591c40ae7c7b6ad60298431277",
+      1000
+    ],
+    "compute/run.stderr": [
+      "b01fbf716d2bfc93c8882669e45ce35e039ca4216d97839453f40be7cf587194",
+      106382
+    ],
+    "compute/run.stdout": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      0
+    ],
+    "compute/session.compute-spec.json": [
+      "92868efabbdf44bc54c8aeba4124f7cabe170ab29b3177b2083d399acaf88c75",
+      990
+    ],
+    "compute/session.lock": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      0
+    ],
+    "compute/session.recovery-intent.json": [
+      "52292aed649b148cabd23e57a3c25ce511e595e48d7dfb17c314eef35d65ef4e",
+      586
+    ],
+    "compute/session/host.json": [
+      "38fedecdd52fe6662b3b0b2d35bdd027a2f4d90407a396ae27ed3c8badf20f22",
+      4814
+    ],
+    "compute/session/plan.json": [
+      "2ba0b5b848491ae08efe1bb94861f8816fdc37183385a723133c8e7d0ca57ae8",
+      565680
+    ],
+    "compute/session/records.jsonl": [
+      "83a93c81daa5ee3acea0d384081519c7f558892ae351612dc676426ba16a3a06",
+      5530547
+    ],
+    "compute/session/session.json": [
+      "0cb45b98e63772443b09b312d17ac13f5492bf193e6d7e1e62a5995a84ba0857",
+      1607
+    ],
+    "compute/session/spec.json": [
+      "92868efabbdf44bc54c8aeba4124f7cabe170ab29b3177b2083d399acaf88c75",
+      990
+    ],
+    "generations/g1/dump/core-531.img": [
+      "afe37ffa95f484af7c12e9c270276d9c6ee6d3180c0f24f52ed11def7e545ea0",
+      2886
+    ],
+    "generations/g1/dump/core-532.img": [
+      "8395a086ff7bef9128bd4e30c7a77aac2458f2ebdcf20329a03df60938532448",
+      1252
+    ],
+    "generations/g1/dump/core-5521.img": [
+      "edf721874b7e82daaf9b08981a0e8ad6eecf7275f0c142091fc59d77e71b0fa4",
+      2751
+    ],
+    "generations/g1/dump/core-5522.img": [
+      "e23294f36470d40c22133a01dbef95f737cb5af88fa6f7b3fe827adfe97b1937",
+      1721
+    ],
+    "generations/g1/dump/core-5523.img": [
+      "a44ac796521164ad7181d1ddb8b7306ddeb5ffe4cad474b926840370fae2d82f",
+      1721
+    ],
+    "generations/g1/dump/core-5524.img": [
+      "f58ac1f8e1ad997cb9ed316162ba964dbdf6e7b56c2020fd648e22e327b8ed41",
+      1674
+    ],
+    "generations/g1/dump/cpuinfo.img": [
+      "c47dbd26e0a3fb9c98ab611972ea8a4e7028883f163704aea17c3668228df51e",
+      120
+    ],
+    "generations/g1/dump/dump-result.json": [
+      "23f096a6200d574c734b8ce84971b26dd28c72a464ccf5389626fc0e52a37637",
+      36
+    ],
+    "generations/g1/dump/dump.log": [
+      "20adcd25fa97d5555c2c50e805fdbfd09dc60ef6e947c4720956598471e0548d",
+      108475
+    ],
+    "generations/g1/dump/fdinfo-2.img": [
+      "f4335b6f10dcf82660f0bfc07542e2f16dc868bfaa86fbe04cdf2888ed11be73",
+      92
+    ],
+    "generations/g1/dump/fdinfo-3.img": [
+      "3d37710cb3ab4bba8de684a17400ef99d2ca95abe6c13ff2d78dd30b715bb4fd",
+      44
+    ],
+    "generations/g1/dump/filelocks.img": [
+      "5b20f514b252a20c59426c91188707fb32a9f9234abd4fb33fa6e86f559f35ae",
+      25
+    ],
+    "generations/g1/dump/files.img": [
+      "7925a71063631c322899003946abeae3a25dd18d782b6d65320c6b081980e8d9",
+      1106
+    ],
+    "generations/g1/dump/fs-531.img": [
+      "8e7aadb450198e11cb58974bb2ea1c0da81e2c05231029a2bd36dffa4fa2f77a",
+      18
+    ],
+    "generations/g1/dump/fs-5521.img": [
+      "c370eb2636e7769efea5dca587e93e6ddc955a26158d47313dac756357999ac2",
+      18
+    ],
+    "generations/g1/dump/ids-531.img": [
+      "f78d18dbee7494f51762bf7f7d0fc90d2af549f2e3ef6e31854e109c341eeb9f",
+      36
+    ],
+    "generations/g1/dump/ids-5521.img": [
+      "a0274224dfff3f701e9bde7b531881573e260efbdbf2b3ea38784655fb517e9b",
+      36
+    ],
+    "generations/g1/dump/inventory.img": [
+      "f45f62ed15eb6c11b8d5275d73783658af7eb0c65ed43958b21b019dc3f89c77",
+      86
+    ],
+    "generations/g1/dump/mm-531.img": [
+      "105966011d1a984e7389e2d1a2503c487d23de8f63b009f05c6ad5b617b78da6",
+      2205
+    ],
+    "generations/g1/dump/mm-5521.img": [
+      "2ed4016c42157eace2ef17d8e6c129b658f28749d979af42382c576d88748c69",
+      1381
+    ],
+    "generations/g1/dump/pagemap-531.img": [
+      "74512bcbc268ad7c7764430c2a90aab6c7e073a7a4646dc260bd6fb6036f70f6",
+      541
+    ],
+    "generations/g1/dump/pagemap-5521.img": [
+      "2d5f824ee4d39f8999a4c53b854688ad82ec196b31c1c14c7b99e014f65d6eb6",
+      379
+    ],
+    "generations/g1/dump/pages-1.img": [
+      "71318ff8d42ec0abc0b6f34125d9f99ce6deb7df56810f9455ff1a9ca187ac95",
+      20144128
+    ],
+    "generations/g1/dump/pages-2.img": [
+      "8667e68718a8122e7134493b15716b6b8836d70780076e692ae4cb0398877de6",
+      19947520
+    ],
+    "generations/g1/dump/pipes-data.img": [
+      "d00bd9d746e9c1e2d65a6b6829f9006f198ec7eb97b1d50a0e0192b289dc0790",
+      50
+    ],
+    "generations/g1/dump/process-531-status.txt": [
+      "65b232207de24cecbae7b6f6918d610d32fc67ab6c4f417733288cc857cf0793",
+      1437
+    ],
+    "generations/g1/dump/process-5521-status.txt": [
+      "3665addb079a5c6933ec72b0cd9308a5b2dc5c88992660ba3f091de639f437cc",
+      1438
+    ],
+    "generations/g1/dump/pstree.img": [
+      "840fed5c08cf299ba6a7b5f874f5d4db995b84932ecec55ae0a190dec236d8fb",
+      57
+    ],
+    "generations/g1/dump/seccomp.img": [
+      "c1d128c2dbebcb99d7623419a907116346c4d0e405e47f84d58c3e991275f874",
+      136
+    ],
+    "generations/g1/dump/stats-dump": [
+      "6dcf7651a6544cceff9095b17d047cc93ca8858b1dbce065420993f4ab803a9a",
+      48
+    ],
+    "generations/g1/dump/timens-0.img": [
+      "4912ef9bb76a3457f5cc89ebfad22e3bb0babb22c0e81ef2ea244176bdb5ee4a",
+      30
+    ]
+  }
+}

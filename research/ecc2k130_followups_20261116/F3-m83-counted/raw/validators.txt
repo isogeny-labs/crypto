@@ -1,0 +1,9 @@
+# validator receipts 2026-11-16T01:12:59Z; controller sha256 58db8a2d6a8c065bd09eb4757df8b9e5c4699e2418b28ef09db276cba98f3e0b built from taskq/deploy/eks-karpenter/resume/controller at c3655407dc (cargo --locked)
+## isolab-eks-recovery validate request-resumable-k0n83-ecbench-mode.json
+exit=1 stderr=isolab-eks-recovery: recovery runtime must be digest-pinned in the approved repository
+## isolab-eks-recovery validate validator-input-resumable-dummy-l0.json
+exit=1 stderr=isolab-eks-recovery: the original benchmark spec must require L2, warmup, five rounds, reference and A/A control
+## isolab-eks-recovery validate validator-input-resumable-dummy-l2.json
+exit=0 stderr=
+## remote/validate-request request-v1-rate-probe-l2.json
+exit=0 stderr=

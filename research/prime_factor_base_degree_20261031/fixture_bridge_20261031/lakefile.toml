@@ -1,0 +1,15 @@
+name = "secant_fixture_bridge"
+version = "0.1.0"
+defaultTargets = ["FixtureBridge"]
+
+[[require]]
+name = "secant_formalization"
+path = "../proof"
+
+[[require]]
+name = "secant_group_formalization"
+path = "../group_law_20261031"
+
+[[lean_lib]]
+name = "FixtureBridge"
+roots = ["FixtureGroupDegree"]

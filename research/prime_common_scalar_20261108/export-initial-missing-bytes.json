@@ -1,0 +1,232 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "research/prime_common_scalar_20261108/reports/summary.json",
+        "sha256": "eb2e82f7110053032257022e2a0850ba6e5f48b8e7e690a9e981bd2e9e4d3846"
+      },
+      {
+        "path": "research/prime_common_scalar_20261108/reports/per-level.csv",
+        "sha256": "f1afa00b3095abab7949ef09811288d0e0dbad7db67db7022b3c9ecac394a178"
+      }
+    ],
+    "script": {
+      "path": "research/prime_common_scalar_20261108/analyze.cpp",
+      "sha256": "aee93585e61b4087d599769b9b6abc69677e7a0efc2ab8cd82ed83ae42d01e00"
+    },
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "c24860ebfa98f2da61763ea074258e459872fa1d2f3d641bd1733e2443fa5734",
+      "commit": "555cd9430f525a4bf0e4f0275e8b6aba4387cbf1",
+      "id": "paired-panel",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "c24860ebfa98f2da61763ea074258e459872fa1d2f3d641bd1733e2443fa5734",
+      "commit": "555cd9430f525a4bf0e4f0275e8b6aba4387cbf1",
+      "id": "replay",
+      "role": "control_aa"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-11-08T05:59:34Z",
+  "export_id": "prime-common-scalar-20261108",
+  "files": [
+    {
+      "path": "research/prime_common_scalar_20261108/runs/0/panel.csv",
+      "sha256": "cdca8f18fd368a67680d6a3cff2b8ed3db30f6b3d1c526f634f4391e7c63269c"
+    },
+    {
+      "path": "research/prime_common_scalar_20261108/runs/0/receipt.json",
+      "sha256": "7e2b344d03065fe5ac052fdd126ef12e7328178e3faeb5de59808181d90dd854"
+    },
+    {
+      "path": "research/prime_common_scalar_20261108/runs/0/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/prime_common_scalar_20261108/runs/1/panel.csv",
+      "sha256": "cdca8f18fd368a67680d6a3cff2b8ed3db30f6b3d1c526f634f4391e7c63269c"
+    },
+    {
+      "path": "research/prime_common_scalar_20261108/runs/1/receipt.json",
+      "sha256": "475c58df9efa01a679683a47e9c87c0a5795b05097bd273fbc5a1c9fa3520f89"
+    },
+    {
+      "path": "research/prime_common_scalar_20261108/runs/1/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/prime_common_scalar_20261108/host.txt",
+      "sha256": "459c2523faa6b777b503ecc0d88bfafd8dab429b3b0b5eed4fbfa63ec33bdb40"
+    }
+  ],
+  "flow": {
+    "attempted": 2,
+    "completed": 2,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 2,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": null,
+    "path": "research/prime_common_scalar_20261108/host.txt",
+    "sha256": "459c2523faa6b777b503ecc0d88bfafd8dab429b3b0b5eed4fbfa63ec33bdb40",
+    "summary": {
+      "cpu_model": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "kernel": null,
+      "logical_cpus": null,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Two physical executions. Kernels and controls are embedded. Exact finite census; precision multipliers are proxies, no runtime conclusion."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "producer",
+    "runtime": "codex",
+    "session": "common-scalar-20261108"
+  },
+  "protocol": {
+    "path": "research/prime_common_scalar_20261108/protocol.json",
+    "protocol_id": "prime-common-scalar-20261108",
+    "sha256": "dedbb0086d84e5ecffba17a424a1fcfe6b89bb3d5db0ea40a5421afc36e8d548",
+    "version": 1
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "paired-panel",
+      "artifacts": [
+        {
+          "path": "research/prime_common_scalar_20261108/runs/0/panel.csv",
+          "sha256": "cdca8f18fd368a67680d6a3cff2b8ed3db30f6b3d1c526f634f4391e7c63269c"
+        },
+        {
+          "path": "research/prime_common_scalar_20261108/runs/0/receipt.json",
+          "sha256": "7e2b344d03065fe5ac052fdd126ef12e7328178e3faeb5de59808181d90dd854"
+        },
+        {
+          "path": "research/prime_common_scalar_20261108/runs/0/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "local-0",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-11-08T05:58:40Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "No timed metric; co-tenants not controlled"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "rows_completed": 20928
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "paired-panel/0",
+      "seed": 0,
+      "started_at": "2026-11-08T05:58:19Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Producer exact reconstruction and recount; no independent signature"
+      },
+      "warmup": false,
+      "worker": "local-cpu0"
+    },
+    {
+      "arm": "replay",
+      "artifacts": [
+        {
+          "path": "research/prime_common_scalar_20261108/runs/1/panel.csv",
+          "sha256": "cdca8f18fd368a67680d6a3cff2b8ed3db30f6b3d1c526f634f4391e7c63269c"
+        },
+        {
+          "path": "research/prime_common_scalar_20261108/runs/1/receipt.json",
+          "sha256": "475c58df9efa01a679683a47e9c87c0a5795b05097bd273fbc5a1c9fa3520f89"
+        },
+        {
+          "path": "research/prime_common_scalar_20261108/runs/1/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "local-1",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-11-08T05:59:18Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "No timed metric; co-tenants not controlled"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "rows_completed": 20928
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "replay/0",
+      "seed": 0,
+      "started_at": "2026-11-08T05:58:53Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Producer exact reconstruction and recount; no independent signature"
+      },
+      "warmup": false,
+      "worker": "local-cpu0"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "555cd9430f525a4bf0e4f0275e8b6aba4387cbf1",
+    "dirty": false,
+    "repo": "crypto"
+  }
+}

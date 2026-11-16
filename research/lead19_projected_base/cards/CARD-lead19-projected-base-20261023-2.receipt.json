@@ -1,0 +1,128 @@
+{
+  "card_id": "CARD-lead19-projected-base-20261023-2",
+  "card_path": "research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-2.yaml",
+  "card_sha256": "e79220749a8b7bb5450225fcc17296ca17b4f07e2ad856e992b482f5dc6e5b04",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "ic"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.179,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 1,
+      "outputs": {
+        "target/release/ic": "373c0f1d02abc29465c4d434754f5e9c732e3ff82bcb836364d1655ca2d1e2ec"
+      },
+      "seconds": 0.179,
+      "stderr_sha256": "0b5fe2277fd2b29cc111b76604c482f8ec516047dbc0954657203c5614f4e4db",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.10s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ic",
+        "boundary",
+        "--regime",
+        "char2",
+        "--char2-degrees",
+        "15,18,21,24,27",
+        "--repeats",
+        "20",
+        "--seed",
+        "123212651130",
+        "--s4-max-degree",
+        "0",
+        "--base-arms",
+        "raw,projected,subgroup",
+        "--out",
+        "research/lead19_projected_base/char2_repeats20.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 66.609,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-char2-repeats20",
+      "index": 2,
+      "outputs": {},
+      "seconds": 66.609,
+      "stderr_sha256": "e20a9a4ab8a18509155d398a79f6465759775d3d13947d14f9e6dd139b1ce031",
+      "stderr_tail": [
+        "  char2: searching a curve over GF(2^15)",
+        "  char2: icv1-f2m15-t131-ed7256f0 r=2^14.0 rho S=2.02 best IC S=5.9",
+        "  char2: searching a curve over GF(2^18)",
+        "  char2: icv1-f2m18-t393-d2c04152 r=2^15.0 rho S=1.91 best IC S=6.6",
+        "  char2: searching a curve over GF(2^21)",
+        "  char2: icv1-f2m21-t2591-de54d72e r=2^20.0 rho S=1.24 best IC S=6.8",
+        "  char2: searching a curve over GF(2^24)",
+        "  char2: icv1-f2m24-tm3047-2d0c0e8c r=2^21.0 rho S=1.28 best IC S=6.0",
+        "  char2: searching a curve over GF(2^27)",
+        "  char2: icv1-f2m27-t12543-569dca8b r=2^24.4 rho S=1.02 best IC S=7.5"
+      ],
+      "stdout_sha256": "2c9bfea83a952204a3122e48f0b0d11a6d90005e18d06589701a97ef72632de0",
+      "stdout_tail": [
+        "| char2 | mitm_m2_negfold_walk_subgroup_balanced | total | 0.470 | 0.981 | 0.430 | 5 |",
+        "| char2 | mitm_m2_negfold_walk_subgroup_balanced | trials | 0.552 | 0.968 | 0.474 | 5 |",
+        "| char2 | mitm_m3 | factor_base | 0.578 | 0.953 | 0.541 | 5 |",
+        "| char2 | mitm_m3 | linear_algebra | 0.721 | 0.954 | 0.670 | 5 |",
+        "| char2 | mitm_m3 | relations | 0.635 | 0.983 | 0.565 | 5 |",
+        "| char2 | mitm_m3 | total | 0.620 | 0.988 | 0.559 | 5 |",
+        "| char2 | mitm_m3 | trials | 0.360 | 0.951 | 0.311 | 5 |",
+        "| char2 | mitm_m3_negfold | factor_base | 0.528 | 0.956 | 0.494 | 5 |",
+        "| char2 | mitm_m3_negfold | linear_algebra | 0.721 | 0.954 | 0.670 | 5 |",
+        "| char2 | mitm_m3_negfold | relations | 0.635 | 0.983 | 0.565 | 5 |",
+        "| char2 | mitm_m3_negfold | total | 0.614 | 0.986 | 0.552 | 5 |",
+        "| char2 | mitm_m3_negfold | trials | 0.360 | 0.951 | 0.311 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | factor_base | 0.528 | 0.956 | 0.494 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | linear_algebra | 0.716 | 0.932 | 0.674 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | relations | 0.684 | 0.985 | 0.615 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | total | 0.646 | 0.983 | 0.586 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | trials | 0.348 | 0.955 | 0.303 | 5 |",
+        "| char2 | rho_reference | total | 0.403 | 0.999 | 0.362 | 5 |",
+        "",
+        "Report saved: research/lead19_projected_base/char2_repeats20.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 2,
+  "commit": "1cb4924a9aec75ea575969ce248619a558dabdd2",
+  "dirty_after": [
+    "docs/ic/LEADERBOARD.md",
+    "docs/ic/leaderboard.json",
+    "ocs/ic-leaderboard.html",
+    "research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-2.yaml",
+    "research/lead19_projected_base/char2_repeats20.json",
+    "research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-2.run-char2-repeats20.stderr",
+    "research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-2.run-char2-repeats20.stdout"
+  ],
+  "dirty_before": [
+    "research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-2.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

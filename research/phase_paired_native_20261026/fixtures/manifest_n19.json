@@ -1,0 +1,228 @@
+{
+  "curve": {
+    "equation": "y^2 + x*y = x^3 + 1",
+    "generator": [
+      "0x5e3be",
+      "0x49b2b"
+    ],
+    "group_order": 523492,
+    "lambda_relation": "pi(P) = [lambda]P on H, lambda^2 - t*lambda + 2 = 0 mod r",
+    "modulus": "0x80027",
+    "n": 19,
+    "odd_subgroup_order": 130873,
+    "trace_t": -1
+  },
+  "factor_space": {
+    "admissible_x_phases_free": 323,
+    "admissible_x_phases_known_zero": 17,
+    "basis": [
+      "0x14a34",
+      "0x360b5",
+      "0xa614",
+      "0x5094e",
+      "0x19aec",
+      "0x1a6b0"
+    ],
+    "representatives": [
+      {
+        "index": 0,
+        "point": [
+          "0x76cc",
+          "0x5101e"
+        ],
+        "x": "0x76cc"
+      },
+      {
+        "index": 1,
+        "point": [
+          "0xa614",
+          "0x176d3"
+        ],
+        "x": "0xa614"
+      },
+      {
+        "index": 2,
+        "point": [
+          "0x17668",
+          "0xe88a"
+        ],
+        "x": "0x17668"
+      },
+      {
+        "index": 3,
+        "point": [
+          "0x1a6b0",
+          "0x6c666"
+        ],
+        "x": "0x1a6b0"
+      },
+      {
+        "index": 4,
+        "point": [
+          "0x22a81",
+          "0x5dcdd"
+        ],
+        "x": "0x22a81"
+      },
+      {
+        "index": 5,
+        "point": [
+          "0x2fa59",
+          "0x5b6c3"
+        ],
+        "x": "0x2fa59"
+      },
+      {
+        "index": 6,
+        "point": [
+          "0x35ce9",
+          "0x51d8e"
+        ],
+        "x": "0x35ce9"
+      },
+      {
+        "index": 7,
+        "point": [
+          "0x360b5",
+          "0x17916"
+        ],
+        "x": "0x360b5"
+      },
+      {
+        "index": 8,
+        "point": [
+          "0x38c31",
+          "0x459a4"
+        ],
+        "x": "0x38c31"
+      },
+      {
+        "index": 9,
+        "point": [
+          "0x3fafd",
+          "0xd40c"
+        ],
+        "x": "0x3fafd"
+      },
+      {
+        "index": 10,
+        "point": [
+          "0x4affe",
+          "0x10f7"
+        ],
+        "x": "0x4affe"
+      },
+      {
+        "index": 11,
+        "point": [
+          "0x4d932",
+          "0xbd1a"
+        ],
+        "x": "0x4d932"
+      },
+      {
+        "index": 12,
+        "point": [
+          "0x59306",
+          "0xb379"
+        ],
+        "x": "0x59306"
+      },
+      {
+        "index": 13,
+        "point": [
+          "0x5e5ca",
+          "0x4e61"
+        ],
+        "x": "0x5e5ca"
+      },
+      {
+        "index": 14,
+        "point": [
+          "0x6f3b3",
+          "0x2ca69"
+        ],
+        "x": "0x6f3b3"
+      },
+      {
+        "index": 15,
+        "point": [
+          "0x75503",
+          "0x32224"
+        ],
+        "x": "0x75503"
+      },
+      {
+        "index": 16,
+        "point": [
+          "0x7cf4b",
+          "0x341bd"
+        ],
+        "x": "0x7cf4b"
+      }
+    ],
+    "s": 6
+  },
+  "schema": "phase_paired_native/manifest/v1",
+  "target_rng": "splitmix64 seeded with target_seed*10000 + n*10; sets a, b, c drawn in that order",
+  "target_seed": 20261026,
+  "target_sets": {
+    "a": {
+      "name": "planted_random_phase",
+      "targets": [
+        {
+          "R": [
+            "0x1bfa8",
+            "0x19e88"
+          ],
+          "id": "a0"
+        },
+        {
+          "R": [
+            "0x477ec",
+            "0x6f9fc"
+          ],
+          "id": "a1"
+        }
+      ]
+    },
+    "b": {
+      "name": "planted_phase0",
+      "targets": [
+        {
+          "R": [
+            "0x6b445",
+            "0x43de2"
+          ],
+          "id": "b0"
+        },
+        {
+          "R": [
+            "0x5244",
+            "0x3c235"
+          ],
+          "id": "b1"
+        }
+      ]
+    },
+    "c": {
+      "name": "uniform_random",
+      "targets": [
+        {
+          "R": [
+            "0x65361",
+            "0x6c40e"
+          ],
+          "id": "c0"
+        },
+        {
+          "R": [
+            "0x7ec31",
+            "0x58cb7"
+          ],
+          "id": "c1"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,814 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "DLP tuning TRAIN Koblitz n=47",
+  "description": "Koblitz double-large-prime tuning against the compact-orbit m=2 baseline; research/ic_koblitz_dlp_tuning_20261023/PROTOCOL.md. Counts only (L0); public synthetic targets; no security claim.",
+  "workloads": {
+    "targets_per_curve": 24,
+    "target_seed": 20261023001,
+    "target_kind": "public",
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 47
+      }
+    ]
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius"
+      }
+    },
+    {
+      "name": "base-k16",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "base-k32",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=32,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "base-k64",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=64,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "base-k128",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=128,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "base-k256",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=256,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c80",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=80",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c160",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=160",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k1-c320",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=320",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c80",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=80",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c160",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=160",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k2-c320",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=320",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c80",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=80",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k3-c160",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=160",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c80",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=80",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c160",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=160",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k6-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k6-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k6-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k6-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k6-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k6-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k6-c80",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=80",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c80",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=80",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k12-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=12,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k12-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=12,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k12-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=12,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k12-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=12,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k12-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=12,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k12-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=12,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=1",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=5",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c20",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=20",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261023002,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

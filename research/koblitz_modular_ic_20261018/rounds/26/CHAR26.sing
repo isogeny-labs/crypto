@@ -1,0 +1,46 @@
+ring c26=2,(x,y,A,b,l,n),dp;
+poly ec=y^2+A*x*y+b*y+x^3+b*x^2;
+map negation=c26,x,y+A*x+b,A,b,l+A,n+b;
+poly shifted=negation(ec);
+poly line=y+l*x+n;
+poly shiftedLine=negation(line);
+print("TATE_NEGATION_AND_LINE_RESIDUALS");shifted-ec;shiftedLine-line;
+if(shifted!=ec || shiftedLine!=line){ERROR("wrong original point/line negation");}
+poly yy=y;poly yyImage=negation(yy);poly yyTwice=negation(yyImage);
+if(yyTwice!=yy){ERROR("point negation not involutive");}
+int delta=34;
+print("CRT_DELTA");delta;delta%11;delta%7;(delta*delta)%77;
+if(delta%11!=1 || delta%7!=6 || (delta*delta)%77!=1){ERROR("delta does not negate Q while fixing P");}
+intvec etaLog;intvec histogram;intvec primitives=1,3,7,9;
+int e;int d;int r;int nonresidue;int exponent;int unitsCount=0;int deltaExponent;
+for(e=0;e<10;e++){etaLog[((2^e)%11)+1]=e;histogram[e+1]=0;}
+for(d=1;d<77;d++){
+ if(d%7!=0 && d%11!=0){
+  unitsCount++;r=d%7;nonresidue=1;
+  if(r==1 || r==2 || r==4){nonresidue=0;}
+  exponent=(etaLog[(d%11)+1]+5*nonresidue)%10;
+  histogram[exponent+1]=histogram[exponent+1]+1;
+  if(d==delta){deltaExponent=exponent;}
+ }
+}
+print("CHARACTER_FIBER_COUNTS");unitsCount;histogram;
+if(unitsCount!=60){ERROR("wrong unit count");}
+for(e=1;e<=10;e++){if(histogram[e]!=6){ERROR("wrong character fiber");}}
+print("DELTA_CHARACTER_EXPONENT");deltaExponent;
+if(deltaExponent!=5){ERROR("wrong delta character");}
+ring f26=11,(z),dp;
+int i;int j;int subgroupSize;int k;number eigen;number sigmaValue;number normValue;
+intvec orders=1,2,5,10;
+for(i=1;i<=4;i++){
+ k=primitives[i];eigen=2^k;sigmaValue=eigen^5;
+ print("PRIMITIVE_DIAMOND_SIGMA "+string(k));eigen;sigmaValue;
+ if(sigmaValue!=-1){ERROR("primitive factor is not minus");}
+ for(j=1;j<=4;j++){
+  subgroupSize=orders[j];normValue=0;
+  int a;for(a=0;a<subgroupSize;a++){normValue=normValue+eigen^(a*(10/subgroupSize));}
+  print("SUBGROUP_NORM "+string(k)+" "+string(subgroupSize));normValue;
+  if(subgroupSize==1){if(normValue!=1){ERROR("trivial norm positive control");}}
+  else{if(normValue!=0){ERROR("nontrivial diamond norm not zero");}}
+ }
+}
+print("CHAR26_ALL_CHECKS_PASS");quit;

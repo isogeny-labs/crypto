@@ -20,28 +20,37 @@ finding all directions structurally null at the prime-field level.
 
 The main result is a **structural-completeness theorem**:
 
-> For every prime-order ordinary elliptic curve `E` over a prime
+> For every ordinary elliptic curve `E` over a prime
 > field `F_p`, no algorithm in the family
 > `{F_p-isogeny transport, Cl(End)-orbit walking, (N, N)-cover
 > via Howe-gluing, higher-genus cover, supersingular-reduction
 > attack, volcano-floor ρ}`
-> reduces ECDLP cost below `√n / √|Aut(E)|` (plain Pollard ρ
-> with full automorphism folding).
+> reduces ECDLP cost below `√r / √|Aut(E)|` (plain Pollard ρ
+> with full automorphism folding), where `#E(F_p) = h·r`, `r` prime,
+> `h ∈ {1,2,4,8}`.
 
-The theorem is proven via seven independent structural blocks
-(§4) and empirically verified across all four deployed curves (§7).
+The theorem is argued by case analysis over seven structural blocks
+(§4; proof sketches in §8, not yet independently reviewed) under
+standing assumptions (Tate's isogeny theorem, Howe's gluing
+theorem, Gaudry's and Diem–Thomé's hyperelliptic index-calculus bounds,
+and no sub-exponential prime-field hyperelliptic DLP). The empirical
+checks are bounded: structural conditions are computed for the four
+deployed curves only (§7); the twist ℓ-rank lemma is checked for
+ℓ ∈ {3,5,7,11,13} on j = 0 curves with p < 500; the split-Jacobian sweep
+covers p ≡ 1 (mod 6), p ≤ 1000, and the CM-73 sweep p ≤ 5000.
+(Corrected 2026-10-16, sheriff case SHF-20261016-3caa6f P5; the LaTeX
+paper `papers/structural-completeness/` is the reference version, and its
+instance and prime counts are recomputed in `recount/`. Corrected again
+2026-10-17, sheriff case SHF-20261017-e4d7f6 P-N6: "proven" became "argued
+(proof sketches in §8)", and a stale paragraph calling the proof
+"unconditional", conditional only on no sub-exponential algorithm being
+*known*, was deleted; it contradicted the standing assumptions above.)
 
 A surprising auxiliary finding: the **Howe-gluing genus-2 cover
 exists for every such curve** (we verify the three Howe (1996)
 conditions hold uniformly), but the cover does not yield a DLP
 speedup because genus-2 prime-field DLP costs `O(p)` while ECDLP
 costs `O(√p)`.
-
-The proof is *unconditional* in the sense that it depends only on
-established theorems (Tate, Howe, Gaudry, Diem-Thomé) plus
-mechanically verifiable arithmetic conditions; it is *conditional*
-only on the standing assumption that no sub-exponential DLP
-algorithm is known for prime-field hyperelliptic Jacobians.
 
 ## Section index
 
@@ -98,8 +107,11 @@ This paper does the systematic version of that audit:
 The result is, predictably, a null: every direction is closed.
 The value lies in the **completeness** of the closure — the
 theorem turns a folklore claim ("ECDLP is hard for prime-field
-ECC") into a rigorously decomposable, mechanically verifiable
-structural statement.
+ECC") into a structural statement argued by case analysis over seven
+blocks (proof sketches in §8, not yet independently reviewed; nothing
+in it is machine-checked). *(Correction, 2026-10-28, sheriff case
+SHF-20261028-0f3f64, PPN-4: this sentence used to call the statement
+"rigorously decomposable, mechanically verifiable".)*
 
 ## 2. Setup: isogeny graphs of CM curves
 
@@ -674,8 +686,14 @@ not a proof of cryptanalytic finality.
 ### 10.1 Code artefacts
 
 All scripts in [`secp256k1_cm_audit/`](../../../secp256k1_cm_audit) are
-PARI/GP 2.17+ scripts with committed expected outputs.  Total
-runtime: ~3 minutes on an M-series Mac.
+PARI/GP 2.17+ scripts. Each script listed below has a committed
+`*_output.expected.txt`; for `vfcg_experiment.gp` the file is
+`vfcg_output.expected.txt`. No automated check compares them with fresh
+runs, and no runtime is recorded. LOC are `wc -l` counts at commit
+`57fa35852`. *(Correction, 2026-10-28, sheriff case SHF-20261028-0f3f64,
+PPN-3: this paragraph used to claim "~3 minutes on an M-series Mac", for
+which no record exists. It also gave `multi_curve_audit.gp` as 274 LOC
+and the total as ~2580. The full 16-script table is in the LaTeX paper.)*
 
 | File                                  | Block(s) implemented                            | LOC  |
 |---------------------------------------|--------------------------------------------------|-----:|
@@ -688,8 +706,8 @@ runtime: ~3 minutes on an M-series Mac.
 | `cover_complexity.gp`                 | B5, B6 (DLP cost across genera)                 | 165  |
 | `supersingular_reductions.gp`         | B7 (V4 closure)                                  | 171  |
 | `p256_comparison.gp`                  | §7 cross-curve (secp256k1 vs P-256)             | 283  |
-| `multi_curve_audit.gp`                | §7 four-curve full audit                         | 274  |
-| **Total**                             |                                                  | **~2580** |
+| `multi_curve_audit.gp`                | §7 four-curve full audit                         | 239  |
+| **Total**                             |                                                  | **2386** |
 
 ### 10.2 How to verify
 

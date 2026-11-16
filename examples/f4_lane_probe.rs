@@ -38,7 +38,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_standard_subspace_factor_base, decomposition_solver_equations, groebner_decompose,
     groebner_decompose_f6_ic_pair_index, KoblitzCurve,
 };
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, mask_low64, F2BoolMono, F2BoolPoly};
 use num_bigint::BigUint;
 use std::collections::HashMap;
 use std::time::Instant;
@@ -117,7 +117,7 @@ fn occurring(system: &[F2BoolPoly]) -> u64 {
     system
         .iter()
         .flat_map(|p| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask)
+        .fold(0u64, |acc, t| acc | mask_low64(t.mask))
 }
 
 struct Cell {
@@ -311,7 +311,9 @@ fn main() {
                     let mut seen: HashMap<(u64, u64), u64> = HashMap::new();
                     for (i, e) in events.iter().enumerate() {
                         let next = events.get(i + 1).map_or(end, |n| n.word_ops);
-                        *seen.entry((e.assigned, e.values)).or_default() += next - e.word_ops;
+                        *seen
+                            .entry((mask_low64(e.assigned), mask_low64(e.values)))
+                            .or_default() += next - e.word_ops;
                         visits += 1;
                     }
                     for (key, work) in seen {
@@ -374,7 +376,7 @@ fn main() {
                     let mut stack: Vec<(u64, usize, u32)> = vec![(0, 0, 0)];
                     while let Some((mask, from, deg)) = stack.pop() {
                         if next() & 1 == 1 || (mask == 0) {
-                            monos.push(F2BoolMono::from_mask(mask));
+                            monos.push(F2BoolMono::from_mask(mask_from64(mask)));
                         }
                         if deg < d {
                             for (j, &v) in vars.iter().enumerate().skip(from) {

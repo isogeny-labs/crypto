@@ -1,0 +1,134 @@
+{
+  "card_id": "CARD-f4-harvest-remeasure-20261024-1",
+  "card_path": "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-1.yaml",
+  "card_sha256": "ed0cabb26370904a7b6c5904230a9cfd16876d217bcd6c6343a5297e4c5a7009",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "CARGO_TARGET_DIR=/home/user/tgt",
+        "CARGO_PROFILE_RELEASE_OPT_LEVEL=1",
+        "CARGO_PROFILE_RELEASE_LTO=false",
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16",
+        "CARGO_PROFILE_RELEASE_DEBUG=false",
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "ecbench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.182,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.182,
+      "stderr_sha256": "85c8dbac64ed6a362d668bf3988686e26e947620bb15cfdbe2e999a0ff8261b2",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.11s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/user/tgt/release/ecbench",
+        "run",
+        "--spec",
+        "research/f4_harvest_remeasure_20261024/SPEC-K0n13.json",
+        "--out",
+        "research/f4_harvest_remeasure_20261024/sessions/K0n13",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet",
+        "--lock",
+        "/tmp/f4-harvest-remeasure.lock"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 23.482,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-k0n13",
+      "index": 2,
+      "outputs": {},
+      "seconds": 23.482,
+      "stderr_sha256": "43f29f3a81ac27d0890e3e055437eac411aed452bbd55ee399d70b39b410a509",
+      "stderr_tail": [
+        "session ECBS1h11d30cd9b363 complete -> research/f4_harvest_remeasure_20261024/sessions/K0n13 (144 records: {\"verified\": 144})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/user/tgt/release/ecbench",
+        "verify",
+        "--dir",
+        "research/f4_harvest_remeasure_20261024/sessions/K0n13",
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        "research/f4_harvest_remeasure_20261024/audits/K0n13.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 2,
+          "seconds": 17.726,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 2,
+      "id": "verify-k0n13",
+      "index": 3,
+      "outputs": {
+        "research/f4_harvest_remeasure_20261024/audits/K0n13.audit.json": null
+      },
+      "seconds": 17.726,
+      "stderr_sha256": "037da25d4828544b62d7b00a66903eb2ded16d72ee9229993c64242f6d6542d0",
+      "stderr_tail": [
+        "ecbench: research/f4_harvest_remeasure_20261024/audits/K0n13.audit.json: No such file or directory (os error 2)"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 11,
+  "commit": "8db015f1682ea4e37536ff25e329229504fd8d01",
+  "dirty_after": [
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-1.run-k0n13.stdout",
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-1.verify-k0n13.stdout",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n13/host.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n13/plan.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n13/records.jsonl",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n13/session.json",
+    "research/f4_harvest_remeasure_20261024/sessions/K0n13/spec.json"
+  ],
+  "dirty_before": [
+    "research/f4_harvest_remeasure_20261024/cards/CARD-f4-harvest-remeasure-20261024-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 3"
+}

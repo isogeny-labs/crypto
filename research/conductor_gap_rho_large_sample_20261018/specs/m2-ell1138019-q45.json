@@ -1,0 +1,64 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "conductor gap ell=1138019 (2^20..), D=-19, hard kernel, q 45 bits: crater vs 3 floors, 128 shared targets",
+ "description": "New parameters t=10055507: q=(t^2+19 ell^2)/4 and N=q+1-t prime; lambda=t/2 mod ell has order given in PROTOCOL.md, so no small-degree kernel field exists. Curve roles, in order: crater, floor(seed1), floor(seed2), floor(seed3).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "conductor_gap",
+    "ell": 1138019,
+    "t": 10055507,
+    "level": "crater",
+    "seed": 1
+   },
+   {
+    "kind": "conductor_gap",
+    "ell": 1138019,
+    "t": 10055507,
+    "level": "floor",
+    "seed": 1
+   },
+   {
+    "kind": "conductor_gap",
+    "ell": 1138019,
+    "t": 10055507,
+    "level": "floor",
+    "seed": 2
+   },
+   {
+    "kind": "conductor_gap",
+    "ell": 1138019,
+    "t": 10055507,
+    "level": "floor",
+    "seed": 3
+   }
+  ],
+  "target_kind": "planted_shared",
+  "target_seed": 2026101812,
+  "targets_per_curve": 128
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261018,
+  "isolation_required": "L2",
+  "timeout_seconds": 900
+ }
+}

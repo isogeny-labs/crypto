@@ -1,0 +1,227 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h0abc57c4d1e81eb0",
+  "statement": {
+    "name": "Short-Weierstrass line intersection cubic",
+    "source": "Milne, Elliptic Curves, second edition, I section 3; direct coefficient expansion, not a novelty claim",
+    "variables": [
+      "x",
+      "t",
+      "c",
+      "a",
+      "b"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "x"
+            },
+            {
+              "op": "var",
+              "args": "x"
+            },
+            {
+              "op": "var",
+              "args": "x"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "var",
+              "args": "x"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "b"
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "t"
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "c"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "t"
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "c"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "x"
+            },
+            {
+              "op": "var",
+              "args": "x"
+            },
+            {
+              "op": "var",
+              "args": "x"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "t"
+                  },
+                  {
+                    "op": "var",
+                    "args": "t"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "x"
+                  },
+                  {
+                    "op": "var",
+                    "args": "x"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "const",
+                        "args": 2
+                      },
+                      {
+                        "op": "var",
+                        "args": "t"
+                      },
+                      {
+                        "op": "var",
+                        "args": "c"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "x"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "b"
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "c"
+              },
+              {
+                "op": "var",
+                "args": "c"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261028,
+  "value_digest": "4e6a12cfb20439712a98e123c015b32088302450cbe095a5dfde34f97282c907",
+  "independence": "Standard coefficient expansion; checked using an independent seed",
+  "proof": null
+}

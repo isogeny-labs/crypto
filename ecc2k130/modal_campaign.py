@@ -230,7 +230,7 @@ def parse_args(argv):
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--threads", type=int, default=256)
     ap.add_argument("--leaf", type=int, default=0)
-    ap.add_argument("--walks", type=int, default=6160384)
+    ap.add_argument("--walks", type=int, default=1540096)  # 96,256 workers x 16 since 2026-10-17
     ap.add_argument("--dp-weight", type=int, default=-1)
     ap.add_argument("--load-max", type=int, default=2000000)
     ap.add_argument("--verify", type=int, default=0)

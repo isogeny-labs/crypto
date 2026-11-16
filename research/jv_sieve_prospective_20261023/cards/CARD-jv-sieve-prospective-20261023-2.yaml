@@ -1,0 +1,44 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-jv-sieve-prospective-20261023-2
+experiment_id: jv_sieve_prospective_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 9f146fc15672af6ea8436b8a54c8f7030ce6d86d
+receipt: research/jv_sieve_prospective_20261023/cards/CARD-jv-sieve-prospective-20261023-2.receipt.json
+binds:
+  - {path: research/jv_sieve_prospective_20261023/PROTOCOL.md, sha256: c7fa70a08c8e834a38e4d20f7488bbc62beca34fb2f47e5cd29ad44842d524d5}
+  - {path: research/jv_sieve_prospective_20261023/run.sh, sha256: b0bdcc9c457b393939a5fd38aa61e005c06f2996a1cb8f8934a04f375aa84ebb}
+  - {path: Cargo.toml, sha256: def239e6a4e217a3059fc5b6740d658fa353f6cb023b685aeb2c40e528e94bfc}
+  - {path: Cargo.lock, sha256: bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42}
+  - {path: target/release/examples/jv_cover, sha256: 8fbe95a6f0c4693b8de9d69c92a88d3b53b75db7c5cfaf71331b063cad384ffd}
+  - {path: target/release/examples/jv_endo_check, sha256: 06513248db9f5610521ed995ce4b8464308de84dc92f4ee7b23f07db0f8d6b6d}
+must_not_exist:
+  - research/jv_sieve_prospective_20261023/raw
+commands:
+  - id: build
+    argv: [cargo, build, --release, --example, jv_cover, --example, jv_endo_check]
+    cwd: .
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/jv_sieve_prospective_20261023/receipts/build.stdout
+    stderr: research/jv_sieve_prospective_20261023/receipts/build.stderr
+  - id: run-all
+    argv: [bash, research/jv_sieve_prospective_20261023/run.sh, all]
+    cwd: .
+    timeout_seconds: 64800
+    success_exit_codes: [0]
+    stdout: research/jv_sieve_prospective_20261023/receipts/run-all.stdout
+    stderr: research/jv_sieve_prospective_20261023/receipts/run-all.stderr
+bus_address: executor-mechanical-jv-sieve-prospective-20261023-2
+background: true
+write_scope:
+  - research/jv_sieve_prospective_20261023/raw/
+  - research/jv_sieve_prospective_20261023/receipts/
+  - research/jv_sieve_prospective_20261023/cards/
+  - target/
+stop_when:
+  - Any command exits with a non-zero status.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.
+  - A line beginning with 'command' and ending with 'FAILED' is printed.
+notes: "The host is shared with another running experiment (research/ghs3_vs_rho_20261023/run.sh). Operation counts are the claim; wall time is an observation only. Binaries were built at HEAD before this card; the build step is a no-op. Launch the one command detached so it survives you: setsid nohup python3 tools/task_card.py run research/jv_sieve_prospective_20261023/cards/CARD-jv-sieve-prospective-20261023-2.yaml > research/jv_sieve_prospective_20261023/receipts/CARD-jv-sieve-prospective-20261023-2.launch.log 2>&1 < /dev/null & - then print the PID (echo $!) and return immediately with the PID and the log path. Do not wait for it, do not poll it."

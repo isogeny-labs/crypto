@@ -245,6 +245,42 @@ impl FastPoint {
     };
 }
 
+/// A short-Weierstrass point in Jacobian coordinates.
+///
+/// `(X : Y : Z)` represents affine `(X/Z², Y/Z³)`. `Z = 0` is the
+/// identity. There is intentionally no projective equality operation:
+/// callers normalize a lane group with [`FastCurve::jacobian_to_affine_batch`]
+/// when they need affine coordinates or equality.
+#[derive(Clone, Copy, Debug)]
+pub struct FastJacobianPoint {
+    x: u64,
+    y: u64,
+    z: u64,
+}
+
+impl FastJacobianPoint {
+    /// The point at infinity.
+    pub const INFINITY: Self = Self { x: 0, y: 0, z: 0 };
+
+    /// Lift an affine point without field arithmetic.
+    pub fn from_affine(f: &FastField, p: FastPoint) -> Self {
+        if p.infinity {
+            Self::INFINITY
+        } else {
+            Self {
+                x: p.x,
+                y: p.y,
+                z: f.one(),
+            }
+        }
+    }
+
+    /// Whether this is the projective identity.
+    pub fn is_infinity(self) -> bool {
+        self.z == 0
+    }
+}
+
 /// How a step must be finished once its denominator has been inverted.
 ///
 /// Splitting the step in two is what lets a whole block of chains share
@@ -351,6 +387,114 @@ impl FastCurve {
         }
     }
 
+    /// `2P` in Jacobian coordinates (EFD `dbl-2007-bl`, general `a`).
+    ///
+    /// This is inversion-free. `Y = 0` is a point of order two, whose
+    /// double is the identity.
+    #[inline]
+    pub fn jacobian_double(&self, p: FastJacobianPoint) -> FastJacobianPoint {
+        if p.is_infinity() || p.y == 0 {
+            return FastJacobianPoint::INFINITY;
+        }
+        let f = &self.f;
+        let xx = f.sqr(p.x);
+        let yy = f.sqr(p.y);
+        let yyyy = f.sqr(yy);
+        let zz = f.sqr(p.z);
+        let t = f.add(p.x, yy);
+        let s = f.dbl(f.sub(f.sub(f.sqr(t), xx), yyyy));
+        let m = f.add(f.add(f.dbl(xx), xx), f.mul(self.a, f.sqr(zz)));
+        let x3 = f.sub(f.sqr(m), f.dbl(s));
+        let yyyy8 = f.dbl(f.dbl(f.dbl(yyyy)));
+        let y3 = f.sub(f.mul(m, f.sub(s, x3)), yyyy8);
+        let yz = f.add(p.y, p.z);
+        let z3 = f.sub(f.sub(f.sqr(yz), yy), zz);
+        FastJacobianPoint {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    /// `P + Q` for Jacobian `P` and affine `Q` (EFD `madd-2007-bl`).
+    ///
+    /// The ordinary path is inversion-free. The identity, inverse, and
+    /// equal-point branches match [`Self::add`].
+    #[inline]
+    pub fn jacobian_add_mixed(&self, p: FastJacobianPoint, q: FastPoint) -> FastJacobianPoint {
+        if q.infinity {
+            return p;
+        }
+        if p.is_infinity() {
+            return FastJacobianPoint::from_affine(&self.f, q);
+        }
+        let f = &self.f;
+        let z1z1 = f.sqr(p.z);
+        let u2 = f.mul(q.x, z1z1);
+        let s2 = f.mul(q.y, f.mul(p.z, z1z1));
+        let h = f.sub(u2, p.x);
+        let r0 = f.sub(s2, p.y);
+        if h == 0 {
+            return if r0 == 0 {
+                self.jacobian_double(p)
+            } else {
+                FastJacobianPoint::INFINITY
+            };
+        }
+        let r = f.dbl(r0);
+        let hh = f.sqr(h);
+        let i = f.dbl(f.dbl(hh));
+        let j = f.mul(h, i);
+        let v = f.mul(p.x, i);
+        let x3 = f.sub(f.sub(f.sqr(r), j), f.dbl(v));
+        let y1j = f.mul(p.y, j);
+        let y3 = f.sub(f.mul(r, f.sub(v, x3)), f.dbl(y1j));
+        let zh = f.add(p.z, h);
+        let z3 = f.sub(f.sub(f.sqr(zh), z1z1), hh);
+        FastJacobianPoint {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    /// Normalize a group of Jacobian points with one simultaneous
+    /// inversion. `out`, `den`, and `scratch` must each be at least as
+    /// long as `points`; infinity lanes are preserved.
+    pub fn jacobian_to_affine_batch(
+        &self,
+        points: &[FastJacobianPoint],
+        out: &mut [FastPoint],
+        den: &mut [u64],
+        scratch: &mut [u64],
+    ) {
+        let n = points.len();
+        assert!(out.len() >= n && den.len() >= n && scratch.len() >= n);
+        let one = self.f.one();
+        let mut needs_inversion = false;
+        for (d, p) in den[..n].iter_mut().zip(points) {
+            *d = if p.is_infinity() { one } else { p.z };
+            needs_inversion |= !p.is_infinity() && p.z != one;
+        }
+        // Fresh and restarted lanes have Z = 1. Avoid an exponentiation
+        // when a whole round consists only of those lanes.
+        if needs_inversion {
+            self.f.batch_inv(&mut den[..n], &mut scratch[..n]);
+        }
+        for ((dst, p), &zi) in out[..n].iter_mut().zip(points).zip(&den[..n]) {
+            if p.is_infinity() {
+                *dst = FastPoint::INFINITY;
+                continue;
+            }
+            let zi2 = self.f.sqr(zi);
+            *dst = FastPoint {
+                x: self.f.mul(p.x, zi2),
+                y: self.f.mul(p.y, self.f.mul(zi2, zi)),
+                infinity: false,
+            };
+        }
+    }
+
     /// Classify `P + A` and produce the denominator to invert.  The modes
     /// that need no inverse report `1`, so a batch is always invertible.
     #[inline]
@@ -433,6 +577,30 @@ fn tag_of(h: u64) -> u32 {
     (h >> 32) as u32
 }
 
+/// Ask the processor to start fetching this address (the same hint as
+/// `koblitz_index_calculus`'s presence-filter prefetch).
+#[inline(always)]
+fn prefetch(address: *const u64) {
+    #[cfg(target_arch = "x86_64")]
+    // SAFETY: a prefetch has no architectural effect beyond the cache;
+    // any address is allowed, valid or not.
+    unsafe {
+        std::arch::x86_64::_mm_prefetch::<{ std::arch::x86_64::_MM_HINT_T0 }>(address as *const i8);
+    }
+    #[cfg(target_arch = "aarch64")]
+    // SAFETY: `PRFM` is a non-faulting data-cache hint.  The caller's
+    // address is inside the table's live allocation anyway.
+    unsafe {
+        std::arch::asm!(
+            "prfm pldl1keep, [{address}]",
+            address = in(reg) address,
+            options(readonly, nostack, preserves_flags)
+        );
+    }
+    #[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
+    let _ = address;
+}
+
 /// The baby table: open addressing, linear probing, lock-free insertion.
 ///
 /// A slot is `(tag << 32) | j`.  The slot position carries the low hash
@@ -457,6 +625,21 @@ impl BabyTable {
     #[inline]
     fn mask(&self) -> u64 {
         (1u64 << self.bits) - 1
+    }
+
+    /// Start fetching the slot an insert or probe of `x` will touch first.
+    ///
+    /// The table is far larger than the cache once `width` passes about
+    /// `2^36`, so a probe is a cache miss, and its "empty?" branch depends
+    /// on the missing load at a load factor near one half, which keeps the
+    /// processor from overlapping one probe's miss with the next.  The
+    /// kernels call this as soon as a visited point's `x` is known and
+    /// probe a round later, so the misses of a round are in flight
+    /// together.  It changes nothing but timing.
+    #[inline(always)]
+    pub fn prefetch(&self, x: u64) {
+        let slot = (hash_x(x) & self.mask()) as usize;
+        prefetch(self.slots.as_ptr().wrapping_add(slot) as *const u64);
     }
 
     /// Insert `j` under the hash of `x`.  `false` means the table was
@@ -568,21 +751,11 @@ impl BsgsFastPlan {
     ) -> Self {
         let workers = workers.max(1);
         let chains_per_worker = chains_per_worker.max(1);
-        let isqrt = |v: u64| {
-            let mut s = (v as f64).sqrt() as u64;
-            while s > 0 && s.saturating_mul(s) > v {
-                s -= 1;
-            }
-            while (s + 1).saturating_mul(s + 1) <= v {
-                s += 1;
-            }
-            s
-        };
         let ceil_div = |a: u64, b: u64| a.div_ceil(b);
         let m = if neg_map {
-            ceil_div(isqrt(width), 2).max(1)
+            ceil_div(isqrt_u64(width), 2).max(1)
         } else {
-            isqrt(ceil_div(width, 2)).max(1)
+            isqrt_u64(ceil_div(width, 2)).max(1)
         }
         // j has to fit the table's 32-bit index field.
         .min(0xFFFF_FFF0);
@@ -681,23 +854,27 @@ impl BsgsFast {
             .into_par_iter()
             .map(|t| {
                 let mut cs: Vec<Chain> = (0..w)
-                    .map(|k| {
+                    .filter_map(|k| {
                         let c = (t * w + k) as u64;
                         let start = c * plan.baby_len;
                         let end = ((c + 1) * plan.baby_len).min(plan.m);
-                        Chain {
+                        (start < end).then(|| Chain {
                             p: curve.scalar_mul(curve.g, start),
                             pos: start,
                             end,
-                        }
+                        })
                     })
                     .collect();
+                if cs.is_empty() {
+                    return 0;
+                }
                 run_kernel(
                     &curve,
                     plan.kernel,
                     plan.pair_k,
                     &mut cs,
                     curve.g,
+                    |x| table.prefetch(x),
                     |p, pos| {
                         // j = 0 is O and has no x; the giant phase reports a
                         // giant point landing on O as the j = 0 hit instead.
@@ -788,55 +965,70 @@ impl BsgsFast {
             .into_par_iter()
             .map(|t| {
                 let mut cs: Vec<Chain> = (0..w)
-                    .map(|k| {
+                    .filter_map(|k| {
                         let c = (t * w + k) as u64;
                         let start = c * plan.giant_len;
                         let end = ((c + 1) * plan.giant_len).min(plan.giant_count);
                         // Chain c starts at Q' - (c·giant_len)·S.
-                        let off = curve.scalar_mul(self.s, start);
-                        Chain {
-                            p: curve.add(qprime, curve.neg(off)),
-                            pos: start,
-                            end,
-                        }
+                        (start < end).then(|| {
+                            let off = curve.scalar_mul(self.s, start);
+                            Chain {
+                                p: curve.add(qprime, curve.neg(off)),
+                                pos: start,
+                                end,
+                            }
+                        })
                     })
                     .collect();
-                run_kernel(curve, plan.kernel, plan.pair_k, &mut cs, neg_s, |p, i| {
-                    if stop.load(Ordering::Relaxed) {
-                        return false;
-                    }
-                    // A giant point at O is the j = 0 hit: Q' = i·S.
-                    if p.infinity {
-                        cands.fetch_add(1, Ordering::Relaxed);
-                        if let Some(k) = self.verify(*q, i, 0) {
-                            found.store(k, Ordering::Relaxed);
-                            stop.store(true, Ordering::Relaxed);
+                if cs.is_empty() {
+                    return 0;
+                }
+                let table = &self.table;
+                let hint = |x| table.prefetch(x);
+                run_kernel(
+                    curve,
+                    plan.kernel,
+                    plan.pair_k,
+                    &mut cs,
+                    neg_s,
+                    hint,
+                    |p, i| {
+                        if stop.load(Ordering::Relaxed) {
                             return false;
                         }
-                        falses.fetch_add(1, Ordering::Relaxed);
-                        return true;
-                    }
-                    let mut hit = None;
-                    self.table.for_each_match(p.x, |j| {
-                        if hit.is_none() {
+                        // A giant point at O is the j = 0 hit: Q' = i·S.
+                        if p.infinity {
                             cands.fetch_add(1, Ordering::Relaxed);
-                            match self.verify(*q, i, j) {
-                                Some(k) => hit = Some(k),
-                                None => {
-                                    falses.fetch_add(1, Ordering::Relaxed);
+                            if let Some(k) = self.verify(*q, i, 0) {
+                                found.store(k, Ordering::Relaxed);
+                                stop.store(true, Ordering::Relaxed);
+                                return false;
+                            }
+                            falses.fetch_add(1, Ordering::Relaxed);
+                            return true;
+                        }
+                        let mut hit = None;
+                        self.table.for_each_match(p.x, |j| {
+                            if hit.is_none() {
+                                cands.fetch_add(1, Ordering::Relaxed);
+                                match self.verify(*q, i, j) {
+                                    Some(k) => hit = Some(k),
+                                    None => {
+                                        falses.fetch_add(1, Ordering::Relaxed);
+                                    }
                                 }
                             }
+                        });
+                        match hit {
+                            Some(k) => {
+                                found.store(k, Ordering::Relaxed);
+                                stop.store(true, Ordering::Relaxed);
+                                false
+                            }
+                            None => true,
                         }
-                    });
-                    match hit {
-                        Some(k) => {
-                            found.store(k, Ordering::Relaxed);
-                            stop.store(true, Ordering::Relaxed);
-                            false
-                        }
-                        None => true,
-                    }
-                })
+                    },
+                )
             })
             .sum();
 
@@ -866,15 +1058,20 @@ impl BsgsFast {
 /// for the early exit once a candidate has verified.  Returns the number
 /// of chain-steps taken, which is exact: a worker that stops early is
 /// charged only for what it did.
-fn run_chains_g<F, V>(
+///
+/// `hint` is told each point's `x` a round before `visit` sees it, so the
+/// table slot can be fetched meanwhile; it may not change what is visited.
+fn run_chains_g<F, H, V>(
     f: &F,
     curve: &FastCurve,
     cs: &mut [Chain],
     addend: FastPoint,
+    mut hint: H,
     mut visit: V,
 ) -> u64
 where
     F: FieldOps,
+    H: FnMut(u64),
     V: FnMut(&FastPoint, u64) -> bool,
 {
     let w = cs.len();
@@ -908,6 +1105,9 @@ where
             }
             c.p = step_finish_g(f, curve.a, c.p, addend, mode[k], den[k]);
             c.pos += 1;
+            if c.pos < c.end && !c.p.infinity {
+                hint(c.p.x);
+            }
         }
     }
 }
@@ -1281,16 +1481,24 @@ where
 
 /// Paired kernel: affine centres, `C ± jA` sharing `1/(x(jA) − x(C))`,
 /// one batch inversion per round over `W·(K+1)` denominators.
-fn run_paired_g<F, V>(
+///
+/// After the inversion a round runs in two passes: the first computes
+/// every `x` of the round and `hint`s it, the second visits them in the
+/// order a single pass would, so a visit's table slot has had the rest of
+/// the round's arithmetic to arrive.  The visits, the early exit and the
+/// field operations are those of the single pass.
+fn run_paired_g<F, H, V>(
     f: &F,
     curve: &FastCurve,
     k: usize,
     cs: &mut [Chain],
     addend: FastPoint,
+    mut hint: H,
     mut visit: V,
 ) -> (u64, u64)
 where
     F: FieldOps,
+    H: FnMut(u64),
     V: FnMut(&FastPoint, u64) -> bool,
 {
     let po = PairOffsets::new(curve, addend, k);
@@ -1301,6 +1509,9 @@ where
     let mut den = vec![0u64; w * per];
     let mut scratch = vec![0u64; w * per];
     let mut slow = vec![false; w];
+    // The round's centres and `x(C + jA), x(C − jA)` between the passes.
+    let mut centre = vec![FastPoint::INFINITY; w];
+    let mut xs = vec![0u64; w * 2 * k];
     let mut steps = 0u64;
     let mut slow_rounds = 0u64;
     let span = (2 * k + 1) as u64;
@@ -1325,6 +1536,51 @@ where
             den[base + k] = f.sub(po.jump.x, c.p.x);
         }
         f.batch_inv(&mut den, &mut scratch);
+        // Pass 1: every x of the round, hinted as soon as it is known; the
+        // fast chains' centres move on to C + (2K+1)A.
+        for (ci, c) in cs.iter_mut().enumerate() {
+            if c.pos >= c.end + k as u64 || slow[ci] {
+                continue;
+            }
+            let base = ci * per;
+            let (xc, yc) = (c.p.x, c.p.y);
+            centre[ci] = c.p;
+            if c.pos < c.end {
+                hint(xc);
+            }
+            let row = &mut xs[ci * 2 * k..(ci + 1) * 2 * k];
+            for j in 1..=k {
+                let o = po.offs[j - 1];
+                let inv = den[base + j - 1];
+                let sx = f.add(xc, o.x);
+                let ip = c.pos + j as u64;
+                let im = c.pos - j as u64;
+                if ip < c.end {
+                    let lam = f.mul(f.sub(o.y, yc), inv);
+                    let x = f.sub(f.sqr(lam), sx);
+                    row[2 * (j - 1)] = x;
+                    hint(x);
+                }
+                if im < c.end {
+                    // λ₋ = (−y_o − y_c)/(x_o − x_c); only λ₋² is needed.
+                    let lam = f.mul(f.add(o.y, yc), inv);
+                    let x = f.sub(f.sqr(lam), sx);
+                    row[2 * (j - 1) + 1] = x;
+                    hint(x);
+                }
+            }
+            // Next centre C + (2K+1)A, with y.
+            let inv = den[base + k];
+            let lam = f.mul(f.sub(po.jump.y, yc), inv);
+            let x3 = f.sub(f.sub(f.sqr(lam), xc), po.jump.x);
+            let y3 = f.sub(f.mul(lam, f.sub(xc, x3)), yc);
+            c.p = FastPoint {
+                x: x3,
+                y: y3,
+                infinity: false,
+            };
+        }
+        // Pass 2: visit in single-pass order (centre, then +j, −j).
         for (ci, c) in cs.iter_mut().enumerate() {
             if c.pos >= c.end + k as u64 {
                 continue;
@@ -1338,48 +1594,29 @@ where
                 c.pos += span;
                 continue;
             }
-            let base = ci * per;
-            let (xc, yc) = (c.p.x, c.p.y);
             if c.pos < c.end {
                 steps += 1;
-                if !visit(&c.p, c.pos) {
+                if !visit(&centre[ci], c.pos) {
                     return (steps, slow_rounds);
                 }
             }
+            let row = &xs[ci * 2 * k..(ci + 1) * 2 * k];
             for j in 1..=k {
-                let o = po.offs[j - 1];
-                let inv = den[base + j - 1];
-                let sx = f.add(xc, o.x);
                 let ip = c.pos + j as u64;
                 let im = c.pos - j as u64;
                 if ip < c.end {
                     steps += 1;
-                    let lam = f.mul(f.sub(o.y, yc), inv);
-                    let x = f.sub(f.sqr(lam), sx);
-                    if !visit(&x_only(x), ip) {
+                    if !visit(&x_only(row[2 * (j - 1)]), ip) {
                         return (steps, slow_rounds);
                     }
                 }
                 if im < c.end {
                     steps += 1;
-                    // λ₋ = (−y_o − y_c)/(x_o − x_c); only λ₋² is needed.
-                    let lam = f.mul(f.add(o.y, yc), inv);
-                    let x = f.sub(f.sqr(lam), sx);
-                    if !visit(&x_only(x), im) {
+                    if !visit(&x_only(row[2 * (j - 1) + 1]), im) {
                         return (steps, slow_rounds);
                     }
                 }
             }
-            // Next centre C + (2K+1)A, with y.
-            let inv = den[base + k];
-            let lam = f.mul(f.sub(po.jump.y, yc), inv);
-            let x3 = f.sub(f.sub(f.sqr(lam), xc), po.jump.x);
-            let y3 = f.sub(f.mul(lam, f.sub(xc, x3)), yc);
-            c.p = FastPoint {
-                x: x3,
-                y: y3,
-                infinity: false,
-            };
             c.pos += span;
         }
     }
@@ -1394,17 +1631,21 @@ struct Jac {
 }
 
 /// Co-Z kernel: Jacobian centres advanced by mixed additions, co-Z
-/// conjugate pairs `C ± jA`, the window's `Z`s inverted together.
-fn run_coz_g<F, V>(
+/// conjugate pairs `C ± jA`, the window's `Z`s inverted together.  The
+/// normalisation runs in two passes, hinting then visiting, as in
+/// [`run_paired_g`].
+fn run_coz_g<F, H, V>(
     f: &F,
     curve: &FastCurve,
     k: usize,
     cs: &mut [Chain],
     addend: FastPoint,
+    mut hint: H,
     mut visit: V,
 ) -> (u64, u64)
 where
     F: FieldOps,
+    H: FnMut(u64),
     V: FnMut(&FastPoint, u64) -> bool,
 {
     let po = PairOffsets::new(curve, addend, k);
@@ -1541,7 +1782,34 @@ where
         }
         // Phase 2: one inversion for the window.
         f.batch_inv(&mut den, &mut scratch);
-        // Phase 3: normalise x and visit.
+        // Phase 3a: normalise every x of the round and hint it, in place.
+        for (ci, c) in cs.iter().enumerate() {
+            if c.pos >= c.end + k as u64 || slow[ci] {
+                continue;
+            }
+            let base = ci * per;
+            if c.pos < c.end {
+                let zi = den[base + k];
+                cur[ci].x = f.mul(cur[ci].x, f.sqr(zi));
+                hint(cur[ci].x);
+            }
+            for j in 1..=k {
+                let zi2 = f.sqr(den[base + j - 1]);
+                let ip = c.pos + j as u64;
+                let im = c.pos - j as u64;
+                if ip < c.end {
+                    let x = f.mul(xp[ci * k + j - 1], zi2);
+                    xp[ci * k + j - 1] = x;
+                    hint(x);
+                }
+                if im < c.end {
+                    let x = f.mul(xm[ci * k + j - 1], zi2);
+                    xm[ci * k + j - 1] = x;
+                    hint(x);
+                }
+            }
+        }
+        // Phase 3b: visit in single-pass order.
         for (ci, c) in cs.iter_mut().enumerate() {
             if c.pos >= c.end + k as u64 {
                 continue;
@@ -1574,30 +1842,24 @@ where
                 c.pos += span;
                 continue;
             }
-            let base = ci * per;
             if c.pos < c.end {
                 steps += 1;
-                let zi = den[base + k];
-                let x = f.mul(cur[ci].x, f.sqr(zi));
-                if !visit(&x_only(x), c.pos) {
+                if !visit(&x_only(cur[ci].x), c.pos) {
                     return (steps, slow_rounds);
                 }
             }
             for j in 1..=k {
-                let zi2 = f.sqr(den[base + j - 1]);
                 let ip = c.pos + j as u64;
                 let im = c.pos - j as u64;
                 if ip < c.end {
                     steps += 1;
-                    let x = f.mul(xp[ci * k + j - 1], zi2);
-                    if !visit(&x_only(x), ip) {
+                    if !visit(&x_only(xp[ci * k + j - 1]), ip) {
                         return (steps, slow_rounds);
                     }
                 }
                 if im < c.end {
                     steps += 1;
-                    let x = f.mul(xm[ci * k + j - 1], zi2);
-                    if !visit(&x_only(x), im) {
+                    if !visit(&x_only(xm[ci * k + j - 1]), im) {
                         return (steps, slow_rounds);
                     }
                 }
@@ -1609,21 +1871,23 @@ where
 
 /// Run a worker's chains with the plan's kernel.  Returns the number of
 /// points visited (the chain-steps the stats charge).
-fn run_kernel<V>(
+fn run_kernel<H, V>(
     curve: &FastCurve,
     kernel: StepKernel,
     pair_k: usize,
     cs: &mut [Chain],
     addend: FastPoint,
+    hint: H,
     visit: V,
 ) -> u64
 where
+    H: FnMut(u64),
     V: FnMut(&FastPoint, u64) -> bool,
 {
     match kernel {
-        StepKernel::Chain => run_chains_g(&curve.f, curve, cs, addend, visit),
-        StepKernel::Paired => run_paired_g(&curve.f, curve, pair_k, cs, addend, visit).0,
-        StepKernel::CoZ => run_coz_g(&curve.f, curve, pair_k, cs, addend, visit).0,
+        StepKernel::Chain => run_chains_g(&curve.f, curve, cs, addend, hint, visit),
+        StepKernel::Paired => run_paired_g(&curve.f, curve, pair_k, cs, addend, hint, visit).0,
+        StepKernel::CoZ => run_coz_g(&curve.f, curve, pair_k, cs, addend, hint, visit).0,
     }
 }
 
@@ -1675,10 +1939,11 @@ pub fn count_kernel_ops(
         digest = digest.wrapping_add(hash_x(key ^ i.wrapping_mul(0x9E37_79B9_7F4A_7C15)));
         true
     };
+    let none = |_: u64| {};
     let (visited, slow_rounds) = match kernel {
-        StepKernel::Chain => (run_chains_g(&cf, curve, &mut cs, addend, visit), 0),
-        StepKernel::Paired => run_paired_g(&cf, curve, pair_k, &mut cs, addend, visit),
-        StepKernel::CoZ => run_coz_g(&cf, curve, pair_k, &mut cs, addend, visit),
+        StepKernel::Chain => (run_chains_g(&cf, curve, &mut cs, addend, none, visit), 0),
+        StepKernel::Paired => run_paired_g(&cf, curve, pair_k, &mut cs, addend, none, visit),
+        StepKernel::CoZ => run_coz_g(&cf, curve, pair_k, &mut cs, addend, none, visit),
     };
     KernelCount {
         ops: cf.counts(),
@@ -1760,23 +2025,25 @@ pub fn reference_scalar_mul(c: &CurveParams, k: u64) -> Point {
 
 /// `√v`, rounded down.
 fn isqrt_u64(v: u64) -> u64 {
-    let mut s = (v as f64).sqrt() as u64;
-    while s > 0 && s.saturating_mul(s) > v {
-        s -= 1;
-    }
-    while (s + 1).saturating_mul(s + 1) <= v {
-        s += 1;
-    }
-    s
+    v.isqrt()
 }
 
 /// `S = operations / √width`, the unit the repository's ECDLP threads
 /// report in, so a row here sits in the same table as a row from the GPU
 /// engine or from Pollard rho.
 pub fn cost_ratio(stats: &BsgsFastStats, width: u64, targets: u64) -> f64 {
-    let ops = stats.baby_steps + stats.giant_steps + stats.candidates;
+    // Preserve ordinary rounding; accumulated counters can have a finite
+    // floating-point total even when their exact sum exceeds one word.
+    let ops = match stats
+        .baby_steps
+        .checked_add(stats.giant_steps)
+        .and_then(|sum| sum.checked_add(stats.candidates))
+    {
+        Some(sum) => sum as f64,
+        None => stats.baby_steps as f64 + stats.giant_steps as f64 + stats.candidates as f64,
+    };
     let sqrt_w = isqrt_u64(width).max(1) as f64;
-    ops as f64 / targets.max(1) as f64 / sqrt_w
+    ops / targets.max(1) as f64 / sqrt_w
 }
 
 // ── tests ───────────────────────────────────────────────────────────────
@@ -1785,6 +2052,53 @@ pub fn cost_ratio(stats: &BsgsFastStats, width: u64, targets: u64) -> f64 {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ecdlp_variants::{bsgs as slow, EcGroup};
+
+    #[test]
+    fn full_width_square_root_boundaries() {
+        let values = [
+            0,
+            1,
+            2,
+            3,
+            4,
+            15,
+            16,
+            17,
+            u32::MAX as u64,
+            (u32::MAX as u64).pow(2) - 1,
+            (u32::MAX as u64).pow(2),
+            u64::MAX - 1,
+            u64::MAX,
+        ];
+        for value in values {
+            let root = isqrt_u64(value) as u128;
+            assert!(root * root <= value as u128);
+            assert!((root + 1) * (root + 1) > value as u128);
+        }
+        assert_eq!(isqrt_u64(u64::MAX), u32::MAX as u64);
+        let plan = BsgsFastPlan::new(u64::MAX, 0, true, 1, 1);
+        assert_eq!(plan.m, 1u64 << 31);
+        let stats = BsgsFastStats::default();
+        assert_eq!(cost_ratio(&stats, u64::MAX, 1), 0.0);
+    }
+
+    #[test]
+    fn cost_ratio_retains_accumulated_counter_magnitude() {
+        let stats = BsgsFastStats {
+            baby_steps: u64::MAX,
+            giant_steps: u64::MAX,
+            candidates: u64::MAX,
+            ..BsgsFastStats::default()
+        };
+        assert_eq!(cost_ratio(&stats, 4, 1), 3.0 * (u64::MAX as f64) / 2.0);
+        let ordinary = BsgsFastStats {
+            baby_steps: 15,
+            giant_steps: 17,
+            candidates: 3,
+            ..BsgsFastStats::default()
+        };
+        assert_eq!(cost_ratio(&ordinary, 81, 2), 35.0 / 2.0 / 9.0);
+    }
 
     /// A deterministic xorshift, so a failure is reproducible.
     struct Rng(u64);
@@ -1897,6 +2211,72 @@ mod tests {
         assert_eq!(curve.lower(curve.g), g_ref, "generator");
     }
 
+    /// Jacobian conversion, doubling, and mixed addition agree with the
+    /// affine formulas on the generic, j=0, and j=1728 curve shapes.
+    #[test]
+    fn jacobian_lanes_match_affine_on_every_curve_shape() {
+        let j0 = CurveParams {
+            name: "j0-223",
+            p: BigUint::from(223u32),
+            a: BigUint::from(0u32),
+            b: BigUint::from(7u32),
+            gx: BigUint::from(47u32),
+            gy: BigUint::from(71u32),
+            n: BigUint::from(223u32),
+            h: 1,
+        };
+        let j1728 = CurveParams {
+            name: "j1728-97",
+            p: BigUint::from(97u32),
+            a: BigUint::from(1u32),
+            b: BigUint::from(0u32),
+            gx: BigUint::from(1u32),
+            gy: BigUint::from(14u32),
+            n: BigUint::from(97u32),
+            h: 1,
+        };
+        for params in [toy40_params(), j0, j1728] {
+            let curve = FastCurve::from_params(&params).unwrap();
+            let mut projective = Vec::new();
+            let mut expected = Vec::new();
+            for k in 0..24 {
+                let p = curve.scalar_mul(curve.g, k);
+                let q = curve.scalar_mul(curve.g, k + 1);
+                let jp = FastJacobianPoint::from_affine(&curve.f, p);
+
+                projective.push(curve.jacobian_double(jp));
+                expected.push(curve.double(p));
+
+                projective.push(curve.jacobian_add_mixed(jp, q));
+                expected.push(curve.add(p, q));
+
+                let inverse = curve.jacobian_add_mixed(jp, curve.neg(p));
+                assert!(inverse.is_infinity(), "{}: P + (-P)", params.name);
+            }
+            // Exercise repeated mixed additions without resetting Z to one.
+            let mut chain = FastJacobianPoint::INFINITY;
+            let mut chain_affine = FastPoint::INFINITY;
+            for k in 1..40 {
+                let q = curve.scalar_mul(curve.g, k);
+                chain = curve.jacobian_add_mixed(chain, q);
+                chain_affine = curve.add(chain_affine, q);
+                projective.push(chain);
+                expected.push(chain_affine);
+            }
+            let n = projective.len();
+            let mut got = vec![FastPoint::INFINITY; n];
+            let mut den = vec![0u64; n];
+            let mut scratch = vec![0u64; n];
+            curve.jacobian_to_affine_batch(&projective, &mut got, &mut den, &mut scratch);
+            assert_eq!(got, expected, "{}: batch normalization", params.name);
+
+            let from_infinity = curve.jacobian_add_mixed(FastJacobianPoint::INFINITY, curve.g);
+            let mut affine = [FastPoint::INFINITY];
+            curve.jacobian_to_affine_batch(&[from_infinity], &mut affine, &mut [0], &mut [0]);
+            assert_eq!(affine[0], curve.g, "{}: O + G", params.name);
+        }
+    }
+
     #[test]
     fn table_inserts_and_finds() {
         let t = BabyTable::new(15);
@@ -1948,6 +2328,23 @@ mod tests {
                         Some(x),
                         "neg={neg_map} width={width} x={x}"
                     );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn sparse_chain_plans_cover_each_interval_position() {
+        let curve = toy40();
+        for kernel in [StepKernel::Chain, StepKernel::Paired, StepKernel::CoZ] {
+            for width in [1u64, 2, 5] {
+                let x0 = 1_234_567u64;
+                let plan = BsgsFastPlan::new(width, x0, true, 4, 16).with_kernel(kernel, 2);
+                let mut solver = BsgsFast::build(curve, plan);
+                for offset in 0..width {
+                    let x = x0 + offset;
+                    let q = curve.scalar_mul(curve.g, x);
+                    assert_eq!(solver.solve(&q), Some(x), "{kernel:?} width={width}");
                 }
             }
         }
@@ -2119,6 +2516,145 @@ mod tests {
                             got.digest, want.digest,
                             "{kern:?} k={k} len={len} start={start}"
                         );
+                    }
+                }
+            }
+        }
+    }
+
+    /// The two-pass rounds visit the same `(index, x)` sequence, in the same
+    /// order, as one pass would (chain: index order per round across the
+    /// chains; paired and co-Z: centre, `+1, −1, +2, −2, …` per chain), and
+    /// every point the fast paths visit was hinted before its visit.  The
+    /// early exit therefore stops at the same point and charges the same
+    /// steps.
+    #[test]
+    fn hints_precede_visits_and_order_is_single_pass() {
+        let curve = toy40();
+        let q = curve.scalar_mul(curve.g, 0x12_3456_789a);
+        let neg_s = curve.neg(curve.scalar_mul(curve.g, 77_777));
+        let (chains, len) = (3usize, 70u64);
+        for (base, addend) in [(FastPoint::INFINITY, curve.g), (q, neg_s)] {
+            let at = |i: u64| curve.add(base, curve.scalar_mul(addend, i));
+            for kern in KERNELS {
+                for k in [1usize, 3, 16] {
+                    // Single-pass order, derived from the kernel's layout.
+                    let mut want = Vec::new();
+                    if kern == StepKernel::Chain {
+                        for t in 0..len {
+                            for c in 0..chains as u64 {
+                                want.push(c * len + t);
+                            }
+                        }
+                    } else {
+                        let span = 2 * k as u64 + 1;
+                        let mut centres: Vec<u64> =
+                            (0..chains as u64).map(|c| c * len + k as u64).collect();
+                        while centres
+                            .iter()
+                            .enumerate()
+                            .any(|(c, &p)| p < (c as u64 + 1) * len + k as u64)
+                        {
+                            for (c, p) in centres.iter_mut().enumerate() {
+                                let end = (c as u64 + 1) * len;
+                                if *p >= end + k as u64 {
+                                    continue;
+                                }
+                                if *p < end {
+                                    want.push(*p);
+                                }
+                                for j in 1..=k as u64 {
+                                    if *p + j < end {
+                                        want.push(*p + j);
+                                    }
+                                    if *p - j < end {
+                                        want.push(*p - j);
+                                    }
+                                }
+                                *p += span;
+                            }
+                        }
+                    }
+                    let mut cs: Vec<Chain> = (0..chains)
+                        .map(|c| {
+                            let s = c as u64 * len;
+                            Chain {
+                                p: at(s),
+                                pos: s,
+                                end: s + len,
+                            }
+                        })
+                        .collect();
+                    let hinted = std::cell::RefCell::new(std::collections::HashSet::new());
+                    let mut got = Vec::new();
+                    let visited = run_kernel(
+                        &curve,
+                        kern,
+                        k,
+                        &mut cs,
+                        addend,
+                        |x| {
+                            hinted.borrow_mut().insert(x);
+                        },
+                        |p, i| {
+                            // Unhinted by design: the chain kernel's
+                            // starting points, and the slow round of a
+                            // chain starting at `O` (its first centre `KA`
+                            // is an offset).
+                            let first_round = if kern == StepKernel::Chain {
+                                i % len == 0
+                            } else {
+                                base.infinity && i < 2 * k as u64 + 1
+                            };
+                            assert!(
+                                p.infinity || first_round || hinted.borrow().contains(&p.x),
+                                "{kern:?} k={k}: index {i} visited unhinted"
+                            );
+                            got.push((i, if p.infinity { None } else { Some(p.x) }));
+                            true
+                        },
+                    );
+                    assert_eq!(visited, chains as u64 * len);
+                    let order: Vec<u64> = got.iter().map(|&(i, _)| i).collect();
+                    assert_eq!(order, want, "{kern:?} k={k}: visit order");
+                    for &(i, x) in &got {
+                        let p = at(i);
+                        assert_eq!(x, (!p.infinity).then_some(p.x), "{kern:?} k={k} i={i}");
+                    }
+                    // Stopping at the t-th visit charges t points (the
+                    // paired kernels count the stopping visit; the chain
+                    // kernel charges completed rounds).
+                    for t in [1usize, 2, 40, 150] {
+                        let mut cs2: Vec<Chain> = (0..chains)
+                            .map(|c| {
+                                let s = c as u64 * len;
+                                Chain {
+                                    p: at(s),
+                                    pos: s,
+                                    end: s + len,
+                                }
+                            })
+                            .collect();
+                        let mut seen = 0usize;
+                        let charged = run_kernel(
+                            &curve,
+                            kern,
+                            k,
+                            &mut cs2,
+                            addend,
+                            |_| {},
+                            |_, _| {
+                                seen += 1;
+                                seen < t
+                            },
+                        );
+                        assert_eq!(seen, t, "{kern:?} k={k} t={t}");
+                        let want_charged = if kern == StepKernel::Chain {
+                            ((t - 1) / chains * chains) as u64
+                        } else {
+                            t as u64
+                        };
+                        assert_eq!(charged, want_charged, "{kern:?} k={k} t={t}");
                     }
                 }
             }

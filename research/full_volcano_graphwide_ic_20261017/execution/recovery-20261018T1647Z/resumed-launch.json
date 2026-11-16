@@ -1,0 +1,69 @@
+{
+  "schema": "volcano-preserved-deadline-resume/v1",
+  "created_utc": "2026-10-18T17:07:08.418324+00:00",
+  "baseline_vertices": 5533,
+  "queue_vertices": 24823,
+  "argv": [
+    "/workspace/volcano_ic_repaired_survey_20261017/volcano-ic-driver",
+    "run",
+    "/workspace/volcano_ic_repaired_survey_20261017",
+    "24823",
+    "183994",
+    "6442450944"
+  ],
+  "original_deadline_ms": "1792527222570",
+  "original_deadline_utc": "2026-10-20T20:13:42.570000+00:00",
+  "remaining_seconds": 183994,
+  "max_spool_bytes": 6442450944,
+  "free_bytes_before": 9898467328,
+  "native_spool_bytes_before": 846658530,
+  "frozen_sha256": {
+    "ecbench": "35d89073f4d666b094c213a1d31b0c819b63600123e067c111af3c947d7609a9",
+    "volcano-ic-driver": "b8b489c7225c64ed492ffce39286c995f5ca820960956cf706c0d3110f5bdd2d",
+    "queue.jsonl": "45e277bede6017c30a49405096afefab3d34a18553ecd6b1a79238f2b9559728"
+  },
+  "before_status": {
+    "campaign": "/workspace/volcano_ic_repaired_survey_20261017",
+    "coverage": [
+      {
+        "graph": "mixed",
+        "state": "audited",
+        "vertices": 1855
+      },
+      {
+        "graph": "mixed",
+        "state": "queued",
+        "vertices": 8215
+      },
+      {
+        "graph": "three",
+        "state": "audited",
+        "vertices": 1836
+      },
+      {
+        "graph": "three",
+        "state": "interrupted",
+        "vertices": 1
+      },
+      {
+        "graph": "three",
+        "state": "queued",
+        "vertices": 4724
+      },
+      {
+        "graph": "two",
+        "state": "audited",
+        "vertices": 1842
+      },
+      {
+        "graph": "two",
+        "state": "queued",
+        "vertices": 6350
+      }
+    ]
+  },
+  "scope": "Same frozen bounded survey and child budgets; new runtime epoch, raw clocks unqualified; original72h deadline is not reset. No host-survival or unattended-upload guarantee.",
+  "pid": 3298,
+  "launch_utc": "2026-10-18T17:07:08.420807+00:00",
+  "log_path": "/workspace/volcano_ic_repaired_survey_20261017/worker-resume-20261018T1647Z.log"
+}

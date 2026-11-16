@@ -1,0 +1,70 @@
+{
+  "schema": "volcano.launch-access/v1",
+  "observed_utc": "2026-10-28T16:18:59.400193+00:00",
+  "scope": "Access and preservation only; no ECDLP experiment",
+  "lab_account": "104186811093",
+  "source_revision": "6187036c049b6de2b1521b014f575952e4f1705c",
+  "source_checkpoint": {
+    "exit_code": 0,
+    "readback_verified": true,
+    "bytes": 2739,
+    "sha256": "165a4d53dee7ad9e24b8adcaff1e7687c825bd6d7a39e286c3a33e8019bf9a59",
+    "members": [
+      ".",
+      "./meta.json",
+      "./RESUME.md"
+    ],
+    "encryption": "AES256"
+  },
+  "source_checkpoint_kind": "Public-source handoff and metadata, not live process state",
+  "codebuild_preflight": {
+    "purpose": "read-only STS/EKS preflight; no experiment or IAM mutation",
+    "request_sha256": "493d941006d23157d265dbd2ba09391099c4c2b35b21201bc7fa4ec2140d7ff7",
+    "definitive_access_denied": true,
+    "ambiguous": false,
+    "build_id": null,
+    "error": "An error occurred (AccessDeniedException) when calling the StartBuild operation: User: <authorized-lab-principal> is not authorized to perform: codebuild:StartBuild on resource: arn:aws:codebuild:us-east-2:104186811093:project/isolab-experiment-launcher because no identity-based policy allows the codebuild:StartBuild action"
+  },
+  "additional_diagnostics": [
+    {
+      "check": "launcher-permissions",
+      "utc": "2026-10-28T16:16:34.573101+00:00",
+      "ok": false,
+      "error": "An error occurred (AccessDenied) when calling the SimulatePrincipalPolicy operation: User: <authorized-lab-principal> is not authorized to perform: iam:SimulatePrincipalPolicy on resource: <authorized-lab-principal> because no identity-based policy allows the iam:SimulatePrincipalPolicy action"
+    },
+    {
+      "check": "launcher-build-list",
+      "utc": "2026-10-28T16:16:35.115537+00:00",
+      "ok": false,
+      "error": "An error occurred (AccessDeniedException) when calling the ListBuildsForProject operation: User: <authorized-lab-principal> is not authorized to perform: codebuild:ListBuildsForProject on resource: arn:aws:codebuild:us-east-2:104186811093:project/isolab-experiment-launcher because no identity-based policy allows the codebuild:ListBuildsForProject action"
+    },
+    {
+      "check": "image-repository",
+      "utc": "2026-10-28T16:16:35.614414+00:00",
+      "ok": false,
+      "error": "An error occurred (AccessDeniedException) when calling the DescribeRepositories operation: User: <authorized-lab-principal> is not authorized to perform: ecr:DescribeRepositories on resource: arn:aws:ecr:us-east-2:104186811093:repository/isolab/tasks because no identity-based policy allows the ecr:DescribeRepositories action"
+    },
+    {
+      "check": "checkpoint-prefix-list",
+      "utc": "2026-10-28T16:16:36.104801+00:00",
+      "ok": true,
+      "result": {
+        "IsTruncated": false,
+        "Name": "setec-astronomy-artifacts",
+        "Prefix": "checkpoints/crypto/codex__volcano-ic-lab-launch-20261028/",
+        "MaxKeys": 1,
+        "EncodingType": "url",
+        "KeyCount": 0
+      }
+    }
+  ],
+  "experiment_launched": false,
+  "original_corpus_new_ic_recoveries": 0,
+  "remaining_gates": [
+    "Authorized custom-command lab execution route",
+    "Tested-source immutable custom image",
+    "Collector-specific CRIU/EBS restore qualification",
+    "Current source checkpoint at actual launch"
+  ],
+  "credential_values_in_files_checkpoints_or_git": false
+}

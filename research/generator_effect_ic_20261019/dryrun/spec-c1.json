@@ -1,0 +1,17 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "SCRATCH dry run, generator-effect E1, curve c1 (not data, PROTOCOL.md not frozen)",
+  "description": "Scratch dry run for research/generator_effect_ic_20261019/PLAN.md section 4 E1. One 24-bit a=-3 prime-order curve, 16 planted_shared targets, arms ic-abscissa (prime-abscissa:size=205), ic-knownlog (known-log:size=205), rho-neg, each ic arm under mitm negation_folded m=2. Not a measurement of record.",
+  "workloads": {
+    "curves": [{"kind": "prime_explicit", "p": 8582641, "a": 8582638, "b": 6723661, "group_order": 8580037, "r": 8580037, "gx": 1, "gy": 4004158}],
+    "targets_per_curve": 16,
+    "target_seed": 20261019,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "ic-abscissa", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=205", "oracle": "mitm:negation_folded=1,m=2"}}},
+    {"name": "ic-knownlog", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "known-log:size=205", "oracle": "mitm:negation_folded=1,m=2"}}}
+  ],
+  "measurement": {"rounds": 2, "warmup": 1, "order": "alternate", "seed": 20261019, "isolation_required": "L0", "timeout_seconds": 600}
+}

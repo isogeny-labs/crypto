@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="sans-serif" font-size="13">
+  <rect width="960" height="520" fill="#ffffff"/>
+  <text x="20" y="26" font-size="16" font-weight="bold">Orbit-aware double large prime: why the phase coefficient matters</text>
+  <text x="20" y="46" fill="#445">Koblitz curve, pi(x,y) = (x^2,y^2) acts on the order-r subgroup as [lambda]; log pi^k(Q) = lambda^k log Q, log(-Q) = -log Q. Status: implemented, measured on toy curves (RESULTS.md).</text>
+
+  <!-- left panel: plain -->
+  <rect x="20" y="70" width="440" height="330" fill="#fafafa" stroke="#999"/>
+  <text x="34" y="92" font-weight="bold">(ii) plain graph: vertices are points</text>
+  <rect x="40" y="110" width="400" height="34" fill="#fff" stroke="#888"/>
+  <text x="50" y="132">row 1:  S1 + Q            = [a1]G + [b1]T</text>
+  <rect x="40" y="160" width="400" height="34" fill="#fff" stroke="#888"/>
+  <text x="50" y="182">row 2:  S2 + pi^3(Q)  = [a2]G + [b2]T</text>
+  <circle cx="110" cy="260" r="26" fill="#f3d9d0" stroke="#b5541c"/>
+  <text x="110" y="256" text-anchor="middle">Q</text><text x="110" y="272" text-anchor="middle" font-size="11">degree 1</text>
+  <circle cx="370" cy="260" r="26" fill="#f3d9d0" stroke="#b5541c"/>
+  <text x="370" y="256" text-anchor="middle">pi^3(Q)</text><text x="370" y="272" text-anchor="middle" font-size="11">degree 1</text>
+  <line x1="110" y1="194" x2="110" y2="234" stroke="#b5541c"/>
+  <line x1="370" y1="194" x2="370" y2="234" stroke="#b5541c"/>
+  <text x="240" y="330" text-anchor="middle" fill="#b5541c" font-weight="bold">two degree-one vertices: both rows peel, no relation</text>
+  <text x="240" y="350" text-anchor="middle" fill="#555" font-size="12">(they are conjugates, but the graph cannot see it)</text>
+
+  <!-- right panel: orbit -->
+  <rect x="500" y="70" width="440" height="330" fill="#f6f9fd" stroke="#1f4e8c"/>
+  <text x="514" y="92" font-weight="bold" fill="#1f4e8c">(iii) orbit graph: vertices are signed Frobenius orbits</text>
+  <rect x="520" y="110" width="400" height="34" fill="#fff" stroke="#1f4e8c"/>
+  <text x="530" y="132">row 1:  S1 + f1 * rep      f1 = eps1 * lambda^(-k1)</text>
+  <rect x="520" y="160" width="400" height="34" fill="#fff" stroke="#1f4e8c"/>
+  <text x="530" y="182">row 2:  S2 + f2 * rep      f2 = eps2 * lambda^(-k2)</text>
+  <circle cx="720" cy="262" r="34" fill="#d9e6f5" stroke="#1f4e8c"/>
+  <text x="720" y="258" text-anchor="middle">orbit(Q)</text><text x="720" y="274" text-anchor="middle" font-size="11">degree 2</text>
+  <line x1="640" y1="194" x2="700" y2="232" stroke="#1f4e8c"/>
+  <line x1="800" y1="194" x2="742" y2="232" stroke="#1f4e8c"/>
+  <text x="720" y="330" text-anchor="middle" fill="#1f4e8c" font-weight="bold">row1 - (f1/f2) row2 : large column cancels</text>
+  <text x="720" y="350" text-anchor="middle" fill="#555" font-size="12">emits a small-only relation with sources {1, 2}</text>
+
+  <!-- bottom: replay -->
+  <rect x="20" y="420" width="920" height="84" fill="#fff" stroke="#2a7d46"/>
+  <text x="34" y="442" font-weight="bold" fill="#2a7d46">Curve replay (does not trust the filter or the table)</text>
+  <text x="34" y="462">Check  sum over small columns [v_c] Q_c  ==  [rhs] G + [B] T  with scalar multiplications only.</text>
+  <text x="34" y="482">Right phase: both sides equal, row verified.  Wrong phase, flipped sign or identifier-only merge: the filter still cancels the column</text>
+  <text x="34" y="498">by arithmetic and the linear replay agrees, but the group identity fails (unit test, orbit.rs). Failures are counted, never filtered.</text>
+</svg>

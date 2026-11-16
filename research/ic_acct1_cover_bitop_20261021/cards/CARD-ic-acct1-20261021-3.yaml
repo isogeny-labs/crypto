@@ -1,0 +1,49 @@
+# IC arm at p = 1009 (seeds 1-4, moves 8 and 64). Protocol: research/ic_acct1_cover_bitop_20261021/PROTOCOL.md.
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ic-acct1-20261021-3
+experiment_id: ic_acct1_cover_bitop_20261021
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 9a6e3de352ddfe69178258551f717f9dd4a7d427
+receipt: research/ic_acct1_cover_bitop_20261021/cards/CARD-ic-acct1-20261021-3.receipt.json
+binds:
+- path: research/ic_acct1_cover_bitop_20261021/PROTOCOL.md
+  sha256: 14a463f5976d1f6a02040473509dda1a543951f674f4b31bcaaf44c3ee152e10
+- path: target/study/ic_acct1_jv_cover_ic_vs_rho_bitops
+  sha256: fce174cc2970e7238392a288385d44d902acbcdd343190e2ab079a4a74bdd0a0
+must_not_exist:
+- research/ic_acct1_cover_bitop_20261021/raw/ic_1009.jsonl
+commands:
+- id: ic-1009
+  argv:
+  - target/study/ic_acct1_jv_cover_ic_vs_rho_bitops
+  - --arm
+  - ic
+  - --p
+  - '1009'
+  - --seeds
+  - 1,2,3,4
+  - --moves
+  - 8,64
+  - --jobs
+  - '4'
+  - --json
+  - research/ic_acct1_cover_bitop_20261021/raw/ic_1009.jsonl
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  env:
+    JV_SIEVE_ROUND_THREADS: '4'
+    F4_FP_THREAD_OPS: '1'
+  stdout: research/ic_acct1_cover_bitop_20261021/cards/CARD-ic-acct1-20261021-ic-1009.stdout
+  stderr: research/ic_acct1_cover_bitop_20261021/cards/CARD-ic-acct1-20261021-ic-1009.stderr
+  outputs:
+  - research/ic_acct1_cover_bitop_20261021/raw/ic_1009.jsonl
+bus_address: executor-mechanical-ic-acct1
+background: true
+write_scope:
+- research/ic_acct1_cover_bitop_20261021/
+stop_when:
+- A command exits with a status other than 0.
+- Any path listed under must_not_exist already exists before the command starts.

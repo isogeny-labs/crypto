@@ -1,0 +1,62 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "perf history: GLV-folded vs negation-folded factor base on one j = 0 curve",
+  "description": "Frozen source of the j = 0 children in docs/perf/ecbench-children.json. Curve, target seed and factor-base seeds are those of research/isogeny_conductor_gap_round2_20261011 E2 (y^2 = x^3 + 15 over p = 2345743, r = 15937; the smaller of its two j = 0 craters, so the negation-only control stays under a minute of callgrind); the oracle is mitm:negation_folded=1 (as in research/ecbench_factor_bases_20261013 prime20) because mitm-fiber no longer runs on prime curves. Instruction counts only; the children are tracked by scripts/perf/perfhistory.py.",
+  "workloads": {
+    "curves": [
+      {
+        "a": 0,
+        "b": 15,
+        "group_order": 2342739,
+        "gx": 947244,
+        "gy": 1525967,
+        "kind": "prime_explicit",
+        "p": 2345743,
+        "r": 15937
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261011
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-glv-auto",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "glv-orbit:size=32,group=auto",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "ic-glv-neg",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "glv-orbit:size=32,group=negation",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "200000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 1,
+    "timeout_seconds": 900,
+    "warmup": 0
+  }
+}

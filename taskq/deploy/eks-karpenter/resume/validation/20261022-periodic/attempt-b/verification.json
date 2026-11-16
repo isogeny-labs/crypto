@@ -1,0 +1,82 @@
+{
+  "schema": "isolab.periodic.qualification-outcome/v1",
+  "run": "ecbench-periodic-20261022-b",
+  "outcome": "failed",
+  "failure": "fresh benchmark epoch failed; measurement is not retried",
+  "source": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+  "runtime_image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0ecb5bf15e2f22b8d12242c3cb306735b1e44e696c698f2dade470b517869dd9",
+  "restores": 1,
+  "generations": [
+    {
+      "number": 1,
+      "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "snapshot_name": "ecbench-periodic-20261022-b-g1",
+      "snapshot_id": "snap-0d025b1c76948a8a5",
+      "archive_key": "recovery/runs/ecbench-periodic-20261022-b/generations/g1/checkpoint.tar",
+      "archive_version": "LTgiSBzssaKXOfrfjXjz9qEjGZLQTN_V",
+      "archive_sha256": "57c2dad45da251957022231e35eb225ddddeed9ea72ce40614d140a80b6f1fc2",
+      "manifest_sha256": "71748d2323684e1294aa499b1741c3a127ef79cecf68c067f35c8f876f0e5042",
+      "archive_bytes": 46489600,
+      "source_instance": "i-0ae9215e018bebc9a",
+      "source_pod_uid": "9a4a8f68-600d-4ccb-9b3b-7fe25202f142",
+      "committed_unix_seconds": 1792647506,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    },
+    {
+      "number": 2,
+      "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "snapshot_name": "ecbench-periodic-20261022-b-g2",
+      "snapshot_id": "snap-042f5c51ec9f5df38",
+      "archive_key": "recovery/runs/ecbench-periodic-20261022-b/generations/g2/checkpoint.tar",
+      "archive_version": "GH1tHPzJEH7UzY4pNT.7ntm8fSEKTA.W",
+      "archive_sha256": "266176d0d9a9b0ab00f6b16dc670cb55e206c17ef3102fe5d63086394aa620f9",
+      "manifest_sha256": "f3890745754a7f06f961ef43922a186b8a552a06dd22f27bc1d27cffa1491d9c",
+      "archive_bytes": 36321280,
+      "source_instance": "i-0ae9215e018bebc9a",
+      "source_pod_uid": "9a4a8f68-600d-4ccb-9b3b-7fe25202f142",
+      "committed_unix_seconds": 1792647640,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    }
+  ],
+  "computation": {
+    "native_replay": true,
+    "timing_valid": false,
+    "records": 3606,
+    "replays": 3600,
+    "prefix_records": 2486,
+    "prefix_bytes": 11113922
+  },
+  "fresh": {
+    "accepted": false,
+    "records": 3606,
+    "grades": [
+      {
+        "level": "L1",
+        "count": 3
+      },
+      {
+        "level": "L2",
+        "count": 3603
+      }
+    ],
+    "rejected_sequences": [
+      676,
+      1406,
+      1826
+    ],
+    "native_replay": true,
+    "replays": 3600,
+    "aa": "not evaluated: L2 gate exited first",
+    "payload_hashes_verified": 18,
+    "exit_code": 42,
+    "retries": 0,
+    "job": "ecbench-periodic-20261022-b-epoch-1",
+    "job_uid": "0e1512e7-e739-4bbb-b1fa-8163f9d8f2df",
+    "pod_uid": "fb1260f3-d86c-44c7-ae62-c5506963d3cb",
+    "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-periodic-20261022-b-epoch-1/fb1260f3-d86c-44c7-ae62-c5506963d3cb/"
+  }
+}

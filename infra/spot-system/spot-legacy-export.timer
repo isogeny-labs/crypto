@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh authorized private off-host legacy checkpoint backups
+[Timer]
+OnActiveSec=15min
+OnUnitInactiveSec=15min
+Unit=spot-legacy-export.service
+[Install]
+WantedBy=timers.target

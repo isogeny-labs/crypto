@@ -1,0 +1,11 @@
+# Canonical polynomial residual construction
+
+Derived and kernel-checked five main declarations: neg_correct, slots_correct, add_correct, sub_correct, residual_correct. Interface ResidualWord.residual_correct (p) [Fact p.toNat.Prime] (f v) hp hb hf hv states canonicality and decoded residual = decoded f - (decoded v)^2, assuming 0<p<2^31 and canonical f/v words.
+
+pneg maps every word without trimming. slots traverses ascending padded coefficient positions, explicitly adding zero for missing entries; padd trims once after this traversal. psub evaluates the negated second vector then padded addition. residual composes psub with the previously checked row-major ProductPolynomial.product on v,v. Structural list traversal models the native indexed loop's ordered values; heap layout/allocation and compiler execution are excluded.
+
+Twelve checked control declarations include two product evaluation witnesses and ten behavior controls: untrimmed negation, padding on both sides, complete cancellation, empty inputs, nonzero square residual, exact square, zero v and empty f. Separate readback of all 17 declarations reports only propext, Classical.choice and Quot.sound. Final residual2, controls5 and readback1 exited zero with unchanged input bindings.
+
+Retained failures: residual1 needed explicit cons/cons unfolding; controls1 kernel evaluation stuck at the well-founded slots definition; controls2 needed explicit product evaluation witnesses before slots equation simplification; controls3 had forward references from newly inserted witnesses; controls4 invoked decide after simp had already closed the empty-negation goal. All receipts and sources are retained; controls5 uses equation simplification and kernel decide, not native_decide. Unused simp warnings are retained.
+
+This is a producer-checked formal component, not independent Lean review. Independent source inspection was separately performed before this implementation at /var/tmp/pencil-residual-source-audit-20261101. The source interpretation is odd n=1 field with diagnostic tables disabled. Allocation failure, counter overflow/instrumentation, compiled Rust equivalence, timing and scientific execution are excluded. Imported compiled dependencies retain their existing trust boundary. No repository files changed.
