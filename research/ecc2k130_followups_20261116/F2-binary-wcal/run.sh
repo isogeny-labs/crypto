@@ -4,7 +4,7 @@
 set -u
 B=$1; cd "$(dirname "$0")"
 mkdir -p raw/measure raw/linz
-CELLS=("11 0 small" "13 0 small" "19 0 small" "23 0 small" "29 0 small" "37 0 small" "41 0 small" "47 1 small" "83 0 wide" "83 0 w3" "131 0 w3")
+CELLS=("11 1 small" "13 0 small" "19 0 small" "23 0 small" "29 1 small" "37 0 small" "41 0 small" "47 1 small" "83 0 wide" "83 0 w3" "131 0 w3")
 for rep in 0 1 2; do
   # seeded shuffle of the cell order for this rep (deterministic: sort by sha256 of rep+cell)
   mapfile -t ORDER < <(for c in "${CELLS[@]}"; do printf '%s\t%s\n' "$(printf '%s' "20261116-$rep-$c" | sha256sum | cut -c1-16)" "$c"; done | sort | cut -f2)
@@ -17,7 +17,7 @@ for rep in 0 1 2; do
 done
 # L2 linz cells: the seed each L2 raw file records.
 L2=../../ecc2k130_open7_20261114/L2-refutation-filters/raw
-for c in "11 5 40" "11 6 40" "13 6 40" "13 7 40" "19 9 40" "19 10 10"; do
+for c in "11 5 200" "11 6 200" "13 6 200" "13 7 200" "19 9 200" "19 10 200"; do
   set -- $c
   seed=$(grep -o '"seed":[0-9]*' $L2/linz_n$1_m2_d$2.json | head -1 | cut -d: -f2)
   out=raw/linz/linz_n$1_m2_d$2.json

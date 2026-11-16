@@ -121,3 +121,14 @@ Conflicts and propagations are unpriced native operations. Per-target propagatio
 0, 0.1 and 1 GAE as a band, and two arms are ranked only where the order holds at both nonzero
 prices. There is no relation-yield or linear-algebra phase here, so no end-to-end number and no
 gap to matched rho: a saving would be a stage ratio of the decomposition oracle only.
+
+## Amendment 1 (2026-11-16, after the C3 runs; rules, arms, statistic and predictions unchanged)
+- **C3 process p3 {WT, WL} stopped after position 61** (`raw/rows_m23k2w2_p3.jsonl`, kept
+  unchanged). Its stderr after 01:34Z is lost: at 01:34Z a repository artifacts hook wrote
+  `raw/.gitignore` and `raw/.artifacts.json` and the log files stopped updating. The cause of the
+  stop is not established. At position 61 WL carried about 23k clauses, so its own memory was small.
+- p3 was rerun from scratch with the same frozen binary (sha256 `c9731a3f…3b87`) into a new file,
+  `raw/rows_m23k2w2_p3v2.jsonl`. Its positions 0–61 are identical to the stopped file in every
+  counted field (124 of 124 rows), as the solver is deterministic. The analysis uses p3v2.
+- **C4 dropped** under section 2: the unscored A0 smoke at m=23, k=3, position 0
+  (`raw/dev_c4_smoke_unscored.jsonl`) was censored at the 2,000,000-conflict budget after 273 s.
