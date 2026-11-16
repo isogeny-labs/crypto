@@ -154,4 +154,4 @@ print(json.dumps({
     'schema': 'ghs.odd5.degree6-direct-replay/v1',
     'source_sha256': hashlib.sha256(Path(__file__).with_suffix('').read_bytes()).hexdigest(),
     'mask': mask, 'counts': counts, 'hits': hits,
-}, sort_keys=True))
+}, sort_keys=True, default=int))
