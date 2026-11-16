@@ -692,6 +692,60 @@ fn solve_using(
     oracle: &mut impl FnMut(&Curve, &[FactorBase], &Point, &mut Meter) -> Result<Option<Vec<Point>>>,
     meter: &mut Meter,
 ) -> Result<Certificate> {
+    solve_with_preparation(
+        curve,
+        target,
+        config,
+        rng,
+        |_, _, _, _| Ok(()),
+        |c, bases, _, query, work| oracle(c, bases, query, work),
+        meter,
+    )
+}
+
+// The indexes are complete enumerations owned by this reduction, never a
+// caller-supplied partial table. Prepare only once per nonempty fresh trial.
+pub(crate) fn solve_with_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    prepare: impl FnMut(&Curve, &[FactorBase], &[BTreeMap<Point, usize>], &mut Meter) -> Result<State>,
+    oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    solve_with_target_preparation(curve, target, config, rng, prepare, oracle, false, meter)
+}
+
+// Joint targets are an explicit alternative; the original collector stays the
+// control. Coefficients never enter the decomposition oracle.
+pub(crate) fn solve_with_target_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    mut prepare: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &[BTreeMap<Point, usize>],
+        &mut Meter,
+    ) -> Result<State>,
+    mut oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    joint_targets: bool,
+    meter: &mut Meter,
+) -> Result<Certificate> {
     if config.slots < 2 || config.trials == 0 || !curve.in_subgroup(target, meter)? {
         return Err(invalid("reduction input"));
     }
@@ -709,6 +763,7 @@ fn solve_using(
             scalar: BigUint::zero(),
         });
     }
+    let mut joint_table = None;
     for _ in 0..config.trials {
         meter.charge(1, "fresh-seed trial")?;
         let prime = if let Some(prime) = &config.hash_prime {
@@ -755,13 +810,29 @@ fn solve_using(
             .ok_or_else(|| overflow("relation attempts"))?;
         let mut relations = Vec::with_capacity(required);
         let mut matrix = Vec::with_capacity(required);
+        let mut oracle_state = prepare(curve, &bases, &indexes, meter)?;
         for _ in 0..attempts {
             let u = random_below(curve.order(), rng, meter)?;
             let v = random_below(curve.order(), rng, meter)?;
-            let left = curve.mul(curve.generator(), &u, meter)?;
-            let right = curve.mul(target, &v, meter)?;
-            let point = curve.add(&left, &right, meter)?;
-            if let Some(points) = oracle(curve, &bases, &point, meter)? {
+            let point = if joint_targets {
+                if joint_table.is_none() {
+                    joint_table = Some(crate::joint::JointTable::from_subgroup_points(
+                        curve,
+                        curve.generator(),
+                        target,
+                        meter,
+                    )?);
+                }
+                joint_table
+                    .as_ref()
+                    .expect("initialized joint table")
+                    .evaluate(&u, &v, meter)?
+            } else {
+                let left = curve.mul(curve.generator(), &u, meter)?;
+                let right = curve.mul(target, &v, meter)?;
+                curve.add(&left, &right, meter)?
+            };
+            if let Some(points) = oracle(curve, &bases, &mut oracle_state, &point, meter)? {
                 let relation = Relation { u, v, points };
                 matrix.push(matrix_row(&relation, &indexes, columns)?);
                 relations.push(relation);

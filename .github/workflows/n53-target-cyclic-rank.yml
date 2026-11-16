@@ -74,7 +74,9 @@ jobs:
         run: git diff --check
 
   outcome:
-    if: github.event.action == 'labeled' && github.event.label.name == 'run-n53-rotation-once' && github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event.action == 'labeled' && github.event.label.name == 'run-n53-rotation-once' && github.event.pull_request.head.repo.full_name == github.repository)
     needs: hash-only
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n53-target-cyclic-rank.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n53-target-cyclic-rank.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 45
