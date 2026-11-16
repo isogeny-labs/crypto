@@ -1,0 +1,14 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 1, 0, 0, z^3]);
+assert #E eq 138;
+assert WeilDescentGenus(E, GF(2), z^94) eq 14;
+C, h := WeilDescent(E, GF(2), z^94);
+assert Genus(C) eq 14;
+R<T> := PolynomialRing(Integers());
+expected := 1+175*T^14+16384*T^28;
+print "predicted", expected;
+observed := LPolynomial(C);
+print "observed", observed;
+print "factorization", Factorization(observed);
+assert observed eq expected;
