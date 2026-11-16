@@ -23,6 +23,11 @@ pub struct TwoLargePrimeDlpOptions {
     pub small_percent: usize,
     /// None enumerates the whole finite degree-nine B space once.
     pub b_count: Option<u128>,
+    /// Opt-in certified homogeneous-rank checks after this many new sources.
+    /// Checks occur only at complete B-batch boundaries. None keeps the
+    /// original fixed-cohort collector and its RNG consumption unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub collection_rank_stride: Option<usize>,
     pub max_descent_residuals: u64,
     pub max_accepted_descents: usize,
 }
@@ -31,10 +36,34 @@ impl Default for TwoLargePrimeDlpOptions {
         Self {
             small_percent: 75,
             b_count: None,
+            collection_rank_stride: None,
             max_descent_residuals: 8192,
             max_accepted_descents: 32,
         }
     }
+}
+
+/// Exact rank of replayed homogeneous rows. Row count alone is insufficient:
+/// dependent rows must not trigger the collection readiness heuristic.
+fn homogeneous_rank(
+    projection: &FilteredTwoLargePrimeRelations,
+    modulus: u64,
+    columns: usize,
+) -> Result<(usize, u64), &'static str> {
+    let mut system = CountedRelationSystem::new(modulus, columns);
+    for row in &projection.rows {
+        if row.rhs != 0 || row.cols.iter().any(|&(c, v)| c >= columns || v >= modulus) {
+            return Err("invalid homogeneous rank row");
+        }
+        let mut dense = vec![0; columns];
+        work::words(columns as u64);
+        for &(c, v) in &row.cols {
+            dense[c] = v;
+            work::words(2);
+        }
+        system.insert(dense, 0);
+    }
+    Ok((system.rank(), system.ops()))
 }
 
 fn bind_line(h: &mut blake3::Hasher, k: u128, line: &crate::cryptanalysis::jv_sieve::Line) {
@@ -71,6 +100,9 @@ pub fn run_two_large_prime_dlp_on(
         || options.max_descent_residuals == 0
         || options.max_descent_residuals > 1_000_000
         || !(2..=32).contains(&options.max_accepted_descents)
+        || options
+            .collection_rank_stride
+            .is_some_and(|s| !(1..=4096).contains(&s))
     {
         return Err("invalid bounded two-LP DLP options".into());
     }
@@ -99,6 +131,10 @@ pub fn run_two_large_prime_dlp_on(
         (0u128, 0u64, 0u64, 0u64, 0u64);
     let mut histogram = [0u64; 3];
     let mut refusal: Option<&str> = None;
+    let rank_target = sieve.small.saturating_sub(1);
+    let mut next_rank_check = rank_target.max(1);
+    let mut rank_checks = Vec::new();
+    let mut rank_ready = false;
     {
         let _g = work::enter(Phase::Relations);
         let scramble = coprime_scramble(b_space(sieve.setup()), &mut enum_rng);
@@ -171,6 +207,38 @@ pub fn run_two_large_prime_dlp_on(
                 "[two-lp collection] B={bs}/{count} lines={lines} verified={}",
                 relations.len()
             );
+            if let Some(stride) = options.collection_rank_stride {
+                if relations.len() >= next_rank_check {
+                    let _la = work::enter(Phase::LinearAlgebra);
+                    let before = work::snapshot();
+                    let projection = match sieve.filter_checked(
+                        &ctx,
+                        &relations,
+                        &LargePrimeFilterOptions {
+                            modulus: spec.l,
+                            ..Default::default()
+                        },
+                    ) {
+                        Ok(p) => p,
+                        Err(error) => {
+                            rank_checks.push(json!({"b_count":bs,"source_rows":relations.len(),"projection_error":error,"observed_primitives":work::prims_json(&work::snapshot().since(&before).total())}));
+                            refusal = Some(error);
+                            break 'collect;
+                        }
+                    };
+                    let (rank, products) = homogeneous_rank(&projection, spec.l, sieve.small)?;
+                    rank_ready = rank >= rank_target;
+                    rank_checks.push(json!({"b_count":bs,"lines":lines,"cohort_digest":fingerprint.clone().finalize().to_hex().to_string(),"source_rows":relations.len(),"complete_rows":projection.rows.len(),"rank":rank,"rank_target":rank_target,"ready":rank_ready,"solver_modular_muls":products,"graph":projection.report,"replayed_rows":projection.replayed_rows,"certificates":projection.certificates,"observed_primitives":work::prims_json(&work::snapshot().since(&before).total())}));
+                    next_rank_check = relations.len().saturating_add(stride);
+                    eprintln!(
+                        "[two-lp rank] sources={} rank={rank}/{rank_target} ready={rank_ready}",
+                        relations.len()
+                    );
+                    if rank_ready {
+                        break 'collect;
+                    }
+                }
+            }
         }
     }
     let by_x = &sieve.by_x;
@@ -295,6 +363,11 @@ pub fn run_two_large_prime_dlp_on(
     let report = json!({"schema":"cover.two-large-prime.dlp/v1","p":spec.p,"l":spec.l,"seed":seed,"options":options,"m":9,"full_base":sieve.base.len(),"small_base":sieve.small,"b_count_planned":count,"b_count_completed":bs,"lines":lines,"cohort_digest":fingerprint.finalize().to_hex().to_string(),"candidates":candidates,"refused":refused,"duplicates":duplicates,"verified_source_rows":relations.len(),"by_large_count":histogram,"source_relations":source_rows,"descents":descents,"descent_residuals":descent_residuals,"descent_timeouts":descent_timeouts,"descent_incomplete":descent_incomplete,"invalid_descents":invalid_descents,"projection_solve_attempts":attempts,"final_projection":proof,"last_rank":last_rank,"solver_modular_muls":solve_ops,"actual_scalar":scalar,"verified":scalar.is_some(),"capped":scalar.is_none(),"resource_refusal":refusal,"fallback_solves":0,"complete_cost":false,"total_bitops":null,"comparative_eligibility":false,"known_uncounted":["native containers and normalization","PRNG internals and other sampling paths","incremental RREF native scans and fixed-factor internals","cohort hashing and serialization"]});
     let mut output = report;
     output["descent_stream_advances"] = json!(stream_advances);
+    if options.collection_rank_stride.is_some() {
+        output["collection_rank_checks"] = json!(rank_checks);
+        output["collection_rank_ready"] = json!(rank_ready);
+        output["collection_rank_target"] = json!(rank_target);
+    }
     Ok((output, scalar))
 }
 
@@ -428,6 +501,42 @@ mod tests {
     use super::*;
     use crate::cryptanalysis::jv_cover::{factor_base, generate_spec};
     use rand::{rngs::StdRng, SeedableRng};
+
+    #[test]
+    fn homogeneous_checkpoint_requires_independent_rows_and_zero_rhs() {
+        use crate::cryptanalysis::gaudry_cubic::SparseRel;
+        let mut projection = FilteredTwoLargePrimeRelations {
+            rows: vec![
+                SparseRel {
+                    cols: vec![(0, 1), (1, 2)],
+                    rhs: 0,
+                },
+                SparseRel {
+                    cols: vec![(0, 2), (1, 4)],
+                    rhs: 0,
+                },
+                SparseRel {
+                    cols: vec![(0, 3), (1, 6)],
+                    rhs: 0,
+                },
+            ],
+            certificates: Vec::new(),
+            report: Default::default(),
+            replayed_rows: 3,
+        };
+        // Three equations, but rank1 cannot reach the3-column target2.
+        assert_eq!(homogeneous_rank(&projection, 101, 3).unwrap().0, 1);
+        projection.rows.push(SparseRel {
+            cols: vec![(1, 1), (2, 1)],
+            rhs: 0,
+        });
+        assert_eq!(homogeneous_rank(&projection, 101, 3).unwrap().0, 2);
+        projection.rows[0].rhs = 1;
+        assert!(homogeneous_rank(&projection, 101, 3).is_err());
+        projection.rows[0].rhs = 0;
+        projection.rows[0].cols[0].0 = 3;
+        assert!(homogeneous_rank(&projection, 101, 3).is_err());
+    }
 
     #[test]
     fn actual_jacobian_affine_equation_preserves_target_and_nonzero_rhs() {

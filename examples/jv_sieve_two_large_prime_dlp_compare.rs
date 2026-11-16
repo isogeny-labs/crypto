@@ -38,6 +38,8 @@ struct Args {
     small_percent: usize,
     #[arg(long)]
     b_count: Option<u128>,
+    #[arg(long)]
+    collection_rank_stride: Option<usize>,
     #[arg(long, default_value_t = 8192)]
     max_descent_residuals: u64,
     #[arg(long, default_value_t = 32)]
@@ -134,7 +136,7 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
         let spec=cover::spec_from_curve(curve.p,alpha,curve.l,g,q,0).ok_or("public transfer failed")?;
         let (report,scalar)=match method{
             "ic"=>{let(r,d)=sieve::run_cover_sieve_dlp_on_with_filter(&spec,args.seed,0,1.0,Some(64),1.25,None,false,None);(serde_json::to_value(r).map_err(|e|e.to_string())?,d)},
-            "two-lp"=>run_two_large_prime_dlp_on(&spec,args.seed,TwoLargePrimeDlpOptions{small_percent:args.small_percent,b_count:args.b_count,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents})?,
+            "two-lp"=>run_two_large_prime_dlp_on(&spec,args.seed,TwoLargePrimeDlpOptions{small_percent:args.small_percent,b_count:args.b_count,collection_rank_stride:args.collection_rank_stride,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents})?,
             _=>return Err("method must be ic or two-lp".into()),
         };
         drop(model);

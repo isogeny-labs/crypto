@@ -1,4 +1,53 @@
-# Current checkpoint:30FINISHED; publish packet then collection optimization (16 November14:32Z)
+# Current checkpoint:31SOURCE READY, NOT RUN (16 November14:58Z)
+
+Nativequeue25349FINISHED:26sievepass/2existingignored, public-input1/1,
+productionexamplebuild andfinal library/examplestrictClippyPASS. Twofrozen
+rootsourcehashesPASS. Standalone17rank-stop/14oldfullchecks/build/ClippyPASS,
+old29summaryreplaybyteexact. No livecompiler/scientificjob, no31rundir/data.
+Nextfreshsource/buildmanifests,COMMIT/PUSHcleanSOURCE/spec thensole31wrapper
+local-cover-two-lp-rank-stop-20261116-31. Originalcopiedqualifier/exports/hash/
+report/viewallpages/exactbenchcopies/publicationrequired. Sourceandcomparison
+scope unchanged. Strongrhoaccountingfollowup documented(no newprice/runselected).
+GoalACTIVE/localauthorized; no stopgoal/subagents/manualmerge.
+
+# Previous checkpoint:31SELECTED; opt-in rank stop native build active (16 November14:47Z)
+
+30PUBLISHEDacfad811d49fda20f41694abbd63379339a0e5e8/PCCfollowupefddb3f61;
+bot8c79fbd4eFFintegrated30PNGmigrationonly/exactsparsebenchrestore+ignoredPNGhashPASS.
+CurrentHEAD8c79fbd4e+DIRTYrankstopcode/qualifier/protocol/docs/journal. No31call/rundir.
+
+TwoLargePrimeDlpOptions.collection_rank_stride optional/defaultNone/skipSerializeNone.
+Afterwhole1024Bbatch, first>=small-1sources thenstridefreshsources: filter_checked
+allcurrenthomogeneoussources/everycertreplay/exactCountedRREFrank; stop>=small-1.
+Readinessheuristiconly; existingaffinedescent/targetsolve/actualellipticreplayrequired.
+Allcheckpoints/certificates/Bcounts/sourceprefixes/graph/rank/legacyM/primitivesretained,
+allcheckpointworkinLA, RNGstreamsunchanged. Newdependent-row/nativeboundtest.
+Rootlibrary/exampleClippyPASS; sourcefrozen14:37 /tmp/ic-rank-stop-root-source-before-tests.sha256
+PASS. Nativequeue25349 cargo testrelease--libjv_sieve THENpublicexampletest THENbuild,
+STILLRUNNING; inspectvalidation/rank-stop-{sieve-tests,public-input-tests,example-build}.log.
+DO NOTmutate2rootsourceswhilecompilerreads ormeasurewhilecompiling.
+
+Standalone rank-stop-analysis17checks(14inherited+3specific)/oldfull14/build/ClippyPASS.
+Original29summaryreanalysisbyteexact. Newfullhelperwrapperspreserveoldfixedbudgetchecks;
+rank-stoppedwrapperexplicit; newqualifierindependentcheckpointreplay/rank/stride/phase
+containment/finalaffineactualscalar/prefixbinding. NativeRustraw-export writesall3workers,
+fixture/plan/flow/summary/BLAKE3pins; selfdescribedNONCANONICALschema. Canonicalskill/
+schemas siblingVLT1encrypted/unreadable; receiptvalidation/rank-stop-canonical-protocol-access.log.
+Neverprintciphertext. FailedinitialCLI/format/deadcodeClippylogsretained/fixed.
+
+SELECTEDAmendment26/rank-stop-plan.json/run-rank-stop-local.sh/rank-stop-report.typ/
+RANK_STOP_REVIEW.md: freshp1009seed311,m9,small75%,full1018081Bbudget,stride128,
+samebinaryoriginalIC/fixed2LP/rankstop2LP;1validation0warm,CPU0/8GiB/900worker2800whole
+60fixture/noretry. Source/spec/manifestsCOMMIT+PUSHcleanBEFOREsolecall
+/workspace/ic-local-runs/local-cover-two-lp-rank-stop-20261116-31.
+Require3actualscalars/native+outerreplay/heldout, exactsourceprefix+commondescentprefix,
+everycheckpoint/finalcertreplay/independentrank/target/count/phasepricechecks.
+Allcompletecost/comparative/rhofalse,totalnull,wallspracticalityonly,noratios/crossruncomposition.
+Needfinishnativequeue, source/buildmanifest+sourcepublication, sole31call/copiedqualifier/
+rawexport/exactcustody/summary/flow/report/vieweverypage/benchmarkcopies/publication.
+Sourcepreparerooteditscomplete. No31data yet. GoalACTIVE/localauthorized/no subagents.
+
+# Previous checkpoint:30FINISHED; publish packet then collection optimization (16 November14:32Z)
 
 Source3acefa56fbd026257f03d962a2d2009559daf8de publishedBEFOREsole30call.
 Run/workspace/ic-local-runs/local-recorded-rref-counter-20261116-30 exits0,

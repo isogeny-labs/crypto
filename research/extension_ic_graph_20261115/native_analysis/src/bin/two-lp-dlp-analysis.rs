@@ -1,7 +1,7 @@
 //! Producer scalar/certificate qualifier. No independent signed admission.
 #[allow(dead_code)]
 #[path = "two-lp-component-analysis.rs"]
-mod shared;
+pub(crate) mod shared;
 use serde_json::{json, Value};
 use shared::{
     accumulate, add, canonical, counts, mul, n, pow, price, prime, Field, Terms, Widths, KINDS,
@@ -17,7 +17,7 @@ use std::{
 
 /// Independent batch Gaussian elimination, including affine consistency.
 /// The protected target is last; a pivot there is a unit target equation.
-fn target_solution(
+pub(crate) fn target_solution(
     rows: &[(Terms, u64)],
     columns: usize,
     p: u64,
@@ -65,7 +65,7 @@ fn target_solution(
     }
     Ok((r, answer))
 }
-fn counter_check(w: &Value, p: u64, l: u64) -> Result<Value, String> {
+pub(crate) fn counter_check(w: &Value, p: u64, l: u64) -> Result<Value, String> {
     let v = &w["work_native"];
     if v["schema"] != "cover.two-large-prime.dlp-work/v1"
         || v["complete"] != false
@@ -179,7 +179,35 @@ fn bind_split(
     }
     Ok(())
 }
-fn candidate_proof(w: &Value, plan: &Value, l: u64, expected: u64) -> Result<Value, String> {
+pub(crate) fn candidate_proof(
+    w: &Value,
+    plan: &Value,
+    l: u64,
+    expected: u64,
+) -> Result<Value, String> {
+    candidate_proof_with_collection_mode(w, plan, l, expected, false)
+}
+#[allow(dead_code)] // Used by the separate rank-stop qualifier binary.
+pub(crate) fn rank_stopped_candidate_proof(
+    w: &Value,
+    plan: &Value,
+    l: u64,
+    expected: u64,
+) -> Result<Value, String> {
+    if w["work"]["options"]["collection_rank_stride"] != plan["collection_rank_stride"]
+        || n(&w["work"], "b_count_completed")? > n(plan, "b_count")?
+    {
+        return Err("rank-stopped collection bounds/options".into());
+    }
+    candidate_proof_with_collection_mode(w, plan, l, expected, true)
+}
+fn candidate_proof_with_collection_mode(
+    w: &Value,
+    plan: &Value,
+    l: u64,
+    expected: u64,
+    rank_stopped: bool,
+) -> Result<Value, String> {
     let v = &w["work"];
     let small = n(v, "small_base")?;
     let base = n(v, "full_base")?;
@@ -198,7 +226,7 @@ fn candidate_proof(w: &Value, plan: &Value, l: u64, expected: u64) -> Result<Val
         || base > p
         || small != base * n(plan, "small_percent")? / 100
         || v["b_count_planned"] != plan["b_count"]
-        || v["b_count_completed"] != plan["b_count"]
+        || (!rank_stopped && v["b_count_completed"] != plan["b_count"])
         || v["actual_scalar"] != expected
         || v["verified"] != true
         || v["capped"] != false

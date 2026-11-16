@@ -30,6 +30,17 @@ bypass hooks, as explicitly recorded in a post-call audit without rewriting
 the frozen measurements. No speed/cost/rho verdict is asserted.
 [pcc:unverified]
 
+The [recorded-matrix arithmetic replay](local-recorded-rref-counter-20261116-30/report.pdf)
+adds exact counted RREF products/subtractions without changing its arithmetic:
+7,711,970products,7,553,168subtractions and398inversions, retaining the same
+scalar/rank/legacy products. The target is determined after471of1122saved
+rows. This corrects counter coverage; the original29measurement is unchanged
+and no end-to-end price is reconstructed. The next opt-in collection lead
+checks certified homogeneous rank at B-batch boundaries before stopping
+collection; [Amendment26](AMENDMENT_26_RANK_STOP_COLLECTION.md) freezes its
+fresh matched validation. Native checks are in progress;31has not run.
+[pcc:unverified]
+
 ## Three graph representations in the Rust integration
 
 | Representation | Vertices and edges | Computation |
