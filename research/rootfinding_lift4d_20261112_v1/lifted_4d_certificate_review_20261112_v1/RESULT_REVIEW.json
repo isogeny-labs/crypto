@@ -1,0 +1,231 @@
+{
+  "schema": "independent-recorded-evidence-review/v1",
+  "created_utc": "2026-11-12T03:00:28.657155+00:00",
+  "decision": "CORRECTNESS_COMPONENT_PASSED_4D_VS_7D_COST_PREDICTION_REFUTED",
+  "operation": "Recorded-byte/hash, complete native batch/tuple/pool/mask coverage and recorded timing-statistic checks only; no LLL/search/root algorithm rerun",
+  "results": [
+    {
+      "mode": "controls",
+      "complete_root_union_size": 18,
+      "all_arms_identical": true,
+      "recorded_native_fibers": 45,
+      "recorded_root_batches": 3,
+      "mask_rows": 10,
+      "candidate_vectors": 325,
+      "candidate_u_checks": 975,
+      "median_component_seconds": {
+        "all": 0.2701744830010284,
+        "seven": 0.2604001130021061,
+        "four": 0.3170995700020285
+      },
+      "raw_sha256": "82f6b49332c9defb6eecf8c33e1553cd5b39ece5e78a017c86923b49ba2c5a59",
+      "wall_seconds": 7.401223779001157,
+      "whole_process_peak_rss_kib": 194204,
+      "child_recovery_discovery_rss_kib": [
+        14208,
+        14540
+      ],
+      "arm_metrics": [
+        {
+          "arm": "all",
+          "paid_component_seconds": 0.2701744830010284,
+          "solved_fibers": 15,
+          "excluded_fibers": 0,
+          "discovery_seconds": null,
+          "masks": {
+            "tiny-11": "000",
+            "tiny-13": "000",
+            "tiny-17": "000",
+            "tiny-5": "000",
+            "tiny-7": "000"
+          }
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 0.2604001130021061,
+          "solved_fibers": 15,
+          "excluded_fibers": 0,
+          "discovery_seconds": 0.014344291001179954,
+          "masks": {
+            "tiny-11": "000",
+            "tiny-13": "000",
+            "tiny-17": "000",
+            "tiny-5": "000",
+            "tiny-7": "000"
+          }
+        },
+        {
+          "arm": "four",
+          "paid_component_seconds": 0.3170995700020285,
+          "solved_fibers": 15,
+          "excluded_fibers": 0,
+          "discovery_seconds": 0.005480566000187537,
+          "masks": {
+            "tiny-11": "000",
+            "tiny-13": "000",
+            "tiny-17": "000",
+            "tiny-5": "000",
+            "tiny-7": "000"
+          }
+        }
+      ]
+    },
+    {
+      "mode": "profile",
+      "complete_root_union_size": 15,
+      "all_arms_identical": true,
+      "recorded_native_fibers": 246,
+      "recorded_root_batches": 9,
+      "mask_rows": 30,
+      "candidate_vectors": 975,
+      "candidate_u_checks": 7800,
+      "median_component_seconds": {
+        "all": 5.1791215049997845,
+        "seven": 3.8126137819999713,
+        "four": 4.564948474999255
+      },
+      "raw_sha256": "79aaee1bfb681198f8f58b6caed31ab86c4defb20bf9b25130ebbe3a34f45fce",
+      "wall_seconds": 46.34494914300012,
+      "whole_process_peak_rss_kib": 194124,
+      "child_recovery_discovery_rss_kib": [
+        14208,
+        16840
+      ],
+      "arm_metrics": [
+        {
+          "arm": "all",
+          "paid_component_seconds": 5.191907339001773,
+          "solved_fibers": 40,
+          "excluded_fibers": 0,
+          "discovery_seconds": null,
+          "masks": {
+            "P-192": "00000000",
+            "P-224": "00000000",
+            "P-256": "00000000",
+            "P-384": "00000000",
+            "P-521": "00000000"
+          }
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 3.9776746819989057,
+          "solved_fibers": 6,
+          "excluded_fibers": 34,
+          "discovery_seconds": 2.7334784129998297,
+          "masks": {
+            "P-192": "01111111",
+            "P-224": "10111111",
+            "P-256": "11101111",
+            "P-384": "11111011",
+            "P-521": "11111100"
+          }
+        },
+        {
+          "arm": "four",
+          "paid_component_seconds": 5.109831747999124,
+          "solved_fibers": 36,
+          "excluded_fibers": 4,
+          "discovery_seconds": 0.1377559159991506,
+          "masks": {
+            "P-192": "00010000",
+            "P-224": "00010000",
+            "P-256": "00000000",
+            "P-384": "00010000",
+            "P-521": "00010000"
+          }
+        },
+        {
+          "arm": "four",
+          "paid_component_seconds": 4.360153702000389,
+          "solved_fibers": 36,
+          "excluded_fibers": 4,
+          "discovery_seconds": 0.12595194399909815,
+          "masks": {
+            "P-192": "00010000",
+            "P-224": "00010000",
+            "P-256": "00000000",
+            "P-384": "00010000",
+            "P-521": "00010000"
+          }
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 3.7486737959989114,
+          "solved_fibers": 6,
+          "excluded_fibers": 34,
+          "discovery_seconds": 2.556514587999118,
+          "masks": {
+            "P-192": "01111111",
+            "P-224": "10111111",
+            "P-256": "11101111",
+            "P-384": "11111011",
+            "P-521": "11111100"
+          }
+        },
+        {
+          "arm": "all",
+          "paid_component_seconds": 4.753323504999571,
+          "solved_fibers": 40,
+          "excluded_fibers": 0,
+          "discovery_seconds": null,
+          "masks": {
+            "P-192": "00000000",
+            "P-224": "00000000",
+            "P-256": "00000000",
+            "P-384": "00000000",
+            "P-521": "00000000"
+          }
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 3.8126137819999713,
+          "solved_fibers": 6,
+          "excluded_fibers": 34,
+          "discovery_seconds": 2.581705952001357,
+          "masks": {
+            "P-192": "01111111",
+            "P-224": "10111111",
+            "P-256": "11101111",
+            "P-384": "11111011",
+            "P-521": "11111100"
+          }
+        },
+        {
+          "arm": "all",
+          "paid_component_seconds": 5.1791215049997845,
+          "solved_fibers": 40,
+          "excluded_fibers": 0,
+          "discovery_seconds": null,
+          "masks": {
+            "P-192": "00000000",
+            "P-224": "00000000",
+            "P-256": "00000000",
+            "P-384": "00000000",
+            "P-521": "00000000"
+          }
+        },
+        {
+          "arm": "four",
+          "paid_component_seconds": 4.564948474999255,
+          "solved_fibers": 36,
+          "excluded_fibers": 4,
+          "discovery_seconds": 0.12713941199763212,
+          "masks": {
+            "P-192": "00010000",
+            "P-224": "00010000",
+            "P-256": "00000000",
+            "P-384": "00010000",
+            "P-521": "00010000"
+          }
+        }
+      ]
+    }
+  ],
+  "observed_all_over_four": 1.1345410651104073,
+  "observed_seven_over_four": 0.8351931687466841,
+  "diagnosis": "Fast4D discovery prunes exactly the midpoint in the four fields whose planted u is elsewhere;36survivors negate the cheap discovery.7D retains6survivors. Any multipivot successor must charge all seeds/replays and preserve full union.",
+  "qualified_speedup": null,
+  "original_global_root_complete": false,
+  "novelty_established": false,
+  "scientific_goal_complete": false
+}

@@ -1,0 +1,3 @@
+# Session 2026-11-02
+
+Previous turn made progress through native restart coverage. T-1396 reserved this new packet. Read historical assembly/qualification source and receipts; confirmed independent reviewer agents still usage-limited. Joined staged context and retained qualifier closure, preserving unadmitted new image/review fields. Expanded readback from 60 to 63 pins to include materialized-source manifest, build-info and smoke bytes. Four helper controls pass. Fresh read-only local Docker observations confirm exact base identity and no local containers. No assembly, qualifier, cloud or scientific execution. Next: exact assembler amendment and independent review/admission. Published packet targets PR3237.

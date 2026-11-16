@@ -1,0 +1,309 @@
+{
+  "schema": "aps.independent-replay-development/v1",
+  "date": "2026-10-29",
+  "status": "bounded supplied witnesses verified; completeness and cost not certified",
+  "base_revision": "117c9c4f3ee85d4dc32f275893f6e50b591e4a47",
+  "source_sha256": {
+    "verifier": "bda29ff081fea3e7c87f33f2bf916285ace2ef98973e26934104a9b5579a6bd5",
+    "producer_cli": "89da6ffd692dfe304dad4aaccf07172547af163ce153fd61e30ca48698b018da",
+    "producer_module": "98a0a59576e6cc0602ca6814cbda4d8c67e2caabf2ddb16ecd47e664e5961b15",
+    "root_cargo_lock": "a86d5ade7e2c17cf603be75dc5dceaecfcbf274dfba89e672dabcf236500ec44",
+    "standalone_cargo_lock": "33484a20cf3366464aea166b343bef49e8a4ec662b871c01a0a5597816af06d0",
+    "aps_author_manuscript": "67442c30c2f14ab7891b6285f9b6d3c77cf5b1a6d2e838ec25b815a280029ba1"
+  },
+  "corpus": {
+    "transcripts": 14,
+    "arms": 12,
+    "curves": 3,
+    "selection": "fixed public development controls; not a performance sample",
+    "cases": [
+      {
+        "name": "block-symmetric4",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "d33292f9a3a5496c36c206868c639288f8d6bc8090ca0cff00761340946babfc",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 1,
+        "labelled_points_checked": 8,
+        "coordinate_sets_checked": 2,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "cover3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "af5ae369cd4288ac30489a93b626954d391782be081b26ab19e80f2aa59e5861",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 3,
+        "labelled_points_checked": 18,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "expanded4",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "c21b7f81f445e73815eceed5515bc0750b4dbb8630f0b86fcd1aa1ea1b79e958",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 1,
+        "labelled_points_checked": 8,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "hybrid3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "f8c4fbf2061f7ee8c4ec32b3cd41f68ddda6893b6b9e44e32e9790f7b078d594",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 4,
+        "labelled_points_checked": 24,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "hybrid4",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "a2d013d6e0b54a0983b479cc29367abc0c1033228530bc197ec99c98ae210239",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 1,
+        "labelled_points_checked": 8,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "line3-toy211",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "827034bd9ff2884e8c8a91fdcdb4f5d8872cb7461f574f2cb3ed26d70d9b4de5",
+        "fixture": "toy211",
+        "curve_icv1": "ICV1:fp-211:-15:227:153:unk:unk:r:9004a75cb03c",
+        "attempts_checked": 2,
+        "labelled_points_checked": 12,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "line3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "7cb2d29f486d5447eb4f370adc7fa2dd53380d7c60224b8d8c97ab99e74bd56b",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 3,
+        "labelled_points_checked": 18,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "orbit-line3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "f86bbfee3ce43fcdbb14aaaf6ef76128d1bf24cac388363931e7ff4961567f1c",
+        "fixture": "toy103_j0",
+        "curve_icv1": "ICV1:fp-103:7:97:0:unk:unk:r:394a8c88b017",
+        "attempts_checked": 1,
+        "labelled_points_checked": 9,
+        "coordinate_sets_checked": 9,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "orbit-pruned-line3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "4cf5f61dbfe76f75f60162ea01498e71e181ddefc0656bfdd62967f4f896aa91",
+        "fixture": "toy103_j0",
+        "curve_icv1": "ICV1:fp-103:7:97:0:unk:unk:r:394a8c88b017",
+        "attempts_checked": 1,
+        "labelled_points_checked": 9,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "orbit3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "77471959a576596d72eb2bc883aff1626b20484d00e5580f4cdd08efcf4a5687",
+        "fixture": "toy103_j0",
+        "curve_icv1": "ICV1:fp-103:7:97:0:unk:unk:r:394a8c88b017",
+        "attempts_checked": 1,
+        "labelled_points_checked": 9,
+        "coordinate_sets_checked": 3,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "partitioned3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "0a59c9b49a0894a619044bfc5b3170ae7bb96bd13de85d70b93bf0bb961b3b04",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 8,
+        "labelled_points_checked": 48,
+        "coordinate_sets_checked": 2,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "split4-toy211",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "94db5108806a764213591b1d6ff4827f98d7af590d36880a02356caf9c290536",
+        "fixture": "toy211",
+        "curve_icv1": "ICV1:fp-211:-15:227:153:unk:unk:r:9004a75cb03c",
+        "attempts_checked": 1,
+        "labelled_points_checked": 8,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "split4",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "c542d17c1c14ade9f0d2f3dd538033f818e2d0140709670311fb34e58669fbfb",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 2,
+        "labelled_points_checked": 16,
+        "coordinate_sets_checked": 2,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      },
+      {
+        "name": "unordered3",
+        "schema": "aps.single-relation.replay/v1",
+        "input_sha256": "f25c0d10e006a6630a2a3d54be7c7b5ef5178aaf85b64ab8d7e1694952c73d22",
+        "fixture": "toy101",
+        "curve_icv1": "ICV1:fp-101:-5:107:36:unk:unk:r:9ced75c2406a",
+        "attempts_checked": 3,
+        "labelled_points_checked": 18,
+        "coordinate_sets_checked": 1,
+        "recoveries_verified": 1,
+        "producer_status": "verified",
+        "independent_affine_arithmetic": true,
+        "enumeration_completeness_verified": false,
+        "sampling_deadlines_and_costs_verified": false
+      }
+    ]
+  },
+  "checks": {
+    "standalone_tests": {
+      "command": "cargo test --offline --locked --manifest-path research/aps_independent_replay_20261029/native/Cargo.toml -- --test-threads=2",
+      "exit_code": 0,
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "raw_log_sha256": "62901d13d15802d133ff8a041f598238fc6840e62c2630fa1dd1093f11c2689c"
+    },
+    "repository_example_tests": {
+      "command": "cargo test --release --locked --example aps_single_relation_replay -- --test-threads=2",
+      "exit_code": 0,
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "raw_log_sha256": "9747cec7d4d96842c9719b5240a35b93c7789a5134c6bcd10887b862ef40580c"
+    },
+    "standalone_clippy": {
+      "command": "cargo clippy --offline --locked --manifest-path research/aps_independent_replay_20261029/native/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "raw_log_sha256": "894df6854222e4caa4fcb8ad5db241b41fd6eade111d67a793dd30c3fd8d0503"
+    },
+    "scoped_rustfmt": "passed",
+    "historical_sha256_files_verified": 19,
+    "root_example_clippy": {
+      "command": "cargo clippy --release --locked --offline --example aps_single_relation_replay -- -D warnings",
+      "exit_code": 0,
+      "raw_log_sha256": "0b8d610662c155c0c200816bda0e964951c7e3f5461e1ae3a2cf401793342be1"
+    },
+    "artifact_policy": {
+      "command": "python3 tools/artifacts/artifacts.py plan research/aps_independent_replay_20261029",
+      "files_requiring_store": 0
+    },
+    "pdf_inspection": "passed; two pages; see report-inspection.json"
+  },
+  "integration": {
+    "main_revision": "992c2579e2891c1c58ee70183888d3a9ce1d32e4",
+    "conflicts": false,
+    "producer_cli_module_and_direct_arithmetic_dependencies_unchanged": true,
+    "verifier_and_corpus_unchanged": true,
+    "command": "cargo check --release --locked --offline --example aps_single_relation_replay",
+    "exit_code": 0,
+    "raw_log_sha256": "a3d5ec879f7e4f2e7d74130b13482266b7a4599846f425b388de229289457e56",
+    "note": "The nine-test standalone/root runs and strict lint above remain tied to base_revision. This additional integration check compiles the merged library; it is not a new full-suite invocation."
+  },
+  "full_library_suite_run": false,
+  "new_performance_experiments": 0,
+  "historical_python_research_executed": false,
+  "independent_affine_arithmetic": true,
+  "uncertified": [
+    "solver root completeness",
+    "random sampling and draw history",
+    "deadlines",
+    "operation counts and total cost",
+    "unsupported curves and parameter ladders"
+  ],
+  "flow": {
+    "initial_generation": {
+      "planned": 14,
+      "completed": 9,
+      "refused_before_json": 1,
+      "not_attempted": 4
+    },
+    "remaining_corrected_cases": {
+      "planned": 5,
+      "completed": 5
+    },
+    "final_corpus": {
+      "planned": 14,
+      "replayed": 14,
+      "excluded": 0
+    }
+  },
+  "limits": "Only the existing three CLI fixtures, arities 3/4, <=128 attempts, <=4096 coordinate sets per attempt, <=32768 sets overall and <=8 MiB JSON.",
+  "receipts_scope": "Compact development results and per-input replay outputs; full build/dependency logs are not redistributed.",
+  "conductor": "unavailable; no lease claimed",
+  "experiment_checkpoint": "gate reported missing resume before upload; no experiment launch or checkpoint upload attempted; development checks use the documented non-experiment exception"
+}

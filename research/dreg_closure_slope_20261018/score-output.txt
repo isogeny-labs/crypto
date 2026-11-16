@@ -1,0 +1,49 @@
+| m | (n, ℓ) | m·ℓ | N | degree per draw | cell | secs per draw |
+|--:|---|--:|--:|---|---|---|
+| 4 | (12, 3) | 12 | 36 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 4 | (14, 3) | 12 | 40 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 3 | (11, 5) | 15 | 26 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 3 | (13, 5) | 15 | 28 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 3 | (15, 5) | 15 | 30 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 4 | (13, 4) | 16 | 42 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 3 | (16, 6) | 18 | 34 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 3 | (18, 6) | 18 | 36 | 4 4 4 4 (committed, dense) | resolved at 4 | — |
+| 3 | (19, 7) | 21 | 40 | unmeasured unmeasured unmeasured unmeasured | unmeasured | 277 269 247 264 |
+| 3 | (21, 7) | 21 | 42 | unmeasured unmeasured unmeasured unmeasured | unmeasured | 220 223 220 231 |
+| 3 | (22, 8) | 24 | 46 | unmeasured unmeasured unmeasured | unmeasured | 8548 0 0 |
+
+Slope s = 0.0000 degrees per summand unknown (m·ℓ), least squares over 8 cells (8 anchors at degree 4, 0 measured here)
+Registered verdict: nothing resolved above the anchors: undecided
+P1 (every resolved draw at m·ℓ = 20, 21 reads 5): 0 of 0 → unmeasured
+P2 (a resolved cell with m·ℓ ≤ 30 reads 6): refuted on the resolved cells (or unmeasured)
+P3 (s ≥ 0.10): unmeasured
+P4 (sparse degree-4 replays of committed dense refutations refute): 1 of 1 measured (2 runs) → incomplete (capped or killed runs are unmeasured)
+P5 (no satisfiable draw refuted): 0 control runs, 0 refuted, 0 unmeasured
+
+Derived (cost model, w = 1; extrapolated degree 4 + s·(m·ℓ − 18) at ℓ = ⌈n/m⌉, read from the fit over m·ℓ ≤ 30):
+| n | m | ℓ | log₂ budget per solve | admissible D (chained N) | admissible D (N = m·ℓ) | extrapolated degree | gap, degrees (chained) |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 73 | 3 | 25 | 13.3 | none | 2 | 4.0 | — |
+| 73 | 4 | 19 | 18.3 | 2 | 3 | 4.0 | +2.0 |
+| 73 | 5 | 15 | 19.0 | 2 | 3 | 4.0 | +2.0 |
+| 73 | 6 | 13 | 21.4 | 2 | 4 | 4.0 | +2.0 |
+| 109 | 3 | 37 | 19.6 | 2 | 3 | 4.0 | +2.0 |
+| 109 | 4 | 28 | 27.6 | 3 | 5 | 4.0 | +1.0 |
+| 109 | 5 | 22 | 29.3 | 3 | 5 | 4.0 | +1.0 |
+| 109 | 6 | 19 | 33.7 | 4 | 6 | 4.0 | +0.0 |
+| 127 | 3 | 43 | 22.7 | 3 | 3 | 4.0 | +1.0 |
+| 127 | 4 | 32 | 30.7 | 4 | 5 | 4.0 | +0.0 |
+| 127 | 5 | 26 | 36.4 | 4 | 6 | 4.0 | +0.0 |
+| 127 | 6 | 22 | 39.8 | 5 | 7 | 4.0 | -1.0 |
+| 131 | 3 | 44 | 22.8 | 3 | 3 | 4.0 | +1.0 |
+| 131 | 4 | 33 | 31.8 | 4 | 5 | 4.0 | +0.0 |
+| 131 | 5 | 27 | 38.4 | 5 | 7 | 4.0 | -1.0 |
+| 131 | 6 | 22 | 37.9 | 4 | 7 | 4.0 | +0.0 |
+| 163 | 3 | 55 | 29.4 | 4 | 4 | 4.0 | +0.0 |
+| 163 | 4 | 41 | 40.4 | 5 | 7 | 4.0 | -1.0 |
+| 163 | 5 | 33 | 47.1 | 6 | 8 | 4.0 | -2.0 |
+| 163 | 6 | 28 | 52.5 | 6 | 10 | 4.0 | -2.0 |
+| 233 | 3 | 78 | 40.2 | 5 | 6 | 4.0 | -1.0 |
+| 233 | 4 | 59 | 59.2 | 7 | 10 | 4.0 | -3.0 |
+| 233 | 5 | 47 | 67.9 | 8 | 12 | 4.0 | -4.0 |
+| 233 | 6 | 39 | 72.3 | 8 | 13 | 4.0 | -4.0 |

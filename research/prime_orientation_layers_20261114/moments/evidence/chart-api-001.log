@@ -1,0 +1,10 @@
+Polynomial.coeff_X_mul.{u} {R : Type u} [Semiring R] (p : Polynomial R) (n : ℕ) :
+  (Polynomial.X * p).coeff (n + 1) = p.coeff n
+Polynomial.coeff_C_mul.{u} {R : Type u} {a : R} {n : ℕ} [Semiring R] (p : Polynomial R) :
+  (Polynomial.C a * p).coeff n = a * p.coeff n
+Polynomial.coeff_X.{u} {R : Type u} {n : ℕ} [Semiring R] : Polynomial.X.coeff n = if 1 = n then 1 else 0
+Finset.sum_mul.{u_1, u_4} {ι : Type u_1} {R : Type u_4} [NonUnitalNonAssocSemiring R] (s : Finset ι) (f : ι → R)
+  (a : R) : (∑ i ∈ s, f i) * a = ∑ i ∈ s, f i * a
+map_sum.{u_1, u_3, u_4, u_7} {ι : Type u_1} {M : Type u_3} {N : Type u_4} [AddCommMonoid M] [AddCommMonoid N]
+  {G : Type u_7} [FunLike G M N] [AddMonoidHomClass G M N] (g : G) (f : ι → M) (s : Finset ι) :
+  g (∑ x ∈ s, f x) = ∑ x ∈ s, g (f x)

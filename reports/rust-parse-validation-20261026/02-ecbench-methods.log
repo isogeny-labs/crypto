@@ -1,0 +1,16 @@
+   Compiling crypto v0.1.0 (/var/tmp/crypto-proof-inventory-20261026)
+error: this file contains an unclosed delimiter
+    --> src/cryptanalysis/ecbench/methods.rs:4870:3
+     |
+2298 | ) -> Result<SolveReport, String> {
+     |                                  - unclosed delimiter
+...
+2363 |     Ok(SolveReport {
+     |       -            - unclosed delimiter
+     |       |
+     |       unclosed delimiter
+...
+4870 | }
+     |  ^
+
+error: could not compile `crypto` (lib test) due to 1 previous error

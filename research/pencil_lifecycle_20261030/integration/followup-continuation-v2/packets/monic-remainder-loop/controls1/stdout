@@ -1,0 +1,134 @@
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:4:73: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [16, 1] [16, 0, 1] 2 = some []
+because its `Decidable` instance
+  (checkedPrem 17 [16, 1] [16, 0, 1] 2).instDecidableEq (some [])
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [16, 1] [16, 0, 1] 2 with
+  | none =>
+    match some [] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:5:73: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [16, 1] [16, 0, 1] 1 = none
+because its `Decidable` instance
+  (checkedPrem 17 [16, 1] [16, 0, 1] 1).decidableEqNone
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.decidableEqNone`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [16, 1] [16, 0, 1] 1 with
+  | none => isTrue ⋯
+  | some val => isFalse ⋯
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:6:72: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [16, 1] [16, 0, 1] 0 = none
+because its `Decidable` instance
+  (checkedPrem 17 [16, 1] [16, 0, 1] 0).decidableEqNone
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.decidableEqNone`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [16, 1] [16, 0, 1] 0 with
+  | none => isTrue ⋯
+  | some val => isFalse ⋯
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:7:76: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [16, 1] [1, 0, 1] 2 = some [2]
+because its `Decidable` instance
+  (checkedPrem 17 [16, 1] [1, 0, 1] 2).instDecidableEq (some [2])
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [16, 1] [1, 0, 1] 2 with
+  | none =>
+    match some [2] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [2] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:8:71: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [16, 1] [3] 0 = some [3]
+because its `Decidable` instance
+  (checkedPrem 17 [16, 1] [3] 0).instDecidableEq (some [3])
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [16, 1] [3] 0 with
+  | none =>
+    match some [3] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [3] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:9:75: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [16, 1] [16, 0, 1, 0, 0] 2 = some []
+because its `Decidable` instance
+  (checkedPrem 17 [16, 1] [16, 0, 1, 0, 0] 2).instDecidableEq (some [])
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [16, 1] [16, 0, 1, 0, 0] 2 with
+  | none =>
+    match some [] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:12:66: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [16, 1] [0, 0] 0 = some []
+because its `Decidable` instance
+  (checkedPrem 17 [16, 1] [0, 0] 0).instDecidableEq (some [])
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [16, 1] [0, 0] 0 with
+  | none =>
+    match some [] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Controls.lean:13:71: error: Tactic `decide` failed for proposition
+  checkedPrem 17 [1] [2, 3, 4] 3 = some []
+because its `Decidable` instance
+  (checkedPrem 17 [1] [2, 3, 4] 3).instDecidableEq (some [])
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUInt64`, `BitVec.decEq`, `Nat.decEq`, `Option.instDecidableEq`, and `UInt64.decEq`, reduction got stuck at the `Decidable` instance
+  match checkedPrem 17 [1] [2, 3, 4] 3 with
+  | none =>
+    match some [] with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some [] with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqList a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯

@@ -1,0 +1,49 @@
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling isolab-eks-mcp v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/taskq/deploy/eks-karpenter/mcp)
+error: couldn't read `src/../../resume/request.schema.json`: No such file or directory (os error 2)
+  --> src/main.rs:30:533
+   |
+30 | ..."request":serde_json::from_str::<Value>(include_str!("../../resume/request.schema.json")).unwrap()}), &["request"], false, false),
+   |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/../../resume/request.schema.json`: No such file or directory (os error 2)
+  --> src/main.rs:31:331
+   |
+31 | ..."request":serde_json::from_str::<Value>(include_str!("../../resume/request.schema.json")).unwrap()}), &["request"], true, false),
+   |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/../../image.json`: No such file or directory (os error 2)
+  --> src/main.rs:53:47
+   |
+53 |     let default: Value = serde_json::from_str(include_str!("../../image.json")).unwrap();
+   |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/../../image.json`: No such file or directory (os error 2)
+  --> src/main.rs:71:47
+   |
+71 |     let default: Value = serde_json::from_str(include_str!("../../image.json")).unwrap();
+   |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/../../image.json`: No such file or directory (os error 2)
+   --> src/main.rs:262:53
+    |
+262 |     let default_image: Value = serde_json::from_str(include_str!("../../image.json")).unwrap();
+    |                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/../../l2-validation.json`: No such file or directory (os error 2)
+   --> src/main.rs:335:30
+    |
+335 |         serde_json::from_str(include_str!("../../l2-validation.json")).unwrap();
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/../../run-ecbench`: No such file or directory (os error 2)
+   --> src/main.rs:365:9
+    |
+365 |         include_str!("../../run-ecbench"),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `isolab-eks-mcp` (bin "isolab-eks-mcp") due to 7 previous errors

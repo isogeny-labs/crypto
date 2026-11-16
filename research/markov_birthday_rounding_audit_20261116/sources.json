@@ -1,0 +1,385 @@
+{
+  "schema": "markov-birthday-source-plan/v1",
+  "created": "2026-11-16T09:08:33.330903+00:00",
+  "formal": {
+    "project": "research/markov_birthday_rounding_audit_20261116/lean",
+    "theorem": "MarkovBirthdayRoundingAudit.actual_markov_birthday_rounding_certificate",
+    "statement": "theorem actual_markov_birthday_rounding_certificate : ActualUniformChains ∧ ActualGreenAtOne ∧ ActualUniformBirthday ∧ ActualFiniteCounterAndControls",
+    "decl_sha256": "b09028b7712726177e63155f7f154897daced7cef1b86748882864e4ebd7027a",
+    "scope": "Actual uniform-reset Markov chain on every nonzero ZMod p: normalized PMF, actual matrix/stationarity/irreducibility/period1, actual Green maxima1+3/p at T1 and least-repeat probabilities. Literal KMPT2010Theorem3.2 finite all-c bound false at actual47-state chain/T1/m=M1/c1/44: displayed time exactly1, actual collision1/47 below1-exp(-1/44), including upward step rounding. Actual uniform birthday law via embedding bijection, exponential/integer/ceiling bound and healthy2step/zero/singleton controls. No general Markov block repair/asymptotic Pollard/qualifiedaddingconstant refutation/full14closure; signedunverified/zero spend.",
+    "sources": [
+      {
+        "path": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+        "bytes": 2000,
+        "sha256": "6f513a6bc498e01f7bdf60c156dd7778b9e301101c5ed90ca26648ca8bc0f1f3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+        "bytes": 2485,
+        "sha256": "9ec402373f13e2004e58a185dc7824b6bf7ef1e88ca0ec0819eb1088f190abfa"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+        "bytes": 3005,
+        "sha256": "a816e5f511d2f438e6fcd7c29d6d3730281ceb757a4dafae35f6a2cfbe530a3e"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+        "bytes": 2810,
+        "sha256": "85231289c6ddd9d038f9f8acccd3e75faf322fd4a735a4fdff885596c14bb434"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+        "bytes": 3898,
+        "sha256": "04a6e61e1c4e95724a1bb14f34f9344924185fb9216ef650f640a451a26d4a61"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+        "bytes": 2104,
+        "sha256": "28e88e300b31a25978d0b8e13f4ee7119666e27366d3f039a9445121d147df3f"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+        "bytes": 3510,
+        "sha256": "b4660c08256c6336341194cb5e1a188f1a528908cc4a35af414190eca1c5a0ad"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+        "bytes": 11094,
+        "sha256": "2eaa87a45eac00c7507992927c746e6cc1f48d446a15acf0ecac0b160c32ffb8"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 356,
+        "sha256": "0a701461970071d742dd15e11f48fec7b44c17ef90c1cd95c3d563472c9d06b3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3948,
+        "sha256": "64c5efc80667aa6d01a85d66546171cf484ea733ed60bc78b8ede4f2321e410d"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lakefile.toml",
+        "bytes": 280,
+        "sha256": "ef3c7bbfa8df48c11cc80121f45e386731f323f54651aab17488579dae39e438"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4069,
+        "sha256": "90f185ef835962877da491e4397eb6f9a17786f3a3c66494e96461bf513a66e9"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lakefile.toml",
+        "bytes": 258,
+        "sha256": "50c2e8bd80c059c5bf813cc5645abc046e6f41be2f06025bb8423282bb3ad82b"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+        "bytes": 3326,
+        "sha256": "95c06bd962b249037332e26b856a531a8c02e81fb122c6129aa58c216264fb09"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayCertificate.lean",
+        "bytes": 3105,
+        "sha256": "513fc57f4adbcab4d5d993342098152ef04b0abfb0215abd95150a8b5e33e337"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayImports.lean",
+        "bytes": 146,
+        "sha256": "36d9be4677ab307066530510c1475caf5efb497d31950211e4fca02571766991"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+        "bytes": 2432,
+        "sha256": "0dc05fb33c6390a0fc9e11599b2a219b7780ad54256c38a4742429b8435ab0f9"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+        "bytes": 2908,
+        "sha256": "dc3566fc13acae361df0b0bf7fcc333faf3a57ace3b1c07f7f286e5add959981"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+        "bytes": 2779,
+        "sha256": "d95978a4ba42253273c649b25c313502bf5a6810df2d6b12e9875acdeda1ac4f"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+        "bytes": 2501,
+        "sha256": "b4ec70f16c9b571049aeae98e67d7eca9bdb7aab8321ff1d60e3b3c5933cc5b6"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+        "bytes": 3252,
+        "sha256": "7d67f3cf8890c5158d891653d5dbee393156eac3d55124921fd703cf939324b6"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+        "bytes": 4105,
+        "sha256": "ad8e99bc6030b198670689f92ffa533a06b56d67a6596f1e14e1fc6b2b71e3cd"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/lake-manifest.json",
+        "bytes": 4642,
+        "sha256": "edc211ef0e5380d9547fc265fcd54f5e8761ae454056aebc4825d8a435f232a2"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/lakefile.toml",
+        "bytes": 430,
+        "sha256": "03482634ef04178e4b43f517aae4a7dabcff7141251e4f376cf3985392feadd9"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BirthdayBound",
+    "BirthdayCertificate",
+    "BirthdayImports",
+    "BirthdayLaw",
+    "BirthdayWords",
+    "CollisionCertificate",
+    "CollisionTails",
+    "Cylinder",
+    "FirstCollision",
+    "GreenMoment",
+    "KMPTCounter",
+    "MarkovCollision",
+    "PathAgreement",
+    "PostCollisionControl",
+    "Survival",
+    "UniformChain",
+    "WalkBoundary",
+    "WalkWeighted",
+    "WalkWeightedGeneral"
+  ],
+  "artifacts": [
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.tar.xz.part01",
+      "bytes": 64000,
+      "sha256": "da6b5e847be634b5ba2e32e0afb1375ad5a9a5b92764903594c55663c5b79742"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.tar.xz.part02",
+      "bytes": 64000,
+      "sha256": "9ec1cf2ac426a16cf876fad11faed819e736d4e9e7c9ee5b179fcb5fc8b86e2d"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.tar.xz.part03",
+      "bytes": 43640,
+      "sha256": "9420dea052a643691344a40fde267fd5677250987695ecf48a2b27a685644021"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.tar.xz.sha256",
+      "bytes": 90,
+      "sha256": "4fc1ef1ac4b94533e4ec4b9c13dc4dc1137aa5093716d2d866666c2a49832994"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.json",
+      "bytes": 1099,
+      "sha256": "4b392608507742e728a0883a368d12ba6cf3e35de3b0676ca718df7cfbf54dd3"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/gate.tar.gz",
+      "bytes": 2446,
+      "sha256": "94f7afe313ad73c8060fd44882522a38e17a0879a9cceb05ebb9f2d1081b8cfa"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/gate.json",
+      "bytes": 4090,
+      "sha256": "137ce2a6923dce307b8cbf6657783a9e0399979f5b14a645b75dc77aacaec78a"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/source-review.json",
+      "bytes": 3154,
+      "sha256": "8f0a88ab4017ba43598afbb0d2c5cfbbc35b3fa060b663668eadfdb5faad8191"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/binding-check.json",
+      "bytes": 1986,
+      "sha256": "a88815c59d2d5fd2ea2b4fcd47f2cb724dcfa38d00d3de128c8a4c1ff58dc05e"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/proof-map.json",
+      "bytes": 30830,
+      "sha256": "aad3a0935201408e9a912cf8d54285d5120566ab05277024df73ae5ef9ed2450"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/render_report.py",
+      "bytes": 7626,
+      "sha256": "be987bcc9127957fb5c38fb142baa5098619e1244ca10a9f02ac4eb3feb7446d"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/restore_attempts.py",
+      "bytes": 1454,
+      "sha256": "ad4323d1a631009f5ab16d39ca7067ec39a5cbd7fc355f0723e58da5ac7adbfc"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/export_binding_input.py",
+      "bytes": 1767,
+      "sha256": "83f59f88f9115fb91790d5d2f34efa97135f0ca2e61a2c3ac0a512fc10766551"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/PROTOCOL.md",
+      "bytes": 7294,
+      "sha256": "0c81ac776a215d2d95d94b946f343ed723e687f6ba811f3347fa1d2f136ed051"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/preflight.json",
+      "bytes": 7550,
+      "sha256": "76be1227d9393e303cb979526b16019cccec2e09746a0f85dcf9a998018de256"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/reports/layout.json",
+      "bytes": 277,
+      "sha256": "fb07ff322420f4604eb8610af79bc6d9283d7bc994f1095d554a060d64cd391d"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/reports/markov-birthday.svg",
+      "bytes": 1388,
+      "sha256": "05edf0a643300f1f48598ec95f8bf1a3282f7ac07f8859906c9f69e55e1bec76"
+    },
+    {
+      "path": "research/markov_birthday_rounding_audit_20261116/reports/report.pdf",
+      "bytes": 47307,
+      "sha256": "09963badfef05a7ec21794d017c12dce05fd5946dacd07ec8864bddb837a19d3"
+    },
+    {
+      "path": "research/static_hash_collision_audit_20261114/sources.json",
+      "bytes": 12200,
+      "sha256": "04ebe24a337d5a9e06fbc6ec8866a2831e27820c0de55634acbdf00f5c2a7019"
+    }
+  ],
+  "assurance": {
+    "schema": "markov-birthday-preflight/v1",
+    "build_snapshots": 9,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08"
+    ],
+    "successful_states": [
+      "09"
+    ],
+    "dependency_plans": 1,
+    "old_formal_files": 22,
+    "static_hash_dependency_pins": 36,
+    "published_preservation_entries": 6074,
+    "all_checked_entries": 6110,
+    "frozen_plans": 47,
+    "copied_modules": 0,
+    "hydrated_modules": 0,
+    "manifest_packages": 13,
+    "all6110pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_states_retained": true,
+    "known_source_methods_credited": true,
+    "actual_uniform_reset_PMF_and_matrix": true,
+    "actual_doubly_stochastic_and_stationary": true,
+    "actual_positive_reachability_and_period_one": true,
+    "actual_chronological_word_product_PMF": true,
+    "actual_Green_includes_identity": true,
+    "actual_Green_maxima_at_one": true,
+    "actual_T1_m_M_equal_one_mixing": true,
+    "actual_static_hash_first_repeat_and_iid_bridge": true,
+    "actual_first_step_collision_probability": true,
+    "literal_KMPT2010_finite_all_c_counter": true,
+    "upward_rounding_displayed_time_does_not_repair_witness": true,
+    "actual_uniform_selfavoiding_embedding_bijection": true,
+    "actual_exact_uniform_birthday_probability": true,
+    "actual_uniform_exponential_survival_bound": true,
+    "actual_integer_quadratic_time_condition": true,
+    "actual_uniform_ceiling_time_bound": true,
+    "actual_same_instance_two_step_control": true,
+    "actual_zero_and_singleton_controls": true,
+    "transparent_proposition_bundles_in_pinned_certificate": true,
+    "expanded_individual_law_headers_in_proof_map": true,
+    "general_Markov_second_moment_and_block_ceiling_repair": false,
+    "asymptotic_Pollard_square_root_order_refuted": false,
+    "qualified_large_partition_adding_constant_refuted": false,
+    "practical_hash_or_scalar_recovery_runtime": false,
+    "full14complete": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 60,
+    "new_modules": 9,
+    "new_concrete_modules": 8,
+    "official_import_bridge_modules": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 19,
+    "actually_imported_custom_modules": 19,
+    "actually_imported_frozen_modules": 10
+  },
+  "dependency_source_plan": "research/static_hash_collision_audit_20261114/sources.json",
+  "preservation_scope": "All46 published pinsets6074entries and47 original plan snapshots checked;6110includes36 static-hash dependency pins, all initial records archived."
+}

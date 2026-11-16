@@ -1,0 +1,37 @@
+{
+  "schema": "research.proof-component/v1",
+  "scope": "literal generic mixed add12 UInt64 payload and guard correspondence",
+  "theorems": [
+    "generic_word_decode",
+    "generic_guard_decode",
+    "generic_dispatch_decode",
+    "generic_outer_guard",
+    "generic_word_preserves"
+  ],
+  "native_receipts": {
+    "module": "attempt3/receipt.json",
+    "controls": "controls4/receipt.json",
+    "readback": "readback1/receipt.json"
+  },
+  "native_exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "prime_bound": "5 <= p < 2^31",
+  "canonical_inputs": "ten coordinate words and curve[3]",
+  "word_packet_independently_reviewed": false,
+  "field_dependency_review": "/var/tmp/pencil-mixed-generic-independent-review-20261031",
+  "value_scope_only": true,
+  "counter_correspondence": false,
+  "compiled_execution_correspondence": false,
+  "class_sum_proof": false,
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "failures_retained": [
+    "attempt1",
+    "controls1",
+    "controls2",
+    "controls3"
+  ]
+}

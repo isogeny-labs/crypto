@@ -1,0 +1,127 @@
+{
+  "union": {
+    "report_pdf_sha256": "36db6b676dbfe3618da7f813c239cff3df5ecbf9aac3268282da3718652f06d9",
+    "status": {
+      "schema": "pencil.formal-producer/v1",
+      "scope": "global signed-graph union representation and anchor mutation",
+      "main": 5,
+      "controls": 8,
+      "readbacks": 13,
+      "machine_status": "passed",
+      "independent_review": "pending_after_publication",
+      "scientific_execution": false,
+      "prior_scientific_scope": 1260,
+      "remaining": [
+        "union forest/size preservation",
+        "new/node allocation",
+        "full post-find composition wrapper",
+        "native words/arrays/counters"
+      ],
+      "failed_attempts": [
+        "invocation-ypj898n4 Union substituted binder name failure"
+      ],
+      "accepted_invocation": "invocation-msdwa6lz",
+      "known_false_invocation": "invocation-2m3kmj9e"
+    }
+  },
+  "division": {
+    "report_pdf_sha256": "c41b7212a566ff1fa4961ac48eebbb22581470ff0bc541833c0476b9717cd519",
+    "status": {
+      "schema": "formal-component-result/v1",
+      "component": "monic-pdiv-quotient-accumulation",
+      "machine_status": "passed",
+      "independent_review": "pending_publication",
+      "main_declarations": 17,
+      "controls": 9,
+      "readbacks": 26,
+      "acceptance": "acceptance.json",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+        "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6"
+      },
+      "invariants": [
+        "coefficient overwrite law",
+        "fresh quotient slots",
+        "Q*B+R conservation",
+        "canonical word remainder",
+        "terminal empty or shorter remainder",
+        "strict remainder-length termination"
+      ],
+      "interfaces": [
+        "NativeDivision.checked_correct",
+        "NativeDivision.exact_iff_divisible",
+        "NativeDivision.quotient_unique",
+        "NativeDivision.returns_given_exact"
+      ],
+      "assumptions": [
+        "Fact p.toNat.Prime",
+        "0<p.toNat",
+        "p.toNat<2^31",
+        "Canon p a",
+        "Canon p b",
+        "b.getLast?=some 1",
+        "fuel >= a.length for total/exact completeness"
+      ],
+      "remaining_interfaces": [
+        "quotient-polynomial to native Vec allocation/writes/trim simulation",
+        "general nonmonic leading inverse",
+        "general pegcd invariants/termination",
+        "compiled equivalence and counters"
+      ],
+      "scientific_execution": false,
+      "repository_edits": false,
+      "failed_attempts": [
+        "write1 coefficient simplification",
+        "exact1 empty listPoly normalization",
+        "controls1 decidable ZMod inequality"
+      ],
+      "visual_inspection": {
+        "pages": [
+          1,
+          2
+        ],
+        "svg_embedded": true,
+        "result": "all pages and diagram inspected; legible without clipping"
+      },
+      "dependencies": "existing word remainder/termination/zero-test proof roots; transitive cache trusted"
+    }
+  },
+  "mount-review": {
+    "report_pdf_sha256": "4208ea5e08324fdac54a460614bbf5725287e2afd6fbec6fdfb9fbbb4ac560e0",
+    "status": {
+      "schema": "software.independent-review/v1",
+      "joint": "mount-diff-proposal",
+      "published_commit": "05fc018e64e948fbe91d5463036e55d4c97d13f1",
+      "machine_status": "fixed_controls_passed",
+      "parser_fidelity": "faithful_scoped",
+      "controls": {
+        "total": 43,
+        "accepted": 7,
+        "rejected": 36,
+        "all_expected": true
+      },
+      "source_sha256": "f38a3070281df684381fe3fd2d33f9ef30cce92f445f869356d6c1413dc3d518",
+      "original_v5_status": "failed",
+      "original_passed_cases": [
+        "Q0"
+      ],
+      "supervisor_integrated": false,
+      "qualification_complete": false,
+      "deployment": false,
+      "admission": false,
+      "runtime_execution": false,
+      "scientific_execution": false,
+      "writer_attribution": null,
+      "no_writes_claim": false,
+      "retained_metadata": "Q1 create and terminal selected identities/mounts agree",
+      "requirements": "AMENDMENT_REQUIREMENTS.md",
+      "reviewer": {
+        "identity": "/root/portfolio_audit",
+        "producer_authorship": false,
+        "source_first": true,
+        "blind": false
+      },
+      "primary_reference": "https://docs.docker.com/reference/cli/docker/container/diff/"
+    }
+  }
+}

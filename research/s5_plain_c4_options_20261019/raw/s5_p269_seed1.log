@@ -1,0 +1,17 @@
+p=269 seed=1: base 149, 97.0 F_p muls per addition, precompute 1.226e9 muls; arms ["committed", "sparsest", "sparsest+chains", "sparsest+chains+replay"]
+residual 0 [0] committed                C4 = 1.2270e12 (echelon 5.825e11, nf 5.461e11, charpoly 7.060e10, eigen 2.774e10) dim 4096 replay Recorded | solver [[41, 122, 180, 226]] oracle [[41, 122, 180, 226]] agree true | 184 s
+residual 0 [1] sparsest                 C4 = 3.2423e11 (echelon 1.131e11, nf 1.128e11, charpoly 7.060e10, eigen 2.774e10) dim 4096 replay Recorded | solver [[41, 122, 180, 226]] oracle [[41, 122, 180, 226]] agree true | 219 s
+residual 0 [2] sparsest+chains          C4 = 1.6889e11 (echelon 1.131e11, nf 5.238e9, charpoly 4.969e10, eigen 8.758e8) dim 4096 replay Recorded | solver [[41, 122, 180, 226]] oracle [[41, 122, 180, 226]] agree true | 203 s
+residual 0 [3] sparsest+chains+replay   C4 = 1.6889e11 (echelon 1.131e11, nf 5.238e9, charpoly 4.969e10, eigen 8.758e8) dim 4096 replay Recorded | solver [[41, 122, 180, 226]] oracle [[41, 122, 180, 226]] agree true | 198 s
+residual 1 [0] sparsest                 C4 = 3.0867e11 (echelon 1.123e11, nf 1.119e11, charpoly 7.060e10, eigen 1.387e10) dim 4096 replay Recorded | solver [] oracle [] agree true | 74 s
+residual 1 [1] sparsest+chains          C4 = 1.6761e11 (echelon 1.123e11, nf 5.189e9, charpoly 4.969e10, eigen 4.379e8) dim 4096 replay Recorded | solver [] oracle [] agree true | 91 s
+residual 1 [2] sparsest+chains+replay   C4 = 7.9995e10 (echelon 2.463e10, nf 5.236e9, charpoly 4.969e10, eigen 4.379e8) dim 4096 replay Replayed | solver [] oracle [] agree true | 43 s
+residual 1 [3] committed                C4 = 1.2130e12 (echelon 5.825e11, nf 5.460e11, charpoly 7.060e10, eigen 1.387e10) dim 4096 replay Recorded | solver [] oracle [] agree true | 101 s
+residual 2 [0] sparsest+chains          C4 = 1.6821e11 (echelon 1.129e11, nf 5.227e9, charpoly 4.969e10, eigen 4.379e8) dim 4096 replay Recorded | solver [] oracle [] agree true | 90 s
+residual 2 [1] sparsest+chains+replay   C4 = 8.0025e10 (echelon 2.466e10, nf 5.240e9, charpoly 4.969e10, eigen 4.379e8) dim 4096 replay Replayed | solver [] oracle [] agree true | 43 s
+residual 2 [2] committed                C4 = 1.2131e12 (echelon 5.825e11, nf 5.461e11, charpoly 7.060e10, eigen 1.387e10) dim 4096 replay Recorded | solver [] oracle [] agree true | 102 s
+residual 2 [3] sparsest                 C4 = 3.0978e11 (echelon 1.129e11, nf 1.125e11, charpoly 7.060e10, eigen 1.387e10) dim 4096 replay Recorded | solver [] oracle [] agree true | 74 s
+residual 3 [0] sparsest+chains+replay   C4 = 1.6562e11 (echelon 1.108e11, nf 5.144e9, charpoly 4.969e10, eigen 0.000e0) dim 4096 replay FellBack | solver [] oracle [] agree true | 91 s
+residual 3 [1] committed                C4 = 1.1991e12 (echelon 5.825e11, nf 5.460e11, charpoly 7.060e10, eigen 0.000e0) dim 4096 replay Recorded | solver [] oracle [] agree true | 102 s
+residual 3 [2] sparsest                 C4 = 2.9193e11 (echelon 1.108e11, nf 1.105e11, charpoly 7.060e10, eigen 0.000e0) dim 4096 replay Recorded | solver [] oracle [] agree true | 77 s
+residual 3 [3] sparsest+chains          C4 = 1.6562e11 (echelon 1.108e11, nf 5.144e9, charpoly 4.969e10, eigen 0.000e0) dim 4096 replay Recorded | solver [] oracle [] agree true | 99 s

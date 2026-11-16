@@ -1,0 +1,3 @@
+# Additional opt-in arithmetic attribution before timing
+
+After the untimed production correctness gate, add matching optional scopes to baseline/candidate group add/neg and the common section-coordinate evaluator. With HEC_PHASE_LOG absent, no clock is read. When present, aggregate inclusive per-method time/call counts, avoiding per-operation output. Model/input/candidate spans remain nested. Add/neg/section aggregates may overlap top-level phases and each other; never sum as disjoint cost. Synchronization/logging overhead is charged in both arms. No arithmetic/acceptance changes. Rebuild and freeze full diagnostic sources/binaries before any benchmark; enabled probes have not executed in the correctness run.

@@ -1,0 +1,100 @@
+# gpu/rootfind -- root-finding 2-decomposition oracle: CUDA + host emulation.
+#
+#   make test            CPU verification of the shared headers (no GPU, no nvcc)
+#   make lib             librootfind_oracle.a, emulation backend only
+#                        (what gpu/rootfind/rs/build.rs builds for the gpu-rootfind cargo crate)
+#   make lib-cuda        librootfind_cuda.a, emulation + CUDA backend (needs nvcc)
+#   make serve           rootfind_serve, host emulation (the IC oracle's worker; no GPU)
+#   make serve-cuda      rootfind_serve_cuda, the same worker on the CUDA backend (needs nvcc)
+#   make bench           CUDA driver: selftest vs emulation + throughput (needs nvcc)
+#   make bench ARCH=sm_100      datacenter Blackwell; default sm_120 (RTX PRO 6000 Blackwell)
+#   make ptxas-info      per-kernel registers / spills / smem for the chosen ARCH
+#   make clean
+#
+# Conventions follow gpu/ecc: every arithmetic function is
+# `__host__ __device__`, so `make test` compiles the *same* headers the
+# kernels use.  Blackwell flags: -gencode arch=compute_120,code=sm_120 for
+# native SASS plus -gencode arch=compute_120,code=compute_120 for a PTX
+# fallback that JIT-compiles on future architectures.
+
+CXX      ?= c++
+NVCC     ?= nvcc
+AR       ?= ar
+CXXFLAGS ?= -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -pthread
+ARCH     ?= sm_120
+# compute_XX is derived from sm_XX
+COMPUTE  := $(subst sm_,compute_,$(ARCH))
+GENCODE  ?= -gencode arch=$(COMPUTE),code=$(ARCH) -gencode arch=$(COMPUTE),code=$(COMPUTE)
+NVCCFLAGS ?= -O3 -std=c++17 -lineinfo $(GENCODE) -Xcompiler -pthread
+# Launch-bounds knobs (see rootfind_cuda.cu header): block size and the
+# minimum resident blocks per SM ptxas must honour (0 = unconstrained).
+RF_BLOCK      ?= 128
+RF_MIN_BLOCKS ?= 0
+# 1: sampled clock64() phase profile in the kernels (`./bench profile`); 0 = off
+RF_PROFILE ?= 0
+# lookup variants (rootfind.cuh): Eytzinger sorted search, packed hash slots,
+# paired eps lookups; on by default (A100: 1.12x at the best configuration of
+# both workloads, research/ic_gpu_rootfind_lookup_20261114); 0 = old path
+RF_SORTED_EYT ?= 1
+RF_HASH_PACKED ?= 1
+RF_PROBE_PAIR ?= 1
+# Eytzinger prefetch distance in levels (0 = off) and L2-only prefetch
+RF_EYT_PREFETCH ?= 0
+RF_EYT_PREFETCH_L2 ?= 0
+RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=$(RF_PROFILE) \
+           -DRF_SORTED_EYT=$(RF_SORTED_EYT) -DRF_HASH_PACKED=$(RF_HASH_PACKED) -DRF_PROBE_PAIR=$(RF_PROBE_PAIR) \
+           -DRF_EYT_PREFETCH=$(RF_EYT_PREFETCH) -DRF_EYT_PREFETCH_L2=$(RF_EYT_PREFETCH_L2)
+
+HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
+
+.PHONY: all test lib lib-cuda serve serve-cuda bench ptxas-info clean
+
+all: test
+
+test_cpu: test_cpu.cpp rootfind_api.cpp $(HDRS)
+	$(CXX) $(CXXFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=0 -o $@ test_cpu.cpp rootfind_api.cpp
+
+test: test_cpu
+	./test_cpu
+
+# --- emulation-only static library (no CUDA toolchain required) -------
+rootfind_api_emul.o: rootfind_api.cpp $(HDRS)
+	$(CXX) $(CXXFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=0 -c -o $@ rootfind_api.cpp
+
+librootfind_oracle.a: rootfind_api_emul.o
+	$(AR) rcs $@ $^
+
+lib: librootfind_oracle.a
+
+# --- CUDA-enabled static library --------------------------------------
+rootfind_api_cuda.o: rootfind_api.cpp $(HDRS)
+	$(CXX) $(CXXFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -c -o $@ rootfind_api.cpp
+
+rootfind_cuda.o: rootfind_cuda.cu $(HDRS)
+	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -c -o $@ rootfind_cuda.cu
+
+librootfind_cuda.a: rootfind_api_cuda.o rootfind_cuda.o
+	$(AR) rcs $@ $^
+
+lib-cuda: librootfind_cuda.a
+
+# --- persistent worker for the IC oracle rootfind-subtract-gpu ---------
+rootfind_serve: rootfind_serve.cpp rootfind_api.cpp $(HDRS)
+	$(CXX) $(CXXFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=0 -o $@ rootfind_serve.cpp rootfind_api.cpp
+
+serve: rootfind_serve
+
+rootfind_serve_cuda: rootfind_serve.cpp rootfind_api_cuda.o rootfind_cuda.o $(HDRS)
+	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -o $@ rootfind_serve.cpp rootfind_api_cuda.o rootfind_cuda.o
+
+serve-cuda: rootfind_serve_cuda
+
+# --- CUDA driver -------------------------------------------------------
+bench: bench.cu rootfind_api_cuda.o rootfind_cuda.o $(HDRS)
+	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -o $@ bench.cu rootfind_api_cuda.o rootfind_cuda.o
+
+ptxas-info: rootfind_cuda.cu $(HDRS)
+	$(NVCC) $(NVCCFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=1 -Xptxas -v -c -o /dev/null rootfind_cuda.cu
+
+clean:
+	rm -f test_cpu bench rootfind_serve rootfind_serve_cuda *.o *.a

@@ -1,0 +1,71 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 4,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:17:32Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7867170",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:33:02Z",
+            "message": "0/3 nodes are available: 1 node(s) didn't match pod anti-affinity rules, 2 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/3 nodes are available: 1 No preemption victims found for incoming pod, 2 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:17:32Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e37865253648f9",
+                "namespace": "isolab",
+                "resourceVersion": "7871889",
+                "uid": "8f461e53-f002-411f-b6b9-e623ad9db379"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 4,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-31T01:17:33Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2",
+                "namespace": "isolab",
+                "resourceVersion": "7867172",
+                "uid": "f177e8cb-8e13-43fe-8d38-e7c1e3ca2b5d"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-31T01:32:43Z",
+            "message": "Failed to schedule pod, node limits have been exhausted for nodepool (NodePool=gha-on-demand-extra); node limits have been exhausted for nodepool (NodePool=gha-on-demand); node limits have been exhausted for nodepool (NodePool=gha-gates); node limits have been exhausted for nodepool (NodePool=cpu-spot); node limits have been exhausted for nodepool (NodePool=cpu-l2-spot)",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T01:17:33Z",
+                "name": "n83-fb-variants-r27-20261031-r1-qdvl2.18e37865777f8c18",
+                "namespace": "isolab",
+                "resourceVersion": "7871792",
+                "uid": "4ff78938-55a9-4f76-8ecc-f1c9561f6aeb"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

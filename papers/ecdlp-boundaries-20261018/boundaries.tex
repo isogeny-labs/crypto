@@ -1,0 +1,51 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,array,longtable}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\Urlmuskip=0mu plus 2mu
+\setlength{\emergencystretch}{3em}
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{definition}[proposition]{Definition}
+\newtheorem{remark}[proposition]{Remark}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\art}[1]{\nolinkurl{#1}}
+\newcommand{\status}[1]{\textbf{Status: #1.}}
+\title{Scoped Boundaries for Elliptic-Curve Index Calculus:\\Counterexamples, Conservation, and Oracle Models}
+\author{Anonymous}
+\date{Research draft, 18 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We assemble six proposed negative results from an existing elliptic-curve
+index-calculus research corpus, preserving their mathematical objects and
+quantifiers. A universal comparison between true and Boolean-reduced first
+fall degrees has explicit small counterexamples, but its interpretation depends
+on the degree convention and the placement of field equations. A measured
+failure of degree-four mutant closure does not by itself refute Semaev's F4
+assumption. Table-based decomposition admits a generic simulation under
+explicit restrictions; connecting a concrete implementation to that model is
+an additional obligation. Mean decomposition multiplicity obeys an exact
+finite-fibre counting identity, which already has a Lean formalization in the
+corpus. The signed-sum description of the ordered Semaev cover gives elementary
+abelian monodromy and a restricted specialization law. Isogeny-map oracles are
+linear in the generic model; coordinate-aware oracle elimination instead
+requires transported challenges and an algebraic-query restriction. This is a
+source-bound synthesis and proof inventory. It introduces no scientific trials,
+claims no new theorem or novelty, and makes no deployed-curve security claim.
+\end{abstract}
+\tableofcontents
+\input{sections/scope}
+\input{sections/fall-degree}
+\input{sections/generic}
+\input{sections/conservation}
+\input{sections/monodromy}
+\input{sections/isogeny}
+\input{sections/formalization}
+\input{sections/reproduction}
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}

@@ -1,0 +1,186 @@
+# Volcano experiment downloads, 17 October 2026
+
+[Download guide v7: current7,937-vertex delivery and verified bounded continuation](https://drive.google.com/file/d/1Tm1_reS7F8XAuifUeVUi7geFO3Cr8Xf9/view).
+
+Latest immutable publication: **7,937 /24,823 audited vertices**, all51 strata
+sampled;126,992 records (81,666 verified /39,550 exhausted /5,776 timeout),
+4,117,173 relations /193,153,057 actual decomposition calls.
+[Archive, CSV, inspected report, viewer and exact verification scope](execution/publication-20261018T2313Z/README.md).
+Clean stop; no new interruption. Frozen runtime source/binaries/queue unchanged.
+Native archive hash/manifest/source checks pass; outer repack not rechecked for
+this publication. Original A/C/D/E/full matrix/independent arithmetic/large-k IC
+remain open. Older entries below are immutable historical snapshots.
+
+[Download guide v6: 6,137-vertex dataset, all downloads and actual guarded resume](https://drive.google.com/file/d/1XyB-FgGQ3vxC90RbE_Z41T787RONHHQQ/view).
+
+Latest immutable publication, 18 October: **6,137 / 24,823 audited vertices**,
+all 51 strata sampled, 98,192 accepted records (63,182 verified / 30,553
+exhausted / 4,457 timeout), 3,181,542 relations / 149,275,746 actual calls.
+[Archive, CSV, report, viewer and byte-verification receipts](execution/publication-20261018T1835Z/README.md).
+This snapshot follows a clean vertex-boundary stop for file-staging validation;
+no new attempt was interrupted. Earlier failed/interrupted attempts are retained.
+All 61,466 manifest entries and a byte-identical outer repack pass. Downloads
+remain fixed while a separate verified runtime epoch may advance the campaign.
+Original A/C/D/E, full matrix, independent arithmetic and large-k IC remain open.
+
+The entries below retain earlier immutable deliveries and execution history.
+
+[Download guide v5: 5,533-vertex checkpoint and actual bounded resume](https://drive.google.com/file/d/1MC0v3MQpCbWTZpa6oWtrQO7EfOYbW_vq/view).
+
+Latest stopped checkpoint, 18 October 2026: **5,533 / 24,823 audited vertices**,
+all 51 strata, 88,528 accepted records (56,959 verified / 27,545 exhausted /
+4,024 timeout), 2,870,489 relations / 134,616,948 actual decomposition calls.
+The retained interrupted attempt was marked by a zero-job native stop;
+its disappearance cause is unknown. [Recovery and new downloads](execution/recovery-20261018T1647Z/README.md).
+Older 4,037-vertex links and PID receipts remain immutable historical snapshots.
+The frozen solver, queue and child mathematical budgets are unchanged. A new
+actual launch receipt will determine resumed status; no stale ledger is treated
+as a live process. Clocks remain unqualified; full original classes and matrix
+remain open.
+
+
+[Download guide v4](https://drive.google.com/file/d/1We8r_TMO00hXcGUdTJhrFOHYOHF61kXd/view) includes all new artifacts, exact scopes and the actual local resume receipt.
+
+Latest measured addition (17 October 2026): **full selected-point-order C**.
+Both EC PH/BSGS and k=1 Tate/Miller → multiplicative PH / projected-prime
+factor-base relations verify all 3,738 public one-target workloads over the
+1,869 retained models (7,476 primary method records); every non-clock record,
+fixture and truth field matches its separate replay. Selected exact orders
+range from 2,600,529,297,408 to 1,637,958,981,148,213,248, with largest prime 7.
+All 2/3/7 prime-power parts are included. This extends the earlier r=7-only
+cohort; the two cohorts are never pooled. It is not full C population, NFS,
+large-k support, a maximal-point-order certificate or a runtime improvement.
+[Protocol, implementation and archived evidence](execution/full_point_order/README.md).
+[Drive archive](https://drive.google.com/file/d/1HHlPDmGzwSopnwMGQ4vgvcGSH0WRa0BO/view),
+[report](https://drive.google.com/file/d/1Gdrpkb8n8XhBoO8Sdr3JKl_VIPMUgqdZ/view),
+[phase CSV](https://drive.google.com/file/d/1UHAE8NCShFWGQ1hHOR3U56KeNdW_MrQL/view),
+[aggregate CSV](https://drive.google.com/file/d/1OUbeh-phxP8vXXE_gzY6KoS6tFPapjIE/view).
+The cold solver intervals charge order certification, setup, projections,
+transfer, relations, matrix work, reconstruction and verification. Shared
+fixture generation is outside both intervals and reported separately. Raw
+clocks remain unqualified; a contended replay is retained separately.
+
+Latest frozen repaired survey: **4,037 / 24,823 vertices**, all 51 strata,
+64,592 records (41,573 verified / 20,132 exhausted / 2,887 timeout),
+2,098,636 relations / 98,188,909 actual calls. The worker was cleanly paused
+at 18:48:59 UTC for isolated C measurement and delivery validation.
+[Checkpoint and downloads](execution/checkpoint-4037/README.md).
+Older 2,935-vertex uploads and PID receipts below remain historical snapshots.
+The new fixed viewer covers every graph vertex/map but only marks 4,037
+measured vertices. A later execution receipt controls current worker status.
+
+
+[Open the Drive folder](https://drive.google.com/drive/folders/109DpcQpX7ATz6GeI8iSWAExGMWBoR-H_).
+These are frozen snapshots. Complete graph enumeration and completed ECDLP
+measurements have different coverage.
+
+| Artifact | What it contains |
+| --- | --- |
+| [Latest complete-graph explorer](https://drive.google.com/file/d/1JT72Pxe6cwJwlr7WBfvbu5eC4Q1fNp7E/view) | All 24,823 vertices / 69,300 selected-degree maps; frozen 2,935 audited-vertex overlay. Download HTML and open locally. Not full measurement coverage. |
+| [Original C prefix dataset](https://drive.google.com/file/d/1Xi7mjLCskYEauXlwzAfQQtOoHw6waop-/view) | 1,869 known C vertices; 3,738 verified finite-field relation targets, exact re-execution, binaries, native statistics, local certificates, calibration graphs and report. Largest prime subgroup 7. NOT full C class. |
+| [Original C report](https://drive.google.com/file/d/1jqNQUqu2uxOU3n7NOn1jOYFQaAD9We4L/view) | Four inspected pages. Local exact conductors: 517 vertices / 24 strata, 2,985,984–967,458,816; 1,352 unknown. Source conductor 967,458,816. |
+| [C per-target operations CSV](https://drive.google.com/file/d/1B4XZNFrlzgIzZT1vI7gq6kJs1MfWFFQf/view) | All 3,738 observations with phase/native counters, unqualified elapsed intervals and local conductor annotations. |
+| [Repaired runner QA](https://drive.google.com/file/d/12Q0z7VUCWJuCgY5ofbW5Dof3V15FZ4Th/view) | New control and pilot: 60 attempts (40 verified, 18 exhausted, 2 timeouts); 58 completed baseline matches, two censored comparisons. Whole-queue execution is separate. |
+| [Stopped release checkpoint](https://drive.google.com/file/d/1vVW3fCYqdnl3Ue2ef1FckbSTODbg-MTs/view) | 70 audited vertices / all 51 strata, 1,120 accepted attempts; extra failed 16-record capsule preserved and excluded from accepted means. Do not resume its old runner. |
+| [Historical dev99 graph explorer](https://drive.google.com/file/d/13AQHFuLnePIfbbS9XbaXNueJY-JMyKCE/view) | All 24,823 vertices, 51 conductor strata and 69,300 recorded directed kernel maps. Download the HTML and open it; Drive preview does not run it. |
+| [99-vertex measured archive](https://drive.google.com/file/d/1hLVWVad2SrgHaBn6U5iSyqnKbx5cAkeY/view) | Complete three graph databases, exact frozen dev binaries/source, full 24,823-row queue, execution ledger, 99 sealed sessions, replay receipts, native statistics and report. |
+| [Three-page report](https://drive.google.com/file/d/1h_G5uJZYYqVzBL3_kynRdYZvE8vjJu9z/view) | Measured coverage and yield/cost summaries over all 51 strata; every page inspected. |
+| [Detailed statistics CSV](https://drive.google.com/file/d/1OWEkYFgWuK_wgMu0auEHsYxJ2VDugFIA/view) | Per-graph/stratum/arm/outcome min, max, arithmetic mean and sample count, including phase/native-operation counters. |
+| [Native pricing band](https://drive.google.com/file/d/1NV-4hpuoG23Xf0TitT8yUBPGAnRJCoj2/view) | All 792 curve/arm rows at common unpriced-operation weights 0/0.1/1 GAE; incomplete/unaccounted cases remain explicit. |
+| [Separate optimized control/pilot](https://drive.google.com/file/d/1lJt6NhNwXVpvdSBoXqCXhoi-flqEzwmF/view) | Actual release runs, binaries, exact dev baseline capsules and native comparison receipts. This is not the optimized whole-queue survey. |
+
+The three source models are `icv1-fp57-t536870914-6cabb0c9`,
+`icv1-fp57-tm536870941-e6d0c766` and `icv1-fp59-t1073741954-4dd0b1ef`.
+Their maximum endomorphism conductors are 8192, 6561 and 1728, respectively.
+Their largest prime subgroups have orders 61751, 19768889568671 and 4253;
+field size is not subgroup security size. Every vertex uses its certified
+actual largest-prime subgroup, not a substituted smaller subgroup.
+
+The stopped dev checkpoint has **99 measured vertices across all 51 strata**:
+1,584 attempts, 1,065 verified, 422 exhausted and 97 timeouts. It compares
+projected factor bases 16/64, MITM/subtraction, a raw-base control and matched
+rho/BSGS, using two public targets, one round and bounded trials/watchdogs.
+Every completed successful/exhausted deterministic report has a replay receipt.
+These are same-implementation replays, not independent validation.
+
+It found 57,176 relations from 2,223,204 source trials and 2,075,145 actual
+decomposition calls. Repeated queries skipped before the oracle explain the
+different denominators; summary v2 exposes both. Timeout counters are unknown,
+not zero. The old first-12 report's "decompositions" label meant source trials;
+historical records/reports/uploads remain unchanged. Do not pool different
+subgroups, build profiles or repeated control/pilot targets as one population.
+
+The optimized control/pilot have 60 attempts: 40 verified, 18 exhausted and
+two timeouts. All 56 comparable completed deterministic profile pairs match
+exactly; four baseline-censored pairs have no final counts to compare.
+The first optimized survey halted on a failed audit after 70 accepted vertices;
+its late-message watchdog recording defect is repaired without relabeling old
+records or weakening the auditor. A separately frozen repaired whole queue
+uses a new binary/ledger and 24-hour/2-GiB guard; actual launch/progress require
+its separate launch receipt and local ledger. Its results are separate from this dev snapshot. No runtime
+speedup, fastest-method or asymptotic claim is established by these runs.
+
+The graph CLI is `crypto isogeny class`. For a supported ordinary prime-field
+curve JSON, use `plan --curve curve.json`, then
+`build --curve curve.json --out graph.sqlite --steps all`. Inspect with
+`vertex --input graph.sqlite --id N` and `status --input graph.sqlite`.
+The native [`CLI documentation`](https://github.com/aburan28/crypto/blob/codex/full-isogeny-class-cli-20261016/tools/volcano-cli/README.md)
+defines backend limits, resume, map verification and the separate one-target
+BSGS command. Graph generation does not itself run graph-wide index calculus.
+
+Graph completeness is for Fp-isomorphism vertices and the declared finite
+degree sets, not other primes or infinitely many compositions. The original
+A–E graphs/campaign, full eight-target/five-round/million-trial matrix, exact
+per-vertex representation registration, transported targets, composite PH and
+independent replay remain open. The C k=1 diagnostic above is implemented and measured; finite-field IC for
+the other actual embedding degrees remains unimplemented. The k=2 MOV teaching
+example is not those backends. The C method is projected-prime subgroup
+relations, not NFS or integer-smoothness IC.
+
+Archive extraction, manifest checks and repacking validations are scoped
+individually in the delivery receipts. The new 2,935-vertex and five-prefix
+archives pass extraction and every manifest entry; their outer repacking was
+not rechecked. Drive metadata confirms names, sizes and parent folder; remote
+whole-file hashes were not checked. Delivery JSON files retain exact byte
+counts and SHA-256s.
+
+
+Original A–E total 7,833,658,967 expected vertices and 515 strata. Historical
+B is separately complete; A/C/D/E remain incomplete. Google Drive deliveries
+work. This runtime's S3 probe found no AWS identity, so no S3 upload is claimed.
+The repository's reports-to-S3 workflow runs after merge to main; it does not
+provide a larger random-access SQLite working volume. A connected existing
+worker/volume and S3 identity remain required for those large runs.
+
+
+Historical launch: repaired local worker **PID 79776 launched 2026-10-17 06:58:03 UTC**, with
+24-hour / 2-GiB guards. At 06:59:13 UTC it has audited vertices in all three
+classes and an active job. This is an actual launch, not full-queue completion.
+That process was absent on recovery; this is not its current running status.
+Later progress is in its local ledger and `execution/repaired-continuation/`.
+It will pause on guards/failures; no unattended upload is assumed. The frozen
+Drive snapshots do not track live progress.
+
+
+Latest checkpoint, 17 October 2026 14:50 UTC: the earlier process was absent
+after the environment returned; its PID receipt is historical. A preserved
+interrupted attempt and **2,935 audited vertices / 46,960 records** are in the
+[new checkpoint archive](https://drive.google.com/file/d/1IoPt5C-EYlo488pPVWPx-qpDHo7t1GwY/view).
+[Latest all-arm min/max/mean CSV](https://drive.google.com/file/d/1AK_WDN-qMx_2FGkDkgfIqH5PyP6gjUus/view).
+There are 30,270 verified recoveries, 14,626 exhausted budgets and 2,064
+timeouts, with samples from every one of the 51 strata; 1,530,557 relations.
+The [report](https://drive.google.com/file/d/1fiyasnknjZ1T0lE8z6yHi7AIhMdUysnA/view)
+is inspected. New runtime epochs and resumes have separate receipts.
+
+[Original A–E local conductors and prefixes](https://drive.google.com/file/d/1zeGSq3GWne9yTH0R37EZ3YI89xG_yR2L/view)
+now include source conductors 268,435,456 / 129,140,163 / 967,458,816 /
+544,195,584 / 644,972,544 and per-vertex bounds, with unknowns retained.
+[One-page report](https://drive.google.com/file/d/17jC_A1uSRHtJc5c8Sy9AkH9jt6UJTbBX/view).
+This is local certification, not complete original class populations. S3
+access was rechecked and still lacks a runtime AWS identity.
+
+Recovery resume **PID 8973 launched 2026-10-17T16:14:06.513686+00:00**, verified live at 2026-10-17T16:15:21.322908+00:00. The unchanged frozen queue/solver/driver retry the preserved interruption in attempt 2, under the same 24-hour / 2-GiB guard. This is a new runtime epoch; wall times remain unqualified. See `execution/recovery-20261017T1450Z/resumed-launch-verified.json` for actual native progress. The Drive archive and explorer remain the frozen 2,935-vertex checkpoint, not live uploads.
+
+Current local resume: PID 97646, launched 2026-10-17T20:13:41.722914+00:00, verified live 2026-10-17T20:13:55.172771+00:00 with newly audited progress. [Actual receipt](execution/resume-after-4037/verified.json) and [outer envelope](execution/resume-after-4037/envelope.json). Outer guards changed from 24 h / 2 GiB to 72 h / 6 GiB; frozen mathematical/child budgets and queue are unchanged. Multiple runtime epochs remain unqualified; no host-survival or unattended-upload guarantee. Frozen Drive snapshots remain 4,037 vertices.
+
+18 October actual resume: PID3298 launched 2026-10-18T17:07:08.420807+00:00, verified 2026-10-18T17:07:52.044044+00:00 with new audited progress and interrupted attempt2 accepted. [Process/native receipt](execution/recovery-20261018T1647Z/resumed-verified.json), [preserved-deadline envelope](execution/recovery-20261018T1647Z/resume-envelope.json). Deadline2026-10-20T20:13:42.570000+00:00; remaining seconds were charged rather than resetting72hours, spool cap6GiB. A bounded continuation check is scheduled around21:09UTC18October. Published snapshot remains5533; clocks unqualified.

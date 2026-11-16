@@ -1,0 +1,1296 @@
+{
+  "actual_scalar": 89981502037382902,
+  "all_public_workers_recovered_actual_scalar": true,
+  "comparative_eligibility": false,
+  "complete_cost": false,
+  "cost_ratios": null,
+  "flow": {
+    "attempted": 6,
+    "automatic_retries": 0,
+    "completed": 6,
+    "excluded": 0,
+    "planned": 6
+  },
+  "graph_proof": {
+    "accepted_descents": 2,
+    "certificate_replays": 374,
+    "descent_residuals": 1396,
+    "descent_stream_advances": 1395,
+    "full_base": 487,
+    "graph": {
+      "complete_relations": 374,
+      "core_large_vertices": 121,
+      "core_relations": 429,
+      "cycles_closed": 308,
+      "duplicate_relations": 0,
+      "input_large_vertices": 121,
+      "input_relations": 495,
+      "merges": 567,
+      "peeled_relations": 0,
+      "pivots": 121,
+      "rejected_fill": 0
+    },
+    "matrix_rank": 366,
+    "output_nonzeros": 7647,
+    "partial_by_large_count": [
+      66,
+      178,
+      249
+    ],
+    "projection_attempts": 1,
+    "small_base": 365,
+    "target_scalar": 89981502037382902,
+    "verified_original_inputs": 493
+  },
+  "independent_signed_verdict": false,
+  "l": 263807419626071897,
+  "outcomes": [
+    {
+      "accounting": {
+        "complete": false,
+        "excluded_harness_primitives": {
+          "field_add": 110652,
+          "field_inv": 1152,
+          "field_mul": 138625,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "excluded_harness_uniform_events": {
+          "calls": 0,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "0",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 0,
+            "integer_mul64": 0
+          },
+          "raw_draws": 0,
+          "rejections": 0,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 0,
+            "integer_shl64": 0,
+            "integer_sub64": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "4789001535986",
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "556284540",
+            "phase": "model",
+            "primitives": {
+              "field_add": 348838,
+              "field_inv": 1606,
+              "field_mul": 412000,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "662462220",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 223960,
+              "field_inv": 0,
+              "field_mul": 514670,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 487,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 1974,
+              "word_op": 4435
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "3059924655370",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 5357426159,
+              "field_inv": 13473839,
+              "field_mul": 1803044166,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 5856,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 1729417420
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1411987363602",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 1012012693,
+              "field_inv": 624860,
+              "field_mul": 1013913892,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 82041642,
+              "legendre": 0,
+              "modr_add": 2816,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 4,
+              "word_op": 443800022
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "315778003514",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 7619142,
+              "modr_inv": 977,
+              "modr_mul": 7620605,
+              "rng_words": 532,
+              "word_op": 15517972
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "92766740",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 62428,
+              "field_inv": 176,
+              "field_mul": 68450,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "total_bitops": null,
+        "uniform_sampling": {
+          "calls": 2430,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "61660160",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 2430,
+            "integer_mul64": 2510
+          },
+          "raw_draws": 2510,
+          "rejections": 80,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 2430,
+            "integer_shl64": 2430,
+            "integer_sub64": 4860
+          }
+        }
+      },
+      "actual_scalar": 89981502037382902,
+      "arm": "ic",
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 47836223180,
+      "rho_options": null,
+      "rho_steps": null,
+      "unpriced_work": [
+        "native containers/normalization/scheduling",
+        "PRNG internals and other sampling paths",
+        "incremental RREF scans/fixed-factor internals",
+        "cohort hashing/serialization"
+      ],
+      "unrankable_reason": "native work categories without complete emitted operation counts",
+      "verified": true
+    },
+    {
+      "accounting": {
+        "complete": false,
+        "excluded_harness_primitives": {
+          "field_add": 0,
+          "field_inv": 0,
+          "field_mul": 0,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "excluded_harness_uniform_events": {
+          "calls": 0,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "0",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 0,
+            "integer_mul64": 0
+          },
+          "raw_draws": 0,
+          "rejections": 0,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 0,
+            "integer_shl64": 0,
+            "integer_sub64": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "7145741221826",
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "unattributed",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "0",
+            "phase": "transport",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "599760516",
+            "phase": "model",
+            "primitives": {
+              "field_add": 348838,
+              "field_inv": 1606,
+              "field_mul": 412144,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 1068,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "701730152",
+            "phase": "factor_base",
+            "primitives": {
+              "field_add": 247332,
+              "field_inv": 1,
+              "field_mul": 544164,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 1974,
+              "word_op": 3948
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "4985629315504",
+            "phase": "relations",
+            "primitives": {
+              "field_add": 9108481906,
+              "field_inv": 23144045,
+              "field_mul": 2811550078,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 5916,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 4424145596
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "1400644902868",
+            "phase": "descent",
+            "primitives": {
+              "field_add": 1003781260,
+              "field_inv": 625190,
+              "field_mul": 1005781288,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 81342174,
+              "legendre": 0,
+              "modr_add": 2790,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 4,
+              "word_op": 440016722
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "758072746046",
+            "phase": "linear_algebra",
+            "primitives": {
+              "field_add": 5147976,
+              "field_inv": 109632,
+              "field_mul": 7048825,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 17763300,
+              "modr_inv": 2480,
+              "modr_mul": 18124028,
+              "rng_words": 0,
+              "word_op": 837955
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "92766740",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 62428,
+              "field_inv": 176,
+              "field_mul": 68450,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 0
+            }
+          }
+        ],
+        "total_bitops": null,
+        "uniform_sampling": {
+          "calls": 1942,
+          "complete": false,
+          "generator_internal_work": "not counted; other sampling paths still require coverage",
+          "known_native_priced_bitops": "48599808",
+          "other_modulus_calls": 0,
+          "priced_native": {
+            "integer_add64": 1942,
+            "integer_mul64": 1978
+          },
+          "raw_draws": 1978,
+          "rejections": 36,
+          "schema": "modular-uniform-events/v1",
+          "unpriced_native": {
+            "integer_clz64": 1942,
+            "integer_shl64": 1942,
+            "integer_sub64": 3884
+          }
+        }
+      },
+      "actual_scalar": 89981502037382902,
+      "arm": "rank-stop",
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 78010796297,
+      "rho_options": null,
+      "rho_steps": null,
+      "unpriced_work": [
+        "native containers/normalization/scheduling",
+        "PRNG internals and other sampling paths",
+        "incremental RREF scans/fixed-factor internals",
+        "cohort hashing/serialization"
+      ],
+      "unrankable_reason": "native work categories without complete emitted operation counts",
+      "verified": true
+    },
+    {
+      "accounting": {
+        "complete": false,
+        "explicit_counts_independently_reconstructed": true,
+        "native_calibration": {
+          "complete": false,
+          "inverse": {
+            "field_add": 42,
+            "field_inv": 1,
+            "field_mul": 80,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "legacy_tuned_credits_included": false,
+          "mul": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "schema": "rho.native-tower-primitives/v1",
+          "square": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "122280490918974",
+        "outer_replay_primitives": {
+          "field_add": 31072,
+          "field_inv": 88,
+          "field_mul": 33880,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "18682785726",
+            "phase": "precompute",
+            "primitives": {
+              "field_add": 12570616,
+              "field_inv": 43307,
+              "field_mul": 13769085,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 514,
+              "word_op": 514
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "122097909452468",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 78979966704,
+              "field_inv": 365647994,
+              "field_mul": 89583758530,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 731295988,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 2193887964
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "163815128652",
+            "phase": "collision",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 11078,
+              "legendre": 0,
+              "modr_add": 3,
+              "modr_inv": 1,
+              "modr_mul": 1,
+              "rng_words": 0,
+              "word_op": 2559602426
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "83552128",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 56352,
+              "field_inv": 176,
+              "field_mul": 61600,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 12
+            }
+          }
+        ],
+        "pricing": "executed native Barrett tower prime-field primitives",
+        "total_bitops": null
+      },
+      "actual_scalar": 89981502037382902,
+      "arm": "rho-plain-1",
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 148036537368,
+      "rho_options": {
+        "batch": 1,
+        "dp_bits": 16,
+        "negation": false,
+        "r": 256
+      },
+      "rho_steps": 365647994,
+      "unpriced_work": [
+        {
+          "count": null,
+          "name": "tuned_reference_bitop_pricing",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rho_setup_and_native_bookkeeping_audit",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rng_internal_work",
+          "status": "coverage_or_emission_pending"
+        }
+      ],
+      "unrankable_reason": "native work categories without complete emitted operation counts",
+      "verified": true
+    },
+    {
+      "accounting": {
+        "complete": false,
+        "explicit_counts_independently_reconstructed": true,
+        "native_calibration": {
+          "complete": false,
+          "inverse": {
+            "field_add": 42,
+            "field_inv": 1,
+            "field_mul": 80,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "legacy_tuned_credits_included": false,
+          "mul": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "schema": "rho.native-tower-primitives/v1",
+          "square": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "208968828976322",
+        "outer_replay_primitives": {
+          "field_add": 31072,
+          "field_inv": 88,
+          "field_mul": 33880,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "18682785726",
+            "phase": "precompute",
+            "primitives": {
+              "field_add": 12570616,
+              "field_inv": 43307,
+              "field_mul": 13769085,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 514,
+              "word_op": 514
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "208673261263816",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 137564021798,
+              "field_inv": 619048944,
+              "field_mul": 151799734000,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 1858338270,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 16649239064
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "276801374652",
+            "phase": "collision",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 18732,
+              "legendre": 0,
+              "modr_add": 3,
+              "modr_inv": 1,
+              "modr_mul": 1,
+              "rng_words": 0,
+              "word_op": 4325007736
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "83552128",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 56352,
+              "field_inv": 176,
+              "field_mul": 61600,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 12
+            }
+          }
+        ],
+        "pricing": "executed native Barrett tower prime-field primitives",
+        "total_bitops": null
+      },
+      "actual_scalar": 89981502037382902,
+      "arm": "rho-negation-1",
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 274710550224,
+      "rho_options": {
+        "batch": 1,
+        "dp_bits": 16,
+        "negation": true,
+        "r": 256
+      },
+      "rho_steps": 617842192,
+      "unpriced_work": [
+        {
+          "count": null,
+          "name": "tuned_reference_bitop_pricing",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rho_setup_and_native_bookkeeping_audit",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rng_internal_work",
+          "status": "coverage_or_emission_pending"
+        }
+      ],
+      "unrankable_reason": "native work categories without complete emitted operation counts",
+      "verified": true
+    },
+    {
+      "accounting": {
+        "complete": false,
+        "explicit_counts_independently_reconstructed": true,
+        "native_calibration": {
+          "complete": false,
+          "inverse": {
+            "field_add": 42,
+            "field_inv": 1,
+            "field_mul": 80,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "legacy_tuned_credits_included": false,
+          "mul": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "schema": "rho.native-tower-primitives/v1",
+          "square": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "414751415176544",
+        "outer_replay_primitives": {
+          "field_add": 31072,
+          "field_inv": 88,
+          "field_mul": 33880,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "19780585506",
+            "phase": "precompute",
+            "primitives": {
+              "field_add": 13309288,
+              "field_inv": 45851,
+              "field_mul": 14578155,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 544,
+              "word_op": 544
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "414310144634018",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 282536216874,
+              "field_inv": 58788227,
+              "field_mul": 305404837285,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 1881223240,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 5643669792
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "421406404892",
+            "phase": "collision",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 28936,
+              "legendre": 0,
+              "modr_add": 3,
+              "modr_inv": 1,
+              "modr_mul": 1,
+              "rng_words": 0,
+              "word_op": 6584454956
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "83552128",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 56352,
+              "field_inv": 176,
+              "field_mul": 61600,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 12
+            }
+          }
+        ],
+        "pricing": "executed native Barrett tower prime-field primitives",
+        "total_bitops": null
+      },
+      "actual_scalar": 89981502037382902,
+      "arm": "rho-plain-16",
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 293075193006,
+      "rho_options": {
+        "batch": 16,
+        "dp_bits": 16,
+        "negation": false,
+        "r": 256
+      },
+      "rho_steps": 940611620,
+      "unpriced_work": [
+        {
+          "count": null,
+          "name": "tuned_reference_bitop_pricing",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rho_setup_and_native_bookkeeping_audit",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rng_internal_work",
+          "status": "coverage_or_emission_pending"
+        }
+      ],
+      "unrankable_reason": "native work categories without complete emitted operation counts",
+      "verified": true
+    },
+    {
+      "accounting": {
+        "complete": false,
+        "explicit_counts_independently_reconstructed": true,
+        "native_calibration": {
+          "complete": false,
+          "inverse": {
+            "field_add": 42,
+            "field_inv": 1,
+            "field_mul": 80,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "legacy_tuned_credits_included": false,
+          "mul": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          },
+          "schema": "rho.native-tower-primitives/v1",
+          "square": {
+            "field_add": 44,
+            "field_inv": 0,
+            "field_mul": 55,
+            "field_sqr": 0,
+            "field_sqrt": 0,
+            "hash_probe": 0,
+            "legendre": 0,
+            "modr_add": 0,
+            "modr_inv": 0,
+            "modr_mul": 0,
+            "rng_words": 0,
+            "word_op": 0
+          }
+        },
+        "observed_primitive_subtotal_bitops": "164267600135514",
+        "outer_replay_primitives": {
+          "field_add": 31072,
+          "field_inv": 88,
+          "field_mul": 33880,
+          "field_sqr": 0,
+          "field_sqrt": 0,
+          "hash_probe": 0,
+          "legendre": 0,
+          "modr_add": 0,
+          "modr_inv": 0,
+          "modr_mul": 0,
+          "rng_words": 0,
+          "word_op": 0
+        },
+        "phases": [
+          {
+            "diagnostic_priced_bitops": "19780585506",
+            "phase": "precompute",
+            "primitives": {
+              "field_add": 13309288,
+              "field_inv": 45851,
+              "field_mul": 14578155,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 544,
+              "word_op": 544
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "164082279229596",
+            "phase": "walk",
+            "primitives": {
+              "field_add": 113388806830,
+              "field_inv": 23803115,
+              "field_mul": 120166975650,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 1110793222,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 9952001622
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "165456768284",
+            "phase": "collision",
+            "primitives": {
+              "field_add": 0,
+              "field_inv": 0,
+              "field_mul": 0,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 11504,
+              "legendre": 0,
+              "modr_add": 3,
+              "modr_inv": 1,
+              "modr_mul": 1,
+              "rng_words": 0,
+              "word_op": 2585252779
+            }
+          },
+          {
+            "diagnostic_priced_bitops": "83552128",
+            "phase": "verification",
+            "primitives": {
+              "field_add": 56352,
+              "field_inv": 176,
+              "field_mul": 61600,
+              "field_sqr": 0,
+              "field_sqrt": 0,
+              "hash_probe": 0,
+              "legendre": 0,
+              "modr_add": 0,
+              "modr_inv": 0,
+              "modr_mul": 0,
+              "rng_words": 0,
+              "word_op": 12
+            }
+          }
+        ],
+        "pricing": "executed native Barrett tower prime-field primitives",
+        "total_bitops": null
+      },
+      "actual_scalar": 89981502037382902,
+      "arm": "rho-negation-16",
+      "pricing_band": null,
+      "ranking_eligible": false,
+      "recorded_inner_wall_ns_practicality_only": 126527232644,
+      "rho_options": {
+        "batch": 16,
+        "dp_bits": 16,
+        "negation": true,
+        "r": 256
+      },
+      "rho_steps": 369311965,
+      "unpriced_work": [
+        {
+          "count": null,
+          "name": "tuned_reference_bitop_pricing",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rho_setup_and_native_bookkeeping_audit",
+          "status": "coverage_or_emission_pending"
+        },
+        {
+          "count": null,
+          "name": "rng_internal_work",
+          "status": "coverage_or_emission_pending"
+        }
+      ],
+      "unrankable_reason": "native work categories without complete emitted operation counts",
+      "verified": true
+    }
+  ],
+  "p": 1009,
+  "rank_check_proof": {
+    "all_certificates_replayed": true,
+    "checkpoint_primitives": {
+      "field_add": 2959730,
+      "field_inv": 65989,
+      "field_mul": 4077320,
+      "field_sqr": 0,
+      "field_sqrt": 0,
+      "hash_probe": 0,
+      "legendre": 0,
+      "modr_add": 11088922,
+      "modr_inv": 1547,
+      "modr_mul": 11313709,
+      "rng_words": 0,
+      "word_op": 523720
+    },
+    "checks": [
+      {
+        "b_count": 667648,
+        "complete_rows": 243,
+        "graph": {
+          "complete_relations": 243,
+          "core_large_vertices": 117,
+          "core_relations": 311,
+          "cycles_closed": 194,
+          "duplicate_relations": 0,
+          "input_large_vertices": 121,
+          "input_relations": 364,
+          "merges": 377,
+          "peeled_relations": 4,
+          "pivots": 117,
+          "rejected_fill": 0
+        },
+        "independent_rank": 243,
+        "rank_target": 364,
+        "ready": false,
+        "solver_modular_muls": 4551311,
+        "source_rows": 364
+      },
+      {
+        "b_count": 870400,
+        "complete_rows": 372,
+        "graph": {
+          "complete_relations": 372,
+          "core_large_vertices": 121,
+          "core_relations": 427,
+          "cycles_closed": 306,
+          "duplicate_relations": 0,
+          "input_large_vertices": 121,
+          "input_relations": 493,
+          "merges": 563,
+          "peeled_relations": 0,
+          "pivots": 121,
+          "rejected_fill": 0
+        },
+        "independent_rank": 364,
+        "rank_target": 364,
+        "ready": true,
+        "solver_modular_muls": 6730487,
+        "source_rows": 493
+      }
+    ],
+    "independent_rank_checks_passed": true
+  },
+  "rho_parity": false,
+  "schema": "cover.ic-graph-rho-portfolio-analysis/v1",
+  "seed": 337,
+  "source_revision": "a06c298bc63f3e2d1fd04d5900c8b4fda46a7798",
+  "target_class": "public-only workers with held-out planted answer; not unknown-log T1 targets",
+  "total_bitops": null
+}

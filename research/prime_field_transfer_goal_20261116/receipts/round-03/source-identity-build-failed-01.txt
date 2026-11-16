@@ -1,0 +1,38 @@
+// New parameter identities; reuse the frozen IDC1 native expression issuer.
+#define main round01_identity_main
+#include "../identity_certificate.cpp"
+#undef main
+
+int main(int argc,char** argv) try {
+    if(argc!=3)throw std::runtime_error("usage: identities OUTDIR LEAN_SOURCE");
+    std::ifstream proof(argv[2],std::ios::binary);
+    if(!proof)throw std::runtime_error("proof source unavailable");
+    std::string bytes((std::istreambuf_iterator<char>(proof)),{}),proofHash=hex(digest(bytes));
+    Expr u=var("u"),r=add({mul({num(3),power(u,2)}),neg(mul({num(3),u})),num(1)});
+    std::vector<Statement> statements={
+        {"parameter-norm","scaled CM norm parameter identity","CMTargetBoundary.parameter_norm_identity",{"u"},2,
+         add({num(1),mul({num(3),power(sub(mul({num(2),u}),num(1)),2)})}),mul({num(4),r})},
+        {"parameter-factor","CM subgroup order minus one factorization","CMTargetBoundary.parameter_factor_identity",{"u"},2,
+         sub(r,num(1)),mul({num(3),u,sub(u,num(1))})}
+    };
+    std::filesystem::create_directories(argv[1]);unsigned refused=0;
+    for(const auto& s:statements) {
+        if(std::max(s.lhs.degree(),s.rhs.degree())>s.degree)throw std::runtime_error("bad degree");
+        std::string id="IDC1h"+hex(digest(s.json())).substr(0,16),values,ignored;U seed=20261116;
+        if(!evaluate(s,id,seed,values))throw std::runtime_error("identity refused");
+        Statement bad=s;bad.rhs=add({bad.rhs,num(1)});
+        if(evaluate(bad,id,seed,ignored))throw std::runtime_error("negative control accepted");
+        ++refused;
+        auto path=std::filesystem::path(argv[1])/(s.file+".json");
+        if(std::filesystem::exists(path))throw std::runtime_error("refusing certificate overwrite");
+        std::ofstream out(path);
+        out<<"{\"schema\":\"identity.certificate/v1\",\"id\":"<<quote(id)
+           <<",\"statement\":"<<s.json()<<",\"modulus\":"<<modulus
+           <<",\"points\":32,\"seed\":"<<seed<<",\"value_digest\":"<<quote(hex(digest(values)))
+           <<",\"independence\":"<<quote("Producer native issuer; identities separately kernel-checked. Rust replay unavailable locally.")
+           <<",\"proof\":{\"kind\":\"lean4\",\"path\":"<<quote(argv[2])
+           <<",\"sha256\":"<<quote(proofHash)<<"}}\n";
+        std::cout<<s.file<<' '<<id<<" accepted32; Lean "<<s.theorem<<'\n';
+    }
+    std::cout<<"negative controls refused "<<refused<<"/2\n";return 0;
+}catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}

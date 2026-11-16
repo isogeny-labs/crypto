@@ -1,0 +1,57 @@
+import UnionAfterFinds
+set_option autoImplicit false
+namespace UnionSize
+
+def Sizes (n : Nat) := { a : Array USize // a.size=n }
+def sizeAt {n : Nat} (s : Sizes n) (i : Fin n) : USize := s.val[i.val]'(by rw [s.property];exact i.isLt)
+def update {n : Nat} (s : Sizes n) (child parent : Fin n) : Sizes n :=
+ ⟨s.val.set parent.val (sizeAt s parent+sizeAt s child) (by rw [s.property];exact parent.isLt),by simp [s.property]⟩
+def forward {n : Nat} (s : Sizes n) (ru rv : Fin n) : Bool := decide (sizeAt s ru≤sizeAt s rv)
+def child {n : Nat} (s : Sizes n) (ru rv : Fin n) : Fin n := if forward s ru rv then ru else rv
+def parent {n : Nat} (s : Sizes n) (ru rv : Fin n) : Fin n := if forward s ru rv then rv else ru
+
+theorem tie_forward {n : Nat} (s : Sizes n) (ru rv : Fin n) (he : sizeAt s ru=sizeAt s rv) :
+ forward s ru rv=true := by simp [forward,he]
+
+theorem disjoint_sum_bound {n : Nat} (a b : Finset (Fin n)) (hd : Disjoint a b) :
+ a.card+b.card≤n := by
+ have h:=Finset.card_le_univ (a∪b)
+ rw [Finset.card_union_of_disjoint hd] at h
+ simpa using h
+
+theorem add_exact (a b : USize) (n : Nat) (hs : a.toNat+b.toNat≤n) (hn : n<USize.size) :
+ (a+b).toNat=a.toNat+b.toNat := by
+ rw [USize.toNat_add]
+ apply Nat.mod_eq_of_lt
+ change a.toNat+b.toNat<USize.size
+ omega
+
+theorem update_parent {n : Nat} (s : Sizes n) (c p : Fin n) :
+ sizeAt (update s c p) p=sizeAt s p+sizeAt s c := by simp [sizeAt,update]
+
+theorem update_other {n : Nat} (s : Sizes n) (c p i : Fin n) (hi : i≠p) :
+ sizeAt (update s c p) i=sizeAt s i := by
+ have hv : p.val≠i.val := by intro h;exact hi (Fin.ext h.symm)
+ simp only [sizeAt,update,Array.getElem_set,if_neg hv]
+
+theorem selected_distinct {n : Nat} (s : Sizes n) (ru rv : Fin n) (hd : ru≠rv) :
+ child s ru rv≠parent s ru rv := by
+ unfold child parent
+ split <;> simp_all [Ne.symm hd]
+
+theorem selected_sum_exact {n : Nat} (s : Sizes n) (ru rv : Fin n)
+ (a b : Finset (Fin n)) (hd : Disjoint a b)
+ (ha : (sizeAt s ru).toNat=a.card) (hb : (sizeAt s rv).toNat=b.card) (hn : n<USize.size) :
+ (sizeAt (update s (child s ru rv) (parent s ru rv)) (parent s ru rv)).toNat=a.card+b.card := by
+ rw [update_parent]
+ have hsum:=disjoint_sum_bound a b hd
+ unfold child parent
+ split
+ · rw [add_exact _ _ n (by rw [ha,hb];omega) hn,ha,hb];omega
+ · rw [add_exact _ _ n (by rw [ha,hb];omega) hn,ha,hb]
+
+-- Every Fin index is safe for the fixed-length size vector.
+theorem selected_access_safe {n : Nat} (s : Sizes n) (ru rv : Fin n) :
+ (child s ru rv).val<s.val.size ∧ (parent s ru rv).val<s.val.size := by
+ rw [s.property];exact ⟨(child s ru rv).isLt,(parent s ru rv).isLt⟩
+end UnionSize

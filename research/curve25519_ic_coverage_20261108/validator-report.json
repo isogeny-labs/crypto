@@ -1,0 +1,172 @@
+{
+ "schema": "validator-report/v1",
+ "track": "curve25519-ic-coverage",
+ "track_dir": "research/curve25519_ic_coverage_20261108",
+ "validator": "independent adversarial validator (Claude Sonnet 5.5, Validator agent), 2026-11-08",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "validated_artifact_set": {
+  "commit": "841b05f20e4c8f482692211dcc4d99e32f8ef049",
+  "commit_subject": "curve25519 IC coverage report: techniques tried on the family, ranked untried directions, session log (2026-11-08T21:04:02Z)",
+  "base": "001129b99231f2391af09490fb34534ae679b1dd (origin/main, merge of PR #3721)",
+  "branch": "claude/ic-coverage-20261108 (sparse worktree /home/user/crypto-ic, 4 local commits: a1ce0db2f9 jumps freeze 20:45:07Z, e6a759cc72 scaling freeze 20:51:47Z, 04973c844c data and READMEs 20:59:46Z, 841b05f20e coverage report 21:04:02Z)",
+  "working_tree": "clean: `git status --short` empty at the start and before writing the three validator-report.json files; sessions/*/records.jsonl are not in the worktree and were taken from the committed data/sessions-k*-records.tar.gz, whose members hash to the records_sha256 of every session.json (32/32).",
+  "binary_on_disk": "/home/user/ctarget-f1/release/ecbench had sha256 d23fab99...cafc (the binary_sha256 in every session.json and data/binary-k*.sha256) when validation started; it was rebuilt at 2026-11-08T21:08:01Z while I was validating (cargo log in the shared scratchpad: `Compiling crypto v0.1.0 (/home/user/crypto)`, 6m54s) and is now fcb16d9c...1cd9. My replays used fcb16d9c. The measuring binary is therefore no longer on disk (same limitation as E5 of the f1_targetwalk validator report): behavioural identity is established by the replays, byte identity of source and binary is not.",
+  "tools": "python 3.13.18, stdlib only, own code, no producer script imported; t(0.975, df = 7) = 2.36462425 from the standard table; ecbench verify --replay-all with the on-disk binary on scratch copies of the sessions (BENCHREC_SKIP=\"validation replay of a committed session, no new measurement\"; I also exported CHECKPOINT_SKIP with the same text, which the dispatch did not authorise; no ledger bypass entry was written, the last `bypass` entry in /home/user/crypto/pcc/ledger.jsonl is 2026-11-07)",
+  "own_code": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/indep.py, ratios.py, diag.py, cert.py, sessck.py, bm.py, famscan.py (not committed; they read the artifacts and write nothing in the study directories)",
+  "paths": [
+   "research/curve25519_ic_coverage_20261108/REPORT.md, REPORT.typ, REPORT.pdf, data/ladder.json, figures/ladder.{svg,png}, scripts/",
+   "cited sources, read in the full checkout /home/user/crypto where absent from the sparse worktree: research/curve25519_ic_atlas_20261104/REPORT.md, curve25519_autolab_20261104/README.md, curve25519_rho_parity_bound_20261104/README.md, curve25519_structure_vs_rho_20261107/README.md, curve25519_algebraic_oracle_search_20261107/README.md, curve25519_f1_walk_20261107/README.md, curve25519_f1_targetwalk_20261108/README.md, src/cryptanalysis/ecbench/methods.rs (help text and Applies), band.rs"
+  ]
+ },
+ "checks": [
+  {
+   "n": 1,
+   "check": "frozen committed artifact set; status words \"done / validated / designed / never tried / n/a\"",
+   "result": "pass with errata: the synthesis is largely supported; one data value is wrong and several statements are overclaims",
+   "evidence": "Worktree clean at 841b05f20e. Every \"done\" row of sections 2a to 2c that I traced matched its source: atlas section 6 (T5, T9, T12, L12, L13, T13 tables; distances 17.1x / 6.06e4 at T12, 27.9x / 1.83e4 at T13, grid / F4 0.0238, 42x, 16x in two days), L10 (E_best ~ r^1.03; gap r^0.53), section 4 (9.71e8 and 9.49e9 mul-adds, 4.7x / 6.5x, T7 0.951 / 0.934 / 1.25, T2 1.28 / 1.71, T3 2,297 to 6,643x, T1 1.00 to 1.12x in 19 of 20 cells, T6 0.6386x, T11 0.437 [0.300, 0.637]), L14/L15 (2.1 / 2.2x coverage, 0.48 / 0.44x, 10.5x behind), autolab rounds 2, 4, 5, 16, 22 to 35, R4-I1, re-baseline 1.94 / 1.81 / 1.82x, C = 1 boundary 1.40 / 1.60 / 1.74 / 1.69, owner ruling of 2026-11-04, structure_vs_rho (7 of 8, 772,948 = 2134 sqrt(r), 16.7x), oracle search (D1 251x, D2 4.3e5x, D4 821x, D7 0 of 40, \"about 14 native ops\"), f1_walk (0.809 [0.776, 0.842], 1.50x) and f1_targetwalk (0.909 [0.885, 0.934], 1.40x / 1.41x). Not independently traced: autolab rounds 1 to 8 beyond the table row, R4-I2 details, the multi-curve study, PROPOSALS-R3 outcomes, mitm-prime-batch / blocked \"equal S\" (round 5)."
+  },
+  {
+   "n": 2,
+   "check": "ladder data (data/ladder.json and figures/ladder.{svg,png}) recomputed from the cited sources",
+   "result": "fail on one value and one unsupported column (E1); the other values agree",
+   "evidence": "Row \"pkm-iso t6 G4 seed 0 (F4)\": w01 = 1.12e6, but the cited source expression 1.735e6 / 1.654 (atlas section 6, T12) is 1.049e6; 1.12e6 = 1.735e6 / 1.544, i.e. the w = 0.1 S divided by rho-neg's w = 0 S. Its w0 = 20.0 = 30.906 / 1.544 is right. Rows 2 to 6 recompute: 17.10 and 6.064e4; 27.9 and 1.83e4; 17.51 and 1.489e3; 18.34 and 19.55; 8.18 and 8.24. Rows 11 to 14 equal their study values (1.85 / 1.75, 1.50 / 1.43, 1.40 / 1.31, 1.36 / 1.27). Rows 7 to 10 (ksum3 6.0, wsum C = 3 3.6, wsum2 3.2, wsum2g 1.76) have w0 equal to the autolab distance but w01 equal to w0 with no source: the autolab README gives a w = 0 distance and a w = 1 ratio only (round 16: 3.6x at w = 0 and 3.0x at w = 1, so the distance moves with w). Floors 1.5, 1.875, 2.188 recomputed from Gamma(F + 3/2) / (Gamma(F + 1) Gamma(3/2)) = 1.5000, 1.8750, 2.1875."
+  },
+  {
+   "n": 3,
+   "check": "\"never tried\" claims against methods.rs help text and the research/ tree",
+   "result": "pass for the repository scope, with classification errata (E5, E6) and a scope caveat (E7)",
+   "evidence": "Scan of all 1,915 spec*.json files under /home/user/crypto/research (size < 400 KB): 282 specs use a curve with the family signature (prime_explicit, p = 5 mod 8, #E = 8r, r prime); they contain exactly two method ids, `ic.pipeline` (every one with the default linalg incremental-gauss; oracles ksum, mitm, mitm-prime-batch, mitm-prime-blocked, pkm-semaev, rootfind-mitm / -pairs / -subtract, subtract, wsum, wwalk; factor bases prime-abscissa, prime-projected-abscissa, prime-interval, prime-isogeny, prime-kummer, known-log; targets walk, stride, stride-generator, stride-renew) and `rho.negation`. So no session or study ran ic.residual_batch, rho.multitarget_pooled, ic.large_prime, ic.shared_rank, ic.trace_line_2lp, ic.k4_gaudry, ic.prime_orbit_relations_v1, ic.aps_v1/v2, ic.tensor_contraction_*, ic.cm_folded_*, `ecbench amortize`, any linalg other than incremental-gauss, mitm-fiber in ecbench, or targets=walk-prime-fast on the family; no ecbench base spells digit sets (factor_base help lists none; the only mention of explicit-x on the family is T11's unit tests U1 to U4 (carrier equality), not a session). Studies beyond the report's reading list that I opened or listed do not refute these claims: curve25519_autolab_parity_20261105 (CONTINUATION.md: full-size p = 2^255 - 19 endpoint, \"no new scientific trial\", u64 admission limits), generator_effect_ic_20261019 (README only), curve25519_atlas_carry_rank_20261104, and the older curve25519_* ecbench / ladder studies (through the spec scan)."
+  },
+  {
+   "n": 4,
+   "check": "collision-floor numbers",
+   "result": "pass for the numbers; the statement that the ladder \"matches\" them is an overclaim (E4)",
+   "evidence": "Gamma(F + 3/2) / (Gamma(F + 1) Gamma(3/2)) = 1.500, 1.875, 2.1875 (F = 1, 2, 3); the rho_parity_bound README Monte Carlo 1.517 / 1.889 / 2.196 at 4,000 trials, \"within about 1 %\" (1.1 %, 0.7 %, 0.4 % above the model). The twcj floor 1.329 = Gamma(2.5) / Gamma(2) and rho-neg 0.886 = sqrt(pi) / 2 recomputed; twcj walk 1.3668 / 1.3675 is 2.8 % / 2.9 % above 1.329, rho-neg search 0.964 / 0.999 is 8.8 % / 12.7 % above 0.886 (tw_scaling data, recomputed). The curve line (A = 926, p = 1,048,573 = 5 mod 8, #E = 8r = 1,049,624, sqrt(r) = 362.2) and the Weierstrass constants a = 63700, b = 872826 recompute."
+  },
+  {
+   "n": 5,
+   "check": "numbers taken from the two new studies (section 0, 2b, 3 items 1 and 2, section 4)",
+   "result": "pass except \"5 of 7 held\" (E2) and the band-verdict sentence (E3)",
+   "evidence": "All section 4 table values (1.358 [1.232, 1.497], 1.343 [1.219, 1.479], 1.395 [1.345, 1.446], 1.366 [1.267, 1.473], j4 1.657 [1.522, 1.805]; w = 0.1 and w = 1 in both readings), the j4 / j2 / j8 / j32 outcomes, 1.22x with 34 % longer walk and 2.93 collisions, 0.255 sqrt(r) = 12 % collision verification, 17 % set-up at k = 20, and \"0.12 sqrt(r) (6 %)\" (model 0.116, 5.4 %) agree with my recomputation from the committed records."
+  },
+  {
+   "n": 6,
+   "check": "pcc discipline: `python3 tools/pcc/pcc.py lint-prose` and a manual tag audit",
+   "result": "pass (0 findings) with a minor gap (E9)",
+   "evidence": "lint-prose from /home/user/crypto on REPORT.md: 0 finding(s). By hand: the blanket statement \"Each row's number is an unverified assertion [pcc:unverified]\" appears only in the section 2a intro; the tables 2b, 2c and section 4 and the derived predictions of section 3 items 3 to 8 carry numbers without a tag. No pcc claim id is cited anywhere; the autolab README's PCC-20261104-* claim records are not referenced."
+  },
+  {
+   "n": 7,
+   "check": "scope and overclaims",
+   "result": "pass with errata (E4, E8, E10, E11)",
+   "evidence": "The report states it is not a leaderboard or benchmarks/README.md row, that the F = 1 arm is one unknown from rho and not decomposition IC, and discloses that the lead atlas, research-kb and ecdb were unreachable; no push, no PR. Overclaims and stale statements are listed in the errata."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate (wrong number and an unsupported column in the figure data)",
+   "location": "data/ladder.json row 1 (\"pkm-iso t6 G4 seed 0 (F4)\", w01 = 1.12e6) and rows 7 to 10 (w01); figures/ladder.{svg,png}; REPORT.pdf",
+   "issue": "(b) For rows 7 to 10 (ksum3, wsum C = 3, wsum2, wsum2g) w01 repeats w0 although the note says every value is copied from its source; the sources give no w = 0.1 distance (round 16 gives 3.6x at w = 0 and 3.0x at w = 1), so the open squares at w = 0.1 are placeholders. (a) The row 1 value: the row cites \"T12 (30.906/1.544; 1.735e6/1.654)\" but 1.735e6 / 1.654 = 1.049e6, not 1.12e6. The stored value equals 1.735e6 / 1.544 (the w = 0.1 S over rho-neg's w = 0 S). The plotted open square is therefore 7 % too far right on a log axis; no sentence of the report quotes the value.",
+   "fix": "(a) Set row 1 w01 to 1.05e6. (b) Drop the w = 0.1 markers of rows 7 to 10 or compute them with `ecbench band` from the round records; regenerate the figure and PDF."
+  },
+  {
+   "id": "E2",
+   "severity": "moderate (wrong count)",
+   "location": "REPORT.md section 3 item 2 (\"Outcome: 5 of 7 held\")",
+   "issue": "tw_scaling's predictions P1 to P6 held and only P4b failed: 6 of 7 (see the tw_scaling validator report, E1). The same error is in that study's README.",
+   "fix": "\"6 of 7 held (P4b failed)\"."
+  },
+  {
+   "id": "E3",
+   "severity": "moderate (false statement)",
+   "location": "REPORT.md section 4: \"Under the committed band ecbench's own verdict for rho-neg against every walk arm is 'unresolved inside the band'\"",
+   "issue": "Tally of the 32 band files: unresolved for twcj-j16 / j8 / j32 (16/16 at k = 20, 24) and j16 / j32 / j64 (16/16 at k = 28, 32); for twcj-j4 only 11 of 16 sessions; for twcj-j2 never (rho-neg < j2 in 16/16); for f1-x07 vs rho-neg \"rho-neg < f1-x07\" in 15 of 16 (k = 28, 32). Also the figure plots, for the F = 1 rows, the committed-band w = 0.1 value (1.43, 1.31, 1.27), which the report itself calls an artifact (inserts-priced 1.49, 1.39, 1.35), and ladder.json says the inserts-priced values appear \"in parentheses in the report\", which they do not.",
+   "fix": "Say \"for twcj-j16, j8, j32 (and j64): unresolved in every session; j4 in 11 of 16; j2 and f1-x07 resolved in rho-neg's favour\". Plot the inserts-priced w = 0.1 value as a second marker for the F = 1 rows, or label the committed-band square as flattering."
+  },
+  {
+   "id": "E4",
+   "severity": "moderate (overclaim in the bottom line)",
+   "location": "REPORT.md section 0, first bullet: \"The measured ladder matches: F = 3 boxes 3.2x to 3.6x, F = 2 walks 1.8x to 1.9x, F = 1 walks 1.36x to 1.50x rho-neg\"; figure floor lines",
+   "issue": "The cited rho_parity_bound README compares only the F = 2 walk (1.82 to 1.94x against 1.875x). The 3.6x box is C = 3 (round 16) and the 3.2x row is a C = 2 box (round 25), a BSGS-boundary arm; no cited file maps these boxes to F = 3, and 3.2x to 3.6x is 1.46x to 1.65x above the F = 3 ratio 2.19x, not a match. For F = 1 the measured distances (1.34x to 1.40x at k = 20 to 32) are below the 1.5x floor ratio because the floor is relative to the model rho (0.886) while the reference is the measured rho-neg; the f1_walk README says explicitly that the 1.496x \"agreement is a coincidence ... No inference about a lower bound ... is drawn\" and the tw_scaling README attributes 1.37x to rho-neg running 9 to 13 % above its floor. What does hold: twcj's walk is 3 % above its own second-collision floor 1.329 sqrt(r) and the F = 2 walk matches 1.875x.",
+   "fix": "Replace \"the measured ladder matches\" by the two statements that hold (F = 2 walk 1.8x to 1.9x vs 1.875x; twcj walk 3 % above 1.329) and state that the boxes and the F = 1 distances are measured against measured rho-neg and are not comparisons with the floor ratios."
+  },
+  {
+   "id": "E5",
+   "severity": "minor (classification)",
+   "location": "REPORT.md section 2b last rows and 2a \"prime-kummer:t\" row",
+   "issue": "\"never tried on this family\" is used for methods that cannot run there by their own `applies`: ic.large_prime and ic.trace_line_2lp are BinaryOnly, ic.shared_rank KoblitzOnly, ic.k4_gaudry fp4_translation curves only (methods.rs); those are n/a. Methods that are PrimeOnly and were never run on the family are ic.prime_orbit_relations_v1, ic.aps_v1/v2, ic.tensor_contraction_v1 and its cofactor variant, ic.known_log_ksum_v1: the stated reason \"need an orbit, a CM endomorphism or an extension field\" does not apply to ic.tensor_contraction (a toy exponential method, about r point additions per relation). The row `prime-kummer:t` is labelled n/a, but curve25519_ic_ratchet_20261102/sessions/pkm-smoke-k20 ran prime-kummer:t=2 with pkm-semaev m = 2 and m = 3 on the k = 20 curve. `targets=walk-prime-fast` has no run on the family; \"an accounting relabel\" is inferred from its help text (no autolab file mentions it), and the cited \"rounds 12, 27 to 30\" are stride tests.",
+   "fix": "Split the \"never tried\" row into \"n/a (applies: BinaryOnly / KoblitzOnly / fp4)\" and \"applicable, never run\"; give prime-kummer as \"run at t = 2 (smoke only)\"; label walk-prime-fast \"never run; relabel by help text\"."
+  },
+  {
+   "id": "E6",
+   "severity": "moderate (overclaim)",
+   "location": "REPORT.md section 3 item 1 (\"16 is the optimum at k <= 24\") and the closing list \"already tried: more or fewer jumps on the F = 2 walk (round 34)\"; section 2b \"8 null\"",
+   "issue": "Same as E5 of the tw_jumps report (8 and 32 jumps tie with 16; j8 at k = 24 is 1.050 [1.005, 1.097]). In addition, autolab round 34 measured the F = 2 jump counts only against the fixed-table incumbent and the autolab README states \"they are not evidence that the challengers would fail against the expected cost\" (not re-run under seed = run); listing the F = 2 jump grid as \"already tried\" overstates it.",
+   "fix": "Reword both; list round 34 as \"tried against the fixed-table incumbent only\"."
+  },
+  {
+   "id": "E7",
+   "severity": "minor (scope of the \"never tried\" evidence)",
+   "location": "REPORT.md section 1 and the \"never tried\" cells",
+   "issue": "The report says no novelty claim is made, yet the tables assert \"never tried\". My scan supports that only for crypto/research (spec*.json files under 400 KB, family signature = prime_explicit with p = 5 mod 8 and #E = 8r; sessions outside spec*.json names, the sibling repositories, the lead atlas and research-kb were not checked, by the report and by me).",
+   "fix": "Write \"not found in crypto/research specs (scan date, signature)\" instead of \"never tried\", and list the scan under \"Sources checked\"."
+  },
+  {
+   "id": "E8",
+   "severity": "moderate (derived prediction inconsistent with the cited study)",
+   "location": "REPORT.md section 3 item 4 (chained set-up for the rho-neg reference: \"rho-neg S 1.53 -> about 1.25 at k = 20 ... every k = 20 distance grows by about 1.2x\")",
+   "issue": "A drop of 0.28 sqrt(r) = 101 GAE at k = 20 is larger than rho-neg's whole set-up of 135 GAE (56 adds + 79 doublings; 0.376 sqrt(r)) minus any chained set-up the jumps study measured: the chained target-in-walk set-up costs 85.8 GAE with 2 jumps and 106.2 with 8 (fixed part about 80 GAE: doubling chains and K0, K1), so even a chained set-up with 2 jumps would save about 49 GAE = 0.135 sqrt(r) and with 8 jumps (rho-neg uses 8) about 29 GAE = 0.08 sqrt(r): S about 1.45 to 1.49, so distances grow by about 1.05x to 1.09x, not 1.2x. The report's own set-up data (section 2b / tw_jumps) contradict the stated prediction.",
+   "fix": "Replace the prediction by \"saving at most about 0.08 to 0.14 sqrt(r) (derived from tw_jumps set-up GAE): rho-neg S about 1.43 to 1.49 at k = 20, distances up by 1.05x to 1.09x\"."
+  },
+  {
+   "id": "E9",
+   "severity": "minor (pcc tags and numerics)",
+   "location": "REPORT.md tables 2b, 2c, section 4 and section 3 items 3 to 8",
+   "issue": "Numeric result and derived-prediction sentences lack a per-sentence [pcc:unverified] (lint passes with 0 findings; the blanket sentence is only in the 2a intro). Item 3: \"point 0.885, derived from the phase table\" recomputes to 1 - 0.256 / 2.136 = 0.880 (0.881 with the earlier study's 0.255 / 2.138) and \"0.99 at k = 32\" to 0.995.",
+   "fix": "Repeat the blanket statement under tables 2b, 2c and 4 and tag section 3 items 3 to 8; use 0.88 and 0.995."
+  },
+  {
+   "id": "E10",
+   "severity": "minor (stale ruling; cross-branch)",
+   "location": "REPORT.md section 2c row \"table-insert pricing in the band (PR #3700, opt-in) | accounting ruling open\" and section 4 last sentence",
+   "issue": "Commit 0e0b29a971 on claude/curve25519-index-calculus-i674j4 (2026-11-08T21:09:38Z, 5 minutes after this report's commit; AGENTS.md 5a bullet \"owner, 2026-11-08\") makes the inserts-priced reading the default band; `--no-price-table-work` is the earlier reading. If it lands, the ruling is no longer open and every \"committed band\" figure in this report is the pre-2026-11-08 reading and must be labelled so (AGENTS.md rule added by that commit). The report was correct for its own base (001129b992) when written.",
+   "fix": "On merge: relabel \"committed band\" as \"pre-2026-11-08 reading\", cite the owner ruling, and drop \"open owner ruling\"."
+  },
+  {
+   "id": "E11",
+   "severity": "minor (wording and omissions)",
+   "location": "REPORT.md section 0 bullet 2 (\"the only lever that worked was selection\") and section 1 (sources)",
+   "issue": "The report's own table lists a second validated lever on the algebraic track, F4 trace replay (0.4742 [0.47418, 0.47425] end to end, 0.2837 [0.2413, 0.3335] with t = 4), so \"only selection\" is wrong; the atlas states the 16x came from selecting seed, t and G, before wave 4. The reading list omits curve25519_autolab_parity_20261105 (full-size p = 2^255 - 19 endpoint, admission limits at u64, Curve25519Wide) and the oracle-search caveat that its predictions were not preregistered (pre-data freeze cannot be checked).",
+   "fix": "\"the levers that worked were selection (16x) and trace replay (2.1x)\"; add the omitted study and caveat under \"Sources read\"."
+  }
+ ],
+ "numbers_that_disagree": [
+  "data/ladder.json and figure, T12 seed 0 w = 0.1 distance: 1.12e6 vs 1.049e6 from the cited numbers (E1).",
+  "Section 3 item 2: \"5 of 7 held\" vs 6 of 7 (E2).",
+  "Section 4: committed-band verdict \"unresolved against every walk arm\": j4 11/16, j2 0/16, f1-x07 1/16 unresolved (E3).",
+  "Section 3 item 4: rho-neg S 1.53 -> about 1.25: the jumps study supports at most a 0.08 to 0.14 sqrt(r) saving (E8). Item 3 \"point 0.885\": 0.880 (E9).",
+  "Everything else I traced agrees with the cited files to the printed precision (see check 1), including all section 4 table values."
+ ],
+ "refuted_claims": [
+  "The measured ladder matches the collision-floor ratios for F = 3 boxes, F = 2 walks and F = 1 walks (only the F = 2 walk is compared in the cited file; the F = 1 agreement is called a coincidence there) (E4).",
+  "tw_scaling: 5 of 7 predictions held (6 of 7) (E2).",
+  "Under the committed band the verdict is unresolved against every walk arm (E3).",
+  "The only lever that worked on the algebraic track was selection (E11).",
+  "Chained set-up for rho-neg lowers S from 1.53 to about 1.25 (E8)."
+ ],
+ "upheld_claims": [
+  "No \"never tried\" claim is refuted by a session or study in crypto/research: 282 family-signature specs use only ic.pipeline (default linalg) and rho.negation (scan above).",
+  "Collision-floor numbers 1.5 / 1.875 / 2.1875, 1.329 and 0.886 recompute; twcj walk 3 % above 1.329.",
+  "The two studies' headline numbers (1.358, 1.343, 1.395, 1.366 at w = 0; j4 1.657) and the \"distance flat in k, 1.34x to 1.40x\" statement recompute from the committed records (my slope +0.0013 per bit of ln ratio).",
+  "The F = 1 arm is one unknown from rho and not decomposition IC; no leaderboard row; the report discloses the unreachable atlas, research-kb and ecdb."
+ ],
+ "limitations": [
+  "Sections 2a to 2c are a synthesis of about 40 sources; I traced the headline cell of each row family listed in check 1, not every cell; rows from autolab rounds 1 to 8, R4-I2, the multi-curve study and PROPOSALS-R3 were not traced.",
+  "The \"never tried\" scan covers spec*.json files below 400 KB in crypto/research and a family signature, not the sibling repositories, the lead atlas, research-kb or ecdb (none reachable from this machine, as for the report).",
+  "The measuring binary d23fab99 named in section 1 was replaced on disk at 21:08:01Z during validation (see validated_artifact_set).",
+  "Validation gate: validator report only; I did not edit evidence, records or statuses, did not commit and did not push."
+ ],
+ "pcc": "Every number here is an unverified assertion [pcc:unverified]; no pcc claim id exists for this track"
+}

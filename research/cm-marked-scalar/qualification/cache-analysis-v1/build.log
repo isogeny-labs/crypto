@@ -1,0 +1,7 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations cache_analyze.cpp -o /tmp/cm-marked-scalar-build/cache-analysis -lcrypto
+cache_analyze.cpp:51:13: warning: ‘void analyze::panel_budget(const analyze::Panel&, const Json&)’ defined but not used [-Wunused-function]
+   51 | static void panel_budget(const Panel&p,const Json&r){double wall=decimal(r.at("wall_seconds"));check(double(p.timed_ns)<=wall*1e9*(1+1e-5)+1000,"panel clocks exceed receipt wall");}
+      |             ^~~~~~~~~~~~
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

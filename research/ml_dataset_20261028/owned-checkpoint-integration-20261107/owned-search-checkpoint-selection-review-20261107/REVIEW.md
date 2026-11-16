@@ -1,0 +1,11 @@
+# Historical checkpoint candidate selector review
+
+Independent read-only review, 2026-11-07. No blocking issue identified in this standalone candidate-selection helper.
+
+The selector requires snapshot indices exactly0..len-1, admits every descriptor in order, and refuses Invalid or Unavailable states anywhere. BoundTruncatedPrefix is permitted only at the final index; consequently multiple or middle prefixes cannot be skipped. A complete final snapshot is selected; with one terminal prefix the immediately preceding complete snapshot is selected. Empty or prefix-only input cannot yield a candidate. There is no backward search past failed descriptors.
+
+Input count is capped at4096 before work; the helper allocates no buffers. It charges one work unit per inspected descriptor, checks the same owner and deadline before/after each admission, and requires a final owner/deadline check before success. On parent refusal the partial inspected/accepted charge counters remain diagnostic and result contains no candidate. Parent accounting remains authoritative if a reserve implementation charges before returning an error. Bounded counts prevent index and counter overflow on this path.
+
+Trust boundary: State and Snapshot are public caller-constructible values. Complete/BoundTruncatedPrefix are assertions by the caller, not seals created by this helper. Integration must classify all authenticated captured snapshots using strict full/prefix wire parsing and exact source/map/receipt binding; resource refusal or identity uncertainty must never become a bound prefix. Candidate is not export authority, original-cell admission, mathematical proof or successful producer completion. Selected original descent, lineage and committed-row proof replay, exact report/failure-envelope joins and full-tail custody/revalidation remain separate required gates.
+
+The source includes13focused controls for ordering, terminal-tail selection, malformed/unavailable refusal, missing complete snapshots, cap/deadline and shared sticky owner. Root reports these passed. This reviewer inspected source rather than rerunning compilation/tests. A production caller must keep this historical route distinct from existing v1 terminal-report joins and must not treat the candidate result as a verified-row label.

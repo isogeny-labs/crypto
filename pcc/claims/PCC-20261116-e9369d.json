@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T19:20:28Z",
+ "id": "PCC-20261116-e9369d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5f7c710d6d9b3f442107d9d97425b2b4d04ed283",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "45960038ea4591d66e05f103edbf97e5a0b9a34a58058744bf44041881de6eb5",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+   "theorem": "CubicCofactorWordBridge22307.noncanonical_overflow_control"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact normalized UInt64 multiply/subtract/cofactor model at223/3, decoded Fin223 polynomial plus raw canonical values, explicit normalization and overflow counterexample. Both unchanged original gates42/0 underj1/120/default memory. Not Rust compiler/base inverse/universal field/Jacobian/counter/runtime or signed standing.",
+ "statement": "theorem noncanonical_overflow_control : wordMul (UInt64.ofNat (2^63)) 2=0 \u2227 decodeWord (wordMul (UInt64.ofNat (2^63)) 2)\u2260 decodeWord (UInt64.ofNat (2^63))*decodeWord 2"
+}

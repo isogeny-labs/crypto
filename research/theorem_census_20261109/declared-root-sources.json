@@ -1,0 +1,30 @@
+{
+  "schema": "declared-resultant-roots-source-plan/v1",
+  "created": "2026-11-10T04:17:44.984517+00:00",
+  "status": "Whole431kernel gate passed; preissue source plan, no declared-root packet yet.",
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "DeclaredResultantRootsAudit.declared_resultant_root_audit_certificate",
+    "statement": "theorem declared_resultant_root_audit_certificate : (\u2200 (F : Type*) [Field F] [IsAlgClosed F] (f g : F[X]) (m n : \u2115), 0<m \u2192 0<n \u2192 f.natDegree\u2264m \u2192 g.natDegree\u2264n \u2192 (Polynomial.resultant f g m n=0 \u2194 (\u2203 a : F,f.eval a=0 \u2227 g.eval a=0) \u2228 (f.coeff m=0 \u2227 g.coeff n=0))) \u2227 (\u2200 (F : Type*) [Field F], \u00ac \u2200 f g : F[X],f.natDegree\u22642 \u2192 g.natDegree\u22642 \u2192 Polynomial.resultant f g 2 2=0 \u2192 \u2203 a : F,f.eval a=0 \u2227 g.eval a=0) \u2227 (Polynomial.resultant rationalNoRoot rationalNoRoot 2 2=0 \u2227 rationalNoRoot.coeff 2\u22600 \u2227 \u00ac \u2203 a : \u211a,rationalNoRoot.eval a=0 \u2227 rationalNoRoot.eval a=0)",
+    "decl_sha256": "89b6c31db318750c276da79b52c9482851b438b76f0f5565dbc9d8e0ee6299f8",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/DeclaredResultantRoots.lean",
+        "bytes": 5614,
+        "sha256": "b0b9cf067feab2f8375d2e287f242192a604ef3188ea8ead25458a91bea335ba"
+      }
+    ],
+    "gate": {
+      "path": "evidence/declared-root-gate.log",
+      "declarations": 431,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Over an algebraically closed field, positive declared sizesm,n and degree bounds imply resultant zero iff common finite root OR both declared leading coefficients vanish. Direct universal affine-only claim refuted by padded constant1/constant1over every field; closure removal refuted by actual full-degree X\u00b2+1overQ. Pure polynomial theorem; no projective-space construction or geometric Semaev recursion proof."
+  },
+  "literature": "Mathlib Resultant.Basic475\u2013489root-product formula, degree padding334\u2013353and IsAlgClosed.Basic definition/splits; actual GeneralS4common-root/gluing/constant-model counterexample reviewed. Retained primary Semaev/KostersYeo scopes unchanged; original2004still403/unread. No novelty/source-status promotion.",
+  "native_experiments": 0,
+  "paid_compute": 0,
+  "inherited_sources": "Previously issued Lean files unchanged; additive Lake root only.",
+  "fresh_checker": "lean4checker unavailable; actual kernel compilation and full transitive axiom gate."
+}

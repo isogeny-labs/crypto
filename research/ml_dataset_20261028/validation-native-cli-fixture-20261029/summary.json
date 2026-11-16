@@ -1,0 +1,248 @@
+{
+  "source_commit": "912a534a663e55437144876058a9ec81ad1cdf01",
+  "fixture_commit": "912a534a663e55437144876058a9ec81ad1cdf01",
+  "binary_sha256": "271bf69057483b38e69503d3030e07afbc7eff3aaf37898aae53a0aff91ba4df",
+  "binary_sha256_after": "271bf69057483b38e69503d3030e07afbc7eff3aaf37898aae53a0aff91ba4df",
+  "fixture_manifest_sha256": "cd1dca98129d2aa3c6b0a83486c756e66becb4419e216d644b06bcd0b4f60462",
+  "protocol_file_sha256": "27b72319531932f663c1d903b5fad984c83ccde525715b10adad0327555acf04",
+  "verdict": "passed_software_checks",
+  "commands": [
+    {
+      "label": "01-plan",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "02-preflight",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "03-generate-62",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "04-verify-62",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "05-status-62",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "06-generate-63",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "07-verify-63",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "08-status-63",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "09-tampered-status",
+      "exit_status": 0,
+      "timed_out": false,
+      "cancelled": false
+    },
+    {
+      "label": "10-tampered-verify",
+      "exit_status": 1,
+      "timed_out": false,
+      "cancelled": false
+    }
+  ],
+  "verified_local_cells": [
+    {
+      "cell_index": 62,
+      "included_in_research_corpus": false,
+      "manifest_sha256": "325606e5f488aecc58314e5d9a6db1d83e5d4b3470d9ea38c65c41dafb6f4bda",
+      "outcome": {
+        "algebra_completed": false,
+        "algebra_completed_scope": "All visited native bases and the full encoding traversal completed; distinct from encoding_search_completed, which can hold after degree-truncated elimination",
+        "binary_field_operation_tally": {
+          "complete_machine_instruction_count": false,
+          "counts": {},
+          "inversion_count_includes_its_mul_and_square_cost": true,
+          "scope": "calling-thread instrumented binary field APIs during adapter solve and replay; excludes setup before solve and optimized kernels bypassing these APIs"
+        },
+        "checkpoint_mid_call": true,
+        "counter_scope": "native adapter operations, not retired instructions",
+        "counters": {
+          "equation_checked_candidates": 1,
+          "group_lift_add_calls": 4,
+          "group_lift_candidates": 1,
+          "native_domain_evaluations": 9,
+          "native_elimination_fp_multiplies": 77,
+          "native_factored_univariates": 1,
+          "native_full_field_branches": 0,
+          "native_root_finder_coefficient_multiplications": 0,
+          "persisted_trace_events": 15,
+          "recursive_native_f4_runs": 4
+        },
+        "ecdlp_pipeline_completed": false,
+        "encoding_search_completed": false,
+        "exhaustive_no_decomposition": false,
+        "exposed_event_stream_complete": true,
+        "factor_base_verified": true,
+        "first_fall_degree": null,
+        "instruction_count_reason": "Worker-level PMU records, when permitted, are saved separately; this adapter does not invent per-operation instruction attribution",
+        "interrupted_trace_loss_possible": true,
+        "known_answer_verified": true,
+        "last_fall_degree": null,
+        "lift_completed": true,
+        "lift_completed_scope": "Every attempted candidate lift completed within its own budget; does not assert all roots or PDP decompositions were attempted",
+        "m": 3,
+        "native_backend_invoked": true,
+        "pdp_witness_verified": true,
+        "reason": "A signed factor-base decomposition was independently replayed in the curve group; trace persistence is reported separately",
+        "requested_work_limit": 512,
+        "retired_hardware_instructions": null,
+        "scalar_recovered_without_witness": false,
+        "scalar_replay_verified": false,
+        "schema": "ml-dataset.solver-outcome/v1",
+        "solver": "f4",
+        "solver_completed": true,
+        "status": "verified",
+        "strategy": "prime-affine-s3-chain-f4-visitor/v1",
+        "supervisor": {
+          "checkpoint_mid_call": false,
+          "clock_valid_for_comparison": false,
+          "elapsed_ms_diagnostic": 101.327297,
+          "exit_code": 0,
+          "instruction_counter_status": "whole_worker_not_counted; see phase telemetry for available hardware counts",
+          "interrupted_trace_loss_possible": true,
+          "memory_limit_bytes": 536870912,
+          "output_budget_bytes": 16777216,
+          "output_budget_scope": "all_cell_files_before_manifest_seal",
+          "retired_instructions": null,
+          "worker_output_bytes_before_seal": 80360
+        },
+        "termination": "verified_positive_stop",
+        "trace_complete": false,
+        "trace_gaps": [
+          "Useful-row traces omit zero rows and private pivot operations",
+          "Internal univariate factorization/GCD states are not exposed",
+          "Native rows are materialized before bounded event serialization; no whole-call checkpoint recovery",
+          "Observed degrees are not exact first/last fall degrees"
+        ]
+      },
+      "twist": false
+    },
+    {
+      "cell_index": 63,
+      "included_in_research_corpus": false,
+      "manifest_sha256": "638f65fab6be7da0a845ccb76b000ee985faefa3d677c7e03585ad517369f63a",
+      "outcome": {
+        "algebra_completed": true,
+        "algebra_completed_scope": "All visited native bases and the full encoding traversal completed; distinct from encoding_search_completed, which can hold after degree-truncated elimination",
+        "binary_field_operation_tally": {
+          "complete_machine_instruction_count": false,
+          "counts": {},
+          "inversion_count_includes_its_mul_and_square_cost": true,
+          "scope": "calling-thread instrumented binary field APIs during adapter solve and replay; excludes setup before solve and optimized kernels bypassing these APIs"
+        },
+        "checkpoint_mid_call": true,
+        "counter_scope": "native adapter operations, not retired instructions",
+        "counters": {
+          "equation_checked_candidates": 0,
+          "group_lift_add_calls": 0,
+          "group_lift_candidates": 0,
+          "native_domain_evaluations": 0,
+          "native_elimination_fp_multiplies": 60,
+          "native_factored_univariates": 0,
+          "native_full_field_branches": 0,
+          "native_root_finder_coefficient_multiplications": 0,
+          "persisted_trace_events": 2,
+          "recursive_native_f4_runs": 1
+        },
+        "ecdlp_pipeline_completed": false,
+        "encoding_search_completed": true,
+        "exhaustive_no_decomposition": false,
+        "exposed_event_stream_complete": true,
+        "factor_base_verified": true,
+        "first_fall_degree": null,
+        "instruction_count_reason": "Worker-level PMU records, when permitted, are saved separately; this adapter does not invent per-operation instruction attribution",
+        "interrupted_trace_loss_possible": true,
+        "known_answer_verified": true,
+        "last_fall_degree": null,
+        "lift_completed": true,
+        "lift_completed_scope": "Every attempted candidate lift completed within its own budget; does not assert all roots or PDP decompositions were attempted",
+        "m": 3,
+        "native_backend_invoked": true,
+        "pdp_witness_verified": false,
+        "reason": "The supplied affine-chain encoding search completed without a verified lift; exceptional infinity branches prevent a general PDP nonexistence claim",
+        "requested_work_limit": 512,
+        "retired_hardware_instructions": null,
+        "scalar_recovered_without_witness": false,
+        "scalar_replay_verified": false,
+        "schema": "ml-dataset.solver-outcome/v1",
+        "solver": "f4",
+        "solver_completed": true,
+        "status": "partial",
+        "strategy": "prime-affine-s3-chain-f4-visitor/v1",
+        "supervisor": {
+          "checkpoint_mid_call": false,
+          "clock_valid_for_comparison": false,
+          "elapsed_ms_diagnostic": 101.17397799999999,
+          "exit_code": 0,
+          "instruction_counter_status": "whole_worker_not_counted; see phase telemetry for available hardware counts",
+          "interrupted_trace_loss_possible": true,
+          "memory_limit_bytes": 536870912,
+          "output_budget_bytes": 16777216,
+          "output_budget_scope": "all_cell_files_before_manifest_seal",
+          "retired_instructions": null,
+          "worker_output_bytes_before_seal": 59208
+        },
+        "termination": "encoding_search_complete",
+        "trace_complete": false,
+        "trace_gaps": [
+          "Useful-row traces omit zero rows and private pivot operations",
+          "Internal univariate factorization/GCD states are not exposed",
+          "Native rows are materialized before bounded event serialization; no whole-call checkpoint recovery",
+          "Observed degrees are not exact first/last fall degrees"
+        ]
+      },
+      "twist": true
+    }
+  ],
+  "semantic_tamper": {
+    "artifact": "prime-f4-input.json",
+    "changes": [
+      "auxiliary domain restricted to leaf abscissae",
+      "one S3 coefficient changed"
+    ],
+    "hash_only_status_passed": true,
+    "included_in_research_corpus": false,
+    "manifest_sha256": "5c21b32424e4ce5f8918cae590af12e86a4f0aacdf80db3bc8c885bdbc27f68c",
+    "original_sha256": "37f48cba70f7b49a52a9a8e099acdb8dc0ba3b60503c9c440c1ae32c32c9bada",
+    "semantic_verify_rejected": true,
+    "source_shard": 62,
+    "tampered_sha256": "f688f12bd33ca47059472c644e5fa5f1ef16e536abbdf42adca4107eacd6459e"
+  },
+  "corpus_rows_added": 0,
+  "verified_cloud_dataset_cells": 0,
+  "startup_gate_exercised": false,
+  "clock_valid_for_comparison": false,
+  "archive": {
+    "path": "native-cli-run.tar.xz",
+    "bytes": 32788,
+    "sha256": "5a3a54300bc22bc3ba56522827326b2b626b1699db4140dbc311eb8a27165739"
+  }
+}

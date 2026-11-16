@@ -1,0 +1,27 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Explicit genus-2 infinity chart: affine stalk bridge}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+For any field $K$, the explicit chart is
+\[A=K[z,w]/(w^2-zU(z)),\qquad U(z)=1+a_3z^2+a_2z^3+a_1z^4+a_0z^5.\]
+Let $\mathfrak m$ be the kernel of evaluation at $(0,0)$. The prior checked result establishes that $A_{\mathfrak m}$ is a discrete valuation ring with uniformizer $w$.
+
+\medskip\noindent\textbf{New checked theorem.} The pinned Lean source defines the prime-spectrum point $x$ associated to $\mathfrak m$ and proves an isomorphism of commutative rings
+\[\mathcal O_{\operatorname{Spec}A,x}\simeq A_{\mathfrak m}.\]
+This invokes Mathlib's affine-scheme stalk isomorphism with the explicit point and locality data. The theorem's audited axioms are exactly \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+\begin{center}\begin{tabular}{p{0.48\linewidth}p{0.39\linewidth}}\toprule
+Gate & Status\\\midrule
+Explicit affine origin point and stalk & Checked in Lean 4.34.1\\
+Specific smooth projective completion & Open: no model constructed here\\
+Open immersion of this chart into completion & Open\\
+Projective infinity stalk isomorphism & Open\\
+Principal divisor and $\operatorname{Pic}^0$ transport & Open\\
+Rust law semantic equivalence & Open\\\bottomrule\end{tabular}\end{center}
+
+\noindent The result identifies the affine scheme stalk only. A projective infinity stalk needs a specific completion and an open chart map. No target count, operation cost, or rho ratio is inferred. The standardized gate table is \texttt{affine-stalk.csv}; the dependency graph is \texttt{affine-stalk.svg}; the Lean source is \texttt{Common22AffineStalk.lean}.
+\end{document}

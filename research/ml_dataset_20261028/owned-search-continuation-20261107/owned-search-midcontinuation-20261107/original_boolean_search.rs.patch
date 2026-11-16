@@ -1,0 +1,75 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -3,6 +3,7 @@
+ use provenance::boolean_equations as equations;
+ use provenance::{checked_model, signed_lift, Admission, CheckedMap, Error, Quote};
+ use std::mem::size_of;
++#[path="owned_search_report.rs"] mod report;
+ #[path="owned_search_capture_publication.rs"] pub(in crate::ml_dataset::solvers) mod publication;
+ #[path="capture_projection.rs"] pub(in crate::ml_dataset::solvers) mod capture_projection;
+ #[path="capture_encoding.rs"] pub(in crate::ml_dataset::solvers) mod capture_encoding;
+@@ -86,6 +87,7 @@
+     continuation:Option<continuation::Attempt>,coverage:Option<continuation::CoverageAudit>,
+     exclusion_audit:Option<exclusions::Audit>,
+     publication:publication::Publication,
++    report_taken:bool,
+     original_deadline:Instant,failure:Option<Failure>,
+     lift_records:Vec<LiftRecord>,accepted_record:Option<usize>,
+ }
+@@ -161,11 +163,13 @@
+         if let Err(e)=self.pay(1,bytes){self.fail(Failure::Admission(e),e);return}
+         if self.lift_records.try_reserve_exact(limits.partitions).is_err(){self.fail(Failure::Admission(Stop::Allocation),Stop::Allocation);return}
+         let Some(expansion)=self.expansion.as_ref()else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+-        let variables=expansion.variables();let map=expansion.source();
+-        let signed=&self.original.math.signed;let target=self.original.math.signed_target;
+-        let records=&mut self.lift_records;
+-        let mut owner=MatrixAdmission(&mut self.original.budget);
+-        let mut session=continuation::Session::new(variables,&self.normalized,limits,self.original_deadline,&mut owner);
++        let variables=expansion.variables();
++        let capture_limits=self.original.capture_limits.clone();
++        let (attempt,terminal_error,accepted,unclassified)=capture_encoding::with_continuation_parts(self,|source,expansion,budget,records,publication,sink|{
++        let map=expansion.source();
++        let signed=source.signed_domain();let target=source.signed_target();
++        let mut owner=MatrixAdmission(budget);
++        let mut session=continuation::Session::new(variables,source.normalized(),limits,source.deadline(),&mut owner);
+         let mut terminal_error=None;let mut accepted=None;let mut unclassified=false;
+         loop {
+             match session.next(){
+@@ -198,6 +202,13 @@
+                     // The model was copied from this exact callback, no next()
+                     // or other candidate mutation occurred before exclusion.
+                     if let Err(e)=session.exclude(id){terminal_error=Some(Failure::Continuation(e));break}
++                    // State remains sealed in this live Session. A checkpoint
++                    // sees the just-classified exclusion before the next search.
++                    let saved=session.with_checkpoint_owner(|attempt,_,owner|
++                        source.checkpoint_active(attempt,records,&mut *owner.0,publication,sink,&capture_limits));
++                    if let Some(Err(s))=saved.value{terminal_error=Some(Failure::Publication(s));break}
++                    if let Err(e)=saved.result{terminal_error=Some(Failure::Continuation(e));break}
++
+                 },
+                 Some(Ok(signed_lift::Outcome::RejectedUnclassified(_)))=>{unclassified=true;break},
+                 Some(Ok(signed_lift::Outcome::Deadline))=>{terminal_error=Some(Failure::Admission(Stop::Deadline));break},
+@@ -206,10 +217,12 @@
+                 None=>{terminal_error=Some(Failure::Admission(Stop::Phase));break},
+             }
+         }
+-        self.continuation=Some(session.into_attempt());
++        (session.into_attempt(),terminal_error,accepted,unclassified)
++        });
++        self.continuation=Some(attempt);
+         self.accepted_record=accepted;
+         if let Some(e)=terminal_error{
+-            let stop=match e{Failure::Admission(s)=>s,Failure::Continuation(continuation::Failure::Deadline)=>Stop::Deadline,_=>Stop::NativeFailure};
++            let stop=match e{Failure::Admission(s)|Failure::Publication(s)=>s,Failure::Continuation(continuation::Failure::Deadline)=>Stop::Deadline,_=>Stop::NativeFailure};
+             self.fail(e,stop);return
+         }
+         if accepted.is_some(){
+@@ -275,7 +288,7 @@
+         let mut out=OwnedAttempt{
+             original:OriginalParts{public_sha256:original.public_sha256,factor_sha256:original.factor_base_sha256,budget,binding,launch_sha256,math,checked,unchecked:retained_unchecked,pattern,map_bytes:retained_bytes,map_ack,publication_attempted,map_published,capture_limits,boolean_attempted},
+             sink,diagnostic,expansion:None,normalized:Vec::new(),normalization_generator:0,normalization_term:0,normalization_sort:0,
+-            continuation:None,coverage:None,exclusion_audit:None,publication:publication::Publication::default(),original_deadline,failure:None,
++            continuation:None,coverage:None,exclusion_audit:None,publication:publication::Publication::default(),report_taken:false,original_deadline,failure:None,
+             lift_records:Vec::new(),accepted_record:None,
+         };
+         let caps=match admission{Ok(c)=>c,Err(s)=>{out.fail(Failure::Admission(s),s);return out}};

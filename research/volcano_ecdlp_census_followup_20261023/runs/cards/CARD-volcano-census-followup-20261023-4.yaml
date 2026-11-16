@@ -1,0 +1,31 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-volcano-census-followup-20261023-4
+experiment_id: volcano_ecdlp_census_followup_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/volcano_ecdlp_census_followup_20261023/runs/cards/CARD-volcano-census-followup-20261023-4.receipt.json
+binds:
+  - {path: research/volcano_ecdlp_census_followup_20261023/scripts/card_instance.py, sha256: 4dc818625de0a8dd9b5263b93667c28ba8988789dd4401e1811c6398bfe60786}
+  - {path: research/volcano_ecdlp_census_followup_20261023/runs/manifest.json, sha256: fd8b2604005be57a178e10376a87cc75d29a5825865acfc7ebaec80660411666}
+  - {path: research/volcano_ecdlp_census_followup_20261023/scripts/run_phase_b.sh, sha256: 87e3d4dced2231dce95500e08986708ba46014ebb9309b7744cc09eb929f447d}
+  - {path: research/volcano_ecdlp_census_followup_20261023/scripts/prune_local_sessions.sh, sha256: 7e6f811c607c474b030a44b11bdf5cde76d336b1598fc9ad01fcb9f78d4a4005}
+  - {path: research/volcano_ecdlp_census_followup_20261023/scripts/start_phase_b.sh, sha256: 6ed66b67186e3ab37c0008c3b9d37fb9a06e3f53bdb80d32fd8bf43dde0161cb}
+  - {path: target/release/ecbench, sha256: ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35}
+commands:
+  - id: start-driver
+    argv: [bash, research/volcano_ecdlp_census_followup_20261023/scripts/start_phase_b.sh]
+    cwd: .
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/volcano_ecdlp_census_followup_20261023/runs/cards/CARD-volcano-census-followup-20261023-4.stdout
+bus_address: executor-mechanical-volcano-followup
+background: false
+write_scope:
+  - research/volcano_ecdlp_census_followup_20261023/
+stop_when:
+  - The command exits with a status other than 0.
+  - A printed line starts with REFUSED.
+  - A printed line starts with DRIVER_NOT_UP.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.
+notes: The command starts the Phase B driver detached and returns after printing DRIVER_STARTED and the pid. The driver keeps running after this card ends. Run it with python3 research/volcano_ecdlp_census_followup_20261023/scripts/card_instance.py followed by the card path, so that each run has its own receipt.

@@ -1,0 +1,17 @@
+{
+  "id": "marked23-r124-n51-xzero-leading-v1",
+  "claim_class": "exact_computation",
+  "precision_exclusive": 640,
+  "input_sha256": {
+    "donor51": "7a92cf0f1665b80bef5a38c57ca45136e530bfcf8cd13a430942af75684b7409",
+    "audit102": "e6812ce976f403b612ee0b0a80c02bdb58d6d05202c80a9920c4fdd6001eb525",
+    "norm109": "3a3f31f25a69f0ec89370f320b9161910c5e489603beaaa6cf099f076b066966",
+    "result116": "7b7de659d6a6993ef7fba9d6177ff8f8131e8d341e02f161def8c553360a66e9",
+    "result118": "3840eb0fae9e2242abda0f33b411b39f2cfba983a88fd621ef16bda8536c9150",
+    "result123": "1435f4fbc2d1b04d628b5adc326916ed1f3a1406c24271348aaffe857e0b3fe3"
+  },
+  "decision_rule": "N51 valuation only if weighted minimum is below every unknown-row bound and its F4 leading sum is nonzero",
+  "controls": ["105 source terms", "F4 conjugacy", "changed-input rejection", "byte-identical replay", "independent schoolbook rational check", "Lean finite arithmetic if useful"],
+  "backend": "local exact F2 Laurent arithmetic",
+  "cloud_cost_usd": 0
+}

@@ -1,0 +1,587 @@
+{
+  "ic_ns_per_gae_assumed": 619.51888,
+  "instance": {
+    "log2_r": 81.00000000000092,
+    "n": 83,
+    "r": "2417851639230796216685689"
+  },
+  "model": {
+    "alpha": 0.839448096209499,
+    "beta": 0.35172161427050547,
+    "drift_factor_at_m83": 0.39656718439080063,
+    "drift_ln_per_log2r_bit": -0.022711794985185708,
+    "fitted_rows": 19,
+    "ic": "alpha*n*C^2 + beta*r/(n^2*C)",
+    "k_rho_mean": 1.062308846668849,
+    "k_rho_range": [
+      0.9224518853841723,
+      1.2856580002564708
+    ],
+    "log_resid_sd": 0.13800849793561193,
+    "rho": "k_rho*sqrt(pi*r/(4n))"
+  },
+  "pcc": "[pcc:unverified]",
+  "price_usd_per_vcpu_hour_assumed": [
+    0.02,
+    0.06
+  ],
+  "probe": {
+    "label": "L0, shared 4-vCPU container, cores 0-2, provisional",
+    "ns_per_step_each": [
+      524.374126,
+      508.359957,
+      626.504901,
+      619.51888
+    ],
+    "session": "research/ecc2k130_followups_20261116/F3-m83-counted/raw/sessions/probe-k0n83-rate",
+    "status_each": [
+      "exhausted",
+      "exhausted",
+      "exhausted",
+      "exhausted"
+    ]
+  },
+  "protocol": "research/ecc2k130_followups_20261116/F3-m83-counted/PROTOCOL.md section 5",
+  "rho_m83": {
+    "core_hours_per_target": 27.651809895352475,
+    "gae": 160683586629.78748,
+    "gae_log2": 37.22543161311522,
+    "ns_per_step": 619.51888,
+    "usd_per_target": [
+      0.5530361979070495,
+      1.6591085937211485
+    ]
+  },
+  "rows": [
+    {
+      "columns": 1.0,
+      "fitted": false,
+      "ic_gae": 563.6249999999999,
+      "log2_r": 10.967946705812707,
+      "measured_over_model": 37.3720577737742,
+      "model_gae": 15.081454797373322,
+      "n": 13.0,
+      "ratio_w0": 6.8682406702208665,
+      "rho_gae": 82.0625,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 1.0,
+      "fitted": false,
+      "ic_gae": 1059.0937499999993,
+      "log2_r": 16.001122266128682,
+      "measured_over_model": 11.25594412712692,
+      "model_gae": 94.0919515980516,
+      "n": 17.0,
+      "ratio_w0": 3.8011440107671577,
+      "rho_gae": 278.625,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 2.0,
+      "fitted": false,
+      "ic_gae": 1384.625000000001,
+      "log2_r": 18.002194205049015,
+      "measured_over_model": 7.223038999368679,
+      "model_gae": 191.69562840807345,
+      "n": 19.0,
+      "ratio_w0": 4.877586966094233,
+      "rho_gae": 283.8750000000001,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 2.0,
+      "fitted": false,
+      "ic_gae": 4456.781250000002,
+      "log2_r": 22.00089368896064,
+      "measured_over_model": 3.0267833925282,
+      "model_gae": 1472.4480321260646,
+      "n": 23.0,
+      "ratio_w0": 5.483792825008652,
+      "rho_gae": 812.7187500000003,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 8.0,
+      "fitted": true,
+      "ic_gae": 15015.218750000007,
+      "log2_r": 27.78083708554834,
+      "measured_over_model": 1.5984529378049364,
+      "model_gae": 9393.594515594275,
+      "n": 37.0,
+      "ratio_w0": 5.201933591001114,
+      "rho_gae": 2886.468750000002,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 16.0,
+      "fitted": true,
+      "ic_gae": 73946.49999999999,
+      "log2_r": 32.112779548336775,
+      "measured_over_model": 1.1472576724297652,
+      "model_gae": 64455.00586053128,
+      "n": 43.0,
+      "ratio_w0": 7.350820731389092,
+      "rho_gae": 10059.624999999998,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 64.0,
+      "fitted": true,
+      "ic_gae": 446518.7812500002,
+      "log2_r": 36.635865112243344,
+      "measured_over_model": 1.0450784078914221,
+      "model_gae": 427258.64191463706,
+      "n": 47.0,
+      "ratio_w0": 9.919312480605463,
+      "rho_gae": 45015.09375000002,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 128.0,
+      "fitted": true,
+      "ic_gae": 1504310.406249999,
+      "log2_r": 39.00000151433405,
+      "measured_over_model": 1.028555635605855,
+      "model_gae": 1462546.4624127094,
+      "n": 41.0,
+      "ratio_w0": 15.020034228676888,
+      "rho_gae": 100153.59374999996,
+      "src": "FC:ic-compact",
+      "verified_targets": 32
+    },
+    {
+      "columns": 61.0,
+      "fitted": true,
+      "ic_gae": 455661.291666667,
+      "log2_r": 36.635865112243344,
+      "measured_over_model": 1.0708129813015408,
+      "model_gae": 425528.35987552605,
+      "n": 47.0,
+      "ratio_w0": 10.787401937086626,
+      "rho_gae": 42240.132918392796,
+      "src": "PX:pipeline",
+      "verified_targets": 24
+    },
+    {
+      "columns": 68.0,
+      "fitted": true,
+      "ic_gae": 704733.9583333334,
+      "log2_r": 38.0021920429723,
+      "measured_over_model": 1.0685557964179893,
+      "model_gae": 659520.0369468223,
+      "n": 57.0,
+      "ratio_w0": 12.0731528484851,
+      "rho_gae": 58371.99008225603,
+      "src": "PX:pipeline",
+      "verified_targets": 24
+    },
+    {
+      "columns": 120.0,
+      "fitted": true,
+      "ic_gae": 1476087.8749999995,
+      "log2_r": 39.00000151433405,
+      "measured_over_model": 1.0150706525324111,
+      "model_gae": 1454172.545839481,
+      "n": 41.0,
+      "ratio_w0": 12.931455021600787,
+      "rho_gae": 114147.08341283581,
+      "src": "PX:pipeline",
+      "verified_targets": 24
+    },
+    {
+      "columns": 313.0,
+      "fitted": true,
+      "ic_gae": 12059932.708333347,
+      "log2_r": 44.258533022667656,
+      "measured_over_model": 0.9438420191621332,
+      "model_gae": 12777490.79135,
+      "n": 53.0,
+      "ratio_w0": 20.021749145348032,
+      "rho_gae": 602341.6146503574,
+      "src": "PX:pipeline",
+      "verified_targets": 24
+    },
+    {
+      "columns": 298.0,
+      "fitted": true,
+      "ic_gae": 12236476.041666673,
+      "log2_r": 44.51731807271853,
+      "measured_over_model": 0.9459492323296818,
+      "model_gae": 12935658.303279877,
+      "n": 59.0,
+      "ratio_w0": 22.912352032027826,
+      "rho_gae": 534055.8675321514,
+      "src": "PX:pipeline",
+      "verified_targets": 24
+    },
+    {
+      "columns": 537.0,
+      "fitted": true,
+      "ic_gae": 39787423.0416667,
+      "log2_r": 47.21087395347554,
+      "measured_over_model": 0.9159573322085356,
+      "model_gae": 43438074.72530644,
+      "n": 61.0,
+      "ratio_w0": 21.369567917326826,
+      "rho_gae": 1861873.0708825588,
+      "src": "PX:pipeline",
+      "verified_targets": 24
+    },
+    {
+      "columns": 43.0,
+      "fitted": true,
+      "ic_gae": 508235.7916666669,
+      "log2_r": 36.635865112243344,
+      "measured_over_model": 1.0851768108444964,
+      "model_gae": 468343.76351182105,
+      "n": 47.0,
+      "ratio_w0": 12.032059478803479,
+      "rho_gae": 42240.132918392796,
+      "src": "PX:pipeline71",
+      "verified_targets": 24
+    },
+    {
+      "columns": 48.0,
+      "fitted": true,
+      "ic_gae": 784503.3750000001,
+      "log2_r": 38.0021920429723,
+      "measured_over_model": 1.0730111224154937,
+      "model_gae": 731123.2461728603,
+      "n": 57.0,
+      "ratio_w0": 13.439722954357078,
+      "rho_gae": 58371.99008225603,
+      "src": "PX:pipeline71",
+      "verified_targets": 24
+    },
+    {
+      "columns": 85.0,
+      "fitted": true,
+      "ic_gae": 1563798.4166666656,
+      "log2_r": 39.00000151433405,
+      "measured_over_model": 0.9761964352373862,
+      "model_gae": 1601930.0626583311,
+      "n": 41.0,
+      "ratio_w0": 13.699854345037227,
+      "rho_gae": 114147.08341283581,
+      "src": "PX:pipeline71",
+      "verified_targets": 24
+    },
+    {
+      "columns": 222.0,
+      "fitted": true,
+      "ic_gae": 12638467.833333347,
+      "log2_r": 44.258533022667656,
+      "measured_over_model": 0.8987419692252485,
+      "model_gae": 14062398.62619102,
+      "n": 53.0,
+      "ratio_w0": 20.982225909577288,
+      "rho_gae": 602341.6146503574,
+      "src": "PX:pipeline71",
+      "verified_targets": 24
+    },
+    {
+      "columns": 212.0,
+      "fitted": true,
+      "ic_gae": 13136357.375000007,
+      "log2_r": 44.51731807271853,
+      "measured_over_model": 0.9233607498360851,
+      "model_gae": 14226679.417911118,
+      "n": 59.0,
+      "ratio_w0": 24.597346782655034,
+      "rho_gae": 534055.8675321514,
+      "src": "PX:pipeline71",
+      "verified_targets": 24
+    },
+    {
+      "columns": 381.0,
+      "fitted": true,
+      "ic_gae": 41824850.58333336,
+      "log2_r": 47.21087395347554,
+      "measured_over_model": 0.8741824129543793,
+      "model_gae": 47844534.462758705,
+      "n": 61.0,
+      "ratio_w0": 22.463857089628394,
+      "rho_gae": 1861873.0708825588,
+      "src": "PX:pipeline71",
+      "verified_targets": 24
+    },
+    {
+      "columns": 120.0,
+      "fitted": true,
+      "ic_gae": 1550731.5007887501,
+      "log2_r": 39.00000151433405,
+      "measured_over_model": 1.0664013051446564,
+      "model_gae": 1454172.545839481,
+      "n": 41.0,
+      "ratio_w0": 14.95636008149475,
+      "rho_gae": 103683.75007950256,
+      "src": "F3:smoke",
+      "verified_targets": 8
+    },
+    {
+      "columns": 313.0,
+      "fitted": true,
+      "ic_gae": 12380807.75,
+      "log2_r": 44.258533022667656,
+      "measured_over_model": 0.9689545429671886,
+      "model_gae": 12777490.79135,
+      "n": 53.0,
+      "ratio_w0": 19.381846764530483,
+      "rho_gae": 638783.6979836901,
+      "src": "F3:smoke",
+      "verified_targets": 8
+    },
+    {
+      "columns": 537.0,
+      "fitted": true,
+      "ic_gae": 40317981.5,
+      "log2_r": 47.21087395347554,
+      "measured_over_model": 0.9281714660459224,
+      "model_gae": 43438074.72530644,
+      "n": 61.0,
+      "ratio_w0": 24.42092516544037,
+      "rho_gae": 1650960.4458825574,
+      "src": "F3:smoke",
+      "verified_targets": 8
+    }
+  ],
+  "scenarios": [
+    {
+      "columns": 970249.0,
+      "ic_core_hours_95": [
+        24465.092932129166,
+        45209.33960751275
+      ],
+      "ic_core_hours_per_target": 33182.12766979756,
+      "ic_gae": 192820047084394.3,
+      "ic_gae_95": [
+        142165698897933.5,
+        262709705613888.5
+      ],
+      "ic_gae_log2": 47.45424838168036,
+      "ic_gae_with_drift": 76466103166359.86,
+      "ratio_to_rho": 1199.9984013840117,
+      "ratio_to_rho_95": [
+        884.755573856346,
+        1634.9504708229326
+      ],
+      "ratio_to_rho_with_drift": 475.87998731031934,
+      "scenario": "rule_c0",
+      "table_TiB": 1137.0109732682322,
+      "table_bytes": 1250156786017328.0,
+      "table_entries": 78134799126083.0,
+      "usd_per_target": [
+        663.6425533959513,
+        1990.9276601878537
+      ]
+    },
+    {
+      "columns": 960410.4165510484,
+      "ic_core_hours_95": [
+        23970.351610480175,
+        44998.45482469954
+      ],
+      "ic_core_hours_per_target": 33178.66935508966,
+      "ic_gae": 192799950952782.56,
+      "ic_gae_95": [
+        139290776413026.56,
+        261484262382638.53
+      ],
+      "ic_gae_log2": 47.45409801297753,
+      "ic_gae_with_drift": 76458133700029.44,
+      "ratio_to_rho": 1199.8733348975506,
+      "ratio_to_rho_95": [
+        866.8637496494921,
+        1627.3240339419
+      ],
+      "ratio_to_rho_with_drift": 475.8303900459218,
+      "scenario": "model_optimum",
+      "table_TiB": 1114.068697821348,
+      "table_bytes": 1224931487395839.0,
+      "table_entries": 76558217962239.94,
+      "usd_per_target": [
+        663.5733871017932,
+        1990.7201613053794
+      ]
+    },
+    {
+      "columns": 3596.0,
+      "ic_core_hours_95": [
+        3923893.4052971634,
+        9262460.897337956
+      ],
+      "ic_core_hours_per_target": 5907515.849509576,
+      "ic_gae": 3.432834372736869e+16,
+      "ic_gae_95": [
+        2.2801591226840076e+16,
+        5.382379828426964e+16
+      ],
+      "ic_gae_log2": 54.93024977007628,
+      "ic_gae_with_drift": 1.3613494616762202e+16,
+      "ratio_to_rho": 213639.39184691382,
+      "ratio_to_rho_95": [
+        141903.67358039247,
+        334967.61811944644
+      ],
+      "ratio_to_rho_with_drift": 84722.37209969357,
+      "scenario": "table_cap_16GiB",
+      "table_TiB": 0.01561843859963119,
+      "table_bytes": 17172654848.0,
+      "table_entries": 1073290928.0,
+      "usd_per_target": [
+        118150.31699019152,
+        354450.9509705746
+      ]
+    },
+    {
+      "columns": 10173.0,
+      "ic_core_hours_95": [
+        1387037.489845217,
+        3274139.2613858026
+      ],
+      "ic_core_hours_per_target": 2088217.7391659878,
+      "ic_gae": 1.2134551671770772e+16,
+      "ic_gae_95": [
+        8060020646090369.0,
+        1.9025895289888324e+16
+      ],
+      "ic_gae_log2": 53.429970325256164,
+      "ic_gae_with_drift": 4812164990318818.0,
+      "ratio_to_rho": 75518.30231253547,
+      "ratio_to_rho_95": [
+        50160.821121453635,
+        118405.96596666526
+      ],
+      "ratio_to_rho_with_drift": 29948.080518055478,
+      "scenario": "table_cap_128GiB",
+      "table_TiB": 0.12499606392520946,
+      "table_bytes": 137434625712.0,
+      "table_entries": 8589664107.0,
+      "usd_per_target": [
+        41764.35478331976,
+        125293.06434995927
+      ]
+    },
+    {
+      "columns": 28774.0,
+      "ic_core_hours_95": [
+        490394.0050514418,
+        1157573.8368115083
+      ],
+      "ic_core_hours_per_target": 738295.4083903192,
+      "ic_gae": 4290205764520282.5,
+      "ic_gae_95": [
+        2849660398057910.0,
+        6726616326077794.0
+      ],
+      "ic_gae_log2": 51.92996826645113,
+      "ic_gae_with_drift": 1701354820492990.8,
+      "ratio_to_rho": 26699.713732460124,
+      "ratio_to_rho_95": [
+        17734.607857761377,
+        41862.49801341449
+      ],
+      "ratio_to_rho_with_drift": 10588.230298922106,
+      "scenario": "table_cap_1TiB",
+      "table_TiB": 0.9999970688368194,
+      "table_bytes": 1099508404928.0,
+      "table_entries": 68719275308.0,
+      "usd_per_target": [
+        14765.908167806385,
+        44297.72450341915
+      ]
+    }
+  ],
+  "schema": "f3.m83_estimate/v1",
+  "smoke": [
+    {
+      "aa_exact": true,
+      "columns": 120.0,
+      "ic": {
+        "mean_gae": 1550731.5007887501,
+        "mean_wall_ns": 562153505.25,
+        "ns_per_gae": 362.50859995045647,
+        "records": 8,
+        "verified": 8
+      },
+      "n": 41.0,
+      "r_from_records": 549756390943.0001,
+      "ratio_ic_over_rho_w0": 14.95636008149475,
+      "rho": {
+        "mean_gae": 103683.75007950256,
+        "mean_wall_ns": 12744476.125,
+        "ns_per_gae": 122.91681305149359,
+        "records": 8,
+        "verified": 8
+      },
+      "rho_aa": {
+        "mean_gae": 103683.75007950256,
+        "records": 8,
+        "verified": 8
+      },
+      "session": "research/ecc2k130_followups_20261116/F3-m83-counted/raw/sessions/smoke-k0n41"
+    },
+    {
+      "aa_exact": true,
+      "columns": 313.0,
+      "ic": {
+        "mean_gae": 12380807.75,
+        "mean_wall_ns": 7004030099.75,
+        "ns_per_gae": 565.7167319919009,
+        "records": 8,
+        "verified": 8
+      },
+      "n": 53.0,
+      "r_from_records": 21044858204113.0,
+      "ratio_ic_over_rho_w0": 19.381846764530483,
+      "rho": {
+        "mean_gae": 638783.6979836901,
+        "mean_wall_ns": 94658555.25,
+        "ns_per_gae": 148.18561517582262,
+        "records": 8,
+        "verified": 8
+      },
+      "rho_aa": {
+        "mean_gae": 638783.6979836901,
+        "records": 8,
+        "verified": 8
+      },
+      "session": "research/ecc2k130_followups_20261116/F3-m83-counted/raw/sessions/smoke-k0n53"
+    },
+    {
+      "aa_exact": true,
+      "columns": 537.0,
+      "ic": {
+        "mean_gae": 40317981.5,
+        "mean_wall_ns": 27576888408.875,
+        "ns_per_gae": 683.9848470309705,
+        "records": 8,
+        "verified": 8
+      },
+      "n": 61.0,
+      "r_from_records": 162888033982417.06,
+      "ratio_ic_over_rho_w0": 24.42092516544037,
+      "rho": {
+        "mean_gae": 1650960.4458825574,
+        "mean_wall_ns": 169388821.625,
+        "ns_per_gae": 102.60016952401877,
+        "records": 8,
+        "verified": 8
+      },
+      "rho_aa": {
+        "mean_gae": 1650960.4458825574,
+        "records": 8,
+        "verified": 8
+      },
+      "session": "research/ecc2k130_followups_20261116/F3-m83-counted/raw/sessions/smoke-k0n61"
+    }
+  ]
+}

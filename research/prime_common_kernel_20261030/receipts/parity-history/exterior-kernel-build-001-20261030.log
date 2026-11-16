@@ -1,0 +1,8 @@
+/workspace/audit/exterior-kernel-check-20261030.cpp: In function ‘unsigned int gf2rank(std::vector<long unsigned int>, unsigned int)’:
+/workspace/audit/exterior-kernel-check-20261030.cpp:21:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   21 |     if(k==rows.size())continue;std::swap(rows[k],rows[rank]);for(unsigned j=0;j<rows.size();++j)if(j!=rank&&(rows[j]&(std::uint64_t{1}<<col)))rows[j]^=rows[rank];++rank;
+      |     ^~
+/workspace/audit/exterior-kernel-check-20261030.cpp:21:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   21 |     if(k==rows.size())continue;std::swap(rows[k],rows[rank]);for(unsigned j=0;j<rows.size();++j)if(j!=rank&&(rows[j]&(std::uint64_t{1}<<col)))rows[j]^=rows[rank];++rank;
+      |                                ^~~
+cc1plus: all warnings being treated as errors

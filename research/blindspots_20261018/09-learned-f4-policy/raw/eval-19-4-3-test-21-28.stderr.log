@@ -1,0 +1,12 @@
+
+thread 'main' (6691) panicked at examples/blindspots_09_learned_f4.rs:2323:74:
+research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3.model: No such file or directory (os error 2)
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/panicking.rs:689:5
+   1: core::panicking::panic_fmt
+             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/panicking.rs:80:14
+   2: blindspots_09_learned_f4::mode_eval::{closure#3}::{closure#0}
+   3: blindspots_09_learned_f4::mode_eval
+   4: blindspots_09_learned_f4::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

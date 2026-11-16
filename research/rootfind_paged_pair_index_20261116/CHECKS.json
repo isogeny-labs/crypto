@@ -1,0 +1,82 @@
+{
+  "artifact_sha256": {
+    "research/rootfind_paged_pair_index_20261116/.gitattributes": "fd7cef9ba51e0a76b22730a6914e44899206c0af00a46159f514c2b4cf96e394",
+    "research/rootfind_paged_pair_index_20261116/AMENDMENT-20261116.md": "aca789506b4216258d4057edfb74b9c7ddfaa8f902f29297a4b4c03813e5ed67",
+    "research/rootfind_paged_pair_index_20261116/PROTOCOL.md": "94b7e91f5e74f4f01de7e58b96c94466eeabd0f34ef6e969907ae5b887ab46ef",
+    "research/rootfind_paged_pair_index_20261116/REPORT.md": "153941b6e4702726f0930f477221ee57e75d4813382ef5b5ce8944e33cd83ec1",
+    "research/rootfind_paged_pair_index_20261116/build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/rootfind_paged_pair_index_20261116/build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/rootfind_paged_pair_index_20261116/derive.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/rootfind_paged_pair_index_20261116/derive.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/rootfind_paged_pair_index_20261116/derive_storage.py": "caff9684a81beb47ca15a95bd5cc4101c9f2a93d92a7b01a3c25a8d5812274e0",
+    "research/rootfind_paged_pair_index_20261116/diagram.dot": "d87190544266746fc8c3293f2eb794d2d2917557dc15b0f8fc18b4339390f54a",
+    "research/rootfind_paged_pair_index_20261116/diagram.svg": "d325c5d230f2eeb45517d1e8791c818e2a35c37133bf3862a64c4c58ecf30917",
+    "research/rootfind_paged_pair_index_20261116/make_visuals.py": "ebc9d79b46e7ef90f8950b298ea316e346f9b515917a0bffbb91b3d876424750",
+    "research/rootfind_paged_pair_index_20261116/paged_index.rs": "5417bcd53b572c4060c5c7350900ef729a4fb9e6983ae83f980becddd98c5941",
+    "research/rootfind_paged_pair_index_20261116/report.pdf": "f4d98772cdf1296fc2997a33b0f662e19f4a428a06d8ded7fd61dcfcf196c0fb",
+    "research/rootfind_paged_pair_index_20261116/report.typ": "dc010f1b04654a81e1ad30074b2fe88492d2504429a6c9f4ebae34032c896a0a",
+    "research/rootfind_paged_pair_index_20261116/requested_backing.svg": "3fcfe04abd8b87d26ed05f3de610a23e2b8fbbc18f45dc0e80cc180174268a7c",
+    "research/rootfind_paged_pair_index_20261116/storage.json": "99c2c2c22fbe349907f229bdeb1ed4cac11a00fc3a5a53fe4ef8990a2e299862",
+    "research/rootfind_paged_pair_index_20261116/test.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/rootfind_paged_pair_index_20261116/test.stdout": "c7aaf673827102705b3643c96c9325b5fd54ee84e3e3b6d6da71ede49994a115",
+    "research/rootfind_paged_pair_index_20261116/verify-storage.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "research/rootfind_paged_pair_index_20261116/verify-storage.stdout": "827c1d04cd26815bd090a1146242bed2e6192d61c50f182bfc1dbb8f1a5fc09e",
+    "research/rootfind_paged_pair_index_20261116/verify_storage.sh": "71c7f51ed2782549808783fbcb03ff82277353a19aad4b7bcda2aacc1e70a80e"
+  },
+  "collector_integrated": false,
+  "commands": [
+    {
+      "command": "rustc --edition=2021 --test research/rootfind_paged_pair_index_20261116/paged_index.rs -o /tmp/rootfind-paged-index-tests-20261116",
+      "exit_code": 0
+    },
+    {
+      "command": "/tmp/rootfind-paged-index-tests-20261116 --nocapture",
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 4
+    },
+    {
+      "command": "python3 research/rootfind_paged_pair_index_20261116/derive_storage.py",
+      "exit_code": 0
+    },
+    {
+      "command": "sh research/rootfind_paged_pair_index_20261116/verify_storage.sh",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tools/pcc/pcc.py lint-prose research/rootfind_paged_pair_index_20261116/PROTOCOL.md research/rootfind_paged_pair_index_20261116/AMENDMENT-20261116.md research/rootfind_paged_pair_index_20261116/REPORT.md",
+      "exit_code": 0,
+      "findings": 0
+    },
+    {
+      "command": "typst compile research/rootfind_paged_pair_index_20261116/report.typ research/rootfind_paged_pair_index_20261116/report.pdf",
+      "exit_code": 0
+    }
+  ],
+  "complete_call_timing_executions": 0,
+  "environment": {
+    "jq": "jq-1.8.2",
+    "machine": "arm64",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.1",
+    "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)",
+    "typst": "typst 0.15.1 (unknown commit)"
+  },
+  "frozen_protocol_commit": "d80f3e97f1f40fa6f432f092109b59bfde553289",
+  "independent_replays": 0,
+  "input_census_sha256": {
+    "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k13.json": "b90950bf46394dd82bdc87d6da6ea597825b63b5e17a2146046cc37e7d050aa1",
+    "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k19.json": "55e434b0dcba675f951b98a78adbf690d92e1ecfdd876f3166bf8b069d1f5dda",
+    "research/rootfind_pair_collision_census_20261116/reports/run-20261116T0711Z/k23.json": "950460e945919b65bcbdeb0d48f9fe42e6355639ee5d07a56a08578c96823b35"
+  },
+  "pdf_pages_inspected": 2,
+  "pre_correction_prose_lint": {
+    "correction": "AMENDMENT-20261116.md",
+    "exit_code": 1,
+    "reason": "frozen protocol final paragraph lacked local unverified marker"
+  },
+  "schema": "rootfind-paged-pair-checks/v1",
+  "source_commit": "3007d1505840b6e1608bb8d7459970ec47126570",
+  "standalone_test_executable_sha256": "49572fbb0ab998f1b10aa16c8857febe52bc74e49e13e6925da8d6e41214be39",
+  "status": "standalone_correctness_and_derived_storage"
+}

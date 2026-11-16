@@ -1,0 +1,25 @@
+--- a/src/main_labelled.rs
++++ b/src/main_labelled.rs
+@@ -48,11 +48,17 @@
+         p: u64,
+     ) -> StepResult {
+         let choice = branch(k, p);
+-        let (kd, r0) = xadd_repaired(k, k, k0, t, acts, p);
+-        let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
+-        let (kpp, r2) = xadd_repaired(kp, kp, k0, t, acts, p);
+-        let pair = if choice == 0 { kd.zip(km) } else { km.zip(kpp) };
+-        (pair, choice, [r0, r1, r2])
++        // Proposed arm: only the selected double is evaluated.
++        // None in the unused repair slot means not evaluated, not repair failure.
++        if choice == 0 {
++            let (kd, r0) = xadd_repaired(k, k, k0, t, acts, p);
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            (kd.zip(km), choice, [r0, r1, None])
++        } else {
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            let (kpp, r2) = xadd_repaired(kp, kp, k0, t, acts, p);
++            (km.zip(kpp), choice, [None, r1, r2])
++        }
+     }
+     pub fn project_divisor(d: Divisor, t: &serde_json::Value, p: u64) -> Option<[u64; 4]> {
+         project(d, t, p)

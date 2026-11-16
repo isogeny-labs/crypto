@@ -1,0 +1,271 @@
+{
+  "id": "IDC1h5d4af0a173c60eeb",
+  "independence": "native issuance and extra checking; exact Lean coverage separated",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": null,
+  "schema": "identity.certificate/v1",
+  "seed": 2026101804,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "y",
+                  "op": "var"
+                },
+                {
+                  "args": "t",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "y",
+                  "op": "var"
+                },
+                {
+                  "args": "t",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": "y",
+                  "op": "var"
+                },
+                {
+                  "args": "t",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": "x",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "a",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": "x",
+                  "op": "var"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": "b",
+          "op": "var"
+        },
+        {
+          "args": "t",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": "t",
+              "op": "var"
+            },
+            {
+              "args": "t",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "velu-integer-lift",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "y",
+              "op": "var"
+            },
+            {
+              "args": "y",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": "y",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": "x",
+              "op": "var"
+            },
+            {
+              "args": "x",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "a",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": "x",
+                  "op": "var"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "t",
+              "op": "var"
+            },
+            {
+              "args": "x",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": "b",
+          "op": "var"
+        },
+        {
+          "args": "t",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": 2,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "t",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "t",
+                      "op": "var"
+                    },
+                    {
+                      "args": "t",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "round04 PROOF_MAP.md, exact universal integer identity; characteristic-two bridges stated separately",
+    "variables": [
+      "y",
+      "t",
+      "x",
+      "b",
+      "a"
+    ]
+  },
+  "value_digest": "6ee8df57ac12587993fac8df2822eaea87c1ed039f7aaa660e4cd6d2fede2860"
+}

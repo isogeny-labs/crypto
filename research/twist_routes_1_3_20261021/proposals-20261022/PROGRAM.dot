@@ -1,0 +1,62 @@
+digraph followup {
+  graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.25, ranksep=0.45,
+         label="Twist routes: proposed follow-up E18–E29\n2026-10-22 • designs only • no new experiment started",
+         labelloc=t, fontsize=17, fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled,dashed", fillcolor="#edf3fa", color="#527391",
+        fontname="DejaVu Sans", fontsize=10, margin="0.12,0.10"];
+  edge [style=dashed, color="#61758a", arrowsize=0.65];
+  evidence [label="Existing frozen evidence: 9dff98b\nNecessary filters and bounded native checks\nComplete-cost IC improvement remains unestablished",
+            style="rounded,filled", fillcolor="#e8e8e8", color="#656565"];
+  subgraph cluster_geometry {
+    label="Geometry and independent arithmetic"; color="#b5cadb"; fontname="DejaVu Sans";
+    E20 [label="E20 • P2\nOther small gluing primes\nNecessary filters only"];
+    E18 [label="E18 • P1\nActual 3-torsion + pairings\nToy positives, then public P-521"];
+    E19 [label="E19 • P1\nPolarized quotient + genus 2\nExplicit subgroup maps"];
+    E24 [label="E24 • P1\nFp divisor arithmetic\nIndependent class/map replay"];
+    E18 -> E19;
+    E19 -> E24 [label="certified models only", fontsize=8];
+    E24 -> E20 [style=invis];
+  }
+  subgraph cluster_collection {
+    label="Projected relation collection"; color="#b7d3be"; fontname="DejaVu Sans";
+    node [fillcolor="#edf7ef", color="#62846b"];
+    E21 [label="E21 • P1\nCoupled Frobenius predicates\nSame projected-base controls"];
+    E22 [label="E22 • P2\nAdditive energy + row yield\nDiagnostics only"];
+    E29 [label="E29 • P1\nConcrete separation proof\nProjected target-span certificates"];
+    E23 [label="E23 • P1\nGeneral mixed helpers\nFull partial-row elimination"];
+    E21 -> E22;
+    E22 -> E29 [style=invis];
+    E21 -> E23;
+    E29 -> E23;
+  }
+  subgraph cluster_solver {
+    label="Solver equivalence and selection"; color="#d4c5e0"; fontname="DejaVu Sans";
+    node [fillcolor="#f4eef9", color="#8c72a2"];
+    E25 [label="E25 • P0\nApplicable signature baseline\nField + complete-basis checks"];
+    E26 [label="E26 • P2\nBlocks / hybrid elimination\nSame projected task"];
+    E28 [label="E28 • P2\nFrozen public-feature selector\nFresh final target labels"];
+    E25 -> E26;
+    E26 -> E28;
+  }
+  E27 [label="E27 • P0\nComplete symmetric primitive pricing\nCold one-target IC + matched rho",
+       fillcolor="#fff1d7", color="#a18345"];
+  gate [label="Future result gate\nVerified output + independent replay + complete costs\nConstruction, stage and pipeline conclusions stay distinct",
+        fillcolor="#fff1d7", color="#a18345"];
+  evidence -> E18;
+  evidence -> E21;
+  evidence -> E25;
+  E26 -> E27 [style=invis];
+  {rank=same; E18; E21; E25;}
+  {rank=same; E19; E22; E26;}
+  {rank=same; E24; E29; E27;}
+  {rank=same; E20; E23; E28;}
+  E21 -> E28;
+  E22 -> E28;
+  E27 -> E28;
+  E24 -> gate;
+  E23 -> gate;
+  E28 -> gate;
+  E27 -> gate;
+  legend [shape=plaintext, style="", label="Dashed boxes/edges: proposed work and dependencies, not verified transfers.\nP0: comparison prerequisite • P1: route/bridge • P2: broader search or diagnostic\nAll twelve cards are blocked and unfunded. No scheduling or novelty claim.", fontsize=9];
+  gate -> legend [style=invis];
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "guarded-degree-invariants-final-validation/v1",
+  "completed_utc": "2026-10-30T04:21:16.493Z",
+  "formal_receipt": "verification.json",
+  "formal_receipt_sha256": "7595ad7b541cd7ba76aa855066d6c2dc2a4a9001fe43cb2f2c4cf7449ac32a56",
+  "formal_source_hashes_rechecked": true,
+  "formal": {
+    "build_jobs": 1706,
+    "audited_declarations": 28,
+    "new_named_theorems": 21,
+    "forbidden_axioms": 0,
+    "trusted_native_evaluation": 0,
+    "fresh_kernel_replay_exit": 0
+  },
+  "library": {
+    "source_commit": "4b1834891e78ca3f83b64540717042e0569d2a60",
+    "source_bindings": {
+      "src": "8d584e7de8fc3d5ee4809ec6829a07f5d19a6bb9",
+      "cargo_toml": "43c519b5f15bf7e83bdbc2875807d939a0d27e15",
+      "cargo_lock": "1c792ecacbbd8c46e82443a95b35ee9400888080"
+    },
+    "command": "RAYON_NUM_THREADS=8 cargo test --release --lib --locked -- --test-threads=1",
+    "exit_code": 0,
+    "declared": 5553,
+    "passed": 5430,
+    "failed": 0,
+    "ignored": 123,
+    "measured": 0,
+    "filtered_out": 0,
+    "seconds_reported_by_test_runner": 2097.93,
+    "binary": "target/release/deps/crypto_lib-cd696b7f650051ce",
+    "binary_sha256": "7fad896b205603054a152ef82d024253c5b3b93eacf5b2640e8007e4a99c9e94",
+    "raw_bytes": 486290,
+    "raw_sha256": "3baa26ee7619516d032ff52966f721557965641b83cbc14671eaa565c7f9bcc3",
+    "archive_bytes": 77584,
+    "archive_sha256": "b6ebb41634de9234a4300fdeae6b65c894750a647478c233c01561c33740a404",
+    "archive_round_trip_verified": true,
+    "full_raw_retention": "/workspace/scratch/guarded-degree-validation-20261030/library.log.xz",
+    "excerpt": "library-summary.txt",
+    "performance_claim": false
+  },
+  "backlog": {
+    "command": "target/release/backlog validate XP-20261030-guarded-degree-census",
+    "build_exit": 0,
+    "check_exit": 0,
+    "checker_sha256": "8cc7f580e0ca35180d0fa712fa748d525f09c364fc28ba46376ed00dee652911",
+    "build_log_sha256": "7c409b3f97a80123f6b40f67d0606838e7ec513d51ce5caf5e441b69ee9dde2e",
+    "build_log_retention": "/workspace/scratch/guarded-degree-validation-20261030/backlog-build.log",
+    "log": "backlog-check-retry1.log",
+    "log_sha256": "12efddb53bcf1f28dbc23f6ef9db50e7d6e6b201e0e22586df266d9011d24b43",
+    "failed_attempts": [
+      {
+        "exit_code": 2,
+        "log": "backlog-check.log",
+        "log_sha256": "a00411c5e9ccbdd100f01c8725a03348b5f1ca783781ec2ff6fb2dfbb6b3d0c0",
+        "reason": "Tracked backlog/schema/card.v1.json not materialized in sparse checkout"
+      }
+    ],
+    "schema_restoration": {
+      "path": "backlog/schema/card.v1.json",
+      "git_blob": "4d87ef178822276fdc601eb1c971718ffc6b886e",
+      "sha256": "77027a1296ceea4752636cf205d1b8f95bffad4cf242a997d92e66003a3c9fe7",
+      "exact_tracked_bytes": true
+    },
+    "draft_not_ready_or_funded": true
+  },
+  "journal": {
+    "inherited_commit": "4b1834891e78ca3f83b64540717042e0569d2a60",
+    "entire_inherited_journal_preserved_as_prefix": true
+  },
+  "scope": {
+    "scientific_campaign_executed": false,
+    "classical_matrix_bridge_newly_formalized": false,
+    "binary_exact_fall_newly_proved": false,
+    "all_preexisting_proof_sources_and_evidence_unchanged": true,
+    "old_configuration_receipts_not_relabelled": true
+  },
+  "note": "verification.json preserves the earlier formal-check snapshot, including then-running library status. This separate completed receipt supersedes that status without rewriting the historical receipt."
+}

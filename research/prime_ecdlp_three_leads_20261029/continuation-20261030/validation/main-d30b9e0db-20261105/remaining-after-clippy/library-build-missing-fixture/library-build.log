@@ -1,0 +1,11 @@
+   Compiling crypto v0.1.0 (/workspace/crypto)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/band.rs:478:20
+    |
+478 |           let text = include_str!(
+    |  ____________________^
+479 | |             "../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json"
+480 | |         );
+    | |_________^
+
+error: could not compile `crypto` (lib test) due to 1 previous error

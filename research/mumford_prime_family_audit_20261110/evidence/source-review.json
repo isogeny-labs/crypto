@@ -1,0 +1,24 @@
+{
+  "schema": "mumford-prime-family-source-review/v1",
+  "created": "2026-11-10T14:23:35.195413+00:00",
+  "primary_formal_source": {
+    "url": "https://github.com/leanprover-community/mathlib4/blob/56a005855ea17e0b0958f73ec801ae140b0a1679/Mathlib/NumberTheory/LSeries/PrimesInAP.lean",
+    "bytes": 25487,
+    "sha256": "30bf0b168ca305ac5c93a5a9bf62ef01bc56d5874dc83ecff87542681595f70b",
+    "author": "Michael Stoll (2024 header)",
+    "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "read_scope": "Introduction/proof outline and actual used theorem statements/proofs in DirichletsTheorem section, lines428–469. No claim of reading the entire analytic dependency stack.",
+    "used_theorem": "Nat.forall_exists_prime_gt_and_modEq",
+    "hypotheses": "q24nonzero and Nat.Coprime5,24, both discharged by kernel decisions.",
+    "effect": "Actual Dirichlet theorem proves an arbitrarily large prime congruent5mod24; quotient/remainder extracts actual family parameter."
+  },
+  "parent_review": {
+    "path": "research/mumford_family_group_audit_20261110/evidence/source-review.json",
+    "bytes": 2948,
+    "sha256": "89ef6ee3a28c9371d69c84c6839ffe7f3408edef97e30df5f0664b41ecea08fe"
+  },
+  "parent_scope": "Frozen known Stoll/Jędrzejak torsion-family attribution and complete normalized polynomial arithmetic/group/fraction proofs remain unchanged.",
+  "KB": "MCP absent/wrapper127; bounded primary formal-source/repository/Mathlib fallback. Conductor absent.",
+  "novelty": "Application of existing Dirichlet and known torsion-family results; no novelty claim.",
+  "scope": "Arbitrarily large prime orders in the actual polynomial arithmetic family, actual cardinality/order/generation/sum certificates and smoothness disparity. Genus grows with the order; full ambient/Picard geometry and typical/dominant-prime or fixed-genus asymptotics remain open."
+}

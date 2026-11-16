@@ -1,0 +1,23 @@
+status: completed
+
+card: CARD-BLINDSPOT-13-07 (sha256 dfb50f3439053d9c14ef774452f9b10f9e1bfb3d791cd2c931c37d22c697d8cf)
+commit: 68abc61e8efda8bcbd4fbbc491f41ef28156d671
+receipt: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/receipt-card-07.json sha256 f119082206d10a1ee62e0055b5409f1e667181bb88d704ff95aebb474552ff82
+command 1 (make-dirs): ["mkdir", "-p", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw", "target/blindspots-13/card-07"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-13/card-07/b13", "examples/blindspots_13_rho_negation.rs"] exit 0 (6.684 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (sweep): ["prlimit", "--as=4294967296", "target/blindspots-13/card-07/b13", "sweep", "--bits", "48", "--t0", "48", "--t1", "64", "--rs", "16", "--arms", "base,none,dbl,min2,la,per2,per4,per8,per16,per32,per64,laper16,laper32,laper64", "--seed-offset", "7000000", "--out", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t48-64.jsonl"] exit 0 (97.948 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    sweep bits=48 targets 48..64 arms ["base", "none", "dbl", "min2", "la", "per2", "per4", "per8", "per16", "per32", "per64", "laper16", "laper32", "laper64"] rs [16]: 224 records in 97.9s
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t48-64.jsonl: 97b7b245694c0956d71052974a65af5012451c0f8a0a63d7c5c92c19480114b2
+command 4 (sweep-baseb): ["prlimit", "--as=4294967296", "target/blindspots-13/card-07/b13", "sweep", "--bits", "48", "--t0", "48", "--t1", "64", "--rs", "16", "--arms", "baseb", "--seed-offset", "9000011", "--out", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t48-64-baseb.jsonl"] exit 0 (3.021 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    sweep bits=48 targets 48..64 arms ["baseb"] rs [16]: 16 records in 3.0s
+  output research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t48-64-baseb.jsonl: c4d321644685a4b56a785fe87f28660fe7c0cbd7888f01346dd81332eb95ea43
+command 5 (remove-bin): ["rm", "-f", "target/blindspots-13/card-07/b13"] exit 0 (0.006 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 6 (remove-bin-dir): ["rmdir", "target/blindspots-13/card-07"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

@@ -1,0 +1,372 @@
+{
+  "id": "IDC1hb0f2e139dc231b5a",
+  "independence": "native issuer;128 extra parsed checks and explicit source-bound kernel theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound18.lean",
+    "sha256": "8fe4332961cf54b7a20194af6dbc0053a787de1c03ae22d675435a3fb102f2e7"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610230300,
+  "statement": {
+    "degree_bound": 6,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "h",
+              "op": "var"
+            },
+            {
+              "args": "h",
+              "op": "var"
+            },
+            {
+              "args": "h",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "U",
+                  "op": "var"
+                },
+                {
+                  "args": "U",
+                  "op": "var"
+                },
+                {
+                  "args": "U",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "h",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "V",
+                          "op": "var"
+                        },
+                        {
+                          "args": "V",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "square-cube-source",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "h",
+                              "op": "var"
+                            },
+                            {
+                              "args": "h",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": "V",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "h",
+                          "op": "var"
+                        },
+                        {
+                          "args": "h",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": "V",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "x",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "h",
+                              "op": "var"
+                            },
+                            {
+                              "args": "U",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": 0,
+                              "op": "const"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "add"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": 1,
+                                      "op": "const"
+                                    },
+                                    {
+                                      "args": "h",
+                                      "op": "var"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                },
+                                {
+                                  "args": [
+                                    {
+                                      "args": "x",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": "x",
+                                      "op": "var"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": "U",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "h",
+                              "op": "var"
+                            },
+                            {
+                              "args": "h",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "U",
+                              "op": "var"
+                            },
+                            {
+                              "args": "U",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound18.square_cube_residual",
+    "variables": [
+      "h",
+      "x",
+      "U",
+      "V"
+    ]
+  },
+  "value_digest": "fb97b8f5b3310796e0152ea09e5ad0169d8d2bd4dbdefda0aa8de9df93d093e4"
+}

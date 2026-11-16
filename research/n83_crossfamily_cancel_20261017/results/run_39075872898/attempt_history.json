@@ -1,0 +1,23 @@
+{
+  "attempts": [
+    {
+      "exit_code": 1,
+      "name": "direct_path",
+      "outcome": "IMPORT_SHADOW_SELECT_BEFORE_VERDICT",
+      "stderr_sha256": "34489619d74e958c132c285923df73d4c4ba06079b322a346e9d85684ca43eec"
+    },
+    {
+      "exit_code": -15,
+      "name": "module_sequential",
+      "outcome": "INTERRUPTED_AFTER_STRATUM0_PASS_TO_AVOID_DUPLICATE_PARALLEL_REPLAY"
+    },
+    {
+      "exit_code": 0,
+      "name": "module_reuse_local_replays",
+      "outcome": "PASS_INDEPENDENT_REPLAY_AND_FROZEN_SELECTOR",
+      "stderr_bytes": 0
+    }
+  ],
+  "schema": "n83.crossfamily-cancel-audit-attempts/v1",
+  "status": "FINAL_AGGREGATE_PASS"
+}

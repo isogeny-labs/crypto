@@ -1,0 +1,40 @@
+{
+  "schema": "registry-three-way-merge/v1",
+  "status": "all-parent-records-and-aliases-preserved",
+  "parents": [
+    "9b9e3dad0a7b4638624759953760f8160bda865b",
+    "172f84c7b0143ff5b4a26d6d21ffed3bf0f0cf3b"
+  ],
+  "inputs": [
+    {
+      "file": "registry-1.json",
+      "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
+    },
+    {
+      "file": "registry-2.json",
+      "sha256": "8f60ef230aea092ebcf5821531ac4e79c8200a941b08730b1b3977e692a9b110"
+    },
+    {
+      "file": "registry-3.json",
+      "sha256": "2d1c9747484edcadd3ecee7dad242189ae60574215c902e066879d5943e5dd0c"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "docs/curves/registry.json",
+      "sha256": "6026770281ae840f090d1d2af3d42634f64d95a52b553644866f3c5afa3301bb"
+    },
+    {
+      "path": "src/cryptanalysis/curve_aliases.json",
+      "sha256": "186f321f9c0def7545ec03f0f7066a7d8de75c1c354107718d5282570ef3fc11"
+    }
+  ],
+  "curve_counts": {
+    "base": 2572,
+    "ours": 2578,
+    "theirs": 15791,
+    "merged": 15797
+  },
+  "semantically_conflicting_records": [],
+  "scope": "Metadata merge only; no research result, frozen evidence or ledger row changes. Alias text regenerated with scripts/curve_id.py alias_map_text."
+}

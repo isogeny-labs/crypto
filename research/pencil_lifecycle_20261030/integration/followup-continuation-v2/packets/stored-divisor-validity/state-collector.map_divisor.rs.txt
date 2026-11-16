@@ -1,0 +1,21 @@
+fn map_divisor(d: Divisor, alpha: u64, beta: u64, f: &Field) -> Divisor {
+    if d.degree == 0 {
+        return d;
+    }
+    let u = transform(
+        &d.u[..=d.degree],
+        alpha,
+        beta,
+        f.pow(alpha, d.degree as u64),
+        f,
+    );
+    let v = transform(&d.v[..d.degree], alpha, beta, f.pow(alpha, 3), f);
+    let mut out = Divisor {
+        degree: d.degree,
+        u: [0; 3],
+        v: [0; 2],
+    };
+    out.u[..u.len()].copy_from_slice(&u);
+    out.v[..v.len()].copy_from_slice(&v);
+    out
+}

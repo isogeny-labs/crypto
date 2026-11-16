@@ -1,0 +1,132 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded itoa v1.0.18
+  Downloaded either v1.18.0
+  Downloaded memchr v2.8.3
+  Downloaded crossbeam-epoch v0.9.21
+  Downloaded quote v1.0.47
+  Downloaded num-bigint v0.4.8
+  Downloaded autocfg v1.5.1
+  Downloaded ppv-lite86 v0.2.21
+  Downloaded indexmap v2.14.2
+  Downloaded num-traits v0.2.19
+  Downloaded hashbrown v0.17.1
+  Downloaded rand v0.8.8
+  Downloaded rand_chacha v0.3.1
+  Downloaded rayon v1.12.0
+  Downloaded proc-macro2 v1.0.107
+  Downloaded serde v1.0.229
+  Downloaded unicode-ident v1.0.27
+  Downloaded equivalent v1.0.3
+  Downloaded syn v3.0.6
+  Downloaded serde_json v1.0.151
+  Downloaded rand_core v0.6.4
+  Downloaded getrandom v0.2.17
+  Downloaded cfg-if v1.0.5
+  Downloaded zmij v1.0.23
+  Downloaded serde_core v1.0.229
+  Downloaded crossbeam-deque v0.8.8
+  Downloaded libc v0.2.190
+  Downloaded num-integer v0.1.47
+  Downloaded rayon-core v1.13.0
+  Downloaded crossbeam-utils v0.8.23
+  Downloaded hex v0.4.3
+  Downloaded serde_derive v1.0.229
+  Downloaded zerocopy v0.8.60
+   Compiling twist-route-experiments v0.1.0 (/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/runner)
+error[E0277]: the trait bound `num_bigint::BigUint: serde::Serialize` is not satisfied
+   --> src/followup/bigfield.rs:7:50
+    |
+  7 | #[derive(Clone,Debug,Eq,PartialEq,Ord,PartialOrd,Serialize,Deserialize)]
+    |                                                  ^^^^^^^^^ the trait `Serialize` is not implemented for `num_bigint::BigUint`
+  8 | pub struct F(pub [BigUint;4]);
+    |              --- required by a bound introduced by this call
+    |
+    = note: for local types consider adding `#[derive(serde::Serialize)]` to your `num_bigint::BigUint` type
+    = note: for types from other crates check whether the crate offers a `serde` feature flag
+    = help: the following other types implement trait `Serialize`:
+              &'a T
+              &'a mut T
+              ()
+              (T,)
+              (T0, T1)
+              (T0, T1, T2)
+              (T0, T1, T2, T3)
+              (T0, T1, T2, T3, T4)
+            and 137 others
+    = note: required for `[num_bigint::BigUint; 4]` to implement `Serialize`
+note: required by a bound in `serialize_newtype_struct`
+   --> /tmp/twist-cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/ser/mod.rs:922:21
+    |
+916 |     fn serialize_newtype_struct<T>(
+    |        ------------------------ required by a bound in this associated function
+...
+922 |         T: ?Sized + Serialize;
+    |                     ^^^^^^^^^ required by this bound in `Serializer::serialize_newtype_struct`
+    = note: this error originates in the derive macro `Serialize` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `num_bigint::BigUint: serde::Deserialize<'de>` is not satisfied
+ --> src/followup/bigfield.rs:8:18
+  |
+8 | pub struct F(pub [BigUint;4]);
+  |                  ^^^^^^^^^^^ the trait `Deserialize<'_>` is not implemented for `num_bigint::BigUint`
+  |
+  = note: for local types consider adding `#[derive(serde::Deserialize)]` to your `num_bigint::BigUint` type
+  = note: for types from other crates check whether the crate offers a `serde` feature flag
+  = help: the following other types implement trait `Deserialize<'de>`:
+            &'a Path
+            &'a [u8]
+            &'a str
+            ()
+            (T,)
+            (T0, T1)
+            (T0, T1, T2)
+            (T0, T1, T2, T3)
+          and 149 others
+  = note: required for `[num_bigint::BigUint; 4]` to implement `Deserialize<'_>`
+
+error[E0277]: the trait bound `num_bigint::BigUint: serde::Deserialize<'de>` is not satisfied
+    --> src/followup/bigfield.rs:8:18
+     |
+   8 | pub struct F(pub [BigUint;4]);
+     |                  ^^^^^^^^^^^ the trait `Deserialize<'_>` is not implemented for `num_bigint::BigUint`
+     |
+     = note: for local types consider adding `#[derive(serde::Deserialize)]` to your `num_bigint::BigUint` type
+     = note: for types from other crates check whether the crate offers a `serde` feature flag
+     = help: the following other types implement trait `Deserialize<'de>`:
+               &'a Path
+               &'a [u8]
+               &'a str
+               ()
+               (T,)
+               (T0, T1)
+               (T0, T1, T2)
+               (T0, T1, T2, T3)
+             and 149 others
+     = note: required for `[num_bigint::BigUint; 4]` to implement `Deserialize<'_>`
+note: required by a bound in `next_element`
+    --> /tmp/twist-cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/de/mod.rs:1771:12
+     |
+1769 |     fn next_element<T>(&mut self) -> Result<Option<T>, Self::Error>
+     |        ------------ required by a bound in this associated function
+1770 |     where
+1771 |         T: Deserialize<'de>,
+     |            ^^^^^^^^^^^^^^^^ required by this bound in `SeqAccess::next_element`
+
+warning: unused variable: `k`
+  --> src/followup/gluing.rs:40:11
+   |
+40 | fn coords(k:&Field,basis:&[Point],p:&Point)->[u64;2] {
+   |           ^ help: if this is intentional, prefix it with an underscore: `_k`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `k`
+  --> src/followup/gluing.rs:46:9
+   |
+46 | fn gp_f(k:&Field,x:&super::bigfield::F)->String {
+   |         ^ help: if this is intentional, prefix it with an underscore: `_k`
+
+For more information about this error, try `rustc --explain E0277`.
+warning: `twist-route-experiments` (bin "twist-route-experiments" test) generated 2 warnings
+error: could not compile `twist-route-experiments` (bin "twist-route-experiments" test) due to 3 previous errors; 2 warnings emitted

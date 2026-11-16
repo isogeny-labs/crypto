@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "sudo",
+    "-n",
+    "docker",
+    "--host",
+    "unix:///var/run/docker.sock",
+    "image",
+    "inspect",
+    "public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39",
+    "--format",
+    "{\"Id\":{{json .Id}},\"RepoDigests\":{{json .RepoDigests}},\"Architecture\":{{json .Architecture}},\"Os\":{{json .Os}},\"User\":{{json .Config.User}}}"
+  ],
+  "started": 1793412763.9509802,
+  "finished": 1793412764.081401,
+  "exit_code": 1,
+  "stdout": "\n",
+  "stderr": "Error response from daemon: No such image: public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39\n",
+  "timeout": false
+}

@@ -1,0 +1,328 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-shift-overlap-v1",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v5",
+  "question": "Exactly count every source/twist shifted coordinate overlap on all ten original fixtures and independently verify finite/genus-two counts and fixed Frobenius-factor controls.",
+  "claims": [
+    {
+      "id": "exact-all-shifts",
+      "text": "All fixed shift counts match an independent square-table point census, including zero and malformed-count controls.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "fixed-polynomials",
+      "text": "Exactly c=1,3 genus-two point counts and Frobenius-factor flags match PARI with ten known-cover and ten corrupted-polynomial controls.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "No novelty, cost, short-orbit mixing, general scalar map, NIST security or full-IC result.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "all-shifts",
+      "role": "baseline",
+      "description": "One native producer execution on the entire original ten-fixture all-shift panel; independent audit and embedded correctness controls certify its output.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "069fb43cd486b24b604ce9320d01caa9f8fb64b3",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-shift-overlap"
+          ]
+        ],
+        "binary_sha256": "bb0c33d7d814c8a04beba89a79178f03cc10693c22908bc73e34deaede80997e",
+        "threads": 1
+      }
+    },
+    {
+      "id": "independent",
+      "role": "reference",
+      "description": "A separate actual native invocation recomputes all counts by square-root multiplicities and checks the producer; GP and factor replay certify the fixed polynomial subset.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "069fb43cd486b24b604ce9320d01caa9f8fb64b3",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-shift-overlap"
+          ]
+        ],
+        "binary_sha256": "bb0c33d7d814c8a04beba89a79178f03cc10693c22908bc73e34deaede80997e",
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite count, no performance or sampling inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No separate experimental arm: the independent verifier and GP replay embed all ten known elliptic-cover factor controls, plus separate pre-data small-curve/unit controls. No detector-null conclusion without their pass."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No separate experimental arm: zero shift, a false plus-one count at every shift, and P+1 wrong-factor controls are embedded and explicitly counted by the independent verifier."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "fixed complete panel",
+        "levels": [
+          "all original fixtures and every shift"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One pinned Rust producer/verifier and separately pinned native PARI implementation.",
+        "how": "Record source/binary hashes before data; reopen raw hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "All ten existing fixtures; c=0..p-1; PARI c=1,3 only, no targets or seed selection.",
+        "how": "Complete finite exhaustion; never infer prefix mixing from full-universe density."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same local L0 managed host; no native clock or cost admitted.",
+        "how": "Record CPU/kernel/hypervisor; no time comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Shared author and host, deterministic exact equality only.",
+        "how": "Independent code, square-table finite census, GP factor controls and Lean sign identity."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "all-shifts",
+          "independent"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exact agreement for every shift and all 30 GP polynomial rows; all embedded controls must pass."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Two actual complete-panel exact executions, producer then independent verifier; no comparative performance.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic fixed input panel and exhaustive shifts; seed field zero is metadata only."
+    },
+    "instance_sampling": {
+      "rule": "The one instance is the complete ten-fixture panel, with every shift. No per-shift independent target inference.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact complete finite counts and necessary-factor checks, not statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Unmeasured prospective watchdog envelope: producer 600s, independent verifier 600s, GP 300s, receipt/admission allowance. Not a runtime observation."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "checked-shifts",
+        "name": "Independently verified field shifts",
+        "unit": "shifts in complete fixed panel",
+        "kind": "exact",
+        "definition": "Every c=0..p-1 on all ten fixtures, with explicit singular zero-shift distinction.",
+        "source": "overlap-audit-v1/AUDIT.json all_shifts",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "exact shift counts",
+      "GP polynomial and embedded control counts"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly all shifts on the ten fixed fixtures; 20 overlap and ten known-cover polynomials; retain bounded failures at the declared per-stage caps. No post-outcome enlargement or pruning.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admit only complete independent count equality, all embedded controls, strict GP replay and exact native factor recheck.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Exact finite equality and fixed polynomial divisibility, not runtime or DLP success.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Counts and exact characteristic polynomials only.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/bin/twist-shift-overlap.rs",
+      "sha256": "43ee0e2010ded69b759e9f9e9d93e5c45aaf76df4e91d2172b6455c698f88863"
+    },
+    "inputs": [
+      "fixed prior PLAN.json",
+      "producer records",
+      "GP receipt/stdout/stderr"
+    ],
+    "outputs": [
+      "overlap-audit-v1/AUDIT.json",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Exact per-fixture overlap ranges and factor-detection controls; native aggregates only."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/overlap-20261027"
+  },
+  "inadmissible": [
+    "Interpreting full-universe density as finite-prefix mixing or solving speed",
+    "Claiming a DLP map from a Frobenius factor flag",
+    "Calling a bounded sample of 20 genus-two polynomials a census of all genus-two factors",
+    "Dropping zeros, controls or capped runs",
+    "Post-data protocol or source replacement without an explicit later amendment",
+    "Novelty, NIST security, full IC/rho or complete formal Legendre/genus/Weil claims"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v5/LITERATURE.md",
+      "provenance": "internal",
+      "claim": "Pre-data review of repository, canonical atlas and local PARI primary help; online access failures explicit.",
+      "verified_by": "Read and recorded before source/protocol freeze."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "b7e3139b59da38041808bdd4d0028b8d8ac8348e2baa9e9ec6f4da7fe436a61d",
+    "commit": "069fb43cd486b24b604ce9320d01caa9f8fb64b3",
+    "frozen_at": "2026-10-27T07:08:27Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Existing user authorization; same documented EKS-access local fallback as execution-v4. No new paid resource."
+  }
+}

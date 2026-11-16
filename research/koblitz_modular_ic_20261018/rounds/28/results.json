@@ -1,0 +1,90 @@
+{
+  "date_utc": "2026-10-29",
+  "client_date": "2026-10-28 America/Los_Angeles",
+  "performance_measured": false,
+  "new_IC_relation_rank_claim": false,
+  "full_F2_modular_factor_transfer": false,
+  "merge_authorized": false,
+  "generic_checker_available": false,
+  "schema": "koblitz.round28/selected-hecke-images-v1",
+  "round": 28,
+  "adjugate_norms": {
+    "accepted": true,
+    "exact_functions": 4,
+    "q_coefficients_each": 1024,
+    "input_coefficients": 123904,
+    "original_M15_norms_match_exactly": true,
+    "dual_determinant_inverse_and_multiplicativity_controls": true
+  },
+  "ordinary_images": {
+    "accepted": true,
+    "selected_supports": 3,
+    "selected_first_degrees": [
+      436,
+      284,
+      83
+    ],
+    "selected_second_degrees": [
+      436,
+      284,
+      83
+    ],
+    "unresolved_first_degree": 12,
+    "unresolved_first_multiplicity": 2,
+    "unresolved_cause": "both first adjugates vanish",
+    "candidate_cubic_roots_each": 3,
+    "complete_scalar_C5_source_fibers": false
+  },
+  "proof": {
+    "named_theorems": 3,
+    "audited_declarations": 4,
+    "generated_congruence_theorems": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "run": "lean28-01",
+    "actual_Hecke_norm_specialization_geometry_formalized": false
+  },
+  "runs": [
+    {
+      "id": "dual28-01",
+      "stage": "build",
+      "build_exit": 101,
+      "status": "compiler_failure"
+    },
+    {
+      "id": "dual28-02",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": 0,
+      "singular_errors": false,
+      "markers": [
+        "DUAL28_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "eval28-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "EVAL28_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "lean28-01",
+      "stage": "proof",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 4
+    }
+  ],
+  "flow": {
+    "build_compiler_failure": 1,
+    "native_accepted": 2,
+    "proof_accepted": 1
+  }
+}

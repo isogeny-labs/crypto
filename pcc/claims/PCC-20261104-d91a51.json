@@ -1,0 +1,14 @@
+{
+ "created_at": "2026-11-04T16:04:21Z",
+ "id": "PCC-20261104-d91a51",
+ "kind": "statement",
+ "producer": {
+  "commit": "8f2f60613146eadfd4a4626003d26cc08fc98fdf",
+  "model": "",
+  "session": "https://claude.ai/code/session_01AXUKfUwhrkCU1Jp7P4AXYb"
+ },
+ "proofs": [],
+ "schema": "pcc.claim/v1",
+ "scope": "Curve25519-family miniature k = 24, 28, 32, wwalk g=1 grow=2 incumbents, ecbench counted GAE, local route L1, 32 fresh targets x 2 rounds per arm; no signed replay or recompute",
+ "statement": "Re-baseline (research/curve25519_autolab_20261104/rebaseline-seedrun): each wwalk incumbent measured with its fixed table (seed 0) and with seed=run (a fresh walk table per run), sessions ECBS1h01111fac5089 (k = 24), ECBS1hc425b2d81514 (k = 28), ECBS1h472e3dd7d7e2 (k = 32); audit 384/384 records per size, 8 replays reproduced. Mean S at w = 0, fixed vs seed=run vs rho-neg: k = 24 1.723 vs 2.105 vs 1.084 (seed=run distance 1.94x); k = 28 1.616 vs 1.883 vs 1.038 (1.81x); k = 32 1.606 vs 1.842 vs 1.010 (1.82x). The seed=run figures are the method's expected cost and replace the fixed-table incumbents in the ledger."
+}

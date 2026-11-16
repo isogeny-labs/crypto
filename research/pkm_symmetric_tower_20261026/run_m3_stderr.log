@@ -1,0 +1,10 @@
+2026-10-26T17:57:58Z stopped by operator: m=2 t=9 target 1 plain-chain exceeded the 900 s budget (ran ~55 min, 4.4 GB RSS; the F4 budget is not checked inside a step); its symmetric row was not run
+2026-10-26T17:58:03Z start m=3 run: --m 3 --t-max-m3 5 --random 2 --budget 900, wrapped in timeout 3600, 10 GB cap
+memory allocation of 60 bytes failed
+stack backtrace:
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+/bin/bash: line 1:  6009 Aborted                 timeout 3600 /home/user/crypto/target/release/examples/pkm_symmetric_tower --p 786433 --m 3 --t-max-m3 5 --random 2 --budget 900
+
+real	20m34.128s
+user	73m12.219s
+sys	1m8.591s

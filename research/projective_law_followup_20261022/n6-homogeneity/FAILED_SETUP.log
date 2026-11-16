@@ -1,0 +1,24 @@
+First check, 2026-10-25 UTC:
+Command: (cd ../formal && lake env lean ../n6-homogeneity/N6Homogeneity.lean)
+Exit: 1
+Diagnostic: object file 'Mathlib/Tactic/NormNum.olean' does not exist in the
+retained pinned Mathlib build. No theorem verdict was taken from this attempt.
+Correction: remove that optional tactic import and use Lean's `decide` for the
+closed integer counterexample. The subsequent `lake env lean` check exited 0;
+its complete axiom output is retained in build.log.
+
+Second check, 2026-10-25 UTC:
+Command: same Lean invocation after adding affine ordinate invariance.
+Exit: 1
+Diagnostic: `field_simp` was unavailable in the retained pinned Mathlib build,
+leaving the new theorem unproved in that attempt. The final proof uses the
+available `mul_div_mul_left` lemma and has a clean Lean exit. No failing
+attempt was used as theorem evidence.
+
+First identity-certificate issue attempt, 2026-10-25 UTC:
+Command: cargo run --release --example n6_homogeneity_identity -- issue
+Exit: 101
+Diagnostic: failed to build `libcrypto_lib-...rlib`: No space left on device
+on the shared 100 GB root volume. No certificate was emitted. The retry uses
+an isolated Cargo target directory on `/tmp`, which had 25 GB available at
+the retry decision; it does not remove or stop another task's files or jobs.

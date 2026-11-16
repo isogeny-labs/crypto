@@ -1,0 +1,54 @@
+{
+  "schema": "crypto.ml-dataset.software-validation/v1",
+  "recorded_utc": "2026-10-28T15:24:01.213791+00:00",
+  "source_commit": "0f55f1c333449d4c85f04448da16fbfec15249cb",
+  "source_hash_readback": "matched before and after inactive interval",
+  "library": {
+    "passed": 5067,
+    "failed": 0,
+    "ignored": 123,
+    "dataset_tests_passed": 74,
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "--",
+      "--test-threads=2"
+    ],
+    "completion_evidence": "terminal test result in complete log; original process handle unavailable on continuation, so process exit code is not separately recorded",
+    "process_exit_code_observed": null
+  },
+  "endpoint": {
+    "test_passed": 1,
+    "test_failed": 0,
+    "combinations_checked": 360,
+    "solved_instance_count": null
+  },
+  "strict_clippy": "passed with Rust1.98",
+  "changed_file_rustfmt": "passed",
+  "release_build": "passed",
+  "cli_subcommand_help_paths": 11,
+  "cli_preflight": "passed; no scientific computation",
+  "container_preflight": "passed as UID1000, network disabled, read-only root; no scientific computation or cloud permission test",
+  "binary_sha256": "b61bf3c1c123bfe95650624d53bf4f0ef96cf1f9d6a583adc61540363572e77b",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:5888f4be197f81e57bfb074b7ad6eeb9939e0cb6af8423047c19ea502bcf4011",
+  "image_pushed_and_described": true,
+  "verified_cloud_dataset_cells": 0,
+  "scientific_or_performance_evidence": false,
+  "cloud_blockers": [
+    "Unapplied scoped IAM proposal awaiting human answer; role policies unchanged at15:16UTC",
+    "Actual us-east-2 resource admission and cumulative accounting against shared USD200 total remain incomplete"
+  ],
+  "export_policy": "strict-structural-allowlist-v3",
+  "superseded_logs": "Missing sparse fixture compile attempts; not test failures or final-source validation",
+  "build_info_note": "Image build info truthfully records full library status running at build time; completed result is recorded here.",
+  "archive_readback": {
+    "receipt": "remote-readback.json",
+    "sha256": "50e49c88e80af0429f46865c087f6bcdb2fc9c2d5ff6d35be8b122f73223af97",
+    "artifact_references": 31,
+    "bytes": 27919121,
+    "fresh_s3_get_hash_verified": true
+  }
+}

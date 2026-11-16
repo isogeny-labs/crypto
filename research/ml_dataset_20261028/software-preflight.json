@@ -1,0 +1,130 @@
+{
+  "schema": "crypto.ml-dataset.software-preflight/v1",
+  "purpose": "Local software-validation calibration only; excluded from scientific corpus and performance comparisons",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "ml_dataset",
+    "--locked",
+    "--",
+    "--test-threads=2",
+    "--nocapture"
+  ],
+  "source_state": "development tree before first implementation commit; tests-3 transcript",
+  "cases": [
+    {
+      "factor_base_size": 4,
+      "m": 2,
+      "method": "bsgs",
+      "metrics": {
+        "clock_valid_for_comparison": false,
+        "counter_scope": "calling thread user space and newly created threads/children only when hardware.inherit=true; excludes kernel/hypervisor",
+        "elapsed_ns_diagnostic": "29262676",
+        "excludes": [
+          "process startup",
+          "artifact serialization outside phase",
+          "upload",
+          "preexisting worker threads"
+        ],
+        "hardware": {
+          "cycles": 29765393,
+          "cycles_scaled": 29765393,
+          "cycles_time_enabled_ns": 29228129,
+          "cycles_time_running_ns": 29228129,
+          "error": null,
+          "grouped": true,
+          "inherit": true,
+          "instructions": 115629137,
+          "instructions_scaled": 115629137,
+          "instructions_time_enabled_ns": 29228129,
+          "instructions_time_running_ns": 29228129,
+          "multiplexed": false
+        },
+        "hardware_events": [
+          "PERF_COUNT_HW_INSTRUCTIONS",
+          "PERF_COUNT_HW_CPU_CYCLES"
+        ],
+        "instructions_status": "measured_unmultiplexed",
+        "interrupted_phase_readback": false,
+        "phase": "bsgs",
+        "retired_instructions_exact_in_scope": 115629137,
+        "retired_instructions_raw": 115629137,
+        "returned_error": null,
+        "returned_ok": true,
+        "scaling": "raw counts preserved; hardware.*_scaled estimates multiplexed counts using time_enabled/time_running",
+        "schema": "crypto.ml-dataset.phase-metrics/v1",
+        "usage_after": {
+          "involuntary_context_switches": 45,
+          "major_faults": 0,
+          "minor_faults": 22571,
+          "peak_rss_native": 104324,
+          "peak_rss_unit": "KiB",
+          "scope": "cumulative worker process; peak RSS is a high-water mark, not an additive phase cost",
+          "system_cpu_us": 53064,
+          "user_cpu_us": 573096,
+          "voluntary_context_switches": 259
+        }
+      },
+      "n": 23,
+      "work_limit": 20000
+    },
+    {
+      "factor_base_size": 4,
+      "m": 2,
+      "method": "enumerate",
+      "metrics": {
+        "clock_valid_for_comparison": false,
+        "counter_scope": "calling thread user space and newly created threads/children only when hardware.inherit=true; excludes kernel/hypervisor",
+        "elapsed_ns_diagnostic": "179174",
+        "excludes": [
+          "process startup",
+          "artifact serialization outside phase",
+          "upload",
+          "preexisting worker threads"
+        ],
+        "hardware": {
+          "cycles": 508422,
+          "cycles_scaled": 508422,
+          "cycles_time_enabled_ns": 162899,
+          "cycles_time_running_ns": 162899,
+          "error": null,
+          "grouped": true,
+          "inherit": true,
+          "instructions": 1381606,
+          "instructions_scaled": 1381606,
+          "instructions_time_enabled_ns": 162899,
+          "instructions_time_running_ns": 162899,
+          "multiplexed": false
+        },
+        "hardware_events": [
+          "PERF_COUNT_HW_INSTRUCTIONS",
+          "PERF_COUNT_HW_CPU_CYCLES"
+        ],
+        "instructions_status": "measured_unmultiplexed",
+        "interrupted_phase_readback": false,
+        "phase": "enumerate",
+        "retired_instructions_exact_in_scope": 1381606,
+        "retired_instructions_raw": 1381606,
+        "returned_error": null,
+        "returned_ok": true,
+        "scaling": "raw counts preserved; hardware.*_scaled estimates multiplexed counts using time_enabled/time_running",
+        "schema": "crypto.ml-dataset.phase-metrics/v1",
+        "usage_after": {
+          "involuntary_context_switches": 45,
+          "major_faults": 0,
+          "minor_faults": 22571,
+          "peak_rss_native": 104324,
+          "peak_rss_unit": "KiB",
+          "scope": "cumulative worker process; peak RSS is a high-water mark, not an additive phase cost",
+          "system_cpu_us": 53100,
+          "user_cpu_us": 573489,
+          "voluntary_context_switches": 260
+        }
+      },
+      "n": 23,
+      "work_limit": 20000
+    }
+  ]
+}

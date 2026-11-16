@@ -1,0 +1,32 @@
+{
+  "schema": "gaudry.cubic.local-run/v1",
+  "backend": "local_user_authorized",
+  "source_revision": null,
+  "binary_sha256": null,
+  "primes": [
+    67
+  ],
+  "seeds": [
+    3,
+    11
+  ],
+  "oracles": [
+    "SymmetricPairOnly",
+    "SymmetricMeetInTheMiddle"
+  ],
+  "oracle_cli": "symmetric-pair,symmetric-mitm",
+  "rounds": 5,
+  "warmup_rounds": 1,
+  "max_residuals": 10000,
+  "timeout_seconds": 900,
+  "memory_gib": 8,
+  "automatic_retries": 0,
+  "aa_tolerance": 1.10,
+  "bootstrap_draws": 10000,
+  "bootstrap_seed": 20261115,
+  "parity_min_subgroup_order": 1073741824,
+  "reference_scope": "existing_cubic_radding_reference_not_fastest_external",
+  "purpose": "matched_sampler_successor_with_seed11_holdout",
+  "sampler": "r-adding",
+  "component_hashes": "validation/sampling-component-source.sha256"
+}

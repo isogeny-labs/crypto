@@ -1,0 +1,21 @@
+    Checking crypto v0.1.0 (/workspace/crypto)
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> examples/jv_sieve_two_large_prime_probe.rs:203:67
+    |
+203 | ...   json!({"phase":phase.name(),"primitives":work::prims_json(&t),"diagnostic_priced_bitops":work::price(&t,&widths).expect("know...
+    |                                                                 ^^ help: change this to: `t`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_borrow
+    = note: `-D clippy::needless-borrow` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_borrow)]`
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> examples/jv_sieve_two_large_prime_probe.rs:203:110
+    |
+203 | ...s_json(&t),"diagnostic_priced_bitops":work::price(&t,&widths).expect("known widths").to_string()})
+    |                                                      ^^ help: change this to: `t`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_borrow
+
+error: could not compile `crypto` (example "jv_sieve_two_large_prime_probe") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

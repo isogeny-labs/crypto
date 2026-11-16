@@ -1,0 +1,76 @@
+{
+  "schema": "pencil-controller-lineage-observation/v1",
+  "observed_utc": "2026-10-30T06:34:29.787466+00:00",
+  "run_name": "pencil-p186379-20261030-c1",
+  "scientific_submission_count": 1,
+  "root_start_build_calls_for_takeover": 0,
+  "manual_takeover_token_used": false,
+  "controller_invocations_observed": 2,
+  "prior_controller_terminal_status": "FAILED",
+  "prior_controller_phase_status": "BUILD_TIMED_OUT",
+  "successor_mechanism": "AWS CodeBuild automatic RetryBuild",
+  "worker_instance_unchanged": "i-04d58c2b309fb6549",
+  "worker_pod_uid_unchanged": "3a7ab215-49d1-4982-8c78-5a0c71646842",
+  "worker_attempt": 0,
+  "worker_restores": 0,
+  "request_deadline_unix_seconds": 1793347824,
+  "outer_expiry_unix_seconds": 1793359074,
+  "resource_accounting": "Worker time continuous across controller ownership transition; both controller invocations retained separately; no refund or zero-cost inference.",
+  "source_of_auto_retry_semantics": "https://docs.aws.amazon.com/codebuild/latest/APIReference/API_AutoRetryConfig.html",
+  "previous_manual_plan": "Not executed: pre-action live reconciliation discovered already active automatic successor. Preserve original independent-review.json as superseded plan, not execution evidence.",
+  "project_timeout_observation": "Project readback1500 minutes; both actual controller builds45 minutes. Cause of discrepancy not established here; actual build limits determine observations.",
+  "timing_qualified": false,
+  "scientific_result_claim": null,
+  "evidence": [
+    {
+      "path": "automatic-successor-build.json",
+      "sha256": "f8cc40bf05e6e02820b13737c86effaa5d37b07e7885219f1cfa915e3c83c6d2",
+      "bytes": 6606
+    },
+    {
+      "path": "automatic-successor-review.json",
+      "sha256": "8c85ea439978eaa1dd46ec795c2d8d97baf9172e6efc9b222e41604e227cb14e",
+      "bytes": 8863
+    },
+    {
+      "path": "independent-review.json",
+      "sha256": "29930c343935b23fd705798e714229e450bba8e73f544243997ca4a27cf1d850",
+      "bytes": 10965
+    },
+    {
+      "path": "original-build-observed.json",
+      "sha256": "40d516b6bbb618bd0a7f01b3963afd3c154b483d0db0030a4fc6c22a31849f3e",
+      "bytes": 7171
+    },
+    {
+      "path": "project-settings-observed.json",
+      "sha256": "f23b132cee7730a8d2ff5019167203ebffdad4c187c1c464edb1fefed56adb89",
+      "bytes": 521
+    },
+    {
+      "path": "scope-review.json",
+      "sha256": "2e6ca3a985d6e944d7299e98e4ef1495d904875fe5e5523d90967ee70f606a30",
+      "bytes": 3180
+    },
+    {
+      "path": "state-after-automatic-successor.json",
+      "sha256": "7e339924d96ce36b6a51a447b5c76b4de5f2f64c1568df44758dd2d4047ec09a",
+      "bytes": 4105
+    },
+    {
+      "path": "state-before.json",
+      "sha256": "03683730e36337ae0e75eeb5912f031a728198cf97ebda6499f5a1ab800b1e54",
+      "bytes": 4105
+    },
+    {
+      "path": "v5-native-validation.json",
+      "sha256": "aeac6c160f7b21e8ed1f796bbb5307b948da39d0a06d20da52c4ed63436439e1",
+      "bytes": 141
+    },
+    {
+      "path": "worker-before.json",
+      "sha256": "f69bc8684c88b9292de607766384a7b38a36ead4d5ecfcc2253430a90cba1773",
+      "bytes": 127
+    }
+  ]
+}

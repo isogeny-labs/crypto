@@ -1,0 +1,39 @@
+proc require96(int ok,string tag){if(!ok){print("DISCRIMINANT96_FATAL "+tag);exit;}}
+execute(read("marked23-field51.sing"));
+string donorF96=string(f23);
+ring polyRing96=2,(x,y),dp;
+execute("poly f96="+donorF96+";");
+require96(deg(f96,y)==7 && leadcoef(f96)==1,"MONIC_DEGREE7_SOURCE");
+poly f0_96=subst(f96,x,0);
+poly f1_96=subst(f96,x,1);
+require96(f0_96==y^4*(y+1)^3,"X0_SPECIALIZATION");
+require96(f1_96==y^3*(y+1)^4,"X1_SPECIALIZATION");
+poly derivative96=diff(f96,y);
+require96(derivative96!=0,"SEPARABLE_GENERIC_SOURCE");
+poly disc96=resultant(f96,derivative96,y);
+require96(disc96!=0 && subst(disc96,y,0)==disc96,"NONZERO_UNIVARIATE_RESULTANT");
+require96(subst(disc96,x,0)==0 && subst(disc96,x,1)==0,"BOTH_REPEATED_FIBERS_DETECTED");
+list factorization96=factorize(disc96,2);
+ideal factors96=factorization96[1];intvec exponents96=factorization96[2];
+require96(size(factors96)==size(exponents96),"FACTOR_SHAPE");
+poly product96=1;int index96;int total96=0;
+for(index96=1;index96<=size(factors96);index96++){
+ require96(deg(factors96[index96],y)==0 && exponents96[index96]>0,"BAD_FACTOR");
+ product96=product96*factors96[index96]^exponents96[index96];
+ total96=total96+deg(factors96[index96],x)*exponents96[index96];
+ print("DISCRIMINANT96_FACTOR index="+string(index96)+" degree="+string(deg(factors96[index96],x))+" multiplicity="+string(exponents96[index96])+" polynomial="+string(factors96[index96]));
+}
+require96(product96==disc96 && total96==deg(disc96,x),"FULL_FACTOR_PRODUCT");
+require96(product96+1!=disc96,"CORRUPTED_FACTOR_PRODUCT_ACCEPTED");
+link out96="ASCII:w discriminant96.sing";open(out96);
+write(out96,"poly f96="+string(f96)+";");
+write(out96,"poly derivative96="+string(derivative96)+";");
+write(out96,"poly disc96="+string(disc96)+";");
+write(out96,"ideal factors96;intvec exponents96;");
+for(index96=1;index96<=size(factors96);index96++){
+ write(out96,"factors96["+string(index96)+"]="+string(factors96[index96])+";exponents96["+string(index96)+"]="+string(exponents96[index96])+";");
+}
+close(out96);
+print("DISCRIMINANT96_RESULT source_degree=7 discriminant_degree="+string(deg(disc96,x))+" factors="+string(size(factors96))+" complete=1");
+print("DISCRIMINANT96_ALL_CHECKS_PASS");
+quit;

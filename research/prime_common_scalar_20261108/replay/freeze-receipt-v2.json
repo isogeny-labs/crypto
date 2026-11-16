@@ -1,0 +1,15 @@
+{
+  "schema": "native-protocol-freeze-receipt/v1",
+  "protocol_version": 2,
+  "protocol_sha256": "7d5b77252d2930a0e8da185f08e0454809af934270dfa94c1a1a44bd50d57635",
+  "source_commit": "a26eb8fd31d2a102c9f12dbe98178e4cbfd57610",
+  "filed_at": "2026-11-09T20:07:22Z",
+  "filed_before_affected_data": true,
+  "canonicalization": "jq -cS del(.freeze), remove terminal newline, SHA256",
+  "v1_canonicalization_control": {
+    "expected": "d509c8b852fc7d561380f89b5e66c02165a9b23e9ffee960996cf3117c9f4f1a",
+    "observed": "d509c8b852fc7d561380f89b5e66c02165a9b23e9ffee960996cf3117c9f4f1a"
+  },
+  "reviewed_change": "Owner-authorized checkpoint transport only; unchanged-field byte comparison passed",
+  "standing": "unsigned producer metadata"
+}

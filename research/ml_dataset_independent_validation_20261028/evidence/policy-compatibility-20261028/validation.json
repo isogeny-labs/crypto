@@ -1,0 +1,60 @@
+{
+  "schema": "ml-dataset.consumer-policy-validation/v1",
+  "source_commit": "8d55079e37f2c5f2f506edf20670f018354edd56",
+  "producer_source_commit": "d71ec2ef5ab9b7f2a038f61c941af10297a775ad",
+  "producer_binary_sha256": "63c95dd788f267d1c4cc6323a33b67f607390dc669730c13e99eb156a0004c07",
+  "consumer_binary_sha256": "182d25fc9abb04907f05590ea92b9e88eb07c55b1fa4342141953da4c12b7b92",
+  "software_fixture": true,
+  "scientific_observation": false,
+  "release_tests": {
+    "library_passed": 80,
+    "integration_passed": 7,
+    "ignored_opt_in": 1,
+    "opt_in_separately_passed": 1,
+    "failed": 0
+  },
+  "strict_all_target_clippy": true,
+  "format_check": true,
+  "root_library_gate": "owned by parent; not certified by this record",
+  "interoperability": {
+    "planned": 72,
+    "sealed": 72,
+    "audited": 72,
+    "positive_certificates_arithmetic_checked": 22,
+    "producer_native_replay": true,
+    "export_rows": 72,
+    "unsupported_feature_rows": 12,
+    "root_artifact_cells": 6,
+    "rehashed_substitutions_rejected": true
+  },
+  "independent_claims": {
+    "positive_group_equations": true,
+    "declared_point_domain": true,
+    "construction": false,
+    "subgroup_order": false,
+    "root_sets": false,
+    "total_instructions": false,
+    "unsat": false,
+    "fall_degree": false,
+    "producer_training_export_equivalence": false
+  },
+  "cloud": {
+    "compute_launched": false,
+    "iam_changed": false,
+    "worker_role_publication_tested": false
+  },
+  "failed_attempts": [
+    {
+      "id": "interop-01",
+      "stage": "producer provenance admission",
+      "generated_cells": 0,
+      "error": "build with CRYPTO_BUILD_GIT_COMMIT before generation"
+    },
+    {
+      "id": "initial-checkpoint-gate",
+      "stage": "missing RESUME.md",
+      "generated_cells": 0,
+      "resolution": "complete resume plus verified canonical S3 checkpoint before interop-02"
+    }
+  ]
+}

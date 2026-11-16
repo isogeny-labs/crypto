@@ -1,0 +1,77 @@
+{
+  "schema": "ml-dataset.koblitz-m4-campaign-audit/v1",
+  "protocol_file_sha256": "0cff54326c907476c85f5c78bb8eaf5094807a1453cb027d0d16e20b0492ffea",
+  "plan_file_sha256": "91e001cd6dfbea0f4e3a76c1a1fcb2843211e1cf482576498843488e4339e84d",
+  "planned_cells": 4,
+  "observed_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "one_attempt_marker_per_index": true,
+  "native_verified_and_exported_cells": 4,
+  "f6_pair_domain_cells": 2,
+  "positive_pdp_witnesses": 0,
+  "independently_solved_bsgs_ecdlp_cells": 2,
+  "archive_total_bytes": 541006,
+  "producer_archive_and_pointer_fresh_s3_get_flags": 4,
+  "independent_s3_sampled_indices": [
+    0,
+    1,
+    3
+  ],
+  "strict_export_rows": {
+    "features.jsonl": 4,
+    "ecdlp-features.jsonl": 4,
+    "restricted/targets.jsonl": 4,
+    "restricted/ecdlp-records.jsonl": 4
+  },
+  "cells": [
+    {
+      "index": 0,
+      "solver": "f6",
+      "twist": false,
+      "f6_pair_domain_promoted": true,
+      "positive_pdp_promoted": false,
+      "ecdlp_solve_promoted": false,
+      "archive_bytes": 38240,
+      "archive_sha256": "dd72cecad83567ff3767c6a9fb0e1c110838bfa9277a62ada2be07d55224f811",
+      "pointer_sha256": "13fd18b837d49b045ccab774920ccd493db38a9b93f9e31bd059d08914f63e2c"
+    },
+    {
+      "index": 1,
+      "solver": "bsgs",
+      "twist": false,
+      "f6_pair_domain_promoted": false,
+      "positive_pdp_promoted": false,
+      "ecdlp_solve_promoted": true,
+      "archive_bytes": 234986,
+      "archive_sha256": "b3830d7088ebfdbfb4b5bd8b7bd644470c412f2a44dacaaa4cd6fb3befce911a",
+      "pointer_sha256": "767b1e98a473817c439c4f28f44e0537499043804bb125ecf6e9087623ef0e8b"
+    },
+    {
+      "index": 2,
+      "solver": "f6",
+      "twist": true,
+      "f6_pair_domain_promoted": true,
+      "positive_pdp_promoted": false,
+      "ecdlp_solve_promoted": false,
+      "archive_bytes": 38309,
+      "archive_sha256": "6b28bad50fae3d73f083258bc5b1201778676409636d5fc91b564f0a34dd544a",
+      "pointer_sha256": "9b0d07f6145ef60e54ab4c528de100dead8da0aa4ef831a7c9f7089aa0d6464d"
+    },
+    {
+      "index": 3,
+      "solver": "bsgs",
+      "twist": true,
+      "f6_pair_domain_promoted": false,
+      "positive_pdp_promoted": false,
+      "ecdlp_solve_promoted": true,
+      "archive_bytes": 229471,
+      "archive_sha256": "f3a6de101521803ab659a324e2328844a5a75a9477281757a52fc82d341c895e",
+      "pointer_sha256": "cb87f9ed21e6838518bcab17c3adcdf42cf6b0fb41d5184de02a6110bbe0005b"
+    }
+  ],
+  "broader_matrix_claim": false
+}

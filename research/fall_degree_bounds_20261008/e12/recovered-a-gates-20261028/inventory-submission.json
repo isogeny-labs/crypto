@@ -1,0 +1,49 @@
+{
+    "Command": {
+        "CommandId": "838abbae-fe26-489d-b63e-606d6ac5803f",
+        "DocumentName": "AWS-RunShellScript",
+        "DocumentVersion": "$DEFAULT",
+        "Comment": "Read-only inventory of existing E12a gate artifacts omitted by output archive",
+        "ExpiresAfter": "2026-10-28T10:19:01.218000+00:00",
+        "Parameters": {
+            "commands": [
+                "#!/bin/sh\nset -eu\njq -e '.id == \"20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f\"' /work/job.json >/dev/null\njq '{id,deadline}' /work/job.json\ncd /work/fall-degree-source/research/fall_degree_bounds_20261008/e7/validate\nset -- *.jsonl\n[ \"$#\" -le 32 ]\nfor path do\n  [ -f \"$path\" ] && [ ! -L \"$path\" ]\n  stat -c '%n %s' \"$path\"\n  sha256sum \"$path\"\ndone\n"
+            ],
+            "executionTimeout": [
+                "60"
+            ]
+        },
+        "InstanceIds": [
+            "i-0f1e979a30bc4f52b"
+        ],
+        "Targets": [],
+        "RequestedDateTime": "2026-10-28T10:17:01.218000+00:00",
+        "Status": "Pending",
+        "StatusDetails": "Pending",
+        "OutputS3Region": "us-east-1",
+        "OutputS3BucketName": "",
+        "OutputS3KeyPrefix": "",
+        "MaxConcurrency": "50",
+        "MaxErrors": "0",
+        "TargetCount": 1,
+        "CompletedCount": 0,
+        "ErrorCount": 0,
+        "DeliveryTimedOutCount": 0,
+        "ServiceRole": "",
+        "NotificationConfig": {
+            "NotificationArn": "",
+            "NotificationEvents": [],
+            "NotificationType": ""
+        },
+        "CloudWatchOutputConfig": {
+            "CloudWatchLogGroupName": "",
+            "CloudWatchOutputEnabled": false
+        },
+        "TimeoutSeconds": 60,
+        "AlarmConfiguration": {
+            "IgnorePollAlarmFailure": false,
+            "Alarms": []
+        },
+        "TriggeredAlarms": []
+    }
+}

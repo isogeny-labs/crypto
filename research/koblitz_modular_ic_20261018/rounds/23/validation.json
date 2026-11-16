@@ -1,0 +1,83 @@
+{
+  "schema": "koblitz.exact-computation-validation/v1",
+  "round": 23,
+  "scientific_source_revision": "5cf618dbff2c01b9675884a685fac477177ba716",
+  "scientific_export": "export.json",
+  "science_archive_unchanged": true,
+  "validation_archive": {
+    "path": "validation.tar.xz",
+    "bytes": 86448,
+    "sha256": "18cbc9d4ba2fd543ae8dad222ab0253c59becda544db37557c19f71da6879365",
+    "members": 29,
+    "manifest": "validation.sha256"
+  },
+  "combined_retained_raw_files": 84,
+  "environment": {
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "lean": "4.34.1 (5045d0056413266e57c625dcd7c365b10e377c52)",
+    "root_test_timeout_seconds": 1200
+  },
+  "root_source_identity": {
+    "merged_pr_base": "fd85e76f9d7fc7947ca7d81b81e1cf5821446015",
+    "base_src_tree": "e3d7636a8f3472d9c4ed5583910a70c25b369d95",
+    "tested_src_tree": "e3d7636a8f3472d9c4ed5583910a70c25b369d95",
+    "src_Cargo_isogeny_algos_changed_by_R23": false,
+    "tests_or_expectations_weakened": false
+  },
+  "compile": {
+    "second_attempt_exit": 0,
+    "initial_failure": "12 missing compile-time sparse include files;exact HEAD fixtures restored"
+  },
+  "first_full_run": {
+    "passed": 4896,
+    "failed": 20,
+    "ignored": 122,
+    "exit": 101,
+    "cause": "missing sparse runtime inputs"
+  },
+  "first_failure_replay": {
+    "passed": 20,
+    "failed": 0,
+    "exit": 0,
+    "exact_tracked_inputs_restored": true
+  },
+  "second_full_run": {
+    "passed": 4913,
+    "failed": 3,
+    "ignored": 122,
+    "exit": 101,
+    "failures": [
+      "GPU capsule lock conflict",
+      "CPU observation absent",
+      "Hilbert cheaper-count18 below required20;basis identities pass"
+    ]
+  },
+  "second_failure_diagnostic_replay": {
+    "passed": 3,
+    "failed": 0,
+    "exit": 0,
+    "replays": 1
+  },
+  "full_suite_status": "no_single_clean_full_run",
+  "artifact_utility_tests": {
+    "passed": 18,
+    "exit": 0
+  },
+  "artifact_policy_check": {
+    "exit": 0
+  },
+  "lean": {
+    "theorems_audited": 15,
+    "failing": 0,
+    "trusted_native": 0,
+    "present_dependency_revisions_checked": 9,
+    "revision_mismatches": 0
+  },
+  "geometry_formalization": "exact algebra and exposed conditional steps;full scheme/DVR bridge written in CM.md",
+  "limitations": [
+    "full parallel root suite failed3 unchanged tests;targeted diagnostics passed",
+    "first-host ignored raw logs unavailable after migration;required certificates replayed",
+    "complete zero/pole divisors,RR,map and other original work remain open"
+  ],
+  "merge_or_gate_waiver_authorized": false
+}

@@ -1,0 +1,110 @@
+import Loop
+import WordAdd11
+import WordErrorExclusion
+set_option autoImplicit false
+namespace WordCoefficient
+open PencilWordRefinement AffineCoefficientLoop
+
+def smallPow (p a : UInt64) (e : Fin 6) : UInt64 := wordPowLoop 3 p a (UInt64.ofNat e.val) 1
+
+def powExpr (a : UInt64) (e : Fin 6) : MulExpr :=
+ match e.val with
+ | 0 => .leaf 1
+ | 1 => .mul (.leaf 1) (.leaf a)
+ | 2 => .mul (.leaf 1) (.mul (.leaf a) (.leaf a))
+ | 3 => .mul (.mul (.leaf 1) (.leaf a)) (.mul (.leaf a) (.leaf a))
+ | 4 => .mul (.leaf 1) (.mul (.mul (.leaf a) (.leaf a)) (.mul (.leaf a) (.leaf a)))
+ | _ => .mul (.mul (.leaf 1) (.leaf a)) (.mul (.mul (.leaf a) (.leaf a)) (.mul (.leaf a) (.leaf a)))
+
+theorem smallPow_unroll (p a : UInt64) (e : Fin 6) : smallPow p a e=(powExpr a e).word p := by
+ fin_cases e <;> rfl
+
+theorem smallPow_decode (p a : UInt64) (e : Fin 6) (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (ha : a.toNat<p.toNat) :
+ (smallPow p a e).toNat<p.toNat ∧ ((smallPow p a e).toNat : ZMod p.toNat)=(a.toNat : ZMod p.toNat)^e.val := by
+ have hg : (powExpr a e).good p := by fin_cases e <;> simp [powExpr,MulExpr.good,ha,hp]
+ have h := MulExpr.composition p (by omega) hb (powExpr a e) hg
+ rw [smallPow_unroll]
+ refine ⟨h.1,?_⟩
+ rw [h.2]
+ fin_cases e <;> simp [powExpr,MulExpr.field] <;> ring
+
+def chooseCoeff (p : UInt64) (k j : Fin 6) : UInt64 := chooseWord k.val j.val%p
+
+theorem chooseCoeff_decode (p : UInt64) (k j : Fin 6) (hj : j.val≤k.val) :
+ ((chooseCoeff p k j).toNat : ZMod p.toNat)=(k.val.choose j.val : ZMod p.toNat) := by
+ rw [chooseCoeff,UInt64.toNat_mod,ZMod.natCast_mod,choose_word_small k j hj]
+
+theorem chooseCoeff_canonical (p : UInt64) (k j : Fin 6) (hp : 0<p.toNat) :
+ (chooseCoeff p k j).toNat<p.toNat := by
+ rw [chooseCoeff,UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+
+def difference (k j : Fin 6) : Fin 6 := ⟨k.val-j.val,by omega⟩
+
+def termExpr (p c a b iw : UInt64) (k j : Fin 6) : MulExpr :=
+ .mul (.mul (.leaf c) (.mul (.leaf (chooseCoeff p k j))
+  (.mul (.leaf (smallPow p a j)) (.leaf (smallPow p b (difference k j)))))) (.leaf iw)
+
+def termWord (p c a b iw : UInt64) (k j : Fin 6) : UInt64 := (termExpr p c a b iw k j).word p
+
+theorem term_decode (p c a b iw : UInt64) (k j : Fin 6) (hj : j.val≤k.val)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hc : c.toNat<p.toNat) (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (hi : iw.toNat<p.toNat) :
+ (termWord p c a b iw k j).toNat<p.toNat ∧
+ ((termWord p c a b iw k j).toNat : ZMod p.toNat)=
+ (c.toNat : ZMod p.toNat)*((k.val.choose j.val : ZMod p.toNat)*
+ ((a.toNat : ZMod p.toNat)^j.val*(b.toNat : ZMod p.toNat)^(k.val-j.val)))*(iw.toNat : ZMod p.toNat) := by
+ have hpa := smallPow_decode p a j hp hb ha
+ have hpb := smallPow_decode p b (difference k j) hp hb hbeta
+ have hchoose := chooseCoeff_canonical p k j (by omega)
+ have hg : (termExpr p c a b iw k j).good p := by
+  simp only [termExpr,MulExpr.good]
+  exact ⟨⟨hc,⟨hchoose,⟨hpa.1,hpb.1⟩⟩⟩,hi⟩
+ have h := MulExpr.composition p (by omega) hb (termExpr p c a b iw k j) hg
+ refine ⟨h.1,?_⟩
+ change (((termExpr p c a b iw k j).word p).toNat : ZMod p.toNat)=_
+ rw [h.2]
+ simp only [termExpr,MulExpr.field]
+ rw [chooseCoeff_decode p k j hj,hpa.2,hpb.2]
+ rfl
+theorem term_literal (p c a b iw : UInt64) (k j : Fin 6) :
+ termWord p c a b iw k j=
+ (((c*((chooseCoeff p k j*((smallPow p a j*smallPow p b (difference k j))%p))%p))%p)*iw)%p := rfl
+
+def InverseWitness (p s iw : UInt64) : Prop :=
+ s.toNat<p.toNat ∧ s≠0 ∧ iw.toNat<p.toNat ∧ (s*iw)%p=1
+
+theorem inverse_witness_decode (p s iw : UInt64) [Fact p.toNat.Prime]
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (h : InverseWitness p s iw) :
+ (iw.toNat : ZMod p.toNat)=(s.toNat : ZMod p.toNat)⁻¹ := by
+ have hn : (s.toNat : ZMod p.toNat)≠0 := canonical_word_nonzero p s (by omega) h.1 h.2.1
+ have hm := uint64_mul_decode p s iw hb h.1 h.2.2.1
+ rw [h.2.2.2] at hm
+ have hprod : (s.toNat : ZMod p.toNat)*(iw.toNat : ZMod p.toNat)=1 := by simpa using hm.symm
+ calc
+  (iw.toNat : ZMod p.toNat) = 1*(iw.toNat : ZMod p.toNat) := by ring
+  _ = ((s.toNat : ZMod p.toNat)⁻¹*(s.toNat : ZMod p.toNat))*(iw.toNat : ZMod p.toNat) := by rw [inv_mul_cancel₀ hn]
+  _ = (s.toNat : ZMod p.toNat)⁻¹*((s.toNat : ZMod p.toNat)*(iw.toNat : ZMod p.toNat)) := by ring
+  _ = (s.toNat : ZMod p.toNat)⁻¹ := by rw [hprod,mul_one]
+
+def updateWord (p out c a b iw : UInt64) (k j : Fin 6) : UInt64 :=
+ wordAdd p out (termWord p c a b iw k j)
+
+theorem update_decode (p out c a b s iw : UInt64) [Fact p.toNat.Prime]
+ (k j : Fin 6) (hj : j.val≤k.val) (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (ho : out.toNat<p.toNat) (hc : c.toNat<p.toNat) (ha : a.toNat<p.toNat)
+ (hbeta : b.toNat<p.toNat) (hi : InverseWitness p s iw) :
+ (updateWord p out c a b iw k j).toNat<p.toNat ∧
+ ((updateWord p out c a b iw k j).toNat : ZMod p.toNat)=
+ (out.toNat : ZMod p.toNat)+(c.toNat : ZMod p.toNat)*
+ ((k.val.choose j.val : ZMod p.toNat)*((a.toNat : ZMod p.toNat)^j.val*
+ (b.toNat : ZMod p.toNat)^(k.val-j.val)))*(s.toNat : ZMod p.toNat)⁻¹ := by
+ have ht := term_decode p c a b iw k j hj hp hb hc ha hbeta hi.2.2.1
+ have hsum := wordAdd_composition p out (termWord p c a b iw k j) (by omega) hb ho ht.1
+ refine ⟨hsum.1,?_⟩
+ change ((wordAdd p out (termWord p c a b iw k j)).toNat : ZMod p.toNat)=_
+ rw [hsum.2,ht.2,inverse_witness_decode p s iw hp hb hi]
+theorem smallExponent_drained (e : Fin 6) :
+ (((UInt64.ofNat e.val >>> 1) >>> 1) >>> 1)=0 := by
+ fin_cases e <;> decide
+end WordCoefficient

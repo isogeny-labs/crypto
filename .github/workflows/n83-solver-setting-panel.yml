@@ -1,0 +1,126 @@
+name: N83 exact-XCNF paired solver-setting panel
+
+on:
+  push:
+    branches:
+      - codex/n83-aws-handoff-20261025
+    paths:
+      - .github/workflows/n83-solver-setting-panel.yml
+      - research/koblitz_n83_factor_base_sweep_20261008/verification/solver-setting-panel-20261025/**
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: n83-solver-setting-panel
+  cancel-in-progress: false
+
+jobs:
+  solve-setting-stratum:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-handoff-20261025'
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-solver-setting-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-solver-setting-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      matrix:
+        stratum:
+          - hash_5_1_t1_m0
+          - gray_5_1_t1_m0
+          - hash_4_2_t1_m0
+          - gray_4_2_t1_m0
+          - hash_5_1_t2_m0
+          - gray_5_1_t2_m0
+          - hash_4_2_t2_m0
+          - gray_4_2_t2_m0
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PANEL: research/koblitz_n83_factor_base_sweep_20261008/verification/solver-setting-panel-20261025
+      PRIOR_SMOKE: research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-actions-preflight-20261025/smoke.py
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out frozen panel
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          path: source
+      - name: Fetch exact prior XCNF artifact and pinned solver
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/n83-setting-meta" "$RUNNER_TEMP/n83-setting-bin"
+          SOURCE_ID="$(python3 -c 'import json,os; p=json.load(open("source/"+os.environ["PANEL"]+"/protocol.json")); s=os.environ["MATRIX_STRATUM"]; print(next(x["source_artifact_id"] for x in p["strata"] if x["id"]==s))')"
+          gh api "repos/aburan28/crypto/actions/artifacts/$SOURCE_ID" \
+            > "$RUNNER_TEMP/n83-setting-meta/source-artifact-metadata.json"
+          gh api "repos/aburan28/crypto/actions/artifacts/$SOURCE_ID/zip" \
+            > "$RUNNER_TEMP/n83-setting-source.zip"
+          gh api repos/aburan28/crypto/actions/artifacts/12593635829/zip \
+            > "$RUNNER_TEMP/n83-setting-preflight.zip"
+          printf '%s  %s\n' \
+            00713618c7c09188a9f75fef6ce6323af376428cc48d537491394c91429d1237 \
+            "$RUNNER_TEMP/n83-setting-preflight.zip" | sha256sum -c \
+            > "$RUNNER_TEMP/n83-setting-meta/preflight.sha256-check"
+          unzip -q "$RUNNER_TEMP/n83-setting-preflight.zip" cryptominisat5 \
+            -d "$RUNNER_TEMP/n83-setting-bin"
+          chmod 755 "$RUNNER_TEMP/n83-setting-bin/cryptominisat5"
+          printf '%s  %s\n' \
+            0936420373bbdf22c2a3d37291e3a4ab4e041d7f41ae3ceed003373fb596ddb2 \
+            "$RUNNER_TEMP/n83-setting-bin/cryptominisat5" | sha256sum -c \
+            > "$RUNNER_TEMP/n83-setting-meta/solver.sha256-check"
+          rm "$RUNNER_TEMP/n83-setting-preflight.zip"
+        env:
+          MATRIX_STRATUM: ${{ matrix.stratum }}
+      - name: Install qualified Linux solver dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq 2>&1 | tee "$RUNNER_TEMP/n83-setting-meta/apt-update.log"
+          sudo apt-get install -y -qq --no-install-recommends \
+            'cryptominisat=5.11.15+dfsg1-1.1build1' 2>&1 \
+            | tee "$RUNNER_TEMP/n83-setting-meta/apt-install.log"
+          dpkg-query -W '-f=${Package}=${Version}\n' cryptominisat \
+            > "$RUNNER_TEMP/n83-setting-meta/package.txt"
+          ldd "$RUNNER_TEMP/n83-setting-bin/cryptominisat5" \
+            > "$RUNNER_TEMP/n83-setting-meta/solver-ldd.txt"
+          if grep -q 'not found' "$RUNNER_TEMP/n83-setting-meta/solver-ldd.txt"; then exit 1; fi
+          printf '%s  %s\n' \
+            0936420373bbdf22c2a3d37291e3a4ab4e041d7f41ae3ceed003373fb596ddb2 \
+            "$(command -v cryptominisat5)" | sha256sum -c
+      - name: Repeat positive wide-XOR solver control
+        run: |
+          set -euo pipefail
+          python3 "source/$PRIOR_SMOKE" --out "$RUNNER_TEMP/n83-setting-meta" \
+            > "$RUNNER_TEMP/n83-setting-meta/positive-smoke.json"
+      - name: Bind one exact S3-backed formula from prior provider ZIP
+        run: |
+          set -euo pipefail
+          python3 "source/$PANEL/fetch.py" \
+            --protocol "source/$PANEL/protocol.json" \
+            --stratum '${{ matrix.stratum }}' \
+            --archive "$RUNNER_TEMP/n83-setting-source.zip" \
+            --metadata "$RUNNER_TEMP/n83-setting-meta/source-artifact-metadata.json" \
+            --out "$RUNNER_TEMP/n83-setting-input" \
+            > "$RUNNER_TEMP/n83-setting-meta/input-fetch.json"
+          cp "$RUNNER_TEMP/n83-setting-input/input-provenance.json" \
+            "$RUNNER_TEMP/n83-setting-meta/input-provenance.json"
+          rm "$RUNNER_TEMP/n83-setting-source.zip"
+      - name: Run paired bounded solver settings
+        run: |
+          set -euo pipefail
+          python3 "source/$PANEL/run.py" \
+            --protocol "source/$PANEL/protocol.json" \
+            --stratum '${{ matrix.stratum }}' \
+            --inputs "$RUNNER_TEMP/n83-setting-input" \
+            --solver "$RUNNER_TEMP/n83-setting-bin/cryptominisat5" \
+            --out "$RUNNER_TEMP/n83-setting-results" \
+            > "$RUNNER_TEMP/n83-setting-meta/panel-progress.jsonl" \
+            2> "$RUNNER_TEMP/n83-setting-meta/panel.stderr"
+      - name: Preserve exact streams and process receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-solver-setting-${{ matrix.stratum }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/n83-setting-meta/
+            ${{ runner.temp }}/n83-setting-results/
+          if-no-files-found: warn
+          retention-days: 90

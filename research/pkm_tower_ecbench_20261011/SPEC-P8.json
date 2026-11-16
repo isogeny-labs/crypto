@@ -1,0 +1,83 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "PKM tower F4/F5/F6 on a prime curve: 15-bit, t=8",
+ "description": "Preregistered prime-field decomposer comparison (PROTOCOL.md). Public one-target workloads; IC S is a counted lower bound (tower F_p multiply-adds unpriced; geometric closure additions charged).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 15,
+    "seed": 115
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 202610112301,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-negation",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation",
+    "params": {}
+   }
+  },
+  {
+   "name": "f4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-tower:t=8,seed=1",
+     "oracle": "pkm-tower:m=2,t=8,seed=1,engine=f4,degree=20",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "sig-f5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-tower:t=8,seed=1",
+     "oracle": "pkm-tower:m=2,t=8,seed=1,engine=sig-f5,degree=20",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "f6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-tower:t=8,seed=1",
+     "oracle": "pkm-tower:m=2,t=8,seed=1,engine=f6,degree=20,cap=4",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "enum",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-tower:t=8,seed=1",
+     "oracle": "pkm-tower:m=2,t=8,seed=1,engine=enum,degree=20",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610112302,
+  "isolation_required": "L1",
+  "timeout_seconds": 3600
+ }
+}

@@ -1,0 +1,591 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "CM-BLOCK-PLAN-CENSUS-V1",
+  "version": 1,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/cm-marked-scalar",
+  "authors": [
+    "T-1888 native comparison"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3674",
+    "parameters": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf",
+    "quotient": "https://ocw.mit.edu/courses/18-783-elliptic-curves-fall-2025/mit18_783_f25_lec05.pdf",
+    "openssl_reference": "https://github.com/openssl/openssl/blob/master/crypto/ec/ec_mult.c"
+  },
+  "question": "Can block-aware offset/window selection lower the original-mu full group schedule below matched block-binary and the frozen optimized direct/binary references on P-192 primary and all five curves?",
+  "claims": [
+    {
+      "id": "C-fixed",
+      "class": "exact_computation",
+      "text": "Every selected block/single schedule preserves original mu; all rows and minima independently replay.",
+      "decided_by": []
+    },
+    {
+      "id": "C-cost",
+      "class": "comparative",
+      "text": "Per curve the relation block minimum has strictly fewer primary D+A calls than matched block-binary and prior optimized direct/binary references.",
+      "decided_by": [
+        "C-count"
+      ],
+      "if_supported": "Finite source-specific group-count result; all tuning/planning/normalization runtime costs remain separate.",
+      "if_not_supported": "Retain every tie/loss and all five curves; do not infer an e2e claim."
+    }
+  ],
+  "arms": [
+    {
+      "id": "single",
+      "role": "baseline",
+      "description": "Paired retained-bank single-column/block schedules, all declared radices/offsets/windows; complete prefix/table and main group calls.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-tune-binary",
+            "block-tune-replay-binary"
+          ]
+        ],
+        "binary_sha256": "869747a5566d8a79b6de7d1dea46f9d676f020040086f0f0af183de22dd63172",
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "claim": "Exact event census; no clock",
+          "table_points": "Cumulative prefix,Q,P table entries"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "binary",
+      "role": "reference",
+      "description": "Paired retained-bank single-column/block schedules, all declared radices/offsets/windows; complete prefix/table and main group calls.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-tune-binary",
+            "block-tune-replay-binary"
+          ]
+        ],
+        "binary_sha256": "869747a5566d8a79b6de7d1dea46f9d676f020040086f0f0af183de22dd63172",
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "claim": "Exact event census; no clock",
+          "table_points": "Cumulative prefix,Q,P table entries"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "relation",
+      "role": "candidate",
+      "description": "Paired retained-bank single-column/block schedules, all declared radices/offsets/windows; complete prefix/table and main group calls.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-tune-binary",
+            "block-tune-replay-binary"
+          ]
+        ],
+        "binary_sha256": "869747a5566d8a79b6de7d1dea46f9d676f020040086f0f0af183de22dd63172",
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "claim": "Exact event census; no clock",
+          "table_points": "Cumulative prefix,Q,P table entries"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "prior_direct",
+      "role": "reference",
+      "description": "Frozen residual-v1/plans.json donor counts, no donor census repeated; original scalar and complete optimized direct/binary schedule.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "residual-binary",
+            "residual-replay-binary"
+          ]
+        ],
+        "binary_sha256": "dabdd54316804799d4d41fa21f3518808dfff96eecfada0a27d98771c98ccf2a",
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "claim": "Exact fixed-mu joint group schedules; no clock",
+          "table_points": "Cumulative prefix,Q,P table entries"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "prior_binary",
+      "role": "reference",
+      "description": "Frozen residual-v1/plans.json donor counts, no donor census repeated; original scalar and complete optimized direct/binary schedule.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "residual-binary",
+            "residual-replay-binary"
+          ]
+        ],
+        "binary_sha256": "dabdd54316804799d4d41fa21f3518808dfff96eecfada0a27d98771c98ccf2a",
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "claim": "Exact fixed-mu joint group schedules; no clock",
+          "table_points": "Cumulative prefix,Q,P table entries"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete deterministic integer census; no clocks or stochastic noise floor."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Before freeze,630 paired boundary parameter cases must match actual block/single point operations and counters; standalone GMP small cases compare suffix DP to exhaustive enumeration."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Independent replay must reject changed counters, missing/duplicate rows and wrong design; selected point/count checks must preserve original mu."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "block relation",
+          "block binary",
+          "same-bank single column",
+          "prior optimized direct/binary"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve and scalar",
+        "treatment": "fixed",
+        "value": [
+          "P-192",
+          "P-224",
+          "P-256",
+          "P-384",
+          "P-521"
+        ],
+        "how": "Same original mu, curve and signed relation certificates; no target substitution."
+      },
+      {
+        "name": "radix/offset/window",
+        "treatment": "crossed",
+        "value": "ell and binary1,2,4,8,16,32; all offsets-64..64; widths2..7",
+        "how": "27090 complete rows. Both schedules share the same bank setup."
+      },
+      {
+        "name": "internal planner",
+        "treatment": "fixed",
+        "value": "span16, unweighted D+A,N,D,steps",
+        "how": "Existing frozen block_core.hpp. Sensitivity weights select among emitted programs, not globally weight-optimal chains."
+      },
+      {
+        "name": "reference",
+        "treatment": "fixed",
+        "value": "residual-v1/plans.json",
+        "how": "Existing independently replayed translation/window/radix optimized reference counts; no donor rerun."
+      },
+      {
+        "name": "resources",
+        "treatment": "fixed",
+        "value": "120seconds/2GiB/one process/thread per invocation",
+        "how": "One scan, zero unchanged retries; no clock or cloud job."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-count",
+        "arms": [
+          "relation",
+          "binary",
+          "prior_direct",
+          "prior_binary"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute"
+      }
+    ],
+    "aa_not_applicable": "Exact deterministic census without a timing metric.",
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact complete deterministic schedules; no hardware-dependent metric.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261108
+      ],
+      "nonce": null,
+      "note": "No random sampling; seed is a design identifier only."
+    },
+    "instance_sampling": {
+      "rule": "Five curves x7radices x129offsets x6widths =27090 rows; one exact finite census.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact minimum and tie rule fixed before data.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 5,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 5,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact complete finite census;20curve/weight plan records,80minimum sets; no population or statistical-power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "No timing pilot; one scientific scan, all native invocations bounded120seconds/2GiB, zero unchanged retries."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "D_plus_A",
+        "name": "Full group-call count",
+        "unit": "group API calls",
+        "kind": "counted",
+        "definition": "Prefix/table construction plus selected block program or original single-column schedule; minimum over the frozen finite parameter domain.",
+        "source": "scan.csv; GMP replay reconstructs every row",
+        "aggregation": "min",
+        "resolution": "exact deterministic integer",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "vectors",
+        "name": "Group and planner event vectors",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "D,A,N,logicalT,physical bank,normalized entries,planner offers and steps; no CPU/allocator/field pricing inferred.",
+        "source": "scan.csv",
+        "aggregation": "per_row",
+        "resolution": "exact native events",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "doubles",
+      "adds",
+      "negations",
+      "table_points"
+    ],
+    "record": [
+      "binary_sha256",
+      "protocol_sha256",
+      "input hashes",
+      "all census rows",
+      "qualification receipts"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "threads": 1,
+      "memory_limit_kib": 2097152,
+      "max_cloud_cost_usd": 0,
+      "offset_min": -64,
+      "offset_max": 64,
+      "widths": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "weights": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "binary_radices": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32
+      ],
+      "rows": 27090,
+      "input_files": [
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/published-curves.json",
+          "sha256": "0d3bd936810a5f987e9cb00188b0f75c78b9a7f91474bf754bbee0d7218e2120"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/marked-relations.json",
+          "sha256": "f65d64a5036f5c2ac863a55d6191df56b328515c0d67a67e4b1f628be8aae1b2"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-192-closure.json",
+          "sha256": "633270bc01bb38c7d66c5474f528c73d46c645df148019a0ac3418b547383eca"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-224-closure.json",
+          "sha256": "0e01eb0975a2b35525b04c694a22ed336f56913f9e0a1c0b3b2335c7975926ce"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-256-closure.json",
+          "sha256": "abf11b0536baf8a3c899c1b94917b7ba0d395d6bf0addbe87a0aa6159950e504"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-384-closure.json",
+          "sha256": "72bc072ef64e2edaef3dadfbccb4eb9b2fe0c4952502591f25fb1038257c9008"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-521-closure.json",
+          "sha256": "ba5eacad1943994a1055e760c66b95f659e7289595e4cb6073150bfcc4fe0059"
+        },
+        {
+          "path": "research/cm-marked-scalar/residual-v1/plans.json",
+          "sha256": "ee7e9e7150351ef8850dbe4d8e721bbbbe68ba552539017fff6cac04c79c8cb5"
+        }
+      ],
+      "source_files": [
+        {
+          "path": "research/cm-marked-scalar/block_tune.cpp",
+          "sha256": "3618c6f0739b42995d024a9d0a251096254b4479236e6b5b9d91c381ad742bf8"
+        },
+        {
+          "path": "research/cm-marked-scalar/block_tune_replay.cpp",
+          "sha256": "15b6880add5e2d01633e3a90720a41f4561070d1258d162005a0cc28d5d42c52"
+        },
+        {
+          "path": "research/cm-marked-scalar/block_tune_mutate.cpp",
+          "sha256": "819c1ae45c3bffa450da13f54670088a3d0ab446cb9fb61e0688e95162a999ec"
+        },
+        {
+          "path": "research/cm-marked-scalar/block_core.hpp",
+          "sha256": "ab79173cb6b8f59d359a1e52a3a32d35b933735d64e2684524e9348eb26ca678"
+        },
+        {
+          "path": "research/cm-marked-scalar/cache_core.hpp",
+          "sha256": "50e2fe3c06f5be122e043ef5d669423d7423778bf0976398fb7fd1f26d651d19"
+        },
+        {
+          "path": "research/cm-marked-scalar/native.cpp",
+          "sha256": "c357e78448653317f39b93e647065cde371e4df6dc249f6c9a9aa57f4d7229f1"
+        },
+        {
+          "path": "research/cm-marked-scalar/json.hpp",
+          "sha256": "ce2fc98e68f35f6500e5983ac2288de3e1945c88cafabc433d502e865ff11973"
+        },
+        {
+          "path": "research/cm-marked-scalar/relation_verify.hpp",
+          "sha256": "a02e71ab00088b90168f223db104d4f1a07dc3c3999f567d9a8113f4b004c5e3"
+        },
+        {
+          "path": "research/cm-marked-scalar/orbit_verify.hpp",
+          "sha256": "302e98c4a1db831dd54e8d1f5ad6070b9d0be05f2ad8e25301d64cf908b431ef"
+        }
+      ],
+      "replay_binary_sha256": "31da9b6df97a5e97d2fe995edd7b28acbb1e44f385578a2fcafc93918262e218",
+      "scan_invocations": 1,
+      "max_native_compute_invocations": 20,
+      "max_declared_compute_seconds": 2400
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Stop after exactly27090rows or retain the first timeout/failure, zero unchanged retries.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any point/counter/source/hash/design/completeness failure invalidates and is retained.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any wrong scalar/point/count, incomplete census, missing hash or invalid archive prevents the affected count claim.",
+    "Original runtime objective requires a separately admitted cold timing comparison."
+  ],
+  "decision_rule": {
+    "text": "Per curve at weight1 require relation-block minimum D+A below matched block-binary and both prior direct/binary minima. Preserve ties/losses and vectors. Weights2..4 sensitivities over this emitted unweighted-planner program family only.",
+    "comparison_ids": [
+      "C-count"
+    ],
+    "threshold": "Strict integer inequality at addition weight1",
+    "statistic": "Exact minimum by score,N,D,A,T,radix,abs(offset),offset,width",
+    "interval": "None: complete finite census",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Absolute count difference and ratio, with all components",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "tied",
+      "candidate_higher_count",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/cm-marked-scalar/block_tune_replay.cpp",
+      "sha256": "15b6880add5e2d01633e3a90720a41f4561070d1258d162005a0cc28d5d42c52"
+    },
+    "inputs": [
+      "scan.csv",
+      "producer receipt",
+      "eight frozen inputs",
+      "independent suffix-DP/GMP replay",
+      "400selected point/count checks"
+    ],
+    "outputs": [
+      "all27090row replay",
+      "80minimum sets",
+      "20curve/weight records",
+      "per-curve full vector comparison",
+      "inspected report and export"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Centered and translated direct/fused count minima per curve"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Changing original mu or subgroup",
+    "Omitting prefix/table/remainder work",
+    "Treating event counts as CPU time",
+    "Hiding offline tuning/first-use plan cost",
+    "Optimizing only the candidate",
+    "Changing domain after data",
+    "Repeating the V3 timing attempt",
+    "Claiming expanded global quotient polynomials"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.helmut-prodinger.at/pdffiles/joint.pdf",
+      "provenance": "retrieved",
+      "claim": "Simultaneous scalar linear combinations and signed expansions are established background. This implementation uses separate window expansions, without optimality or novelty claims.",
+      "verified_by": "Introduction and section2 read2026-11-08"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e",
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  }
+}

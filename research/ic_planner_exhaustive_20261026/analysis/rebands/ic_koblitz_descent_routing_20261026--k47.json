@@ -1,0 +1,91 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "log2_r": 36.635865112243344,
+      "arm": "descent",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.8639754745862571,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "charged_sum": 14618358.0,
+      "uncounted": [
+        "field_arithmetic_uncharged",
+        "hash_and_allocation_uncharged",
+        "modular_combination_uncharged",
+        "vector_declined_lanes_uncharged"
+      ]
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "log2_r": 36.635865112243344,
+      "arm": "pipeline",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.311794742912879,
+        1.365662832579942,
+        1.4733990119140685,
+        1.8504756395835118,
+        2.927837432924777,
+        6.69860370961921
+      ],
+      "charged_sum": 10287842.0,
+      "native_sum": 42246426,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "log2_r": 36.635865112243344,
+      "arm": "rho",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.1386045901130218,
+        0.1413407212794848,
+        0.14681298361241088,
+        0.16596590177765216,
+        0.22068852510691295,
+        0.4122177067593256
+      ],
+      "charged_sum": 1087016.1900414266,
+      "native_sum": 2145830,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "a": "descent",
+      "b": "pipeline",
+      "verdict": "unrankable (uncounted unpriced work)"
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "a": "descent",
+      "b": "rho",
+      "verdict": "unrankable (uncounted unpriced work)"
+    },
+    {
+      "curve": "icv1-f2m47-t22705043-f4e44623",
+      "a": "pipeline",
+      "b": "rho",
+      "verdict": "rho < pipeline"
+    }
+  ]
+}

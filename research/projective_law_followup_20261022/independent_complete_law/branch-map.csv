@@ -1,0 +1,18 @@
+input_class,predicate,source_function,paper_source,output_type,source_line,evidence_scope
+identity,either input identity,add_projective,2024 section 3.1,other input,606,source audit
+1+1,same x opposite y,add11,2024 section 3.2,identity,511,finite gate
+1+1,same point,add11 then dbl,2024 equation 13,degree 2,511,finite gate and symbolic certificate
+1+1,distinct x,add11,2024 equation 14,degree 2,511,finite gate and symbolic certificate
+1+2,shared support inverse,add12_weighted_complete,2024 equation 15,degree 1,828,finite gate and symbolic certificate
+1+2,triple support,add12_weighted_complete then triple,2024 equation 16,degree 2,828,finite gate and symbolic certificate
+1+2,shared positive distinct remainder,add12_weighted_complete then dbl then add12_weighted_generic,2024 equations 13 and 17,degree 2,828,finite gate and symbolic certificate
+1+2,disjoint support,add12_weighted_generic,2024 equation 18,degree 2,232,finite gate and symbolic certificate
+2+2,same u inverse v,add22_weighted,2024 section 3.4,identity,896,finite gate and symbolic certificate
+2+2,same u equal v B zero,double22_weighted then dbl,2024 equation 19,degree 2,727,finite gate and symbolic certificate
+2+2,same u distinct noninverse v,add22_weighted then dbl,2024 equation 20,degree 2,896,finite gate and symbolic certificate
+2+2,different u shared root inverse,add22_weighted then add11,2024 equation 21 and 14,degree 2,896,finite gate and symbolic certificate
+2+2,different u shared root positive,add22_weighted then dbl and add_point_to_result,2024 equation 21 and section 3.4,degree 1 or 2,896,finite gate and symbolic certificate
+2+2,different u B nonzero C zero,add22_weighted,2024 equation 11 via cited Hu Lin Zhao,degree 1,896,finite gate and symbolic certificate
+2+2,different u B and C nonzero,add22_weighted_common,2024 equation 12 via cited Hisil Costello,degree 2,636,finite gate and partial formal proof
+2+2,same u equal v B nonzero C zero,double22_weighted,2024 equation 8 via cited Hu Lin Zhao,degree 1,727,finite gate and symbolic certificate
+2+2,same u equal v B and C nonzero,double22_weighted,2024 equation 9 via cited Hisil Costello,degree 2,727,finite gate and symbolic certificate

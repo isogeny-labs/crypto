@@ -1,0 +1,20 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=17mm]{geometry}\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,booktabs,hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}\sloppy\setlength{\emergencystretch}{3em}
+\begin{document}
+\begin{center}{\Large First formal build: final coercion simplification failed}\\cm8-dual-20261029\end{center}
+The first unmodified scoped proof gate fails the build at the final actual-source
+reduction theorem: simplification leaves an additive-hom coercion, so the target
+cannot match phi Q=nU. No complete theorem-count or zero-axiom gate result is
+claimed for this failed module; its final declaration carries sorryAx in the
+failed log. Exact source is retained as .lean.txt. The correction explicitly
+reduces the hom application, rewrites phi(P)=U and uses the same generic theorem.
+It changes no hypothesis, formula or requested domain. The corrected full gate
+passes21named/25audited declarations without extra trusted axioms.
+\par
+\fbox{\parbox{.94\linewidth}{Frozen source $\to$ build fails at final coercion $\to$ explicit reduction $\to$ full gate passes.}}\par
+Full report: \path{reports/cm8-dual-20261029/README.md}. Exact command/source/logs:
+\path{validation/cm8-dual-20261029/restore-runs.sh}. Existing local resources,
+600sec caps, no paid compute, no new general geometric-duality/speed claim.
+\end{document}

@@ -1,0 +1,21 @@
+/var/tmp/pencil-sameu-composition-review-20261031-v1/replay/ReviewerControls.lean:6:53: error: Tactic `decide` failed for proposition
+  WeightedAdd11.nx (sourcePoint a b) = 1 ∧ WeightedAdd11.ny (sourcePoint a b) = 1
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(WeightedAdd11.nx (sourcePoint a b))).beq ↑1 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-sameu-composition-review-20261031-v1/replay/ReviewerControls.lean:9:41: error: Tactic `decide` failed for proposition
+  let o := MixedPositiveDistinct.doubled 1 (-1) 0 0 (sourcePoint a b);
+  nq o = 3 ∧ nr o = 1 ∧ ns o = 2 ∧ nt o = 4
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑(nq (MixedPositiveDistinct.doubled 1 (-1) 0 0 (sourcePoint a b)))).beq ↑3 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯

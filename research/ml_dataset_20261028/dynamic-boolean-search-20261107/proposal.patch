@@ -1,0 +1,63 @@
+--- v1/search.rs
++++ v2/search.rs
+@@ -3,17 +3,18 @@
+ #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Origin{Original(usize),Branch{parent:usize,variable:u32,value:bool}}
+ #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum NodeStatus{Building,Ready,Running,Branching,Branched,Refuted,Witness}
+ #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Verdict{Unknown,Witness,UnsatDerived}
++#[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum NativeDisposition{Complete,LocalCap,Stopped}
+ #[derive(Clone,Copy)]pub struct SearchLimits{pub native:Limits,pub nodes:usize}
+ #[derive(Debug)]pub struct Node{
+  pub parent:Option<usize>,pub origins:Vec<Origin>,pub equations:Vec<Polynomial>,pub decisions:Vec<(u32,bool)>,
+- pub status:NodeStatus,pub native:Option<Attempt>,pub candidate:Vec<bool>,pub candidate_valid:Option<bool>,
++ pub status:NodeStatus,pub native_disposition:Option<NativeDisposition>,pub native:Option<Attempt>,pub candidate:Vec<bool>,pub candidate_valid:Option<bool>,
+  pub children:[Option<usize>;2],pub refutation_row:Option<usize>,
+ }
+ #[derive(Debug)]pub struct SearchAttempt{pub result:Result<(),Failure>,pub verdict:Verdict,pub nodes:Vec<Node>,pub queue:Vec<usize>,pub active:Option<usize>,pub witness_node:Option<usize>,pub charge:Charge}
+ struct NativeOwner<'a,'b,T:Owner>{meter:&'a mut Meter<'b,T>,failure:Option<Failure>}
+ impl<T:Owner> Owner for NativeOwner<'_,'_,T>{fn reserve(&mut self,q:Charge)->Result<(),()>{self.meter.pay(q.work,q.bytes).map_err(|e|{self.failure=Some(e);})}fn check(&mut self)->Result<(),()>{self.meter.pay(0,0).map_err(|e|{self.failure=Some(e);})}}
+ fn copied_poly<T:Owner>(p:&Polynomial,m:&mut Meter<T>)->Result<Polynomial,Failure>{m.pay(1,0)?;let mut q=m.alloc(p.len())?;for t in p{q.push(m.mono(t)?)}Ok(q)}
+-fn empty_node<T:Owner>(parent:Option<usize>,eqs:usize,depth:usize,m:&mut Meter<T>)->Result<Node,Failure>{Ok(Node{parent,origins:m.alloc(eqs)?,equations:m.alloc(eqs)?,decisions:m.alloc(depth)?,status:NodeStatus::Building,native:None,candidate:Vec::new(),candidate_valid:None,children:[None,None],refutation_row:None})}
++fn empty_node<T:Owner>(parent:Option<usize>,eqs:usize,depth:usize,m:&mut Meter<T>)->Result<Node,Failure>{Ok(Node{parent,origins:m.alloc(eqs)?,equations:m.alloc(eqs)?,decisions:m.alloc(depth)?,status:NodeStatus::Building,native_disposition:None,native:None,candidate:Vec::new(),candidate_valid:None,children:[None,None],refutation_row:None})}
+ fn eval<T:Owner>(g:&[Polynomial],point:&[bool],m:&mut Meter<T>)->Result<bool,Failure>{let mut all=true;for p in g{m.pay(1,0)?;let mut sum=false;for t in p{m.scan(t.len())?;sum^=t.iter().all(|v|point[*v as usize]);}all&=!sum;}Ok(all)}
+ /// Stops at the first exactly evaluated Boolean witness. A witness is not a signed
+ /// ECDLP relation. UnsatDerived requires every visited branch leaf to contain an
+@@ -33,7 +34,15 @@
+    a.nodes[idx].status=NodeStatus::Running;
+    let mut bridge=NativeOwner{meter:&mut m,failure:None};let native=super::run(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge);let failure=bridge.failure;
+    let result=native.result;a.nodes[idx].native=Some(native);
+-   if let Some(e)=failure{return Err(e)}result?;
++   if let Some(e)=failure{a.nodes[idx].native_disposition=Some(NativeDisposition::Stopped);return Err(e)}
++   match result{
++    Ok(())=>a.nodes[idx].native_disposition=Some(NativeDisposition::Complete),
++    Err(Failure::Cap)=>a.nodes[idx].native_disposition=Some(NativeDisposition::LocalCap),
++    Err(e)=>{a.nodes[idx].native_disposition=Some(NativeDisposition::Stopped);return Err(e)}
++   }
++   // A local closure cap is not a parent admission grant. Recheck the same
++   // cumulative owner/deadline before using only committed basis rows.
++   m.pay(1,0)?;
+    let native=a.nodes[idx].native.as_ref().unwrap();let mut contradiction=None;
+    for(i,r)in native.basis.iter().enumerate(){m.pay(1,0)?;if r.polynomial.len()==1&&r.polynomial[0].is_empty(){contradiction=Some(i);break}}
+    if let Some(row)=contradiction{m.pay(1,0)?;a.nodes[idx].refutation_row=Some(row);a.nodes[idx].status=NodeStatus::Refuted;a.queue.pop();a.active=None;continue}
+@@ -53,7 +62,7 @@
+    a.nodes[idx].candidate_valid=Some(valid);
+    if valid{m.pay(1,0)?;a.nodes[idx].status=NodeStatus::Witness;a.witness_node=Some(idx);a.verdict=Verdict::Witness;a.queue.pop();a.active=None;return Ok(())}
+    let mut variable=None;for v in 0..n{m.scan(a.nodes[idx].decisions.len())?;if !a.nodes[idx].decisions.iter().any(|(x,_)|*x==v){variable=Some(v);break}}
+-   let Some(variable)=variable else{return Err(Failure::Malformed)};
++   let Some(variable)=variable else{return Err(if a.nodes[idx].native_disposition==Some(NativeDisposition::LocalCap){Failure::Cap}else{Failure::Malformed})};
+    if a.nodes.len().checked_add(2).ok_or(Failure::Overflow)?>limits.nodes{return Err(Failure::Cap)}
+    let eqs=a.nodes[idx].equations.len().checked_add(1).ok_or(Failure::Overflow)?;if eqs>limits.native.generators{return Err(Failure::Cap)}
+    let depth=a.nodes[idx].decisions.len().checked_add(1).ok_or(Failure::Overflow)?;a.nodes[idx].status=NodeStatus::Branching;
+--- v1/harness.rs
++++ v2/harness.rs
+@@ -14,4 +14,11 @@
+  #[test]fn both_children_execute_with_conditional_refutation(){let g=vec![vec![vec![],vec![0]],vec![vec![],vec![1],vec![2]]];let a=solve(3,&g,limits(),Instant::now()+Duration::from_secs(5),&mut Ledger::default());check(&g,&a);assert_eq!(a.result,Ok(()));assert_eq!(a.verdict,Verdict::Witness);let f=a.nodes[0].children[0].unwrap();let t=a.nodes[0].children[1].unwrap();assert_eq!(a.nodes[f].status,NodeStatus::Refuted);assert!(a.nodes[t].native.is_some());let r=&a.nodes[f].native.as_ref().unwrap().basis[a.nodes[f].refutation_row.unwrap()];assert!(r.proof.iter().any(|p|matches!(a.nodes[f].origins[p.generator],Origin::Branch{value:false,..})));}
+  #[test]fn deadline_and_small_global_work_budget_stop_without_reset(){let g=vec![vec![vec![],vec![0],vec![1]]];let a=solve(2,&g,limits(),Instant::now(),&mut Ledger::default());assert_eq!(a.result,Err(Failure::Deadline));for cap in [0,1,10,100,1000]{let mut l=limits();l.native.work=cap;let mut o=Ledger::default();let a=solve(2,&g,l,Instant::now()+Duration::from_secs(5),&mut o);check(&g,&a);assert_eq!(a.verdict,Verdict::Unknown);assert!(a.charge.work<=cap);assert_eq!(a.charge.work,o.work);}}
+ 
++ #[test]fn local_batch_cap_uses_committed_unit_for_exact_model(){let g=vec![vec![vec![],vec![0]]];let mut l=limits();l.native.batches=1;let a=solve(1,&g,l,Instant::now()+Duration::from_secs(5),&mut Ledger::default());check(&g,&a);assert_eq!(a.result,Ok(()));assert_eq!(a.verdict,Verdict::Witness);let node=&a.nodes[0];assert_eq!(node.native_disposition,Some(NativeDisposition::LocalCap));assert_eq!(node.native.as_ref().unwrap().result,Err(Failure::Cap));assert!(!node.native.as_ref().unwrap().complete);assert_eq!(node.candidate,vec![true]);}
++ #[test]fn local_degree_cap_continues_real_branch_search(){let g=vec![vec![vec![],vec![0,1]]];let mut l=limits();l.native.degree=2;let a=solve(2,&g,l,Instant::now()+Duration::from_secs(5),&mut Ledger::default());check(&g,&a);assert_eq!(a.result,Ok(()));assert_eq!(a.verdict,Verdict::Witness);assert_eq!(a.nodes[0].native_disposition,Some(NativeDisposition::LocalCap));assert_eq!(a.nodes[0].status,NodeStatus::Branched);assert!(a.nodes[0].children.iter().all(Option::is_some));assert!(a.nodes.iter().filter(|n|n.native.is_some()).count()>=2);}
++ #[test]fn local_batch_cap_preserves_committed_one_refutation(){let g=vec![vec![vec![0]],vec![vec![],vec![0]]];let mut l=limits();l.native.batches=1;let a=solve(1,&g,l,Instant::now()+Duration::from_secs(5),&mut Ledger::default());check(&g,&a);assert_eq!(a.result,Ok(()));assert_eq!(a.verdict,Verdict::UnsatDerived);assert_eq!(a.nodes[0].native_disposition,Some(NativeDisposition::LocalCap));assert_eq!(a.nodes[0].native.as_ref().unwrap().result,Err(Failure::Cap));assert_eq!(a.nodes[0].status,NodeStatus::Refuted);}
++ #[test]fn parent_stop_never_becomes_local_cap_continuation(){let g=vec![vec![vec![],vec![0],vec![1]]];let mut l=limits();l.native.batches=1;let mut base=Ledger::default();let full=solve(2,&g,l,Instant::now()+Duration::from_secs(5),&mut base);assert_eq!(full.verdict,Verdict::Witness);let mut saw_native_stop=false;for at in 1..=base.checks{let mut o=Ledger{stop:Some(at),..Default::default()};let a=solve(2,&g,l,Instant::now()+Duration::from_secs(5),&mut o);check(&g,&a);assert_eq!(a.result,Err(Failure::Owner));assert_eq!(a.verdict,Verdict::Unknown);assert_eq!(a.charge.work,o.work);for n in &a.nodes{if n.native_disposition==Some(NativeDisposition::Stopped){saw_native_stop=true;assert!(n.candidate.is_empty());assert!(n.children.iter().all(Option::is_none));}}}assert!(saw_native_stop);}
++
++ #[test]fn cap_without_committed_leaf_refutation_stays_unknown(){let g=vec![vec![vec![],vec![0],vec![1]]];let mut l=limits();l.native.degree=1;let a=solve(2,&g,l,Instant::now()+Duration::from_secs(5),&mut Ledger::default());check(&g,&a);assert_eq!(a.result,Err(Failure::Cap));assert_eq!(a.verdict,Verdict::Unknown);assert!(a.nodes.iter().any(|n|n.native_disposition==Some(NativeDisposition::LocalCap)));assert!(a.nodes.iter().all(|n|n.status!=NodeStatus::Refuted));}
++
+ }

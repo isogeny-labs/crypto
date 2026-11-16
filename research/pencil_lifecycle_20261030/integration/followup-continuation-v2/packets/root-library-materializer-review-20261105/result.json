@@ -1,0 +1,45 @@
+{
+  "schema": "independent-source-review/v1",
+  "status": "revision_required",
+  "pcc": "unverified",
+  "producer_commit": "357f73fe0eb945c9406fab542def431de51ee64c",
+  "producer_sha256": "d6151c45c1c00691a3ad9f446a8d68051ac6cb511b5e0c6011b241ffacb901ef",
+  "review_plan_sha256": "47e055f50253041e748bd54a381974e99bb6c52c3ed458788881bb17473f379e",
+  "independent_of_authorship": true,
+  "implementation_unread_when_plan_written": true,
+  "design_blind": false,
+  "native_execution": false,
+  "materializer_execution": false,
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "revision_required",
+      "lines": "materialize.py:68,76-78,114,163",
+      "finding": "Candidate hash and copy are separate reads; destination digest is then freshly accepted rather than compared to the pinned candidate. Bound JSON inputs are also read after their initial hash without final recheck.",
+      "source_counterexample": "Approved bytes A pass H(candidate). Candidate changes to B before read_bytes. B is copied and row records H(B); final IMM comparison accepts B. This is a source trace, not an executed race.",
+      "correction": "Read/hash the exact bytes to be consumed; verify destination against the approved candidate digest; recheck initially bound inputs at completion."
+    },
+    {
+      "id": "M2",
+      "severity": "revision_required",
+      "lines": "materialize.py:47-49,168-171",
+      "finding": "Owned subprocess cleanup calls ACTIVE.wait() without a timeout and skips process-group cleanup if the leader already exited.",
+      "source_counterexample": "After guard failure, killed child can remain unreaped; wait has no remaining-time bound. Alternatively a leader exits while descendants remain; poll is non-None and group kill is skipped. No runtime example was executed.",
+      "correction": "Use bounded reap within remaining cleanup allowance, retain errors and descendant/ownership observations, and require outer cgroup termination before acceptance."
+    }
+  ],
+  "source_consistent_components": [
+    "Pinned full Git revision and blob-only source selection",
+    "Fresh exclusive output/workspace creation and owned-only checkpoint writes",
+    "Archive digest equality to lock checksums; traversal/link/duplicate rejection; per-file vendor checksum generation",
+    "Fresh immutable and initial-cache manifests; copied cache bytes distinguished from source inputs",
+    "Live cgroup limits checked; disk/source/vendor/cache caps and lease/deadline guards present"
+  ],
+  "release_obligations": [
+    "Published reviewed preparation.json and supervisor with current lease/debit and resolved paths",
+    "Bounded outer runtime/stop/cgroup cleanup and durable outer result",
+    "Exact preparation tool identity, including git/findmnt, or explicit trusted-host assumption",
+    "No compiler/run admission from materializer source review"
+  ],
+  "reference": "https://doc.rust-lang.org/cargo/reference/source-replacement.html"
+}

@@ -1,0 +1,104 @@
+{
+  "id": "IDC1h8695f783c1779eb3",
+  "independence": "native issuer;128 additional parsed checks;source-bound kernel theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound20.lean",
+    "sha256": "41cd9733920e238cbc360446239c0479e7e13943719fa8f0625e3297a0269e6e"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610240100,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "d",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": 1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "p",
+                      "op": "var"
+                    },
+                    {
+                      "args": "e",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": 1,
+                          "op": "const"
+                        },
+                        {
+                          "args": -1,
+                          "op": "const"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": "e",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": "p",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": "d",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "integral-lift-step",
+    "rhs": {
+      "args": "d",
+      "op": "var"
+    },
+    "source": "KoblitzRound20.lift_step_cancel",
+    "variables": [
+      "d",
+      "p",
+      "e"
+    ]
+  },
+  "value_digest": "f8db3cb3cdb2df69e38e16f0d002b15ac58709aa9a18e9c2dd5e5f4340226bc9"
+}
