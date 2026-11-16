@@ -48,3 +48,5 @@ fig.text(
 )
 for suffix in ("svg", "png"):
     fig.savefig(root / f"integration-diagnostics.{suffix}", dpi=180, bbox_inches="tight")
+svg = root / "integration-diagnostics.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
