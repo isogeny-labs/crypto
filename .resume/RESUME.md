@@ -1,3 +1,68 @@
+# Resume: pair-index timing on codex/rootfind-pair-index-timing-20261116
+
+This is the current branch handoff. The older rootfinding and unrelated
+handoffs remain below as historical text. The current task is Conductor
+T-6814; production collector files remain reserved by T-6708.
+
+## Goal
+Continue toward a matched complete-call rootfinding result faster than
+F4/F5/F6. This branch measures whether changing the binary pair-index
+representation can lower its cold build and lookup component.
+
+## Lead / hypothesis
+`research/rootfind_pair_index_timing_20261116/PROTOCOL.md` fixes the actual
+K13/K19/K23 pair and probe streams, five arms and 101 measured repetitions.
+`AMENDMENT-1.md` matches the reference to the production `MixHasher` and
+`a*a+1` reservation. The prior paged and inline prototypes passed
+first-witness correctness screens; their timing is not yet known.
+
+## Spec
+Protocol commit `46faae79f8`; hash-control amendment commit `71d5af799b`;
+corrected harness source and retained first compile failure commit
+`1b91f79a5c`. Exact test source SHA-256
+`f8e7d48cd2faa2eb6a2c04e5df095dc5263e9fe9209febf65073cf44a4fdcbcb`;
+locked harness Cargo.lock SHA-256
+`608cd364e6fd8d307b99ba7d02bdf50407ec42117065056c90a49ff88311f4e1`.
+
+## State
+The first release compile-only command failed on a source type mismatch and
+is archived as `build.*`; corrected `build2.*` passed. The source-bound
+executable SHA-256 is
+`4f8e218be771a8cf58cc1005c9aa49561ae85701d3846f5af0f266ca862ec7ff`.
+The one frozen local diagnostic completed at 2026-11-16T14:14:19Z, 1/1 test
+passed, with all 1,515 measured rows and full duplicate/witness checks.
+`RUN_RECORD.json` and `RESULTS.json` are archived at `11abb8a59a` and pushed.
+The descriptive report, chart and inspected PDF are in
+`research/rootfind_pair_index_timing_20261116/reports/run-20261116T1414Z/`.
+The direct flat index had lower combined medians than hash for K13/K19,
+while K23 was higher; this is one L0 component timer, not a complete-call
+or independently replayed result. The correct AWS account's latest monthly
+and daily budget readbacks exceed their limits; the frozen L2 F4/F5/F6 panel
+was not submitted.
+
+## Next steps
+1. Commit and push the derived report and updated handoff, then open a ready
+   PR stacked on #4421. Do not poll its CI.
+2. After production collector source reservation T-6708 is released,
+   integrate the direct-build flat candidate for small Koblitz cells under
+   a new source-bound protocol. Include allocation, pair-sum arithmetic,
+   probe generation, memory and complete-call correctness/timing.
+3. Recheck the correct-account EKS budget and isolation gates before the
+   separately frozen F4/F5/F6 panel; run only when admission allows it.
+   Require exact same targets, priced full phases and independent replay.
+
+## Runs in flight
+None on this branch. The local timer has finished; no cloud job was
+submitted.
+
+## Stop and success conditions
+The local component screen is complete at its frozen scope. The larger
+objective requires a matched, verified complete-call comparison against
+F4/F5/F6, including setup, relation collection, rank, verification, failed
+attempts and memory. Do not promote this component observation to that claim.
+
+## Historical handoffs
+
 # Resume: rootfinding first-independent collector on codex/rootfind-multihit-relations-20261116
 
 This top section is the current handoff for the worktree and PR #4421. The
