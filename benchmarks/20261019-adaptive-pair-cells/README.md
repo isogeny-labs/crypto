@@ -1,1 +1,0 @@
-See ../../research/autolab_cycle_20261019_v3/REPORT.md for exact scope, source hashes, raw attempts, validation gaps and next experiment. Conditional binary pair cells only; external F4/F5/F6 comparison not run and no qualified speedup. PDF/plots are byte-identical browsing copies.
