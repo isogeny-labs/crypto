@@ -1,0 +1,2804 @@
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 21248666860
+Trigger: Program termination
+Profiled target:  /home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast construct:73:1:40 empty.txt 1 out.jsonl (PID 13546, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                       
+--------------------------------------------------------------------------------
+124,355,947,799 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                        file:function
+--------------------------------------------------------------------------------
+124,355,947,799 (100.0%)  ???:0x000000000001f540 [/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2]
+124,355,559,566 (100.0%)  ???:(below main) [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+124,355,559,554 (100.0%)  ./csu/../csu/libc-start.c:__libc_start_main@@GLIBC_2.34 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+124,355,559,371 (100.0%)  ./csu/../sysdeps/nptl/libc_start_call_main.h:(below main) [/usr/lib/x86_64-linux-gnu/libc.so.6]
+124,355,559,307 (100.0%)  ???:main [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+124,355,559,297 (100.0%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/rt.rs:std::rt::lang_start_internal [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+124,355,445,104 (100.0%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ops/function.rs:std::rt::lang_start_internal
+124,355,445,103 (100.0%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/rt.rs:std::rt::lang_start::<()>::{closure#0} [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+124,355,445,100 (100.0%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/sys/backtrace.rs:std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()> [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+124,355,445,099 (100.0%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ops/function.rs:std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+124,355,445,098 (100.0%)  /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::main [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+124,355,442,501 (100.0%)  /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::run [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+ 83,564,941,344 (67.20%)  /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:<crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve>::new [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+ 83,564,941,333 (67.20%)  /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:<crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve>::subfield [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+ 83,537,709,075 (67.18%)  /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::factorise [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+ 51,050,821,957 (41.05%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/num/uint_macros.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::factorise
+ 39,519,040,551 (31.78%)  /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::extract128 [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+ 32,486,928,041 (26.12%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/macros.rs:__umodti3 [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+ 15,439,640,000 (12.42%)  /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+ 13,922,968,104 (11.20%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/int/specialized_div_rem/mod.rs:__umodti3
+ 10,546,178,753 ( 8.48%)  /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+  9,281,979,076 ( 7.46%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/int/specialized_div_rem/asymmetric.rs:__umodti3
+  9,152,894,546 ( 7.36%)  /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+  2,791,910,184 ( 2.25%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/../../stdarch/crates/core_arch/src/simd.rs:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64 [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+  1,729,061,825 ( 1.39%)  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/num/uint_macros.rs:koblitz_orbit_dlp_fast::wide::extract128
+  1,595,377,248 ( 1.28%)  /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64
+  1,168,293,154 ( 0.94%)  /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::build_index128 [/home/user/wt/t03/target/release/examples/koblitz_orbit_dlp_fast]
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs
+--------------------------------------------------------------------------------
+Ir                      
+
+-- line 491 ----------------------------------------
+             .                   match self {
+             .                       Self::Compact4 => 4,
+             .                       Self::Standard => 8,
+             .                       Self::Wide3 | Self::Wide5 => 16,
+             .                   }
+             .               }
+             .           
+             .               fn hashes(self) -> usize {
+             3 ( 0.00%)          match self {
+             .                       Self::Compact4 | Self::Standard | Self::Wide3 => 3,
+             .                       Self::Wide5 => 5,
+             .                   }
+             .               }
+             .           
+             .               fn name(self) -> &'static str {
+             .                   match self {
+             .                       Self::Compact4 => "compact4",
+-- line 507 ----------------------------------------
+-- line 508 ----------------------------------------
+             .                       Self::Standard => "standard",
+             .                       Self::Wide3 => "wide3",
+             .                       Self::Wide5 => "wide5",
+             .                   }
+             .               }
+             .           }
+             .           
+             .           impl RootBloom {
+             8 ( 0.00%)      fn with_capacity(keys: usize) -> Self {
+             .                   Self::with_profile(keys, RootBloomProfile::from_env())
+             8 ( 0.00%)      }
+             .           
+             .               fn with_profile(keys: usize, profile: RootBloomProfile) -> Self {
+             .                   let bits = keys
+             .                       .checked_mul(profile.bits_per_request())
+             .                       .and_then(usize::checked_next_power_of_two)
+             .                       .expect("root Bloom size overflow")
+             .                       .max(64);
+             6 ( 0.00%)          Self {
+             1 ( 0.00%)              words: vec![0; bits / 64],
+             .                       bit_mask: bits - 1,
+             .                       hashes: profile.hashes(),
+             .                       profile,
+             .                   }
+             .               }
+             .           
+             .               #[inline(always)]
+             .               fn hash_pair(key: u128) -> (u64, u64) {
+             .                   let low = key as u64;
+             .                   let high = (key >> 64) as u64;
+             .                   (
+    46,720,000 ( 0.04%)              mix_root_bloom(low ^ high.rotate_left(23) ^ 0xA5A5_38F9_9328_6F3D),
+    70,080,000 ( 0.06%)              mix_root_bloom(high ^ low.rotate_left(17) ^ 0xD4C9_3E72_B719_485B) | 1,
+             .                   )
+             .               }
+             .           
+             .               #[inline(always)]
+             .               fn insert(&mut self, key: u128) {
+             .                   let (first, step) = Self::hash_pair(key);
+             .                   for index in 0..self.hashes {
+             .                       let bit =
+       700,080 ( 0.00%)                  first.wrapping_add((index as u64).wrapping_mul(step)) as usize & self.bit_mask;
+     1,750,200 ( 0.00%)              self.words[bit >> 6] |= 1u64 << (bit & 63);
+             .                   }
+             .               }
+             .           
+             .               #[inline(always)]
+             .               fn contains(&self, key: u128) -> bool {
+             .                   let (first, step) = Self::hash_pair(key);
+             .                   for index in 0..self.hashes {
+             .                       let bit =
+    27,502,552 ( 0.02%)                  first.wrapping_add((index as u64).wrapping_mul(step)) as usize & self.bit_mask;
+    80,394,198 ( 0.06%)              if self.words[bit >> 6] & (1u64 << (bit & 63)) == 0 {
+             .                           return false;
+             .                       }
+             .                   }
+             .                   true
+             .               }
+             .           
+             .               fn bytes(&self) -> usize {
+             .                   self.words.len() * std::mem::size_of::<u64>()
+             .               }
+             .           }
+             .           
+             .           #[inline(always)]
+             .           fn mix_root_bloom(mut value: u64) -> u64 {
+    81,760,000 ( 0.07%)      value = (value ^ (value >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    81,760,000 ( 0.07%)      value = (value ^ (value >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    70,080,000 ( 0.06%)      value ^ (value >> 31)
+             .           }
+             .           
+             .           fn root_bloom_enabled() -> bool {
+             .               // Enabled by default (opt out with KIC_ROOT_BLOOM=0): most root-table
+             .               // probe keys miss, and the Bloom prefilter avoids a random DRAM walk per
+             .               // miss. Exactness is unchanged; a Bloom pass still probes the table.
+             .               std::env::var("KIC_ROOT_BLOOM").as_deref() != Ok("0")
+             .           }
+-- line 584 ----------------------------------------
+-- line 588 ----------------------------------------
+             .               // transparent huge pages before they are first written. Off by default;
+             .               // contents and probe order are unchanged either way.
+             .               std::env::var("KIC_ROOT_TABLE_HUGEPAGE").as_deref() == Ok("1")
+             .           }
+             .           
+             .           /// A root-slot vector of `len` copies of `fill`. With the huge-page request
+             .           /// on Linux, the allocation is advised `MADV_HUGEPAGE` before it is filled,
+             .           /// so the first-touch faults can map 2 MiB pages; otherwise it is `vec!`.
+            13 ( 0.00%)  fn root_slot_vec<T: Clone>(len: usize, fill: T) -> Vec<T> {
+             .               if !root_table_hugepage_requested() {
+             .                   return vec![fill; len];
+             .               }
+             .               let mut slots: Vec<T> = Vec::with_capacity(len);
+             .               advise_hugepage(
+             .                   slots.as_mut_ptr() as *mut u8,
+             .                   len * std::mem::size_of::<T>(),
+             .               );
+             .               slots.resize(len, fill);
+             .               slots
+             9 ( 0.00%)  }
+             .           
+             .           #[cfg(target_os = "linux")]
+             .           fn advise_hugepage(ptr: *mut u8, bytes: usize) {
+             .               const PAGE: usize = 4096;
+             .               let start = (ptr as usize).div_ceil(PAGE) * PAGE;
+             .               let end = (ptr as usize + bytes) / PAGE * PAGE;
+             .               if end > start {
+             .                   // SAFETY: [start, end) lies inside the vector's live allocation;
+-- line 615 ----------------------------------------
+-- line 879 ----------------------------------------
+             .           
+             .           struct Index {
+             .               states: Vec<State>,
+             .               table: RootTable,
+             .               shifted: Vec<Vec<u64>>,
+             .           }
+             .           
+             .           fn pack(left: u16, right: u16, relative: u16, shift: u32) -> u64 {
+       233,600 ( 0.00%)      (left as u64) | ((right as u64) << 16) | ((relative as u64) << 32) | ((shift as u64) << 48)
+             .           }
+             .           
+             .           fn unpack(value: u64) -> (usize, usize, usize, u32) {
+             .               (
+             .                   (value & 0xffff) as usize,
+             .                   ((value >> 16) & 0xffff) as usize,
+             .                   ((value >> 32) & 0xffff) as usize,
+             .                   ((value >> 48) & 0xffff) as u32,
+-- line 895 ----------------------------------------
+-- line 1154 ----------------------------------------
+             .                   fast.scalar_mul(rep, &BigUint::from(lambda)),
+             .                   rep.map(|(x, y)| (gf.sqr(x), gf.sqr(y))),
+             .                   "Frobenius must act as lambda on the subgroup"
+             .               );
+             .               (points, labels, reps, scanned)
+             .           }
+             .           
+             .           fn mulmod(a: u64, b: u64, r: u64) -> u64 {
+        23,360 ( 0.00%)      ((a as u128 * b as u128) % r as u128) as u64
+        40,880 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/macros.rs:__umodti3 (2,920x)
+             .           }
+             .           
+             .           fn powmod(mut a: u64, mut e: u64, r: u64) -> u64 {
+             .               let mut acc = 1u64;
+             .               while e > 0 {
+             .                   if e & 1 == 1 {
+             .                       acc = mulmod(acc, a, r);
+             .                   }
+-- line 1170 ----------------------------------------
+-- line 1265 ----------------------------------------
+             .           
+             .               /// F2-linear map on n ≤ 128 bits applied by byte tables.
+             .               #[derive(Clone)]
+             .               struct Linear128 {
+             .                   tables: Vec<[u128; 256]>,
+             .               }
+             .           
+             .               impl Linear128 {
+            32 ( 0.00%)          fn from_images(images: &[u128]) -> Self {
+             .                       let chunks = images.len().div_ceil(8);
+             .                       let mut tables = vec![[0u128; 256]; chunks];
+             .                       for (chunk, table) in tables.iter_mut().enumerate() {
+             .                           for byte in 1usize..256 {
+             .                               let low = byte & (byte - 1);
+        30,600 ( 0.00%)                      let bit = chunk * 8 + byte.trailing_zeros() as usize;
+             .                               let image = images.get(bit).copied().unwrap_or(0);
+        51,000 ( 0.00%)                      table[byte] = table[low] ^ image;
+             .                           }
+             .                       }
+            12 ( 0.00%)              Self { tables }
+            32 ( 0.00%)          }
+             .           
+             .                   #[inline(always)]
+             .                   fn apply(&self, v: u128) -> u128 {
+             .                       let mut acc = 0u128;
+        33,781 ( 0.00%)              for (chunk, table) in self.tables.iter().enumerate() {
+ 5,421,793,525 ( 4.36%)                  acc ^= table[((v >> (8 * chunk)) & 0xff) as usize];
+             .                       }
+             .                       acc
+             .                   }
+             .               }
+             .           
+             .               #[derive(Clone)]
+             .               struct NormalBasis128 {
+             .                   n: u32,
+             .                   mask: u128,
+             .                   to_normal: Linear128,
+             .                   to_poly: Linear128,
+             .                   sparse_canonical: bool,
+             .               }
+             .           
+             .               impl NormalBasis128 {
+             9 ( 0.00%)          fn new(gf: &Gf2_128) -> Self {
+             1 ( 0.00%)              let n = gf.n as usize;
+            18 ( 0.00%)              let mask = (1u128 << n) - 1;
+             .                       for candidate in 2u128.. {
+             .                           let mut conjugates = Vec::with_capacity(n);
+             8 ( 0.00%)                  let mut value = candidate & mask;
+             .                           for _ in 0..n {
+             .                               conjugates.push(value);
+           876 ( 0.00%)                      value = gf.sqr(value);
+        28,032 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (146x)
+             .                           }
+             4 ( 0.00%)                  let Some(inverse_columns) = invert_columns128(&conjugates, n) else {
+             .                               continue;
+             .                           };
+            17 ( 0.00%)                  return Self {
+             .                               n: gf.n,
+             .                               mask,
+             1 ( 0.00%)                      to_normal: Linear128::from_images(&inverse_columns),
+        97,330 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::Linear128>::from_images (1x)
+             1 ( 0.00%)                      to_poly: Linear128::from_images(&conjugates),
+        97,214 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::Linear128>::from_images (1x)
+             .                               sparse_canonical: std::env::var("KIC_SPARSE_CANONICAL").as_deref() == Ok("1"),
+             .                           };
+             .                       }
+             .                       unreachable!()
+             8 ( 0.00%)          }
+             .           
+             .                   #[inline(always)]
+             .                   fn rotate(&self, v: u128, k: u32) -> u128 {
+   171,265,684 ( 0.14%)              if k == 0 {
+             .                           return v;
+             .                       }
+    19,089,592 ( 0.02%)              ((v << k) | (v >> (self.n - k))) & self.mask
+             .                   }
+             .           
+             .                   #[inline(always)]
+             .                   fn canonical(&self, v: u128) -> (u128, u32) {
+             .                       let mut best = v;
+             .                       let mut best_shift = 0;
+             .                       let mut current = v;
+             .                       for shift in 1..self.n {
+11,167,948,800 ( 8.98%)                  current = ((current << 1) | (current >> (self.n - 1))) & self.mask;
+ 5,146,675,200 ( 4.14%)                  if current < best {
+             .                               best = current;
+             .                               best_shift = shift;
+             .                           }
+             .                       }
+             .                       (best, best_shift)
+             .                   }
+             .           
+             .                   /// Wide-word analogue of the exact cyclic zero-gap selector.
+-- line 1354 ----------------------------------------
+-- line 1399 ----------------------------------------
+             .                               best_shift = shift;
+             .                           }
+             .                       }
+             .                       (best_value, best_shift)
+             .                   }
+             .           
+             .                   #[inline(always)]
+             .                   fn canonical_selected(&self, v: u128) -> (u128, u32) {
+    59,100,800 ( 0.05%)              if self.sparse_canonical {
+             .                           self.canonical_sparse(v)
+             .                       } else {
+             .                           self.canonical(v)
+             .                       }
+             .                   }
+             .               }
+             .           
+             .               #[cfg(test)]
+-- line 1415 ----------------------------------------
+-- line 1479 ----------------------------------------
+             .           
+             .               /// Same Gauss-Jordan as the twin, with rows as `(m, i)` word pairs
+             .               /// (the M and I halves no longer share one word past 64 columns).
+             .               fn invert_columns128(columns: &[u128], n: usize) -> Option<Vec<u128>> {
+             .                   let mut rows: Vec<(u128, u128)> = (0..n)
+             .                       .map(|r| {
+             .                           let mut m = 0u128;
+             .                           for (i, &column) in columns.iter().enumerate() {
+       202,064 ( 0.00%)                      if (column >> r) & 1 == 1 {
+             .                                   m |= 1u128 << i;
+             .                               }
+             .                           }
+             .                           (m, 1u128 << r)
+             .                       })
+             .                       .collect();
+             .                   for pivot in 0..n {
+         1,800 ( 0.00%)              let found = (pivot..n).find(|&r| (rows[r].0 >> pivot) & 1 == 1)?;
+             .                       rows.swap(pivot, found);
+             .                       for r in 0..n {
+       119,415 ( 0.00%)                  if r != pivot && (rows[r].0 >> pivot) & 1 == 1 {
+        17,140 ( 0.00%)                      rows[r].0 ^= rows[pivot].0;
+        29,995 ( 0.00%)                      rows[r].1 ^= rows[pivot].1;
+             .                           }
+             .                       }
+             .                   }
+             .                   let mut images = vec![0u128; n];
+           803 ( 0.00%)          for (i, &(_, ih)) in rows.iter().enumerate() {
+             .                       for r in 0..n {
+        53,290 ( 0.00%)                  if (ih >> r) & 1 == 1 {
+         9,045 ( 0.00%)                      images[r] |= 1u128 << i;
+             .                           }
+             .                       }
+             .                   }
+             .                   Some(images)
+             .               }
+             .           
+             .               /// Table-driven S3 root solver on wide words.
+             .               struct S3Solver128 {
+             .                   square: Linear128,
+             .                   half_trace: Linear128,
+             .                   trace_mask: u128,
+             .                   b: u128,
+             .               }
+             .           
+             .               impl S3Solver128 {
+             8 ( 0.00%)          fn new(gf: &Gf2_128, b: u128) -> Self {
+             2 ( 0.00%)              let n = gf.n as usize;
+             2 ( 0.00%)              assert!(n % 2 == 1, "half-trace solver needs odd n");
+           729 ( 0.00%)              let unit: Vec<u128> = (0..n).map(|bit| 1u128 << bit).collect();
+             .                       let half_trace_images: Vec<u128> = unit
+             .                           .iter()
+             .                           .map(|&e| {
+             .                               let mut acc = e;
+             .                               let mut power = e;
+           219 ( 0.00%)                      for _ in 0..(n - 1) / 2 {
+        15,768 ( 0.00%)                          power = gf.sqr(gf.sqr(power));
+     1,009,152 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (5,256x)
+         5,256 ( 0.00%)                          acc ^= power;
+             .                               }
+             .                               acc
+             .                           })
+             .                           .collect();
+             .                       let mut trace_mask = 0u128;
+            73 ( 0.00%)              for (bit, &e) in unit.iter().enumerate() {
+             .                           let mut acc = e;
+             .                           let mut power = e;
+             .                           for _ in 1..n {
+        10,512 ( 0.00%)                      power = gf.sqr(power);
+     1,009,152 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (5,256x)
+        10,512 ( 0.00%)                      acc ^= power;
+             .                           }
+         1,168 ( 0.00%)                  if acc & 1 == 1 {
+             .                               trace_mask |= 1u128 << bit;
+             .                           }
+             .                       }
+            14 ( 0.00%)              Self {
+             3 ( 0.00%)                  square: Linear128::from_images(
+        97,206 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::Linear128>::from_images (1x)
+            76 ( 0.00%)                      &unit.iter().map(|&e| gf.sqr(e)).collect::<Vec<_>>(),
+        14,016 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (73x)
+             .                           ),
+             5 ( 0.00%)                  half_trace: Linear128::from_images(&half_trace_images),
+        97,126 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::Linear128>::from_images (1x)
+             .                           trace_mask,
+             .                           b,
+             .                       }
+             8 ( 0.00%)          }
+             .           
+             .                   /// Everything before the inversion: `a = (left + right)^2`,
+             .                   /// `p = left·right`, `ps = p^2`, and the denominator `a·ps`
+             .                   /// (zero marks the exceptional path, which `finish` routes to the
+             .                   /// direct solver exactly as the scalar `roots` did).
+             .                   #[inline(always)]
+             .                   fn prepare(&self, gf: &Gf2_128, left: u128, right: u128) -> PreparedRoot128 {
+         6,141 ( 0.00%)              let a = self.square.apply(left ^ right);
+    24,077,176 ( 0.02%)              let p = gf.mul(left, right);
+       325,473 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (2,047x)
+             .                       let ps = self.square.apply(p);
+    88,679,578 ( 0.07%)              let denominator = if a == 0 || ps == 0 { 0 } else { gf.mul(a, ps) };
+       325,473 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (2,047x)
+             .                       PreparedRoot128 {
+             .                           left,
+             .                           right,
+             .                           a,
+             .                           p,
+             .                           ps,
+             .                           denominator,
+             .                       }
+-- line 1579 ----------------------------------------
+-- line 1583 ----------------------------------------
+             .                   /// (ignored on the exceptional path).
+             .                   #[inline(always)]
+             .                   fn finish(
+             .                       &self,
+             .                       gf: &Gf2_128,
+             .                       prepared: PreparedRoot128,
+             .                       inverse: u128,
+             .                   ) -> Option<[u128; 2]> {
+    11,680,000 ( 0.01%)              if prepared.denominator == 0 {
+           400 ( 0.00%)                  return s3_x_roots_128(gf, self.b, prepared.left, prepared.right);
+       516,760 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:crypto_lib::cryptanalysis::koblitz_fast_arith::s3_x_roots_128 (40x)
+             .                       }
+    65,553,018 ( 0.05%)              let q = gf.mul(prepared.p, gf.mul(prepared.ps, inverse));
+       650,946 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (4,094x)
+    17,876,421 ( 0.01%)              let c = prepared.ps ^ self.b;
+   119,055,286 ( 0.10%)              let d = gf.mul(gf.mul(c, prepared.a), gf.mul(prepared.a, inverse));
+       976,419 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (6,141x)
+    29,793,006 ( 0.02%)              if (d & self.trace_mask).count_ones() & 1 == 1 {
+             .                           return None;
+             .                       }
+    29,672,185 ( 0.02%)              let first = gf.mul(q, self.half_trace.apply(d));
+       163,611 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (1,029x)
+    47,779,072 ( 0.04%)              Some([first, first ^ q])
+             .                   }
+             .           
+             .                   /// Scalar form: one inversion per call, same root order as the
+             .                   /// batched form.
+             .                   #[inline(always)]
+             .                   fn roots(
+             .                       &self,
+             .                       gf: &Gf2_128,
+             .                       basis: &NormalBasis128,
+             .                       left: u128,
+             .                       right: u128,
+             .                   ) -> Option<[u128; 2]> {
+             .                       let prepared = self.prepare(gf, left, right);
+       237,614 ( 0.00%)              let inverse = if prepared.denominator == 0 {
+             .                           0
+             .                       } else {
+             .                           invert128(gf, basis, prepared.denominator)
+             .                       };
+             .                       self.finish(gf, prepared, inverse)
+             .                   }
+             .               }
+             .           
+-- line 1623 ----------------------------------------
+-- line 1649 ----------------------------------------
+             .                           prepared: Vec::with_capacity(entries),
+             .                           inverses: Vec::with_capacity(entries),
+             .                           prefixes: Vec::with_capacity(entries),
+             .                           regular: Vec::with_capacity(entries),
+             .                           results: Vec::with_capacity(entries),
+             .                       }
+             .                   }
+             .           
+       480,000 ( 0.00%)          fn solve(
+             .                       &mut self,
+             .                       gf: &Gf2_128,
+             .                       basis: &NormalBasis128,
+             .                       solver: &S3Solver128,
+             .                       inputs: &[(u128, u128)],
+             .                   ) {
+             .                       self.prepared.clear();
+             .                       self.inverses.clear();
+             .                       self.prefixes.clear();
+             .                       self.regular.clear();
+             .                       self.results.clear();
+             .                       self.inverses.resize(inputs.len(), 0);
+             .                       self.prefixes.resize(inputs.len(), 0);
+    58,400,000 ( 0.05%)              for (index, &(left, right)) in inputs.iter().enumerate() {
+             .                           let prepared = solver.prepare(gf, left, right);
+    11,680,000 ( 0.01%)                  if prepared.denominator != 0 {
+             .                               self.regular.push(index);
+             .                           }
+             .                           self.prepared.push(prepared);
+             .                       }
+        80,000 ( 0.00%)              if !self.regular.is_empty() {
+             .                           let mut product = 1u128;
+     5,840,000 ( 0.00%)                  for &index in &self.regular {
+    11,680,000 ( 0.01%)                      self.prefixes[index] = product;
+    52,560,000 ( 0.04%)                      product = gf.mul(product, self.prepared[index].denominator);
+   928,560,000 ( 0.75%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (5,840,000x)
+             .                           }
+             .                           // A product of non-zero field elements is non-zero.
+             .                           let mut inverse_product = invert128(gf, basis, product);
+     5,880,000 ( 0.00%)                  for &index in self.regular.iter().rev() {
+    52,560,000 ( 0.04%)                      self.inverses[index] = gf.mul(inverse_product, self.prefixes[index]);
+   928,560,000 ( 0.75%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (5,840,000x)
+    52,560,000 ( 0.04%)                      inverse_product = gf.mul(inverse_product, self.prepared[index].denominator);
+   928,560,000 ( 0.75%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (5,840,000x)
+             .                           }
+             .                       }
+        40,000 ( 0.00%)              for (prepared, &inverse) in self.prepared.iter().zip(&self.inverses) {
+    52,560,000 ( 0.04%)                  self.results.push(solver.finish(gf, *prepared, inverse));
+             .                       }
+       320,000 ( 0.00%)          }
+             .               }
+             .           
+             .               #[inline(always)]
+             .               fn invert128(gf: &Gf2_128, basis: &NormalBasis128, a: u128) -> u128 {
+       164,094 ( 0.00%)          let e = gf.n - 1;
+             .                   let mut c = a;
+             .                   let mut k = 1u32;
+             .                   let bits = 32 - e.leading_zeros();
+       614,329 ( 0.00%)          for i in (0..bits - 1).rev() {
+             .                       let raised = basis
+             .                           .to_poly
+             .                           .apply(basis.rotate(basis.to_normal.apply(c), k));
+     6,165,330 ( 0.00%)              c = gf.mul(c, raised);
+     1,952,838 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (12,282x)
+     2,630,808 ( 0.00%)              k *= 2;
+     1,905,684 ( 0.00%)              if (e >> i) & 1 == 1 {
+     1,394,550 ( 0.00%)                  c = gf.mul(gf.sqr(c), a);
+       325,473 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (2,047x)
+       393,024 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (2,047x)
+       275,567 ( 0.00%)                  k += 1;
+             .                       }
+             .                   }
+       555,228 ( 0.00%)          gf.sqr(c)
+       393,024 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (2,047x)
+             .               }
+             .           
+             .               /// Store the canonical key and its witness in one `u128` slot when their
+             .               /// combined bit widths leave the top bit free for the empty marker.
+             .               /// The witness uses exact widths for the number of representatives and
+             .               /// Frobenius rotations; insertion order and the first witness are kept.
+             .               #[derive(Clone, Copy)]
+             .               struct PackedRootLayout {
+-- line 1722 ----------------------------------------
+-- line 1918 ----------------------------------------
+             .                   }
+             .           
+             .                   fn with_capacity(
+             .                       entries: usize,
+             .                       degree: u32,
+             .                       representatives: usize,
+             .                       packed: bool,
+             .                   ) -> Self {
+             2 ( 0.00%)              let slots = (entries * 2).next_power_of_two().max(16);
+             .                       let packed_layout = packed.then(|| PackedRootLayout::new(degree, representatives));
+            33 ( 0.00%)              Self {
+             .                           slots: if packed {
+             .                               RootSlots128::Packed(crate::root_slot_vec(slots, u128::MAX))
+             .                           } else {
+             5 ( 0.00%)                      RootSlots128::Wide(crate::root_slot_vec(slots, (u128::MAX, 0)))
+     1,771,122 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::root_slot_vec::<(u128, u64)> (1x)
+             .                           },
+             1 ( 0.00%)                  shift: 128 - slots.trailing_zeros(),
+             .                           len: 0,
+             1 ( 0.00%)                  bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
+       263,697 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::RootBloom>::with_capacity (1x)
+             .                           packed_layout,
+             .                           indexed83_id30: false,
+             .                       }
+             .                   }
+             .           
+             .                   #[inline(always)]
+             .                   fn slot(&self, key: u128) -> usize {
+     1,336,728 ( 0.00%)              (key.wrapping_mul(0x9E37_79B9_7F4A_7C15_9E37_79B9_7F4A_7C15) >> self.shift) as usize
+             .                   }
+             .           
+             .                   fn layout_receipt(&self) -> (&'static str, usize, usize) {
+             .                       match &self.slots {
+             .                           RootSlots128::Wide(slots) => (
+             .                               "wide_u128_u64",
+             .                               std::mem::size_of::<(u128, u64)>(),
+             .                               slots.len() * std::mem::size_of::<(u128, u64)>(),
+-- line 1952 ----------------------------------------
+-- line 2104 ----------------------------------------
+             .                           if old_fingerprint == fingerprint && key_of(state_index, root_selector) == key {
+             .                               return Some((state_index, root_selector));
+             .                           }
+             .                           slot = (slot + 1) & mask;
+             .                       }
+             .                   }
+             .           
+             .                   fn insert_if_absent(&mut self, key: u128, value: u64) {
+       467,200 ( 0.00%)              let mask = match &self.slots {
+             .                           RootSlots128::Wide(slots) => slots.len() - 1,
+             .                           RootSlots128::Packed(slots) => slots.len() - 1,
+             .                           RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_) => {
+             .                               unreachable!("use indexed insertion")
+             .                           }
+             .                       };
+             .                       let mut slot = self.slot(key);
+             .                       let inserted = match &mut self.slots {
+             .                           RootSlots128::Wide(slots) => loop {
+     1,815,944 ( 0.00%)                      if slots[slot].0 == u128::MAX {
+       466,720 ( 0.00%)                          slots[slot] = (key, value);
+             .                                   break true;
+             .                               }
+       603,256 ( 0.00%)                      if slots[slot].0 == key {
+             .                                   break false;
+             .                               }
+        67,788 ( 0.00%)                      slot = (slot + 1) & mask;
+             .                           },
+             .                           RootSlots128::Packed(slots) => {
+             .                               let layout = self.packed_layout.expect("packed slots need layout");
+             .                               loop {
+             .                                   if slots[slot] == u128::MAX {
+             .                                       slots[slot] = layout.encode(key, value);
+             .                                       break true;
+             .                                   }
+-- line 2137 ----------------------------------------
+-- line 2141 ----------------------------------------
+             .                                   slot = (slot + 1) & mask;
+             .                               }
+             .                           }
+             .                           RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_) => {
+             .                               unreachable!("use indexed insertion")
+             .                           }
+             .                       };
+             .                       if inserted {
+       816,760 ( 0.00%)                  self.len += 1;
+       116,680 ( 0.00%)                  if let Some(bloom) = &mut self.bloom {
+             .                               bloom.insert(key);
+             .                           }
+             .                       }
+             .                   }
+             .           
+             .                   #[inline(always)]
+             .                   fn get(&self, key: u128) -> Option<u64> {
+             .                       if self
+             .                           .bloom
+             .                           .as_ref()
+             .                           .is_some_and(|bloom| !bloom.contains(key))
+             .                       {
+             .                           return None;
+             .                       }
+        84,364 ( 0.00%)              let mask = match &self.slots {
+             .                           RootSlots128::Wide(slots) => slots.len() - 1,
+             .                           RootSlots128::Packed(slots) => slots.len() - 1,
+             .                           RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_) => {
+             .                               unreachable!("use contextual indexed lookup")
+             .                           }
+             .                       };
+             .                       let mut slot = self.slot(key);
+             .                       match &self.slots {
+             .                           RootSlots128::Wide(slots) => loop {
+       111,756 ( 0.00%)                      let (stored, value) = slots[slot];
+       335,268 ( 0.00%)                      if stored == key {
+             .                                   return Some(value);
+             .                               }
+       167,634 ( 0.00%)                      if stored == u128::MAX {
+             .                                   return None;
+             .                               }
+        27,392 ( 0.00%)                      slot = (slot + 1) & mask;
+             .                           },
+             .                           RootSlots128::Packed(slots) => {
+             .                               let layout = self.packed_layout.expect("packed slots need layout");
+             .                               loop {
+             .                                   let stored = slots[slot];
+             .                                   if stored == u128::MAX {
+             .                                       return None;
+             .                                   }
+-- line 2190 ----------------------------------------
+-- line 2202 ----------------------------------------
+             .           
+             .                   #[inline(always)]
+             .                   fn get_with_context(
+             .                       &self,
+             .                       key: u128,
+             .                       states: &StateStore128,
+             .                       basis: &NormalBasis128,
+             .                   ) -> Option<u64> {
+    11,680,000 ( 0.01%)              if !matches!(
+             .                           &self.slots,
+             .                           RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_)
+             .                       ) {
+             .                           return self.get(key);
+             .                       }
+             .                       let (state_index, root_selector) = self.get_indexed83(key, |index, selector| {
+             .                           basis.canonical_selected(states.root_at(index, selector)).0
+             .                       })?;
+-- line 2218 ----------------------------------------
+-- line 3164 ----------------------------------------
+             .                       shifted: Vec<Vec<u128>>,
+             .                       gf: Box<Gf2_128>,
+             .                       basis: Box<NormalBasis128>,
+             .                   },
+             .               }
+             .           
+             .               impl StateStore128 {
+             .                   fn len(&self) -> usize {
+            29 ( 0.00%)              match self {
+             .                           Self::Wide(states) => states.len(),
+             .                           Self::Packed83(states) => states.len(),
+             .                           Self::Packed26(states) => states.len(),
+             .                           Self::RootOnly83 { states, .. } => states.len(),
+             .                           Self::RootOnly21 { states, .. } => states.len(),
+             .                           Self::RootOnly11 { states, .. } => states.len(),
+             .                       }
+             .                   }
+             .           
+     1,411,209 ( 0.00%)          fn get(&self, index: usize) -> State128 {
+     1,724,811 ( 0.00%)              match self {
+     1,097,607 ( 0.00%)                  Self::Wide(states) => states[index],
+             .                           Self::Packed83(states) => states[index].to_wide(),
+             .                           Self::Packed26(states) => states[index].to_wide(),
+             .                           Self::RootOnly83 { states, k } => {
+             .                               let (left, right, relative) = symmetric_labels_for_ordinal(*k, index);
+             .                               State128 {
+             .                                   left,
+             .                                   right,
+             .                                   relative,
+-- line 3192 ----------------------------------------
+-- line 3216 ----------------------------------------
+             .                                   relative,
+             .                                   normal_roots: [
+             .                                       root11_at(states, *k, shifted, gf, basis, index, 0),
+             .                                       root11_at(states, *k, shifted, gf, basis, index, 1),
+             .                                   ],
+             .                               }
+             .                           }
+             .                       }
+     1,411,209 ( 0.00%)          }
+             .           
+             .                   #[inline(always)]
+             .                   fn root_at(&self, index: usize, selector: usize) -> u128 {
+             .                       assert!(selector < 2);
+             .                       match self {
+             .                           Self::Wide(states) => states[index].normal_roots[selector],
+             .                           Self::Packed83(states) => {
+             .                               let state = states[index];
+-- line 3232 ----------------------------------------
+-- line 3603 ----------------------------------------
+             .           
+             .               struct Base128 {
+             .                   points: Vec<FastPoint128>,
+             .                   labels: Vec<(usize, u64)>,
+             .                   by_x: HashMap<u128, Vec<usize>>,
+             .                   columns: usize,
+             .               }
+             .           
+            13 ( 0.00%)      fn build_index128(
+             .                   gf: &Gf2_128,
+             .                   basis: &NormalBasis128,
+             .                   solver: &S3Solver128,
+             .                   reps: &[u128],
+             .               ) -> Index128 {
+             .                   let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
+             .                   let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
+            12 ( 0.00%)          build_index128_with_symmetry(gf, basis, solver, reps, symmetric_states, indexed5_load75)
+ 1,168,290,689 ( 0.94%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::build_index128_with_symmetry (1x)
+             7 ( 0.00%)      }
+             .           
+             7 ( 0.00%)      fn build_index128_with_symmetry(
+             .                   gf: &Gf2_128,
+             .                   basis: &NormalBasis128,
+             .                   solver: &S3Solver128,
+             .                   reps: &[u128],
+             .                   symmetric_states: bool,
+             .                   indexed5_load75: bool,
+             .               ) -> Index128 {
+             4 ( 0.00%)          let n = gf.n as usize;
+             .                   assert!(
+             2 ( 0.00%)              !symmetric_states || gf.n == 83,
+             .                       "symmetric S3 index requires N83"
+             .                   );
+             .                   let shifted: Vec<Vec<u128>> = reps
+             .                       .iter()
+             .                       .map(|&code| {
+            41 ( 0.00%)                  let mut row = Vec::with_capacity(n);
+             .                           let mut value = code;
+           240 ( 0.00%)                  for _ in 0..n {
+             .                               row.push(value);
+        17,520 ( 0.00%)                      value = gf.sqr(value);
+       560,640 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (2,920x)
+             .                           }
+           200 ( 0.00%)                  row
+             .                       })
+             .                       .collect();
+             .                   let packed_state83 = std::env::var("KIC_STATE28").as_deref() == Ok("1");
+             .                   let packed_state26 = std::env::var("KIC_STATE26").as_deref() == Ok("1");
+             .                   let root_only83 = std::env::var("KIC_ROOT_ONLY22").as_deref() == Ok("1");
+             .                   let root_only21 = std::env::var("KIC_ROOT_ONLY21").as_deref() == Ok("1");
+             .                   let root_only11 = std::env::var("KIC_ROOT_ONLY11").as_deref() == Ok("1");
+             .                   let indexed5_id30 = std::env::var("KIC_INDEXED5_ID30").as_deref() == Ok("1");
+-- line 3652 ----------------------------------------
+-- line 3653 ----------------------------------------
+             .                   let indexed4_table = std::env::var("KIC_INDEXED_ROOT4").as_deref() == Ok("1");
+             .                   let indexed4_fixed30 = std::env::var("KIC_INDEXED4_FIXED30").as_deref() == Ok("1");
+             .                   let indexed4_fixed31 = std::env::var("KIC_INDEXED4_FIXED31").as_deref() == Ok("1");
+             .                   assert!(
+             .                       !(indexed4_fixed30 && indexed4_fixed31),
+             .                       "select one four-byte root table capacity"
+             .                   );
+             .                   assert!(
+             8 ( 0.00%)              (packed_state83 as u8
+             .                           + packed_state26 as u8
+             .                           + root_only83 as u8
+             .                           + root_only21 as u8
+             .                           + root_only11 as u8)
+             .                           <= 1,
+             .                       "select one packed state layout"
+             .                   );
+             2 ( 0.00%)          assert!(!packed_state83 || gf.n == 83, "28-byte states require N83");
+             2 ( 0.00%)          assert!(!packed_state26 || gf.n == 83, "26-byte states require N83");
+             .                   assert!(
+             4 ( 0.00%)              !(root_only83 || root_only21 || root_only11) || (gf.n == 83 && symmetric_states),
+             .                       "root-only states require symmetric N83 traversal"
+             .                   );
+             .                   assert!(
+             2 ( 0.00%)              !packed_state26 || reps.len() <= 4096,
+             .                       "26-byte state labels require K <= 4096"
+             .                   );
+             .                   // S3(x,y,z) is symmetric in x,y.  Frobenius^relative maps the
+             .                   // reversed pair (right,left,n-relative) to (left,right,relative)
+             .                   // up to exchange.  Canonical root keys are therefore identical.
+             .                   // Keep the lexicographically first state for every such pair so
+             .                   // first-inserted exact-root witnesses remain available.
+             1 ( 0.00%)          let k = reps.len();
+             2 ( 0.00%)          let max_states = if symmetric_states {
+             .                       k.checked_mul(k.saturating_sub(1))
+             .                           .and_then(|pairs| pairs.checked_div(2))
+             .                           .and_then(|pairs| pairs.checked_mul(n))
+             .                           .and_then(|off_diagonal| {
+             .                               k.checked_mul(n / 2 + 1)
+             .                                   .and_then(|diagonal| off_diagonal.checked_add(diagonal))
+             .                           })
+             .                           .expect("symmetric state capacity exceeds usize")
+             .                   } else {
+             .                       k.checked_mul(k)
+             .                           .and_then(|pairs| pairs.checked_mul(n))
+             .                           .expect("state capacity exceeds usize")
+             .                   };
+             2 ( 0.00%)          if root_only11 {
+             .                       assert!(
+             .                           ((std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
+             .                               && (std::env::var("KIC_INDEXED5_FIXED30").as_deref() == Ok("1")
+             .                                   || indexed5_load75)
+             .                               && !indexed4_table)
+             .                               || (indexed4_table
+             .                                   && indexed4_fixed31
+             .                                   && std::env::var("KIC_INDEXED_ROOT5").as_deref() != Ok("1")
+-- line 3707 ----------------------------------------
+-- line 3716 ----------------------------------------
+             .                                       31
+             .                                   } else {
+             .                                       30
+             .                                   }),
+             .                           "one-root complete key bound exceeds fixed indexed slots"
+             .                       );
+             .                   }
+             .                   assert!(
+             2 ( 0.00%)              !indexed5_id30
+             .                           || (root_only11
+             .                               && !indexed4_table
+             .                               && indexed5_load75
+             .                               && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
+             .                       "30-bit indexed state IDs require one-root five-byte load75 slots"
+             .                   );
+             .                   // One-root states insert their exact keys while each second root is
+             .                   // still available.  The retained state count is known from the
+-- line 3732 ----------------------------------------
+-- line 3746 ----------------------------------------
+             .                   });
+             .                   let mut early_root11_table = root11_request_entries.map(|entries| {
+             .                       if indexed4_table {
+             .                           RootTable128::with_capacity_indexed83_four(entries)
+             .                       } else {
+             .                           RootTable128::with_capacity_indexed83_mode(entries, indexed5_id30)
+             .                       }
+             .                   });
+             2 ( 0.00%)          let mut states83 = if packed_state83 {
+             .                       Vec::with_capacity(max_states)
+             .                   } else {
+             .                       Vec::new()
+             .                   };
+             2 ( 0.00%)          let mut states26 = if packed_state26 {
+             .                       Vec::with_capacity(max_states)
+             .                   } else {
+             .                       Vec::new()
+             .                   };
+             2 ( 0.00%)          let mut root_only_states = if root_only83 {
+             .                       Vec::with_capacity(max_states)
+             .                   } else {
+             .                       Vec::new()
+             .                   };
+             2 ( 0.00%)          let mut root_only21_states = if root_only21 {
+             .                       Vec::with_capacity(max_states)
+             .                   } else {
+             .                       Vec::new()
+             .                   };
+             2 ( 0.00%)          let mut root_only11_states = if root_only11 {
+             .                       Vec::with_capacity(max_states)
+             .                   } else {
+             .                       Vec::new()
+             .                   };
+             .                   let mut states_wide = Vec::new();
+             .                   for left in 0..reps.len() {
+             .                       for right in 0..reps.len() {
+             .                           for relative in 0..n {
+       233,600 ( 0.00%)                      if symmetric_states && (left > right || (left == right && relative > n / 2)) {
+             .                                   continue;
+             .                               }
+     1,168,000 ( 0.00%)                      let roots = solver.roots(gf, basis, shifted[left][0], shifted[right][relative]);
+            80 ( 0.00%)                      if root_only83 || root_only21 || root_only11 {
+             .                                   assert!(
+             .                                       roots.is_some(),
+             .                                       "root-only state domain has a missing S3 root"
+             .                                   );
+             .                               }
+           280 ( 0.00%)                      if let Some(roots) = roots {
+             .                                   let state = State128 {
+             .                                       left: left as u16,
+             .                                       right: right as u16,
+             .                                       relative: relative as u16,
+             .                                       normal_roots: [
+             .                                           basis.to_normal.apply(roots[0]),
+             .                                           basis.to_normal.apply(roots[1]),
+             .                                       ],
+             .                                   };
+       233,600 ( 0.00%)                          if packed_state83 {
+             .                                       states83.push(State83::from_wide(state));
+       233,600 ( 0.00%)                          } else if packed_state26 {
+             .                                       states26.push(State26::from_wide(state));
+       233,600 ( 0.00%)                          } else if root_only83 {
+             .                                       root_only_states.push(RootOnly83::from_wide(state));
+       233,600 ( 0.00%)                          } else if root_only21 {
+             .                                       root_only21_states.push(RootOnly21::from_wide(state));
+       233,600 ( 0.00%)                          } else if root_only11 {
+             .                                       let state_index = root_only11_states.len();
+             .                                       root_only11_states.push(RootOnly11::from_wide(state));
+             .                                       let table = early_root11_table.as_mut().unwrap();
+             .                                       for (selector, root) in state.normal_roots.into_iter().enumerate() {
+             .                                           let canonical = basis.canonical_selected(root).0;
+             .                                           table.insert_indexed83(
+             .                                               canonical,
+             .                                               state_index,
+-- line 3819 ----------------------------------------
+-- line 3835 ----------------------------------------
+             .                                       }
+             .                                   } else {
+             .                                       states_wide.push(state);
+             .                                   }
+             .                               }
+             .                           }
+             .                       }
+             .                   }
+             2 ( 0.00%)          let states = if packed_state83 {
+             .                       StateStore128::Packed83(states83)
+             2 ( 0.00%)          } else if packed_state26 {
+             .                       StateStore128::Packed26(states26)
+             2 ( 0.00%)          } else if root_only83 {
+             .                       assert_eq!(root_only_states.len(), max_states);
+             .                       StateStore128::RootOnly83 {
+             .                           states: root_only_states,
+             .                           k,
+             .                       }
+             2 ( 0.00%)          } else if root_only21 {
+             .                       assert_eq!(root_only21_states.len(), max_states);
+             .                       StateStore128::RootOnly21 {
+             .                           states: root_only21_states,
+             .                           k,
+             .                       }
+             2 ( 0.00%)          } else if root_only11 {
+             .                       assert_eq!(root_only11_states.len(), max_states);
+             .                       StateStore128::RootOnly11 {
+             .                           states: root_only11_states,
+             .                           k,
+             .                           shifted: shifted.clone(),
+             .                           gf: Box::new(gf.clone()),
+             .                           basis: Box::new(basis.clone()),
+             .                       }
+             .                   } else {
+            17 ( 0.00%)              StateStore128::Wide(states_wide)
+             .                   };
+             .                   let packed = std::env::var("KIC_PACKED_ROOT_TABLE").as_deref() == Ok("1");
+             .                   let dense_table = std::env::var("KIC_PACKED_ROOT_TABLE_DENSE").as_deref() == Ok("1");
+             .                   let load75_table = std::env::var("KIC_PACKED_ROOT_TABLE_LOAD75").as_deref() == Ok("1");
+             .                   let indexed5_table = std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1");
+             .                   let indexed5_fixed30 = std::env::var("KIC_INDEXED5_FIXED30").as_deref() == Ok("1");
+             .                   assert!(
+             2 ( 0.00%)              !indexed4_table
+             .                           || (!indexed5_table
+             .                               && ((root_only11 && indexed4_fixed31) || (root_only21 && indexed4_fixed30))),
+             .                       "four-byte root slots require one-root/fixed31 or 21-byte/fixed30 states"
+             .                   );
+             .                   assert!(
+             7 ( 0.00%)              !(dense_table || load75_table) || packed,
+             .                       "dense root table requires packed slots"
+             .                   );
+             .                   assert!(
+             2 ( 0.00%)              !(dense_table && load75_table),
+             .                       "select one dense root table request rule"
+             .                   );
+             .                   assert!(
+             2 ( 0.00%)              !indexed5_table
+             .                           || (gf.n == 83
+             .                               && (packed_state83
+             .                                   || packed_state26
+             .                                   || root_only83
+             .                                   || root_only21
+             .                                   || root_only11)
+             .                               && packed
+             .                               && !dense_table
+             .                               && !load75_table),
+             .                       "five-byte indexed roots require N83 compact states and the regular packed request"
+             .                   );
+             .                   assert!(
+             4 ( 0.00%)              !indexed5_load75 || indexed5_table,
+             .                       "indexed five-byte load75 request requires the indexed table"
+             .                   );
+             .                   assert!(
+             .                       !indexed5_fixed30
+             .                           || (indexed5_table && (root_only21 || root_only11) && !indexed5_load75),
+             .                       "fixed 2^30 root slots require an indexed root-only state layout"
+             .                   );
+             .                   if indexed5_fixed30 {
+             .                       assert!(
+             .                           max_states.checked_mul(2).unwrap() < (1usize << 30),
+             .                           "fixed 2^30 root table cannot hold all possible state roots"
+             .                       );
+             .                   }
+             4 ( 0.00%)          if indexed4_fixed31 {
+             .                       assert!(
+             .                           indexed4_table
+             .                               && max_states < (1usize << 29)
+             .                               && max_states.checked_mul(2).unwrap() < (1usize << 31),
+             .                           "fixed 2^31 four-byte table cannot encode all state roots"
+             .                       );
+             .                   }
+             9 ( 0.00%)          if indexed4_fixed30 {
+             .                       assert!(
+             .                           indexed4_table
+             .                               && root_only21
+             .                               && max_states < (1usize << 29)
+             .                               && max_states.checked_mul(2).unwrap() < (1usize << 30),
+             .                           "fixed 2^30 four-byte table cannot encode all state roots"
+             .                       );
+             .                   }
+             .                   // The symmetric quotient retains almost two distinct canonical root
+             .                   // keys per state.  Requesting 4*S/3 therefore targets at most 75%
+             .                   // occupancy after the constructor doubles the request.
+             2 ( 0.00%)          let root_table_request_entries = if let Some(entries) = root11_request_entries {
+             .                       entries
+             .                   } else if indexed4_fixed31 {
+             .                       1usize << 30
+             2 ( 0.00%)          } else if indexed4_fixed30 || indexed5_fixed30 {
+             .                       1usize << 29
+             2 ( 0.00%)          } else if indexed5_load75 {
+             .                       states
+             .                           .len()
+             .                           .checked_mul(4)
+             .                           .and_then(|n| n.checked_add(2))
+             .                           .expect("indexed root table request exceeds usize")
+             .                           / 3
+             2 ( 0.00%)          } else if load75_table {
+             .                       states
+             .                           .len()
+             .                           .checked_mul(2)
+             .                           .and_then(|n| n.checked_add(2))
+             .                           .expect("root table request exceeds usize")
+             .                           / 3
+             2 ( 0.00%)          } else if dense_table {
+             .                       states.len()
+             .                   } else {
+             1 ( 0.00%)              states.len() * 2
+             .                   };
+             5 ( 0.00%)          let mut table = if let Some(table) = early_root11_table {
+             .                       table
+             2 ( 0.00%)          } else if indexed4_table {
+             .                       RootTable128::with_capacity_indexed83_four(root_table_request_entries)
+             3 ( 0.00%)          } else if indexed5_table {
+             .                       RootTable128::with_capacity_indexed83_mode(root_table_request_entries, indexed5_id30)
+             .                   } else {
+             .                       RootTable128::with_capacity(root_table_request_entries, gf.n, reps.len(), packed)
+             .                   };
+             3 ( 0.00%)          if !root_only11 {
+             .                       for state_index in 0..states.len() {
+       350,400 ( 0.00%)                  if matches!(
+             .                               &table.slots,
+             .                               RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_)
+             .                           ) {
+             .                               for root_selector in 0..2 {
+             .                                   let canonical = basis
+             .                                       .canonical_selected(states.root_at(state_index, root_selector))
+             .                                       .0;
+             .                                   table.insert_indexed83(
+-- line 3982 ----------------------------------------
+-- line 3984 ----------------------------------------
+             .                                       state_index,
+             .                                       root_selector,
+             .                                       |index, selector| {
+             .                                           basis.canonical_selected(states.root_at(index, selector)).0
+             .                                       },
+             .                                   );
+             .                               }
+             .                           } else {
+       467,200 ( 0.00%)                      let state = states.get(state_index);
+     4,905,600 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::StateStore128>::get (116,800x)
+       467,200 ( 0.00%)                      for &root in &state.normal_roots {
+             .                                   let (canonical, shift) = basis.canonical_selected(root);
+             .                                   table.insert_if_absent(
+             .                                       canonical,
+       467,200 ( 0.00%)                              pack(state.left, state.right, state.relative, shift),
+             .                                   );
+             .                               }
+             .                           }
+             .                       }
+             .                   }
+            22 ( 0.00%)          Index128 {
+            12 ( 0.00%)              states,
+             3 ( 0.00%)              table,
+            30 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (1x)
+             4 ( 0.00%)              shifted,
+             .                       symmetric_states,
+             .                       dense_table,
+             .                       load75_table,
+             .                       indexed5_table,
+             .                       indexed5_id30,
+             .                       indexed4_table,
+             .                       indexed5_load75,
+             .                       indexed5_fixed30,
+             .                       indexed4_fixed30,
+             .                       indexed4_fixed31,
+             .                       root_table_request_entries,
+             .                   }
+            20 ( 0.00%)      }
+             .           
+             .               /// Reusable scratch for batched affine adds in [`lift128`]: result
+             .               /// slots, Montgomery-batch denominators/prefixes, all reused across
+             .               /// calls so the hot lift loop performs no allocations.  The u128 twin
+             .               /// of the u64 pipeline's `LiftScratch`.
+            10 ( 0.00%)      #[derive(Default)]
+             .               struct LiftScratch128 {
+             .                   results: Vec<FastPoint128>,
+             .                   denominators: Vec<u128>,
+             .                   prefixes: Vec<u128>,
+             .                   regular: Vec<usize>,
+             .               }
+             .           
+             .               impl LiftScratch128 {
+-- line 4033 ----------------------------------------
+-- line 4130 ----------------------------------------
+             .               /// Per-state scratch for [`scan_state128`]: the `2n` candidate pairs
+             .               /// and their batched root solutions.
+             .               struct StateScan128 {
+             .                   inputs: Vec<(u128, u128)>,
+             .                   batch: RootBatch128,
+             .               }
+             .           
+             .               impl StateScan128 {
+             8 ( 0.00%)          fn new(n: u32) -> Self {
+             .                       let entries = 2 * n as usize;
+            18 ( 0.00%)              Self {
+             .                           inputs: Vec::with_capacity(entries),
+             .                           batch: RootBatch128::with_capacity(entries),
+             .                       }
+             9 ( 0.00%)          }
+             .               }
+             .           
+             .               /// Scan one index state against `target` in the sequential candidate
+             .               /// order (shift outer, stored root inner) and return the first lifted
+             .               /// relation.  The `2n` root-pair solves of the state share one field
+             .               /// inversion; the candidate order, the probe count at the hit and the
+             .               /// published relation are exactly those of the per-candidate scan.
+             .               #[inline(always)]
+-- line 4152 ----------------------------------------
+-- line 4163 ----------------------------------------
+             .                   scan: &mut StateScan128,
+             .                   lift_scratch: &mut LiftScratch128,
+             .                   probes: &mut u64,
+             .                   relation_check_ns: &mut u128,
+             .               ) -> Option<Relation128> {
+             .                   let n = gf.n;
+             .                   scan.inputs.clear();
+             .                   for shift in 0..n {
+       440,000 ( 0.00%)              for &normal_root in &state.normal_roots {
+             .                           let absolute = basis.to_poly.apply(basis.rotate(normal_root, shift));
+             .                           scan.inputs.push((absolute, target_x));
+             .                       }
+             .                   }
+       280,000 ( 0.00%)          scan.batch.solve(gf, basis, solver, &scan.inputs);
+15,439,640,000 (12.42%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::RootBatch128>::solve (40,000x)
+             .                   let mut candidate = 0usize;
+             .                   for shift in 0..n {
+    17,520,000 ( 0.01%)              let left_x = index.shifted[state.left as usize][shift as usize];
+    14,600,000 ( 0.01%)              let right_x = index.shifted[state.right as usize]
+    20,440,000 ( 0.02%)                  [(shift as usize + state.relative as usize) % n as usize];
+             .                       for _ in 0..state.normal_roots.len() {
+             .                           let absolute = scan.inputs[candidate].0;
+             .                           let result = scan.batch.results[candidate];
+             .                           candidate += 1;
+    40,880,000 ( 0.03%)                  let Some(partners) = result else {
+             .                               continue;
+             .                           };
+    17,520,000 ( 0.01%)                  for partner in partners {
+    87,600,000 ( 0.07%)                      *probes += 1;
+             .                               let (canonical, partner_shift) =
+             .                                   basis.canonical_selected(basis.to_normal.apply(partner));
+             .                               let Some(value) = index
+             .                                   .table
+             .                                   .get_with_context(canonical, &index.states, basis)
+             .                               else {
+             .                                   continue;
+             .                               };
+-- line 4198 ----------------------------------------
+-- line 4207 ----------------------------------------
+             .                                   index.shifted[right2][right_shift2],
+             .                               ];
+             .                               // Time the whole lift once per candidate instead of one
+             .                               // Instant::now() per innermost add.
+             .                               let lift_started = Instant::now();
+             .                               let lifted = lift128(fast, base, &codes, target, lift_scratch);
+             .                               *relation_check_ns += lift_started.elapsed().as_nanos();
+             .                               if let Some(point_indices) = lifted {
+             8 ( 0.00%)                          return Some(Relation128 {
+             .                                       point_indices,
+             .                                       x_codes: codes,
+             .                                       intermediates: [absolute, partner],
+             .                                       probes: *probes,
+             .                                   });
+             .                               }
+             .                           }
+             .                       }
+             .                   }
+             .                   None
+             .               }
+             .           
+             .               static PROF_STATES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+             .               static PROF_HITS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+             .           
+            10 ( 0.00%)      fn extract128(
+             .                   gf: &Gf2_128,
+             .                   fast: &FastBinaryCurve128,
+             .                   basis: &NormalBasis128,
+             .                   solver: &S3Solver128,
+             .                   index: &Index128,
+             .                   base: &Base128,
+             .                   target: FastPoint128,
+             .                   start: usize,
+             .                   relation_check_ns: &mut u128,
+             .               ) -> Option<Relation128> {
+             .                   let (target_x, _) = target?;
+             2 ( 0.00%)          let mut probes = 0u64;
+             4 ( 0.00%)          let mut scan = StateScan128::new(gf.n);
+         1,207 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::StateScan128>::new (1x)
+             .                   let mut lift_scratch = LiftScratch128::default();
+             .                   let prof_cap: u64 = std::env::var("KIC_PROF_MAX_STATES").ok().and_then(|v| v.parse().ok()).unwrap_or(u64::MAX);
+            10 ( 0.00%)          let start = start % index.states.len().max(1);
+             .                   for offset in 0..index.states.len() {
+       400,010 ( 0.00%)              let state = index.states.get((start + offset) % index.states.len());
+     1,680,042 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::StateStore128>::get (40,001x)
+        80,002 ( 0.00%)              if PROF_STATES.fetch_add(1, std::sync::atomic::Ordering::Relaxed) >= prof_cap {
+            18 ( 0.00%)                  eprintln!("PROF states={} probes={} hits={} index_states={}", prof_cap, probes, PROF_HITS.load(std::sync::atomic::Ordering::Relaxed), index.states.len());
+         1,703 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/io/stdio.rs:std::io::stdio::_eprint (1x)
+             2 ( 0.00%)                  std::process::exit(0);
+         2,694 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/process.rs:std::process::exit (1x)
+             .                       }
+             3 ( 0.00%)              if let Some(relation) = scan_state128(
+             .                           gf,
+             .                           fast,
+             .                           basis,
+             .                           solver,
+             .                           index,
+             .                           base,
+             .                           target,
+             .                           target_x,
+-- line 4262 ----------------------------------------
+-- line 4270 ----------------------------------------
+             .                       }
+             .                   }
+             .                   None
+             .               }
+             .           
+             .               /// Frobenius-closed signed-orbit base from a deterministic public
+             .               /// x-scan (wide twin: scanned abscissae are small integers, so the
+             .               /// u64 scan counter converts losslessly).
+            11 ( 0.00%)      fn construct_base128(
+             .                   fast: &FastBinaryCurve128,
+             .                   curve: &KoblitzCurve,
+             .                   b: u128,
+             .                   columns: usize,
+             .                   r: u64,
+             .               ) -> (
+             .                   Vec<FastPoint128>,
+             .                   Vec<(usize, u64)>,
+             .                   Vec<Option<[u128; 2]>>,
+             .                   u64,
+             .               ) {
+             .                   let gf = &fast.gf;
+             2 ( 0.00%)          let n = fast.n as usize;
+             .                   let lambda = curve.lambda.to_u64().unwrap();
+             .                   let mut seen = std::collections::HashSet::new();
+             3 ( 0.00%)          let mut points = Vec::with_capacity(columns * 2 * n);
+             .                   let mut labels = Vec::with_capacity(columns * 2 * n);
+             .                   let mut reps = Vec::with_capacity(columns);
+             .                   let mut scanned = 0u64;
+             .                   let mut raw_x = 1u64;
+           199 ( 0.00%)          while reps.len() < columns {
+             .                       scanned += 1;
+         2,110 ( 0.00%)              for point in fast.points_with_x(b, raw_x as u128) {
+     2,842,315 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:<crypto_lib::cryptanalysis::koblitz_fast_arith::FastBinaryCurve128>::points_with_x (95x)
+           930 ( 0.00%)                  let Some((px, py)) = fast.scalar_mul(point, &curve.cofactor) else {
+    19,149,444 ( 0.02%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:<crypto_lib::cryptanalysis::koblitz_fast_arith::FastBinaryCurve128>::scalar_mul (93x)
+             .                               continue;
+             .                           };
+           558 ( 0.00%)                  if px <= 1 {
+             .                               continue;
+             .                           }
+             .                           let mut key = px;
+             .                           let mut x = px;
+             .                           for _ in 1..n {
+        13,392 ( 0.00%)                      x = gf.sqr(x);
+     1,285,632 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (6,696x)
+             .                               key = key.min(x);
+             .                           }
+           279 ( 0.00%)                  if !seen.insert(key) {
+             .                               continue;
+             .                           }
+             .                           let column = reps.len();
+             .                           reps.push(Some([px, py]));
+             .                           let (mut cx, mut cy) = (px, py);
+             .                           let mut coefficient = 1u64;
+             .                           for _ in 0..n {
+             .                               points.push(Some((cx, cy)));
+             .                               labels.push((column, coefficient));
+         8,760 ( 0.00%)                      points.push(Some((cx, cx ^ cy)));
+        26,280 ( 0.00%)                      labels.push((column, (r - coefficient) % r));
+         8,760 ( 0.00%)                      cx = gf.sqr(cx);
+       560,640 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (2,920x)
+         8,760 ( 0.00%)                      cy = gf.sqr(cy);
+       560,640 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (2,920x)
+             .                               coefficient = super::mulmod(coefficient, lambda, r);
+             .                           }
+           198 ( 0.00%)                  if reps.len() == columns {
+             .                               break;
+             .                           }
+             .                       }
+           190 ( 0.00%)              raw_x += 1;
+             .                   }
+             6 ( 0.00%)          let rep = reps[0].map(|[x, y]| (x, y));
+             .                   assert_eq!(
+             7 ( 0.00%)              fast.scalar_mul(rep, &BigUint::from(lambda)),
+     1,094,226 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:<crypto_lib::cryptanalysis::koblitz_fast_arith::FastBinaryCurve128>::scalar_mul (1x)
+             9 ( 0.00%)              rep.map(|(x, y)| (gf.sqr(x), gf.sqr(y))),
+           384 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (2x)
+             .                       "Frobenius must act as lambda on the subgroup"
+             .                   );
+            15 ( 0.00%)          (points, labels, reps, scanned)
+             8 ( 0.00%)      }
+             .           
+             .               fn relation_row128(base: &Base128, relation: &Relation128, rhs: u64, r: u64) -> Vec<u64> {
+             .                   let mut row = vec![0u64; base.columns + 1];
+             .                   for &index in &relation.point_indices {
+             .                       let (column, coefficient) = base.labels[index];
+             .                       row[column] = (row[column] + coefficient) % r;
+             .                   }
+             .                   row[base.columns] = rhs % r;
+             .                   row
+             .               }
+             .           
+             .               /// Wide pipeline for `64 < n ≤ 127`: same stages, timers, and JSON
+             .               /// shapes as the `u64` flow (field values widen to `u128`).
+             9 ( 0.00%)      pub fn run(arguments: &[String]) -> ! {
+             3 ( 0.00%)          assert_eq!(arguments.len(), 5);
+             3 ( 0.00%)          let process_started = Instant::now();
+            29 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/sys/time/unix.rs:<std::time::Instant>::now (1x)
+             .                   let constructed: Option<(u32, u8, usize)> =
+             .                       arguments[1].strip_prefix("construct:").map(|spec| {
+             .                           let parts: Vec<&str> = spec.split(':').collect();
+             2 ( 0.00%)                  assert_eq!(parts.len(), 3, "construct:<n>:<a>:<columns>");
+             .                           (
+             2 ( 0.00%)                      parts[0].parse().unwrap(),
+             2 ( 0.00%)                      parts[1].parse().unwrap(),
+             2 ( 0.00%)                      parts[2].parse().unwrap(),
+             .                           )
+             .                       });
+             .                   let header: Value = match constructed {
+             7 ( 0.00%)              Some((n, a, _)) => json!({"n":n, "a":a}),
+             .                       None => {
+             .                           let header_bytes = std::fs::read(&arguments[1]).expect("read base header");
+             .                           let header_line = header_bytes.split(|&b| b == b'\n').next().unwrap();
+             .                           let header: Value = serde_json::from_slice(header_line).expect("parse base header");
+             .                           assert_eq!(header["kind"], "point_defined_factor_base");
+             .                           header
+             .                       }
+             .                   };
+             3 ( 0.00%)          let n = header["n"].as_u64().unwrap() as u32;
+            50 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.151/src/value/mod.rs:<serde_json::value::Value>::as_u64 (1x)
+             2 ( 0.00%)          let a = header["a"].as_u64().unwrap() as u8;
+            44 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.151/src/value/mod.rs:<serde_json::value::Value>::as_u64 (1x)
+             1 ( 0.00%)          assert!((64..=127).contains(&n), "wide pipeline needs 64 < n ≤ 127");
+             .                   let target_inputs: Vec<TargetInput128> = std::fs::read_to_string(&arguments[2])
+             1 ( 0.00%)              .expect("read target points or legacy fixture scalars")
+            11 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/result.rs:<core::result::Result<alloc::string::String, std::io::error::Error>>::expect (1x)
+             .                       .lines()
+             .                       .filter(|line| !line.trim().is_empty())
+             .                       .map(|line| {
+             .                           let line = line.trim();
+             .                           if line.starts_with('[') {
+             .                               let [x, y] = parse_wide_pair_line(line);
+             .                               TargetInput128::PublicPoint(Some((x, y)))
+             .                           } else {
+             .                               TargetInput128::KnownAnswerScalar(line.parse().unwrap())
+             .                           }
+             .                       })
+             .                       .collect();
+             1 ( 0.00%)          let mut rank_seed: u64 = arguments[3].parse().unwrap();
+             6 ( 0.00%)          let mut out = std::fs::File::create(&arguments[4]).expect("create output");
+           234 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/fs.rs:<std::fs::File>::create::<&alloc::string::String> (1x)
+             8 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/result.rs:<core::result::Result<std::fs::File, std::io::error::Error>>::expect (1x)
+             .           
+             3 ( 0.00%)          let setup_started = Instant::now();
+            29 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/sys/time/unix.rs:<std::time::Instant>::now (1x)
+             4 ( 0.00%)          let curve = KoblitzCurve::new(a, n).expect("admitted Koblitz rung");
+83,564,941,344 (67.20%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:<crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve>::new (1x)
+             .                   let r = curve.subgroup_order.to_u64().unwrap();
+             2 ( 0.00%)          if constructed.is_none() {
+             .                       assert_eq!(header["subgroup_order"].as_u64(), Some(r));
+             .                       let low_terms: Vec<u64> =
+             .                           serde_json::from_value(header["field_modulus_low_terms"].clone()).unwrap();
+             .                       assert_eq!(
+             .                           low_terms,
+             .                           curve
+             .                               .curve
+             .                               .irreducible
+             .                               .low_terms
+             .                               .iter()
+             .                               .map(|&t| t as u64)
+             .                               .collect::<Vec<_>>(),
+             .                           "base header field must match the constructed curve"
+             .                       );
+             .                   }
+             6 ( 0.00%)          let fast = FastBinaryCurve128::new(&curve.curve.irreducible, a as u128).unwrap();
+       209,272 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:<crypto_lib::cryptanalysis::koblitz_fast_arith::FastBinaryCurve128>::new (1x)
+             1 ( 0.00%)          let gf = Gf2_128::new(&curve.curve.irreducible);
+       135,772 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::new (1x)
+             5 ( 0.00%)          let b = gf.from_element(&curve.curve.b);
+            17 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::from_element (1x)
+             2 ( 0.00%)          let generator: FastPoint128 = match curve.generator() {
+             1 ( 0.00%)              crypto_lib::binary_ecc::BinaryPoint::Affine { x, y } => {
+             6 ( 0.00%)                  Some((fast.word(x), fast.word(y)))
+             .                       }
+             .                       crypto_lib::binary_ecc::BinaryPoint::Infinity => panic!("generator must be affine"),
+             .                   };
+             .                   let mut scanned_x = None;
+             3 ( 0.00%)          let (points, labels, representatives): (
+             .                       Vec<FastPoint128>,
+             .                       Vec<(usize, u64)>,
+             .                       Vec<Option<[u128; 2]>>,
+             2 ( 0.00%)          ) = match constructed {
+             .                       Some((_, _, columns)) => {
+            18 ( 0.00%)                  let (points, labels, reps, scanned) =
+            10 ( 0.00%)                      construct_base128(&fast, &curve, b, columns, r);
+    25,915,583 ( 0.02%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::construct_base128 (1x)
+             .                           scanned_x = Some(scanned);
+             .                           (points, labels, reps)
+             .                       }
+             .                       None => {
+             .                           let coordinates = decode_point_list128(&header["factor_base_point_coordinates"]);
+             .                           let representatives = decode_point_list128(&header["factor_base_representatives"]);
+             .                           (
+             .                               coordinates.iter().map(|c| c.map(|[x, y]| (x, y))).collect(),
+             .                               serde_json::from_value(header["factor_base_point_labels"].clone()).unwrap(),
+             .                               representatives,
+             .                           )
+             .                       }
+             .                   };
+             .                   let base_hash = match constructed {
+             .                       Some(_) => {
+             1 ( 0.00%)                  let mut hasher = blake3::Hasher::new();
+           164 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.7/src/lib.rs:<blake3::Hasher>::new (1x)
+             4 ( 0.00%)                  hasher.update(b"compact-orbit-constructed-base-v1");
+           122 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.7/src/lib.rs:<blake3::Hasher>::update (1x)
+             .                           for (point, &(column, coefficient)) in points.iter().zip(&labels) {
+        17,520 ( 0.00%)                      let (x, y): (u128, u128) = point.unwrap();
+             .                               for word in [x, y] {
+        52,560 ( 0.00%)                          hasher.update(&word.to_le_bytes());
+     2,869,662 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.7/src/lib.rs:<blake3::Hasher>::update (11,680x)
+             .                               }
+        46,720 ( 0.00%)                      hasher.update(&(column as u64).to_le_bytes());
+       659,920 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.7/src/lib.rs:<blake3::Hasher>::update (5,840x)
+        23,360 ( 0.00%)                      hasher.update(&coefficient.to_le_bytes());
+     1,448,133 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.7/src/lib.rs:<blake3::Hasher>::update (5,840x)
+             .                           }
+             2 ( 0.00%)                  hasher.finalize().to_hex().to_string()
+         2,109 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.7/src/lib.rs:<blake3::Hasher>::finalize (1x)
+           324 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.7/src/lib.rs:<blake3::Hash>::to_hex (1x)
+             .                       }
+             .                       None => header["base_hash"].as_str().unwrap().to_owned(),
+             .                   };
+             .                   let mut by_x: HashMap<u128, Vec<usize>> = HashMap::new();
+             .                   for (index, point) in points.iter().enumerate() {
+        11,680 ( 0.00%)              if let Some((x, _)) = point {
+        29,200 ( 0.00%)                  by_x.entry(*x).or_default().push(index);
+       145,520 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/collections/hash/map.rs:<std::collections::hash::map::Entry<u128, alloc::vec::Vec<usize>>>::or_default (5,840x)
+             .                       }
+             .                   }
+             1 ( 0.00%)          let base = Base128 {
+             5 ( 0.00%)              points,
+             5 ( 0.00%)              labels,
+             8 ( 0.00%)              by_x,
+             .                       columns: representatives.len(),
+             .                   };
+             .                   let reps: Vec<u128> = representatives
+             .                       .iter()
+             .                       .map(|p| p.expect("affine representative")[0])
+             .                       .collect();
+             1 ( 0.00%)          let base_load_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
+            90 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/time.rs:<std::time::Instant>::elapsed (1x)
+             .           
+             5 ( 0.00%)          let basis_started = Instant::now();
+            29 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/sys/time/unix.rs:<std::time::Instant>::now (1x)
+             1 ( 0.00%)          let basis = NormalBasis128::new(&gf);
+       794,490 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::NormalBasis128>::new (1x)
+             1 ( 0.00%)          let solver = S3Solver128::new(&gf, b);
+     2,307,584 ( 0.00%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:<koblitz_orbit_dlp_fast::wide::S3Solver128>::new (1x)
+             .                   for probe in 1..2048u128 {
+        14,329 ( 0.00%)              let x = probe.wrapping_mul(0x2545_F491_4F6C_DD1D) & basis.mask;
+         8,188 ( 0.00%)              assert_eq!(
+         4,094 ( 0.00%)                  basis
+             .                               .to_poly
+        12,282 ( 0.00%)                      .apply(basis.rotate(basis.to_normal.apply(x), 1)),
+        12,282 ( 0.00%)                  gf.sqr(x)
+       393,024 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (2,047x)
+             .                       );
+        18,423 ( 0.00%)              let y = (probe * 0x9E37_79B9) & basis.mask;
+         3,065 ( 0.00%)              assert_eq!(
+             .                           solver.roots(&gf, &basis, x, y),
+        20,470 ( 0.00%)                  s3_x_roots_128(&gf, b, x, y)
+    51,221,668 ( 0.04%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:crypto_lib::cryptanalysis::koblitz_fast_arith::s3_x_roots_128 (2,047x)
+             .                       );
+             .                   }
+             3 ( 0.00%)          let basis_ms = basis_started.elapsed().as_secs_f64() * 1000.0;
+            90 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/time.rs:<std::time::Instant>::elapsed (1x)
+             .           
+             3 ( 0.00%)          let index_started = Instant::now();
+            29 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/sys/time/unix.rs:<std::time::Instant>::now (1x)
+             5 ( 0.00%)          let index = build_index128(&gf, &basis, &solver, &reps);
+ 1,168,293,154 ( 0.94%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::build_index128 (1x)
+             3 ( 0.00%)          let index_ms = index_started.elapsed().as_secs_f64() * 1000.0;
+            90 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/time.rs:<std::time::Instant>::elapsed (1x)
+             3 ( 0.00%)          let setup_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
+            90 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/time.rs:<std::time::Instant>::elapsed (1x)
+             .           
+             3 ( 0.00%)          let rank_started = Instant::now();
+            29 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/sys/time/unix.rs:<std::time::Instant>::now (1x)
+             8 ( 0.00%)          let mut echelon = super::Echelon {
+             .                       r,
+             1 ( 0.00%)              columns: base.columns,
+             3 ( 0.00%)              pivots: vec![None; base.columns],
+             .                       rank: 0,
+             .                   };
+             1 ( 0.00%)          let mut rank_attempts = 0u64;
+             .                   let mut rank_failures = 0u64;
+             1 ( 0.00%)          let mut rank_relations = 0u64;
+             1 ( 0.00%)          let mut rank_probes = 0u64;
+             1 ( 0.00%)          let mut rank_rows_without_gain = 0u64;
+             2 ( 0.00%)          let mut rank_unused_relation_check_ns = 0u128;
+             .                   let rank_threads: usize = std::env::var("KIC_RANK_THREADS")
+             .                       .ok()
+             .                       .and_then(|value| value.trim().parse::<usize>().ok())
+             .                       .filter(|&threads| threads > 0)
+             .                       .unwrap_or(1);
+             .                   let rank_policy_parallel = rank_threads > 1;
+             .                   if rank_policy_parallel {
+             .                       // Parallel guided rank: every column is anchored by its own
+-- line 4528 ----------------------------------------
+-- line 4605 ----------------------------------------
+             .                                   rank_rows_without_gain += 1;
+             .                               }
+             .                           }
+             .                           for handle in handles {
+             .                               handle.join().expect("rank worker thread");
+             .                           }
+             .                       });
+             .                   } else {
+             3 ( 0.00%)              while echelon.rank < base.columns {
+             1 ( 0.00%)                  rank_seed = rank_seed
+             .                               .wrapping_mul(6364136223846793005)
+             .                               .wrapping_add(1442695040888963407);
+            12 ( 0.00%)                  let scalar = (rank_seed >> 11) % (r - 1) + 1;
+             2 ( 0.00%)                  let column = (0..base.columns)
+             .                               .find(|&c| echelon.pivots[c].is_none())
+             .                               .unwrap();
+             8 ( 0.00%)                  let rep: FastPoint128 = representatives[column].map(|[x, y]| (x, y));
+             5 ( 0.00%)                  let point = fast.add(
+        12,771 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:<crypto_lib::cryptanalysis::koblitz_fast_arith::FastBinaryCurve128>::add (1x)
+            11 ( 0.00%)                      fast.scalar_mul(generator, &BigUint::from(scalar)),
+     1,029,290 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_fast_arith.rs:<crypto_lib::cryptanalysis::koblitz_fast_arith::FastBinaryCurve128>::scalar_mul (1x)
+             .                               FastBinaryCurve128::neg(rep),
+             .                           );
+             1 ( 0.00%)                  rank_attempts += 1;
+             2 ( 0.00%)                  let mut unused_relation_check_ns = 0u128;
+            14 ( 0.00%)                  match extract128(
+39,519,040,551 (31.78%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::extract128 (1x)
+             .                               &gf,
+             .                               &fast,
+             .                               &basis,
+             .                               &solver,
+             .                               &index,
+             .                               &base,
+             .                               point,
+             2 ( 0.00%)                      (rank_seed >> 20) as usize,
+             .                               &mut unused_relation_check_ns,
+             .                           ) {
+             .                               Some(relation) => {
+             .                                   rank_relations += 1;
+             .                                   rank_probes += relation.probes;
+             .                                   let mut row = relation_row128(&base, &relation, scalar, r);
+             .                                   row[column] = (row[column] + 1) % r;
+             .                                   if !echelon.insert(row) {
+-- line 4644 ----------------------------------------
+-- line 4930 ----------------------------------------
+             .                       assert_eq!(
+             .                           decode_point_list128(&encoded),
+             .                           vec![Some([1u128 << 64, 9]), None]
+             .                       );
+             .                   }
+             .               }
+             .           }
+             .           
+            10 ( 0.00%)  fn main() {
+             3 ( 0.00%)      let arguments: Vec<String> = std::env::args().collect();
+         1,431 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/env.rs:std::env::args (1x)
+             2 ( 0.00%)      assert_eq!(
+             .                   arguments.len(),
+             .                   5,
+             .                   "usage: <base_header.jsonl | construct:<n>:<a>:<columns>> <target_points_or_legacy_scalars.txt> <rank_seed> <out.jsonl>"
+             .               );
+             .               // Wide pipeline (`u128` words) for 64 < n ≤ 127.  The degree is
+             .               // detected here so the `u64` flow below stays byte-identical;
+             .               // the wide path re-parses its own arguments.
+             .               {
+-- line 4948 ----------------------------------------
+-- line 4951 ----------------------------------------
+             .                       None => {
+             .                           let header_bytes = std::fs::read(&arguments[1]).expect("read base header");
+             .                           let header_line = header_bytes.split(|&b| b == b'\n').next().unwrap();
+             .                           let header: Value = serde_json::from_slice(header_line).expect("parse base header");
+             .                           header["n"].as_u64().map(|n| n as u32)
+             .                       }
+             .                   };
+             .                   if wide_n.is_some_and(|n| n > 63) {
+             3 ( 0.00%)              wide::run(&arguments);
+124,355,442,501 (100.0%)  => /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs:koblitz_orbit_dlp_fast::wide::run (1x)
+             .                   }
+             .               }
+             .               let process_started = Instant::now();
+             .               let constructed: Option<(u32, u8, usize)> =
+             .                   arguments[1].strip_prefix("construct:").map(|spec| {
+             .                       let parts: Vec<&str> = spec.split(':').collect();
+             .                       assert_eq!(parts.len(), 3, "construct:<n>:<a>:<columns>");
+             .                       (
+-- line 4967 ----------------------------------------
+
+   340,400,259 ( 0.27%)  <counts for unidentified lines in /home/user/wt/t03/examples/koblitz_orbit_dlp_fast.rs>
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs
+--------------------------------------------------------------------------------
+Ir                     
+
+-- line 154 ----------------------------------------
+            .               /// through `red`.  No tail is zero — an irreducible polynomial has a
+            .               /// constant term — so the one word is also the switch.
+            .               fold_tail: u64,
+            .           }
+            .           
+            .           /// Spread the low 32 bits of `x` so that bit `i` lands at bit `2i`.
+            .           #[inline(always)]
+            .           fn spread32(x: u64) -> u64 {
+    1,577,320 ( 0.00%)      let mut x = x & 0xFFFF_FFFF;
+   13,407,220 ( 0.01%)      x = (x | (x << 16)) & 0x0000_FFFF_0000_FFFF;
+   13,407,220 ( 0.01%)      x = (x | (x << 8)) & 0x00FF_00FF_00FF_00FF;
+   13,407,220 ( 0.01%)      x = (x | (x << 4)) & 0x0F0F_0F0F_0F0F_0F0F;
+   10,252,580 ( 0.01%)      x = (x | (x << 2)) & 0x3333_3333_3333_3333;
+   10,252,580 ( 0.01%)      x = (x | (x << 1)) & 0x5555_5555_5555_5555;
+            .               x
+            .           }
+            .           
+            .           #[cfg(target_arch = "x86_64")]
+            .           #[target_feature(enable = "pclmulqdq")]
+            .           unsafe fn clmul_u64(a: u64, b: u64) -> u128 {
+            .               use std::arch::x86_64::*;
+            .               let x = _mm_set_epi64x(0, a as i64);
+            .               let y = _mm_set_epi64x(0, b as i64);
+            .               let z = _mm_clmulepi64_si128::<0x00>(x, y);
+            .               let lo = _mm_cvtsi128_si64(z) as u64;
+            .               let hi = _mm_cvtsi128_si64(_mm_srli_si128::<8>(z)) as u64;
+1,199,738,676 ( 0.96%)      ((hi as u128) << 64) | (lo as u128)
+  398,844,312 ( 0.32%)  }
+            .           
+            .           /// AArch64 carry-less multiply via `PMULL` (`vmull_p64`), the ARM
+            .           /// counterpart of `pclmulqdq`.  Gated on the `aes` feature the same way
+            .           /// `binary_ecc::f2m` gates its PMULL path, so Apple M-series and Graviton
+            .           /// run the single-instruction product instead of the bit-serial loop.
+            .           #[cfg(target_arch = "aarch64")]
+            .           #[target_feature(enable = "aes")]
+            .           unsafe fn clmul_u64_neon(a: u64, b: u64) -> u128 {
+-- line 189 ----------------------------------------
+-- line 827 ----------------------------------------
+            .               /// `n + d ≤ 129` so the first fold fits one `u128`); zero selects
+            .               /// the byte-table reduction.
+            .               fold_tail: u64,
+            .           }
+            .           
+            .           /// `x` times `cur`, reduced: one step of the `z^t mod irr` ladder.
+            .           #[inline(always)]
+            .           fn mul_x_128(cur: u128, bits: u128, n: u32) -> u128 {
+        1,152 ( 0.00%)      let shifted = cur << 1;
+        6,428 ( 0.00%)      if (shifted >> n) & 1 != 0 {
+            .                   shifted ^ bits
+            .               } else {
+            .                   shifted
+            .               }
+            .           }
+            .           
+            .           impl Gf2_128 {
+            .               /// Build from an irreducible polynomial of degree `64 < n ≤ 127`.
+           14 ( 0.00%)      pub fn new(irr: &IrreduciblePoly) -> Self {
+            .                   #[cfg(target_arch = "x86_64")]
+            .                   let has_clmul = std::arch::is_x86_feature_detected!("pclmulqdq");
+            .                   #[cfg(target_arch = "aarch64")]
+            .                   let has_clmul = std::arch::is_aarch64_feature_detected!("aes");
+            .                   #[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
+            .                   let has_clmul = false;
+            .                   Self::with_kernels(irr, has_clmul, true)
+           18 ( 0.00%)      }
+            .           
+            .               /// The byte-table reduction and the software product only, whatever
+            .               /// the host supports; the oracle the fold is tested against.
+            .               #[cfg(test)]
+            .               pub(crate) fn portable(irr: &IrreduciblePoly) -> Self {
+            .                   Self::with_kernels(irr, false, false)
+            .               }
+            .           
+            .               fn with_kernels(irr: &IrreduciblePoly, has_clmul: bool, fold: bool) -> Self {
+            2 ( 0.00%)          let n = irr.degree;
+            .                   assert!((64..=127).contains(&n), "Gf2_128 handles 64 < n ≤ 127");
+           16 ( 0.00%)          let mut bits = 1u128 << n;
+            8 ( 0.00%)          for &t in &irr.low_terms {
+           78 ( 0.00%)              bits |= 1u128 << t;
+            .                   }
+            .                   // z^t mod irr ladders for the two reduction tables.
+            .                   let red_lo_positions = (128 - n as usize).div_ceil(8);
+            .                   let pow = bits ^ (1u128 << n); // z^n ≡ the low terms
+            .                   let mut red_lo = vec![0u128; red_lo_positions * 256];
+            .                   // Byte k of the folded part sits at absolute position n + 8k:
+            .                   // record every 8th ladder rung starting from z^n.
+            4 ( 0.00%)          let mut ladder = vec![0u128; red_lo_positions + 1];
+           14 ( 0.00%)          ladder[0] = pow;
+            .                   for k in 1..=red_lo_positions {
+           42 ( 0.00%)              let mut v = ladder[k - 1];
+            .                       for _ in 0..8 {
+            .                           v = mul_x_128(v, bits, n);
+            .                       }
+           28 ( 0.00%)              ladder[k] = v;
+            .                   }
+            .                   for k in 0..red_lo_positions {
+            .                       // red_lo[k][v] from the z^{n+8k} rung by the lowbit DP.
+           28 ( 0.00%)              let rung = ladder[k];
+            .                       // Recompute the rung powers bit by bit: pow8[t] = z^{n+8k+t}.
+            .                       let mut pow8 = [0u128; 8];
+           28 ( 0.00%)              pow8[0] = rung;
+            .                       for t in 1..8 {
+          252 ( 0.00%)                  pow8[t] = mul_x_128(pow8[t - 1], bits, n);
+            .                       }
+            .                       for v in 1usize..256 {
+        7,140 ( 0.00%)                  red_lo[k * 256 + v] =
+       24,990 ( 0.00%)                      red_lo[k * 256 + (v & (v - 1))] ^ pow8[v.trailing_zeros() as usize];
+            .                       }
+            .                   }
+            .                   // red_hi[j][v] = (v · z^{128+8j}) mod irr: advance the z^n
+            .                   // ladder to z^128 first (128 − n steps).
+            .                   let mut rung128 = pow;
+            2 ( 0.00%)          for _ in 0..(128 - n) {
+            .                       rung128 = mul_x_128(rung128, bits, n);
+            .                   }
+            .                   let mut red_hi = vec![0u128; 16 * 256];
+            .                   for j in 0..16 {
+            .                       let mut pow8 = [0u128; 8];
+           64 ( 0.00%)              pow8[0] = rung128;
+            .                       for t in 1..8 {
+          448 ( 0.00%)                  pow8[t] = mul_x_128(pow8[t - 1], bits, n);
+            .                       }
+            .                       for v in 1usize..256 {
+       16,320 ( 0.00%)                  red_hi[j * 256 + v] =
+       48,960 ( 0.00%)                      red_hi[j * 256 + (v & (v - 1))] ^ pow8[v.trailing_zeros() as usize];
+            .                       }
+            .                       for _ in 0..8 {
+            .                           rung128 = mul_x_128(rung128, bits, n);
+            .                       }
+            .                   }
+            .           
+            .                   let tail_degree = irr.low_terms.iter().copied().max().unwrap_or(0);
+            8 ( 0.00%)          let fold_tail = if fold
+            .                       && has_clmul
+            .                       && tail_degree <= 63
+           24 ( 0.00%)              && 2 * tail_degree < n + 2
+            .                       && n + tail_degree <= 129
+            .                   {
+            .                       pow as u64
+            .                   } else {
+            .                       0
+            .                   };
+            .           
+           18 ( 0.00%)          Self {
+            .                       n,
+            .                       irr: bits,
+            4 ( 0.00%)              mask: (1u128 << n) - 1,
+            8 ( 0.00%)              red_lo,
+            .                       red_lo_positions,
+            6 ( 0.00%)              red_hi,
+            .                       has_clmul,
+            .                       fold_tail,
+            .                   }
+            .               }
+            .           
+            .               /// `a·b mod irr` by two carry-less folds instead of the byte tables.
+            .               ///
+            .               /// The product has degree `≤ 2n − 2`, so `H = P >> n` has at most
+-- line 946 ----------------------------------------
+-- line 954 ----------------------------------------
+            .               /// # Safety
+            .               ///
+            .               /// The CPU must support the carry-less multiply (`has_clmul`) and
+            .               /// the field must fold (`fold_tail ≠ 0`).
+            .               #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+            .               #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+            .               #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes"))]
+            .               #[inline]
+  795,659,264 ( 0.64%)      unsafe fn mul_fold(&self, a: u128, b: u128) -> u128 {
+            .                   let (hi, lo) = clmul_u128(a, b);
+            .                   self.reduce_fold(lo, hi)
+  530,500,496 ( 0.43%)      }
+            .           
+            .               /// The two folds of [`Self::mul_fold`] on a product of degree
+            .               /// `≤ 2n − 2` given as `(lo, hi)`.
+            .               ///
+            .               /// # Safety
+            .               ///
+            .               /// As for [`Self::mul_fold`].
+            .               #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+            .               #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+            .               #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes"))]
+            .               #[inline]
+    4,344,120 ( 0.00%)      unsafe fn reduce_fold(&self, lo: u128, hi: u128) -> u128 {
+   67,135,527 ( 0.05%)          let n = self.n;
+   67,135,527 ( 0.05%)          let tail = self.fold_tail;
+            .                   // H = P >> n, at most n − 1 ≤ 126 bits (n ≤ 127 keeps the shift in range).
+1,142,092,619 ( 0.92%)          let h = (lo >> n) | (hi << (128 - n));
+  266,587,908 ( 0.21%)          let acc = lo & self.mask;
+            .                   // H·t in one u128: n − 1 + d ≤ 128 bits.
+  800,252,274 ( 0.64%)          let ht = clmul_u64(h as u64, tail) ^ (clmul_u64((h >> 64) as u64, tail) << 64);
+  928,215,778 ( 0.75%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/../../stdarch/crates/core_arch/src/simd.rs:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64 (132,602,254x)
+            .                   // Above zⁿ at most d − 1 bits remain; their fold has degree < n.
+  402,813,162 ( 0.32%)          let h1 = (ht >> n) as u64;
+  536,107,116 ( 0.43%)          acc ^ (ht & self.mask) ^ clmul_u64(h1, tail)
+  464,107,889 ( 0.37%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/../../stdarch/crates/core_arch/src/simd.rs:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64 (66,301,127x)
+    3,652,420 ( 0.00%)      }
+            .           
+            .               /// Fold a 256-bit carry-less product `(hi, lo)` back into the field.
+            .               ///
+            .               /// Fixed trip count (`red_lo_positions + 16` lookups), mirroring
+            .               /// the `u64` twin's constant-time philosophy.
+            .               #[inline(always)]
+            .               fn reduce(&self, lo: u128, hi: u128) -> u128 {
+            .                   let mut acc = lo & self.mask;
+-- line 996 ----------------------------------------
+-- line 1043 ----------------------------------------
+            .                       bb >>= 1;
+            .                       pos += 1;
+            .                   }
+            .                   (hi, lo)
+            .               }
+            .           
+            .               /// No early-out on a zero operand (same rationale as the twin).
+            .               #[inline]
+  597,121,803 ( 0.48%)      pub fn mul(&self, a: u128, b: u128) -> u128 {
+            .                   #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+  132,693,734 ( 0.11%)          if self.fold_tail != 0 {
+            .                       // SAFETY: `fold_tail` is non-zero only when construction
+            .                       // detected the hardware carry-less multiply and checked the
+            .                       // tail-degree conditions the fold needs.
+  597,121,803 ( 0.48%)              return unsafe { self.mul_fold(a, b) };
+9,152,894,546 ( 7.36%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul_fold (66,346,867x)
+            .                   }
+            .                   let (hi, lo) = self.clmul(a, b);
+            .                   self.reduce(lo, hi)
+            .               }
+            .           
+            .               /// Square via four `u64` spreads: bit `i` of `a` lands at `2i`.
+            .               /// Composes because the low/high 64-bit halves occupy positions
+            .               /// `[0, 128)` / `[128, 256)` after spreading.
+            .               #[inline]
+    7,097,940 ( 0.01%)      pub fn sqr(&self, a: u128) -> u128 {
+            .                   let lo64 = a as u64;
+            .                   let hi64 = (a >> 64) as u64;
+      788,660 ( 0.00%)          let lo = (spread32(lo64) as u128) | ((spread32(lo64 >> 32) as u128) << 64);
+      788,660 ( 0.00%)          let hi = (spread32(hi64) as u128) | ((spread32(hi64 >> 32) as u128) << 64);
+            .                   #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    1,577,320 ( 0.00%)          if self.fold_tail != 0 {
+            .                       // SAFETY: as in `mul`; a square has degree ≤ 2n − 2 as well.
+    8,675,260 ( 0.01%)              return unsafe { self.reduce_fold(lo, hi) };
+   52,921,150 ( 0.04%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::reduce_fold (788,660x)
+            .                   }
+            .                   let lo = (spread32(lo64) as u128) | ((spread32(lo64 >> 32) as u128) << 64);
+            .                   let hi = (spread32(hi64) as u128) | ((spread32(hi64 >> 32) as u128) << 64);
+            .                   self.reduce(lo, hi)
+            .               }
+            .           
+            .               /// `a^(2^k)`.
+            .               pub fn sqr_k(&self, mut a: u128, k: u32) -> u128 {
+            .                   for _ in 0..k {
+    1,342,600 ( 0.00%)              a = self.sqr(a);
+   41,083,560 ( 0.03%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (268,520x)
+            .                   }
+            .                   a
+            .               }
+            .           
+            .               /// `a^{-1}` by Fermat: `a^(2^n − 2)` via the same Itoh-Tsujii
+            .               /// chain shape as the twin.  Zero maps to zero.
+       30,688 ( 0.00%)      pub fn inv(&self, a: u128) -> u128 {
+       15,344 ( 0.00%)          if a == 0 {
+            .                       return 0;
+            .                   }
+        3,836 ( 0.00%)          let e = self.n - 1;
+        7,672 ( 0.00%)          if e == 0 {
+            .                       return 1;
+            .                   }
+            .                   let mut c = a;
+            .                   let mut k = 1u32;
+            .                   let bits = 32 - e.leading_zeros();
+       23,016 ( 0.00%)          for i in (0..bits - 1).rev() {
+      161,112 ( 0.00%)              c = self.mul(c, self.sqr_k(c, k));
+    2,163,504 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (23,016x)
+       46,032 ( 0.00%)              k *= 2;
+       46,032 ( 0.00%)              if (e >> i) & 1 == 1 {
+       42,196 ( 0.00%)                  c = self.mul(self.sqr(c), a);
+      586,908 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (3,836x)
+      360,584 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::mul (3,836x)
+        7,672 ( 0.00%)                  k += 1;
+            .                       }
+            .                   }
+            .                   debug_assert_eq!(k, e);
+       42,196 ( 0.00%)          self.sqr(c)
+      586,908 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs:<crypto_lib::cryptanalysis::semaev_decomp::Gf2_128>::sqr (3,836x)
+            .               }
+            .           
+            .               /// Montgomery batch inversion; zeros stay zero.
+            .               pub fn batch_inv(&self, xs: &mut [u128], scratch: &mut Vec<u128>) {
+            .                   scratch.clear();
+            .                   scratch.reserve(xs.len());
+            .                   let mut acc = 1u128;
+            .                   for &x in xs.iter() {
+-- line 1120 ----------------------------------------
+-- line 1130 ----------------------------------------
+            .                           xs[i] = self.mul(inv_acc, scratch[i]);
+            .                           inv_acc = self.mul(inv_acc, xi);
+            .                       }
+            .                   }
+            .               }
+            .           
+            .               /// Lift to the crate's general element type.
+            .               pub fn to_element(&self, a: u128) -> F2mElement {
+          438 ( 0.00%)          let bits: Vec<u32> = (0..self.n).filter(|i| (a >> i) & 1 == 1).collect();
+            .                   F2mElement::from_bit_positions(&bits, self.n)
+            .               }
+            .           
+            .               /// Project a general element down, assuming it fits in 128 bits.
+            3 ( 0.00%)      pub fn from_element(&self, e: &F2mElement) -> u128 {
+            .                   let raw = e.raw_bits();
+            .                   let lo = raw.first().copied().unwrap_or(0) as u128;
+            .                   let hi = raw.get(1).copied().unwrap_or(0) as u128;
+            6 ( 0.00%)          (lo | (hi << 64)) & self.mask
+            3 ( 0.00%)      }
+            .           }
+            .           
+            .           /// Carry-less `u128 × u128 → (hi, lo)` via three hardware `u64`
+            .           /// Karatsuba pieces: `a·b = a1·b1·x^128 ⊕ ((a0⊕a1)·(b0⊕b1) ⊕ a1·b1 ⊕
+            .           /// a0·b0)·x^64 ⊕ a0·b0`.  Same `clmul_u64` the `u64` twin uses.
+            .           #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+            .           #[inline(always)]
+            .           unsafe fn clmul_u128(a: u128, b: u128) -> (u128, u128) {
+-- line 1156 ----------------------------------------
+-- line 1157 ----------------------------------------
+            .               #[cfg(target_arch = "x86_64")]
+            .               let clmul = clmul_u64;
+            .               #[cfg(target_arch = "aarch64")]
+            .               let clmul = clmul_u64_neon;
+            .               let a0 = a as u64;
+            .               let a1 = (a >> 64) as u64;
+            .               let b0 = b as u64;
+            .               let b1 = (b >> 64) as u64;
+  397,806,762 ( 0.32%)      let z0 = clmul(a0, b0);
+  464,107,889 ( 0.37%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/../../stdarch/crates/core_arch/src/simd.rs:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64 (66,301,127x)
+  397,806,762 ( 0.32%)      let z2 = clmul(a1, b1);
+  464,107,889 ( 0.37%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/../../stdarch/crates/core_arch/src/simd.rs:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64 (66,301,127x)
+  729,632,577 ( 0.59%)      let z1 = clmul(a0 ^ a1, b0 ^ b1) ^ z0 ^ z2;
+  464,107,889 ( 0.37%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/../../stdarch/crates/core_arch/src/simd.rs:crypto_lib::cryptanalysis::semaev_decomp::clmul_u64 (66,301,127x)
+  132,647,994 ( 0.11%)      let lo = z0 ^ (z1 << 64);
+  132,693,734 ( 0.11%)      let hi = z2 ^ (z1 >> 64);
+            .               (hi, lo)
+            .           }
+            .           
+            .           // ── Polynomials over F_{2ⁿ}, degree ≤ MAX_DEG ───────────────────────
+            .           
+            .           /// Coefficients low-to-high; `deg` is the index of the highest
+            .           /// non-zero one, or `None` for the zero polynomial.
+            .           ///
+-- line 1177 ----------------------------------------
+
+   66,377,323 ( 0.05%)  <counts for unidentified lines in /home/user/wt/t03/src/cryptanalysis/semaev_decomp.rs>
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs
+--------------------------------------------------------------------------------
+Ir                      
+
+-- line 254 ----------------------------------------
+             .           // Twin of the `u64` helpers above with identical Rabin semantics; the
+             .           // `u64` path is deliberately untouched so every `n ≤ 63` fixture stays
+             .           // byte-identical.  The twin is only used past the `u64` shift ceiling
+             .           // (`1u64 << n` wraps for `n ≥ 64`, which is why the narrow search
+             .           // returns `None` there).  A 256-bit carry-less product never arises
+             .           // here: every intermediate is reduced to degree `< 128` before it can
+             .           // overflow the word.
+             .           fn poly_deg_wide(f: u128) -> Option<u32> {
+       353,400 ( 0.00%)      if f == 0 {
+             .                   None
+             .               } else {
+        97,279 ( 0.00%)          Some(127 - f.leading_zeros())
+             .               }
+             .           }
+             .           
+             .           fn poly_rem_wide(mut a: u128, f: u128) -> u128 {
+             .               let df = match poly_deg_wide(f) {
+             .                   Some(d) => d,
+             .                   None => return a,
+             .               };
+             .               while let Some(da) = poly_deg_wide(a) {
+       260,930 ( 0.00%)          if da < df {
+             .                       break;
+             .                   }
+       286,810 ( 0.00%)          a ^= f << (da - df);
+             .               }
+             .               a
+             .           }
+             .           
+             .           fn poly_mulmod_wide(a: u128, b: u128, f: u128) -> u128 {
+             .               let mut acc = 0u128;
+             .               let mut a = poly_rem_wide(a, f);
+             .               let mut b = b;
+       265,488 ( 0.00%)      while b != 0 {
+             .                   if b & 1 == 1 {
+             .                       acc ^= a;
+             .                   }
+             .                   b >>= 1;
+       265,488 ( 0.00%)          a <<= 1;
+             .                   a = poly_rem_wide(a, f);
+             .               }
+             .               poly_rem_wide(acc, f)
+             .           }
+             .           
+             .           fn poly_gcd_wide(mut a: u128, mut b: u128) -> u128 {
+            15 ( 0.00%)      while b != 0 {
+             .                   let r = poly_rem_wide(a, b);
+             .                   a = b;
+             .                   b = r;
+             .               }
+             .               a
+             .           }
+             .           
+             .           fn poly_x_pow_2k_wide(k: u32, f: u128) -> u128 {
+-- line 307 ----------------------------------------
+-- line 311 ----------------------------------------
+             .               }
+             .               acc
+             .           }
+             .           
+             .           /// Rabin's irreducibility test for a degree-`d` polynomial of `F_2[x]`
+             .           /// held in a `u128` bitmask (`64 ≤ d ≤ 127`): `f` is irreducible iff
+             .           /// `x^(2^d) ≡ x (mod f)` and `gcd(x^(2^(d/p)) − x, f) = 1` for every
+             .           /// prime `p | d`.  Same mathematics as [`is_irreducible_f2`].
+           105 ( 0.00%)  pub fn is_irreducible_f2_wide(f: u128) -> bool {
+             .               let d = match poly_deg_wide(f) {
+            30 ( 0.00%)          Some(d) if d >= 1 => d,
+             .                   _ => return false,
+             .               };
+            90 ( 0.00%)      if f & 1 == 0 && d > 1 {
+             .                   return false;
+             .               }
+            60 ( 0.00%)      if poly_x_pow_2k_wide(d, f) != poly_rem_wide(0b10, f) {
+             .                   return false;
+             .               }
+             6 ( 0.00%)      for p in prime_divisors(d) {
+           410 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::prime_divisors (1x)
+             8 ( 0.00%)          let t = poly_x_pow_2k_wide(d / p, f) ^ 0b10;
+             .                   if poly_deg_wide(poly_gcd_wide(poly_rem_wide(t, f), f)) != Some(0) {
+             .                       return false;
+             .                   }
+             .               }
+             .               true
+           120 ( 0.00%)  }
+             .           
+             .           /// **Sparse irreducible search on `u128` masks**: the smallest-mask
+             .           /// irreducible polynomial of degree `n` over `F_2` among trinomials
+             .           /// and pentanomials, for `64 ≤ n ≤ 127`.  Same ascending-mask order
+             .           /// as [`find_irreducible_sparse`]; at `n = 71` this is
+             .           /// `x^71 + x^5 + x^3 + x + 1` (independent sympy check agrees).
+             7 ( 0.00%)  pub fn find_irreducible_sparse_wide(n: u32) -> Option<IrreduciblePoly> {
+             4 ( 0.00%)      if n <= 63 || n > 127 {
+             .                   return None;
+             .               }
+             .               let mut candidates: Vec<u128> = Vec::new();
+             .               candidates.push(1);
+             .               for i in 1..n {
+           864 ( 0.00%)          candidates.push(1 | (1u128 << i));
+             .                   for j in (i + 1)..n {
+        30,672 ( 0.00%)              candidates.push(1 | (1u128 << i) | (1u128 << j));
+             .                       for k in (j + 1)..n {
+       715,680 ( 0.00%)                  candidates.push(1 | (1u128 << i) | (1u128 << j) | (1u128 << k));
+             .                       }
+             .                   }
+             .               }
+             1 ( 0.00%)      candidates.sort_unstable();
+             8 ( 0.00%)      let hi = 1u128 << n;
+            34 ( 0.00%)      for low in candidates {
+            75 ( 0.00%)          if is_irreducible_f2_wide(hi | low) {
+     3,285,651 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::is_irreducible_f2_wide (15x)
+             8 ( 0.00%)              return Some(IrreduciblePoly {
+             .                           degree: n,
+             .                           low_terms: (0..n).filter(|i| (low >> i) & 1 == 1).collect(),
+             .                       });
+             .                   }
+             .               }
+             .               None
+             9 ( 0.00%)  }
+             .           
+             9 ( 0.00%)  fn prime_divisors(mut n: u32) -> Vec<u32> {
+             .               let mut out = Vec::new();
+             .               let mut d = 2u32;
+            37 ( 0.00%)      while d * d <= n {
+             7 ( 0.00%)          if n.is_multiple_of(d) {
+             .                       out.push(d);
+             .                       while n.is_multiple_of(d) {
+             .                           n /= d;
+             .                       }
+             .                   }
+             7 ( 0.00%)          d += 1;
+             .               }
+             2 ( 0.00%)      if n > 1 {
+             .                   out.push(n);
+             .               }
+             4 ( 0.00%)      out
+             8 ( 0.00%)  }
+             .           
+             .           /// **Rabin's irreducibility test** for a degree-`d` polynomial of
+             .           /// `F_2[x]`: `f` is irreducible iff `x^(2^d) ≡ x (mod f)` and
+             .           /// `gcd(x^(2^(d/p)) − x, f) = 1` for every prime `p | d`.
+             .           pub fn is_irreducible_f2(f: u64) -> bool {
+             .               let d = match poly_deg(f) {
+             .                   Some(d) if d >= 1 => d,
+             .                   _ => return false,
+-- line 396 ----------------------------------------
+-- line 655 ----------------------------------------
+             .                   s_cur = next;
+             .               }
+             .               let count = (1i128 << n) + 1 - s_cur;
+             .               BigUint::from(count as u128)
+             .           }
+             .           
+             .           /// `#E(F_{q^e}) = q^e + 1 − s_e` from the trace `t` of the `q`-power
+             .           /// Frobenius (`s_0 = 2`, `s_1 = t`, `s_i = t·s_{i−1} − q·s_{i−2}`).
+             7 ( 0.00%)  pub fn subfield_group_order(trace: i128, q: u64, e: u32) -> BigUint {
+             .               let q = q as i128;
+             .               let (mut s_prev, mut s_cur) = (2i128, trace);
+             .               for _ in 1..e {
+         1,152 ( 0.00%)          let next = trace * s_cur - q * s_prev;
+             .                   s_prev = s_cur;
+             .                   s_cur = next;
+             .               }
+             4 ( 0.00%)      let count = q.pow(e) + 1 - s_cur;
+             .               BigUint::from(count as u128)
+             8 ( 0.00%)  }
+             .           
+             .           /// `#E(F_q)` for a curve whose coefficients lie in the subfield spanned
+             .           /// by `basis`, by enumerating the `q` abscissae and keeping the points
+             .           /// whose ordinate is also in `F_q`.
+             9 ( 0.00%)  fn subfield_point_count(curve: &BinaryCurve, basis: &[F2mElement], k: u32) -> u64 {
+             2 ( 0.00%)      let n = curve.m;
+             .               let irr = &curve.irreducible;
+             .               let mut count = 1u64; // O
+            38 ( 0.00%)      for x in span_f2(basis, n) {
+           669 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::span_f2 (1x)
+            26 ( 0.00%)          for p in points_with_x(curve, &x) {
+       110,793 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::points_with_x (2x)
+            30 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (1x)
+             2 ( 0.00%)              if let BinaryPoint::Affine { y, .. } = &p {
+             6 ( 0.00%)                  if y.square_k_times(k, irr) == *y {
+           569 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::square_k_times (1x)
+             1 ( 0.00%)                      count += 1;
+             .                           }
+             .                       }
+             .                   }
+             .               }
+             .               count
+             9 ( 0.00%)  }
+             .           
+             .           /// Trial-division helper kept for upcoming cofactor work.
+             .           #[allow(dead_code)]
+             .           fn factorise_u64(mut v: u64) -> Vec<(u64, u32)> {
+             .               let mut out = Vec::new();
+             .               // Whether what is left is prime changes only when a division changes
+             .               // it, so the test runs then and not at every trial divisor: a
+             .               // Miller–Rabin test per divisor was most of building a curve whose
+-- line 700 ----------------------------------------
+-- line 715 ----------------------------------------
+             .                   d += if d == 2 { 1 } else { 2 };
+             .               }
+             .               if v > 1 {
+             .                   out.push((v, 1));
+             .               }
+             .               out
+             .           }
+             .           
+             9 ( 0.00%)  fn factorise(v: BigUint) -> Vec<(BigUint, u32)> {
+             1 ( 0.00%)      if let Some(v) = v.to_u64() {
+             .                   return factorise_u64(v)
+             .                       .into_iter()
+             .                       .map(|(p, e)| (BigUint::from(p), e))
+             .                       .collect();
+             .               }
+             .               if let Some(v) = biguint_to_u128(&v) {
+             .                   return factorise_u128(v)
+             .                       .into_iter()
+             .                       .map(|(p, e)| (BigUint::from(p), e))
+             .                       .collect();
+             .               }
+             .               factorise_big(v)
+             8 ( 0.00%)  }
+             .           
+             .           /// Deterministic Miller–Rabin for every `u64`: the first twelve primes
+             .           /// as bases are a complete witness set below `3.3 · 10²⁴`.
+             .           fn is_prime_u64(n: u64) -> bool {
+             .               const BASES: [u64; 12] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+             .               if n < 2 {
+             .                   return false;
+             .               }
+-- line 745 ----------------------------------------
+-- line 799 ----------------------------------------
+             .                   out.push((v, 1));
+             .               }
+             .               out
+             .           }
+             .           
+             .           /// `Some(v)` as a native word when the [`BigUint`] fits in 128 bits.
+             .           fn biguint_to_u128(v: &BigUint) -> Option<u128> {
+             .               let limbs = v.to_u64_digits();
+             2 ( 0.00%)      if limbs.len() > 2 {
+             .                   return None;
+             .               }
+             .               Some(limbs[0] as u128 | ((limbs.get(1).copied().unwrap_or(0) as u128) << 64))
+             .           }
+             .           
+             .           /// Native-word trial division: same factor list as [`factorise`], no
+             .           /// allocations.  `d * d` cannot overflow: `d ≤ √v < 2^64`.
+             .           fn factorise_u128(mut v: u128) -> Vec<(u128, u32)> {
+             .               let mut out: Vec<(u128, u32)> = Vec::new();
+             .               let mut d = 2u128;
+23,204,918,474 (18.66%)      while d * d <= v {
+             .                   let mut e = 0;
+             2 ( 0.00%)          while v.is_multiple_of(d) {
+            14 ( 0.00%)              v /= d;
+            27 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/macros.rs:__udivti3 (2x)
+             2 ( 0.00%)              e += 1;
+             .                   }
+             4 ( 0.00%)          if e > 0 {
+             .                       out.push((d, e));
+             .                   }
+ 4,640,983,694 ( 3.73%)          d += 1;
+             .               }
+             6 ( 0.00%)      if v > 1 {
+             .                   out.push((v, 1));
+             .               }
+             5 ( 0.00%)      out
+             .           }
+             .           
+             .           impl KoblitzCurve {
+             .               /// Word arithmetic with the curve's actual field-encoded coefficient.
+             .               /// A subfield model's `a` tag is a basis index, not that coefficient.
+             .               pub(crate) fn fast_binary_curve(&self) -> Option<FastBinaryCurve> {
+             .                   let mut fast = FastBinaryCurve::new(&self.curve.irreducible, 0)?;
+             .                   fast.a = fast.word(&self.curve.a);
+-- line 840 ----------------------------------------
+-- line 844 ----------------------------------------
+             .               /// Build `K_a` over `F_{2^n}`: pick a defining irreducible
+             .               /// polynomial, count points, split off the largest prime-order
+             .               /// subgroup, find a generator of it, and determine `λ`.
+             .               ///
+             .               /// Returns `None` if `n` is out of range, if no irreducible
+             .               /// polynomial is found, or if the largest prime factor of `#E` is
+             .               /// too small for the subgroup to be usable (`r ≤ h`, or `r² | #E`).
+             .               pub fn new(a: u8, n: u32) -> Option<Self> {
+             2 ( 0.00%)          if a > 1 {
+             .                       return None;
+             .                   }
+             4 ( 0.00%)          Self::subfield(1, n, u64::from(a), 1)
+83,564,941,333 (67.20%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:<crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve>::subfield (1x)
+             3 ( 0.00%)      }
+             .           
+             .               /// The pinned K_1 model over GF(2^83) used by the two-word IC stage
+             .               /// gate. Its parameters are the C082 public fixture.
+             .               pub fn known_n83_k1() -> Option<Self> {
+             .                   Self::known_n83_from_fixture(
+             .                       1,
+             .                       "8569786107849059",
+             .                       "1128547018",
+-- line 864 ----------------------------------------
+-- line 950 ----------------------------------------
+             .               /// `a, b ∈ F_q` given by their coordinates `a_index` (`< q`) and
+             .               /// `b_index` (`1 ≤ b_index < q`) in the `F_2`-basis of the subfield.
+             .               /// `k = 1` is the Koblitz family (`b_index = 1`); `k ≤`
+             .               /// [`MAX_SUBFIELD_DEGREE`].  The `q`-power Frobenius `π` is an
+             .               /// endomorphism with `π² − tπ + q = 0`, `t` the trace over `F_q`
+             .               /// (found by counting `E(F_q)`), and `#E(F_{2^n})` follows from the
+             .               /// same recurrence as for `K_a`.  Everything else — the prime-order
+             .               /// subgroup, its generator and `λ` — is as for [`Self::new`].
+             9 ( 0.00%)      pub fn subfield(k: u32, n: u32, a_index: u64, b_index: u64) -> Option<Self> {
+             9 ( 0.00%)          if k == 0 || k > MAX_SUBFIELD_DEGREE || !(3..=MAX_N).contains(&n) || !n.is_multiple_of(k) {
+             .                       return None;
+             .                   }
+             4 ( 0.00%)          let ext = n / k;
+             4 ( 0.00%)          if ext < 3 || ext.is_multiple_of(2) {
+             .                       return None;
+             .                   }
+             3 ( 0.00%)          let q = 1u64 << k;
+             5 ( 0.00%)          if a_index >= q || b_index == 0 || b_index >= q {
+             .                       return None;
+             .                   }
+             .                   // Identical to the exhaustive `find_irreducible` wherever both
+             .                   // are defined (a test pins that for every n ≤ 24) and far
+             .                   // cheaper past it, where the exhaustive scan would touch 2^n
+             .                   // masks: the sparse (trinomial/pentanomial) search is what
+             .                   // reaches the boundary-ledger rungs at n = 37 / n = 41.
+             .                   // reaches the boundary-ledger rungs at n = 37 / n = 41, and
+             .                   // its `u128` twin reaches the wide rungs past the `u64` shift
+             .                   // ceiling (`1u64 << n` wraps for `n ≥ 64`).
+             4 ( 0.00%)          let irreducible = if n <= 63 {
+             .                       find_irreducible_sparse(n)?
+             .                   } else {
+             1 ( 0.00%)              find_irreducible_sparse_wide(n)?
+    18,673,259 ( 0.02%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide (1x)
+             .                   };
+             .                   // F_q ⊂ F_{2^n} is the kernel of X^{2^k} + X.
+             9 ( 0.00%)          let subfield_basis = linearised_kernel_basis(&[0, k], n, &irreducible);
+       241,149 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::linearised_kernel_basis (1x)
+             2 ( 0.00%)          if subfield_basis.len() != k as usize {
+             .                       return None;
+             .                   }
+            24 ( 0.00%)          let combine = |index: u64| {
+             .                       let mut acc = F2mElement::zero(n);
+             .                       for (i, e) in subfield_basis.iter().enumerate() {
+             4 ( 0.00%)                  if (index >> i) & 1 == 1 {
+            32 ( 0.00%)                      acc = acc.add(e);
+           204 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::add (2x)
+             .                           }
+             .                       }
+            42 ( 0.00%)              acc
+            16 ( 0.00%)          };
+             8 ( 0.00%)          let a_fe = combine(a_index);
+           204 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:<crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve>::subfield::{closure#0} (1x)
+             5 ( 0.00%)          let b_fe = combine(b_index);
+           204 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:<crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve>::subfield::{closure#0} (1x)
+             .                   let a = a_index as u8;
+             .           
+             .                   // Arithmetic-only shell; generator/order are filled in below.
+            23 ( 0.00%)          let mut curve = BinaryCurve {
+             .                       m: n,
+             4 ( 0.00%)              irreducible,
+            12 ( 0.00%)              a: a_fe,
+             .                       b: b_fe,
+             .                       generator: BinaryPoint::Infinity,
+             .                       order: BigUint::zero(),
+             .                       cofactor: BigUint::one(),
+             .                   };
+             .           
+            11 ( 0.00%)          let trace = q as i128 + 1 - subfield_point_count(&curve, &subfield_basis, k) as i128;
+       112,532 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::subfield_point_count (1x)
+             1 ( 0.00%)          let group_order = subfield_group_order(trace, q, ext);
+         1,602 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::subfield_group_order (1x)
+             1 ( 0.00%)          let factors = factorise(group_order.clone());
+83,537,709,075 (67.18%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::factorise (1x)
+             4 ( 0.00%)          let (r, e) = factors.last()?.clone();
+             2 ( 0.00%)          if e != 1 {
+             .                       return None;
+             .                   }
+             1 ( 0.00%)          let cofactor = &group_order / &r;
+           274 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint/division.rs:<&num_bigint::biguint::BigUint as core::ops::arith::Div>::div (1x)
+             1 ( 0.00%)          if r <= cofactor {
+             .                       return None;
+             .                   }
+             .           
+             .                   // A generator of the order-r subgroup: kill the cofactor on
+             .                   // curve points until the result is non-trivial.  Exhaustive
+             .                   // abscissa search is fine through ~24 bits; past that a full
+             .                   // `2^n` sweep is impossible, so sample deterministically from
+             .                   // a fixed LCG (reproducible across hosts).
+             2 ( 0.00%)          let mut generator = BinaryPoint::Infinity;
+             9 ( 0.00%)          let mask = if n >= 64 { u64::MAX } else { (1u64 << n) - 1 };
+             4 ( 0.00%)          let exhaustive = n <= 24;
+             3 ( 0.00%)          let budget = if exhaustive {
+             .                       1u64 << n
+             .                   } else {
+             .                       // ~1M trials is plenty: a random x hits the curve ~1/2 of
+             .                       // the time and survives the cofactor map with probability
+             .                       // ≈ 1 − 1/r ≫ 2^{-20} on admitted rungs.
+             .                       1u64 << 20
+             .                   };
+             3 ( 0.00%)          let mut state = 0x9e37_79b9_7f4a_7c15u64 ^ (n as u64) ^ ((a as u64) << 32);
+            14 ( 0.00%)          if k > 1 {
+             .                       state ^= (u64::from(k) << 40) ^ (b_index << 48);
+             .                   }
+             .                   for i in 0..budget {
+            18 ( 0.00%)              let raw = if exhaustive {
+             .                           i
+             .                       } else {
+             .                           state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+             .                           state & mask
+             .                       };
+             6 ( 0.00%)              let x = F2mElement::from_biguint(&BigUint::from(raw), n);
+           688 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::from_biguint (2x)
+             8 ( 0.00%)              let pts = points_with_x(&curve, &x);
+       228,305 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::points_with_x (2x)
+             .                       let mut found = false;
+            25 ( 0.00%)              for p in pts {
+            30 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (1x)
+             5 ( 0.00%)                  let cand = scalar_mul(&curve, &p, &cofactor);
+       663,438 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/curve.rs:crypto_lib::binary_ecc::curve::scalar_mul (1x)
+             .                           if cand != BinaryPoint::Infinity {
+             .                               // Confirm order divides r (reject accidental torsion).
+             7 ( 0.00%)                      if scalar_mul(&curve, &cand, &r) == BinaryPoint::Infinity {
+     3,689,968 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/curve.rs:crypto_lib::binary_ecc::curve::scalar_mul (1x)
+             8 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<crypto_lib::binary_ecc::cover_transfer::BinaryCoverPoint> (1x)
+             7 ( 0.00%)                          generator = cand;
+            30 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (1x)
+             8 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<crypto_lib::binary_ecc::cover_transfer::BinaryCoverPoint> (1x)
+             .                                   found = true;
+             .                                   break;
+             .                               }
+             .                           }
+             2 ( 0.00%)              }
+             8 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<crypto_lib::binary_ecc::cover_transfer::BinaryCoverPoint> (1x)
+             .                       if found {
+             .                           break;
+             .                       }
+             .                   }
+             5 ( 0.00%)          if generator == BinaryPoint::Infinity {
+            16 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/curve.rs:<crypto_lib::binary_ecc::curve::BinaryPoint as core::cmp::PartialEq>::eq (1x)
+             .                       return None;
+             .                   }
+             6 ( 0.00%)          curve.generator = generator;
+            30 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (1x)
+             8 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<crypto_lib::binary_ecc::cover_transfer::BinaryCoverPoint> (1x)
+             5 ( 0.00%)          curve.order = r.clone();
+             7 ( 0.00%)          curve.cofactor = cofactor.clone();
+             .           
+             .                   let trace = i64::try_from(trace).ok()?;
+             1 ( 0.00%)          let lambda = frobenius_eigenvalue_q(&curve, trace, q, k, &r)?;
+     3,619,272 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs:crypto_lib::cryptanalysis::koblitz_index_calculus::frobenius_eigenvalue_q (1x)
+             .           
+            16 ( 0.00%)          Some(Self {
+            89 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (1x)
+             .                       a,
+             .                       n,
+             3 ( 0.00%)              curve,
+            77 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (1x)
+             .                       trace,
+             4 ( 0.00%)              group_order,
+             4 ( 0.00%)              subgroup_order: r,
+             4 ( 0.00%)              cofactor,
+             .                       lambda,
+             .                       k,
+             .                       q,
+             .                       a_index,
+             .                       b_index,
+             4 ( 0.00%)              subfield_basis,
+             .                       frobenius_is_endomorphism: true,
+             .                   })
+            11 ( 0.00%)      }
+           130 ( 0.00%)  => /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<alloc::vec::Vec<(num_bigint::biguint::BigUint, u32)>> (1x)
+             .           
+             .               /// Build an **isogenous member of the class of `K_a`**: the model
+             .               /// `y² + xy = x³ + a x² + b` over `F_{2^n}` with `b` arbitrary (in
+             .               /// practice `b ∉ F_2`, a floor curve of the isogeny volcano).
+             .               ///
+             .               /// Isogenous curves have equal point counts, so `#E` is taken from the
+             .               /// Koblitz recurrence for the class and then **certified** on sampled
+             .               /// points: every sample is killed by `#E`, and some sample realises the
+-- line 1103 ----------------------------------------
+-- line 1366 ----------------------------------------
+             .           
+             .           /// Both points of `E` with the given `x`-coordinate, or an empty vector
+             .           /// when `x` is not the abscissa of any `F_{2^n}`-point.
+             .           ///
+             .           /// For `x ≠ 0` the substitution `y = x·u` turns `y² + xy = x³ + ax² + b`
+             .           /// into the Artin–Schreier equation `u² + u = x + a + b/x²`, solvable
+             .           /// iff the right-hand side has absolute trace `0`.  For `x = 0` the
+             .           /// equation degenerates to `y² = b`, whose unique solution is `y = √b`.
+            40 ( 0.00%)  pub fn points_with_x(curve: &BinaryCurve, x: &F2mElement) -> Vec<BinaryPoint> {
+             .               let irr = &curve.irreducible;
+             4 ( 0.00%)      let m = curve.m;
+             .               if x.is_zero() {
+             .                   // y² = b ⇒ y = b^(2^(m−1)) (squaring is a bijection).
+             6 ( 0.00%)          let y = curve.b.square_k_times(m - 1, irr);
+        28,614 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::square_k_times (1x)
+            28 ( 0.00%)          return vec![BinaryPoint::Affine { x: x.clone(), y }];
+             .               }
+            15 ( 0.00%)      let x_inv = match x.flt_inverse(irr) {
+       111,105 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::flt_inverse (3x)
+            36 ( 0.00%)          Some(v) => v,
+             .                   None => return Vec::new(),
+             .               };
+            36 ( 0.00%)      let rhs = x.add(&curve.a).add(&curve.b.mul(&x_inv.square(irr), irr));
+         1,374 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::mul (3x)
+         1,631 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::square (3x)
+           612 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::add (6x)
+            15 ( 0.00%)      let u = match solve_artin_schreier(&rhs, m, irr) {
+       194,049 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/binary_semaev.rs:crypto_lib::cryptanalysis::binary_semaev::solve_artin_schreier (3x)
+            14 ( 0.00%)          Some(u) => u,
+             .                   None => return Vec::new(),
+             .               };
+             3 ( 0.00%)      let y = x.mul(&u, irr);
+           516 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::mul (1x)
+            16 ( 0.00%)      let p = BinaryPoint::Affine { x: x.clone(), y };
+             1 ( 0.00%)      let np = point_neg(&p);
+           174 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/curve.rs:crypto_lib::binary_ecc::curve::point_neg (1x)
+             2 ( 0.00%)      if p == np {
+             .                   vec![p]
+             .               } else {
+            11 ( 0.00%)          vec![p, np]
+            60 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms (2x)
+             .               }
+            36 ( 0.00%)  }
+             .           
+             .           /// Single-word version of `points_with_x` for an odd-degree field.
+             .           /// Reuse the field reduction tables across all coordinates of a factor base.
+             .           /// The same half-trace root is returned first, preserving sampling and indexing.
+             .           ///
+             .           /// Public so that the cost of a lift can be priced on its own: it is the
+             .           /// one piece of algebra selecting a factor base cannot avoid, and
+             .           /// therefore the floor everything else in that phase is measured
+-- line 1407 ----------------------------------------
+-- line 1437 ----------------------------------------
+             .           /// `λ² − tλ + 2 ≡ 0 (mod r)`; which one is settled by testing
+             .           /// `π(G) = [λ]G`.
+             .           pub fn frobenius_eigenvalue(curve: &BinaryCurve, trace: i64, r: &BigUint) -> Option<BigUint> {
+             .               frobenius_eigenvalue_q(curve, trace, 2, 1, r)
+             .           }
+             .           
+             .           /// [`frobenius_eigenvalue`] for the `q`-power Frobenius, `q = 2^k`:
+             .           /// `λ` is a root of `λ² − tλ + q ≡ 0 (mod r)` with `π_q(G) = [λ]G`.
+            12 ( 0.00%)  pub fn frobenius_eigenvalue_q(
+             .               curve: &BinaryCurve,
+             .               trace: i64,
+             .               q: u64,
+             .               k: u32,
+             .               r: &BigUint,
+             .           ) -> Option<BigUint> {
+             2 ( 0.00%)      let t = if trace >= 0 {
+             .                   BigUint::from(trace as u64) % r
+             .               } else {
+             .                   r - (BigUint::from((-trace) as u64) % r)
+             .               };
+             .               // disc = t² − 4q
+             2 ( 0.00%)      let t_sq = (&t * &t) % r;
+            65 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint/multiplication.rs:<&num_bigint::biguint::BigUint as core::ops::arith::Mul>::mul (1x)
+             3 ( 0.00%)      let disc = (&t_sq + r - (BigUint::from(4 * q) % r)) % r;
+            97 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/macros.rs:<&num_bigint::biguint::BigUint as core::ops::arith::Add>::add (1x)
+             2 ( 0.00%)      let s = sqrt_mod_p(&disc, r)?;
+        91,029 ( 0.00%)  => /home/user/wt/t03/src/cryptanalysis/ec_index_calculus.rs:crypto_lib::cryptanalysis::ec_index_calculus::sqrt_mod_p (1x)
+             2 ( 0.00%)      let inv2 = mod_inverse(&BigUint::from(2u32), r)?;
+           108 ( 0.00%)  => /home/user/wt/t03/src/utils/mod.rs:crypto_lib::utils::mod_inverse (1x)
+             .           
+             .               let g = &curve.generator;
+             2 ( 0.00%)      let pi_g = match g {
+             .                   BinaryPoint::Infinity => return None,
+            29 ( 0.00%)          BinaryPoint::Affine { x, y } => BinaryPoint::Affine {
+             4 ( 0.00%)              x: x.square_k_times(k, &curve.irreducible),
+           627 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::square_k_times (1x)
+             3 ( 0.00%)              y: y.square_k_times(k, &curve.irreducible),
+           627 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::square_k_times (1x)
+             .                   },
+             .               };
+             .               for sign in [true, false] {
+             .                   let num = if sign {
+             1 ( 0.00%)              (&t + &s) % r
+            97 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/macros.rs:<&num_bigint::biguint::BigUint as core::ops::arith::Add>::add (1x)
+             .                   } else {
+             .                       (&t + r - &s) % r
+             .                   };
+             1 ( 0.00%)          let lambda = (num * &inv2) % r;
+           162 ( 0.00%)  => /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint/multiplication.rs:<num_bigint::biguint::BigUint as core::ops::arith::Mul<&num_bigint::biguint::BigUint>>::mul (1x)
+             6 ( 0.00%)          if scalar_mul(curve, g, &lambda) == pi_g {
+     3,524,826 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/curve.rs:crypto_lib::binary_ecc::curve::scalar_mul (1x)
+             4 ( 0.00%)              return Some(lambda);
+             .                   }
+             .               }
+             .               None
+             9 ( 0.00%)  }
+             .           
+             .           // ── Frobenius-invariant factor base ────────────────────────────────
+             .           
+             .           /// Algebraic description of the allowed abscissae.
+             .           #[derive(Clone, Debug, PartialEq, Eq)]
+             .           pub enum FactorBaseDomain {
+             .               LinearSubspace,
+             .               /// The polynomial-basis span `⟨1,z,…,z^(ell-1)⟩`.  Unlike a GGMP
+-- line 1491 ----------------------------------------
+-- line 2203 ----------------------------------------
+             .           }
+             .           
+             .           /// An `F_2`-**basis** of the kernel of the linearised polynomial
+             .           /// `F(X) = Σ_{k ∈ exps} X^{2^k}` acting `F_2`-linearly on `F_{2^n}`.
+             .           ///
+             .           /// The map is written as an `n × n` matrix over `F_2` in the polynomial
+             .           /// basis `1, z, …, z^{n−1}`; the kernel basis is read off by row
+             .           /// reducing `[image | preimage]`.
+            11 ( 0.00%)  pub fn linearised_kernel_basis(exps: &[u32], n: u32, irr: &IrreduciblePoly) -> Vec<F2mElement> {
+             .               kernel_basis_of(n, |basis| {
+             .                   let mut img = F2mElement::zero(n);
+           146 ( 0.00%)          for &k in exps {
+         2,920 ( 0.00%)              img = img.add(&basis.square_k_times(k, irr));
+        48,025 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::square_k_times (146x)
+        14,892 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::add (146x)
+             .                   }
+         1,606 ( 0.00%)          img
+             .               })
+             9 ( 0.00%)  }
+             .           
+             .           /// An `F_2`-basis of the kernel of the `q`-linearised polynomial
+             .           /// `L(X) = Σ_i c_i X^{q^i}`, `q = 2^k`, acting on `F_{2^n}`.  With
+             .           /// `c_i ∈ F_q` the kernel is `π_q`-invariant; for `c_i ∈ F_2` and
+             .           /// `k = 1` this is [`linearised_kernel_basis`].
+             .           pub fn q_linearised_kernel_basis(
+             .               coeffs: &[F2mElement],
+             .               k: u32,
+-- line 2227 ----------------------------------------
+-- line 2239 ----------------------------------------
+             .                   }
+             .                   img
+             .               })
+             .           }
+             .           
+             .           /// Kernel basis of an `F_2`-linear map on `F_{2^n}` given by its action
+             .           /// on the polynomial basis.
+             .           fn kernel_basis_of(n: u32, image: impl Fn(&F2mElement) -> F2mElement) -> Vec<F2mElement> {
+             3 ( 0.00%)      if n == 0 || n > 128 {
+             .                   return Vec::new();
+             .               }
+             .               // Column i = F(z^i), retaining both words for the wide-field path.
+             .               // Every admitted field degree fits a u128; retain high image and
+             .               // preimage bits during elimination for the N71/N83 constructors.
+             .               // Column i = F(z^i), packed into the low n bits of a u128 (two raw
+             .               // limbs): the wide rungs have 64 < n ≤ MAX_N = 127, and a u64 here
+             .               // silently dropped their top limb and shifted `1 << i` out of range,
+             .               // so every wide constructor returned `None`.
+             .               debug_assert!(n <= 128, "kernel_basis_of packs columns into u128");
+             .               // Column i = F(z^i), packed into the low n bits of a u128.
+             .               // Retain both coordinate words for the admitted degrees 64..=127.
+             1 ( 0.00%)      let mut rows: Vec<(u128, u128)> = Vec::with_capacity(n as usize);
+             .               for i in 0..n {
+           438 ( 0.00%)          let basis = F2mElement::from_bit_positions(&[i], n);
+         6,789 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::from_bit_positions (73x)
+             .                   let img = image(&basis);
+             .                   let words = img.raw_bits();
+             .                   let img_bits = u128::from(words.first().copied().unwrap_or(0))
+             .                       | (u128::from(words.get(1).copied().unwrap_or(0)) << 64);
+           730 ( 0.00%)          rows.push((img_bits, 1u128 << i));
+             .               }
+             .           
+             .               // Gaussian elimination on the image halves; whatever reduces to
+             .               // zero contributes its preimage to the kernel basis.
+             .               let mut pivots: Vec<(u128, u128)> = Vec::new();
+             .               let mut kernel_basis: Vec<u128> = Vec::new();
+             5 ( 0.00%)      for (mut img, mut pre) in rows {
+         5,112 ( 0.00%)          for &(pimg, ppre) in &pivots {
+         7,668 ( 0.00%)              let lead = 1u128 << (127 - pimg.leading_zeros());
+        28,116 ( 0.00%)              if img & lead != 0 {
+           388 ( 0.00%)                  img ^= pimg;
+           582 ( 0.00%)                  pre ^= ppre;
+             .                       }
+             .                   }
+           219 ( 0.00%)          if img == 0 {
+             .                       kernel_basis.push(pre);
+             .                   } else {
+             .                       pivots.push((img, pre));
+             .                       pivots.sort_by_key(|p| std::cmp::Reverse(p.0));
+             .                   }
+             .               }
+             .           
+             3 ( 0.00%)      kernel_basis
+             .                   .into_iter()
+             4 ( 0.00%)          .map(|v| F2mElement::from_biguint(&BigUint::from(v), n))
+           344 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::from_biguint (1x)
+             .                   .collect()
+             .           }
+             .           
+             .           /// The kernel itself: every `F_2`-combination of
+             .           /// [`linearised_kernel_basis`], `2^dim` elements.
+             .           pub fn linearised_kernel(exps: &[u32], n: u32, irr: &IrreduciblePoly) -> Vec<F2mElement> {
+             .               span_f2(&linearised_kernel_basis(exps, n, irr), n)
+             .           }
+             .           
+             .           /// All `2^{|basis|}` `F_2`-combinations of `basis`.
+             9 ( 0.00%)  pub fn span_f2(basis: &[F2mElement], n: u32) -> Vec<F2mElement> {
+             4 ( 0.00%)      let mut out = Vec::with_capacity(1usize << basis.len());
+             .               for mask in 0..(1u64 << basis.len()) {
+             .                   let mut acc = F2mElement::zero(n);
+             .                   for (b, base) in basis.iter().enumerate() {
+             4 ( 0.00%)              if (mask >> b) & 1 == 1 {
+            16 ( 0.00%)                  acc = acc.add(base);
+           102 ( 0.00%)  => /home/user/wt/t03/src/binary_ecc/f2m.rs:<crypto_lib::binary_ecc::f2m::F2mElement>::add (1x)
+             .                       }
+             .                   }
+            32 ( 0.00%)          out.push(acc);
+             .               }
+             5 ( 0.00%)      out
+             8 ( 0.00%)  }
+             .           
+             .           /// **The 2-cyclotomic cosets mod `n`**: orbits of `s ↦ 2s` on `Z/n`.
+             .           ///
+             .           /// These classify every Frobenius-stable `F_2`-subspace of `F_{2^n}`.
+             .           /// A subspace closed under squaring is an `F_2[x]/(x^n − 1)`-submodule,
+             .           /// i.e. a binary cyclic code of length `n`, i.e. a divisor of
+             .           /// `x^n − 1`; and the irreducible factors of `x^n − 1` correspond one
+             .           /// for one with these cosets, a coset of size `d` giving a factor of
+-- line 2323 ----------------------------------------
+
+ 4,642,058,642 ( 3.73%)  <counts for unidentified lines in /home/user/wt/t03/src/cryptanalysis/koblitz_index_calculus.rs>
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  ./csu/../csu/libc-start.c
+  ./csu/../sysdeps/nptl/libc_start_call_main.h
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/int/specialized_div_rem/asymmetric.rs
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/int/specialized_div_rem/mod.rs
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/compiler-builtins/compiler-builtins/src/macros.rs
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/../../stdarch/crates/core_arch/src/simd.rs
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/num/uint_macros.rs
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/ops/function.rs
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/rt.rs
+  /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/sys/backtrace.rs
+
+--------------------------------------------------------------------------------
+Ir                      
+--------------------------------------------------------------------------------
+60,692,140,122 (48.81%)  events annotated
+
