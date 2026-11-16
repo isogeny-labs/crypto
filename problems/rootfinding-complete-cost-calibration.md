@@ -4,7 +4,7 @@
 - **Kind:** measurement gap; implementation gap for native-work accounting; independent-host validation gap
 - **Affected work:** [ecbench root-finding assessment](../research/ecbench_rootfinding_assessment_20261012/REPORT.md), [arity trial](../research/ecbench_rootfinding_arity_20261013/REPORT.md), [batched pair-table trial](../research/ecbench_rootfinding_batchtable_20261013/REPORT.md), its [target-pinned follow-up](../research/ecbench_rootfinding_batchtable_20261013/followup/), and the [synchronized-lane and coverage study](../research/ecbench_rootfinding_lanes_20261013/REPORT.md)
 - **Next action owner:** unassigned measurement and ecbench instrumentation task
-- **Last updated:** 2026-10-14
+- **Last updated:** 2026-11-15
 
 ## Problem
 
@@ -60,6 +60,8 @@ Later 2026-10-13: The one-lane native walk matched every paired relation and ans
 2026-10-14: The synchronized 4/8/16-lane collector and fixed-stride B48 coverage controls completed five frozen L0 sessions, all verified and replayed. The train-selected B48 did not establish a holdout B optimum, and the stride panels did not resolve a coverage bias against exact uniform occupancy. Missing sealed field-operation counters, unequal target-pinned probe budgets, inaccessible L2 workers and absent independent-host replay keep the stated exit criteria open. The prior kernel-only and one-lane observations remain immutable historical records.
 
 Later 2026-10-14: The equal-prefix addendum first measured a reused-target exploratory panel, then a separately frozen eight-fresh-target confirmation. Both showed an early stride-23 independent-rank surplus; the fresh primary effect was smaller and diminished by 8,192 probes. The exact equal-probe control now exists, while complete native pricing, isolated wall and independent-host replay remain open.
+
+2026-11-15, K13 binary batch study: [the source-level cost-model review](../research/rootfind_negfold_binary_batch_20261115/COST_MODEL_REVIEW_20261115.md) identified a distinct metric obstruction before data. The fixed `bitop/v1` binary `group_add` weight prices the scalar and batched table's equal abstract additions alike; the ecbench rootfinding adapter does not serialize the shared-inversion and lazy-ordinate field work as separately priced primitives. Under matching relation trajectories, a strict batch `bitop/v1` win is structurally unavailable at m=2 and extra completed-block additions can make m=3 count worse. This is a model-sensitivity conclusion, not a wall measurement. [Amendment 3](../research/rootfind_negfold_binary_batch_20261115/AMENDMENT-3.md) makes the already specified L2/A/A whole-solve wall comparison the m=3 primary decision, tightens its target-cluster threshold, and keeps m=2 descriptive. A new source/protocol publication receipt and admitted run remain required. The existing problem-index row still identifies missing native field counts and L2 validation; its file is reserved by Conductor T-6315 for an unrelated N83 change, so no concurrent index edit was made. Unresolved.
 
 
 ## 2026-10-19 generalized all-roots conditional-cell follow-up

@@ -1641,6 +1641,13 @@ fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) 
     }
     let inverse = field.inv(coordinate);
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
+    if crate::cryptanalysis::koblitz_fast::cached_point_lifts_enabled() {
+        let Some(root) = curve.half_trace_root_cached(rhs) else {
+            return (none, 0);
+        };
+        let point = FastPoint::affine(coordinate, field.mul(coordinate, root));
+        return ([point, curve.neg(point)], 2);
+    }
     let mut root = rhs;
     let mut power = rhs;
     for _ in 0..(curve.n - 1) / 2 {
@@ -4394,6 +4401,20 @@ pub enum FilterLayout {
 }
 
 impl FilterLayout {
+    /// Filter bits a folded build adds to [`filter_bits_for`]'s width:
+    /// one for a [`FilterLayout::Top`] table (`KIC_FILTER_DOUBLE`, default
+    /// on), doubling its filter, and none for `Low`.  A `Low` table is the
+    /// format the table files, the GPU builder and `ecbench`'s methods
+    /// share, so their widths and counted bucket reads stay as they were;
+    /// a `Top` table lives only in this process.  The doubled filter
+    /// admits about a fifth as many absent keys; `0` keeps the old width.
+    fn extra_filter_bits(self) -> u32 {
+        static DOUBLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+        let double =
+            *DOUBLE.get_or_init(|| std::env::var("KIC_FILTER_DOUBLE").map_or(true, |v| v != "0"));
+        u32::from(self == FilterLayout::Top && double)
+    }
+
     /// The layout this module's folded builds use: `Top`, unless
     /// `KIC_FILTER_LAYOUT=low` (the same-binary control).
     fn for_folded_builds() -> Self {
@@ -6200,7 +6221,7 @@ impl PairSumTable {
         // At one thread there is one run, and its filter is the filter.
         // Every bit is set either way, so the filter is the same.
         const FILL_AHEAD: usize = 16;
-        let filter_bits = filter_bits_for(total);
+        let filter_bits = (filter_bits_for(total) + layout.extra_filter_bits()).min(32);
         let present_mask = (1u64 << filter_bits) - 1;
         let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
         let filter_words = (1usize << filter_bits) / 64;
@@ -6646,7 +6667,7 @@ impl PairSumTable {
             let total = bucket_start[buckets] as usize;
             let cursor: Vec<AtomicU32> = bucket_start.iter().map(|&c| AtomicU32::new(c)).collect();
             let mut rests = vec![0u32; total];
-            let filter_bits = filter_bits_for(total);
+            let filter_bits = (filter_bits_for(total) + layout.extra_filter_bits()).min(32);
             let present_mask = (1u64 << filter_bits) - 1;
             let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
             let words = (1usize << filter_bits) / 64;
@@ -17860,6 +17881,13 @@ mod tests {
                         points_with_x(&curve, &x),
                         "ordered roots at n={n}, a={a}, b={b}, x={bits}",
                     );
+                    assert_eq!(
+                        crate::cryptanalysis::koblitz_fast::with_cached_point_lifts(true, || {
+                            points_with_x_fast(&fast, &x)
+                        }),
+                        points_with_x(&curve, &x),
+                        "cached ordered roots at n={n}, a={a}, b={b}, x={bits}",
+                    );
                 }
             }
         }
@@ -21531,7 +21559,11 @@ mod tests {
             assert_eq!(ts.filter_layout, FilterLayout::Top);
             // The same stored pairs, a different filter.
             assert_eq!(ls.bucket_start, ts.bucket_start);
-            assert_eq!(ls.present_mask, ts.present_mask);
+            // A `Top` table's filter is wider by its extra bits.
+            assert_eq!(
+                ts.present_mask.count_ones(),
+                (ls.present_mask.count_ones() + FilterLayout::Top.extra_filter_bits()).min(32)
+            );
             assert_ne!(
                 ls.present, ts.present,
                 "K_{a}/2^{n}: the layout changed nothing"

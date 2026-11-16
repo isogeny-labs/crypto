@@ -1,5 +1,7 @@
 # Index calculus code map for aburan28/crypto: what the code implements and where it falls short of the claims
 
+> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands. The 120/168 replay-all is likewise superseded: 72/168 identical on current main, 96 mismatches in all four IC arms, an open regression (sweep D, PR #2290).
+
 Scope: read-only survey of `/home/user/crypto` on 2026-10-14 (src/, gpu/, sage/, scripts/, examples/, tests/, benches/, groebner_compare/; hdl/, isogeny_algos/ and quantum_circuit_secp256k1/ had nothing IC-specific). The sources are local files, cited as `path:line`. Sizes are `wc -l`. Test counts are the number of `#[test]` attributes in the file. Inline tests are often `#[ignore]`d or toy-scale, so a test count shows that tests exist, not that the code is validated at scale.
 
 Scale: 231 files in src/, 296 in examples/, 225 in scripts/, 31 in gpu/, 12 in tests/ and 4 in sage/ match "index calculus | summation poly | semaev | factor base". `src/cryptanalysis/` holds 239 modules.

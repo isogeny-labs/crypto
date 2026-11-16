@@ -132,13 +132,13 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2010Z-ic-native-ifma",
+  "latest_record": "20261116T0122Z-ic-positive-control-lucas",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
-    "censored": 8,
+    "censored": 10,
     "invalid": 4,
-    "measured": 199,
-    "open": 1
+    "measured": 202,
+    "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -4126,6 +4126,29 @@
     },
     {
       "better": "lower",
+      "first": 0.0008,
+      "latest": 0.0008,
+      "latest_derived": {},
+      "metric": "ic_pair_keys_kernel_s_n4096",
+      "points": [
+        {
+          "commit": "0c8c4311854f",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 1,
+          "record": "20261115T2225Z-ic-gpu-rootfind-setup",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 6: device pair-table key kernel with batched inversions (runs of 16): 5.7x the per-cell kernel at n=4096 with 0 mismatching keys; 120/120 verified and replayed, 36 identity checks equal. GPU m=3 set-up at 4096 0.109-0.116 s vs round 5's 0.121 s (prediction <= half failed): the stage timings put 47 ms in copying the 67 MB build-index map to the host. Launched through benchrec run.",
+          "value": 0.0008
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.004,
       "latest": 0.004,
       "latest_derived": {},
@@ -4558,14 +4581,19 @@
     {
       "better": "lower",
       "first": 0.122,
-      "latest": 0.122,
-      "latest_derived": {},
+      "latest": 0.109,
+      "latest_derived": {
+        "improvement_vs_first_percent": 10.6557,
+        "improvement_vs_previous_percent": 10.6557
+      },
       "metric": "ic_rf3_gpup_setup_s_r39_f4096",
       "points": [
         {
           "commit": "5142615e5d83",
           "date": "2026-11-15",
-          "derived": {},
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
           "n": 4,
           "record": "20261115T0656Z-ic-gpu-rootfind-pairs",
           "reference": null,
@@ -4573,6 +4601,21 @@
           "spread": null,
           "summary": "rootfind-subtract-gpu round 4 on an A100: 260/260 records verified and replayed, 156 pair checks equal S. The m=3 pair table built on the device (probe_build=pairs, charged as the CPU build) cuts oracle set-up to 0.02-0.12 s; complete m=3 solves 4.0-57.3x one CPU thread (0.368 s vs 21.1 s at log2 r=39.3, |F_x|=2048) and 4.7-10.9x a 14-thread CPU arm. Pooled emulation sized by the cgroup quota (13.6 CPUs): m=2 multi-thread 7.5-10.5x one thread. S unchanged (m=3 140-569x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
           "value": 0.122
+        },
+        {
+          "commit": "0c8c4311854f",
+          "date": "2026-11-15",
+          "derived": {
+            "improvement_vs_first_percent": 10.6557,
+            "improvement_vs_previous_percent": 10.6557
+          },
+          "n": 6,
+          "record": "20261115T2225Z-ic-gpu-rootfind-setup",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 6: device pair-table key kernel with batched inversions (runs of 16): 5.7x the per-cell kernel at n=4096 with 0 mismatching keys; 120/120 verified and replayed, 36 identity checks equal. GPU m=3 set-up at 4096 0.109-0.116 s vs round 5's 0.121 s (prediction <= half failed): the stage timings put 47 ms in copying the 67 MB build-index map to the host. Launched through benchrec run.",
+          "value": 0.109
         }
       ],
       "problem": "ic-gpu-kernels",
@@ -9138,7 +9181,7 @@
     {
       "better": "neutral",
       "first": 0.9936946952799995,
-      "latest": 0.9936946952799995,
+      "latest": 1.0002249485271448,
       "latest_derived": {},
       "metric": "admitted_aa_k0n53",
       "points": [
@@ -9156,6 +9199,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9936946952799995
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.962455760187498,
+            1.052731552711639
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0002249485271448
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9164,7 +9222,7 @@
     {
       "better": "neutral",
       "first": 0.9906579495433447,
-      "latest": 0.9906579495433447,
+      "latest": 0.9908515592794462,
       "latest_derived": {},
       "metric": "admitted_aa_k0n61",
       "points": [
@@ -9182,6 +9240,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9906579495433447
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9633635219831673,
+            1.0151837880178802
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9908515592794462
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9240,9 +9313,61 @@
       "unit": "ratio"
     },
     {
+      "better": "higher",
+      "first": 2.60729240581533,
+      "latest": 2.60729240581533,
+      "latest_derived": {},
+      "metric": "admitted_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.4826899800443893,
+            2.7174251311293083
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 2.60729240581533
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.573647068364809,
+      "latest": 2.573647068364809,
+      "latest_derived": {},
+      "metric": "admitted_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.500478369643154,
+            2.654160332791119
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 2.573647068364809
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 1.0252541002390572,
-      "latest": 1.0252541002390572,
+      "latest": 0.970128248245923,
       "latest_derived": {},
       "metric": "build_aa_k0n53",
       "points": [
@@ -9260,6 +9385,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.0252541002390572
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9148986609247828,
+            1.0222508794676612
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.970128248245923
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9268,7 +9408,7 @@
     {
       "better": "neutral",
       "first": 1.0098062333040732,
-      "latest": 1.0098062333040732,
+      "latest": 1.0123265869528344,
       "latest_derived": {},
       "metric": "build_aa_k0n61",
       "points": [
@@ -9286,6 +9426,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.0098062333040732
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9798306203714428,
+            1.0540970157404068
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0123265869528344
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9436,6 +9591,58 @@
       "unit": "percent"
     },
     {
+      "better": "higher",
+      "first": 1.0122252208564697,
+      "latest": 1.0122252208564697,
+      "latest_derived": {},
+      "metric": "build_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9817663846605311,
+            1.0429527268792707
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0122252208564697
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9871286540703486,
+      "latest": 0.9871286540703486,
+      "latest_derived": {},
+      "metric": "build_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9356056526775712,
+            1.053593418587798
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9871286540703486
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 33.62852825584937,
       "latest": 33.62852825584937,
@@ -9582,7 +9789,7 @@
     {
       "better": "neutral",
       "first": 0.9975502951567751,
-      "latest": 0.9975502951567751,
+      "latest": 0.9935932860469807,
       "latest_derived": {},
       "metric": "collect_aa_k0n53",
       "points": [
@@ -9600,6 +9807,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9975502951567751
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9758018259571236,
+            1.0176740308735146
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9935932860469807
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9608,7 +9830,7 @@
     {
       "better": "neutral",
       "first": 0.9868535955289628,
-      "latest": 0.9868535955289628,
+      "latest": 0.980559856788509,
       "latest_derived": {},
       "metric": "collect_aa_k0n61",
       "points": [
@@ -9626,6 +9848,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9868535955289628
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9640228893025966,
+            1.0162249677390807
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.980559856788509
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9684,9 +9921,61 @@
       "unit": "ratio"
     },
     {
+      "better": "higher",
+      "first": 1.0996385745907045,
+      "latest": 1.0996385745907045,
+      "latest_derived": {},
+      "metric": "collect_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0630331408112088,
+            1.1249220806680211
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0996385745907045
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0789368965136354,
+      "latest": 1.0789368965136354,
+      "latest_derived": {},
+      "metric": "collect_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0626082086389348,
+            1.1150021012169142
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0789368965136354
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 1.007316210958665,
-      "latest": 1.007316210958665,
+      "latest": 0.9991725107503957,
       "latest_derived": {},
       "metric": "filter_aa_k0n53",
       "points": [
@@ -9704,6 +9993,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.007316210958665
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9511772843015918,
+            1.0536215064537593
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9991725107503957
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9712,7 +10016,7 @@
     {
       "better": "neutral",
       "first": 0.9857451205160304,
-      "latest": 0.9857451205160304,
+      "latest": 0.9908117684022968,
       "latest_derived": {},
       "metric": "filter_aa_k0n61",
       "points": [
@@ -9730,6 +10034,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9857451205160304
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9686130186943898,
+            1.0236769218442299
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9908117684022968
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9788,9 +10107,61 @@
       "unit": "ratio"
     },
     {
+      "better": "higher",
+      "first": 1.2944251904039803,
+      "latest": 1.2944251904039803,
+      "latest_derived": {},
+      "metric": "filter_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.225829845422297,
+            1.3423376748488516
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.2944251904039803
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2095500396428485,
+      "latest": 1.2095500396428485,
+      "latest_derived": {},
+      "metric": "filter_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1758443563487844,
+            1.2358777251779893
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.2095500396428485
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 1.018536182234212,
-      "latest": 1.018536182234212,
+      "latest": 0.9931878940906476,
       "latest_derived": {},
       "metric": "setup_aa_k0n53",
       "points": [
@@ -9808,6 +10179,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.018536182234212
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9710272039905103,
+            1.017033244801555
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.9931878940906476
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9816,7 +10202,7 @@
     {
       "better": "neutral",
       "first": 0.9930865502835435,
-      "latest": 0.9930865502835435,
+      "latest": 0.986175075247113,
       "latest_derived": {},
       "metric": "setup_aa_k0n61",
       "points": [
@@ -9834,6 +10220,21 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 0.9930865502835435
+        },
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9678871677965422,
+            1.0362867746515256
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 0.986175075247113
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -9886,6 +10287,58 @@
           ],
           "summary": "Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] established; k0n53 same direction, not established; no regression. Kept as default.",
           "value": 1.0400940958652325
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.062414092641178,
+      "latest": 1.062414092641178,
+      "latest_derived": {},
+      "metric": "setup_single_over_doubled_k0n53",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0463499904992302,
+            1.0811703185044066
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.062414092641178
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0658220940279266,
+      "latest": 1.0658220940279266,
+      "latest_derived": {},
+      "metric": "setup_single_over_doubled_k0n61",
+      "points": [
+        {
+          "commit": "2826b353f98c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 24,
+          "record": "20261115T2132Z-ic-filter-double-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.044807069517664,
+            1.0987128375824735
+          ],
+          "summary": "Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062, 1.066 established; no build regression. Kept as default.",
+          "value": 1.0658220940279266
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -23452,6 +23905,84 @@
     },
     {
       "better": "lower",
+      "first": 3.97,
+      "latest": 3.97,
+      "latest_derived": {},
+      "metric": "l_over_rho_w01_p65537",
+      "points": [
+        {
+          "commit": "4feb188f4747",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T0122Z-ic-positive-control-lucas",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.62,
+            6.38
+          ],
+          "summary": "Genus-3 positive control: Cardano-Lucas split test halves relation work (L/C 0.45-0.52, M/C 0.20-0.22); distance to matched rho at w=0.1 7.4->3.7 (p=32771); 5a verdict unresolved. Unvalidated [pcc:unverified].",
+          "value": 3.97
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.69,
+      "latest": 3.69,
+      "latest_derived": {},
+      "metric": "m_over_rho_w01_p32771",
+      "points": [
+        {
+          "commit": "4feb188f4747",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0122Z-ic-positive-control-lucas",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.08,
+            7.12
+          ],
+          "summary": "Genus-3 positive control: Cardano-Lucas split test halves relation work (L/C 0.45-0.52, M/C 0.20-0.22); distance to matched rho at w=0.1 7.4->3.7 (p=32771); 5a verdict unresolved. Unvalidated [pcc:unverified].",
+          "value": 3.69
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 19.57,
+      "latest": 19.57,
+      "latest_derived": {},
+      "metric": "m_over_rho_w1_p32771",
+      "points": [
+        {
+          "commit": "4feb188f4747",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0122Z-ic-positive-control-lucas",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11.02,
+            37.84
+          ],
+          "summary": "Genus-3 positive control: Cardano-Lucas split test halves relation work (L/C 0.45-0.52, M/C 0.20-0.22); distance to matched rho at w=0.1 7.4->3.7 (p=32771); 5a verdict unresolved. Unvalidated [pcc:unverified].",
+          "value": 19.57
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 7.312885088044173,
       "latest": 7.312885088044173,
       "latest_derived": {},
@@ -24237,6 +24768,58 @@
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.454,
+      "latest": 0.454,
+      "latest_derived": {},
+      "metric": "rel_mul_l_over_c_p32771",
+      "points": [
+        {
+          "commit": "4feb188f4747",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0122Z-ic-positive-control-lucas",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.45,
+            0.457
+          ],
+          "summary": "Genus-3 positive control: Cardano-Lucas split test halves relation work (L/C 0.45-0.52, M/C 0.20-0.22); distance to matched rho at w=0.1 7.4->3.7 (p=32771); 5a verdict unresolved. Unvalidated [pcc:unverified].",
+          "value": 0.454
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.196,
+      "latest": 0.196,
+      "latest_derived": {},
+      "metric": "rel_mul_m_over_c_p32771",
+      "points": [
+        {
+          "commit": "4feb188f4747",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 8,
+          "record": "20261116T0122Z-ic-positive-control-lucas",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.194,
+            0.197
+          ],
+          "summary": "Genus-3 positive control: Cardano-Lucas split test halves relation work (L/C 0.45-0.52, M/C 0.20-0.22); distance to matched rho at w=0.1 7.4->3.7 (p=32771); 5a verdict unresolved. Unvalidated [pcc:unverified].",
+          "value": 0.196
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
     },
     {
       "better": "lower",
