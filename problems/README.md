@@ -11,10 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Historical genus-3 cold-target native/counting admission](genus3-cold-target-native-counted-replay.md) | open | primary cold single-target IC evaluation from the historical Python/BSGS audit | full native cover path, exact identity/map, counted matched rho, qualified execution and signed independent replay |
-
----
-
+| [Iso Lab EC2 Fleet request quota](isolab-ec2-fleet-request-quota-20261115.md) | open | provisioning the worker for the four-rung single-target tournament | reconcile AWS fleet-count refusal and admit the original Job within its existing deadline and limits |
 | [Historical benchmark registry path](benchmark-record-mutable-registry-path.md) | resolved | offline archived-input availability for a reused registry path | existing guarded archive verification, matched readback and substitution controls; both records preserved |
 | [Primo has no prime-field or bit-vector route for index calculus](primo-prime-field-theory-gap.md) | open | using `primo-smt` on prime-field IC or claiming a prime-field performance advantage from the binary adapter | exact native frontend or qualified Primo theory support, SAT/UNSAT controls with independent model checks, and a matched stage benchmark |
 | [Lift to characteristic zero, reduce at a second prime p′](lift-reduce-second-prime-transfer.md) | open (proposed lead; untracked route) | deciding whether lifting to an abelian variety over a number field and reducing at a second prime can weaken a prime-field ECDLP | atlas/KB lookup for a duplicate; review of the derived g = 1 and non-torsion reductions; a bound on the field of definition of an N-torsion lift for g ≥ 2 |
@@ -139,7 +136,6 @@ Keep resolved and superseded records in the index.
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
 | [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | resolved | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner chose eager (version 2) as the identity, 2026-10-28; original marked pre-#2043; re-recorded as `claim-n13-v2`, which replays with 0 problems, twice |
-| [CM marked-scalar timing admission](cm-marked-scalar-measurement-admission.md) | open | admitted cold native comparison against matched public-scalar multiplication | authorized quiet backend; known live cloud caps/funds if used; published frozen inputs/source/analysis and complete paired A/A evidence |
 
 ## Add or update a problem
 
@@ -187,6 +183,26 @@ A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
 | [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection, bounded norm reconstruction and uniform full sub-exponential bit cost; finite weighted-count and actual growing input-budget components added | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |
+
+
+
+
+| [Historical genus-3 cold-target native/counting admission](genus3-cold-target-native-counted-replay.md) | open | primary cold single-target IC evaluation from the historical Python/BSGS audit | full native cover path, exact identity/map, counted matched rho, qualified execution and signed independent replay |
+
+---
+
+
+
+
+| [CM marked-scalar timing admission](cm-marked-scalar-measurement-admission.md) | open | admitted cold native comparison against matched public-scalar multiplication | authorized quiet backend; known live cloud caps/funds if used; published frozen inputs/source/analysis and complete paired A/A evidence |
+
+
+
+
+
+
+
+
 
 
 
