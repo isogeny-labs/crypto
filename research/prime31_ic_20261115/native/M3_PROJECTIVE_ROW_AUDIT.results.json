@@ -1,0 +1,94 @@
+{
+  "schema": "prime31-m3-projective-collision-v1",
+  "standing": "[pcc:unverified]",
+  "date": "2026-11-15",
+  "field_prime": 2147483647,
+  "curve_a": 847514846,
+  "curve_b": 2087444724,
+  "group_order": 2147446831,
+  "cofactor": 1,
+  "analysis": "affine group point exact equality; canonical nonzero row over F_n normalized by first nonzero coefficient; modular elimination",
+  "runtime": "producer-local independent C++ group arithmetic plus Python exact modular linear algebra; not native Rust execution",
+  "results": [
+    {
+      "arm": "dickson_depth8",
+      "B": 135,
+      "templates": 3207960,
+      "unique_sum_points": 3205590,
+      "raw_collisions": 2370,
+      "projective_unique": 127,
+      "duplicate_projective": 2243,
+      "rank": 126,
+      "rank_target": 134,
+      "transcript_sha256": "cc04a93488292fd4af59509b6adb4135ff47b5ad55731bf7ea6b695c4bfbe3e8",
+      "support_multiplicity": {
+        "6/20": 114,
+        "6/18": 1,
+        "5/6": 12
+      }
+    },
+    {
+      "arm": "first_liftable_x_135",
+      "B": 135,
+      "templates": 3207960,
+      "unique_sum_points": 3205716,
+      "raw_collisions": 2244,
+      "projective_unique": 122,
+      "duplicate_projective": 2122,
+      "rank": 122,
+      "rank_target": 134,
+      "transcript_sha256": "1059dff96fe3da171f01ee6f8214c7f7520bfc113ae7850ddd86c71a37c52932",
+      "support_multiplicity": {
+        "6/20": 108,
+        "5/6": 14
+      }
+    },
+    {
+      "arm": "dickson_depth9_early",
+      "B": 256,
+      "templates": 4051363,
+      "unique_sum_points": 4047598,
+      "raw_collisions": 3765,
+      "projective_unique": 305,
+      "duplicate_projective": 3460,
+      "rank": 255,
+      "rank_target": 255,
+      "transcript_sha256": "a0db101100439f6fd79e1aa789878e0b0448900790a6da7203d563779e2385b9",
+      "support_multiplicity": {
+        "4/200": 1,
+        "4/2": 1,
+        "5/4": 7,
+        "5/6": 12,
+        "6/1": 1,
+        "6/6": 12,
+        "6/10": 12,
+        "6/12": 231,
+        "6/16": 3,
+        "6/18": 25
+      }
+    }
+  ],
+  "native_replay": [
+    "cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m3_collision_ic",
+    "PRIME31_COMPARE_BASES=1 cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m3_collision_ic"
+  ],
+  "notes": [
+    "Rows and point equalities are exact but producer-only; independent PCC signature pending",
+    "The B256 record is an early prefix, not a full m3 enumeration",
+    "No new cold solve speed or algebraic F4 witness measurement was made",
+    "Raw collision multiplicity does not measure independent useful relation yield"
+  ],
+  "independent_producer_group_replay": {
+    "language": "Python",
+    "method": "separate modular EC addition and Dickson/plain-x lift",
+    "all_pairs_checked": true,
+    "total_replayed_equalities": 8379,
+    "per_arm": [
+      2370,
+      2244,
+      3765
+    ],
+    "standing": "[pcc:unverified]",
+    "note": "Producer-local independent implementation, not independently signed PCC"
+  }
+}

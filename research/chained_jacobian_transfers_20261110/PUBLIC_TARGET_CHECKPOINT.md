@@ -980,3 +980,125 @@ Full fresh diagnosticCI, full scientific custodyNEW28 using resource-aware regul
 
 ## Errors
 Prior allocation134/driver1 and wrong61-count false rejection1/driver1 remain complete frozen attempts. This success uses the original62-record schema and unchanged2GiBVM120s criterion. The original audit101 is the expected control rejection. No new fresh solver CI has run. Conductor command/tool unavailable in this runtime; existing reserved project/evidence/log/problem scopes retained. [pcc:unverified]
+
+# Full diagnostic CI source published; follow-up PR1573 replaces merged1564
+
+## What was done
+Root pcc/claims/PCC-20261115-379d7c.json and Consumer pcc/claims/PCC-20261115-1aa62b.json: source8a3bc795/b1f07d/5c5c9b normallypublished, complete99-phase/1598-file guarded diagnosticCI source retained. OriginalGitHubAPI shows1564mergedonly1e426e19 at20:47:32Z, mergef41f7594, before e73eb11e result and8a3bc795 CI source. Newready PR1573 now carries those two commits; closed1564body/queue3904/Root3877 corrected. Fresh diagnosticCI pending. [pcc:unverified]
+
+## Decisions made
+Follow exactsource8a3bc795 runs from1573; do not assume closed1564 provides newCI coverage. Feature-base auto-merge remains unavailable. Preserve actual source/runtime/prepared/raw/proof/partial outputs and original checkpoint readbacks; inspect actual exits before reporting fresh results. [pcc:unverified]
+
+## Open threads
+Actual newCI completion/failures, complete scientificNEW28, reviewed prospective unassisted relation completion and unchanged numerical Lean/global-character/cost/reference/admission/merge obligations. Root3877 remains open with frozenledger/conflict/review gates. [pcc:unverified]
+
+## Errors
+The previous ready/open1564 descriptions became stale because it merged before resultpublication. Corrected using exact originalAPI/source/merge/time, no scientific history rewritten. Earlier769560/f19383 negative runs and all oldsources remain frozen. [pcc:unverified]
+
+2026-11-15T21:11:24.656547+00:00
+
+# External main merge rewrites shared ledger prefix; preserve local history on new branch
+
+## What was done
+pcc/claims/PCC-20261115-99baab.json: remoteRoot223e8696 merges2d46258a with main30e066b0 and changes35739paths. Originalnormalpublisher refused1487e3a before push because expectedremote2d hadmoved. Entireoriginal old/new/local ledgers and unchangedPCC check show old2d is not a prefix of223; canonical ledger[569] differs. Fullfetch/RAMcache/commands/oldactualfailure preserved with lossless archive/everyoriginalbyte roundtrip. Local1487e3a now genuinelynormallypublished on new research/chained-transfer-preserved-20261115-ct120 ref, actualpush0/exactreadback, originalsharedrefuntouched. [pcc:unverified]
+
+## Decisions made
+Keep both immutable histories and all frozen science. Do not merge, rechain, reset, forcepush or pick a ledger side. ContinueRootcheckpoint work on the preserved branch; report preciseoriginalPR3877 frozen-ledger blocker and review metadata via a regular continuationPR. Independentlycontinue Consumer1573 freshCI and reviewed unassisted relation completion. [pcc:unverified]
+
+## Open threads
+Root ledger-prefix conflict requires an authorized append-only history resolution, beyond routine filemerge; no repair proposed. Consumer1573/sourcef136 and fullfresh diagnosticCI (first8a3 run43761331865queued) remain active. FullscientificNEW28 must use a coherent preserved source lineage with originalpolicy and complete terminal holds; all existing mathematical/cost/reference/admission gates remain. [pcc:unverified]
+
+## Errors
+Rootnormalpub1 is a real expected-head refusal, not a failednetworkpush; no retry was attempted on movedsharedbranch. Previousdescription of1487 publication must reference the newpreservedbranch only. OriginalRoot3877nowpoints223; its auto-reconciledledger fails the original2d-prefix check. Allcomplete evidence and localclaims remain intact. [pcc:unverified]
+
+---
+
+2026-11-15T21:16:34.350009+00:00
+
+# Preserve original artifact-policy failure; route complete metadata archive through original store
+
+## What was done
+pcc/claims/PCC-20261115-b50a7e.json: Rootdivergence metadata governance passed ledger/prose/workingcachedwhitespace/wiring/all343science, then originalartifact1 selected the full726536-byte34member archive pinned99baab. Full failure and stagedfilename record remain. No commit/push occurred in that failed governor; local1487 stays normallypublished on preservedbranch. [pcc:unverified]
+
+## Decisions made
+Use the original trusted artifact migration with this one entire archive, no trim/rename/split/exception. Freeze METADATA_TRANSPORT_01.md before sourcepublication: stablebase snapshot2d46258a, preservedbranch source, all343 science and originaltools/workflow/policy/archive/newsubject/sourceledger holds through actual replays-before-bot/exact3pathnormalFF/terminalguards. This metadata sidecar has no Consumer projection and is separate from NEW28. [pcc:unverified]
+
+## Open threads
+Source transportgovernance/publication/readycontinuationPR, actual artifactmigration/terminalclosure; original3877 frozenledger conflict; Consumer1573freshCI and primary-reviewed unassisted completion/fullscientificNEW28. [pcc:unverified]
+
+## Errors
+Original artifact1 is retained and handled by the original store, not relabeled as0. Remote223 fails original2d-prefix check; no historyrepair or forcepush. All prior failures remain. [pcc:unverified]
+
+---
+
+2026-11-15T22:19:50.352839+00:00
+
+# Original metadata transport replays full object, then loses mutable branch publication race
+
+## What was done
+pcc/claims/PCC-20261115-e3c377.json: original43763536307/job132963431408 uploads/replays1entireobject, createsrunner-local50d79441e5, then normalpush1/non-fast-forward. Completejob/API/sourcehold retained. Observedbotprefixnotpublished(422). All406heldfiles/fullsourceledger/HEAD/status/wholearchive/externalcopy unchanged at failureterminalguard; attemptclosedfailed withno canonicalpublication/FF/acceptance claim. [pcc:unverified]
+
+## Decisions made
+Preserve sourcec019 andallrawbytes; release failedmetadatahold onlyfornewbookkeeping. Authorseparatelyprospective transport02 usingoriginalimmutabletool/policy, exactwholearchive/replay/directparent/3pathguards, fullbotbundle/manifest/log exports onfailure, andnewuniqueimmutabletagpublication. Thisaddresses observedexternalbranchmovement withoutforcedupdates/ledgerrechain orfakecanonicalentries. [pcc:unverified]
+
+## Open threads
+Concrete02workflow/staticchecks/sourcepublication/actualoriginaltooltransport; scientificNEW28; Consumer1578freshCI02atsource826 queuedlastobserved, cheapercompleteLPpresentationreview/protocolbeforecode andoriginalledgermergegates. [pcc:unverified]
+
+## Errors
+Originalmigrationjoboverall1 despiteS3whole-replay success; do nottreatpartialinfrastructuresuccess asterminalcustody. Bothpreservedheadandstablebasebranchesmovedexternallywhilejobran. No unchangedretryagainstthe sameadvancedbranch andno forcepush. [pcc:unverified]
+
+---
+
+2026-11-15T23:16:07.116711+00:00
+
+# Freeze original artifact transport02 and immutable source clone
+
+## What was done
+pcc/claims/PCC-20261115-553a04.json: new thin workflow/protocol positive static gates0; historical broadbenchrec1 unchanged; exact original c019 clone holds952 files, full source ledger, all343 science inputs and whole payload/external copy. e3c377 retains attempt01 full failed publication and closed hold. [pcc:unverified]
+
+## Decisions made
+Publish concrete02 source on new codex feature/checkpoint base and genuinely new source tag. Actual original migration must replay whole bytes before its real direct-parent three-path bot, publish a new run tag, and complete normal FF plus terminal guards in the isolated source clone. Never force moved shared branches, rechain frozen ledgers or manufacture canonical metadata. [pcc:unverified]
+
+## Open threads
+Ready PR and actual transport02; full scientific NEW28; Consumer LP proof/native development and fresh CI03 materialization; original shared-ledger prefix conflicts. [pcc:unverified]
+
+## Errors
+Prior normal branch publication was rejected after successful whole-object replay. It remains failed;02 addresses publication with a new tag and exports the real bot bundle on every outcome. No02 success yet. [pcc:unverified]
+
+---
+
+2026-11-16T00:29:30.616703+00:00
+
+# Close original metadata transport02 with real published bot and terminal custody
+
+## What was done
+pcc/claims/PCC-20261116-0e8d86.json: actual original replay-before-bot532c2d32/sourcec019 and new run tag; full1111167B artifact/all34 members retained. Isolated source clone normalFF0, whole archive restored only after genuine ignore, original artifact/local verification/full-manifest wiring/ledger0, all952 held keys/full ledger/payload unchanged and all343 ongoing science unchanged. Original metadata hold02 is closed successfully at this narrow scope. [pcc:unverified]
+
+## Decisions made
+Preserve the real bot/tag and all raw. An integration into the ongoing metadata branch is an ordinary merge, distinct from the actual isolated-source FF. Global PCC CI still fails on the old absolute-path claim3e6bc7 and two cold store-backed subjects of67abc8; retain the whole log and name those separate blockers. No old claim or ledger is rewritten, and no PR merges while required checks fail. [pcc:unverified]
+
+## Open threads
+Integrate genuine three-path metadata bot/checkpoint; frozen PCC compatibility/cold hydration; Consumer66d2 synthetic engine/development CI and next strict historical ingestion/CI03; scientificNEW28 and original main-ledger/reference/global/cost bridges. [pcc:unverified]
+
+## Errors
+Earlier attempt01 remains failede3c377. Root4366 canary and base-prefix steps pass but verify-all fails on existing3e6bc7 path escape and67abc8 missing hydrated objects. Metadata transport success does not make those gates green. [pcc:unverified]
+
+---
+
+2026-11-16T01:07:30.997061+00:00
+
+# Integrate genuine metadata bot and publish unchanged-verifier evidence preparation
+
+## What was done
+pcc/claims/PCC-20261116-2bdca5.json: ordinary merge of genuinebot532 into893 prepared, with exact canonical metadata and whole ignored archive. All343 science and original verifier/core tests/artifact tools/policy unchanged; scoped source gates0 and broad benchmark1 exactly historical. The separate real isolated-source FF/custody result remains0e8d86. [pcc:unverified]
+
+## Decisions made
+Commit both real parents and owned metadata, then normal publish and new source tag. Fresh required CI must actually validate the data-address restoration/hydration; keep claims unsigned and every old failure. No PR or main merge bypass. [pcc:unverified]
+
+## Open threads
+Actual RootPCC final-head CI and named address problem; Consumer66d2 unit/proof CI; strict historical LP ingestion/CI03, scientificNEW28, EKS admission and original main-ledger/reference/global bridges. [pcc:unverified]
+
+## Errors
+No new source acceptance error so far. The previous cold-CI failure and first metadata-test wording failure are retained. Broad benchrec remains1; overall CI has not yet been observed with this source. [pcc:unverified]
+
+---

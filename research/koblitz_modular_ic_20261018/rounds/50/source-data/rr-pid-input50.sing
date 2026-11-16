@@ -1,0 +1,98 @@
+execute(read("../rr-field50-01/rr-field50.sing"));
+short=0;
+proc inverseParameter50(number a){
+ poly nn=numerator(a);poly dd=denominator(a);
+ poly changedN=subst(nn,u,1/u);poly changedD=subst(dd,u,1/u);
+ if(changedD==0){ERROR("RR_PID50_PARAMETER_ZERO_DENOMINATOR");return(number(0));}
+ return(leadcoef(changedN)/leadcoef(changedD));
+}
+number parameterControl50=(u+1)/(u^2+u+1);
+if(inverseParameter50(parameterControl50)!=(u^2+u)/(u^2+u+1) || inverseParameter50(inverseParameter50(parameterControl50))!=parameterControl50){ERROR("RR_PID50_PARAMETER_CONTROL");quit;}
+matrix inverseColumns50[32][196];int row50;int column50;int parity50;
+number oldCoefficient50;number newCoefficient50;number rawCoefficient50;
+poly reconstructed50;poly changedProduct50;poly remaining50;intvec exponent50;
+for(column50=1;column50<=196;column50++){
+ reconstructed50=0;changedProduct50=0;remaining50=rrProducts50[column50];
+ for(row50=1;row50<=32;row50++){
+  oldCoefficient50=leadcoef(rrColumns50[row50,column50]);parity50=(row50-1) div 16;
+  newCoefficient50=inverseParameter50(oldCoefficient50)/u^(2*parity50);
+  if(inverseParameter50(newCoefficient50)/u^(2*parity50)!=oldCoefficient50){ERROR("RR_PID50_COEFFICIENT_ROUNDTRIP");quit;}
+  inverseColumns50[row50,column50]=newCoefficient50;
+  reconstructed50=reconstructed50+newCoefficient50*l^((row50-1)%16)*v^parity50;
+ }
+ while(remaining50!=0){
+  exponent50=leadexp(remaining50);rawCoefficient50=leadcoef(remaining50);
+  changedProduct50=changedProduct50+inverseParameter50(rawCoefficient50)*l^exponent50[1]*v^exponent50[2]/u^(2*exponent50[2]);
+  remaining50=remaining50-lead(remaining50);
+ }
+ if(changedProduct50!=reconstructed50){ERROR("RR_PID50_COMPLETE_PRODUCT_TRANSPORT");quit;}
+}
+print("RR_PID50_STAGE coefficient_transport_checked=true columns=196 base_parameter_u_now_denotes_inverse_original_u=true");
+ring inverseBasePid50=2,(u),(c,dp);short=0;option(redSB);
+poly commonDenominator50=1;poly nextDenominator50;poly gcdDenominator50;poly factorDenominator50;
+string denominatorString50;string coefficientString50;
+setring rrFieldCertificate50;
+for(column50=1;column50<=196;column50++){
+ for(row50=1;row50<=32;row50++){
+  denominatorString50=string(denominator(leadcoef(inverseColumns50[row50,column50])));
+  setring inverseBasePid50;execute("nextDenominator50="+denominatorString50+";");
+  gcdDenominator50=gcd(commonDenominator50,nextDenominator50);
+  factorDenominator50=nextDenominator50/gcdDenominator50;
+  if(factorDenominator50*gcdDenominator50!=nextDenominator50){ERROR("RR_PID50_DENOMINATOR_DIVISION");quit;}
+  commonDenominator50=commonDenominator50*factorDenominator50;
+  setring rrFieldCertificate50;
+ }
+}
+setring inverseBasePid50;denominatorString50=string(commonDenominator50);
+int denominatorDegree50=deg(commonDenominator50);
+matrix integerColumns50[32][196];
+setring rrFieldCertificate50;number commonFieldDenominator50;
+execute("commonFieldDenominator50="+denominatorString50+";");
+matrix clearedColumns50=commonFieldDenominator50*inverseColumns50;
+for(column50=1;column50<=196;column50++){
+ for(row50=1;row50<=32;row50++){
+  if(clearedColumns50[row50,column50]!=leadcoef(clearedColumns50[row50,column50]) || denominator(leadcoef(clearedColumns50[row50,column50]))!=1){ERROR("RR_PID50_NOT_INTEGRAL_ENTRY");quit;}
+  coefficientString50=string(clearedColumns50[row50,column50]);
+  setring inverseBasePid50;
+  execute("integerColumns50["+string(row50)+","+string(column50)+"]="+coefficientString50+";");
+  setring rrFieldCertificate50;
+ }
+}
+map pidBack50=inverseBasePid50,u;
+matrix backColumns50=pidBack50(integerColumns50);
+if(backColumns50!=clearedColumns50){ERROR("RR_PID50_INTEGER_MATRIX_ROUNDTRIP");quit;}
+setring inverseBasePid50;
+link out50="ASCII:w rr-pid50.sing";open(out50);
+write(out50,"// Native u denotes z=1/(original base u); ordered basis l^i v^j means T^i V^j.\nring inverseBaseCertificate50=2,(u),(c,dp);short=0;poly commonDenominator50="+string(commonDenominator50)+";matrix integerColumns50[32][196];");
+for(column50=1;column50<=196;column50++){for(row50=1;row50<=32;row50++){write(out50,"integerColumns50["+string(row50)+","+string(column50)+"]="+string(integerColumns50[row50,column50])+";");}}
+print("RR_PID50_STAGE denominator_degree="+string(denominatorDegree50)+" integer_columns_exported=true module_basis_begin=true");
+module originalModule50=module(integerColumns50);module basis50=std(originalModule50);
+if(size(basis50)!=32){ERROR("RR_PID50_NOT_FREE_RANK32");quit;}
+intvec leadingComponents50;int basisDegreeSum50=0;int component50;int other50;vector leadingVector50;
+write(out50,"module basis50;");
+for(column50=1;column50<=32;column50++){
+ leadingVector50=lead(basis50[column50]);component50=0;
+ for(row50=1;row50<=32;row50++){
+  if(leadingVector50[row50]!=0){if(component50!=0){ERROR("RR_PID50_MULTIPLE_LEADING_COMPONENTS");quit;}component50=row50;basisDegreeSum50=basisDegreeSum50+deg(leadingVector50[row50]);}
+ }
+ if(component50==0){ERROR("RR_PID50_ZERO_BASIS_COLUMN");quit;}
+ for(other50=1;other50<column50;other50++){if(leadingComponents50[other50]==component50){ERROR("RR_PID50_REPEATED_LEADING_COMPONENT");quit;}}
+ leadingComponents50[column50]=component50;
+ write(out50,"basis50["+string(column50)+"]="+string(basis50[column50])+";");
+}
+matrix originalLift50=lift(originalModule50,basis50);matrix reverseLift50=lift(basis50,originalModule50);
+if(matrix(originalModule50)*originalLift50!=matrix(basis50) || matrix(basis50)*reverseLift50!=matrix(originalModule50)){ERROR("RR_PID50_TWO_FULL_MODULE_LIFTS");quit;}
+module sourcePowerBasis50;for(column50=1;column50<=32;column50++){sourcePowerBasis50[column50]=commonDenominator50*gen(column50);}
+matrix sourceLift50=lift(basis50,sourcePowerBasis50);
+if(matrix(basis50)*sourceLift50!=matrix(sourcePowerBasis50)){ERROR("RR_PID50_SOURCE_CONTAINMENT");quit;}
+int normalizationIndex50=32*denominatorDegree50-basisDegreeSum50;
+if(normalizationIndex50!=376){ERROR("RR_PID50_INDEX_MISMATCH");quit;}
+write(out50,"matrix originalLift50[196][32];matrix reverseLift50[32][196];matrix sourceLift50[32][32];");
+for(column50=1;column50<=32;column50++){
+ for(row50=1;row50<=196;row50++){write(out50,"originalLift50["+string(row50)+","+string(column50)+"]="+string(originalLift50[row50,column50])+";");}
+ for(row50=1;row50<=32;row50++){write(out50,"sourceLift50["+string(row50)+","+string(column50)+"]="+string(sourceLift50[row50,column50])+";");}
+}
+for(column50=1;column50<=196;column50++){for(row50=1;row50<=32;row50++){write(out50,"reverseLift50["+string(row50)+","+string(column50)+"]="+string(reverseLift50[row50,column50])+";");}}
+write(out50,"int normalizationIndex50="+string(normalizationIndex50)+";");close(out50);
+print("RR_PID50_RESULT source_rank=32 RR_generators=196 PID_basis_rank=32 full_original_lifts=2 source_power_basis_contained=true normalization_index="+string(normalizationIndex50)+" multiplication_table_pending=true");
+print("RR_PID50_ALL_CHECKS_PASS");quit;

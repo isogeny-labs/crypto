@@ -762,6 +762,9 @@ enum AuxOrder {
 }
 
 static AUX_ORDER_MESTRE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+/// Set only by `--aux-search`: adds the search's and the chain's group
+/// operations to an isogeny tower's `info`, so tower rows stay unchanged.
+static AUX_SEARCH_STATS: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
 fn aux_order_method() -> AuxOrder {
     if AUX_ORDER_MESTRE.load(std::sync::atomic::Ordering::Relaxed) {
@@ -966,6 +969,7 @@ fn isogeny_with(p: u64, t: usize, rng: &mut StdRng, method: AuxOrder) -> Tower {
         if s.len() != two_t as usize {
             continue;
         }
+        let ops_search = ops;
         // The chain: kernel of step j is [2^{t−1−j}] Q_j on E'_j.
         let (mut aj, mut bj) = (a, b);
         let (mut qj, mut rj) = (q, r0);
@@ -1000,6 +1004,17 @@ fn isogeny_with(p: u64, t: usize, rng: &mut StdRng, method: AuxOrder) -> Tower {
         if method == AuxOrder::Mestre {
             // Only under `--aux-order mestre`, so default rows stay byte-identical.
             info["aux_order_method"] = json!("mestre");
+        }
+        if AUX_SEARCH_STATS.load(std::sync::atomic::Ordering::Relaxed) {
+            let o = |g: &GroupOps| json!({"adds": g.adds, "doubles": g.doubles, "scalar_mults": g.scalar_mults});
+            let chain = GroupOps {
+                adds: ops.adds - ops_search.adds,
+                doubles: ops.doubles - ops_search.doubles,
+                scalar_mults: ops.scalar_mults - ops_search.scalar_mults,
+                ..GroupOps::default()
+            };
+            info["aux_ops_search"] = o(&ops_search);
+            info["aux_ops_chain"] = o(&chain);
         }
         return Tower {
             kind: Kind::Isogeny,
@@ -3501,6 +3516,41 @@ fn export_magma_rows(files: &[String], dir: &str) {
     }
 }
 
+/// `--aux-search FILE`: the auxiliary-curve search of `isogeny_with`
+/// alone, under `--aux-order mestre`.  Each input line is `p t seed`; each
+/// output line (stdout, JSONL) is the curve found, the curves tried, and
+/// the group operations of the search and of the Vélu chain.
+fn aux_search(path: &str) {
+    AUX_SEARCH_STATS.store(true, std::sync::atomic::Ordering::Relaxed);
+    let text = std::fs::read_to_string(path).expect("read --aux-search file");
+    for line in text
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+    {
+        let f: Vec<u64> = line
+            .split_whitespace()
+            .map(|x| {
+                if let Some(h) = x.strip_prefix("0x") {
+                    u64::from_str_radix(h, 16).expect("hex")
+                } else {
+                    x.parse().expect("integer")
+                }
+            })
+            .collect();
+        let (p, t, seed) = (f[0], f[1] as usize, f[2]);
+        let started = Instant::now();
+        let tower = isogeny_with(p, t, &mut StdRng::seed_from_u64(seed), AuxOrder::Mestre);
+        let mut info = tower.info.clone();
+        if let Some(o) = info.as_object_mut() {
+            o.remove("v");
+        }
+        println!(
+            "{}",
+            json!({"p": p, "t": t, "seed": seed, "ms": started.elapsed().as_secs_f64() * 1e3, "info": info})
+        );
+    }
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().collect();
     if let Some(i) = argv.iter().position(|x| x == "--export-magma-rows") {
@@ -3510,6 +3560,10 @@ fn main() {
             .position(|x| x == "--export-dir")
             .expect("--export-dir");
         export_magma_rows(&files, &argv[j + 1]);
+        return;
+    }
+    if let Some(i) = argv.iter().position(|x| x == "--aux-search") {
+        aux_search(&argv[i + 1]);
         return;
     }
     let a = parse_args();
