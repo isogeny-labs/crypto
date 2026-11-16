@@ -22,6 +22,8 @@ The actual nonzero factor-base logarithm vector annihilates every homogeneous ro
 
 The triple counts are exactly $binom(B+2,3)$, not measured relation yields. The cap and deterministic sampling are fixed in `PROTOCOL.md`. Zero rows, dependent rows, rank increments, group additions, hash work, elimination, RSS and L0 wall diagnostics must be retained. [pcc:unverified]
 
+*Before-data amendment.* `AMENDMENT-1.md` adds a paired generator control on the same unique triples. An on-demand cache stores the full two-point prefix, then adds the third point. The direct arm computes both additions. The source test requires exact full-point parity before collision processing and records cache hits, inserts and additions. No runtime or attack-cost ordering is inferred from this source preparation. [pcc:unverified]
+
 == Execution state
 
 The science run requires a complete branch-specific S3 resume checkpoint and a passing `scripts/checkpoint.sh gate`. Conductor T-6814 currently reserves `.resume/RESUME.md`; the existing `problems/rootfinding-complete-cost-calibration.md` tracks this obstruction. The source is a prepared test only. A rank screen does not establish a complete-call improvement against F4/F5/F6 or matched rho; those comparisons require the separate frozen panel and independent replay. [pcc:unverified]
@@ -29,4 +31,4 @@ The science run requires a complete branch-specific S3 resume checkpoint and a p
 #pagebreak()
 == Planned data flow
 
-#image("flow.svg", width: 100%)
+#image("flow.svg", width: 100%, height: 600pt, fit: "contain")

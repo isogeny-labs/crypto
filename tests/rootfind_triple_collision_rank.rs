@@ -39,6 +39,7 @@ fn inverse(a: u64, r: u64) -> u64 {
     t.rem_euclid(r as i128) as u64
 }
 
+#[derive(Clone)]
 struct Basis {
     r: u64,
     pivots: Vec<Option<Vec<u64>>>,
@@ -196,14 +197,21 @@ fn fixed_koblitz_triple_collision_rank() {
         let mut basis = Basis::new(inst.r, fb.columns);
         pair_seed(&inst.fast, &fb, &collisions, &mut basis);
         assert_eq!(basis.rank, seed_rank);
+        let mut direct_basis = basis.clone();
 
         let capacity = points * (points + 1) * (points + 2) / 6;
         let limit = capacity.min(if n == 13 { capacity } else { 32_768 });
         let mut state = 2_026_111_601u64 + n as u64;
         let mut seen = HashSet::<[usize; 3]>::with_capacity(limit);
         let mut sums = HashMap::<u64, ([usize; 3], FastPoint)>::with_capacity(limit);
-        let (mut draws, mut additions, mut collisions_seen, mut identity_sums) =
+        let mut direct_sums = HashMap::<u64, ([usize; 3], FastPoint)>::with_capacity(limit);
+        let mut prefixes = HashMap::<(usize, usize), FastPoint>::with_capacity(
+            limit.min(points * (points + 1) / 2),
+        );
+        let (mut draws, mut collisions_seen, mut identity_sums) = (0u64, 0u64, 0u64);
+        let (mut direct_adds, mut prefix_adds, mut prefix_hits, mut tail_adds) =
             (0u64, 0u64, 0u64, 0u64);
+        let (mut parity_checks, mut verify_adds, mut tamper_adds) = (0u64, 0u64, 0u64);
         let (mut zero, mut dependent, mut independent) = (0u64, 0u64, 0u64);
         let mut rank_at = Vec::<(usize, usize)>::new();
         let mut rows = Vec::new();
@@ -218,13 +226,29 @@ fn fixed_koblitz_triple_collision_rank() {
             if !seen.insert(ids) {
                 continue;
             }
-            let sum = triple_sum(&inst.fast, &fb, ids);
-            additions += 2;
+            let prefix = if let Some(&cached) = prefixes.get(&(ids[0], ids[1])) {
+                prefix_hits += 1;
+                cached
+            } else {
+                let new = inst.fast.add(fb.points[ids[0]], fb.points[ids[1]]);
+                prefix_adds += 1;
+                prefixes.insert((ids[0], ids[1]), new);
+                new
+            };
+            let sum = inst.fast.add(prefix, fb.points[ids[2]]);
+            tail_adds += 1;
+            let direct = triple_sum(&inst.fast, &fb, ids);
+            direct_adds += 2;
+            parity_checks += 1;
+            assert_eq!(sum, direct, "cached and direct triple sums must match");
             let row = vector(&fb, &ids, inst.r);
             if sum.infinity {
                 identity_sums += 1;
                 let nonzero = row.iter().any(|&x| x != 0);
                 let raised_rank = nonzero && basis.add(row.clone());
+                let direct_raised_rank = nonzero && direct_basis.add(row.clone());
+                assert_eq!(raised_rank, direct_raised_rank);
+                assert_eq!(basis.rank, direct_basis.rank);
                 if !nonzero {
                     zero += 1;
                 } else if raised_rank {
@@ -242,18 +266,21 @@ fn fixed_koblitz_triple_collision_rank() {
                 continue;
             }
             let key = sum.pack().min(inst.fast.neg(sum).pack());
+            let direct_key = direct.pack().min(inst.fast.neg(direct).pack());
+            assert_eq!(key, direct_key);
+            assert_eq!(sums.get(&key), direct_sums.get(&direct_key));
             if let Some(&(first, _)) = sums.get(&key) {
                 collisions_seen += 1;
                 let a = triple_sum(&inst.fast, &fb, ids);
                 let b = triple_sum(&inst.fast, &fb, first);
-                additions += 4;
+                verify_adds += 4;
                 let first_row = vector(&fb, &first, inst.r);
                 let mut signed = row;
                 let sign;
                 if a == b {
                     sign = "equal";
                     assert!(inst.fast.add(a, inst.fast.neg(b)).infinity);
-                    additions += 1;
+                    verify_adds += 1;
                     for (x, y) in signed.iter_mut().zip(first_row) {
                         *x = sub(*x, y, inst.r);
                     }
@@ -261,7 +288,7 @@ fn fixed_koblitz_triple_collision_rank() {
                     sign = "opposite";
                     assert_eq!(a, inst.fast.neg(b));
                     assert!(inst.fast.add(a, b).infinity);
-                    additions += 1;
+                    verify_adds += 1;
                     for (x, y) in signed.iter_mut().zip(first_row) {
                         *x = (*x + y) % inst.r;
                     }
@@ -269,6 +296,9 @@ fn fixed_koblitz_triple_collision_rank() {
                 tamper_witness.get_or_insert((first, ids));
                 let nonzero = signed.iter().any(|&x| x != 0);
                 let raised_rank = nonzero && basis.add(signed.clone());
+                let direct_raised_rank = nonzero && direct_basis.add(signed.clone());
+                assert_eq!(raised_rank, direct_raised_rank);
+                assert_eq!(basis.rank, direct_basis.rank);
                 if !nonzero {
                     zero += 1;
                 } else if raised_rank {
@@ -282,6 +312,7 @@ fn fixed_koblitz_triple_collision_rank() {
                     "unique_index":seen.len()}));
             } else {
                 sums.insert(key, (ids, sum));
+                direct_sums.insert(direct_key, (ids, direct));
             }
             assert!(
                 basis.rank < fb.columns,
@@ -291,12 +322,14 @@ fn fixed_koblitz_triple_collision_rank() {
         let (first, later) =
             tamper_witness.expect("each cell needs a collision for tamper control");
         let first_sum = triple_sum(&inst.fast, &fb, first);
+        tamper_adds += 2;
         let mut rejected = false;
         for pos in 0..3 {
             for replacement in 0..points {
                 let mut wrong = later;
                 wrong[pos] = replacement;
                 let check = triple_sum(&inst.fast, &fb, wrong);
+                tamper_adds += 2;
                 if check != first_sum && check != inst.fast.neg(first_sum) {
                     rejected = true;
                     break;
@@ -307,22 +340,44 @@ fn fixed_koblitz_triple_collision_rank() {
             }
         }
         assert!(rejected, "mutated witness must be rejected");
+        assert_eq!(sums, direct_sums);
+        assert_eq!(basis.rank, direct_basis.rank);
+        assert_eq!(basis.row_ops, direct_basis.row_ops);
+        assert_eq!(prefix_adds + prefix_hits, seen.len() as u64);
+        assert_eq!(tail_adds, seen.len() as u64);
+        assert_eq!(direct_adds, 2 * seen.len() as u64);
         println!(
             "TRIPLE_COLLISION_JSON={}",
             json!({
-                "schema":"rootfind-triple-collision-rank/v1", "n":n, "dimension":d,
+                "schema":"rootfind-triple-collision-rank/v2", "n":n, "dimension":d,
                 "curve_id":curve_id, "base_sha256":base_hash, "subgroup_order":inst.r,
                 "base_points":points, "columns":fb.columns, "pair_seed_rank":seed_rank,
                 "triples_possible":capacity, "unique_triples":seen.len(), "draws":draws,
                 "duplicate_draws":draws-seen.len() as u64,
                 "pair_table_group_additions":pair.build_ops.adds+pair.build_ops.doubles,
                 "pair_seed_verification_additions":2*pair_collisions,
-                "triple_group_additions":additions,
+                "direct_generator_additions":direct_adds,
+                "cached_prefix_additions":prefix_adds,
+                "cached_prefix_hits":prefix_hits,
+                "cached_tail_additions":tail_adds,
+                "prefix_cache_entries":prefixes.len(),
+                "prefix_cache_capacity":prefixes.capacity(),
+                "prefix_cache_retained_payload_bytes_floor":prefixes.len()
+                    *(std::mem::size_of::<(usize, usize)>()
+                      +std::mem::size_of::<FastPoint>()),
+                "prefix_cache_requested_payload_bytes_floor":prefixes.capacity()
+                    *(std::mem::size_of::<(usize, usize)>()
+                      +std::mem::size_of::<FastPoint>()),
+                "parity_point_comparisons":parity_checks,
+                "parity_validation_additions":0,
+                "collision_verification_additions":verify_adds,
+                "tamper_validation_additions":tamper_adds,
                 "sum_key_lookups":seen.len() as u64-identity_sums,
                 "sum_key_inserts":sums.len(), "sum_key_collisions":collisions_seen,
                 "identity_sums":identity_sums, "zero_rows":zero,
                 "dependent_rows":dependent, "independent_rows":independent,
-                "final_homogeneous_rank":basis.rank, "row_ops":basis.row_ops,
+                "final_homogeneous_rank":basis.rank,
+                "cached_row_ops":basis.row_ops, "direct_row_ops":direct_basis.row_ops,
                 "rank_at_unique_triple":rank_at, "rows":rows,
                 "tamper_control":rejected,
             })
