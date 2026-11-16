@@ -1544,6 +1544,7 @@ mod tests {
             factor_base_size: 2,
             degree_bound: 8,
             work_limit: 50_000,
+            factor_base_policy: None,
         };
         let mut case = curves::generate(&cfg).unwrap();
         case.private_witness = Value::Null;
