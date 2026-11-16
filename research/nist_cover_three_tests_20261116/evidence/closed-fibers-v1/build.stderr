@@ -1,0 +1,15 @@
+closed_fibers.cpp: In function ‘CFPoly cf_resultant(const EBPoly&, const EBPoly&)’:
+closed_fibers.cpp:16:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   16 |     for(int shift=0;shift<n;++shift)for(int j=0;j<=m;++j)matrix[shift][shift+j]=a[m-j];for(int shift=0;shift<m;++shift)for(int j=0;j<=n;++j)matrix[n+shift][shift+j]=b[n-j];return cf_determinant(matrix);
+      |     ^~~
+closed_fibers.cpp:16:88: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   16 |     for(int shift=0;shift<n;++shift)for(int j=0;j<=m;++j)matrix[shift][shift+j]=a[m-j];for(int shift=0;shift<m;++shift)for(int j=0;j<=n;++j)matrix[n+shift][shift+j]=b[n-j];return cf_determinant(matrix);
+      |                                                                                        ^~~
+closed_fibers.cpp: In member function ‘ClosedFiber ClosedFiberSolver::fiber(const EC&)’:
+closed_fibers.cpp:59:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   59 |         for(auto& p:std::array<CFPoly,2>{out.u,out.v})for(auto& c:p.c){mpz_class f;mpz_powm(f.get_mpz_t(),c.x.get_mpz_t(),prime.get_mpz_t(),prime.get_mpz_t());require(f==c.x,"closed fiber prime-Frobenius coefficient");++Frobenius_checks;}return out;
+      |         ^~~
+closed_fibers.cpp:59:239: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   59 |         for(auto& p:std::array<CFPoly,2>{out.u,out.v})for(auto& c:p.c){mpz_class f;mpz_powm(f.get_mpz_t(),c.x.get_mpz_t(),prime.get_mpz_t(),prime.get_mpz_t());require(f==c.x,"closed fiber prime-Frobenius coefficient");++Frobenius_checks;}return out;
+      |                                                                                                                                                                                                                                               ^~~~~~
+cc1plus: all warnings being treated as errors
