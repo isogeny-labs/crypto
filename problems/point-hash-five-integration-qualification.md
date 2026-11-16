@@ -47,3 +47,15 @@ current heads, every required/applicable check and blocking thread. MERGE only
 with an expected-head guard when permitted, then check actual parents/tree,
 native/report identities and main reachability. Auto-merge stays off while these
 obligations fail or remain pending. No experiment or scientific workflow here.
+
+## 2026-11-16 normal main refresh
+
+Crypto normally imported main d2f6c9e3f51cd0a7ea226df1d1a16c695225bd6f in
+merge8835c72446594913338e5a3bf04a481d62ab3b98, bringing the owning lane's
+workflow/catalog/evidence repairs without editing those records in this lane.
+Native/frozen feature trees are unchanged; full parent journal byte prefixes
+and exact incoming canonical PCC history are retained. Fresh native controls
+pass, but the broad local wiring check was interrupted under disk pressure
+(exit130) and is not a pass. Old four-job failures remain historical receipts;
+refreshed-head hosted qualification is pending. This problem stays open until
+actual new-head qualification permits integration. [pcc:unverified]
