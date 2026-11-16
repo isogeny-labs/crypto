@@ -1,0 +1,265 @@
+{
+  "schema": "pairing-geometric-torsion-source-plan/v1",
+  "created": "2026-11-12T22:04:54.143393+00:00",
+  "status": "Preissue frozen sources; whole18gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/pairing_geometric_torsion_audit_20261112/lean",
+    "theorem": "PairingGeometricFrobeniusAudit.actual_geometric_torsion_and_frobenius_certificate",
+    "statement": "theorem actual_geometric_torsion_and_frobenius_certificate : Nat.card (geometricGroup K)=9 ∧ (∀ v : Index,(geometricBasis K v).val= pointMap (geometricEmbedding K) (indexedPoint v)) ∧ (∀ R : (geometricCurve K).Point,(3:ℕ) • R=0 → ∃ U : curve.Point,(3:ℕ) • U=0 ∧ pointMap (geometricEmbedding K) U=R) ∧ (∀ v : Index,pointFrobenius BKActualThreeAudit.curve (geometricBasis K v).val= (geometricBasis K (v.1,-v.2)).val) ∧ (∀ v : Index,(∃ R : BKActualThreeAudit.curve.Point, baseInclusion K R=(geometricBasis K v).val) ↔ v.2=0)",
+    "decl_sha256": "9da3ac3c7a7653a23c9db519bfa1942742d46dc164be1be8ed9e04bc32ee47be",
+    "sources": [
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/ThreeTorsion.lean",
+        "bytes": 4730,
+        "sha256": "ce0fe4bbd4a5e65d5ab060af8d2afe2c7662e78cedb67caf61c48cef5ff56a8f"
+      },
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4086,
+        "sha256": "b8ded4aa6492ea60d20bb5a779c806b0db824040243e44b0400a2ed126c256e8"
+      },
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/lakefile.toml",
+        "bytes": 309,
+        "sha256": "6b8d5eebef309c5dcb04e13274fa377499ed0a105b8dca2857503560c798d652"
+      },
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/pairing_geometric_torsion_audit_20261112/lean/AlgebraicClosure.lean",
+        "bytes": 1764,
+        "sha256": "6d2b44b431849f6ad48b2d785df49457f2da361c773bb071fa4325fb4a13ce72"
+      },
+      {
+        "path": "research/pairing_geometric_torsion_audit_20261112/lean/CoordinateDescent.lean",
+        "bytes": 2219,
+        "sha256": "d4675a3d09ef3c5953b84a56d16d156661d1cec5e1f54b646c6841178b61ef19"
+      },
+      {
+        "path": "research/pairing_geometric_torsion_audit_20261112/lean/GeometricFrobenius.lean",
+        "bytes": 3441,
+        "sha256": "4b082f4013809e85d6269177f99fb6ac47113e3db758f90f77c286427ea61063"
+      },
+      {
+        "path": "research/pairing_geometric_torsion_audit_20261112/lean/GeometricTorsion.lean",
+        "bytes": 3127,
+        "sha256": "fe7c5c39a8e252fb560ad6ee33cf5e7904a9e32b9c537d88663b81ceeaadf7f4"
+      },
+      {
+        "path": "research/pairing_geometric_torsion_audit_20261112/lean/lake-manifest.json",
+        "bytes": 4644,
+        "sha256": "dbe50d5897b2cb2bcacc6a56d5b8234d1bfc3cf86ec7ac98839d324f0cd1a165"
+      },
+      {
+        "path": "research/pairing_geometric_torsion_audit_20261112/lean/lakefile.toml",
+        "bytes": 332,
+        "sha256": "e826b5af5b865ffd47e8416966c64c005f5f9117c4edc5a11ef3eb2bffe763bd"
+      },
+      {
+        "path": "research/pairing_geometric_torsion_audit_20261112/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/BaseDescent.lean",
+        "bytes": 3645,
+        "sha256": "2e206215da8994af1a94e3285d2f32a4b57d5f2a0eb8b8da8fd6373e0c7414dd"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerCurve.lean",
+        "bytes": 2458,
+        "sha256": "689300e3c8e6ecf23da0ed27b455193d8ca8c530d259b7e91ed8757b471325b9"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerExpressions.lean",
+        "bytes": 2286,
+        "sha256": "b9fb8a504e1fdfa078809837286c3510e48e6dd9030fc9fd8f0f6d9f86e09422"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerProperties.lean",
+        "bytes": 4708,
+        "sha256": "04a2175047c9ce4b71de46515b7d8d6c8f023fd3b187fac703263d367f121122"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerTable.lean",
+        "bytes": 2299,
+        "sha256": "e9d9633cb202a583f1c7692f58b43a0021d915d9caf9d346c3b2388e8e739ef0"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/TorsionIndex.lean",
+        "bytes": 2783,
+        "sha256": "b1a98b1b2be6726b1495b84eb3b5f22108ae76b91b1bdae4818d330b30b9abd4"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4361,
+        "sha256": "f45033ad3c0a4c2f8a8dc4c6bb541ba5b96c8cc3e475e063ac2613f96e745d9d"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/lakefile.toml",
+        "bytes": 442,
+        "sha256": "9aaa76b75ee1fd64591cdba9367e8b0c2b09c562d000c740cf50081f1f8fae9c"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "Concrete y²=x³+1/F5, r3: actual3-torsion descent from F25 into every field with an F5-algebra embedding; actual additive equivalence/cardinality9/basis. Actual algebraically closed extensions get constructed embedding; Frobenius matrix(a,-b) and actual base-rational line proved."
+  },
+  "artifacts": [
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/attempts.tar.gz",
+      "bytes": 14523,
+      "sha256": "0d2bff941b8a04d193ceeb0965d6036efcd111aa327a0cd1a314eac7214b304b"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/attempts.json",
+      "bytes": 4786,
+      "sha256": "00f8383446f403605bc0b7ed0530b8bfb472c7dd9b6bf0244e79b90f8d89f0a8"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/gate.tar.gz",
+      "bytes": 2845,
+      "sha256": "93f300ad644e026ba896dd1bc83f551b6bf90d6ef1412da0f9fc6cfdc2afc59e"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/gate.json",
+      "bytes": 1223,
+      "sha256": "77d1550d300160d742a662b5cde5afcf3fcbf78134f7d8efd987f86097c4147f"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/before-binding-gate.tar.gz",
+      "bytes": 2832,
+      "sha256": "e7c21d30cafc2b0b261b6c02b317968eb25928f30506fa11ebdb31e26e1a7f5b"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/before-binding-gate.json",
+      "bytes": 1223,
+      "sha256": "e2476fe3cf8c2c433915698d2d7547a37539c96e3c97e55dce58e19a45ddfad3"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/before-second-binding-gate.tar.gz",
+      "bytes": 2829,
+      "sha256": "c7443a52abc06944f6ef66cf84ee544cb692fa557484151fd78f047c497d4a03"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/before-second-binding-gate.json",
+      "bytes": 1245,
+      "sha256": "9b9a768323c0c790ba5d56a888cff3ec92e7d2b4c498a3fa9c962cb3addbfe65"
+    },
+    {
+      "path": "research/pairing_geometric_torsion_audit_20261112/evidence/source-review.json",
+      "bytes": 2126,
+      "sha256": "b4f31a3f25a98c404ca32e367181dadd5b8e376b5c05a8bc9fc2b56e7cceee9e"
+    }
+  ],
+  "gate": {
+    "archive": "research/pairing_geometric_torsion_audit_20261112/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 18,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/pairing_geometric_torsion_audit_20261112/evidence/attempts.tar.gz",
+    "files": 29,
+    "roundtrip_equal": true
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "native_experiment": false,
+    "paid_compute": 0,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "generic_rank_premise": false,
+    "canonical_divisor_bridge_proved": false,
+    "lean4checker": "Unavailable; actual kernel and transitive axiom gate."
+  },
+  "proof_outline": [
+    "Actual F25 root identities and universal cubic/square factorizations force coordinates to descend under every field embedding.",
+    "Nonsingularity reflects and actual point base change is injective; every actual3-torsion point lifts to an actualF25torsion point.",
+    "Actual restricted additive map is bijective, so prior concrete finite basis transfers and cardinality9 follows.",
+    "For every algebraically closed characteristic5 extension, actual IsAlgClosed.lift constructs embedding from the finite algebraic F25 field.",
+    "Actual Frobenius commutes with point base change; transported matrix is(a,-b) and actual base-rational image is exactlyb0."
+  ]
+}

@@ -37,10 +37,13 @@ def verified_live_ids(ec2, receipt):
 
 def guard(receipt, output, clock=lambda: datetime.now(timezone.utc),
           sleep=time.sleep, ec2=None):
+    initial = json.loads(receipt.read_text())
+    if (initial.get('account_id') != '590183823895' or
+            initial.get('region') != 'us-west-2'):
+        raise ValueError('guard receipt account or region differs')
     if ec2 is None:
         import boto3
-        ec2 = boto3.client('ec2', region_name='us-east-1')
-    initial = json.loads(receipt.read_text())
+        ec2 = boto3.client('ec2', region_name=initial['region'])
     deadline = datetime.fromisoformat(initial['deadline_utc'])
     if deadline.tzinfo is None:
         raise ValueError('deadline must have a timezone')
@@ -50,7 +53,8 @@ def guard(receipt, output, clock=lambda: datetime.now(timezone.utc),
     for retry in range(5):
         value = json.loads(receipt.read_text())
         ids = value.get('instance_ids', [])
-        if value.get('account_id') != '590183823895' or not all(
+        if (value.get('account_id') != initial['account_id'] or
+                value.get('region') != initial['region']) or not all(
                 isinstance(item, str) and item.startswith('i-') for item in ids):
             raise ValueError('guard receipt account or instances differ')
         try:

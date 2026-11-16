@@ -1,0 +1,112 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "smoke: rootfind-subtract-gpu m = 2 and 3, spawn and daemon, beside rootfind-subtract on a 20-bit prime-order curve",
+ "description": "Plumbing and identity check for research/ic_gpu_rootfind_big_20261115 (backend and probe_build parameters).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 20,
+    "seed": 59297
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261114
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf3-cpu",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-mt",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=emulate",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpud",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=device",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf3-gpuh",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "oracle": "rootfind-subtract-gpu:m=3,worker=daemon,backend=cuda,probe_build=host",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-cpu",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=64",
+     "oracle": "rootfind-subtract:m=2",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-gpud",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=64",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=daemon,backend=cuda",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L0",
+  "timeout_seconds": 300
+ }
+}

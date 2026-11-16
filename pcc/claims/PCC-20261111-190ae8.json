@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-11T22:39:04Z",
+ "id": "PCC-20261111-190ae8",
+ "kind": "statement",
+ "producer": {
+  "commit": "882b6446d358b316bf670f49f52a6ba06fe76edd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/successor-quotients-field-05.txt",
+    "sha256": "adeaac7545ba8bebeda4993feac2a90cc2984772afde7ebf823ddf1f482adc36"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/successor-preflight-source-05.rs",
+    "sha256": "a5a0a0f10d61bdcdf306d38a2effaf5468bea128da85ea224ab1163b01187056"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/CT24_CHAIN_KERNEL_PLAN.md",
+    "sha256": "233a55a0419ef343a555f1ac03a017e2559fd8542524da550ba6cc0ebf191b89"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Successor complete05 passes5 Rust tests. Actual C2 quotient charts(destination,shift,scale)=[(1,41,18),(0,37,18)] match targets(59,27)/(23,7),all120 curve-point images including x0/infinities,full109/113 coordinate bijections andall3 actual transported2-root support matches. Finite-ring certificate finds unique Frobenius scalars33/27 modulo49 reducing5/6,exact orders42/14,sixthpowers8/29 and each7 fixed residues overFp6. Conditional on the written nondual cyclic-kernel/HLP bridge,full product49\u00b2 kernel splits overFp42 and has49/2401 points overFp6. No full composite kernel enumeration or new whole-Jacobian runtime pass inferred; unsigned."
+}

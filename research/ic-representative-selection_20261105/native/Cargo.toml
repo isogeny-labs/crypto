@@ -1,0 +1,23 @@
+[package]
+name = "repsel"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "IC representative-selection study (research/ic-representative-selection_20261105): counted 2-isogeny transport, job specs, model selection and the frozen analysis"
+
+# Standalone: builds in seconds without the crypto library (tools/volcano-cli does the same).
+[workspace]
+
+[lib]
+name = "repsel"
+path = "src/lib.rs"
+
+[[bin]]
+name = "repsel"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = "1.0"
+
+[profile.release]
+overflow-checks = true

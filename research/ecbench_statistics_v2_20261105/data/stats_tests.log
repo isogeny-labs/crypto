@@ -1,0 +1,29 @@
+   Compiling crypto v0.1.0 (/home/user/wt/statsev)
+    Finished `release` profile [optimized] target(s) in 8m 07s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-24e7e65220b9e040)
+
+running 8 tests
+test cryptanalysis::ecbench::stats::tests::bootstrap_is_deterministic_and_brackets_the_mean ... ok
+test cryptanalysis::ecbench::stats::tests::cluster_bootstrap_sees_between_stratum_spread ... ok
+test cryptanalysis::ecbench::stats::tests::coverage_table_for_report ... COVTSV	K	reps	method	coverage	median_log_width	median_width_ratio_scale
+COVTSV	2	2000	linearised_t_log	0.9395	4.5753	16.6395
+COVTSV	2	2000	cluster_bootstrap_percentile	0.8580	0.8921	1.6308
+COVTSV	3	2000	linearised_t_log	0.9585	1.5312	2.8191
+COVTSV	3	2000	cluster_bootstrap_percentile	0.9055	0.8216	1.5181
+COVTSV	4	2000	linearised_t_log	0.9515	1.0239	1.8020
+COVTSV	4	2000	cluster_bootstrap_percentile	0.9275	0.7335	1.3225
+COVTSV	8	2000	linearised_t_log	0.9500	0.5789	0.9832
+COVTSV	8	2000	cluster_bootstrap_percentile	0.9620	0.5633	0.9804
+ok
+test cryptanalysis::ecbench::stats::tests::linearised_interval_covers_at_few_workloads ... K = 2: linearised coverage 0.9573, log scale 0.9557
+K = 4: linearised coverage 0.9480, log scale 0.9460
+K = 8: linearised coverage 0.9470, log scale 0.9500
+ok
+test cryptanalysis::ecbench::stats::tests::linearised_ratio_is_the_totals_ratio_with_a_t_interval ... ok
+test cryptanalysis::ecbench::stats::tests::percentile_cluster_bootstrap_undercovers_at_two_workloads ... ok
+test cryptanalysis::ecbench::stats::tests::quantiles_interpolate ... ok
+test cryptanalysis::ecbench::stats::tests::t_quantiles_match_published_tables ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 6171 filtered out; finished in 0.60s
+
+FINISHED

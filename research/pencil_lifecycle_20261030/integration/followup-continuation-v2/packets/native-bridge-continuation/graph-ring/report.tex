@@ -1,0 +1,19 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\begin{document}\section*{Native graph Ring word correspondence}
+2026-11-01. Seven main declarations, ten kernel controls and seventeen axiom readbacks passed.
+
+\textbf{Exact native formulas.} Addition $(a+b)\bmod r$ and subtraction via native negation decode correctly and preserve canonicality for $0<r\le2^{63}$ with canonical operands. The bound gives $a+b<2^{64}$. Native negation $(r-a)\bmod r$ is explicitly proved equal to the earlier reduced-input negation only under $a<r$; no silent substitution is used.
+
+\textbf{Widened multiplication.} The literal source widens both operands to u128 before multiplication and remainder, then narrows. The existing checked BitVec128 value theorem supplies canonical output and exact product decoding for every positive UInt64 modulus and all UInt64 operands, without the addition bound.
+
+\textbf{Signed branch.} For decoded signs $s=1$ or $s=-1$, output decodes to $s a$. The model uses Int after sign decoding. Native i8 correspondence and preservation of exactly these two signs remain separate; source treats any other sign as negation.
+
+\begin{center}\fbox{Literal word operations}\quad$\longrightarrow$\quad\fbox{Bounds and canonicality}\quad$\longrightarrow$\quad\fbox{Ring decoding}\end{center}
+
+\textbf{Boundary controls.} At $r=2^{63}+1$, $a=b=2^{63}$, wrapping addition returns zero whereas natural modular addition is $2^{63}-1$. This is an arithmetic boundary control, not a constructor-accepted prime fixture. Noncanonical native negation differs from reduced-input negation. Wide $2^{63}\cdot2\bmod17=1$ while narrow multiplication wraps to zero. Additional controls cover exact bound addition, zero/maximal canonical negation, sign zero and literal subtraction.
+
+\textbf{Composition obligations.} Establish actual modulus headroom, canonical graph offsets, i8 sign closure and mutable forest invariants before composing with graph algebra. Prime constructor validation alone does not supply the addition bound. Counter headroom, inversion, source compilation and runtime equivalence remain separate.
+
+\textbf{Provenance.} Source-first plan, fresh GraphRing/Controls/Readback checks and matching pre/post bindings retained. Existing imported helpers and Mathlib binaries retain their trust boundary. Main-only first check also passed; no failed proof attempts. Independent semantic review pending. No scientific runs or performance claim.
+
+Detailed report: REPORT.md. Structured status, editable SVG, native source snapshot, receipts and bindings accompany this PDF. Source reference: three\_leads.rs Ring lines1491--1530; exact prior dependencies: WordAdd11, WordClassifier and Wide.wideMul.
+\end{document}

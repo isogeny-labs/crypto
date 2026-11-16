@@ -1,0 +1,64 @@
+//! Postrun structural export. Never launches a payload or authenticates its own inputs.
+use crypto_lib::cryptanalysis::ecbench::{canonical::sha256_hex, diagnostic_binding_core::{parse,OwnerObservation}, diagnostic_file_adapter, diagnostic_resources::{FreshOwnerPins,SessionResourceJournal}};
+use serde_json::{json,Value};
+use std::{fs::{self,OpenOptions},io::{Read,Write},path::{Path,PathBuf}};
+use std::os::unix::fs::OpenOptionsExt;
+#[derive(Clone)]
+pub struct NativeFiles {
+ pub inventory_request:PathBuf, pub inventory_sha256:String, pub route:String,
+ pub host:PathBuf,pub session:PathBuf,pub preparation:PathBuf,pub launch:PathBuf,
+ pub contexts:Vec<PathBuf>,pub journal:PathBuf,pub owner:PathBuf,pub config:PathBuf,pub custody:PathBuf,
+}
+pub struct Expected {pub fresh:FreshOwnerPins,pub controller_custody_sha256:String}
+fn read(path:&Path,cap:usize)->Result<Vec<u8>,String>{
+ let f=OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW|libc::O_NONBLOCK).open(path).map_err(|e|e.to_string())?;
+ if !f.metadata().map_err(|e|e.to_string())?.is_file(){return Err("retained input must be regular".into())}
+ let mut b=Vec::new();f.take(cap as u64+1).read_to_end(&mut b).map_err(|e|e.to_string())?;
+ if b.len()>cap{return Err("retained input byte bound".into())} Ok(b)
+}
+fn text(v:&Value,k:&str)->Result<String,String>{v[k].as_str().map(str::to_owned).ok_or_else(||format!("missing retained {k}"))}
+fn number(v:&Value,k:&str)->Result<u64,String>{v[k].as_u64().ok_or_else(||format!("missing retained {k}"))}
+fn write(out:&Path,name:&str,b:&[u8])->Result<Value,String>{
+ let p=out.join(name);let mut f=OpenOptions::new().write(true).create_new(true).mode(0o400).custom_flags(libc::O_NOFOLLOW).open(&p).map_err(|e|e.to_string())?;
+ f.write_all(b).and_then(|_|f.sync_all()).map_err(|e|e.to_string())?;
+ Ok(json!({"path":p.to_str().ok_or("nonutf8 export path")?,"sha256":sha256_hex(b)}))
+}
+/// Supplied expected pins remain an external trust obligation, even on success.
+pub fn export(files:&NativeFiles,expected:&Expected,out:&Path)->Result<Value,String>{
+ if !out.is_absolute()||out.exists(){return Err("fresh absolute export directory required".into())}
+ if files.contexts.is_empty()||files.contexts.len()>22680{return Err("context count bound".into())}
+ // Validate original immutable enrollment using the existing file adapter.
+ let original_inventory=read(&files.inventory_request,1024*1024)?;
+ if sha256_hex(&original_inventory)!=files.inventory_sha256{return Err("inventory request pin".into())}
+ let static_report=diagnostic_file_adapter::check_file(files.inventory_request.to_str().ok_or("inventory path")?,&files.inventory_sha256)?;
+ if static_report.result.stage!="static_inventory_only"{return Err("static enrollment request required".into())}
+ let mut request=parse(&original_inventory,1024*1024)?;
+ let prep=read(&files.preparation,65536)?;let journal=read(&files.journal,8*1024*1024)?;
+ let owner=read(&files.owner,256*1024)?;let config=read(&files.config,65536)?;let custody=read(&files.custody,256*1024)?;
+ crate::custody::verify_fresh(&custody,&expected.controller_custody_sha256,&owner,&expected.fresh)?;
+ let j:SessionResourceJournal=serde_json::from_value(parse(&journal,8*1024*1024)?).map_err(|e|e.to_string())?;
+ let closure=j.close_fresh_enclosing_evidence(&journal,&prep,&owner,&config,&expected.fresh)?;
+ let p=parse(&prep,65536)?;let o=parse(&owner,256*1024)?;
+ let host=read(&files.host,4*1024*1024)?;let session=read(&files.session,4*1024*1024)?;let launch=read(&files.launch,65536)?;
+ let s=parse(&session,4*1024*1024)?;
+ if s["status"]!="complete"{return Err("postrun complete native session required".into())}
+ // This typed value is a comparison input, never an authentication token.
+ let comparison=OwnerObservation{
+  session_sha256:sha256_hex(&session),host_sha256:sha256_hex(&host),preparation_sha256:closure.preparation_sha256.clone(),
+  binary_sha256:expected.fresh.binary_sha256.clone(),runner_pid:number(&o["postexec_runner_observation"],"pid")?,
+  boot_id:text(&p,"boot_id")?,time_namespace:text(&p,"time_namespace")?,time_namespace_offsets:text(&p,"time_namespace_offsets")?,origin_ns:number(&p,"origin_ns")?,
+ };
+ let comparison_json=json!({"session_sha256":comparison.session_sha256,"host_sha256":comparison.host_sha256,"preparation_sha256":comparison.preparation_sha256,"binary_sha256":comparison.binary_sha256,"runner_pid":comparison.runner_pid,"boot_id":comparison.boot_id,"time_namespace":comparison.time_namespace,"time_namespace_offsets":comparison.time_namespace_offsets,"origin_ns":comparison.origin_ns});
+ fs::create_dir(out).map_err(|e|e.to_string())?;
+ let mut actual=json!({"route":files.route,"host":write(out,"host.json",&host)?,"session":write(out,"session.json",&session)?,"preparation":write(out,"preparation.json",&prep)?,"launch":write(out,"launch.json",&launch)?,"owner_observation":write(out,"owner-comparison.json",&serde_json::to_vec(&comparison_json).map_err(|e|e.to_string())?)?});
+ let mut contextpins=Vec::new();let mut total=prep.len()+journal.len()+owner.len()+config.len()+custody.len()+host.len()+session.len()+launch.len();
+ for (i,path) in files.contexts.iter().enumerate(){let b=read(path,65536)?;total=total.checked_add(b.len()).ok_or("export byte overflow")?;if total>64*1024*1024{return Err("export total byte bound".into())} contextpins.push(write(out,&format!("context-{i:05}.json"),&b)?);}
+ actual["contexts"]=json!(contextpins);request["stage"]=json!("actual_session_subset_checked");request["actual"]=actual;
+ let requestpin=write(out,"actual-request.json",&serde_json::to_vec(&request).map_err(|e|e.to_string())?)?;
+ let structural=diagnostic_file_adapter::check_file(requestpin["path"].as_str().ok_or("request path")?,requestpin["sha256"].as_str().ok_or("request digest")?)?;
+ let retained=json!({"journal":write(out,"resource-journal.json",&journal)?,"fresh_owner":write(out,"fresh-owner.json",&owner)?,"fresh_config":write(out,"fresh-config.json",&config)?,"controller_custody":write(out,"controller-custody.json",&custody)?,"supplied_expected_pins":write(out,"supplied-expected-pins.json",&serde_json::to_vec(&json!({"fresh":expected.fresh,"controller_custody_sha256":expected.controller_custody_sha256})).map_err(|e|e.to_string())?)?});
+ let report=json!({"schema":"ecbench.retained-native-session-export/v1","status":"postrun_structural_export_checked","actual_request":requestpin,"retained":retained,"closure":closure,"structural_report":structural,"owner_authentication_verified":false,"external_owner_verification_required":true,"controller_pin_origin":"caller-supplied; authentication not verified by exporter","worker_allocation_ns":null,"total_active_worker_ns":null,"exact_kernel_exit_ns":null,"accepted_external_closure":null,"scientific_execution_admitted":false,"mathematical_rows_accepted":false});
+ write(out,"export-report.json",&serde_json::to_vec(&report).map_err(|e|e.to_string())?)?;
+ let d=fs::File::open(out).map_err(|e|e.to_string())?;d.sync_all().map_err(|e|e.to_string())?;
+ Ok(report)
+}

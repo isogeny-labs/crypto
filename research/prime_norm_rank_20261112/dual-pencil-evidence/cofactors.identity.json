@@ -1,0 +1,244 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h76b1a590e132b252",
+  "statement": {
+    "name": "Two-support dual pencil cofactor pairings",
+    "source": "NormDualPencil.pencilCofactors; two coefficients encoded by independent tags; no generic search bound",
+    "variables": [
+      "U",
+      "V",
+      "y",
+      "a",
+      "b",
+      "z1",
+      "z2"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "z1"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "a"
+                          },
+                          {
+                            "op": "var",
+                            "args": "U"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "b"
+                          },
+                          {
+                            "op": "var",
+                            "args": "V"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "U"
+                      },
+                      {
+                        "op": "var",
+                        "args": "a"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "z2"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 2
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "b"
+                          },
+                          {
+                            "op": "var",
+                            "args": "y"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "V"
+                      },
+                      {
+                        "op": "var",
+                        "args": "a"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "neg",
+      "args": {
+        "op": "add",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "z1"
+              },
+              {
+                "op": "const",
+                "args": 2
+              },
+              {
+                "op": "var",
+                "args": "U"
+              },
+              {
+                "op": "var",
+                "args": "a"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "z1"
+              },
+              {
+                "op": "var",
+                "args": "V"
+              },
+              {
+                "op": "var",
+                "args": "b"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "z2"
+              },
+              {
+                "op": "var",
+                "args": "V"
+              },
+              {
+                "op": "var",
+                "args": "a"
+              }
+            ]
+          },
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "z2"
+              },
+              {
+                "op": "const",
+                "args": 2
+              },
+              {
+                "op": "var",
+                "args": "y"
+              },
+              {
+                "op": "var",
+                "args": "y"
+              },
+              {
+                "op": "var",
+                "args": "b"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261114,
+  "value_digest": "e456e32105b2ac1f38ee434ccac976816e40f2aada77f91fdd0d1dd2efdfd513",
+  "independence": "Unsigned producer expression identity; full recovery theorem checked in Lean",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormDualPencil.lean",
+    "sha256": "e4c28c7ef27ad43a86a1361b0e911e86d8bd169db3f1ddddd55b58d73c4c7daf"
+  }
+}

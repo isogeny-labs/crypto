@@ -1,0 +1,10 @@
+arm	ecbench_sha256_16	seq	child	before_solve_Ir	solve_Ir	total_gae
+E: PR #3144 head (registry index)	0038806674a3af21	0	rho.negation	2170921	1222979	1706
+E: PR #3144 head (registry index)	0038806674a3af21	1	ic.pipeline N=32	2203287	15144353	14101
+E: PR #3144 head (registry index)	0038806674a3af21	2	ic.pipeline N=45	2203287	10267488	10632
+F: E + walk key ring, jump wrap, 32-bit inversion	b6cd58faf502e51a	0	rho.negation	2219489	1054933	1706
+F: E + walk key ring, jump wrap, 32-bit inversion	b6cd58faf502e51a	1	ic.pipeline N=32	2251923	14373889	14101
+F: E + walk key ring, jump wrap, 32-bit inversion	b6cd58faf502e51a	2	ic.pipeline N=45	2251923	9737258	10632
+G: F + raw-nanosecond phase trace	1efe6b068214f08e	0	rho.negation	2210669	1054467	1706
+G: F + raw-nanosecond phase trace	1efe6b068214f08e	1	ic.pipeline N=32	2243057	12409320	14101
+G: F + raw-nanosecond phase trace	1efe6b068214f08e	2	ic.pipeline N=45	2250315	8551931	10632

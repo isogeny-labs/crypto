@@ -1,0 +1,11 @@
+/var/tmp/pencil-remainder-trace-20261031-v1/Trace.lean:27:60: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+b : K[X]
+e : ℕ × K
+es : List (ℕ × K)
+ih : ∀ (r : K[X]), r = b * quotient es + run b es r
+r : K[X]
+h : cancel b r e = b * quotient es + run b es (cancel b r e)
+⊢ b * term e + (b * quotient es + run b es (cancel b r e)) =
+    b * term e + (b * quotient es + run b es (b * quotient es + run b es (cancel b r e)))

@@ -1,0 +1,19 @@
+   Compiling crypto v0.1.0 (/workspace/secant-fixture-proof-20261031)
+error[E0658]: use of unstable library feature `atomic_try_update`
+   --> src/cryptanalysis/ecbench/diagnostic_runtime.rs:139:14
+    |
+139 |             .try_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+    |              ^^^^^^^^^^
+    |
+    = note: see issue #135894 <https://github.com/rust-lang/rust/issues/135894> for more information
+
+error[E0658]: use of unstable library feature `atomic_try_update`
+  --> src/cryptanalysis/ecbench/pencil.rs:79:18
+   |
+79 |                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+   |                  ^^^^^^^^^^
+   |
+   = note: see issue #135894 <https://github.com/rust-lang/rust/issues/135894> for more information
+
+For more information about this error, try `rustc --explain E0658`.
+error: could not compile `crypto` (lib test) due to 2 previous errors

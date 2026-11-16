@@ -11,7 +11,7 @@
   "links": {
     "plan": "crypto:research/gaudry_k4_char2_redteam_20261026/REPORT.md section 3 (Frozen replication plan)",
     "paper": "crypto:papers/ecdlp-index-calculus-treatise/sections/extension.tex and prog_openproblems.tex item 6; conclusion item 3",
-    "prerequisite": "rho-strong: registered as rho.negation_strong (src/cryptanalysis/ecbench/methods.rs registry; ecbench::negation_strong), commit 6e04a8dec015faef6d923a68d59e271584756681. Second prerequisite, open: f2m4_torsion and gaudry_quartic_bin take m <= 15 (u16 F_q elements, 4m-bit packed points), so the decisive m = 16, 17 refuse at plan time until the tower is widened",
+    "prerequisite": "rho-strong: registered as rho.negation_strong (src/cryptanalysis/ecbench/methods.rs registry; ecbench::negation_strong), commit 6e04a8dec015faef6d923a68d59e271584756681. Second prerequisite, met on branch claude/f2m4-wide-tower-20261105: f2m4_torsion and gaudry_quartic_bin already build m <= 20 on main (u32 F_q elements, u128 orders and packed points, ic_wide for rho.negation and ic.pipeline); rho.negation_strong now takes two-word orders and 4m-bit point keys, its one-word walks replaying bit for bit (pinned test), so the decisive m = 16, 17 cells no longer refuse at plan time. The instrument commit is pinned at freeze.",
     "spec": "crypto:research/fd_paper_data_request_20261029/protocols/k4-char2-replication/spec.json"
   },
   "question": "On k=4 characteristic-two curves E/F_{2^{4m'}} (Gaudry D4, binary oracle), is index calculus below the strongest legitimate rho in counted F_q multiplications at m=16 and m=17, across the pricing band, with 8 fresh targets per arm?",
@@ -489,7 +489,7 @@
     "rows below L1 isolation are excluded from timing; counted units stand",
     "a wrong_answer row is reported and excluded from the decisive ratio",
     "rho-strong not built before freeze: the study does not start",
-    "the frozen instrument refuses m = 16, 17 (f2m4_torsion takes m <= 15); widening the tower is an instrument change, filed as an amendment with its commit before any m >= 16 row, and the m = 14, 15 arms are rerun on the widened binary only if its replay of this instrument's records differs"
+    "the m = 16, 17 arms run on the widened instrument (rho.negation_strong with u128 orders); the instrument commit pinned at freeze must contain the widening, and the m = 14, 15 arms are rerun on it only if its replay of the one-word records differs"
   ],
   "decision_rule": {
     "text": "C2 supported at m when the Holm-corrected 95% paired-bootstrap interval of ic_over_rho lies below 1 at w=0, 0.1 and 1; 'trades' if the band straddles; 'loses' if above 1 at every w.",

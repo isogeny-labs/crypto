@@ -1,0 +1,64 @@
+import FastCRTInterpolation
+set_option autoImplicit false
+namespace FastCRT
+open Polynomial
+variable {K : Type*} [Field K]
+
+theorem delta_degree_le (s t : K) : (delta s t).natDegree≤1 := by
+ unfold delta
+ apply natDegree_add_le_of_degree_le
+ · simpa only [pow_one] using natDegree_C_mul_X_pow_le s 1
+ · simp
+
+theorem support_shape (q r : K) : (support q r).natDegree=2 ∧ (support q r).Monic := by
+ have he : support q r=X^2+delta q r := by unfold support delta;ring
+ have hl : (delta q r).natDegree<(X^2 : K[X]).natDegree := by
+  have h := delta_degree_le q r
+  simp only [natDegree_X_pow];omega
+ constructor
+ · rw [he,natDegree_add_eq_left_of_natDegree_lt hl,natDegree_X_pow]
+ · change (support q r).leadingCoeff=1
+   rw [he,leadingCoeff_add_of_degree_lt' (degree_lt_degree hl)]
+   exact (monic_X_pow 2).leadingCoeff
+
+theorem numerator_shape (a b c d q r : K) (hs : slopeOne a b c d ≠ 0) :
+ (numerator a b c d q r).natDegree=1 ∧
+ (numerator a b c d q r).leadingCoeff=slopeOne a b c d := by
+ have hl : (C (slopeZero a b c d q r)).natDegree <
+  (C (slopeOne a b c d)*X).natDegree := by rw [natDegree_C_mul_X _ hs];simp
+ constructor
+ · exact (natDegree_add_eq_right_of_natDegree_lt hl).trans (natDegree_C_mul_X _ hs)
+ · exact (leadingCoeff_add_of_degree_lt (degree_lt_degree hl)).trans (leadingCoeff_C_mul_X _)
+
+theorem slope_shape (qa ra sa ta qb rb sb tb : K)
+ (hn : norm (qa-qb) (ra-rb) qb rb ≠ 0)
+ (hs : slopeOne (qa-qb) (ra-rb) (sb-sa) (tb-ta) ≠ 0) :
+ (slope qa ra sa ta qb rb sb tb).natDegree=1 ∧
+ (slope qa ra sa ta qb rb sb tb).leadingCoeff=
+ slopeOne (qa-qb) (ra-rb) (sb-sa) (tb-ta)/norm (qa-qb) (ra-rb) qb rb := by
+ have hh := numerator_shape (qa-qb) (ra-rb) (sb-sa) (tb-ta) qb rb hs
+ constructor
+ · unfold slope
+   rw [natDegree_C_mul_of_isUnit (isUnit_iff_ne_zero.mpr (inv_ne_zero hn)),hh.1]
+ · unfold slope
+   rw [leadingCoeff_mul,leadingCoeff_C,hh.2]
+   simp only [div_eq_mul_inv,mul_comm]
+
+theorem interpolant_shape (qa ra sa ta qb rb sb tb : K)
+ (hn : norm (qa-qb) (ra-rb) qb rb ≠ 0)
+ (hs : slopeOne (qa-qb) (ra-rb) (sb-sa) (tb-ta) ≠ 0) :
+ (interpolant qa ra sa ta qb rb sb tb).natDegree=3 ∧
+ (interpolant qa ra sa ta qb rb sb tb).leadingCoeff=
+ slopeOne (qa-qb) (ra-rb) (sb-sa) (tb-ta)/norm (qa-qb) (ra-rb) qb rb := by
+ obtain ⟨hd,hl⟩ := slope_shape qa ra sa ta qb rb sb tb hn hs
+ obtain ⟨hu,hm⟩ := support_shape qa ra
+ have hs0 : slope qa ra sa ta qb rb sb tb ≠ 0 := by intro hz;rw [hz,natDegree_zero] at hd;omega
+ have hp : (slope qa ra sa ta qb rb sb tb*support qa ra).natDegree=3 := by
+  rw [natDegree_mul hs0 hm.ne_zero,hd,hu]
+ have hlt : (delta sa ta).natDegree<(slope qa ra sa ta qb rb sb tb*support qa ra).natDegree := by
+  rw [hp];have h:=delta_degree_le sa ta;omega
+ constructor
+ · exact (natDegree_add_eq_right_of_natDegree_lt hlt).trans hp
+ · change (delta sa ta+slope qa ra sa ta qb rb sb tb*support qa ra).leadingCoeff=_
+   rw [leadingCoeff_add_of_degree_lt (degree_lt_degree hlt),leadingCoeff_mul,hm.leadingCoeff,mul_one,hl]
+end FastCRT

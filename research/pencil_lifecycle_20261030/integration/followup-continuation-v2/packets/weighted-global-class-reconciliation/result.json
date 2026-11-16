@@ -1,0 +1,80 @@
+{
+  "schema": "research.weighted-global-class-reconciliation/v1",
+  "task": "T-1535",
+  "activity": "source and retained-evidence reading only",
+  "independent_geometry_fidelity_review_found": false,
+  "existing_cohorts_preserved": true,
+  "compiler_invocations": 0,
+  "new_experiments": 0,
+  "components": [
+    {
+      "component": "Affine/infinity charts and cover",
+      "evidence_level": "existing source and saved producer build narrative",
+      "source_or_theorem": "WEIGHTED_QUOTIENT_COMPONENTS.md",
+      "scope": "No reimplementation proposed"
+    },
+    {
+      "component": "Proper over Spec K",
+      "evidence_level": "existing WeightedProjBase theorem and saved build narrative",
+      "source_or_theorem": "WeightedProjBase.weightedProj_proper_over_K",
+      "scope": "arbitrary field/coefficients"
+    },
+    {
+      "component": "Global smoothness",
+      "evidence_level": "existing source and saved producer build narrative",
+      "source_or_theorem": "WeightedProjSmoothFinal.smooth",
+      "scope": "perfect field; char not2; squarefree quintic"
+    },
+    {
+      "component": "Infinity actual stalk DVR",
+      "evidence_level": "existing source and saved producer build narrative",
+      "source_or_theorem": "WeightedProjInfinityDVR.projective_origin_dvr",
+      "scope": "actual stalk; local parameter and z order2"
+    },
+    {
+      "component": "Global two-chart isomorphism",
+      "evidence_level": "saved direct/replay log inspected",
+      "source_or_theorem": "WeightedProjCrossInjective.gluedToProj_isIso",
+      "scope": "later closes old conditional cross-chart gap"
+    },
+    {
+      "component": "Actual-quintic branch order",
+      "evidence_level": "saved direct axiom log inspected",
+      "source_or_theorem": "source_style_actual_quintic_branch_zero_order_of_separable",
+      "scope": "valid inputs; determinant nonzero; rational branch/support root"
+    },
+    {
+      "component": "Rational nonbranch DVR",
+      "evidence_level": "saved direct axiom log inspected",
+      "source_or_theorem": "WeightedProjNonbranchDVR.projective_point_dvr",
+      "scope": "separable quintic; 2*y !=0"
+    },
+    {
+      "component": "Derivative-point DVR",
+      "evidence_level": "saved direct axiom log inspected",
+      "source_or_theorem": "WeightedProjDerivativePointDVR",
+      "scope": "derivative nonzero; no singular-point claim"
+    },
+    {
+      "component": "Actual-quintic nonbranch norm transport",
+      "evidence_level": "proposed next construction",
+      "source_or_theorem": "point_norm_order plus concrete maps",
+      "scope": "derive scalar units,numerator nonunit,norm equality"
+    },
+    {
+      "component": "Global principal divisor and concrete class map",
+      "evidence_level": "open construction",
+      "source_or_theorem": "RuntimeSemantics.PrincipalClassInterface is abstract",
+      "scope": "all places,multiplicities,infinity,normalization,branch composition"
+    }
+  ],
+  "next": "Concrete actual-quintic rational nonbranch stalk norm-order composition",
+  "later_global_obligations": [
+    "single function-field embeddings and valuation transport",
+    "all closed points or algebraic-closure/Galois descent, not only rational K-points",
+    "finite-support principal divisor with multiplicities and infinity pole6 vs5",
+    "residual weighted output normalization and sign",
+    "source-ordered exceptional dispatcher branches and validity preservation"
+  ],
+  "source_fidelity": "Manual exact-source proposal; no compiled Rust semantics established"
+}
