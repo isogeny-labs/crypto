@@ -17923,8 +17923,8 @@ mod tests {
 
     #[test]
     fn batched_packed_lifts_match_individual_lifts() {
-        for n in [5, 7, 13, 17, 23] {
-            let kc = KoblitzCurve::new(0, n).unwrap();
+        for n in [5, 7, 13, 19, 23] {
+            let kc = KoblitzCurve::new(0, n).unwrap_or_else(|| panic!("missing E0 K{n}"));
             let fast = FastCurve::new(&kc.curve).unwrap();
             let samples = if n <= 7 { 1u64 << n } else { 128 };
             let mut rng = StdRng::seed_from_u64(73015 + u64::from(n));
@@ -17959,8 +17959,8 @@ mod tests {
 
     #[test]
     fn batched_standard_subspace_base_matches_legacy_order_and_columns() {
-        for (n, ell) in [(5, 2), (7, 3), (13, 5), (17, 6), (23, 8)] {
-            let kc = KoblitzCurve::new(0, n).unwrap();
+        for (n, ell) in [(5, 2), (7, 3), (13, 5), (19, 7), (23, 8)] {
+            let kc = KoblitzCurve::new(0, n).unwrap_or_else(|| panic!("missing E0 K{n}"));
             let old = build_standard_subspace_factor_base(&kc, ell).unwrap();
             let new = build_standard_subspace_factor_base_batch_lifts(&kc, ell).unwrap();
             assert_eq!(new.domain, old.domain, "n={n}");
