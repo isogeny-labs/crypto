@@ -243,6 +243,33 @@ fn intervals<const K: usize>(values: &[[f64; K]]) -> [Statistics; K] {
 fn includes_one(stats: &Statistics) -> bool {
     stats.percentile_95[0] <= 1. && stats.percentile_95[1] >= 1.
 }
+/// Numerical A/A gate for captured calls. Full transcript/provenance validation
+/// is separate; this helper grants no execution or mathematical standing.
+pub fn aa_control(arm: Arm, pairs: &[[Sample; 2]], setup: u64) -> Result<AaResult, String> {
+    if pairs.len() != 7 || setup == 0 || setup > CAMPAIGN_NS {
+        return Err("seven pairs and positive bounded setup required".into());
+    }
+    let ratios: Vec<_> = pairs
+        .iter()
+        .map(|[a, b]| {
+            if a.arm != arm || b.arm != arm {
+                return Err("A/A arm mismatch".into());
+            }
+            Ok([
+                a.worker_wall_ns as f64 / b.worker_wall_ns as f64,
+                paid(a, setup)? as f64 / paid(b, setup)? as f64,
+            ])
+        })
+        .collect::<Result<_, String>>()?;
+    let [native, full_cost] = intervals(&ratios);
+    let admitted = includes_one(&native) && includes_one(&full_cost);
+    Ok(AaResult {
+        arm,
+        native,
+        full_cost,
+        admitted,
+    })
+}
 pub fn analyze(case: &Case) -> Report {
     let mut report = Report {
         schema: "compact-speed-analysis/v1",
@@ -267,26 +294,7 @@ pub fn analyze(case: &Case) -> Report {
     let aa: Vec<_> = ARMS
         .iter()
         .zip(&case.aa_pairs)
-        .map(|(arm, pairs)| {
-            let ratios: Vec<_> = pairs
-                .iter()
-                .map(|[a, b]| {
-                    [
-                        a.worker_wall_ns as f64 / b.worker_wall_ns as f64,
-                        paid(a, case.setup_wall_ns).unwrap() as f64
-                            / paid(b, case.setup_wall_ns).unwrap() as f64,
-                    ]
-                })
-                .collect();
-            let [native, full_cost] = intervals(&ratios);
-            let admitted = includes_one(&native) && includes_one(&full_cost);
-            AaResult {
-                arm: *arm,
-                native,
-                full_cost,
-                admitted,
-            }
-        })
+        .map(|(arm, pairs)| aa_control(*arm, pairs, case.setup_wall_ns).unwrap())
         .collect();
     let admitted = aa.iter().all(|a| a.admitted);
     report.aa = Some(aa);
@@ -489,5 +497,13 @@ mod tests {
         let mut value = serde_json::to_value(support::synthetic()).unwrap();
         value["verified"] = serde_json::json!(true);
         assert!(serde_json::from_value::<Case>(value).is_err());
+    }
+    #[test]
+    fn public_aa_gate_rejects_invalid_costs_and_arm_pairing() {
+        let mut case = support::synthetic();
+        assert!(aa_control(Arm::F4, &case.aa_pairs[0], 0).is_err());
+        assert!(aa_control(Arm::Certified, &case.aa_pairs[0], 1).is_err());
+        case.aa_pairs[0][0][1].worker_wall_ns = 0;
+        assert!(aa_control(Arm::F4, &case.aa_pairs[0], 1).is_err());
     }
 }

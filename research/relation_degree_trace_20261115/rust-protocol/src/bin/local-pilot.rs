@@ -1,0 +1,631 @@
+//! Local L0 pilot; see LOCAL_COMPACT_PILOT_PROTOCOL.md before execution.
+use certified_relations::{workload, Poly, System};
+use compact_speed_analysis::{aa_control, analyze, Arm, Case, Sample};
+use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
+use std::{
+    collections::BTreeSet,
+    error::Error,
+    fs::{self, File, OpenOptions},
+    io::Write,
+    path::{Path, PathBuf},
+    process::{Command, Stdio},
+    time::{Duration, Instant},
+};
+type Result<T> = std::result::Result<T, Box<dyn Error>>;
+type Basis = BTreeSet<Poly>;
+const P: u64 = 2147483647;
+const ARMS: [Arm; 3] = [Arm::F4, Arm::Certified, Arm::Compact];
+const ORDERS: [&str; 6] = ["FEC", "ECF", "CFE", "CEF", "EFC", "FCE"];
+fn arm_name(a: Arm) -> &'static str {
+    match a {
+        Arm::F4 => "f4",
+        Arm::Certified => "certified",
+        Arm::Compact => "compact",
+    }
+}
+fn hash(bytes: &[u8]) -> String {
+    format!("{:x}", Sha256::digest(bytes))
+}
+fn file_hash(p: &Path) -> Result<String> {
+    Ok(hash(&fs::read(p)?))
+}
+fn ns(start: Instant) -> u64 {
+    start.elapsed().as_nanos().min(u64::MAX as u128) as u64
+}
+fn write_new(p: &Path, b: &[u8]) -> Result<()> {
+    OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(p)?
+        .write_all(b)?;
+    Ok(())
+}
+fn save(p: &Path, v: &impl serde::Serialize) -> Result<()> {
+    write_new(p, &serde_json::to_vec_pretty(v)?)
+}
+fn expr(f: &Poly, names: &[String]) -> String {
+    f.iter()
+        .map(|(m, c)| {
+            let mut s = c.to_string();
+            for (e, v) in m.iter().zip(names) {
+                if *e > 0 {
+                    s += &format!("*{v}^{e}");
+                }
+            }
+            s
+        })
+        .collect::<Vec<_>>()
+        .join("+")
+}
+fn singular_code(s: &System, f: &[Poly], algorithm: &str) -> String {
+    format!("ring r={},({}),dp;\noption(redSB);\nideal I={};\nideal G={algorithm}(I);\nint i;poly f;\nfor(i=1;i<=size(G);i++){{print(\"POLY\");f=G[i];while(f!=0){{print(\"TERM:\"+string(leadcoef(f))+\":\"+string(leadexp(f)));f=f-lead(f);}}print(\"ENDPOLY\");}}\nprint(\"DONE\");\nquit;\n",s.prime,s.variables.join(","),f.iter().map(|f|expr(f,&s.variables)).collect::<Vec<_>>().join(","))
+}
+fn singular_basis(text: &str, n: usize) -> Result<Basis> {
+    let mut basis = Basis::new();
+    let mut current = None;
+    let mut done = false;
+    for line in text.lines().map(str::trim).filter(|s| !s.is_empty()) {
+        if line == "POLY" {
+            if current.is_some() || done {
+                return Err("bad POLY order".into());
+            }
+            current = Some(Poly::new());
+        } else if let Some(term) = line.strip_prefix("TERM:") {
+            let (c, m) = term.split_once(':').ok_or("bad TERM")?;
+            let c = (c.parse::<i128>()?).rem_euclid(P as i128) as u64;
+            let m: Vec<usize> = m
+                .split(',')
+                .map(|x| x.trim().parse())
+                .collect::<std::result::Result<_, _>>()?;
+            if m.len() != n
+                || m.iter()
+                    .try_fold(0usize, |s, e| s.checked_add(*e))
+                    .is_none_or(|d| d > 64)
+                || c == 0
+            {
+                return Err("bad term shape/residue".into());
+            }
+            if current
+                .as_mut()
+                .ok_or("TERM outside POLY")?
+                .insert(m, c)
+                .is_some()
+            {
+                return Err("duplicate monomial".into());
+            }
+        } else if line == "ENDPOLY" {
+            let f = current.take().ok_or("END outside POLY")?;
+            if f.is_empty() || !basis.insert(f) {
+                return Err("empty/duplicate polynomial".into());
+            }
+        } else if line == "DONE" {
+            if done || current.is_some() {
+                return Err("bad completion".into());
+            }
+            done = true;
+        } else if !line.starts_with("//") {
+            return Err("unexpected Singular output".into());
+        }
+    }
+    if !done || current.is_some() || basis.is_empty() {
+        return Err("missing complete basis".into());
+    }
+    Ok(basis)
+}
+fn msolve_basis(text: &str, names: &[String]) -> Result<Basis> {
+    let text = text
+        .lines()
+        .filter(|s| !s.trim_start().starts_with('#'))
+        .collect::<String>();
+    let body = text
+        .trim()
+        .strip_prefix('[')
+        .and_then(|s| s.strip_suffix("]:"))
+        .ok_or("bad msolve framing")?;
+    let mut basis = Basis::new();
+    for polynomial in body.split(',') {
+        let mut f = Poly::new();
+        for term in polynomial.trim().split('+') {
+            let mut factors = term.trim().split('*');
+            let c = factors
+                .next()
+                .ok_or("missing coefficient")?
+                .trim()
+                .parse::<i128>()?
+                .rem_euclid(P as i128) as u64;
+            let mut m = vec![0; names.len()];
+            for factor in factors {
+                let (v, e) = factor.trim().split_once('^').ok_or("missing power")?;
+                let axis = names
+                    .iter()
+                    .position(|n| n == v.trim())
+                    .ok_or("unknown variable")?;
+                if m[axis] != 0 {
+                    return Err("repeated variable".into());
+                }
+                m[axis] = e.trim().parse()?;
+            }
+            if m.iter()
+                .try_fold(0usize, |s, e| s.checked_add(*e))
+                .is_none_or(|d| d > 64)
+                || c == 0
+                || f.insert(m, c).is_some()
+            {
+                return Err("malformed/duplicate msolve term".into());
+            }
+        }
+        if f.is_empty() || !basis.insert(f) {
+            return Err("empty/duplicate msolve polynomial".into());
+        }
+    }
+    if basis.is_empty() {
+        return Err("missing msolve basis".into());
+    }
+    Ok(basis)
+}
+fn native_basis(value: &Value, n: usize) -> Result<Basis> {
+    let raw: Vec<Vec<(Vec<usize>, u64)>> = serde_json::from_value(value.clone())?;
+    let mut out = Basis::new();
+    for row in raw {
+        let mut f = Poly::new();
+        for (m, c) in row {
+            if m.len() != n
+                || m.iter()
+                    .try_fold(0usize, |s, e| s.checked_add(*e))
+                    .is_none_or(|d| d > 64)
+                || c == 0
+                || c >= P
+                || f.insert(m, c).is_some()
+            {
+                return Err("bad native term".into());
+            }
+        }
+        if f.is_empty() || !out.insert(f) {
+            return Err("empty/duplicate native polynomial".into());
+        }
+    }
+    if out.is_empty() {
+        return Err("missing native basis".into());
+    }
+    Ok(out)
+}
+fn basis_hash(b: &Basis) -> String {
+    let rows: Vec<Vec<_>> = b
+        .iter()
+        .map(|f| f.iter().map(|(m, c)| (m, *c)).collect())
+        .collect();
+    hash(&serde_json::to_vec(&rows).unwrap())
+}
+fn prepare(root: &Path, mode: &str) -> Result<()> {
+    let roster: Vec<_> = match mode {
+        "qualification" => [3].into_iter().map(|n| (n, 7)).collect(),
+        "pilot" => [3, 4, 6]
+            .into_iter()
+            .flat_map(|n| [101, 307, 911].map(|s| (n, s)))
+            .collect(),
+        _ => return Err("mode must be qualification or pilot".into()),
+    };
+    fs::create_dir(root)?;
+    let mut cases = Vec::new();
+    for (n, seed) in roster {
+        let start = Instant::now();
+        let s = workload::generate(P, n, seed)?.system;
+        let dir = root.join(format!("n{n}-s{seed}"));
+        fs::create_dir(&dir)?;
+        let f = s.decode()?;
+        let bytes = serde_json::to_vec(&s)?;
+        write_new(&dir.join("system.json"), &bytes)?;
+        for algorithm in ["std", "slimgb"] {
+            write_new(
+                &dir.join(format!("{algorithm}.sing")),
+                singular_code(&s, &f, algorithm).as_bytes(),
+            )?;
+        }
+        let ms = format!(
+            "{}\n{}\n{}\n",
+            s.variables.join(","),
+            P,
+            f.iter()
+                .map(|f| expr(f, &s.variables))
+                .collect::<Vec<_>>()
+                .join(",\n")
+        );
+        write_new(&dir.join("input.ms"), ms.as_bytes())?;
+        cases.push(json!({"id":format!("n{n}-s{seed}"),"variables":n,"seed":seed,"input_sha256":hash(&bytes),"preparation_ns":ns(start)}));
+    }
+    save(
+        &root.join("manifest.json"),
+        &json!({"schema":"local-compact-inputs/v1","mode":mode,"cases":cases}),
+    )
+}
+struct Runner {
+    worker: PathBuf,
+    singular: PathBuf,
+    msolve: PathBuf,
+    cpu: String,
+    worker_hash: String,
+    global: Instant,
+    case: Instant,
+}
+impl Runner {
+    fn process(
+        &self,
+        exe: &Path,
+        args: &[String],
+        input: Option<&Path>,
+        prefix: &Path,
+    ) -> Result<(std::process::ExitStatus, Vec<u8>, u64)> {
+        let remaining = Duration::from_secs(1800)
+            .saturating_sub(self.global.elapsed())
+            .min(Duration::from_secs(1200).saturating_sub(self.case.elapsed()))
+            .min(Duration::from_secs(30));
+        if remaining.is_zero() {
+            return Err("original pilot/case deadline exhausted".into());
+        }
+        let start = Instant::now();
+        let stdout = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(prefix.with_extension("stdout"))?;
+        let stderr = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(prefix.with_extension("stderr"))?;
+        let mut cmd = Command::new("timeout");
+        cmd.args([
+            "--kill-after=1s",
+            &format!("{}s", remaining.as_secs_f64()),
+            "prlimit",
+            "--as=2147483648",
+            "--fsize=16777216",
+            "--",
+            "taskset",
+            "-c",
+            &self.cpu,
+        ]);
+        cmd.arg(exe)
+            .args(args)
+            .env("RAYON_NUM_THREADS", "1")
+            .env("OMP_NUM_THREADS", "1")
+            .env("OPENBLAS_NUM_THREADS", "1")
+            .env(
+                "LD_LIBRARY_PATH",
+                "/workspace/msolve-source/src/neogb/.libs:/workspace/native-cas/lib",
+            )
+            .stdout(Stdio::from(stdout))
+            .stderr(Stdio::from(stderr));
+        cmd.stdin(match input {
+            Some(p) => Stdio::from(File::open(p)?),
+            None => Stdio::null(),
+        });
+        let command = format!("{cmd:?}");
+        let status = cmd.status()?;
+        let bytes = fs::read(prefix.with_extension("stdout"))?;
+        let wall = ns(start);
+        save(
+            &prefix.with_extension("process.json"),
+            &json!({"command":command,"exit_code":status.code(),"success":status.success(),"parent_process_wall_ns":wall,"scope":"launch through bounded stdout consumption; parser/checking charged by caller"}),
+        )?;
+        Ok((status, bytes, wall))
+    }
+    fn references(&self, input: &Path, out: &Path, s: &System, prep: u64) -> Result<(Basis, u64)> {
+        let start = Instant::now();
+        let mut first = None;
+        let mut routes = Vec::new();
+        for algorithm in ["std", "slimgb", "msolve"] {
+            let route = Instant::now();
+            let prefix = out.join(format!("setup-{algorithm}"));
+            let (exe, args) = if algorithm == "msolve" {
+                (
+                    &self.msolve,
+                    vec![
+                        "-g".into(),
+                        "2".into(),
+                        "-t".into(),
+                        "1".into(),
+                        "-v".into(),
+                        "0".into(),
+                        "-f".into(),
+                        input.join("input.ms").display().to_string(),
+                        "-o".into(),
+                        out.join("msolve-basis.txt").display().to_string(),
+                    ],
+                )
+            } else {
+                (
+                    &self.singular,
+                    vec![
+                        "-q".into(),
+                        input
+                            .join(format!("{algorithm}.sing"))
+                            .display()
+                            .to_string(),
+                    ],
+                )
+            };
+            let (status, bytes, _) = self.process(exe, &args, None, &prefix)?;
+            if !status.success() {
+                return Err(format!("reference {algorithm} failed: {status}").into());
+            }
+            let basis = if algorithm == "msolve" {
+                msolve_basis(
+                    &fs::read_to_string(out.join("msolve-basis.txt"))?,
+                    &s.variables,
+                )?
+            } else {
+                singular_basis(std::str::from_utf8(&bytes)?, s.variables.len())?
+            };
+            if first.as_ref().is_some_and(|b| *b != basis) {
+                return Err("mature bases disagree".into());
+            }
+            if first.is_none() {
+                first = Some(basis);
+            }
+            routes.push(json!({"route":algorithm,"whole_route_ns":ns(route)}));
+        }
+        let basis = first.unwrap();
+        let reference_hash = basis_hash(&basis);
+        let fastest = routes
+            .iter()
+            .min_by_key(|r| r["whole_route_ns"].as_u64().unwrap())
+            .unwrap()["route"]
+            .clone();
+        save(
+            &out.join("references.json"),
+            &json!({"routes":routes,"fastest_successful_route":fastest,"reference_basis_sha256":reference_hash,"basis":basis.iter().map(|f|f.iter().collect::<Vec<_>>()).collect::<Vec<_>>()}),
+        )?;
+        Ok((basis, prep.checked_add(ns(start)).ok_or("setup overflow")?))
+    }
+    fn sample(
+        &self,
+        a: Arm,
+        input: &Path,
+        out: &Path,
+        n: usize,
+        reference: &Basis,
+        input_hash: &str,
+    ) -> Result<Sample> {
+        let start = Instant::now();
+        let (status, bytes, _) = self.process(
+            &self.worker,
+            &[
+                arm_name(a).into(),
+                "--degree-cap".into(),
+                "12".into(),
+                "--deadline-ms".into(),
+                "10000".into(),
+            ],
+            Some(&input.join("system.json")),
+            out,
+        )?;
+        let value: Value = serde_json::from_slice(&bytes)?;
+        let complete = status.success()
+            && value["status"] == "complete"
+            && value["basis"].as_array().is_some_and(|a| !a.is_empty());
+        let worker_wall_ns = ns(start);
+        let validation = Instant::now();
+        let basis = if complete {
+            native_basis(&value["basis"], n).ok()
+        } else {
+            None
+        };
+        let equal = basis.as_ref().is_some_and(|b| b == reference);
+        let basis_sha256 = basis.as_ref().map(basis_hash).unwrap_or_default();
+        let external_basis_sha256 = basis_hash(reference);
+        let validation_wall_ns = ns(validation).max(1);
+        save(
+            &out.with_extension("call.json"),
+            &json!({"arm":a,"complete":complete,"mature_basis_equal":equal,"worker_wall_ns":worker_wall_ns,"validation_wall_ns":validation_wall_ns,"basis_sha256":basis_sha256,"reference_basis_sha256":external_basis_sha256,"worker_output":value}),
+        )?;
+        if !complete || !equal {
+            return Err(format!("{} incomplete or mature basis mismatch", arm_name(a)).into());
+        }
+        Ok(Sample {
+            arm: a,
+            complete: true,
+            input_sha256: input_hash.into(),
+            worker_sha256: self.worker_hash.clone(),
+            validation_input_sha256: input_hash.into(),
+            worker_wall_ns,
+            validation_wall_ns,
+            basis_sha256,
+            external_basis_sha256,
+        })
+    }
+}
+fn run(
+    prepared: &Path,
+    out: &Path,
+    worker: PathBuf,
+    singular: PathBuf,
+    msolve: PathBuf,
+    cpu: String,
+) -> Result<()> {
+    let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
+    let qualification = manifest["mode"] == "qualification";
+    if !qualification && manifest["mode"] != "pilot" {
+        return Err("unknown prepared mode".into());
+    }
+    let worker_hash = file_hash(&worker)?;
+    let singular_hash = file_hash(&singular)?;
+    let msolve_hash = file_hash(&msolve)?;
+    fs::create_dir(out)?;
+    let mut runner = Runner {
+        worker,
+        singular,
+        msolve,
+        cpu,
+        worker_hash,
+        global: Instant::now(),
+        case: Instant::now(),
+    };
+    save(
+        &out.join("pre-call.json"),
+        &json!({"schema":"local-compact-run/v1","mode":manifest["mode"],"prepared_manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"adapter_sha256":file_hash(&std::env::current_exe()?)?,"worker_sha256":runner.worker_hash,"singular_sha256":singular_hash,"msolve_sha256":msolve_hash,"cpu":runner.cpu,"backend":"local L0; no exclusive-core/L2 claim","checkpoint":"waived by user in this thread","cpuinfo":fs::read_to_string("/proc/cpuinfo")?}),
+    )?;
+    let mut summaries = Vec::new();
+    for item in manifest["cases"].as_array().ok_or("missing cases")? {
+        let id = item["id"].as_str().ok_or("missing id")?;
+        let input = prepared.join(id);
+        let dir = out.join(id);
+        fs::create_dir(&dir)?;
+        runner.case = Instant::now();
+        let mut transcript = None;
+        let outcome = (|| -> Result<Value> {
+            let bytes = fs::read(input.join("system.json"))?;
+            let input_hash = hash(&bytes);
+            if Some(input_hash.as_str()) != item["input_sha256"].as_str() {
+                return Err("changed prepared input".into());
+            }
+            let s: System = serde_json::from_slice(&bytes)?;
+            let n = s.variables.len();
+            let (reference, setup) = runner.references(
+                &input,
+                &dir,
+                &s,
+                item["preparation_ns"]
+                    .as_u64()
+                    .ok_or("missing preparation cost")?,
+            )?;
+            transcript = Some(Case {
+                schema: "compact-speed-transcript/v1".into(),
+                prime: P,
+                variables: n,
+                seed: item["seed"].as_u64().ok_or("missing seed")?,
+                input_sha256: input_hash.clone(),
+                worker_sha256: runner.worker_hash.clone(),
+                reference_basis_sha256: basis_hash(&reference),
+                setup_wall_ns: setup,
+                warmups: Vec::new(),
+                aa_pairs: std::array::from_fn(|_| Vec::new()),
+                blocks: Vec::new(),
+            });
+            let case = transcript.as_mut().unwrap();
+            for a in ARMS {
+                case.warmups.push(runner.sample(
+                    a,
+                    &input,
+                    &dir.join(format!("warmup-{}", arm_name(a))),
+                    n,
+                    &reference,
+                    &input_hash,
+                )?);
+            }
+            if qualification {
+                return Ok(json!({"id":id,"status":"qualification_complete","ratios":null}));
+            }
+            for (i, a) in ARMS.iter().enumerate() {
+                for j in 0..7 {
+                    let left = runner.sample(
+                        *a,
+                        &input,
+                        &dir.join(format!("aa-{}-{j}-0", arm_name(*a))),
+                        n,
+                        &reference,
+                        &input_hash,
+                    )?;
+                    let right = runner.sample(
+                        *a,
+                        &input,
+                        &dir.join(format!("aa-{}-{j}-1", arm_name(*a))),
+                        n,
+                        &reference,
+                        &input_hash,
+                    )?;
+                    case.aa_pairs[i].push([left, right]);
+                }
+                let aa = aa_control(*a, &case.aa_pairs[i], setup)?;
+                save(&dir.join(format!("aa-{}.json", arm_name(*a))), &aa)?;
+                if !aa.admitted {
+                    return Err(format!("{} A/A rejected", arm_name(*a)).into());
+                }
+            }
+            for i in 0..21 {
+                let mut block = Vec::new();
+                for c in ORDERS[i % 6].chars() {
+                    let a = match c {
+                        'F' => Arm::F4,
+                        'E' => Arm::Certified,
+                        _ => Arm::Compact,
+                    };
+                    block.push(runner.sample(
+                        a,
+                        &input,
+                        &dir.join(format!("block-{i}-{}", arm_name(a))),
+                        n,
+                        &reference,
+                        &input_hash,
+                    )?);
+                }
+                case.blocks.push(block);
+            }
+            let report = analyze(case);
+            let tenfold = report.comparisons.as_ref().is_some_and(|v| {
+                v.iter()
+                    .all(|c| c.full_cost.adjusted_lower_1_over_720 > 10.)
+            });
+            save(&dir.join("analysis.json"), &report)?;
+            Ok(
+                json!({"id":id,"status":report.status,"conditional_numerical_15x":report.numerical_rule_passes,"conditional_numerical_10x":tenfold,"comparisons":report.comparisons,"setup_wall_ns":setup}),
+            )
+        })();
+        if let Some(case) = transcript {
+            save(&dir.join("transcript.json"), &case)?;
+        }
+        let summary = match outcome {
+            Ok(s) => s,
+            Err(e) => {
+                json!({"id":id,"status":"case_failed","reason":e.to_string(),"missing_remainder":"not replaced","comparisons":null})
+            }
+        };
+        save(&dir.join("outcome.json"), &summary)?;
+        println!("{id}: {}", summary["status"]);
+        summaries.push(summary);
+    }
+    let unchanged = file_hash(&runner.worker)? == runner.worker_hash
+        && file_hash(&runner.singular)? == singular_hash
+        && file_hash(&runner.msolve)? == msolve_hash;
+    save(
+        &out.join("summary.json"),
+        &json!({"schema":"local-compact-summary/v1","mode":manifest["mode"],"identities_unchanged":unchanged,"scope":"unsigned producer L0 exploration; not formal protocol admission, independent replay or fresh family confirmation","cases":summaries}),
+    )?;
+    if !unchanged {
+        return Err("executable identity changed during run".into());
+    }
+    Ok(())
+}
+fn main() -> Result<()> {
+    let a: Vec<_> = std::env::args().collect();
+    match a.get(1).map(String::as_str){
+    Some("prepare")if a.len()==4=>prepare(Path::new(&a[2]),&a[3]),
+    Some("run")if a.len()==8=>run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),a[7].clone()),
+    _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn exact_signed_singular_and_msolve_agree() {
+        let s = singular_basis("POLY\nTERM:1:1,0\nTERM:-1:0,0\nENDPOLY\nDONE", 2).unwrap();
+        let m = msolve_basis("[1*x1^1+2147483646]:", &["x1".into(), "x2".into()]).unwrap();
+        assert_eq!(s, m);
+    }
+    #[test]
+    fn incomplete_and_duplicate_cas_outputs_rejected() {
+        for s in [
+            "POLY\nTERM:1:1,0\nENDPOLY",
+            "POLY\nTERM:1:1,0\nTERM:2:1,0\nENDPOLY\nDONE",
+            "DONE",
+        ] {
+            assert!(singular_basis(s, 2).is_err());
+        }
+        assert!(msolve_basis("[1*x1^1+2*x1^1]:", &["x1".into()]).is_err());
+    }
+    #[test]
+    fn native_shape_residue_and_duplicate_rejected() {
+        assert!(native_basis(&json!([[[[1, 0], 1], [[1, 0], 2]]]), 2).is_err());
+        assert!(native_basis(&json!([[[[1], P]]]), 1).is_err());
+        assert!(native_basis(&json!([]), 2).is_err());
+    }
+}
