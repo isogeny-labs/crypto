@@ -225,10 +225,21 @@ mod tests {
     }
 
     #[test]
-    fn b4_exact_curve_support_is_never_larger_than_integer_ceiling() {
+    fn b4_b8_exact_curve_support_matches_independent_reference() {
         let mut ar = Arithmetic::default();
         check_curve(PRIME31, &mut ar).unwrap();
-        let row = census(4, &mut ar);
-        assert!(row["distinct_prime31_group_targets_including_identity"].as_u64().unwrap() <= 2_241);
+        let points = first_rational_points(&mut ar, 8);
+        assert_eq!(points, vec![
+            (0, 309_380_359), (1, 749_117_756),
+            (2, 51_658_786), (3, 166_645_833),
+            (5, 457_995_111), (6, 865_603_774),
+            (8, 849_737_830), (9, 548_858_265)
+        ]);
+        let b4 = census(4, &mut ar);
+        let b8 = census(8, &mut ar);
+        assert_eq!(b4["distinct_prime31_group_targets_including_identity"].as_u64(), Some(2_241));
+        assert_eq!(b8["distinct_prime31_group_targets_including_identity"].as_u64(), Some(187_137));
+        // Injective map from net signed signatures to group elements on
+        // these fixed B4/B8 sets. This is NOT uniqueness of raw eight-words.
     }
 }
