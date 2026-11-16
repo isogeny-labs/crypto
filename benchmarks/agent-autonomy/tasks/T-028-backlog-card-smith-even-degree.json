@@ -1,0 +1,39 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-028",
+  "title": "Turn an open thread into a valid backlog card",
+  "class": "docs-tooling",
+  "difficulty": 2,
+  "source": [
+    "backlog/README.md",
+    "backlog/schema/card.v1.json",
+    "docs/session-logs/2026-11-14.md (Smith near-prime census: open threads)",
+    "research/smith_near_prime_20261114/RESULTS.md"
+  ],
+  "prompt": "The 2026-11-14 session log ends the Smith near-prime census with an open thread: even-degree models (`deg f = 8`) were not measured. Write that thread up as a backlog card for someone else to run, following `backlog/README.md`: scaffold it with the `backlog` tool, fill the card and its README (question, decision value, cost derivation, what done means), and validate it. The card is not to be run now.",
+  "setup": "Fresh checkout. Build `cargo build --release --bin backlog` if needed.",
+  "acceptance": [
+    "backlog/XP-<date>-smith-*even*/card.json and README.md exist",
+    "`target/release/backlog validate <ID> --no-git` exits 0 for the new card",
+    "decision_value names which result would change which decision",
+    "no other card or file under backlog/ changed"
+  ],
+  "check_command": "ID=$(ls -d backlog/XP-*smith*even* 2>/dev/null | head -1 | xargs -r basename); [ -n \"$ID\" ] && ./target/release/backlog validate \"$ID\" --no-git && test -s backlog/$ID/README.md && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vc \"^backlog/$ID/\")\" = 0 ]",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "running the experiment",
+    "editing the schema to fit the card"
+  ],
+  "max_wall_minutes": 35,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [
+    "cargo"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Real open thread (2026-11-14 23:40Z entry). The slug is not fixed by the prompt, so the check globs smith + even."
+}

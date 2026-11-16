@@ -1,0 +1,37 @@
+name: CT116 cross-characteristic orbit-index audit
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct116/**'
+      - '.github/workflows/ct116-orbit-index.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct116/**'
+      - '.github/workflows/ct116-orbit-index.yml'
+  workflow_dispatch:
+jobs:
+  ct116:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct116
+      - name: Independently verify full toy orbit lookup and BSGS control
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct116
+          python3 -B "$D/ct116_orbit_index.py" > /tmp/ct116-py.json
+          python3 -O -B "$D/ct116_orbit_index.py" > /tmp/ct116-pyopt.json
+          node "$D/ct116_orbit_index_independent.js" > /tmp/ct116-js.json
+          node --no-opt "$D/ct116_orbit_index_independent.js" > /tmp/ct116-jsopt.json
+          cmp /tmp/ct116-py.json /tmp/ct116-pyopt.json
+          cmp /tmp/ct116-py.json /tmp/ct116-js.json
+          cmp /tmp/ct116-py.json /tmp/ct116-jsopt.json
+          printf '%s  %s\n' e356ec49a6c53a942fa617b1d199e368c000e213c94c2b056448298979eac997 /tmp/ct116-py.json | sha256sum -c
+          cat /tmp/ct116-py.json

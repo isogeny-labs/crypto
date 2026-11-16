@@ -1,0 +1,46 @@
+{
+  "schema": "general-three-torsion-verification/v1",
+  "source_commit": "0b4d20738e627f3f29ba8b5ee86765cad59cf353",
+  "source_plan": "sources.json",
+  "claim_id": "PCC-20261112-1c1db4",
+  "declaration_sha256": "bc2b6a00543ebea346b7104d0f7ae8b394f450e7644277c7d8c960e168630793",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 11,
+  "actual_verdict": {
+    "claim_id": "PCC-20261112-1c1db4",
+    "claim_sha256": "d70c2f671c575dbb53f8448d5ab9d227b8c14b6666b8de5a873b288d672f7b7e",
+    "commit": "0b4d20738e627f3f29ba8b5ee86765cad59cf353",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/three_torsion_rank_audit_20261112/lean (GeometricCardinality.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-12T23:28:09Z",
+    "verifier_host": "2d18c814bc7e"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261112-1c1db4",
+    "claim_sha256": "d70c2f671c575dbb53f8448d5ab9d227b8c14b6666b8de5a873b288d672f7b7e",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/proof-20261112/report.pdf",
+    "pages": 1,
+    "bytes": 24476,
+    "sha256": "ac2f460b2ec8aa79726ca57ce0ff8b07022c2208b68c8fb21774d2267f510da9",
+    "all_pages_visually_inspected": true
+  },
+  "scope": "Every shortWeierstrass y\u00b2=x\u00b3+ax+b over an algebraically closed field with2ne0/3ne0 and4a\u00b3+27b\u00b2ne0 has exactlynine actual Mathlib points killedby3, via an explicit identity-plus-rootfibres equivalence. No generic rank/basis/Hasse/pairing premise. All-prime rank, Frobenius determinant, fullBK and p500census remain open.",
+  "assumed_generic_rank_or_basis": false,
+  "native_experiment": false,
+  "paid_compute": 0
+}

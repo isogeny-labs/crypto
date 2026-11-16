@@ -1,0 +1,37 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m13-t181-515ee569 | 10.97 | da-f4 | 30/30 | 15.125 | 1568.321 | 15547.084 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rf-mitm | 30/30 | 41.902 | 44.920 | 72.086 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rf-pairs | 30/30 | 310.163 | 338.085 | 589.381 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-strong | 30/30 | 14.399 | 14.643 | 16.841 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-strong-aa | 30/30 | 14.399 | 14.643 | 16.841 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | da-f4 | 30/30 | 11.326 | 200.669 | 1904.757 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rf-mitm | 30/30 | 50.416 | 55.144 | 97.691 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rf-pairs | 30/30 | 727.745 | 795.768 | 1407.979 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-strong | 30/30 | 4.160 | 4.327 | 5.835 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-strong-aa | 30/30 | 4.160 | 4.327 | 5.835 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m13-t181-515ee569 | da-f4 vs rf-mitm | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | da-f4 vs rf-pairs | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | da-f4 vs rho-strong | rho-strong < da-f4 |
+| icv1-f2m13-t181-515ee569 | da-f4 vs rho-strong-aa | rho-strong-aa < da-f4 |
+| icv1-f2m13-t181-515ee569 | rf-mitm vs rf-pairs | rf-mitm < rf-pairs |
+| icv1-f2m13-t181-515ee569 | rf-mitm vs rho-strong | rho-strong < rf-mitm |
+| icv1-f2m13-t181-515ee569 | rf-mitm vs rho-strong-aa | rho-strong-aa < rf-mitm |
+| icv1-f2m13-t181-515ee569 | rf-pairs vs rho-strong | rho-strong < rf-pairs |
+| icv1-f2m13-t181-515ee569 | rf-pairs vs rho-strong-aa | rho-strong-aa < rf-pairs |
+| icv1-f2m13-t181-515ee569 | rho-strong vs rho-strong-aa | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | da-f4 vs rf-mitm | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | da-f4 vs rf-pairs | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | da-f4 vs rho-strong | rho-strong < da-f4 |
+| icv1-f2m17-tm101-00378d4e | da-f4 vs rho-strong-aa | rho-strong-aa < da-f4 |
+| icv1-f2m17-tm101-00378d4e | rf-mitm vs rf-pairs | rf-mitm < rf-pairs |
+| icv1-f2m17-tm101-00378d4e | rf-mitm vs rho-strong | rho-strong < rf-mitm |
+| icv1-f2m17-tm101-00378d4e | rf-mitm vs rho-strong-aa | rho-strong-aa < rf-mitm |
+| icv1-f2m17-tm101-00378d4e | rf-pairs vs rho-strong | rho-strong < rf-pairs |
+| icv1-f2m17-tm101-00378d4e | rf-pairs vs rho-strong-aa | rho-strong-aa < rf-pairs |
+| icv1-f2m17-tm101-00378d4e | rho-strong vs rho-strong-aa | unresolved inside the band |

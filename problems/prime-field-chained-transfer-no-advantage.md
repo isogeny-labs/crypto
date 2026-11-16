@@ -233,11 +233,11 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 
 ## Whole-Jacobian IC, open case O3 (2026-11-13 addendum)
 
-`research/full_jacobian_ic_20261113/RESULTS.md` [pcc:unverified]; not validated.
+`research/full_jacobian_ic_20261113/RESULTS.md` [pcc:unverified]; admitted with caveats by `research/validation_20261114/` (2026-11-14, `VALIDATION.json`), with eight reporting errors corrected in its `ERRATA.md` and the verdict unchanged.
 - **Setup.** Gaudry-style IC on the whole `J_C(F_p)` with full relations (A) and with double large primes (B), plus the subgroup-restricted controls, at p = 211 to 51,203. Protocol frozen before data.
 - **Result.** All 36 IC cells (four arms, nine primes) are above the negation rho on `E1` at the band and at the calibrated reading. At w = 0.1, A and B cost 406 to 7.5e6 times rho.
 - **Verdict.** Unresolved under the frozen rule, because the slope-CI condition fails (lower bounds −0.07 for A and −0.65 for B). Rho costs about √r, and the selection let r vary from 71 to 3191 independently of p.
-- **Next step.** A decisive rerun freezes r ≈ p.
+- **Next step.** The rerun with r ≥ 0.4p is frozen in `research/full_jacobian_ic_rp_20261114/PROTOCOL.md`. It has not run, because the S3 checkpoint gate has no credentials here, so there is no new measurement.
 
 ## Resolution and history
 
@@ -258,4 +258,5 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - 2026-11-12: proof note added; ATLAS iff narrowed to only-if.
 - 2026-11-13: instrument-fix addendum; the recorded gaps were understated.
 - 2026-11-13: validation addendum; small_de admitted, three targets not (rho reference).
+- 2026-11-14: O3 run admitted with caveats; r ≈ p rerun protocol frozen, not run.
 - 2026-11-13: negation re-measurement addendum.

@@ -1,0 +1,51 @@
+# Full counted n = 3 IC vs store-all +- rho (unit: F_p mult; I = 3M; Z_r mult = 1M)
+
+| p | log2 r | curves/targets | rho steps | rho M-eq | IC trials (all) | rels | M-eq per trial | IC M-eq (all) | gap all | gap 2lp:B | gap 1lp:B | gap all, Zr=9M |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 31 | 14.9 | 4/8 | 155 | 6.96e+03 | 141 | 15 | 1.8e+05 | 2.54e+07 | 3647 | 3818 | censored 3 | 3647 |
+| 67 | 18.2 | 4/8 | 485 | 2.18e+04 | 246 | 30 | 1.93e+05 | 4.74e+07 | 2174 | 2455 | censored 1 | 2174 |
+| 127 | 21.0 | 4/8 | 1296 | 5.83e+04 | 450 | 56 | 2.01e+05 | 9.03e+07 | 1549 | 1605 | 2377 | 1549 |
+| 251 | 23.9 | 4/8 | 3927 | 1.77e+05 | 866 | 109 | 2.07e+05 | 1.8e+08 | 1017 | 1101 | censored 2 | 1017 |
+| 503 | 26.9 | 4/8 | 11394 | 5.13e+05 | 1495 | 224 | 2.16e+05 | 3.24e+08 | 631 | 715 | 1098 | 631 |
+| 1019 | 30.0 | 4/8 | 24949 | 1.12e+06 | 2815 | 471 | 2.24e+05 | 6.32e+08 | 563 | 642 | censored 2 | 564 |
+| 2039 | 33.0 | 4/8 | 80252 | 3.61e+06 | 5799 | 932 | 2.31e+05 | 1.34e+09 | 370 | 415 | 665 | 372 |
+| 4091 | 36.0 | 4/8 | 217634 | 9.79e+06 | 11281 | 1897 | 2.38e+05 | 2.69e+09 | 274 | 309 | 489 | 279 |
+
+## Breakdown, mode all (share of IC M-eq; per-trial M-eq)
+
+| p | walk | build | f4 | multmatrix | wiedemann | rootfind | eigen | post | la | decomposition per solver call | la (Wiedemann est.) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 31 | 0.0% | 0.9% | 22.7% | 0.5% | 55.5% | 1.5% | 18.8% | 0.1% | 0.0% | 1.82e+05 | 2.03e+03 (0.01%) |
+| 67 | 0.0% | 0.8% | 22.1% | 0.4% | 53.1% | 3.8% | 19.6% | 0.1% | 0.0% | 1.93e+05 | 8.21e+03 (0.02%) |
+| 127 | 0.0% | 0.8% | 21.5% | 0.4% | 51.1% | 6.6% | 19.5% | 0.1% | 0.0% | 2.01e+05 | 2.82e+04 (0.03%) |
+| 251 | 0.0% | 0.8% | 20.9% | 0.3% | 49.4% | 9.3% | 19.1% | 0.1% | 0.0% | 2.07e+05 | 1.08e+05 (0.06%) |
+| 503 | 0.0% | 0.7% | 20.1% | 0.3% | 47.3% | 11.9% | 19.4% | 0.2% | 0.0% | 2.16e+05 | 4.59e+05 (0.14%) |
+| 1019 | 0.0% | 0.7% | 19.5% | 0.3% | 45.6% | 14.3% | 19.3% | 0.2% | 0.0% | 2.24e+05 | 2.04e+06 (0.32%) |
+| 2039 | 0.0% | 0.7% | 18.9% | 0.3% | 44.4% | 16.7% | 18.7% | 0.2% | 0.1% | 2.3e+05 | 7.97e+06 (0.60%) |
+| 4091 | 0.0% | 0.7% | 18.4% | 0.3% | 43.0% | 18.8% | 18.4% | 0.2% | 0.2% | 2.38e+05 | 3.3e+07 (1.23%) |
+
+## Fits (log2 of quantity vs log2 r; OLS over curves; 95% t intervals)
+
+- gap all: slope -0.172 (95% CI -0.195 .. -0.149), n = 32
+- gap 2lp:B: slope -0.167 (95% CI -0.190 .. -0.144), n = 32
+- gap 1lp:B: slope -0.152 (95% CI -0.177 .. -0.127), n = 25
+- gap all, Zr=9M: slope -0.171 (95% CI -0.194 .. -0.148), n = 32
+- rho M-eq: slope +0.495 (95% CI +0.480 .. +0.510), n = 32
+- IC all M-eq: slope +0.323 (95% CI +0.309 .. +0.337), n = 32
+- IC all trials: slope +0.305 (95% CI +0.290 .. +0.321), n = 32
+- IC all phase walk: slope +0.305 (95% CI +0.290 .. +0.321), n = 32
+- IC all phase build: slope +0.306 (95% CI +0.290 .. +0.321), n = 32
+- IC all phase f4: slope +0.309 (95% CI +0.294 .. +0.324), n = 32
+- IC all phase multmatrix: slope +0.285 (95% CI +0.270 .. +0.300), n = 32
+- IC all phase wiedemann: slope +0.306 (95% CI +0.291 .. +0.321), n = 32
+- IC all phase rootfind: slope +0.484 (95% CI +0.458 .. +0.510), n = 32
+- IC all phase eigen: slope +0.319 (95% CI +0.309 .. +0.328), n = 32
+- IC all phase post: slope +0.386 (95% CI +0.384 .. +0.389), n = 32
+- IC all phase la: slope +0.684 (95% CI +0.646 .. +0.721), n = 32
+- decomposition M-eq per trial (all): slope +0.018 (95% CI +0.016 .. +0.019), n = 32
+- gap all, p >= 251 only: slope -0.150 (95% CI -0.186 .. -0.114), n = 20
+
+## Parity extrapolation of the gap fit (mode all)
+
+- all sizes: gap(log2) = 14.19 -0.1716 * log2 r; parity at log2 r = 83; bootstrap slope 95% [-0.1958, -0.1489]; parity 95% [76, 91] (median 83); share of bootstrap slopes >= 0: 0.000
+- p >= 251: gap(log2) = 13.50 -0.1496 * log2 r; parity at log2 r = 90; bootstrap slope 95% [-0.1840, -0.1188]; parity 95% [79, 106] (median 90); share of bootstrap slopes >= 0: 0.000

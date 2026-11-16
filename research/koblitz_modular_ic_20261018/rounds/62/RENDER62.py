@@ -1,0 +1,146 @@
+"""Render recorded rows and their counts only; no field algebra or new trials."""
+from pathlib import Path
+import json,csv,collections
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import typst
+h=Path(__file__).resolve().parent
+result=json.loads((h/'results.json').read_text())
+rows=list(csv.DictReader((h/'runs/split62-02/split62.tsv').open(),delimiter='|'))
+families=['basis','control','cubic','mixed']
+totals=collections.Counter(r['family'] for r in rows)
+zeros=collections.Counter(r['family'] for r in rows if r['zero_odd']=='1')
+data={'source':'runs/split62-02/split62.tsv','rows':len(rows),'families':[{'family':f,'functions':totals[f],'zero_odd':zeros[f]} for f in families]}
+(h/'plot-data62.json').write_text(json.dumps(data,indent=2)+'\n')
+fig,ax=plt.subplots(figsize=(8.3,3.1));xs=list(range(4))
+ax.bar([x-.18 for x in xs],[totals[f] for f in families],width=.36,label='Complete cohort',color='#205984')
+ax.bar([x+.18 for x in xs],[zeros[f] for f in families],width=.36,label='Zero odd output',color='#d38127')
+for x,f in zip(xs,families):
+ ax.text(x-.18,totals[f]+4,str(totals[f]),ha='center',fontsize=9)
+ ax.text(x+.18,zeros[f]+4,str(zeros[f]),ha='center',fontsize=9)
+ax.set_xticks(xs,families);ax.set_ylabel('Number of source functions');ax.set_ylim(0,365)
+ax.legend(frameon=False);ax.set_title('All 435 source functions retained (split62-02)')
+fig.tight_layout();fig.savefig(h/'cohort62.svg');plt.close(fig)
+kernel_rows=[]
+for receipt in result['runs']:
+ if receipt['status']=='accepted':
+  for line in receipt.get('native_results',[]):
+   if line.startswith('KERNEL62_RESULT '):
+    kernel_rows.append(dict(part.split('=',1) for part in line.split()[1:]))
+assert len(kernel_rows)==2
+kernel_by_family={r['family']:r for r in kernel_rows}
+data['complete_square_kernels']=kernel_rows
+(h/'plot-data62.json').write_text(json.dumps(data,indent=2)+'\n')
+fig,ax=plt.subplots(figsize=(8.3,2.5))
+labels=['mixed','cubic'];xi=list(range(2))
+ax.bar([x-.18 for x in xi],[zeros[f] for f in labels],width=.36,label='Individual zero odd columns',color='#d38127')
+ax.bar([x+.18 for x in xi],[int(kernel_by_family[f]['square_dimension']) for f in labels],width=.36,label='Complete F2 kernel dimension',color='#205984')
+for x,f in zip(xi,labels):
+ ax.text(x-.18,zeros[f]+.3,str(zeros[f]),ha='center',fontsize=9)
+ ax.text(x+.18,int(kernel_by_family[f]['square_dimension'])+.3,kernel_by_family[f]['square_dimension'],ha='center',fontsize=9)
+ax.set_xticks(xi,['Mixed (all76 columns)','Cubic (all324 columns)']);ax.set_ylabel('Dimension / column count');ax.set_title('Full combinations versus individual zero outputs')
+ax.set_ylim(0,max(int(r['square_dimension']) for r in kernel_rows)*1.3+2);ax.legend(frameon=False,fontsize=8);fig.tight_layout();fig.savefig(h/'kernels62.svg');plt.close(fig)
+diagram='<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="155" viewBox="0 0 1000 155"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#205984"/></marker></defs><g fill="none" stroke="#205984" stroke-width="2" marker-end="url(#arrow)"><path d="M145,76 L190,38"/><path d="M145,76 L190,114"/><path d="M355,38 L405,76"/><path d="M355,114 L405,76"/><path d="M575,76 H625"/><path d="M800,76 H845"/></g><g fill="#eef5fa" stroke="#205984" stroke-width="1.5"><rect x="5" y="48" width="140" height="55" rx="6"/><rect x="190" y="10" width="165" height="55" rx="6"/><rect x="190" y="86" width="165" height="55" rx="6"/><rect x="405" y="48" width="170" height="55" rx="6"/><rect x="625" y="48" width="175" height="55" rx="6"/><rect x="845" y="48" width="150" height="55" rx="6"/></g><g font-family="sans-serif" font-size="15" text-anchor="middle" fill="#17384c"><text x="75" y="71">Actual R61 field</text><text x="75" y="91">degree 32</text><text x="272" y="33">Squared-basis inverse</text><text x="272" y="53">32 by 32</text><text x="272" y="109">Generator formula</text><text x="272" y="129">pair arithmetic</text><text x="490" y="71">435 source identities</text><text x="490" y="91">870 roots compared</text><text x="712" y="71">Complete binary kernels</text><text x="712" y="91">76 / 324 inputs</text><text x="920" y="71">Explicit root bases</text><text x="920" y="91">dimensions 10 / 128</text></g></svg>'
+(h/'pipeline62.svg').write_text(diagram+'\n')
+status=collections.Counter(r['status'] for r in result['runs'])
+table=[]
+for r in result['runs']:
+ wall=str(r.get('native_wall_seconds','not recorded'))
+ table.append('['+r['attempt'].replace('-','‑')+'], ['+r['status']+'], ['+wall+'],')
+text='''#set page(paper: "a4", margin: 16mm)
+#set text(size: 10pt)
+#set heading(numbering: none)
+= R62: complete square decomposition and generator route
+Exact Koblitz modular-carrier field construction. Source field: the retained
+R61 degree32 extension of F2(u), with generators lambda and v. These are
+whole-source identities, with no scalar-fiber or series approximation.
+
+== Recorded computation
+The matrix construction binds all32 standard monomials and squared columns
+and checks both inverse products. The repaired complete cohort checks435
+whole-source decompositions and13920 rational coefficient parity identities.
+The fresh source replay reloads every input and root, binds all435 functions
+to R61 and rechecks the complete operator and negative controls.
+
+#image("cohort62.svg", width: 100%)
+Recorded counts from split62-02; all435 rows, seed62, one exact source instance.
+Zero odd components are field-operator outputs. Their complete supported
+divisors and global differential regularity are separate obligations.
+
+== Terminal receipts
+#table(columns: (2fr,1fr,1.4fr), inset: 4pt,
+[Attempt], [Status], [Native wall seconds],
+'''+ '\n'.join(table)+'''
+)
+Wall times are native receipt intervals, not controlled performance comparisons.
+Lean compile and audit intervals were not recorded by the proof driver.
+
+#image("pipeline62.svg", width: 100%)
+Source identities, complete kernels and roots are separately checked stages.
+
+#pagebreak()
+= Complete square subspaces and generator route
+#image("kernels62.svg", width: 100%)
+All76mixed and324cubic functions are retained in the complete F2 kernel.
+Native checked denominator clearing and binary row reconstruction precede
+rank/nullspace computation; every resulting root is checked in the full source.
+The independent Rust checker replays both full binary matrices and kernels.
+
+== Direct generator route and proof scope
+For a grouped characteristic-two source polynomial,
+$ P(t)=a^2+u b^2+t c^2+u t d^2 $.
+Put $q=c^2+u d^2$.
+With $P(t)=0$ and a checked nonzero derivative/inverse,
+$ t=((a c+u b d)/q)^2+u((a d+b c)/q)^2. $
+The direct route uses pair arithmetic rather than reading the squared-basis
+matrix. It checks the actual source grouping, derivative inverse, both
+source generators, all32 generated basis pairs and all435 functions, and
+compares870 roots with the matrix output. The rational scalar parity helper
+is shared; this is not a separately implemented scalar parity algorithm.
+
+== Lean statements
+The pinned Lean4.34.1/mathlib d13f23b toolchain checks twelve authored
+claims: rational parity, uniqueness under nonsquare-u and characteristic-two
+premises, the zero-odd square criterion, five cyclic5 norm/projector/control
+claims, three pair arithmetic identities and the generator formula. Native
+field/model and nonsquare-parameter inputs, normality, local valuations,
+complete holomorphic regularity, actual deck/Cartier action and target-factor
+action are not inferred from these abstract implications.
+
+== Failures retained
+The first complete435 attempt used unsupported ideal equality and is rejected
+in full despite a late marker. The first Lean compile failed on a lemma name
+and numeral-cast normalization; the second lacked a Ring tactic import.
+Both artifacts are rejected. All later failures,
+if present, are listed in results.json with their actual errors. An early
+raw-index mistake was corrected without deleting local bytes or rewriting
+Git history. Accepted producers were not repeated for publication.
+
+== Scaling and next construction
+GENERATOR-LEAD62.md and SCALE112-DESIGN62.md bind the proposed larger rung
+to the marked23 degree7 base followed by the degree16 lambda extension.
+The larger field has degree112;991 denotes the selected factor action.
+Next: apply the generator operator to this exact larger source and complete
+the normal-order/infinity bridge needed for the full61-dimensional
+holomorphic space. Unit divisors/saturation, actual primitive cyclic block,
+Hecke/order11 action, proper polarization, quotient saturation and arbitrary
+reverse divisors retain their separate obligations.
+
+== Reproduction and provenance
+PROTOCOL.md, protocol.json, donors.json and per-attempt source revisions
+freeze the affected inputs before data. results.json verifies historical
+source bytes. Native limits:1200seconds,4GiB virtual, one Singular/FLINT
+thread, seed62, one math job. Lean:1200seconds separately per compile/audit,
+CPU0, -j1 -M4096, unlimited virtual address space. No timing claim.
+
+Sources: R61/SQUARE-DECOMPOSITION61.md; R52/CM.md;
+#link("https://www.singular.uni-kl.de/index.php/singular.pdf")[Singular manual].
+'''
+for old,new in [('all32','all 32'),('all435','all 435'),('all76mixed','all 76 mixed'),('324cubic','324 cubic'),('complete435','complete 435'),('13920','13,920'),('compares870','compares 870'),('Lean4.34.1','Lean 4.34.1'),('degree7','degree 7'),('degree16','degree 16'),('degree112','degree 112'),('full61','full 61'),('Hecke/order11','Hecke/order-11'),('limits:1200','limits: 1200'),('Lean:1200','Lean: 1200'),('4GiB','4 GiB'),('seconds,4','seconds, 4'),('all76','all 76')]:
+ text=text.replace(old,new)
+(h/'report.typ').write_text(text.rstrip()+'\n')
+for name in ['cohort62.svg','kernels62.svg','pipeline62.svg']:
+ path=h/name;path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
+typst.compile(str(h/'report.typ'),output=str(h/'report.pdf'))
+print(json.dumps({'attempts':len(result['runs']),'status':dict(status),'cohort':data}))

@@ -87,15 +87,24 @@ struct Cli {
     /// Print a machine-readable JSON report, without progress text.
     #[arg(long, global = true)]
     json: bool,
-    /// Trace index-calculus stages and individual trials as they finish (suppressed by --json).
-    #[arg(short, long, global = true)]
-    verbose: bool,
+    /// Live stages and relations; -vv adds point coordinates, -vvv includes unsuccessful attempts. Suppressed by --json.
+    #[arg(short, long, global = true, action = clap::ArgAction::Count)]
+    verbose: u8,
     /// Write the JSON report to a new file; existing files are never overwritten.
     #[arg(long, global = true)]
     out: Option<PathBuf>,
     /// Publish --out through the configured artifact store under a new logical name.
     #[arg(long, global = true, requires = "out")]
     store_name: Option<String>,
+    /// GPU offload: off (default), auto (discover workers) or a worker executable. Every offloaded
+    /// result is re-verified on the CPU and a worker failure falls back to the CPU path.
+    #[arg(
+        long,
+        global = true,
+        value_name = "off|auto|WORKER",
+        default_value = "off"
+    )]
+    gpu: String,
 }
 #[derive(Subcommand)]
 #[allow(clippy::large_enum_variant)]
@@ -746,8 +755,21 @@ fn display(report: &Value) {
 }
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    match crypto_lib::cryptanalysis::gpu_offload::GpuMode::parse(&cli.gpu) {
+        Ok(mode) => crypto_lib::cryptanalysis::gpu_offload::set_mode(mode),
+        Err(message) => {
+            eprintln!("ic: {message}");
+            return ExitCode::FAILURE;
+        }
+    }
     // Generated parameters stay directly importable even with a global -v.
-    progress::init(cli.verbose && !cli.json && !matches!(cli.command, Some(Action::Generate(_))));
+    progress::init(
+        if cli.json || matches!(cli.command, Some(Action::Generate(_))) {
+            0
+        } else {
+            cli.verbose
+        },
+    );
     progress::line(format_args!(
         "startup: capturing executable and source provenance"
     ));
@@ -798,6 +820,9 @@ fn main() -> ExitCode {
             "arch":std::env::consts::ARCH,"binary_blake3":binary_hash(),"git_commit":git_commit(),
             "git_dirty":crypto_lib::build_provenance::git_dirty(),
             "git_commit_source":crypto_lib::build_provenance::source()});
+        if let Some(gpu) = crypto_lib::cryptanalysis::gpu_offload::report() {
+            report["gpu"] = gpu;
+        }
     }
     let success = matches!(
         report["status"].as_str(),

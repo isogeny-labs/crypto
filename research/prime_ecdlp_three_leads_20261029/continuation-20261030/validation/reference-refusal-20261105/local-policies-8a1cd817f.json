@@ -1,0 +1,94 @@
+{
+  "recorded_utc": "2026-11-05T23:37:27.114260+00:00",
+  "head": "8a1cd817f82e32157f1f08fd04bd0549950b9cff",
+  "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "checks": {
+    "whitespace": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "8a1cd817f82e32157f1f08fd04bd0549950b9cff"
+      ],
+      "exit": 0,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_utf8": ""
+    },
+    "size": {
+      "command": [
+        "scripts/check-large-files.sh",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "8a1cd817f82e32157f1f08fd04bd0549950b9cff"
+      ],
+      "exit": 0,
+      "bytes": 65,
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+      "raw_utf8": "check-large-files: no added or modified file over 10485760 bytes\n"
+    },
+    "artifacts": {
+      "command": [
+        "python3",
+        "tools/artifacts/artifacts.py",
+        "check",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "8a1cd817f82e32157f1f08fd04bd0549950b9cff"
+      ],
+      "exit": 0,
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "raw_utf8": "artifacts check: no data files committed\n"
+    },
+    "benchrec": {
+      "command": [
+        "python3",
+        "tools/benchrec.py",
+        "gate"
+      ],
+      "exit": 0,
+      "bytes": 52,
+      "sha256": "edb93f3fb65973557b2a971cbf34983528e61662e524059d93cf3382b2fedeb8",
+      "raw_utf8": "benchrec: OK, 37 record(s), progress report current\n"
+    },
+    "ledger-old-d30": {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160"
+      ],
+      "exit": 0,
+      "bytes": 30,
+      "sha256": "cb011bc82c1ea5e53002b5cda267d30203542d0a413a8ae0f2322a6a956fc3fc",
+      "raw_utf8": "ledger: 136 entries, chain ok\n"
+    },
+    "body-lint": {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "lint-prose",
+        "/workspace/pkm-reference-refusal-20261105/pr-body.md"
+      ],
+      "exit": 0,
+      "bytes": 25,
+      "sha256": "78860995516e3367bf95a303485b67d572a3b44e8a1165dc117ca264ddb7b3eb",
+      "raw_utf8": "lint-prose: 0 finding(s)\n"
+    }
+  },
+  "currentmainprefix": {
+    "base": "c224878f19c01aa8954695c7bd20e42ad86379ef",
+    "exit": 1,
+    "raw_utf8": "ledger[95]: differs from the base branch (history rewritten)\nledger: 136 entries, BROKEN\n",
+    "unresolved_frozenfork": true
+  },
+  "body": {
+    "sha256": "28ebe3c0569a042a9b0d08f4b98fe7afe304b63d865fd188e5fdbc49560e6c7f",
+    "raw_utf8": "The independent replay path discarded affine work on errors and omitted submitted-witness checking even from successful certificate counts. This change retains caller-owned setup work and disjoint oracle validation, witness-checking and exhaustive-enumeration ledgers, merging attempted work before propagating Err. It extends the earlier independent scalar row-space accounting. [pcc:unverified]\n\nNested replay-work changes fromv1 tov2 for owned setup counts/state and attempted/failed oracle-call diagnostics. Outer replay remainsv2; request/producer outputsv1 remain readable. Legacy reference_counts/completed_oracle_counts remain enumeration-only and overlap attempted enumeration. Within a stage, point/inverse diagnostics overlap expanded field children; do not charge both. Scalar n and coordinate p remain distinct. Counts are partial/unpriced source-call views; coverage_complete=false, priced_total=null, comparison_admissible=false. [pcc:unverified]\n\nObserved validation on source `c933e1bdef0e98e3c37282d6ec313565c432f3af`: **27 oracle tests pass**,0failed/ignored, including4new ownership/refusal controls and23prior controls. New cases retain exact corrupt-witness prefixes, lost-output verification/enumeration, the fixed F257 scan before a tuple-budget refusal, and the full F17 scan before incorrect-order refusal with no oracle/rank work started. Formatting/CLIbuild0 and actual checkpoint-refusal MESSAGE with expectedexit1 pass. The unchanged real gate precedes controlled nonexistent input and replay-envelope emission. PCC-20261105-6020c1 is an unsigned producer observation. [pcc:unverified]\n\n**Overall validation remains FAIL101.** Final scoped Cargo clippy and supervisor fail on the unchanged inherited library unused solve_one_with_trace and custody bool_comparison errors; final Cargo example strictlint is unqualified. Initial sourceb013 failed FIRST test compilation because unwrap_err required Debug on Certificate: ZEROtests, laterphases NOT_REACHED. The assertion now extracts Err with an explicit expectation and checks the same message. Initial source/recipe/22bindings/logs remain frozen; final source has a new recipe/directory, not an old restart. No assertion/test/ignore/lint/gate waiver. [pcc:unverified]\n\nFinal receipt retains22guarded source objects and globaltrackedclean checks beforeeveryphase, exact small phase captures/terminals and2freshbinaryhashes with preservedcopies. Eight unchanged binaries, the old213453-byte raw library log (NOT_UPLOADED) and exact formal/gate/Mathlib objects are rechecked. No duplicate unchanged library/legacy/process-prerequisite/Lean tests were run. Earlier6168-case library cap/clock2failure, legacyPCC13 and other historical failures remain at their own revisions; no full-suite pass or new theorem is claimed. The oldf866 producer-prefix byteidentity statement does not apply after this setup refactor. No producer timing/speedup is admitted. [pcc:unverified]\n\nIntegration remains blocked by the frozen PCC fork after95common entries. The original local history is preserved; landed maintainer945/e2 re-chain operations were recorded, not copied/repeated or treated as a general contract. Copilot request6664459966 is **REPORT-ONLY/no file edits** about a sanctioned provenance-preserving reconciliation contract. No response/edit was visible at this continuation's start. No ordinary main merge, ledger side-selection/re-chain, claim rewrite or shared verifier/keyring patch was attempted. PR3452/2949 are merged; their maintenance has stopped. [pcc:unverified]\n\nAuto-merge stays paused. Require gate,size,artifacts SUCCESS on the exact current head, applicable live reviews/resolvedthreads and expected-head guard after reviewed/validated resolution. Prior-head review/migrate successes do not qualify absent/pending requiredchecks or changedsource. Current-main source/dependency changes are not validated by this receipt.\n\nOriginal G1-G6 acceptance remains: G1-G3/G6 partial,G4/G5 unrun,zero scientific panels,all cost/GAE/scaling metrics null. Full-panel historical card remains blocked/unfunded/unimplemented. No scientific panel,funding/lease/IAM/quota/pool/access changes or checkpoint/protocol/runtime bypass. Next G2 work is parameter/constructor/shared-encoder helper coverage and a nonoverlapping charge frontier, plus full F4/root/logical/wholeprocess and qualified runtime/resume accounting. Rust/polynomial/complete-cost proof bridges remain open.\n\nEvidence: `research/prime_ecdlp_three_leads_20261029/continuation-20261030/G2_REFERENCE_REFUSAL_20261105.md`, `validation/reference-refusal-20261105/{initial-b013cb1e3,final}/receipt.json`, and the new two-page `reference-refusal-20261105.pdf`/editable SVG. Both pages inspected; all older reports/evidence remain preserved. Canonical scientific/curve/performance graphs are unchanged because no admitted metric/curve/phaseprice/reference changed. [pcc:unverified]\n",
+    "lint0actuallyobserved": true
+  },
+  "scope": "localold-basepolicies only; NOTcurrentmainprefix/globalPCC/nativeaggregate/GitHubCI",
+  "pcc_standing": "unverified"
+}

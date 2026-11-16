@@ -174,3 +174,138 @@ Evidence is by the tests named in the PR; none has a pcc claim.
 [pcc:unverified] The pooled comparison and `--unit bitop/v1` carry no
 calibrated block. `compare`, `challenge` and `bound fit` take the w_cal from
 the sessions only; the override flags exist on `run` and `band`.
+
+## Follow-up 2026-11-14: pooled compare, overrides, and `--unit bitop/v1`
+
+Closes the three items the 2026-11-13 follow-up left out. Every addition
+is optional; a session set without a `w_cal` and without an override
+compares, fits and judges with the same bytes and ids as before.
+
+### Pooled multi-session compare (`compare --dir D1 D2 ...`)
+
+- `sessions[].calibrated`: each session that carries a `w_cal` (or every
+  session, under an override) gets its own `CalibratedGrid`, in total cost
+  (`S·√r`) like the rest of the pooled output.
+- `calibrated` (top level, `PooledCalibrated`): the matched pairs of every
+  session whose runs both count (`matched_verified`), pooled in total cost and read at `0`, `w_cal` and `10*w_cal`.
+  The rule for differing readings is the conservative one:
+  - every session carries the same reading: `rule: identical`, one grid;
+  - every session carries one and the largest is at most
+    `1 + POOLED_WCAL_TOLERANCE` (`0.10`) times the smallest:
+    `rule: within tolerance`, one pooled grid at each distinct reading;
+    `order_at` gives an order only where every grid gives it (else
+    `flips`), and `ranked_at_calibrated_price` needs every grid ranked with
+    the same order;
+  - a session without a reading, or readings further apart:
+    `rule: declined`, no grid and no order, `declined` says why, and the
+    per-session grids stand. Such a set is not refused, because pooled
+    comparisons that read no `w_cal` before this change must still run.
+  - an override: `rule: override`, one grid.
+- The sessions' own readings do not enter `comparison_id`.
+
+### `--w-cal` override on `compare`, `challenge verdict` and `bound fit`
+
+- Flags `--w-cal W --w-cal-method M --w-cal-host H`, as on `band` and
+  `run`. They take precedence over `options.w_cal` and the `w_cal.json`
+  sidecar. A value that is not finite or not above zero is refused (as is an
+  unknown method or an empty host).
+- The grid (or bound point) then carries `source: "override"`. With the
+  sessions' own reading there is no `source` key, so grids written by the
+  2026-11-13 change serialise unchanged.
+- `compare` (single and pooled): the override enters `comparison_id` as
+  `w_cal_override` (v2 identity only; the legacy id is unchanged), so a
+  saved override comparison never overwrites the sessions' reading.
+  Refused with `--unit bitop/v1`.
+- `challenge verdict`: the override is refused for procedure 1, which has
+  no calibrated block. It reaches the verdict's `calibrated` block and the
+  bounds fitted from the session.
+- `bound fit`: the override is kept as `fit_options.w_cal`, which is absent
+  without one, so `bound check` fits it again with the same id. It is
+  refused for fit version 1, with `--weight`, and with `--unit`.
+- Behaviour change on `bound fit --unit bitop/v1|bitop/v2`: the sessions'
+  own `w_cal` no longer adds `sizes[].calibrated`. Those records are
+  re-priced in gates by `work::bitop_view`, so a GAE calibrated point there
+  was mislabelled. No committed record carries a `w_cal`, so no committed
+  bound changes.
+
+### `--unit bitop/v1`: not implemented, no specification
+
+`grep -rn "bitop/v1"` finds the unit's definition (`docs/units/BITOPS.md`,
+`src/cryptanalysis/bitops.rs`, `ecbench::work`) and its counters. Nothing
+in AGENTS.md, BITOPS.md, NOTE.md or PROGRESS_2.md defines a calibrated
+reading in that unit. NOTE.md only records its absence. BITOPS.md
+("Relation to the unpriced-work band") says a `bitop/v1` comparison
+between complete arms has no unpriced counters, so the band has nothing to
+weigh. It prices `field_mul` and `field_sqr` at frozen primitive weights
+and keeps `--unit` and `--weight` exclusive. `w_cal` is a GAE-per-mulmod
+ratio for counters left unpriced in GAE, and BITOPS.md gives no rule for
+it in gates. No semantics were invented. The only change is the refusal of
+a `--w-cal` override together with `--unit bitop/v1`, with the BITOPS.md
+reason.
+
+### Tests
+
+- `compare::pooled::tests::pooled_calibrated_is_absent_without_w_cal_and_additive_with_one`
+- `compare::pooled::tests::pooled_calibrated_is_the_hand_computed_ratio_of_total_cost`
+- `compare::pooled::tests::differing_w_cal_pools_within_tolerance_and_declines_beyond_it`
+- `compare::pooled::tests::a_w_cal_override_wins_is_recorded_and_bad_ones_are_refused`
+- `band::tests::sidecar_and_override_reach_single_and_pooled_compare_from_directories`
+- `bounds::tests::a_w_cal_override_is_recorded_re_derives_and_is_refused_where_meaningless`
+- `challenge::tests::a_w_cal_override_needs_procedure_2_and_a_positive_finite_value`
+  covers only the refusals. No test fixture builds a procedure-2
+  verdict, so the override's path into a sealed verdict is covered by code
+  reading and by the bounds test of the same option, not by its own test.
+
+Evidence is by these tests; none has a pcc claim. [pcc:unverified]
+
+## Follow-up 2026-11-15: validator findings B (research/validation_20261114/REPORT.md)
+
+Three open findings from the independent validation are fixed in
+`src/cryptanalysis/ecbench/challenge.rs`.
+
+1. **Procedure 1 no longer reads `w_cal.json`.** `verdict` called
+   `runner::read_wcal` for every procedure, so a malformed or invalid
+   sidecar made a procedure-1 verdict fail although procedure 1 has no
+   calibrated block. The verdict's paired comparisons (`compare`, for ops
+   and the A/A control) also read it. Procedure 1 now reads no `w_cal`
+   anywhere: its comparisons run on the session the verdict loaded, with
+   `options.w_cal` cleared (`procedure_1_compare`).
+   Procedure 2 is unchanged: it still reads, validates and refuses a bad
+   sidecar. Test:
+   `challenge::tests::an_invalid_w_cal_sidecar_leaves_a_procedure_1_verdict_unchanged`
+   copies the `prime-toy-reference-e1` session to a temporary root at the
+   same relative path, writes an invalid sidecar, and checks that the
+   procedure-1 verdict text is identical to the one without it and that
+   procedure 2 refuses the sidecar.
+2. **Procedure-2 calibrated block, end to end.** Test
+   `challenge::tests::a_procedure_2_verdict_carries_the_calibrated_block_only_with_w_cal`
+   builds procedure-2 verdicts of the same committed session. Each uses a
+   synthetic commitment and beacon, so the verdict is inadmissible: the
+   spec does not match, and the block is computed anyway. The test covers
+   three cases: no `w_cal` (no block), a `--w-cal` override (source
+   `override`) and a sidecar (no source). With `w_cal = 0.1` the field
+   weights are `[0, 0.1, 1]`, equal to the band weights. The grid's
+   diagonal is then checked against a hand computation over pairs matched
+   by workload and round: `Σ S_B / Σ S_A` and `priced_s` at 0.1 and 1.
+   The block changes no axis or outcome.
+3. **The committed procedure-1 verdicts re-derive again.** Commit
+   `c7ae83ee81` (2026-10-23, "honest intervals ... in compare") moved
+   `compare` to `ecbench.comparison/v2`. That commit made the linearised
+   `t` interval primary (`ci_method` `linearised_t`) and kept the old
+   percentile two-stage bootstrap beside it as `ci95_bootstrap`, with the
+   same statistic, resamples and seed. It did not touch `challenge.rs`,
+   so procedure-1 verdicts silently took the new ops interval and
+   per-curve intervals. The re-derived id for `prime-toy-reference-e1`
+   became `ECVD1he794a2187563` instead of the committed
+   `ECVD1h0b0f5e0d7f67`. A procedure-1 verdict is frozen, so the fix reads
+   the comparison's bootstrap interval back for procedure 1
+   (`procedure_1_compare`, for the ops and control comparisons).
+   Procedure 2 keeps the linearised interval. The committed records are
+   not edited. Test
+   `challenge::tests::the_committed_procedure_1_verdicts_re_derive_byte_for_byte`
+   re-derives both committed verdicts (`prime-toy-reference-e1` and
+   `koblitz-toy-reference-e1`) with every run replayed and `--bounds
+   docs/bounds/records`, as `docs/bounds/refit.sh` does. It checks each
+   verdict file and the bound it wrote byte for byte.
+
+Evidence is by these tests; none has a pcc claim. [pcc:unverified]

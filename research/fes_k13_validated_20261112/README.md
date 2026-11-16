@@ -1,4 +1,13 @@
-# `fes-f2` vs `inherited-f4` at degree 13: the validated Iso Lab run (prepared, not submitted)
+# `fes-f2` vs `inherited-f4` at degree 13: the validated run (done on Runpod)
+
+Status, 2026-11-15: **run on Runpod and independently validated.** The owner moved
+the run from Iso Lab to Runpod on 2026-11-14 because the AWS budget was exhausted.
+Session `ECBS1h695ef8e76c34` (pod `y1i37jqnb3511d`, launch 3) was validated for counts
+only: H1 is not supported (unresolved inside the band) and H2 is supported
+`[pcc:unverified]`. Results, figures and PDF:
+[`RESULTS.md`](RESULTS.md), [`RESULTS.pdf`](RESULTS.pdf). Evidence:
+[`runpod-a1/`](runpod-a1/VALIDATION.json). The text below is the historical record of the
+frozen plan and the Iso Lab launch block; it is kept unchanged.
 
 Status, 2026-11-12: **frozen, not yet run.** The main session froze the
 protocol with fresh seeds (`/a1/` tags; the smoke's pairs are not in the

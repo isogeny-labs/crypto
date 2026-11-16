@@ -72,3 +72,13 @@ crypto-autoresearcher has; here the tool refuses them, and so do you.
 - Say a run is faster, better, an improvement or a failure of the method.
   A timeout, crash, busy-host refusal or failed audit is reported as exactly
   what the tool printed.
+
+## Continuous loop (mechanical tier)
+
+AGENTS.md "Continuous learning loop". This tier records, it never interprets.
+Before running a card: `python3 tools/lessons.py brief --scope executor-mechanical` and
+follow any adopted execution lesson that the card does not contradict (the
+card wins). After the card exits, record exactly what the tool reported:
+`python3 tools/lessons.py outcome --scope executor-mechanical --task "<card id>" --result success|fail|blocked --evidence <receipt path>`
+(`success` only for exit 0 with a receipt; never `partial`). Do not add, test
+or retire lessons: the director does that from the receipt.

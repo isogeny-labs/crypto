@@ -71,7 +71,6 @@ verified 2/3-term relation per target (unbatched scan); baseline `ic_multi_solve
 curves idx 0,1 (26 bit, two curves), all targets verified against the planted k in both arms (every row `sym_ok == base_ok == T`).
 
 | T | rows | sym total ms | baseline total ms | baseline/sym | setup sym / base ms |
-|---|---|---|---|---|---|
 | 20 | 6 | 9 | 14 | 1.63 | 7.4 / 11.6 |
 | 200 | 4 | 22 | 26 | 1.18 | 7.2 / 10.4 |
 | 1000 | 6 | 74 | 76 | 1.03 | 6.7 / 9.5 |
@@ -105,7 +104,6 @@ Lever left: a lock-step batched per-scan collector for the symmetric arm (as `co
 28 bits, T=20, 2 curves, interleaved rounds (5 rounds x 3 B values, 20 rows per B, all targets verified in both arms; `ic_multi_solve_ex` c=0.5 as the in-run noise reference):
 
 | B | sym setup ms (table / collection) | baseline setup ms | sym/baseline setup (median of per-run ratios) |
-|---|---|---|---|
 | 159 | 19.5 (5.7 / 13.4) | 26.6 | 0.73 |
 | 190 | 20.9 (7.8 / 12.1) | 26.3 | 0.73 |
 | 230 | 22.4 (11.6 / 10.6) | 25.9 | 0.86 |
@@ -135,7 +133,6 @@ Hypothesis: the setup collection (about 70% of the symmetric setup) is memory-bo
 `LINPROBE=1` in `examples/prime_fast_j0_multi.rs`; 28 bits, B=159, T=20, 2 curves, 5 interleaved rounds (20 rows per arm), all targets verified in both arms:
 
 | layout | table ms | collection ms | setup ms | sym/baseline setup |
-|---|---|---|---|---|
 | chained (`heads`/`next`) | 6.2 | 13.6 | 20.5 | 0.75 |
 | linear probe + fingerprint | 6.3 | 14.0 | 20.8 | 0.74 |
 
@@ -147,7 +144,6 @@ No difference: the probe is not the bottleneck (the table is about 1-2 MB and ca
 planted targets as the symmetric multi-target IC (`prime_fast_j0_multi`: B=100, extra 8, c=0.5 baseline), 26 bits, medians; every target of every row verified (rho 18/18 rows, IC 18/18 rows).
 
 | T | sym multi IC ms | folded multi rho ms (steps) | rho / IC |
-|---|---|---|---|
 | 20 | 8.7 | 9.2 (28k) | 1.06 |
 | 200 | 20.2 | 47.0 (166k) | 2.3 |
 | 1000 | 70.4 | 386 (1.24M) | 5.5 |
@@ -163,7 +159,6 @@ The previous section compared the symmetric multi-target IC with an **unbatched*
 degenerate steps fall back to unbatched adds). Same curves and planted targets, 26 bits, medians, every target of every row verified (18/18 rho rows, 18/18 IC rows):
 
 | T | sym multi IC ms | folded multi rho, batched ms (steps) | rho / IC | (unbatched rho, previous section) |
-|---|---|---|---|---|
 | 20 | 8.7 | 4.1 (35k) | 0.47 | 1.06 |
 | 200 | 20.2 | 14.1 (160k) | 0.70 | 2.3 |
 | 1000 | 70.4 | 80.0 (1.22M) | 1.14 | 5.5 |
@@ -176,7 +171,6 @@ at larger sizes it moves with the setup cost p^(2/3) against the rho's sqrt(nT).
 Same planted targets for both arms, 2 curves x 2 instances (n=4 rows per cell), all targets verified in both arms. Symmetric multi-target IC (B=159 at 28 bits, 252 at 30 bits, extra 8, not retuned per T) against the batched folded multi-target rho (128 lanes, dp bits from the same formula, 32-step table), medians:
 
 | bits | T | IC ms | batched rho ms | rho / IC |
-|---|---|---|---|---|
 | 26 | 20 / 200 / 1000 | 8.7 / 20.2 / 70.4 | 4.1 / 14.1 / 80.0 | 0.47 / 0.70 / 1.14 |
 | 28 | 200 | 42.8 | 24.3 | 0.57 |
 | 28 | 1000 | 125.4 | 117.2 | 0.93 |
@@ -194,7 +188,6 @@ Cause: `new_lane` in `examples/prime_fast_j0_rho_multi.rs` drew each new walk's 
 Fix: new walks start only from unsolved targets (plus G as the anchor), as in Kuhn-Struik. `RESTART=all` keeps the old policy. Same curves, same planted targets (seed `0xC0DE ^ inst ^ n ^ T` in both examples), 2 curves x 2 instances, 128 lanes, same dp bits. Every target of every row verified in both policies. One local 4-core host, not isolated, medians:
 
 | bits | T | IC ms | rho, old restarts ms (steps) | rho, Kuhn-Struik ms (steps) | K-S `sqrt(2Tn/6)` | rho/IC old | **rho/IC fixed** |
-|---|---|---|---|---|---|---|---|
 | 26 | 20 | 8.7 | 4.5 (35.9k) | 4.9 (29.2k) | 21.2k | 0.51 | **0.56** |
 | 26 | 200 | 20.2 | 14.2 (165k) | 16.8 (102k) | 66.9k | 0.70 | **0.83** |
 | 26 | 1000 | 70.4 | 100.7 (1.22M) | 27.8 (340k) | 150k | 1.43 | **0.39** |
@@ -213,7 +206,6 @@ Reading: the old policy reproduces the earlier rows (942 vs 909 ms at 28/3000, 1
 `examples/prime_fast_j0_bsgs_multi.rs`: multi-target BSGS folded by the order-6 automorphism group: baby table of the canonical orbit key of jG (j=1..m, open-addressing, 8-byte key + 5-byte value), giant steps P_i = Q_t - i*S (S = (2m+1) G) batched in lock-step across all unsolved targets (one inversion per round), a hit gives k = i*stride + (mu_j / mu') j with the stored/observed orbit multipliers, verified kG = Q for every target. m = MC * sqrt(T n / 6); MC tuned at 26 bits, T=1000 on the tuning curves (0.5 / 1.0 / 2.0: 15.8 / 14.2 / 15.0 ms, flat), MC=1 used throughout. Same curves and planted targets as the IC and rho arms; n=4 rows per cell, every target verified (36/36 rows).
 
 | bits | T | folded BSGS ms | sym multi IC ms (x BSGS) | batched folded rho ms (x BSGS) |
-|---|---|---|---|---|
 | 26 | 20 | 2.0 | 8.7 (4.4x) | 4.1 (2.1x) |
 | 26 | 200 | 5.0 | 20.2 (4.0x) | 14.1 (2.8x) |
 | 26 | 1000 | 10.9 | 70.4 (6.5x) | 80.0 (7.3x) |
@@ -246,14 +238,12 @@ Reading: the 2.0x-2.4x improvement over the strongest implemented single-target 
 A/B on the tuning curves (26 bits, B=100, 4 targets x 2 curves x 2 rounds, 16 rows per arm, all verified), same planted targets, baseline `ic_solve` c=0.7:
 
 | scan | targets needed (median) | sym3 ms | plain3 ms | ratio |
-|---|---|---|---|---|
 | shift ignored (old) | 274 | 8.3 | 20.1 | 2.42 |
 | shift applied (`SHIFTFIX=1`) | 192 (-30%) | 6.0 (-28%) | 18.1 | 3.01 |
 
 Fresh holdout (curves idx 9 and 10; frozen B rule B = round(100 (p/2^26)^(1/3)); `SHIFTFIX=1`; 4 targets per curve; baseline c in {0.5, 0.7}; 64 rows, all verified), medians:
 
 | bits | B | sym3 ms | plain3 ms | ratio (range over curves, c) | sym3 / negation rho |
-|---|---|---|---|---|---|
 | 28 | 159 | 17.8-25.5 | 52.5-65.4 | 2.57-2.95 | 6x-8x |
 | 30 | 252 | 51.2-58.2 | 143-162 | 2.59-2.86 | 12x-16x |
 | 32 | 400 | 156-175 | 447-522 | 2.61-3.19 | 24x-38x |
@@ -282,7 +272,6 @@ Reading: the best implemented single-target rho is the batched, folded multi-tar
 Fresh curves (idx 13, 14), 4 targets per curve (n=8 rows per B), baseline `ic_solve` c=0.7, shift applied (default), every solve verified. Medians:
 
 | bits | B | sym ms | targets needed | ratio vs plain3 |
-|---|---|---|---|---|
 | 28 | 50 / 64 / 80 | 31.5 / 23.4 / 21.0 | 3573 / 1928 / 1368 | 1.61 / 2.46 / 2.45 |
 | 28 | **100 / 159** | **19.7 / 19.8** | 806 / 318 | 2.87 / 2.80 |
 | 28 | 250 / 400 | 33.5 / 46.2 | 124 / 47 | 1.87 / 1.18 |
@@ -295,3 +284,80 @@ Reading: the frozen B rule (B = round(100 (p/2^26)^(1/3))) is within about 11% o
 
 ## Obstruction: no prime-order j=1728 curves for the order-4 symmetric factor base (2026-11-14)
 The next symmetry in the list, j=1728 (y^2 = x^3 + a x, phi(x,y) = (-x, i y), orbits of size 2 in x, group of order 4 acting through lambda^2 = -1 mod n), was adapted from the j=0 code (orbit size 2, canonical key min(x, -x), y scaled by i on the rotated point, shift modulo 2). The first run found **no curve**: the search for a prime-order j=1728 curve over a prime field never terminates, and the reason is structural: x^3 + a x = x (x^2 + a) always has the root x = 0, so (0, 0) is a rational 2-torsion point and the group order is even (divisible by 4 when p = 1 mod 4 and the curve is not a twist with cofactor 2). Every j=1728 curve over F_p therefore has cofactor at least 2; the framework's prime-order assumption (relations in a prime-order subgroup, `scalar_field` mod n) does not hold for the full group. Using the prime-order subgroup requires projecting the factor base through the cofactor (the H1 cofactor projection of the earlier campaign), a different and larger construction with its own costs; it was not built. Expected gain if built, by the orbit size alone: about 1.5x over `ic_solve` against 2.8x-3.0x for j=0, i.e. another constant on the same exponent. Not pursued; no code kept (the adapted example was deleted).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Experiment: tuned dp bits for the multi-target rho (2026-11-14) — `[pcc:unverified]`
+After the Kuhn-Struik restart fix the rho was still 1.4x-4.8x above `W = sqrt(2nT/6)` steps. Its dp-bit formula, `bits/2 - 10 + log2(T)/2`, grows with T, but the work per extra log, about `W/T`, shrinks with T, so at large T each target's last walk to a distinguished point dominated.
+`examples/prime_fast_j0_rho_multi.rs` gains `DP=<k>`, `DPRULE=ks` (`dp = round(log2(W/T) - DPDIV)`) and `INST0` (instance offset). Kuhn-Struik restarts, 128 lanes, 2 curves x 2 instances per cell; every target of every row checked against its planted log.
+
+**Tuning, on held-out targets** (`INST0=10`, `run_dp_sweep.sh`, dp 2-12, `results/pf_j0/dpsweep/`): the optimum is flat and sits at `log2(W/T) - 1` to `- 3` in every cell. The rule `DPDIV=1.5` was fixed from this sweep and is within about 10% of the best dp everywhere (largest gap: 30 bits, T = 200, 25 against 23 ms).
+
+**Confirmation, on the IC comparison's own targets** (`INST0=0`, `run_dp_confirm.sh`, `results/pf_j0/rhotuned_*.jsonl`), medians:
+
+| bits | T | dp old → rule | IC ms | rho, old dp ms | **rho, tuned ms** | tuned steps / W | tuned / old dp | **rho/IC** | folded BSGS ms (section above) |
+|---|---|---|---|---|---|---|---|---|---|
+| 26 | 20 | 5 → 9 | 8.7 | 4.9 | **3.4** | 3.31 | 0.70 | **0.40** | 2.0 |
+| 26 | 200 | 6 → 7 | 20.2 | 16.8 | **7.3** | 1.94 | 0.43 | **0.36** | 5.0 |
+| 26 | 1000 | 7 → 6 | 70.4 | 27.8 | **22.6** | 1.63 | 0.81 | **0.32** | 10.9 |
+| 28 | 200 | 7 → 8 | 42.8 | 16.8 | **13.9** | 2.00 | 0.83 | **0.32** | 12.5 |
+| 28 | 1000 | 8 → 7 | 125.4 | 45.7 | **31.2** | 1.65 | 0.68 | **0.25** | 30.4 |
+| 28 | 3000 | 9 → 6 | 357.7 | 152.4 | **79.4** | 1.45 | 0.52 | **0.22** | 60.2 |
+| 30 | 200 | 8 → 9 | 95.2 | 27.1 | **26.3** | 2.07 | 0.97 | **0.28** | 27.3 |
+| 30 | 1000 | 9 → 8 | 303.2 | 85.7 | **54.6** | 1.69 | 0.64 | **0.18** | 58.7 |
+| 30 | 3000 | 10 → 7 | 836.6 | 286.7 | **110.0** | 1.47 | 0.38 | **0.13** | 132.8 |
+
+Graph: `figures/multirho_dp_tune.{svg,png,pdf}` (`figures/plot_multirho_dp_tune.py`). Bench record: `benchmarks/records/20261114T1854Z-j0-multirho-dp-tune.json`.
+
+Reading: the tuned rho takes 0.38x-0.97x the time of the same rho with the old dp formula, the gain growing with T. Against the symmetric multi-target IC it is 2.5x-7.6x faster in every cell, and the gap widens with T and with size (rho/IC 0.40 → 0.13). At 30 bits it is level with or ahead of the folded multi-target BSGS (0.83x-0.96x of its time: 26.3 vs 27.3, 54.6 vs 58.7, 110.0 vs 132.8 ms) and still behind it at 26-28 bits (BSGS figures come from a different run, same targets, same host class; not interleaved). Remaining rho overhead is 1.45x-2.1x of W except at 26 bits, T = 20, where 128 lanes times 2^9 steps in flight exceed W (3.3x). Not a claim: one host, no isolation, no §5a band, IC arm not retuned per T. [pcc:unverified]
+
+## Correction: interleaved rho vs BSGS (2026-11-14) — `[pcc:unverified]`
+The tuned rho's lead over the folded BSGS at 30 bits in the section above came from separate runs. The interleaved, paired study in [`interleaved_rho_bsgs/`](interleaved_rho_bsgs/README.md) (frozen protocol, 6 rounds per cell on fresh shared targets, A/A arm) finds BSGS faster at 26 and 28 bits (rho/BSGS 1.27-1.98) and the two tied at 30 bits (0.97-1.00, every interval containing 1). The 30-bit rho lead is withdrawn. [pcc:unverified]

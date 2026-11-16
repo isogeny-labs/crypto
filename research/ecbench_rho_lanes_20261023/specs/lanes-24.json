@@ -1,0 +1,70 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "round 3 2026-10-23: rho.negation_lanes vs rho.negation, 24-bit",
+ "description": "Batched-inversion lanes against the serial negation walk on one prime-order curve: S (GAE/sqrt r) and solve wall time, A/A control.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 24,
+    "seed": 59297
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "lanes-8",
+   "role": "candidate",
+   "method": {
+    "id": "rho.negation_lanes",
+    "params": {
+     "lanes": "8"
+    }
+   }
+  },
+  {
+   "name": "lanes-16",
+   "role": "candidate",
+   "method": {
+    "id": "rho.negation_lanes",
+    "params": {
+     "lanes": "16"
+    }
+   }
+  },
+  {
+   "name": "lanes-32",
+   "role": "candidate",
+   "method": {
+    "id": "rho.negation_lanes",
+    "params": {
+     "lanes": "32"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 5,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 300
+ }
+}

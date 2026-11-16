@@ -1,0 +1,45 @@
+{
+  "card_id": "CARD-n83-sat-boundary-20261019-free",
+  "outcome": "stopped",
+  "stopped_at_step": "command1",
+  "stopped_command_id": "free",
+  "recommendation": "respecify",
+  "requested_respecification": "Independent decoded-selector export and original-group replay under an explicitly separate follow-up; preserve this card's stopped disposition.",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "interpretation": "not_assessed",
+  "native_card_check": {
+    "checker": "/home/ec2-user/scratch/n83-sat-boundary-20261019/transport-fix-target/release/n83-sweep-runner",
+    "checker_sha256": "89cc67b25466a83baee13459059317890daef26667ce5b35c278a6adff3eca5d",
+    "exit_code": 0,
+    "status": "stopped at command 1",
+    "relay_verbatim": true,
+    "record_digests_verified": true
+  },
+  "reasons": [
+    "Corrected native card-check verified exact actual relay and all available recorded command-stream/output digests, including raw stdout.log/stderr.log.",
+    "Exact frozen argv ran once; command runner exit1 is allowed by success_exit_codes but declared audit.json is absent, therefore succeeded=false and card stopped at command1. No command timeout or executor deviation observed.",
+    "Worker stdout reports SAT_verified_witness_x and model_verified=true. Frozen auditor explicitly rejects free-selector positive terminal pending independent decoded-selector replay; producer assertions are not independently admitted.",
+    "audit-failure.json preserves the exact rejection: free-selector positive terminal requires independent decoded selector replay; preserved but not admitted.",
+    "Outer record reports worker exit0,wall_censored=false,cleanup_verified=true. This is protocol fail-closed admission behavior, not an infrastructure failure or reason for retry.",
+    "Receipt card_changed=false,dirty_before/dirty_after empty; current source HEAD remains frozen and clean; declared streams/outputs/receipt remain inside scoped exec/v4 workspace."
+  ],
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-sat-boundary-20261019/cards/free.json",
+    "relay": "/home/ec2-user/scratch/n83-sat-boundary-20261019/free-relay.txt",
+    "relay_sha256": "dfd2d567e856a945d9b1d19e3b838c82417c9728b605b868edf2c04ffc65d1bb",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free.receipt.json",
+    "audit_failure": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/audit-failure.json",
+    "source_commit": "5e9ee5d4b1aa6ca22368213e5bc05b343e00bfb4"
+  },
+  "custody": {
+    "streams_verified": 2,
+    "existing_declared_outputs_verified": 8,
+    "missing_declared_output": "audit.json",
+    "cleanup_verified": true
+  },
+  "independent_positive_gate_passed": false,
+  "rerun_performed": false,
+  "source_or_spec_changes": false,
+  "scientific_interpretation": "not_assessed"
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "general-actual-degree-two-collision-verification/v1",
+  "source_commit": "1b3f9f21c29d4fad25e32bbaa66b330862492367",
+  "claim_id": "PCC-20261114-7a948c",
+  "declaration_sha256": "5802fbd3152989fdd4805235c86098686c69810ad95be92dadfca6606495d47c",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 29,
+  "gate_declarations": 35,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 85,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-7a948c",
+    "claim_sha256": "2c254177ca178d91b4652f47121ed3f193b17d13277c50659812633649ea899a",
+    "commit": "1b3f9f21c29d4fad25e32bbaa66b330862492367",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/general_two_step_collision_audit_20261114/lean (GeneralCollisionCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T18:05:58Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-7a948c",
+    "claim_sha256": "2c254177ca178d91b4652f47121ed3f193b17d13277c50659812633649ea899a",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47185,
+    "sha256": "39fc1e2d6ddfd52b8ddcc4668a0fa00e02ca90bc06b1418d521bb1f98f97d0b6",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 35,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "general_actual_group_coefficient_proved": true,
+    "actual_pair_label_equivalence_proved": true,
+    "actual_query_injectivity_derived": true,
+    "genuine_joint_PMF_and_event_measure_proved": true,
+    "limiting_first_collision_penalty_proved": false,
+    "higher_degree_asymptotic_correction_proved": false,
+    "practical_hash_refinement_proved": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

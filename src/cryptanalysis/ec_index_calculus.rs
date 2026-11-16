@@ -1973,8 +1973,8 @@ pub fn ec_index_calculus_dlp_staged_seeded_projected(
 pub type PairSumTableExact =
     std::collections::HashMap<(BigUint, BigUint), (usize, i64, usize, i64)>;
 
-/// Largest factor base the compact table indexes (13 bits per index).
-pub const PAIR_SUM_TABLE_MAX_FB: usize = 1 << 13;
+/// Largest factor base the compact table indexes (14 bits per index).
+pub const PAIR_SUM_TABLE_MAX_FB: usize = 1 << 14;
 
 fn x_fingerprint(x: &BigUint) -> u64 {
     // splitmix64 fold over the 32-bit limbs; only a probe key (every hit is checked against the point)
@@ -1991,12 +1991,11 @@ fn x_fingerprint(x: &BigUint) -> u64 {
 }
 
 /// Compact pair-sum table: open addressing over a 64-bit fingerprint of the x coordinate plus a
-/// packed `(i, s_i, j, s_j)`, 12 bytes a slot (about 20 per stored sum at load 0.6) instead of about 170 for the exact hash map. A hit
-/// is checked against the factor-base points (one addition, only on a hit), so a fingerprint
-/// collision is a miss, never a wrong relation; the hit set equals the exact table's (both
-/// signs of every pair sum are stored there, so a hit is "x is a pair-sum x"). Entries with the
-/// same x are all kept, in insertion order, and the first valid one is returned, which is the
-/// exact table's first-wins choice.
+/// packed `(i, s_i, j, s_j)`: 12 bytes a slot at load 0.6 and one slot per +/- pair of sums (`+S`
+/// and `-S` share x), about 20 bytes a pair against about 340 for the exact hash map. A hit is
+/// checked against the factor-base points (one addition, only on a hit), so a fingerprint
+/// collision is a miss, never a wrong relation; the hit set equals the exact table's, and among
+/// sums with the same x the earliest inserted answers, as in the exact table.
 pub struct PairSumTable {
     fps: Vec<u64>,
     vals: Vec<u32>,
@@ -2012,16 +2011,16 @@ impl PairSumTable {
 
     fn pack(i: usize, s_i: i64, j: usize, s_j: i64) -> u32 {
         let sign = |s: i64| u32::from(s < 0);
-        1 + ((((i as u32) << 13 | j as u32) << 2) | sign(s_i) << 1 | sign(s_j))
+        1 + ((((i as u32) << 14 | j as u32) << 2) | sign(s_i) << 1 | sign(s_j))
     }
 
     fn unpack(v: u32) -> (usize, i64, usize, i64) {
         let v = v - 1;
         let sg = |b: u32| if b == 1 { -1i64 } else { 1 };
         (
-            (v >> 15) as usize,
+            (v >> 16) as usize,
             sg((v >> 1) & 1),
-            ((v >> 2) & 0x1FFF) as usize,
+            ((v >> 2) & 0x3FFF) as usize,
             sg(v & 1),
         )
     }
@@ -2055,12 +2054,12 @@ impl PairSumTable {
     }
 
     /// The decomposition `r = s_i F_i + s_j F_j` of the affine point `(x, y)`, if it is a pair sum.
-    /// Among entries with the same x it returns the first one stored for exactly `(x, y)`, as the
-    /// exact table does, and only if there is none the first one for `(x, -y)` with both signs flipped.
+    /// A slot holds one of the two signs of a pair sum (`+S` and `-S` share x); the first verified
+    /// slot in insertion order answers, with both signs flipped when its y is the other one, which is
+    /// the entry the exact table (both signs stored, first insertion wins) returns.
     pub fn find(&self, x: &BigUint, y: &BigUint) -> Option<(usize, i64, usize, i64)> {
         let fp = x_fingerprint(x);
         let mut at = self.slot(fp);
-        let mut flipped = None;
         while self.vals[at] != 0 {
             if self.fps[at] == fp {
                 let (i, s_i, j, s_j) = Self::unpack(self.vals[at]);
@@ -2076,10 +2075,11 @@ impl PairSumTable {
                 };
                 if let Point::Affine { x: sx, y: sy } = pi.add_vartime(&pj, &self.a_fe) {
                     if &sx.value == x {
-                        if &sy.value == y {
-                            return Some((i, s_i, j, s_j));
-                        }
-                        flipped.get_or_insert((i, -s_i, j, -s_j));
+                        return Some(if &sy.value == y {
+                            (i, s_i, j, s_j)
+                        } else {
+                            (i, -s_i, j, -s_j)
+                        });
                     }
                 }
             }
@@ -2088,7 +2088,7 @@ impl PairSumTable {
                 at = 0;
             }
         }
-        flipped
+        None
     }
 }
 
@@ -2099,7 +2099,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
     );
     let a_fe = curve.a_fe();
     let f = factor_base.len();
-    let slots = (f * f * 2 * 5 / 3).max(16);
+    let slots = (f * f * 5 / 3).max(16);
     let mut table = PairSumTable {
         fps: vec![0; slots],
         vals: vec![0; slots],
@@ -2114,16 +2114,16 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
     };
     for (i, fi) in factor_base.iter().enumerate() {
         for (j, fj) in factor_base.iter().enumerate().skip(i) {
+            // one slot serves both signs (+S and -S share x); the counters keep the exact table's
+            // accounting (two insert attempts and the negations per sum) so counts stay comparable
             let sum = fi.point.add_vartime(&fj.point, &a_fe);
             put(&sum, (i, 1, j, 1));
-            put(&sum.neg_vartime(), (i, -1, j, -1));
             count("group_additions", 1);
             count("table_insert_attempts_uncharged", 2);
             count("point_negations_uncharged", 1);
             if i != j {
                 let dif = fi.point.add_vartime(&fj.point.neg_vartime(), &a_fe);
                 put(&dif, (i, 1, j, -1));
-                put(&dif.neg_vartime(), (i, -1, j, 1));
                 count("group_additions", 1);
                 count("table_insert_attempts_uncharged", 2);
                 count("point_negations_uncharged", 2);
@@ -3164,6 +3164,11 @@ mod tests {
         assert!(hits > 0, "no pair sum was hit");
         let packed = PairSumTable::pack(11, -1, 7, 1);
         assert_eq!(PairSumTable::unpack(packed), (11, -1, 7, 1));
+        let top = PairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
+        assert_eq!(
+            PairSumTable::unpack(top),
+            (PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1)
+        );
     }
 
     /// Every relation found by the table lookup and by the restarted walk
