@@ -32,3 +32,6 @@ jobs:
       - name: Full cold 24 Q APS vs optimized negation rho with repeat
         timeout-minutes: 6
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-cold-match
+      - name: Prospective fresh 24 Q negation rho long-cycle escape and APS control
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-watchdog-match
