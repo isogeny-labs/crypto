@@ -5,6 +5,10 @@ recovery code and certified F4 trace API. It does not copy or replace those
 algorithms. The separate `aps-partition-lab` supplies ordinary-residue affine
 arithmetic, candidate colorings and cheap specialization features.
 
+The separate [quartic-cell extension](QUARTIC.md) integrates `Expanded4`
+with a complete disjoint label-profile cover. The tuple-only valuation
+sections below still describe the original binary and its frozen reports.
+
 The purpose is structural correctness, not timing, throughput or a speed
 ranking. No profiler is launched, and trace diagnostics are not complete
 costs. The whole ecbench registry/record pipeline is outside this bridge.
