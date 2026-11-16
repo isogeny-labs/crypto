@@ -11,22 +11,17 @@ use std::process::{Command, Stdio};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub const ACCOUNT: &str = "590183823895";
-pub const REGION: &str = "us-west-2";
-pub const ZONE: &str = "us-west-2b";
-pub const VPC: &str = "vpc-0394e002d95674fe6";
-pub const SUBNET: &str = "subnet-0ffc4f0562edc244f";
+pub const REGION: &str = "us-east-1";
+pub const ZONE: &str = "us-east-1d";
+pub const VPC: &str = "vpc-0da45a1bf46c94fa9";
+pub const SUBNET: &str = "subnet-0561480728d2b1ffd";
 pub const INSTANCE: &str = "g5g.4xlarge";
-pub const SECURITY_GROUP: &str = "sg-031c140ef9d078b3d";
+pub const SECURITY_GROUP: &str = "sg-030ffadf6a62d2ce2";
 pub const PROFILE: &str = "n83-online-screen-ssm-20261019";
 pub const BUCKET: &str = "aburan28-n83-tier1-20261016-590183823895";
-pub const BUCKET_REGION: &str = "us-east-1";
 pub const PROJECT_TAG: &str = "N83HighKCurrent";
 pub const CAP_SECONDS: u64 = 21600;
-pub const BID_USD_HOURLY: &str = "0.31";
-pub const BID_PROJECTION_USD: &str = "4.15";
-const RESULT_ARCHIVE_MAX_BYTES: u64 = 3 * 1024 * 1024 * 1024;
-const STATUS_ARCHIVE_MAX_BYTES: u64 = 256 * 1024 * 1024;
-const SOURCE_ARCHIVE_MAX_BYTES: u64 = 64 * 1024 * 1024;
+pub const BID_USD_HOURLY: &str = "0.27";
 const AMI_PARAMETER: &str =
     "/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id";
 
@@ -53,8 +48,6 @@ fn checked_source(root: &Path, directory: &Path) -> Result<Value> {
     fixture(root)?;
     arms(root)?;
     let bundle = bundle::verify(directory, None)?;
-    if fs::metadata(directory.join("source.tar.gz"))?.len() > SOURCE_ARCHIVE_MAX_BYTES {
-        return Err("source archive exceeds cross-region transfer budget".into());
     let head = Command::new("git")
         .args(["rev-parse", "HEAD"])
         .current_dir(root)
@@ -90,32 +83,11 @@ fn latest_quote(rows: &Value, now: DateTime<Utc>) -> Result<(String, String)> {
         return Err("Spot quote is stale".into());
     let price = field(row, "SpotPrice")?;
     let rate: f64 = price.parse()?;
-    if rate <= 0.0 || rate > BID_USD_HOURLY.parse::<f64>()? {
-        return Err("Spot quote exceeds proposed bid".into());
+    if !(0.0..=0.27).contains(&rate) || rate == 0.0 {
+        return Err("Spot quote exceeds approved bid".into());
     Ok((price.to_owned(), field(row, "Timestamp")?.to_owned()))
 
-fn check_budget() -> Result<()> {
-    let cents = BID_USD_HOURLY
-        .strip_prefix("0.")
-        .filter(|digits| digits.len() == 2)
-        .ok_or("Spot bid must have two decimal cents")?
-        .parse::<u64>()?;
-    if CAP_SECONDS != 21_600 {
-        return Err("six-hour deletion guard differs".into());
-    // Two hosts for six hours, $0.08 disks, $0.05 S3, and $0.30 for
-    // at most 6.625 GiB of cross-region source/results/status transfer.
-    let transfer_bytes =
-        2 * (RESULT_ARCHIVE_MAX_BYTES + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES);
-    if transfer_bytes > 7 * 1024 * 1024 * 1024 {
-        return Err("cross-region transfer envelope exceeds allowance".into());
-    let projected_cents = 2 * 6 * cents + 8 + 5 + 30;
-    if projected_cents > 420
-        || format!("{}.{:02}", projected_cents / 100, projected_cents % 100) != BID_PROJECTION_USD
-        return Err("Spot bid projection exceeds or differs from frozen cap".into());
-    Ok(())
-
 pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
-    check_budget()?;
     if output.exists() {
         return Err("AWS plan output already exists".into());
     let bundle = checked_source(root, source_bundle)?;
@@ -158,7 +130,7 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         || subnet["State"] != "available"
         || subnet["MapPublicIpOnLaunch"] != true
         || subnet["AvailableIpAddressCount"].as_u64().unwrap_or(0) < 2
-        return Err("proposed subnet differs".into());
+        return Err("approved east-region subnet differs".into());
     let zones = cli(
         &["ec2", "describe-availability-zones", "--zone-names", ZONE],
     let zone_id = field(&zones["AvailabilityZones"][0], "ZoneId")?;
@@ -176,9 +148,9 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         .iter()
         .find(|item| item["AvailabilityZoneId"] == zone_id)
         .and_then(|item| item["Score"].as_u64())
-        .ok_or("proposed-zone placement score absent")?;
+        .ok_or("east-zone placement score absent")?;
     if score < 3 {
-        return Err("proposed-zone placement score below gate".into());
+        return Err("east-zone placement score below approved gate".into());
     let parameter = cli(&["ssm", "get-parameter", "--name", AMI_PARAMETER], REGION)?;
     let image_id = field(&parameter["Parameter"], "Value")?;
     let images = cli(&["ec2", "describe-images", "--image-ids", image_id], REGION)?;
@@ -196,33 +168,22 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
             "--max-results",
             "100",
     let (quote, quote_time) = latest_quote(&history, now)?;
-    // This is read-only. A plan is ready only when the exact security group,
-    // instance profile, bucket, and no-overlapping-allocation gates pass too.
-    preflight_provider()?;
     let zone = |stratum| {
         json!({"stratum":stratum,"zone":ZONE,"subnet_id":SUBNET,
         "zone_id":zone_id,"spot_placement_score":score,"quote_usd_per_hour":quote,
         "quote_time":quote_time,"max_hourly_usd":BID_USD_HOURLY})
     };
     let record = json!({"schema":"n83.crossfamily-aws-spot-plan/v1",
-        "status":"PROPOSED_ROUTE_PROVIDER_READY","tier":"cloud_instance_tier1",
+        "status":"READY_FOR_APPROVED_ALLOCATION","tier":"cloud_instance_tier1",
         "placement_model":"two_distinct_instances_same_availability_zone",
         "recorded_utc":now.to_rfc3339(),"account_id":ACCOUNT,"region":REGION,
-        "vpc_id":VPC,"security_group_id":SECURITY_GROUP,
-        "s3_bucket":BUCKET,"s3_bucket_region":BUCKET_REGION,
         "instance_type":INSTANCE,"architecture":"arm64","image_id":image_id,
         "source_head_sha":bundle["source_head_sha"],
         "source_archive_sha256":bundle["source_archive_sha256"],
         "source_manifest_sha256":bundle["source_manifest_sha256"],
         "spot_quota_vcpus":quota_value,"cap_seconds":CAP_SECONDS,
         "root_disk_gb_per_host":50,"gp3_usd_per_gb_month":"0.08",
-        "s3_allowance_usd":"0.05","cross_region_transfer_allowance_usd":"0.30",
-        "cross_region_transfer_max_bytes":2 * (RESULT_ARCHIVE_MAX_BYTES
-            + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES),
-        "result_archive_max_bytes_per_host":RESULT_ARCHIVE_MAX_BYTES,
-        "status_archive_max_bytes_per_host":STATUS_ARCHIVE_MAX_BYTES,
-        "source_archive_max_bytes_per_host":SOURCE_ARCHIVE_MAX_BYTES,
-        "projected_at_bids_usd":BID_PROJECTION_USD,
+        "s3_allowance_usd":"0.05","projected_at_bids_usd":"3.37",
         "total_cap_usd":"4.20","zones":[zone(0),zone(1)]});
     let mut file = OpenOptions::new()
         .write(true)
@@ -236,13 +197,9 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
 pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Result<Value> {
     let plan: Value = serde_json::from_slice(&fs::read(plan_path)?)?;
     if plan["schema"] != "n83.crossfamily-aws-spot-plan/v1"
-        || plan["status"] != "PROPOSED_ROUTE_PROVIDER_READY"
+        || plan["status"] != "READY_FOR_APPROVED_ALLOCATION"
         || plan["account_id"] != ACCOUNT
         || plan["region"] != REGION
-        || plan["vpc_id"] != VPC
-        || plan["security_group_id"] != SECURITY_GROUP
-        || plan["s3_bucket"] != BUCKET
-        || plan["s3_bucket_region"] != BUCKET_REGION
         || plan["instance_type"] != INSTANCE
         || plan["architecture"] != "arm64"
         || plan["source_head_sha"] != bundle["source_head_sha"]
@@ -250,13 +207,7 @@ pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Resul
         || plan["source_manifest_sha256"] != bundle["source_manifest_sha256"]
         || plan["cap_seconds"] != CAP_SECONDS
         || plan["root_disk_gb_per_host"] != 50
-        || plan["cross_region_transfer_allowance_usd"] != "0.30"
-        || plan["cross_region_transfer_max_bytes"]
-            != 2 * (RESULT_ARCHIVE_MAX_BYTES + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES)
-        || plan["result_archive_max_bytes_per_host"] != RESULT_ARCHIVE_MAX_BYTES
-        || plan["status_archive_max_bytes_per_host"] != STATUS_ARCHIVE_MAX_BYTES
-        || plan["source_archive_max_bytes_per_host"] != SOURCE_ARCHIVE_MAX_BYTES
-        || plan["projected_at_bids_usd"] != BID_PROJECTION_USD
+        || plan["projected_at_bids_usd"] != "3.37"
         || plan["total_cap_usd"] != "4.20"
         || plan["zones"].as_array().is_none_or(|zones| {
             zones.len() != 2
@@ -267,7 +218,7 @@ pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Resul
                         || zone["max_hourly_usd"] != BID_USD_HOURLY
                 })
         })
-        return Err("AWS plan differs from sealed inputs".into());
+        return Err("approved AWS plan differs from sealed inputs".into());
     Ok(plan)
 
 fn atomic_json(path: &Path, record: &Value) -> Result<()> {
@@ -277,6 +228,7 @@ fn atomic_json(path: &Path, record: &Value) -> Result<()> {
         .open(&temporary)?;
     serde_json::to_writer_pretty(&mut file, record)?;
     fs::rename(temporary, path)?;
+    Ok(())
 
 fn now_epoch() -> Result<u64> {
     Ok(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs())
@@ -311,7 +263,6 @@ fn upload(path: &Path, key: &str, digest: &str, head: &str) -> Result<Value> {
             body,
             "--metadata",
             &metadata,
-        BUCKET_REGION,
     let version = field(&response, "VersionId")?;
     Ok(json!({"key":key,"version_id":version,"sha256":digest}))
 
@@ -372,18 +323,14 @@ fn user_data(
     let values = [
         ("N83_STRATUM", stratum.to_string()),
         ("N83_CAP_SECONDS", CAP_SECONDS.to_string()),
-        (
-            "N83_RESULT_ARCHIVE_MAX_BYTES",
-            RESULT_ARCHIVE_MAX_BYTES.to_string(),
-        ),
-            "N83_STATUS_ARCHIVE_MAX_BYTES",
-            STATUS_ARCHIVE_MAX_BYTES.to_string(),
         ("N83_SOURCE_GET_URL", links.source_url.to_owned()),
         ("N83_MANIFEST_GET_URL", links.manifest_url.to_owned()),
         ("N83_RESULTS_PUT_URL", links.result_url.to_owned()),
         ("N83_STATUS_PUT_URL", links.status_url.to_owned()),
+        (
             "N83_SOURCE_SHA256",
             field(plan, "source_archive_sha256")?.to_owned(),
+        ),
             "N83_MANIFEST_SHA256",
             field(plan, "source_manifest_sha256")?.to_owned(),
         ("N83_ALLOCATION_JSON", serde_json::to_string(&template)?),
@@ -407,7 +354,6 @@ fn user_data(
 
 fn launch(
     script: &str,
-    dry_run: bool,
     let user_data_path = output.join(format!("userdata-s{stratum}.sh"));
     let mut script_file = OpenOptions::new()
         .mode(0o600)
@@ -431,50 +377,35 @@ fn launch(
     let token = format!("n83-{run_id}-{stratum}");
     let profile = format!("Name={PROFILE}");
     let script_arg = format!("file://{}", user_data_path.display());
-    let args = [
-        "ec2",
-        "run-instances",
-        "--image-id",
-        field(plan, "image_id")?,
-        "--instance-type",
-        INSTANCE,
-        "--count",
-        "1",
-        "--client-token",
-        &token,
-        "--subnet-id",
-        SUBNET,
-        "--security-group-ids",
-        SECURITY_GROUP,
-        "--iam-instance-profile",
-        &profile,
-        "--instance-market-options",
-        &market,
-        "--metadata-options",
-        &metadata,
-        "--instance-initiated-shutdown-behavior",
-        "terminate",
-        "--block-device-mappings",
-        &disk,
-        "--tag-specifications",
-        &tags,
-        "--user-data",
-        &script_arg,
-    let mut command = Command::new("aws");
-    command
-        .args(["--region", REGION, "--output", "json", "--no-cli-pager"]);
-    if dry_run {
-        command.arg("--dry-run");
-    let result = command.output();
+    let result = cli(
+            "run-instances",
+            "--image-id",
+            field(plan, "image_id")?,
+            "--instance-type",
+            "--min-count",
+            "1",
+            "--max-count",
+            "--client-token",
+            &token,
+            "--subnet-id",
+            SUBNET,
+            "--security-group-ids",
+            SECURITY_GROUP,
+            "--iam-instance-profile",
+            &profile,
+            "--instance-market-options",
+            &market,
+            "--metadata-options",
+            "--instance-initiated-shutdown-behavior",
+            "terminate",
+            "--block-device-mappings",
+            &disk,
+            "--tag-specifications",
+            &tags,
+            "--user-data",
+            &script_arg,
     fs::remove_file(user_data_path)?;
     let result = result?;
-    let error = String::from_utf8_lossy(&result.stderr);
-        if !result.status.success() && error.contains("(DryRunOperation)") {
-            return Ok("DRY_RUN_PASS".to_owned());
-        return Err(format!("EC2 RunInstances dry run failed: {}", error.trim()).into());
-    if !result.status.success() {
-        return Err(format!("EC2 RunInstances failed: {}", error.trim()).into());
-    let result: Value = serde_json::from_slice(&result.stdout)?;
     let instances = result["Instances"]
         .ok_or("EC2 launch instances absent")?;
     if instances.len() != 1 {
@@ -580,19 +511,11 @@ fn preflight_provider() -> Result<()> {
     let group = cli(
             "describe-security-groups",
             "--group-ids",
-            SECURITY_GROUP,
     let group = &group["SecurityGroups"][0];
     if group["VpcId"] != VPC
         || group["IpPermissions"]
             .is_none_or(|rules| !rules.is_empty())
-        || group["IpPermissionsEgress"].as_array().is_none_or(|rules| {
-            rules.len() != 1
-                || rules[0]["IpProtocol"] != "-1"
-                || rules[0]["IpRanges"] != json!([{"CidrIp":"0.0.0.0/0"}])
-                || rules[0]["Ipv6Ranges"] != json!([])
-                || rules[0]["UserIdGroupPairs"] != json!([])
-                || rules[0]["PrefixListIds"] != json!([])
-        return Err("N83 security group differs from outbound-only rule".into());
+        return Err("N83 security group differs or permits inbound traffic".into());
     let profile = cli(
             "iam",
             "get-instance-profile",
@@ -600,17 +523,13 @@ fn preflight_provider() -> Result<()> {
             PROFILE,
     if !field(&profile["InstanceProfile"], "Arn")?.contains(&format!(":{ACCOUNT}:")) {
         return Err("EC2 instance profile belongs to another account".into());
-    cli(&["s3api", "head-bucket", "--bucket", BUCKET], BUCKET_REGION)?;
+    cli(&["s3api", "head-bucket", "--bucket", BUCKET], REGION)?;
     let filter = format!("Name=tag:Project,Values={PROJECT_TAG}");
-    for region in [REGION, BUCKET_REGION] {
-        let existing = cli(&["ec2", "describe-instances", "--filters", &filter], region)?;
-        let instances = existing["Reservations"]
-            .ok_or("EC2 reservations absent")?
-            .iter()
-            .flat_map(|r| r["Instances"].as_array().into_iter().flatten().cloned())
-            .collect::<Vec<_>>();
-        if !active_ids(&instances).is_empty() {
-            return Err("another N83 allocation is active".into());
+    let existing = cli(&["ec2", "describe-instances", "--filters", &filter], REGION)?;
+    let instances = existing["Reservations"]
+        .flat_map(|r| r["Instances"].as_array().into_iter().flatten().cloned())
+    if !active_ids(&instances).is_empty() {
+        return Err("another N83 allocation is active".into());
 
 fn run_id() -> Result<String> {
     let stamp = timestamp()?;
@@ -622,6 +541,7 @@ pub fn allocate(
     source_bundle: &Path,
     plan_path: &Path,
     let approved_plan = verify_plan(root, source_bundle, plan_path)?;
+    preflight_provider()?;
         return Err("AWS allocation output already exists".into());
     fs::create_dir(output)?;
     // Placement and price are mutable. Recheck both at the allocation boundary.
@@ -631,15 +551,13 @@ pub fn allocate(
         || plan["zones"][1]["zone_id"] != approved_plan["zones"][1]["zone_id"]
         return Err("approved image or zone changed before allocation".into());
     let run_id = run_id()?;
-    // Exercise the exact CLI argument shape before creating S3 objects.
-    launch(&plan, 0, "#!/bin/bash\ntrue\n", &run_id, output, true)?;
     let deadline = now_epoch()? + CAP_SECONDS;
     let receipt_path = output.join("allocation.json");
     let mut receipt = json!({"schema":"n83.crossfamily-aws-controller/v1",
         "account_id":ACCOUNT,"region":REGION,"source_head_sha":plan["source_head_sha"],
         "run_id":run_id,"deadline_epoch":deadline,"instance_ids":[],"strata":[],
         "source_objects":{},"result_objects":{},"status_objects":{},
-        "allocation_cap_usd":"4.20","bid_projection_usd":BID_PROJECTION_USD});
+        "allocation_cap_usd":"4.20","bid_projection_usd":"3.37"});
     atomic_json(&receipt_path, &receipt)?;
     let prefix = format!(
         "n83-highk-current/{}/{run_id}",
@@ -663,7 +581,7 @@ pub fn allocate(
             method: "GET",
             bucket: BUCKET,
             key: field(&receipt["source_objects"]["source.tar.gz"], "key")?,
-            region: BUCKET_REGION,
+            region: REGION,
             timestamp: &date,
             expires: CAP_SECONDS as u32,
             version_id: Some(field(
@@ -697,7 +615,7 @@ pub fn allocate(
                     method: "PUT",
                     bucket: BUCKET,
                     key: &result_key,
-                    region: BUCKET_REGION,
+                    region: REGION,
                     timestamp: &date,
                     expires: (CAP_SECONDS + 900) as u32,
                     version_id: None,
@@ -716,7 +634,7 @@ pub fn allocate(
                     status_url: &status_url,
                 &run_id,
                 root,
-            let id = launch(&plan, stratum, &script, &run_id, output, false)?;
+            let id = launch(&plan, stratum, &script, &run_id, output)?;
             receipt["instance_ids"]
                 .as_array_mut()
                 .ok_or("instance IDs absent")?
@@ -733,6 +651,7 @@ pub fn allocate(
         if ids.len() != 2 || ids[0] == ids[1] {
             return Err("two distinct AWS instances absent".into());
         let frozen = instances
+            .iter()
             .map(|item| {
                 let tags = item["Tags"]
                     .as_array()
@@ -752,6 +671,7 @@ pub fn allocate(
                 "subnet_id":item["SubnetId"],"state":item["State"]["Name"],
                 "launch_time":item["LaunchTime"],"tags":tags})
             })
+            .collect::<Vec<_>>();
         if frozen.iter().any(|item| {
             item["instance_type"] != INSTANCE
                 || item["instance_lifecycle"] != "spot"
@@ -780,28 +700,174 @@ pub fn allocate(
         "instance_ids":receipt["instance_ids"],"deadline_epoch":deadline,
         "receipt":receipt_path}))
 
-pub const REGION: &str = "us-east-1";
-pub const ZONE: &str = "us-east-1d";
-pub const VPC: &str = "vpc-0da45a1bf46c94fa9";
-pub const SUBNET: &str = "subnet-0561480728d2b1ffd";
-pub const SECURITY_GROUP: &str = "sg-030ffadf6a62d2ce2";
+pub const REGION: &str = "us-west-2";
+pub const ZONE: &str = "us-west-2b";
+pub const VPC: &str = "vpc-0394e002d95674fe6";
+pub const SUBNET: &str = "subnet-0ffc4f0562edc244f";
+pub const SECURITY_GROUP: &str = "sg-031c140ef9d078b3d";
+pub const BUCKET_REGION: &str = "us-east-1";
+pub const BID_USD_HOURLY: &str = "0.31";
+pub const BID_PROJECTION_USD: &str = "4.15";
+const RESULT_ARCHIVE_MAX_BYTES: u64 = 3 * 1024 * 1024 * 1024;
+const STATUS_ARCHIVE_MAX_BYTES: u64 = 256 * 1024 * 1024;
+const SOURCE_ARCHIVE_MAX_BYTES: u64 = 64 * 1024 * 1024;
+
+
+    if fs::metadata(directory.join("source.tar.gz"))?.len() > SOURCE_ARCHIVE_MAX_BYTES {
+        return Err("source archive exceeds cross-region transfer budget".into());
+
+
+    if rate <= 0.0 || rate > BID_USD_HOURLY.parse::<f64>()? {
+        return Err("Spot quote exceeds proposed bid".into());
+
+fn check_budget() -> Result<()> {
+    let cents = BID_USD_HOURLY
+        .strip_prefix("0.")
+        .filter(|digits| digits.len() == 2)
+        .ok_or("Spot bid must have two decimal cents")?
+        .parse::<u64>()?;
+    if CAP_SECONDS != 21_600 {
+        return Err("six-hour deletion guard differs".into());
+    // Two hosts for six hours, $0.08 disks, $0.05 S3, and $0.30 for
+    // at most 6.625 GiB of cross-region source/results/status transfer.
+    let transfer_bytes =
+        2 * (RESULT_ARCHIVE_MAX_BYTES + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES);
+    if transfer_bytes > 7 * 1024 * 1024 * 1024 {
+        return Err("cross-region transfer envelope exceeds allowance".into());
+    let projected_cents = 2 * 6 * cents + 8 + 5 + 30;
+    if projected_cents > 420
+        || format!("{}.{:02}", projected_cents / 100, projected_cents % 100) != BID_PROJECTION_USD
+        return Err("Spot bid projection exceeds or differs from frozen cap".into());
+
+    check_budget()?;
+        return Err("proposed subnet differs".into());
+        .ok_or("proposed-zone placement score absent")?;
+        return Err("proposed-zone placement score below gate".into());
+    // This is read-only. A plan is ready only when the exact security group,
+    // instance profile, bucket, and no-overlapping-allocation gates pass too.
+        "status":"PROPOSED_ROUTE_PROVIDER_READY","tier":"cloud_instance_tier1",
+        "vpc_id":VPC,"security_group_id":SECURITY_GROUP,
+        "s3_bucket":BUCKET,"s3_bucket_region":BUCKET_REGION,
+        "s3_allowance_usd":"0.05","cross_region_transfer_allowance_usd":"0.30",
+        "cross_region_transfer_max_bytes":2 * (RESULT_ARCHIVE_MAX_BYTES
+            + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES),
+        "result_archive_max_bytes_per_host":RESULT_ARCHIVE_MAX_BYTES,
+        "status_archive_max_bytes_per_host":STATUS_ARCHIVE_MAX_BYTES,
+        "source_archive_max_bytes_per_host":SOURCE_ARCHIVE_MAX_BYTES,
+        "projected_at_bids_usd":BID_PROJECTION_USD,
+
+        || plan["status"] != "PROPOSED_ROUTE_PROVIDER_READY"
+        || plan["vpc_id"] != VPC
+        || plan["security_group_id"] != SECURITY_GROUP
+        || plan["s3_bucket"] != BUCKET
+        || plan["s3_bucket_region"] != BUCKET_REGION
+        || plan["cross_region_transfer_allowance_usd"] != "0.30"
+        || plan["cross_region_transfer_max_bytes"]
+            != 2 * (RESULT_ARCHIVE_MAX_BYTES + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES)
+        || plan["result_archive_max_bytes_per_host"] != RESULT_ARCHIVE_MAX_BYTES
+        || plan["status_archive_max_bytes_per_host"] != STATUS_ARCHIVE_MAX_BYTES
+        || plan["source_archive_max_bytes_per_host"] != SOURCE_ARCHIVE_MAX_BYTES
+        || plan["projected_at_bids_usd"] != BID_PROJECTION_USD
+        return Err("AWS plan differs from sealed inputs".into());
+
+
+
+
+
+        BUCKET_REGION,
+
+
+
+            "N83_RESULT_ARCHIVE_MAX_BYTES",
+            RESULT_ARCHIVE_MAX_BYTES.to_string(),
+            "N83_STATUS_ARCHIVE_MAX_BYTES",
+            STATUS_ARCHIVE_MAX_BYTES.to_string(),
+
+    dry_run: bool,
+    let args = [
+        "ec2",
+        "run-instances",
+        "--image-id",
+        field(plan, "image_id")?,
+        "--instance-type",
+        INSTANCE,
+        "--count",
+        "1",
+        "--client-token",
+        &token,
+        "--subnet-id",
+        SUBNET,
+        "--security-group-ids",
+        SECURITY_GROUP,
+        "--iam-instance-profile",
+        &profile,
+        "--instance-market-options",
+        &market,
+        "--metadata-options",
+        &metadata,
+        "--instance-initiated-shutdown-behavior",
+        "terminate",
+        "--block-device-mappings",
+        &disk,
+        "--tag-specifications",
+        &tags,
+        "--user-data",
+        &script_arg,
+    let mut command = Command::new("aws");
+    command
+        .args(["--region", REGION, "--output", "json", "--no-cli-pager"]);
+    if dry_run {
+        command.arg("--dry-run");
+    let result = command.output();
+    let error = String::from_utf8_lossy(&result.stderr);
+        if !result.status.success() && error.contains("(DryRunOperation)") {
+            return Ok("DRY_RUN_PASS".to_owned());
+        return Err(format!("EC2 RunInstances dry run failed: {}", error.trim()).into());
+    if !result.status.success() {
+        return Err(format!("EC2 RunInstances failed: {}", error.trim()).into());
+    let result: Value = serde_json::from_slice(&result.stdout)?;
+
+
+
+
+
+
+
+        || group["IpPermissionsEgress"].as_array().is_none_or(|rules| {
+            rules.len() != 1
+                || rules[0]["IpProtocol"] != "-1"
+                || rules[0]["IpRanges"] != json!([{"CidrIp":"0.0.0.0/0"}])
+                || rules[0]["Ipv6Ranges"] != json!([])
+                || rules[0]["UserIdGroupPairs"] != json!([])
+                || rules[0]["PrefixListIds"] != json!([])
+        return Err("N83 security group differs from outbound-only rule".into());
+    cli(&["s3api", "head-bucket", "--bucket", BUCKET], BUCKET_REGION)?;
+    for region in [REGION, BUCKET_REGION] {
+        let existing = cli(&["ec2", "describe-instances", "--filters", &filter], region)?;
+        let instances = existing["Reservations"]
+            .ok_or("EC2 reservations absent")?
+            .flat_map(|r| r["Instances"].as_array().into_iter().flatten().cloned())
+        if !active_ids(&instances).is_empty() {
+            return Err("another N83 allocation is active".into());
+
+
+    // Exercise the exact CLI argument shape before creating S3 objects.
+    launch(&plan, 0, "#!/bin/bash\ntrue\n", &run_id, output, true)?;
+        "allocation_cap_usd":"4.20","bid_projection_usd":BID_PROJECTION_USD});
+            region: BUCKET_REGION,
+                    region: BUCKET_REGION,
+            let id = launch(&plan, stratum, &script, &run_id, output, false)?;
+
 pub const BID_USD_HOURLY: &str = "0.28";
 
 
 
 
     if !(0.0..=0.28).contains(&rate) || rate == 0.0 {
-        return Err("Spot quote exceeds approved bid".into());
 
-        return Err("approved east-region subnet differs".into());
-        .ok_or("east-zone placement score absent")?;
-        return Err("east-zone placement score below approved gate".into());
-        "status":"READY_FOR_APPROVED_ALLOCATION","tier":"cloud_instance_tier1",
         "s3_allowance_usd":"0.05","projected_at_bids_usd":"3.49",
 
-        || plan["status"] != "READY_FOR_APPROVED_ALLOCATION"
         || plan["projected_at_bids_usd"] != "3.49"
-        return Err("approved AWS plan differs from sealed inputs".into());
 
 
 
@@ -811,32 +877,6 @@ pub const BID_USD_HOURLY: &str = "0.28";
 
 
 
-    let result = cli(
-            "run-instances",
-            "--image-id",
-            field(plan, "image_id")?,
-            "--instance-type",
-            "--min-count",
-            "1",
-            "--max-count",
-            "--client-token",
-            &token,
-            "--subnet-id",
-            SUBNET,
-            "--security-group-ids",
-            "--iam-instance-profile",
-            &profile,
-            "--instance-market-options",
-            &market,
-            "--metadata-options",
-            "--instance-initiated-shutdown-behavior",
-            "terminate",
-            "--block-device-mappings",
-            &disk,
-            "--tag-specifications",
-            &tags,
-            "--user-data",
-            &script_arg,
 
 
 
@@ -844,16 +884,6 @@ pub const BID_USD_HOURLY: &str = "0.28";
 
 
 
-        return Err("N83 security group differs or permits inbound traffic".into());
-    cli(&["s3api", "head-bucket", "--bucket", BUCKET], REGION)?;
-    let existing = cli(&["ec2", "describe-instances", "--filters", &filter], REGION)?;
-    let instances = existing["Reservations"]
-        .flat_map(|r| r["Instances"].as_array().into_iter().flatten().cloned())
-    if !active_ids(&instances).is_empty() {
-        return Err("another N83 allocation is active".into());
 
 
         "allocation_cap_usd":"4.20","bid_projection_usd":"3.49"});
-            region: REGION,
-                    region: REGION,
-            let id = launch(&plan, stratum, &script, &run_id, output)?;
