@@ -20,3 +20,6 @@ Frozenbe5e94cd2808/checkpoint043935Z executed once:12exact reference comparisons
 
 ## Prefix preparation error
 The source-generation edit initially expected indentation absent from the authoritative clone; it stopped before creating the new binary source. The subsequent build consequently found no prefix binary. Retained BUILD-PREFIX-INITIAL.txt, corrected markers from actual source and rebuilt before any execution. No scientific gate ran during this preparation error.
+
+## Completed prefix gate and publication decision
+Frozen83fa8ce7331f/checkpoint044149Z executed once:12reference-equivalent cases and3supplied-target source checks pass, complete operator/transpose basis checks pass, exit0/emptystderr. Prefixbound improves initial circuit for everyg2/g3case and worsens everyg4case; against expanded rows favorable4/5g2,0/5g3,0/5g4. Do not promote circuit-only work into tenfold evidence or spend timing cohort on this gate. RESULTS.md includes all15cases; two-page REPORT.pdf rendered and every page inspected. Next investigate relation-production/retained-algebra mechanisms with prior anchor work screened first. Goal remains active. No PR merge.
