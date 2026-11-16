@@ -1,0 +1,31 @@
+{
+  "schema": "independent-static-include-closure/v1",
+  "scientific_execution": false,
+  "compilation": false,
+  "project_files": [
+    "research/primal_enum_20261109_v4/native.cpp",
+    "research/primal_enum_20261109_v4/frozen_lll_prefix.hpp",
+    "research/dual_lattice_20261109_v2/frozen_prefix.hpp",
+    "research/nist_sum_gmp_20261109_v1/gmp_field.hpp"
+  ],
+  "quoted_include_edges": [
+    [
+      "research/primal_enum_20261109_v4/native.cpp",
+      "research/primal_enum_20261109_v4/frozen_lll_prefix.hpp"
+    ],
+    [
+      "research/primal_enum_20261109_v4/frozen_lll_prefix.hpp",
+      "research/dual_lattice_20261109_v2/frozen_prefix.hpp"
+    ],
+    [
+      "research/dual_lattice_20261109_v2/frozen_prefix.hpp",
+      "research/nist_sum_gmp_20261109_v1/gmp_field.hpp"
+    ],
+    [
+      "research/nist_sum_gmp_20261109_v1/gmp_field.hpp",
+      "/usr/include/gmpxx.h"
+    ]
+  ],
+  "native_minimal_repair_verified": true,
+  "all_five_input_sha256": "403db5080e81eda5e9b5643020babf54283472b338831f4f14d7655ef5955c93"
+}

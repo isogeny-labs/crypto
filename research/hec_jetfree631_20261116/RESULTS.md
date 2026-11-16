@@ -1,0 +1,9 @@
+# Exact section evaluation without unnecessary Hensel lifts
+
+Correctness gate passes on one execution:48no-base evaluations match every numerator coefficient and base factor against the original Hensel evaluator. An explicit reduced divisor containing the fixed base exercises a degree2common base factor and matches the unchanged cancellation fallback. Both final classes match the preceding direct replay byte-for-byte, with all candidate/adjacent corruption controls preserved. Exit0/stderrempty. Source050bd00ca954/checkpoint20261116T032138Z precedes the run.
+
+Mechanism: if g=1, reduction modulo u after polynomial evaluation of a lift y+u*t equals direct evaluation of y modulo u. No base-factor division consumes precision, so the old modulo-u²Newton lift, derivative inversion and subsequent reduction are redundant on that branch. Reduced numerators used in the gcd are reused as the result. If g is nontrivial, use the complete original Hensel/cancellation implementation.
+
+Residue.lean proves polynomial evaluation preserves this ideal-quotient residue in any commutative ring, under the explicit ideal-membership hypothesis. Lean4.19/mathlibc44e0c8ee63ca166450922a373c7409c5d26b00b checks with exit0; axiomspropext,Classical.choice,Quot.sound. It does not formalize the Rust evaluator, correctness of the computed gcd/lift or the full geometric correspondence. The exact numerical comparisons address this finite implementation cohort separately.
+
+The comparison build intentionally runs the reference on every call, so its wall time is not an optimization measurement. No benchmark or new speedup claim is made. The previous charged1.621xinverse result is unchanged. A production variant must remove comparison-only reference calls, retain both branches and undergo the same class/exceptional controls before a separately frozen timing run. Broad support/global-map/genus2/4and tenfold objective remain unresolved.

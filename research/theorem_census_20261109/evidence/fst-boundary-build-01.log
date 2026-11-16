@@ -1,0 +1,24 @@
+SourceFSTBoundary.lean:24:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+SourceFSTBoundary.lean:43:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+SourceFSTBoundary.lean:91:50: warning: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [E, curve, WeierstrassCurve.baseChange, WeierstrassCurve.map, map_zero, map_one, mul_zero, zero_mul,
+    add_zero, zero_pow (by decide : (2 : ℕ) ≠ 0), one_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
