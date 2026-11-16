@@ -67,3 +67,5 @@ divisor representatives, isogeny comparison, general descent, canonical
 Tate and general MOV/Frey–Rück remain open. All fourteen targets remain
 active. Rational-function reciprocity does not close these bridges.
 [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `428c0bca48eaab58ea0f21fde389f6448d11eab9` and local receipt `ca593bcb1701d14e648feef21e2622aba859bed6` share tree `9fa3cb42f644c1a2db13f0a4ad61d486cc296afa`. Anonymous fetch completed and a fresh read matched the exact head, title, body and ready state. All 42 pinsets / 4707 entries match. Current-head CI, review and signing are pending. [pcc:unverified]
