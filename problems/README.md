@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Prepared-table PCC/artifact storage](prepared-point-tables-ledger-artifact-policy.md) | open | canonical producer artifact registration | reviewed append-only storage contract or approved policy exception covering gate and migration readers |
 | [Native Koblitz measurement checkpoint access](native-koblitz-measurement-access.md) | open | requested isolated Rust baseline/candidate measurement | existing authorized S3 uploader, checkpoint gate, source-pinned EKS execution and verified receipts |
 
 ---
@@ -61,6 +62,7 @@ Keep resolved and superseded records in the index.
 | [IC six-obligation follow-up gates](ic-six-obligation-followup-gates.md) | investigating | fixed-population yield/rank, production arity-three theory, PKM lower bound, Wagner variance, and xedni selector conclusions | clean source custody and native producers; checked proof/lower-bound objects; frozen EKS protocols only after their individual gates |
 | [Hashed-ECDLP boundary-rank family lower bound](hashed-ecdl-boundary-rank-family-lower-bound.md) | open | asymptotic lower bound for the registered exact linear-message contraction | freeze the production cut family and prove a uniform exponential nonzero minor or equivalent rank bound, plus the architecture cost bridge |
 | [ECDLP dataset worker publication and cumulative admission](ml-ecdlp-dataset-durable-launch.md) | open | first durable native cloud cell and admitted large-corpus launch | approved scoped worker access, real PUT/GET/hash preflight, cumulative budget reservations, fresh restore and independent replay |
+| [Native point-table applicable CI dependency](point-table-crypto-applicable-ci.md) | open | Crypto4342/4351 merge under all applicable checks | owning lane resolves the unchanged open genus-ladder benchmark record; fresh current-head CI/review |
 
 | [Guarded fall-degree exact-pair Lean proof](guarded-fall-degree-lean-exact-pair.md) | resolved | the original ordinary guarded three-abscissa prime-field pair `(4,5)` | `GuardedExactPair.exact_pair_prime` proves the full statement; current proof map and versioned verification receipt bind the complete source chain |
 | [E12b On-Demand launch denied](fall-degree-e12b-on-demand-launch.md) | open | completion of registered fall-degree cell 3:24:7 after two Spot interruptions | administrator-authorized On-Demand execution environment, successful launch preflight, then unchanged Amendment 12 gates and four draws |
