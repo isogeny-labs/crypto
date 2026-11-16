@@ -1,0 +1,24 @@
+import CrossCharacteristicExample
+import Mathlib.Algebra.CharP.Two
+import Mathlib.FieldTheory.Finite.GaloisField
+
+open CrossCharacteristicExample
+
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+noncomputable instance : DecidableEq (GaloisField 2 2) := Classical.decEq _
+
+example : Nat.card (GaloisField 2 2) = 4 := by
+  exact GaloisField.card 2 2 (by decide)
+
+example (E : WeierstrassCurve (GaloisField 2 2))
+    (R : E.toAffine.Point) (hR : addOrderOf R = 3) :
+    ∃ f : AddSubgroup.zmultiples P ≃+ AddSubgroup.zmultiples R,
+      f sourceGenerator = ⟨R, by simp⟩ := by
+  let g : AddSubgroup.zmultiples R := ⟨R, by simp⟩
+  let f : AddSubgroup.zmultiples P ≃+ AddSubgroup.zmultiples R :=
+    addEquivOfAddOrderOfEq (g := sourceGenerator) (g' := g)
+      (AddSubgroup.forall_zmultiples.mpr (fun n => ⟨n, rfl⟩))
+      (AddSubgroup.forall_zmultiples.mpr (fun n => ⟨n, rfl⟩))
+      (by simpa only [sourceGenerator, g, AddSubgroup.addOrderOf_mk]
+        using P_order.trans hR.symm)
+  exact ⟨f, addEquivOfAddOrderOfEq_apply_gen _ _ _⟩

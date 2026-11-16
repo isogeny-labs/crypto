@@ -1,0 +1,80 @@
+{
+  "schema": "merge-parent-evidence-review/v1",
+  "reviewed_merge": "5e2b86ebdd65b223eec365cdfa3cac7116196ac5",
+  "parents": [
+    "014587e015c50116ceae8a3c12a7aacbfa3536fd",
+    "84fd610de0727b15cb009951392f7b21fea585df"
+  ],
+  "source_ledger_entries": 1088,
+  "main_ledger_entries": 1088,
+  "merged_ledger_entries": 1089,
+  "main_ledger_hash_prefix_preserved": true,
+  "original_source_ledger_hash_prefix_preserved": false,
+  "changed_source_rows": [
+    {
+      "original_index": 1087,
+      "original_hash": "5b035a40ac22607243f30684ce6755000c9d98e7cfc342ff085940cecb99604c",
+      "type": "claim",
+      "claim_id": "PCC-20261115-8b013d",
+      "replacement_hash": "55b996ec59623fca139a433fb6415bfbb21dbe5ce637f008843dc7e9c0a501b1",
+      "replacement_claim": "PCC-20261115-a65a43",
+      "event_found_at_index": 1088,
+      "event_new_hash": "adc32e6de5dcf2c68e6e4935f74971116347a24f1fc5ba7603767978a9544700"
+    }
+  ],
+  "decision": "Unresolved frozen-ledger history issue in the independently produced merge. Report, do not rewrite or choose a history. New characteristic-two work only appends its own claim.",
+  "journal_review": {
+    "normalization": "Full ## block with trimEnd only; compare multiplicities, never headings alone",
+    "merged_blocks": 244,
+    "parents": [
+      {
+        "ref": "014587e015c50116ceae8a3c12a7aacbfa3536fd",
+        "blocks": 229,
+        "missing_full_block_multiplicities": [
+          {
+            "heading": "## 2026-11-15 Why isogeny seeds differ (Claude)",
+            "normalized_block_sha256": "a6be049f288fc05c10ac54a59e1e41b4694ca4c2fa67bcf6f42001d154b2fe52",
+            "required": 1,
+            "present": 0
+          },
+          {
+            "heading": "## 2026-11-15T01:05:00Z — Survey: further speed-up techniques for genus ≥ 2 DLP",
+            "normalized_block_sha256": "40b755c769e0636fdd1d3ac0cc86ae505e9652fa94eb83de171c6fb20d1b4b01",
+            "required": 1,
+            "present": 0
+          },
+          {
+            "heading": "## 2026-11-15T04:30Z — F5 closed: ecbench rebuilt from e9d5dbdccd, 288/288 identical replay (Claude, main session)",
+            "normalized_block_sha256": "8e2d78ec565bf476884c28cfcb6ab5b9f68e46c5b2deee349dc21f61be3ccc40",
+            "required": 1,
+            "present": 0
+          },
+          {
+            "heading": "## 2026-11-15T18:13:07Z — Preserve the latest main histories in PR 4308",
+            "normalized_block_sha256": "0668a595ed9cb2c0a4adb65ec8bccf71bb5301cf133e826332b68af414c7464d",
+            "required": 1,
+            "present": 0
+          }
+        ]
+      },
+      {
+        "ref": "84fd610de0727b15cb009951392f7b21fea585df",
+        "blocks": 237,
+        "missing_full_block_multiplicities": [
+          {
+            "heading": "## 2026-11-15T19:25Z — Assessment repairs, item 2: validation gate (Claude, session 01TCbLH9)",
+            "normalized_block_sha256": "fef4c789844d2cd1571756d6dd822ef6082ac67f60dc05368b65d9eb2cc5e753",
+            "required": 1,
+            "present": 0
+          },
+          {
+            "heading": "## 2026-11-15T19:44Z — Orientation review branch synchronization (Codex)",
+            "normalized_block_sha256": "bc17d9d235af9e687290eea5fb4adf18ba206b6ceae7a31ebe1a8a358074a444",
+            "required": 1,
+            "present": 0
+          }
+        ]
+      }
+    ]
+  }
+}

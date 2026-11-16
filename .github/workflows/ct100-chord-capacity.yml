@@ -1,0 +1,45 @@
+name: CT100 chord incidence and rational cross-prime control
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct100/**'
+      - '.github/workflows/ct100-chord-capacity.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct100/**'
+      - '.github/workflows/ct100-chord-capacity.yml'
+  workflow_dispatch:
+jobs:
+  ct100:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent finite field chord capacity and cold source BSGS
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct100
+          python3 -B "$D/ct100_chord_capacity.py" > /tmp/chord-py.json
+          python3 -O -B "$D/ct100_chord_capacity.py" > /tmp/chord-pyopt.json
+          node "$D/ct100_chord_capacity_independent.js" > /tmp/chord-js.json
+          node --no-opt "$D/ct100_chord_capacity_independent.js" > /tmp/chord-jsopt.json
+          cmp /tmp/chord-py.json /tmp/chord-pyopt.json
+          cmp /tmp/chord-py.json /tmp/chord-js.json
+          cmp /tmp/chord-py.json /tmp/chord-jsopt.json
+          printf '%s  %s\n' e102c79b5abbced8bce33df16c3538838be11e6ead453404755f03ef84c94c09 /tmp/chord-py.json | sha256sum -c
+          cat /tmp/chord-py.json
+      - name: Independent global rational five torsion and all 25 group pairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct100
+          python3 -B "$D/ct100_rational_torsion.py" > /tmp/rational-py.json
+          python3 -O -B "$D/ct100_rational_torsion.py" > /tmp/rational-pyopt.json
+          node "$D/ct100_rational_torsion_independent.js" > /tmp/rational-js.json
+          node --no-opt "$D/ct100_rational_torsion_independent.js" > /tmp/rational-jsopt.json
+          cmp /tmp/rational-py.json /tmp/rational-pyopt.json
+          cmp /tmp/rational-py.json /tmp/rational-js.json
+          cmp /tmp/rational-py.json /tmp/rational-jsopt.json
+          printf '%s  %s\n' 8fd9c76473f73b96747a1419bde2474b12291b615796b0683ea374e92a23abc4 /tmp/rational-py.json | sha256sum -c
+          cat /tmp/rational-py.json

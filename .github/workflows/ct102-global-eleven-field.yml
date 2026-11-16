@@ -1,0 +1,39 @@
+name: CT102 global eleven-torsion point field
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct102/**'
+      - '.github/workflows/ct102-global-eleven-field.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct102/**'
+      - '.github/workflows/ct102-global-eleven-field.yml'
+  workflow_dispatch:
+
+jobs:
+  ct102:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exact irreducibility and negative field norm certificates
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct102
+          python3 -B "$D/ct102_global_point_field.py" >/tmp/ct102-py.json
+          python3 -O -B "$D/ct102_global_point_field.py" >/tmp/ct102-pyopt.json
+          node "$D/ct102_global_independent.js" >/tmp/ct102-js.json
+          node --no-opt "$D/ct102_global_independent.js" >/tmp/ct102-jsopt.json
+          cmp /tmp/ct102-py.json /tmp/ct102-pyopt.json
+          cmp /tmp/ct102-py.json /tmp/ct102-js.json
+          cmp /tmp/ct102-py.json /tmp/ct102-jsopt.json
+          printf 'a3ef0ab024d4fc8982a56482df4223a3c822ebf2ee253ccc70e21eb333c35a1d  %s\n' /tmp/ct102-py.json | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/ct102-py.json'))
+          assert r['minimal_x_degree']==60
+          assert r['oriented_point_field_degree']==120
+          assert r['negative_norm_certifies_nonsquare'] is True
+          assert r['global_lift_of_public_source_computed'] is False
+          PY
