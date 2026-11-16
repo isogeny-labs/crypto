@@ -7,6 +7,8 @@ use std::{collections::BTreeMap, path::Path};
 pub(crate) mod round14;
 #[path = "round15_record.rs"]
 pub(crate) mod round15;
+#[path = "round22_record.rs"]
+pub(crate) mod round22;
 fn hash(p: &Path) -> String {
     hex::encode(sha256_impl::sha256(&std::fs::read(p).unwrap()))
 }

@@ -1,0 +1,63 @@
+{
+  "schema": "research.formal-component/v1",
+  "scope": "signed graph affine potential algebra over CommRing",
+  "main_declarations": 9,
+  "controls": 9,
+  "readbacks": 18,
+  "checks": {
+    "algebra1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "algebra2": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "algebra3": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "axioms": [
+    "propext",
+    "Quot.sound"
+  ],
+  "scientific_execution": false,
+  "independent_review": false,
+  "compiled_equivalence": false,
+  "source_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+  "interfaces": [
+    "compression",
+    "compression_sound",
+    "reversal",
+    "reverse_involutive",
+    "edge_reduction",
+    "union_forward",
+    "union_sign",
+    "union_backward",
+    "fixed_child_transport"
+  ],
+  "native_obligations": [
+    "actual node scalar-coordinate interpretation",
+    "forest shape and recursive find termination",
+    "array bounds and update invariant",
+    "Ring.add no-overflow under 2r-2<2^64",
+    "Ring.neg canonical operands",
+    "signs are plus/minus one",
+    "counter headroom",
+    "same-root cycle and final inverse extraction not covered here"
+  ]
+}

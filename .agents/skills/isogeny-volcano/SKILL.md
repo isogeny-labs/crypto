@@ -16,7 +16,7 @@ draws recorded values.
 |:--|:--|:--|
 | binary | `target/release/volcano-rho` (`src/bin/volcano_rho.rs`) | `build/ca volcano` (`ca_volcano.h`, `src/volcano.c`) |
 | curve | `--curve P,A,B [--order N]`, or a search: `--bits --depth --crater any\|split\|inert\|ramified --max-cofactor` | `--p P --a A --b B [--order N]` |
-| rho | built-in single-walker 32-adding DP walk, no negation map; or `--engine ca --ca PATH [--ca-arg ...]` | `ca_rho_solve` in-process (negation map on; `--no-negation`, `--threads`, `--dp-bits`, `--r`) |
+| rho | built-in single-walker 32-adding DP walk on `{R, −R}` (negation map, look-ahead, cycle escape; `--negation off` for the walk on points used before 2026-10-20); or `--engine ca --ca PATH [--ca-arg ...]` | `ca_rho_solve` in-process (negation map on; `--no-negation`, `--threads`, `--dp-bits`, `--r`) |
 | output | `--out DIR`: `results.json`, `trials.csv`, `instances.jsonl` | JSON on stdout, table on stderr, `--trials-out CSV`, `--diagram FILE` |
 | graphs | `research/isogeny-volcano-rho/plot.py DIR` (writes `volcano.diagram.json` and the SVG/PNGs) | `--diagram` writes `volcano-diagram/v1` input (`plot_ca.py` turns it into v2) |
 
@@ -142,3 +142,22 @@ Write down, in the note or PR:
   large. That is expected, and review bots may decline it.
 - **Code changes:** a change to either binary must replay the recorded
   runs before it lands.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope isogeny-volcano`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope isogeny-volcano --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope isogeny-volcano --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `isogeny-volcano` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

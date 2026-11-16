@@ -1,0 +1,166 @@
+{
+  "card_id": "CARD-fall-degree-e10-20261027-3",
+  "card_path": "research/fall_degree_bounds_20261008/e10/launch3.card.yaml",
+  "card_sha256": "302368a83ab7774b0c42ecc0a672b5c21ea97eca174b478ccc63f6c99b06e37f",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--no-source",
+        "--type",
+        "m7a.8xlarge",
+        "--toolchain",
+        "rust",
+        "--ttl",
+        "24h",
+        "--name",
+        "fd-e9-large-20261027-r3",
+        "--",
+        "set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo \"dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 6:10:3 5:15:3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.856,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-e9",
+      "index": 1,
+      "outputs": {},
+      "seconds": 10.856,
+      "stderr_sha256": "6a1cb6775a6ce665ef223e9869eefd3f826c98a6d23a995ff3823c699e7a1dee",
+      "stderr_tail": [
+        "ephemeral: job 20261027-051737-fd-e9-large-20261027-r3-309af7",
+        "ephemeral:   m7a.8xlarge spot i-094cd5bb870735c01 (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T05:17:38Z)",
+        "ephemeral:   command: set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo \"dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 6:10:3 5:15:3",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-051737-fd-e9-large-20261027-r3-309af7/"
+      ],
+      "stdout_sha256": "2d4dc5facbda6ea7b75c5beabdca0d2dfa2ed47a5e836ae95fb24f0219d2018b",
+      "stdout_tail": [
+        "20261027-051737-fd-e9-large-20261027-r3-309af7"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--no-source",
+        "--type",
+        "m7a.4xlarge",
+        "--toolchain",
+        "rust",
+        "--ttl",
+        "24h",
+        "--name",
+        "fd-e10-m3m6-20261027-r3",
+        "--",
+        "set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo \"dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 3:21:7 3:24:8 3:27:9 6:12:2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-e10-m3-m6",
+      "index": 2,
+      "outputs": {},
+      "seconds": 9.007,
+      "stderr_sha256": "cec36510cc5cf262f5f5cb61783e1a06f6f1770e16bec4fc3b8760f63fb3da4d",
+      "stderr_tail": [
+        "ephemeral: job 20261027-051747-fd-e10-m3m6-20261027-r3-c78d05",
+        "ephemeral:   m7a.4xlarge spot i-056e89200ba46b491 (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T05:17:48Z)",
+        "ephemeral:   command: set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo \"dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 3:21:7 3:24:8 3:27:9 6:12:2",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-051747-fd-e10-m3m6-20261027-r3-c78d05/"
+      ],
+      "stdout_sha256": "b0f5b1651a071eaf9f46562cb792c0f3183f1da7f1e69cffe1039c9e506068e0",
+      "stdout_tail": [
+        "20261027-051747-fd-e10-m3m6-20261027-r3-c78d05"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--no-source",
+        "--type",
+        "m7a.4xlarge",
+        "--toolchain",
+        "rust",
+        "--ttl",
+        "24h",
+        "--name",
+        "fd-e10-m4-20261027-r3",
+        "--",
+        "set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo \"dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 4:12:3 4:16:4 4:20:5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.234,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-e10-m4",
+      "index": 3,
+      "outputs": {},
+      "seconds": 9.234,
+      "stderr_sha256": "bae34442d743f636467fbf916d7b5be915b7d355c2babc7d48b51ebde0c9bb24",
+      "stderr_tail": [
+        "ephemeral: job 20261027-051756-fd-e10-m4-20261027-r3-7f17f2",
+        "ephemeral:   m7a.4xlarge spot i-08cbc049a43f22903 (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T05:17:58Z)",
+        "ephemeral:   command: set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo \"dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e10/run_job.sh \"$EPHEMERAL_OUT\" 4:12:3 4:16:4 4:20:5",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-051756-fd-e10-m4-20261027-r3-7f17f2/"
+      ],
+      "stdout_sha256": "1e1413dd4aa14306530de0a1894bae15fc5744ddea47c7a2c5943e73fafefade",
+      "stdout_tail": [
+        "20261027-051756-fd-e10-m4-20261027-r3-7f17f2"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 3,
+  "commit": "54267c7c8dba85136fe221a4939127a7090f7beb",
+  "dirty_after": [
+    "research/fall_degree_bounds_20261008/e10/launch3.card.yaml",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m3-m6.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m3-m6.stdout",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m4.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e10-m4.stdout",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e9.stderr",
+    "research/fall_degree_bounds_20261008/e10/launch_receipt3/launch-e9.stdout",
+    "research/fall_degree_bounds_20261008/e10/source_paths.txt"
+  ],
+  "dirty_before": [
+    "research/fall_degree_bounds_20261008/e10/launch3.card.yaml",
+    "research/fall_degree_bounds_20261008/e10/source_paths.txt"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

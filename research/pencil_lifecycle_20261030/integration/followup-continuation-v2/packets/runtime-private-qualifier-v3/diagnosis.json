@@ -1,0 +1,25 @@
+{
+  "observed_failure": "FileNotFoundError: No usable temporary directory found in /tmp,/var/tmp,/usr/tmp,/",
+  "passed_cases": [],
+  "code_path": "first daemon-info inspection allocates TemporaryFile before subprocess.Popen",
+  "source_derived_cause": "ProtectSystem=strict plus narrow writable paths and no temporary-directory environment override leaves default tempfile candidates unusable",
+  "correction": "inspection_capture(d): tempfile.TemporaryFile(mode=w+b,dir=d)",
+  "writable_storage": "existing per-command receipt directory beneath private bounded filesystem",
+  "source_hashes": {
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v3/supervise.py": "c8d1dc9342bcb483e2b1f2aaf4592bdd1eaf29111793cf9c1ce587e75ca0eb4e",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualifier-v2/supervise.py": "23f726c63740205e5041af3af3c364de7864fa8b36ed2ffa93c33a277c1c89ae",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualification-attempt-v3/qualifier-receipt.stdout": "fb31d284257a099bd74f13d6b3033e23a9bbdfdfe1ff0588512d9400df282f50",
+    "/usr/lib64/python3.9/tempfile.py": "6f8317b2d048bbc85cdd54ac0e329c5ad33a57290ee4be39bf7f04db1daee68f"
+  },
+  "changed_production_files": [
+    "supervise.py"
+  ],
+  "unchanged_production_files": [
+    "private_contract.py",
+    "head_contract.py",
+    "gate.c"
+  ],
+  "runtime_retry_executed": false,
+  "runtime_integration_validated": false,
+  "admission": false
+}

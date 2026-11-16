@@ -1,0 +1,74 @@
+
+--------------- INPUT DATA ---------------
+#variables                      24
+#equations                      48
+#invalid equations               0
+field characteristic             2
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  2      18      45      24 x 169        48.89%       18 new       0 zero         0.00 | 0.00         
+  2       3     169      59 x 272        11.27%        2 new       1 zero         0.00 | 0.00         
+  3     191     191    1189 x 2494        1.49%      169 new      22 zero         0.02 | 0.02         
+  3     310    1101    1861 x 2782        3.09%      310 new       0 zero         0.08 | 0.08         
+  4    5951    5951   20629 x 16752       1.42%     2072 new    3879 zero         8.18 | 8.07         
+  2     275    7430     586 x 313         2.90%        0 new     275 zero         0.00 | 0.00         
+  3    2543    7155    4078 x 1537        3.32%        0 new    2543 zero         0.03 | 0.03         
+  4    4612    4612    5810 x 1200        0.14%        0 new    4612 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis       24 x 26          9.94%       24 new       0 zeroDimension of quotient: 2
+------------------------------------------------------------------------------------
+msolve overall time           8.34 sec (elapsed) /  8.22 sec (cpu)
+------------------------------------------------------------------------------------
+         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)        8.33 sec
+overall(cpu)            8.21 sec
+select                  0.18 sec   2.1%
+symbolic prep.          0.08 sec   1.0%
+update                  2.95 sec  35.5%
+convert                 0.01 sec   0.1%
+linear algebra          5.09 sec  61.1%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                    24
+#terms in basis                  48
+#pairs reduced                13903
+#GM criterion               3414368
+#redundant elements            2595
+#rows reduced                 27830
+#zero reductions              11332
+max. matrix data              20629 x 16752 (1.424%)
+max. symbolic hash table size  2^15
+max. basis hash table size     2^19
+-----------------------------------------
+

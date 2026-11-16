@@ -1,0 +1,31 @@
+    Checking serde_core v1.0.229
+    Checking typenum v1.20.1
+    Checking generic-array v0.14.7
+    Checking zmij v1.0.23
+    Checking memchr v2.8.3
+    Checking itoa v1.0.18
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking digest v0.10.7
+    Checking cfg-if v1.0.5
+    Checking cpufeatures v0.2.17
+    Checking sha2 v0.10.9
+    Checking five-leads-study v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/five_leads_e2e_20261019/native)
+    Checking pencil-symbolic-graph v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029)
+    Checking pencil-early-rejection-study v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_early_rejection_20261030)
+error: called `unwrap` on `old.0` after checking its variant with `is_some`
+   --> src/equivalence_tests.rs:172:44
+    |
+163 |                 if old.0.is_some() {
+    |                 ------------------ help: try: `if let Some(<item>) = &old.0`
+...
+172 |                         old_graph.relation(old.0.as_ref().unwrap(), 1, 1),
+    |                                            ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_unwrap
+    = note: `-D clippy::unnecessary-unwrap` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::unnecessary_unwrap)]`
+
+error: could not compile `pencil-early-rejection-study` (lib test) due to 1 previous error

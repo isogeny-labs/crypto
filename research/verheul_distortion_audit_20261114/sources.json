@@ -1,0 +1,144 @@
+{
+  "schema": "verheul-distortion-source-plan/v1",
+  "created": "2026-11-14T01:07:24.675797+00:00",
+  "formal": {
+    "project": "research/verheul_distortion_audit_20261114/lean",
+    "theorem": "VerheulDistortionAudit.actual_distortion_formula_certificate",
+    "statement": "theorem actual_distortion_formula_certificate : (∀ (K : Type) [Field K] (a x y w : K), w^3=1 → w≠1 → y≠0 → (model a).Equation x y → ¬ (model a).Equation x (w*y)) ∧ (∀ (K : Type) [Field K] (a x y w : K), w^3=1 → ((model a).Equation (w*x) y ↔ (model a).Equation x y)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (a w : K) (hΔ : (model a).Δ≠0) (hw : w^3=1), Function.Bijective (correctedPoint a w hΔ hw) ∧ (∀ P Q : (model a).Point,correctedPoint a w hΔ hw (P+Q)= correctedPoint a w hΔ hw P+correctedPoint a w hΔ hw Q) ∧ (∀ P : (model a).Point,correctedPoint a w hΔ hw (correctedPoint a w hΔ hw (correctedPoint a w hΔ hw P))=P)) ∧ (Nat.Prime 29 ∧ Nat.Prime 5 ∧ 3<29 ∧ 3<5 ∧ 29%3=2 ∧ Nat.Coprime 5 29 ∧ ¬5∣29-1 ∧ 5∣29^2-1 ∧ Nat.card Extension=29^2 ∧ IsPrimitiveRoot omega 3 ∧ (∀ r : Base,omega≠algebraMap Base Extension r)) ∧ ((model (1 : Base)).Δ≠0 ∧ (model (1 : Extension)).Δ≠0 ∧ Nat.card (model (1 : Base)).Point=30 ∧ (29 : ℤ)+1-(Nat.card (model (1 : Base)).Point : ℤ)=0 ∧ addOrderOf baseP=5 ∧ addOrderOf P=5) ∧ (¬ (model (1 : Extension)).Equation 4 (omega*6) ∧ (model (1 : Extension)).Equation (omega*4) 6 ∧ ¬ (∃ D : (model (1 : Extension)).Point → (model (1 : Extension)).Point, ∃ h : (model (1 : Extension)).Nonsingular 4 (omega*6),D P=.some 4 (omega*6) h)) ∧ (addOrderOf Q=5 ∧ Q∉AddSubgroup.zmultiples P ∧ (∀ R : (model (1 : Extension)).Point,R∈AddSubgroup.zmultiples P → R≠0 → repaired R∉AddSubgroup.zmultiples P)) ∧ (addOrderOf threeControl=3 ∧ threeControl≠0 ∧ repaired threeControl=threeControl)",
+    "decl_sha256": "3e0ef4fc5452757ec1b9ee9721bd425b412fdf9c79f1a738683e8d41d22f0deb",
+    "scope": "Verheul2004publishedp288explicitformula audit. Generic actual y²=x³+a point withnonzeroordinate/nontrivialcuberootw is sentoffcurveby printed(x,w*y). Corrected(w*x,y) preservesactualequation/nonsingularity and groupaddition, isbijectivewithperiod3/explicitAddEquiv for everyfield/nonzerodiscriminant/w³1. Actual p29/l5 bothprime>3,pmod3=2,coprime/cyclotomicdegree2; actual nonsplitQuadraticAlgebraF841/card841/nonbaseprimitivecube root; actual E/F29pointcount30/source trace0; actual baseandextensionP(4,6)order5. Printed outputnotoncurve/no pointmapwiththosecoordinates. CorrectedQorder5outsideactualcyclicP and allnonzero subgroupmembersdistorted. Actual order3point(0,1)fixedtestsboundary. Literalformularefutedonly; generaltheorem5/distortionexistence/endring/Tatemodule/canonicalWeilTate/geometry remainopen. Point-groupautomorphismnotclaimformal schemes/isogenies; tracepredicateonly,notgeneric supersingularityclassification. Primarypublisher/authorreadscope retained; nofullpaper/corpuspromotion/novelty/nativeexperiment/spend/upload.",
+    "sources": [
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/ConcreteDistortion.lean",
+        "bytes": 3726,
+        "sha256": "2870c3f4217cafdc972401e109f7feb73c55d0098f4b9117bfd8aa923299497b"
+      },
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/CubeAutomorphism.lean",
+        "bytes": 3774,
+        "sha256": "60a1aab472d84fc9c4abc8420159289a1c341740180c179d9ea67fc172676209"
+      },
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/CubeScaling.lean",
+        "bytes": 1617,
+        "sha256": "83cc486e31798267940809406936f15e80c5cd06a0344f64f1b9c642f7184162"
+      },
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/DistortionCertificate.lean",
+        "bytes": 3010,
+        "sha256": "ff4a76f2da0820231a5a4e78d12db6b6d591a6148ac8f5b77a420024a3ff3ff0"
+      },
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/Field29.lean",
+        "bytes": 3423,
+        "sha256": "5f68e669f3241b011904b8b8f1d7732ad4160f331c11698b4f7d3d6979bdbb08"
+      },
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3245,
+        "sha256": "50c1e4d8b4fa7e252e66ee3168027226bf13337a214236610363a13b32a976ae"
+      },
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/lakefile.toml",
+        "bytes": 384,
+        "sha256": "1222449ad42328192c893092b00e8f207560c45702813d2790b7c5878a518e17"
+      },
+      {
+        "path": "research/verheul_distortion_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ConcreteDistortion",
+    "CubeAutomorphism",
+    "CubeScaling",
+    "DistortionCertificate",
+    "Field29"
+  ],
+  "artifacts": [
+    {
+      "path": "research/verheul_distortion_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 15854,
+      "sha256": "2971ea9e56dc6bb48edcc8ba85a37cf5b43b3702867fe6c6ac8efb7d9eb9a391"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/evidence/attempts.json",
+      "bytes": 12385,
+      "sha256": "963c9e20ac22b8a55848458235ad58906a4788059c7f7e31dde94957ce80fd03"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1413,
+      "sha256": "7a6fa6533168e47e07ab848f3d254f09f5cd6c739bf242b228c9ead679fba84e"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/evidence/gate.json",
+      "bytes": 1176,
+      "sha256": "f72f219c5519f9867ec87dd70e3f6163f59c452ad6590800a4dce81504a6ae7c"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/evidence/source-review.json",
+      "bytes": 5923,
+      "sha256": "7aabdb65142d0391b7fd01a8274153697cb19237a31114feea3345b4c4546b76"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/coverage.json",
+      "bytes": 825,
+      "sha256": "b5e42fa52d9e60767b6ccc4433d1d7625619168170cbe99ab1e23de7408b3b16"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/proof-map.json",
+      "bytes": 1919,
+      "sha256": "3449be7d95e710731f66d9ddf79ae4b4d21ab8ae0d12c9b64154f5b475b8a16a"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/render_report.py",
+      "bytes": 6660,
+      "sha256": "f81fb5acc6a8b66f0d4d6a9444bb65abc7598911457d90d386339856b06b1eb1"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/reports/formula-repair.svg",
+      "bytes": 1603,
+      "sha256": "303b00bfe042a006c42642e6aba818ae47d148324116f70dd1afee6655a30be4"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/reports/layout.json",
+      "bytes": 288,
+      "sha256": "8c4ba8a8fc4f741205dec7c0ee9c5a47d1621187cb734660da8a96b3ef41ad5c"
+    },
+    {
+      "path": "research/verheul_distortion_audit_20261114/reports/report.pdf",
+      "bytes": 47805,
+      "sha256": "687e2537ab54af192a990efb03c30e041053e8bb4f5b19b4bc0b66f7734342af"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 49,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "literal_published_formula_refuted": true,
+    "actual_point_group_automorphism_repair": true,
+    "actual_source_domain_p29_l5": true,
+    "actual_cyclic_distortion_and_order3_control": true,
+    "general_existence_theorem_refuted": false,
+    "full_paper_read": false,
+    "scheme_or_canonical_pairing_proof": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

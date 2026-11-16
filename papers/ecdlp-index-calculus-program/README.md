@@ -2,7 +2,7 @@
 
 `ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf)) is the
 programme record of the repository's ECDLP index-calculus work from
-2026-07-01 to 2026-10-24 (last folded in: 21–24 October): the routes pursued, the measurement infrastructure
+2026-07-01 to 2026-10-26 (last folded in: 21–24 October, plus the plane-quartic program of 18–26 October): the routes pursued, the measurement infrastructure
 (ecbench, the boundary ledger, claim hygiene), what improved and on which
 boundary, the negative results, and where the frontier stands.
 
@@ -16,7 +16,10 @@ Restore authors with `make deanonymize` after creating an `AUTHORS` file
 **Change class** (per `AGENTS.md`): none of its own; it reports results
 already classed by their studies. With one modelled exception (the `k = 4`
 crossover of §10.9, an extrapolation fed by a measured constant) every
-improvement it reports is *engineering* or *accounting*.
+improvement it reports is *engineering* or *accounting*. The plane-quartic
+N4 result (§11), which the leaderboard classes *advance* restricted to the
+GHS-weak family, is reported as below a matched plain rho, not as an advance
+against the strongest rho.
 
 ## What it says
 
@@ -54,12 +57,16 @@ improvement it reports is *engineering* or *accounting*.
   unplanted relation), small-x bases, isogeny walks over a million
   P-256-isogenous curves, lattices, ECCp-131, audits of standard curves,
   Gaudry `k = 4` over `F_{p^4}`.
-- **Covers and transfers** (§11): the conservation lemma, genus 3 at parity
+- **Covers and transfers** (§11): the conservation lemma, plane-quartic index
+  calculus below a matched plain rho from q = 4051 on the GHS-weak family, Smith's
+  walk (frozen o(p), post hoc Θ~(p)), genus 3 at parity
   with the strongest rho over `q = 2^14..2^20`, the two generations of
   Joux–Vitse comparisons, cover censuses, volcano levels.
 - **Frontier** (§12): a table of every measured improvement by boundary and
-  class; cold one-target frontier still rho; one admitted online point
-  (compact-orbit IC at Koblitz `n = 61`, 13.9× [9.8, 19.1] over strong rho,
+  class; cold one-target frontier still rho; one online point (13.9x, superseded 2026-10-20)
+  (compact-orbit IC at Koblitz `n = 61`, 13.9× [9.8, 19.1] over strong rho —
+  superseded, corrected 2026-10-20 by validation sweep B (verdict 108.1): rho had an
+  empty table and Bernstein–Lange rho at equal advice is 53–317× faster online —
   64 targets, set-up excluded; 83× rho with set-up charged).
 - **21–24 October** (frontier section, "The ladder continued, 21–24 October"): four factor bases closed under known-log maps
   (Z[τ], Z[φ], integer multiples, LEAD-19 cofactor projection), 1.3–20×
@@ -108,7 +115,7 @@ provenance:
 |:--|:--|:--|
 | P1. Root-finding decomposition | §6; extends `../rootfinding-decomposition/` with the PDP family, GPU, Kummer tower, ecbench loops and the audit corrections | novelty audit; Magma/msolve cross-check on every row; a GPU run on hardware; `m ≥ 3` prime measurements |
 | P2. ecbench: one unit for every ECDLP method | §4, Definition 1, corrections, isolation rubric, frontier synthesis | an L3 cross-host replay certificate; inherited-F4 counter drift resolved; a four-size bound per incumbent |
-| P3. Index calculus on Koblitz curves, measured | §8, compact orbit, online ladder, admitted `n = 61` panel, ECC2K-130 extrapolation | isolated panels at `n = 71, 73, 83`; the constant `C` reconciled; a cold `n = 83` session |
+| P3. Index calculus on Koblitz curves, measured | §8, compact orbit, online ladder, `n = 61` panel (13.9x online point superseded), ECC2K-130 extrapolation | isolated panels at `n = 71, 73, 83`; the constant `C` reconciled; a cold `n = 83` session |
 | P4. Symmetry at `k = 4` | §10.9 | a second prime and more seeds; the degenerate target explained; a measured end-to-end point |
 | P5. Negative results | §§9–11, lit2026 negatives, SAT scaling, symmetrised bases, fibre-aware IC, Lemma 1 | literature check of Lemma 1; the conductor-gap yield experiment |
 

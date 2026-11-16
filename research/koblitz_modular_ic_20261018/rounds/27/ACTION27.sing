@@ -1,0 +1,245 @@
+// Frozen post-processing of complete RR exports. All vector bits are F2.
+if(size(charts)!=20 || size(basisCoefficients)!=68 || size(sourceJets)!=1568){ERROR("ACTION27 input framing/count mismatch");}
+proc acJet(list value,int low,int high){
+ poly answer=0;int j;int ex;
+ for(j=1;j<=size(value[1]);j++){
+  ex=deg(value[1][j])+value[2];
+  if(ex>=low && ex<high){answer=answer+leadcoef(value[1][j])*w^(ex-low);}
+ }
+ if(value[3]<high){ERROR("ACTION27 requested coefficients exceed absolute precision");}
+ return(answer);
+}
+proc acApply(poly bits,list columns){
+ poly answer=0;int j;int ex;
+ for(j=1;j<=size(bits);j++){
+  if(leadcoef(bits[j])!=1){ERROR("nonbinary vector coefficient");}
+  ex=deg(bits[j]);answer=answer+columns[ex+1];
+ }
+ return(answer);
+}
+proc acSolve(poly value,list pivots,list coords){
+ poly combination=0;int p;
+ while(value!=0){
+  if(leadcoef(value)!=1){ERROR("nonbinary Gaussian pivot");}
+  p=deg(value)+1;if(pivots[p]==0){break;}
+  value=value+pivots[p];combination=combination+coords[p];
+ }
+ return(list(value,combination));
+}
+proc acExport(string path,string name,list values){
+ link output="ASCII:w "+path;open(output);write(output,"ideal "+name+";");int j;
+ for(j=1;j<=size(values);j++){write(output,name+"["+string(j)+"]="+string(values[j])+";");}
+ close(output);
+}
+link acFunctionOutput="ASCII:w basis-functions.sing";open(acFunctionOutput);
+write(acFunctionOutput,"// Functions are basisNumerators[i]/commonDenominator in the original source field.");
+write(acFunctionOutput,"// n=nu,l=lambda; v^2+v=u^3+u; b,c as in R22 CM.");
+write(acFunctionOutput,"ring rrBasis27=2,(n,l,v,u),dp;poly commonDenominator=u^16*(u+1)^16;ideal basisNumerators;");
+string acFunctionLine;
+int acI;int acJ;int acK;int acC;int acTerm;int acIndex;int acGroup;int acPower;
+int acIL;int acJN;int acEV;int acPivot;int acRank;int acSrank;
+poly acBits;poly acPoly;poly acVector;poly acCombination;poly acRebuilt;
+list acGroups;list acSingleGroups;list acBasisAt;list acAt;
+list acUPowers;list acGroupFactors;list acChart;list acCoords;
+list acValue;list acSum;list acDen;list acSolved;
+list acOJets;list acOJets389;list acSigmaJets;list acSigma;list acTraceColumns;
+for(acI=1;acI<=68;acI++){
+ acSingleGroups=list();for(acJ=1;acJ<=32;acJ++){acSingleGroups=insert(acSingleGroups,poly(0),size(acSingleGroups));}
+ acBits=basisCoefficients[acI];acRebuilt=0;acFunctionLine="basisNumerators["+string(acI)+"]=0";
+ for(acTerm=1;acTerm<=size(acBits);acTerm++){
+  if(leadcoef(acBits[acTerm])!=1){ERROR("nonbinary basis coefficient");}
+  acIndex=deg(acBits[acTerm]);acGroup=acIndex div 49;acPower=acIndex%49;
+  if(acGroup>=32){ERROR("basis coefficient outside frozen monomial family");}
+  acSingleGroups[acGroup+1]=acSingleGroups[acGroup+1]+w^acPower;
+  acRebuilt=acRebuilt+w^(49*acGroup+acPower);
+  acFunctionLine=acFunctionLine+"+n^"+string((acGroup div 2)%4)+"*l^"+string(acGroup div 8)+"*v^"+string(acGroup%2)+"*u^"+string(acPower);
+ }
+ if(acRebuilt!=acBits){ERROR("basis regrouping identity failed");}
+ acGroups=insert(acGroups,acSingleGroups,size(acGroups));write(acFunctionOutput,acFunctionLine+";");
+}
+close(acFunctionOutput);
+// Reconstruct all68 functions at all20 certified charts, not only O.
+for(acC=1;acC<=20;acC++){
+ acChart=charts[acC];acCoords=acChart[1];
+ acUPowers=list(lc(1));
+ for(acK=1;acK<=48;acK++){acUPowers=insert(acUPowers,lm(acUPowers[acK],acChart[2]),size(acUPowers));}
+ acGroupFactors=list();
+ for(acIL=0;acIL<=3;acIL++){
+ for(acJN=0;acJN<=3;acJN++){
+ for(acEV=0;acEV<=1;acEV++){
+  acValue=lm(lm(lpw(acCoords[2],acIL),lpw(acCoords[1],acJN)),lpw(acChart[3],acEV));
+  acGroupFactors=insert(acGroupFactors,acValue,size(acGroupFactors));
+ }
+ }
+ }
+ acDen=li(lm(lpw(acChart[2],16),lpw(la(acChart[2],lc(1)),16)));
+ acAt=list();
+ for(acI=1;acI<=68;acI++){
+  acSum=lc(0);acSingleGroups=acGroups[acI];
+  for(acJ=1;acJ<=32;acJ++){
+   acPoly=acSingleGroups[acJ];acValue=lc(0);
+   for(acTerm=1;acTerm<=size(acPoly);acTerm++){acValue=la(acValue,acUPowers[deg(acPoly[acTerm])+1]);}
+   acSum=la(acSum,lm(acValue,acGroupFactors[acJ]));
+  }
+  acSum=lm(acSum,acDen);
+  if(acSum[3]<129){ERROR("reconstructed RR section precision below129");}
+  acK=0;if(acChart[5]==1){acK=7*acChart[4];}if(acChart[5]==4){acK=acChart[4];}
+  if(acSum[1]!=0 && acSum[2]<-acK){ERROR("reconstructed RR section violates original divisor bound");}
+  acAt=insert(acAt,acSum,size(acAt));
+ }
+ acBasisAt=insert(acBasisAt,acAt,size(acBasisAt));
+ print("ACTION27_RECONSTRUCTED_CHART "+string(acC));
+}
+acAt=acBasisAt[1];
+for(acI=1;acI<=68;acI++){
+ acPoly=acJet(acAt[acI],0,129);acRebuilt=0;acBits=basisCoefficients[acI];
+ for(acTerm=1;acTerm<=size(acBits);acTerm++){acRebuilt=acRebuilt+sourceJets[deg(acBits[acTerm])+1];}
+ if(acPoly!=acRebuilt){ERROR("independent original-column/O-jet agreement failed");}
+ acOJets=insert(acOJets,acPoly,size(acOJets));
+ acOJets389=insert(acOJets389,acJet(acAt[acI],0,389),size(acOJets389));
+}
+list acJPivots;list acJCoords;
+for(acJ=1;acJ<=129;acJ++){acJPivots=insert(acJPivots,poly(0),size(acJPivots));acJCoords=insert(acJCoords,poly(0),size(acJCoords));}
+acRank=0;
+for(acI=1;acI<=68;acI++){
+ acSolved=acSolve(acOJets[acI],acJPivots,acJCoords);acPoly=acSolved[1];acBits=acSolved[2]+w^(acI-1);
+ if(acPoly==0){ERROR("RR basis lost independence");}
+ acPivot=deg(acPoly)+1;acJPivots[acPivot]=acPoly;acJCoords[acPivot]=acBits;acRank=acRank+1;
+}
+acAt=acBasisAt[6];
+for(acI=1;acI<=68;acI++){
+ acPoly=acJet(acAt[acI],0,129);acSolved=acSolve(acPoly,acJPivots,acJCoords);
+ if(acSolved[1]!=0){ERROR("sigma section not in complete RR space");}
+ acSigma=insert(acSigma,acSolved[2],size(acSigma));
+}
+for(acI=1;acI<=68;acI++){
+ if(acApply(acSigma[acI],acSigma)!=w^(acI-1)){ERROR("actual sigma matrix does not square to identity");}
+ acTraceColumns=insert(acTraceColumns,acSigma[acI]+w^(acI-1),size(acTraceColumns));
+}
+list acTPivots;list acTCoords;list acInvariants;
+for(acJ=1;acJ<=68;acJ++){acTPivots=insert(acTPivots,poly(0),size(acTPivots));acTCoords=insert(acTCoords,poly(0),size(acTCoords));}
+acSrank=0;
+for(acI=1;acI<=68;acI++){
+ acSolved=acSolve(acTraceColumns[acI],acTPivots,acTCoords);acPoly=acSolved[1];acBits=acSolved[2]+w^(acI-1);
+ if(acPoly!=0){acPivot=deg(acPoly)+1;acTPivots[acPivot]=acPoly;acTCoords[acPivot]=acBits;acSrank=acSrank+1;}
+ else{acInvariants=insert(acInvariants,acBits,size(acInvariants));}
+}
+print("ACTION27_SIGMA_PLUS_ID_RANK");acSrank;
+if(acSrank!=34){ERROR("trace rank does not match etale quotient RR dimension");}
+acSolved=acSolve(poly(1),acJPivots,acJCoords);
+if(acSolved[1]!=0){ERROR("constant1 not in RR basis");}
+poly acConstant=acSolved[2];acSolved=acSolve(acConstant,acTPivots,acTCoords);
+if(acSolved[1]!=0){ERROR("trace-one section not found");}
+poly acTraceOne=acSolved[2];
+if(acApply(acTraceOne,acTraceColumns)!=acConstant){ERROR("trace-one matrix certificate failed");}
+print("ACTION27_TRACE_ONE_BASIS_COEFFICIENTS");acTraceOne;
+int acTracePoleDegree=0;
+for(acC=1;acC<=20;acC++){
+ acAt=acBasisAt[acC];acSum=lc(0);
+ for(acTerm=1;acTerm<=size(acTraceOne);acTerm++){acSum=la(acSum,acAt[deg(acTraceOne[acTerm])+1]);}
+ lrecord("traceone_chart"+string(acC),acSum);
+ if(acSum[2]<0){acTracePoleDegree=acTracePoleDegree-acSum[2];}
+}
+print("ACTION27_TRACE_ONE_POLE_DEGREE");acTracePoleDegree;
+acExport("sigma-matrix.sing","sigmaColumns",acSigma);
+acExport("basis-jets389.sing","basisJets389",acOJets389);
+if(size(acInvariants)!=34){ERROR("invariant basis count");}
+list acInvariantJets;
+for(acI=1;acI<=34;acI++){
+ if(acApply(acInvariants[acI],acTraceColumns)!=0){ERROR("invariant basis trace certificate");}
+ acInvariantJets=insert(acInvariantJets,acApply(acInvariants[acI],acOJets),size(acInvariantJets));
+}
+acExport("invariant-coefficients.sing","invariantCoefficients",acInvariants);
+acExport("invariant-jets129.sing","invariantJets129",acInvariantJets);
+// Explicit birational coordinates recovered in the complete source basis.
+acChart=charts[1];acCoords=acChart[1];
+list acOriginalSections=list(lc(1),acCoords[3],acCoords[4],acCoords[2]);
+list acCoordinateCoefficients;
+for(acI=1;acI<=4;acI++){
+ acSolved=acSolve(acJet(acOriginalSections[acI],0,129),acJPivots,acJCoords);
+ if(acSolved[1]!=0){ERROR("original coordinate not represented by RR basis");}
+ acCoordinateCoefficients=insert(acCoordinateCoefficients,acSolved[2],size(acCoordinateCoefficients));
+}
+acExport("original-coordinate-coefficients.sing","coordinateCoefficients",acCoordinateCoefficients);
+
+// Actual degree14 point constraints via the nondegenerate field trace.
+number acPointU=alpha27;
+number acPointV=alpha27^12+alpha27^11+alpha27^8+alpha27^7+alpha27^3+alpha27+1;
+number acPointNu=alpha27^11+alpha27^10+alpha27^8+alpha27^7+alpha27^6+alpha27^4+1;
+if(acPointV^2+acPointV+acPointU^3+acPointU!=0){ERROR("degree14 point base equation");}
+number acPointDen=acPointU^16*(acPointU+1)^16;
+list acPointValues;number acPV;number acPQ;
+for(acI=1;acI<=68;acI++){
+ acSingleGroups=acGroups[acI];acPV=0;
+ for(acJN=0;acJN<=3;acJN++){
+ for(acEV=0;acEV<=1;acEV++){
+  acPoly=acSingleGroups[2*acJN+acEV+1];acPQ=leadcoef(subst(acPoly,w,acPointU));
+  acPV=acPV+acPQ*acPointNu^acJN*acPointV^acEV;
+ }
+ }
+ acPointValues=insert(acPointValues,acPV/acPointDen,size(acPointValues));
+}
+acPV=0;for(acTerm=1;acTerm<=size(acConstant);acTerm++){acPV=acPV+acPointValues[deg(acConstant[acTerm])+1];}
+if(acPV!=1){ERROR("degree14 constant evaluation failed");}
+proc acAbsoluteTrace(number value){
+ number ans=0;int j;for(j=1;j<=14;j++){ans=ans+value;value=value^2;}
+ if(ans!=0 && ans!=1){ERROR("absolute trace not in F2");}
+ return(ans);
+}
+// Explicit rank14 control for the absolute-trace coordinate detector.
+list acFieldPivots;list acFieldCoords;
+for(acJ=1;acJ<=14;acJ++){acFieldPivots=insert(acFieldPivots,poly(0),size(acFieldPivots));acFieldCoords=insert(acFieldCoords,poly(0),size(acFieldCoords));}
+int acFieldRank=0;
+for(acI=0;acI<=13;acI++){
+ acBits=0;
+ for(acJ=0;acJ<=13;acJ++){if(acAbsoluteTrace(alpha27^(acI+acJ))==1){acBits=acBits+w^acJ;}}
+ acSolved=acSolve(acBits,acFieldPivots,acFieldCoords);acPoly=acSolved[1];
+ if(acPoly!=0){acPivot=deg(acPoly)+1;acFieldPivots[acPivot]=acPoly;acFieldRank=acFieldRank+1;}
+}
+if(acFieldRank!=14){ERROR("degree14 point detector is degenerate");}
+print("ACTION27_FIELD_TRACE_DETECTOR_RANK14");
+list acMembership;int acDCoefficient;int acDegree=0;int acSign;int acOrd;int acExponent;
+for(acI=1;acI<=68;acI++){
+ acBits=0;
+ for(acC=1;acC<=20;acC++){
+  acChart=charts[acC];acCoords=acChart[1];acValue=acCoords[2];acDCoefficient=-acValue[2];
+  if(acChart[4]==7){acSign=1;if(acC>=16){acSign=-1;}acDCoefficient=acDCoefficient+acSign*moved[acChart[5]+1];}
+  acK=0;if(acChart[5]==1){acK=7*acChart[4];}if(acChart[5]==4){acK=acChart[4];}
+  if(acDCoefficient>acK){ERROR("moved divisor not bounded by complete RR divisor");}
+  if(acI==1){acDegree=acDegree+acDCoefficient;print("MOVED_DIVISOR_CHART "+string(acC)+" "+string(acDCoefficient));}
+  acAt=acBasisAt[acC];acValue=acAt[acI];
+  if(acValue[3]<=-acDCoefficient){ERROR("moved divisor precision insufficient");}
+  for(acTerm=1;acTerm<=size(acValue[1]);acTerm++){
+   acExponent=deg(acValue[1][acTerm])+acValue[2];
+   if(acExponent < -acDCoefficient){
+    if(acExponent<-64 || acExponent>=64){ERROR("moved divisor coefficient row outside frozen range");}
+    acBits=acBits+leadcoef(acValue[1][acTerm])*w^((acC-1)*128+acExponent+64);
+   }
+  }
+ }
+ for(acJ=0;acJ<=13;acJ++){
+  acPV=acAbsoluteTrace(alpha27^acJ*acPointValues[acI]);
+  if(acPV==1){acBits=acBits+w^(2560+acJ);}
+ }
+ acMembership=insert(acMembership,acBits,size(acMembership));
+}
+if(acDegree!=14){ERROR("moved divisor degree not zero after degree14 zero constraint");}
+list acMPivots;list acMCoords;list acKernel;
+for(acJ=1;acJ<=2574;acJ++){acMPivots=insert(acMPivots,poly(0),size(acMPivots));acMCoords=insert(acMCoords,poly(0),size(acMCoords));}
+acRank=0;
+for(acI=1;acI<=68;acI++){
+ acSolved=acSolve(acMembership[acI],acMPivots,acMCoords);acPoly=acSolved[1];acBits=acSolved[2]+w^(acI-1);
+ if(acPoly==0){acKernel=insert(acKernel,acBits,size(acKernel));}
+ else{acPivot=deg(acPoly)+1;acMPivots[acPivot]=acPoly;acMCoords[acPivot]=acBits;acRank=acRank+1;}
+}
+for(acJ=1;acJ<=2574;acJ++){
+ if(acMPivots[acJ]!=0 && acApply(acMCoords[acJ],acMembership)!=acMPivots[acJ]){ERROR("membership pivot independent recombination failed");}
+}
+for(acJ=1;acJ<=size(acKernel);acJ++){if(acApply(acKernel[acJ],acMembership)!=0){ERROR("membership kernel recombination failed");}}
+print("ACTUAL_TORSION_CLASS_TEST rank68minusLdimension,Ldimension");acRank;size(acKernel);
+if(size(acKernel)>1 || acRank+size(acKernel)!=68){ERROR("degreezero section-space dimension contradiction");}
+if(size(acKernel)==0){print("ACTUAL_NONZERO_11_TORSION_DIVISOR_CLASS");}
+else{print("ACTUAL_CUSP_CLASS_PRINCIPAL_FUNCTION_BASIS_COEFFICIENTS");acKernel[1];}
+acExport("membership-columns.sing","membershipColumns",acMembership);
+acExport("membership-kernel.sing","membershipKernel",acKernel);
+print("ACTION27_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,535 @@
+\chapter{Extension fields: $k=4$ and the $D_4$ symmetry}\label{ch:extension}
+
+Over $\FF_{q^k}$ with a factor base of points whose abscissa lies in
+$\FF_q$, Gaudry's index calculus~\cite{gaudry2009} decomposes each target
+into $k$ summands by Weil restriction of $\Sem{k+1}$. It costs
+$\tilde O(q^{2-2/k})$, below rho's $q^{k/2}$ for $k\ge3$, but with a
+Gröbner constant that grows very fast in $k$. Faugère, Gaudry, Huot and
+Renault~\cite{fghr2014} show that on curves with rational 2-torsion the
+system has the larger symmetry group $D_k$, the Weyl group of type D, in
+a well-chosen coordinate. At $k=4$ this chapter reports how far that
+symmetry moves the measured gap to rho. Chapter~\ref{sec:prime}
+(\S\ref{sec:gaudry}) gives the odd-characteristic engineering in detail;
+Chapter~\ref{ch:glvprogramme} gives the later $k=4$ programme and supersedes
+the odd-characteristic distances below.
+
+\section{The $D_4$ system}
+
+On $E$ with rational 2-torsion point $T$, the coordinate
+$Y=(x-x_0-c)/(x-x_0+c)$ satisfies $Y(P+T)=-Y(P)$. In $Y$, $\Sem5$ is
+invariant under $D_4$, of order 192. Written in the invariants
+$\sigma_k=e_k(Y_i^2)$ and $\pi=\prod Y_i$, the system shrinks
+(Table~\ref{tab:extension-system}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+System & Bézout number & Macaulay degree & Matrix \\
+\midrule
+before invariants & 4{,}096 & 29 & $41{,}780\times40{,}920$ \\
+$D_4$ invariants & 512 & 14 & $13{,}412\times11{,}628$ \\
+\addlinespace
+Frobenius-reduced, char.~2 & & 11 & $384\times448$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Size of the $\Sem5$ decomposition system at $k=4$: before and
+after rewriting it in the $D_4$ invariants $\sigma_k,\pi$, and in the
+Frobenius-reduced form with weights $(2,2,1,1)$ in characteristic two
+(ladder step~5 of Table~\ref{tab:extension-ladder}; the source gives no
+Bézout number for it). Matrix: rows $\times$ columns of the Macaulay
+matrix. Sources: \art{research/gaudry_quartic_d4_20261013/},
+\art{research/gaudry_quartic_d4_char2_20261015/}.}
+\label{tab:extension-system}
+\end{table}
+
+Table~\ref{tab:extension-ladder} gives the engineering ladder, each step
+against the previous incumbent. At step~1 all 19 solved targets agree with
+an independent meet-in-the-middle enumeration; at step~3 all 648 of 648
+solves are exact. At step~4, double large primes cut the linear algebra to
+$0.827\times$ but regress the whole solve, to $1.025\times$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}X>{\raggedright}p{3.0cm}>{\raggedright\arraybackslash}p{5.2cm}@{}}
+\toprule
+& Step & Scope & Result \\
+\midrule
+1 & $D_4$ invariants & $p=269$ & $C_4=2.54\cdot10^{10}$ instead of
+  $1.21\cdot10^{12}$, a factor of $47.5$--$48.4$ \\
+2 & The $Y$-line on a complete ladder & $p=101$--$1033$ (21 curves) &
+  $0.0548$ $[0.048,0.061]$ of plain $\Sem4$, at the same exponent \\
+3 & Sparsest pivots, the weighted grading $\sigma_4=\pi^2$, and shape
+  replay & & $C_4$ falls to $6.89\cdot10^7$, by $369.8\times$
+  $[367.9,371.6]$; ecbench $S$ falls $398$--$406\times$ \\
+4 & First-dependency stop & & $0.979$ $[0.973,0.986]$ of the previous
+  step \\
+\addlinespace
+5 & A Frobenius-reduced form in characteristic two & $m=8$ & one
+  decomposition $481\times$ $[479,483]$ below the plain form \\
+\bottomrule
+\end{tabularx}
+\caption[]{The $k=4$ engineering ladder, each step against the previous
+incumbent. $C_4$: $\FF_p$ multiplications per decomposition. Result: the
+step's cost as the source states it, either a factor below the previous
+incumbent or a fraction of it. Sources:
+\art{research/gaudry_quartic_d4_20261013/} (step~1),
+\art{research/gaudry_quartic_d4_cost_20261014/} (step~3),
+\art{research/gaudry_quartic_d4_char2_20261015/} (step~5).}
+\label{tab:extension-ladder}
+\end{table}
+The $D_n$ symmetry is FGHR's~\cite{fghr2014}. Invariant rings in
+characteristic two, including even-power substitutions, were studied by
+Galbraith and Gebregiyorgis~\cite{galbraith2014}. Whether the
+Frobenius-reduced weighting is in that work has not been checked.
+
+\section{Distance to rho}
+
+\paragraph{Odd characteristic.} Over $\FF_{p^4}$ the best line (GLS twists
+with full rational 2-torsion) measured $1.5\cdot10^3\times$ its strongest
+matched rho at $n=2^{42.4}$ (E32, validated), falling as $n^{-0.24}$, with a
+fitted crossover at $2^{85.5}$ $[2^{79.2},2^{94.3}]$ at $w=0$; that is a fit,
+not a measured crossing (Chapter~\ref{ch:glvprogramme}). The earlier
+single-point models of \S\ref{sec:gaudry} are superseded.
+
+\paragraph{Characteristic two.} Over $\FF_{(2^m)^4}$ the gap closes with
+size (Table~\ref{tab:pf-d4} and Figure~\ref{fig:pf-d4}, two targets per
+size up to $m=12$). IC over rho's theoretical $S=0.886$ falls from
+$5{,}080$ and $4{,}124$ at $m=6$ to $6.06$ at $m=14$, a single target. The
+fitted slope over $m\ge8$ (seven points) is $-0.248$ in $\log_2 n$, which
+is Gaudry's $n^{-1/4}$. The extrapolated crossover was $n\approx2^{68.1}$,
+where rho takes about $2^{34}$ steps, so it could be tested directly. The
+follow-up study ran $m=15$--$18$: $m=15$ completed in a clean session at
+$3.61$ and $3.67\times$ rho's theoretical cost; the $m=16$ and $m=17$
+records come from sessions killed by container restarts and were not
+replayed, and $m=18$ produced no record
+(\art{research/gaudry_k4_char2_crossover_20261015/README.md}). The ratio to
+the same-session rho run scatters more than the ratio to theory, because
+one rho run is a single draw: at $m=15$ it is $19.1$ on one target and
+$3.8$ on the other.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrrrrl@{}}
+\toprule
+$m$ & $\log_2 n$ & $h$ & IC $S$ & trials/rel. & rho $S$ & IC/rho theory & IC/rho run & Session \\
+\midrule
+6 & 24 & 14 & $4{,}501$ & 386 & --- & $5{,}080$ & $4{,}427$ & clean \\
+ & &  & $3{,}654$ & 363 & --- & $4{,}124$ & $2{,}781$ & clean \\
+8 & 32 & 6 & $573.9$ & 247 & --- & $648$ & $919$ & clean \\
+ & &  & $459.6$ & 191 & --- & $519$ & $438$ & clean \\
+10 & 40 & 2 & $71.4$ & 179 & --- & $80.6$ & $98.9$ & clean \\
+ & &  & $73.4$ & 183 & --- & $82.9$ & $38.4$ & clean \\
+12 & 48 & 10 & $44.0$ & 182 & --- & $49.7$ & $47.2$ & clean \\
+ & &  & $42.6$ & 177 & --- & $48.1$ & $50.3$ & clean \\
+14 & 56 & 2 & $5.37$ & 186 & --- & $6.06$ & $4.27$ & clean \\
+15 & 60 & 2 & $3.198$ & --- & 0.168 & $3.61$ & $19.1$ & clean \\
+ & &  & $3.253$ & --- & 0.856 & $3.67$ & $3.8$ & clean \\
+16 & 64 & 2 & $1.482$ & --- & 0.899 & $1.67$ & $1.65$ & interrupted \\
+17 & 68 & 2 & $0.849$ & --- & 1.361 & $0.96$ & $0.62$ & IC interrupted \\
+\bottomrule
+\end{tabular}
+\caption[]{$k=4$ index calculus over $\FF_{(2^m)^4}$ with the
+Frobenius-reduced $D_4$ oracle, one row per target. $h$: cofactor.
+IC/rho theory: IC $S$ over $0.886$. IC/rho run: over the same session's
+rho run on that target (rho $S$ is listed where the source gives it).
+$m\le14$: ladder sessions \texttt{ECBS1h4d63e1551dc1} (24/24 verified) and
+\texttt{ECBS1hb9229e3a0f30} (3/3). $m=15$--$17$: the crossover study; the
+interrupted rows pass every \texttt{ecbench verify} check except session
+completeness and record count, and are indicated, not established.
+Producer-reported; no validation file; the red team's verdict on the
+crossover is ``not survived (unsupported), not refuted''. Sources:
+\art{research/gaudry_quartic_d4_char2_20261015/README.md},
+\art{research/gaudry_k4_char2_crossover_20261015/README.md}; extracted in
+\art{figures/data-pf-d4.json}.}
+\label{tab:pf-d4}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-pf-d4.pdf}
+\caption[]{$k=4$ over $\FF_{(2^m)^4}$: IC over rho per target, against
+rho's theoretical $S=0.886$ (circles) and against the same-session rho run
+(squares). Open markers: interrupted sessions ($m=16,17$), not replayed.
+Dashed: parity. Data \art{figures/data-pf-d4.json}
+(Table~\ref{tab:pf-d4}).}
+\label{fig:pf-d4}
+\end{figure}
+
+The same study replaced the dense incremental elimination, whose
+\texttt{row\_ops} grew as $\abs{\Fb}^3$, with a Wiedemann solve on a
+singleton-filtered core, which grows as $\abs{\Fb}^2$
+(Table~\ref{tab:pf-d4-la}). The sparse solver loses at $m=8$ and $10$ and
+wins from $m=12$; trials per relation are unchanged within $0.4\%$. Linear
+algebra stays below $0.08\%$ of $S$ at these sizes.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rlrrrrrr@{}}
+\toprule
+$m$ & Workload & dense \texttt{row\_ops} & Wiedemann & ratio & trials ratio & LA \% dense & LA \% Wied. \\
+\midrule
+8 & \texttt{Wa195d33f5d8a} & $11{,}370$ & $69{,}871$ & $0.16$ & $1.0000$ & $0.0004$ & $0.0024$ \\
+8 & \texttt{Wf87c59c61bdd} & $14{,}252$ & $86{,}869$ & $0.16$ & $1.0000$ & $0.0007$ & $0.0046$ \\
+10 & \texttt{W845d6165060e} & $718{,}813$ & $1{,}536{,}771$ & $0.47$ & $1.0000$ & $0.0074$ & $0.0159$ \\
+10 & \texttt{Wc69dfe4568cc} & $536{,}268$ & $1{,}423{,}931$ & $0.38$ & $1.0000$ & $0.0056$ & $0.0148$ \\
+12 & \texttt{W255399ed9512} & $32{,}211{,}708$ & $22{,}221{,}501$ & $1.45$ & $1.0008$ & $0.0754$ & $0.0520$ \\
+12 & \texttt{W739a83ada978} & $27{,}959{,}816$ & $21{,}700{,}171$ & $1.29$ & $1.0040$ & $0.0692$ & $0.0535$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Dense against Wiedemann linear algebra in the $k=4$,
+characteristic-two pipeline, paired within one clean session (Part~D,
+18/18 verified). ratio: dense over Wiedemann \texttt{row\_ops}; trials ratio: Wiedemann over dense. LA \%: share of the arm's counted $S$. Producer-reported;
+no validation file. Source:
+\art{research/gaudry_k4_char2_crossover_20261015/raw/summary.json}
+(\texttt{part\_d}); extracted in \art{figures/data-pf-d4.json}.}
+\label{tab:pf-d4-la}
+\end{table}
+
+\paragraph{The red-team verdict.} An adversarial review tested that
+crossover (\art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}). Its
+verdict: \textbf{not survived (unsupported), not refuted}.
+Table~\ref{tab:extension-redteam} lists its estimates. The only clean point
+is at $m=15$, with two targets per arm, so no interval is possible with
+$n=2$; the $m=17$ ratio came from a killed run and is not evidence. The rho
+reference survives: these are generic ordinary curves with
+$\operatorname{Aut}=\{\pm1\}$. Pricing partly survives. A prime-field
+cross-check agrees with the fitted exponents. The corrected crossover is
+at or above the edge of what was measured.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{2.3cm}>{\raggedright}X>{\raggedright}p{2.2cm}>{\raggedright\arraybackslash}p{4.6cm}@{}}
+\toprule
+Part & Quantity & Estimate & Range or note \\
+\midrule
+Data & IC/rho at $m=15$, recorded & $6.30$ & two targets per arm \\
+ & IC/rho at $m=15$, corrected & $5.2$ & $2.4$--$15.0$ over unit-price variants \\
+ & IC/rho at $m=17$ & $0.72$ & killed run; not evidence \\
+\addlinespace
+Rho reference (survives) & floor & $0.886$ & about 3.5\% generous to rho \\
+\addlinespace
+Pricing (partly survives) & ratio moved by the unit price & $0.64$--$0.89$ & plausible range $0.31$--$3.1$ \\
+ & ratio moved by unpriced rho work & about $0.93$ & \\
+\addlinespace
+Fitted exponents & IC relations & $1.07$ & $[1.01,1.13]$ \\
+ & IC linear algebra & $2.03$ & \\
+ & rho & $2.00$ & $[1.71,2.29]$ \\
+\addlinespace
+Corrected crossover & fall of IC/rho per unit of $m$ & about $2^{-0.93}$ & \\
+ & crossover $m^*$ & $\approx17.6$ & range $16.3$--$19.2$ \\
+\bottomrule
+\end{tabularx}
+\caption[]{The red team's estimates for $k=4$ over $\FF_{(2^m)^4}$, grouped
+by the part of the verdict they bear on. Estimate: the point value; Range:
+the interval or range the review gives, with what it runs over. The
+corrected IC/rho applies the corrections that favour index calculus.
+Exponents are of cost in $q=2^m$. Source:
+\art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}.}
+\label{tab:extension-redteam}
+\end{table}
+Linear algebra is 0.4\% of the cost at $m=15$. Basic Gaudry linear
+algebra grows as $q^2$, like rho, so the $n^{-1/4}$ trend lasts only while
+the relation phase dominates. Beyond that point double large primes are
+required.
+
+The red team froze a plan to settle the question: $m=14$--$17$, eight fresh
+targets per arm, a strong rho with batched inversion and charged
+canonicalisation, counted and hardware units, about 30\,h of wall time.
+It has not run. It is the cheapest experiment that could put the $k=4$
+characteristic-two family below rho, as a measured size crossover; other
+weak families already have measured below-rho rows, the validated
+Joux--Vitse sieve row among them (Chapter~\ref{sec:transfer},
+\S\ref{sec:jac-jv}). It would be a crossover in a weak family:
+$\FF_{(2^m)^4}$ is not a field deployed curves use.
+
+\paragraph{Three per-trial probes, 12 November.} Three leads of the
+11 November survey targeted the cost of one characteristic-two $k=4$ trial
+(\art{research/leads_20261111/README.md}; local, unverified). The
+chain unknown of the Frobenius-reduced system is fixed by the weight
+vector; it already gives 12 chains, not the 16 the lead assumed, and the
+only alternative variable gives 28 chains at $2.34\times$ the cost per
+trial, so the lead is closed (\art{research/leads_20261111/probes/CHAIN_VARIABLE.md}).
+The 21 carrying monomials have $\FF_2$-rank of differences 4 on 300 of
+300 instances, so they lie in no index-2 coset, and that lead is closed.
+The quadratic part has rank 2, not 3, on 300 of 300 targets, so the
+constant-quadratic elimination is falsified as written
+(\art{research/leads_20261111/runs/B_d4bin_probes/RESULT.md}). Its rank-2
+variant, preregistered the same evening, row-reduces the two square
+coefficients, solves the two linear rows by Cramer's rule and takes a
+resultant in $s_4$. At $m=12$ it costs $0.6891$ $[0.6885,0.6896]$ of the
+current solve in counted $\FF_q$ multiplications with the semilinear root
+finder ($0.727$ with the Newton nodes' inverses charged), cheaper on 300 of
+300 targets with identical solution sets, and $1.0069$ with the baseline
+root finder; the preregistered central value was $1.15$
+(\art{research/leads_20261111/runs/B_d4bin_probes/rank2/RESULT.md}; local,
+unverified). At $m=8$ the current solver misses three solutions with
+$s_4=0$. None of the four moves the distances of Table~\ref{tab:pf-d4}.
+
+\section{The Joux--Vitse cover, 11--12 November}\label{sec:ext-jv-nov}
+
+Four studies extend the Joux--Vitse account of \S\ref{sec:jac-jv}. Two
+change the cost of a solver arm; two charge or bound the cost of reaching
+the weak class at all. Every number below is an unverified assertion
+(\texttt{[pcc:unverified]} in each source); none has a pcc claim. All are
+local runs on a 4-vCPU container, on the weak class of curves over
+$\FF_{p^6}$ with full rational 2-torsion. The validated sieve row they
+refer to is the pooled table-line arm U of the 3 November study:
+$0.0141$ $[0.0122,0.0167]$ of matched negation rho in U2 at $w=0$, and
+$0.0857$ and $0.0900$ at $w=0.1$ and $1$ (\art{research/jv_sieve_line_vs_rho_20261103/VALIDATION.json},
+validated 11 November; leaderboard component
+\texttt{jv\_sieve\_line\_vs\_rho\_component}).
+
+\paragraph{The Hilbert stop on the Nagao arm.} The Hilbert early stop of F4
+(\texttt{--stop hilbert:16}) had lowered counted $S$ by $1.848$--$1.875$ at
+$p=53$--$503$, and the scale runs at $p\ge1301$ never used it
+(\art{research/leads_20261111/README.md}, lead~1). A preregistered test ran
+it on the nine line-search instances of \S\ref{sec:jac-jv}
+($p\in\{1301,1451,1601\}$, seeds 1--3), with a drift control that
+reproduced the frozen record exactly
+(\art{research/jv_nagao_hilbert_20261112/README.md}). Relations, residuals
+and the relation digest are identical on 9 of 9 instances. Counted $S$
+falls to $0.5276$--$0.5280$ of the line-search arm; F4 multiplications
+fall to $0.3894$--$0.3895$; the emitted native F4 counter falls to
+$0.983$; about $0.08\%$ of systems fall back. All four preregistered
+falsifiers pass. Re-scored with the unchanged tool against the pooled
+matched negation rho (126 runs), the arm moves below rho in U2 at
+$p=1451$ and $1601$ at every weight of the band on its emitted counters
+(Table~\ref{tab:ext-jv-hilbert}); the validation below does not admit that
+order. At $p=1301$ it is level with rho at
+$w=0$ ($1.003$ $[0.916,1.104]$), so the order does not hold across the
+band there. The cover's native count omits its $\FF_p$ additions, so a
+``below'' could narrow under complete counts. The source classifies the
+change as engineering: the counted cost falls while the native counter
+stays flat.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rrrrrrrl@{}}
+\toprule
+$p$ & $S_B/S_A$ & U2, line & U2, Hilbert, $w=0$ & $w=0.1$ & $w=1$ & U1, $w=0$ & Band \\
+\midrule
+1301 & $0.5276$--$0.5279$ & $1.900$ & $1.003$ $[0.916,1.104]$ & $0.861$ & $0.831$ & $0.417$ $[0.381,0.459]$ & no \\
+1451 & $0.5278$--$0.5280$ & $1.585$ & $0.837$ $[0.771,0.910]$ & $0.718$ & $0.693$ & $0.348$ $[0.321,0.379]$ & below \\
+1601 & $0.5277$--$0.5278$ & $1.318$ & $0.695$ $[0.642,0.756]$ & $0.597$ & $0.576$ & $0.289$ $[0.267,0.314]$ & below \\
+\bottomrule
+\end{tabular}
+\caption[]{The Hilbert early stop on the plain Nagao arm of the
+Joux--Vitse cover. $S_B/S_A$: counted $S$ with the stop over the
+line-search records, per seed (three seeds). U2, line: the line-search arm
+against matched negation rho at $w=0$
+(Table~\ref{tab:jac-nagao}). U2, Hilbert: with the stop, cover/rho in
+textbook $\FF_p$ multiplications at $w=0$, $0.1$ and $1$ GAE per native
+operation; U1: group additions. Brackets: 95\% bootstrap intervals over
+cover seeds and the 126 pooled rho runs (estimator b). Band: verdict
+across $w\in\{0,0.1,1\}$ in U2 (``no'': not the same at every weight).
+The cover's native count is a lower bound. Modelled U2 crossover
+$p^*=1327$ $[1278,1381]$, U1 $874$ $[842,910]$, on the crossover study's
+slope $-2.10$ (not re-fitted). Local L0; the validation of
+Table~\ref{tab:ext-jv-hilbert-val} returned insufficient evidence; unverified.
+Sources: \art{research/jv_nagao_hilbert_20261112/results/paired.txt},
+\art{research/jv_nagao_hilbert_20261112/rescore/table.md}.}
+\label{tab:ext-jv-hilbert}
+\end{table}
+
+\paragraph{The validation attempt.} The same evening the Hilbert-stop
+records went through as much of the validation gate as one session could
+reach (\art{research/jv_nagao_hilbert_20261112/validation/RESULT.md}). A
+32-vCPU pod replayed the drift control and the nine Hilbert instances; every
+counted field, relation digest and logarithm is identical in 10 of 10
+records. Rho re-run with the study binary on the same pod reproduced all
+126 pooled walks except their wall time, so the pooled rescore is a
+same-binary replay. A fresh sample of 126 walks (run indices 14--27) is
+cheaper than the pooled reference and raises each ratio
+(Table~\ref{tab:ext-jv-hilbert-val}). The verdicts per prime do not change:
+not resolved at $p=1301$ at $w=0$, below at $1451$ and $1601$ in the
+emitted counts. In U1 every cell is below at every weight. The modelled U2
+crossover is $p^*=1356$ $[1305,1413]$ with the fresh sample and $1342$
+$[1305,1382]$ combined.
+
+The independent validator returned \emph{insufficient evidence}. Its
+blocking findings: 8 of the 9 cover solves and all rho solves have no
+independent certificate (\texttt{correct: true} is the solver checking
+itself); the cover's native count omits $\FF_p$ additions, F4 pair
+selection and matrix assembly, and with an addition proxy U2 at
+$p=1451$ and $1601$ would be above rho at $w=0.1$ and $1$; the
+preregistered Hilbert/plain band of $[0.50,0.62]$ at $w=0.1$ and $1$ was
+missed, at $0.821$ and $0.959$, so the stop's gain is $1.90\times$ at
+$w=0$ and $1.04\times$ at $w=1$; and there is no S3 benchmark record.
+\texttt{VALIDATION.json} records \texttt{order\_holds\_across\_band: false}
+(\art{research/jv_nagao_hilbert_20261112/validation/VALIDATION.json}). The
+replay also found that the recorded \texttt{hilbert\_check\_muls} is
+inflated by concurrency ($6.4\cdot10^{10}$ recorded, $8.875\cdot10^9$ on one
+thread, $11.1\%$ of the F4 multiplications); it enters neither $S$ nor the
+rescore.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Rho reference & $p$ & $w=0$ [95\%] & $w=0.1$ & $w=1$ & Band \\
+\midrule
+pooled, runs 0--13 (126) & 1301 & $1.003$ $[0.916,1.104]$ & $0.861$ & $0.831$ & no \\
+ & 1451 & $0.837$ $[0.771,0.910]$ & $0.718$ & $0.693$ & below \\
+ & 1601 & $0.695$ $[0.642,0.756]$ & $0.597$ & $0.576$ & below \\
+\addlinespace
+fresh, runs 14--27 (126) & 1301 & $1.050$ $[0.957,1.155]$ & $0.901$ & $0.870$ & no \\
+ & 1451 & $0.876$ $[0.807,0.956]$ & $0.752$ & $0.725$ & below \\
+ & 1601 & $0.728$ $[0.672,0.793]$ & $0.625$ & $0.603$ & below \\
+\addlinespace
+combined, runs 0--27 (252) & 1301 & $1.026$ $[0.955,1.108]$ & $0.881$ & $0.850$ & no \\
+ & 1451 & $0.856$ $[0.805,0.912]$ & $0.735$ & $0.709$ & below \\
+ & 1601 & $0.711$ $[0.670,0.756]$ & $0.611$ & $0.589$ & below \\
+\bottomrule
+\end{tabular}
+\caption[]{The Nagao arm with Hilbert stop against three samples of the
+matched negation rho, all run with the study binary on one pod: U2
+(textbook $\FF_p$ multiplications), cover over rho at $w=0$, $0.1$ and $1$
+GAE per emitted native operation, 95\% bootstrap intervals at $w=0$
+(estimator b). Band: on emitted counters only; the validator does not
+admit the order across the band, because the cover's native count is a
+lower bound. Disposition: insufficient evidence. Every value is
+\texttt{[pcc:unverified]}; no pcc claim. Source:
+\art{research/jv_nagao_hilbert_20261112/validation/RESULT.md}.}
+\label{tab:ext-jv-hilbert-val}
+\end{table}
+
+\paragraph{The same stop in the sieve's descent: killed.} The sieve route's
+descent built its F4 options without the Hilbert rule; an opt-in patch
+(\texttt{JV\_SIEVE\_HILBERT=16}) wired it in and ran 16 paired seeds at
+$p=1511$, the plain arm reproducing the committed records exactly
+(\art{research/jv_sieve_hilbert_descent_20261112/README.md}). Digests,
+relations and solutions agree on 16 of 16 seeds. Descent F4
+multiplications fall to $0.407$ and counted $S$ to $0.856$ (paired
+geometric mean; per seed $0.709$--$0.969$); $S^+$ falls to $0.961$; 11
+of 20{,}405 systems fall back. The descent's native F4 operations rise to
+$1.139\times$, above the preregistered kill limit of $1.10\times$. In the
+band, Hilbert over plain is $0.709$--$0.832$ at $w=0$, $0.927$--$0.947$ at
+$w=0.1$ and $1.095$--$1.101$ at $w=1$ on the four seeds tabulated, so the
+order flips inside the band. The lead is killed by its own falsifier; the
+plain sieve row is unchanged. The source's reading: at $p=1511$ the
+descent's native F4 work (about $6.7\cdot10^7$ operations) is large next
+to its counted work (about $1.0\cdot10^7$ group-addition equivalents), so a
+change that trades multiplications for checks ranks only if it wins at
+$w=1$.
+
+\paragraph{Emitting the sieve's unemitted additions.} The validated row
+priced the cover's F4, descent and linear-algebra additions by an upper-bound
+proxy. A preregistered run on seeds 17--32 emitted them
+(\art{research/leads_20261111/runs/C_sieve_emit_price/RESULT.md}, lead~3).
+Emitted over proxy is $0.816$ as a ratio of per-run means on seeds
+17--24 ($0.815$ on all 16), $0.44$--$0.93$ per seed, geometric mean
+$0.715$. The layer-A cells move by less than 3\%; the worst emitted cell is
+$0.1196$ (U2, $w=1$), and U1 at $w=1$ is $0.1185$. Neither falsifier
+triggered; the verdict is ``partial'', because the ratio prediction
+$0.92$ $[0.80,1.05]$ holds only as a ratio of means. The proxy priced a
+linear-algebra operation at 16 additions; the emitted count is one, and the
+skeptic's note records that at 16 the ratio is about $0.99$. This is
+accounting: the proxy was an upper bound, so the validated row needs no
+erratum.
+
+\paragraph{The walk into the weak class, charged.} The validated row
+starts on a weak curve. A frozen protocol charged the isogeny walk from a
+non-weak start $C$, built by $M\in\{8,32,128,512\}$ random isogeny moves
+away from the weak curve, on the validated instances ($p\in\{1009,1511,1823\}$,
+seeds 17--24; 96 runs, 0 failures)
+(\art{research/jv_walk_charge_20261111/README.md}). With the walk charged,
+the pooled arm-U ratio stays below rho at every weight
+(Table~\ref{tab:ext-jv-walk}); the preregistered verdict ``walk charged,
+still below rho'' held. The walk cost is heavy-tailed: medians stay at
+0.1--4\% of the route, while the worst instance rises from $0.18\times$
+the route at $M=8$ to $1.48\times$ at $M=512$ ($p=1009$;
+$1.9\cdot10^9$ $\FF_p$ multiplications). As an arithmetic mean, a
+statistic declared after the run, the walk adds 21\%, 1.6\% and 6.2\% at
+$p=1009$, $1511$ and $1823$, and the charged mean is $0.039$, $0.012$ and
+$0.0086$ of rho. The walk's hash-set probes are not emitted.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+$w$ & walk charged, $M=512$ [95\%] & validated row, walk not charged \\
+\midrule
+0 & $0.0155$ $[0.0125,0.0200]$ & $0.0141$ \\
+0.1 & $0.0858$ $[0.0707,0.1088]$ & $0.0857$ \\
+1 & $0.0900$ $[0.0739,0.1138]$ & $0.0900$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The Joux--Vitse sieve route (arm U, U2, layer A, pooled over 24
+instances at $p\in\{1009,1511,1823\}$) over matched negation rho, with
+the isogeny walk from a start $M=512$ random moves from the weak curve
+charged, against the validated row without it. 95\% bootstrap
+intervals. Starts lie within the implemented walk's reach by
+construction (see Table~\ref{tab:ext-jv-coverage}). Unverified; no
+validation file for the charge. Source:
+\art{research/jv_walk_charge_20261111/README.md}
+(\texttt{analysis.json}).}
+\label{tab:ext-jv-walk}
+\end{table}
+
+\paragraph{How often a curve reaches the class.} The walk-charge starts were
+built by the walk's own moves, so the walk can always return. A second
+frozen study asked how often a curve over $\FF_{p^6}$ lands in a weak class,
+and how often the implemented walk reaches a weak curve from a random
+admitted start (\art{research/jv_weak_coverage_20261111/README.md}; the
+cubic norm-one branch only, two disclosed amendments).
+Table~\ref{tab:ext-jv-coverage} gives the shares. About a quarter of
+uniform curves pass the proved necessary condition
+$t\equiv\pm(p^6+1)\pmod{16}$ at every size; the prediction of $1/8$
+failed. At $p=37$--$67$ exact censuses find a weak curve in 98.8--99.6\%
+of admitted classes; at $p\ge1009$ that share is unresolved, apart from
+three classes reached at $p=1009$. The implemented walk reaches a weak curve
+from about 40\% of admitted starts at $p=37$ and 53, from 3 of 60 at
+$p=1009$ and from none of 60 at $p=1511$ and $1823$ (prediction $W<0.1$ at
+$p\ge1009$ held). The odd jumps exist only where an $\ell$-torsion point is
+rational over $\FF_{q^3}$, so from a random start they reach a small part
+of the class. The three successful walks at $p=1009$ took 19--153 isogeny
+steps and $1.8\cdot10^9$--$3.0\cdot10^{10}$ $\FF_p$ multiplications,
+$0.008$--$0.14$ of matched rho and up to about $30\times$ the route. The
+validated sieve row therefore holds for curves in the weak class; the
+walk charge of Table~\ref{tab:ext-jv-walk} holds for starts within the
+walk's reach, not for an arbitrary curve of the class. Reaching the class
+from a typical curve needs odd isogenies with irrational kernel points,
+which are not implemented.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rllll@{}}
+\toprule
+$p$ & uniform admitted & full 2-torsion admitted & walk reaches weak & coverage \\
+ & ($n=2{,}000$) & ($n=400$) & (of 60 admitted) & U$\times$W \\
+\midrule
+37 & $24.5\%$ $[22.6,26.4]$ & $62.5\%$ $[57.7,67.1]$ & $40\%$ $[29,53]$ & $9.8\%$ \\
+53 & $24.0\%$ $[22.2,25.9]$ & $62.5\%$ $[57.7,67.1]$ & $42\%$ $[30,54]$ & $10.0\%$ \\
+1009 & $22.9\%$ $[21.1,24.8]$ & $59.3\%$ $[54.4,64.0]$ & $5\%$ $[1.7,13.7]$ & $1.1\%$ \\
+1511 & $22.3\%$ $[20.5,24.2]$ & $59.8\%$ $[54.9,64.4]$ & $0\%$ $[0,6.0]$ & $<1.5\%$ \\
+1823 & $24.0\%$ $[22.1,25.9]$ & $63.3\%$ $[58.4,67.8]$ & $0\%$ $[0,6.0]$ & $<1.6\%$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Reach of the Joux--Vitse weak class over $\FF_{p^6}$. Admitted:
+the class passes the proved necessary condition $t\equiv\pm(p^6+1)
+\pmod{16}$ (an upper bound on landing in a weak class). Walk reaches weak:
+share of random admitted starts from which the implemented walk reaches a
+weak curve. Coverage: the source's operational coverage of the route as
+implemented; at $p=1511$ and $1823$ an upper bound. Wilson 95\% intervals.
+Unverified. Source: \art{research/jv_weak_coverage_20261111/README.md}.}
+\label{tab:ext-jv-coverage}
+\end{table}
+
+\section{Other extension-field routes}
+
+\begin{itemize}
+\item \emph{Joux--Vitse $(n-1)$-decomposition.} The
+  $(n-1)$-decomposition~\cite{jouxvitse2012} at $n=5$ over $E(\FF_{p^5})$
+  completed verified logarithms at $4.5\cdot10^7$--$1.8\cdot10^8\times$ rho,
+  with a crossover extrapolated to groups near $2^{291}$
+  (\art{research/joux_vitse_n1_20261015/}).
+\item \emph{EcGFp5 and EcMasFp5.} These curves over $\FF_{p^5}$, and a
+  short remainder on $\FF_{p^4}$, are recorded with the named targets in
+  \S\ref{sec:pt-gfp5}.
+\item \emph{Joux--Vitse cover.} The cover of $E(\FF_{p^6})$ is summarised in
+  Chapter~\ref{sec:transfer}, with the full account in \S\ref{sec:jac-jv}
+  and the November follow-ups in \S\ref{sec:ext-jv-nov}.
+\end{itemize}

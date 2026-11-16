@@ -1,0 +1,23 @@
+[ephemeral 05:18:34] phase: booting
+[ephemeral 05:18:35] phase: setup
+[ephemeral 05:18:37] toolchain preset: rust (baked into the image: 2026-10-16T22:38:40Z)
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+[ephemeral 05:18:42] phase: running (set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-5296ce8.tgz src.tgz --only-show-errors; echo "dade82a3bf840f556e26beaafd36ba290ba94e74a9be0f6ca71a494230655d91  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 5296ce8a74382f1f872f8f57da52261ef8fbbc34 >"$EPHEMERAL_OUT/source_commit"; research/fall_degree_bounds_20261008/e10/run_job.sh "$EPHEMERAL_OUT" 6:10:3 5:15:3)
+src.tgz: OK
+2026-10-27T05:21:10Z gate 0
+2026-10-27T05:23:52Z gate 1
+2026-10-27T05:24:40Z gate 2
+2026-10-27T05:26:54Z gate 5:10:2 reproduces e6/B_5-10-2.rerun.jsonl
+2026-10-27T05:26:54Z gate 3
+2026-10-27T05:28:30Z gate 3:18:6 reproduces e6/B_3-18-6.jsonl
+2026-10-27T05:28:35Z gate 4:8:2 reproduces e8/E8_4-8-2.jsonl
+2026-10-27T05:29:31Z gate 5:8:2 reproduces e8/E8_5-8-2.jsonl
+2026-10-27T05:29:31Z gate passed
+2026-10-27T05:29:31Z start 6:10:3
+2026-10-27T05:41:55Z done 6:10:3 exit=0 draws=4
+2026-10-27T05:41:55Z start 5:15:3
+2026-10-27T06:54:27Z done 5:15:3 exit=0 draws=4
+[ephemeral 06:54:27] command exited 0
+[ephemeral 06:54:27] phase: uploading
+[ephemeral 06:54:27] phase: done
+[ephemeral 06:54:27] terminating

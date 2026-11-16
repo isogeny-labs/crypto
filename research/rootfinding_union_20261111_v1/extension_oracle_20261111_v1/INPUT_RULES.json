@@ -1,0 +1,17 @@
+{
+  "schema": "extension-coordinate-oracle-inputs/v1",
+  "fields": [{"p":3,"modulus_low_first":[1,0,1]},{"p":5,"modulus_low_first":[2,0,1]}],
+  "basis": ["1","theta"],
+  "domain": ["0","1","theta"],
+  "feature_coefficients": "a_i=(2*i+1) mod q; b_i=(3*i+2) mod q; i=0..4; polynomial coordinate encoding",
+  "affine_constants": ["theta","1"],
+  "all_monic_cubics": true,
+  "training_only": true,
+  "check_cap": 200000,
+  "basis_transform_cap": 128,
+  "worker_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cores": 1,
+  "command": ["python","-m","research.extension_oracle_20261111_v1.worker","extension-oracle-20261111-v1"],
+  "release_claim": false
+}

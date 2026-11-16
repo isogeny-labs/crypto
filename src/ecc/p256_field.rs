@@ -14,6 +14,7 @@
 //! more thorough writeup of the Montgomery-form invariants.
 
 use crate::ct_bignum::{compute_minv64, Uint, U256};
+use crate::ecc::mont_vt::ct_mont_mul4;
 use num_bigint::BigUint;
 use subtle::{Choice, ConstantTimeEq};
 
@@ -48,6 +49,14 @@ pub const R_SQUARED_MOD_P: U256 = Uint([
     0x0000_0004_FFFF_FFFD,
 ]);
 
+/// `a·b·R⁻¹ mod p` (the value of `U256::mont_mul(a, b, &P, P_INV_LOW)`
+/// for `a, b < p`) by the interleaved constant-time pass of
+/// [`crate::ecc::mont_vt::ct_mont_mul4`].
+#[inline(always)]
+fn mm(a: &U256, b: &U256) -> U256 {
+    Uint(ct_mont_mul4(&a.0, &b.0, &P.0, P_INV_LOW))
+}
+
 /// A field element over P-256's prime, stored in Montgomery form.
 #[derive(Copy, Clone, Debug)]
 pub struct P256FieldElement(U256);
@@ -57,11 +66,11 @@ impl P256FieldElement {
     pub const ONE: P256FieldElement = P256FieldElement(R_MOD_P);
 
     pub fn from_canonical(a: &U256) -> Self {
-        P256FieldElement(U256::mont_mul(a, &R_SQUARED_MOD_P, &P, P_INV_LOW))
+        P256FieldElement(mm(a, &R_SQUARED_MOD_P))
     }
 
     pub fn to_canonical(&self) -> U256 {
-        U256::mont_mul(&self.0, &U256::ONE, &P, P_INV_LOW)
+        mm(&self.0, &U256::ONE)
     }
 
     pub fn from_biguint(v: &BigUint) -> Self {
@@ -91,11 +100,11 @@ impl P256FieldElement {
     }
 
     pub fn mul(&self, other: &Self) -> Self {
-        P256FieldElement(U256::mont_mul(&self.0, &other.0, &P, P_INV_LOW))
+        P256FieldElement(mm(&self.0, &other.0))
     }
 
     pub fn sqr(&self) -> Self {
-        P256FieldElement(U256::mont_sqr(&self.0, &P, P_INV_LOW))
+        P256FieldElement(mm(&self.0, &self.0))
     }
 
     pub fn neg(&self) -> Self {

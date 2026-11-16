@@ -1,0 +1,62 @@
+{
+  "schema": "pkm.goal-program-validation/v1",
+  "updated_utc": "2026-10-29T17:27:01.837974+00:00",
+  "scope": "planning metadata, report rendering and model arithmetic; no scientific execution",
+  "producer_reference": "8baeee2d446968936882adc503570fb957bb1429",
+  "existing_source_hashes_unchanged": true,
+  "source_sha256": {
+    "research/prime_ecdlp_three_leads_20261029/PKM_GOALS.md": "364f4240cbbc1878a794dc51a6ef1bac64cbb7e116118a3577f2badcfca95335",
+    "research/prime_ecdlp_three_leads_20261029/pkm-goals.typ": "be8aff54a3482bf191b367d54b8b8221ce296712699c978a477a3cb9aba7e688",
+    "research/prime_ecdlp_three_leads_20261029/pkm-goals.svg": "4577cef7db5eeaa108d5346a91054931b84ec6c4b5b14c47bbcd77317117d00b",
+    "research/prime_ecdlp_three_leads_20261029/pkm-goals.pdf": "62eb057796ba4705a06ecee2b96dfdced1b751a024397283b26fc04ea3363b94",
+    "research/prime_ecdlp_three_leads_20261029/lean/ThreeLeads/PKMGoalModel.lean": "2c004c9fa6932056d862d2a02bde2e3fc223bf4d667fb5cd8da287bc5481a5d6",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "87f570d0074a6ee8da5fdfac90c401d478dd0e13b38d3e7365b61746e5009248",
+    "backlog/XP-20261029-pkm-verified-oracle-program/README.md": "85c1ab367dbf2e5bc7a8552dc348bd08de941bf423b0e29f3566768b2c28fa37"
+  },
+  "commands": [
+    {
+      "argv": [
+        "target/release/backlog",
+        "validate",
+        "XP-20261029-pkm-verified-oracle-program"
+      ],
+      "exit": 0,
+      "log": "backlog-validate.log"
+    },
+    {
+      "argv": [
+        "lake",
+        "build",
+        "+ThreeLeads.PKMGoalModel"
+      ],
+      "exit": 0,
+      "log": "lean-build.log"
+    },
+    {
+      "argv": [
+        "lake",
+        "env",
+        "leanchecker",
+        "ThreeLeads.PKMGoalModel"
+      ],
+      "exit": 0,
+      "stdout": "empty",
+      "mode": "module replay against imported environment; not --fresh or an external prover"
+    },
+    {
+      "argv": [
+        "tools/lean/proof-gate.sh",
+        "research/prime_ecdlp_three_leads_20261029/lean"
+      ],
+      "exit": 0,
+      "audited_declarations": 10,
+      "trusted_exceptions": 0,
+      "log": "proof-gate.log"
+    }
+  ],
+  "pdf_pages_inspected": 3,
+  "backlog_status": "blocked",
+  "funding_units": 0,
+  "scientific_panels_run": 0,
+  "prior_full_library_status": "historical capped incomplete; unchanged by this planning update"
+}

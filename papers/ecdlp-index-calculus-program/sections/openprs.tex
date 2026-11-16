@@ -1,11 +1,13 @@
 \section{Work in open pull requests}\label{sec:openprs}
 
-At the paper's date, 111 open pull requests in the repository concern elliptic-curve index calculus or its baselines. Their results are not on \texttt{main}, have not been reviewed here, and are not used anywhere in the paper; the titles below are quoted as their authors filed them and are claims, not findings. Two bear on the text: \#2359 reports a plane-quartic IC/rho of $0.024$, but the plane-quartic $S$ values on \texttt{main} are unverified because their degree-3 reduction merges distinct classes (\S\ref{sec:corrections}); and \#2324 records that a Joux--Vitse sieve replication failed its acceptance rule and withheld its decisions. As these merge, they are folded into the sections above and the catalogue under the same rules as everything else. Source: \art{papers/ecdlp-index-calculus-program/data/open_prs.tsv}.
+At the paper's date, 112 open pull requests in the repository concern elliptic-curve index calculus or its baselines. Their results are not on \texttt{main}, have not been reviewed here, and are not used anywhere in the paper; the titles below are quoted as their authors filed them and are claims, not findings. Two bear on the text: \#2359 and \#2597 report plane-quartic IC/rho ratios beyond the plain-rho comparison on \texttt{main} (\S\ref{sec:transfer}), and \#2598 runs Smith's isogeny on divisor classes; and \#2324 records that a Joux--Vitse sieve replication failed its acceptance rule and withheld its decisions. As these merge, they are folded into the sections above and the catalogue under the same rules as everything else. Source: \art{papers/ecdlp-index-calculus-program/data/open_prs.tsv}.
 
 {\footnotesize\setlength{\tabcolsep}{3pt}
 \begin{longtable}{@{}r l >{\raggedright\arraybackslash}p{0.78\linewidth}@{}}
 \toprule PR & Updated & Title as filed\\ \midrule \endhead
 \bottomrule \endfoot
+\href{https://github.com/aburan28/crypto/pull/2597}{\#2597} & 2026-10-26 & N4 v2: plane-quartic IC on the GHS-weak family to q = 2\textasciicircum{}22 vs plain and negation-map rho (stacked)\\
+\href{https://github.com/aburan28/crypto/pull/2598}{\#2598} & 2026-10-26 & W3b: Smith's explicit isogeny $\psi$ on divisor classes, verified; toy Route S solves\\
 \href{https://github.com/aburan28/crypto/pull/2514}{\#2514} & 2026-10-24 & Record N83 Spot replay failure and AWS resume custody\\
 \href{https://github.com/aburan28/crypto/pull/2513}{\#2513} & 2026-10-24 & isoclass-rho: same-host repeat runs of P0 and K (data only)\\
 \href{https://github.com/aburan28/crypto/pull/2511}{\#2511} & 2026-10-24 & R6.1: direct S5 systems, chained-x ic oracle plug-in, discrepancy protocol\\
@@ -69,7 +71,6 @@ At the paper's date, 111 open pull requests in the repository concern elliptic-c
 \href{https://github.com/aburan28/crypto/pull/2246}{\#2246} & 2026-10-23 & Audit N83 factor-base gates and S3-custody finalist evidence\\
 \href{https://github.com/aburan28/crypto/pull/2231}{\#2231} & 2026-10-23 & Optimize Boolean F4/\allowbreak{}F5 construction and recursion; compare F6 and root solvers end to end\\
 \href{https://github.com/aburan28/crypto/pull/2229}{\#2229} & 2026-10-23 & Run fresh end-to-end checks of three ECDLP leads, including two 1,260-target genus cohorts\\
-\href{https://github.com/aburan28/crypto/pull/2227}{\#2227} & 2026-10-23 & W1: canonical Pic\textasciicircum{}0 arithmetic on smooth plane quartics\\
 \href{https://github.com/aburan28/crypto/pull/2224}{\#2224} & 2026-10-23 & jv\_\allowbreak{}cover: large-prime variation (L6 of \#2216) does not pay at p \textless{}= 12k\\
 \href{https://github.com/aburan28/crypto/pull/2223}{\#2223} & 2026-10-23 & ecbench: prime-field PKM tower oracle; tower F4, signature F5 and an F6 analogue on prime curves (preregistered round)\\
 \href{https://github.com/aburan28/crypto/pull/2215}{\#2215} & 2026-10-24 & Koblitz IC: integral recovery and proper source equations\\

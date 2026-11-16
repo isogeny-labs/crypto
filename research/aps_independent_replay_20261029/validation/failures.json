@@ -1,0 +1,24 @@
+{
+  "schema": "aps.replay-development-failures/v1",
+  "failures": [
+    {
+      "stage": "initial strict standalone Clippy",
+      "exit_code": 101,
+      "diagnostic": "manual_is_multiple_of",
+      "correction": "Use the equivalent native is_multiple_of method; no arithmetic contract changes."
+    },
+    {
+      "stage": "initial native producer corpus generation",
+      "case": "orbit3",
+      "fixture": "toy103_j0",
+      "seed": 20261026,
+      "labels": "guaranteed",
+      "subset_size": 1,
+      "exit_code": 1,
+      "error": "short or overlapping automorphism orbits",
+      "transcript_emitted": false,
+      "flow": {"planned": 14, "completed_before_failure": 9, "failed": 1, "not_attempted": 4},
+      "correction": "Use Labels::Random with the same seed for the three orbit cases, matching the existing producer's positive orbit unit-test fixture. Preserve the first nine generated files; generate the five remaining cases separately. This is correctness-fixture construction, not a performance sample."
+    }
+  ]
+}

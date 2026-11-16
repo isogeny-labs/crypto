@@ -1,0 +1,52 @@
+{
+  "schema": "pencil-upper-gate-finite-design-independent-review/v1",
+  "reviewer": "/root/four_lead_state",
+  "producer": "/root",
+  "status": "reviewed_ready_for_scoped_finite_gate_admission",
+  "protocol": {
+    "path": "upper-gate-protocol-v2.json",
+    "file_sha256": "65ad107e3d341e7783ed06942cc82b6c1b3a9084f9d88c92202b31fec7509746",
+    "canonical_body_sha256": "5762e40132c75a0a3d1cbc9ec6d64b777e2235ebc6d3c3364d9bdd299af45040"
+  },
+  "body_derivation": "jq -cSj del(.freeze): remove only freeze, sorted compact JSON no newline; full frozen file retained unchanged",
+  "checks": {
+    "exact_gate_plan": true,
+    "workloads": 1,
+    "base_rows": 18,
+    "measured": 15,
+    "warmups": 3,
+    "pairs": 5,
+    "pricing_cells": 36,
+    "instrument_unchanged": true,
+    "consumer_source_commit": "848f495fa7031f0d0b5ac0d811ec07aa29fed9e7",
+    "native_source_review_complete": true,
+    "source_commit_and_binaries_bound": true,
+    "original_finite_mapping_semantics_unchanged": true,
+    "missing_and_failed_rows_retained": true,
+    "upper_gate_separately_charged_not_enrolled": true,
+    "independent_replay_required_before_remaining_cohort": true,
+    "shared10800budget_and_outer050550_retained": true,
+    "conditional_R900_internal032820_guard_reviewed": true,
+    "exact_binary_sizes": {
+      "analyze_pair": 874424,
+      "analyze_cohort": 1653848
+    }
+  },
+  "coverage_boundary": "All nine finite declared semantic categories; external coverage record binds exact frozen body and current mapping. No allocator/infrastructure CPU census or invented cost conversion.",
+  "timing_boundary": "All clocks remain unqualified; original timing objective unfinished; no old L2 failure erased.",
+  "remaining_operational_requirements": [
+    "Commit and publish frozen protocol before any affected execution",
+    "Final live owner/job reconciliation and exact reviewed request admission",
+    "Retain actual attempt/control/replay/recovery/resource observations; stop on cap/deadline",
+    "Independent actual18-row result review and all15 measured non-wall replays before latercohort"
+  ],
+  "new_solver_executions": 0,
+  "new_cloud_actions": 0,
+  "launch_performed": false,
+  "correction_review": {
+    "prior_review": "upper-gate-independent-design-review.json",
+    "finding": "Version1 omitted required analyzer byte sizes; solver-free packaging caught it before gate execution. Prior readiness review did not detect this metadata omission.",
+    "changes": "Only two byte sizes plus version, amendment, parent metadata and freeze changed; complete diff reviewed.",
+    "coverage_metadata": "Corrected stale donor full-protocol pointer, relative source-audit path and post-data label in additive version2 coverage."
+  }
+}

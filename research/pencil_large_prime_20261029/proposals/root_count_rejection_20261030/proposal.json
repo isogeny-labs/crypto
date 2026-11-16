@@ -1,0 +1,58 @@
+{
+  "schema": "pencil-source-optimization-proposal/v1",
+  "id": "root-count-rejection-20261030",
+  "status": "unapplied_source_only_proposal",
+  "source": {
+    "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+    "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+    "line": 1332
+  },
+  "change": "Move complement call below existing roots.len()!=3 guard, inside same measured closure",
+  "execution": {
+    "patch_applied": false,
+    "tests_run": false,
+    "solver_runs": 0,
+    "benchmarks": 0,
+    "new_measurements": 0
+  },
+  "equivalence": {
+    "mathematical_outputs": "Conditional on valid normalized field inputs and bounded arithmetic",
+    "full_observational_equivalence": false,
+    "resource_counters": "Intentionally changed for rejected candidates",
+    "arbitrary_u64_panic_equivalence": "Not established"
+  },
+  "assumptions": [
+    "degree2 divisor",
+    "quintic h has length6",
+    "prior sieve complement(lambda0) completed",
+    "normalized residues, p<=2^63 for u64 add/sub safety",
+    "same finalized buckets, candidate ordering and graph state"
+  ],
+  "counter_delta_removed_per_rejection": {
+    "variables": {
+      "D": "monic division iterations,1..4",
+      "L": "trimmed w_squared length",
+      "T": "total trim predicate evaluations",
+      "V": "trim predicate evaluations on nonempty vectors"
+    },
+    "base_muls": "12+3D",
+    "base_adds": "18+3D",
+    "initialized_elements": "18",
+    "copied_elements": "D",
+    "entry_visits": "33+L+7D+V",
+    "predicate_comparisons": "6+D+T",
+    "inversions": 0,
+    "engine_group_operations": 0
+  },
+  "limits": [
+    "No predicted speedup",
+    "No timing ratio",
+    "No automatic retry or continuation admission",
+    "New instrument and prospective measurement contract required for later empirical comparison"
+  ],
+  "independent_review": {
+    "path": "independent-review.json",
+    "sha256": "ee94e8660748f796a0acbfcbd1ba441e79b7fbc1f27846e78480a174e57d6221",
+    "scope": "Static conditional algebra and event-count review only; no execution"
+  }
+}

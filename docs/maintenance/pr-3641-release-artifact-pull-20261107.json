@@ -1,0 +1,52 @@
+{
+  "schema": "maintenance.canonical-workflow-input-pull/v1",
+  "source_head": "3c934a54801c11635776eda27720be02279b4470",
+  "source_tree": "6e8630a4068a40b845e0584b515e239f839425b4",
+  "workflow": ".github/workflows/release.yml",
+  "canonical_wire_blob": "e163ac6befe9950b6f880c122358ad63c8ebab4d",
+  "old_workflow": {
+    "bytes": 54021,
+    "git_blob": "e2522d280a874d3622cde3f9147211729fdf623c",
+    "sha256": "392701179a9704360a691134e127d225334174036bfd96827ce108e8867418ea"
+  },
+  "new_workflow": {
+    "bytes": 55147,
+    "git_blob": "50c6d7d57fb0de28035852919abcf175fd98e38b",
+    "sha256": "bdb1df88890bfe66b520d92c3c5fedc90a6ed671cfe9d813e3ecd0c97d310d58"
+  },
+  "textual_canonical_transform": {
+    "changed_jobs": [
+      "macos"
+    ],
+    "notes": [],
+    "original_bytes": 54021,
+    "candidate_bytes": 55147,
+    "candidate_sha256": "bdb1df88890bfe66b520d92c3c5fedc90a6ed671cfe9d813e3ecd0c97d310d58",
+    "scope": "text-only canonical wire functions and duplicate-key YAML AST comparison; no workflow, AWS, unit, native or scientific command executed; no Git object/ref created"
+  },
+  "all_existing_jobs_steps_fields_exact": true,
+  "sole_changed_job": "macos",
+  "new_step": "Pull store data this workflow reads (tools/artifacts)",
+  "pull_paths": [
+    "docs/curves"
+  ],
+  "all_other_head_objects_must_remain_exact": true,
+  "no_previous_Nov07_journal_at_source_head": true,
+  "journal": {
+    "bytes": 3886,
+    "git_blob": "542b14994bbe65cf6ebddb863fe8dbf984e2f5f4",
+    "sha256": "7fcfc3bc99db2a1d41e557e01d9f2f85f6abc2e59e8da4bd9272a2385cf6a44e"
+  },
+  "artifact_tool": "7ce68d532608a04747aaa6918904ec4fc328437b",
+  "artifact_policy": "8b75801c2be96f2fad0b83361168cdf0d1d01e6d",
+  "unresolved_migration_config_cmp": {
+    "run": 42399246892,
+    "trusted_main": "a2be660914e8e485eefd45f2958eb6d18344dadf",
+    "trusted_policy": "8c79891e911c2f8f9823fb41893dabfb85b882b4",
+    "guard_not_changed": true,
+    "no_retry": true
+  },
+  "source_security_review": "INCOMPLETE",
+  "new_head_CI": "UNOBSERVED",
+  "no_scientific_custody_PCC_admission": true
+}

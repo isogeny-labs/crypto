@@ -1,0 +1,23 @@
+{
+  "schema":"koblitz.exact-computation-export/v1",
+  "round":23,
+  "source_revision":"5cf618dbff2c01b9675884a685fac477177ba716",
+  "source_manifest":"source.sha256",
+  "protocol":"protocol.json",
+  "protocol_amendments":"PROTOCOL.md",
+  "backend":{"name":"Singular","version":"4.4.1","virtual_memory_KiB":4194304,"timeout_seconds":1200},
+  "raw_archive":{"path":"runs.tar.xz","bytes":38236,"sha256":"95955643a8139649f453fe204adb391275b15753b28377c877498c8a787fba2c","manifest":"runs.sha256","retained_files":55},
+  "report_pdf":{"path":"report.pdf","bytes":54610,"sha256":"3744c38900e12fdbc88c7f637d880dccc14510bfc68bff21a06af77e9dc43642","pages":3,"all_pages_visually_inspected":true},
+  "original_inputs":{"round22_source_revision":"64121dd0c55f030ad11d973efbcd12f8dadd8931","round22_raw_archive_sha256":"f5cbf0fc344cd2770e2ef3bda233c7a0d5d37c9992f352327e59e383f0a2d01a","restored_raw_hashes_checked":314},
+  "native_positive_runs":["ss23-compact-host2-01","z23-smooth-host2-06","z23-components-host2-07","ss23-compact-host2-08","ss23-unit-host2-09"],
+  "negative_control":{"id":"ss23-corrupt-host2-10","mutation":"actual compact inverse plus1","native_exit":0,"later_success_marker_present":true,"native_error_present":true,"wrapper_exit":1,"expected_rejection":true},
+  "lean":{"version":"4.34.1","mathlib_revision":"d13f23b723b8a846827a245b89c10fc7d3f11612","module":"KoblitzRound23Local","source_sha256":"e6b9032ca95652ec4e06f2f454a9f6e0be44d183f4c70becf44f97352c6c436b","transitive_project_imports_rebuilt":true,"theorems_audited":15,"failing":0,"trusted_native":0,"separate_fresh_checker_pass":false},
+  "exact_native_observations":{"original_Z5_length":20,"closure_Z5_length":16,"original_Z5_component_lengths":[2,18],"closure_Z5_component_lengths":[2,14],"closure_Z5_residue_degrees_over_F32":[2,2],"closure_generator_count":51,"unit_minor_rows":[8,1,2],"unit_minor_columns":["lambda","b","c"],"all_registered_unit_indexes_checked":[1,2,3,4,5,6,7,8],"Z5_ramified_separator_quotient_dimensions":[8,12]},
+  "written_geometric_derivation":{"proof":"CM.md","formal_scope":"PROOF_MAP.md","source_component_bridge":"Round22 identified original generic incidence function field and its registered-open closure","SS5":{"closed_point_degrees_over_F2":[20,20,20,20],"ramification_indices":[1,1,1,1],"nu_denominator_orders":[2,2,2,2]},"Z5":{"closed_point_degrees_over_F2":[10,10],"ramification_indices":[1,7],"separator_orders":[0,4],"norm_orders":[0,6],"nu_denominator_orders":[1,7]},"complete_global_divisors":false,"full_scheme_normalization_formalized":false},
+  "migration":{"source_checkpoint":"20261027T060251Z-021a715657bd","recovered_source_commits":9,"old_ignored_raw_logs_lost":true,"replayed_missing_certificates":true,"failure_ledger":"FAILURES.md","no_duplicate_Diem":true,"no_new_EKS_job":true},
+  "performance_measured":false,
+  "new_relation_rank_claim":false,
+  "official_scientific_promotion":false,
+  "merge_authorized":false,
+  "remaining_requirements":["five rational lifted supports and global pole divisors","complete prescribed RR space","actual F2 modular-factor map/correspondence with nonzero order11 action","node187 source-bound polynomial membership or full simultaneous arc","full quotient saturation and proper polarized embedding","arbitrary modular-divisor reverse evaluation and460/367 fibers/images"]
+}

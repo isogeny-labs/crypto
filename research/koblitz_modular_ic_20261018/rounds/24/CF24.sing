@@ -1,0 +1,32 @@
+// Appended after the exact R22 f, in F4[u,l] with a^2+a+1=0.
+option(redSB);
+print("BEGIN_CF24");
+poly pos=l^2+l+1;
+poly neg=l^2+l+a;
+list fp=factorize(pos); list fn=factorize(neg);
+poly prodpos=1;poly prodneg=1;int i;
+for(i=1;i<=size(fp[1]);i++){prodpos=prodpos*fp[1][i]^fp[2][i];}
+for(i=1;i<=size(fn[1]);i++){prodneg=prodneg*fn[1][i]^fn[2][i];}
+if(prodpos!=pos || prodneg!=neg){ERROR("control product mismatch");}
+print("POSITIVE_FACTORS");fp;
+print("NEGATIVE_FACTORS");fn;
+if(size(fp[1])!=3 || size(fn[1])!=2){ERROR("unexpected control factor counts");}
+if(subst(neg,l,0)==0 || subst(neg,l,1)==0 || subst(neg,l,a)==0 || subst(neg,l,a+1)==0){ERROR("negative control has a root");}
+print("SOURCE_LAMBDA_DEGREE");deg(f,intvec(0,1));
+list fs=factorize(f);
+print("SOURCE_FACTORIZATION");fs;
+poly product=1;
+for(i=1;i<=size(fs[1]);i++){
+ product=product*fs[1][i]^fs[2][i];
+ print("FACTOR_"+string(i)+"_LAMBDA_DEGREE_EXPONENT");deg(fs[1][i],intvec(0,1));fs[2][i];
+}
+print("PRODUCT_RESIDUAL");product-f;
+if(product!=f){ERROR("source factor product mismatch");}
+print("SOURCE_DERIVATIVE_GCD");gcd(f,diff(f,l));
+print("SOURCE_CONTENT_IN_U");gcd(f,u);
+write("cf24-factors.dump","ring r4=(2,a),(u,l),dp;minpoly=a^2+a+1;");
+write("cf24-factors.dump","poly f="+string(f)+";");
+for(i=1;i<=size(fs[1]);i++){
+ write("cf24-factors.dump","poly factor"+string(i)+"="+string(fs[1][i])+";");
+}
+print("CF24_FACTORIZATION_ALL_CHECKS_PASS");quit;

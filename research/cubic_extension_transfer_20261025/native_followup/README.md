@@ -14,6 +14,12 @@ gate fails and no compatible isolated-runner connection is configured. The
 [observed access record](../native_end_to_end/ACCESS_STATUS.md) describe the
 remaining native-map and execution prerequisites. No new benchmark has run.
 
+2026-10-28 continuation: the supplied AWS identity now passes the S3 checkpoint
+gate, with verified readback; all five pending historical artifacts are uploaded
+and hydrated. The [AWS access receipt](../native_end_to_end/access/20261028-aws.json)
+records a denial of the lab's required CodeBuild status action. Native transfer
+construction/inversion and the qualified full comparison remain unfinished.
+
 | Requested requirement | Status | Evidence and remaining gap |
 | --- | --- | --- |
 | Prove or disprove one extra step after preparation | Partial | Explicit rational three-torsion lift with exact polynomial checks; 27 prepared native replays. Level-nine neighbor labels and obstruction divisors remain uncomputed. |
@@ -103,8 +109,13 @@ Regenerate the manifest with `jq -n -f run_manifest.jq` before a fresh run;
 use a new output directory. Strict isolation is the default. Diagnostic mode
 does not satisfy the strict measurement requirement.
 
-The root `cargo test --release --lib` was attempted but cannot run in this
-partial import checkout because Cargo.toml is absent. Rust is now installed;
-this corrects the earlier environment limitation without claiming a root
-release-test pass. Conductor, Lean/Lake and the original five S3 uploads
-remain unresolved. Benchmark/leaderboard admission is not requested.
+The earlier root `cargo test --release --lib` attempt was blocked by the original
+partial import's absent Cargo.toml. The 2026-10-28 continuation uses a proper
+sparse clone. Its root release build stopped at compiler allocation failure
+under both 4-GiB and 12-GiB virtual ceilings; library tests did not execute.
+The [validation record](../native_end_to_end/access/20261028-local-validation.json)
+retains all attempts. The earlier standalone tests are distinct.
+The five original S3 uploads and fresh-cache byte checks
+were completed on 2026-10-28. Conductor, Lean/Lake and the remaining native
+measurement/release obligations stay open. Benchmark/leaderboard admission
+is not requested.

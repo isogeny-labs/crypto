@@ -1,0 +1,46 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "same-field genus-3 Jacobian image: paired-host L2 common-cost panel",
+  "description": "Preregistered combined panel over the four faithful sizes that passed the earlier cold run. The same immutable spec is to run once on c8a.2xlarge and once on m8a.2xlarge EKS Spot. Shared comparison units are target-window wall time, instructions and cycles; destination F2m counts are an additional native ledger, not a source conversion. The candidate is still generic BSGS, not a non-generic calculus or speedup claim.",
+  "workloads": {
+    "curves": [
+      {"kind": "koblitz", "a": 0, "n": 9},
+      {"kind": "koblitz", "a": 0, "n": 13},
+      {"kind": "koblitz", "a": 0, "n": 19},
+      {"kind": "koblitz", "a": 0, "n": 23}
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610310830,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "source-rho-strong",
+      "role": "reference",
+      "method": {"id": "rho.signed_frobenius_strong"}
+    },
+    {
+      "name": "destination-rho3",
+      "role": "baseline",
+      "method": {"id": "jacobian_image.rho3"}
+    },
+    {
+      "name": "destination-bsgs",
+      "role": "candidate",
+      "method": {"id": "jacobian_image.bsgs"}
+    },
+    {
+      "name": "source-rho-strong-aa",
+      "role": "control",
+      "method": {"id": "rho.signed_frobenius_strong"}
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610310831,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

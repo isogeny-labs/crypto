@@ -1,0 +1,33 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb}
+\begin{document}
+\section*{Infinity-chart derivative and conditional local parameter}
+For the normalized quintic, put
+\[
+F(z,w)=w^2-z(1+a_3z^2+a_2z^3+a_1z^4+a_0z^5).
+\]
+The pinned Lean file \texttt{Common22InfinityChart.lean} checks
+$F(0,0)=0$ and $\partial F/\partial z(0,0)=-1$ over every field. It also
+proves that the zero of $F(z,0)$ at $z=0$ has root multiplicity one.
+
+\paragraph{Conditional local algebra.} In a supplied local ring $R$, assume
+$w^2=zu$ for a unit $u$ and $\mathfrak m_R=(z,w)$. The separate Lean file
+\texttt{Common22LocalParameter.lean} proves $z\in(w)$ and hence
+$\mathfrak m_R=(w)$. If $R$ is a domain and $w\ne0$, it also proves that $w$
+is irreducible. The derivative theorem does not construct $R$ or discharge
+$\mathfrak m_R=(z,w)$.
+
+\paragraph{Open bridge.} Construct the smooth projective completion, its
+unique infinity stalk, and the chart identification; establish the local
+Noetherian one-dimensional domain/DVR instance and $w$ as normalized
+uniformizer. Then connect the conditional valuation packets to the principal
+divisor, Mumford reduction, $\operatorname{Pic}^0$ equation, and compiled Rust
+semantics. No target solve or rho ratio changes. The adjacent CSV records
+checked, conditional, and open gates; the SVG shows their dependency.
+
+\paragraph{Replay.} From the pinned formal directory, run
+\texttt{TMPDIR=/dev/shm lake env lean Common22InfinityChart.lean} and
+\texttt{TMPDIR=/dev/shm lake env lean Common22LocalParameter.lean}. The
+successful axiom outputs are retained in the named build logs.
+\end{document}

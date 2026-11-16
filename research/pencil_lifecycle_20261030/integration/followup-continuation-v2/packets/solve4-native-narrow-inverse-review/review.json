@@ -1,0 +1,38 @@
+{
+  "schema": "formal.independent-component-review/v1",
+  "task": "T-1478",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "decision": "accept_scoped_native_narrow_inverse_value_bridge",
+  "published_revision": "378d3fcfd5b9dfa22e421322fec7391907fa17d8",
+  "source_sha256": "9d20c4c354a321d9c9c5c99407d174346301013f4e99bcedc99a704f8cdedae7",
+  "native_source_sha256": "56a6bda57c9e8402e6ec80f3d6fd5ba5ba3308aae23c1c42480b7023b01a7183",
+  "plan_sha256": "f09bb8204b570af48e201ad493bfb32b68ae47e65e6284920527d28ee8fd86cf",
+  "runner_sha256": "cad075b3b3719c7053f05702d617db382fa6933826b26a83e1506c1cdc7b9761",
+  "replay_receipt_sha256": "b4fadb7cfeec870ac0afc251a5944f9968899359afb9bf1262f1f8a3c952ad4e",
+  "declarations": 10,
+  "producer_controls": 7,
+  "own_controls": 4,
+  "named_axiom_readbacks": 21,
+  "malformed_audit_rejections": 3,
+  "dependency_files": 28785,
+  "checks": [
+    "Literal UInt64 lowbit equality, conditional accumulator multiplication, unconditional square, rightshift and termination correspond to native value source.",
+    "Canonical operands and p<=2^32 establish no multiplication overflow; fuel64 covers all UInt64 exponents.",
+    "Prime/canonical/nonzero input implies canonical output and field inverse value; inverse value is derived, not assumed.",
+    "Own kernel controls exhibit zero-input and nonprime inverse failures, insufficientfuel failure and valid inclusive modulus2^32 product boundary.",
+    "Knownfalse inverse3 mod7=4 rejected by decide; all21namedaxiom readbacks within propext/Classical.choice/Quot.sound.",
+    "Fresh target compilation at published exactsource; private graph/comparator dependency snapshots and28785recursive sharedinput hashes unchanged pre/post."
+  ],
+  "assumptions": [
+    "p prime;1<p.toNat; p.toNat<=2^32; a.toNat<p.toNat; a!=0 for inverse.",
+    "Power value theorem requires1<p<=2^32 and canonical base, not primality."
+  ],
+  "limitations": [
+    "Ops.i state and possible counter overflow excluded.",
+    "Supplies inverse/canonical witness premise; no new native pivot/swap/zero-prefix/fullGaussian-array-loop composition theorem.",
+    "Manual source-to-value-model fidelity review, not verified compiler extraction or machine-code simulation.",
+    "No independent binary/kernel rechecker available on PATH; pinned sharedmathlib/toolchain caches trusted. Pre/post hashes do not exclude transient concurrent edits.",
+    "Review independent of proof author; proof read only after frozenplan and rootpublication confirmation."
+  ],
+  "scientific_execution": false
+}

@@ -1,0 +1,79 @@
+{
+  "authorization_start_utc": "2026-10-29T23:32:22Z",
+  "cap_additive_worker_execution_seconds": 14400,
+  "cloud_reads_performed": [],
+  "conclusion": {
+    "allocated_worker_or_pod_lifetime": "not_proven_by_current_source",
+    "explicit_additive_counter": "absent",
+    "launch_gate_interpretation": "Admissible only if worker-execution means active computation/checkpoint/restore/native-replay/fresh-L2 payload work, not allocated idle pod lifetime. Record that definition in the frozen protocol/admission receipt.",
+    "scientific_payload_execution": "bounded_by_existing_deadline_given_seriality_and_current_prelaunch_delay"
+  },
+  "concrete_enforcement_issue": "The request/controller has no cumulative elapsed counter and does not wait for predecessor Pod deletion before the fresh Job may run. A controller crash after fresh Job creation could leave an idle predecessor Pod allocated until its absolute deadline. Thus the 14,400 cap is not provable if worker-execution includes allocated Pod/instance lifetime rather than active scientific payload execution.",
+  "created_utc": "2026-10-29T23:56:49.766045+00:00",
+  "deadline_margin_observed_read_only": {
+    "observed_utc": "2026-10-29T23:55:38Z",
+    "qualification": "Point-in-time source-review observation; launch remained unperformed.",
+    "seconds_elapsed_since_authorization_before_any_launch": 1396,
+    "seconds_remaining_to_deadline": 13004
+  },
+  "deadline_utc": "2026-10-30T03:32:22Z",
+  "mutations_performed": [],
+  "request": "/home/ec2-user/pencil-controller-review-20261029/first-gate-20261029/request.json",
+  "reviewer": "ci_audit",
+  "schema": "pencil-controller-budget-enforcement-review/v1",
+  "serial_execution_argument": [
+    "Initial computation, checkpoint and in-pod native replay share one attempt pod.",
+    "A restore cannot start until the previous writer instance is terminated.",
+    "Fresh L2 creation occurs only after the old computation and native replay are complete.",
+    "Therefore active scientific payload intervals do not overlap. The idle predecessor supervisor pod may overlap the fresh job, but it performs no scientific payload after verified transition."
+  ],
+  "smallest_no_source_change_admission_treatment": [
+    "Freeze an explicit definition that worker-execution elapsed counts active scientific payload/checkpoint/restore/replay/fresh-L2 intervals, excluding a verified predecessor Pod that is idle while deletion completes.",
+    "Record the actual submission timestamp and prove it is at least the grace/overlap allowance after 23:32:22Z; preserve the fixed 03:32:22Z deadline.",
+    "At admission/readback, verify no preexisting run and preserve all attempt/Pod start-finish times so additive active intervals can be recomputed.",
+    "If the approved definition instead includes allocated worker lifetime, current source is insufficient and launch should remain blocked pending an explicit cumulative counter or deletion-complete fence."
+  ],
+  "source_evidence": [
+    {
+      "fact": "Strict request has deadline but no additive-budget field; initial admission binds original deadline and does not reset it.",
+      "lines": "41-55,147-158",
+      "path": "contract.rs"
+    },
+    {
+      "fact": "Every computation/restore pod gets activeDeadlineSeconds equal to the remaining original deadline.",
+      "lines": "240-250",
+      "path": "cloud.rs"
+    },
+    {
+      "fact": "Restore begins only after the exact previous EC2 writer is confirmed terminated; attempts are serial.",
+      "lines": "198-237",
+      "path": "model.rs"
+    },
+    {
+      "fact": "Supervisor checks the original deadline every loop and kills the payload process group; RPC operations are serialized.",
+      "lines": "627-635,637-707",
+      "path": "supervisor.rs"
+    },
+    {
+      "fact": "Native replay is synchronous in the same predecessor pod and must finish before its status becomes verified.",
+      "lines": "530-576",
+      "path": "supervisor.rs"
+    },
+    {
+      "fact": "Computation completes, replay verifies, archive/readback finishes, then benchmark phase begins.",
+      "lines": "923-960",
+      "path": "cloud.rs"
+    },
+    {
+      "fact": "Fresh L2 job gets remaining deadline minus 120 seconds, no retry, and succeeds only after verification/readback. Old pod deletion is asynchronous after fresh job UID is bound.",
+      "lines": "670-760",
+      "path": "cloud.rs"
+    },
+    {
+      "fact": "L2 job has backoffLimit=0, activeDeadlineSeconds, and 60-second termination grace.",
+      "lines": "48-69",
+      "path": "submit-job"
+    }
+  ],
+  "synchronous_boundary": "verify() and CRIU operations can block the supervisor loop past its next explicit deadline check. The Pod active deadline is the fallback. The fresh job reserves 120 seconds and has 60-second termination grace; the computation pod omits an explicit terminationGracePeriodSeconds and uses the Kubernetes default. The 1,396-second prelaunch slack observed at review exceeds these normal grace windows, but that slack is external admission evidence, not an encoded cumulative counter."
+}

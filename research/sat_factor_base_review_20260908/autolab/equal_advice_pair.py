@@ -188,6 +188,7 @@ def run_ic_arm(
     env["RAYON_NUM_THREADS"] = "1"
     if extra_env:
         env.update(extra_env)
+    lab.write_switches(run, env, None, "switches_ic.json", extra_env=extra_env or {})
     # Stream to files: capture_output can OOM / appear hung on L>=1024 panels.
     with stdout_path.open("w") as stdout, stderr_path.open("w") as stderr:
         completed = subprocess.run(cmd, cwd=lab.REPO, stdout=stdout, stderr=stderr, env=env)

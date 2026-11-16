@@ -1,0 +1,18 @@
+{
+  "schema": "point-sieve.progress-route-source/v1",
+  "task": "T-1554",
+  "canonical_edited": false,
+  "compiler_invoked": false,
+  "route": {
+    "None": "native_solver::solve_one; finite-difference sieve",
+    "Some(sink)": "progress_native::solve_one_with_progress; current canonical Horner sieve"
+  },
+  "files": {
+    "src/cryptanalysis/ecbench/pencil_progress_native.rs": "01468d21fec366d03c100fbccea2c2705794b5cda15c6a5654a97d9ae965b6f7",
+    "research/pencil_large_prime_20261029/src/native_solver.rs": "061f4f9f45d261b61af3482509ca5f09e03964abc670765852922d20f946bbd1",
+    "src/cryptanalysis/ecbench/pencil.rs": "481f94cc389a1e79880fc168c3a98b5bb37e9411694d424632d4f8f389e5ed00",
+    "src/cryptanalysis/ecbench/pencil_progress_sink.rs": "6587e873f5de575ea31999c2b026c9e4989718137ba28c9a3ad4d14a8dc3fb6d",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/point-sieve-progress-route-integration/candidate-progress-native.rs": "87f3581cbbeadb826e878cc80887de8e9d0980cb65262058ca54b50aae86a0ae",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/point-sieve-progress-route-integration/integration.patch": "2b2501f8994eb5b747596066fe58f1d7fe5a683ef36431113c1059530569046f"
+  }
+}

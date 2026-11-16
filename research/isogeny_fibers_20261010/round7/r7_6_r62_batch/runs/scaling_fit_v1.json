@@ -1,0 +1,256 @@
+{
+  "bootstrap": {
+    "method": "percentile, resampling classes and, within a class, its pairs",
+    "nboot": 10000
+  },
+  "fits": [
+    {
+      "classes": 40,
+      "cost": "total",
+      "exponent": 1.1299577343877012,
+      "hi": 1.2066554961144804,
+      "intercept_ln": 0.05351934395997926,
+      "lo": 1.058881554007702,
+      "one_in_interval": false,
+      "size_max": 16702,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "all"
+    },
+    {
+      "classes": 40,
+      "cost": "search_only",
+      "exponent": 1.131760830404752,
+      "hi": 1.2145439576124308,
+      "intercept_ln": -0.6719814103686215,
+      "lo": 1.053965804070998,
+      "one_in_interval": false,
+      "size_max": 16702,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "all"
+    },
+    {
+      "classes": 19,
+      "cost": "total",
+      "exponent": 1.0850136098579957,
+      "hi": 1.2967609805812306,
+      "intercept_ln": 0.472225263353077,
+      "lo": 0.9106212205695917,
+      "one_in_interval": true,
+      "size_max": 16702,
+      "size_min": 129,
+      "sqrt_in_interval": false,
+      "subset": "size_ge_100"
+    },
+    {
+      "classes": 19,
+      "cost": "search_only",
+      "exponent": 1.0751072419482057,
+      "hi": 1.303875995340077,
+      "intercept_ln": -0.15337984895891754,
+      "lo": 0.8874066400244719,
+      "one_in_interval": true,
+      "size_max": 16702,
+      "size_min": 129,
+      "sqrt_in_interval": false,
+      "subset": "size_ge_100"
+    },
+    {
+      "classes": 11,
+      "cost": "total",
+      "exponent": 1.2757682288715848,
+      "hi": 1.9039724117821901,
+      "intercept_ln": -1.2254315517734433,
+      "lo": 0.7457463345259517,
+      "one_in_interval": true,
+      "size_max": 16702,
+      "size_min": 1050,
+      "sqrt_in_interval": false,
+      "subset": "size_ge_1000"
+    },
+    {
+      "classes": 11,
+      "cost": "search_only",
+      "exponent": 1.3081328296663968,
+      "hi": 2.0406783619117568,
+      "intercept_ln": -2.2189390055195606,
+      "lo": 0.6946417673667833,
+      "one_in_interval": true,
+      "size_max": 16702,
+      "size_min": 1050,
+      "sqrt_in_interval": false,
+      "subset": "size_ge_1000"
+    },
+    {
+      "classes": 29,
+      "cost": "total",
+      "exponent": 1.1593347695948255,
+      "hi": 1.2836556717562884,
+      "intercept_ln": -0.03381028340759418,
+      "lo": 0.9781754040394285,
+      "one_in_interval": true,
+      "size_max": 728,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "size_lt_1000"
+    },
+    {
+      "classes": 29,
+      "cost": "search_only",
+      "exponent": 1.167248258578856,
+      "hi": 1.2996103495745588,
+      "intercept_ln": -0.7774584459208076,
+      "lo": 0.9739580553603483,
+      "one_in_interval": true,
+      "size_max": 728,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "size_lt_1000"
+    },
+    {
+      "classes": 17,
+      "cost": "total",
+      "exponent": 1.0973258302544808,
+      "hi": 1.2169285947309691,
+      "intercept_ln": 0.11048319590278499,
+      "lo": 0.9542632145606249,
+      "one_in_interval": true,
+      "size_max": 16702,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "ells_split_ge_3"
+    },
+    {
+      "classes": 17,
+      "cost": "search_only",
+      "exponent": 1.094041979363663,
+      "hi": 1.223498182061844,
+      "intercept_ln": -0.6851989708696058,
+      "lo": 0.9325529026063857,
+      "one_in_interval": true,
+      "size_max": 16702,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "ells_split_ge_3"
+    },
+    {
+      "classes": 23,
+      "cost": "total",
+      "exponent": 1.1603750484947648,
+      "hi": 1.2688941780944505,
+      "intercept_ln": -0.02328304761717348,
+      "lo": 1.076891305131479,
+      "one_in_interval": false,
+      "size_max": 13760,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "ells_split_le_2"
+    },
+    {
+      "classes": 23,
+      "cost": "search_only",
+      "exponent": 1.1656902629870751,
+      "hi": 1.2794768705182393,
+      "intercept_ln": -0.6960543646663346,
+      "lo": 1.078850636077593,
+      "one_in_interval": false,
+      "size_max": 13760,
+      "size_min": 8,
+      "sqrt_in_interval": false,
+      "subset": "ells_split_le_2"
+    }
+  ],
+  "inputs": [
+    "research/isogeny_fibers_20261010/round7/r7_6_r62_batch/runs/scaling_v1.json",
+    "research/isogeny_fibers_20261010/round7/r7_6_r62_batch/runs/scaling_v2.json"
+  ],
+  "ks_ideal_gain_exponent_L2_to_256": 0.4892540668559115,
+  "schema": "r7_6.scaling_fit/v1",
+  "size_bins": [
+    {
+      "classes": 13,
+      "max_cost_over_size": 3.230769230769231,
+      "mean_cost_over_size": 1.7877835305719918,
+      "mean_cost_over_sqrt_size": 6.505613563976315,
+      "mean_size": 13.23076923076923,
+      "mean_total_cost": 25.21538461538461,
+      "min_cost_over_size": 0.95,
+      "size_from": 8,
+      "size_to": 30
+    },
+    {
+      "classes": 8,
+      "max_cost_over_size": 4.275,
+      "mean_cost_over_size": 1.4538372368875083,
+      "mean_cost_over_sqrt_size": 10.273353070687216,
+      "mean_size": 57.0,
+      "mean_total_cost": 74.13333333333333,
+      "min_cost_over_size": 0.3523809523809524,
+      "size_from": 30,
+      "size_to": 100
+    },
+    {
+      "classes": 3,
+      "max_cost_over_size": 4.096899224806202,
+      "mean_cost_over_size": 2.5865926708949964,
+      "mean_cost_over_sqrt_size": 33.25015218641667,
+      "mean_size": 165.66666666666666,
+      "mean_total_cost": 437.0,
+      "min_cost_over_size": 0.7878787878787878,
+      "size_from": 100,
+      "size_to": 300
+    },
+    {
+      "classes": 5,
+      "max_cost_over_size": 4.511781609195403,
+      "mean_cost_over_size": 3.874309230041989,
+      "mean_cost_over_sqrt_size": 87.86240708525057,
+      "mean_size": 520.0,
+      "mean_total_cost": 2025.6333333333337,
+      "min_cost_over_size": 2.6115384615384616,
+      "size_from": 300,
+      "size_to": 1000
+    },
+    {
+      "classes": 5,
+      "max_cost_over_size": 4.628429878048781,
+      "mean_cost_over_size": 3.0069346101017804,
+      "mean_cost_over_sqrt_size": 126.97533929575266,
+      "mean_size": 1717.2,
+      "mean_total_cost": 5428.8,
+      "min_cost_over_size": 0.33095238095238094,
+      "size_from": 1000,
+      "size_to": 3000
+    },
+    {
+      "classes": 3,
+      "max_cost_over_size": 5.7195498392282955,
+      "mean_cost_over_size": 4.4270920288946,
+      "mean_cost_over_sqrt_size": 332.62846369112,
+      "mean_size": 5974.0,
+      "mean_total_cost": 25324.033333333336,
+      "min_cost_over_size": 2.6419761273209548,
+      "size_from": 3000,
+      "size_to": 10000
+    },
+    {
+      "classes": 3,
+      "max_cost_over_size": 3.8492151162790695,
+      "mean_cost_over_size": 3.286192908105324,
+      "mean_cost_over_sqrt_size": 381.06270794385676,
+      "mean_size": 13924.0,
+      "mean_total_cost": 44439.13333333333,
+      "min_cost_over_size": 2.297162016524967,
+      "size_from": 10000,
+      "size_to": 100000
+    }
+  ],
+  "sizes": {
+    "classes": 40,
+    "decades": 3.3196784923566365,
+    "distinct_sizes": 32,
+    "max": 16702,
+    "min": 8
+  }
+}

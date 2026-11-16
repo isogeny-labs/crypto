@@ -1,0 +1,82 @@
+{
+  "schema": "research-artifact-publication-status/v1",
+  "recorded_date_utc": "2026-10-25",
+  "run": "s3-yield-20261024",
+  "state": "published-and-remote-sha256-verified",
+  "approved_manifest": {
+    "path": "research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/ARTIFACTS_UPLOAD_PENDING.json",
+    "sha256": "ef0f5f60214310f6f4b62747a9d270c8371fec82b89fb610564d8317a3b9d747",
+    "snapshot_commit": "66d3d03c21935d9709e3af5a77569743e1a8471c"
+  },
+  "authorization": {
+    "state": "approved",
+    "scope": "The four unchanged files and exact S3 destination in the manifest, as approved by the user.",
+    "previous_automatic_review_block": "resolved by subsequent explicit user authorization",
+    "requires_repeat_approval": false
+  },
+  "destination": "s3://setec-astronomy-artifacts/store",
+  "total_bytes": 684341,
+  "payloads": [
+    {
+      "path": "research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/runs.tar.xz",
+      "sha256": "faf8f283b7a47662b2f7cd4cd3fa7c24e39da82e9e0ed3edd62e4f09ab51b212",
+      "bytes": 85956,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/fa/faf8f283b7a47662b2f7cd4cd3fa7c24e39da82e9e0ed3edd62e4f09ab51b212"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/report.pdf",
+      "sha256": "c69b4e343009e3d09576fb0c0ecf4745c556a33d339e0681ca3487e8c2baa184",
+      "bytes": 363795,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/c6/c69b4e343009e3d09576fb0c0ecf4745c556a33d339e0681ca3487e8c2baa184"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/bridge.png",
+      "sha256": "de3809423fac606635b345ce15ee18651a4f5bb7f3d71b783e5819932df2b000",
+      "bytes": 137156,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/de/de3809423fac606635b345ce15ee18651a4f5bb7f3d71b783e5819932df2b000"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/profiles.png",
+      "sha256": "7dbceeae51109caddd24cab8d4eb1aacf1012d71017f343e6ab47e9a1bbc2a52",
+      "bytes": 97434,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/7d/7dbceeae51109caddd24cab8d4eb1aacf1012d71017f343e6ab47e9a1bbc2a52"
+    }
+  ],
+  "payload_integrity": "All four original local payloads and fresh remote downloads match the approved immutable hashes.",
+  "upload_attempt": {
+    "tool": "Pinned unmodified repository artifacts.py",
+    "tool_git_blob": "4f134496957ccf88d909f5f0b6f000317fa06fad",
+    "tool_sha256": "0054cdc0de842c0c9efc74f1d4fed4951b0e0c0fdc81a7f9308d8b6b8a4b8fe9",
+    "aws_cli": "aws-cli/1.46.2; botocore/1.43.62",
+    "exit_code": 0,
+    "uploaded_files": 4,
+    "already_stored_files": 0,
+    "remote_hash_verification": "S3 checksums and fresh full-object download SHA-256 verification; four matching files.",
+    "remote_hydration_manifests_created": true,
+    "manifest_directories": [
+      "reports/s3-yield-20261024",
+      "validation/s3-yield-20261024"
+    ],
+    "region": "us-east-2",
+    "earlier_attempt_in_this_record": "attempt-01-network-sandbox.log: network access was not enabled for that command; proxy connection failed before any S3 validation or upload. The same approved operation was rerun with command network permission and the inherited proxy/CA."
+  },
+  "environment": {
+    "observations_current": true,
+    "observed_spec_revision": "139",
+    "network_policy": "unrestricted/enforced",
+    "configured_secret_bindings": 0,
+    "configured_outbound_identities": 0,
+    "credential_use": "User-supplied credentials were used only in the short-lived child process environment; no credential values, identifiers or credential files are retained in this record or configured persistently.",
+    "network_access": "Command-specific network permission; inherited proxy and CA preserved."
+  },
+  "next_action": "Artifact publication is complete for these four immutable files. Keep the PR open for its unchanged research, Conductor, exact-head CI, review and integration gates. No further artifact upload or credential reuse is scheduled.",
+  "preservation": "Original proposal, four payloads, all prior research/library sources and all frozen INPUTS/OUTPUTS files are unchanged. The two ignore files are already hash-pinned and already ignore the same payloads: after retaining the tool-generated duplicate ignore patch, their original bytes were restored. Both new hydration manifests remain exactly as emitted by the artifact tool.",
+  "supersedes": "../artifact-upload-20261024/status.json",
+  "verification_summary": {
+    "files": 4,
+    "bytes": 684341,
+    "problems": 0,
+    "fresh_downloads": true,
+    "credentials_persisted": false
+  }
+}

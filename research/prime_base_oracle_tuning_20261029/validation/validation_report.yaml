@@ -1,0 +1,69 @@
+validation_report:
+  id: VAL-20261029-d7c08b
+  task_id: none issued (main-session dispatch, 2026-10-29; XP-20261016-prime-base-oracle-tuning, 20-bit holdout row)
+  snapshot:
+    branch: claude/pbo-results-20261029
+    commit: deabd9d629c907016794aa673f6a16c68fb5c2c4   # study dir committed by the coordinator; parent 7df34ba67 (card freeze)
+    work_tree_vs_commit: study dir clean (git status), validation/ untracked (validator output)
+  run_ids:
+    - ECBS1h685271327a8a   # sessions/holdout-P20 (decision session)
+    - ECBS1h9fcb65b4770e   # sessions/train-P20 (selection)
+    - ECBS1ha368dc51e639, ECBS1ha57ef6e65d33, ECBS1hcbc72b50affc, ECBS1h3a02e6d7e2d1, ECBS1h05fb46c3b647, ECBS1h2a0b15cfb042   # train-ext-P20-* (edge rule)
+    - ECBS1hbb6e007c0137   # research/ic_frontier_campaign_20261015/phase1/sessions/P20 (identity)
+    - ECBS1ha436e6362605, ECBS1h3c10dafc408f, ECBS1h1901ad2eb0e5   # holdout-P24/P28/P32 (readings spot-checked from records; not replayed)
+  artifact_checks:
+    - "binary sha256 bf5eec6d...3807d9 = host/ecbench.sha256 = every session's binary_sha256: pass"
+    - "select/FROZEN.sha256: sha256sum -c from the study dir, 12/12 OK: pass"
+    - "PROTOCOL.md git blob 0ee2e28732a57f45cbd283bb796d2d41b3933a94 (card, HEAD, work tree); amendments none: pass"
+    - "holdout specs: FROZEN line = specs/holdout-P<b>.json = sessions/holdout-P<b>/spec.json = template filled from selection, all four sizes: pass"
+    - "selection on train data only: band_train_sha256 = sha256(select/band-train-P<b>.json); band rows are the train curves, disjoint from the holdout curves; ecbench band re-run reproduces band-train JSON/MD byte-for-byte; FROZEN written 01:34:05Z before holdout-P20 started 01:34:06Z: pass"
+    - "session files hashed before replay equal the receipt hashes and the producer audit hashes; unchanged after replay: pass"
+    - "src/, Cargo.toml, Cargo.lock identical between code.commit 0e124fb1b and 7df34ba67 (host/commit.txt): pass (binary not rebuilt)"
+  metric_recomputations:
+    - "ecbench compare --weight {0,0.1,1} re-run for all 84 committed compare files (7 pairs x 3 weights x 4 sizes): 84/84 byte-identical"
+    - "stdlib recompute from records.jsonl (validation/recompute.py): 84/84 paired ratios agree with ecbench to <= 1.07e-15 relative"
+    - "P20 sum S_sel / sum S_inc: w=0 0.818034 [0.7727, 0.8664]; w=0.1 0.797837 [0.7516, 0.8468]; w=1 0.726119 [0.6775, 0.7782] (ecbench cluster bootstrap, seed 20261002)"
+    - "validator's own two-stage cluster bootstrap (seed 29102026): [0.7721, 0.8671], [0.7511, 0.8480], [0.6778, 0.7789]; upper bounds < 1 at all weights"
+    - "P20 gap to matched rho: sel/rho-neg 7.748 / 8.023 / 9.353; inc/rho-neg 9.471 / 10.056 / 12.881"
+    - "P20 mean S: inc 12.853 / 14.826 / 32.577; sel 10.515 / 11.829 / 23.655; rho-neg 1.357 / 1.474 / 2.529"
+    - "205 headline numbers (README and committed analysis) agree at printed precision; 2 non-row README misroundings (32-bit stride-control interval: 1.019 should be 1.018 at w=0, 0.939 should be 0.938 at w=1)"
+    - "train selection recomputed from train records: mitm2-n45 / n115 / n288 / n1024, equal to select/selection-P*.json; batch2 ties resolved to the incumbent oracle"
+  control_checks:
+    - "replay-all holdout-P20 (core 2): 1008 records verified, 672/672 measured replays identical, 0 problems"
+    - "replay-all train-P20 + 6 edge extensions: 232 + 96 replays identical; identity frontier P20: 160/160 identical"
+    - "[d]G = Q re-verified with the validator's own affine arithmetic for all 672 measured holdout-P20 records: 672/672"
+    - A/A null arms inc-aa/inc and rho-neg-aa/rho-neg = 1.0 [1, 1] at every weight and size; per-pair GAE, unpriced counts and scalars identical
+    - "completeness: sel 96/96, inc 96/96 verified; 0 censored, 0 unpaired"
+    - band ranks sel < inc at 20 bits; rho-neg < sel < inc at every weight
+    - "32 bits is a built-in negative case (R* = incumbent, same method id): ratio exactly 1"
+    - stride control cheaper than sel at every size (20 bits stride/sel 0.989 / 0.989 / 0.985); random-base control absent (PROTOCOL 12.2)
+    - "section 7.3 readings: 20 bits improvement (1-4 hold); 24 bits relabelling (0.902 falls at w=0, 1.126 rises at w=1); 28 bits relabelling (0.929 falls, 1.193 rises; w=0.1 interval includes 1, so null/unresolved rows also apply, same outcome); 32 bits null by construction"
+  heuristic_validation_checks:
+    - "not applicable: no heuristic distribution claimed; pre-registered section 10 prediction 4 ('gain under about 10%') is exceeded at 20 bits (18-27%), not mentioned in the README"
+  cost_model_checks:
+    - "unit declared: ecbench GAE / sqrt(r), cold whole pipeline, one target; section 5a band w = 0, 0.1, 1 applied to every arm including rho; no pinned calibration on any record (C = n_C = 0)"
+    - IC arms are lower bounds at w = 0 (unpriced natives) and priced across the band; no wall claim
+    - "memory: mean max RSS sel 50258 KiB vs inc 50319 KiB (0.999); no time-memory label required"
+    - "success probability: every measured run solved and verified, so cost per solved target needs no inverse-success factor"
+  proof_architecture_checks: []
+  verdict: passed
+  limitations:
+    - PROTOCOL.md section 13 requires a second-host replay (ecbench-independent-runner) before leaderboard promotion; none exists. Passed means admissible evidence, not promotion.
+    - same-host, same-binary replay; not an independent-host or independent-implementation replication
+    - one holdout curve at 20 bits; interval is over targets on that curve only; no exponent or cross-size claim
+    - counted unit only; no wall-clock claim
+    - section 10 prediction 4 exceeded and not noted in README; shallow train minimum (n45 11.243 vs n64 11.413)
+    - route local (PBO_CPU=3, not isolab-eks); deterministic counts make this immaterial to S
+    - binary built from code.commit asserted, not rebuilt
+    - README misrounds two 32-bit stride-control bounds (non-decision)
+    - "not re-checked: panel K, wall medians, figures/PDFs, verify/, reports/; 24-32-bit sessions read from producer audits, not replayed"
+  artifact_paths:
+    - research/prime_base_oracle_tuning_20261029/VALIDATION.json
+    - research/prime_base_oracle_tuning_20261029/replay-certificate.json
+    - research/prime_base_oracle_tuning_20261029/validator-report.json
+    - research/prime_base_oracle_tuning_20261029/validation/   # receipts, logs, compare/, band/, recompute.py/json, build_gate_files.py, provenance.txt, SHA256SUMS
+  review_attestation:
+    joints_owned: [whole receipt; no review_plan]
+    read_sibling_reports: false
+    sources_read: listed in validator-report.json review_attestation
+    verdict: passed

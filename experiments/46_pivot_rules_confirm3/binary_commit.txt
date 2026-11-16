@@ -1,0 +1,8 @@
+e1cd7265777490f431f0253eac6dc55be1342042 (E39 harness; control hook 31f2a2999e; registration 16d17d2462)
+Built from a clean `git archive` export of e1cd726577 into /dev/shm/e39_src (export_tree.sh: Cargo.toml, Cargo.lock,
+src, examples, crates, tools, isogeny_algos, benches and Cargo path targets, plus the five include_str! files
+docs/ic/boundary_targets.json, docs/ecbench/schema.sql, docs/curves/registry.json, docs/ic/calibration.json,
+docs/curves/standards/parameters.json, all from the same commit); verify_tree.sh: files=4678 mismatches=0.
+cargo build --release -j 2, CARGO_PROFILE_RELEASE_DEBUG=0, CARGO_INCREMENTAL=0, default release profile,
+CARGO_TARGET_DIR=/dev/shm/e39 (under flock on the shared build lock). Pinned copies in /dev/shm/e39bin, run only from there.
+No release unit tests were built.

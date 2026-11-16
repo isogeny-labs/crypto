@@ -1,0 +1,125 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "2000000",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "abscissa",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.known_log_mitm2_v1",
+        "params": {
+          "base_multiplier": "1",
+          "base_seed": "20261021",
+          "max_pair_work": "1100",
+          "max_trials": "2000000",
+          "size": "32"
+        }
+      },
+      "name": "known-log",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.known_log_mitm2_v1",
+        "params": {
+          "base_multiplier": "1",
+          "base_seed": "20261021",
+          "max_pair_work": "1100",
+          "max_trials": "2000000",
+          "size": "32"
+        }
+      },
+      "name": "known-log-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "2000000",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "abscissa-aa",
+      "role": "control"
+    }
+  ],
+  "description": "Frozen one-target cold-cost experiment; see ../PROTOCOL.md. Public target logs are absent.",
+  "label": "arbitrary-target known-log two-sum study",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "alternate",
+    "rounds": 5,
+    "seed": 20261021,
+    "timeout_seconds": 120,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 2574,
+        "b": 2980,
+        "group_order": 3583,
+        "gx": 2663,
+        "gy": 644,
+        "kind": "prime_explicit",
+        "p": 3529,
+        "r": 3583
+      },
+      {
+        "a": 4589,
+        "b": 186,
+        "group_order": 53117,
+        "gx": 43982,
+        "gy": 22687,
+        "kind": "prime_explicit",
+        "p": 53411,
+        "r": 53117
+      },
+      {
+        "a": 51142,
+        "b": 548946,
+        "group_order": 562427,
+        "gx": 271792,
+        "gy": 48157,
+        "kind": "prime_explicit",
+        "p": 563153,
+        "r": 562427
+      },
+      {
+        "a": 8820674,
+        "b": 11008593,
+        "group_order": 16482251,
+        "gx": 10566184,
+        "gy": 339081,
+        "kind": "prime_explicit",
+        "p": 16483309,
+        "r": 16482251
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026102101,
+    "targets_per_curve": 8
+  }
+}

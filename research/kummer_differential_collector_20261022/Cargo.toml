@@ -1,0 +1,13 @@
+[package]
+name = "kummer-differential-collector"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+five-leads-study = { path = "../five_leads_e2e_20261019/native" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[[bin]]
+name = "uncached"
+path = "src/main_uncached.rs"

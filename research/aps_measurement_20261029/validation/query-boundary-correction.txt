@@ -1,0 +1,17 @@
+Pre-correction source: validation/pre-query-input-sha256.txt.
+Both strict lint versions passed at this boundary. The subsequent adapter
+build was interrupted with exit130 before its tests ran, after source review
+found live-target conversion before the online clock boundary. Signals were
+sent only to the ownership-guarded Cargo/compiler PIDs, never a process group;
+both exited. Their raw logs and local cancellation audit are preserved privately.
+
+Move the conversion after the target_query boundary. Preserve all validation,
+signed recovery, deadline grading and acceptance assertions. Make the existing
+post-run report aggregation/serialization exclusion explicit. Add a missing-
+algebra-report counter so absent solver diagnostics are unknown rather than
+interpreted as zero work. Clarify that aborted sampling attempts are retained,
+without claiming a per-draw transcript that the sampler does not expose.
+
+Fresh final input pins, strict lint and affected unit/integration verdicts
+belong to a separate boundary. The original broad suite still uses its earlier
+compiled binary; never call it a final-source full-suite run.

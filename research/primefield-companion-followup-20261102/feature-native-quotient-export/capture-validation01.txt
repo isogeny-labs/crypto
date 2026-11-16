@@ -1,0 +1,52 @@
+"""In-job, one-attempt paired capture. Admission evidence is external authority."""
+from pathlib import Path
+import argparse,json,subprocess,time,os,resource
+from common import D,PREVIOUS,load,sha,require,canonical,analyzer,protocol,bindings,profile,pair,FILE_LIMIT
+previous=load('quotient_previous_capture',PREVIOUS/'capture.py')
+admission=previous.admission
+
+def limit_files():
+ soft,hard=resource.getrlimit(resource.RLIMIT_FSIZE)
+ limit=FILE_LIMIT if hard==resource.RLIM_INFINITY else min(FILE_LIMIT,hard)
+ resource.setrlimit(resource.RLIMIT_FSIZE,(limit,limit))
+
+def capture(p,pp,binary,a,out,execute=False):
+ profile(p);bindings(p,pp.parent);ph=p['freeze']['protocol_sha256']
+ require(p['freeze']['status']=='frozen' and p['freeze']['filed_before_affected_data']is True,'not frozen')
+ require(canonical.protocol_hash(p)==ph,'protocol changed')
+ admission(p,a,ph,time.time());bh=sha(binary)
+ require(all(arm['instrument']['binary_sha256']==bh for arm in p['arms']),'binary mismatch')
+ require(Path(a.get('attempt_directory','')).is_absolute() and Path(a['attempt_directory']).resolve()==out.resolve(),'attempt directory differs')
+ if not execute:return {'checked':True,'executed':False}
+ # One directory, shared deadline, no retry or cluster permissions changes.
+ out.mkdir(parents=True,exist_ok=False);deadline=time.monotonic()+120
+ r={'schema':'primefield-quotient-capture/v1','protocol_sha256':ph,'binary_sha256':bh,'source_commit':p['arms'][0]['instrument']['commit'],'status':'infra_error','exit_code':None,'attempts':1,'processes':[],'started_at':canonical.now_iso(),'admission':a,'job_uid':a['job_uid'],'pod_uid':a['pod_uid'],'image_digest':a['image_digest'],'host':previous.host_facts(),'file_limit_bytes':FILE_LIMIT,'error':None}
+ for arm in ['trace','aa']:
+  stdout=out/(arm+'.csv');stderr=out/(arm+'.stderr');entry={'arm':arm,'executed':False,'exit_code':None,'status':'infra_error','stdout':stdout.name,'stderr':stderr.name,'command':[str(binary)]}
+  try:
+   with stdout.open('xb')as so,stderr.open('xb')as se:
+    remaining=min(deadline-time.monotonic(),a['expires_unix']-time.time())
+    if remaining<=0:entry.update(status='timeout',exit_code=124)
+    else:
+     entry['executed']=True
+     env=dict(os.environ,PF_QUOTIENT_TRACE_ADMITTED='1')
+     try:
+      child=subprocess.run([str(binary)],stdout=so,stderr=se,timeout=remaining,env=env,preexec_fn=limit_files)
+      entry.update(exit_code=child.returncode,status='succeeded'if child.returncode==0 else'failed')
+     except subprocess.TimeoutExpired:entry.update(status='timeout',exit_code=124)
+  except OSError as e:entry['error']=str(e)
+  for kind,path in [('stdout',stdout),('stderr',stderr)]:entry[kind+'_sha256']=sha(path)if path.exists()else None;entry[kind+'_bytes']=path.stat().st_size if path.exists()else None
+  r['processes'].append(entry)
+  if entry['status']!='succeeded':r.update(status=entry['status'],exit_code=entry['exit_code']);break
+ else:
+  try:pair(out/'trace.csv',out/'aa.csv');r.update(status='succeeded',exit_code=0)
+  except (ValueError,OSError,UnicodeError)as e:r.update(status='invalid_data',exit_code=1,error=str(e))
+ r['finished_at']=canonical.now_iso();canonical.write_once(out/'receipt.json',r);return r
+
+def main():
+ ap=argparse.ArgumentParser()
+ for k in ['protocol','expected-protocol','binary','admission','out']:ap.add_argument('--'+k,required=True)
+ ap.add_argument('--execute',action='store_true');args=ap.parse_args();pp=Path(args.protocol).resolve();p=protocol(pp,args.expected_protocol);a=analyzer.read_json(Path(args.admission).read_text())
+ r=capture(p,pp,Path(args.binary).resolve(),a,Path(args.out).resolve(),args.execute);print(json.dumps(r))
+ if args.execute and r['status']!='succeeded':raise SystemExit(1)
+if __name__=='__main__':main()

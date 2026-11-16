@@ -1,0 +1,53 @@
+{
+  "schema": "ml-dataset.software-validation-summary/v1",
+  "source_commit": "69e4c9763bed508f0ab0d2f424873d2e748a7229",
+  "full_library": {
+    "passed": 5153,
+    "failed": 0,
+    "ignored": 123
+  },
+  "focused_native": {
+    "passed": 3,
+    "failed": 0
+  },
+  "focused_prime_adapters": {
+    "passed": 8,
+    "failed": 0
+  },
+  "restored_runtime_retry": {
+    "passed": 25,
+    "failed": 0
+  },
+  "endpoint_integration": {
+    "passed": 1,
+    "failed": 0,
+    "combinations": 360,
+    "unsupported_and_capped_allowed": true,
+    "solved_instance_count": null
+  },
+  "release_cli_build": "passed",
+  "actual_cli_checks": 4,
+  "strict_clippy": {
+    "status": "failed",
+    "exit_code": 101,
+    "errors": [
+      "ActivationPhase unused",
+      "validate_launch_delivery unused",
+      "BudgetSession::activation_phase unused"
+    ],
+    "reason": "startup module registration pending active T766 reservation"
+  },
+  "startup_command_registered": false,
+  "stored_prime_chain_verifier_registered": false,
+  "native_prime_f4_modulus_limit": "p < 2^32",
+  "prime_f4_chain_arity": [
+    3,
+    15
+  ],
+  "verified_cloud_dataset_cells": 0,
+  "performance_comparison": null,
+  "exact_first_fall_degree": null,
+  "exact_last_fall_degree": null,
+  "release_binary_sha256": "49469ac0ef47bf3f8f6f23a095aa4684255a88bd6108895611c7658c8da82c35",
+  "created_utc": "2026-10-29T05:06:43.334574+00:00"
+}

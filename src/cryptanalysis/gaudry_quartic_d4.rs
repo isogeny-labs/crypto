@@ -1080,6 +1080,12 @@ impl DecompositionOracle<Curve4> for D4Oracle<'_> {
     fn summands(&self) -> u32 {
         4
     }
+    /// The set-up interpolates the symmetrised system (solver work, in the
+    /// solver block) and builds no table: no table inserts to count
+    /// (`ecbench::work`).
+    fn setup_work_native(&self) -> std::collections::BTreeMap<String, u64> {
+        std::collections::BTreeMap::from([("counted:table_insert_attempts".to_string(), 1)])
+    }
     fn describe(&self, _params: &Params) -> String {
         let mut d = if self.opts.weighted {
             format!(
@@ -1173,6 +1179,9 @@ impl DecompositionOracle<Curve4> for D4Oracle<'_> {
                         .entry("degenerate_fp_muls".into())
                         .or_insert(0) += cost.total_muls;
                 }
+                let degree = u32::from(self.macaulay);
+                self.totals
+                    .observe_degree(degree, degree, cost.total_muls, true, false);
                 return None;
             }
         };
@@ -1189,11 +1198,16 @@ impl DecompositionOracle<Curve4> for D4Oracle<'_> {
         self.totals.solving_degree_max =
             self.totals.solving_degree_max.max(u32::from(self.macaulay));
         self.totals.calls_with_a_degree += 1;
-        let w = sol.witness?;
-        let idx: Option<Vec<usize>> = w.iter().map(|q| fb.index_of_key(c.key(q))).collect();
-        if idx.is_none() {
+        let idx: Option<Vec<usize>> = sol
+            .witness
+            .as_ref()
+            .and_then(|w| w.iter().map(|q| fb.index_of_key(c.key(q))).collect());
+        if sol.witness.is_some() && idx.is_none() {
             counters.lift_failures += 1;
         }
+        let degree = u32::from(self.macaulay);
+        self.totals
+            .observe_degree(degree, degree, sol.solve.total_muls, false, idx.is_some());
         idx
     }
     fn last_system(&self) -> Option<SystemShape> {

@@ -1,0 +1,406 @@
++ 03:34:30 export DEBIAN_FRONTEND=noninteractive
++ 03:34:30 pgrep -f 'http.server 8080'
++ 03:34:30 DEBIAN_FRONTEND=noninteractive
++ 03:34:30 apt-get update -qq
+++ 03:35:06 date -u +%FT%TZ
++ 03:35:06 echo '2026-11-12T03:35:06Z boot: apt update exit=0'
++ 03:35:06 apt-get install -y -qq jq curl git
+++ 03:35:40 date -u +%FT%TZ
++ 03:35:40 echo '2026-11-12T03:35:40Z boot: apt base exit=0'
++ 03:35:40 apt-get install -y -qq build-essential pkg-config libssl-dev time
+++ 03:36:13 date -u +%FT%TZ
++ 03:36:13 echo '2026-11-12T03:36:13Z boot: apt build tools exit=0'
+++ 03:36:15 awk -v c=2.08 'BEGIN{ if (c+0 <= 0) { print 0; exit } h = int(100 / c); print (h < 36 ? h : 36) }'
++ 03:36:15 HRS=36
++ 03:36:15 '[' 36 -gt 0 ']'
++ 03:36:15 DEADLINE_EPOCH=1794584070
++ 03:36:15 sleep 600
+++ 03:36:15 date -u -d @1794584070 +%FT%TZ
+++ 03:36:15 left
++++ 03:36:15 date +%s
++ 03:36:15 log 'pod q0pylpkso8ofd1 start; costPerHr 2.08; limit 36 h; deadline 2026-11-13T15:34:30Z'
+++ 03:36:15 echo 129495
+++ 03:36:15 date -u +%FT%TZ
++ 03:36:15 tee -a /workspace/out/run.log
++ 03:36:15 '[' 129495 -gt 120 ']'
++ 03:36:15 sleep 60
++ 03:36:15 echo '2026-11-12T03:36:15Z pod q0pylpkso8ofd1 start; costPerHr 2.08; limit 36 h; deadline 2026-11-13T15:34:30Z'
++ 03:36:15 grep MemTotal /proc/meminfo
++ 03:36:15 nproc
++ 03:36:15 lscpu
++ 03:36:15 grep 'Model name'
++ 03:36:16 echo 'costPerHr 2.08'
++ 03:36:16 command -v cargo
++ 03:36:16 curl -sSf https://sh.rustup.rs -o /workspace/rustup.sh
++ 03:36:17 sh /workspace/rustup.sh -y --profile minimal
+++ 03:37:15 left
++++ 03:37:15 date +%s
+++ 03:37:15 echo 129435
++ 03:37:15 '[' 129435 -gt 120 ']'
++ 03:37:15 sleep 60
+++ 03:38:15 left
++++ 03:38:15 date +%s
+++ 03:38:15 echo 129375
++ 03:38:15 '[' 129375 -gt 120 ']'
++ 03:38:15 sleep 60
++ 03:38:36 . /root/.cargo/env
+++ 03:38:36 case ":${PATH}:" in
+++ 03:38:36 export PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ 03:38:36 PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ 03:38:37 rustc --version
++ 03:38:37 log 'rust ready'
++ 03:38:37 tee -a /workspace/out/run.log
+++ 03:38:37 date -u +%FT%TZ
++ 03:38:37 echo '2026-11-12T03:38:37Z rust ready'
++ 03:38:37 pack
++ 03:38:37 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:38:37 mv -f /workspace/out.tgz.part /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:38:37 sha256sum /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:38:37 cut '-d ' -f1
++ 03:38:37 S=research/fall_degree_bounds_20261008
++ 03:38:37 curl -sS -m 120 -o /workspace/source_paths.txt https://raw.githubusercontent.com/isogeny-labs/crypto/43438f5ab6eb6d1844b8d0465c933ad079099326/research/fall_degree_bounds_20261008/e13/source_paths.txt
++ 03:38:38 echo '97b6bbde009ee1e04884041280b1c5dcd9030024d95b940f7e4a12bd9bd28ecd  /workspace/source_paths.txt'
++ 03:38:38 sha256sum -c -
++ 03:38:38 cd /workspace/src
++ 03:38:38 git init -q .
++ 03:38:38 git remote add origin https://github.com/isogeny-labs/crypto.git
++ 03:38:38 git sparse-checkout init --no-cone
++ 03:38:38 git sparse-checkout set --stdin
++ 03:38:38 git fetch -q --filter=blob:none --depth 1 origin a2be660914e8e485eefd45f2958eb6d18344dadf
++ 03:38:46 git checkout -q FETCH_HEAD
+++ 03:39:15 left
++++ 03:39:15 date +%s
+++ 03:39:15 echo 129315
++ 03:39:15 '[' 129315 -gt 120 ']'
++ 03:39:15 sleep 60
+++ 03:40:15 left
++++ 03:40:15 date +%s
+++ 03:40:15 echo 129255
++ 03:40:15 '[' 129255 -gt 120 ']'
++ 03:40:15 sleep 60
+++ 03:41:13 git rev-parse HEAD
++ 03:41:13 '[' a2be660914e8e485eefd45f2958eb6d18344dadf = a2be660914e8e485eefd45f2958eb6d18344dadf ']'
+++ 03:41:13 sha256sum
+++ 03:41:13 cut '-d ' -f1
++++ 03:41:13 tr '\n' ' '
+++ 03:41:13 git ls-tree -r HEAD -- Cargo.lock Cargo.toml benches benches/pqc_speed.rs benches/pqc_split.rs crates/ecdl-tensor-ic crates/ecdl-tensor-ic/src/bin/ecdldemo.rs crates/ecdl-tensor-ic/src/bin/ecdlscale.rs crates/ecdl-tensor-ic/src/lib.rs crates/hashed-ecdl-tensor docs/curves/cover-catalog.json docs/curves/cover-links.yaml docs/curves/fixed-f8-genus3-order-certificate.json docs/curves/registry.json docs/curves/standards/parameters.json docs/curves/traits.json docs/ecbench/schema.sql docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json docs/ecdlp-audit/ecdlp-audit-plan.schema.json docs/ic/archive-comparison-v1.json docs/ic/archive-comparison-v1.json.sha256 docs/ic/archive-technique-comparison-v2.json docs/ic/archive-technique-comparison-v2.json.sha256 docs/ic/boundary_targets.json docs/ic/calibration.json docs/identity-certificates/schoenhage-10mult.json docs/units/bitop-v1.vectors.json docs/units/bitop-v2.vectors.json examples/dreg_linear_guess.rs examples/hky_crosscheck.rs examples/hky_par.rs examples/hky_window.rs examples/performance_gains_audit.rs experiments/koblitz-n53-compact-cold-20261009/native_replay.rs experiments/koblitz-n53-compact-cold-20261009/native_run.rs experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs isogeny_algos research/aps_measurement_20261029/spec-controls.json research/aps_measurement_20261029/spec-orbit-controls.json research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs research/conductor_gap_cm_orbits_20261015/native/study.rs research/conductor_gap_followups_20261016/native/followups.rs research/conductor_gap_followups_20261016/native/posthoc.rs research/ct_dynamic_audit_20261102/src/main.rs research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json research/dreg_fixed_surplus_20260923/runs research/dreg_invariant_guess_20261029/draws research/dreg_invariant_guess_20261029/runs/S3.d0.b4.jsonl research/dreg_m4_chain_20261006/runs research/ecbench_factor_bases_20261013/sessions/prime20/host.json research/ecbench_factor_bases_20261013/sessions/prime20/plan.json research/ecbench_factor_bases_20261013/sessions/prime20/records.jsonl research/ecbench_factor_bases_20261013/sessions/prime20/session.json research/ecbench_factor_bases_20261013/sessions/prime20/spec.json research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json research/ecbench_rootfind_parity_20261013/sessions/claim-n13-v2/comparisons/rho-strong__ic-c2-frob-counted-m2.json research/f4_linear_algebra_20260914/contract.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json research/fall_degree_bounds_20261008 research/five_leads_e2e_20261019/native research/full_volcano_graphwide_ic_20261017/execution/driver.rs research/full_volcano_graphwide_ic_20261017/execution/summarize.rs research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl research/ic_candidate_tournament_20260915/goal_20260924/prepared-f5-runtime-v1/mathematics.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-f5-v3-control-v1/controls/pipeline.stdout research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/f5-preparation.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/sat-preparation.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.anf research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.xor.cnf research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/manifest.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/result.json research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs research/n83_jacobian_projector_20261031/prym-factorization.identity.json research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json research/pencil_large_prime_20261029 research/pencil_large_prime_20261029/src/bin/pencil_symbolic.rs research/pencil_large_prime_20261029/src/lib.rs research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl src src/bin/cryptopro_b_chain_sweep.rs src/bin/cryptopro_b_glv_bench.rs src/bin/curve_cover_check.rs src/bin/curve_cover_check/checker.rs src/bin/curve_cover_check/links.rs src/bin/curve_cover_check/models.rs src/bin/ecc2k_guard.rs src/bin/ecc2k_merge.rs src/bin/ecc2k_status.rs src/bin/ecdlp_audit.rs src/bin/ecdlp_audit/fixed_f8_order.rs src/bin/ecdlp_challenges.rs src/bin/ecdlp_nist.rs src/bin/endo_chain_bench.rs src/bin/factor_base_sweep.rs src/bin/generator_n0.rs src/bin/hyperelliptic_cover.rs src/bin/ic.rs src/bin/icprog/f5_target.rs src/bin/icprog/oracle.rs src/bin/icprog/prepared_f5.rs src/bin/icprog/prepared_sat.rs src/bin/icprog/sat_source.rs src/bin/icx.rs src/bin/isoclass_rho/main.rs src/bin/jacobian_certificate.rs src/bin/jacobian_transfers.rs src/bin/pkm_aux_search.rs src/bin/quartic_ic.rs src/bin/transfer_audit.rs src/bin/volcano_rho.rs src/bin/volcano_stats.rs src/binary_ecc/efd/catalogue.json src/cryptanalysis/algebra_cache.rs src/cryptanalysis/bielliptic_quartic.rs src/cryptanalysis/curve_aliases.json src/cryptanalysis/curve_traits/modular_polynomials.txt src/cryptanalysis/data/phi_j_11.txt src/cryptanalysis/ecbench/full_prices.json src/cryptanalysis/ecbench/koblitz_descent.rs src/cryptanalysis/ecbench/methods.rs src/cryptanalysis/ecbench/registry_index.txt src/cryptanalysis/group_op_count.rs src/cryptanalysis/ic_boundary.rs src/cryptanalysis/ic_framework/explicit_base.rs src/cryptanalysis/ic_framework/linalg.rs src/cryptanalysis/ic_framework/mod.rs src/cryptanalysis/ic_framework/pkm_semaev.rs src/cryptanalysis/ic_framework/plugins.rs src/cryptanalysis/ic_framework/shared_rank.rs src/cryptanalysis/ic_framework/solvers.rs src/cryptanalysis/koblitz_groebner.rs src/cryptanalysis/koblitz_index_calculus.rs src/cryptanalysis/polynomial_reuse.rs src/cryptanalysis/pq_groebner_f2.rs src/cryptanalysis/semaev_leading_form.rs src/cryptopals/data_10.txt src/cryptopals/data_19.txt src/cryptopals/data_20.txt src/cryptopals/data_4.txt src/cryptopals/data_6.txt src/cryptopals/data_7.txt src/cryptopals/data_8.txt src/lib.rs src/main.rs src/ml_dataset/telemetry/checked/policy.json tests/fixtures/ecbench_manifest_small.json tools/factor-base tools/volcano-cli tools/volcano-cli/src/main.rs
++ 03:41:13 TREE=da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff
++ 03:41:13 echo 'tree da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff'
++ 03:41:13 '[' da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff = da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff ']'
++ 03:41:13 log 'source verified a2be660914e8e485eefd45f2958eb6d18344dadf'
+++ 03:41:13 date -u +%FT%TZ
++ 03:41:13 tee -a /workspace/out/run.log
++ 03:41:13 echo '2026-11-12T03:41:13Z source verified a2be660914e8e485eefd45f2958eb6d18344dadf'
++ 03:41:14 pack
++ 03:41:14 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:41:14 mv -f /workspace/out.tgz.part /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:41:14 sha256sum /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:41:14 cut '-d ' -f1
++ 03:41:14 cargo build --release --example dreg_linear_guess --example hky_par
+++ 03:41:15 left
++++ 03:41:15 date +%s
+++ 03:41:15 echo 129195
++ 03:41:15 '[' 129195 -gt 120 ']'
++ 03:41:15 sleep 60
+++ 03:42:15 left
++++ 03:42:16 date +%s
+++ 03:42:16 echo 129134
++ 03:42:16 '[' 129134 -gt 120 ']'
++ 03:42:16 sleep 60
+++ 03:43:16 left
++++ 03:43:16 date +%s
+++ 03:43:16 echo 129074
++ 03:43:16 '[' 129074 -gt 120 ']'
++ 03:43:16 sleep 60
+++ 03:44:16 left
++++ 03:44:16 date +%s
+++ 03:44:16 echo 129014
++ 03:44:16 '[' 129014 -gt 120 ']'
++ 03:44:16 sleep 60
+++ 03:45:16 left
++++ 03:45:16 date +%s
+++ 03:45:16 echo 128954
++ 03:45:16 '[' 128954 -gt 120 ']'
++ 03:45:16 sleep 60
++ 03:46:15 pack
++ 03:46:15 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:46:15 mv -f /workspace/out.tgz.part /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:46:15 sha256sum /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:46:15 cut '-d ' -f1
++ 03:46:15 sleep 600
+++ 03:46:16 left
++++ 03:46:16 date +%s
+++ 03:46:16 echo 128894
++ 03:46:16 '[' 128894 -gt 120 ']'
++ 03:46:16 sleep 60
+++ 03:47:16 left
++++ 03:47:16 date +%s
+++ 03:47:16 echo 128834
++ 03:47:16 '[' 128834 -gt 120 ']'
++ 03:47:16 sleep 60
+++ 03:48:16 left
++++ 03:48:16 date +%s
+++ 03:48:17 echo 128774
++ 03:48:17 '[' 128774 -gt 120 ']'
++ 03:48:17 sleep 60
+++ 03:49:17 left
++++ 03:49:17 date +%s
+++ 03:49:17 echo 128713
++ 03:49:17 '[' 128713 -gt 120 ']'
++ 03:49:17 sleep 60
+++ 03:50:17 left
++++ 03:50:17 date +%s
+++ 03:50:17 echo 128653
++ 03:50:17 '[' 128653 -gt 120 ']'
++ 03:50:17 sleep 60
+++ 03:51:17 left
++++ 03:51:17 date +%s
+++ 03:51:17 echo 128593
++ 03:51:17 '[' 128593 -gt 120 ']'
++ 03:51:17 sleep 60
+++ 03:52:17 left
++++ 03:52:17 date +%s
+++ 03:52:17 echo 128533
++ 03:52:17 '[' 128533 -gt 120 ']'
++ 03:52:17 sleep 60
+++ 03:53:17 left
++++ 03:53:17 date +%s
+++ 03:53:17 echo 128473
++ 03:53:17 '[' 128473 -gt 120 ']'
++ 03:53:17 sleep 60
+++ 03:54:17 left
++++ 03:54:17 date +%s
+++ 03:54:17 echo 128413
++ 03:54:17 '[' 128413 -gt 120 ']'
++ 03:54:17 sleep 60
+++ 03:55:17 left
++++ 03:55:17 date +%s
+++ 03:55:17 echo 128353
++ 03:55:17 '[' 128353 -gt 120 ']'
++ 03:55:17 sleep 60
++ 03:56:15 pack
++ 03:56:15 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:56:15 mv -f /workspace/out.tgz.part /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:56:15 sha256sum /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 03:56:15 cut '-d ' -f1
++ 03:56:15 sleep 600
+++ 03:56:17 left
++++ 03:56:17 date +%s
+++ 03:56:17 echo 128293
++ 03:56:17 '[' 128293 -gt 120 ']'
++ 03:56:17 sleep 60
+++ 03:57:17 left
++++ 03:57:18 date +%s
+++ 03:57:18 echo 128232
++ 03:57:18 '[' 128232 -gt 120 ']'
++ 03:57:18 sleep 60
+++ 03:58:18 left
++++ 03:58:18 date +%s
+++ 03:58:18 echo 128172
++ 03:58:18 '[' 128172 -gt 120 ']'
++ 03:58:18 sleep 60
+++ 03:59:18 left
++++ 03:59:18 date +%s
+++ 03:59:18 echo 128112
++ 03:59:18 '[' 128112 -gt 120 ']'
++ 03:59:18 sleep 60
+++ 04:00:18 left
++++ 04:00:18 date +%s
+++ 04:00:18 echo 128052
++ 04:00:18 '[' 128052 -gt 120 ']'
++ 04:00:18 sleep 60
+++ 04:01:18 left
++++ 04:01:18 date +%s
+++ 04:01:18 echo 127992
++ 04:01:18 '[' 127992 -gt 120 ']'
++ 04:01:18 sleep 60
+++ 04:02:18 left
++++ 04:02:18 date +%s
+++ 04:02:18 echo 127932
++ 04:02:18 '[' 127932 -gt 120 ']'
++ 04:02:18 sleep 60
+++ 04:03:18 left
++++ 04:03:18 date +%s
+++ 04:03:18 echo 127872
++ 04:03:18 '[' 127872 -gt 120 ']'
++ 04:03:18 sleep 60
+++ 04:04:18 left
++++ 04:04:18 date +%s
+++ 04:04:18 echo 127812
++ 04:04:18 '[' 127812 -gt 120 ']'
++ 04:04:18 sleep 60
+++ 04:05:18 left
++++ 04:05:18 date +%s
+++ 04:05:18 echo 127752
++ 04:05:18 '[' 127752 -gt 120 ']'
++ 04:05:18 sleep 60
++ 04:06:15 pack
++ 04:06:15 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:06:15 mv -f /workspace/out.tgz.part /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 04:06:15 sha256sum /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 04:06:15 cut '-d ' -f1
++ 04:06:15 sleep 600
+++ 04:06:18 left
++++ 04:06:18 date +%s
+++ 04:06:18 echo 127692
++ 04:06:18 '[' 127692 -gt 120 ']'
++ 04:06:18 sleep 60
+++ 04:07:18 left
++++ 04:07:19 date +%s
+++ 04:07:19 echo 127631
++ 04:07:19 '[' 127631 -gt 120 ']'
++ 04:07:19 sleep 60
+++ 04:08:19 left
++++ 04:08:19 date +%s
+++ 04:08:19 echo 127571
++ 04:08:19 '[' 127571 -gt 120 ']'
++ 04:08:19 sleep 60
+++ 04:09:19 left
++++ 04:09:19 date +%s
+++ 04:09:19 echo 127511
++ 04:09:19 '[' 127511 -gt 120 ']'
++ 04:09:19 sleep 60
+++ 04:10:19 left
++++ 04:10:19 date +%s
+++ 04:10:19 echo 127451
++ 04:10:19 '[' 127451 -gt 120 ']'
++ 04:10:19 sleep 60
+++ 04:11:19 left
++++ 04:11:19 date +%s
+++ 04:11:19 echo 127391
++ 04:11:19 '[' 127391 -gt 120 ']'
++ 04:11:19 sleep 60
+++ 04:12:19 left
++++ 04:12:19 date +%s
+++ 04:12:19 echo 127331
++ 04:12:19 '[' 127331 -gt 120 ']'
++ 04:12:19 sleep 60
+++ 04:13:19 left
++++ 04:13:19 date +%s
+++ 04:13:19 echo 127271
++ 04:13:19 '[' 127271 -gt 120 ']'
++ 04:13:19 sleep 60
+++ 04:14:19 left
++++ 04:14:19 date +%s
+++ 04:14:19 echo 127211
++ 04:14:19 '[' 127211 -gt 120 ']'
++ 04:14:19 sleep 60
+++ 04:15:19 left
++++ 04:15:19 date +%s
+++ 04:15:19 echo 127151
++ 04:15:19 '[' 127151 -gt 120 ']'
++ 04:15:19 sleep 60
++ 04:16:15 pack
++ 04:16:15 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:16:16 mv -f /workspace/out.tgz.part /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 04:16:16 sha256sum /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 04:16:16 cut '-d ' -f1
++ 04:16:16 sleep 600
+++ 04:16:19 left
++++ 04:16:19 date +%s
+++ 04:16:20 echo 127091
++ 04:16:20 '[' 127091 -gt 120 ']'
++ 04:16:20 sleep 60
+++ 04:17:20 left
++++ 04:17:20 date +%s
+++ 04:17:20 echo 127030
++ 04:17:20 '[' 127030 -gt 120 ']'
++ 04:17:20 sleep 60
+++ 04:18:20 left
++++ 04:18:20 date +%s
+++ 04:18:20 echo 126970
++ 04:18:20 '[' 126970 -gt 120 ']'
++ 04:18:20 sleep 60
+++ 04:19:20 left
++++ 04:19:20 date +%s
+++ 04:19:20 echo 126910
++ 04:19:20 '[' 126910 -gt 120 ']'
++ 04:19:20 sleep 60
+++ 04:20:20 left
++++ 04:20:20 date +%s
+++ 04:20:20 echo 126850
++ 04:20:20 '[' 126850 -gt 120 ']'
++ 04:20:20 sleep 60
+++ 04:21:20 left
++++ 04:21:20 date +%s
+++ 04:21:20 echo 126790
++ 04:21:20 '[' 126790 -gt 120 ']'
++ 04:21:20 sleep 60
+++ 04:22:20 left
++++ 04:22:20 date +%s
+++ 04:22:20 echo 126730
++ 04:22:20 '[' 126730 -gt 120 ']'
++ 04:22:20 sleep 60
+++ 04:23:20 left
++++ 04:23:20 date +%s
+++ 04:23:20 echo 126670
++ 04:23:20 '[' 126670 -gt 120 ']'
++ 04:23:20 sleep 60
+++ 04:24:20 left
++++ 04:24:20 date +%s
+++ 04:24:20 echo 126610
++ 04:24:21 '[' 126610 -gt 120 ']'
++ 04:24:21 sleep 60
+++ 04:25:21 left
++++ 04:25:21 date +%s
+++ 04:25:21 echo 126549
++ 04:25:21 '[' 126549 -gt 120 ']'
++ 04:25:21 sleep 60
++ 04:26:16 pack
++ 04:26:16 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:26:16 mv -f /workspace/out.tgz.part /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 04:26:16 sha256sum /workspace/serve/8878d0ec0787cc07fc2b994331fb2c09/out.tgz
++ 04:26:16 cut '-d ' -f1
++ 04:26:16 sleep 600
+++ 04:26:21 left
++++ 04:26:21 date +%s
+++ 04:26:21 echo 126489
++ 04:26:21 '[' 126489 -gt 120 ']'
++ 04:26:21 sleep 60
+++ 04:27:21 left
++++ 04:27:21 date +%s
+++ 04:27:21 echo 126429
++ 04:27:21 '[' 126429 -gt 120 ']'
++ 04:27:21 sleep 60
+++ 04:28:21 left
++++ 04:28:21 date +%s
+++ 04:28:21 echo 126369
++ 04:28:21 '[' 126369 -gt 120 ']'
++ 04:28:21 sleep 60
+++ 04:29:21 left
++++ 04:29:21 date +%s
+++ 04:29:21 echo 126309
++ 04:29:21 '[' 126309 -gt 120 ']'
++ 04:29:21 sleep 60
+++ 04:30:21 left
++++ 04:30:21 date +%s
+++ 04:30:21 echo 126249
++ 04:30:21 '[' 126249 -gt 120 ']'
++ 04:30:21 sleep 60
+++ 04:31:21 left
++++ 04:31:21 date +%s
+++ 04:31:21 echo 126189
++ 04:31:21 '[' 126189 -gt 120 ']'
++ 04:31:21 sleep 60
+++ 04:32:22 left
++++ 04:32:22 date +%s
+++ 04:32:22 echo 126128
++ 04:32:22 '[' 126128 -gt 120 ']'
++ 04:32:22 sleep 60
+++ 04:33:22 left
++++ 04:33:22 date +%s
+++ 04:33:22 echo 126068
++ 04:33:22 '[' 126068 -gt 120 ']'
++ 04:33:22 sleep 60
+++ 04:34:22 left
++++ 04:34:22 date +%s
+++ 04:34:22 echo 126008
++ 04:34:22 '[' 126008 -gt 120 ']'
++ 04:34:22 sleep 60
+++ 04:35:22 left
++++ 04:35:22 date +%s
+++ 04:35:22 echo 125948
++ 04:35:22 '[' 125948 -gt 120 ']'
++ 04:35:22 sleep 60
++ 04:36:16 pack
++ 04:36:16 tar czf /workspace/out.tgz.part -C /workspace out

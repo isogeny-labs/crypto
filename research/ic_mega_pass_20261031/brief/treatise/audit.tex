@@ -1,0 +1,219 @@
+\chapter{Corrections and validation}\label{ch:audit}
+
+A ratchet is worth only as much as its pawl. Several recorded results were
+corrected once the reference was matched, native work was priced, or the
+evidence was replayed. Each correction is recorded in the source with a
+dated note; frozen evidence is never rewritten. Figure~\ref{fig:audit}
+shows the before and after values. Every correction moved IC's position
+against rho \emph{down}, and several moved it from apparently ahead of rho
+to behind it.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-audit.pdf}
+\caption[]{IC/rho as first recorded (orange) and after correction (blue), on
+the boundary the correction used. Values left of the dashed line had
+claimed IC ahead of rho. Sources: \art{figures/data-ledger.json}.}
+\label{fig:audit}
+\end{figure}
+
+\section{Claims that did not survive}
+
+\paragraph{1. Every online win is retired.} The one-target online ladder
+compared IC \emph{with} a retained table against rho \emph{without} one
+(Table~\ref{tab:audit-online}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rlr@{}}
+\toprule
+$n$ & Reading & IC online over rho \\
+\midrule
+61 & strong rho, 64 targets & $13.94\times$ $[9.81,19.13]$ \\
+83 & dense root index & $18.53\times$ \\
+71 & hosted single target & $7.29\times$ \\
+83 & hosted single target & $12.29\times$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The retired online wins: IC's online speed-up over rho with no
+table, IC keeping its retained table.}
+\label{tab:audit-online}
+\end{table}
+Given a distinguished-point table no larger than IC's pair table,
+Bernstein--Lange preprocessing rho~\cite{bl2012} is $53$--$317\times$ faster
+online at $n=41,53,61$ on the same 64 targets (benchmarks row
+\texttt{20261014-ic-next10-09-equal-advice}). At $n=83$, rho with a table
+matched to IC's set-up time or memory wins every pair: $3.74\times$
+time-matched and $40.61\times$ memory-matched against K3300, and
+$81.5$--$395.5\times$ against K600 (benchmarks row
+\texttt{20261016-n83-precomputed-rho-control}). Cold, the hosted $n=83$
+point is $133.7\times$ rho. Those online rows measured what a table buys,
+and generic rho buys more per byte. The within-IC result survives: K1798's
+probe reduction over K1500 at $n=83$ (from $300{,}021.9$ to $169{,}069.8$
+probes per relation).
+
+\paragraph{2. Pricing native work moved two arms.} Table~\ref{tab:audit-pricing}
+gives both before and after.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lllr@{}}
+\toprule
+Arm & Reading & Rho & IC \\
+\midrule
+Inherited F4, $n=13$ & Boolean word XORs unpriced & $S=14.4$ & $S=16.7$ \\
+ & priced & & $S=421.4$ \\
+\addlinespace
+Compact orbit, $n=13$ & earlier, lower bound & & $1.08\times$ rho \\
+ & strong rho, $w=0$ & & $0.93$ \\
+ & strong rho, $w=0.1$ & & $1.53$ \\
+ & strong rho, $w=1$ & & $5.7\times$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The two arms moved by pricing native work. Inherited F4, whose unpriced $S$ was close to rho's:
+\art{research/ecbench_rootfind_faster_20261014/}. Compact orbit at the
+three band weights $w$; the pair is unresolved inside the band
+(\art{research/ic_frontier_campaign_20261015/select/SELECTION.md}).}
+\label{tab:audit-pricing}
+\end{table}
+
+The pricing change itself (\#1774, $0.002304$ GAE per word XOR) made every
+earlier F4 $S$ a lower bound. A separate algorithmic change (\#1862) raised
+counted work (\art{research/f4_pricing_jump_20261018/README.md}).
+
+\paragraph{3. Matching the rho reference.} Table~\ref{tab:audit-rho} lists
+the changes to the rho side.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lllr@{}}
+\toprule
+Change & Quantity & Scope & Factor \\
+\midrule
+Rule v8, matched rho & Koblitz gap raised & every size & $1.30$--$1.58\times$ \\
+Standing rho improved & instruction count & \texttt{rho.signed\_frobenius\_strong} & $0.802\times$ \\
+ & instructions per step & strong Koblitz rho & 718 instead of 1{,}196 \\
+Better of $P\pm R$ & steps cut & prime side & $1.129\times$ \\
+Signed $\sigma$ steps & GPU time cut to & ECC2K-130 & $0.961$--$0.970$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Changes to the rho reference and their factors. Rule v8:
+Chapter~\ref{ch:distance}. The improved ecbench standing rho keeps
+identical GAE, so counted-unit comparisons are unaffected; wall-time
+comparisons against the older rho overstate IC by up to that factor. The
+last two are rho studies, neither yet in a campaign arm.}
+\label{tab:audit-rho}
+\end{table}
+
+\paragraph{4. A replay regression, and its root cause.} The root-finder
+ecbench session was recorded with a replay certificate of 120 of 168
+identical records; the 48 mismatches were all in inherited F4's word-XOR
+counts. On \texttt{main} of 19 October it replayed only 72 of 168, with
+mismatches in all four index-calculus arms.
+\begin{itemize}
+\item \emph{First diagnosis} (20 October). A cross-ISA replay found that
+  with the x86-only BMI2 branch disabled, x86 reproduces all 168 of 168
+  records, and so does an aarch64 build under emulation
+  (\art{research/validation_sweep_20261019/D-known-issues/item1_cross_isa_20261020/RESULT.md}).
+\item \emph{Cause, stated precisely} (26 October addendum). At the recorded
+  commit, BMI2 availability decided whether F4's row specialisation was
+  \emph{eager} (every kept row rewritten at once and charged per row) or
+  \emph{lazy} (rewritten on first read). The two differ in the quantity
+  charged, for example $301{,}961$ against $300{,}531$ word XORs. Since
+  \#2043 every host is eager and the two eager paths charge identical
+  counts. Sessions now record the version of the F4 accounting they were
+  made under
+  (\art{research/validation_sweep_20261019/D-known-issues/ADDENDUM-20261026-item1-accounting.md}).
+\end{itemize}
+Archived sessions recorded with the lazy charge cannot replay on
+\texttt{main}. That is a change of definition, not a dependence on the host.
+Scalars, trial counts and charged group operations are unaffected.
+
+\paragraph{5. Reported cells that compared unlike statistics.} The
+u64-rootbatch rank and per-target cells compared a fastest run with a
+median, and were corrected from $2.95\times$ and $6.09\times$ to $2.47\times$
+and $5.00\times$ (Chapter~\ref{sec:koblitz}). The $n=83$ stacked producer's
+``$360\to94.4$'' cold-gap history mixed a ratio from another run; paired
+within the run it is $305.8\to94.4$ (Chapter~\ref{sec:koblitz}).
+
+\paragraph{6. Results resting on faulty code or wrong references.}
+\begin{itemize}
+\item \emph{Plane-quartic IC.} Its $S$ values of $650{,}896$ to
+  $3.79\cdot10^7$ rest on a degree-3 reduction in
+  \art{research/ghs_cubic_quartic_ic_20261012/quartic_ic.rs} that merges
+  distinct classes (reported in an open pull request). Recoveries are still
+  checked against the planted scalar, but relation counts and $S$ are
+  unverified.
+\item \emph{Volcano census crater.} A claim that IC is 22--25\% cheaper on
+  the volcano crater was withdrawn, because the crater's rho reference
+  should have been the cubic-automorphism rho. Against it, IC is
+  $84.9\times$ rho at $w=0$
+  (\art{research/volcano_ecdlp_census_20261017/REPORT.md}, erratum A3).
+\end{itemize}
+
+\paragraph{Reading.} None of these corrections removes an IC improvement
+against its own incumbent. They correct the \emph{distance to rho}, which
+is the quantity most exposed to an unmatched reference or an unpriced
+counter. This is why the gate of \S\ref{sec:gate} asks for a matched,
+band-priced rho on every row.
+
+\section{Validation status}\label{sec:gate}
+
+Since 19 October no row may enter the index-calculus leaderboard or
+\art{benchmarks/README.md} without three pieces of evidence, named by the
+evidence directory's \texttt{VALIDATION.json}
+(\art{docs/VALIDATION_GATE.md}):
+\begin{itemize}
+\item an independent replay certificate with verified scalars;
+\item an independent validator report that recomputes every headline
+  number;
+\item a matched rho reference: the strongest available, in the same unit
+  and the same binary, priced across the §5a band.
+\end{itemize}
+On 29 October, \textbf{19 of the 28 leaderboard rows are validated}
+(\art{docs/ic/leaderboard.json}, \texttt{validation\_gate.status\_counts}).
+
+Table~\ref{tab:audit-validation} gives the status by leaderboard table.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.2\linewidth}r>{\raggedright\arraybackslash}p{0.16\linewidth}lr@{}}
+\toprule
+Table & Scope & Rows & Status & Rho reference & IC/rho \\
+\midrule
+B & prime and random binary, one target & 13 & validated 24 October & matched negation-map & $5.47$--$38.21\times$ \\
+ & & & & across the band & $4.05$--$54.76\times$ \\
+\addlinespace
+A & Koblitz descent, one target & 6 & validated at baseline v7 & as-built, same process & $3.43$--$11.5\times$ \\
+ & & & & matched, rule v8 & $4.67$--$18.07\times$ \\
+\addlinespace
+C & 32-target batch & 9 & pre-gate & none matched, no band & \\
+\addlinespace
+--- & components outside A--C & 2 & validated & & \\
+\bottomrule
+\end{tabular}
+\caption[]{Validation status of the leaderboard on 29 October. Table~B
+validated on 24 October (\art{research/ic_validation_gate_20261024/}):
+1{,}257 runs replay identically in a fresh process; 1{,}578 of 1{,}578
+negative controls are rejected by an independent verifier; 52 headline
+numbers recompute to relative $10^{-9}$; index calculus stays above rho at
+every band weight. Table~A (64 targets per size) validated at baseline v7
+(\art{research/ic_tool_program/rule/v7/}); the sweep flags the reference as
+only partly adequate, and the rule~v8 row is from
+Chapter~\ref{ch:distance}. Table~C's replays and recomputations pass, but
+no matched rho with a band exists for them. The two components are the
+prime-field base-size tuning and the post-Gröbner linear stage
+(\art{research/prime_base_oracle_tuning_20261029/VALIDATION.json},
+\art{research/postgb_linear_stage_20261026/validation/VALIDATION.json}).}
+\label{tab:audit-validation}
+\end{table}
+Validation says the numbers are what the archive says, and that the
+reference is fair. \textbf{No validated row is below its reference.}
+
+The theory of Part~\ref{part:theory} has a different standard of evidence:
+\begin{itemize}
+\item written proofs, which still need expert review;
+\item independently checked certificates;
+\item Lean for the finite and algebraic identities only.
+\end{itemize}
+Each theorem there names its tier.

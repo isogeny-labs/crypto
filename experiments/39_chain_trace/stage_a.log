@@ -1,0 +1,92 @@
+p=101 seed=1: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333961, misses 258806 (shifted 174740), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 997, modal 2 (= trace false), contested agree 271787/333961 rows (212213 choices), all columns 321821/384158, instrument = B 1000, learned = mode 0/3
+  learning: 511885 muls, 528192 entries, selection [2863, 11050, 871843] = 885756 (mode 1344), drawn 3
+                existing: C median   1617013 mean    1635539 | ech   429955 | sel         0 | S(0,.1,1) 1.63554e6 3.35870e6 1.88672e7 | +learn 1.63554e6 3.35870e6 1.88672e7 | fb 0
+           chain-counted: C median    600981 mean     650768 | ech   435068 | sel         0 | S(0,.1,1) 6.50768e5 2.40977e6 1.82408e7 | +learn 6.50768e5 2.40977e6 1.82408e7 | fb 12
+  chain-sparsest-counted: C median    304257 mean     354502 | ech   172792 | sel   1049232 | S(0,.1,1) 3.54502e5 1.22911e7 1.19720e8 | +learn 3.54502e5 1.22911e7 1.19720e8 | fb 12
+      chain-sparsest-est: C median    371483 mean     421163 | ech   230348 | sel     12697 | S(0,.1,1) 4.21163e5 2.30332e6 1.92428e7 | +learn 4.21163e5 2.30332e6 1.92428e7 | fb 12
+    chain-sparsest-trace: C median    545055 mean     595635 | ech   387028 | sel       744 | S(0,.1,1) 5.95635e5 2.36186e6 1.82578e7 | +learn 5.96147e5 2.37608e6 1.83955e7 | fb 12
+p=101 seed=2: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333939, misses 257160 (shifted 183015), calls with a miss 999, shape fallbacks 1
+  stage0: shape 999/1000, sequence = trace 0, distinct 1000, modal 1 (= trace false), contested agree 232966/333939 rows (167748 choices), all columns 282968/384098, instrument = B 1000, learned = mode 0/3
+  learning: 507524 muls, 528192 entries, selection [2858, 10999, 859952] = 873809 (mode 1344), drawn 3
+                existing: C median   1616974 mean    1632675 | ech   428090 | sel         0 | S(0,.1,1) 1.63268e6 3.35306e6 1.88366e7 | +learn 1.63268e6 3.35306e6 1.88366e7 | fb 0
+           chain-counted: C median    600890 mean     642782 | ech   432824 | sel         0 | S(0,.1,1) 6.42782e5 2.39451e6 1.81601e7 | +learn 6.42782e5 2.39451e6 1.81601e7 | fb 11
+  chain-sparsest-counted: C median    304103 mean     346338 | ech   170427 | sel   1049048 | S(0,.1,1) 3.46338e5 1.22738e7 1.19621e8 | +learn 3.46338e5 1.22738e7 1.19621e8 | fb 11
+      chain-sparsest-est: C median    371479 mean     413099 | ech   228048 | sel     12696 | S(0,.1,1) 4.13099e5 2.28798e6 1.91619e7 | +learn 4.13099e5 2.28798e6 1.91619e7 | fb 11
+    chain-sparsest-trace: C median    543699 mean     585503 | ech   381812 | sel       745 | S(0,.1,1) 5.85503e5 2.34445e6 1.81750e7 | +learn 5.86010e5 2.35856e6 1.83115e7 | fb 11
+p=149 seed=1: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333994, misses 233241 (shifted 159686), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 1000, modal 1 (= trace false), contested agree 272885/333994 rows (228548 choices), all columns 322891/384063, instrument = B 1000, learned = mode 0/3
+  learning: 518733 muls, 528192 entries, selection [2862, 11191, 878728] = 892781 (mode 1344), drawn 3
+                existing: C median   1632660 mean    1640795 | ech   428135 | sel         0 | S(0,.1,1) 1.64080e6 3.35699e6 1.88027e7 | +learn 1.64080e6 3.35699e6 1.88027e7 | fb 0
+           chain-counted: C median    612064 mean     640025 | ech   431104 | sel         0 | S(0,.1,1) 6.40025e5 2.37654e6 1.80052e7 | +learn 6.40025e5 2.37654e6 1.80052e7 | fb 7
+  chain-sparsest-counted: C median    313237 mean     341672 | ech   167045 | sel   1052227 | S(0,.1,1) 3.41672e5 1.22848e7 1.19773e8 | +learn 3.41672e5 1.22848e7 1.19773e8 | fb 7
+      chain-sparsest-est: C median    381297 mean     409025 | ech   225183 | sel     12738 | S(0,.1,1) 4.09025e5 2.26910e6 1.90097e7 | +learn 4.09025e5 2.26910e6 1.90097e7 | fb 7
+    chain-sparsest-trace: C median    526709 mean     555468 | ech   354079 | sel       770 | S(0,.1,1) 5.55468e5 2.29945e6 1.79953e7 | +learn 5.55986e5 2.31375e6 1.81336e7 | fb 7
+p=149 seed=2: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333982, misses 251586 (shifted 172641), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 1000, modal 1 (= trace false), contested agree 270267/333982 rows (223864 choices), all columns 320285/384082, instrument = B 1000, learned = mode 0/3
+  learning: 520566 muls, 528192 entries, selection [2865, 11106, 879041] = 893012 (mode 1344), drawn 3
+                existing: C median   1633472 mean    1653825 | ech   431939 | sel         0 | S(0,.1,1) 1.65383e6 3.37560e6 1.88715e7 | +learn 1.65383e6 3.37560e6 1.88715e7 | fb 0
+           chain-counted: C median    612068 mean     658073 | ech   436163 | sel         0 | S(0,.1,1) 6.58073e5 2.41087e6 1.81861e7 | +learn 6.58073e5 2.41087e6 1.81861e7 | fb 10
+  chain-sparsest-counted: C median    313320 mean     359603 | ech   172014 | sel   1052083 | S(0,.1,1) 3.59603e5 1.23176e7 1.19940e8 | +learn 3.59603e5 1.23176e7 1.19940e8 | fb 10
+      chain-sparsest-est: C median    381118 mean     426916 | ech   230103 | sel     12737 | S(0,.1,1) 4.26916e5 2.30326e6 1.91903e7 | +learn 4.26916e5 2.30326e6 1.91903e7 | fb 10
+    chain-sparsest-trace: C median    550612 mean     596552 | ech   382330 | sel       751 | S(0,.1,1) 5.96552e5 2.35664e6 1.81974e7 | +learn 5.97072e5 2.37094e6 1.83358e7 | fb 10
+p=197 seed=1: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333973, misses 225726 (shifted 153705), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 1000, modal 1 (= trace false), contested agree 287350/333973 rows (246984 choices), all columns 337377/384046, instrument = B 1000, learned = mode 0/3
+  learning: 521205 muls, 528192 entries, selection [2864, 11123, 880890] = 894877 (mode 1344), drawn 3
+                existing: C median   1645617 mean    1662211 | ech   428642 | sel         0 | S(0,.1,1) 1.66221e6 3.37701e6 1.88102e7 | +learn 1.66221e6 3.37701e6 1.88102e7 | fb 0
+           chain-counted: C median    620058 mean     643711 | ech   430765 | sel         0 | S(0,.1,1) 6.43711e5 2.37402e6 1.79468e7 | +learn 6.43711e5 2.37402e6 1.79468e7 | fb 5
+  chain-sparsest-counted: C median    320425 mean     344325 | ech   165855 | sel   1053657 | S(0,.1,1) 3.44325e5 1.22951e7 1.19852e8 | +learn 3.44325e5 1.22951e7 1.19852e8 | fb 5
+      chain-sparsest-est: C median    388563 mean     412033 | ech   224277 | sel     12759 | S(0,.1,1) 4.12033e5 2.26611e6 1.89527e7 | +learn 4.12033e5 2.26611e6 1.89527e7 | fb 5
+    chain-sparsest-trace: C median    531027 mean     554103 | ech   348457 | sel       777 | S(0,.1,1) 5.54103e5 2.29195e6 1.79326e7 | +learn 5.54624e5 2.30628e6 1.80711e7 | fb 5
+p=197 seed=2: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333985, misses 220750 (shifted 150268), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 1000, modal 1 (= trace false), contested agree 288684/333985 rows (247210 choices), all columns 338699/384068, instrument = B 1000, learned = mode 0/3
+  learning: 520417 muls, 528192 entries, selection [2865, 11145, 875640] = 889650 (mode 1344), drawn 3
+                existing: C median   1646416 mean    1674484 | ech   431444 | sel         0 | S(0,.1,1) 1.67448e6 3.39346e6 1.88643e7 | +learn 1.67448e6 3.39346e6 1.88643e7 | fb 0
+           chain-counted: C median    620152 mean     658258 | ech   434836 | sel         0 | S(0,.1,1) 6.58258e5 2.40206e6 1.80963e7 | +learn 6.58258e5 2.40206e6 1.80963e7 | fb 8
+  chain-sparsest-counted: C median    320741 mean     358951 | ech   169969 | sel   1053837 | S(0,.1,1) 3.58951e5 1.23250e7 1.20019e8 | +learn 3.58951e5 1.23250e7 1.20019e8 | fb 8
+      chain-sparsest-est: C median    388836 mean     426714 | ech   228450 | sel     12762 | S(0,.1,1) 4.26714e5 2.29431e6 1.91026e7 | +learn 4.26714e5 2.29431e6 1.91026e7 | fb 8
+    chain-sparsest-trace: C median    527295 mean     560311 | ech   345124 | sel       782 | S(0,.1,1) 5.60311e5 2.31170e6 1.80742e7 | +learn 5.60831e5 2.32597e6 1.82123e7 | fb 8
+p=269 seed=1: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333994, misses 210828 (shifted 144892), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 1000, modal 1 (= trace false), contested agree 268760/333994 rows (235575 choices), all columns 318766/384026, instrument = B 1000, learned = mode 0/3
+  learning: 522053 muls, 528192 entries, selection [2864, 11097, 878696] = 892657 (mode 1344), drawn 3
+                existing: C median   1650218 mean    1660631 | ech   429975 | sel         0 | S(0,.1,1) 1.66063e6 3.37543e6 1.88086e7 | +learn 1.66063e6 3.37543e6 1.88086e7 | fb 0
+           chain-counted: C median    623969 mean     647640 | ech   432102 | sel         0 | S(0,.1,1) 6.47640e5 2.37795e6 1.79507e7 | +learn 6.47640e5 2.37795e6 1.79507e7 | fb 5
+  chain-sparsest-counted: C median    323602 mean     347366 | ech   166417 | sel   1055451 | S(0,.1,1) 3.47366e5 1.23156e7 1.20029e8 | +learn 3.47366e5 1.23156e7 1.20029e8 | fb 5
+      chain-sparsest-est: C median    391883 mean     415505 | ech   225213 | sel     12784 | S(0,.1,1) 4.15505e5 2.26982e6 1.89587e7 | +learn 4.15505e5 2.26982e6 1.89587e7 | fb 5
+    chain-sparsest-trace: C median    522927 mean     541749 | ech   334840 | sel       792 | S(0,.1,1) 5.41749e5 2.27974e6 1.79217e7 | +learn 5.42271e5 2.29405e6 1.80600e7 | fb 5
+p=269 seed=2: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333985, misses 205814 (shifted 138047), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 1000, modal 1 (= trace false), contested agree 278651/333985 rows (248662 choices), all columns 328666/384053, instrument = B 1000, learned = mode 0/3
+  learning: 522443 muls, 528192 entries, selection [2863, 11093, 878580] = 892536 (mode 1344), drawn 3
+                existing: C median   1651643 mean    1663794 | ech   429082 | sel         0 | S(0,.1,1) 1.66379e6 3.37719e6 1.87978e7 | +learn 1.66379e6 3.37719e6 1.87978e7 | fb 0
+           chain-counted: C median    624544 mean     643044 | ech   430783 | sel         0 | S(0,.1,1) 6.43044e5 2.36886e6 1.79012e7 | +learn 6.43044e5 2.36886e6 1.79012e7 | fb 4
+  chain-sparsest-counted: C median    324142 mean     342810 | ech   165088 | sel   1055488 | S(0,.1,1) 3.42810e5 1.23069e7 1.19983e8 | +learn 3.42810e5 1.23069e7 1.19983e8 | fb 4
+      chain-sparsest-est: C median    392462 mean     410890 | ech   223853 | sel     12784 | S(0,.1,1) 4.10890e5 2.26071e6 1.89091e7 | +learn 4.10890e5 2.26071e6 1.89091e7 | fb 4
+    chain-sparsest-trace: C median    524500 mean     543219 | ech   339582 | sel       797 | S(0,.1,1) 5.43219e5 2.27676e6 1.78787e7 | +learn 5.43741e5 2.29107e6 1.80170e7 | fb 4
+p=397 seed=1: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333997, misses 185749 (shifted 126979), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 998, modal 2 (= trace false), contested agree 295243/333997 rows (268045 choices), all columns 345246/384020, instrument = B 1000, learned = mode 0/3
+  learning: 527764 muls, 528192 entries, selection [2865, 11148, 884863] = 898876 (mode 1344), drawn 3
+                existing: C median   1663086 mean    1674046 | ech   429232 | sel         0 | S(0,.1,1) 1.67405e6 3.38605e6 1.87941e7 | +learn 1.67405e6 3.38605e6 1.87941e7 | fb 0
+           chain-counted: C median    633960 mean     648278 | ech   430513 | sel         0 | S(0,.1,1) 6.48278e5 2.36959e6 1.78614e7 | +learn 6.48278e5 2.36959e6 1.78614e7 | fb 3
+  chain-sparsest-counted: C median    333134 mean     347318 | ech   164186 | sel   1056883 | S(0,.1,1) 3.47318e5 1.23204e7 1.20078e8 | +learn 3.47318e5 1.23204e7 1.20078e8 | fb 3
+      chain-sparsest-est: C median    401778 mean     415672 | ech   223181 | sel     12804 | S(0,.1,1) 4.15672e5 2.26118e6 1.88708e7 | +learn 4.15672e5 2.26118e6 1.88708e7 | fb 3
+    chain-sparsest-trace: C median    523296 mean     516281 | ech   309179 | sel       817 | S(0,.1,1) 5.16281e5 2.24552e6 1.78087e7 | +learn 5.16808e5 2.25989e6 1.79476e7 | fb 3
+p=397 seed=2: 1000 calls, agree [1000, 1000, 1000, 1000, 1000]; T: digest=B 0, contested 333982, misses 218731 (shifted 150447), calls with a miss 1000, shape fallbacks 0
+  stage0: shape 1000/1000, sequence = trace 0, distinct 997, modal 2 (= trace false), contested agree 291615/333982 rows (263178 choices), all columns 341633/384037, instrument = B 1000, learned = mode 0/3
+  learning: 526718 muls, 528192 entries, selection [2864, 11151, 884230] = 898245 (mode 1344), drawn 3
+                existing: C median   1661986 mean    1657157 | ech   427231 | sel         0 | S(0,.1,1) 1.65716e6 3.36637e6 1.87493e7 | +learn 1.65716e6 3.36637e6 1.87493e7 | fb 0
+           chain-counted: C median    633419 mean     638537 | ech   427657 | sel         0 | S(0,.1,1) 6.38537e5 2.35086e6 1.77617e7 | +learn 6.38537e5 2.35086e6 1.77617e7 | fb 1
+  chain-sparsest-counted: C median    332624 mean     337598 | ech   161366 | sel   1056713 | S(0,.1,1) 3.37598e5 1.23000e7 1.19962e8 | +learn 3.37598e5 1.23000e7 1.19962e8 | fb 1
+      chain-sparsest-est: C median    400978 mean     405988 | ech   220390 | sel     12802 | S(0,.1,1) 4.05988e5 2.24249e6 1.87710e7 | +learn 4.05988e5 2.24249e6 1.87710e7 | fb 1
+    chain-sparsest-trace: C median    537318 mean     544503 | ech   342354 | sel       784 | S(0,.1,1) 5.44503e5 2.26443e6 1.77438e7 | +learn 5.45030e5 2.27879e6 1.78826e7 | fb 1
+cross-curve contested agreement (row: calls of curve i, column: trace of curve j):
+  (101, 1): 0.814 0.693 0.802 0.796 0.818 0.819 0.786 0.797 0.811 0.811
+  (101, 2): 0.817 0.698 0.800 0.796 0.821 0.822 0.785 0.797 0.815 0.813
+  (149, 1): 0.843 0.706 0.817 0.814 0.847 0.849 0.797 0.816 0.837 0.836
+  (149, 2): 0.838 0.703 0.814 0.809 0.842 0.844 0.795 0.813 0.833 0.831
+  (197, 1): 0.856 0.711 0.825 0.819 0.860 0.862 0.802 0.826 0.850 0.847
+  (197, 2): 0.858 0.714 0.823 0.822 0.862 0.864 0.802 0.825 0.852 0.848
+  (269, 1): 0.877 0.723 0.831 0.831 0.883 0.885 0.805 0.836 0.869 0.863
+  (269, 2): 0.875 0.720 0.829 0.830 0.880 0.883 0.804 0.834 0.867 0.861
+  (397, 1): 0.893 0.727 0.839 0.839 0.899 0.902 0.808 0.846 0.884 0.876
+  (397, 2): 0.890 0.728 0.835 0.838 0.896 0.899 0.805 0.842 0.881 0.873
+stage_a exit 0

@@ -1,0 +1,42 @@
+{
+  "schema": "p739-cross-session-independent-review/v1",
+  "status": "scoped_clean",
+  "reviewer_identity": "root/four_lead_state",
+  "producer_identity": "root/ci_audit",
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/p739_cross_session_audit_20261030/src/lib.rs",
+    "sha256": "47a969754e4a1738071a6a0ebbd7e57cd14227d4ec8ba9230e814cd1c8428a5f"
+  },
+  "output": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/p739_cross_session_audit_20261030/output/audit.json",
+    "sha256": "875caa536442f34d1577b76abe3694b167fa4fe189583c9dbf283e6aa5404113"
+  },
+  "closed_findings": [
+    "Exact plan-slot record binding",
+    "Distinct complete measured replay coverage",
+    "Trailing array differences explicitly checked",
+    "Observed measured and warmup inventories",
+    "Checked computation audit timestamp subtraction",
+    "Fixed scoped p739 dimensions",
+    "Archive HEAD ContentLength binding"
+  ],
+  "observed": {
+    "records_per_session": 1080,
+    "measured_records": 900,
+    "warmups": 180,
+    "disallowed_differences": 0,
+    "projection_sha256": "91338d7abcda1144d949d64d827de81d874ca49d07a2b536cd803f42ff78a3e1",
+    "recorded_software_tests_passed": 13,
+    "recorded_software_tests_failed": 0
+  },
+  "method": "Read-only source and saved output/test-log review; no new execution",
+  "limits": [
+    "Retained hash-bound session consistency only",
+    "Not independent mathematical implementation or auditor identity proof",
+    "No cohort reuse or scientific admission",
+    "No timing qualification or resource authorization",
+    "No claim all non-wall resources equal"
+  ],
+  "new_solver_executions": 0,
+  "new_measurements": 0
+}

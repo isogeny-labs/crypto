@@ -1,0 +1,26 @@
+== E
+  1/h                 mean log resid +0.097  CI [+0.008,+0.186]  sd 0.222  RSS 1.410
+  U                   mean log resid +0.066  CI [-0.024,+0.156]  sd 0.222  RSS 1.290
+  exact               mean log resid +0.010  CI [-0.064,+0.084]  sd 0.184  RSS 0.815
+  exact_random_start  mean log resid +0.007  CI [-0.076,+0.084]  sd 0.198  RSS 0.944
+  MC rung  12: obs 0.313  model p2.5/50/97.5 = 0.258/0.294/0.335  obs at model quantile 0.82  (exact median 0.287)
+  MC rung  16: obs 0.258  model p2.5/50/97.5 = 0.238/0.275/0.317  obs at model quantile 0.19  (exact median 0.272)
+  MC rung  20: obs 0.254  model p2.5/50/97.5 = 0.217/0.253/0.292  obs at model quantile 0.54  (exact median 0.253)
+  MC rung all: obs 0.277  model p2.5/50/97.5 = 0.252/0.273/0.299  obs at model quantile 0.65  (exact median 0.272)
+  decomposition: {'one_over_h': 0.25, 'plus_diagonal_term': 0.0078, 'plus_actual_classes_and_collisions': 0.0138, 'plus_statistic_and_sampling': 0.0058, 'observed_median': 0.2774, 'mc_median_of_pair_ratio_under_exact': 0.2731}
+  exact spread by rung: {'12': (0.294, 0.013), '16': (0.276, 0.026), '20': (0.252, 0.004)}
+== M
+  1/h                 mean log resid +0.191  CI [+0.137,+0.243]  sd 0.130  RSS 1.286
+  U                   mean log resid +0.153  CI [+0.098,+0.205]  sd 0.134  RSS 0.997
+  exact               mean log resid +0.070  CI [+0.024,+0.118]  sd 0.117  RSS 0.448
+  exact_random_start  mean log resid +0.082  CI [+0.035,+0.129]  sd 0.116  RSS 0.486
+  MC rung  12: obs 0.172  model p2.5/50/97.5 = 0.142/0.161/0.184  obs at model quantile 0.83  (exact median 0.157)
+  MC rung  16: obs 0.151  model p2.5/50/97.5 = 0.117/0.134/0.155  obs at model quantile 0.94  (exact median 0.128)
+  MC rung  20: obs 0.137  model p2.5/50/97.5 = 0.113/0.130/0.151  obs at model quantile 0.72  (exact median 0.131)
+  MC rung all: obs 0.153  model p2.5/50/97.5 = 0.131/0.142/0.154  obs at model quantile 0.96  (exact median 0.136)
+  decomposition: {'one_over_h': 0.125, 'plus_diagonal_term': 0.0039, 'plus_actual_classes_and_collisions': 0.0073, 'plus_statistic_and_sampling': 0.0163, 'observed_median': 0.1525, 'mc_median_of_pair_ratio_under_exact': 0.1417}
+  exact spread by rung: {'12': (0.162, 0.018), '16': (0.134, 0.012), '20': (0.13, 0.009)}
+
+real	0m3.142s
+user	0m3.096s
+sys	0m0.004s

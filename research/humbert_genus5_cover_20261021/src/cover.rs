@@ -206,6 +206,9 @@ pub struct FactorBase {
     pub xidx: Vec<usize>,
     /// basis12 rows (F_p values) of the + and - points: rows[2j], rows[2j+1]
     pub rows: Vec<[u64; 12]>,
+    /// x-indices that relation and descent searches draw their chosen points from
+    /// (all of them, or the small factor base of a large-prime arm)
+    pub pick: Vec<usize>,
 }
 
 impl FactorBase {
@@ -242,7 +245,8 @@ impl FactorBase {
                 rows.push(row);
             }
         }
-        FactorBase { xs, w0: w0s, xidx, rows }
+        let pick = (0..xs.len()).collect();
+        FactorBase { xs, w0: w0s, xidx, rows, pick }
     }
     pub fn n_points(&self) -> usize {
         self.rows.len()
@@ -448,11 +452,10 @@ fn identify(fb: &FactorBase, c: &[u64; 12], x: u64, p: u64) -> Option<usize> {
 /// and its section is the 4 chosen iota-pairs (flagged `sym`: no Res(E) content).
 pub fn hyperplane_relation(s: &Setup, fb: &FactorBase, nodes: &Nodes, rng: &mut Rng, st: &mut Stats) -> Option<Relation> {
     let p = s.p;
-    let nx = fb.xs.len();
     st.candidates += 1;
     let mut chosen: Vec<usize> = Vec::new();
     while chosen.len() < 4 {
-        let j = rng.below(nx as u64) as usize;
+        let j = fb.pick[rng.below(fb.pick.len() as u64) as usize];
         if chosen.iter().any(|&c| c / 2 == j) {
             continue;
         }
@@ -513,11 +516,10 @@ pub fn hyperplane_relation(s: &Setup, fb: &FactorBase, nodes: &Nodes, rng: &mut 
 /// sum of the 16 points - 2 D_oo ~ 0.
 pub fn quadric_relation(s: &Setup, fb: &FactorBase, nodes: &Nodes, rng: &mut Rng, st: &mut Stats) -> Option<Relation> {
     let p = s.p;
-    let nx = fb.xs.len();
     st.candidates += 1;
     let mut chosen: Vec<usize> = Vec::new();
     while chosen.len() < 11 {
-        let j = rng.below(nx as u64) as usize;
+        let j = fb.pick[rng.below(fb.pick.len() as u64) as usize];
         if chosen.iter().any(|&c| c / 2 == j) {
             continue;
         }
@@ -634,7 +636,9 @@ pub fn pushforward_check(s: &Setup, places: &[Vec<GPt>], pt_xy: (E4, E4)) -> boo
 /// Quadric descent of one place Z of degree ell: a function in L(2 D_oo) through
 /// Z and 11 - ell random FB points whose residual degree-5 divisor splits.
 /// Returns the FB points of the relation  Z ~ 2 D_oo - sum(FB points).
-pub fn descend_place(s: &Setup, fb: &FactorBase, nodes: &Nodes, z: &[GPt], rng: &mut Rng, st: &mut Stats) -> Vec<usize> {
+/// `has_log(i)` says whether FB point i has a log (every point, or in a large-prime
+/// arm the small base plus the large primes solved from partial relations).
+pub fn descend_place(s: &Setup, fb: &FactorBase, nodes: &Nodes, z: &[GPt], has_log: &dyn Fn(usize) -> bool, rng: &mut Rng, st: &mut Stats) -> Vec<usize> {
     let p = s.p;
     let k = s.k();
     let l = &s.l;
@@ -664,7 +668,7 @@ pub fn descend_place(s: &Setup, fb: &FactorBase, nodes: &Nodes, z: &[GPt], rng: 
         st.candidates += 1;
         let mut chosen: Vec<usize> = Vec::new();
         while chosen.len() < 11 - ell {
-            let j = rng.below(fb.xs.len() as u64) as usize;
+            let j = fb.pick[rng.below(fb.pick.len() as u64) as usize];
             if chosen.iter().any(|&c| c / 2 == j) {
                 continue;
             }
@@ -702,8 +706,8 @@ pub fn descend_place(s: &Setup, fb: &FactorBase, nodes: &Nodes, z: &[GPt], rng: 
         let mut ok = true;
         for x in poly::roots(&res, p) {
             match identify(fb, &c, x, p) {
-                Some(i) => pts.push(i),
-                None => {
+                Some(i) if has_log(i) => pts.push(i),
+                _ => {
                     ok = false;
                     break;
                 }

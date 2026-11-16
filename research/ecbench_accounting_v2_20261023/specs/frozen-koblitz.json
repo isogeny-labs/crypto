@@ -1,0 +1,17 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "accounting v2 study: frozen ids only, run on the branch binary and on the main binary (Koblitz a=1 n=17)",
+  "description": "Only frozen ids (no _v2), with the arm names and workloads of pairs-koblitz.json, so the same file runs on the main binary. Used to compare recorded counts of frozen ids across binaries.",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 1, "n": 17}],
+    "targets_per_curve": 8,
+    "target_seed": 20261023
+  },
+  "arms": [
+    {"name": "rho-frob", "role": "reference", "method": {"id": "rho.signed_frobenius"}},
+    {"name": "rho-strong", "role": "baseline", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "claw", "role": "baseline", "method": {"id": "claw.pair_table", "params": {"base_scale": "4.0", "table_scale": "1.0"}}},
+    {"name": "bsgs-neg", "role": "baseline", "method": {"id": "bsgs.negation"}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 20261023, "isolation_required": "L2", "timeout_seconds": 300}
+}

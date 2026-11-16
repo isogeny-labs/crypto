@@ -1,0 +1,142 @@
+/var/tmp/pencil-mixed-generic-independent-review-20261031/replay/ReviewerControls.lean:3:39: error: Function expected at
+  ZMod
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  2
+
+Hint: The identifier `ZMod` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/var/tmp/pencil-mixed-generic-independent-review-20261031/replay/ReviewerControls.lean:4:13: error: Function expected at
+  ZMod
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  2
+
+Hint: The identifier `ZMod` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/var/tmp/pencil-mixed-generic-independent-review-20261031/replay/ReviewerControls.lean:18:69: error: Tactic `rfl` failed: The left-hand side
+  (outputWith 1 1 { x := 0, y := 1, z := 0, w := 1 } { q := 0, r := 1, s := 0, t := 0, z := 1, w := 1 } 0).z
+is not definitionally equal to the right-hand side
+  0
+
+⊢ (outputWith 1 1 { x := 0, y := 1, z := 0, w := 1 } { q := 0, r := 1, s := 0, t := 0, z := 1, w := 1 } 0).z = 0
+'MixedGeneric.disjoint_product_dvd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedGeneric.residual_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedGeneric.genericK_same' depends on axioms: [propext, Quot.sound]
+'MixedGeneric.slope_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+theorem MixedGeneric.weighted_generic_preserves.{u_1} : ∀ {K : Type u_1} [inst : Field K] (a0 a1 a2 a3 : K)
+  (a : WeightedAdd11.Input K) (b : D2 K),
+  a.z ≠ 0 →
+    a.w ≠ 0 →
+      b.z ≠ 0 →
+        b.w ≠ 0 →
+          genericK a b ≠ 0 →
+            validPoint (curve a0 a1 a2 a3) a →
+              validTwo (curve a0 a1 a2 a3) b →
+                (output a b a3).z ≠ 0 ∧ (output a b a3).w ≠ 0 ∧ validTwo (curve a0 a1 a2 a3) (output a b a3) :=
+fun {K} [Field K] a0 a1 a2 a3 a b haz haw hbz hbw hk ha hb =>
+  have hkaff := fun hz =>
+    hk
+      (Eq.mpr (id (congrArg (fun _a => _a = 0) (genericK_same a b)))
+        (Eq.mpr (id (congrArg (fun _a => _a = 0) (scales a b haz haw hbz hbw).left))
+          (Eq.mpr (id (congrArg (fun _a => a.z ^ 4 * b.z ^ 4 * a.w * _a = 0) hz))
+            (Eq.mpr (id (congrArg (fun _a => _a = 0) (mul_zero (a.z ^ 4 * b.z ^ 4 * a.w)))) (Eq.refl 0)))));
+  And.casesOn (normalized_with (genericK a b) (genericA a b) a b a3 hk haz hbz hbw) fun hz right =>
+    And.casesOn right fun hw right =>
+      And.casesOn right fun hq right =>
+        And.casesOn right fun hr right =>
+          And.casesOn right fun hs ht =>
+            have hm := slope_decode a b haz haw hbz hbw hk;
+            ⟨hz,
+              ⟨hw,
+                id
+                  (Eq.mpr
+                    (id
+                      (congrArg
+                        (fun _a =>
+                          MixedCancellation.support _a (nr (outputWith (genericK a b) (genericA a b) a b a3)) ∣
+                            curve a0 a1 a2 a3 -
+                              ordinate (ns (outputWith (genericK a b) (genericA a b) a b a3))
+                                  (nt (outputWith (genericK a b) (genericA a b) a b a3)) ^
+                                2)
+                        (Eq.mp
+                          (congrArg
+                            (fun _a =>
+                              nq (outputWith (genericK a b) (genericA a b) a b a3) = oq (WeightedAdd11.nx a) (nq b) _a)
+                            hm)
+                          hq)))
+                    (Eq.mpr
+                      (id
+                        (congrArg
+                          (fun _a =>
+                            MixedCancellation.support
+                                (oq (WeightedAdd11.nx a) (nq b)
+                                  ((WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                    (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b)))
+                                _a ∣
+                              curve a0 a1 a2 a3 -
+                                ordinate (ns (outputWith (genericK a b) (genericA a b) a b a3))
+                                    (nt (outputWith (genericK a b) (genericA a b) a b a3)) ^
+                                  2)
+                          (Eq.mp
+                            (congrArg
+                              (fun _a =>
+                                nr (outputWith (genericK a b) (genericA a b) a b a3) =
+                                  orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b) _a)
+                              hm)
+                            hr)))
+                      (Eq.mpr
+                        (id
+                          (congrArg
+                            (fun _a =>
+                              MixedCancellation.support
+                                  (oq (WeightedAdd11.nx a) (nq b)
+                                    ((WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                      (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b)))
+                                  (orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b)
+                                    ((WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                      (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b))) ∣
+                                curve a0 a1 a2 a3 -
+                                  ordinate _a (nt (outputWith (genericK a b) (genericA a b) a b a3)) ^ 2)
+                            (Eq.mp
+                              (congrArg
+                                (fun _a =>
+                                  ns (outputWith (genericK a b) (genericA a b) a b a3) =
+                                    _a * oq (WeightedAdd11.nx a) (nq b) _a - (ns b + _a * nq b))
+                                hm)
+                              hs)))
+                        (Eq.mpr
+                          (id
+                            (congrArg
+                              (fun _a =>
+                                MixedCancellation.support
+                                    (oq (WeightedAdd11.nx a) (nq b)
+                                      ((WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                        (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b)))
+                                    (orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b)
+                                      ((WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                        (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b))) ∣
+                                  curve a0 a1 a2 a3 -
+                                    ordinate
+                                        ((WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                              (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b) *
+                                            oq (WeightedAdd11.nx a) (nq b)
+                                              ((WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                                (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b)) -
+                                          (ns b +
+                                            (WeightedAdd11.ny a - (ns b * WeightedAdd11.nx a + nt b)) /
+                                                (WeightedAdd11.nx a ^ 2 + nq b * WeightedAdd11.nx a + nr b) *
+                                              nq b))
+                                        _a ^
+                                      2)
+                              (Eq.mp
+                                (congrArg
+                                  (fun _a =>
+                                    nt (outputWith (genericK a b) (genericA a b) a b a3) =
+                                      _a * orr a3 (WeightedAdd11.nx a) (nq b) (nr b) (ns b) _a - (nt b + _a * nr b))
+                                  hm)
+                                ht)))
+                          (affine_generic_valid a0 a1 a2 a3 (WeightedAdd11.nx a) (WeightedAdd11.ny a) (nq b) (nr b)
+                            (ns b) (nt b) hkaff ha hb)))))⟩⟩

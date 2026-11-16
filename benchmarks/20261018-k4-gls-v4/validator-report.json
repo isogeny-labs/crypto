@@ -1,0 +1,3806 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "validator": "validator subagent (review-adversarial policy), independent of the session that produced E25; recompute in this stdlib script, which shares no code with examples/glv_invariant_experiment_tables.rs",
+ "date": "2026-10-21",
+ "row": "benchmarks/README.md, row 20261018-k4-gls-v4",
+ "script": "validate.py",
+ "tolerance_rule": "a printed claim agrees when |claimed - recomputed| <= half a unit in its last printed digit (integers: 0.5); rel_tol = that half unit / max(|claimed|, |recomputed|), the gate's comparison. summary.json values are machine output: rel_tol 1e-9.",
+ "raw_data": [
+  {
+   "path": "../../experiments/30_gls_v4/p101s1.json",
+   "sha256": "e73678810c24da921589f8e77d8ad83d894dc5ff023e7913508ef6b201438db7"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p101s2.json",
+   "sha256": "4aae4ec5866654358f72e1df8b9d021b751eb6cba2e3d7ae1f54293d6c9bbd91"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p149s1.json",
+   "sha256": "d35fe1354818e709a43c1d7520ffa7269f75ac9fdad08ae69c69d28edde25db7"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p149s2.json",
+   "sha256": "8b86c30cb57af6e563ee2888f8860dab9090a6c9171e3fda0218ffacd07f6f85"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p197s1.json",
+   "sha256": "99ab02e0f3143f09259e3be67c9916912feb197753c7679e1b9740ef7358c935"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p197s2.json",
+   "sha256": "e2db47a63c72e035f701b8d8e62cfb031b21681fc16b7e696c30f151dcc6451b"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p269s1.json",
+   "sha256": "ca89fc4676ba87f1ed5d8bfb1d7f02fc7166d0b9440bb864e0f7bc4dc26f208a"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p269s2.json",
+   "sha256": "d1aa960d1537b7b4510d236bc32c34fa63c59e605c60ecccadde800ed489f8da"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p397s1.json",
+   "sha256": "c01cde05204b4dbd42f89c7b8ff7283ad6681bcf86a2aaf882f1d92e3ae245a0"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p397s2.json",
+   "sha256": "ca27c4538a37d8c225b462d86aa02a5a2766364f2787bfe72a0227a89cdcf664"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/stage_a.json",
+   "sha256": "089ef8565c636ec095c1e6dd5a7ac0485d41b9d0a556880a5d71aa786d061fc3"
+  },
+  {
+   "path": "../../research/glv_gls_v4_20261018/summary.json",
+   "sha256": "c8de6d58008176d6ccf6ca055ebc751ba95334112c6730829ca9d676038100da"
+  }
+ ],
+ "claim_text_pins": [
+  {
+   "path": "../../research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md",
+   "sha256": "0968424c6ab60fba0d2ce83f2be9d42f130afeae745ac8b30d9125659beedd2b"
+  },
+  {
+   "path": "../../research/glv_gls_v4_20261018/REPORT.typ",
+   "sha256": "0f667f0a134a393bf83fb6cafc6bd12efe4a24dfefb029330b725f7937949389"
+  },
+  {
+   "path": "../../research/glv_gls_v4_20261018/README.md",
+   "sha256": "7ddd6cc644415751f5314ee8be593f71d00a92fe82dcb7dcf53b1e037e0d8251"
+  },
+  {
+   "path": "../../research/glv_gls_v4_20261018/summary.json",
+   "sha256": "c8de6d58008176d6ccf6ca055ebc751ba95334112c6730829ca9d676038100da"
+  }
+ ],
+ "claim_text_note": "the claims were read from these files at these hashes. The note's §9.19 was read from the working tree on 2026-10-21 and then committed unchanged in 911674b04 (same hash); re-run this script if any of these files changes. The §9.19 estimate that an abscissa-first <±psi> walk would save about 6 % is the validator's own estimate, not a measurement, and is not checked here",
+ "superseded_claims": [
+  "G2.36 <±psi> walk steps below n ~ 2^25, most"
+ ],
+ "status_rule": "pass iff every headline number agrees at its printed precision, every headline bound holds, and every check holds; explanatory remarks (numbers inside an explanation of a mechanism, not a reported result) are checked and listed but do not decide the status",
+ "headline_count": 251,
+ "headline_disagreements": 0,
+ "headline": [
+  {
+   "name": "curves",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 0.050000000000050004,
+   "agrees": true,
+   "definition": "curves with both arms",
+   "class": "headline"
+  },
+  {
+   "name": "smallest p",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "101",
+   "claimed": 101.0,
+   "recomputed": 101,
+   "rel_tol": 0.0049504950495099015,
+   "agrees": true,
+   "definition": "min p",
+   "class": "headline"
+  },
+  {
+   "name": "largest p",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "397",
+   "claimed": 397.0,
+   "recomputed": 397,
+   "rel_tol": 0.001259445843829975,
+   "agrees": true,
+   "definition": "max p",
+   "class": "headline"
+  },
+  {
+   "name": "h, least over arms and curves",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "min cofactor over all 20 records",
+   "class": "headline"
+  },
+  {
+   "name": "h, most over arms and curves",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "max cofactor over all 20 records",
+   "class": "headline"
+  },
+  {
+   "name": "Gls walks per curve and arm, least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "min over records of the fold = Gls walk count",
+   "class": "headline"
+  },
+  {
+   "name": "Gls walks per curve and arm, most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "max over records",
+   "class": "headline"
+  },
+  {
+   "name": "Negation walks per curve and arm, least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "min over records of the fold = Negation walk count",
+   "class": "headline"
+  },
+  {
+   "name": "Negation walks per curve and arm, most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "max over records",
+   "class": "headline"
+  },
+  {
+   "name": "None walks per curve and arm, least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "min over records of the fold = None walk count",
+   "class": "headline"
+  },
+  {
+   "name": "None walks per curve and arm, most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "max over records",
+   "class": "headline"
+  },
+  {
+   "name": "points per column, arm A, least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "4",
+   "claimed": 4.0,
+   "recomputed": 4.0,
+   "rel_tol": 0.125000000000125,
+   "agrees": true,
+   "definition": "min over curves of arm A points_per_column",
+   "class": "headline"
+  },
+  {
+   "name": "points per column, arm A, most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "4",
+   "claimed": 4.0,
+   "recomputed": 4.0,
+   "rel_tol": 0.125000000000125,
+   "agrees": true,
+   "definition": "max over curves",
+   "class": "headline"
+  },
+  {
+   "name": "points per column, arm B, least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "8",
+   "claimed": 8.0,
+   "recomputed": 8.0,
+   "rel_tol": 0.0625000000000625,
+   "agrees": true,
+   "definition": "min over curves of arm B points_per_column",
+   "class": "headline"
+  },
+  {
+   "name": "points per column, arm B, most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "8",
+   "claimed": 8.0,
+   "recomputed": 8.0,
+   "rel_tol": 0.0625000000000625,
+   "agrees": true,
+   "definition": "max over curves",
+   "class": "headline"
+  },
+  {
+   "name": "S_A/S_B least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "1.35",
+   "claimed": 1.35,
+   "recomputed": 1.3494385163288045,
+   "rel_tol": 0.0037037037037074075,
+   "agrees": true,
+   "definition": "min over curves of arm A total_muls / arm B total_muls",
+   "class": "headline"
+  },
+  {
+   "name": "S_A/S_B most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "2.67",
+   "claimed": 2.67,
+   "recomputed": 2.6655190236464006,
+   "rel_tol": 0.0018726591760318354,
+   "agrees": true,
+   "definition": "max over curves",
+   "class": "headline"
+  },
+  {
+   "name": "S_A/S_B median",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "1.86",
+   "claimed": 1.86,
+   "recomputed": 1.8568792407635701,
+   "rel_tol": 0.002688172043013441,
+   "agrees": true,
+   "definition": "median over the 10 curves",
+   "class": "headline"
+  },
+  {
+   "name": "improvement at p >= 197, least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "1.26",
+   "claimed": 1.26,
+   "recomputed": 1.262440643883149,
+   "rel_tol": 0.003960582245376282,
+   "agrees": true,
+   "definition": "(S_A / rho_negation) / (S_B / rho_<±psi>), min over the six curves at p >= 197",
+   "class": "headline"
+  },
+  {
+   "name": "improvement at p >= 197, most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "1.97",
+   "claimed": 1.97,
+   "recomputed": 1.973694354634511,
+   "rel_tol": 0.002533320312876358,
+   "agrees": true,
+   "definition": "max over the six curves at p >= 197",
+   "class": "headline"
+  },
+  {
+   "name": "S_B/rho least",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "1.1e4",
+   "claimed": 11000.0,
+   "recomputed": 11319.010623352826,
+   "rel_tol": 0.04417347210266988,
+   "agrees": true,
+   "definition": "min over curves of arm B total_muls / mean <±psi> walk fp_muls",
+   "class": "headline"
+  },
+  {
+   "name": "S_B/rho most",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "2.7e5",
+   "claimed": 270000.0,
+   "recomputed": 265216.8461257697,
+   "rel_tol": 0.018518518518537037,
+   "agrees": true,
+   "definition": "max over curves",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm A log2 n*",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "93.2",
+   "claimed": 93.2,
+   "recomputed": 93.23036425444502,
+   "rel_tol": 0.0005363059599723286,
+   "agrees": true,
+   "definition": "section 11.16 model from arm A's constants against the <±psi> walk, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B log2 n*",
+   "source": "benchmarks/README.md row 20261018-k4-gls-v4",
+   "printed": "88.0",
+   "claimed": 88.0,
+   "recomputed": 88.02064983655403,
+   "rel_tol": 0.0005680485214878014,
+   "agrees": true,
+   "definition": "same from arm B's constants",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A curves",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "56",
+   "claimed": 56.0,
+   "recomputed": 56,
+   "rel_tol": 0.008928571428580357,
+   "agrees": true,
+   "definition": "stage_a.json rows without an error",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A points per column under <V4, psi>, least (non-empty bases)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "8.00",
+   "claimed": 8.0,
+   "recomputed": 8.0,
+   "rel_tol": 0.0006250000000006251,
+   "agrees": true,
+   "definition": "min over non-empty bases",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A points per column under <V4, psi>, most (non-empty bases)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "8.00",
+   "claimed": 8.0,
+   "recomputed": 8.0,
+   "rel_tol": 0.0006250000000006251,
+   "agrees": true,
+   "definition": "max over non-empty bases",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A points per column under V4, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "4.00",
+   "claimed": 4.0,
+   "recomputed": 4.0,
+   "rel_tol": 0.0012500000000012501,
+   "agrees": true,
+   "definition": "min over non-empty bases",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A points per column under V4, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "4.00",
+   "claimed": 4.0,
+   "recomputed": 4.0,
+   "rel_tol": 0.0012500000000012501,
+   "agrees": true,
+   "definition": "max over non-empty bases",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A curves with nu^2 not in F_p",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "56",
+   "claimed": 56.0,
+   "recomputed": 56,
+   "rel_tol": 0.008928571428580357,
+   "agrees": true,
+   "definition": "count of nu2_in_fp = false",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A largest p with logarithms computed",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "149",
+   "claimed": 149.0,
+   "recomputed": 149,
+   "rel_tol": 0.003355704697989933,
+   "agrees": true,
+   "definition": "max p where distinct_column_logs is recorded",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A density pooled",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "0.49",
+   "claimed": 0.49,
+   "recomputed": 0.4867149758454106,
+   "rel_tol": 0.010204081632663268,
+   "agrees": true,
+   "definition": "sum base_points / sum eligible over the 56 curves",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A density pooled at p >= 149",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "0.52",
+   "claimed": 0.52,
+   "recomputed": 0.5201612903225806,
+   "rel_tol": 0.009612403100784808,
+   "agrees": true,
+   "definition": "sum base_points / sum eligible over curves at p >= 149",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A density per curve, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "0",
+   "claimed": 0.0,
+   "recomputed": 0.0,
+   "rel_tol": 5.0000000000049996e+299,
+   "agrees": true,
+   "definition": "min density",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A density per curve, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "0.75",
+   "claimed": 0.75,
+   "recomputed": 0.75,
+   "rel_tol": 0.0066666666666733345,
+   "agrees": true,
+   "definition": "max density",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A curves outside [0.3, 0.7]",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "14",
+   "claimed": 14.0,
+   "recomputed": 14,
+   "rel_tol": 0.03571428571432143,
+   "agrees": true,
+   "definition": "count of curves with density outside [0.3, 0.7]",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A outside curves at p > 113",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "1",
+   "claimed": 1.0,
+   "recomputed": 1,
+   "rel_tol": 0.5000000000005,
+   "agrees": true,
+   "definition": "'all but one at p <= 113'",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A curves with no base",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "2",
+   "claimed": 2.0,
+   "recomputed": 2,
+   "rel_tol": 0.25000000000025,
+   "agrees": true,
+   "definition": "count of base_points = 0 (both at p = 41)",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A h, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "min cofactor",
+   "class": "headline"
+  },
+  {
+   "name": "Stage A h, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "max cofactor",
+   "class": "headline"
+  },
+  {
+   "name": "walks, all correct",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "960",
+   "claimed": 960.0,
+   "recomputed": 960,
+   "rel_tol": 0.0005208333333338542,
+   "agrees": true,
+   "definition": "walks in the 20 records, every one correct (else -1)",
+   "class": "headline"
+  },
+  {
+   "name": "unsolved targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16",
+   "printed": "198",
+   "claimed": 198.0,
+   "recomputed": 198,
+   "rel_tol": 0.002525252525255051,
+   "agrees": true,
+   "definition": "sum unsolved over both arms",
+   "class": "headline"
+  },
+  {
+   "name": "targets",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16",
+   "printed": "1.15e6",
+   "claimed": 1150000.0,
+   "recomputed": 1148217,
+   "rel_tol": 0.00434782608696087,
+   "agrees": true,
+   "definition": "sum targets over both arms",
+   "class": "headline"
+  },
+  {
+   "name": "unsolved share, percent",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16",
+   "printed": "0.017",
+   "claimed": 0.017,
+   "recomputed": 0.01724412719895281,
+   "rel_tol": 0.028995378787907786,
+   "agrees": true,
+   "definition": "pooled",
+   "class": "headline"
+  },
+  {
+   "name": "C median, smallest",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16",
+   "printed": "1.62e6",
+   "claimed": 1620000.0,
+   "recomputed": 1616889.0,
+   "rel_tol": 0.003086419753089506,
+   "agrees": true,
+   "definition": "min over the 20 records",
+   "class": "headline"
+  },
+  {
+   "name": "C median, largest",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1663282.0,
+   "rel_tol": 0.003006104797626019,
+   "agrees": true,
+   "definition": "max over the 20 records",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "22.6",
+   "claimed": 22.6,
+   "recomputed": 22.632866768472404,
+   "rel_tol": 0.0022091766152089946,
+   "agrees": true,
+   "definition": "record p101s1: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 0.050000000000050004,
+   "agrees": true,
+   "definition": "record p101s1: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "5",
+   "claimed": 5.0,
+   "recomputed": 5,
+   "rel_tol": 0.10000000000010001,
+   "agrees": true,
+   "definition": "record p101s1: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "3731",
+   "claimed": 3731.0,
+   "recomputed": 3731.181818181818,
+   "rel_tol": 0.0001340057987965183,
+   "agrees": true,
+   "definition": "record p101s1: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "3528",
+   "claimed": 3528.0,
+   "recomputed": 3527.6666666666665,
+   "rel_tol": 0.00014172335600921203,
+   "agrees": true,
+   "definition": "record p101s1: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "6.76e10",
+   "claimed": 67600000000.0,
+   "recomputed": 67608592257,
+   "rel_tol": 0.0007395509702374131,
+   "agrees": true,
+   "definition": "record p101s1: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "3.48e10",
+   "claimed": 34800000000.0,
+   "recomputed": 34825654827,
+   "rel_tol": 0.001435723183050832,
+   "agrees": true,
+   "definition": "record p101s1: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.94",
+   "claimed": 1.94,
+   "recomputed": 1.9413444655341756,
+   "rel_tol": 0.0025755346816461098,
+   "agrees": true,
+   "definition": "record p101s1: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.03",
+   "claimed": 1.03,
+   "recomputed": 1.0283045305931808,
+   "rel_tol": 0.004854368932043689,
+   "agrees": true,
+   "definition": "record p101s1: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.53e5",
+   "claimed": 153000.0,
+   "recomputed": 152979.2192082182,
+   "rel_tol": 0.0032679738562124186,
+   "agrees": true,
+   "definition": "record p101s1: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "6.77e4",
+   "claimed": 67700.0,
+   "recomputed": 67716.66156232964,
+   "rel_tol": 0.0007383707177298991,
+   "agrees": true,
+   "definition": "record p101s1: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=1 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.26",
+   "claimed": 2.26,
+   "recomputed": 2.2591075176883733,
+   "rel_tol": 0.0022123893805331865,
+   "agrees": true,
+   "definition": "record p101s1: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "22.6",
+   "claimed": 22.6,
+   "recomputed": 22.632563285360174,
+   "rel_tol": 0.0022092062383580035,
+   "agrees": true,
+   "definition": "record p101s2: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "14",
+   "claimed": 14.0,
+   "recomputed": 14,
+   "rel_tol": 0.03571428571432143,
+   "agrees": true,
+   "definition": "record p101s2: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "7",
+   "claimed": 7.0,
+   "recomputed": 7,
+   "rel_tol": 0.07142857142864285,
+   "agrees": true,
+   "definition": "record p101s2: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "1001",
+   "claimed": 1001.0,
+   "recomputed": 1000.6666666666666,
+   "rel_tol": 0.000499500499500999,
+   "agrees": true,
+   "definition": "record p101s2: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "888",
+   "claimed": 888.0,
+   "recomputed": 888.25,
+   "rel_tol": 0.0005629045876729524,
+   "agrees": true,
+   "definition": "record p101s2: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "2.47e10",
+   "claimed": 24700000000.0,
+   "recomputed": 24712296642,
+   "rel_tol": 0.0020232842266498237,
+   "agrees": true,
+   "definition": "record p101s2: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "1.17e10",
+   "claimed": 11700000000.0,
+   "recomputed": 11695092130,
+   "rel_tol": 0.004273504273508547,
+   "agrees": true,
+   "definition": "record p101s2: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.11",
+   "claimed": 2.11,
+   "recomputed": 2.1130484794222824,
+   "rel_tol": 0.002366249543584549,
+   "agrees": true,
+   "definition": "record p101s2: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.49",
+   "claimed": 1.49,
+   "recomputed": 1.4866607264531684,
+   "rel_tol": 0.003355704697989933,
+   "agrees": true,
+   "definition": "record p101s2: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "6.02e4",
+   "claimed": 60200.0,
+   "recomputed": 60220.512803361045,
+   "rel_tol": 0.0008302818702875508,
+   "agrees": true,
+   "definition": "record p101s2: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.93e4",
+   "claimed": 29300.0,
+   "recomputed": 29307.303115035425,
+   "rel_tol": 0.0017060594010916918,
+   "agrees": true,
+   "definition": "record p101s2: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=101 seed=2 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.05",
+   "claimed": 2.05,
+   "recomputed": 2.0547954401326787,
+   "rel_tol": 0.0024333322443435773,
+   "agrees": true,
+   "definition": "record p101s2: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "24.9",
+   "claimed": 24.9,
+   "recomputed": 24.876622843008242,
+   "rel_tol": 0.002008032128516065,
+   "agrees": true,
+   "definition": "record p149s1: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 0.050000000000050004,
+   "agrees": true,
+   "definition": "record p149s1: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "5",
+   "claimed": 5.0,
+   "recomputed": 5,
+   "rel_tol": 0.10000000000010001,
+   "agrees": true,
+   "definition": "record p149s1: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "32013",
+   "claimed": 32013.0,
+   "recomputed": 32013.272727272728,
+   "rel_tol": 1.5618521863106496e-05,
+   "agrees": true,
+   "definition": "record p149s1: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "22006",
+   "claimed": 22006.0,
+   "recomputed": 22006.0,
+   "rel_tol": 2.2721076070185407e-05,
+   "agrees": true,
+   "definition": "record p149s1: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "5.83e11",
+   "claimed": 583000000000.0,
+   "recomputed": 582509291729,
+   "rel_tol": 0.0008576329331054889,
+   "agrees": true,
+   "definition": "record p149s1: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "2.19e11",
+   "claimed": 219000000000.0,
+   "recomputed": 218535034476,
+   "rel_tol": 0.0022831050228333334,
+   "agrees": true,
+   "definition": "record p149s1: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.67",
+   "claimed": 2.67,
+   "recomputed": 2.6655190236464006,
+   "rel_tol": 0.0018726591760318354,
+   "agrees": true,
+   "definition": "record p149s1: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.09",
+   "claimed": 1.09,
+   "recomputed": 1.0885126182479277,
+   "rel_tol": 0.004587155963307339,
+   "agrees": true,
+   "definition": "record p149s1: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "8.31e5",
+   "claimed": 831000.0,
+   "recomputed": 830566.8561936531,
+   "rel_tol": 0.0006016847172087847,
+   "agrees": true,
+   "definition": "record p149s1: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.65e5",
+   "claimed": 265000.0,
+   "recomputed": 265216.8461257697,
+   "rel_tol": 0.0018852497769443828,
+   "agrees": true,
+   "definition": "record p149s1: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=1 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "3.13",
+   "claimed": 3.13,
+   "recomputed": 3.1316519607498314,
+   "rel_tol": 0.001596601430386223,
+   "agrees": true,
+   "definition": "record p149s1: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "24.9",
+   "claimed": 24.9,
+   "recomputed": 24.876544159086606,
+   "rel_tol": 0.002008032128516065,
+   "agrees": true,
+   "definition": "record p149s2: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "14",
+   "claimed": 14.0,
+   "recomputed": 14,
+   "rel_tol": 0.03571428571432143,
+   "agrees": true,
+   "definition": "record p149s2: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "7",
+   "claimed": 7.0,
+   "recomputed": 7,
+   "rel_tol": 0.07142857142864285,
+   "agrees": true,
+   "definition": "record p149s2: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "4039",
+   "claimed": 4039.0,
+   "recomputed": 4039.0,
+   "rel_tol": 0.00012379301807390446,
+   "agrees": true,
+   "definition": "record p149s2: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "4272",
+   "claimed": 4272.0,
+   "recomputed": 4272.0,
+   "rel_tol": 0.00011704119850198971,
+   "agrees": true,
+   "definition": "record p149s2: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "1.01e11",
+   "claimed": 101000000000.0,
+   "recomputed": 100505737317,
+   "rel_tol": 0.0049504950495099015,
+   "agrees": true,
+   "definition": "record p149s2: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "5.67e10",
+   "claimed": 56700000000.0,
+   "recomputed": 56705564507,
+   "rel_tol": 0.0008817476809331079,
+   "agrees": true,
+   "definition": "record p149s2: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.77",
+   "claimed": 1.77,
+   "recomputed": 1.7724140159929649,
+   "rel_tol": 0.0028210113183988984,
+   "agrees": true,
+   "definition": "record p149s2: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "0.96",
+   "claimed": 0.96,
+   "recomputed": 0.9580397534717296,
+   "rel_tol": 0.005208333333338542,
+   "agrees": true,
+   "definition": "record p149s2: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.58e5",
+   "claimed": 158000.0,
+   "recomputed": 157929.22965399857,
+   "rel_tol": 0.0031645569620284814,
+   "agrees": true,
+   "definition": "record p149s2: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "7.01e4",
+   "claimed": 70100.0,
+   "recomputed": 70113.54405661329,
+   "rel_tol": 0.0007131289777575276,
+   "agrees": true,
+   "definition": "record p149s2: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=149 seed=2 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.25",
+   "claimed": 2.25,
+   "recomputed": 2.2524782020215435,
+   "rel_tol": 0.0022197773081744474,
+   "agrees": true,
+   "definition": "record p149s2: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "26.5",
+   "claimed": 26.5,
+   "recomputed": 26.488137357833217,
+   "rel_tol": 0.0018867924528320756,
+   "agrees": true,
+   "definition": "record p197s1: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "22",
+   "claimed": 22.0,
+   "recomputed": 22,
+   "rel_tol": 0.022727272727295456,
+   "agrees": true,
+   "definition": "record p197s1: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "11",
+   "claimed": 11.0,
+   "recomputed": 11,
+   "rel_tol": 0.04545454545459091,
+   "agrees": true,
+   "definition": "record p197s1: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "2218",
+   "claimed": 2218.0,
+   "recomputed": 2218.4347826086955,
+   "rel_tol": 0.00022538413295726526,
+   "agrees": true,
+   "definition": "record p197s1: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "3150",
+   "claimed": 3150.0,
+   "recomputed": 3149.5,
+   "rel_tol": 0.00015873015873031748,
+   "agrees": true,
+   "definition": "record p197s1: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "8.53e10",
+   "claimed": 85300000000.0,
+   "recomputed": 85316189300,
+   "rel_tol": 0.0005860552423905554,
+   "agrees": true,
+   "definition": "record p197s1: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "6.32e10",
+   "claimed": 63200000000.0,
+   "recomputed": 63223472776,
+   "rel_tol": 0.0007908455167782289,
+   "agrees": true,
+   "definition": "record p197s1: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.35",
+   "claimed": 1.35,
+   "recomputed": 1.3494385163288045,
+   "rel_tol": 0.0037037037037074075,
+   "agrees": true,
+   "definition": "record p197s1: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.52",
+   "claimed": 1.52,
+   "recomputed": 1.523663824715805,
+   "rel_tol": 0.003281563766822123,
+   "agrees": true,
+   "definition": "record p197s1: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "7.71e4",
+   "claimed": 77100.0,
+   "recomputed": 77119.90942615947,
+   "rel_tol": 0.0006483410104095602,
+   "agrees": true,
+   "definition": "record p197s1: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "6.11e4",
+   "claimed": 61100.0,
+   "recomputed": 61087.94880759373,
+   "rel_tol": 0.0008183306055654665,
+   "agrees": true,
+   "definition": "record p197s1: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=1 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.26",
+   "claimed": 1.26,
+   "recomputed": 1.262440643883149,
+   "rel_tol": 0.003960582245376282,
+   "agrees": true,
+   "definition": "record p197s1: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "26.5",
+   "claimed": 26.5,
+   "recomputed": 26.488133311560034,
+   "rel_tol": 0.0018867924528320756,
+   "agrees": true,
+   "definition": "record p197s2: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "30",
+   "claimed": 30.0,
+   "recomputed": 30,
+   "rel_tol": 0.016666666666683334,
+   "agrees": true,
+   "definition": "record p197s2: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "15",
+   "claimed": 15.0,
+   "recomputed": 15,
+   "rel_tol": 0.03333333333336667,
+   "agrees": true,
+   "definition": "record p197s2: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "846",
+   "claimed": 846.0,
+   "recomputed": 846.3225806451613,
+   "rel_tol": 0.0005907912791589991,
+   "agrees": true,
+   "definition": "record p197s2: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "969",
+   "claimed": 969.0,
+   "recomputed": 968.75,
+   "rel_tol": 0.0005159958720335398,
+   "agrees": true,
+   "definition": "record p197s2: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "4.39e10",
+   "claimed": 43900000000.0,
+   "recomputed": 43878678034,
+   "rel_tol": 0.0011389521640102506,
+   "agrees": true,
+   "definition": "record p197s2: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "2.59e10",
+   "claimed": 25900000000.0,
+   "recomputed": 25919573654,
+   "rel_tol": 0.0019290440756279117,
+   "agrees": true,
+   "definition": "record p197s2: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.69",
+   "claimed": 1.69,
+   "recomputed": 1.6928780781557526,
+   "rel_tol": 0.002953549971804276,
+   "agrees": true,
+   "definition": "record p197s2: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.62",
+   "claimed": 1.62,
+   "recomputed": 1.6238050471876642,
+   "rel_tol": 0.003079187374534098,
+   "agrees": true,
+   "definition": "record p197s2: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "3.97e4",
+   "claimed": 39700.0,
+   "recomputed": 39650.638733721236,
+   "rel_tol": 0.001259445843829975,
+   "agrees": true,
+   "definition": "record p197s2: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.62e4",
+   "claimed": 26200.0,
+   "recomputed": 26233.4055238699,
+   "rel_tol": 0.0019059668007859205,
+   "agrees": true,
+   "definition": "record p197s2: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=197 seed=2 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.51",
+   "claimed": 1.51,
+   "recomputed": 1.5114560211270676,
+   "rel_tol": 0.0033080684651853676,
+   "agrees": true,
+   "definition": "record p197s2: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "28.3",
+   "claimed": 28.3,
+   "recomputed": 28.28583179843023,
+   "rel_tol": 0.0017667844522985868,
+   "agrees": true,
+   "definition": "record p269s1: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "30",
+   "claimed": 30.0,
+   "recomputed": 30,
+   "rel_tol": 0.016666666666683334,
+   "agrees": true,
+   "definition": "record p269s1: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "15",
+   "claimed": 15.0,
+   "recomputed": 15,
+   "rel_tol": 0.03333333333336667,
+   "agrees": true,
+   "definition": "record p269s1: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "2645",
+   "claimed": 2645.0,
+   "recomputed": 2644.967741935484,
+   "rel_tol": 0.00018903591682438567,
+   "agrees": true,
+   "definition": "record p269s1: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "2950",
+   "claimed": 2950.0,
+   "recomputed": 2950.4375,
+   "rel_tol": 0.00016946639269616796,
+   "agrees": true,
+   "definition": "record p269s1: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "1.37e11",
+   "claimed": 137000000000.0,
+   "recomputed": 136903497485,
+   "rel_tol": 0.0036496350365,
+   "agrees": true,
+   "definition": "record p269s1: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "7.88e10",
+   "claimed": 78800000000.0,
+   "recomputed": 78830518113,
+   "rel_tol": 0.0006342721219766342,
+   "agrees": true,
+   "definition": "record p269s1: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.74",
+   "claimed": 1.74,
+   "recomputed": 1.7366814371149382,
+   "rel_tol": 0.0028735632183936786,
+   "agrees": true,
+   "definition": "record p269s1: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.61",
+   "claimed": 1.61,
+   "recomputed": 1.6097015949348892,
+   "rel_tol": 0.003105590062114907,
+   "agrees": true,
+   "definition": "record p269s1: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "7.45e4",
+   "claimed": 74500.0,
+   "recomputed": 74521.43332109599,
+   "rel_tol": 0.0006709479108461498,
+   "agrees": true,
+   "definition": "record p269s1: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "4.84e4",
+   "claimed": 48400.0,
+   "recomputed": 48420.937595454496,
+   "rel_tol": 0.0010326111488750632,
+   "agrees": true,
+   "definition": "record p269s1: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=1 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.54",
+   "claimed": 1.54,
+   "recomputed": 1.5390332575487276,
+   "rel_tol": 0.0032467532467564935,
+   "agrees": true,
+   "definition": "record p269s1: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "28.3",
+   "claimed": 28.3,
+   "recomputed": 28.285813282616946,
+   "rel_tol": 0.0017667844522985868,
+   "agrees": true,
+   "definition": "record p269s2: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "40",
+   "claimed": 40.0,
+   "recomputed": 40,
+   "rel_tol": 0.012500000000012501,
+   "agrees": true,
+   "definition": "record p269s2: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "20",
+   "claimed": 20.0,
+   "recomputed": 20,
+   "rel_tol": 0.025000000000025002,
+   "agrees": true,
+   "definition": "record p269s2: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "744",
+   "claimed": 744.0,
+   "recomputed": 744.2439024390244,
+   "rel_tol": 0.0006718227698767943,
+   "agrees": true,
+   "definition": "record p269s2: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "718",
+   "claimed": 718.0,
+   "recomputed": 718.047619047619,
+   "rel_tol": 0.0006963326480542808,
+   "agrees": true,
+   "definition": "record p269s2: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "5.10e10",
+   "claimed": 51000000000.0,
+   "recomputed": 50987187104,
+   "rel_tol": 0.0009803921568637256,
+   "agrees": true,
+   "definition": "record p269s2: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "2.52e10",
+   "claimed": 25200000000.0,
+   "recomputed": 25202029895,
+   "rel_tol": 0.001983967172817688,
+   "agrees": true,
+   "definition": "record p269s2: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.02",
+   "claimed": 2.02,
+   "recomputed": 2.0231381089709637,
+   "rel_tol": 0.002471408144522654,
+   "agrees": true,
+   "definition": "record p269s2: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.08",
+   "claimed": 2.08,
+   "recomputed": 2.0843691272955063,
+   "rel_tol": 0.0023988073583168833,
+   "agrees": true,
+   "definition": "record p269s2: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.24e4",
+   "claimed": 22400.0,
+   "recomputed": 22441.042350836575,
+   "rel_tol": 0.002228060498187423,
+   "agrees": true,
+   "definition": "record p269s2: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.56e4",
+   "claimed": 15600.0,
+   "recomputed": 15620.10374446329,
+   "rel_tol": 0.003201003067458693,
+   "agrees": true,
+   "definition": "record p269s2: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=269 seed=2 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.44",
+   "claimed": 1.44,
+   "recomputed": 1.4366769080385295,
+   "rel_tol": 0.003472222222225695,
+   "agrees": true,
+   "definition": "record p269s2: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "30.5",
+   "claimed": 30.5,
+   "recomputed": 30.531966407371566,
+   "rel_tol": 0.0016376278990002466,
+   "agrees": true,
+   "definition": "record p397s1: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "60",
+   "claimed": 60.0,
+   "recomputed": 60,
+   "rel_tol": 0.008333333333341667,
+   "agrees": true,
+   "definition": "record p397s1: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "30",
+   "claimed": 30.0,
+   "recomputed": 30,
+   "rel_tol": 0.016666666666683334,
+   "agrees": true,
+   "definition": "record p397s1: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "700",
+   "claimed": 700.0,
+   "recomputed": 699.9180327868852,
+   "rel_tol": 0.0007142857142864287,
+   "agrees": true,
+   "definition": "record p397s1: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "800",
+   "claimed": 800.0,
+   "recomputed": 799.6451612903226,
+   "rel_tol": 0.0006250000000006251,
+   "agrees": true,
+   "definition": "record p397s1: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "7.19e10",
+   "claimed": 71900000000.0,
+   "recomputed": 71928854428,
+   "rel_tol": 0.0006951313266096773,
+   "agrees": true,
+   "definition": "record p397s1: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "4.17e10",
+   "claimed": 41700000000.0,
+   "recomputed": 41737731799,
+   "rel_tol": 0.001197956808981363,
+   "agrees": true,
+   "definition": "record p397s1: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.72",
+   "claimed": 1.72,
+   "recomputed": 1.7233532184833138,
+   "rel_tol": 0.0029013204875117785,
+   "agrees": true,
+   "definition": "record p397s1: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.36",
+   "claimed": 1.36,
+   "recomputed": 1.3590572905499139,
+   "rel_tol": 0.003676470588238971,
+   "agrees": true,
+   "definition": "record p397s1: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.99e4",
+   "claimed": 19900.0,
+   "recomputed": 19920.554874526875,
+   "rel_tol": 0.002509970245055111,
+   "agrees": true,
+   "definition": "record p397s1: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.13e4",
+   "claimed": 11300.0,
+   "recomputed": 11319.010623352826,
+   "rel_tol": 0.004417347210266987,
+   "agrees": true,
+   "definition": "record p397s1: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=1 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.76",
+   "claimed": 1.76,
+   "recomputed": 1.7599201500374746,
+   "rel_tol": 0.002840909090911932,
+   "agrees": true,
+   "definition": "record p397s1: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 log2 n",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "30.5",
+   "claimed": 30.5,
+   "recomputed": 30.531966407371566,
+   "rel_tol": 0.0016376278990002466,
+   "agrees": true,
+   "definition": "record p397s2: log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 cols A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "48",
+   "claimed": 48.0,
+   "recomputed": 48,
+   "rel_tol": 0.010416666666677083,
+   "agrees": true,
+   "definition": "record p397s2: cols A",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 cols B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "24",
+   "claimed": 24.0,
+   "recomputed": 24,
+   "rel_tol": 0.020833333333354166,
+   "agrees": true,
+   "definition": "record p397s2: cols B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "1600",
+   "claimed": 1600.0,
+   "recomputed": 1599.8163265306123,
+   "rel_tol": 0.00031250000000031253,
+   "agrees": true,
+   "definition": "record p397s2: y A",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "1349",
+   "claimed": 1349.0,
+   "recomputed": 1349.04,
+   "rel_tol": 0.00037063393227813857,
+   "agrees": true,
+   "definition": "record p397s2: y B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 S_A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "1.31e11",
+   "claimed": 131000000000.0,
+   "recomputed": 131255013245,
+   "rel_tol": 0.0038093783059333693,
+   "agrees": true,
+   "definition": "record p397s2: S_A",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table",
+   "printed": "5.65e10",
+   "claimed": 56500000000.0,
+   "recomputed": 56478967827,
+   "rel_tol": 0.0008849557522132744,
+   "agrees": true,
+   "definition": "record p397s2: S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 S_A/S_B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "2.32",
+   "claimed": 2.32,
+   "recomputed": 2.323962676638241,
+   "rel_tol": 0.002151497547816825,
+   "agrees": true,
+   "definition": "record p397s2: S_A/S_B",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 neg/psi steps",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.67",
+   "claimed": 1.67,
+   "recomputed": 1.6653207821095501,
+   "rel_tol": 0.0029940119760508985,
+   "agrees": true,
+   "definition": "record p397s2: neg/psi steps",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 S_A/rho neg",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "3.38e4",
+   "claimed": 33800.0,
+   "recomputed": 33754.50399554483,
+   "rel_tol": 0.0014792899408298818,
+   "agrees": true,
+   "definition": "record p397s2: S_A/rho neg",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 S_B/rho psi",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.71e4",
+   "claimed": 17100.0,
+   "recomputed": 17102.194124578877,
+   "rel_tol": 0.002923601476853263,
+   "agrees": true,
+   "definition": "record p397s2: S_B/rho psi",
+   "class": "headline"
+  },
+  {
+   "name": "p=397 seed=2 improvement",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 table and research/glv_gls_v4_20261018/REPORT.typ table",
+   "printed": "1.97",
+   "claimed": 1.97,
+   "recomputed": 1.973694354634511,
+   "rel_tol": 0.002533320312876358,
+   "agrees": true,
+   "definition": "record p397s2: improvement",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B constant y (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37",
+   "printed": "2474",
+   "claimed": 2474.0,
+   "recomputed": 2473.6845637583892,
+   "rel_tol": 0.000202101859337308,
+   "agrees": true,
+   "definition": "section 11.16 model, arm B, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B constant cols_p (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37",
+   "printed": "0.060",
+   "claimed": 0.06,
+   "recomputed": 0.05974601646683388,
+   "rel_tol": 0.008333333333341667,
+   "agrees": true,
+   "definition": "section 11.16 model, arm B, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B constant c (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37",
+   "printed": "1.66e6",
+   "claimed": 1660000.0,
+   "recomputed": 1655972.5466760988,
+   "rel_tol": 0.003012048192774097,
+   "agrees": true,
+   "definition": "section 11.16 model, arm B, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B constant h (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37",
+   "printed": "16",
+   "claimed": 16.0,
+   "recomputed": 16.0,
+   "rel_tol": 0.03125000000003125,
+   "agrees": true,
+   "definition": "section 11.16 model, arm B, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B constant s_rho (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37",
+   "printed": "121.7",
+   "claimed": 121.7,
+   "recomputed": 121.74306478514066,
+   "rel_tol": 0.0004107010127294968,
+   "agrees": true,
+   "definition": "section 11.16 model, arm B, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B constant r (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37",
+   "printed": "0.045",
+   "claimed": 0.045,
+   "recomputed": 0.044835415664718554,
+   "rel_tol": 0.011111111111122224,
+   "agrees": true,
+   "definition": "section 11.16 model, arm B, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B constant log2n (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37",
+   "printed": "88.0",
+   "claimed": 88.0,
+   "recomputed": 88.02064983655403,
+   "rel_tol": 0.0005680485214878014,
+   "agrees": true,
+   "definition": "section 11.16 model, arm B, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm B log2 n*, p=397 only",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.37 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "85.7",
+   "claimed": 85.7,
+   "recomputed": 85.73467586359753,
+   "rel_tol": 0.0005831946000425684,
+   "agrees": true,
+   "definition": "the two p = 397 curves",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm A log2 n* (all curves)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16",
+   "printed": "93.2",
+   "claimed": 93.2,
+   "recomputed": 93.23036425444502,
+   "rel_tol": 0.0005363059599723286,
+   "agrees": true,
+   "definition": "arm A against the <±psi> walk, every curve pooled",
+   "class": "headline"
+  },
+  {
+   "name": "handover arm A log2 n*, p=397 only",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16",
+   "printed": "91.1",
+   "claimed": 91.1,
+   "recomputed": 91.05547672916555,
+   "rel_tol": 0.000548847420417673,
+   "agrees": true,
+   "definition": "the two p = 397 curves",
+   "class": "headline"
+  },
+  {
+   "name": "slope of S/rho in n, arm B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "-0.29",
+   "claimed": -0.29,
+   "recomputed": -0.2856106062180688,
+   "rel_tol": 0.017241379310362074,
+   "agrees": true,
+   "definition": "least-squares slope of log2(S_B/rho_psi) on log2 n",
+   "class": "headline"
+  },
+  {
+   "name": "slope of S/rho in n, arm A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "-0.30",
+   "claimed": -0.3,
+   "recomputed": -0.29645065648228536,
+   "rel_tol": 0.016666666666683334,
+   "agrees": true,
+   "definition": "least-squares slope of log2(S_A/rho_psi) on log2 n (the tables tool's arm A ratio)",
+   "class": "headline"
+  },
+  {
+   "name": "G2.33 cols A/B, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.33",
+   "printed": "2.00",
+   "claimed": 2.0,
+   "recomputed": 2.0,
+   "rel_tol": 0.0025000000000025002,
+   "agrees": true,
+   "definition": "min over curves",
+   "class": "headline"
+  },
+  {
+   "name": "G2.33 cols A/B, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.33",
+   "printed": "2.00",
+   "claimed": 2.0,
+   "recomputed": 2.0,
+   "rel_tol": 0.0025000000000025002,
+   "agrees": true,
+   "definition": "max over curves",
+   "class": "headline"
+  },
+  {
+   "name": "G2.34 y_B/y_A, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.34 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "0.69",
+   "claimed": 0.69,
+   "recomputed": 0.6874023842383556,
+   "rel_tol": 0.007246376811601451,
+   "agrees": true,
+   "definition": "min over curves",
+   "class": "headline"
+  },
+  {
+   "name": "G2.34 y_B/y_A, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.34 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "1.42",
+   "claimed": 1.42,
+   "recomputed": 1.419694653496394,
+   "rel_tol": 0.003521126760566902,
+   "agrees": true,
+   "definition": "max over curves",
+   "class": "headline"
+  },
+  {
+   "name": "G2.34 curves outside [0.8, 1.25]",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.34",
+   "printed": "2",
+   "claimed": 2.0,
+   "recomputed": 2,
+   "rel_tol": 0.25000000000025,
+   "agrees": true,
+   "definition": "count",
+   "class": "headline"
+  },
+  {
+   "name": "G2.34 pooled y B",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.34",
+   "printed": "2474",
+   "claimed": 2474.0,
+   "recomputed": 2473.6845637583892,
+   "rel_tol": 0.000202101859337308,
+   "agrees": true,
+   "definition": "pooled over arm B",
+   "class": "headline"
+  },
+  {
+   "name": "G2.34 pooled y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.34",
+   "printed": "2707",
+   "claimed": 2707.0,
+   "recomputed": 2707.0763888888887,
+   "rel_tol": 0.0001847011048719329,
+   "agrees": true,
+   "definition": "pooled over arm A",
+   "class": "headline"
+  },
+  {
+   "name": "G2.34 pooled y B / y A",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.34 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "0.91",
+   "claimed": 0.91,
+   "recomputed": 0.9137845440607258,
+   "rel_tol": 0.005471749366415989,
+   "agrees": true,
+   "definition": "ratio of pooled yields",
+   "class": "headline"
+  },
+  {
+   "name": "G2.35 S_A/S_B least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.35 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "1.35",
+   "claimed": 1.35,
+   "recomputed": 1.3494385163288045,
+   "rel_tol": 0.0037037037037074075,
+   "agrees": true,
+   "definition": "min",
+   "class": "headline"
+  },
+  {
+   "name": "G2.35 S_A/S_B most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.35 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "2.67",
+   "claimed": 2.67,
+   "recomputed": 2.6655190236464006,
+   "rel_tol": 0.0018726591760318354,
+   "agrees": true,
+   "definition": "max",
+   "class": "headline"
+  },
+  {
+   "name": "G2.35 S_A/S_B median",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.35 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "1.86",
+   "claimed": 1.86,
+   "recomputed": 1.8568792407635701,
+   "rel_tol": 0.002688172043013441,
+   "agrees": true,
+   "definition": "median",
+   "class": "headline"
+  },
+  {
+   "name": "G2.35 curves in [1.6, 2.4]",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.35 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "8",
+   "claimed": 8.0,
+   "recomputed": 8,
+   "rel_tol": 0.0625000000000625,
+   "agrees": true,
+   "definition": "count of 10",
+   "class": "headline"
+  },
+  {
+   "name": "G2.36 neg/psi steps, mean",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "1.44",
+   "claimed": 1.44,
+   "recomputed": 1.4427435295559334,
+   "rel_tol": 0.0034656194240870837,
+   "agrees": true,
+   "definition": "mean over curves of negation steps / <±psi> steps (16-walk means)",
+   "class": "headline"
+  },
+  {
+   "name": "G2.36 improvement, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+   "printed": "1.26",
+   "claimed": 1.26,
+   "recomputed": 1.262440643883149,
+   "rel_tol": 0.003960582245376282,
+   "agrees": true,
+   "definition": "min over the 10 curves",
+   "class": "headline"
+  },
+  {
+   "name": "G2.36 improvement, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+   "printed": "3.13",
+   "claimed": 3.13,
+   "recomputed": 3.1316519607498314,
+   "rel_tol": 0.001596601430386223,
+   "agrees": true,
+   "definition": "max over the 10 curves",
+   "class": "headline"
+  },
+  {
+   "name": "G2.36 improvement, median",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+   "printed": "1.87",
+   "claimed": 1.87,
+   "recomputed": 1.8668072523359927,
+   "rel_tol": 0.002673796791446524,
+   "agrees": true,
+   "definition": "median over the 10 curves",
+   "class": "headline"
+  },
+  {
+   "name": "G2.36 improvement in [1.1, 2.0] at p >= 197 (count)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+   "printed": "6",
+   "claimed": 6.0,
+   "recomputed": 6,
+   "rel_tol": 0.08333333333341666,
+   "agrees": true,
+   "definition": "count of six",
+   "class": "headline"
+  },
+  {
+   "name": "G2.36 improvement above 2.0 at p <= 149 (count)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+   "printed": "4",
+   "claimed": 4.0,
+   "recomputed": 4,
+   "rel_tol": 0.125000000000125,
+   "agrees": true,
+   "definition": "count of four",
+   "class": "headline"
+  },
+  {
+   "name": "best S_B/rho (p=397 seed 1)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "1.13e4",
+   "claimed": 11300.0,
+   "recomputed": 11319.010623352826,
+   "rel_tol": 0.004417347210266987,
+   "agrees": true,
+   "definition": "S_B / rho_psi at p397s1, the minimum",
+   "class": "headline"
+  },
+  {
+   "name": "largest log2 n (scope)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 and research/glv_gls_v4_20261018/REPORT.typ",
+   "printed": "30.5",
+   "claimed": 30.5,
+   "recomputed": 30.531966407371566,
+   "rel_tol": 0.0016376278990002466,
+   "agrees": true,
+   "definition": "max bits",
+   "class": "headline"
+  },
+  {
+   "name": "summary curves",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "10",
+   "claimed": 10.0,
+   "recomputed": 10,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "count",
+   "class": "headline"
+  },
+  {
+   "name": "summary handover_log2_n_a",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "93.23036425444502",
+   "claimed": 93.23036425444502,
+   "recomputed": 93.23036425444502,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "arm A handover",
+   "class": "headline"
+  },
+  {
+   "name": "summary handover_log2_n_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "88.02064983655403",
+   "claimed": 88.02064983655403,
+   "recomputed": 88.02064983655403,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "arm B handover",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=2 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "2.1130484794222824",
+   "claimed": 2.1130484794222824,
+   "recomputed": 2.1130484794222824,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=2 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "60220.512803361045",
+   "claimed": 60220.512803361045,
+   "recomputed": 60220.512803361045,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=2 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "29307.303115035425",
+   "claimed": 29307.303115035425,
+   "recomputed": 29307.303115035425,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=2 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.4866607264531684",
+   "claimed": 1.4866607264531684,
+   "recomputed": 1.4866607264531684,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=2 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "22.632563285360174",
+   "claimed": 22.632563285360174,
+   "recomputed": 22.632563285360174,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=1 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.9413444655341756",
+   "claimed": 1.9413444655341756,
+   "recomputed": 1.9413444655341756,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=1 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "152979.2192082182",
+   "claimed": 152979.2192082182,
+   "recomputed": 152979.2192082182,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=1 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "67716.66156232964",
+   "claimed": 67716.66156232964,
+   "recomputed": 67716.66156232964,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=1 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.0283045305931808",
+   "claimed": 1.0283045305931808,
+   "recomputed": 1.0283045305931808,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=101 seed=1 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "22.632866768472404",
+   "claimed": 22.632866768472404,
+   "recomputed": 22.632866768472404,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=2 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.7724140159929649",
+   "claimed": 1.7724140159929649,
+   "recomputed": 1.7724140159929649,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=2 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "157929.22965399857",
+   "claimed": 157929.22965399857,
+   "recomputed": 157929.22965399857,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=2 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "70113.54405661329",
+   "claimed": 70113.54405661329,
+   "recomputed": 70113.54405661329,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=2 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "0.9580397534717296",
+   "claimed": 0.9580397534717296,
+   "recomputed": 0.9580397534717296,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=2 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "24.876544159086606",
+   "claimed": 24.876544159086606,
+   "recomputed": 24.876544159086606,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=1 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "2.6655190236464006",
+   "claimed": 2.6655190236464006,
+   "recomputed": 2.6655190236464006,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=1 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "830566.8561936531",
+   "claimed": 830566.8561936531,
+   "recomputed": 830566.8561936531,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=1 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "265216.8461257697",
+   "claimed": 265216.8461257697,
+   "recomputed": 265216.8461257697,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=1 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.0885126182479277",
+   "claimed": 1.0885126182479277,
+   "recomputed": 1.0885126182479277,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=149 seed=1 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "24.876622843008242",
+   "claimed": 24.876622843008242,
+   "recomputed": 24.876622843008242,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=2 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.6928780781557526",
+   "claimed": 1.6928780781557526,
+   "recomputed": 1.6928780781557526,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=2 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "39650.638733721236",
+   "claimed": 39650.638733721236,
+   "recomputed": 39650.638733721236,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=2 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "26233.4055238699",
+   "claimed": 26233.4055238699,
+   "recomputed": 26233.4055238699,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=2 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.6238050471876642",
+   "claimed": 1.6238050471876642,
+   "recomputed": 1.6238050471876642,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=2 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "26.488133311560034",
+   "claimed": 26.488133311560034,
+   "recomputed": 26.488133311560034,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=1 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.3494385163288045",
+   "claimed": 1.3494385163288045,
+   "recomputed": 1.3494385163288045,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=1 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "77119.90942615947",
+   "claimed": 77119.90942615947,
+   "recomputed": 77119.90942615947,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=1 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "61087.94880759373",
+   "claimed": 61087.94880759373,
+   "recomputed": 61087.94880759373,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=1 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.523663824715805",
+   "claimed": 1.523663824715805,
+   "recomputed": 1.523663824715805,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=197 seed=1 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "26.488137357833217",
+   "claimed": 26.488137357833217,
+   "recomputed": 26.488137357833217,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=2 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "2.0231381089709637",
+   "claimed": 2.0231381089709637,
+   "recomputed": 2.0231381089709637,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=2 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "22441.042350836575",
+   "claimed": 22441.042350836575,
+   "recomputed": 22441.042350836575,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=2 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "15620.10374446329",
+   "claimed": 15620.10374446329,
+   "recomputed": 15620.10374446329,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=2 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "2.0843691272955063",
+   "claimed": 2.0843691272955063,
+   "recomputed": 2.0843691272955063,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=2 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "28.285813282616946",
+   "claimed": 28.285813282616946,
+   "recomputed": 28.285813282616946,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=1 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.7366814371149382",
+   "claimed": 1.7366814371149382,
+   "recomputed": 1.7366814371149382,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=1 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "74521.43332109599",
+   "claimed": 74521.43332109599,
+   "recomputed": 74521.43332109599,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=1 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "48420.937595454496",
+   "claimed": 48420.937595454496,
+   "recomputed": 48420.937595454496,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=1 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.6097015949348892",
+   "claimed": 1.6097015949348892,
+   "recomputed": 1.6097015949348892,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=269 seed=1 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "28.28583179843023",
+   "claimed": 28.28583179843023,
+   "recomputed": 28.28583179843023,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=1 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.7233532184833138",
+   "claimed": 1.7233532184833138,
+   "recomputed": 1.7233532184833138,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=1 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "19920.554874526875",
+   "claimed": 19920.554874526875,
+   "recomputed": 19920.554874526875,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=1 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "11319.010623352826",
+   "claimed": 11319.010623352826,
+   "recomputed": 11319.010623352826,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=1 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.3590572905499139",
+   "claimed": 1.3590572905499139,
+   "recomputed": 1.3590572905499139,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=1 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "30.531966407371566",
+   "claimed": 30.531966407371566,
+   "recomputed": 30.531966407371566,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=2 s_a_over_s_b",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "2.323962676638241",
+   "claimed": 2.323962676638241,
+   "recomputed": 2.323962676638241,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=2 s_a_over_rho_negation",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "33754.50399554483",
+   "claimed": 33754.50399554483,
+   "recomputed": 33754.50399554483,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=2 s_b_over_rho_psi",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "17102.194124578877",
+   "claimed": 17102.194124578877,
+   "recomputed": 17102.194124578877,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=2 negation_over_psi_steps",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "1.6653207821095501",
+   "claimed": 1.6653207821095501,
+   "recomputed": 1.6653207821095501,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  },
+  {
+   "name": "summary p=397 seed=2 log2_n",
+   "source": "research/glv_gls_v4_20261018/summary.json",
+   "printed": "30.531966407371566",
+   "claimed": 30.531966407371566,
+   "recomputed": 30.531966407371566,
+   "rel_tol": 1e-09,
+   "agrees": true,
+   "definition": "exact",
+   "class": "headline"
+  }
+ ],
+ "bounds": [],
+ "explanatory": [
+  {
+   "name": "Stage A eligible orbits of 8 at p <= 113, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "3",
+   "claimed": 3.0,
+   "recomputed": 3.0,
+   "rel_tol": 0.16666666666683333,
+   "agrees": true,
+   "definition": "min over the p <= 113 curves of eligible / 8: the sentence 'where a base is 3-13 orbits of 8 points that lift together' read as the candidate line holding 3-13 orbits (the literal reading, base_points / 8, gives 0-9 and does not match)",
+   "class": "explanatory"
+  },
+  {
+   "name": "Stage A eligible orbits of 8 at p <= 113, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 Stage A",
+   "printed": "13",
+   "claimed": 13.0,
+   "recomputed": 13.0,
+   "rel_tol": 0.038461538461576926,
+   "agrees": true,
+   "definition": "max over the p <= 113 curves of eligible / 8",
+   "class": "explanatory"
+  },
+  {
+   "name": "G2.36 <±psi> walk F_p mults at p=101 seed 1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+   "printed": "5.1e5",
+   "claimed": 510000.0,
+   "recomputed": 514284.875,
+   "rel_tol": 0.00972223808838438,
+   "agrees": true,
+   "definition": "mean of 16 <±psi> walks; printed '5.1 against 4.4e5'",
+   "class": "explanatory"
+  },
+  {
+   "name": "G2.36 negation walk F_p mults at p=101 seed 1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+   "printed": "4.4e5",
+   "claimed": 440000.0,
+   "recomputed": 441946.25,
+   "rel_tol": 0.011313592999159966,
+   "agrees": true,
+   "definition": "mean of 16 negation walks",
+   "class": "explanatory"
+  },
+  {
+   "name": "G2.36 <±psi> walk steps below n ~ 2^25, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19 (supersedes research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36)",
+   "printed": "4057",
+   "claimed": 4057.0,
+   "recomputed": 4056.625,
+   "rel_tol": 0.00012324377618942568,
+   "agrees": true,
+   "definition": "max over the curves below n = 2^25 (p = 101 and 149) of the mean <±psi> walk steps; the remark 'below n ~ 2^25 a walk is <= 3,000 steps' (it holds at p = 101: 2,007 and 1,192; at p = 149, n = 2^24.9, the means are 4,057 and 3,965)",
+   "superseded": {
+    "printed": "3000",
+    "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.16 G2.36",
+    "bound": "le",
+    "agrees_with_raw_data": false,
+    "superseded_by": "additive erratum, note §9.19 (2026-10-21); the earlier text is left as written and §9.19 is the record"
+   },
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: <±psi> walk mean steps p=149 seed=1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "4057",
+   "claimed": 4057.0,
+   "recomputed": 4056.625,
+   "rel_tol": 0.00012324377618942568,
+   "agrees": true,
+   "definition": "mean steps of the 16 <±psi> walks",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: <±psi> walk mean steps p=149 seed=2",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "3965",
+   "claimed": 3965.0,
+   "recomputed": 3965.0625,
+   "rel_tol": 0.00012610141706480038,
+   "agrees": true,
+   "definition": "mean steps of the 16 <±psi> walks",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: <±psi> walk mean steps p=101 seed=1",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "2007",
+   "claimed": 2007.0,
+   "recomputed": 2007.1875,
+   "rel_tol": 0.0002491047796982096,
+   "agrees": true,
+   "definition": "mean steps of the 16 <±psi> walks",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: <±psi> walk mean steps p=101 seed=2",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "1192",
+   "claimed": 1192.0,
+   "recomputed": 1192.4375,
+   "rel_tol": 0.0004193091881130039,
+   "agrees": true,
+   "definition": "mean steps of the 16 <±psi> walks",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: log2 n at p=149",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "24.9",
+   "claimed": 24.9,
+   "recomputed": 24.876622843008242,
+   "rel_tol": 0.002008032128516065,
+   "agrees": true,
+   "definition": "bits of the p = 149 curves",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: log2 n at p=101",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "22.6",
+   "claimed": 22.6,
+   "recomputed": 22.632866768472404,
+   "rel_tol": 0.0022091766152089946,
+   "agrees": true,
+   "definition": "bits of the p = 101 curves",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: <±psi> walk F_p mults per step at p=397, least",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "152",
+   "claimed": 152.0,
+   "recomputed": 152.41248834271514,
+   "rel_tol": 0.0032805710702406396,
+   "agrees": true,
+   "definition": "min over the two p = 397 curves of mean fp_muls / mean steps (set-up included)",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: <±psi> walk F_p mults per step at p=397, most",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "154",
+   "claimed": 154.0,
+   "recomputed": 154.04024243413667,
+   "rel_tol": 0.003245905044678738,
+   "agrees": true,
+   "definition": "max over the two p = 397 curves",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: negation walk F_p mults per step at p=397",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "109",
+   "claimed": 109.0,
+   "recomputed": 109.36504076124987,
+   "rel_tol": 0.004571844864868917,
+   "agrees": true,
+   "definition": "mean over the two p = 397 curves (109.8 and 108.9 individually)",
+   "class": "explanatory"
+  },
+  {
+   "name": "§9.19: improvement above 2.0 at p <= 149 (verdict unchanged)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.19",
+   "printed": "4",
+   "claimed": 4.0,
+   "recomputed": 4,
+   "rel_tol": 0.125000000000125,
+   "agrees": true,
+   "definition": "count of four",
+   "class": "explanatory"
+  }
+ ],
+ "checks": {
+  "every record: folded.solved and folded.correct (log equals planted d), both arms": true,
+  "every walk correct": true,
+  "check_failures = 0, rows_readd_failures = 0, off_base = 0 on every record": true,
+  "rows_readded = folded.relations on every record": true,
+  "both arms of a curve share the instance (n, #E, h, base points)": true,
+  "both arms of a curve ran identical walks (same seeds and trajectories)": true,
+  "matched_fold = Gls on every record": true,
+  "rho_matched_muls = mean fp_muls of the 16 Gls walks on every record": true,
+  "rho_negation_muls = mean fp_muls of the 16 negation walks on every record": true,
+  "ratio = total_muls / rho_matched_muls on every record": true,
+  "total_muls = sum of the charged phases on every record": true,
+  "la_fp_muls = 16 * folded.la_ops on every record": true,
+  "rho (<±psi> walk) below the index calculus on every record of both arms at 0, 0.1 and 1 GAE": true,
+  "rho (negation walk) below the index calculus on every record of both arms at 0, 0.1 and 1 GAE": true,
+  "arm B below arm A on every curve at 0, 0.1 and 1 GAE": true,
+  "improvement > 1 on every curve at 0, 0.1 and 1 GAE": true,
+  "Stage A: points in both arms identical (no error rows)": true,
+  "Stage A: distinct column logs = columns under <V4, psi> wherever computed": true,
+  "Stage A: the curves without a base are at p = 41": true,
+  "the two G2.35 outside curves are the two G2.34 outside curves": true
+ },
+ "disagreements": [],
+ "rho_reference_assessment": {
+  "kind": "negation_frobenius",
+  "protocol": "note section 9.15 (registered before code): on each GLS curve the matched walk is the <+-psi> walk, psi the GLS endomorphism (the twisted p^2-power Frobenius, psi^2 = -1), with 16 <+-psi>, 16 negation and 16 unfolded walks per curve; S_B / rho = total_muls / mean fp_muls of the 16 <+-psi> walks (set-up and class representatives included); the improvement compares arm A against the negation walk with arm B against the <+-psi> walk.",
+  "matches_protocol": "every record carries 16 Gls, 16 negation and 16 unfolded walks, all correct, matched_fold = Gls; rho_matched_muls equals the mean of the Gls walks' fp_muls; both arms of a curve ran identical walks (checks above).",
+  "strongest_available": "on all 10 curves j(E) is in F_{p^2} but not in F_p (independent Python check: j^(p^2) = j, j^p != j), so the only Frobenius-type endomorphism over F_{p^4} is psi from the p^2-power map (verified independently: psi^2(G) = -G, psi(G) = [lambda]G, lambda^2 = -1 mod n); Aut(E) = {+-1} (j != 0, 1728); <+-psi> (classes of 4) is the largest fold, no order-8 fold from a p-power map exists. <+-psi> walks take 0.47-0.79 sqrt(n) steps (16-walk means over the 10 curves; 0.54-0.61 at p = 397), against sqrt(pi n / 8) = 0.627 sqrt(n).",
+  "same_unit_and_process": "one process per (p, seed) runs arm A, arm B and inside each arm's run the 16 + 16 + 16 walks (rho4_folded) on the same instance with the same Fp4/Curve4 counters.",
+  "unpriced_native_work": "Read from src/cryptanalysis/quartic_folds.rs, klein_v4.rs, d4_weighted_s5.rs and gaudry_quartic.rs: the index calculus charges F_p multiplications only (the Fp4 counter: an F_{p^4} multiplication 19, an inversion 40; the solve's F_p multiplications counted directly; the matrix at 16 per mod-n multiplication). Unpriced on the index calculus: the Macaulay matrices' entry traffic and additions (emitted: macaulay_entries, rows x cols at each call's last degree), the solve's F_p inversions (inv_mod per pivot or eigenvector; count not emitted, at most one per pivot row, far fewer than the entries), hash and table work in the lift-back, F_p additions. Unpriced on the walks: per step the hash-table lookup and insert, the partition hashes (two with the look-ahead) and the class comparisons, F_p additions (emitted: steps). The protocol's band prices one GAE per Macaulay entry and one per walk step, GAE = the curve's measured F_p multiplications per affine addition (fp_muls_per_add = 97.0 on every record). Native work is unpriced on both arms, so the 0, 0.1 and 1 GAE values differ.",
+  "limitations": [
+   "16 walks per curve and fold: about 13 % sampling error on each walk mean; the per-curve improvement, a ratio of two walk means and two IC totals, carries it twice.",
+   "The <+-psi> walk applies psi to both coordinates on every step (152-154 F_p multiplications a step at p = 397, against 109 for the negation walk); comparing psi(x) first and mapping y only when needed would save an estimated 6 % (not measured). S_B / rho and the improvement are favourable to the index calculus by about that much.",
+   "Below n ~ 2^25 the walks' set-up dominates and the <+-psi> walk costs more F_p multiplications than the negation walk, which inflates the improvement at p <= 149; the README row quotes the improvement at p >= 197 only.",
+   "The two arms share one seeded RNG for target draws and Wiedemann; the target streams coincide until arm B's first Wiedemann attempt and then diverge, so the comparison is paired on a prefix of each stream only (code reading of collect_and_solve and Arm::attempt). This adds noise to S_A / S_B per curve, not a bias.",
+   "The handovers (2^93.2, 2^88.0) are section 11.16's model extrapolated with theory exponents from measured constants, not measured crossings."
+  ]
+ },
+ "preregistration": {
+  "E25 (G2.32-G2.37, note section 9.15)": "registered in 40b2973f4 (2026-10-18 06:23 UTC) before the E25 code and Stage A 46202dc97 (07:03 UTC); the bands in the committed note equal those at 40b2973f4",
+  "how": "git log -S on the note for the prediction ids and git show 40b2973f4 of the note, read by the validator on 2026-10-21"
+ },
+ "gae_band_rows": [
+  {
+   "p": 101,
+   "seed": 2,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 2665742016,
+   "rho_psi_steps_mean": 1192.4375,
+   "rho_negation_steps_mean": 1772.75,
+   "ic": {
+    "0": 24712296642.0,
+    "0.1": 50569994197.200005,
+    "1": 283289272194.0
+   },
+   "rho_psi": {
+    "0": 399050.4375,
+    "0.1": 410617.08125,
+    "1": 514716.875
+   },
+   "rho_negation": {
+    "0": 410363.4375,
+    "0.1": 427559.1125,
+    "1": 582320.1875
+   },
+   "s_over_rho_psi": {
+    "0": 61927.75228319353,
+    "0.1": 123156.08995917777,
+    "1": 550378.8314575853
+   }
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 1262331840,
+   "rho_psi_steps_mean": 1192.4375,
+   "rho_negation_steps_mean": 1772.75,
+   "ic": {
+    "0": 11695092130.0,
+    "0.1": 23939710978.0,
+    "1": 134141280610.0
+   },
+   "rho_psi": {
+    "0": 399050.4375,
+    "0.1": 410617.08125,
+    "1": 514716.875
+   },
+   "rho_negation": {
+    "0": 410363.4375,
+    "0.1": 427559.1125,
+    "1": 582320.1875
+   },
+   "s_over_rho_psi": {
+    "0": 29307.303115035425,
+    "0.1": 58301.79033254721,
+    "1": 260611.7792621429
+   }
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 7293380864,
+   "rho_psi_steps_mean": 2007.1875,
+   "rho_negation_steps_mean": 2064.0,
+   "ic": {
+    "0": 67608592257.0,
+    "0.1": 138354386637.8,
+    "1": 775066536065.0
+   },
+   "rho_psi": {
+    "0": 514284.875,
+    "0.1": 533754.59375,
+    "1": 708982.0625
+   },
+   "rho_negation": {
+    "0": 441946.25,
+    "0.1": 461967.05,
+    "1": 642154.25
+   },
+   "s_over_rho_psi": {
+    "0": 131461.3661484795,
+    "0.1": 259209.7346942974,
+    "1": 1093210.360403159
+   }
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 3758803328,
+   "rho_psi_steps_mean": 2007.1875,
+   "rho_negation_steps_mean": 2064.0,
+   "ic": {
+    "0": 34825654827.0,
+    "0.1": 71286047108.6,
+    "1": 399429577643.0
+   },
+   "rho_psi": {
+    "0": 514284.875,
+    "0.1": 533754.59375,
+    "1": 708982.0625
+   },
+   "rho_negation": {
+    "0": 441946.25,
+    "0.1": 461967.05,
+    "1": 642154.25
+   },
+   "s_over_rho_psi": {
+    "0": 67716.66156232964,
+    "0.1": 133555.84746871324,
+    "1": 563384.6027564344
+   }
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 10734873408,
+   "rho_psi_steps_mean": 3965.0625,
+   "rho_negation_steps_mean": 3798.6875,
+   "ic": {
+    "0": 100505737317.0,
+    "0.1": 204634009374.6,
+    "1": 1141788457893.0
+   },
+   "rho_psi": {
+    "0": 808767.625,
+    "0.1": 847228.73125,
+    "1": 1193378.6875
+   },
+   "rho_negation": {
+    "0": 636397.3125,
+    "0.1": 673244.58125,
+    "1": 1004870.0
+   },
+   "s_over_rho_psi": {
+    "0": 124270.22819688164,
+    "0.1": 241533.36853045967,
+    "1": 956769.6070431122
+   }
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 6056718528,
+   "rho_psi_steps_mean": 3965.0625,
+   "rho_negation_steps_mean": 3798.6875,
+   "ic": {
+    "0": 56705564507.0,
+    "0.1": 115455734228.6,
+    "1": 644207261723.0
+   },
+   "rho_psi": {
+    "0": 808767.625,
+    "0.1": 847228.73125,
+    "1": 1193378.6875
+   },
+   "rho_negation": {
+    "0": 636397.3125,
+    "0.1": 673244.58125,
+    "1": 1004870.0
+   },
+   "s_over_rho_psi": {
+    "0": 70113.54405661329,
+    "0.1": 136274.5737603313,
+    "1": 539817.9710017656
+   }
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 62367443712,
+   "rho_psi_steps_mean": 4056.625,
+   "rho_negation_steps_mean": 4415.6875,
+   "ic": {
+    "0": 582509291729.0,
+    "0.1": 1187473495735.4,
+    "1": 6632151331793.0
+   },
+   "rho_psi": {
+    "0": 823986.25,
+    "0.1": 863335.5125,
+    "1": 1217478.875
+   },
+   "rho_negation": {
+    "0": 701339.4375,
+    "0.1": 744171.60625,
+    "1": 1129661.125
+   },
+   "s_over_rho_psi": {
+    "0": 706940.5487397392,
+    "0.1": 1375448.4537497812,
+    "1": 5447446.742591735
+   }
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 23388758400,
+   "rho_psi_steps_mean": 4056.625,
+   "rho_negation_steps_mean": 4415.6875,
+   "ic": {
+    "0": 218535034476.0,
+    "0.1": 445405990956.0,
+    "1": 2487244599276.0
+   },
+   "rho_psi": {
+    "0": 823986.25,
+    "0.1": 863335.5125,
+    "1": 1217478.875
+   },
+   "rho_negation": {
+    "0": 701339.4375,
+    "0.1": 744171.60625,
+    "1": 1129661.125
+   },
+   "s_over_rho_psi": {
+    "0": 265216.8461257697,
+    "0.1": 515912.97300654015,
+    "1": 2042946.822609961
+   }
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 4641366912,
+   "rho_psi_steps_mean": 5119.1875,
+   "rho_negation_steps_mean": 8312.5625,
+   "ic": {
+    "0": 43878678034.0,
+    "0.1": 88899937080.4,
+    "1": 494091268498.0
+   },
+   "rho_psi": {
+    "0": 988036.9375,
+    "0.1": 1037693.05625,
+    "1": 1484598.125
+   },
+   "rho_negation": {
+    "0": 1106632.3125,
+    "0.1": 1187264.16875,
+    "1": 1912950.875
+   },
+   "s_over_rho_psi": {
+    "0": 44409.95712672939,
+    "0.1": 85670.74487485277,
+    "1": 332811.45932876616
+   }
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 2741934720,
+   "rho_psi_steps_mean": 5119.1875,
+   "rho_negation_steps_mean": 8312.5625,
+   "ic": {
+    "0": 25919573654.0,
+    "0.1": 52516340438.0,
+    "1": 291887241494.0
+   },
+   "rho_psi": {
+    "0": 988036.9375,
+    "0.1": 1037693.05625,
+    "1": 1484598.125
+   },
+   "rho_negation": {
+    "0": 1106632.3125,
+    "0.1": 1187264.16875,
+    "1": 1912950.875
+   },
+   "s_over_rho_psi": {
+    "0": 26233.4055238699,
+    "0.1": 50608.742268915994,
+    "1": 196610.27222030205
+   }
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 9028071360,
+   "rho_psi_steps_mean": 5454.0,
+   "rho_negation_steps_mean": 8310.0625,
+   "ic": {
+    "0": 85316189300.0,
+    "0.1": 172888481492.0,
+    "1": 961039111220.0
+   },
+   "rho_psi": {
+    "0": 1034958.1875,
+    "0.1": 1087861.9875,
+    "1": 1563996.1875
+   },
+   "rho_negation": {
+    "0": 1106279.6875,
+    "0.1": 1186887.29375,
+    "1": 1912355.75
+   },
+   "s_over_rho_psi": {
+    "0": 82434.43100448925,
+    "0.1": 158925.01390669282,
+    "1": 614476.6329361657
+   }
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 6688389120,
+   "rho_psi_steps_mean": 5454.0,
+   "rho_negation_steps_mean": 8310.0625,
+   "ic": {
+    "0": 63223472776.0,
+    "0.1": 128100847240.0,
+    "1": 711997217416.0
+   },
+   "rho_psi": {
+    "0": 1034958.1875,
+    "0.1": 1087861.9875,
+    "1": 1563996.1875
+   },
+   "rho_negation": {
+    "0": 1106279.6875,
+    "0.1": 1186887.29375,
+    "1": 1912355.75
+   },
+   "s_over_rho_psi": {
+    "0": 61087.94880759373,
+    "0.1": 117754.68645097777,
+    "1": 455242.29733200674
+   }
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 5388954816,
+   "rho_psi_steps_mean": 9478.4375,
+   "rho_negation_steps_mean": 19756.5625,
+   "ic": {
+    "0": 50987187104.0,
+    "0.1": 103260048819.20001,
+    "1": 573715804256.0
+   },
+   "rho_psi": {
+    "0": 1613435.5,
+    "0.1": 1705376.34375,
+    "1": 2532843.9375
+   },
+   "rho_negation": {
+    "0": 2272050.75,
+    "0.1": 2463689.40625,
+    "1": 4188437.3125
+   },
+   "s_over_rho_psi": {
+    "0": 31601.627151503733,
+    "0.1": 60549.713380061665,
+    "1": 226510.52272185247
+   }
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 2663066112,
+   "rho_psi_steps_mean": 9478.4375,
+   "rho_negation_steps_mean": 19756.5625,
+   "ic": {
+    "0": 25202029895.0,
+    "0.1": 51033771181.4,
+    "1": 283519442759.0
+   },
+   "rho_psi": {
+    "0": 1613435.5,
+    "0.1": 1705376.34375,
+    "1": 2532843.9375
+   },
+   "rho_negation": {
+    "0": 2272050.75,
+    "0.1": 2463689.40625,
+    "1": 4188437.3125
+   },
+   "s_over_rho_psi": {
+    "0": 15620.10374446329,
+    "0.1": 29925.225225758913,
+    "1": 111937.19382444186
+   }
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 14485808064,
+   "rho_psi_steps_mean": 9565.4375,
+   "rho_negation_steps_mean": 15397.5,
+   "ic": {
+    "0": 136903497485.0,
+    "0.1": 277415835705.80005,
+    "1": 1542026879693.0
+   },
+   "rho_psi": {
+    "0": 1628025.4375,
+    "0.1": 1720810.18125,
+    "1": 2555872.875
+   },
+   "rho_negation": {
+    "0": 1837102.3125,
+    "0.1": 1986458.0625,
+    "1": 3330659.8125
+   },
+   "s_over_rho_psi": {
+    "0": 84091.74348972665,
+    "0.1": 161212.33982023783,
+    "1": 603326.9083044672
+   }
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 8340360000,
+   "rho_psi_steps_mean": 9565.4375,
+   "rho_negation_steps_mean": 15397.5,
+   "ic": {
+    "0": 78830518113.0,
+    "0.1": 159732010113.0,
+    "1": 887845438113.0
+   },
+   "rho_psi": {
+    "0": 1628025.4375,
+    "0.1": 1720810.18125,
+    "1": 2555872.875
+   },
+   "rho_negation": {
+    "0": 1837102.3125,
+    "0.1": 1986458.0625,
+    "1": 3330659.8125
+   },
+   "s_over_rho_psi": {
+    "0": 48420.937595454496,
+    "0.1": 92823.72446039943,
+    "1": 347374.6471498509
+   }
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 7534168320,
+   "rho_psi_steps_mean": 24193.5625,
+   "rho_negation_steps_mean": 32880.4375,
+   "ic": {
+    "0": 71928854428.0,
+    "0.1": 145010287132.0,
+    "1": 802743181468.0
+   },
+   "rho_psi": {
+    "0": 3687401.0625,
+    "0.1": 3922078.61875,
+    "1": 6034176.625
+   },
+   "rho_negation": {
+    "0": 3610785.6875,
+    "0.1": 3929725.93125,
+    "1": 6800188.125
+   },
+   "s_over_rho_psi": {
+    "0": 19506.653387801915,
+    "0.1": 36972.81498610449,
+    "1": 133032.76177601115
+   }
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 4373511744,
+   "rho_psi_steps_mean": 24193.5625,
+   "rho_negation_steps_mean": 32880.4375,
+   "ic": {
+    "0": 41737731799.0,
+    "0.1": 84160795715.8,
+    "1": 465968370967.0
+   },
+   "rho_psi": {
+    "0": 3687401.0625,
+    "0.1": 3922078.61875,
+    "1": 6034176.625
+   },
+   "rho_negation": {
+    "0": 3610785.6875,
+    "0.1": 3929725.93125,
+    "1": 6800188.125
+   },
+   "s_over_rho_psi": {
+    "0": 11319.010623352826,
+    "0.1": 21458.212314627894,
+    "1": 77221.53326378642
+   }
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "arm": "A",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 13833328320,
+   "rho_psi_steps_mean": 21438.8125,
+   "rho_negation_steps_mean": 35702.5,
+   "ic": {
+    "0": 131255013245.0,
+    "0.1": 265438297949.0,
+    "1": 1473087860285.0
+   },
+   "rho_psi": {
+    "0": 3302439.875,
+    "0.1": 3510396.35625,
+    "1": 5382004.6875
+   },
+   "rho_negation": {
+    "0": 3888518.5,
+    "0.1": 4234832.75,
+    "1": 7351661.0
+   },
+   "s_over_rho_psi": {
+    "0": 39744.86083414312,
+    "0.1": 75614.90812181559,
+    "1": 273706.16449040396
+   }
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "arm": "B",
+   "gae_fp_muls": 97.0,
+   "macaulay_entries": 5951597568,
+   "rho_psi_steps_mean": 21438.8125,
+   "rho_negation_steps_mean": 35702.5,
+   "ic": {
+    "0": 56478967827.0,
+    "0.1": 114209464236.6,
+    "1": 633783931923.0
+   },
+   "rho_psi": {
+    "0": 3302439.875,
+    "0.1": 3510396.35625,
+    "1": 5382004.6875
+   },
+   "rho_negation": {
+    "0": 3888518.5,
+    "0.1": 4234832.75,
+    "1": 7351661.0
+   },
+   "s_over_rho_psi": {
+    "0": 17102.194124578877,
+    "0.1": 32534.6350229821,
+    "1": 117759.82532958357
+   }
+  }
+ ],
+ "gae_band_arms": [
+  {
+   "p": 101,
+   "seed": 2,
+   "s_a_over_s_b": {
+    "0": 2.1130484794222824,
+    "0.1": 2.112389503936475,
+    "1": 2.1118724296186664
+   },
+   "improvement": {
+    "0": 2.0547954401326787,
+    "0.1": 2.0286860628412655,
+    "1": 1.8666987693466792
+   }
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "s_a_over_s_b": {
+    "0": 1.9413444655341756,
+    "0.1": 1.9408340376487057,
+    "1": 1.940433506798875
+   },
+   "improvement": {
+    "0": 2.2591075176883733,
+    "0.1": 2.2424306740088,
+    "1": 2.1423708552802916
+   }
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "s_a_over_s_b": {
+    "0": 1.7724140159929649,
+    "0.1": 1.7724023041543249,
+    "1": 1.7723930258705356
+   },
+   "improvement": {
+    "0": 2.2524782020215435,
+    "0.1": 2.2304377892283926,
+    "1": 2.1048852716744784
+   }
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "s_a_over_s_b": {
+    "0": 2.6655190236464006,
+    "0.1": 2.66604742604979,
+    "1": 2.6664652659105266
+   },
+   "improvement": {
+    "0": 3.1316519607498314,
+    "0.1": 3.092960550479215,
+    "1": 2.873751304991861
+   }
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "s_a_over_s_b": {
+    "0": 1.6928780781557526,
+    "0.1": 1.6928052552586736,
+    "1": 1.6927470552293957
+   },
+   "improvement": {
+    "0": 1.5114560211270676,
+    "0.1": 1.479546258702364,
+    "1": 1.3137028959475148
+   }
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "s_a_over_s_b": {
+    "0": 1.3494385163288045,
+    "0.1": 1.3496279315630855,
+    "1": 1.3497793077167208
+   },
+   "improvement": {
+    "0": 1.262440643883149,
+    "0.1": 1.2370247215107424,
+    "1": 1.1039000935026553
+   }
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "s_a_over_s_b": {
+    "0": 2.0231381089709637,
+    "0.1": 2.023367006372334,
+    "1": 2.023550126485243
+   },
+   "improvement": {
+    "0": 1.4366769080385295,
+    "0.1": 1.4005832953772452,
+    "1": 1.2236870908392057
+   }
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "s_a_over_s_b": {
+    "0": 1.7366814371149382,
+    "0.1": 1.7367579329249434,
+    "1": 1.736819060500415
+   },
+   "improvement": {
+    "0": 1.5390332575487276,
+    "0.1": 1.504502304761819,
+    "1": 1.3327955946914933
+   }
+  },
+  {
+   "p": 397,
+   "seed": 1,
+   "s_a_over_s_b": {
+    "0": 1.7233532184833138,
+    "0.1": 1.7230146875236394,
+    "1": 1.7227417813833774
+   },
+   "improvement": {
+    "0": 1.7599201500374746,
+    "0.1": 1.7196616720746989,
+    "1": 1.5286824418750087
+   }
+  },
+  {
+   "p": 397,
+   "seed": 2,
+   "s_a_over_s_b": {
+    "0": 2.323962676638241,
+    "0.1": 2.3241357423681586,
+    "1": 2.324274545451823
+   },
+   "improvement": {
+    "0": 1.973694354634511,
+    "0.1": 1.9265548660545266,
+    "1": 1.7015551313721677
+   }
+  }
+ ],
+ "gae_band_summary": {
+  "what": "median over the 10 curves of arm B's S_IC(g) and of the matched <±psi> walk's S_rho(g), F_p multiplications, g GAE per unpriced native operation",
+  "values": {
+   "0": {
+    "ic": 49108349813.0,
+    "rho": 1011497.5625
+   },
+   "0.1": {
+    "ic": 99185129976.20001,
+    "rho": 1062777.521875
+   },
+   "1": {
+    "ic": 549876151445.0,
+    "rho": 1524297.15625
+   }
+  }
+ }
+}
