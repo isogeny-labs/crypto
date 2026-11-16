@@ -8561,6 +8561,9 @@ pub struct PairTable {
     /// Opt-in cache-line representation.  All other representations are
     /// empty when this is present.
     lines: Option<PairLineIndex>,
+    /// Opt-in direct index for binary keys `x + 1`. A zero word is absent;
+    /// the high word stores `i + 1`, the low word `j`.
+    dense: Option<Vec<u64>>,
     /// `full` (every `i ≤ j`) or `negation_folded` (one pair per orbit
     /// under negation).
     pub kind: &'static str,
@@ -8601,6 +8604,10 @@ impl PairTable {
         if self.filter_bit_sets > 0 {
             out.insert("table_filter_bit_sets".to_string(), self.filter_bit_sets);
         }
+        if let Some(dense) = &self.dense {
+            out.insert("table_dense_zero_words".to_string(), dense.len() as u64);
+            out.insert("table_dense_witness_writes".to_string(), self.entries);
+        }
         out
     }
 
@@ -8628,6 +8635,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8675,6 +8683,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
@@ -8749,6 +8758,52 @@ impl PairTable {
         Ok(Self::build_negation_folded_binary_batch_inner(
             g, fb, true, true,
         ))
+    }
+
+    /// Convert the torsion-harvest binary table to direct abscissa lookup.
+    /// The builder has already fixed the first witness and collision stream;
+    /// this changes only storage and probe lookup. It deliberately keeps the
+    /// hash build cost and charges the conversion to `build_wall_ns`.
+    pub fn into_binary_dense(mut self, n: u32) -> Result<Self, String> {
+        if self.kind != "negation_folded_binary_batch_torsion" {
+            return Err("dense conversion requires the binary torsion-harvest table".into());
+        }
+        if !(1..=23).contains(&n) {
+            return Err(format!(
+                "dense binary pair table requires n=1..=23, got {n}"
+            ));
+        }
+        let len = (1usize << n) + 1;
+        let bytes = len * std::mem::size_of::<u64>();
+        if bytes > 128 * 1024 * 1024 {
+            return Err("dense binary pair table exceeds 128 MiB".into());
+        }
+        let started = Instant::now();
+        let mut dense = vec![0u64; len];
+        let map = std::mem::replace(&mut self.map, fast_map(0));
+        for (key, (i, j)) in map {
+            let at = usize::try_from(key).map_err(|_| "dense binary key is too wide")?;
+            if at == 0 || at >= len || i == u32::MAX {
+                return Err("dense binary table has an invalid key or witness".into());
+            }
+            let witness = ((u64::from(i) + 1) << 32) | u64::from(j);
+            if dense[at] != 0 {
+                return Err("dense binary table has a duplicate first key".into());
+            }
+            dense[at] = witness;
+        }
+        self.dense = Some(dense);
+        self.kind = "negation_folded_binary_batch_torsion_dense";
+        self.build_wall_ns = self
+            .build_wall_ns
+            .saturating_add(started.elapsed().as_nanos() as u64);
+        Ok(self)
+    }
+
+    pub fn dense_bytes(&self) -> Option<u64> {
+        self.dense
+            .as_ref()
+            .map(|dense| (dense.len() * std::mem::size_of::<u64>()) as u64)
     }
 
     fn build_negation_folded_binary_batch_inner(
@@ -8897,6 +8952,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8941,6 +8997,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: Some(lines),
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8974,6 +9031,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
@@ -9006,6 +9064,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: Some(lines),
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -9070,6 +9129,7 @@ impl PairTable {
                 part_shift: 0,
                 packed: Some(packed),
                 lines: None,
+                dense: None,
                 build_ops: ops,
                 build_wall_ns: start.elapsed().as_nanos() as u64,
                 insert_attempts,
@@ -9147,6 +9207,7 @@ impl PairTable {
             part_shift,
             packed: None,
             lines: None,
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -9157,7 +9218,14 @@ impl PairTable {
 
     /// The witness stored under a key, in whichever layout the table has.
     fn get(&self, key: u64) -> Option<(u32, u32)> {
-        if let Some(lines) = &self.lines {
+        if let Some(dense) = &self.dense {
+            let witness = *dense.get(usize::try_from(key).ok()?)?;
+            if witness == 0 {
+                None
+            } else {
+                Some(((witness >> 32) as u32 - 1, witness as u32))
+            }
+        } else if let Some(lines) = &self.lines {
             lines.get(key)
         } else if let Some(packed) = &self.packed {
             packed.get(key)
@@ -9196,7 +9264,11 @@ impl PairTable {
     /// `build_negation_folded`); `None` for the blocked, packed and line
     /// layouts.  `rootfind-subtract-gpu` (`m = 3`) probes this set on the device.
     pub(crate) fn map_abscissae(&self) -> Option<Vec<u64>> {
-        if !self.parts.is_empty() || self.packed.is_some() || self.lines.is_some() {
+        if !self.parts.is_empty()
+            || self.packed.is_some()
+            || self.lines.is_some()
+            || self.dense.is_some()
+        {
             return None;
         }
         Some(self.map.keys().map(|k| k - 1).collect())
@@ -18990,6 +19062,89 @@ mod tests {
                 )
                 .is_err()
             );
+        }
+    }
+
+    #[test]
+    fn binary_dense_probe_preserves_torsion_first_witness_and_sign() {
+        use crate::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+
+        for (n, dimension) in [(13, 5), (19, 7), (23, 8)] {
+            let inst = koblitz_instance(0, n).unwrap();
+            let frob =
+                build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), dimension)
+                    .unwrap();
+            let fb = koblitz_factor_base(
+                &inst,
+                &frob,
+                ColumnFold::SignedFrobeniusOrbit,
+                format!("d={dimension}"),
+            )
+            .unwrap();
+            let group = BinaryGroup(&inst.fast);
+            let (hash, hash_collisions, _) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            let (candidate, dense_collisions, _) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            let dense = candidate.into_binary_dense(n).unwrap();
+            assert_eq!(hash_collisions, dense_collisions);
+            assert_eq!(dense.entries, hash.entries);
+            assert_eq!(dense.insert_attempts, hash.insert_attempts);
+            assert_eq!(dense.build_ops, hash.build_ops);
+            assert_eq!(dense.dense_bytes(), Some(((1u64 << n) + 1) * 8));
+            let work = dense.work_counters();
+            assert_eq!(work.get("table_dense_zero_words"), Some(&((1u64 << n) + 1)));
+            assert_eq!(work.get("table_dense_witness_writes"), Some(&dense.entries));
+            for (&key, &witness) in &hash.map {
+                assert_eq!(dense.get(key), Some(witness), "n={n} key={key}");
+            }
+            for key in [0, 1, 2, 3, 1u64 << n, (1u64 << n) + 1] {
+                assert_eq!(dense.get(key), hash.get(key), "n={n} key={key}");
+            }
+            if n == 13 {
+                for key in 0..=(1u64 << n) {
+                    assert_eq!(dense.get(key), hash.get(key), "all n=13 keys: {key}");
+                }
+            }
+            let mut keys: Vec<_> = hash.map.keys().copied().collect();
+            keys.sort_unstable();
+            for key in keys.into_iter().step_by(if n == 13 { 1 } else { 37 }) {
+                let (i, j) = hash.get(key).unwrap();
+                let target = group.add(
+                    &mut GroupOps::default(),
+                    fb.points[i as usize],
+                    fb.points[j as usize],
+                );
+                for point in [target, group.neg(target)] {
+                    let mut h_ops = GroupOps::default();
+                    let mut d_ops = GroupOps::default();
+                    let mut h_lookups = 0;
+                    let mut d_lookups = 0;
+                    assert_eq!(
+                        dense.probe(&group, &fb, &mut d_ops, &mut d_lookups, point),
+                        hash.probe(&group, &fb, &mut h_ops, &mut h_lookups, point),
+                        "n={n} key={key}"
+                    );
+                    assert_eq!(d_ops, h_ops);
+                    assert_eq!(d_lookups, h_lookups);
+                }
+            }
+            assert!(PairTable::build_negation_folded(&group, &fb)
+                .into_binary_dense(n)
+                .is_err());
+            if n == 13 {
+                assert!(
+                    PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                        &group, &fb
+                    )
+                    .unwrap()
+                    .0
+                    .into_binary_dense(24)
+                    .is_err()
+                );
+            }
         }
     }
 

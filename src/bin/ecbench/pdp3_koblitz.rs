@@ -637,6 +637,8 @@ pub struct Pdp3KoblitzOracle<'i> {
     torsion_inversion_lanes: u64,
     torsion_inversion_batches: u64,
     torsion_seed_rows: u64,
+    /// Opt-in direct lookup after the torsion table's first witnesses exist.
+    dense_probe: bool,
     /// Reused by the batched `m = 3` scan; all completed additions are charged.
     scan_scratch: BatchScratch,
     scan_addends: Vec<FastPoint>,
@@ -689,6 +691,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             torsion_inversion_lanes: 0,
             torsion_inversion_batches: 0,
             torsion_seed_rows: 0,
+            dense_probe: false,
             scan_scratch: BatchScratch::default(),
             scan_addends: Vec::new(),
             scan_sums: Vec::new(),
@@ -966,6 +969,15 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                  pair sums (m = {}); no Groebner search",
                 self.summands
             ),
+            Some("rootfind-negfold-batch-harvest-torsion") => format!(
+                "torsion-row harvest with {} pair-table lookup (m = {}); no Groebner search",
+                if params.get("layout") == Some("dense") {
+                    "direct-index"
+                } else {
+                    "hash"
+                },
+                self.summands
+            ),
             Some("rootfind-window-negfold") => format!(
                 "root finding with negation-folded PairTable and cyclic third-summand window \
                  of length ⌈|F|/window_div⌉ (div={}); m = {}; no Groebner search",
@@ -1026,6 +1038,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 "under rootfind-window-negfold (default 3): window length ⌈|F|/div⌉; \
                  refused under other engines (rootfind-window stays fixed at div=3)",
             ),
+            (
+                "layout",
+                "optional dense under rootfind-negfold-batch-harvest-torsion only: direct \
+                 binary-key index for n<=23; omitted means the incumbent hash map",
+            ),
         ]
     }
 
@@ -1070,6 +1087,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         self.torsion_inversion_lanes = 0;
         self.torsion_inversion_batches = 0;
         self.torsion_seed_rows = 0;
+        self.dense_probe = match params.get("layout") {
+            None => false,
+            Some("dense") if self.engine == Pdp3Engine::RootfindNegfoldBatchHarvestTorsion => true,
+            Some(_) if self.engine == Pdp3Engine::RootfindNegfoldBatchHarvestTorsion => {
+                return Err("torsion harvest layout must be dense when specified".into());
+            }
+            Some(_) => {
+                return Err("layout is only supported by torsion harvest".into());
+            }
+        };
         if self.engine == Pdp3Engine::F6IcPair {
             // Reuse within this pipeline solve, never across independent
             // records or replayed records in the auditor process.
@@ -1260,6 +1287,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                             PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
                                 ctx.group, fb,
                             )?;
+                        let table = if self.dense_probe {
+                            table.into_binary_dense(ctx.group.0.n)?
+                        } else {
+                            table
+                        };
                         self.collision_candidates =
                             collisions.len() as u64 + stats.skipped_twin_collisions;
                         self.collision_verified = collisions.len() as u64;
@@ -1489,6 +1521,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 "pair_table_build_adds".into(),
                 table.build_ops.adds + table.build_ops.doubles,
             );
+            if let Some(bytes) = table.dense_bytes() {
+                counts.insert("pair_table_dense_bytes".into(), bytes);
+            }
         }
         if matches!(
             self.engine,
@@ -1810,6 +1845,46 @@ mod engine_names {
             None,
         )
         .unwrap();
+        spec.oracle_params.set("layout", "dense");
+        let mut dense_oracle = Pdp3KoblitzOracle::new("pdp3-koblitz", 3, &inst);
+        let dense = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut dense_oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .unwrap();
+        assert!(dense.verified);
+        assert_eq!(dense.recovered, torsion.recovered);
+        assert_eq!(
+            dense.decomposition.targets_tried,
+            torsion.decomposition.targets_tried
+        );
+        assert_eq!(
+            dense.decomposition.relations_found,
+            torsion.decomposition.relations_found
+        );
+        assert_eq!(dense.linear_algebra.rank, torsion.linear_algebra.rank);
+        assert_eq!(dense.total_gae, torsion.total_gae);
+        assert_eq!(
+            dense.decomposition.setup.get("pair_table_dense_bytes"),
+            65_544
+        );
+        spec.oracle_params.set("engine", "rootfind-negfold-batch");
+        let mut unsupported = Pdp3KoblitzOracle::new("pdp3-koblitz", 3, &inst);
+        assert!(run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut unsupported,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .is_err());
         assert!(torsion.verified);
         assert_eq!(torsion.recovered, Some(planted));
         assert_eq!(torsion.linear_algebra.cost.get("setup_seed_independent"), 5);
