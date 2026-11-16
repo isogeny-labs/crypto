@@ -78,3 +78,30 @@ Commit, rerun, audit all cells and exact identities; continue the other shapes.
 
 Univariate gcd was needlessly expensive. Direct root filtering is exact here
 because every specialized equation is quadratic or lower in `w`.
+
+## 2026-11-15 23:02 America/Los_Angeles
+
+### What was done
+
+Stopped both second-amendment runs without a final JSON receipt after the
+finite-field fallback expanded many parameter triples; process sampling showed
+the candidate-list construction. A separate exact diagnostic checked all 243
+b=68 coefficient ideals: 232 had dimension zero, ten dimension one, and one
+dimension three. In each dimension-one ideal, the reduced Gröbner basis has
+a monic relation `t³+c w³+d=0` with coefficients in `K`. In the dimension-three
+case the CRT branch residue `h` is constant, so `H²h` has degree six.
+
+### Decisions made
+
+Use inverse Frobenius to solve `t` from `w` and then roots of quadratic
+equations in `s` for every `w∈K`. This is exact for the checked relation
+shape and bounded by 243 univariate systems per exceptional assignment.
+
+### Open threads
+
+Commit third amendment; finish b=68 and b=84, independently audit receipts.
+
+### Errors
+
+The direct finite-field fallback was exact but not computationally bounded
+enough in the exceptional ideals. The interrupted files contain no results.

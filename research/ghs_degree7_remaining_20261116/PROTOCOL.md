@@ -45,6 +45,17 @@ nonzero equation and checks every other equation there. If all vanish, it
 enumerates `w∈K`. This is the same exact solution set and avoids the costly
 gcd. The two interrupted runs are not counted as completed cells.
 
+Third amendment, 16 November UTC: inspection of the 11 exceptional b=68
+ideals found ten one-dimensional ideals whose reduced Gröbner basis contains
+`t³+c w³+d`, and one constant branch assignment for which `h` has degree
+zero and hence `deg(H²h)=6`. The preceding fallback still expanded too many
+specialized systems and was stopped before any final receipt. The current
+source checks the Gröbner relation exactly, uses the inverse Frobenius
+`z↦z^81` on `K=F_(3^5)` to derive `t=(-c)^81 w+(-d)^81`, enumerates all
+243 values of `w`, and solves the remaining degree-at-most-two equations in
+`s`. If the asserted relation is absent, it records a censored system.
+The constant assignment is excluded by the numerator degree condition.
+
 Sources checked: the repository's three degree-seven protocols and trace-`+22`
 results; [Howe, Theorem 4.17 and Remark 4.18](https://arxiv.org/pdf/2110.04221)
 for the existence ceiling (not an executable map); the 2015 Iijima–Momose–Chao

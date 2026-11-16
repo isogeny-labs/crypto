@@ -39,31 +39,37 @@ P = PolynomialRing(K, names=('s', 't', 'w'), order='degrevlex')
 s, t, w = P.gens()
 hc = [w^2, 2*t*w, t^2+2*s*w, 2*s*t+2*w, s^2+2*t, 2*s, P(1)]
 counts = {'systems': 0, 'zero_dimensional': 0, 'positive_dimensional': 0,
+          'constant_branch_assignments': 0,
           'censored_systems': 0,
           'parameter_solutions': 0, 'allowed_cubics': 0,
           'numerator_degree_seven': 0, 'coprime': 0,
           'f_divides': 0, 'full_equation_hits': 0}
 censored = []
 hits = []
-P2 = PolynomialRing(K, names=('t0', 'w0'), order='degrevlex')
-t0, w0 = P2.gens()
-S = PolynomialRing(K, 'W'); W = S.gen()
+S = PolynomialRing(K, 'S0'); S0 = S.gen()
 
-def recover_positive_dim(eqs):
-    """Enumerate one field coordinate, then solve the remaining exact system."""
+def recover_positive_dim(I, eqs):
+    """Use the checked Frobenius relation to reduce to 243 quadratic systems."""
+    gb = I.groebner_basis()
+    relation = next((G for G in gb if G.degree(s) == 0 and
+                     G.degree(t) == 3 and G.degree(w) == 3), None)
+    if relation is None:
+        raise ValueError('no Frobenius relation in positive-dimensional ideal')
+    d = K(relation(0, 0, 0))
+    c = K(relation(0, 0, 1) - d)
+    if relation != t^3 + c*w^3 + d:
+        raise ValueError('unexpected positive-dimensional relation')
+    tc = (-c)^81
+    td = (-d)^81
+    assert tc^3 == -c and td^3 == -d
     out = []
-    for sv in K:
-        specialized = [F(sv, t0, w0) for F in eqs]
-        J = P2.ideal(specialized)
-        if J.dimension() == 0:
-            out.extend((sv, K(sol[t0]), K(sol[w0])) for sol in J.variety(ring=K))
-            continue
-        for tv in K:
-            polys = [F(sv, tv, W) for F in eqs]
-            first = next((p for p in polys if p != 0), None)
-            ws = K if first is None else first.roots(multiplicities=False)
-            out.extend((sv, tv, wv) for wv in ws
-                       if all(p(wv) == 0 for p in polys))
+    for wv in K:
+        tv = tc*wv + td
+        polys = [F(S0, tv, wv) for F in eqs]
+        first = next((p for p in polys if p != 0), None)
+        ss = K if first is None else first.roots(multiplicities=False)
+        out.extend((sv, tv, wv) for sv in ss
+                   if all(p(sv) == 0 for p in polys))
     return out
 
 for choices in itertools.product(range(3), repeat=5):
@@ -74,8 +80,12 @@ for choices in itertools.product(range(3), repeat=5):
     I = P.ideal(eqs)
     try:
         if I.dimension() != 0:
+            if h.degree() == 0:
+                assert all(F == 0 for F in eqs)
+                counts['constant_branch_assignments'] += 1
+                continue
             counts['positive_dimensional'] += 1
-            solutions = recover_positive_dim(eqs)
+            solutions = recover_positive_dim(I, eqs)
         else:
             counts['zero_dimensional'] += 1
             solutions = [(K(sol[s]), K(sol[t]), K(sol[w])) for sol in I.variety(ring=K)]
