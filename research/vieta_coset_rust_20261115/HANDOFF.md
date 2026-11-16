@@ -1,5 +1,29 @@
 # Vieta Rust port: continuation receipt
 
+## Publication reconciliation — 16 November, 20:39 UTC
+
+The normal mainb02431b26e merge preserves453 main journal blocks and all53 local
+blocks (50 genuinely missing blocks appended), and exact main ledger bytes as
+prefix plus6 unchanged local bodies (1221 entries). See
+next-20261116/evidence/final-main-merge.json. Main subsequently advanced to
+672067a75a without changing this study, PCC, journal or benchmark progress;
+integrate that clean advance before pushing.
+
+The official PCC ledger check FAILS with125 missing claim_type errors, reproduced
+on all2135 exact main claim blobs plus main ledger/keyring using the unchanged
+checker. Base/head errors are identical, chains/prefix valid; the three new
+claim types and all their proof pins match. See evidence/pcc-base-reproduction.json
+and both error logs under next-20261116. Do not rewrite unrelated frozen claims
+or weaken the gate. Two whole-pcc archives stalled on lazy fetch and were stopped;
+the reproduction instead uses individually Git-blob-checked claim files.
+
+Final local artifact policy,239-entry lessons verification, progress freshness,
+both file-verified exports,9-file frozen source/binary manifest and identical
+report copies pass. Final PDF pages1/4 inspected after the cosmetic rebuild;
+all4 pages reviewed. No benchmark is active or needs rerunning. Publish to4410,
+inspect its new head once, and preserve the bounded follow-up until gates pass
+or the unchanged limit is reached. General independent standing remains pending.
+
 ## Half-GCD and general rational towers — 16 November, 20:26 UTC
 
 User authorized all four next steps. Source9d2106eb2a implements opt-in HalfGcd,

@@ -529,6 +529,29 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             }
         }
     }
+    let seed_start = std::time::Instant::now();
+    let (mut setup_seed_independent, mut setup_seed_dependent) = (0u64, 0u64);
+    for seed_row in oracle.setup_rows() {
+        if seed_row.len() != fb.columns {
+            return Err(format!(
+                "oracle setup row has {} columns, expected {}",
+                seed_row.len(),
+                fb.columns
+            ));
+        }
+        let mut row = seed_row.clone();
+        row.push(0);
+        match matrix.add_row(row, 0) {
+            crate::cryptanalysis::ic_boundary::RowStatus::Independent => {
+                setup_seed_independent += 1
+            }
+            crate::cryptanalysis::ic_boundary::RowStatus::Dependent => setup_seed_dependent += 1,
+            crate::cryptanalysis::ic_boundary::RowStatus::Inconsistent => {
+                return Err("verified oracle setup row was inconsistent".into());
+            }
+        }
+    }
+    let setup_seed_ns = seed_start.elapsed().as_nanos() as u64;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
@@ -664,6 +687,22 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     };
     for (name, value) in oracle.relation_counters() {
         outcome.relations.count(&name, value);
+    }
+    let setup_seed_rows = setup_seed_independent + setup_seed_dependent;
+    if setup_seed_rows > 0 {
+        outcome.linear_algebra.wall_ns += setup_seed_ns;
+        outcome
+            .linear_algebra
+            .count("setup_seed_rows", setup_seed_rows);
+        outcome
+            .linear_algebra
+            .count("setup_seed_independent", setup_seed_independent);
+        outcome
+            .linear_algebra
+            .count("setup_seed_dependent", setup_seed_dependent);
+        outcome
+            .linear_algebra
+            .work("row_build_words", setup_seed_rows * (fb.columns as u64 + 1));
     }
     outcome.relations.work_all(&oracle.relation_work_native());
     // Kept opt-in so the previously recorded full-rank sessions retain

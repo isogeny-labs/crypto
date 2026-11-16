@@ -76,4 +76,4 @@ let pairs = a.solve_tower(&Curve { a: 2, b: 2 }, &tower, &Some((7, 11)), 42)?;
 // [((5,1),(7,6)), ((7,6),(5,1))]
 ```
 
-The example charges one cumulative context. The experiment uses fresh construction/query contexts with separately recorded work, so the query deadline starts after construction. `PrimeField` callers must supply an actual prime modulus; the general constructors do not prove primality. Normalized auxiliary maps create a field subset, not a discrete-log transfer.
+The example charges one cumulative context. The experiment uses fresh construction/query contexts with separately recorded work, so the query deadline starts after construction. `PrimeField` callers must supply an actual prime modulus; primality is a caller precondition. Normalized auxiliary maps create a field subset, not a discrete-log transfer.

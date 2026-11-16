@@ -1,0 +1,232 @@
+{
+  "schema": "actual-k1-pairing-source-plan/v1",
+  "created": "2026-11-13T20:25:47.713661+00:00",
+  "formal": {
+    "project": "research/pairing_k1_audit_20261113/lean",
+    "theorem": "PairingKOneAudit.actual_k1_quotient_miller_certificate",
+    "statement": "theorem actual_k1_quotient_miller_certificate : (curve.Δ≠0 ∧ Nat.card curve.Point=9 ∧ addOrderOf G=9 ∧ Nat.Prime 3 ∧ Nat.Coprime 3 7 ∧ 3 ∣ 7-1 ∧ 3^2 ∣ Nat.card curve.Point ∧ TorsionBoundaryAudit.embeddingDegree 7 3=1) ∧ (Nat.card threeTorsion=3 ∧ Nat.card Right=3 ∧ Nat.card UnitTarget=3 ∧ Nat.card cubeRoots=3 ∧ torsionHom 1≠0 ∧ toRight G≠0 ∧ ∀ U : threeTorsion,torsionToRight U=0) ∧ (∀ (U : threeTorsion) (R : curve.Point), tateValue U (toRight R)=reducedTateMiller U.val R) ∧ (∀ (U : threeTorsion) (R S : curve.Point) (h : goodAux U.val R S), (QuotientGroup.mk' baseCubes) (rawAuxUnit U R S h)=tateClass U (toRight R)) ∧ (∀ (U V : threeTorsion) (S : curve.Point), WeilAuxSupport U.val V.val S → weilAtAux U.val V.val S=1) ∧ (∀ (U V : threeTorsion) (z : Right), tateClass (U+V) z=tateClass U z*tateClass V z) ∧ (∀ (U : threeTorsion) (z w : Right), tateClass U (z+w)=tateClass U z*tateClass U w) ∧ (∀ U : threeTorsion,(∀ z : Right,tateClass U z=1) → U=0) ∧ (∀ z : Right,(∀ U : threeTorsion,tateClass U z=1) → z=0) ∧ (∀ (U V : threeTorsion) (z : Right), reducedUnits (U+V) z=reducedUnits U z*reducedUnits V z) ∧ (∀ (U : threeTorsion) (z w : Right), reducedUnits U (z+w)=reducedUnits U z*reducedUnits U w) ∧ (∀ U : threeTorsion,(∀ z : Right,reducedUnits U z=1) → U=0) ∧ (∀ z : Right,(∀ U : threeTorsion,reducedUnits U z=1) → z=0) ∧ (∀ U V : threeTorsion,weilValue U V=1 ∧ tateClass U (torsionToRight V)=1) ∧ (¬∀ U : threeTorsion,(∀ V : threeTorsion,weilValue U V=1) → U=0) ∧ (¬∀ U : threeTorsion,(∀ V : threeTorsion,tateClass U (torsionToRight V)=1) → U=0) ∧ (∀ (A : Type) [AddCommGroup A] (b : threeTorsion →+ threeTorsion →+ A), (∀ U : threeTorsion,b U U=0) → (∀ U V : threeTorsion,b U V=0) ∧ (¬∀ U : threeTorsion,(∀ V : threeTorsion,b U V=0) → U=0)) ∧ (∀ U : threeTorsion,InflectionCertificate U.val) ∧ (∃ P : geometricCurve.Point,(3:ℕ) • P=0 ∧ P ∉ Set.range basePointMap) ∧ IsPrimitiveRoot (2:F) 3 ∧ reducedTateMiller ((3:ℕ) • G) G=2",
+    "decl_sha256": "cdaa83475f74e576cd16408e5148181e4b775b0bb57234a019a5cda602f4d076",
+    "scope": "Actual nonsingular E/F7:y²=x³+3x+2 has rationalpointgroup cyclic9 with actual generatorG0,3/order9, rational3torsionAcard3 and true quotientB=E(F7)/3E(F7)card3. Natural A->B iszero, Gclassnonzero; actual geometric3torsion outsidebaseimage, embeddingdegree1,r3prime/coprime7/rdiv6/r²div#E9. Prescribed actual tangent/Miller expressions give rawclasses in actualF7*/cubes and reducedunit-cuberootvalues, both targets3 and actualfinalexponent2isomorphism. Full bilateralbilinearity/ND onA×B, exactMillerbridge for everyactualpoint and everyvalidTateauxiliary; allvalidWeilauxiliaries onrationalA×A give1. Both rationalrestrictionsall1 with directNDnegations; everyalternatingbiadditive map onactualcyclicA istrivial/degenerate. Actual tangent tripleintersection and localinfinitychart algebra. ConcreteT(3G,G)=2primitivecuberoot. No torsionbasis/representative/ND/Hasse/genericpairing premise. Canonicaldivisor/valuation identification andgenericMOV/FR remainopen; noqualifiedsourcerefutation, originalFR94remainsunread, no nativeexperiment or executionassurance.",
+    "sources": [
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/ActualGroup.lean",
+        "bytes": 4811,
+        "sha256": "7fadbfb0725308112100cdfff0a718512db694b23ce0a9f037895698891d1f91"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/ActualQuotient.lean",
+        "bytes": 3536,
+        "sha256": "b5e27206daa30a4fff48af5ccc90557db96eded02bb66c09359a659b229dfb1a"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/Certificate.lean",
+        "bytes": 4284,
+        "sha256": "1a92390a8a83a92690566e032cedd4b79afba5fcbb61a7338b45ea5881145e74"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/CyclicObstruction.lean",
+        "bytes": 1184,
+        "sha256": "5c6167e6b8d6a935c7cdfa47550aad57ecfd9fd1111e815e470e771e91af22e9"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/Inflection.lean",
+        "bytes": 3804,
+        "sha256": "9b53fc0f77836722b436e53c23601ced6d72179efa6a59cb2e71d4eded063490"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/MillerData.lean",
+        "bytes": 3335,
+        "sha256": "49042da14df1197b8d0d00adabb32b31723fad8e37367c1e60983d8c35855f20"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/RawClasses.lean",
+        "bytes": 5252,
+        "sha256": "394266a9ce823f35c493de5ffb68eb102388df3fb89134f44ec52d25c6385092"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/TateValues.lean",
+        "bytes": 5005,
+        "sha256": "03bf9f56137dc0be1a8f908d41318650040ce020eb09a59a6b552f3b2e05b560"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/UnitTarget.lean",
+        "bytes": 2420,
+        "sha256": "01d07b4c754fb40986ed21962f36e340758ff9471750aa8603cb0b7a75d38999"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/lake-manifest.json",
+        "bytes": 4082,
+        "sha256": "98c1f2e5071a7beb12db0671a2fdaf324a6e20132ba547e8f0d7a5a817dfd4f5"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/lakefile.toml",
+        "bytes": 356,
+        "sha256": "b288ffc87328a0ab9aaa67da8b0b263b9dbdc7cbeec37b10b2c010abd615653a"
+      },
+      {
+        "path": "research/pairing_k1_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/pairing_k1_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 36836,
+      "sha256": "e1d783642d5f2c687d53f3b682db4fe646b0a1336899ff4f8a6a86bd1151b73f"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/evidence/attempts.json",
+      "bytes": 14618,
+      "sha256": "539f901bc4e0d25c2264abd2b2f9807ff2090a3dddf261dab30afc0248874d95"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 3044,
+      "sha256": "37170db2cbbf594f5a043c0330f3998cf1a91a445db22baf517ddb6f68d462eb"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/evidence/gate.json",
+      "bytes": 1130,
+      "sha256": "4f4a24e6983ca1523d941823e2a4899d80ce670aa25192f17b2290886820fdd2"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/evidence/catalogs.tar.gz",
+      "bytes": 9460,
+      "sha256": "aaa3f9af637da8c5185d9db58342cc91ea45bfea9e8e8ad4283bfcb91dd2a3fa"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/evidence/catalogs.json",
+      "bytes": 624,
+      "sha256": "b960d5f421d79b43729dc9edc466a74abe9b1205d8ae7f4bc1b809cc0aceb4b0"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/evidence/source-review.json",
+      "bytes": 2886,
+      "sha256": "0f9e71b26fffd5d5f12f9a00843199134e8a3e12412c18555222ef758b166df4"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/proof-map.json",
+      "bytes": 3391,
+      "sha256": "9d287beca3799d133c66411418eecc681459c3ae8c303e209b91ee4f77cfbc47"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/render_report.py",
+      "bytes": 6445,
+      "sha256": "795cbed38351547f200e0d0de624db0bed163706288f7d63d7e7616002b0992e"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/reports/layout.json",
+      "bytes": 262,
+      "sha256": "d1d9e9dbdf167e0bcdcfe349637c51b92b85344cd6fcbaa5de1700ba727381e6"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/reports/pairing-domains.svg",
+      "bytes": 5564,
+      "sha256": "4a4822f2504dee44d169f91e41c30b2ab0bf2b18caec27ebcc8b33678286be76"
+    },
+    {
+      "path": "research/pairing_k1_audit_20261113/reports/report.pdf",
+      "bytes": 48466,
+      "sha256": "90334a959362de5e6fb8adf0f5489da8507687fdcfa9a2ea12ee5f6fcb9b854d"
+    }
+  ],
+  "custom_import_modules": [
+    "ActualGroup",
+    "ActualQuotient",
+    "Certificate",
+    "CyclicObstruction",
+    "Inflection",
+    "MillerData",
+    "RationalCounterexample",
+    "RawClasses",
+    "S3Completion",
+    "S3Roots",
+    "StructuralAudit",
+    "TateValues",
+    "TorsionBoundaries",
+    "UnitTarget"
+  ],
+  "assurance": {
+    "gate_declarations": 116,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "actual_group_and_quotients": true,
+    "all_actual_point_representatives": true,
+    "all_valid_Tate_and_Weil_auxiliaries": true,
+    "bilateral_nondegeneracy_proper_domains": true,
+    "actual_restriction_disproofs": true,
+    "canonical_divisor_identification": false,
+    "qualified_source_refuted": false,
+    "original_FR94_read": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}
