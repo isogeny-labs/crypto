@@ -285,28 +285,76 @@ fn normalize_jac_batch(block:&[(JacPoint,u64,u64)])
     if inv!=1{return Err("projective inverse-prefix invariant failed".into());}
     Ok(out)
 }
+
+// EXP-R31-JOINT64: the 64 public jump points of the existing APS additive
+// walk are independently labelled a*G+b*Q. Joint interleaved Jacobian
+// multiplication is classical (also used elsewhere in this repository);
+// batching ALL jump-point inversions together is the new scoped experiment.
+// No unknown logarithm enters either the generator or algebraic S3 search.
+fn joint_public_jac(a:u64,b:u64,q:(u64,u64),
+    g_plus_q:Option<(u64,u64)>)->JacPoint{
+    let mut acc=JacPoint{x:0,y:1,z:0};
+    for bit in (0..31u32).rev(){
+        acc=jac_double(acc);
+        let point=match (((a>>bit)&1)!=0,((b>>bit)&1)!=0){
+            (false,false)=>None,
+            (true,false)=>Some(PRIME31.g),
+            (false,true)=>Some(q),
+            (true,true)=>g_plus_q
+        };
+        if let Some(p)=point{
+            acc=jac_mixed(acc,p);
+        }
+    }
+    acc
+}
 // Produces *exactly* the affine walk's public points/labels at the same PRNG
 // locations. Pending transition is deferred until next candidate so neither
 // the last in a batch nor the final accepted point consumes an extra PRNG.
 fn source_walk_profile_jac(q:(u64,u64),seed:u64,ar:&mut Arithmetic,
     sizes:[usize;3])->Result<([Vec<Labelled>;3],u64,u64),String>{
+    source_walk_profile_jac_mode(q,seed,ar,sizes,false)
+}
+fn source_walk_profile_jac_joint(q:(u64,u64),seed:u64,ar:&mut Arithmetic,
+    sizes:[usize;3])->Result<([Vec<Labelled>;3],u64,u64),String>{
+    source_walk_profile_jac_mode(q,seed,ar,sizes,true)
+}
+fn source_walk_profile_jac_mode(q:(u64,u64),seed:u64,ar:&mut Arithmetic,
+    sizes:[usize;3],joint:bool)->Result<([Vec<Labelled>;3],u64,u64),String>{
     const STEPS:usize=64;
     const BATCH:usize=256;
     let mut rng=seed^0x5741_4c4b_5f53_5445_u64;
-    let mut steps=Vec::with_capacity(STEPS);
-    for _ in 0..STEPS{
-        let jump=loop{
+    let steps=if joint{
+        // All public coefficients are drawn in the same order as the old
+        // two-scalar arm; an identity result consumes a draw and is skipped.
+        // One shared inversion normalizes ALL admitted step points.
+        let g_plus_q=ar.add(PRIME31,Some(PRIME31.g),Some(q));
+        let mut projective=Vec::with_capacity(STEPS);
+        while projective.len()<STEPS{
             let a=prng(&mut rng)%N;
             let b=prng(&mut rng)%N;
             if a==0 && b==0 {continue;}
-            let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
-            let bq=ar.scalar(PRIME31,b,Some(q));
-            if let Some(pt)=ar.add(PRIME31,ag,bq){
-                break Labelled{pt,a,b};
-            }
-        };
-        steps.push(jump);
-    }
+            let point=joint_public_jac(a,b,q,g_plus_q);
+            if point.z!=0{projective.push((point,a,b));}
+        }
+        normalize_jac_batch(&projective)?
+    }else{
+        let mut steps=Vec::with_capacity(STEPS);
+        for _ in 0..STEPS{
+            let jump=loop{
+                let a=prng(&mut rng)%N;
+                let b=prng(&mut rng)%N;
+                if a==0 && b==0 {continue;}
+                let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+                let bq=ar.scalar(PRIME31,b,Some(q));
+                if let Some(pt)=ar.add(PRIME31,ag,bq){
+                    break Labelled{pt,a,b};
+                }
+            };
+            steps.push(jump);
+        }
+        steps
+    };
     let mut out:[Vec<Labelled>;3]=std::array::from_fn(|i|
         Vec::with_capacity(sizes[i]));
     let mut xs=HashSet::with_capacity(sizes.iter().sum());
@@ -1815,6 +1863,10 @@ fn execute_factorized_unequal_index(q:(u64,u64),sizes:[usize;3],round_limit:usiz
 }
 fn execute_factorized_unequal_index_variant(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool,packed:bool)
     ->Result<serde_json::Value,String>{
+    execute_factorized_unequal_index_variant_joint(q,sizes,round_limit,compact,packed,false)
+}
+fn execute_factorized_unequal_index_variant_joint(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool,packed:bool,joint:bool)
+    ->Result<serde_json::Value,String>{
     if sizes.iter().any(|&n|n<16 || n>32_768)
        || sizes.iter().sum::<usize>()>40_000
        || round_limit==0 || round_limit>8{
@@ -1833,7 +1885,11 @@ fn execute_factorized_unequal_index_variant(q:(u64,u64),sizes:[usize;3],round_li
         let begin=Instant::now();
         let before=ar.counts.group_additions;
         let (parts,identities,duplicates)=
-            source_walk_profile_jac(q,seed,&mut ar,sizes)?;
+            if joint{
+                source_walk_profile_jac_joint(q,seed,&mut ar,sizes)?
+            }else{
+                source_walk_profile_jac(q,seed,&mut ar,sizes)?
+            };
         let source_ns=begin.elapsed().as_nanos();
         let source_additions=ar.counts.group_additions-before;
         let root_begin=Instant::now();
@@ -1850,7 +1906,7 @@ fn execute_factorized_unequal_index_variant(q:(u64,u64),sizes:[usize;3],round_li
             "rejected_duplicate_x":duplicates,
             "s3_query_ns":root_ns,
             "s3_pair_quadratics":stats.pair_s3,
-            "x_fibre_precompute":true,"jacobian_source":true,"compact_x_index":compact,"packed_x_index":packed,
+            "x_fibre_precompute":true,"jacobian_source":true,"joint_batched_public_jumps":joint,"compact_x_index":compact,"packed_x_index":packed,
             "s3_sqrts":stats.s3_sqrt,
             "s3_batch_inversions":stats.batch_inversions,
             "signed_candidates":stats.signed_candidates,
@@ -2399,8 +2455,124 @@ fn packed_x_index_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// Frozen 24-Q fresh prospective panel. All costs, failed rounds and scalar
+// verification are charged; the known logarithm is held only by this caller.
+fn joint_jump_batch_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const PROFILE:[usize;3]=[384,384,16_384];
+    const TARGET_SEED:u64=0x4a53_3343_4f4c_4431;
+    let mut rng=TARGET_SEED;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut totals=[0u128;4];
+    let mut source_totals=[0u128;3];
+    let mut wins=[0u64;2];
+    let mut cases=Vec::with_capacity(CASES);
+    for case in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let order:[usize;4]=match case%4{
+            0=>[0,1,2,3],1=>[1,2,3,0],2=>[2,3,0,1],_=>[3,0,1,2]
+        };
+        let mut arms:[serde_json::Value;4]=std::array::from_fn(|_|json!(null));
+        for idx in order{
+            let result=match idx{
+                0=>execute_factorized_unequal_index_variant(q,PROFILE,6,false,true)?,
+                1|2=>execute_factorized_unequal_index_variant_joint(q,PROFILE,6,false,true,true)?,
+                3=>cold_batched_bsgs(q)?,
+                _=>return Err("joint jump batch invalid arm".into())
+            };
+            if result["complete_target_scalar_recovered"].as_bool()!=Some(true){
+                return Err(format!("joint jump incomplete case={case} arm={idx}"));
+            }
+            let log=if idx==3{
+                result["log"].as_u64().ok_or("joint batch BSGS scalar missing")?
+            }else{
+                result["attempts"].as_array()
+                    .and_then(|a|a.last())
+                    .and_then(|a|a["solution"]["log"].as_u64())
+                    .ok_or("joint batch APS scalar missing")?
+            };
+            if log!=known||verifier.scalar(PRIME31,log,Some(PRIME31.g))!=Some(q){
+                return Err(format!("joint jump wrong recovered scalar case={case} arm={idx}"));
+            }
+            totals[idx]+=result["cold_wall_ns"].as_u64()
+                .ok_or("joint jump missing fully cold ns")? as u128;
+            if idx<3{
+                let attempts=result["attempts"].as_array()
+                    .ok_or("joint jump attempts unavailable")?;
+                source_totals[idx]+=attempts.iter().map(|a|
+                    a["source_setup_ns"].as_u64().unwrap_or(0) as u128).sum::<u128>();
+            }
+            arms[idx]=result;
+        }
+        let prior=arms[0]["attempts"].as_array().ok_or("joint jump prior missing attempts")?;
+        for alternative in [1usize,2]{
+            let candidate=arms[alternative]["attempts"].as_array()
+                .ok_or("joint jump candidate missing attempts")?;
+            if candidate.len()!=prior.len(){
+                return Err(format!("joint jump attempts differ case={case} arm={alternative}"));
+            }
+            for (r,(old,new)) in prior.iter().zip(candidate.iter()).enumerate(){
+                for field in ["round","seed","s3_pair_quadratics",
+                    "signed_candidates","solution","rejected_duplicate_x",
+                    "rejected_identity"]{
+                    if old[field]!=new[field]{
+                        return Err(format!("joint batch transcript differs case={case} arm={alternative} attempt={r} field={field}"));
+                    }
+                }
+            }
+        }
+        if arms[1]["cold_wall_ns"].as_u64()<arms[0]["cold_wall_ns"].as_u64(){wins[0]+=1;}
+        if arms[1]["cold_wall_ns"].as_u64()<arms[3]["cold_wall_ns"].as_u64(){wins[1]+=1;}
+        cases.push(json!({
+            "case":case,"public_Q":q,"caller_known_scalar_verifier_only":known,
+            "chronological_order":order,"old_packed_APS":arms[0],
+            "joint_public_batch_APS":arms[1],
+            "joint_public_batch_APS_AA":arms[2],
+            "new_table_cold_BSGS":arms[3]
+        }));
+    }
+    let ratio=totals[1] as f64/totals[0] as f64;
+    let drift=(totals[1] as f64/totals[2] as f64-1.0).abs();
+    let bsgs_ratio=totals[1] as f64/totals[3] as f64;
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_JOINT_SHAMIR_BATCH_PROTOCOL_20261116.md",
+        "mechanism":"precompute 64 public walk jumps by joint Jacobian double scalar + one batch inversion",
+        "classification":"published APS m3 index calculus, generic pair-MITM-equivalent",
+        "p":P,"n":N,"cofactor":1,"profile":PROFILE,
+        "public_target_seed":format!("{TARGET_SEED:016x}"),
+        "cases_count":CASES,"verified_complete_scalar_recoveries":4*CASES,
+        "arm_names":["old_packed_APS","joint_public_batch_APS",
+            "joint_public_batch_APS_AA","cold_BSGS"],
+        "fully_cold_ns":totals.map(|n|n.to_string()),
+        "source_setup_ns":source_totals.map(|n|n.to_string()),
+        "candidate_vs_old_ratio":ratio,
+        "candidate_vs_BSGS_ratio":bsgs_ratio,
+        "candidate_AA_drift":drift,
+        "paired_wins_candidate_vs_old":wins[0],
+        "paired_wins_candidate_vs_BSGS":wins[1],
+        "passes_preregistered_development_gate":ratio<=0.90 && wins[0]>=18 && drift<=0.05,
+        "cases":cases,
+        "limits":"development Actions source-specific timings only; no PCC, optimized rho or external CAS comparison"
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--joint-jumps-confirm" {
+        let result=joint_jump_batch_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--packed-x-index-confirm" {
         let result=packed_x_index_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -2516,6 +2688,48 @@ fn main()->Result<(),String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn joint_jacobian_public_double_scalar_matches_existing_arithmetic(){
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let neg_g=ar.neg(PRIME31,Some(PRIME31.g)).unwrap();
+        let targets=[PUBLIC_Q,neg_g,ar.scalar(PRIME31,49,Some(PRIME31.g)).unwrap()];
+        let mut rng=0x4a53_3343_4f4c_4431u64;
+        for q in targets{
+            let gq=ar.add(PRIME31,Some(PRIME31.g),Some(q));
+            for i in 0..360usize{
+                let a=if i%41==0{0}else if i%41==1{N-1}else{prng(&mut rng)%N};
+                let b=if i%47==0{0}else if i%47==1{N-1}else{prng(&mut rng)%N};
+                let actual=joint_public_jac(a,b,q,gq);
+                let expected=ar.add(PRIME31,
+                    ar.scalar(PRIME31,a,Some(PRIME31.g)),
+                    ar.scalar(PRIME31,b,Some(q)));
+                if let Some(point)=expected{
+                    assert_ne!(actual.z,0);
+                    assert_eq!(normalize_jac_batch(&[(actual,a,b)]).unwrap()[0].pt,point);
+                }else{
+                    assert_eq!(actual.z,0);
+                }
+            }
+        }
+    }
+    #[test]
+    fn joint_batched_jump_source_is_identical_to_existing_public_walk(){
+        let mut old_ar=Arithmetic::default();
+        let mut new_ar=Arithmetic::default();
+        for sizes in [[32,48,64],[384,384,2048]]{
+            let previous=source_walk_profile_jac(PUBLIC_Q,SEED,&mut old_ar,sizes).unwrap();
+            let candidate=source_walk_profile_jac_joint(PUBLIC_Q,SEED,&mut new_ar,sizes).unwrap();
+            assert_eq!((previous.1,previous.2),(candidate.1,candidate.2));
+            for (left,right) in previous.0.iter().zip(candidate.0.iter()){
+                assert_eq!(left.len(),right.len());
+                for (a,b) in left.iter().zip(right.iter()){
+                    assert_eq!((a.pt,a.a,a.b),(b.pt,b.a,b.b));
+                }
+            }
+        }
+    }
     #[test]
     fn post_jac_profile_admission_and_rotation() {
         for profile in POST_JAC_PROFILES {
