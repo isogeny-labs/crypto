@@ -1,0 +1,24 @@
+    Checking relation-degree-trace v0.1.0 (/workspace/crypto-leads/research/relation_degree_trace_20261115)
+error: the loop variable `c` is only used to index `matrix[j]`
+   --> src/quotient.rs:201:18
+    |
+201 |         for c in j..=k {
+    |                  ^^^^^
+    |
+note: for this index operation
+   --> src/quotient.rs:202:32
+    |
+202 |             matrix[j][c] = mul(matrix[j][c], scalar, p);
+    |                                ^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+    |
+201 -         for c in j..=k {
+201 +         for <item> in matrix[j].iter_mut().take(k + 1).skip(j) {
+    |
+
+error: could not compile `relation-degree-trace` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `relation-degree-trace` (lib test) due to 1 previous error

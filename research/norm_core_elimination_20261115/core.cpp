@@ -137,6 +137,7 @@ void selftest() {
 }
 } // namespace core
 
+#ifndef NORM_CORE_NO_MAIN
 int main(int argc,char**argv) {
     try {
         using namespace algebraic;
@@ -196,3 +197,4 @@ int main(int argc,char**argv) {
         throw std::invalid_argument("usage: core --selftest | --qualify-{models,arity,cold} MSOLVE OUTDIR TSV | --solve MSOLVE OUTDIR Qx Qy SEED");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }
+#endif

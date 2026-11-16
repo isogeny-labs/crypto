@@ -25,7 +25,7 @@ for ax, tag, rid in zip(axes, ("n71", "n83"),
     ax.set_xlabel("one-target eval workload seed")
     ax.set_ylabel("online wall (ms, log scale)")
     ax.set_title(f"{tag}: paired single-target online, hosted EPYC\n"
-                 f"run {rid}, K=600, W=16, median rho/IC = {median:.2f}x")
+                 f"run {rid}, K=600, W=16, median rho/IC = {median:.2f}x\nSUPERSEDED 2026-10-20 (sweep B 104.1): empty-table rho, IC setup excluded", color="#b00")
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8)
 fig.suptitle("Koblitz compact-orbit single-target panels, hosted isolated reruns (AMD EPYC 7763, 0 contended)", fontsize=9)

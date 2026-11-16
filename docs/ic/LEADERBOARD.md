@@ -684,7 +684,7 @@ Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_2026111
 
 ## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)
 
-The live source tree now exposes **104 top-level ECBench methods** and **33 nested algorithms** (20 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
+The live source tree now exposes **105 top-level ECBench methods** and **34 nested algorithms** (21 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
 
 ### Solver and GPU diagnostics
 
@@ -955,6 +955,50 @@ Same instances and configuration as the section above (c_D = 1.7, square-root ch
 Study: [research/ic_gw_fasthash_20261114/](../../research/ic_gw_fasthash_20261114/); [report](../../research/ic_gw_fasthash_20261114/REPORT.pdf); source `research/ic_gw_fasthash_20261114/analysis.json`. Times are L0 (local container, not an isolated host). The DL phase sum leaves out the instance search and the D and DL1 linear algebra; whole-process CPU fell only to 0.90–0.96 of v3 in the validator's timing replay (relation stage 0.43–0.50 there).
 
 
+## GHS-weak E0/F_{q^3}: block Lanczos without two redundant products, outside tables A–C
+
+Same instances and configuration as the two sections above (c_D = 1.7, square-root chain, fast relation stage). The DL arm's block Lanczos (width 4) no longer computes MV_prev^T MV (it equals columns of this iteration's V^T MV by M-orthogonality, exact in every path) or V_i^T V_0 for i >= 2 (it follows from the three-term recurrence's k x k coefficients while no column has been narrowed away; the validator found the frozen guard too weak in general, and amendment 1, used here, falls back to the direct product from any narrowing on, costing at most 0.04% more). Every other counted field, the iteration count and every logarithm are unchanged. Cold M-eq of the DL arm divided by the previous configuration on the same instance, k = 18..22, seeds 1–6; geometric mean (worst seed) with additions priced at 0, 0.5 and 1 M-eq. Pre-registered decision: improvement. Class: component improvement (linear algebra) over the previous GHS-weak DL configuration; GHS-weak family only. validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_gw_bl_reuse_20261115/validation/VALIDATION.json).
+
+| k | additions 0 | 0.5 | 1 | mod-ell multiplications in linear algebra |
+|--:|--:|--:|--:|--:|
+| 18 | 0.818 (0.822) | 0.864 (0.866) | 0.883 (0.886) | 0.739 |
+| 19 | 0.811 (0.814) | 0.862 (0.865) | 0.884 (0.886) | 0.735 |
+| 20 | 0.815 (0.816) | 0.866 (0.866) | 0.886 (0.887) | 0.732 |
+| 21 | 0.819 (0.819) | 0.869 (0.870) | 0.889 (0.891) | 0.730 |
+| 22 | 0.813 (0.813) | 0.868 (0.869) | 0.889 (0.891) | 0.729 |
+
+DL against the frozen negation-map rho at k = 22 (mean cold M-eq over seeds 1–3, §5a band): w = 0: 0.00222, w = 0.1: 0.00207, w = 1: 0.00170 (before: 0.00274, 0.00246, 0.00183).
+
+Study: [research/ic_gw_bl_reuse_20261115/](../../research/ic_gw_bl_reuse_20261115/); [report](../../research/ic_gw_bl_reuse_20261115/REPORT.pdf); source `research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json`. Counted operations (host-independent); local L0 runs.
+
+
+## GHS-weak E0/F_{q^3}: normalised-coordinate relation stage and scalar Lanczos dot reuse, outside tables A–C
+
+Same instances and configuration as the sections above. (1) Factor-base and residual points have first coordinate 1, so the relation stage no longer multiplies by that coordinate (or by its square) and forms 4·g1 by two additions: waste removed from the baseline rather than a new algorithm, and the operations are really not executed. (2) Scalar Lanczos (arms D and DL1) takes v^T v_prev = s from local A-orthogonality and w^T y from the three-term recurrence (exact: scalar Lanczos never narrows). Same relations, graph, matrix, iterates and logarithms. Cold M-eq with both changes divided by the previous configuration on the same instance, k = 18..22, seeds 1–6; geometric mean (worst seed), additions priced at 0, 0.5 and 1 M-eq. The headline DL arm gains from (1) only. Class: component improvement (relation stage; scalar linear algebra) over the previous GHS-weak configuration; GHS-weak family only. validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_gw_nrm_lz_20261115/validation/VALIDATION.json).
+
+| IC arm | k | additions 0 | 0.5 | 1 |
+|:--|--:|--:|--:|--:|
+| DL | 18 | 0.961 (0.962) | 0.979 (0.980) | 0.987 (0.987) |
+| DL | 19 | 0.958 (0.959) | 0.979 (0.979) | 0.987 (0.987) |
+| DL | 20 | 0.959 (0.959) | 0.979 (0.979) | 0.987 (0.987) |
+| DL | 21 | 0.959 (0.959) | 0.979 (0.980) | 0.987 (0.987) |
+| DL | 22 | 0.957 (0.957) | 0.979 (0.979) | 0.987 (0.987) |
+| DL1 | 18 | 0.850 (0.856) | 0.917 (0.919) | 0.939 (0.941) |
+| DL1 | 19 | 0.835 (0.841) | 0.915 (0.918) | 0.939 (0.941) |
+| DL1 | 20 | 0.843 (0.845) | 0.918 (0.919) | 0.941 (0.942) |
+| DL1 | 21 | 0.849 (0.849) | 0.921 (0.922) | 0.943 (0.944) |
+| DL1 | 22 | 0.838 (0.839) | 0.920 (0.921) | 0.943 (0.944) |
+| D | 18 | 0.971 (0.973) | 0.974 (0.976) | 0.976 (0.977) |
+| D | 19 | 0.972 (0.972) | 0.975 (0.975) | 0.977 (0.977) |
+| D | 20 | 0.972 (0.973) | 0.975 (0.975) | 0.977 (0.977) |
+| D | 21 | 0.973 (0.974) | 0.976 (0.977) | 0.978 (0.978) |
+| D | 22 | 0.974 (0.974) | 0.976 (0.977) | 0.978 (0.979) |
+
+DL against the frozen negation-map rho at k = 22 (mean cold M-eq over seeds 1–3, §5a band): w = 0: 0.00213, w = 0.1: 0.00199, w = 1: 0.00168 (before: 0.00222, 0.00207, 0.00170).
+
+Study: [research/ic_gw_nrm_lz_20261115/](../../research/ic_gw_nrm_lz_20261115/); [report](../../research/ic_gw_nrm_lz_20261115/REPORT.pdf); source `research/ic_gw_nrm_lz_20261115/analysis.json`. Counted operations (host-independent); local L0 runs.
+
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -1203,15 +1247,17 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
 - `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
 - `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
-- `src/cryptanalysis/ecbench/methods.rs` — sha256 `2e884c247357af60…`
-- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `f8f9a75589e96902…`
-- `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
-- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `25f5089736d59040…`
+- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `3dbda3647cb57390…`
+- `integrations/primo/README.md` — sha256 `c75c86afe2f82334…`
+- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `ad90945be0c09c37…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
 - `research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json` — sha256 `d363ee50d3da05c2…`
 - `research/ic_gw_fasthash_20261114/analysis.json` — sha256 `504ae961cf2d994b…`
+- `research/ic_gw_bl_reuse_20261115/amendment-1/analysis.json` — sha256 `d8db1947a8082a94…`
+- `research/ic_gw_nrm_lz_20261115/analysis.json` — sha256 `340a83a64dbc1249…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
@@ -1220,7 +1266,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `33a16da0548b7b0c…`
+- `docs/curves/registry.json` — sha256 `c0e1027ac8023409…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

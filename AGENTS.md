@@ -825,6 +825,13 @@ verifiers, replay tools, and research result generation.
   Python provenance. Label historical Python timings accordingly and rerun
   matched native baseline/candidate measurements before making new performance
   claims.
+- For prime-field research, use distinct build, pre-call and post-call
+  manifest names, and refuse replacement of a pre-call manifest. Label any
+  later reconstruction as post-call evidence (adopted lesson
+  `L-b9df3560e3b1`, 2026-11-15).
+- For prime-field research, execute a separately copied immutable qualifier
+  and capture its hash before calls. Edit a different template for later
+  work (adopted lesson `L-9d758ede7873`, 2026-11-15).
 - Older instructions that name Python scripts describe legacy tooling; they
   do not grant an exception. Preserve their mathematical contracts, fixtures,
   and accounting requirements in the native replacement.
@@ -884,6 +891,14 @@ follows the PR until it lands, under the check-in and merge rules below.
   runtime defaults to. Before ending an update to an existing draft, mark it
   ready so reviews and checks that skip drafts (`llm-review`) can run. An
   explicit user request to keep a particular PR in draft is the only exception.
+- **One PR per research lane, not per session.** Before opening a PR, look for
+  an open PR from `lane/<lane>` for the same study (IC autolab, volcano,
+  conductor gap, N83, ...). If there is one, push to it with
+  `scripts/lane-push.sh <lane>` (merge commits, retried, never a force-push)
+  and stop there: the lane PR carries your commits. Open a new PR only for
+  work no lane covers; name new lanes after the study.
+- **Keep a PR's head within 30 CI checks.** The sweeper holds a PR whose head
+  ran more (`ci:over-budget`); split it by touched area instead.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
@@ -1844,6 +1859,13 @@ specified in [`docs/curves/ICV1.md`](docs/curves/ICV1.md).
   challenge published may go by that name (`ECC2K-130`, `sect163k1`,
   `secp256k1`, `P-256`).  Family notation with a free parameter is fine
   when a sentence is about the family.
+- **Use the standard panel.** New measurements run on the curves of
+  [`docs/ic/STANDARD_PANEL.md`](docs/ic/STANDARD_PANEL.md) (owner,
+  2026-11-10), and a study that uses another curve says why. Prose and
+  tables may name a panel curve by its alias (`K0-23`, `K1-83`, `P36a`);
+  records and file names keep the slug. An alias-shaped name that is not
+  on the panel fails `curve-names` in `docs/ic/` and in research dated on
+  or after the freeze.
 - **Never write a retired form.** The spellings in `ICV1.md`'s table of
   retired names carry no model and may not appear in new text or be
   emitted by new code.  Frozen reports keep them; the registry resolves

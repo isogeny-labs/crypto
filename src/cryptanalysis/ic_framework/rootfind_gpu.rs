@@ -61,6 +61,7 @@ use super::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::ic_boundary::{
     CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
 };
+use crate::cryptanalysis::prime_fast::Fp64;
 
 const MAGIC_INIT: u32 = 0x3353_4652; // "RFS3"
 const MAGIC_BATCH: u32 = 0x3142_4652; // "RFB1"
@@ -121,6 +122,9 @@ pub fn discover_socket() -> Option<PathBuf> {
 pub enum WorkerMode {
     Spawn,
     Daemon,
+    /// No worker: the sweep runs in this process, [`NativeSweep`] over the
+    /// batch's targets on every available thread (`worker=native`).
+    Native,
 }
 
 impl WorkerMode {
@@ -128,8 +132,9 @@ impl WorkerMode {
         match s {
             "spawn" => Ok(Self::Spawn),
             "daemon" => Ok(Self::Daemon),
+            "native" => Ok(Self::Native),
             other => Err(format!(
-                "rootfind-subtract-gpu: worker must be spawn or daemon, got `{other}`"
+                "rootfind-subtract-gpu: worker must be spawn, daemon or native, got `{other}`"
             )),
         }
     }
@@ -331,6 +336,9 @@ fn with_worker<T>(
                     )?;
                     RootfindWorker::connect(&sock)?
                 }
+                WorkerMode::Native => {
+                    return Err("rootfind-subtract-gpu: worker=native has no worker process".into())
+                }
             };
             *guard = Some((mode, worker));
         }
@@ -365,6 +373,341 @@ fn charge_misses(ops: &mut GroupOps, counters: &mut OracleCounters, n: usize) {
 /// `position = 2·i + (0 for ε = +1, 1 for ε = −1)`.
 type Hits = Vec<(usize, u32, i8)>;
 
+/// `worker=native`: the batch sweep on the CPU, in this process, with
+/// `rootfind-subtract`'s own arithmetic (one Montgomery batched inversion a
+/// target, two candidates per abscissa) and the targets of a batch spread
+/// over a thread pool.  A candidate is reported when its abscissa is in the
+/// probe set (`m = 2`: the base's abscissae; `m = 3`: the pair table's), a
+/// superset of the positions where the CPU lookup succeeds; the caller
+/// confirms them in order through that lookup, as it does a worker's.
+struct NativeSweep {
+    f: Fp64,
+    xs: Vec<u64>,
+    ys: Vec<u64>,
+    /// Open-addressing set of Montgomery-form abscissae (`u64::MAX` empty).
+    slots: Vec<u64>,
+    shift: u32,
+    pool: rayon::ThreadPool,
+    /// `simd=ifma`: eight targets a step in AVX-512 IFMA lanes; the probe
+    /// set then holds canonical abscissae instead of Montgomery forms.
+    ifma: Option<ifma::Ifma52>,
+}
+
+impl NativeSweep {
+    /// `probe`: the probe set's abscissae in Montgomery form, or canonical
+    /// when `simd` (then [`ifma::Ifma52`] sweeps).
+    fn new(
+        f: Fp64,
+        reps: &[SweepRep],
+        probe_mont: &[u64],
+        threads: usize,
+        simd: bool,
+    ) -> Result<Self, String> {
+        let ifma = if simd {
+            let xs: Vec<u64> = reps.iter().map(|r| f.from_mont(r.x)).collect();
+            let ys: Vec<u64> = reps.iter().map(|r| f.from_mont(r.y)).collect();
+            Some(ifma::Ifma52::new(f.p, &xs, &ys).ok_or(
+                "rootfind-subtract-gpu: simd=ifma needs AVX-512 IFMA on this host and p < 2^52",
+            )?)
+        } else {
+            None
+        };
+        let n = probe_mont.len().max(1);
+        let bits = (usize::BITS - (2 * n - 1).leading_zeros()).max(4);
+        let mut slots = vec![u64::MAX; 1usize << bits];
+        let shift = 64 - bits;
+        let mask = slots.len() - 1;
+        for &x in probe_mont {
+            let mut h = Self::hash(x, shift);
+            while slots[h] != u64::MAX && slots[h] != x {
+                h = (h + 1) & mask;
+            }
+            slots[h] = x;
+        }
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .map_err(|e| format!("rootfind-subtract-gpu: worker=native thread pool: {e}"))?;
+        Ok(Self {
+            f,
+            xs: reps.iter().map(|r| r.x).collect(),
+            ys: reps.iter().map(|r| r.y).collect(),
+            slots,
+            shift,
+            pool,
+            ifma,
+        })
+    }
+
+    #[inline(always)]
+    fn hash(x: u64, shift: u32) -> usize {
+        (x.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> shift) as usize
+    }
+
+    #[inline(always)]
+    fn contains(&self, x: u64) -> bool {
+        let mask = self.slots.len() - 1;
+        let mut h = Self::hash(x, self.shift);
+        loop {
+            let v = self.slots[h];
+            if v == x {
+                return true;
+            }
+            if v == u64::MAX {
+                return false;
+            }
+            h = (h + 1) & mask;
+        }
+    }
+
+    /// One target's reported positions, in the CPU sweep's order.  Rows with
+    /// `x_i = x_R` are skipped (such targets go to the CPU oracle whole).
+    fn sweep_one(&self, x: u64, y: u64, diffs: &mut Vec<u64>, scratch: &mut Vec<u64>) -> Hits {
+        let f = self.f;
+        let (xr, yr) = (f.to_mont(x), f.to_mont(y));
+        diffs.clear();
+        diffs.extend(self.xs.iter().map(|&xi| {
+            let d = f.sub(xr, xi);
+            if d == 0 {
+                f.one
+            } else {
+                d
+            }
+        }));
+        f.batch_inv(diffs, scratch);
+        let mut hits = Hits::new();
+        for i in 0..self.xs.len() {
+            let (xi, yi) = (self.xs[i], self.ys[i]);
+            if xi == xr {
+                continue;
+            }
+            let inv = diffs[i];
+            let lm = f.mul(f.add(yr, yi), inv);
+            let lp = f.mul(f.sub(yr, yi), inv);
+            let base = f.add(xr, xi);
+            if self.contains(f.sub(f.sqr(lm), base)) {
+                hits.push((2 * i, 0, 1));
+            }
+            if self.contains(f.sub(f.sqr(lp), base)) {
+                hits.push((2 * i + 1, 0, 1));
+            }
+        }
+        hits
+    }
+
+    fn sweep(&self, pts: &[PrimePoint]) -> Vec<Hits> {
+        use rayon::prelude::*;
+        if let Some(v) = &self.ifma {
+            return self.pool.install(|| {
+                pts.par_chunks(ifma::LANES)
+                    .map_init(Vec::new, |c, chunk| {
+                        v.sweep_lanes(chunk, c, |x| self.contains(x))
+                    })
+                    .flatten()
+                    .collect()
+            });
+        }
+        self.pool.install(|| {
+            pts.par_iter()
+                .map_init(
+                    || (Vec::new(), Vec::new()),
+                    |(d, s), p| self.sweep_one(p.x, p.y, d, s),
+                )
+                .collect()
+        })
+    }
+}
+
+/// The 8-lane sweep of `simd=ifma`: Montgomery arithmetic with `R = 2^52`
+/// in AVX-512 IFMA lanes, one target a lane, each with its own batched
+/// inversion over the base's abscissae; the same candidates, in the same
+/// order, as [`NativeSweep::sweep_one`].
+mod ifma {
+    use super::{Hits, PrimePoint};
+    #[cfg(target_arch = "x86_64")]
+    use std::arch::x86_64::*;
+
+    pub(super) const LANES: usize = 8;
+    const M52: u64 = (1 << 52) - 1;
+
+    pub(super) struct Ifma52 {
+        p: u64,
+        /// `−p⁻¹ mod 2^52`.
+        pinv: u64,
+        /// `2^52 mod p`, `2^104 mod p`.
+        r: u64,
+        r2: u64,
+        /// The base's abscissae and ordinates, times `2^52` mod `p`.
+        xs: Vec<u64>,
+        ys: Vec<u64>,
+    }
+
+    fn mulmod(a: u64, b: u64, p: u64) -> u64 {
+        (a as u128 * b as u128 % p as u128) as u64
+    }
+
+    fn powmod(mut a: u64, mut e: u64, p: u64) -> u64 {
+        let mut r = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = mulmod(r, a, p);
+            }
+            a = mulmod(a, a, p);
+            e >>= 1;
+        }
+        r
+    }
+
+    impl Ifma52 {
+        /// `None` without AVX-512 IFMA or for `p ≥ 2^52`.
+        pub(super) fn new(p: u64, xs: &[u64], ys: &[u64]) -> Option<Self> {
+            #[cfg(target_arch = "x86_64")]
+            let ok = std::arch::is_x86_feature_detected!("avx512f")
+                && std::arch::is_x86_feature_detected!("avx512ifma");
+            #[cfg(not(target_arch = "x86_64"))]
+            let ok = false;
+            if !ok || !(5..1 << 52).contains(&p) || p & 1 == 0 {
+                return None;
+            }
+            let mut inv = 1u64;
+            for _ in 0..6 {
+                inv = inv.wrapping_mul(2u64.wrapping_sub(p.wrapping_mul(inv)));
+            }
+            let r = ((1u128 << 52) % p as u128) as u64;
+            let r2 = mulmod(r, r, p);
+            Some(Self {
+                p,
+                pinv: inv.wrapping_neg() & M52,
+                r,
+                r2,
+                xs: xs.iter().map(|&x| mulmod(x, r, p)).collect(),
+                ys: ys.iter().map(|&y| mulmod(y, r, p)).collect(),
+            })
+        }
+
+        /// Each target's reported positions (as [`NativeSweep::sweep_one`]
+        /// reports them); `contains` answers for canonical abscissae.
+        pub(super) fn sweep_lanes(
+            &self,
+            pts: &[PrimePoint],
+            prefix: &mut Vec<[u64; LANES]>,
+            contains: impl Fn(u64) -> bool,
+        ) -> Vec<Hits> {
+            debug_assert!(!pts.is_empty() && pts.len() <= LANES);
+            let mut xr = [0u64; LANES];
+            let mut yr = [0u64; LANES];
+            for l in 0..LANES {
+                let q = pts[l.min(pts.len() - 1)];
+                xr[l] = mulmod(q.x, self.r, self.p);
+                yr[l] = mulmod(q.y, self.r, self.p);
+            }
+            let mut hits = vec![Hits::new(); LANES];
+            // SAFETY: `new` returned `Some` only where the CPU has
+            // avx512f and avx512ifma.
+            #[cfg(target_arch = "x86_64")]
+            unsafe {
+                self.sweep_avx(&xr, &yr, prefix, &contains, &mut hits)
+            };
+            hits.truncate(pts.len());
+            hits
+        }
+
+        /// `a⁻¹·2^52` from `a·2^52`, per lane (scalar).
+        fn inv_lanes(&self, v: [u64; LANES]) -> [u64; LANES] {
+            let mut o = [0u64; LANES];
+            for l in 0..LANES {
+                o[l] = mulmod(self.r2, powmod(v[l], self.p - 2, self.p), self.p);
+            }
+            o
+        }
+
+        #[cfg(target_arch = "x86_64")]
+        #[target_feature(enable = "avx512f,avx512ifma")]
+        unsafe fn sweep_avx(
+            &self,
+            xr: &[u64; LANES],
+            yr: &[u64; LANES],
+            prefix: &mut Vec<[u64; LANES]>,
+            contains: &impl Fn(u64) -> bool,
+            hits: &mut [Hits],
+        ) {
+            let ld = |a: &[u64; LANES]| _mm512_loadu_si512(a.as_ptr() as *const _);
+            let st = |v: __m512i| {
+                let mut a = [0u64; LANES];
+                _mm512_storeu_si512(a.as_mut_ptr() as *mut _, v);
+                a
+            };
+            let p = _mm512_set1_epi64(self.p as i64);
+            let pinv = _mm512_set1_epi64(self.pinv as i64);
+            let z = _mm512_setzero_si512();
+            let one_r = _mm512_set1_epi64(self.r as i64);
+            let one = _mm512_set1_epi64(1);
+            // Montgomery product, R = 2^52, inputs and output in [0, p).
+            let mm = |a: __m512i, b: __m512i| {
+                let lo = _mm512_madd52lo_epu64(z, a, b);
+                let hi = _mm512_madd52hi_epu64(z, a, b);
+                let m = _mm512_madd52lo_epu64(z, lo, pinv);
+                let c = _mm512_srli_epi64::<52>(_mm512_madd52lo_epu64(lo, m, p));
+                let u = _mm512_add_epi64(_mm512_madd52hi_epu64(hi, m, p), c);
+                _mm512_min_epu64(u, _mm512_sub_epi64(u, p))
+            };
+            let add = |a: __m512i, b: __m512i| {
+                let s = _mm512_add_epi64(a, b);
+                _mm512_min_epu64(s, _mm512_sub_epi64(s, p))
+            };
+            let sub = |a: __m512i, b: __m512i| {
+                let d = _mm512_sub_epi64(a, b);
+                _mm512_min_epu64(d, _mm512_add_epi64(d, p))
+            };
+            let vxr = ld(xr);
+            let vyr = ld(yr);
+            let k = self.xs.len();
+            // x_R − x_i, with 1 (in Montgomery form) where it is 0.
+            let diff = |i: usize| {
+                let d = sub(vxr, _mm512_set1_epi64(self.xs[i] as i64));
+                let zm = _mm512_cmpeq_epi64_mask(d, z);
+                (_mm512_mask_blend_epi64(zm, d, one_r), zm)
+            };
+            prefix.clear();
+            prefix.reserve(k);
+            let mut acc = one_r;
+            for i in 0..k {
+                acc = mm(acc, diff(i).0);
+                prefix.push(st(acc));
+            }
+            let mut inv = ld(&self.inv_lanes(st(acc)));
+            for i in (1..k).rev() {
+                let inv_i = mm(inv, ld(&prefix[i - 1]));
+                inv = mm(inv, diff(i).0);
+                prefix[i] = st(inv_i);
+            }
+            prefix[0] = st(inv);
+            for i in 0..k {
+                let (_, zm) = diff(i);
+                let xi = _mm512_set1_epi64(self.xs[i] as i64);
+                let yi = _mm512_set1_epi64(self.ys[i] as i64);
+                let inv_i = ld(&prefix[i]);
+                let lm = mm(add(vyr, yi), inv_i);
+                let lp = mm(sub(vyr, yi), inv_i);
+                let base = add(vxr, xi);
+                let xm = st(mm(sub(mm(lm, lm), base), one));
+                let xp = st(mm(sub(mm(lp, lp), base), one));
+                for (l, h) in hits.iter_mut().enumerate() {
+                    if zm & (1 << l) != 0 {
+                        continue;
+                    }
+                    if contains(xm[l]) {
+                        h.push((2 * i, 0, 1));
+                    }
+                    if contains(xp[l]) {
+                        h.push((2 * i + 1, 0, 1));
+                    }
+                }
+            }
+        }
+    }
+}
+
 pub struct RootfindSubtractGpuOracle<'i> {
     cpu: RootfindSubtractOracle<'i>,
     m: u32,
@@ -377,6 +720,7 @@ pub struct RootfindSubtractGpuOracle<'i> {
     pending: RefCell<Vec<PrimePoint>>,
     swept: HashMap<(u64, u64), Hits>,
     counters: BTreeMap<String, u64>,
+    native: Option<NativeSweep>,
 }
 
 impl<'i> RootfindSubtractGpuOracle<'i> {
@@ -391,6 +735,7 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
             pending: RefCell::new(Vec::new()),
             swept: HashMap::new(),
             counters: BTreeMap::new(),
+            native: None,
         }
     }
 
@@ -583,6 +928,15 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
                 batch.push(p);
             }
         }
+        if let Some(native) = &self.native {
+            let hits = native.sweep(&batch);
+            for (p, h) in batch.iter().zip(hits) {
+                self.swept.insert((p.x, p.y), h);
+            }
+            self.bump("gpu_batches", 1);
+            self.bump("gpu_targets_swept", batch.len() as u64);
+            return Ok(());
+        }
         // A batch whose relations overflow the worker's buffer is split in
         // halves until each fits (only dense m = 3 tables on tiny curves).
         let mut work: Vec<&[PrimePoint]> = batch.chunks(MAX_BATCH).rev().collect();
@@ -651,8 +1005,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             ),
             (
                 "worker",
-                "spawn (default: a worker process per run, which creates its CUDA context) or \
-                 daemon (connect to rootfind_serve --daemon; its start is a one-time host cost)",
+                "spawn (default: a worker process per run, which creates its CUDA context), \
+                 daemon (connect to rootfind_serve --daemon; its start is a one-time host cost) or \
+                 native (no worker: rootfind-subtract's own sweep over each batch's targets on a \
+                 thread pool in this process)",
             ),
             (
                 "backend",
@@ -662,6 +1018,16 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             (
                 "probe_build",
                 "device (default for m = 3: the lookup table built on the device) or host",
+            ),
+            (
+                "threads",
+                "worker=native only: the thread pool's size (default: every thread the process \
+                 may use)",
+            ),
+            (
+                "simd",
+                "worker=native only: off (default, scalar 64-bit Montgomery) or ifma (eight targets \
+                 at once in AVX-512 IFMA lanes; refused without IFMA or for p >= 2^52)",
             ),
         ]
     }
@@ -680,14 +1046,44 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             ));
         }
         for key in params.0.keys() {
-            if !["m", "worker", "backend", "probe_build"].contains(&key.as_str()) {
+            if !["m", "worker", "backend", "probe_build", "threads", "simd"].contains(&key.as_str())
+            {
                 return Err(format!(
-                    "rootfind-subtract-gpu reads only `m`, `worker`, `backend` and `probe_build`; \
-                     `{key}` is unknown"
+                    "rootfind-subtract-gpu reads only `m`, `worker`, `backend`, `probe_build`, \
+                     `threads` and `simd`; `{key}` is unknown"
                 ));
             }
         }
         self.mode = WorkerMode::parse(params.0.get("worker").map_or("spawn", |s| s.as_str()))?;
+        // `worker=native` has no backend or device table; `threads` belongs to it
+        // alone (0 or absent: every thread the process may use).
+        let threads = match params.0.get("threads") {
+            None => 0,
+            Some(t) => t.parse::<usize>().map_err(|_| {
+                format!("rootfind-subtract-gpu: threads must be a count, got `{t}`")
+            })?,
+        };
+        if self.mode == WorkerMode::Native {
+            for k in ["backend", "probe_build"] {
+                if params.0.contains_key(k) {
+                    return Err(format!(
+                        "rootfind-subtract-gpu: worker=native takes no `{k}` (it sweeps on the \
+                         CPU against the probe set the CPU oracle builds)"
+                    ));
+                }
+            }
+        } else if params.0.contains_key("threads") || params.0.contains_key("simd") {
+            return Err("rootfind-subtract-gpu: `threads` and `simd` need worker=native".into());
+        }
+        let simd = match params.0.get("simd").map_or("off", |s| s.as_str()) {
+            "off" => false,
+            "ifma" => true,
+            other => {
+                return Err(format!(
+                    "rootfind-subtract-gpu: simd must be off or ifma, got `{other}`"
+                ))
+            }
+        };
         // `backend=cuda` fails closed when the worker has no device; `emulate`
         // runs the same kernel code on every host thread (a multi-threaded CPU
         // sweep); `any` (the default) takes the device when there is one.
@@ -706,7 +1102,11 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         // (sorted for large sets), the first m = 3 measurement's path;
         // `pairs` (m = 3): the pair table itself is built by the worker (on the
         // device under CUDA) from the base, and charged here as the CPU build.
-        let default_build = if self.m == 3 { "device" } else { "host" };
+        let default_build = if self.m == 3 && self.mode != WorkerMode::Native {
+            "device"
+        } else {
+            "host"
+        };
         self.lookup = match params
             .0
             .get("probe_build")
@@ -728,7 +1128,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         // The CPU oracle sees only `m`: the worker changes where the sweep
         // runs, not the search.
         let mut cpu_params = params.clone();
-        for k in ["worker", "backend", "probe_build"] {
+        for k in ["worker", "backend", "probe_build", "threads", "simd"] {
             cpu_params.0.remove(k);
         }
         self.cpu.prepare(ctx, fb, &cpu_params, ops)?;
@@ -776,6 +1176,31 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         } else {
             Vec::new()
         };
+        self.native = None;
+        if self.mode == WorkerMode::Native {
+            let (f, reps) = self
+                .cpu
+                .sweep()
+                .ok_or("rootfind-subtract did not prepare")?;
+            // The IFMA sweep probes canonical abscissae; the scalar one
+            // Montgomery forms.
+            let set: Vec<u64> = match (self.m == 3, simd) {
+                (true, true) => probe.clone(),
+                (true, false) => probe.iter().map(|&x| f.to_mont(x)).collect(),
+                (false, true) => reps.iter().map(|r| f.from_mont(r.x)).collect(),
+                (false, false) => reps.iter().map(|r| r.x).collect(),
+            };
+            let threads = if threads == 0 {
+                std::thread::available_parallelism().map_or(1, |n| n.get())
+            } else {
+                threads
+            };
+            self.native = Some(NativeSweep::new(f, reps, &set, threads, simd)?);
+            self.swept.clear();
+            self.pending.borrow_mut().clear();
+            self.counters.clear();
+            return Ok(());
+        }
         let (backend, lookup) = (self.backend, self.lookup);
         let curve_a = ctx.group.a;
         if lookup == 4 {
@@ -1131,6 +1556,206 @@ mod tests {
         }
     }
 
+    /// `worker=native` (no worker process): the in-process multi-threaded sweep
+    /// equals `rootfind-subtract`, `m = 2` and `3`, one thread and three, on
+    /// single targets and lane batches.
+    #[test]
+    fn native_sweep_matches_rootfind_subtract() {
+        for m in [2, 3] {
+            for threads in ["1", "3"] {
+                run_equality_with(
+                    m,
+                    "native",
+                    &[Targets::Walk, Targets::WalkPrimeBatch256],
+                    &[("threads", threads)],
+                );
+            }
+        }
+    }
+
+    fn ifma_present() -> bool {
+        let ok = ifma::Ifma52::new(1_000_003, &[1], &[1]).is_some();
+        if !ok {
+            eprintln!("skipped: no AVX-512 IFMA on this host");
+        }
+        ok
+    }
+
+    /// `simd=ifma` against the scalar sweep, hit for hit: targets in and out
+    /// of the base (degenerate rows), negatives, and a partial last chunk.
+    #[test]
+    fn ifma_lanes_match_scalar_sweep() {
+        if !ifma_present() {
+            return;
+        }
+        for (inst, n) in [
+            (prime_instance_for(20, 59297), 40u64),
+            (prime_instance_for(14, 1), 9),
+        ] {
+            let f = Fp64::new(inst.curve.p);
+            let g = inst.generator_point();
+            let pt = |k: u64| inst.curve.mul(&mut GroupOps::default(), g, k);
+            let reps: Vec<SweepRep> = (1..=n)
+                .map(&pt)
+                .map(|q| SweepRep {
+                    x: f.to_mont(q.x),
+                    y: f.to_mont(q.y),
+                    plus: 0,
+                    minus: 0,
+                })
+                .collect();
+            // A probe set holding the base's abscissae and some others.
+            let canon: Vec<u64> = (1..=3 * n).map(|k| pt(k).x).collect();
+            let mont: Vec<u64> = canon.iter().map(|&x| f.to_mont(x)).collect();
+            let scalar = NativeSweep::new(f, &reps, &mont, 2, false).unwrap();
+            let lanes = NativeSweep::new(f, &reps, &canon, 2, true).unwrap();
+            let mut targets: Vec<PrimePoint> = (1..=29).map(|k| pt(7 * k + 3)).collect();
+            targets.push(pt(5)); // R = F_5: a degenerate row
+            targets.push(inst.curve.neg(pt(2)));
+            for len in [targets.len(), 1, 8, 9] {
+                let a = scalar.sweep(&targets[..len]);
+                let b = lanes.sweep(&targets[..len]);
+                assert_eq!(a, b, "{} len {len}", inst.name);
+                assert!(
+                    a.iter().any(|h| !h.is_empty()),
+                    "{}: no hits to compare",
+                    inst.name
+                );
+            }
+        }
+    }
+
+    /// `simd=ifma` on primes up to just below 2^52 (the curves above use
+    /// p < 2^36; the Montgomery product's final reduction only matters past
+    /// about 2^51): random field values, a probe set holding about a third of
+    /// the candidates' abscissae (computed with u128), lanes against the
+    /// scalar sweep and against that expectation.
+    #[test]
+    fn ifma_lanes_match_scalar_sweep_near_2_52() {
+        if !ifma_present() {
+            return;
+        }
+        fn mulm(a: u64, b: u64, p: u64) -> u64 {
+            (a as u128 * b as u128 % p as u128) as u64
+        }
+        fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
+            let mut r = 1;
+            while e > 0 {
+                if e & 1 == 1 {
+                    r = mulm(r, a, p);
+                }
+                a = mulm(a, a, p);
+                e >>= 1;
+            }
+            r
+        }
+        fn is_prime(n: u64) -> bool {
+            if n < 4 || n.is_multiple_of(2) {
+                return n == 2 || n == 3;
+            }
+            let (mut d, mut s) = (n - 1, 0);
+            while d.is_multiple_of(2) {
+                d /= 2;
+                s += 1;
+            }
+            'w: for a in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+                let mut x = powm(a % n, d, n);
+                if x <= 1 || x == n - 1 {
+                    continue;
+                }
+                for _ in 1..s {
+                    x = mulm(x, x, n);
+                    if x == n - 1 {
+                        continue 'w;
+                    }
+                }
+                return false;
+            }
+            true
+        }
+        let mut seed = 0x1234_5678_9abc_def0u64;
+        let mut rnd = |n: u64| {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed % n
+        };
+        let starts = [(1u64 << 52) - 1, (1 << 52) - 5000, 3 << 50, (1 << 51) + 777];
+        for start in starts {
+            let mut p = start | 1;
+            while !is_prime(p) {
+                p -= 2;
+            }
+            let f = Fp64::new(p);
+            let k = 37usize;
+            let xs: Vec<u64> = (0..k).map(|_| rnd(p)).collect();
+            let ys: Vec<u64> = (0..k).map(|_| rnd(p)).collect();
+            let reps: Vec<SweepRep> = xs
+                .iter()
+                .zip(&ys)
+                .map(|(&x, &y)| SweepRep {
+                    x: f.to_mont(x),
+                    y: f.to_mont(y),
+                    plus: 0,
+                    minus: 0,
+                })
+                .collect();
+            let mut targets: Vec<PrimePoint> = (0..19)
+                .map(|_| PrimePoint::affine(rnd(p), rnd(p)))
+                .collect();
+            targets.push(PrimePoint::affine(xs[3], ys[3])); // a degenerate row
+            targets.push(PrimePoint::affine(p - 1, p - 1)); // values at the edge
+                                                            // The candidates' abscissae with u128 arithmetic; keep every third.
+            let mut canon = Vec::new();
+            let mut expected = vec![0usize; targets.len()];
+            for (t, q) in targets.iter().enumerate() {
+                for i in 0..k {
+                    if xs[i] == q.x {
+                        continue;
+                    }
+                    let inv = powm((q.x + p - xs[i]) % p, p - 2, p);
+                    let num = [(q.y + ys[i]) % p, (q.y + p - ys[i]) % p];
+                    for (e, yy) in num.into_iter().enumerate() {
+                        let lam = mulm(yy, inv, p);
+                        let x3 = (mulm(lam, lam, p) + 2 * p - q.x - xs[i]) % p;
+                        if (t + i + e) % 3 == 0 {
+                            canon.push(x3);
+                            expected[t] += 1;
+                        }
+                    }
+                }
+            }
+            canon.extend((0..50).map(|_| rnd(p)));
+            let mont: Vec<u64> = canon.iter().map(|&x| f.to_mont(x)).collect();
+            let scalar = NativeSweep::new(f, &reps, &mont, 2, false).unwrap();
+            let lanes = NativeSweep::new(f, &reps, &canon, 2, true).unwrap();
+            for len in [targets.len(), 1, 8, 9] {
+                let a = scalar.sweep(&targets[..len]);
+                let b = lanes.sweep(&targets[..len]);
+                assert_eq!(a, b, "p = {p:#x}, len {len}");
+                for t in 0..len {
+                    assert!(b[t].len() >= expected[t], "p = {p:#x}, target {t}");
+                }
+            }
+        }
+    }
+
+    /// `worker=native,simd=ifma` equals `rootfind-subtract` over whole pipelines.
+    #[test]
+    fn native_ifma_matches_rootfind_subtract() {
+        if !ifma_present() {
+            return;
+        }
+        for m in [2, 3] {
+            run_equality_with(
+                m,
+                "native",
+                &[Targets::Walk, Targets::WalkPrimeBatch256],
+                &[("threads", "3"), ("simd", "ifma")],
+            );
+        }
+    }
+
     /// The emulation backend asked for by name, and both probe-table builds.
     #[test]
     fn gpu_oracle_backend_and_probe_build_match() {
@@ -1334,6 +1959,23 @@ mod tests {
             let r = run_pipeline(&c, &spec, &base, &mut o, 1, &Calibration::default(), None);
             assert!(r.is_err(), "{k}={v}");
             spec.oracle_params.0.remove(k);
+        }
+        // `threads` only with worker=native; native takes no backend or build.
+        for extra in [
+            &[("threads", "2")][..],
+            &[("worker", "native"), ("backend", "emulate")],
+            &[("worker", "native"), ("probe_build", "host")],
+            &[("worker", "native"), ("threads", "two")],
+            &[("worker", "native"), ("simd", "avx9")],
+            &[("worker", "spawn"), ("simd", "ifma")],
+        ] {
+            let mut sp = spec.clone();
+            for (k, v) in extra {
+                sp.oracle_params.set(k, *v);
+            }
+            let mut o = RootfindSubtractGpuOracle::new(2, &inst);
+            let r = run_pipeline(&c, &sp, &base, &mut o, 1, &Calibration::default(), None);
+            assert!(r.is_err(), "{extra:?}");
         }
     }
 }

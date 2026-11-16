@@ -65,6 +65,10 @@ pub use super::groebner_f4::Ordering;
 /// non-zero coefficients, sorted with the leading term first.
 pub type Poly = Vec<(Vec<u32>, u64)>;
 
+/// Opt-in, bounded trace storage with independent Buchberger checks on replay.
+pub mod reuse;
+pub use reuse::{TracePool, TraceStats};
+
 /// Optional, read-only observations of the regular F4/solve path. Degrees
 /// describe this run, never a certified degree of regularity.
 #[derive(Clone, Debug, serde::Serialize)]
@@ -3239,16 +3243,23 @@ fn f4_with_arithmetic(
         .map(|_| ckpt::fingerprint(input, n_vars, p, opts, mode, gm, packed.is_some()));
     let mut resumed_opts: Option<F4Options> = None;
     let mut resume_rref: Option<ckpt::RrefLoaded> = None;
+    // (elapsed, field operations) of the loop-top checkpoint just read: the first
+    // step of a resumed run starts from exactly what is on disk, so it needs no
+    // rewrite of that file, and an in-step snapshot of it binds to these values.
+    let mut disk_top: Option<(Duration, u64)> = None;
     if let (Some((path, _)), Some(fp)) = (&opts.checkpoint, ck_fp) {
+        let t_read = Instant::now();
         if let Some(l) = ckpt::load_best(path, Some(fp)) {
             eprintln!(
-                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs",
+                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs (read in {:.1} s)",
                 path.display(),
                 l.steps,
                 l.elapsed.as_secs_f64(),
                 l.basis.len(),
-                l.pairs.len()
+                l.pairs.len(),
+                t_read.elapsed().as_secs_f64()
             );
+            disk_top = Some((l.elapsed, l.field_ops));
             basis = l.basis;
             alive = l.alive;
             pairs = l.pairs;
@@ -3273,14 +3284,16 @@ fn f4_with_arithmetic(
             // finished part of the reduction, so its counts continue from the
             // snapshot's.
             if !deferred && opts.weights.is_none() {
+                let t_rref = Instant::now();
                 if let Some(r) = ckpt::load_rref(&ckpt::rref_path(path), fp, l.steps, l.elapsed) {
                     eprintln!(
-                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows",
+                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows (read in {:.1} s)",
                         r.phase,
                         r.c,
                         r.pivots.len(),
                         r.elapsed.as_secs_f64(),
-                        r.rows.len()
+                        r.rows.len(),
+                        t_rref.elapsed().as_secs_f64()
                     );
                     carried.set(r.elapsed);
                     ops_carry.set(r.ops);
@@ -3377,13 +3390,23 @@ fn f4_with_arithmetic(
             eprintln!("f4: {} pairs pending, basis {}", pairs.len(), basis.len());
         }
         // the loop-top values a checkpoint of this step's top records
-        let top_el = t0.elapsed() + carried.get();
-        let top_ops = ops_carry.get() + (field_ops_now() - ops0);
-        let mut wrote_top = false;
+        let (mut top_el, mut top_ops, mut wrote_top) = match disk_top.take() {
+            Some((e, o)) => (e, o, true),
+            None => (
+                t0.elapsed() + carried.get(),
+                ops_carry.get() + (field_ops_now() - ops0),
+                false,
+            ),
+        };
         if let (Some((path, every)), Some(fp)) = (&opts.checkpoint, ck_fp) {
             let stop = opts.checkpoint_stop_after.is_some_and(|k| steps >= k);
             if stop || last_ckpt.elapsed() >= *every {
                 let tw = Instant::now();
+                if wrote_top {
+                    // rewriting the file this step started from: record the values of now
+                    top_el = t0.elapsed() + carried.get();
+                    top_ops = ops_carry.get() + (field_ops_now() - ops0);
+                }
                 let snap = ckpt::Snap {
                     fingerprint: fp,
                     n_vars,
@@ -4899,6 +4922,7 @@ struct VisitState<'a, F, S> {
     assignment: Vec<u64>,
     visitor: F,
     sink: Option<S>,
+    pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
 }
@@ -5005,7 +5029,19 @@ where
         {
             return VisitEnd::Complete;
         }
-        let (r, trace) = if self.sink.is_some() {
+        let mut native_calls = 1;
+        let (r, trace) = if let Some(pool) = &mut self.pool {
+            let profile: Vec<_> = active
+                .iter()
+                .map(|&i| self.domains[i].as_ref().map(Vec::len))
+                .collect();
+            let before = pool.stats();
+            let r = pool.run(input, active.len(), self.p, self.opts, &profile);
+            let after = pool.stats();
+            native_calls = (after.learned - before.learned + after.replay_attempts
+                - before.replay_attempts) as usize;
+            (r, None)
+        } else if self.sink.is_some() {
             let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
             (r, Some(trace))
         } else {
@@ -5014,7 +5050,7 @@ where
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
         }
-        self.report.f4_runs += 1;
+        self.report.f4_runs += native_calls;
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
@@ -5179,6 +5215,7 @@ pub fn solve_visit(
         domains,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+        None,
     )
 }
 
@@ -5203,9 +5240,38 @@ pub fn solve_visit_traced(
     if opts.stop_hilbert.is_some() {
         return Err("traced visitor does not support Hilbert stopping".into());
     }
-    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink))
+    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink), None)
 }
 
+/// Reuse certified native traces across attempts in one explicitly scoped
+/// family. Learning, rejected replay, certification and fallback remain inside
+/// the same deadline; the original visitor and traced APIs are unchanged.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_visit_reusing(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    pool: &mut TracePool,
+    visitor: impl FnMut(&[u64]) -> bool,
+) -> Result<VisitReport, String> {
+    if opts.stop_hilbert.is_some() {
+        return Err("trace reuse does not support Hilbert stopping".into());
+    }
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        visitor,
+        None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+        Some(pool),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
 fn solve_visit_impl<F, S>(
     input: &[Poly],
     n_vars: usize,
@@ -5214,6 +5280,7 @@ fn solve_visit_impl<F, S>(
     domains: &[Option<Vec<u64>>],
     visitor: F,
     sink: Option<S>,
+    pool: Option<&mut TracePool>,
 ) -> Result<VisitReport, String>
 where
     F: FnMut(&[u64]) -> bool,
@@ -5248,6 +5315,7 @@ where
         assignment: vec![0; n_vars],
         visitor,
         sink,
+        pool,
         next_node: 0,
         report: VisitReport::default(),
     };

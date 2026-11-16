@@ -55,3 +55,7 @@ Run a clean full-fixture Linux suite on the new head when host resources permit;
 do not report the macOS suite as passing or infer a factor-base runtime from
 the controller tests. The passing example test establishes controller behavior
 only; it does not launch the K600 arm.
+
+The later merge of `main` and its exact validation are recorded separately in
+[MERGE_VALIDATION.md](MERGE_VALIDATION.md); the attempts above remain the
+pre-merge history and are not rewritten as merged-head results.

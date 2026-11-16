@@ -1,7 +1,9 @@
 #include "native_group.hpp"
+#include "measurement_hook.hpp"
 using namespace cubic_native;
 int main(int argc, char **argv) {
   try {
+    CubicMeasurement measurement;
     require(argc == 5 || argc == 6,
             "usage: transfer_test PUBLIC_FIXTURE HISTORICAL_RESULTS "
             "NEW_OUTPUT ARM(ic|rho|rho-neg|map) [SEED]");

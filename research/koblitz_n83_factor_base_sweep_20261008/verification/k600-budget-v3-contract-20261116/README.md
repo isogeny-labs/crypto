@@ -79,3 +79,8 @@ a checked logarithm, total cold runtime, or a winning base.
 The K600 readiness work and this controller are not a substitute for the
 requested full combination sweep. The historical finite grid still includes
 many unavailable backend adapters; those cases remain explicit open work.
+
+The [original controller validation](VALIDATION.md) and the
+[merged-tree validation](MERGE_VALIDATION.md) record passing example tests and
+the failed macOS full-library gate. The merged-tree report is the current
+gate status for this PR; neither record is a factor-base performance result.

@@ -42,3 +42,14 @@ The second release example test invocation used a separate Cargo target and
 temporary directory under `/Volumes/SSD990/tmp/`; its result is recorded
 separately. None of these host operations changes the frozen K600 source,
 input hashes, or the arm admission protocol's 5 GiB boot floor.
+
+Before the merged-tree full library run, two more inactive generated locations
+were relocated to the same secondary-volume quarantine. The remaining
+`/private/tmp/ic-suite-feature-integration/debug/incremental` directory now
+points to `incremental-rest`, and the idle
+`/Users/adamburan/.rustup/toolchains/stable-aarch64-apple-darwin` directory
+now points to `stable-aarch64-apple-darwin`. Each original path is a symlink
+to the preserved directory. The pinned validation command uses Rust 1.99.1,
+not the relocated `stable` toolchain. These moves were checked for active
+Cargo/rustc processes and open handles before completion. They were not
+deletions or changes to repository inputs.
