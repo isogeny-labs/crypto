@@ -395,3 +395,6 @@ Remote115a6f26f62902e35a3bdff10638d80e84550452/tree54b7d86dff3bdfa5d2b028d0f694f
 
 ## Active successor override: budgeted early rank
 User requested continued work; new activegoal fixed RANK_BUDGET_PROTOCOL_02.md PCCd8ef6a (01tagerror1d2f7b retained). Source47tests/lint/build50 passe54197. Nextfreeze source then4Singular matrix probes +6oldn3 correctness cells, corruptedrankrefusal, publish36 then18n3/4/6seed7arms. Actualrootworker8d0ba116c unchanged. No fresh/reservedinputs allowed. LocalCPU0/L0/checkpointwaived/zero$. Prior studiescomplete.
+
+## Latest early-rank study completion
+18cells complete allchecks; PCCedfc6c/de603d. Two syzygies each10poly/8proof terms/proddegree6 lower actualF4 and affine5to4 at n3/4/6; negativecountdiffgain0degree5, n6matrix136x175to78x73. All18basisideals equalstar, zero failures/contention, unchangedpins.19rawarchives; closedrecord20261116T2046Z-budgeted-early-rank-relations-20261116, integrityerrors[], PDF4pages inspected. Next finishpublication37 andreceipt; no new15x timing claim. Successor firsttwo structuralrule unmeasured. Allfresh/reservedseedsuntouched.

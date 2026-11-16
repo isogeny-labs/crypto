@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1631Z-fixed-relation-degree-ablations-20261116",
+  "latest_record": "20261116T2046Z-budgeted-early-rank-relations-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 219,
+    "measured": 220,
     "open": 1
   },
   "repo": "crypto",
@@ -14513,6 +14513,52 @@
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 18.0,
+      "latest": 18.0,
+      "latest_derived": {},
+      "metric": "checked_complete_cells",
+      "points": [
+        {
+          "commit": "a4ffb0f5b6ba",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 18,
+          "record": "20261116T2046Z-budgeted-early-rank-relations-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All18 fixed development cells complete and fully match RustF4/3CAS, exact identities/rank decisions/fees. Two selected cubics lower actualF4 degree5to4 at n3/4/6, control differences stay5; n6matrix136x175to78x73. Descriptive single-call costs; no timing or15x admission. PCCedfc6c/de603d unsigned localL0/checkpoint waiver.",
+          "value": 18.0
+        }
+      ],
+      "problem": "kernel:certified-relations-rank-budget",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 3.0,
+      "latest": 3.0,
+      "latest_derived": {},
+      "metric": "rank_selected_cells_with_f4_degree_5_to_4",
+      "points": [
+        {
+          "commit": "a4ffb0f5b6ba",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T2046Z-budgeted-early-rank-relations-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All18 fixed development cells complete and fully match RustF4/3CAS, exact identities/rank decisions/fees. Two selected cubics lower actualF4 degree5to4 at n3/4/6, control differences stay5; n6matrix136x175to78x73. Descriptive single-call costs; no timing or15x admission. PCCedfc6c/de603d unsigned localL0/checkpoint waiver.",
+          "value": 3.0
+        }
+      ],
+      "problem": "kernel:certified-relations-rank-budget",
       "unit": "count"
     },
     {
