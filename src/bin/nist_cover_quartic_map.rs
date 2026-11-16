@@ -51,8 +51,7 @@ fn find_prime_e(p: u64) -> Option<(u64, u128)> {
 
 fn generator(e: &nc::Ecc, r: u128) -> Option<nc::EPt> {
     for x in 0..e.p {
-        let rhs =
-            ((x as u128).pow(3) + e.a as u128 * x as u128 + e.b as u128) % e.p as u128;
+        let rhs = ((x as u128).pow(3) + e.a as u128 * x as u128 + e.b as u128) % e.p as u128;
         if let Some(y) = sp::sqrt_mod(rhs as u64, e.p) {
             let pt = Some((x, y));
             if e.order(&pt, r) == r {
@@ -135,7 +134,11 @@ fn main() -> ExitCode {
         let e = chain.ecc();
         let r = chain.e_prime_subgroup;
         let gp = generator(&e, r).expect("generator");
-        let k = if k_plant == 0 { (r / 3) + 1 } else { k_plant % r };
+        let k = if k_plant == 0 {
+            (r / 3) + 1
+        } else {
+            k_plant % r
+        };
         let q = e.mul(&gp, k);
 
         let mut rng = sp::SplitMix64(0x5eed_0000_0000_0001u64 ^ p);
@@ -157,11 +160,9 @@ fn main() -> ExitCode {
         let recovered = nc::bsgs_quartic(c, &psi_g, &psi_q, r);
         let dlp_ok = recovered == Some(k % r);
 
-        let nc_fp = crypto_lib::cryptanalysis::smith_canonical::count_quartic_points(
-            p, &chain.quartic, 1,
-        );
-        let nh_fp =
-            crypto_lib::cryptanalysis::smith_canonical::count_h_points(&chain.f, p, 1);
+        let nc_fp =
+            crypto_lib::cryptanalysis::smith_canonical::count_quartic_points(p, &chain.quartic, 1);
+        let nh_fp = crypto_lib::cryptanalysis::smith_canonical::count_h_points(&chain.f, p, 1);
 
         let ok = ord_pg == r && hom_ok && img_nonzero && dlp_ok && nc_fp == nh_fp;
         all_ok &= ok;

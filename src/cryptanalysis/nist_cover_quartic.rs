@@ -206,7 +206,10 @@ pub fn pullback(jac: &sc::HJac, gamma: u64, pt: &EPt) -> Option<sc::Mumford> {
             // conjugate pair over F_{p^2}: U = u^2 - x0 u + gamma,
             // V = y0 x0 u - y0 gamma  (= y0 u^2 mod U).
             let u = vec![gamma % p, ng(x0), 1];
-            let v = vec![ng(m(y0 as u128 * gamma as u128)), m(y0 as u128 * x0 as u128)];
+            let v = vec![
+                ng(m(y0 as u128 * gamma as u128)),
+                m(y0 as u128 * x0 as u128),
+            ];
             sc::Mumford { u, v }
         }
     };
@@ -347,7 +350,8 @@ impl Chain {
         pt: &EPt,
         rng: &mut sp::SplitMix64,
     ) -> Result<crate::cryptanalysis::plane_quartic_pic::PicClass, String> {
-        let d = pullback(&self.jac, self.gamma, pt).ok_or("pullback undefined (O_E or ramified)")?;
+        let d =
+            pullback(&self.jac, self.gamma, pt).ok_or("pullback undefined (O_E or ramified)")?;
         self.transfer
             .transfer_divisor(&self.jac, &d, &self.pts_over_u, rng)
     }
@@ -416,12 +420,10 @@ mod tests {
         };
         let mut checked = 0;
         for x0 in 0..200u64 {
-            let rhs =
-                ((x0 as u128).pow(3) + a as u128 * x0 as u128 + b as u128) % p as u128;
+            let rhs = ((x0 as u128).pow(3) + a as u128 * x0 as u128 + b as u128) % p as u128;
             if let Some(y0) = super::sp::sqrt_mod(rhs as u64, p) {
                 assert!(e.on(&Some((x0, y0))));
-                let disc = (x0 as u128 * x0 as u128 + p as u128
-                    - 4 * gamma as u128 % p as u128)
+                let disc = (x0 as u128 * x0 as u128 + p as u128 - 4 * gamma as u128 % p as u128)
                     % p as u128;
                 if let Some(s) = super::sp::sqrt_mod(disc as u64, p) {
                     if disc == 0 {
@@ -455,8 +457,7 @@ mod tests {
         for b in 1..p {
             let e = Ecc::new(p, a, b);
             // nonsingular: 4a^3 + 27b^2 != 0
-            let disc = (4 * (a as u128).pow(3) % p as u128 + 27 * (b as u128).pow(2))
-                % p as u128;
+            let disc = (4 * (a as u128).pow(3) % p as u128 + 27 * (b as u128).pow(2)) % p as u128;
             if disc == 0 {
                 continue;
             }
@@ -499,8 +500,7 @@ mod tests {
         // A generator P of E (order r), and a planted target Q = [k] P.
         let mut gp = None;
         for x in 0..p {
-            let rhs = ((x as u128).pow(3) + a as u128 * x as u128 + chain.b as u128)
-                % p as u128;
+            let rhs = ((x as u128).pow(3) + a as u128 * x as u128 + chain.b as u128) % p as u128;
             if let Some(y) = super::sp::sqrt_mod(rhs as u64, p) {
                 let pt = Some((x, y));
                 if e.order(&pt, r) == r {
@@ -521,7 +521,10 @@ mod tests {
         assert_eq!(chain.jac.order(&pg, n), r, "phi*(P) keeps order r");
         // phi*([k]P) = [k] phi*(P)
         let kpg = chain.jac.mul(&pg, k);
-        assert!(chain.jac.is_zero(&chain.jac.sub(&kpg, &pq)), "phi* homomorphism on the planted pair");
+        assert!(
+            chain.jac.is_zero(&chain.jac.sub(&kpg, &pq)),
+            "phi* homomorphism on the planted pair"
+        );
 
         // Transfer both to Pic^0(C) and recover k there.
         let psi_g = chain.transfer_point(&gp, &mut rng).expect("Psi phi* P");
