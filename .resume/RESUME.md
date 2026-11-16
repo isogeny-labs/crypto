@@ -1,4 +1,23 @@
-# Current checkpoint:26FINISHED, publish packet/continue coverage (16 November11:26Z)
+# Current checkpoint:26PUBLISHED; RNG/native-price review next (16 November11:30Z)
+
+26packetPUBLISHED2a13f5c8acea5e37bfa73d4a5ca3087c8b286ced;PR4288rewritten
+aroundfinalRustimplementation/actualevidence/remaininggaps,titleupdated.
+RegularOPEN/automergeENABLEDconfirmed,no manualmerge. Artifactbot6309b997a
+FFintegrated; exactignored26PNGrestoredfromlocal/hashPASS,neverreaddPNG.
+No activecompiler/scientificjob. GoalACTIVE/no stopgoal/no subagents.
+All26sourcechecks and2actualDLP/counterchecksPASS asbelow;primarycostunknown.
+
+NEXT ACTION: readlatestjournal +exact pinnedrand0.8.8 uniform sampler/other
+RNGcalls andnativecontainer/strongRhoprice sources. KBunavailable,primary
+sourcefallbackalreadyused. PreserveoldRNGstreams/APIs/legacyrecords. No new
+samplerrewrite orscientificprotocolselected. Needsource/pricecoveragecontract
+beforecode,source/specpublishedbeforeanytrial. No paidcloud needed/localworks.
+Potential actual optimizedextension/tunedRhopricing needsprimaryreview; never
+treatlegacyfloatTUNEDorpartialrho_tallyascomplete. Don'tcomposeoldpartialwalls.
+CurrentCIrequiredgatesreviewUNCONFIRMED,next>=12:09absentevent/sourcepublication.
+ReportinglessonsO-45e77eaf0e65/T-a92dc834b60a/T-5851ab7c5c2c recordedwith26evidence.
+
+# Previous checkpoint:26FINISHED, publish packet/continue coverage (16 November11:26Z)
 
 26source d30b6e4a81c48e4c4a7302f0a1b535bb956ac70b PUBLISHED beforeSOLEcall.
 Run /workspace/ic-local-runs/local-cover-native-scans-validation-20261116-26
