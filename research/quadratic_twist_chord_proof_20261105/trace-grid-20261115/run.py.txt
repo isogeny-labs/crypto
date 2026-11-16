@@ -1,0 +1,45 @@
+# Thin build/process/file/hash metadata orchestration; no research arithmetic.
+from pathlib import Path
+import subprocess,sys,json,hashlib,datetime,os
+root=Path('/workspace/crypto-twist-chord-proof')
+out=Path(sys.argv[1]);expected=sys.argv[2]
+assert not out.exists();assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==expected
+assert subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True)==''
+scope=Path('research/quadratic_twist_chord_proof_20261105/trace-grid-20261115')
+pins=json.loads((root/scope/'PINS.json').read_text())
+for name,digest in pins['inputs'].items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest
+out.mkdir();rows=[];start=datetime.datetime.now(datetime.timezone.utc).isoformat()
+def stage(name,cmd,want=0):
+    with (out/(name+'.stdout')).open('wb') as a,(out/(name+'.stderr')).open('wb') as b:
+        p=subprocess.run(['timeout','600',*cmd],cwd=root,stdout=a,stderr=b,env=dict(os.environ,CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup'))
+    rows.append(dict(name=name,command=cmd,exit=p.returncode,expected=want));(out/'stages.json').write_text(json.dumps(rows,indent=2)+'\n');assert p.returncode==want,(name,p.returncode)
+try:
+    stage('cpp',['g++','-std=c++20','-O2','-Wall','-Wextra',str(scope/'grid.cpp'),'-o',str(out/'producer')])
+    stage('rust',['/workspace/twist-native-tooling/cargo/bin/rustc','+1.85.1','-O',str(scope/'audit.rs'),'-o',str(out/'auditor')])
+    stage('candidate',[str(out/'producer')]);(out/'cases.txt').write_bytes((out/'candidate.stdout').read_bytes())
+    for tag in ['A','B']:stage('audit'+tag,[str(out/'auditor'),str(out/'cases.txt'),str(out/('audit'+tag+'.json'))])
+    assert (out/'auditA.json').read_bytes()==(out/'auditB.json').read_bytes()
+    original=(out/'cases.txt').read_text().splitlines();controls=[]
+    for mode in ['delta','grid','query','missing-witness','false-witness','missing-axis','missing-query']:
+        lines=original.copy()
+        if mode=='delta':lines[0]=lines[0].replace('7 3 8','7 3 9',1)
+        elif mode=='missing-query':lines.pop()
+        else:
+            index=1 if mode in ['grid','missing-axis'] else next(i for i in range(1,len(lines)) if lines[i].split()[3]!='0' and lines[i].split()[7]!='-')
+            cols=lines[index].split()
+            if mode=='grid':cols[1]='1'
+            elif mode=='query':cols[4]='-2'
+            else:
+                values=cols[7].split(',')
+                if mode=='missing-axis':assert '-1' in values;values.remove('-1')
+                elif mode=='missing-witness':values.pop(0)
+                else:values.insert(0,'-2')
+                cols[6]=str(len(values));cols[7]=','.join(values) if values else '-'
+            lines[index]=' '.join(cols)
+        payload=('\n'.join(lines)+'\n').encode();assert payload!=(out/'cases.txt').read_bytes()
+        false=out/('false-'+mode+'.txt');false.write_bytes(payload);receipt=out/('false-'+mode+'.json')
+        stage('control-'+mode,[str(out/'auditor'),str(false),str(receipt)],101);assert not receipt.exists()
+        controls.append(dict(mode=mode,sha256=hashlib.sha256(payload).hexdigest(),receipt=False))
+    (out/'controls.json').write_text(json.dumps(controls,indent=2)+'\n')
+finally:
+    (out/'run.json').write_text(json.dumps(dict(start=start,finish=datetime.datetime.now(datetime.timezone.utc).isoformat(),checkpoint=expected,stages=len(rows)),indent=2)+'\n')

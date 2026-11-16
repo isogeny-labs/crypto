@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""Finite GL4/F3 forms catalog for rational isotropic cover subgroups.
+
+Enumerating all compatible alternating forms also accounts for relative
+polarization signs that need not be visible in a GL Frobenius matrix.
+"""
+import itertools
+import json
+from pathlib import Path
+import numpy as np
+import sympy as S
+from nist_cover_three_grid import read_catalog
+
+ROOT=Path(__file__).parent
+PAIRS=list(itertools.combinations(range(4),2))
+
+
+def partitions(n,top=None):
+    if n==0:yield [];return
+    for a in range(min(n,top or n),0,-1):
+        for tail in partitions(n-a,a):yield [a]+tail
+
+
+def gl4_representatives():
+    x=S.Symbol('x');irreduc=[]
+    for deg in range(1,5):
+        for c in itertools.product(range(3),repeat=deg):
+            if c[0]==0:continue
+            p=S.Poly(sum(v*x**i for i,v in enumerate(c))+x**deg,x,modulus=3)
+            if p.is_irreducible:irreduc.append(p)
+    def build(start,left,blocks):
+        if left==0:yield blocks;return
+        for i in range(start,len(irreduc)):
+            p=irreduc[i];deg=p.degree()
+            for mult in range(1,left//deg+1):
+                for part in partitions(mult):
+                    yield from build(i+1,left-mult*deg,blocks+[p**a for a in part])
+    for blocks in build(0,4,[]):
+        A=np.zeros((4,4),dtype=np.int16);pos=0
+        for p in blocks:
+            n=p.degree()
+            for i in range(n-1):A[pos+i,pos+i+1]=1
+            A[pos+n-1,pos:pos+n]=[-int(p.nth(i))%3 for i in range(n)];pos+=n
+        assert pos==4
+        yield A
+
+
+def nullspace(A):
+    A=A.copy()%3;row=0;piv=[]
+    for col in range(A.shape[1]):
+        nz=next((i for i in range(row,A.shape[0]) if A[i,col]),None)
+        if nz is None:continue
+        A[[row,nz]]=A[[nz,row]];A[row]=(A[row]*int(A[row,col]))%3
+        for i in range(A.shape[0]):
+            if i!=row and A[i,col]:A[i]=(A[i]-A[i,col]*A[row])%3
+        piv.append(col);row+=1
+    out=[]
+    for col in range(A.shape[1]):
+        if col in piv:continue
+        v=np.zeros(A.shape[1],dtype=np.int16);v[col]=1
+        for i,j in enumerate(piv):v[j]=-A[i,col]%3
+        out.append(v)
+    return np.array(out,dtype=np.int16).reshape((-1,A.shape[1]))
+
+
+def rank(A):return A.shape[1]-len(nullspace(A))
+
+
+def forms(A,mu):
+    js=[]
+    for i,j in PAIRS:
+        J=np.zeros((4,4),dtype=np.int16);J[i,j]=1;J[j,i]=2;js.append(J)
+    equations=np.array([(A@J@A.T-mu*J).ravel()%3 for J in js],dtype=np.int16).T
+    basis=nullspace(equations);out=[]
+    for c in itertools.product(range(3),repeat=len(basis)):
+        if not any(c):continue
+        v=(np.array(c,dtype=np.int16)@basis)%3
+        J=sum(int(a)*jj for a,jj in zip(v,js))%3
+        if rank(J)==4:out.append(v)
+    return np.array(out,dtype=np.int16).reshape((-1,6))
+
+
+def planes(k):
+    blocks=[];pivots=[]
+    for piv in itertools.combinations(range(6),k):
+        free=[(i,j) for i in range(k) for j in range(6) if j>piv[i] and j not in piv]
+        n=3**len(free);B=np.zeros((n,k,6),dtype=np.int16)
+        for i,p in enumerate(piv):B[:,i,p]=1
+        nums=np.arange(n,dtype=np.int64)
+        for i,j in free:B[:,i,j]=nums%3;nums//=3
+        blocks.append(B);pivots.append(np.tile(np.array(piv,dtype=np.int16),(n,1)))
+    return np.concatenate(blocks),np.concatenate(pivots)
+
+
+def stable(B,piv,A):
+    BA=(B@A)%3
+    C=np.take_along_axis(BA,np.broadcast_to(piv[:,None,:],(len(B),B.shape[1],B.shape[1])),axis=2)
+    same=np.all(np.einsum('nij,njk->nik',C,B)%3==BA,axis=(1,2))
+    return B[same]
+
+
+def isotropic_counts(B,fs):
+    if B.shape[1]==1:return np.full(len(fs),len(B),dtype=np.int64)
+    if len(B)==0:return np.zeros(len(fs),dtype=np.int64)
+    coeff=[]
+    for i,j in itertools.combinations(range(B.shape[1]),2):
+        a=B[:,i,:];b=B[:,j,:]
+        columns=[a[:,0]*b[:,1]-a[:,1]*b[:,0]]
+        columns += [a[:,s+2]*b[:,t+2]-a[:,t+2]*b[:,s+2] for s,t in PAIRS]
+        coeff.append(np.stack(columns,axis=1))
+    coeff=np.stack(coeff,axis=1)
+    full=np.column_stack((np.ones(len(fs),dtype=np.int16),fs))
+    check=np.einsum('nps,fs->fnp',coeff,full)%3
+    return np.sum(np.all(check==0,axis=2),axis=1)
+
+
+def orbit_profile(A):
+    rem=set(itertools.product(range(3),repeat=4));rem.remove((0,0,0,0));out=[]
+    while rem:
+        v=next(iter(rem));w=v;n=0
+        while True:
+            rem.remove(w);w=tuple(int(x) for x in np.array(w,dtype=np.int16)@A%3);n+=1
+            if w==v:break
+        out.append(n)
+    return sorted(out)
+
+
+def main():
+    E=[np.array(a,dtype=np.int16) for a in [[[0,2],[1,0]],[[0,2],[1,1]],[[2,0],[0,2]],[[0,1],[1,1]],[[0,1],[1,2]]]]
+    grass={k:planes(k) for k in [1,2,3]};assert [len(grass[k][0]) for k in [1,2,3]]==[364,11011,33880]
+    entries={};representatives=0
+    for M in gl4_representatives():
+        representatives+=1;profile=orbit_profile(M);cp=[int(c)%3 for c in reversed(S.Matrix(M.tolist()).charpoly().all_coeffs())]
+        for mu in [1,2]:
+            fs=forms(M,mu)
+            if len(fs)==0:continue
+            for ei,EE in enumerate(E,1):
+                if (int(round(np.linalg.det(EE)))%3)!=mu:continue
+                A=np.zeros((6,6),dtype=np.int16);A[:2,:2]=EE;A[2:,2:]=M
+                counts=[]
+                for k in [1,2,3]:
+                    B,piv=grass[k];BS=stable(B,piv,A);counts.append(isotropic_counts(BS,fs))
+                possibilities={tuple(int(counts[k][i]) for k in range(3)) for i in range(len(fs))}
+                key=(mu,tuple(cp),tuple(profile),ei)
+                entries.setdefault(key,set()).update(possibilities)
+        print('GLCLASS',representatives,flush=True)
+    # Check every old Magma observation is represented; extra relative-form
+    # possibilities may occur because we enumerate all alternating forms.
+    for mu,cp,prof,eid,n in read_catalog():
+        assert n in {a[2] for a in entries[mu,tuple(cp),tuple(prof),eid]},(mu,cp,prof,eid,n)
+    rows=[]
+    for (mu,cp,prof,eid),poss in sorted(entries.items()):
+        rows.append({'multiplier':mu,'Prym_characteristic_coefficients_mod3':list(cp),
+                     'Prym_nonzero_three_torsion_orbit_lengths':list(prof),'E_type_id':eid,
+                     'possible_isotropic_subgroup_count_triples':sorted(poss)})
+    result={'method':'Enumerate every GL4(F3) rational canonical class and every compatible nondegenerate alternating form, including relative polarization signs. Enumerate all subspaces of dimensions 1,2,3 in F3^6, test Frobenius stability and isotropy for the product form.',
+            'GL4_classes_checked':representatives,'all_Magma_catalog_counts_represented':True,
+            'triple_order':'Counts of Fp-defined isotropic subgroups of orders 3,9,27.','rows':rows}
+    (ROOT/'nist_three_isotropic_local_catalog.json').write_text(json.dumps(result,indent=2)+'\n')
+    print('CATALOG_DONE',representatives,len(rows),flush=True)
+
+
+if __name__=='__main__':main()

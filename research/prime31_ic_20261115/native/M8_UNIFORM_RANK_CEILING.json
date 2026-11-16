@@ -1,0 +1,36 @@
+{
+  "standing": "[pcc:unverified]",
+  "dataset": "prime31 m8 exact uniform-query occupancy, NOT an F4 or end-to-end runtime",
+  "field_prime": "2147483647",
+  "curve_a": "847514846",
+  "curve_b": "2087444724",
+  "group_prime_order": "2147446831",
+  "actual_elliptic_factor_base_size": 31,
+  "dimensions": {
+    "split_left_points": 15,
+    "split_right_points": 16,
+    "arity": 8,
+    "distinct_indices": true
+  },
+  "split": {
+    "left_signed_four_templates": "21840",
+    "right_signed_four_templates": "29120",
+    "total_signed_eight_templates": "635980800",
+    "mean_raw_witnesses_per_uniform_target": "635980800/2147446831",
+    "expected_calls_rank32_lower_bound": "68718298592/635980800"
+  },
+  "full_unrestricted": {
+    "signed_eight_templates": "2019513600",
+    "mean_raw_witnesses_per_uniform_target": "2019513600/2147446831",
+    "expected_calls_rank32_lower_bound": "68718298592/2019513600"
+  },
+  "formula": "For independent uniform R in a prime-order group, each signed template maps to one R, hence E[number of raw matches]=templates/n exactly, regardless of sum collisions. Incremental relation rank <= raw matches. For any finite expected stopping time at rank 32, Wald/Tonelli yields E[calls]>=32*n/templates.",
+  "assumptions": [
+    "independent uniformly distributed public R masks, conditional on any prior history",
+    "one algebraic relation row per signed witness template",
+    "all eight indices distinct and canonical signs",
+    "no setup, F4, extraction, linear algebra, memory, or verification work is included"
+  ],
+  "control_observation": "previous producer record: 124 natural queries, 26 positive masks, 32 independent rows for restricted split; no new run inferred",
+  "caveat": "Not an unconditional per-instance query bound, not a prediction that a real F4 solver extracts matches, and not an arithmetic-operation speedup"
+}
