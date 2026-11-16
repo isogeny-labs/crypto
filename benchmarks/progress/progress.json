@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2010Z-ic-native-ifma",
+  "latest_record": "20261116T0314Z-hec-inversecost631",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 8,
     "invalid": 4,
-    "measured": 213,
+    "measured": 214,
     "open": 1
   },
   "repo": "crypto",
@@ -10587,6 +10587,85 @@
       ],
       "problem": "ic:gw-quartic-dl-sqrt-compiled",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 1.503780333,
+      "latest": 1.503780333,
+      "latest_derived": {
+        "value_over_reference": 0.617039
+      },
+      "metric": "inverse_component_wall",
+      "points": [
+        {
+          "commit": "4995fcfdc059",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 0.617039
+          },
+          "n": 5,
+          "record": "20261116T0314Z-hec-inversecost631",
+          "reference": 2.437092333,
+          "reference_kind": "baseline",
+          "spread": [
+            1.48245525,
+            1.614404167
+          ],
+          "summary": "All10cells verified; direct symmetric inverse component1.621x faster; tenfold gate failed; common setup excluded; unvalidated.",
+          "value": 1.503780333
+        }
+      ],
+      "problem": "ic:hec-f631-c49-inverse-pair",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 2.437092333,
+      "latest": 2.437092333,
+      "latest_derived": {},
+      "metric": "ordered_component_wall",
+      "points": [
+        {
+          "commit": "4995fcfdc059",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0314Z-hec-inversecost631",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.432739625,
+            2.639559625
+          ],
+          "summary": "All10cells verified; direct symmetric inverse component1.621x faster; tenfold gate failed; common setup excluded; unvalidated.",
+          "value": 2.437092333
+        }
+      ],
+      "problem": "ic:hec-f631-c49-inverse-pair",
+      "unit": "wall_s"
+    },
+    {
+      "better": "higher",
+      "first": 1.620643839741,
+      "latest": 1.620643839741,
+      "latest_derived": {},
+      "metric": "ordered_over_direct",
+      "points": [
+        {
+          "commit": "4995fcfdc059",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0314Z-hec-inversecost631",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All10cells verified; direct symmetric inverse component1.621x faster; tenfold gate failed; common setup excluded; unvalidated.",
+          "value": 1.620643839741
+        }
+      ],
+      "problem": "ic:hec-f631-c49-inverse-pair",
+      "unit": "ratio"
     },
     {
       "better": "neutral",

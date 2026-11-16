@@ -1,5 +1,7 @@
 # Benchmarks
 
+The [F631 inverse component comparison](20261115-hec-inversecost631/) verifies all ten cells. Direct symmetric inversion has median 1.503780 s versus ordered 2.437092 s, a derived 1.621x component gain; the 10x gate fails. Quotient setup and public-coordinate preparation are reused outside the timer. Shared ARM host, unvalidated producer evidence; no cold end-to-end gain or admitted leaderboard change. [Record](records/20261116T0314Z-hec-inversecost631.json) [pcc:unverified].
+
 The [15 November complete-cold genus-3 quotient comparison](20261115-hec-coldcost13/)
 ([PDF](20261115-hec-coldcost13/REPORT.pdf)) remains outside the admitted table.
 All 20 cells recover and verify scalar 183049. Cold median 1.780975 s versus
