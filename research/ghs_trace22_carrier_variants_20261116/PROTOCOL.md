@@ -1,0 +1,15 @@
+# Frozen twelve-carrier trace +22 cover screen
+
+16 November 2026 UTC. The fixed-carrier mask-32280 screen returned zero degree-seven covers in the quadratic-denominator shapes. This follow-up expands that same bounded algebraic screen across **all twelve monic odd-degree trace +22 genus-five carrier masks recorded in** `../ghs_odd5_carrier_20261115/screen.json`. It does not assert that the recorded twelve models exhaust every genus-five carrier in the isogeny class. Finite claims remain [pcc:unverified] until PCC admission.
+
+## Fixed input space and execution
+
+Take `K=F3[a]/(a^5+2a+1)` and for each mask `m` set `f_m=x^11+Σ_(i=0)^10 floor(m/3^i) mod 3 · x^i`. The frozen carrier masks are `32280,35349,36380,51009,67186,106121,112490,113379,127268,168265,175537,175771`. Each has trace +22 and factorization type one linear plus one degree-ten factor over F3; over K, its degree-ten factor splits into five quadratic factors. The source orbit representatives are `E_b/K: v²=u³+u²+b` with coefficient masks **68** and **84**, each of order 222 and trace +22. The Cartesian product has exactly 24 pairs. Masks 68 and 84 represent the two Frobenius orbits of the ten source classes.
+
+`screen_variant.sage` enumerates maps of degree seven `u=A/B`, `v=yC/B²` for `B=H²` or `B=Q_iH²`, monic quadratic `H`, with `Q_i` a quadratic branch factor. It checks source/target premises, degrees, coprimality and `f_m C²=B(A³+A²B+bB³)`. `run_variants.py` preparses once, runs at most four local Sage workers, writes one stdout JSON and one `/usr/bin/time -l` stderr per pair atomically, then writes a source-hash-bound manifest. A failed worker retains its `.tmp` files and prevents a complete manifest. All hits and null receipts are retained.
+
+## Decision boundary
+
+A hit is only a candidate until a second implementation checks the cover identity and an evaluated corrected pullback plus trace preserves a specified nonzero prime subgroup. Only a complete relation/decomposition, rank, descent and verification run compared with same-target Frobenius-aware rho can support a vulnerability claim. If all 24 cells are null, the conclusion is limited to these twelve recorded carrier models, both source Frobenius orbits and the two specified denominator shapes. The simultaneous quadratic twists inherit a corresponding null within the same transformed shapes. Other carriers, correspondences, isogeny paths, denominator shapes and cover degrees remain open.
+
+The trace +22 isogeny class is separate from trace ±26 and trace +10. Its `s=11` order has an 80-bit prime factor by the exact recurrence receipt in `../ghs_trace22_cover_screen_20261116/order_screen.json`, but this is only a cost screen until a nonzero map exists. Shared-KB and exact-equation web searches were performed before this expansion; no match was located, and publication priority remains unestablished. Primary nearby work: [Iijima–Momose–Chao 2015](https://eprint.iacr.org/2015/805.pdf), [Joux–Vitse 2012](https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf), [Diem 2006](https://arxiv.org/abs/math/0606607).
