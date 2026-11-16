@@ -1,8 +1,8 @@
 # Frozen chained-transfer PCC evidence addresses in a cold checkout
 
-- **Status:** investigating
+- **Status:** resolved at the feature-checkpoint CI scope
 - **Kind:** historical data-address compatibility and missing artifact hydration
-- **Affected work:** Root PR4366 and retained chained-transfer checkpoints
+- **Affected work:** Root PR4366, successor PR4396 and retained chained-transfer checkpoints
 - **Next action owner:** current research continuation
 - **Last updated:** 2026-11-16
 
@@ -11,6 +11,8 @@
 The current required PCC workflow cannot finish on a cold worker because frozen data claim3e6bc7 names a historical absolute scratch address, and claim67abc8 needs two genuine store-backed metadata objects that are not pulled by the workflow. Original canaries and the feature-base ledger prefix pass. Whole actual run43774098503/job132996285205 is retained in public-n4-ledger-immutable-transport-terminal-02, claim0e8d86. This is a CI/evidence-layout obstruction, not a mathematical obstruction. [pcc:unverified]
 
 ## Evidence and uncertainty
+
+Resolution, 2026-11-16: data63ba17 preserves the complete current-source PCC run43800448798/job133079183510, whole193910-byte artifact/all10 members and entire1077822-byte job log. Original canaries, actual feature-base ledger prefix, every-claim replay with the unchanged exit2 allowance, exact actual-current workflow restoration and original tests all succeed. All8 started current-head jobs succeed; main-only signing is legitimately skipped. Size/artifacts have unchanged main-only branch filters and do not apply to this feature base. Reviews/threads are empty and the immediate base is unprotected. PR4396 merged normally as40839ddeaf174801500bff4fdacc746ccf016d0c with expected dfeb head; data757c7f retains confirmation. This resolves this addressability obstruction at the stated checkpoint. It leaves the independent main-ledger integration and scientific NEW28 requirements open. [pcc:unverified]
 
 Update, 2026-11-16: both complete currentd3 logs in2af6d7 show the original address preparation and the two earlier object pulls succeeding. The remaining failures are old3baf4e/99baab references to the whole726536-byte archive genuinely migrated by bot532. The exact fifth loader input is now implemented for gate/sign. Oldb55dd4 also pins the previous active workflow as unsigned historical data. Protocol02 preserves that complete old source and the actual current source separately, exposes only the historical data address during original attestation replay, and restores the current file before source tests or signing-ledger publication. It does not treat old bytes as current execution evidence. [pcc:unverified]
 
@@ -30,6 +32,8 @@ The two missing67abc8 objects are complete-current-guard.json.xz and whole-faile
 These conditions repair evidence addressability. They do not resolve the original shared-main ledger forks, full scientific NEW28, global character/program bridges or solving-cost claims. [pcc:unverified]
 
 ## Next discriminating step
+
+Completed: inspect the full current-source artifact, require source restoration and original gates, and merge the passing successor under the expected-head guard. Preserve the historical investigation below. Future workflow attestations use immutable snapshots; genuinely new missing inputs or incompatible claims require a new scoped investigation. [pcc:unverified]
 
 Current next action: publish the exact archive/source-data preparation02 and collect actual final-head required CI. Inspect its whole source/address artifact, require current source restoration and every original gate, and preserve any failure. Keep mutable workflow paths out of new attestation subjects; attest immutable source snapshots. Source-file compatibility repairs data addressability only. [pcc:unverified]
 

@@ -1,3 +1,18 @@
+# Publish Root archive/source-data successor
+
+## What was done
+pcc/claims/PCC-20261116-d30fc8.json: source dfebaa75dca4 published to fresh owned branch and new exact source tag, both actual0/readback exact. Ordinary merge parents6e77 and genuine966648 preserve all prior history and the repair. Olddeleted branch is not recreated. Source governance531e88/6dc2d8 and data821559/80b1fb retain exact scope. [pcc:unverified]
+
+## Decisions made
+Open ready successor PR against the genuinely advanced immediate parent checkpoint branch now at966648. Track actual required CI about50 minutes after publication; no empty refresh or force. Prior4366 was merged externally, not by this session. [pcc:unverified]
+
+## Open threads
+Successor required CI/review, fullscientificNEW28/oldgloballedger; Consumerc045 nativeunitCI success fullartifact collection; independent historical reconstruction and fullEKS population still pending. [pcc:unverified]
+
+## Errors
+Deleted old head caused one refused publisher attempt; full failure remains77ebba. No source, ledger prefix or scientific acceptance criterion was changed to publish the successor. [pcc:unverified]
+
+---
 # Prior Root PR merged externally during source preparation
 
 ## What was done
@@ -2556,3 +2571,8 @@ pcc/claims/PCC-20261116-067d85.json: all11 metadata controls0 with unchanged ori
 
 ## Source-address report
 pcc/claims/PCC-20261116-80b1fb.json: one-page37628-byte report rendered and inspected; source/current vs historical unsigned bytes and current restoration are explicit. Required final-head CI and scientific/EKS scope remain open. [pcc:unverified]
+
+
+# 2026-11-16 04:54 UTC Root CI/merge checkpoint
+
+PR4396 genuine merge40839ddeaf174801500bff4fdacc746ccf016d0c; expected dfeb head. Actual all8 started checks success and main-only sign skipped; size/artifacts legitimately main-only. Original full PCC CI43800448798/job133079183510, entire193910-byte archive/all10 members/full1077822-byte job log retained by63ba17. Actual merge confirmation757c7f. Scoped PCC data-address problem resolved; global main-ledger/scientificNEW28 remain open. Continue Consumer1587 independent raw reconstruction/streaming certificates and8 direct graph theorem bindings be98f8; full historical population remains EKS-only and unexecuted. This metadata must publish through a fresh owned successor, never resurrect the merged/deleted branch. [pcc:unverified]
