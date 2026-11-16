@@ -58,3 +58,99 @@ untouched until its reservation clears. [pcc:unverified]
 
 - The first rustfmt check requested formatting only; it was applied before
   source pinning.
+
+## 2026-11-16T10:47Z — Default toolchain refusal
+
+### What was done (commands, files, features)
+
+- Ran the frozen Cargo integration test from source commit `1103716b6d`.
+  Cargo exited 101 before compiling the test because default rustc 1.93.1
+  is below several pinned AWS dependency requirements of 1.94.1. The
+  complete stderr is retained as `test.stderr`; stdout is empty.
+
+### Decisions made (and why)
+
+- Rerun the unchanged test with already installed Rust 1.99.1, as earlier
+  project receipts did. This is a compiler-admission correction, not a
+  changed test or curve outcome.
+
+### Open threads (unfinished, pick up next time)
+
+- Capture the 1.99.1 run separately and inspect its actual parity results.
+
+### Errors (what went wrong, how it was handled)
+
+- The default compiler refused locked dependencies before test execution;
+  no algorithm evidence follows from that exit.
+
+## 2026-11-16T10:48Z — Cargo wrapper correction
+
+### What was done (commands, files, features)
+
+- `cargo +1.99.1 ...` exited 101 immediately because the shell resolves
+  Homebrew Cargo rather than rustup's shim. Its stderr is retained in
+  `test-1.99.stderr`. `rustup run 1.99.1 cargo --version` confirms Cargo
+  1.99.1 is installed.
+
+### Decisions made (and why)
+
+- Use `rustup run 1.99.1 cargo test ...` on the unchanged source and preserve
+  this second wrapper failure separately.
+
+### Open threads (unfinished, pick up next time)
+
+- Execute the actual test with the pinned toolchain.
+
+### Errors (what went wrong, how it was handled)
+
+- The Homebrew Cargo wrapper did not interpret the `+toolchain` syntax;
+  no test was run.
+
+## 2026-11-16T10:49Z — Compiler path correction
+
+### What was done (commands, files, features)
+
+- `rustup run 1.99.1 cargo test ...` also exited 101 before compiling the
+  test. Its stdout and stderr are retained as `test-rustup.stdout` and
+  `test-rustup.stderr`. Cargo was 1.99.1, but Cargo found Homebrew's rustc
+  1.93.1 on `PATH`; the dependency admission message confirms this.
+
+### Decisions made (and why)
+
+- Set `RUSTC` to the absolute installed 1.99.1 compiler for the next
+  unchanged run. Preserve the third admission failure separately.
+
+### Open threads (unfinished, pick up next time)
+
+- Execute and inspect the pinned parity test.
+
+### Errors (what went wrong, how it was handled)
+
+- The mismatched compiler path prevented test execution; it is not an
+  algorithm observation.
+
+## 2026-11-16T10:55Z — Platform build boundary
+
+### What was done (commands, files, features)
+
+- With `RUSTC` pinned to 1.99.1, the top-level Cargo integration-test
+  command compiled dependencies but exited 101 while building the unrelated
+  `icprog` binary. `icprog` calls Linux-only `libc` affinity and limit APIs
+  unavailable on macOS. The complete output is retained in
+  `test-rustup-rustc.stdout` and `test-rustup-rustc.stderr`.
+
+### Decisions made (and why)
+
+- Add a study-local Cargo harness that depends on this checkout's `crypto`
+  library and points its test target at the unchanged source-pinned test.
+  This avoids the root package's binary target while retaining the exact
+  library, curve fixtures, index prototype, and assertions.
+
+### Open threads (unfinished, pick up next time)
+
+- Commit the adapter, then run the unchanged test and retain its output.
+
+### Errors (what went wrong, how it was handled)
+
+- The failure is a macOS build incompatibility in an unrelated binary, not
+  a parity result.
