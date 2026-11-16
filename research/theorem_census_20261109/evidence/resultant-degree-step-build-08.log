@@ -1,0 +1,27 @@
+ResultantDegreeStep.lean:277:43: error: Application type mismatch: The argument
+  hz
+has type
+  s3Ring (MvPolynomial.C (WeierstrassCurve.b₂ W)) (MvPolynomial.C (WeierstrassCurve.b₄ W))
+      (MvPolynomial.C (WeierstrassCurve.b₆ W)) (MvPolynomial.C (WeierstrassCurve.b₈ W)) (MvPolynomial.X 0)
+      (MvPolynomial.X 1) (MvPolynomial.X 2) =
+    0
+but is expected to have type
+  ?m.52 = ?m.53
+in the application
+  congrArg (⇑tripleProbe) hz
+ResultantDegreeStep.lean:285:2: error: Type mismatch
+  multivariate_triple_nonzero W
+has type
+  s3Ring ((@MvPolynomial.C K ℕ Field.toSemifield.toCommSemiring) (WeierstrassCurve.b₂ W))
+      (MvPolynomial.C (WeierstrassCurve.b₄ W)) (MvPolynomial.C (WeierstrassCurve.b₆ W))
+      (MvPolynomial.C (WeierstrassCurve.b₈ W)) (MvPolynomial.X 0) (MvPolynomial.X 1) (MvPolynomial.X 2) ≠
+    0
+but is expected to have type
+  s3Ring ((@MvPolynomial.C K (Fin 3) Field.toSemifield.toCommSemiring) (WeierstrassCurve.b₂ W))
+      (MvPolynomial.C (WeierstrassCurve.b₄ W)) (MvPolynomial.C (WeierstrassCurve.b₆ W))
+      (MvPolynomial.C (WeierstrassCurve.b₈ W)) (MvPolynomial.X 0) (MvPolynomial.X 1) (MvPolynomial.X 2) ≠
+    0
+'ResultantDegreeStepAudit.determinant_coeff_column_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResultantDegreeStepAudit.secondLift_coeff_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResultantDegreeStepAudit.resultantStep_coeff_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResultantDegreeStepAudit.symbolicS5_last_natDegree' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

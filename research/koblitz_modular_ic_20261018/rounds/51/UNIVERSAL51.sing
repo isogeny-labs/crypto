@@ -1,0 +1,50 @@
+execute(read("../../source-data/universal-archived51.sing"));
+if(matrix(qr)*forward!=matrix(generic) || matrix(generic)*backward!=matrix(qr)){ERROR("UNIVERSAL51_ARCHIVED_FULL_PRODUCTS");quit;}
+poly A51=1+c;poly Delta51=b^3*(b+c*A51^3);
+poly compactG51=l^16+A51^8*l^8+Delta51*l^4+A51^3*Delta51*l+b^4*(b^4+b*c*A51^3+c^2*A51^4);
+if(generic[1]!=compactG51 || diff(generic[2],n)!=A51^2*Delta51 || deg(subst(generic[2],n,0))!=14){ERROR("UNIVERSAL51_TRIANGULAR_SHAPE");quit;}
+matrix damaged51=forward;damaged51[1,1]=damaged51[1,1]+1;
+if(matrix(qr)*damaged51==matrix(generic)){ERROR("UNIVERSAL51_CORRUPTION_ACCEPTED");quit;}
+list denominatorStrings51;int i51;int j51;poly remaining51;
+ideal allEntries51=generic;
+for(i51=1;i51<=3;i51++){for(j51=1;j51<=2;j51++){allEntries51[size(allEntries51)+1]=forward[i51,j51];}}
+for(i51=1;i51<=2;i51++){for(j51=1;j51<=3;j51++){allEntries51[size(allEntries51)+1]=backward[i51,j51];}}
+for(i51=1;i51<=size(allEntries51);i51++){
+ remaining51=allEntries51[i51];
+ while(remaining51!=0){denominatorStrings51=insert(denominatorStrings51,string(denominator(leadcoef(remaining51))),size(denominatorStrings51));remaining51=remaining51-lead(remaining51);}
+}
+ring universalBase51=2,(b,c),dp;short=0;
+poly common51=1;poly incoming51;poly divisor51;
+for(i51=1;i51<=size(denominatorStrings51);i51++){
+ execute("incoming51="+denominatorStrings51[i51]+";");
+ divisor51=gcd(common51,incoming51);common51=(common51/divisor51)*incoming51;
+ if(reduce(common51,ideal(incoming51))!=0){ERROR("UNIVERSAL51_DENOMINATOR_LCM");quit;}
+}
+string commonString51=string(common51);
+setring universalField51;execute("poly D51="+commonString51+";");
+ideal clearedGeneric51=D51*generic;matrix clearedForward51=D51*forward;matrix clearedBackward51=D51*backward;
+ideal integralEntries51=qr,clearedGeneric51;
+for(i51=1;i51<=3;i51++){for(j51=1;j51<=2;j51++){integralEntries51[size(integralEntries51)+1]=clearedForward51[i51,j51];}}
+for(i51=1;i51<=2;i51++){for(j51=1;j51<=3;j51++){integralEntries51[size(integralEntries51)+1]=clearedBackward51[i51,j51];}}
+for(i51=1;i51<=size(integralEntries51);i51++){
+ remaining51=integralEntries51[i51];
+ while(remaining51!=0){if(denominator(leadcoef(remaining51))!=1){ERROR("UNIVERSAL51_NONINTEGRAL_CLEARED_COEFFICIENT");quit;}remaining51=remaining51-lead(remaining51);}
+}
+string qrString51=string(qr);string genericString51=string(clearedGeneric51);
+list forwardStrings51;list backwardStrings51;
+for(i51=1;i51<=3;i51++){for(j51=1;j51<=2;j51++){forwardStrings51=insert(forwardStrings51,string(clearedForward51[i51,j51]),size(forwardStrings51));}}
+for(i51=1;i51<=2;i51++){for(j51=1;j51<=3;j51++){backwardStrings51=insert(backwardStrings51,string(clearedBackward51[i51,j51]),size(backwardStrings51));}}
+string rawG51=string(generic[1]);string rawN51=string(generic[2]);
+ring universalPolynomial51=2,(n,l,b,c),dp;short=0;
+execute("poly D51="+commonString51+";ideal qr51="+qrString51+";ideal generic51="+genericString51+";poly G51="+rawG51+";poly N51="+rawN51+";");
+matrix F51[3][2];matrix B51[2][3];int k51=0;
+for(i51=1;i51<=3;i51++){for(j51=1;j51<=2;j51++){k51++;execute("F51["+string(i51)+","+string(j51)+"]="+forwardStrings51[k51]+";");}}
+k51=0;for(i51=1;i51<=2;i51++){for(j51=1;j51<=3;j51++){k51++;execute("B51["+string(i51)+","+string(j51)+"]="+backwardStrings51[k51]+";");}}
+if(matrix(qr51)*F51!=matrix(generic51) || matrix(generic51)*B51!=D51^2*matrix(qr51)){ERROR("UNIVERSAL51_FULL_POLYNOMIAL_PRODUCTS");quit;}
+link out51="ASCII:w universal-polynomial51.sing";open(out51);
+write(out51,"ring universalPolynomialCertificate51=2,(n,l,b,c),dp;short=0;poly D51="+string(D51)+";ideal qr51="+string(qr51)+";ideal generic51="+string(generic51)+";poly G51="+string(G51)+";poly N51="+string(N51)+";matrix F51[3][2];matrix B51[2][3];");
+for(i51=1;i51<=3;i51++){for(j51=1;j51<=2;j51++){write(out51,"F51["+string(i51)+","+string(j51)+"]="+string(F51[i51,j51])+";");}}
+for(i51=1;i51<=2;i51++){for(j51=1;j51<=3;j51++){write(out51,"B51["+string(i51)+","+string(j51)+"]="+string(B51[i51,j51])+";");}}
+close(out51);
+print("UNIVERSAL51_RESULT archived_generic_generators=2 QR_generators=3 full_field_products=2 full_polynomial_products=2 denominator_degree="+string(deg(D51))+" corruption_rejected=true no_new_Groebner_basis=true");
+print("UNIVERSAL51_ALL_CHECKS_PASS");quit;

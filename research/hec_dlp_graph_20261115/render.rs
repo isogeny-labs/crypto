@@ -1,0 +1,7 @@
+use std::{fs,fmt::Write};
+fn main(){let a:Vec<_>=std::env::args().collect();let t=fs::read_to_string(&a[1]).unwrap();
+let mut s=String::from("<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='380' viewBox='0 0 1000 380'><rect width='1000' height='380' fill='#f5f8fa'/><g font-family='Arial' fill='#233746'><text x='20' y='30' font-size='23' font-weight='bold'>Raw projected-row outputs at 32,768 trials</text><text x='20' y='58' font-size='17'>Three-target medians · rooted simplification versus full weighted forest · counts, not speed</text>");
+let x=|v:f64|200.0+(v.log10()-2.0)*285.0;
+for v in [100.0,1000.0,10000.0]{let p=x(v);write!(s,"<line x1='{p}' x2='{p}' y1='73' y2='319' stroke='#d5dfe5'/><text x='{p}' y='343' text-anchor='middle' font-size='15'>{v}</text>").unwrap();}
+for(i,line)in t.lines().enumerate(){let v:Vec<_>=line.split('\t').collect();let y=95+i*40;let r=v[2].parse::<f64>().unwrap();let f=v[3].parse::<f64>().unwrap();write!(s,"<text x='20' y='{}' font-size='17'>g{} · p{}</text><line x1='{}' x2='{}' y1='{y}' y2='{y}' stroke='#9aadb6' stroke-width='2'/><circle cx='{}' cy='{y}' r='5' fill='#b34b42'/><circle cx='{}' cy='{y}' r='5' fill='#15758a'/><text x='855' y='{}' font-size='16'>{r:.0} / {f:.0}</text>",y+5,v[0],v[1],x(r),x(f),x(r),x(f),y+5).unwrap();}
+s.push_str("<text x='20' y='374' font-size='17'>Red: rooted. Teal: full. Log-count axis. Row counts include empty emissions; unique rows/rank are separate.</text></g></svg>");fs::write(&a[2],s).unwrap();}

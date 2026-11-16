@@ -2,6 +2,7 @@ name: Quadratic twist adaptive S3 native replay
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/quadratic_twist_evidence_20261021/**'
       - '.github/workflows/quadratic-twist-adaptive-s3.yml'
@@ -14,6 +15,7 @@ permissions:
 
 jobs:
   native-adaptive-s3:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

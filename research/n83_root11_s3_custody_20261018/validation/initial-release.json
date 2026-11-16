@@ -1,0 +1,26 @@
+{
+  "command": "cargo test --release --lib",
+  "environment": "local filesystem/network sandbox, default test concurrency",
+  "failed": 13,
+  "failure_cases": [
+    "cryptanalysis::jv_cover::tests::nagao_finds_planted_six_sums_and_agrees_with_the_oracle",
+    "cryptanalysis::jv_cover::tests::replayed_f4_agrees_with_the_full_solver_and_the_oracle",
+    "cryptanalysis::jv_cover::tests::stopped_f4_agrees_with_the_full_solver_and_the_oracle",
+    "cryptanalysis::jv_cover::tests::the_solver_loses_no_rational_solution_at_small_p",
+    "cryptanalysis::pollard_collab::cairn::tests::a_key_submitter_signs_what_cairn_verifies",
+    "cryptanalysis::pollard_collab::cairn::tests::an_older_node_without_progress_turns_heartbeats_off_quietly",
+    "cryptanalysis::pollard_collab::cairn::tests::generic_artifacts_use_the_persisted_commit_reveal_outbox",
+    "cryptanalysis::pollard_collab::cairn::tests::heartbeats_carry_the_sessions_own_counters_at_the_cadence",
+    "cryptanalysis::pollard_collab::cairn::tests::pending_commitments_survive_a_restart",
+    "cryptanalysis::pollard_collab::cairn::tests::points_travel_through_cairn_as_commit_reveal_claims_and_solve",
+    "cryptanalysis::pollard_collab::cairn::tests::the_client_speaks_enough_http",
+    "cryptanalysis::pollard_collab::net::tests::foreign_job_is_refused",
+    "cryptanalysis::pollard_collab::net::tests::three_nodes_in_a_chain_converge"
+  ],
+  "ignored": 117,
+  "passed": 4072,
+  "raw_output_retained": false,
+  "schema": "n83.root11-custody-validation/v1",
+  "status": "FAIL_ENVIRONMENT_AND_BOUNDED_SOLVER",
+  "test_wall_seconds": 744.11
+}

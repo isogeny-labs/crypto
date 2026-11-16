@@ -40,6 +40,10 @@ else
   echo "ECDLP lead atlas: clone aburan28/crypto-autoresearcher next to this checkout and run python3 tools/lead_atlas.py --brief. It records every lead already tried here, so check it before proposing an ECDLP idea."
 fi
 
+# Lessons ledger (AGENTS.md "Continuous learning loop"): what earlier sessions
+# learned, adopted lessons first. Never fatal.
+python3 "$(cd "$(dirname "$0")/../.." && pwd)/tools/lessons.py" brief --limit 10 2>/dev/null || true
+
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi

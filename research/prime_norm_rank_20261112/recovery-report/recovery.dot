@@ -1,0 +1,13 @@
+digraph Recovery {
+ graph [rankdir=TB, bgcolor="white", nodesep=0.3, ranksep=0.32, fontname="Helvetica"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fb", fontname="Helvetica", fontsize=12];
+ supplied [label="Supplied actual F,H,V, branch and degree bounds\nAll target coefficient cofactor equations", fillcolor="#fff1d9"];
+ column [label="Actual nonzero adjugate column\nKernel membership and exact radical direction"];
+ residual [label="Every actual norm residual coefficient is zero\nFinite equations + degree bound reconstruct polynomial"];
+ nonzero [label="Zero norm would force F to divide H\nBezout inverse + branch guards + degree gap"];
+ result [label="Full norm = c G, c nonzero\nEven-chart normalization c = alpha^2", fillcolor="#e7f3e7"];
+ control [label="Fixed F,H,V,branch gives fixed rank\nOnly one monic target satisfies all coefficient equations"];
+ missing [label="Still missing: efficient public-input certificate finder\nDivisor/scalar bridge and uniform total bit complexity", fillcolor="#fff1d9"];
+ supplied -> column; column -> residual; residual -> result;
+ supplied -> nonzero; nonzero -> result; result -> control; control -> missing [style=dashed];
+}

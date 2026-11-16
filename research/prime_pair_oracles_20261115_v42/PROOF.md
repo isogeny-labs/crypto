@@ -1,0 +1,8 @@
+# Independent prime-interval pair oracles
+The unchanged preparedprototype assumes provedprime p and4M³<p. Independent smallprime oracle enumerates every positiveinterval pair and every targetresidue, including signs,zero,diagonal and no-pair cases, forced work/output caps and unsupportedheight. ActualNIST p is proved via unchangedFLINT fmpz_is_prime binding functions with pinned binary input, never probableprime.
+
+Independent Fraction(t,p).limit_denominator(M²) supplies boundedfraction completeness: if tD-kp=N with |N|<=2M,D<=M² and4M³<p, any different k'/D' with D'<=M² cannot be at least as close to t/p. Otherwise1/(DD')<=2|N|/(pD), contradicting2|N|M²<p. Thus any boundedfraction must be the uniqueclosest denominator-bounded approximation. Compute signedN exactly and admit only positiveN. This certifies actual absence or numerator/denominator independently of the prototype's Euclid implementation.
+
+For actualfullinterval planted nearhalf pairs, qmax1 and perfect-square discriminant certify everypair; diagonal has qrangeM..M, zero has no positivepair. Frozenqueries are checked against the independentfraction certificate. Unitfractiont1 is deliberately retained as unresolved: prototype's qrange exceeds cap although(2,2)exists. This is an APIcap correctness control, not full alltarget completion. A freshadaptive variant is next. Primefield arithmetic is not oddcurve integration; binaryk0reciprocal identity is not assumed.
+
+90sec4GiB1core65smallphase78actual84serializedreport; librarybytes source-identified and hashfrozen as input. No timing/speedreleaseclaim. Sole-model preparation plus independent arithmetic oracles, not externaladmission.

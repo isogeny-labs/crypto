@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T06:23:29Z",
+ "id": "PCC-20261115-30dcbf",
+ "kind": "execution",
+ "producer": {
+  "commit": "959b45750a46eb9759e0eda0dee3960c7eead9e7",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/results/toy.json",
+    "sha256": "b432adc7c8a3822a76b7710419767db6678512976f14422f793b6f5493d66301"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/results/trace.json",
+    "sha256": "b53d835386b6d6ecb394a6d38ea69aeffae9d91afea0494f743cdefd6664ea28"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/results/local-checks.txt",
+    "sha256": "d28298b0b0d9b862d10038c11e16ed1939735a0e7d508036bb9a4800aea51f81"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/sources.sha256",
+    "sha256": "692fcc8bda0f791b67c6b5a3d5c5dfa4238773fb9e3ea2984fe9dfd7512e43b8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/folded_walk/results/runpod-access.json",
+    "sha256": "f7d8355be216edd0e8b047f57e9c4f44e280e6c28d2131516e2a70edfe6849c9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115/folded_walk",
+ "statement": "Producer implementation and replay checks: 54 paired public toy DLP cases in three fixed fields, four release tests, strict Clippy and formatting; 32 transitions per arm over P-256 with coefficient invariants and a RustCrypto source adapter. Unsigned correctness evidence only; no full-size DLP recovery, complete cost or speedup."
+}

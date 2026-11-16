@@ -169,6 +169,38 @@ system shape (Bardet–Faugère–Salvy; the Boolean series
 `(1+t)^v / Π(1+t^{d_i})` for binary systems, `Π(1−t^{d_i}) / (1−t)^v` for the
 prime membership systems, field equations excluded) and half uniform, keeps the
 forecast defined before the first solve and washes out as solves accumulate.
+
+For Boolean `m = 2` binary-subspace candidates of shape `coordinate`, `gp`,
+`scaled` or `random` with `n ∈ {11, 13, 17, 19, 23, 29, 31}` and `2 ≤ k ≤ 8`,
+the point half of the prior sits at a **calibrated degree** instead
+(`src/cryptanalysis/dreg_prior_table.rs`, `dreg_prior_table.json`): the mode
+of the exact MutantXL solving degree over 40 systems per cell, measured in
+ml-cryptanalysis `experiments/dreg-prior-calibration-20261112`. There, leaving
+each `n` out in turn, it cut the prior's log-loss from 2.075 (semi-regular
+point) to 0.833, and the point equalled the realised degree on 88.3 % of
+systems against 29.7 %. MutantXL is a calibrated F4 proxy (10 of 11 control
+cells), not F4. The forecast names the calibration in `prior_source`. Every
+other candidate keeps the semi-regular point.
+
+For binary-subspace candidates of dimension `k ≥ 7` that the calibrated table
+does not cover (other shapes, such as `frobenius`, `symmetric`, `small-order`,
+`mixed` and `tracezero`), the point is instead `min(semi-regular degree,
+effective degree)`. The effective degree is the Boolean semi-regular degree of
+the system left after eliminating the `n − dim(V·V) + 1` affine equations the
+factor base guarantees at degree 2 (`dreg_forecast::effective_degree`,
+`forecast::affine_falls`, computed from the persisted dump, so a replay matches
+its record). In ml-cryptanalysis `experiments/dmut-mechanistic-20261114` it was
+never below the measured MutantXL solving degree on any of 15,543 systems with
+`k ≥ 7`, including 640/640 pre-registered fresh systems at n = 47–61; below
+`k = 7` it failed on 44 small systems, so it is not used there. It is a forecast
+point, **not a bound** `[pcc:unverified]`: a target with four or more
+decompositions in `V × V` provably has solving degree at least 3, and such targets
+exist with effective degree 2 at every `k` (12 constructed at n = 31–61, all
+confirmed by MutantXL; `experiments/dmut-mechanistic-20261114/BOUND_ANALYSIS.md`
+in ml-cryptanalysis). They are rare among random targets (heuristically about
+`2^(2k−1−n)` of them), and the forecaster's empirical update corrects the point
+once solves are recorded.
+
 The semi-regular degree is also the yardstick: `structural_gain` is `true`
 when the whole band lies below it, `false` when it lies on or above it.
 

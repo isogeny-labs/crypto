@@ -1,0 +1,15 @@
+✖ [3138/3138] Building CryptoLean.Group.PartiteCoverage (3.2s)
+warning: CryptoLean/Group/PartiteCoverage.lean: imports `Mathlib.GroupTheory.Index` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/PartiteCoverage.lean: imports `Mathlib.Algebra.BigOperators.Ring.Finset` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/PartiteCoverage.lean: imports `Mathlib.Algebra.Order.BigOperators.Ring.Finset` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/PartiteCoverage.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/scratch/mathlib4/.lake/packages/Cli/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/batteries/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/Qq/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/aesop/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/plausible/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/build/lib/lean:/workspace/scratch/crypto-lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/scratch/crypto-lean/CryptoLean/Group/PartiteCoverage.lean -o /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/PartiteCoverage.olean -i /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/PartiteCoverage.ilean -c /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/PartiteCoverage.c --setup /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/PartiteCoverage.setup.json --json
+error: CryptoLean/Group/PartiteCoverage.lean:224:2: Type mismatch
+  hcancel
+has type
+  L * N ≤ H * (r + (L - 1))
+but is expected to have type
+  N * L ≤ (r + (L - 1)) * H
+Some required targets logged failures:
+- CryptoLean.Group.PartiteCoverage
+error: build failed

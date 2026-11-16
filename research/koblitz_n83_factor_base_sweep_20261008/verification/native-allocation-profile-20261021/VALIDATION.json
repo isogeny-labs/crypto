@@ -1,0 +1,15 @@
+{
+  "schema":"n83.storage-profile-validation/v1",
+  "source_commit":"7e8ae96c4af60ac63311b4c3c29efcb83321861e",
+  "worker_source_commit":"674d2075958c5cb388cbfcb271e8ebcd6dea646c",
+  "release_library":{"passed":4471,"failed":0,"ignored":119},
+  "exporter":{"passed":19,"failed":0},
+  "independent_model_checker":{"passed":2,"failed":0},
+  "native_guard":{"unit_passed":38,"card_passed":7,"failed":0},
+  "k2048":{"audit":"PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY","memory":"PASS_CONTAINER_MEMORY_PROFILE_CUSTODY_AND_COUNTERS","storage":"PASS_OWNERSHIP_COUNTERS_AND_RETAINED_SNAPSHOT_SIGNATURES","matched_conflict_snapshots":451,"storage_snapshots":47,"memory_samples":29,"director":"executed_as_specified"},
+  "k4096":{"audit":"PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY","memory":"PASS_CONTAINER_MEMORY_PROFILE_CUSTODY_AND_COUNTERS","storage":"PASS_OWNERSHIP_COUNTERS_AND_RETAINED_SNAPSHOT_SIGNATURES","matched_conflict_snapshots":451,"storage_snapshots":47,"memory_samples":29,"director":"executed_as_specified"},
+  "supplemental_streams_equal_final_logs":true,
+  "scope":"native correctness, execution and ownership accounting; no timing gain, UNSAT, recovery, minimum-memory or merge readiness admission",
+  "storage_publication":"external PUBLICATION.md records actual immutable S3 receipts; not self-referential",
+  "pr_readiness":"HOLD: broader main reconciliation and fresh CI/review remain separate"
+}

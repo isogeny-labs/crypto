@@ -1,0 +1,98 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "rootfind-subtract m = 2: one thread, the scalar native sweep and the AVX-512 IFMA native sweep (simd=ifma), 1 and all threads, 28/30-bit prime-order curves, |F_x| = 4096",
+ "description": "research/ic_native_ifma_20261115, frozen before the run (PROTOCOL.md). Identical relations, logarithm and S required across IC arms. Public synthetic curves; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 20261114
+   },
+   {
+    "kind": "prime_search",
+    "bits": 30,
+    "seed": 20261114
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261130
+ },
+ "arms": [
+  {
+   "name": "rf2-cpu-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=2",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-native1-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=native,threads=1",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-ifma1-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=native,threads=1,simd=ifma",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-native-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=native",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-ifma-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=native,simd=ifma",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261140,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

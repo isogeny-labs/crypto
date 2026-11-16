@@ -710,7 +710,7 @@ fn restore_remote(
     if receipt.namespace != format!("ml-dataset/custody/{}", original_manifest.sha256) {
         return Err("publication namespace differs from custody manifest".into());
     }
-    if receipt.completion.roundtrip_verified == false
+    if !receipt.completion.roundtrip_verified
         || receipt
             .catalog
             .as_ref()

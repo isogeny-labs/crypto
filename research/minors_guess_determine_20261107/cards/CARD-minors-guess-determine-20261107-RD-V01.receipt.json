@@ -1,0 +1,434 @@
+{
+  "card_id": "CARD-minors-guess-determine-20261107-RD-V01",
+  "card_path": "research/minors_guess_determine_20261107/cards/CARD-minors-guess-determine-20261107-RD-V01.yaml",
+  "card_sha256": "4e40f4c3f6e01fd19a5b7ca91e5c3fb10bea6172bb917e768ef84b9727876993",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "734b73a3b207e273fb2041fabf3d0c06caefc7d4",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.009,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.009,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "734b73a3b207e273fb2041fabf3d0c06caefc7d4",
+        "HEAD",
+        "--",
+        "research/minors_guess_determine_20261107",
+        ":(exclude)research/minors_guess_determine_20261107/cards",
+        ":(exclude)research/minors_guess_determine_20261107/receipts",
+        ":(exclude)research/minors_guess_determine_20261107/results",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "8f4f85b43546bf57efe7bca78aa7ef3bc83d6bd70ebe885c3f51e14d23764ebd",
+        ".provenance.protocol_sha256 == $h",
+        "research/minors_guess_determine_20261107/eks/r2img_request_c.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "minors-gd-panel-20261108-c",
+        ".job_name == $job and (.job_uid | length) > 0 and (.state == \"submitted\" or .state == \"active\" or .state == \"succeeded\")",
+        "research/minors_guess_determine_20261107/receipts/RD/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-receipt-exists",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/minors_guess_determine_20261107/cards/wait_command_status.sh",
+        "research/minors_guess_determine_20261107/cards/status_request_d.json",
+        "minors-gd-panel-20261108-c",
+        "research/minors_guess_determine_20261107/receipts/RD/collect-v01",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 54.742,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "status-once",
+      "index": 5,
+      "outputs": {
+        "research/minors_guess_determine_20261107/receipts/RD/collect-v01/final-status.json": "42f75ee00679fe3be87cd070f145d81c3c62c6f1f5316867b739cb5c2fd2df9a"
+      },
+      "seconds": 54.742,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2293cf6096ec863b4f8957c6247c091c03294657d343e699efd12f9576c14bb7",
+      "stdout_tail": [
+        "2026-11-08T17:10:08Z poll 1 launcher_exit 0 state succeeded",
+        "{\"state\":\"succeeded\",\"job_name\":\"minors-gd-panel-20261108-c\",\"job_uid\":\"cbc1635a-5188-41eb-b389-84b25cb5c8cc\",\"pods\":[],\"launcher\":\"isolab-experiment-launcher:f97ea3fb-dbe4-4eb5-941c-9087d5630290\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/minors-gd-panel-20261108-c/launcher/f97ea3fb-dbe4-4eb5-941c-9087d5630290/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/minors_guess_determine_20261107/cards/status_with_audit_pod.sh",
+        "research/minors_guess_determine_20261107/receipts/RD/collect-v01/final-status.json",
+        "2026-11-08T00:00:00Z",
+        "2026-11-08T17:08:11Z",
+        "research/minors_guess_determine_20261107/receipts/RD/collect-v01/status-with-audit-pod.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 46.552,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pod-from-audit",
+      "index": 6,
+      "outputs": {
+        "research/minors_guess_determine_20261107/receipts/RD/collect-v01/status-with-audit-pod.json": "2cd350d9658843cf961a94be1e157ddc2e4212e6d878ff831c7e719ee7b8f50c"
+      },
+      "seconds": 46.552,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "17f4a87209b0ea346e688dc81dc9e5527c16bf4b401f2c36326ae9f53a7a5ac6",
+      "stdout_tail": [
+        "pod minors-gd-panel-20261108-c-98v7w uid b8617fcd-e2e5-4235-90b0-b201e5bb3857 exit 0 (from 1 node report(s)); job minors-gd-panel-20261108-c uid cbc1635a-5188-41eb-b389-84b25cb5c8cc"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/minors-gd-panel-20261108-c/",
+        "research/minors_guess_determine_20261107/results/RD",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.306,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 7,
+      "outputs": {},
+      "seconds": 2.306,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/minors_guess_determine_20261107/cards/verify_results_lines.sh",
+        "research/minors_guess_determine_20261107/receipts/RD/collect-v01/status-with-audit-pod.json",
+        "research/minors_guess_determine_20261107/receipts/RD/launch/result.json",
+        "research/minors_guess_determine_20261107/results/RD",
+        "binary.sha256",
+        "523c66fffd9a7e49bb2901b1d408824f5cd8096f7c48c03d0f0adeca70c8d686  /opt/minors/minors_gd",
+        "binary.sha256",
+        "48efa7aacf28aea9b100215e1e9b9e554f723e3784eae4ab4c22f107a10ba17d  /opt/minors/run_panel.sh",
+        "binary.sha256",
+        "eb5d15cc0ea6a9d5c60024b23288484ae195b147c07c5b6d3fcb3bf71c006a70  /opt/minors/minors_gd_analyze.py",
+        "progress.txt",
+        "run_panel exit 0",
+        "SHA256SUMS",
+        "  panel/records.jsonl",
+        "SHA256SUMS",
+        "  panel/analysis.json",
+        "host.txt",
+        "jobs: 12"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.045,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.045,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "177281817a7c663ae8dd4c6ad30c9bd4c0329189145155931e95b3616385cb5b",
+      "stdout_tail": [
+        "panel/shard_b36_k0.jsonl: OK",
+        "panel/shard_b36_k1.jsonl: OK",
+        "panel/shard_b36_k2.jsonl: OK",
+        "panel/shard_b36_k3.jsonl: OK",
+        "panel/shard_b36_k4.jsonl: OK",
+        "panel/shard_b36_k5.jsonl: OK",
+        "panel/shard_b36_k6.jsonl: OK",
+        "panel/shard_b36_k7.jsonl: OK",
+        "panel/shard_b40_k0.jsonl: OK",
+        "panel/shard_b40_k1.jsonl: OK",
+        "panel/shard_b40_k2.jsonl: OK",
+        "panel/shard_b40_k3.jsonl: OK",
+        "panel/shard_b40_k4.jsonl: OK",
+        "panel/shard_b40_k5.jsonl: OK",
+        "panel/shard_b40_k6.jsonl: OK",
+        "panel/shard_b40_k7.jsonl: OK",
+        "progress.txt: OK",
+        "run_panel.log: OK",
+        "SHA256SUMS lines: 54",
+        "verified: job minors-gd-panel-20261108-c job_uid cbc1635a-5188-41eb-b389-84b25cb5c8cc pod_uid b8617fcd-e2e5-4235-90b0-b201e5bb3857"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "find",
+        "research/minors_guess_determine_20261107/results/RD",
+        "-type",
+        "f",
+        "-exec",
+        "python3",
+        "tools/benchrec.py",
+        "add-raw",
+        "benchmarks/records/20261108T0449Z-minors-gd-panel.json",
+        "{}",
+        "+"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.076,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.076,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4f8c432ec27493c2ec8c137817516eb68c9afd88659d24bbc6dd94f192d69bb6",
+      "stdout_tail": [
+        "56 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "upload",
+        "benchmarks/records/20261108T0449Z-minors-gd-panel.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 107.747,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "upload-raw",
+      "index": 10,
+      "outputs": {},
+      "seconds": 107.747,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 10,
+  "commit": "3418c32400a70392b86a85fd7eaac2bfac71b204",
+  "dirty_after": [
+    "enchmarks/records/20261108T0449Z-minors-gd-panel.json",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/SHA256SUMS",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/binary.sha256",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/host.txt",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/SHA256SUMS",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/analysis.json",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/records.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k0.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k1.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k2.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k3.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k4.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k5.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k6.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b20_k7.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k0.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k1.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k2.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k3.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k4.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k5.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k6.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b24_k7.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k0.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k1.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k2.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k3.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k4.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k5.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k6.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b28_k7.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k0.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k1.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k2.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k3.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k4.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k5.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k6.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b32_k7.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k0.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k1.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k2.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k3.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k4.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k5.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k6.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b36_k7.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k0.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k1.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k2.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k3.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k4.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k5.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k6.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/shard_b40_k7.jsonl",
+    "research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/progress.txt"
+  ],
+  "dirty_before": [
+    "research/minors_guess_determine_20261107/cards/CARD-minors-guess-determine-20261107-RD-V01.yaml",
+    "research/minors_guess_determine_20261107/cards/status_with_audit_pod.sh"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
