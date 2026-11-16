@@ -26,6 +26,12 @@ spec and receipt remain intact. Run only after the separate amended
 publication receipt is committed and checked; do not pool eager-sum and
 lazy-sum revisions.
 
+**Second before-data amendment:** [`AMENDMENT-2.md`](AMENDMENT-2.md) applies
+an x-only lazy sum to the candidate's binary pair-table build as well. The
+original protocol and spec remain fixed. This revision requires its own
+`publication-amendment-2.json` receipt and the stated release parity gate
+before execution; earlier publication receipts keep their original scope.
+
 ## Admission obstruction
 
 The read-only [AWS monthly budget response](budget-monthly-readback.json)

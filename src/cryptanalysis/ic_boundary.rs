@@ -8676,8 +8676,9 @@ impl PairTable {
     /// The binary negation-folded table in the scalar builder's exact pair
     /// order. Each abscissa row shares one inversion across its ordinary
     /// additions; exceptional doublings may need their own inversion.
-    /// The table stores full points only long enough to obtain their keys;
-    /// first-witness insertion and the abstract addition charge are unchanged.
+    /// The table needs only the final abscissa of each sum, so ordinates are
+    /// left unfinished. First-witness insertion and the abstract addition
+    /// charge are unchanged.
     pub fn build_negation_folded_binary_batch(
         g: &BinaryGroup<'_>,
         fb: &FactorBase<FastPoint>,
@@ -8696,11 +8697,13 @@ impl PairTable {
         let mut indices = Vec::new();
         let mut addends = Vec::new();
         let mut sums = Vec::new();
+        let mut lambdas = Vec::new();
         for ai in 0..a {
             let i = groups[ai][0];
             indices.clear();
             addends.clear();
             sums.clear();
+            lambdas.clear();
             for group in groups.iter().skip(ai) {
                 for &j in group.iter() {
                     indices.push(j);
@@ -8708,12 +8711,20 @@ impl PairTable {
                 }
             }
             ops.adds += addends.len() as u64;
-            g.0.add_many(fb.points[i], &addends, &mut sums, &mut scratch);
+            g.0.add_many_lazy(
+                fb.points[i],
+                &addends,
+                &mut sums,
+                &mut lambdas,
+                &mut scratch,
+            );
+            debug_assert_eq!(sums.len(), indices.len());
+            debug_assert_eq!(lambdas.len(), indices.len());
             for (&j, s) in indices.iter().zip(sums.iter()) {
                 if s.infinity {
                     continue;
                 }
-                map.entry(s.pack() >> 1).or_insert((i as u32, j as u32));
+                map.entry(s.x + 1).or_insert((i as u32, j as u32));
                 attempts += 1;
             }
         }
