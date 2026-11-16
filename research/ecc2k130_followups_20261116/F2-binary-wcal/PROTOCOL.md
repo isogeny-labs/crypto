@@ -68,8 +68,10 @@ that L2's word-op counter leaves out.
 
 ## 4. Design
 
-- n ∈ {11, 13, 19, 23, 29, 37, 41, 47} (`small`; a = 0 except n = 47, a = 1, the only
-  registered Koblitz curve there), 83 (`wide` a = 0, and `w3` a = 0), 131 (`w3` a = 0).
+- n ∈ {11, 13, 19, 23, 29, 37, 41, 47} (`small`; a = 0 except n = 11, 29 and 47, where a = 1:
+  ecbench's constructor finds no usable prime-order subgroup for K_0 at n = 11 and 29, and n = 47
+  has only K_1 registered), 83 (`wide` a = 0, and `w3` a = 0), 131 (`w3` a = 0). The curve
+  coefficient a changes one field addition in the group law.
 - Per process: every op is sized so one sample takes about 1 ms; 10 warm-up rounds are
   discarded; then 101 measured rounds. Within each round every op runs once, in a fresh
   seeded random order (interleaved arms). A per-round paired ratio `t_op / t_ga` is formed.
@@ -78,9 +80,8 @@ that L2's word-op counter leaves out.
   derived from (seed, n, rep, a).
 - Every process runs under `taskset -c 3`, `prlimit --as=2000000000` and `timeout`. Nothing
   else of this lane runs while a measurement runs.
-- linz: L2 cells (n, d) ∈ {(11,5), (11,6), (13,6), (13,7), (19,9), (19,10)}, m = 2, the first
-  40 targets of each stream (n = 19, d = 10: the first 10, because a D = 4 call costs about
-  7e7 word ops), 3 repetitions, on core 3, after all `measure` processes.
+- linz: L2 cells (n, d) ∈ {(11,5), (11,6), (13,6), (13,7), (19,9), (19,10)}, m = 2, all 200
+  targets of each stream, 3 repetitions, on core 3, after all `measure` processes.
 - Before measuring, each process runs a self-check (field identities x·x⁻¹ = 1, x² = x·x;
   points on the curve; P + Q − Q = P). A failed self-check aborts the process.
 
@@ -102,6 +103,22 @@ that L2's word-op counter leaves out.
 
 A failed control is reported next to every price it touches; a failed A/A or positive control
 makes that (n, impl) row INCONCLUSIVE for the re-reads.
+
+### Known limits of the ops, fixed before data (from the smoke run, which is not data)
+
+- `fadd` is timed as a dependent chain through `black_box`, so it carries a store/reload
+  (about 1.9 ns against 0.2 ns per word of `xor_w64` in the smoke). It is an upper bound on a
+  field addition. Where a price in word-XOR units is needed (L4), the field addition is
+  bracketed: low end 1 word op by construction (an addition in GF(2^n), n ≤ 64, is one 64-bit
+  XOR; 2 words for 64 < n ≤ 128; 3 at 131), high end the measured `fadd` interval. Point: the
+  low end.
+- `inv_lat` is the field type's public inversion (`Gf2::inv`, `WideGf2::inv`, `Gf2W::inv`).
+  The `wide` group addition inverts with a private normal-basis Itoh–Tsujii, so at n = 83
+  `inv_lat` may exceed 1 GAE: it prices `WideGf2::inv`, not the addition's own inversion.
+- The `w3` addition is dominated by `Gf2W::inv`. At n = 83 its GA is compared with the ecbench
+  `wide` GA. The n = 131 prices are reported in the `w3` unit, as measured. As a labelled
+  extrapolation they are also rescaled by the n = 83 ratio GA_w3 / GA_wide, an estimate of the
+  price in an ecbench-quality addition at n = 131.
 
 ## 6. Reading rule
 
@@ -128,7 +145,10 @@ add·P_add with the measured prices in word-XOR units at that n (L4's `g` counts
 the measured `inv_lat` price, not Itoh–Tsujii); I = `inherited-f4` native `ops` (min over
 repetitions). I/G is the geometric mean over targets. Point: the latency variants at W = 64.
 Range: every price at its interval's low or high end, over both the latency and throughput
-variants and every W from 4 to 4096 (G at all-high gives the low I/G and vice versa). Reading:
+variants and every W from 4 to 4096 (G at all-high gives the low I/G and vice versa). The row
+width of `inherited-f4`'s word XORs is not recorded (it XORs partial row tails), hence the wide
+W bracket. A secondary range over W ≥ 16 only is reported as description and decides nothing.
+Reading:
 G cheaper if the whole range is > 1, I cheaper if < 1, unresolved otherwise. A cell where I hit
 its budget has I as a lower bound.
 
@@ -151,3 +171,12 @@ A local shared-VM timing is provisional: no isolcpus, no frequency pinning, no h
 counters (the `perf-ipc` skill refuses on this VM), and noisy neighbours on cores 0–2. The
 authoritative w_cal for binary rows needs an isolated host (`isolab-eks`); the task card is in
 RESULTS.md.
+
+## 10. Before the freeze
+
+A smoke run (seeds 999 and 1, 5 rounds, scratchpad only, not data) checked the code paths and
+found the limits listed under §4 (fadd, wide inversion, w3 addition, K_0 unavailable at n = 11
+and 29, L2's recorded seeds differing from `run_linz.sh`). No smoke number enters RESULTS.md.
+The run script is `run.sh`; the binary's sha256 is recorded in `raw/BINARY.sha256` at run time.
+
+Amendments, if any, are appended below with a date.
