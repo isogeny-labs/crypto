@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0819Z-m31-complete-paid-screen-20261116",
+  "latest_record": "20261116T0827Z-m31-paired-development-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 203,
+    "measured": 204,
     "open": 1
   },
   "repo": "crypto",
@@ -13767,7 +13767,7 @@
     {
       "better": "neutral",
       "first": 45.0,
-      "latest": 96.0,
+      "latest": 108.0,
       "latest_derived": {},
       "metric": "complete_matching_answers",
       "points": [
@@ -13794,6 +13794,18 @@
           "spread": null,
           "summary": "Six known fixtures,96 complete matching outputs,4 paid recoveries,0 monitor contention; first-star-n16 selected only. Primary26.978/17.578 vs oldroot1.027, no paired confirmation; regressions retained. PCC5449c2/68f7f0 unsigned L0.",
           "value": 96.0
+        },
+        {
+          "commit": "b2e61b478ef1",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0827Z-m31-paired-development-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All A/A gates pass;21 blocks/108 matching answers,0 monitor contention. Named paid adjusted lower F419.860/E12.874:10x partial passes,15x fails. Prior candidate only1.027 in separate screen; no fastest/fresh/signed claim. PCCcd096e/6f927f.",
+          "value": 108.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
@@ -13864,6 +13876,58 @@
       ],
       "problem": "kernel:certified-relations-grevlex",
       "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 13.723612836801772,
+      "latest": 13.723612836801772,
+      "latest_derived": {},
+      "metric": "expanded_regeneration_over_candidate_full_paid",
+      "points": [
+        {
+          "commit": "b2e61b478ef1",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 21,
+          "record": "20261116T0827Z-m31-paired-development-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            13.258557791244904,
+            14.395680533166685
+          ],
+          "summary": "All A/A gates pass;21 blocks/108 matching answers,0 monitor contention. Named paid adjusted lower F419.860/E12.874:10x partial passes,15x fails. Prior candidate only1.027 in separate screen; no fastest/fresh/signed claim. PCCcd096e/6f927f.",
+          "value": 13.723612836801772
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 21.43971514730975,
+      "latest": 21.43971514730975,
+      "latest_derived": {},
+      "metric": "f4_regeneration_over_candidate_full_paid",
+      "points": [
+        {
+          "commit": "b2e61b478ef1",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 21,
+          "record": "20261116T0827Z-m31-paired-development-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            20.078212467145843,
+            21.899465469080937
+          ],
+          "summary": "All A/A gates pass;21 blocks/108 matching answers,0 monitor contention. Named paid adjusted lower F419.860/E12.874:10x partial passes,15x fails. Prior candidate only1.027 in separate screen; no fastest/fresh/signed claim. PCCcd096e/6f927f.",
+          "value": 21.43971514730975
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "ratio"
     },
     {
       "better": "neutral",
