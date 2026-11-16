@@ -1,0 +1,62 @@
+{
+  "schema": "research.cast-run-result/v1",
+  "task": "T-2103",
+  "status": "failed",
+  "source_commit": "f3c1b8cc7663ca7d15374ae5e9a16c86839c9d18",
+  "freeze_sha256": "c8ae601aa329fa54fed01560304615a2fa4824bfc266de8aa7e5d67907d384ba",
+  "release_sha256": "c0f2f57efc4e2316083b48e6b0f3319e9c65d5b9398af60e94b61862cda7b55c",
+  "outer_elapsed_worker_seconds": 192.1372683380032,
+  "phase_measurements": [
+    {
+      "phase": "pre",
+      "worker_wall_seconds": 54.44882508798037,
+      "passed": true,
+      "terminal_owner_confirmed": true,
+      "invocation_id": "3734f37eb8034d8f838a92cb9848a50d"
+    },
+    {
+      "phase": "compiler",
+      "worker_wall_seconds": 104.72157733800123,
+      "passed": false,
+      "terminal_owner_confirmed": true,
+      "invocation_id": "5958a22f6bc748c088bf175df6fb3881"
+    },
+    {
+      "phase": "post",
+      "worker_wall_seconds": 32.84840777597856,
+      "passed": true,
+      "terminal_owner_confirmed": true,
+      "invocation_id": "cc58a6688d364b16be07adce9d8ab3f9"
+    }
+  ],
+  "modules": [
+    {
+      "module": "BranchRootMultiplicity",
+      "exit_code": 0
+    },
+    {
+      "module": "BranchCoefficientMultiplicity",
+      "exit_code": 0
+    },
+    {
+      "module": "IndependentControls",
+      "exit_code": 1
+    }
+  ],
+  "unreached": [
+    "Readback",
+    "ExpectedFailure"
+  ],
+  "final_13_name_audit_complete": false,
+  "failure": "IndependentControls.lean lines22 and28: simp made no progress",
+  "pre_post_dependency_manifests_identical": true,
+  "pre_post_retained_manifests_identical": true,
+  "pre_post_runtime_manifests_identical": true,
+  "charged_seconds": 600,
+  "campaign_ceiling_seconds": 129600,
+  "remaining_worker_seconds": 129000,
+  "charge_basis": "Full conservative reservation, not observed wall time",
+  "cost_ratio": null,
+  "cohort_targets_run": 0,
+  "independent_review": "separate pending review; producer report only"
+}

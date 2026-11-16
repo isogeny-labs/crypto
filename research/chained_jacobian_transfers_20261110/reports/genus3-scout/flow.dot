@@ -1,0 +1,13 @@
+digraph {
+graph [rankdir=TB,bgcolor="white",pad="0.15",ranksep="0.3"];
+node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=12,color="#35566b",fillcolor="#eef4f7"];
+edge [color="#35566b"];
+E [label="Encoded E0(K), K=Fq^3, q=5/7/11\nExact original cubic bases + frozen u-polynomials\nOdd subgroups 37/89/331: producer expectations"];
+C [label="Existing descended Ciani quartic C/Fq\nCompleted degree-two pi0 fibre over K\nLine + conic: split / nonsplit / ramified / infinity"];
+I [fillcolor="#fff4db",label="PROPOSED: product of conjugate fibre ideals\nTrace coefficients to Fq; preserve sum multiplicity\nOrigin: one triple point + three single points"];
+J [label="Existing canonical Pic^0(C)(Fq) arithmetic\nReduce D6(P), subtract ACTUAL D6(O)\nNo sample-fitted shift or scalar-label input"];
+V [fillcolor="#e7f4e9",label="REQUIRED: separate FpR6 points + local jets\nAll encoded points / generating edges / odd scalars\nWritten proof + feasible partial Lean"];
+E -> C; C -> I; I -> J; J -> V;
+O [fillcolor="#f7eeee",label="Prior W1 partial split coverage\n18/37,38/89,164/331\nHistorical reported data, NOT new replay"];
+O -> I [style=dashed];
+}

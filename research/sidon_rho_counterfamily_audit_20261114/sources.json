@@ -1,0 +1,324 @@
+{
+  "schema": "sidon-rho-counterfamily-source-plan/v1",
+  "created": "2026-11-14T18:31:38.432759+00:00",
+  "formal": {
+    "project": "research/sidon_rho_counterfamily_audit_20261114/lean",
+    "theorem": "SidonRhoCounterfamilyAudit.sidon_rho_counterfamily_certificate",
+    "statement": "theorem sidon_rho_counterfamily_certificate : (∀ (p : ℕ) [NeZero p], 1902 < p → TwoStepCollisionAudit.DegreeTwoGeneric (increments p) ∧ (∀ h : ZMod p → Fin 20, p ≤ 951 * firstCollision p (transition p h) 0 ∧ firstCollision p (transition p h) 0 ≤ p) ∧ (p : ℝ) ≤ 951 * meanCollision p ∧ meanCollision p ≤ p ∧ meanCollision p = ∑ h, (uniformHashLaw p 20 (Nat.succ_pos 19) h).toReal * (firstCollision p (transition p h) 0 : ℝ) ∧ (∀ target : ZMod p, expectation (uniformWeights 20) (fun h => inDegree (increments p) h target) = 1 ∧ expectation (uniformWeights 20) (fun h => (inDegree (increments p) h target - 1)^2) = 19 / 20) ∧ (localLaw p).toOuterMeasure (GeneralTwoStepCollisionAudit.freshEvent (increments p) : Set (GeneralTwoStepCollisionAudit.JointSample (ZMod p) (Fin 20))) = ENNReal.ofReal ((7581 : ℝ) / (8000 * p))) ∧ (¬∃ C : ℝ, ∀ (p : ℕ) (hp : Nat.Prime p), 1902 < p → TwoStepCollisionAudit.DegreeTwoGeneric (increments p) → (@meanCollision p ⟨hp.ne_zero⟩)^2 ≤ C * p) ∧ Nat.Prime 10000019 ∧ (4 : ℝ) * 10000019 < (meanCollision 10000019)^2",
+    "decl_sha256": "f4550e4315788edd2a98a3625997981779e48497f43bb1391580f556d5203953",
+    "scope": "Explicit fixed20-step shifted Mian–Chowla finite-table rho counterfamily. Kernel checks the actual table Sidon property; for every p>1902 actual ZModp increments satisfy the unchanged literal degree0/1/2genericity predicate. Actual original20-label static hash walk embeds pointwise into bounded951 transition; no uniform distribution on Fin951 is assumed. Actual least firstcollision T satisfies p<=951T and T<=p for every hash. Actual uniform20-label product PMF has mean E with p<=951E and E<=p, in-degree variance19/20, and genuine fresh two-step event measure7581/(8000p). Nevertheless E²/p is unbounded over primes; direct negation of any real uniform square-root bound even retaining the literal local degree guard. Kernel checks prime10000019 and E²>4p. Strengthens prior known bounded fixed-support counterfamily by satisfying exact low-degree source conditions, credits Bernstein–Lange local dependency warning/OEIS finite table; no novelty or qualified random-increment-ensemble source refutation. No asymptotic random-table/practicalhash law, infinite greedy generation property, physicalhost/parser/hash/execution refinement. Only standard foundations/defaults, no holes/customaxioms/nativeproofevaluation/flags/limits/waivers/newcryptographicexperiment/spend/upload.",
+    "sources": [
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/CollisionProbability.lean",
+        "bytes": 5164,
+        "sha256": "88b7993cf07f750e076fef5a387bfbab585fa1d7ca1f17296bef4b69750a139e"
+      },
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/ExpectedCollision.lean",
+        "bytes": 5179,
+        "sha256": "d4b3a2602218efd360bdeb4a38557ab0438172c7ec6416de6790ce647cb20120"
+      },
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/GeneralCollisionCertificate.lean",
+        "bytes": 1417,
+        "sha256": "aa2da8fd80e6cd1e56bce17f32f04fd3da4ea404771ffc52a7dfde1c1149c435"
+      },
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/PairLabelEquiv.lean",
+        "bytes": 4397,
+        "sha256": "7f35fc6307b4c1107abe2b847b0510de4c6bc61ff825396174c4250385da653b"
+      },
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/QueryGeometry.lean",
+        "bytes": 3591,
+        "sha256": "ad8e1f725f25ecb0d0aff9d9534da79d67196ee4779886b163a3d51bf048eb3d"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/BoundedSteps.lean",
+        "bytes": 2713,
+        "sha256": "27966e2d8df0bc99b81b197371ee3c4c960e412db775dde2a2e3dceb7253c9ea"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+        "bytes": 2000,
+        "sha256": "6f513a6bc498e01f7bdf60c156dd7778b9e301101c5ed90ca26648ca8bc0f1f3"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/UniformCollision.lean",
+        "bytes": 3552,
+        "sha256": "fd16ea0e974a635bfbb72f1236cfe4f8bfbf870617902ff9f803ae58ea07a813"
+      },
+      {
+        "path": "research/sidon_rho_counterfamily_audit_20261114/lean/SidonCounterfamily.lean",
+        "bytes": 3776,
+        "sha256": "664d4a3fef534e0392716e9f38878ab3b08e02d1c3f51c303a0b65799046e53f"
+      },
+      {
+        "path": "research/sidon_rho_counterfamily_audit_20261114/lean/SidonTable.lean",
+        "bytes": 2706,
+        "sha256": "a218699b8b3640b68ac78beedc23dfccfbe25591a4af8c50ac2a4bc30af3d191"
+      },
+      {
+        "path": "research/sidon_rho_counterfamily_audit_20261114/lean/SlowCollision.lean",
+        "bytes": 4260,
+        "sha256": "6da139f8ba46e34e2504c57a368bb054316ea9a9ebb530a4d02f4b85e63d0908"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+        "bytes": 2810,
+        "sha256": "85231289c6ddd9d038f9f8acccd3e75faf322fd4a735a4fdff885596c14bb434"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/FiniteGraphs.lean",
+        "bytes": 2253,
+        "sha256": "d9657405ea83afa6c1b6c6e1f67cd2afd513550173536d6a9d323a802ac883c5"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/LabelCoefficient.lean",
+        "bytes": 3642,
+        "sha256": "43dd2c4a1c8c5cfc49aabe8d2759dc39cdf2ddaa59ef1be3d167db2098a95771"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+        "bytes": 11094,
+        "sha256": "2eaa87a45eac00c7507992927c746e6cc1f48d446a15acf0ecac0b160c32ffb8"
+      },
+      {
+        "path": "research/sidon_rho_counterfamily_audit_20261114/lean/lakefile.toml",
+        "bytes": 334,
+        "sha256": "dc9b52d17e9846ef2fe44c69e9b0eba5278afa91d97b59ea946f2a5ab2f28edb"
+      },
+      {
+        "path": "research/sidon_rho_counterfamily_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5134,
+        "sha256": "75f4fba8bbe344e47a4e5c3a33c64b0be7437e90203ad577ed501027ba6b92aa"
+      },
+      {
+        "path": "research/sidon_rho_counterfamily_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 490,
+        "sha256": "4faa2a1cf56c2917587672506e9a27e881073f6715469c13b85edec3917e7e58"
+      },
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4603,
+        "sha256": "e6eaa7f66a9bb46b2b44d5ee152f8ec2bf06fa682649fdd32ed56e9bc38997da"
+      },
+      {
+        "path": "research/general_two_step_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 356,
+        "sha256": "0a701461970071d742dd15e11f48fec7b44c17ef90c1cd95c3d563472c9d06b3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3948,
+        "sha256": "64c5efc80667aa6d01a85d66546171cf484ea733ed60bc78b8ede4f2321e410d"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lakefile.toml",
+        "bytes": 280,
+        "sha256": "ef3c7bbfa8df48c11cc80121f45e386731f323f54651aab17488579dae39e438"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4069,
+        "sha256": "90f185ef835962877da491e4397eb6f9a17786f3a3c66494e96461bf513a66e9"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lakefile.toml",
+        "bytes": 258,
+        "sha256": "50c2e8bd80c059c5bf813cc5645abc046e6f41be2f06025bb8423282bb3ad82b"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 368,
+        "sha256": "4ea703b59eb2190c0141993d51e2b9dcbd969da3ac614df42cdb34ca2a4ea35f"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3175,
+        "sha256": "9ed2b7892af613969a6f6db81e30aa4cf4e3e298d7e5a33003a0ada8e9102442"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BoundedSteps",
+    "CollisionProbability",
+    "Cylinder",
+    "ExpectedCollision",
+    "FiniteGraphs",
+    "FirstCollision",
+    "GeneralCollisionCertificate",
+    "LabelCoefficient",
+    "PairLabelEquiv",
+    "QueryGeometry",
+    "SidonCounterfamily",
+    "SidonTable",
+    "SlowCollision",
+    "UniformCollision",
+    "WalkBoundary",
+    "WalkWeighted",
+    "WalkWeightedGeneral"
+  ],
+  "artifacts": [
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/evidence/attempts.tar.xz",
+      "bytes": 9628,
+      "sha256": "62836d4100701728bb114100dedad2b99846bf02d4860dded8c132e2b523290e"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "8f3ed86f16de4d2c19d3cb5cbf619251fcb9ab21a651b3a1354bfed65d6f78be"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/evidence/attempts.json",
+      "bytes": 232,
+      "sha256": "1bf672ef1c30a878c6593858c5033b30e584a3b5119d4a23891804a9f97c8af9"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 2105,
+      "sha256": "745afd3a71daef5d00bb7a8b56b65af3a5a66318eb5924e588d207a4742476b7"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/evidence/gate.json",
+      "bytes": 1265,
+      "sha256": "e525a548467f1fe1eac798c3b62ef576929baefbde40d3e98f6586961e17fbb8"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/evidence/source-review.json",
+      "bytes": 6339,
+      "sha256": "56369b53434caf70f3bef34af77911dcd36af248baee164333bbb6df0fd1f44f"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/evidence/binding-check.json",
+      "bytes": 4922,
+      "sha256": "d5c976e5f57af8dab83413dd92d5a5473ce781923306e8491e6982a6381ed64e"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/proof-map.json",
+      "bytes": 4526,
+      "sha256": "8e1a79064cc338690abe4dad20fb5662e8f1d8d007714f12c92a6abae897f60e"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/render_report.py",
+      "bytes": 6951,
+      "sha256": "102a03dfdaf55a4f1167cc3c9dc21024be22016fafa88a3f1de2e75f32524210"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/export_binding_input.py",
+      "bytes": 1752,
+      "sha256": "73c76f243a5f454018ed43ef304729496b487ef6c82ee47beb43f0922549f148"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/reports/layout.json",
+      "bytes": 452,
+      "sha256": "512bcd4c7305ea26010a770978d1c252839d02b4cb2d884735f58bb509fbe62a"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/reports/report.pdf",
+      "bytes": 47086,
+      "sha256": "410377f77414adc556b1ada70cec40716043c140dd74faf85d0e58f4e97324d9"
+    },
+    {
+      "path": "research/sidon_rho_counterfamily_audit_20261114/reports/sidon-rho-counterfamily.svg",
+      "bytes": 1431,
+      "sha256": "8731ea27fd18f71541f98eb88b68c75e4d168aa5d309dc92378baf91fd04ef4a"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 27,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_degree_two_genericity_proved": true,
+    "actual_original_hash_PMF_preserved": true,
+    "pointwise_and_mean_lower_bounds_proved": true,
+    "unbounded_prime_collision_ratio_proved": true,
+    "actual_local_probability_proved": true,
+    "qualified_random_table_refutation": false,
+    "infinite_greedy_sequence_proved": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

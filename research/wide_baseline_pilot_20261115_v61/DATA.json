@@ -1,0 +1,74 @@
+{
+  "input": "research/ordinary_boolean_encoding_20261115_v61/neutral.json",
+  "encoding_receipt": "research/ordinary_boolean_encoding_20261115_v61/raw.json",
+  "engines": [
+    {
+      "label": "msolve_F4",
+      "scope": "genuine optimizedMSolve0.11.0F4; pre-encoded ANF engine diagnostic",
+      "command": [
+        "/workspace/generalized_roots/baselines/crypto_native/target/release/native-msolve-neutral-baseline-v1",
+        "--input",
+        "{input}",
+        "--threads",
+        "1",
+        "--msolve-timeout-ms",
+        "5000",
+        "--node-budget",
+        "10000",
+        "--max-solutions",
+        "100",
+        "--max-expanded-terms",
+        "2000000",
+        "--max-basis-bytes",
+        "64000000"
+      ]
+    },
+    {
+      "label": "F5B_reference",
+      "scope": "source-identified ordinary-ringSun-WangF5B reference; optimizedF5 comparison not established",
+      "command": [
+        "/workspace/generalized_roots/baselines/crypto_native/target/release/native-signature-f5b-v1",
+        "--input",
+        "{input}",
+        "--timeout-ms",
+        "5000",
+        "--max-terms",
+        "2000000",
+        "--max-labels",
+        "1000",
+        "--max-pairs",
+        "100000",
+        "--max-reductions",
+        "200000",
+        "--node-budget",
+        "10000",
+        "--max-solutions",
+        "100"
+      ]
+    },
+    {
+      "label": "inherited_F4_reference",
+      "scope": "modified source-derived384-bit inheritedF4; no geometry oracle; NOTF6",
+      "command": [
+        "/workspace/generalized_roots/baselines/crypto_native/target/release/f6-inherited-width-wrapper-v1",
+        "--input",
+        "{input}",
+        "--expected-input-sha256",
+        "{sha}",
+        "--mode",
+        "solve",
+        "--max-seconds",
+        "5",
+        "--max-input-bytes",
+        "16777216",
+        "--max-terms",
+        "300000",
+        "--max-nodes",
+        "10000",
+        "--max-roots",
+        "100"
+      ]
+    }
+  ],
+  "rule": "retain every declared result; no ratio for incomplete calls;3GiB child address cap/9s full lifetime guard/onecore"
+}

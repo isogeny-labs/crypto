@@ -1,0 +1,36 @@
+{
+  "schema": "native-continuous-h1-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "continuous-h1-comparison",
+      "expected_decl_sha256": "65928939b66df9e96c426f625abbea3493ad127ec27c3bae6ed4cc38c7d8848d",
+      "full_characters": 1405,
+      "full_decl_sha256": "65928939b66df9e96c426f625abbea3493ad127ec27c3bae6ed4cc38c7d8848d",
+      "full_normalized_signature": "theorem continuous_h1_comparison_certificate : (∀ (k G : Type) [Ring k] [TopologicalSpace k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (X : TopRep.{0} k G) (hρ : Continuous (fun a : G × X => X.ρ a.1 a.2)), Nonempty (continuousCohomology 1 X ≃ₗ[k] CrossedClasses X hρ)) ∧ (∀ (K : Type) [Field K] [Fintype K] (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)] (ρ : Gamma K →ₜ* MulAut M), Nonempty (continuousCohomology 1 (coefficientObject K M ρ) ≃ₗ[ℤ] Additive (CocycleClasses K M ρ)) ∧ Nonempty (continuousCohomology 1 (coefficientObject K M ρ) ≃ₗ[ℤ] Additive (Coinvariants K M ρ)) ∧ (∀ hM : ∀ m : M, m ^ (Fintype.card K - 1) = 1, Nonempty (galoisCharacters K M ρ ≃* (ActualH1 K M ρ →* Kˣ)) ∧ Nonempty (ActualH1 K M ρ ≃* (galoisCharacters K M ρ →* Kˣ)) ∧ (∀ (χ : galoisCharacters K M ρ) (f : KernelOne (coefficientObject K M ρ)), baseUnitMap K (canonicalPairing K M ρ hM χ (Multiplicative.ofAdd (homogeneousKernelClass (coefficientObject K M ρ) f))) = χ.val (f.val.val 1 (frobenius K)).toMul) ∧ (∀ χ, (∀ c, canonicalPairing K M ρ hM χ c = 1) → χ = 1) ∧ (∀ c, (∀ χ, canonicalPairing K M ρ hM χ c = 1) → c = 1))) ∧ (∀ (F : Type) [Field F] [Fintype F] [CharP F 2], missingActualTwoClass F ≠ 1 ∧ ¬ ∃ e : TwoCharacters F →* (ActualTwoH1 F →* Fˣ), ∀ c : ActualTwoH1 F, (∀ χ : TwoCharacters F, e χ c = 1) → c = 1)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "continuous_h1_comparison_certificate",
+        "end_byte": 2287,
+        "file": "/workspace/scratch/continuous-h1-binding-input01/ContinuousH1Certificate.lean",
+        "qualified_decl_id": "ContinuousH1ComparisonAudit.continuous_h1_comparison_certificate",
+        "signature": "theorem continuous_h1_comparison_certificate :\n    (∀ (k G : Type) [Ring k] [TopologicalSpace k]\n      [Group G] [TopologicalSpace G] [IsTopologicalGroup G]\n      (X : TopRep.{0} k G) (hρ : Continuous (fun a : G × X => X.ρ a.1 a.2)),\n      Nonempty (continuousCohomology 1 X ≃ₗ[k] CrossedClasses X hρ)) ∧\n    (∀ (K : Type) [Field K] [Fintype K]\n      (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]\n      [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)]\n      (ρ : Gamma K →ₜ* MulAut M),\n      Nonempty (continuousCohomology 1 (coefficientObject K M ρ) ≃ₗ[ℤ]\n        Additive (CocycleClasses K M ρ)) ∧\n      Nonempty (continuousCohomology 1 (coefficientObject K M ρ) ≃ₗ[ℤ]\n        Additive (Coinvariants K M ρ)) ∧\n      (∀ hM : ∀ m : M, m ^ (Fintype.card K - 1) = 1,\n        Nonempty (galoisCharacters K M ρ ≃* (ActualH1 K M ρ →* Kˣ)) ∧\n        Nonempty (ActualH1 K M ρ ≃* (galoisCharacters K M ρ →* Kˣ)) ∧\n        (∀ (χ : galoisCharacters K M ρ) (f : KernelOne (coefficientObject K M ρ)),\n          baseUnitMap K (canonicalPairing K M ρ hM χ\n            (Multiplicative.ofAdd (homogeneousKernelClass (coefficientObject K M ρ) f))) =\n              χ.val (f.val.val 1 (frobenius K)).toMul) ∧\n        (∀ χ, (∀ c, canonicalPairing K M ρ hM χ c = 1) → χ = 1) ∧\n        (∀ c, (∀ χ, canonicalPairing K M ρ hM χ c = 1) → c = 1))) ∧\n    (∀ (F : Type) [Field F] [Fintype F] [CharP F 2],\n      missingActualTwoClass F ≠ 1 ∧\n      ¬ ∃ e : TwoCharacters F →* (ActualTwoH1 F →* Fˣ),\n        ∀ c : ActualTwoH1 F, (∀ χ : TwoCharacters F, e χ c = 1) → c = 1)",
+        "start_byte": 587
+      },
+      "recorded_statement": "theorem continuous_h1_comparison_certificate : (∀ (k G : Type) [Ring k] [TopologicalSpace k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (X : TopRep.{0} k G) (hρ : Continuous (fun a : G × X => X.ρ a.1 a.2)), Nonempty (continuousCohomology 1 X ≃ₗ[k] CrossedClasses X hρ)) ∧ (∀ (K : Type) [Field K] [Fintype K] (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)] (ρ : Gamma K →ₜ* MulAut M), Nonempty (continuousCohomology 1 (coefficientObject K M ρ) ≃ₗ[ℤ] Additive (CocycleClasses K M ρ)) ∧ Nonempty (continuousCohomology 1 (coefficientObject K M ρ) ≃ₗ[ℤ] Additive (Coinvariants K M ρ)) ∧ (∀ hM : ∀ m : M, m ^ (Fintype.card K - 1) = 1, Nonempty (galoisCharacters K M ρ ≃* (ActualH1 K M ρ →* Kˣ)) ∧ Nonempty (ActualH1 K M ρ ≃* (galoisCharacters K M ρ →* Kˣ)) ∧ (∀ (χ : galoisCharacters K M ρ) (f : KernelOne (coefficientObject K M ρ)), baseUnitMap K (canonicalPairing K M ρ hM χ (Multiplicative.ofAdd (homogeneousKernelClass (coefficientObject K M ρ) f))) = χ.val (f.val.val 1 (frobenius K)).toMul) ∧ (∀ χ, (∀ c, canonicalPairing K M ρ hM χ c = 1) → χ = 1) ∧ (∀ c, (∀ χ, canonicalPairing K M ρ hM χ c = 1) → c = 1))) ∧ (∀ (F : Type) [Field F] [Fintype F] [CharP F 2], missingActualTwoClass F ≠ 1 ∧ ¬ ∃ e : TwoCharacters F →* (ActualTwoH1 F →* Fˣ), ∀ c : ActualTwoH1 F, (∀ χ : TwoCharacters F, e χ c = 1) → c = 1)",
+      "recorded_text_sha256": "65928939b66df9e96c426f625abbea3493ad127ec27c3bae6ed4cc38c7d8848d",
+      "source_plan": "research/continuous_h1_comparison_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "ContinuousH1ComparisonAudit.continuous_h1_comparison_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned procedural source processing, not kernel parser/hash/physical-host refinement."
+}

@@ -1,0 +1,3 @@
+# Sole-model preparation review
+
+Reviewed direct-sum E2 parameterization, column tracked kernel injectivity, low-to-high pivot back substitution, characteristic-two degree reduction, complete affine kernel reconstruction, all residual truth assignments, candidate aliases, no-model/cap distinction and final output boundaries. The small oracle uses general Newton and exhaustive generator span instead of straight-line formulas and Gaussian image reduction. Existing formula helper imports have complete source pins. No external reviewer available; no solver promotion admission. Positive moment models are deliberately not called roots. Bound checks and raw caps precede publication.

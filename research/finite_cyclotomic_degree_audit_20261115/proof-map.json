@@ -1,0 +1,113 @@
+{
+  "main": "FiniteCyclotomicDegreeAudit.finite_cyclotomic_degree_certificate",
+  "binding": "f288e1fae592ab4d95cb11362fa1784f7a077a5ba6ee54060279e215ce8c5742",
+  "custom_imports": {
+    "RootField": "research/finite_cyclotomic_degree_audit_20261115/lean/RootField.lean",
+    "RootRationality": "research/finite_cyclotomic_degree_audit_20261115/lean/RootRationality.lean",
+    "GuardControls": "research/finite_cyclotomic_degree_audit_20261115/lean/GuardControls.lean",
+    "CyclotomicCertificate": "research/finite_cyclotomic_degree_audit_20261115/lean/CyclotomicCertificate.lean",
+    "FrobeniusDegree": "research/finite_cyclotomic_degree_audit_20261115/lean/FrobeniusDegree.lean"
+  },
+  "claims": [
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.roots_field_simple",
+      "conclusion": "Actual all-root adjoin is a simple primitive-root extension; primitive root derived."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.root_power_fixed",
+      "conclusion": "r dividing N-1 fixes every actual rth root under Nth power."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.frobenius_pow_eq_one_iff",
+      "conclusion": "Actual q-Frobenius nth power is identity iff r divides q^n-1."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.roots_field_degree",
+      "conclusion": "Actual finite-field all-roots extension finrank equals modular multiplicative order."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.actual_degree_dvd_iff",
+      "conclusion": "Actual all-roots extension degree divides n iff r divides q^n-1."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.finite_field_power_fixed_iff",
+      "conclusion": "Actual finite intermediate field contains exactly cardinal-power fixed elements."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.roots_field_le_iff",
+      "conclusion": "Actual all-root field containment iff r divides actual extension cardinality minus1."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.roots_field_le_degree_iff",
+      "conclusion": "Actual finite extension containment iff r divides q^actualfinrank-1."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.all_roots_rational_iff",
+      "conclusion": "All actual roots rational in actual finite extension iff r divides q^actualfinrank-1."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.roots_one_field_degree",
+      "conclusion": "Actual r1 roots field degree1 over every field."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.roots_two_field_degree",
+      "conclusion": "Actual r2 roots field degree1 over every field."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.characteristic_root_one",
+      "conclusion": "All actual pth roots equal1 in characteristicp."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.characteristic_root_field_degree",
+      "conclusion": "Actual characteristicp rootfieldp=base has degree1."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.characteristic_modular_order_zero",
+      "conclusion": "Actual finite characteristicp q has modularorder0 modp."
+    },
+    {
+      "declaration": "FiniteCyclotomicDegreeAudit.characteristic_guard_counterexample",
+      "conclusion": "Deleting characteristic guard breaks actual degree/order and containment/divisibility statements."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 23,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_general_cyclotomic_adjoin_degree_proved": true,
+    "actual_primitive_root_and_simple_extension_finiteness_derived": true,
+    "actual_all_root_rationality_in_finite_extensions_proved": true,
+    "actual_characteristic_p_guard_counterfamily_proved": true,
+    "r1_r2_actual_degree1_proved": true,
+    "full_geometric_elliptic_torsion_field_proved": false,
+    "general_nonprime_supersingular_at_most6_proved": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

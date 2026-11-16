@@ -1,0 +1,11 @@
+name = "seven_torsion_rank_audit"
+version = "0.1.0"
+defaultTargets = ["SevenTorsionRankAudit"]
+
+[[require]]
+name = "five_torsion_rank_audit"
+path = "../../five_torsion_rank_audit_20261115/lean"
+
+[[lean_lib]]
+name = "SevenTorsionRankAudit"
+roots = ["SevenPolynomial", "SevenRootData", "SevenSeparable", "SevenKummerImports", "SevenKummer", "SevenMultiples", "SevenPoint", "SevenCardinality", "SevenBasis", "SevenControls", "SevenCertificate"]

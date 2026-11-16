@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T07:10:04Z",
+ "id": "PCC-20261112-122fda",
+ "kind": "statement",
+ "producer": {
+  "commit": "33e8ef7524c2dddec08f1e61447933ae3fbbd500",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-failed-native-21.txt",
+    "sha256": "9ffcb86cb81db0697c5e859f4c7445711e49ee04982b49cbe9b3e28e600d0737"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-failed-clippy-21.txt",
+    "sha256": "3de07630481a8144fdfce3bc3dbd92694b4c3f2be899cfb6b088c6b6888c3264"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-failed-source-21.sha256",
+    "sha256": "b8cb07d3a7f40c87b26be0c9c2b6978f44c7455ddf582192c4cb0e7ed2a7dfb2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-failed-ct29_source_control-21.rs",
+    "sha256": "aead97b6fd2bb2bb12b2b8f7d36635f34eafeec1055530765c478bff806dff82"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-failed-ct28_prime_psi-21.rs",
+    "sha256": "e34107fd2f4391f0ad9901bc9a54f2bd38a4788d27dcb436e807b1028221cb22"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-failed-ct28_pullback-21.rs",
+    "sha256": "c5ed650766fded592f98dbc381823e0dfc24a472ebf6a0fad96396eff2522208"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned negative result: isolated source-endpoint21 strictClippy passes but its one named native test fails at scalar recovery after the reverse28 assertion passes. Test incorrectly uses39 as inverse28 modulo109; frozen written d55462 contains the same error. Preserve full failed output/exact source and correct in a new proof/test version using74 modulo109 and109 modulo113, with an explicit public integer inverse assertion. No acceptance criteria relaxed; no original proof/claim altered."
+}

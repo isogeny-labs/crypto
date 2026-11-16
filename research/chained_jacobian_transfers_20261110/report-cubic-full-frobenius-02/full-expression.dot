@@ -1,0 +1,14 @@
+digraph F {
+  graph [rankdir=LR, bgcolor="white", pad="0.22", nodesep="0.38", ranksep="0.4"];
+  node [shape=box,style="rounded,filled",fillcolor="#eef4fb",fontname="DejaVu Sans",fontsize=12,margin="0.13,0.10",color="#456987"];
+  edge [color="#456987",fontname="DejaVu Sans",fontsize=10];
+  x [label="(a,b,c) in Fin223³"];
+  t [label="T(a,b,c)
+(a,183b,39c)"];
+  e [label="E = e(a)+e(b)z+e(c)z²"];
+  q [label="E²²³ = e(a)+183e(b)z+39e(c)z²"];
+  x -> t [label="T"];
+  x -> e [label="canonical embedding"];
+  t -> q [label="encode"];
+  e -> q [label="q-power"];
+}

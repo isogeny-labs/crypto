@@ -1,0 +1,84 @@
+{
+  "schema": "actual-negation-pullback-verification/v1",
+  "source_commit": "45aecbdb5549908b38504b2f9af6326b3288d4e2",
+  "claim_id": "PCC-20261115-421c18",
+  "declaration_sha256": "aeb39697095990a68ba9433163f8b7fa516850bef89f64e69f2b1a4ecac6ed1e",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 50,
+  "gate_declarations": 381,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 97,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-421c18",
+    "claim_sha256": "2d3f0afe263951e2563971decff90fc82452dab3edd91710df7a984d204a669f",
+    "commit": "45aecbdb5549908b38504b2f9af6326b3288d4e2",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/negation_pullback_audit_20261115/lean (NegationCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T08:05:52Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-421c18",
+    "claim_sha256": "2d3f0afe263951e2563971decff90fc82452dab3edd91710df7a984d204a669f",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47090,
+    "sha256": "9778db0949585a4a18fc33eddbeb6ba531c3850e63a89d7957d4463895ce20cc",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 381,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 39,
+    "new_modules": 8,
+    "actual_coordinate_field_localization_maps": true,
+    "actual_normalized_all_function_local_pullback": true,
+    "actual_point_order_divisor_pullback": true,
+    "actual_norm_product_fraction_identity": true,
+    "actual_F5_missing_function_pullback_counter": true,
+    "qualified_source_survives": true,
+    "arbitrary_field_scope": "ActualnonsingularKpoints; ellipticmodeloveralgclosedK includesallgeometricpoints.",
+    "geometric_degree_zero_or_constant_kernel": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "algebraic_closure_basechange_or_canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

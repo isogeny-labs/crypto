@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T11:31:58Z",
+ "id": "PCC-20261111-167595",
+ "kind": "statement",
+ "producer": {
+  "commit": "cdaa61178c4135846a85f57b9844ed38d2997e3d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/independent-field6-02.txt",
+    "sha256": "645471a7ab48b578c96ded75b43250604f9ddf958d51505f2be0db53d389258f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/nonsplit-field6-witness-01.tsv",
+    "sha256": "46dc06ef4b2e8650a80aaa0f6107a90ca778c5b16ef79d2c5a2b71774e32617d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Independent arithmetic replay accepts128 frozen F17^6 tower-field witnesses including products,inverses and Frobenius powers, with exact seed-coordinate checks. Uses the pre-existing icprog B5a flat degree6 Fpk engine and its Rabin irreducibility checker via gamma=T+s, s=(gamma\u00b3+11gamma+2)/(3gamma\u00b2+5), modulus gamma6+12gamma4+4gamma3+14gamma2+10gamma+14. No producer field/map code imported or arithmetic engine modified; only a new test and small immutable fixture. This validates bounded extension arithmetic, not independently the whole Jacobian map; producer-authored harness and receipts remain unsigned, no speed result."
+}

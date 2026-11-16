@@ -1,0 +1,31 @@
+{
+  "schema": "primal-parabola-provenance/v1",
+  "scientific_execution": false,
+  "compilation": false,
+  "parent_variant": "research/primal_enum_20261109_v4",
+  "change": "exact quadratic/linear/constant solve of final lattice coefficient; independent checker retains original full-box enumeration then filters curved points",
+  "command": [
+    "python",
+    "-m",
+    "research.primal_parabola_20261109_v5.worker",
+    "primal-parabola-20261109-v5"
+  ],
+  "artifact": "research/primal_parabola_20261109_v5/raw.json.gz",
+  "input": "research/dual_ladder_20261109_v3/planted_inputs.json",
+  "input_sha256": "403db5080e81eda5e9b5643020babf54283472b338831f4f14d7655ef5955c93",
+  "input_rule": "all same five planted cases; only public coefficients to native",
+  "budget": {
+    "whole_worker_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cores": 1
+  },
+  "source_sha256": {
+    "research/primal_parabola_20261109_v5/EXTERNAL_GMP.json": "edd39099d523d2679f4a7b9ab0d09717b3701c3c1824197d9926206bee4d7301",
+    "research/primal_parabola_20261109_v5/EXTRACTION.json": "8007ac88c27a7284940ba7c916c0dc681d068cebb2defe42ae16dbc6d057ff68",
+    "research/primal_parabola_20261109_v5/PROOF.md": "6cca6a418509b0b5b5e37c1aeb17d165e1ac93da8e4b00c011a090d58b05efc7",
+    "research/primal_parabola_20261109_v5/checker.py": "5866dd0cdc291448e47cf13c3cca92cf1da0f66d957a342e7deca9a36b2c75ed",
+    "research/primal_parabola_20261109_v5/frozen_lll_prefix.hpp": "0ff2791be39425e7fade63ec285a9f9fec1da0cff6d290d2df23c4f8fd514c89",
+    "research/primal_parabola_20261109_v5/native.cpp": "7e4464c8267d146a877278620c9f302c4722b428cac1ee49859a744cca51718d",
+    "research/primal_parabola_20261109_v5/worker.py": "0017736abb0b66981b26778a07618b1c27b7e27715fdd8488e2e6cc3cc95ca02"
+  }
+}

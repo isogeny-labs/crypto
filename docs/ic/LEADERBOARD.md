@@ -684,7 +684,7 @@ Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_2026111
 
 ## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)
 
-The live source tree now exposes **104 top-level ECBench methods** and **33 nested algorithms** (20 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
+The live source tree now exposes **105 top-level ECBench methods** and **34 nested algorithms** (21 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
 
 ### Solver and GPU diagnostics
 
@@ -1247,10 +1247,10 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
 - `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
 - `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
-- `src/cryptanalysis/ecbench/methods.rs` — sha256 `2e884c247357af60…`
-- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `f8f9a75589e96902…`
-- `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
-- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `25f5089736d59040…`
+- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `3dbda3647cb57390…`
+- `integrations/primo/README.md` — sha256 `c75c86afe2f82334…`
+- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `ad90945be0c09c37…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
@@ -1266,7 +1266,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `33a16da0548b7b0c…`
+- `docs/curves/registry.json` — sha256 `c0e1027ac8023409…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

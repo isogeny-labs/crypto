@@ -1,0 +1,36 @@
+test_push_refuses_unmerged_index_without_changing_stages (test_artifacts.RoundTrip.test_push_refuses_unmerged_index_without_changing_stages) ... 
+  test_push_refuses_unmerged_index_without_changing_stages (test_artifacts.RoundTrip.test_push_refuses_unmerged_index_without_changing_stages) (arguments=('push', 'research/r1/runs/a.jsonl')) ... FAIL
+  test_push_refuses_unmerged_index_without_changing_stages (test_artifacts.RoundTrip.test_push_refuses_unmerged_index_without_changing_stages) (arguments=('push', 'research')) ... FAIL
+  test_push_refuses_unmerged_index_without_changing_stages (test_artifacts.RoundTrip.test_push_refuses_unmerged_index_without_changing_stages) (arguments=('push', '--dry-run', 'research/r1/runs/a.jsonl')) ... FAIL
+
+======================================================================
+FAIL: test_push_refuses_unmerged_index_without_changing_stages (test_artifacts.RoundTrip.test_push_refuses_unmerged_index_without_changing_stages) (arguments=('push', 'research/r1/runs/a.jsonl'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/crypto-benchrec-sync/tools/artifacts/test_artifacts.py", line 74, in test_push_refuses_unmerged_index_without_changing_stages
+    self.assertNotEqual(result.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_push_refuses_unmerged_index_without_changing_stages (test_artifacts.RoundTrip.test_push_refuses_unmerged_index_without_changing_stages) (arguments=('push', 'research'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/crypto-benchrec-sync/tools/artifacts/test_artifacts.py", line 74, in test_push_refuses_unmerged_index_without_changing_stages
+    self.assertNotEqual(result.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_push_refuses_unmerged_index_without_changing_stages (test_artifacts.RoundTrip.test_push_refuses_unmerged_index_without_changing_stages) (arguments=('push', '--dry-run', 'research/r1/runs/a.jsonl'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/crypto-benchrec-sync/tools/artifacts/test_artifacts.py", line 74, in test_push_refuses_unmerged_index_without_changing_stages
+    self.assertNotEqual(result.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 1 test in 0.806s
+
+FAILED (failures=3)

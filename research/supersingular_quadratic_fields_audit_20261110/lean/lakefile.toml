@@ -1,0 +1,11 @@
+name = "supersingular_quadratic_fields"
+version = "0.1.0"
+defaultTargets = ["QuadraticFieldsAudit"]
+
+[[require]]
+name = "supersingular_small_characteristic"
+path = "../../supersingular_small_characteristic_20261110/lean"
+
+[[lean_lib]]
+name = "QuadraticFieldsAudit"
+roots = ["CompleteSquare","ExtensionControls","FibreBound","NonaryClassification","NormalizedAll","NormalizedCase00","NormalizedCase01","NormalizedCase02","NormalizedCase10","NormalizedCase11","NormalizedCase12","NormalizedCase20","NormalizedCase21","NormalizedCase22","NormalizedPredicate","QuadraticCertificate","QuadraticModels","QuaternaryClassification","SourceTrace"]

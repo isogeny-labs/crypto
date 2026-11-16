@@ -1,0 +1,126 @@
+{
+  "schema": "independent-recorded-evidence-review/v1",
+  "created_utc": "2026-11-12T05:18:03.738694+00:00",
+  "decision": "PASSED_CONDITIONAL_COMPONENT_GAIN_ONLY",
+  "operation": "Recorded byte identities, complete native row/tuple coverage, all-arm conditional unions and timing-statistic recomputation; no rootfinding algorithm rerun.",
+  "results": [
+    {
+      "mode": "controls",
+      "conditional_root_union_size": 18,
+      "all_arm_unions_identical": true,
+      "complete_native_batches": 3,
+      "complete_native_fibers": 45,
+      "admitted_mask_rows": 10,
+      "admitted_candidate_vectors": 370,
+      "admitted_candidate_u_checks": 1110,
+      "additional_forced_cap_rows": 5,
+      "wall_seconds": 6.5023069939998095,
+      "peak_process_rss_kib": 194072,
+      "native_child_rss_kib": [
+        14336,
+        14568
+      ],
+      "raw_sha256": "192e58709fdbb37cfa70bf17b0675558a81451031de556e8bc40379b6897e3fa",
+      "arm_costs": [
+        {
+          "arm": "all",
+          "paid_component_seconds": 0.23890540399952442,
+          "solved_fibers": 15,
+          "excluded_fibers": 0
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 0.2608994309994159,
+          "solved_fibers": 15,
+          "excluded_fibers": 0
+        },
+        {
+          "arm": "five",
+          "paid_component_seconds": 0.2635869570003706,
+          "solved_fibers": 15,
+          "excluded_fibers": 0
+        }
+      ]
+    },
+    {
+      "mode": "profile",
+      "conditional_root_union_size": 15,
+      "all_arm_unions_identical": true,
+      "complete_native_batches": 9,
+      "complete_native_fibers": 153,
+      "admitted_mask_rows": 30,
+      "admitted_candidate_vectors": 1110,
+      "admitted_candidate_u_checks": 8880,
+      "additional_forced_cap_rows": 0,
+      "wall_seconds": 37.494762041002105,
+      "peak_process_rss_kib": 194080,
+      "native_child_rss_kib": [
+        14208,
+        17732
+      ],
+      "raw_sha256": "045b624d393bf37e991ea11b83ec0f3916b6bf2cae8f5468072e025d12ebbf02",
+      "arm_costs": [
+        {
+          "arm": "all",
+          "paid_component_seconds": 5.1381161009994685,
+          "solved_fibers": 40,
+          "excluded_fibers": 0
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 3.8976911839999957,
+          "solved_fibers": 6,
+          "excluded_fibers": 34
+        },
+        {
+          "arm": "five",
+          "paid_component_seconds": 1.7001749629998812,
+          "solved_fibers": 5,
+          "excluded_fibers": 35
+        },
+        {
+          "arm": "five",
+          "paid_component_seconds": 1.6465839150005195,
+          "solved_fibers": 5,
+          "excluded_fibers": 35
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 4.173542525997618,
+          "solved_fibers": 6,
+          "excluded_fibers": 34
+        },
+        {
+          "arm": "all",
+          "paid_component_seconds": 5.077332019998721,
+          "solved_fibers": 40,
+          "excluded_fibers": 0
+        },
+        {
+          "arm": "seven",
+          "paid_component_seconds": 3.8815683939974406,
+          "solved_fibers": 6,
+          "excluded_fibers": 34
+        },
+        {
+          "arm": "all",
+          "paid_component_seconds": 4.937723764000111,
+          "solved_fibers": 40,
+          "excluded_fibers": 0
+        },
+        {
+          "arm": "five",
+          "paid_component_seconds": 1.6563236140027584,
+          "solved_fibers": 5,
+          "excluded_fibers": 35
+        }
+      ]
+    }
+  ],
+  "observed_median_all_over_five": 3.06542270910971,
+  "observed_median_seven_over_five": 2.353218387426495,
+  "qualified_speedup": null,
+  "original_global_root_search_complete": false,
+  "matching_genuine_F4_F5_F6_measured": false,
+  "interpretation": "5D paid conditional component improves7D on five exposed positive width8training blocks. Shared3compilations/wrapper excluded from armratios; noA/A,isolation,hardness,noveltyor8xstanding."
+}

@@ -1,0 +1,11 @@
+digraph current_bootstrap {
+  graph [rankdir=LR, bgcolor="white", pad="0.16", nodesep="0.26", ranksep="0.44"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, penwidth=1.3];
+  edge [color="#8b98a8", penwidth=1.2];
+  source [label="Clean full checkout\nea47352a1d0b", color="#456b8b", fillcolor="#ecf4fb"];
+  build [label="Cold Cargo build\n18m56s", color="#456b8b", fillcolor="#ecf4fb"];
+  binary [label="ARM64 producer ELF\n846,392 bytes", color="#398c62", fillcolor="#eaf7ef"];
+  path [label="Current path embedded\nSHA-256 pinned", color="#398c62", fillcolor="#eaf7ef"];
+  final [label="Clean source\nexit 0 · no OOM", color="#398c62", fillcolor="#eaf7ef"];
+  source -> build -> binary -> path -> final;
+}

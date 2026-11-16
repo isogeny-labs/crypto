@@ -1,0 +1,314 @@
+{
+  "schema": "research.source-fidelity-review/v1",
+  "status": "scoped_source_supported_recorded_machine_evidence_read_back",
+  "reviewer": "/root/materializer_qualification",
+  "inherited_context": "Parent task context retained; reviewer did not author historical theorem sources",
+  "new_execution": false,
+  "fresh_independent_kernel_replay": false,
+  "source_claims": [
+    {
+      "claim": "Every modeled execution is accepted",
+      "source_fidelity": "supported_scoped",
+      "basis": "Universal Runs premise feeds every_execution_preserves; output WellFormed is derived through total execution and unique output, then validator acceptance. Output validity is not assumed."
+    },
+    {
+      "claim": "Accepted execution exists",
+      "source_fidelity": "supported_scoped",
+      "basis": "total_preserving_execution produces the classifier-selected Runs witness and WellFormed output, then test_accepts_wellformed."
+    },
+    {
+      "claim": "Native dispatch/accessor correspondence",
+      "source_fidelity": "supported_at_value_model_boundary",
+      "basis": "Retained Rust add checks left identity then right identity, degree-two fast condition and norm/slope guards, then fallback. Runs retains actual successful quotient/remainder/construction and fallback traces. Native valid checks degree<=2, active leading coefficient1 and empty residual remainder."
+    },
+    {
+      "claim": "Canonical storage boundary",
+      "source_fidelity": "explicit_premise_required",
+      "basis": "WellFormed includes all-slot canonical storage and capacities3/2. Validator reads only active up/vp data; inactive_noncanonical_accepted demonstrates acceptance is weaker without canonical premise."
+    },
+    {
+      "claim": "Control nonvacuity",
+      "source_fidelity": "supported_for_model_layer",
+      "basis": "Concrete prime17 fallback Runs witnesses exist for degree/norm/slope branches. Invalid identity output is rejected; noncanonical inactive storage is accepted but not WellFormed. Some fixtures use singular quintics; smoothness is not required by these representation statements."
+    }
+  ],
+  "acceptance_main_declarations": 2,
+  "acceptance_controls": 5,
+  "acceptance_named_readbacks": 7,
+  "affine_named_readbacks": 23,
+  "named_axioms": {
+    "acceptance": [
+      {
+        "name": "DispatchAcceptance.every_execution_accepted",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "DispatchAcceptance.accepted_execution_exists",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AcceptanceControls.invalid_identity_output",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AcceptanceControls.acceptance_not_canonical",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AcceptanceControls.degree_fallback_accepted",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AcceptanceControls.norm_fallback_accepted",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AcceptanceControls.slope_fallback_accepted",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    ],
+    "affine": [
+      {
+        "name": "AffineDispatch.monic_last",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.raw_active_last",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.construct_wellformed",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.runs_tag",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.tag_unique",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.classify_fast_iff",
+        "axioms": [
+          "propext"
+        ]
+      },
+      {
+        "name": "AffineDispatch.nonidentity_partition",
+        "axioms": [
+          "propext"
+        ]
+      },
+      {
+        "name": "AffineDispatch.fallback_execution",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.total_preserving_execution",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.pegcd_unique",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.reduction_unique",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.chain_unique",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.runs_unique",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineDispatch.every_execution_preserves",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.identity_precedence",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.branch_partition_controls",
+        "axioms": [
+          "propext"
+        ]
+      },
+      {
+        "name": "AffineControls.f5_decode",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.fs_decode",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.slope_inputs",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.fallback_degree_execution",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.fallback_norm_execution",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.fallback_slope_execution",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "AffineControls.fast_execution",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    ]
+  },
+  "native_snapshot_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+  "native_reference_lines": {
+    "field_n1_no_table": [
+      161,
+      233
+    ],
+    "storage_accessors": [
+      938,
+      962
+    ],
+    "valid": [
+      972,
+      982
+    ],
+    "add_dispatch": [
+      1004,
+      1073
+    ]
+  },
+  "assumptions": [
+    "prime modulus2<p<2^31",
+    "canonical curve coefficients decoding to degree5",
+    "both input WellFormed: degree<=2, capacities3/2, all-slot canonical values, active leading1 and residual divisibility",
+    "n=1/no-table native value model"
+  ],
+  "preserved_failure": "AffineControls-attempt-bRf3ZMss exit1 with unsolved goals; subsequent retained control receipt exits0",
+  "malformed_inventory_controls": "Existing readback-audit.json reports empty/wrong_name/sorryAx rejected; script inspected, not rerun",
+  "scope_limits": [
+    "Acceptance and modeled execution uniqueness, not global divisor-class addition or scalar equivalence",
+    "No compiler translation/counter/cost/extension-field correspondence",
+    "Historical imported caches reused and only recorded hashes read back; no fresh dependency rebuild or transient-edit exclusion",
+    "No new reviewer-owned runtime boundary tests; no official machine-evidence status promotion"
+  ],
+  "blocking_source_findings": [],
+  "costs": null
+}

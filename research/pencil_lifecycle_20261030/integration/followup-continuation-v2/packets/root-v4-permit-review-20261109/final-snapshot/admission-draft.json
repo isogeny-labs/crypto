@@ -1,0 +1,78 @@
+{
+  "schema": "durable-root-library-admission/v2",
+  "status": "prospective_not_released",
+  "workspace": "/var/tmp/pencil-root-materialize-t1953-20261109",
+  "unit": "pencil-root-durable-v4-20261109.service",
+  "uid": 1000,
+  "gid": 1000,
+  "toolchain": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+  "absolute_deadline": "2026-11-10T05:11:39+00:00",
+  "limits": {
+    "total_seconds": 1800,
+    "outer_term_seconds": 1795,
+    "outer_kill_grace_seconds": 5,
+    "aggregate_cpu": 2,
+    "aggregate_memory_bytes": 17179869184,
+    "target_stop_threshold_bytes": 6442450944,
+    "logs_stop_threshold_bytes": 268435456,
+    "minimum_free_bytes": 6442450944,
+    "durable_metadata_stop_bytes": 67108864,
+    "durable_total_stop_bytes": 402653184,
+    "supervisor_permit_seconds": 10
+  },
+  "inputs_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+  "recipe_files": {
+    "durable-launcher.py": "32d752703c87cbdf369bd0799c7183d5aa3f0d6af21cc23c2336733bc916238a",
+    "durable-worker.py": "b3de879c3d030edc33441300cbdfb5558b17fcc423bd894feadf8968c0928e95",
+    "durable_io.py": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c",
+    "source-bindings.json": "0cb53e87305fecdb313174c9824f57db239434f7e98fdd4cbf4673504c903f72",
+    "fixture.json": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980",
+    "candidate.patch": "6493f7a3bb0a9b60a60e2e39104ba9527817a03cfee68b2b9e27722328a67a75",
+    "recipe-proposal.json": "d339402ffe1835f057b297b7a88ce72cb6a7aaf053b679727b3010f64d8891af",
+    "owner-dollar-waiver.json": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+  },
+  "exact_tests": [
+    "cryptanalysis::ecbench::three_leads::pencil::tests::actual_some_none_known_answer_and_diagnostic_ledger",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations"
+  ],
+  "launch_command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "1795s",
+    "python3",
+    "-B",
+    "durable-launcher.py"
+  ],
+  "compiler_invoked": false,
+  "admission": false,
+  "lease": null,
+  "durable_run": "/home/ec2-user/pencil-validation-receipts/root-library-v4-20261109",
+  "publication": null,
+  "cost": {
+    "mode": "owner-waived-dollar-facts/v1",
+    "finite_dollar_ceiling_usd": null,
+    "worst_case_incremental_usd": null,
+    "receipt_file": "owner-dollar-waiver.json",
+    "receipt_sha256": "ff3f3a2fa06f7b5a73d0dc21abd7992f6dff4cb48ac3dcab2b07dfc1c966ca90"
+  },
+  "attempts": 1,
+  "automatic_retry": false,
+  "campaign_authorization": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261109/authorization.json",
+  "campaign_remaining_worker_seconds": null,
+  "produced_manifest_expected_path": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+  "admitted": false,
+  "campaign_accounting": {
+    "ceiling_seconds": 43200,
+    "charged_seconds": null,
+    "remaining_before_reservation_seconds": null,
+    "validation_reservation_seconds": 1800,
+    "unreserved_after_reservation_seconds": null,
+    "automatic_retry": false,
+    "root_ledger_authoritative": true
+  },
+  "root_release_condition": "New source qualification, fresh post-v3 cache snapshot, independent review, final bindings/publication/readback, current lease and no-overlap checks. One manual bounded attempt; no retry.",
+  "current_cache_sha256": null
+}

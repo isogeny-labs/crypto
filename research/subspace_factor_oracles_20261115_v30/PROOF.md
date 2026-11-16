@@ -1,0 +1,11 @@
+# First implicit-subspace support/factor oracle
+
+The prepared extractor proves conditional completeness: if all algebraic roots of a monic H(degree<=5) lie in a declared affine Fp-subspace, return every root with full multiplicity. If full support fails, return not-fully-supported and no root-set claim. Large characteristic is unresolved, not an empty solution. This is a support-qualified polynomial component, not the outer search for H.
+
+Independent tiny oracle explicitly builds each small affine domain, repeatedly divides by every linear factor and retains multiplicities. Full support means no nonconstant factor remains. Exhaust all monic polynomials through degree3 over GF4, GF8(two affine domains), F3(full and point domains), F5, GF9(prefix/full); through degree2 over GF25. Add repeated fourth/fifth powers to every profile. This gives3,800complete support decisions; every accepted case must return the exact full multiplicity list and reconstruct H. Literal scalar convolution is independent of the extractor's field operations. Include dimension-zero, affine-offset and inseparable/repeated branches.
+
+For actual GF(2^83), modulus T^83+T^45+T^2+T+1, basis1,T,...,T^17 defines the262144element factor base. Construct32quintics from known roots in this space, including repeated roots; construct16others with one explicit root T^18outside it. Independent bit-convolution multiplication constructs H, so planted complete multiplicities and support status are known without scanning the factor base. These48cases are not norm candidates or original-source solutions.
+
+Check the bound nodes<=1+degree*dimension. Refuse dependent bases; a characteristic37example must remain unsupported/unresolved. Finite-field coordinates use the standard canonical prime-subfield embedding. The binary adapter uses already-certified field arithmetic internally on canonical inputs; literal bit convolution is the independent oracle.
+
+Total3,848cases, cap10,000; at most1MiBraw with bounded witnesses and transcript hashes. Initial90second/4GiB/onecore experiment,84second final serialization guard. Compare strongest specialized trace/Frobenius factorization only after correctness passes. No novelty, original-root or qualified speed claim.

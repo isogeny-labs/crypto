@@ -1,0 +1,11 @@
+--- exporter-v4-qualification-v3-20261111/materialize.py
++++ exporter-v4-qualification-v4-20261111/materialize.py
+@@ -10,7 +10,7 @@
+ assert time.monotonic()<END and END-time.monotonic()<=1800
+ ABS=datetime.datetime.fromisoformat(A['absolute_deadline'].replace('Z','+00:00')).timestamp()
+ W=Path(A['workspace']);DONOR=Path(A['donor_workspace']);SOURCE=W/'source';CACHE=W/'cache'
+-assert str(W)=='/var/tmp/pencil-exporter-v4-qualification-v3-20261111'
++assert str(W)=='/var/tmp/pencil-exporter-v4-qualification-v4-20261111'
+ assert str(DONOR)=='/var/tmp/pencil-root-materialize-t1953-20261109'
+ assert W.is_dir() and not W.is_symlink()
+ assert {x.name for x in W.iterdir()}=={'workspace-owner.json'},'existing staged attempt; do not overwrite'

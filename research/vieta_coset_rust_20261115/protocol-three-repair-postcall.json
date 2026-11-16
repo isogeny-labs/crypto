@@ -1,0 +1,520 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-COSET-LOCAL-THREE-FIXTURE-REPAIR-20261115",
+  "version": 4,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115",
+  "authors": [
+    "Codex"
+  ],
+  "question": "Complete three-point decomposition and component costs: streaming Vieta versus nested batched lookup and scalar pair-table MITM.",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Successful arms return identical complete ordered relation sets on each frozen target.",
+      "decided_by": [
+        "C-candidate"
+      ]
+    },
+    {
+      "id": "C-cost",
+      "class": "comparative",
+      "text": "Report descriptive component costs by configuration and population, including all failures and cold setup; no directional or fastest-backend claim.",
+      "decided_by": [
+        "C-candidate"
+      ]
+    },
+    {
+      "id": "C-excluded",
+      "class": "out_of_scope",
+      "text": "No last-fall-degree bound, exponent fit, fastest-native-backend or end-to-end ECDLP speedup is established.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "mitm",
+      "role": "reference",
+      "description": "Three-term mitm",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "f21cb5e7a51e85a2bf0715a23542516d131a439b",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "f98f64c3e70371aacc2247d2ed0d6c251dcb0168dee1ef36bdc4784858af56a8",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "mitm"
+      }
+    },
+    {
+      "id": "nested-batched",
+      "role": "baseline",
+      "description": "Three-term nested-batched",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "f21cb5e7a51e85a2bf0715a23542516d131a439b",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "f98f64c3e70371aacc2247d2ed0d6c251dcb0168dee1ef36bdc4784858af56a8",
+        "threads": 1
+      },
+      "same_instrument_as": "mitm",
+      "parameters": {
+        "arm": "nested-batched"
+      }
+    },
+    {
+      "id": "stream-vieta",
+      "role": "candidate",
+      "description": "Three-term stream-vieta",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "f21cb5e7a51e85a2bf0715a23542516d131a439b",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "f98f64c3e70371aacc2247d2ed0d6c251dcb0168dee1ef36bdc4784858af56a8",
+        "threads": 1
+      },
+      "same_instrument_as": "mitm",
+      "parameters": {
+        "arm": "stream-vieta"
+      }
+    },
+    {
+      "id": "mitm-aa",
+      "role": "control_aa",
+      "description": "Three-term mitm-aa",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "f21cb5e7a51e85a2bf0715a23542516d131a439b",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "f98f64c3e70371aacc2247d2ed0d6c251dcb0168dee1ef36bdc4784858af56a8",
+        "threads": 1
+      },
+      "same_instrument_as": "mitm",
+      "parameters": {
+        "arm": "mitm-aa"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each arm receives five independently named conditioned-two-sum target calls per configuration. Every such target must return a nonempty set, with complete equality to lookup; these input-level controls use every arm rather than a separate arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Random x conditioned on rational lift is a separate population, not assumed unsatisfiable. Complete lookup determines zero/nonzero output. No null-probability or absence claim is made."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "mitm",
+          "nested-batched",
+          "stream-vieta",
+          "mitm-aa"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "field_and_m",
+        "treatment": "crossed",
+        "value": {
+          "fields": [
+            "word17",
+            "word31",
+            "word62",
+            "p224"
+          ],
+          "m": [
+            16,
+            64,
+            128
+          ]
+        },
+        "how": "All 20 configurations are retained separately; no pooled speed or exponent fit."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "uniform-x-rational",
+          "conditioned-two-sum"
+        ],
+        "how": "Five retained target calls of each population per configuration; same target across arms."
+      },
+      {
+        "name": "binary_flags_threads",
+        "treatment": "fixed",
+        "value": "one release binary, locked dependencies, one thread",
+        "how": "Record compiler, source and binary hashes before execution; same binary and primitive counters for all arms."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "value": "alternating forward/reverse four-arm order",
+        "how": "Interleave per target so first/last arm cost is balanced; two distinct warmups per configuration."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Record CPU, frequency, SMT, NUMA, kernel, virtualization, co-tenants, PSI, affinity, memory, interruptions and actual admission. No clock interpretation below required tier."
+      },
+      {
+        "name": "layout_hashing",
+        "treatment": "measured",
+        "how": "HashSet iteration never decides search order. Hashing/allocation/sorting are unpriced by field counters and remain in secondary clock intervals."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "No significance test or directional declaration; retain all status classes and separate populations."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-candidate",
+        "arms": [
+          "stream-vieta",
+          "mitm"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ]
+      },
+      {
+        "id": "C-scalar",
+        "arms": [
+          "nested-batched",
+          "mitm"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ]
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "mitm",
+          "mitm-aa"
+        ],
+        "design": "aa",
+        "differs_in": []
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "native/main.rs fixes the fixture seed to 0x76696574612d7631 XOR m, uses SplitMix64 words via Arithmetic::random_element, alternating random rational targets and fixed base-index sums. Root seed is the post-fixture seed XOR call index. Freeze exact source before data."
+    },
+    "instance_sampling": {
+      "rule": "20 field/coset configurations, each with two warmups then ten matched target calls, half per population. Random x is reduced modulo p, rejection on nonsquare RHS, canonical Tonelli sign; not uniform points.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive tables only, unblinded method labels; no inferential decision.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 10,
+    "warmups": 2,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Not powered for a statistical hypothesis. Ten target calls per configuration give five descriptive observations per population. No significance or general scaling exponent claim is licensed."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 3600,
+      "measured_on": "Separate preflight word31/m32: 12 arm calls completed in 0.027859347999765305 seconds including thin driver. Native per-stage costs in scale-20261115T2053Z/preflight/summary.json. Fixed/per-sample scalar slots are not pooled across heterogeneous fields and sizes. 3600 seconds is the enforced conservative attempt envelope, not an algorithm-runtime extrapolation."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Primitive multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "All multiplications inside each independent stage, including inverse/sqrt internals; cold accounting includes declared reusable setup.",
+        "source": "row.work.muls",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "range"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "ordered point triples",
+        "kind": "exact",
+        "definition": "Length and SHA-256 of sorted complete pair set, compared across arms and replayed by wide scalar subtraction.",
+        "source": "three-query rows: relations and result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Stage wall interval",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "First to last stage operation, fixture generation excluded; include cold setup separately. Do not interpret without admitted host/A-A receipts. Local diagnostic only: PSI absent and unmovable host threads; wall_valid=false for L2 comparisons.",
+        "source": "row.elapsed_ns",
+        "aggregation": "median",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 2,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": [
+        4
+      ],
+      "max_memory_gib": 8,
+      "cloud_spend_usd": 0,
+      "git_only_checkpoint_authorized": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "12 three-term configurations x4 arms x(2 warmups+10 retained calls)=576 three-query rows. The same CLI emits 576 ancillary two-query rows, retained separately. One shared 3600-second driver deadline for both panels."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "A set mismatch terminates that configuration as invalid. Budget failure preserves remaining control arms and yields nonzero status. No extra attempts."
+    }
+  ],
+  "decision_rule": {
+    "text": "Descriptive component tables only after complete set equality, successful replay and host/A-A admission. Missing rows or failed admission remain explicitly inconclusive; no directional speed claim.",
+    "comparison_ids": [
+      "C-candidate",
+      "C-scalar"
+    ],
+    "statistic": "per-population median and quartiles; no pooling across configurations",
+    "interval": "empirical interquartile range, not a confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "matched component costs at declared cold/warm scope; no exponent fit",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.rs",
+      "sha256": "60b3dba6fd4dfdfc220e53e2978f93540547efb0e3fd36bbfc41e406a6f8af92"
+    },
+    "inputs": [
+      "raw/*.jsonl",
+      "host-and-admission.json"
+    ],
+    "outputs": [
+      "summary.json",
+      "report.pdf",
+      "scale.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Launch before checkpoint, live budget/capacity and source/image gates",
+    "Represent a fixture ecbench job as this component study",
+    "Silently reduce m, fields, target counts or controls",
+    "Treat development tests as scale timings",
+    "Pool identity and finite-target costs or the two target populations",
+    "Count inverse/sqrt calls twice on top of nested primitive totals",
+    "Declare fastest backend without the repository Montgomery/external comparison",
+    "Promote unsigned producer observations to verified claims"
+  ],
+  "literature": [
+    {
+      "ref": "https://christophe.petit.web.ulb.be/files/16PKC_primeECDLP.pdf",
+      "provenance": "retrieved",
+      "claim": "Smooth subgroup/coset low-degree power maps.",
+      "verified_by": "producer source read; no signed PCC verdict"
+    },
+    {
+      "ref": "RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md; src/cryptanalysis/prime_fast.rs; src/cryptanalysis/fp_backend.rs; src/cryptanalysis/pkm_smooth_tower.rs",
+      "provenance": "internal",
+      "claim": "Existing decomposition, batch lookup and native arithmetic controls.",
+      "verified_by": "producer source read; KB unavailable"
+    }
+  ],
+  "amendments": [
+    {
+      "filed_before_affected_data": true,
+      "reason": "User explicitly authorized isolated local scaling with Git-only checkpoints; LOCAL_AMENDMENT.md retains workload and documents missing PSI, lower clock admission, calibration and secondary three-term panel.",
+      "id": "A-local-1",
+      "filed": "2026-11-15",
+      "changes": [
+        "EKS to user-authorized isolated local execution and Git-only custody",
+        "Local clocks remain below L2; primitive counts primary",
+        "Frozen 20-config primary and 12-config secondary matrix; separate panel labels and complete-set replay"
+      ]
+    },
+    {
+      "id": "A-fixture-clock",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": true,
+      "reason": "Untimed fixture context incorrectly inherited previous arm elapsed time; new source epoch, original records preserved.",
+      "changes": [
+        "Renew fixture budget per round",
+        "Repeat complete P-224/m128 configuration with identical inputs, seeds, arms and stage limits",
+        "Keep incomplete original epoch and all algorithm timeouts; no pooling"
+      ]
+    },
+    {
+      "id": "A-source-metadata",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": false,
+      "reason": "Correct stale copied source-commit field in repaired protocol. Actual qualifier hash and publication receipt were pinned before calls; original v3 protocol retained unchanged.",
+      "changes": [
+        "Correct instrument.commit to published repair source; no workload, binary, algorithm, budget or result change"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "invalidation_rules": [
+    "Counted results require complete-set equality and separate-process replay.",
+    "All local wall values are diagnostic, wall_valid=false for L2 claims, even when the isolated runner reports no detected contention.",
+    "Retain failures, timeouts, missing rows and warmups; report their actual flow."
+  ],
+  "extensions": {
+    "local_amendment": "FIXTURE_CLOCK_AMENDMENT.md",
+    "planned_configs": 1,
+    "primary_query_rows": 48,
+    "ancillary_two_query_rows": 48,
+    "panel": "three-repair",
+    "supersedes": "only incomplete original three/p224/m128 epoch"
+  }
+}
