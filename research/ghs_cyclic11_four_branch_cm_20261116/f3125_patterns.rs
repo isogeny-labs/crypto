@@ -70,7 +70,7 @@ fn main() {
                 log[&field.pow(field.sub(x,lambda),(Q-1)/11)]));
         }
         assert_eq!(chars.len(),Q-3);
-        let mut classes=BTreeMap::<[i32;4],BTreeSet<(usize,i64)>>::new();
+        let mut classes=BTreeMap::<[i32;4],BTreeMap<(usize,i64),[i32;4]>>::new();
         let mut rows=0;
         for a in 1..=10 {for b in 1..=10 {for c in 1..=10 {
             let d=fourth(a,b,c);if d==0||!paired(a,b,c,d){continue;}
@@ -81,14 +81,14 @@ fn main() {
             let t=t_num/10;
             assert!(t*t<=4*3125,"Hasse failure lambda={} exponents={},{},{},{}",lambda,a,b,c,d);
             let mut key=[a,b,c,d];key.sort();
-            classes.entry(key).or_default().insert((n,t));
+            classes.entry(key).or_default().entry((n,t)).or_insert([a,b,c,d]);
             overall.entry(t).or_default().push((lambda as i32,key));
             rows+=1;
         }}}
         assert_eq!(rows,270);
         println!("lambda={lambda}; ordered_rows={rows}; sorted_patterns={}",classes.len());
         for (key,values) in classes {
-            println!("lambda={lambda}; pattern={key:?}; N_and_trace={values:?}");
+            println!("lambda={lambda}; pattern={key:?}; N_trace_representatives={values:?}");
         }
     }
     for (t,rows) in overall {
