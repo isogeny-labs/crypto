@@ -1,0 +1,55 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm1698-f687c608 | 25.00 | inc | 24/24 | 1.893 | 1.939 | 2.352 | — |
+| icv1-fp28-tm1698-f687c608 | 25.00 | inc-aa | 24/24 | 1.893 | 1.939 | 2.352 | — |
+| icv1-fp28-tm1698-f687c608 | 25.00 | rho-neg | 24/24 | 1.054 | 1.153 | 2.043 | — |
+| icv1-fp28-tm1698-f687c608 | 25.00 | rho-neg-aa | 24/24 | 1.054 | 1.153 | 2.043 | — |
+| icv1-fp28-tm2978-45210efb | 25.00 | inc | 24/24 | 1.813 | 1.853 | 2.217 | — |
+| icv1-fp28-tm2978-45210efb | 25.00 | inc-aa | 24/24 | 1.813 | 1.853 | 2.217 | — |
+| icv1-fp28-tm2978-45210efb | 25.00 | rho-neg | 24/24 | 1.118 | 1.224 | 2.172 | — |
+| icv1-fp28-tm2978-45210efb | 25.00 | rho-neg-aa | 24/24 | 1.118 | 1.224 | 2.172 | — |
+| icv1-fp28-tm3826-fe9ab601 | 25.00 | inc | 24/24 | 1.949 | 1.981 | 2.268 | — |
+| icv1-fp28-tm3826-fe9ab601 | 25.00 | inc-aa | 24/24 | 1.949 | 1.981 | 2.268 | — |
+| icv1-fp28-tm3826-fe9ab601 | 25.00 | rho-neg | 24/24 | 1.038 | 1.135 | 2.011 | — |
+| icv1-fp28-tm3826-fe9ab601 | 25.00 | rho-neg-aa | 24/24 | 1.038 | 1.135 | 2.011 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc | 24/24 | 1.871 | 1.904 | 2.201 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc-aa | 24/24 | 1.871 | 1.904 | 2.201 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg | 24/24 | 0.964 | 1.054 | 1.863 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg-aa | 24/24 | 0.964 | 1.054 | 1.863 | — |
+| icv1-fp28-tm30170-b059aa20 | 25.00 | inc | 24/24 | 1.820 | 1.854 | 2.158 | — |
+| icv1-fp28-tm30170-b059aa20 | 25.00 | inc-aa | 24/24 | 1.820 | 1.854 | 2.158 | — |
+| icv1-fp28-tm30170-b059aa20 | 25.00 | rho-neg | 24/24 | 1.025 | 1.121 | 1.985 | — |
+| icv1-fp28-tm30170-b059aa20 | 25.00 | rho-neg-aa | 24/24 | 1.025 | 1.121 | 1.985 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm1698-f687c608 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm1698-f687c608 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm1698-f687c608 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp28-tm1698-f687c608 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm1698-f687c608 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp28-tm1698-f687c608 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-tm2978-45210efb | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm2978-45210efb | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm2978-45210efb | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp28-tm2978-45210efb | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm2978-45210efb | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp28-tm2978-45210efb | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-tm3826-fe9ab601 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm3826-fe9ab601 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm3826-fe9ab601 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp28-tm3826-fe9ab601 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm3826-fe9ab601 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp28-tm3826-fe9ab601 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm27314-a41e3b62 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-tm30170-b059aa20 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm30170-b059aa20 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm30170-b059aa20 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp28-tm30170-b059aa20 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm30170-b059aa20 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp28-tm30170-b059aa20 | rho-neg vs rho-neg-aa | unresolved inside the band |

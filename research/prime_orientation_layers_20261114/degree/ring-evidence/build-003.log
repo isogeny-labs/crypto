@@ -1,0 +1,26 @@
+../ring-evidence/draft-003.lean.txt:38:8: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ‖↑?q‖
+in the target expression
+  ↑↑q ∈ PadicInt.subring 2
+
+q : ↥integralRationals
+⊢ ↑↑q ∈ PadicInt.subring 2
+../ring-evidence/draft-003.lean.txt:43:18: error: unsolved goals
+a b : ↥integralRationals
+⊢ ↑↑a * ↑↑b = ↑(⟨↑↑a, ⋯⟩ * ⟨↑↑b, ⋯⟩)
+../ring-evidence/draft-003.lean.txt:42:18: error: unsolved goals
+a b : ↥integralRationals
+⊢ ↑↑a + ↑↑b = ↑(⟨↑↑a, ⋯⟩ + ⟨↑↑b, ⋯⟩)
+../ring-evidence/draft-003.lean.txt:55:2: error: mod_cast has type
+  padicNorm 2 ↑q ≤ 2 ^ (-↑p)
+but is expected to have type
+  ↑(padicNorm 2 ↑q) ≤ 2 ^ (-↑p)
+
+Note: The following definitions were not unfolded because their definition is not exposed:
+  Real.instLE ↦ 2
+'OrientationCoefficientReduction.reduce_zero_of_bound' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'OrientationCoefficientReduction.integral_den_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_compatible' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

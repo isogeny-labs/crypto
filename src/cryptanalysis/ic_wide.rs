@@ -415,6 +415,7 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         verified: recovered.is_some(),
         recovered: recovered.and_then(|d| d.checked_u128().and_then(|v| u64::try_from(v).ok())),
         counters,
+        work_native: Default::default(),
     };
     (res, recovered)
 }
@@ -773,6 +774,7 @@ pub fn run_f2m4<S: NarrowRhoScalar>(
             extra: t.extra.clone(),
             forecaster: t.forecaster.clone(),
             forecast_unavailable: t.forecast_unavailable.clone(),
+            pricing_qualification: None,
         }
     });
     let total_gae = fb_phase.gae + prep_cost.gae + rel.gae + la.gae + ver.gae;

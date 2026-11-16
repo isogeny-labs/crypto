@@ -1,0 +1,77 @@
+import FastCallFinish
+set_option autoImplicit false
+namespace DivisorArrayCopy
+open ScaleTrim MonicRemainder MonicZeroTest
+structure Stored where
+ degree : Nat
+ u : Array UInt64
+ v : Array UInt64
+ deriving DecidableEq, Repr
+
+def identity : Stored := ⟨0,#[1,0,0],#[0,0]⟩
+def copyPrefix : Nat → List UInt64 → Array UInt64 → Array UInt64
+ | _,[],out => out
+ | i,a::as,out => copyPrefix (i+1) as (out.setIfInBounds i a)
+
+def raw (u v : List UInt64) : Stored :=
+ let d := identity
+ let d := {d with degree:=u.length-1}
+ let d := {d with u:=#[0,0,0]}
+ let d := {d with u:=copyPrefix 0 u d.u}
+ {d with v:=copyPrefix 0 v d.v}
+
+def shape (u v : List UInt64) : Prop := u≠[] ∧ u.length≤3 ∧ v.length<u.length
+
+def construct (u v : List UInt64) : Option Stored :=
+ if u=[] ∨ u.length>3 ∨ v.length≥u.length then none else some (raw u v)
+
+def up (d : Stored) : List UInt64 := d.u.toList.take (d.degree+1)
+def vp (d : Stored) : List UInt64 :=
+ let xs:=d.v.toList.take d.degree
+ trimFuel xs.length xs
+
+theorem from_success (u v : List UInt64) (h : shape u v) : construct u v=some (raw u v) := by
+ unfold construct
+ rw [if_neg (by rcases h with ⟨h0,h1,h2⟩;simp only [h0,false_or];omega)]
+
+theorem bounded_lists (u v : List UInt64) (h : shape u v) :
+ (∃ a,u=[a] ∧ v=[]) ∨
+ (∃ a b,u=[a,b] ∧ (v=[] ∨ ∃ x,v=[x])) ∨
+ (∃ a b c,u=[a,b,c] ∧ (v=[] ∨ (∃ x,v=[x]) ∨ ∃ x y,v=[x,y])) := by
+ rcases h with ⟨h0,h1,h2⟩
+ cases u with
+ | nil => contradiction
+ | cons a us =>
+  cases us with
+  | nil => left;refine ⟨a,rfl,?_⟩;cases v <;> simp_all
+  | cons b us =>
+   cases us with
+   | nil =>
+    right;left;refine ⟨a,b,rfl,?_⟩
+    cases v with
+    | nil => exact Or.inl rfl
+    | cons x vs =>
+     right;refine ⟨x,?_⟩
+     cases vs <;> simp_all <;> omega
+   | cons c us =>
+    have hus : us=[] := by cases us <;> simp_all <;> omega
+    subst us
+    right;right;refine ⟨a,b,c,rfl,?_⟩
+    cases v with
+    | nil => exact Or.inl rfl
+    | cons x vs =>
+     right
+     cases vs with
+     | nil => exact Or.inl ⟨x,rfl⟩
+     | cons y vs =>
+      right;refine ⟨x,y,?_⟩
+      cases vs <;> simp_all <;> omega
+
+theorem raw_shape (u v : List UInt64) (h : shape u v) :
+ (raw u v).degree=u.length-1 ∧ (raw u v).degree≤2 ∧
+ (raw u v).u.size=3 ∧ (raw u v).v.size=2 ∧ up (raw u v)=u := by
+ rcases bounded_lists u v h with ⟨a,rfl,rfl⟩ | ⟨a,b,rfl,hv⟩ | ⟨a,b,c,rfl,hv⟩
+ · simp [raw,identity,copyPrefix,up,Array.setIfInBounds]
+ · rcases hv with rfl | ⟨x,rfl⟩ <;> simp [raw,identity,copyPrefix,up,Array.setIfInBounds]
+ · rcases hv with rfl | ⟨x,rfl⟩ | ⟨x,y,rfl⟩ <;> simp [raw,identity,copyPrefix,up,Array.setIfInBounds]
+end DivisorArrayCopy

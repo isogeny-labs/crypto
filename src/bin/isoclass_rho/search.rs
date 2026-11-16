@@ -191,7 +191,7 @@ pub fn search_prime(
                 break c;
             }
         };
-        let f = Fp { p };
+        let f = Fp::new(p);
         for _ in 0..300 {
             tried += 1;
             let e = Curve {
@@ -285,7 +285,7 @@ mod tests {
         let q = (1u64 << 62) - 1;
         let order = q + 1;
         assert_eq!(trace_and_discriminant(q, order), Ok((0, 4 * q)));
-        let f = Fp { p: q };
+        let f = Fp::new(q);
         let curve = Curve { a: 0, b: 1 };
         assert!(describe(&f, q, curve, order, 0).is_err());
         let outside = q + 1 + 4_294_967_296;

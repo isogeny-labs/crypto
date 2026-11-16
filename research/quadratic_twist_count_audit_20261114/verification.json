@@ -1,0 +1,74 @@
+{
+  "schema": "quadratic-twist-count-verification/v1",
+  "source_commit": "78e9468510cb314728b2ba091026bb7d1eb0b8e3",
+  "claim_id": "PCC-20261114-501186",
+  "declaration_sha256": "b58b303b769b3481b65b0cdd7536744a62d4a3573bf823b89ff116762f8a5b8e",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 97,
+  "gate_declarations": 42,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 64,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-501186",
+    "claim_sha256": "c1a8330d7b45b563fe60ef013575dede3e1d67fcecb0aae13151d7acb35927f9",
+    "commit": "78e9468510cb314728b2ba091026bb7d1eb0b8e3",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/quadratic_twist_count_audit_20261114/lean (TwistCountCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T07:21:51Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-501186",
+    "claim_sha256": "c1a8330d7b45b563fe60ef013575dede3e1d67fcecb0aae13151d7acb35927f9",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47600,
+    "sha256": "5d19ce10775aa272cb1ddb77808f5ad5074548cfc433dce4d319b21ebe69bfc8",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 42,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_odd_field_twist_counts_trace_source_invariance_proved": true,
+    "literal_galbraith_ex9_5_3_refuted": true,
+    "actual_coordinate_AddEquiv_and_universal_homogeneous_inverse_identities_proved": true,
+    "qualified_generic_j_lemma9_5_7_refuted": false,
+    "fst_embedding_theorem_refuted": false,
+    "nonsquare_and_nonsingularity_deletion_universal_negations_proved": true,
+    "general_char3_Hasse_Endrank_embedding_closed": false,
+    "full_paper_read": false,
+    "full_book_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

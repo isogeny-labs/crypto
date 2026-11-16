@@ -1,0 +1,340 @@
+{
+ "schema": "pkm-fd-y13-analysis/v1 (scratchpad, not committed)",
+ "every_number": "[pcc:unverified]",
+ "study": "research/pkm_falldegree_unblock_20261107",
+ "cell": "Kummer m=2, P1 p=2013265921, t=13 (N=26), random targets, f4_fp_tower, 12 threads",
+ "rows": [
+  {
+   "job": "Y1",
+   "draw": 0,
+   "cap": 5,
+   "file": "research/pkm_falldegree_unblock_20261107/results/Y1/9253a575-a872-49e5-886e-eaa87e0ff902/runs/X-m2-t13-k0-c5.jsonl",
+   "sha256": "434428ba87ed12a5824e2af25225325eef58400f980b5578224c6e8c7bd97e0a",
+   "pod_uid": "9253a575-a872-49e5-886e-eaa87e0ff902",
+   "grid_zeros": 0,
+   "decomposable": false,
+   "cpu": "Intel(R) Xeon(R) Platinum 8375C CPU @ 2.90GHz",
+   "memtotal_kB": 129804652,
+   "argv": "argv: cap:13:0:5:27900000000",
+   "start_utc": "2026-11-10T03:09:48Z",
+   "end_utc": "2026-11-10T03:10:05Z",
+   "node_type": "r6i.4xlarge (SPOT_LOSSES.md)",
+   "degree_reached": 5,
+   "inconsistent": false,
+   "timed_out": false,
+   "oversize": false,
+   "basis_len": 2922,
+   "max_cols": 16572,
+   "muladds": 179052499158,
+   "wall_s": 16.752185718,
+   "x_r": 1118191946,
+   "max_degree_bound": 5,
+   "zero_dim": true,
+   "steps": 22,
+   "max_rows": 15267,
+   "max_nnz": 18634316,
+   "max_dense_entries": 53833099,
+   "refutes": false
+  },
+  {
+   "job": "Y2",
+   "draw": 1,
+   "cap": 5,
+   "file": "research/pkm_falldegree_unblock_20261107/results/Y2/e7e4ad4c-2d4b-4f65-96b9-6b10ededf985/runs/X-m2-t13-k1-c5.jsonl",
+   "sha256": "f3322c13e18b19c6b4801c7d5bffd68455cdf3cb2739461704ae3cebb7088d81",
+   "pod_uid": "e7e4ad4c-2d4b-4f65-96b9-6b10ededf985",
+   "grid_zeros": 0,
+   "decomposable": false,
+   "cpu": "AMD EPYC 7R13 Processor",
+   "memtotal_kB": 129114476,
+   "argv": "argv: cap:13:1:5:27900000000",
+   "start_utc": "2026-11-10T03:19:25Z",
+   "end_utc": "2026-11-10T03:19:42Z",
+   "node_type": "not recorded",
+   "degree_reached": 5,
+   "inconsistent": false,
+   "timed_out": false,
+   "oversize": false,
+   "basis_len": 2922,
+   "max_cols": 16572,
+   "muladds": 179052499158,
+   "wall_s": 16.770541655,
+   "x_r": 1132329660,
+   "max_degree_bound": 5,
+   "zero_dim": true,
+   "steps": 22,
+   "max_rows": 15267,
+   "max_nnz": 18634316,
+   "max_dense_entries": 53833099,
+   "refutes": false
+  },
+  {
+   "job": "Y4",
+   "draw": 1,
+   "cap": 6,
+   "file": "research/pkm_falldegree_unblock_20261107/results/Y4/2f855278-d366-4b77-a295-e2a784e950ba/runs/X-m2-t13-k1-c6.jsonl",
+   "sha256": "ab70822ddc6037edce3beadb2a00d36fd37b394b4851990c96af9218ca83cc98",
+   "pod_uid": "2f855278-d366-4b77-a295-e2a784e950ba",
+   "grid_zeros": 0,
+   "decomposable": false,
+   "cpu": "Intel(R) Xeon(R) 6975P-C",
+   "memtotal_kB": 64776640,
+   "argv": "argv: cap:13:1:6:12800000000",
+   "start_utc": "2026-11-10T07:12:18Z",
+   "end_utc": "2026-11-10T10:25:08Z",
+   "node_type": "m8i.4xlarge (SPOT_LOSSES.md; y4_node.txt)",
+   "degree_reached": 6,
+   "inconsistent": true,
+   "timed_out": false,
+   "oversize": false,
+   "basis_len": 1,
+   "max_cols": 177063,
+   "muladds": 288586444518022,
+   "wall_s": 11569.960909013,
+   "x_r": 1132329660,
+   "max_degree_bound": 6,
+   "zero_dim": true,
+   "steps": 32,
+   "max_rows": 397952,
+   "max_nnz": 6387192745,
+   "max_dense_entries": 4717115340,
+   "refutes": true,
+   "a14_max_dense_limit": 12800000000,
+   "a14_oversize_false": true,
+   "a14_timed_out_false": true,
+   "a14_max_dense_below_limit": true,
+   "peak_memory_MB": 20618,
+   "peak_memory_MB_distinct_values": [
+    3,
+    4,
+    5,
+    17,
+    31,
+    70,
+    151,
+    152,
+    333,
+    344,
+    356,
+    1398,
+    3774,
+    9856,
+    20618
+   ]
+  }
+ ],
+ "mismatches": [],
+ "no_row": [
+  {
+   "draw": 0,
+   "cap": 6,
+   "job": "pfd-x-t13-k0-c6",
+   "reason": "launched three times, killed each time by an EC2 Spot interruption (SPOT_LOSSES.md rows 1-3); nothing admitted"
+  }
+ ],
+ "c_star": 6,
+ "draws": [
+  {
+   "draw": 0,
+   "cap_cstar_minus_1_refutes": false,
+   "cap_cstar_refutes": "no row (lost 3 times)",
+   "d_F": null,
+   "bound": "d_F >= 6"
+  },
+  {
+   "draw": 1,
+   "cap_cstar_minus_1_refutes": false,
+   "cap_cstar_refutes": true,
+   "d_F": 6,
+   "bound": "d_F = 6"
+  }
+ ],
+ "median_dF": ">= 6 (draw 0 one-sided, draw 1 exact 6)",
+ "D5_reading": "undecided at t = 13",
+ "bracket_rule": "Amendment 7 B: cap c*-1 = 5 not refuting, cap c* = 6 refuting => d_F = 6 per draw; draw 0 has no cap-6 row; D.5: a bound that includes c* is \"undecided\"",
+ "reading_applied_by": "hand / scratchpad script from the rule text; the Amendment 7 D scorer patch is not committed or reviewed (RESULTS.md section 8)",
+ "grid_zeros_all_zero": true,
+ "compare_t12": [
+  {
+   "draw": 0,
+   "cap": 5,
+   "job_t13": "Y1",
+   "job_t12": "X1",
+   "max_cols": {
+    "t13": 16572,
+    "t12": 16572
+   },
+   "max_dense_entries": {
+    "t13": 53833099,
+    "t12": 53833099
+   },
+   "muladds": {
+    "t13": 179052499158,
+    "t12": 179052499158
+   },
+   "basis_len": {
+    "t13": 2922,
+    "t12": 2922
+   },
+   "steps": {
+    "t13": 22,
+    "t12": 22
+   },
+   "wall_s": {
+    "t13": 16.752185718,
+    "t12": 10.778363992
+   }
+  },
+  {
+   "draw": 1,
+   "cap": 5,
+   "job_t13": "Y2",
+   "job_t12": "X2",
+   "max_cols": {
+    "t13": 16572,
+    "t12": 16572
+   },
+   "max_dense_entries": {
+    "t13": 53833099,
+    "t12": 53833099
+   },
+   "muladds": {
+    "t13": 179052499158,
+    "t12": 179052499158
+   },
+   "basis_len": {
+    "t13": 2922,
+    "t12": 2922
+   },
+   "steps": {
+    "t13": 22,
+    "t12": 22
+   },
+   "wall_s": {
+    "t13": 16.770541655,
+    "t12": 11.763469237
+   }
+  },
+  {
+   "draw": 1,
+   "cap": 6,
+   "job_t13": "Y4",
+   "job_t12": "X4",
+   "max_cols": {
+    "t13": 177063,
+    "t12": 103785
+   },
+   "max_dense_entries": {
+    "t13": 4717115340,
+    "t12": 1357804954
+   },
+   "muladds": {
+    "t13": 288586444518022,
+    "t12": 42213325353310
+   },
+   "basis_len": {
+    "t13": 1,
+    "t12": 1
+   },
+   "steps": {
+    "t13": 32,
+    "t12": 30
+   },
+   "wall_s": {
+    "t13": 11569.960909013,
+    "t12": 1762.846554637
+   }
+  }
+ ],
+ "stageA_P1_kummer_m2": [
+  {
+   "t": 1,
+   "N": 2,
+   "dF_median": "3",
+   "source": "closure"
+  },
+  {
+   "t": 2,
+   "N": 4,
+   "dF_median": "4",
+   "source": "closure"
+  },
+  {
+   "t": 3,
+   "N": 6,
+   "dF_median": "4",
+   "source": "closure"
+  },
+  {
+   "t": 4,
+   "N": 8,
+   "dF_median": "4",
+   "source": "closure"
+  },
+  {
+   "t": 5,
+   "N": 10,
+   "dF_median": "4",
+   "source": "closure"
+  },
+  {
+   "t": 6,
+   "N": 12,
+   "dF_median": "5",
+   "source": "closure"
+  },
+  {
+   "t": 7,
+   "N": 14,
+   "dF_median": "5",
+   "source": "closure"
+  },
+  {
+   "t": 8,
+   "N": 16,
+   "dF_median": "5",
+   "source": "closure"
+  },
+  {
+   "t": 9,
+   "N": 18,
+   "dF_median": "5",
+   "source": "closure"
+  },
+  {
+   "t": 10,
+   "N": 20,
+   "dF_median": "6",
+   "source": "closure"
+  },
+  {
+   "t": 11,
+   "N": 22,
+   "dF_median": "6",
+   "source": "=D (F4)"
+  },
+  {
+   "t": 12,
+   "N": 24,
+   "dF_median": ">=6",
+   "source": "bracket incomplete: cap 5 not refuting, cap 6 not run -> d_F >= 6"
+  },
+  {
+   "t": 13,
+   "N": 26,
+   "dF_median": ">=6",
+   "source": "closure one-sided"
+  },
+  {
+   "t": 14,
+   "N": 28,
+   "dF_median": ">=6",
+   "source": "closure one-sided"
+  }
+ ],
+ "t12_median_dF": 6,
+ "open_cells": {
+  "13": "undecided (draw 0 >= 6, draw 1 = 6; c* = 6)",
+  "14": "undecided (>= 6; c* = 7; the decisive cell)"
+ }
+}

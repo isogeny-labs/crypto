@@ -1,0 +1,12 @@
+{
+ "status": "pass",
+ "verdict": "endorsed exactly as worded (statement_judged): every clause recomputes from runs.json and the validator's replays",
+ "notes": [
+  "Every clause holds under the native-work convention the statement itself names: a distinguished-point canonicalisation and a point hash are each one native operation priced at h, and so is each rho step index. The 'cheaper in all 9 cells' clause at h = 1 (and hence 'because the order flips with h') does not survive charging a distinguished-point rho one native operation per point instead of two: then at I = 10M the IC is 0.83-1.06x at h = 1, not cheaper in 3 of 9 cells, and 3 of the 27 decisions are dearer (validator-report.json V5-F5). It does survive pricing rho2xks's step index at 0 (0.87-0.92x), kappa up to 1.0, rho2x, a modelled non-negation DP rho and cross-fitting (V5-F6).",
+  "'rho step-index hashes': rho2xks's step index is x mod 32 (the five low bits of x), a partition function rather than a hash; with it priced at 0 the statement's decisions and the h = 1 clause still hold.",
+  "'fresh': 0 (p, a, b) overlap with 116,860 curve records; one v5 curve shares (p, n) with a v4 curve but has a different j-invariant (not isomorphic).",
+  "'solver operations': L = 0 in every v5 row; the IC's solver work is counted as mod-n M and I.",
+  "This report judges only the statement above. RESULTS.md carries three secondary prose errors that the statement does not repeat (validator-report.json V5-F4)."
+ ],
+ "proposed_wording": null
+}

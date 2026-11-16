@@ -1,0 +1,11 @@
+--- published/materialize.py
++++ proposed/materialize.py
+@@ -7,7 +7,7 @@
+ F=json.loads((P/'preparation.json').read_text());START=time.monotonic();END=START+880
+ REV='29861c9a55f9ae5a33e1e09b3866aa397fbde605';W=Path(F['workspace']);OUT=Path(F['output']);REPO=Path(F['repository']);OWN=False;ACTIVE=None;LAST_HEARTBEAT=0
+ R={'status':'failed','revision':REV,'compiler_invoked':False,'errors':[],'files':0,'phase':'admission','outer_cgroup_confirmation_required':True};IMM={};CACHE={};SOURCE=W/'source';STAGE=W/'cache-stage-v2'
+-resource.setrlimit(resource.RLIMIT_AS,(4*1024**3,4*1024**3))
++# Physical RAM remains bounded by the verified 4 GiB cgroup; no separate RLIMIT_AS.
+ def stop(sig,frame):raise RuntimeError('signal '+str(sig))
+ for sig in [signal.SIGTERM,signal.SIGINT]:signal.signal(sig,stop)
+ def checkpoint():

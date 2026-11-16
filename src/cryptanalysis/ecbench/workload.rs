@@ -13,9 +13,6 @@
 //! (`canonical::derive_u64`), never from an RNG stream, and no solver is
 //! handed it: the runner verifies the solver's answer afterwards.
 
-use super::exact_scalar::ExactScalar;
-use crate::cryptanalysis::curve25519_wide::Curve25519Wide;
-use crate::cryptanalysis::fp_backend::PrimeField;
 use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -23,7 +20,7 @@ use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ec_index_calculus_curves::CurveKind;
-use crate::cryptanalysis::ecbench::canonical::{bare_id, derive_u128, derive_u64};
+use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
@@ -38,7 +35,7 @@ use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, unpack_e4,
 use crate::cryptanalysis::ic_boundary::{
     find_prime_order_curve, koblitz_instance, random_binary_instance, roster_prime_instance,
     BinaryGroup, BinaryInstance, CountedGroup, CubicClasses, GroupOps, PrimeCurve, PrimeInstance,
-    PrimePoint, QuarticClasses,
+    PrimePoint, PrimeRepresentation, QuarticClasses,
 };
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
@@ -52,9 +49,6 @@ use crate::cryptanalysis::prime_orbit_index_calculus::{
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum CurveSpec {
-    /// Actual Curve25519 over p=2^255-19, in the backend's short
-    /// Weierstrass coordinates with its fixed prime-order generator.
-    Curve25519,
     /// `ic_boundary::find_prime_order_curve(bits, seed)`: prime order,
     /// cofactor 1, `8 ≤ bits ≤ 32`.
     PrimeSearch { bits: u32, seed: u64 },
@@ -102,6 +96,18 @@ pub enum CurveSpec {
         gx: u64,
         gy: u64,
     },
+    /// An EFD model/chart: the engine builds the short-Weierstrass curve
+    /// through the EFD bridge and decodes the generator in `chart`.
+    Efd {
+        model: String,
+        chart: String,
+        p: u64,
+        params: std::collections::BTreeMap<String, u64>,
+        r: u64,
+        cofactor: u64,
+        generator: Vec<u64>,
+        lift: u32,
+    },
     /// An externally supplied public point with no logarithm in the fixture,
     /// retained verbatim in measured child inputs. Restricted to certified
     /// cofactor-one prime-order regression cohorts.
@@ -133,6 +139,18 @@ pub enum CurveSpec {
     /// point is written as two packed words (coefficient `i` of the tower
     /// basis in bits `[im, (i + 1)m)`).
     F2m4Torsion {
+        m: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// `ecbench::xline_bin::find_bin_curve_a0(m, seed, max_cofactor)`: the
+    /// curve `y² + xy = x³ + b` (`a = 0`, so `Tr(a) = 0`) over the same tower
+    /// `F_{q⁴}`, `q = 2^m`, `4 ≤ m ≤ 15`, `b ∉ F_{q²}`, `#E = h·r`, `r`
+    /// prime, `h ≤ max_cofactor`: the C1 end-to-end study's family
+    /// (`research/c1_end_to_end_solve_20261107`), on which the twisted
+    /// all-lift line exists.  Built as an `f2m4_torsion` instance, so every
+    /// method that runs there runs here.
+    F2m4A0 {
         m: u32,
         seed: u64,
         max_cofactor: u64,
@@ -284,20 +302,8 @@ impl CurveSpec {
     /// Build the instance, or say why it cannot be built.
     pub fn build(&self) -> Result<Instance, String> {
         match *self {
-            CurveSpec::Curve25519 => {
-                let curve = Curve25519Wide::new();
-                let mut scratch = GroupOps::default();
-                if curve.generator.is_none()
-                    || !curve.on_curve(curve.generator)
-                    || curve
-                        .mul_biguint(&mut scratch, curve.generator, &curve.r)
-                        .is_some()
-                {
-                    return Err("Curve25519 generator failed its group/order checks".into());
-                }
-                Ok(Instance::Curve25519(Box::new(curve)))
-            }
             CurveSpec::ThreeLeads {
+                p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
                 p,
                 n,
                 modulus,
@@ -316,6 +322,7 @@ impl CurveSpec {
                 let f = crate::cryptanalysis::three_leads::Field::new(p, n as usize, modulus);
                 let c = if p == 2 { [b, 0, a, 1] } else { [b, a, 0, 1] };
                 let i = crate::cryptanalysis::three_leads::StudyInstance {
+                    curve: crate::cryptanalysis::three_leads::Elliptic { f, c, binary: p == 2 },
                     curve: crate::cryptanalysis::three_leads::Elliptic {
                         f,
                         c,
@@ -449,6 +456,8 @@ impl CurveSpec {
                         word("generator x", &params.gx)?,
                         word("generator y", &params.gy)?,
                     ),
+
+                    representation: None,
                 };
                 instance.name = instance.curve_id().slug;
                 Ok(Instance::Prime(instance))
@@ -494,6 +503,17 @@ impl CurveSpec {
                 }
                 .map(Instance::Prime)
             }
+            CurveSpec::Efd {
+                ref model,
+                ref chart,
+                p,
+                ref params,
+                r,
+                cofactor,
+                ref generator,
+                lift,
+            } => PrimeInstance::from_efd(model, chart, p, params, r, cofactor, generator, lift)
+                .map(Instance::Prime),
             CurveSpec::PrimeExplicit {
                 p,
                 a,
@@ -525,6 +545,8 @@ impl CurveSpec {
                     r,
                     cofactor: group_order / r,
                     generator: (gx, gy),
+
+                    representation: None,
                 };
                 inst.name = inst.curve_id().slug;
                 Ok(Instance::Prime(inst))
@@ -567,6 +589,12 @@ impl CurveSpec {
                 }
                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
             }
+            CurveSpec::F2m4A0 {
+                m,
+                seed,
+                max_cofactor,
+            } => crate::cryptanalysis::ecbench::xline_bin::find_bin_curve_a0(m, seed, max_cofactor)
+                .map(|c| Instance::F2m4(Box::new(c))),
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
@@ -640,7 +668,6 @@ impl CurveSpec {
     /// measured child rebuilds instead of repeating a search.
     pub fn explicit(inst: &Instance) -> Option<CurveSpec> {
         match inst {
-            Instance::Curve25519(_) => Some(CurveSpec::Curve25519),
             Instance::Prime(i) => Some(CurveSpec::PrimeExplicit {
                 p: i.curve.p,
                 a: i.curve.a,
@@ -700,6 +727,8 @@ impl CurveSpec {
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
+            | Instance::Ext(_)
+            | Instance::ThreeLeads(_) => None,
             | Instance::ThreeLeads(_)
             | Instance::Ext(_) => None,
             // The thread rule and the order's point counts are the slow
@@ -722,11 +751,16 @@ impl CurveSpec {
     /// The constructor call, in the registry's `generator_call` form.
     pub fn call(&self) -> String {
         match *self {
-            CurveSpec::Curve25519 => "Curve25519Wide::new()".into(),
             CurveSpec::ThreeLeads {p,n,a,b,ref family,parameter,..}=>format!("three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"),
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
+            CurveSpec::Efd {
+                ref model,
+                ref chart,
+                p,
+                ..
+            } => format!("PrimeInstance::from_efd({model}, {chart}, {p}, ...)"),
             CurveSpec::PrimeOrbitShape {
                 ref shape,
                 bits,
@@ -770,9 +804,17 @@ impl CurveSpec {
                 seed,
                 max_cofactor,
             } => format!("gaudry_quartic_bin::find_bin_curve({m}, {seed}, {max_cofactor})"),
+            CurveSpec::F2m4A0 {
+                m,
+                seed,
+                max_cofactor,
+            } => format!("ecbench::xline_bin::find_bin_curve_a0({m}, {seed}, {max_cofactor})"),
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::ThreeLeads { p, n, a, b, ref family, parameter, .. } => format!(
+                "three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"
+            ),
             CurveSpec::GlsFp2 {
                 p_bits,
                 seed,
@@ -817,7 +859,6 @@ impl CurveSpec {
 
 /// A built curve instance.
 pub enum Instance {
-    Curve25519(Box<Curve25519Wide>),
     ThreeLeads(Box<crate::cryptanalysis::three_leads::StudyInstance>),
     Prime(PrimeInstance),
     /// A curve over `F_{p⁴}` with rational 2-torsion (`fp4_torsion`).
@@ -885,10 +926,14 @@ pub struct CurveFacts {
     pub field_degree: Option<u32>,
     /// Bits of the field characteristic for prime curves.
     pub field_bits: Option<u32>,
-    /// Exact orders through 256 bits; JSON numbers through u64, decimal strings above.
-    pub group_order: ExactScalar,
-    pub r: ExactScalar,
-    pub cofactor: ExactScalar,
+    /// Orders as `u128` for wide curves; a value that fits a `u64` is
+    /// written as the number it always was (`canonical::compat_u128`).
+    #[serde(with = "compat_u128")]
+    pub group_order: u128,
+    #[serde(with = "compat_u128")]
+    pub r: u128,
+    #[serde(with = "compat_u128")]
+    pub cofactor: u128,
     /// Generator coordinates as lower-case hex.
     pub generator: [String; 2],
     /// Automorphisms a generic algorithm may use, under the floor rule
@@ -1133,11 +1178,8 @@ fn matching_representation(entry: &Value, r: u128, gx: u128, gy: u128) -> Option
 }
 
 impl Instance {
-    pub fn r(&self) -> ExactScalar {
-        let narrow = match self {
-            Instance::Curve25519(curve) => {
-                return ExactScalar::from_biguint(&curve.r).expect("canonical order fits")
-            }
+    pub fn r(&self) -> u128 {
+        match self {
             Instance::ThreeLeads(i) => u128::from(i.r),
             Instance::Prime(i) => u128::from(i.r),
             Instance::Binary(i) => u128::from(i.r),
@@ -1150,67 +1192,10 @@ impl Instance {
             Instance::Quartic(i) => u128::from(i.r),
             Instance::Ghs(i) => u128::from(i.l),
             Instance::Hyper(i) => u128::from(i.r()),
-        };
-        narrow.into()
+        }
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
-        if let Instance::Curve25519(curve) = self {
-            let order = &curve.r * curve.cofactor;
-            let id = crate::cryptanalysis::curve_id::prime(
-                curve.field.modulus(),
-                &curve.field.to_biguint(curve.a),
-                &curve.field.to_biguint(curve.b),
-                &order,
-            )
-            .expect("canonical Curve25519 model and order");
-            let generator = super::curve25519_workload::encode(curve, curve.generator)
-                .expect("nonidentity generator");
-            let entry = registry_entry(&id.slug);
-            let rep = entry.as_ref().and_then(|entry| {
-                entry
-                    .get("representations")?
-                    .as_array()?
-                    .iter()
-                    .find_map(|rep| {
-                        let c = rep.get("curve")?;
-                        let r: ExactScalar = c.get("subgroup_order")?.as_str()?.parse().ok()?;
-                        let g = c.get("generator")?.as_array()?;
-                        let decode = |s: &str| {
-                            num_bigint::BigUint::parse_bytes(
-                                s.trim_start_matches("0x").as_bytes(),
-                                16,
-                            )
-                        };
-                        if r != self.r()
-                            || decode(g.first()?.as_str()?)? != decode(&generator[0])?
-                            || decode(g.get(1)?.as_str()?)? != decode(&generator[1])?
-                        {
-                            return None;
-                        }
-                        Some((
-                            rep.get("ec1")?.as_str()?.to_string(),
-                            rep.get("curve_uid")?.as_str()?.to_string(),
-                        ))
-                    })
-            });
-            return CurveFacts {
-                slug: id.slug,
-                icv1: id.icv1,
-                family: "prime".into(),
-                construction: spec.call(),
-                field_degree: None,
-                field_bits: Some(255),
-                group_order: ExactScalar::from_biguint(&order).expect("order fits"),
-                r: self.r(),
-                cofactor: curve.cofactor.into(),
-                generator,
-                automorphisms_available: 2,
-                registered: entry.is_some(),
-                ec1: rep.as_ref().map(|p| p.0.clone()),
-                curve_uid: rep.map(|p| p.1),
-            };
-        }
         if let Instance::ThreeLeads(i) = self {
             return super::three_leads::facts(i, spec);
         }
@@ -1245,9 +1230,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - p.leading_zeros()),
-                group_order: u128::from(order).into(),
-                r: u128::from(r).into(),
-                cofactor: u128::from(h).into(),
+                group_order: u128::from(order),
+                r: u128::from(r),
+                cofactor: u128::from(h),
                 generator,
                 automorphisms_available: 2,
                 registered: false,
@@ -1264,9 +1249,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: Some(6),
                 field_bits: Some(64 - i.p.leading_zeros()),
-                group_order: u128::from(i.group_order()).into(),
-                r: u128::from(i.l).into(),
-                cofactor: 4u64.into(),
+                group_order: u128::from(i.group_order()),
+                r: u128::from(i.l),
+                cofactor: 4,
                 generator: i.encode(&i.generator),
                 automorphisms_available: 2,
                 registered: false,
@@ -1283,9 +1268,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - i.p().leading_zeros()),
-                group_order: (u128::from(i.group_order())).into(),
-                r: (u128::from(i.r())).into(),
-                cofactor: (u128::from(i.cofactor())).into(),
+                group_order: u128::from(i.group_order()),
+                r: u128::from(i.r()),
+                cofactor: u128::from(i.cofactor()),
                 generator: i.generator_hex(),
                 automorphisms_available: i.automorphisms_available(),
                 registered: false,
@@ -1302,9 +1287,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - i.p.leading_zeros()),
-                group_order: u128::from(i.group_order).into(),
-                r: u128::from(i.r).into(),
-                cofactor: u128::from(i.cofactor).into(),
+                group_order: u128::from(i.group_order),
+                r: u128::from(i.r),
+                cofactor: u128::from(i.cofactor),
                 generator: i.generator_hex(),
                 automorphisms_available: 2,
                 registered: false,
@@ -1322,9 +1307,9 @@ impl Instance {
                 construction: spec.call(),
                 field_degree: None,
                 field_bits: Some(64 - i.p.leading_zeros()),
-                group_order: u128::from(i.group_order).into(),
-                r: u128::from(i.r).into(),
-                cofactor: u128::from(i.cofactor).into(),
+                group_order: u128::from(i.group_order),
+                r: u128::from(i.r),
+                cofactor: u128::from(i.cofactor),
                 generator: g,
                 automorphisms_available: 2,
                 registered: false,
@@ -1361,14 +1346,14 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Curve25519(_)
-            | Instance::Fp4(_)
+            Instance::Fp4(_)
             | Instance::ThreeLeads(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::ThreeLeads(_) => {
                 unreachable!("returned above")
             }
             Instance::Wide(i) => (
@@ -1448,9 +1433,9 @@ impl Instance {
             construction: spec.call(),
             field_degree: degree,
             field_bits: bits,
-            group_order: (order).into(),
-            r: r.into(),
-            cofactor: (h).into(),
+            group_order: order,
+            r,
+            cofactor: h,
             generator: [format!("0x{gx:x}"), format!("0x{gy:x}")],
             automorphisms_available: aut,
             registered: entry.is_some(),
@@ -1463,10 +1448,7 @@ impl Instance {
     /// conversion, so no high bits are discarded. All current instance orders
     /// fit u128; a future full-width instance must supply its own branch here.
     pub fn mul_generator_exact(&self, k: super::exact_scalar::ExactScalar) -> Option<[String; 2]> {
-        if let Instance::Curve25519(curve) = self {
-            return super::curve25519_workload::mul_generator(curve, k);
-        }
-        let reduced = k.to_biguint() % self.r().to_biguint();
+        let reduced = k.to_biguint() % num_bigint::BigUint::from(self.r());
         let narrow = super::exact_scalar::ExactScalar::from_biguint(&reduced)?.checked_u128()?;
         self.mul_generator_hex(narrow)
     }
@@ -1475,9 +1457,6 @@ impl Instance {
     /// double-and-add on a ledger nobody reads.  Used to build the
     /// target and, separately, to verify an answer.
     pub fn mul_generator_hex(&self, k: u128) -> Option<[String; 2]> {
-        if let Instance::Curve25519(curve) = self {
-            return super::curve25519_workload::mul_generator(curve, k.into());
-        }
         let mut scratch = GroupOps::default();
         if let Instance::Wide(i) = self {
             return match i.rho.scalar_mul(i.rho.generator(), k % i.kc.r) {
@@ -1499,7 +1478,7 @@ impl Instance {
         }
         // A one-word instance's subgroup order fits a word, so a reduced
         // scalar does too.
-        let k = u64::try_from(k % self.r().checked_u128()?).ok()?;
+        let k = u64::try_from(k % self.r()).ok()?;
         if let Instance::Fp4(i) = self {
             return i.mul_generator_hex(k);
         }
@@ -1553,15 +1532,15 @@ impl Instance {
                     ]
                 })
             }
-            Instance::Curve25519(_)
-            | Instance::Wide(_)
+            Instance::Wide(_)
             | Instance::Fp4(_)
             | Instance::ThreeLeads(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
             | Instance::Quartic(_)
             | Instance::Ghs(_)
-            | Instance::Hyper(_) => {
+            | Instance::Hyper(_)
+            | Instance::ThreeLeads(_) => {
                 unreachable!("returned above")
             }
         }
@@ -1581,12 +1560,23 @@ impl Instance {
         seed: u64,
         index: u64,
     ) -> Option<([String; 2], u64)> {
-        if let Instance::Curve25519(c) = self {
-            let sample = super::curve25519_workload::public(c, seed, index, 10_000).ok()?;
-            return Some((sample.coordinates, sample.point_counter));
-        }
+        self.hash_to_subgroup_counted(curve, seed, index, &mut HashWork::default())
+    }
+
+    /// [`Instance::hash_to_subgroup`], also tallying into `work` what the
+    /// derivation did, including the draws that found no point. Only the
+    /// prime-field branch fills `work.draws`, `sqrt_field_muls` and
+    /// `on_curve_checks`; every branch adds its cofactor multiplications to
+    /// `work.group_ops`. The result is the same function of the inputs.
+    pub fn hash_to_subgroup_counted(
+        &self,
+        curve: &CurveFacts,
+        seed: u64,
+        index: u64,
+        work: &mut HashWork,
+    ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
-        let mut scratch = GroupOps::default();
+        let scratch = &mut work.group_ops;
         if let Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
@@ -1631,19 +1621,23 @@ impl Instance {
                 Instance::Prime(i) => {
                     let c = &i.curve;
                     let x = h % c.p;
-                    let Some(y) = c.sqrt(c.rhs(x)) else { continue };
+                    work.draws += 1;
+                    let Some(y) = c.sqrt_counted(c.rhs(x), &mut work.sqrt_field_muls) else {
+                        continue;
+                    };
                     let y = if flip && y != 0 { c.p - y } else { y };
                     let p = PrimePoint::affine(x, y);
+                    work.on_curve_checks += 1;
                     if !c.is_on_curve(p) {
                         continue;
                     }
-                    let q = c.mul(&mut scratch, p, i.cofactor);
+                    let q = c.mul(scratch, p, i.cofactor);
                     if !q.infinity {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Curve25519(_)
-                | Instance::Wide(_)
+                Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {
+                Instance::Wide(_)
                 | Instance::Fp4(_)
                 | Instance::ThreeLeads(_)
                 | Instance::Hyper(_) => {
@@ -1681,7 +1675,7 @@ impl Instance {
                     };
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
-                    let q: Pt4 = CountedGroup::mul(c, &mut scratch, pt, i.cofactor);
+                    let q: Pt4 = CountedGroup::mul(c, scratch, pt, i.cofactor);
                     if !q.inf {
                         return Some((
                             [
@@ -1711,7 +1705,7 @@ impl Instance {
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
                     let cof = u64::try_from(i.cofactor).expect("a small cofactor");
-                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, cof);
+                    let q: PtB = CountedGroup::mul(c, scratch, pt, cof);
                     if !q.inf {
                         return Some((
                             [
@@ -1733,7 +1727,7 @@ impl Instance {
                         continue;
                     };
                     let g = BinaryGroup(&i.fast);
-                    let q = g.mul(&mut scratch, p, i.cofactor);
+                    let q = g.mul(scratch, p, i.cofactor);
                     if !q.infinity {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
@@ -1742,6 +1736,19 @@ impl Instance {
         }
         None
     }
+}
+
+/// What one [`Instance::hash_to_subgroup_counted`] call did: the cofactor
+/// multiplications' group operations, and, on a prime field, the draws (each
+/// one SHA-256 hash, one curve-equation evaluation and one square-root
+/// attempt), the modular multiplications of those square roots and the
+/// on-curve checks. Nothing here is priced by the derivation itself.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HashWork {
+    pub group_ops: GroupOps,
+    pub draws: u64,
+    pub sqrt_field_muls: u64,
+    pub on_curve_checks: u64,
 }
 
 /// ICV1's last field: the first 12 hex digits of the model hash.
@@ -1813,35 +1820,25 @@ pub fn shared_planted_scalar(r: u64, target_seed: u64, index: u64) -> u128 {
 }
 
 /// `k ∈ [1, r−1]` for target `index` under `target_seed`.
-pub fn planted_scalar(
-    curve: &CurveFacts,
-    target_seed: u64,
-    index: u64,
-) -> Result<ExactScalar, String> {
-    if curve.r < ExactScalar::from(2u64) {
-        return Err("subgroup order must exceed one".into());
-    }
+pub fn planted_scalar(curve: &CurveFacts, target_seed: u64, index: u64) -> u128 {
+    // The curve's model hash and subgroup enter the derivation, so the
+    // same seed on two curves gives unrelated scalars.
     let model = model_hash(curve);
-    if let Some(r) = curve.r.checked_u64() {
-        return Ok((1 + derive_u64(TARGET_LAW, &[model, r, target_seed, index]) % (r - 1)).into());
+    match u64::try_from(curve.r) {
+        Ok(r) => u128::from(1 + derive_u64(TARGET_LAW, &[model, r, target_seed, index]) % (r - 1)),
+        Err(_) => {
+            let parts = [model, target_seed, index].map(|v| v.to_string());
+            let parts = [
+                parts[0].clone(),
+                curve.r.to_string(),
+                parts[1].clone(),
+                parts[2].clone(),
+            ];
+            // The modulo bias of a 128-bit draw over r < 2^127 is below 2^-1.
+            1 + derive_u128(TARGET_LAW_WIDE, &parts) % (curve.r - 1)
+        }
     }
-    let parts = [
-        model.to_string(),
-        curve.r.to_string(),
-        target_seed.to_string(),
-        index.to_string(),
-    ];
-    if let Some(r) = curve.r.checked_u128() {
-        return Ok((1 + derive_u128(TARGET_LAW_WIDE, &parts) % (r - 1)).into());
-    }
-    let bound =
-        ExactScalar::from_biguint(&(curve.r.to_biguint() - 1u8)).ok_or("order exceeds 256 bits")?;
-    let (draw, _) = super::exact_sampling::derive_below(TARGET_LAW_EXACT, &parts, bound, 128)?;
-    ExactScalar::from_biguint(&(draw.to_biguint() + 1u8)).ok_or_else(|| "scalar overflow".into())
 }
-
-/// New rejection-sampling law only for orders beyond the legacy u128 path.
-pub const TARGET_LAW_EXACT: &str = "uniform_scalar_sha256_rejection_v3";
 
 /// One built single-target workload.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -1860,11 +1857,16 @@ pub struct Workload {
     /// The planted `k` with `Q = [k]G`, for a planted target.  Not in the
     /// identity (the target point is) and never passed to a solver.
     /// `None` for a public target, whose logarithm nobody knows.
-    #[serde(default)]
-    pub planted: Option<ExactScalar>,
+    #[serde(default, with = "compat_u128::option")]
+    pub planted: Option<u128>,
     /// The hash counter that landed a public target in the subgroup.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_counter: Option<u64>,
+    /// EFD model/chart used for input and output, when one was selected.
+    /// This does not change the group or the priced workload; it is kept so
+    /// a record names the representation its generator and target came from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub representation: Option<PrimeRepresentation>,
 }
 
 impl Workload {
@@ -1893,100 +1895,75 @@ impl Workload {
         kind: TargetKind,
     ) -> Result<Workload, String> {
         let curve = inst.facts(spec);
-        if curve.r < ExactScalar::from(5u64) {
+        if curve.r < 5 {
             return Err(format!(
                 "subgroup order {} is too small to measure",
                 curve.r
             ));
         }
-        let (law, target, planted, counter) = if let Instance::Curve25519(curve) = inst {
-            match kind {
-                TargetKind::Planted => {
-                    let (sample, scalar) =
-                        super::curve25519_workload::planted(curve, target_seed, index)?;
-                    (
-                        super::curve25519_workload::PLANTED_LAW,
-                        sample.coordinates,
-                        Some(scalar),
-                        None,
-                    )
+        let (law, target, planted, counter) =
+            if let CurveSpec::PrimePublicFixture { qx, qy, .. } = *spec {
+                if kind != TargetKind::Public || index != 0 {
+                    return Err("external fixture is exactly one public target per curve".into());
                 }
-                TargetKind::Public => {
-                    let sample =
-                        super::curve25519_workload::public(curve, target_seed, index, 10_000)?;
-                    (
-                        super::curve25519_workload::PUBLIC_LAW,
-                        sample.coordinates,
-                        None,
-                        Some(sample.point_counter),
-                    )
-                }
-                TargetKind::PlantedShared => {
-                    return Err("planted_shared targets need a one-word subgroup order".into())
-                }
-            }
-        } else if let CurveSpec::PrimePublicFixture { qx, qy, .. } = *spec {
-            if kind != TargetKind::Public || index != 0 {
-                return Err("external fixture is exactly one public target per curve".into());
-            }
-            (
-                "ecbench.public-fixture/v1",
-                [format!("0x{qx:x}"), format!("0x{qy:x}")],
-                None,
-                None,
-            )
-        } else {
-            match kind {
-                TargetKind::Planted => {
-                    let k = planted_scalar(&curve, target_seed, index)?;
-                    let q = inst.mul_generator_exact(k.into()).ok_or(
-                        "the planted scalar gave the identity; the subgroup order is wrong",
-                    )?;
-                    let law = if u64::try_from(curve.r).is_ok() {
-                        TARGET_LAW
-                    } else if curve.r.checked_u128().is_some() {
-                        TARGET_LAW_WIDE
-                    } else {
-                        TARGET_LAW_EXACT
-                    };
-                    (law, q, Some(k), None)
-                }
-                TargetKind::PlantedShared => {
-                    let r = u64::try_from(curve.r)
-                        .map_err(|_| "planted_shared targets need a one-word subgroup order")?;
-                    let k = shared_planted_scalar(r, target_seed, index);
-                    let q = inst.mul_generator_exact(k.into()).ok_or(
-                        "the planted scalar gave the identity; the subgroup order is wrong",
-                    )?;
-                    (SHARED_TARGET_LAW, q, Some(k.into()), None)
-                }
-                TargetKind::Public => {
-                    // With r | h the r-torsion can be Z/r × Z/r, and a cleared
-                    // point need not lie in <G>.
-                    if curve.cofactor.to_biguint() % curve.r.to_biguint()
-                        == num_bigint::BigUint::from(0u8)
-                    {
-                        return Err(format!(
-                            "r = {} divides the cofactor {}: a hashed target need not lie in <G>",
-                            curve.r, curve.cofactor
-                        ));
+                (
+                    "ecbench.public-fixture/v1",
+                    [format!("0x{qx:x}"), format!("0x{qy:x}")],
+                    None,
+                    None,
+                )
+            } else {
+                match kind {
+                    TargetKind::Planted => {
+                        let k = planted_scalar(&curve, target_seed, index);
+                        let q = inst.mul_generator_hex(k).ok_or(
+                            "the planted scalar gave the identity; the subgroup order is wrong",
+                        )?;
+                        let law = if u64::try_from(curve.r).is_ok() {
+                            TARGET_LAW
+                        } else {
+                            TARGET_LAW_WIDE
+                        };
+                        (law, q, Some(k), None)
                     }
-                    let (q, c) = inst
-                        .hash_to_subgroup(&curve, target_seed, index)
-                        .ok_or("no public target found in 10 000 hash attempts")?;
-                    let law = if u64::try_from(curve.r).is_ok() {
-                        PUBLIC_TARGET_LAW
-                    } else {
-                        PUBLIC_TARGET_LAW_WIDE
-                    };
-                    (law, q, None, Some(c))
+                    TargetKind::PlantedShared => {
+                        let r = u64::try_from(curve.r)
+                            .map_err(|_| "planted_shared targets need a one-word subgroup order")?;
+                        let k = shared_planted_scalar(r, target_seed, index);
+                        let q = inst.mul_generator_hex(k).ok_or(
+                            "the planted scalar gave the identity; the subgroup order is wrong",
+                        )?;
+                        (SHARED_TARGET_LAW, q, Some(k), None)
+                    }
+                    TargetKind::Public => {
+                        // With r | h the r-torsion can be Z/r × Z/r, and a cleared
+                        // point need not lie in <G>.
+                        if curve.cofactor.is_multiple_of(curve.r) {
+                            return Err(format!(
+                        "r = {} divides the cofactor {}: a hashed target need not lie in <G>",
+                        curve.r, curve.cofactor
+                    ));
+                        }
+                        let (q, c) = inst
+                            .hash_to_subgroup(&curve, target_seed, index)
+                            .ok_or("no public target found in 10 000 hash attempts")?;
+                        let law = if u64::try_from(curve.r).is_ok() {
+                            PUBLIC_TARGET_LAW
+                        } else {
+                            PUBLIC_TARGET_LAW_WIDE
+                        };
+                        (law, q, None, Some(c))
+                    }
                 }
-            }
-        };
+            };
         let (workload_id, workload_sha256) = bare_id(
             "W",
             &Self::identity_view(&curve, law, target_seed, index, &target),
         )?;
+        let representation = match inst {
+            Instance::Prime(prime) => prime.representation.clone(),
+            _ => None,
+        };
         Ok(Workload {
             workload_id,
             workload_sha256,
@@ -1998,13 +1975,13 @@ impl Workload {
             target,
             planted,
             target_counter: counter,
+            representation,
         })
     }
 
     /// The target's kind, from its law.
     pub fn kind(&self) -> TargetKind {
-        if self.target_law == super::curve25519_workload::PUBLIC_LAW
-            || self.target_law == PUBLIC_TARGET_LAW
+        if self.target_law == PUBLIC_TARGET_LAW
             || self.target_law == PUBLIC_TARGET_LAW_WIDE
             || self.target_law == "ecbench.public-fixture/v1"
         {
@@ -2062,44 +2039,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn actual_curve25519_workloads_replay_with_exact_orders_and_targets() {
-        let spec = CurveSpec::Curve25519;
-        assert_eq!(
-            serde_json::to_value(&spec).unwrap(),
-            json!({"kind":"curve25519"})
-        );
-        let inst = spec.build().unwrap();
-        let facts = inst.facts(&spec);
-        assert_eq!(facts.field_bits, Some(255));
-        assert_eq!(facts.r.bits(), 253);
-        assert!(facts.r.checked_u128().is_none());
-        assert_eq!(facts.group_order.to_biguint(), facts.r.to_biguint() * 8u8);
-        assert_eq!(spec.for_child(&inst), spec);
-        let Instance::Curve25519(curve) = &inst else {
-            panic!("full-width constructor")
-        };
-        for kind in [TargetKind::Planted, TargetKind::Public] {
-            let w = Workload::on(&spec, &inst, 20261105, 0, kind).unwrap();
-            assert_eq!(w.kind(), kind);
-            assert_eq!(w, Workload::on(&spec, &inst, 20261105, 0, kind).unwrap());
-            assert!(super::super::curve25519_workload::decode(curve, &w.target)
-                .unwrap()
-                .is_some());
-            let encoded = serde_json::to_string(&w).unwrap();
-            assert_eq!(serde_json::from_str::<Workload>(&encoded).unwrap(), w);
-            if kind == TargetKind::Planted {
-                let scalar = w.planted.unwrap();
-                assert!(scalar.checked_u128().is_none());
-                assert_eq!(inst.mul_generator_exact(scalar), Some(w.target.clone()));
-            } else {
-                assert!(w.planted.is_none());
-                assert!(w.target_counter.is_some());
-            }
-        }
-        assert!(Workload::on(&spec, &inst, 20261105, 0, TargetKind::PlantedShared).is_err());
-    }
-
-    #[test]
     fn exact_scalar_verification_preserves_high_bits_until_subgroup_reduction() {
         use super::super::exact_scalar::ExactScalar;
         let inst = CurveSpec::Koblitz { a: 0, n: 7 }.build().unwrap();
@@ -2109,7 +2048,9 @@ mod tests {
                 inst.mul_generator_hex(scalar)
             );
         }
-        let wide = (num_bigint::BigUint::from(1u8) << 200usize) * inst.r().to_biguint() + 13u8;
+        let wide = (num_bigint::BigUint::from(1u8) << 200usize)
+            * num_bigint::BigUint::from(inst.r())
+            + 13u8;
         let exact = ExactScalar::from_biguint(&wide).unwrap();
         assert!(exact.checked_u128().is_none());
         assert_eq!(inst.mul_generator_exact(exact), inst.mul_generator_hex(13));
@@ -2183,7 +2124,7 @@ mod tests {
             assert_eq!(inst.r(), facts.r);
             assert_eq!(inst.mul_generator_hex(1).unwrap(), facts.generator);
             assert!(inst.mul_generator_hex(0).is_none());
-            assert!(inst.mul_generator_exact(inst.r()).is_none());
+            assert!(inst.mul_generator_hex(inst.r()).is_none());
             assert!(inst.mul_generator_hex(2).is_some());
             assert!(
                 inst.hash_to_subgroup(&facts, 1, 0).is_none(),
@@ -2440,8 +2381,7 @@ mod tests {
                 w
             );
             // In <G>, by exhaustion on a subgroup this small.
-            assert!((1..w.curve.r.checked_u128().expect("legacy test order"))
-                .any(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target)));
+            assert!((1..w.curve.r).any(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target)));
         }
     }
 
@@ -2515,7 +2455,7 @@ mod tests {
         .unwrap();
         let n = 20_000u64;
         let mut xs: Vec<f64> = (0..n)
-            .map(|i| planted_scalar(&w.curve, 20261002, i).unwrap().to_f64() / w.curve.r.to_f64())
+            .map(|i| planted_scalar(&w.curve, 20261002, i) as f64 / w.curve.r as f64)
             .collect();
         xs.sort_by(f64::total_cmp);
         let d = xs
@@ -2611,13 +2551,42 @@ mod merged_variant_tests {
         for spec in specs {
             let i = spec.build().unwrap();
             let facts = i.facts(&spec);
-            assert!(facts.r > ExactScalar::from(2u64));
+            assert!(facts.r > 2);
             assert_eq!(i.mul_generator_hex(1).unwrap(), facts.generator);
-            assert!(i.mul_generator_exact(i.r()).is_none());
+            assert!(i.mul_generator_hex(i.r()).is_none());
             assert_eq!(
                 serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
                 spec
             );
         }
+    }
+
+    #[test]
+    fn efd_spec_builds_and_records_the_representation() {
+        let spec = CurveSpec::Efd {
+            model: "montgom".into(),
+            chart: "xz".into(),
+            p: 1019,
+            params: std::collections::BTreeMap::from([
+                ("a".to_string(), 131u64),
+                ("b".to_string(), 1u64),
+            ]),
+            r: 269,
+            cofactor: 4,
+            generator: vec![604, 1],
+            lift: 0,
+        };
+        let instance = spec.build().unwrap();
+        let facts = instance.facts(&spec);
+        assert_eq!(facts.family, "prime");
+        assert_eq!(facts.r, 269);
+        let (workload, _) = Workload::build(&spec, 1, 0, TargetKind::Planted).unwrap();
+        let representation = workload.representation.expect("EFD representation");
+        assert_eq!(representation.model, "montgom");
+        assert_eq!(representation.chart, "montgom/xz");
+        assert_eq!(
+            serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
+            spec
+        );
     }
 }

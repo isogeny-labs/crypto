@@ -1,0 +1,80 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 2445,
+  "date": "2026-11-05",
+  "standing": "unverified",
+  "parents": [
+    "fa8519189e677e53f7d749f695861c2a3faa971b",
+    "d9c228db855c475da6ee11843654d6dca7bd97a3"
+  ],
+  "incoming_main": "d9c228db855c475da6ee11843654d6dca7bd97a3",
+  "common_base": "3b27a31f7cc3362bccc1bc8f80fbbdab87dcccb9",
+  "exact_incoming_entries": [
+    {
+      "path": ".github/workflows/factor-base-chart-screen.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7fa7163b243fb2ca5acfeecd0dc710ce47f1439a"
+    },
+    {
+      "path": ".github/workflows/isolab-experiment.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fc19ffd48ab5b8938b475a43af3cb91d61f8ff3"
+    },
+    {
+      "path": ".github/workflows/pqc-assay.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16fc1d2fb48d879660307b1bce20a32fa93ed6cf"
+    },
+    {
+      "path": "docs/maintenance/pr-2445-infrastructure-ready-split-20261105.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "860272bf3acba008995d6603400f8243e812d739"
+    },
+    {
+      "path": "docs/maintenance/pr-3456-main-3454-20261105.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b620c67914066264f135d2a1bda975c1daebc3f1"
+    }
+  ],
+  "source_changes": [
+    ".github/scripts/merge_sweeper.py",
+    ".github/scripts/test_merge_sweeper.py",
+    ".github/workflows/claim-corpus.yml",
+    ".github/workflows/lab-parity.yml",
+    ".github/workflows/binary-merges.yml",
+    ".github/scripts/draft_tier_gate.py",
+    ".github/workflows/workflows-parse.yml",
+    ".github/CI.md"
+  ],
+  "regression_test_methods": 35,
+  "new_test_methods": 11,
+  "policy": {
+    "pcc_always_runs": true,
+    "new_draft_guards": [
+      "claim-corpus.yml",
+      "lab-parity.yml",
+      "binary-merges.yml"
+    ],
+    "ready_workload_unchanged": true,
+    "checker_restored_to_ci": true
+  },
+  "journal": {
+    "main_is_intact_byte_prefix": true,
+    "complete_divergent_branch_tail_retained": true,
+    "both_parent_line_sequences_retained": true
+  },
+  "validation": "New tests and policy check pending current-head CI; runtime unavailable. No new scientific execution, custody, standing or benchmark result.",
+  "unchanged": [
+    "scientific source",
+    "evidence",
+    "frozen bytes",
+    "ledger",
+    "benchmark inputs",
+    "repository settings"
+  ]
+}

@@ -1,0 +1,10 @@
+# Committed ecbench sessions with a known, owner-dispositioned integrity defect.
+# Committed evidence is never edited, so a defective session stays in the tree
+# and is audited on every run: .github/scripts/ecbench-audit-sessions.sh hashes
+# all five capsule files against these pins and runs `ecbench verify` on it.
+# The row passes only if verify fails with exactly the pinned problem checks;
+# a changed byte, a new problem or a vanished one fails CI. Such a session is
+# never integrity-passed and must not be cited beyond its defect note.
+# Defect notes and owner approvals: docs/ecbench/DEFECTIVE_SESSIONS.md.
+# directory	session.json sha256	plan.json sha256	records.jsonl sha256	spec.json sha256	host.json sha256	expected problem checks
+research/curve25519_algebraic_ladder_20261102/sessions/smoke-k20	b96baa96f420e3e6e4bde6c9e151c6d17da4c85c05deca857dd332995c66c33a	82102a6b2b2775fb1095459ff1dcac492ba91e371305bf2cef0897e650261eb2	121905ecd27b9b405a27d89303abb839cd7790534b9bb72f05b69d735469fe50	d19bbc4d5e32839287249132cdb6513467f2ac30840e5cff0b669ba21c44f30e	b9c95762cab775492a32ad89257661a2e4190db4af32ce31f37c9142517d14d4	last_seq,record_count,status_counts,stop

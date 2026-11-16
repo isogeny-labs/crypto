@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-11-05T18:20:21.422880+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-collapse/check.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-quartic-collapse-20261105/checker"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-quartic-collapse-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-collapse/program.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "packet_sha256": "5abcccfd3b9fcd250cdf3bac720f08e953624855500632bdfdfb6b07b237b4fb"
+    },
+    {
+      "step": "negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-quartic-collapse-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-quartic-collapse/negative-program.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101,
+      "packet_sha256": "b048b5c871739830d9bfaf02b2bbfb5c5aa6bb80528dbd75f628492ecda2402d"
+    }
+  ],
+  "binary_sha256": "4aceae5f785ca4045f5666ee0dfab15659adb05521a3c4b0a738002ed1ccfe39",
+  "source_sha256": "41f23dbb75a7b74f2eb08cfd59a81b2faf95d7a9c6b9572eaa4c0a689e68e247",
+  "producer_imports": 0,
+  "negative_control": "coefficient sign corruption rejected by exact field-value assertion"
+}

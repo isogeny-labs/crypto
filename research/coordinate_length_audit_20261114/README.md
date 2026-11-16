@@ -1,0 +1,43 @@
+# Actual coordinate algebra: solutions, length and nonreduced controls
+
+Lean constructs an equivalence between the actual solutions of any multivariate ideal over a field extension and algebra homomorphisms from its coordinate quotient. If that quotient is finite dimensional, its solution set is finite and its cardinality is bounded by the quotient's dimension, which equals its scalar-module length. The quotient may contain nilpotents. Signed standing remains unverified. [pcc:unverified]
+
+For every field K and every m, the actual two-variable ideal `(x^m, y−x)` has coordinate algebra isomorphic to `K[t]/(t^m)`, with dimension and K-module length m. For m>0 it has exactly one solution over every field extension; its actual coordinate x has mth power zero and previous power nonzero. Thus point count and dimension can differ by arbitrarily much over a fixed field. Lean directly negates their universal equality. [pcc:unverified]
+
+| Component | Formal scope |
+|:--|:--|
+| Generic solutions | Actual ideal vanishing, quotient lift, inverse evaluations, all variable types and field extensions. Finite quotient implies finite support and support ≤ dimension = scalar-module length. |
+| Unbounded family | Actual ideal `(x^m, y−x)` and quotient isomorphism, dimension/length m, exact nilpotent powers, one solution for m>0, nonreduced for m>1. |
+| Negative controls | m=0 gives empty support and dimension/length zero; m=1 is reduced and actually isomorphic to K through the constructed quotient equivalence. |
+| Target-domain condition | Over F3, the actual dual-number algebra has dimension two and at least three endomorphisms, obtained by scaling its nonzero nilpotent root. This directly disproves the bound after removing the target-domain condition. |
+
+All entries are scoped local formal results; signed standing is unverified. None identifies scalar-module length with a formally constructed scheme cycle or local intersection multiplicity. The generic bound assumes a finite dimensional affine coordinate algebra; Diem also permits positive dimensional components and counts their isolated points separately. That geometric bridge remains open. The family tests support versus algebra length; it is not a counterexample to the equal-multidegree Bézout theorem or the corpus's qualified decomposition node. [pcc:unverified]
+
+The existing [16-call msolve calibration](../solver_multiplicity_audit_20261109/README.md) is preserved: the nonreduced fixture reports quotient dimension two and parameter degree one. The new packet proves generic coordinate-algebra accounting and an unbounded formal family; it performs no new solver measurement or internal C refinement. The [full fourteen-item requirement map](../theorem_census_20261109/README.md#original-fourteen-requirements) retains the other obligations. [pcc:unverified]
+
+Sources checked before implementation: Diem (2011), Proposition 2.5, DOI [10.1112/S0010437X10005075](https://doi.org/10.1112/S0010437X10005075); the existing bivariate multiplicity and JV quotient-basis/length proofs; Mathlib's actual quotient lift/ext, evaluation uniqueness, finite algebra-map independence/cardinality, monic AdjoinRoot power basis and module length proofs. Exact Stacks [09HS](https://stacks.math.columbia.edu/tag/09HS) and [0CKM](https://stacks.math.columbia.edu/tag/0CKM) were downloaded and read. Their statements concern field extensions and are narrower than the checked nonreduced-ring algebra theorem: citation annotations are not substituted for actual hypotheses. No full-paper read or novelty claim. KB unavailable (status/two distinct searches/theorem query all127); bounded fallback and source hashes retained. [pcc:unverified]
+
+The closed main declaration is `CoordinateLengthAudit.actual_coordinate_length_certificate` in [LengthCertificate.lean](lean/LengthCertificate.lean). Lean 4.35.0 and Mathlib 56a005855ea17e0b0958f73ec801ae140b0a1679 are pinned. Whole gate 44/0 failures/0 trusted passes. Exact local **PCC-20261114-c3ba4f** replay passed at 2026-11-14T00:34:55Z; all eight formal/config and ten artifact pins match. The 62 attempt files, five gate files and inspected one-page PDF47161B/SVG are retained in the [receipt](verification.json). Signed standing remains unverified. No holes, custom axioms, native evaluator, raised limits, new global elaboration flags or linter waivers. No new native experiment, paid compute or agent storage upload. README/publication/current receipts remain outside the immutable source/artifact pin sets. [pcc:unverified]
+
+## Additive actual ring-length and locality proof
+
+The [actual local-algebra length proof](../local_algebra_length_audit_20261114/README.md)
+now derives self-module length m for actual K[t]/(t^m) and
+K[x,y]/(x^m,y−x), for every field K and natural m. The proof constructs
+actual multiplication-closed tail ideals and a strict chain from a nilpotent
+power basis; scalar restriction gives the opposite bound. Positive m gives
+actual local rings with support1 over every extension field, arbitrarily
+large local length at support1. The m0 zero rings have length0 and are not
+local. Actual F4/F2 is a local field with ring length1 versus scalar length2,
+with a direct inequality proving why a residue-degree qualification matters.
+No ring-length/locality/cycle/intersection result is assumed. This closes
+self-module length/locality for the actual truncated/bivariate family,
+not general scheme-cycle/localization/intersection geometry, positive-dimensional
+component extraction, Diem's qualified n!d^n bound or JV ringlength8.
+Exact local **PCC-20261114-81195a** PASS at 2026-11-14T16:43:35Z, signed standing unverified;
+whole28/0/0, complete771-character binding`58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249`,
+independent native1full/0prefix/0unresolved;7custom/13formal-config+
+14artifact pins,64provenance files/30objects/10964-byte lossless XZ/
+fivegate/inspected onepagePDF46331bytes. Three failed states retained.
+No qualified-source refutation, novelty, new crypto experiment/spend/upload.
+[pcc:unverified]

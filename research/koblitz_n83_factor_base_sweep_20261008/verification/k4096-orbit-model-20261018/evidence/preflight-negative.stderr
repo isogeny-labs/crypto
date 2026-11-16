@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012/research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-orbit-model-20261018/preflight.py", line 149, in <module>
+    main()
+    ~~~~^^
+  File "/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012/research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-orbit-model-20261018/preflight.py", line 139, in main
+    result = check(args.panel.resolve(strict=True), args.fixtures.resolve(strict=True),
+                   args.binary.resolve(strict=True), args.head.resolve(strict=True),
+                   args.get.resolve(strict=True))
+  File "/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012/research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-orbit-model-20261018/preflight.py", line 93, in check
+    require((panel / "probe-corpus.json").is_file(),
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "capacity panel is missing the exact public corpus")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990/crypto/worktrees/codex-n83-mixed-orbit-worker-20261012/research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-orbit-model-20261018/preflight.py", line 30, in require
+    raise ValueError(reason)
+ValueError: capacity panel is missing the exact public corpus

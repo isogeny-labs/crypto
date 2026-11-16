@@ -98,3 +98,19 @@ submitted; the report says so (AGENTS.md §9: no replacement keys).
   curve's own multiplications per addition, `row_ops` at one each, at L1
   isolation (operation counts; wall time descriptive).
 - A D1 miss stops every claim until the cause is found.
+
+## Addendum (2026-11-10): amendments made after the first claim runs
+
+Recorded here, not rewritten above (EXPERIMENTS W28, W30–W34):
+
+- `m = 17` was split into single-target sessions (`SPEC-E-m17-ic-t0`,
+  `SPEC-E-m17b-ic`, `SPEC-E-m17b-rho`) to limit what a container restart
+  loses; target 0 of `SPEC-E-m17-ic-t0` is the target of the clean rho run.
+- Completed `m = 16`, `m = 17` IC, `m = 18` IC and `D`-`m = 14` sessions ran
+  on a binary with checkpoint/resume (`ad1dd91a…`), not the registered one
+  (`c143cf62…`). The change is additive; counts are tested equal to an
+  uninterrupted run, and a from-scratch replay is still to do.
+- No headline number uses a session that was killed before it finished.
+- The rho half of `m = 18` was still running when the results were written;
+  E3's measured-run half is pending.
+

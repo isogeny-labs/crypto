@@ -1,0 +1,26 @@
+fn powered_checks(){let(mut section_equalities,mut states,mut public,mut updates)=(0,0,0,0);
+ for(r,m)in[(7u64,3usize),(11,2),(13,4),(17,6),(41,5),(97,3),(281,5),(281,35)]{
+  let h=(r-1)/2;let mut dense=vec![1];for _ in 0..h{let mut next=vec![0;dense.len()+1];for(j,&c)in dense.iter().enumerate(){next[j]=(next[j]+r-c)%r;next[j+1]=(next[j+1]+c)%r;}dense=next;}
+  for g in [vec![0,1],vec![1,0,1],vec![4,r-4,1],vec![0,0,0,1]]{for v in [Quad([vec![0],vec![0]]),Quad([vec![0],vec![1]]),Quad([vec![2],vec![1]]),Quad([vec![r-1],vec![1]])]{
+   let mut ring=QuadRing::new(r,&g).unwrap();let got=ring.sections(m,&v,1024).unwrap();for e in 0..m{let cs:Vec<_>=dense.iter().skip(e).step_by(m).copied().collect();let mut expected=Quad([vec![0],vec![0]]);for &c in cs.iter().rev(){expected=ring.multiply(&expected,&v).unwrap();expected.0[0][0]=(expected.0[0][0]+c)%r;}for j in 0..2{assert_eq!(ring.rem(&got[e].0[j]).unwrap(),ring.rem(&expected.0[j]).unwrap());}section_equalities+=1;}
+   assert!(matches!(ring.sections(m,&v,0),Err(Error::Limit)));assert!(matches!(ring.sections(m,&Quad([vec![],vec![0]]),1024),Err(Error::Domain)));
+  }}
+ }
+ for(r,m)in[(17u64,4usize),(41,5),(97,3),(193,3),(281,5),(281,35)]{
+  let zeta=(2..r).find(|&z|pow(z,m as u64,r)==1&&(1..m).all(|j|pow(z,j as u64,r)!=1)).unwrap();let i=(2..r).find(|&x|mul(x,x,r)==r-1).unwrap();let stream=StreamModes::new(r,m,zeta,64,2048,7).unwrap();let modes=RecoveryModes::from_modes(&stream).unwrap();
+  let ks:Vec<_>=if m==35{vec![0,1,2,3,7,17,r-1]}else{(0..r).collect()};
+  for k in ks{for slots in [0usize,16,1024]{let(mut old,mut new):(Option<SignedImage>,Option<PoweredImage>)=(None,None);
+   for b in [2,1,3,2]{let x=mul(k,pow(b,r-2,r),r);let mut z=1;let signs:Vec<_>=(0..m).map(|_|{let s=pow(mul(b,(x+r-z)%r,r),(r-1)/2,r);z=mul(z,zeta,r);s}).collect();let pair=modes.signed_observed(&signs).unwrap();let f=[signs.iter().fold(0,|a,&s|(a+s)%r),pair[0],pair[1]];
+    if let Some(old)=&mut old{old.update(&modes,b,&f).unwrap();new.as_mut().unwrap().update(&modes,b,&f).unwrap();}else{old=Some(SignedImage::new(&modes,b,&f,i).unwrap());new=Some(PoweredImage::new(&modes,b,&f,i,slots).unwrap());}
+    let(old,new)=(old.as_mut().unwrap(),new.as_mut().unwrap());assert_eq!(old.materialize(r as usize,r as usize).unwrap(),new.materialize(r as usize,r as usize).unwrap());assert_eq!(old.zero,new.zero);assert_eq!(old.rounds,new.rounds);states+=1;
+    for(a,b)in old.branches.iter().zip(&new.branches){assert_eq!(a.u,b.u);assert_eq!(canonical_signature(&a.canonical),canonical_signature(&b.canonical));}
+   }
+  }}
+ }
+ let(p,a,b,r,base,m)=(257,1,7,281,[1,3],5usize);let curve=group::Curve::new(p,a,b);let bp=group::Point{x:base[0],y:base[1]};let source=source::Source::new(p,a,b,r,base,64).unwrap();let z=(2..r).find(|&z|pow(z,m as u64,r)==1&&(1..m).all(|j|pow(z,j as u64,r)!=1)).unwrap();let modes=StreamModes::new(r,m,z,16,256,7).unwrap();let extra:Vec<_>=(0..17).collect();
+ for cap in [8usize,16,64]{for k in 0..r{let target=multiple(curve,bp,k);let old=modes.recover_signed_image(&source,curve,bp,target,&[1,2,3,4],cap,&extra,128).unwrap();
+  for slots in [0usize,16,1024]{POWERED_IMAGE_COUNTS.with(|c|c.set((0,0,0,0)));let new=modes.recover_powered_image(&source,curve,bp,target,&[1,2,3,4],cap,&extra,128,slots).unwrap();assert_eq!(old.0,new.0);assert_eq!(new.0,Some(k));assert_eq!(old.2,new.2);assert_eq!((old.1.calls,old.1.extra,old.1.replayed,old.1.lifted,old.1.image_count),(new.1.calls,new.1.extra,new.1.replayed,new.1.lifted,new.1.image_count));public+=1;updates+=POWERED_IMAGE_COUNTS.with(|c|c.get().1);}
+ }}
+ let(calls,products,fallbacks)=POWERED_EVAL.with(|c|c.get());assert!(calls>0&&fallbacks>0&&updates>0);
+ println!("quadratic_section_equalities={section_equalities} canonical_state_equalities={states} public_target_capacity_cases={public} subsequent_updates={updates} powered_calls={calls} algebra_products={products} fallback_branches={fallbacks} outcomes_routes_source_stats_equal=true");
+}

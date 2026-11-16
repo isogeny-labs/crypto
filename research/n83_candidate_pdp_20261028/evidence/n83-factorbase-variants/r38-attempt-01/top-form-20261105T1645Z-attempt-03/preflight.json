@@ -1,0 +1,129 @@
+{
+  "schema": "n83.topform-attempt-preflight/v1",
+  "status": "frozen-pre-run",
+  "created_utc": "2026-11-05T16:48:00Z",
+  "objective": "Rebuild frozen PDP/top source offline in a clean Cargo project, verify exact binary hashes, then generate and replay the 48 frozen spike38 systems under the fixed wall cap.",
+  "protocol": {
+    "id": "N83-FACTOR-BASE-TOP-DREG-20261031-V2",
+    "freeze_sha256": "3d852e474eb7b129e51f68bb564f379d9d997148dbe9c3727e529102a6ef47c6",
+    "file_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "source_commit": "52665c7a6e8308f86201e10c9305afa346fd134b"
+  },
+  "candidate": {
+    "id": "spike38",
+    "coordinate_bit": 38,
+    "families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "m": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "target_kinds": [
+      "natural",
+      "planted"
+    ],
+    "systems": 48
+  },
+  "inputs": {
+    "factor_base_index_sha256": "3fb72aa61147882832bbb17fc65a3ccfb8f5f179c047a43e4ccf65cecfa34623",
+    "family_manifest_sha256": {
+      "koblitz": "f6573e4f71d511672a1da6bd4aa170e2e54acd9291423f014ce87f9ce8266caa",
+      "binary": "28816f378a8604ad0eab78c2b0418289e0d6a8650455564e5f2a03dea3726796",
+      "prime": "976a24675d8634b5b21246e99c42009bcc1b7a7dcc1c8df19b2db02b042bbc71"
+    },
+    "factor_base_shards": 384,
+    "recovery_audit_sha256": "ef4a4d3f7d42f55f3b7595369ab86dcc95d686ce796a7c80531b8b4ad3890d5a",
+    "matched_baseline_inputs_sha256": "f7325211302b4ca21f98ea9a7022d2dcc023b29ea2fad9329867e90b75a01c82",
+    "input_generation": "frozen deterministic PDP generator from source commit; candidate spike38; m2-9; natural baseline target and planted tuple from complete selector domain; generation command recorded in runner.",
+    "s3_file_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+    "verified_recovery_file_count": 786,
+    "compressed_shards_to_fetch": 384,
+    "compressed_shard_bytes": 4576000923,
+    "recovery_audit_valid": true,
+    "recovery_audit_errors": [],
+    "family_recovery_validity": {
+      "koblitz": null,
+      "binary": null,
+      "prime": null
+    }
+  },
+  "instrument": {
+    "pdp_source_commit": "52665c7a6e8308f86201e10c9305afa346fd134b",
+    "pdp_source_sha256": "8e23a7287dc82afc967ef3f50e20c486f3f01d1e4a5f1847b5891b24df3b7629",
+    "top_source_sha256": "2b22d880eb68ba304c8cca67fec0694c8987f1523436ef728bfa9ad39a621e7e",
+    "pdp_binary_sha256": "b8e00f73512977828497c4bb30f0ae08d319350688a90b15310aa4143308a3ca",
+    "top_binary_sha256": "4749b49ba7e98cd916c9d36d4b14c0396041fd6ff31e3708e17e7a91749fe53a",
+    "threads": 1,
+    "cargo_manifest_sha256": "67bf2d622a3c3fe35babe46a3e17ae37693dee36a7330300b5fe57e473c71cdf",
+    "cargo_lock_sha256": "210fabaa277a42007115baea73429d5e68feb35e3b274eab7ef9c311270722c5",
+    "builder": "cargo build --locked --offline --release --bin pdp --bin top, CARGO_BUILD_JOBS=1, virtual-memory limit 8 GiB, timeout 600 s"
+  },
+  "execution": {
+    "host": "ip-172-31-17-161.us-east-2.compute.internal",
+    "instance_type": "m8i.8xlarge",
+    "backend": "existing Spot host",
+    "cpus_reserved": 1,
+    "memory_limit_gib": 8,
+    "s3_fetch_concurrency": 4,
+    "wall_timeout_seconds": 12850,
+    "kill_grace_seconds": 45,
+    "attempts": 1,
+    "retries": 0,
+    "measurement_scope": "top-form quotient Dreg certificates/intervals only; no affine LFD/FFD claim",
+    "build_timeout_seconds": 600,
+    "scientific_timeout_seconds": 12850,
+    "wall_timeout_includes_build_seconds": false,
+    "build_completed_before_launch": true,
+    "build_wall_seconds": 108,
+    "one_cpu_enforcement": "taskset pins launch and all descendants to the first CPU in the invoking process allowed set",
+    "aws_cli_max_attempts": 1,
+    "aws_cli_retry_mode": "standard"
+  },
+  "cost": {
+    "observed_spot_usd_per_hour": 0.5321,
+    "compute_ceiling_usd": 1.93,
+    "compute_worst_case_seconds_including_grace": 13045,
+    "artifact_ceiling_usd": 0.25,
+    "total_ceiling_usd": 2.18,
+    "daily_budget_usd": 200,
+    "daily_cost_observed_before_run_usd": 37.0452184422,
+    "monthly_budget_usd": 1000,
+    "month_cost_observed_before_run_usd": 538.7198087168,
+    "forecast": "Not available; hard wall cap applied."
+  },
+  "storage": {
+    "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/results/",
+    "prefix_empty_before_run": null,
+    "prior_attempt": "attempt-01 preflight failed before any PDP system or top certificate was produced; preserved in Git; not overwritten.",
+    "capsule_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/capsule-v3/",
+    "output_prefix_checked_empty_at_launch": true,
+    "capsule_v1_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/"
+  },
+  "control_state": {
+    "matching_process_active": false,
+    "eks_jobs_submitted": false,
+    "source_codex_waiting_freeze_lane": "separate Boolean-validation lane remains quiesced; not resumed",
+    "diem_generator": "deadline-expired, no pending process; not launched"
+  },
+  "launch_command": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r38-attempt-01/top-form-20261105T1645Z-attempt-03/launch.sh",
+  "outputs": {
+    "cases": "candidate-inputs/<family-m-target-kind>/system.sing and input.json",
+    "certificates": "top-certificates/<case-id>/",
+    "replay": "top-replay.log",
+    "full_layout": "S3_PERSISTENCE_INDEX.json",
+    "failure_policy": "preserve every generated file and exit record; do not retry or overwrite; use a new attempt prefix for an explicitly authorized continuation."
+  },
+  "launch_script_sha256": "eb07f399cb5624487434f238c3c1406b6306827140c3c3df3a9c6eb3e6b06066",
+  "runner_script_sha256": "55efb60709cc1fd518e937594e56f08852891ebfed4dc41943a3e02618cf93e9",
+  "attempt": "03",
+  "failure_policy": "Use the already-built binaries only after verifying both pinned hashes at launch. Stop on any mismatch; preserve all partial output. No retries; output prefix remains separate and fresh."
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-031",
+  "title": "Repair one dead link in each of two documents",
+  "class": "docs-tooling",
+  "difficulty": 1,
+  "source": [
+    "docs/ecbench/README.md line 276 (../../research/ecbench_accounting_v2_20261023/REPORT.pdf)",
+    "docs/ECDLP_CALIBRATION_PRIMES.md line 300 (../src/cryptanalysis/summation_poly/)"
+  ],
+  "prompt": "`docs/ecbench/README.md` links to `../../research/ecbench_accounting_v2_20261023/REPORT.pdf` and `docs/ECDLP_CALIBRATION_PRIMES.md` links to `../src/cryptanalysis/summation_poly/`. Neither target exists in the checkout. Find out why for each (moved, renamed, never committed, or kept in the artifact store) and repair the link or annotate it honestly. Do not create the missing files.",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- docs/ecbench/README.md docs/ECDLP_CALIBRATION_PRIMES.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
+  "acceptance": [
+    "neither link target is a dead relative path",
+    "only the two documents changed",
+    "if a PDF is only in the artifact store, the text says so instead of linking a file that is absent"
+  ],
+  "check_command": "python3 -c \"import re,os\nfor f in ['docs/ecbench/README.md','docs/ECDLP_CALIBRATION_PRIMES.md']:\n  b=os.path.dirname(f)\n  for t in re.findall(r'\\]\\(([^)#\\s]+)',open(f).read()):\n    if re.match(r'(https?:|mailto:|/)',t): continue\n    if ('ecbench_accounting_v2' in t or 'summation_poly' in t) and not os.path.exists(os.path.normpath(os.path.join(b,t))): raise SystemExit(1)\" && [ \"$(git diff --name-only \"$T_BASE\" HEAD | grep -vcE '^docs/(ecbench/README.md|ECDLP_CALIBRATION_PRIMES.md)$')\" = 0 ]",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "creating an empty target file",
+    "committing a PDF"
+  ],
+  "max_wall_minutes": 20,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": ""
+}
