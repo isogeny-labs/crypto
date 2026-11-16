@@ -49,6 +49,16 @@ these are incomplete counts without a full-cost or speed ranking. Native
 with release builds/strictClippy and byte-exact29summary replay.
 [pcc:unverified]
 
+The [Runpod native-rho validation](runpod-rho-native-price-validation-20261116-32/report.pdf)
+checks the reference's actual tower pricing through the new opt-in Rust
+calibration. Both modes recover72701199046 in469686identical semantic
+steps. Native inversion counts80Fp products/42additions/1inverse rather
+than the preserved harness150/104/1; explicit phase and outer-replay
+counts are disjoint. This corrects accounting without an algorithm gain
+or IC/rho comparison. The4vCPU/8GiB CPU runner was terminated after exact
+artifact collection and portable hash checks(DELETE204/lookup404).
+All scientific raw/export/summary files fit Git. [pcc:unverified]
+
 ## Three graph representations in the Rust integration
 
 | Representation | Vertices and edges | Computation |

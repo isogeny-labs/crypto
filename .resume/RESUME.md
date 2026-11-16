@@ -1,4 +1,44 @@
-# Current checkpoint:32SOURCE READY; Runpod runner provisioning, NOT MEASURED
+# Current checkpoint:32FINISHED ON RUNPOD; publish packet, no paid pod active
+
+Sourceafdfc612cc74eba2ce59d6ec059412a81fab557aPUSHEDbeforesealedbundle/sole
+POST/run. USERbackendRunpodauthpersists; privateheaderdirectorypointer
+/tmp/ic-runpod-auth-location, NEVERprintsecrets/APIresponses.env. NoAPIkeyinpod/
+source/bundle; separateephemeralcapturetokenremovedfrommeasurementenv.
+Native32CPU-onlypod s1ngkkcetckkq6 (4vCPU/8GiB/$0.12h,pinnedRustimage)
+actualCPU37. Publicp101seed317,L265379843621, bothactualscalar72701199046,
+469686IDENTICALsemanticsteps/operationtrace; native+outerellreplay/heldout,
+nativecalibration/independentphasecounts/price/outerresidualallPASS. Nativeinverse
+80M42A1I vslegacyharness150M104A1I; product/square55M44Aboth. Observedpartial
+subtotal117413099033harness/114521413145native. Accountingcorrection,NOalgorithm
+gain/ICcomparison/parity/oldrecordrepricing. TUNED/RNG/bookkeepinggapsremain.
+Remoteexit0/0.491secpracticalityONLY;fixture+2workers6flowrecords/0warm/noretry.
+OriginalcopiedRustqualifierexit0writesexact8900Bsummary+32309Bnativeexport.
+Harnessraw11175B/native12361B, allscientificdatafitsGit/exactcopies.
+
+LOCALoriginalcollectedcustody:
+/workspace/ic-runpod-runs/runpod-rho-native-price-validation-20261116-32/
+returned/task/run. Sealedbundle+returnedgzip+source/binariesalsoinparentstage.
+All264source/precall/preworker/postcall/qualifiedhashPASS(remoteANDlocalportable)
+BEFOREpostcalldocedits. Credentialscanofrawbundle/source/binaries/returnedrun
+foundnoAPIkeyortasktoken. CollectedBEFOREDELETE204andGET404confirmed16:02:43Z;
+cleanup.jsonproof. Previousfailedbootstrap3aqk0v57a1udnqalsoDELETE204before
+replacement; neitherownpodactive. Bothlocalguardsinertbyprivate.deletedmarkers.
+No compiler/scientificjob. GoalACTIVE/no stopgoal/subagents.
+
+Packetresearch/.../runpod-rho-native-price-validation-20261116-32 +benchmarks/
+20261116-runpod-native-rho-prices:singlefinalPDFpageVIEWED/exactPDF/SVG/150dpiPNG
+copieshashPASS/localoriginals. PresentationusesactualCPU37insteadfrozendraftCPU0;
+originaltemplateLOCALhashbound, raw/qualifier/criteria/summaryunchanged.
+PCC-20261116-0e87ecstandingunverified; lessonO-f75f4193badb. Currentafdfc+DIRTY
+32packet/PCC/lesson/journal/resume/mainREADME. Nextcommit/push/updatePRactual32,
+artifactbotinspect/FF/restoreignoredPNG/hash. No newtrialselectedyet.
+Afterpublication: selectfairnative/tunedreferenceparameterportfolio andactual
+matchedIC/graph/rhoRunpodcomparisonundernewfrozenprotocol; don'tassumebatch16
+cheapest. Nativebookkeeping/RNG/tunedpricecoverage remainopen. Keepallfuture
+MEASUREMENTSonRunpod(userexplicit), localsourcebuild/unitchecksokay. Avoidlong
+speculativeformula/numericalderivationloops; chooseconcretecode/data step.
+
+# Previous checkpoint:32SOURCE READY; Runpod runner provisioning, NOT MEASURED
 
 USERswitchedpendingmeasurementtoRunpodandprovidedserviceauth. CredentialONLYprivate
 tempheader outsideGit: directorypointer/tmp/ic-runpod-auth-location. NEVERprintheader/
