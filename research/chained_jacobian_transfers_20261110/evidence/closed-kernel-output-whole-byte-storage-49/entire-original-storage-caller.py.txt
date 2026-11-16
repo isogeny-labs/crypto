@@ -1,0 +1,34 @@
+"""Exact whole-byte sharing of one closed immutable output; no native program run."""
+from pathlib import Path
+from datetime import datetime,timezone
+import filecmp,hashlib,json,os,shutil,stat,subprocess
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';h=Path('/workspace/scratch/ct547-closed-kernel-library-whole-byte-sharing');h.mkdir()
+src=Path('/workspace/scratch/ct90-original-full-evaluator-build-03/actual-prepared-original-engine/libisogeny_algos.rlib');dst=Path('/workspace/scratch/ct48-kernel-target/release/deps/libisogeny_algos-e97507d926e5798a.rlib');digest='15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c'
+q=subprocess.run(['ps','-eo','pid=,ppid=,stat=,etimes=,comm='],capture_output=True,check=True,text=True);(h/'entire-current-process-state-table.txt').write_text(q.stdout);os.chmod(h/'entire-current-process-state-table.txt',0o600);compilers=[]
+for line in q.stdout.splitlines():
+ z=line.split()
+ if z[-1]in['cargo','rustc','rust-analyzer','ld','cc','clang','gcc']:compilers.append(dict(pid=int(z[0]),ppid=int(z[1]),state=z[2],elapsed=int(z[3]),command=z[4]))
+assert all('Z'in x['state']for x in compilers)
+assert Path('/workspace/scratch/ct48-kernel-tests-02.exit').read_text().strip()=='0'and Path('/workspace/scratch/ct48-kernel-after-02.exit').read_text().strip()=='0'
+assert Path('/workspace/scratch/ct48-kernel-tests-02.finished').read_text().strip()=='2026-11-12T20:39:16Z'
+assert '4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out'in Path('/workspace/scratch/ct48-kernel-tests-02.txt').read_text()
+def row(x):
+ s=x.lstat();assert stat.S_ISREG(s.st_mode)
+ with x.open('rb')as f:sha=hashlib.file_digest(f,'sha256').hexdigest()
+ return dict(path=str(x),bytes=s.st_size,sha256=sha,mode=stat.S_IMODE(s.st_mode),dev=s.st_dev,ino=s.st_ino,nlink=s.st_nlink,mtime_ns=s.st_mtime_ns,blocks=s.st_blocks)
+before=[row(src),row(dst)];assert all(x['bytes']==49789168 and x['sha256']==digest and x['mode']==384 for x in before);assert before[0]['dev']==before[1]['dev']and before[0]['ino']!=before[1]['ino']and before[1]['nlink']==1
+assert filecmp.cmp(src,dst,shallow=False);(h/'ENTIRE_BEFORE_EXACT_CLOSED_KERNEL_LIBRARY.json').write_text(json.dumps(before,indent=2)+'\n');available_before=os.statvfs('/workspace').f_bavail*os.statvfs('/workspace').f_frsize
+scratch_link=dst.parent/'.ct547-exact-whole-closed-kernel-sharing';assert not scratch_link.exists();os.link(src,scratch_link);os.replace(scratch_link,dst)
+after=[row(src),row(dst)];assert filecmp.cmp(src,dst,shallow=False)and after[0]['ino']==after[1]['ino']and after[0]['nlink']==before[0]['nlink']+1
+assert all(x['bytes']==49789168 and x['sha256']==digest and x['mode']==384 for x in after);available_after=os.statvfs('/workspace').f_bavail*os.statvfs('/workspace').f_frsize
+rec=dict(time=datetime.now(timezone.utc).isoformat(),before=before,after=after,before_available=available_before,after_available=available_after,actual_available_delta=available_after-available_before,full_byte_compare_and_SHA_before_after=True,both_original_paths_remain_whole_regular_with_same_bytes_modes=True,canonical_inode_and_mtime_preserved=True,destination_mtime='adopts canonical; full original value recorded',compiler_state_rows=compilers,closed_status='original ct48 kernel unit4/0, tests02=0, after02=0, finishNov12T20:39:16 retained; no new native/build invocation',scope='capacity for whole upcoming current CI/continued work, no raw/archive/partial/Git object deletion, no active cache or cold qualification/performance result')
+(h/'ACTUAL_WHOLE_CLOSED_KERNEL_SHARING.json').write_text(json.dumps(rec,indent=2)+'\n');e=p/'evidence/closed-kernel-output-whole-byte-storage-49';e.mkdir()
+for n in ['ENTIRE_BEFORE_EXACT_CLOSED_KERNEL_LIBRARY.json','ACTUAL_WHOLE_CLOSED_KERNEL_SHARING.json']:shutil.copyfile(h/n,e/n)
+for n in ['ct48-kernel-tests-02.exit','ct48-kernel-after-02.exit','ct48-kernel-tests-02.finished','ct48-kernel-tests-02.txt']:shutil.copyfile('/workspace/scratch/'+n,e/n)
+shutil.copyfile(__file__,e/'entire-original-storage-caller.py.txt')
+a=['python3','tools/pcc/pcc.py','claim','new','--kind','statement','--claim-type','data','--statement','Closed ct48 kernel library49789168B/15e4ed73 shares existing complete canonical ct90 after full-byte/SHA/size/mode/device/distinct-inode/destinationnlink1 checks; original tests4/0/tests02=0/after02=0/finishNov12 retained. No live compiler, only exact zombie states captured. Both original paths remain whole regular/exact bytes/modes; canonical inode/mtime preserved and nlink increments1, destination original mtime retained and adopts canonical. Actual free-capacity delta in receipt for upcoming whole currentCI; no raw/archive/partial/Git-object deletion/active-cache mutation/native build/cold/performance result or original policy/gate/criteria change.']
+for f in sorted(e.iterdir()):a+=['--proof','attestation:'+str(f.relative_to(r))]
+c=subprocess.check_output(a,cwd=r,text=True).strip();print(c,'free_delta',available_after-available_before,'available',available_after,flush=True)
+s='\n---\n\n'+datetime.now(timezone.utc).isoformat()+'\n# Recover capacity by exact whole closed kernel-output sharing\n\n## What was done\n'+c+': original closed ct48 full49789168B library shares existing exact ct90 after full compare/SHA/mode/device/nlink1 checks. Original unit4/0/tests02/after02/finishNov12 retained. Both paths complete regular/bytes/modes, original mtime provenance; actual free delta'+str(available_after-available_before)+'B. No live compiler/native invocation. [pcc:unverified]\n\n## Decisions made\nReserve actual capacity for whole currentCI archives and continued source/proof work; no raw/partial/Git objects deleted, no active cache or cold/performance qualification. [pcc:unverified]\n\n## Open threads\nCurrent278/12ccCI20:55/full original store/gates/normal merge, completed finite08 source tag, next actual Euclidean base inverse/raw norm model and full original scientific/runtime/admission/cost. [pcc:unverified]\n\n## Errors\nNo new storage failure; all older source/index/metadata/proof/S3/benchmark negatives retained, no identity/policy/paid/signed promotion. [pcc:unverified]\n'
+for x in[r/'docs/session-logs/2026-11-16.md',r/'.resume/RESUME.md']:
+ with x.open('a')as o:o.write(s)
