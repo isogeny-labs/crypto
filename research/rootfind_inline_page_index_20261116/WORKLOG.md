@@ -34,3 +34,33 @@ held file. [pcc:unverified]
 ### Errors (what went wrong, how it was handled)
 
 - No implementation or run attempted at this freeze.
+
+## 2026-11-16T11:17Z — Source implementation before execution
+
+### What was done (commands, files, features)
+
+- Implemented a 32-bit inline singleton directory, promoted spill pages,
+  first-witness preservation, explicit bounds and source-local synthetic
+  controls in `inline_page_index.rs`. Added a new exact K13/K19/K23
+  integration test comparing each insertion with a hash map and the prior
+  paged prototype, then the complete collision vector and group equations
+  with the production torsion builder.
+- Added a local Cargo library harness pointing at the new test source.
+  Copied the pinned dependency lock and resolved its package entry offline.
+  Rustfmt completed with no remaining format changes. No test has run yet.
+
+### Decisions made (and why)
+
+- Preallocate at most 512 spill pages initially and enforce the folded
+  builder's `floor((a²+1)/2)` spill-page limit. A spill needs at least two
+  retained keys, so the limit is a worst-case bound rather than an observed
+  value. Record actual capacity separately from occupied spill pages.
+
+### Open threads (unfinished, pick up next time)
+
+- Pin this source in a commit, then execute the source-bound unit and
+  actual-curve parity tests with raw output retention.
+
+### Errors (what went wrong, how it was handled)
+
+- None before execution.
