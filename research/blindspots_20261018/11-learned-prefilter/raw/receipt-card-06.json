@@ -1,0 +1,299 @@
+{
+  "card_id": "CARD-BLINDSPOT-11-06",
+  "card_path": "research/blindspots_20261018/11-learned-prefilter/card-06.yaml",
+  "card_sha256": "40b5cedcda4a411684799dcb5b1046b74a80d202919f60ad10ea8e353bd6c170",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-11/card-06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-11/card-06/b11",
+        "examples/blindspots_11_learned_prefilter.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.674,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 5.674,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-11/card-06/b11",
+        "cell",
+        "--n",
+        "29",
+        "--m",
+        "2",
+        "--per-base",
+        "2000",
+        "--perms",
+        "20",
+        "--pilot",
+        "400",
+        "--pop",
+        "U"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 147.48,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cell-n29-m2-u",
+      "index": 3,
+      "outputs": {},
+      "seconds": 147.48,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "c394bb47f0174cfbcf2c81cb0bcbafedf9f753f446db6e122090a3662c629ef1",
+      "stdout_tail": [
+        "{\"pop\":\"U\",\"kind\":\"base\",\"n\":29,\"m\":2,\"l\":15,\"idx\":8,\"type\":\"P\",\"classes\":16331,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1269,\"pos_frac\":0.634500,\"b_refutes\":0}",
+        "{\"pop\":\"U\",\"kind\":\"base\",\"n\":29,\"m\":2,\"l\":15,\"idx\":9,\"type\":\"P\",\"classes\":16485,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1278,\"pos_frac\":0.639000,\"b_refutes\":0}",
+        "{\"pop\":\"U\",\"kind\":\"label_summary\",\"n\":29,\"m\":2,\"l\":15,\"targets\":20000,\"pos\":11107,\"false_refutations_b\":0,\"seconds\":38.120070}",
+        "{\"pop\":\"U\",\"kind\":\"cost\",\"n\":29,\"m\":2,\"l\":15,\"feat_mul\":37.000000,\"feat_sqr\":31.000000,\"feat_lin\":230.000000,\"lr_model_ops\":328,\"gbt_model_ops\":400,\"dec_neg_field_ops\":116957.956145,\"dec_neg_lin\":492115.305859,\"dec_pos_field_ops\":29858.563158,\"dec_pos_lin\":123953.703970,\"neg_targets\":8893,\"pos_targets\":11107}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"ALL\",\"neg\":8893,\"pos\":11107,\"rate_b\":0.449567,\"rate_c\":0.000000,\"fr\":6,\"delta\":-0.449567,\"delta_lo\":-0.459462,\"delta_hi\":-0.439447,\"rate_union\":0.449792,\"roc0\":0.449792,\"auc\":0.759754,\"null_auc_max\":0.564713,\"null_auc_mean\":0.558385,\"null_roc0_max\":0.001462,\"null_roc0_mean\":0.000551,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"T\",\"neg\":4512,\"pos\":3488,\"rate_b\":0.886082,\"rate_c\":0.886082,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.886082,\"roc0\":0.886082,\"auc\":0.942825,\"null_auc_max\":0.510016,\"null_auc_mean\":0.498315,\"null_roc0_max\":0.002660,\"null_roc0_mean\":0.000942,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"G\",\"neg\":2206,\"pos\":3794,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":4,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000453,\"roc0\":0.000453,\"auc\":0.508281,\"null_auc_max\":0.507123,\"null_auc_mean\":0.499923,\"null_roc0_max\":0.000907,\"null_roc0_mean\":0.000136,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"P\",\"neg\":2175,\"pos\":3825,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":2,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000460,\"roc0\":0.000460,\"auc\":0.501260,\"null_auc_max\":0.511318,\"null_auc_mean\":0.499392,\"null_roc0_max\":0.001379,\"null_roc0_mean\":0.000161,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"name\":\"planted_trace\",\"neg\":9982,\"pos\":10018,\"auc\":1.000000,\"fr\":9,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"name\":\"planted_selector\",\"neg\":9970,\"pos\":10030,\"auc\":0.875069,\"fr\":8,\"rate_cal\":0.498295,\"roc0\":0.498094}",
+        "{\"pop\":\"U\",\"kind\":\"timing\",\"n\":29,\"m\":2,\"model\":\"lr\",\"seconds\":16.784212}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"ALL\",\"neg\":8893,\"pos\":11107,\"rate_b\":0.449567,\"rate_c\":0.000000,\"fr\":4,\"delta\":-0.449567,\"delta_lo\":-0.460362,\"delta_hi\":-0.439109,\"rate_union\":0.449904,\"roc0\":0.449680,\"auc\":0.766381,\"null_auc_max\":0.586476,\"null_auc_mean\":0.579161,\"null_roc0_max\":0.001462,\"null_roc0_mean\":0.000635,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"T\",\"neg\":4512,\"pos\":3488,\"rate_b\":0.886082,\"rate_c\":0.886082,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.886082,\"roc0\":0.886082,\"auc\":0.941980,\"null_auc_max\":0.509315,\"null_auc_mean\":0.498235,\"null_roc0_max\":0.002881,\"null_roc0_mean\":0.001186,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"G\",\"neg\":2206,\"pos\":3794,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":3,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000907,\"roc0\":0.000000,\"auc\":0.516429,\"null_auc_max\":0.509660,\"null_auc_mean\":0.499007,\"null_roc0_max\":0.000453,\"null_roc0_mean\":0.000136,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"P\",\"neg\":2175,\"pos\":3825,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":1,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000460,\"roc0\":0.000460,\"auc\":0.506430,\"null_auc_max\":0.517349,\"null_auc_mean\":0.500003,\"null_roc0_max\":0.000000,\"null_roc0_mean\":0.000000,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"gbt_splits\",\"n\":29,\"m\":2,\"l\":15,\"total\":2444,\"splits_polybits\":412,\"splits_normalbits\":238,\"splits_powertraces\":426,\"splits_hilbert90\":24,\"splits_shiftedV\":116,\"splits_halftrace\":696,\"splits_context\":532}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"name\":\"planted_trace\",\"neg\":9982,\"pos\":10018,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"name\":\"planted_selector\",\"neg\":9970,\"pos\":10030,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"timing\",\"n\":29,\"m\":2,\"model\":\"gbt\",\"seconds\":92.570448}",
+        "{\"pop\":\"U\",\"kind\":\"done\",\"n\":29,\"m\":2,\"l\":15,\"seconds\":147.474757,\"rss_peak_kb\":19512}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-11/card-06/b11",
+        "cell",
+        "--n",
+        "29",
+        "--m",
+        "2",
+        "--per-base",
+        "2000",
+        "--perms",
+        "20",
+        "--pilot",
+        "400",
+        "--pop",
+        "S"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 140.434,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cell-n29-m2-s",
+      "index": 4,
+      "outputs": {},
+      "seconds": 140.434,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0c50fd1081453789d82e3d8d4e1a783ce98b7b1f00b2aaabf1c43b8c040eb288",
+      "stdout_tail": [
+        "{\"pop\":\"S\",\"kind\":\"base\",\"n\":29,\"m\":2,\"l\":15,\"idx\":8,\"type\":\"P\",\"classes\":16266,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1243,\"pos_frac\":0.621500,\"b_refutes\":0}",
+        "{\"pop\":\"S\",\"kind\":\"base\",\"n\":29,\"m\":2,\"l\":15,\"idx\":9,\"type\":\"P\",\"classes\":16386,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1283,\"pos_frac\":0.641500,\"b_refutes\":0}",
+        "{\"pop\":\"S\",\"kind\":\"label_summary\",\"n\":29,\"m\":2,\"l\":15,\"targets\":20000,\"pos\":14563,\"false_refutations_b\":0,\"seconds\":31.559160}",
+        "{\"pop\":\"S\",\"kind\":\"cost\",\"n\":29,\"m\":2,\"l\":15,\"feat_mul\":37.000000,\"feat_sqr\":31.000000,\"feat_lin\":230.000000,\"lr_model_ops\":328,\"gbt_model_ops\":400,\"dec_neg_field_ops\":117064.222365,\"dec_neg_lin\":492556.732573,\"dec_pos_field_ops\":28820.694294,\"dec_pos_lin\":119587.529355,\"neg_targets\":5437,\"pos_targets\":14563}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"ALL\",\"neg\":5437,\"pos\":14563,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":1,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000184,\"auc\":0.611525,\"null_auc_max\":0.621905,\"null_auc_mean\":0.614867,\"null_roc0_max\":0.001287,\"null_roc0_mean\":0.000460,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"T\",\"neg\":1057,\"pos\":6943,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":1,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.500478,\"null_auc_max\":0.524142,\"null_auc_mean\":0.503962,\"null_roc0_max\":0.000000,\"null_roc0_mean\":0.000000,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"G\",\"neg\":2170,\"pos\":3830,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000461,\"auc\":0.486610,\"null_auc_max\":0.518762,\"null_auc_mean\":0.496674,\"null_roc0_max\":0.001382,\"null_roc0_mean\":0.000576,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"type\":\"P\",\"neg\":2210,\"pos\":3790,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.505526,\"null_auc_max\":0.517498,\"null_auc_mean\":0.499711,\"null_roc0_max\":0.002262,\"null_roc0_mean\":0.000566,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"name\":\"planted_trace\",\"neg\":9990,\"pos\":10010,\"auc\":1.000000,\"fr\":6,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"lr\",\"name\":\"planted_selector\",\"neg\":10010,\"pos\":9990,\"auc\":0.876288,\"fr\":8,\"rate_cal\":0.506494,\"roc0\":0.506593}",
+        "{\"pop\":\"S\",\"kind\":\"timing\",\"n\":29,\"m\":2,\"model\":\"lr\",\"seconds\":16.957514}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"ALL\",\"neg\":5437,\"pos\":14563,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":4,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000552,\"roc0\":0.000552,\"auc\":0.622139,\"null_auc_max\":0.633738,\"null_auc_mean\":0.626629,\"null_roc0_max\":0.001471,\"null_roc0_mean\":0.000561,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"T\",\"neg\":1057,\"pos\":6943,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.485205,\"null_auc_max\":0.520504,\"null_auc_mean\":0.503827,\"null_roc0_max\":0.000000,\"null_roc0_mean\":0.000000,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"G\",\"neg\":2170,\"pos\":3830,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":1,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.499797,\"null_auc_max\":0.517643,\"null_auc_mean\":0.500635,\"null_roc0_max\":0.002765,\"null_roc0_mean\":0.000668,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"type\":\"P\",\"neg\":2210,\"pos\":3790,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":3,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.001357,\"roc0\":0.001357,\"auc\":0.491710,\"null_auc_max\":0.517103,\"null_auc_mean\":0.499690,\"null_roc0_max\":0.002262,\"null_roc0_mean\":0.000724,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"gbt_splits\",\"n\":29,\"m\":2,\"l\":15,\"total\":3483,\"splits_polybits\":524,\"splits_normalbits\":562,\"splits_powertraces\":652,\"splits_hilbert90\":9,\"splits_shiftedV\":220,\"splits_halftrace\":1332,\"splits_context\":184}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"name\":\"planted_trace\",\"neg\":9990,\"pos\":10010,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":29,\"m\":2,\"l\":15,\"model\":\"gbt\",\"name\":\"planted_selector\",\"neg\":10010,\"pos\":9990,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"S\",\"kind\":\"timing\",\"n\":29,\"m\":2,\"model\":\"gbt\",\"seconds\":91.910961}",
+        "{\"pop\":\"S\",\"kind\":\"done\",\"n\":29,\"m\":2,\"l\":15,\"seconds\":140.427662,\"rss_peak_kb\":19536}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-11/card-06/b11"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-11/card-06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "16d97a43fe881f07aa52dcd0e8b6486c9e3bf18e",
+  "dirty_after": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i1.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-09.json",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-08.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-08.json",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-06-build.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-06-build.stdout.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-S.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-S.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-U.log",
+    "xamples/blindspots_06_signature_gb.rs"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i1.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-09.json",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-08.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-08.json",
+    "xamples/blindspots_06_signature_gb.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

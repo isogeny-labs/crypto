@@ -1,0 +1,7 @@
+item,decision,basis
+Active coefficient reads,accepted,Native peval charges one collection visit per consumed coefficient and no separate scalar Copy. New initialization consumes k=2d+1 active entries once; padding consumes no inactive entry.
+Optional access and bounds,accepted within existing finite-event boundary,get/first/Option checks are access mechanics rather than new algorithmic predicates on curve or collector values. Registry excludes an instruction census/API surcharge; existing indexing and iterator mechanics are similarly uncharged. This does not price these machine operations at zero.
+Local scalar assignments,accepted,No collection element is cloned or initialized by assigning scalar recurrence locals. COST_BOUNDARY excludes fixed record Copy moves; original peval scalar extraction has the same read-only convention.
+Arithmetic and last update,accepted,"Two calls initialize differences and three calls run per x, before both continues. Final unused update is retained. Baseline uses k*p adds and k*p multiplies."
+Existing mapper,accepted for these affected fields,Analyzer counts base_adds and collection_entry_visits and normalizes inverse expansion separately. Removed recurrence multiplies are outside inverse expansion. No new coefficient is introduced.
+Caller scope,degree two caller verified,Native producer skips d.degree != 2 before calling point_sieve_candidates. Lower degrees remain component controls; no hidden omission of their addition increases.

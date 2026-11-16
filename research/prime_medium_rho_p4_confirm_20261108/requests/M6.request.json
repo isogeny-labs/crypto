@@ -1,0 +1,78 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "prime-medium-rho-p4-20261108-m6",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 3600,
+    "memory": "4Gi",
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "prime medium rho P4 confirm M6: 49-bit curve 1, target block K06",
+      "description": "research/prime_medium_rho_p4_confirm_20261108/PROTOCOL.md. Confirmatory study of the paired rho.plain / rho.negation operation-count ratio on the ten medium-tier curves of research/prime_medium_tier_rho_20261107 (curves.json); seeds from seeds.json (new, disjoint). Operation counts are the result; wall time only at L2 against the A/A arm.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_explicit",
+            "p": 365857381347911,
+            "a": 265803930896159,
+            "b": 186608017781445,
+            "group_order": 365857391582227,
+            "r": 365857391582227,
+            "gx": 2,
+            "gy": 209161832331426
+          }
+        ],
+        "targets_per_curve": 12,
+        "target_seed": 134742999582066,
+        "target_kind": "planted"
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-plain",
+          "role": "baseline",
+          "method": {
+            "id": "rho.plain"
+          }
+        },
+        {
+          "name": "rho-neg-v2",
+          "role": "candidate",
+          "method": {
+            "id": "rho.negation_v2"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 6,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 121887317757250,
+        "isolation_required": "L2",
+        "timeout_seconds": 300
+      }
+    },
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+      "source_revision": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+      "ecbench_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9"
+    }
+  },
+  "provenance": {
+    "harness": "claude-code: research/prime_medium_rho_p4_confirm_20261108 (PROTOCOL.md)",
+    "source_revision": "dbd587a01aefba0634acc459ea30cfb9bbf49a09"
+  }
+}

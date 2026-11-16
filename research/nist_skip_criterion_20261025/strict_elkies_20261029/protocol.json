@@ -1,0 +1,572 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "nist-strict-elkies-full21-20261029",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/nist_skip_criterion_20261025/strict_elkies_20261029",
+  "authors": [
+    "native-curve-analysis"
+  ],
+  "links": {
+    "preparation": "PROTOCOL.md",
+    "pr": "https://github.com/isogeny-labs/crypto/pull/2666"
+  },
+  "question": "Does the externally reported strict Elkies691 count separate every published/omitted same-field pair, and what is the exact calibration over the declared cutoff family?",
+  "claims": [
+    {
+      "id": "finite-profile",
+      "class": "exact_computation",
+      "text": "Recompute all6342 odd-prime characters, all303 cutoff outcomes and all4480 within-stream label assignments, with a separate verifier.",
+      "decided_by": [
+        "exact-recompute"
+      ]
+    },
+    {
+      "id": "fixed-691",
+      "class": "exact_computation",
+      "text": "Reproduce or contradict the externally reported fixed691 lower-count separation on the same visible-label census; no independent holdout claim.",
+      "decided_by": [
+        "exact-recompute"
+      ]
+    },
+    {
+      "id": "historical-selector",
+      "class": "out_of_scope",
+      "text": "A finite fit and its restricted-family calibration do not establish the historical acceptance rule.",
+      "decided_by": []
+    },
+    {
+      "id": "security",
+      "class": "out_of_scope",
+      "text": "No attack, DLP, measured SEA runtime, explicit isogeny map or security claim.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "positive",
+      "role": "control_positive",
+      "description": "Native fixed residue, planted separator and nonseparator controls",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "043a568661ebf1c40a4ead333889d814c32d045c",
+        "build": [
+          [
+            "sh",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "ee832a009e658cab455e241f0117ebd6c8a32a8f437e0641c4e57e7eb5a074ff",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror -pedantic",
+          "scope": "Exact finite integers; production has no admitted clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "same_instrument_as": "production"
+    },
+    {
+      "id": "production",
+      "role": "candidate",
+      "description": "Full21 GMP residue-table extraction and exact cutoff/label enumeration",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "043a568661ebf1c40a4ead333889d814c32d045c",
+        "build": [
+          [
+            "sh",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "ee832a009e658cab455e241f0117ebd6c8a32a8f437e0641c4e57e7eb5a074ff",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror -pedantic",
+          "scope": "Exact finite integers; production has no admitted clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "same_instrument_as": null
+    },
+    {
+      "id": "verification",
+      "role": "baseline",
+      "description": "Separate PARI characters, pairwise threshold checks and recursive label enumeration",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "043a568661ebf1c40a4ead333889d814c32d045c",
+        "build": [
+          [
+            "sh",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "312eb724b6fd1940ff33541692ea0227a9d092164cda99f9c4cc77b357982259",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror -pedantic",
+          "scope": "Exact finite integers; production has no admitted clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "same_instrument_as": null
+    },
+    {
+      "id": "negative_character",
+      "role": "control_negative",
+      "description": "Expected refusal of one deliberately corrupted saved character field; native status1 is required",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "043a568661ebf1c40a4ead333889d814c32d045c",
+        "build": [
+          [
+            "sh",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "312eb724b6fd1940ff33541692ea0227a9d092164cda99f9c4cc77b357982259",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror -pedantic",
+          "scope": "Exact finite integers; production has no admitted clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "same_instrument_as": "verification"
+    },
+    {
+      "id": "negative_calibration",
+      "role": "control_negative",
+      "description": "Expected refusal of one deliberately corrupted saved calibration field; native status1 is required",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "043a568661ebf1c40a4ead333889d814c32d045c",
+        "build": [
+          [
+            "sh",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "312eb724b6fd1940ff33541692ea0227a9d092164cda99f9c4cc77b357982259",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror -pedantic",
+          "scope": "Exact finite integers; production has no admitted clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "same_instrument_as": "verification"
+    },
+    {
+      "id": "negative_summary",
+      "role": "control_negative",
+      "description": "Expected refusal of one deliberately corrupted saved summary field; native status1 is required",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "043a568661ebf1c40a4ead333889d814c32d045c",
+        "build": [
+          [
+            "sh",
+            "build.sh"
+          ]
+        ],
+        "binary_sha256": "312eb724b6fd1940ff33541692ea0227a9d092164cda99f9c4cc77b357982259",
+        "flags": {
+          "language": "C++17",
+          "optimization": "-O2 -Wall -Wextra -Werror -pedantic",
+          "scope": "Exact finite integers; production has no admitted clock"
+        },
+        "env": {
+          "LANG": "C",
+          "LC_ALL": "C"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "same_instrument_as": "verification"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact deterministic census and exact finite label enumeration; no host variance or performance claim."
+    },
+    "positive": {
+      "present": true,
+      "arm": "positive",
+      "expected_detection": "Planted lower-count separator and actual nonseparator, quadratic-residue catalogs and six toy label assignments.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "negative_character",
+      "null_population": {
+        "description": "Three fixed invalid saved-output controls, not a sampled random population.",
+        "generator": "tamper.mjs: character9, one flipped calibration flag, and one incorrect summary count",
+        "n": 3,
+        "why_n": "One explicit control for character arithmetic, full-label calibration and headline summary admission. No significance estimate uses this n.",
+        "matched_on": [
+          "All untouched inputs and output bytes",
+          "Same native verifier and source",
+          "Same resource ceiling"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "instrument",
+        "levels": [
+          "GMP enumerated residues",
+          "PARI Kronecker and recursive labels"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "crossed",
+        "how": "Separate character and finite-enumeration implementations; underlying GMP integer primitives may be shared."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "how": "Hash-identical all21 source cohort; no curve omitted; original stream published counts preserved."
+      },
+      {
+        "name": "cutoff",
+        "treatment": "fixed",
+        "how": "External fixed691 primary; descriptive303 prime cutoff positions through2000, lower direction only; inclusive zero-character sensitivity separate."
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "how": "Shared local exact-analysis fallback; no performance clock."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "fixed",
+        "how": "Clean native environment,1536MiB address ceiling; no restores."
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Positive, production, verification, three refusal controls; stop-on-unexpected-status."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "All actual labels and the external reported691pattern/calibration were seen before replay; no blinding or independent historical holdout."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "how": "No retries or restores; failures retained."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-recompute",
+        "arms": [
+          "production",
+          "verification"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "one_factor",
+        "reason": "Exact equality of every raw table and summary on identical inputs; restricted-family descriptive calibration, not historical significance."
+      }
+    ],
+    "crosses_map": false,
+    "aa_not_applicable": "No clock and no random-population claim."
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact computation with a required positive-control admission and subsequent independent verification, not a timing comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No random sampling; all allowed labels enumerated. Historical literal seeds remain in inputs.tsv."
+    },
+    "instance_sampling": {
+      "rule": "One frozen all21 input bundle; original six streams, no added curve or omitted control. Enumerate4480 labels with original published counts in each stream.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "External reported outcome and labels already visible. No holdout or novel discovery claim."
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 303,
+      "correction": "other",
+      "passes": true,
+      "note": "All4480 allowed labelings and all303 fixed cutoff positions are enumerated, not Monte Carlo. This calibration excludes all other examined hypotheses and is not a confirmatory historical p-value."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 53.76,
+      "threads": 1,
+      "estimated_total_seconds": 53.76,
+      "measured_on": "evidence/preflight-runtime.json: self-tests only,0.005/0.004/0.024s, n1 per phase,0.001s resolution. Heuristic512*(positive+production+4*verification); no actual-cohort timing or upper bound."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "curve_choices",
+        "name": "Original curve choices retained",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Original curve choices retained on the frozen finite census, not a sampled population or performance estimate",
+        "source": "results/summary.json:curve_choices",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "odd_prime_character_cells",
+        "name": "Odd-prime character cells checked",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Odd-prime character cells checked on the frozen finite census, not a sampled population or performance estimate",
+        "source": "results/summary.json:odd_prime_character_cells",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "label_assignments",
+        "name": "Complete within-stream label family",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Complete within-stream label family on the frozen finite census, not a sampled population or performance estimate",
+        "source": "results/summary.json:label_assignments",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "cutoffs",
+        "name": "Fixed prime cutoff positions",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Fixed prime cutoff positions on the frozen finite census, not a sampled population or performance estimate",
+        "source": "results/summary.json:cutoffs",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "strict_search_success_assignments",
+        "name": "Label assignments admitting any declared strict lower-count separator",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Label assignments admitting any declared strict lower-count separator on the frozen finite census, not a sampled population or performance estimate",
+        "source": "results/summary.json:strict_search_success_assignments",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "strict_fixed691_success_assignments",
+        "name": "Label assignments admitting the fixed691strict separator",
+        "unit": "integer records",
+        "kind": "exact",
+        "definition": "Label assignments admitting the fixed691strict separator on the frozen finite census, not a sampled population or performance estimate",
+        "source": "results/summary.json:strict_fixed691_success_assignments",
+        "aggregation": "per_row",
+        "resolution": "one integer",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "source commit",
+      "input/source/binary hashes",
+      "all phase statuses including expected negative1",
+      "all characters",
+      "all cutoff and calibration rows",
+      "full independent summary verification"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "route_reason": "No installed EKS MCP; unchanged portable validator dc6b59d32e937db5c049704102fe0d5ca0db7af9ac2bd8de67270bcafc230426 supports ecbench only. Existing CodeBuild project inspection denied. Reported local exact-analysis fallback before data; no paid job, new identity or policy change.",
+      "address_limit_bytes": 1610612736
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 360,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly six native phases over one frozen bundle: positive, production, verification, negative_character, negative_calibration, negative_summary. No automatic retry or restore.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "30/120/120/30/30/30seconds and1536MiB uniform virtual-address cap.",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "Main phases require native exit0; each negative verifier requires native exit1. Preserve failure/absence and do not invent unattempted rows.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admit only all-row exact recomputation and three correct refusals. Then report whether the externally fixed691criterion separates the visible labels, every searched cutoff and every label-calibration row. A fit remains exploratory.",
+    "comparison_ids": [
+      "exact-recompute"
+    ],
+    "statistic": "Exact character, count, inequality and complete-label-enumeration equality.",
+    "interval": "none: exact deterministic finite integers",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Literal within-field count gaps and exact finite success counts, with every other tested family explicitly outside this calibration.",
+    "verdict_vocabulary": [
+      "verified_exact_profile",
+      "reported_fit_reproduced",
+      "reported_fit_not_reproduced",
+      "incomplete",
+      "refuted_arithmetic"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "producer.cpp",
+      "sha256": "090143b67ba31e04fd77772c5a5ce14ae6174214feb5fbe5246b7b5d79c28027"
+    },
+    "inputs": [
+      "inputs.tsv",
+      "inputs.sha256",
+      "source.sha256",
+      "binaries.sha256",
+      "BUILD.json",
+      "evidence/preparation-delivery.json"
+    ],
+    "outputs": [
+      "results/characters.tsv",
+      "results/at691.tsv",
+      "results/invariants.tsv",
+      "results/cutoffs.tsv",
+      "results/calibration.tsv",
+      "results/summary.json",
+      "verification.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "visual.svg"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "No historical attribution, attack, DLP, security or actual SEA runtime claim.",
+    "No unknown character at2 encoded numerically; odd primes only contribute to the count.",
+    "No omitted P384/P521 controls or claim that singleton fields test skip discrimination.",
+    "No new cutoff/direction chosen after outcomes and described as fixed. No independent holdout or correction for all earlier hypotheses."
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/pdf/1112.3390 v2 pages1–2",
+      "provenance": "retrieved",
+      "claim": "Frobenius discriminant character criterion for odd primes; average-case distribution is not a per-curve security theorem."
+    },
+    {
+      "ref": "https://teapaw.org/asanso/status/2111511837866893580",
+      "provenance": "retrieved",
+      "claim": "Authored post through a named mirror; direct X endpoint403. External exploratory691claim and303-cutoff calibration seen before replay, not independently discovered."
+    },
+    {
+      "ref": "../native/features.cpp lines123–138; ../sea_replay_20261026/REPORT.md",
+      "provenance": "internal",
+      "claim": "Prior snapshots include ramified primes and stop at499; product coverage is a different metric."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "eeb7482bcda69477a360a7c28749b7f737d377dbe3298bec94346e4efbcdbbb7",
+    "commit": "72fed44fdb29bc593a0ba6e3213fcc9d1474ce38",
+    "frozen_at": "2026-10-29T14:40:47Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "source_revision": "043a568661ebf1c40a4ead333889d814c32d045c",
+    "canonical_tool_revision": "8c5db250d4fff65eb40fffede9c8391de403897f",
+    "source_sha256": "0a160db62d9bab4f74c3f0609ec637ec369ac9fd17864d805ffb8343e138fc90",
+    "input_sha256": "357b816dd011fe43f63ba36b498a20d2c29910a2dc6802da8c72cbe79e640fbb",
+    "verifier_sha256": "dd9ef2ed84d2446a27766da480917b83c5a1c8a85d2f251224edbc8e351c11bf",
+    "external_report_seen_before_data": true,
+    "actual_cohort_read_during_development": false,
+    "cutoff_positions": "303 primes2..1999;2 is only a zero-count boundary and has literalNAcharacter",
+    "negative_control_native_expected_status": 1,
+    "default_backend_contract_checked_unchanged": true
+  }
+}

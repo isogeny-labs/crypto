@@ -1,0 +1,42 @@
+{
+  "schema": "gap80-complete-pipeline-controls/v1",
+  "status": "native_complete_fixture_checks_pass",
+  "scope": "Ordinary-curve correctness controls only; not certified conductor-gap crossings or performance measurements",
+  "complete_fixture_count": 2,
+  "pari_codomain_matches": 2,
+  "pari_point_images_verified": 42,
+  "paired_targets_verified": 34,
+  "endpoint_scalar_recoveries": 68,
+  "coverage_negative_controls_passed": 6,
+  "fixture_degrees": [
+    "19",
+    "10009"
+  ],
+  "fixture_subgroup_orders": [
+    "3",
+    "37"
+  ],
+  "runtime_measurements": null,
+  "target80_gate": {
+    "status": "incomplete_target_coverage",
+    "ell": "729845429276318409687041",
+    "baby_roots_expected": "427154957034",
+    "baby_roots_in_current_fixture": 4096,
+    "giant_count_expected": "427154957034",
+    "kernel_pairs_expected": "364922714638159204843520",
+    "quotient": null,
+    "point_images": null,
+    "endpoint_timings": null,
+    "reason": "stored prefix does not cover complete native schedule; assembly refused"
+  },
+  "source_sha256": "8e759d79bf5db40618de97a3c0f38da68f4853039fea1e5c284ab82bdc8a2403",
+  "native_binary_sha256": "2cc91ef36201829b902e470a4cd635e63775e2ec1bf8f9cce201c2c0fd59c53d",
+  "raw_receipts_sha256": "dfd44f832ae1b1d6f6e8696673f1a20ca32fdc06d351dae75696631c78a52bba",
+  "initial_failed_control": {
+    "file": "initial-subgroup-assumption.stderr",
+    "exit_status": 2,
+    "reason": "Incorrect q=2 assumption for the p=71 fixture; independent PARI found order 57=3*19; corrected to q=3 and replayed"
+  },
+  "s3_controller_integration": "not implemented: fixture runner regenerates bounded blocks; production durable manifest/coverage resume path remains open",
+  "timing_execution": "not run; no complete 80-bit endpoint pair exists"
+}

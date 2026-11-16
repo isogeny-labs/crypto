@@ -1,0 +1,44 @@
+{
+  "schema": "crypto.ic-cubic-target-s3-acceptance/v1",
+  "date_utc": "2026-10-18",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/cubic-target-20261018-296d3f8a32f24825ad836b2f0eec6deb",
+  "object_key": "ic/v1/acceptance/cubic-target-20261018-296d3f8a32f24825ad836b2f0eec6deb/sha256/8b/8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+  "logical_name": "public-cubic/cofactor12.json",
+  "bytes": 146,
+  "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+  "head_checksum_sha256_base64": "ixNXA0fJcS0hnMan4Yt33BOwILc9H8VQP+TVBj8/+Wc=",
+  "ic_binary_sha256": "096f79b5a28ae160c4ededdd8c42904eb8a967e3f3f2660c6ac064e0155c6dd8",
+  "producer": "docs/ic/fixtures/cubic_f7_cofactor12_public_target.json",
+  "consumer": "icx solve-cubic --input store:public-cubic/cofactor12.json --seed 1 --max-residuals 1000 --json",
+  "public_target": {
+    "field": "F_7[t]/(t^3-2)",
+    "curve_order": 348,
+    "subgroup_order": 29,
+    "cofactor": 12
+  },
+  "attempts": [
+    {
+      "configuration": "default AWS profile",
+      "result": "S3 HeadObject 403 before upload; no object written"
+    },
+    {
+      "configuration": "AWS_PROFILE=ecc-challenges-new, AWS_DEFAULT_REGION=us-east-2",
+      "result": "completed"
+    }
+  ],
+  "results": {
+    "push_uploaded": true,
+    "head_bytes_match": true,
+    "head_checksum_match": true,
+    "fresh_cache_fetched": true,
+    "store_verify_remote": true,
+    "ic_scalar": 5,
+    "ic_verified": true,
+    "same_target_rho_verified": true,
+    "delete_unique_test_object": true,
+    "head_after_delete_http_status": 404
+  }
+}

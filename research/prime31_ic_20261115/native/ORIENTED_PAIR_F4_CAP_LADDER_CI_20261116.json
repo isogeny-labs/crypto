@@ -1,0 +1,160 @@
+{
+  "date": "2026-11-16",
+  "standing": "[pcc:unverified]",
+  "source_commit": "19efc09da705d6412cb8e3919f1f54dd192696ae",
+  "run_id": 43781444534,
+  "job_id": 133019318139,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/43781444534",
+  "development_conclusion": "success",
+  "scope": "one same-host source-bound Rust 1.100.0 F4 30k/60k capped development ladder, zero completed roots or ECDLP solves",
+  "ladder": {
+    "arms": [
+      {
+        "F4_cap": 30000,
+        "arm": "S3_x_only",
+        "basis_elements": 23,
+        "degree_reached": 6,
+        "exact_B31_membership": true,
+        "f4_internal_reported_ms": 1.775893,
+        "free_variables": 1,
+        "input_terms_after_tower_nf": [
+          16,
+          32,
+          32
+        ],
+        "limits": {
+          "degree": 12,
+          "max_dense": 30000,
+          "max_nnz": 30000,
+          "seconds": 5
+        },
+        "max_cols": 495,
+        "max_dense_entries": 32599,
+        "max_nnz": 11892,
+        "muladds": 30943,
+        "oversize": true,
+        "polynomial_count": 3,
+        "root_extraction": "not_implemented",
+        "setup_ns": 142534,
+        "solving_degree_max": 5,
+        "steps": 5,
+        "timed_out": false,
+        "tower_variables": 12,
+        "verdict": "undetermined",
+        "whole_f4_wall_ns": 1778717
+      },
+      {
+        "F4_cap": 30000,
+        "arm": "oriented_chord_tangent",
+        "basis_elements": 31,
+        "degree_reached": 5,
+        "exact_B31_membership": true,
+        "f4_internal_reported_ms": 1.325836,
+        "free_variables": 3,
+        "input_terms_after_tower_nf": [
+          4,
+          4,
+          6,
+          32,
+          32
+        ],
+        "limits": {
+          "degree": 12,
+          "max_dense": 30000,
+          "max_nnz": 30000,
+          "seconds": 5
+        },
+        "max_cols": 430,
+        "max_dense_entries": 37664,
+        "max_nnz": 3629,
+        "muladds": 103354,
+        "oversize": true,
+        "polynomial_count": 5,
+        "root_extraction": "not_implemented",
+        "setup_ns": 106070,
+        "solving_degree_max": 5,
+        "steps": 5,
+        "timed_out": false,
+        "tower_variables": 12,
+        "verdict": "undetermined",
+        "whole_f4_wall_ns": 1336792
+      },
+      {
+        "F4_cap": 60000,
+        "arm": "S3_x_only",
+        "basis_elements": 51,
+        "degree_reached": 6,
+        "exact_B31_membership": true,
+        "f4_internal_reported_ms": 4.466122,
+        "free_variables": 1,
+        "input_terms_after_tower_nf": [
+          16,
+          32,
+          32
+        ],
+        "limits": {
+          "degree": 12,
+          "max_dense": 60000,
+          "max_nnz": 60000,
+          "seconds": 5
+        },
+        "max_cols": 1339,
+        "max_dense_entries": 280334,
+        "max_nnz": 20283,
+        "muladds": 666277,
+        "oversize": true,
+        "polynomial_count": 3,
+        "root_extraction": "not_implemented",
+        "setup_ns": 103445,
+        "solving_degree_max": 6,
+        "steps": 10,
+        "timed_out": false,
+        "tower_variables": 12,
+        "verdict": "undetermined",
+        "whole_f4_wall_ns": 4496146
+      },
+      {
+        "F4_cap": 60000,
+        "arm": "oriented_chord_tangent",
+        "basis_elements": 44,
+        "degree_reached": 5,
+        "exact_B31_membership": true,
+        "f4_internal_reported_ms": 1.987762,
+        "free_variables": 3,
+        "input_terms_after_tower_nf": [
+          4,
+          4,
+          6,
+          32,
+          32
+        ],
+        "limits": {
+          "degree": 12,
+          "max_dense": 60000,
+          "max_nnz": 60000,
+          "seconds": 5
+        },
+        "max_cols": 604,
+        "max_dense_entries": 70526,
+        "max_nnz": 6304,
+        "muladds": 246250,
+        "oversize": true,
+        "polynomial_count": 5,
+        "root_extraction": "not_implemented",
+        "setup_ns": 127582,
+        "solving_degree_max": 5,
+        "steps": 6,
+        "timed_out": false,
+        "tower_variables": 12,
+        "verdict": "undetermined",
+        "whole_f4_wall_ns": 1991427
+      }
+    ],
+    "factor_base_size": 31,
+    "n": 2147446831,
+    "note": "unrestricted Dickson64 arms have unequal Fp projections because the oriented ideal enforces first-point liftability; compare exact B31 membership arms only for same rational projection",
+    "p": 2147483647,
+    "scope": "paired B31 30k/60k cap ladder; no roots or ECDLP",
+    "standing": "[pcc:unverified]"
+  }
+}

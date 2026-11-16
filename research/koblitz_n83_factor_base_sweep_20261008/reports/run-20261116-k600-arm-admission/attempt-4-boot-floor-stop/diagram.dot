@@ -1,0 +1,9 @@
+digraph stop {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", pad="0.3"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fb", color="#2b5274", fontname="Helvetica"];
+  h2 [label="Clean H2\nmetadata and cache checks pass"];
+  build [label="Cached Rust release build\nTMPDIR on SSD\n120 s outer interval"];
+  stop [label="Boot free 4,908,536 KiB\nbelow unchanged 5 GiB floor\nwatcher sent TERM; exit 143", fillcolor="#ffe7e4", color="#a13d34"];
+  pending [label="No completed binary\nNo S3 stage or solver", fillcolor="#fff3dc", color="#976b1d"];
+  h2 -> build -> stop -> pending;
+}

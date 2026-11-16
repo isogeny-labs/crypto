@@ -1,0 +1,60 @@
+{
+  "task": "T-1478",
+  "claim": "Literal native64-bit multiplication/pow loop with lowbit==1 and unconditionalfinalsquare; canonical nonzero input and prime modulus<=2^32 imply inverse value. Ops.i excluded.",
+  "prior": "Plausible via overflow-free products below2^64 and Fermat; implementation ordering and fuel termination are load-bearing.",
+  "producer_proof_read": false,
+  "publication_required_before_read": true,
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independence": "Different proof author; prior general bridge context known, no proof read before freeze.",
+  "joints": [
+    {
+      "joint": "native multiply",
+      "attack": "Check both operands canonical and p<=2^32 suffice for product<2^64; contrast oversized modulus wrap."
+    },
+    {
+      "joint": "literal power loop",
+      "attack": "Compare lowbit branch, accumulator-before-square, unconditional square and shift; exponent0 and final iteration."
+    },
+    {
+      "joint": "fuel",
+      "attack": "Check64iterations cover all UInt64 exponents; reject fuel premise hidden in end theorem."
+    },
+    {
+      "joint": "inverse",
+      "attack": "Remove nonzero or prime assumptions and exhibit nearby failures; inspect result not premised."
+    },
+    {
+      "joint": "claim scope",
+      "attack": "CounterOps.i and completeGaussian-loop semantics must remain excluded."
+    }
+  ],
+  "execution": {
+    "attempts": 1,
+    "total_wrapper_seconds": 300,
+    "outer_term_seconds": 295,
+    "kill_grace_seconds": 5,
+    "address_space_bytes": 8589934592,
+    "lean_memory_mib": 3500,
+    "lean_stack_kib": 16384,
+    "os_stack_kib": 10240,
+    "threads": 1,
+    "hashes_inside_wrapper": true
+  },
+  "checks": [
+    "Fresh compile exact published modules and controls in private workspace",
+    "Named17axiom readbacks and strict allowedaxioms audit",
+    "Independent semantic controls and source comparison",
+    "Pre/post recursive input/dependency/toolchain inventories"
+  ],
+  "render": {
+    "calls_max": 2,
+    "seconds_each": 60,
+    "memory_mib": 1024
+  },
+  "outputs": [
+    "JSON findings and raw replay receipts",
+    "CSV scope map",
+    "SVG/PDF with source and inspection",
+    "No producer edit, runtime/scientific execution or index mutation"
+  ]
+}

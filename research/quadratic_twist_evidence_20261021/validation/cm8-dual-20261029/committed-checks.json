@@ -1,0 +1,59 @@
+{
+  "evidence_commit": "98dee8831fbf9a3accf54b919c56f44fdcf09c68",
+  "source_head": "f3d785d1cb924778f24522b9f0f7d246628fb161",
+  "checks": {
+    "artifact_exit": 0,
+    "size_exit": 0,
+    "whitespace_exit": 0,
+    "draft_card_validated": true,
+    "workflow_parser_tests": 4,
+    "naming_exit": 1,
+    "raw_restore_and_repack": true
+  },
+  "native": {
+    "addition_pairs": 392,
+    "arms": 12,
+    "dual_sha256": "5b3e1a9a3221fb321bf1c0804427704097d26843e6a052eb644a63294501d820",
+    "independent_arithmetic": true,
+    "pullbacks": 6,
+    "rejected_valid_non_r7_points": 7,
+    "source_points": 14,
+    "source_recoveries": 72,
+    "status": "passed",
+    "subgroup_inverse_points": 7,
+    "target_points": 14
+  },
+  "proof": {
+    "named": 21,
+    "audited": 25,
+    "extra_trusted": 0,
+    "source_sha256": "2333098885814ed491a5233fe695b7b5a4d476bcddb9f4faf9505bfcfb8aa7f9"
+  },
+  "library": {
+    "source_head": "bfa7e448e62cb4325a3b8af7c78c3daa4254e413",
+    "command": "timeout600 cargo test --release --locked --lib -- --test-threads=2",
+    "exit": 124,
+    "declared_tests": 5140,
+    "completed_summary": null,
+    "observed_ok_lines": 2053,
+    "observed_ignored_lines": 48,
+    "observed_failed_lines": 0,
+    "status": "incomplete,600sec cap124, no suite pass"
+  },
+  "archive": {
+    "raw_files": 779,
+    "dehydrated_exact_duplicates": 526,
+    "archive_bytes": 62436,
+    "archive_sha256": "7770cda9f4958ccf19760a317390dee1d1d29a17c434233590e4f981e6764da9",
+    "restore_verified": true,
+    "repack_verified": true,
+    "excluded": "build binaries/targets/Lean caches; hashes/source bindings retained. All signing/token/session internals excluded."
+  },
+  "cache_cleanup": {
+    "generated_files_removed_from_tip": 176,
+    "history_rewritten": false,
+    "local_cache_deleted": false,
+    "source_math_changed": false
+  },
+  "completion": "verified finite rational inverse component; original useful-yield/relevant-degree/complete-cost objective and library/naming/registry/coordination/review gates remain open"
+}

@@ -1,0 +1,13 @@
+import NonmonicWordControls
+set_option autoImplicit false
+namespace NonmonicReview
+open NonmonicDivision NonmonicStorage
+theorem inverse_minus_one : il 17 16=16 := by decide
+theorem scaled_minus_one : coefficient 17 16 16=1 := by decide
+theorem noncanonical_inverse_one : il 17 18=1 := by decide
+theorem noncanonical_excluded : ¬((18:UInt64).toNat < (17:UInt64).toNat) := by decide
+theorem raw_bad_leading_empty : wordDiv 17 0 [0] [] 0=some ([],[]) := by decide
+theorem mismatched_leading_fails : wordDiv 17 1 [2] [2] 1=none := by decide
+theorem exact_fuel_two : wordDiv 17 2 [2,2] [2,4,2] 2=some ([1,1],[]) := by decide
+theorem high_canonical_word : wordDiv 17 16 [16] [16,15] 2=some ([1,2],[]) := by decide
+end NonmonicReview

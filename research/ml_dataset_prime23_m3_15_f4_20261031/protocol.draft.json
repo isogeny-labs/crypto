@@ -1,0 +1,573 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": false,
+    "inputs": [
+      "frozen plan/protocol",
+      "native runner receipts",
+      "cell manifests",
+      "Git custody checkpoints",
+      "S3 readback receipts"
+    ],
+    "outputs": [
+      "26-row official export",
+      "native status counts by arity and quadratic twist",
+      "F4/PDP/scalar labels",
+      "archive audit and report"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "Thirteen fixed arities m3..15 on the untwisted natural prime n23 curve; one generator/key and one native attempt per cell. No timing comparison.",
+      "id": "prime23-m3-15-f4-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "prime",
+        "field_size_bits": 23,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103106,
+        "shard_count": 26,
+        "shard_indices": "m3..15 each with untwisted then twisted",
+        "solver": "f4",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Thirteen fixed arities m3..15 on the twisted natural prime n23 curve; one generator/key and one native attempt per cell. No timing comparison.",
+      "id": "prime23-m3-15-f4-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "prime",
+        "field_size_bits": 23,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103106,
+        "shard_count": 26,
+        "shard_indices": "m3..15 each with untwisted then twisted",
+        "solver": "f4",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "ML dataset prime n23 natural F4 campaign"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "fixed-population-accounting",
+      "text": "All 26 fixed plan indices have at most one native attempt; censored, failed, unsupported and interrupted cells remain in the denominator. This is a natural prime n23 F4 block, not an inference about other generators or keys."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "prime-f4-capture",
+      "text": "A completed F4 cell retains its bounded affine S3-chain system, native visitor and group-lift trace, and independent verifier outcome. A budget, timeout or degree stop does not certify no decomposition or an exact first or last fall degree."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "scalar-label",
+      "text": "An ECDLP scalar label is promoted only after native independent recovery and generator-target group replay; a known-answer scalar or PDP witness alone does not qualify."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "custody",
+      "text": "Each attempted shard retains native verify, report and strict export statuses, a restricted archive and fresh S3 archive and pointer readback receipts; failures remain counted."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Absolute software coverage, replay and custody; no comparative performance claim or timing-effect inference.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "A recomputed-hash tampered F4 witness fixture must be rejected by the native verifier before natural cells; this exact fixed-population study makes no false-positive-rate inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "A separate fixed known-positive F4 fixture must pass the same native verification path before natural cells; fixture results are outside this 26-cell denominator and no detector-sensitivity claim is made.",
+      "present": false
+    }
+  },
+  "created": "2026-10-31",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: exact fixed-population accounting without inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact counts by arity, quadratic twist and native status; verified F4 artifacts, independently replayed PDP/scalar labels and S3 custody",
+    "text": "Account all 26 fixed cells. Promote only independently verified method, PDP and scalar labels. Retain timeout, unsupported, partial and construction failures. Durable requires fresh S3 readback/hash match.",
+    "verdict_vocabulary": [
+      "verified_prime_f4_artifact_and_durable",
+      "verified_ecdlp_and_durable",
+      "verified_custody_pending",
+      "failed",
+      "timed_out",
+      "interrupted",
+      "invalid_receipt",
+      "unattempted"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": 1,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "immediate_s3_custody": true,
+      "local_only": true,
+      "local_xfs_output": true,
+      "one_shard_at_a_time": true,
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 190
+  },
+  "extensions": {
+    "ml_dataset_prime23_m3_15_f4": {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "export_mapping": {
+        "arms": "quadratic twist",
+        "instance_id_to_m": {
+          "0": 3,
+          "1": 4,
+          "10": 13,
+          "11": 14,
+          "12": 15,
+          "2": 5,
+          "3": 6,
+          "4": 7,
+          "5": 8,
+          "6": 9,
+          "7": 10,
+          "8": 11,
+          "9": 12
+        },
+        "instance_ids": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "rows_expected": 26,
+        "twist_identity_note": "m varies on a seeded curve and generator/key; opposite quadratic twists are distinct. Shared keys across m are not independent."
+      },
+      "label_scope": "bounded prime affine S3-chain F4 artifacts; scalar only after independent recovery; p remains unbound until native readback",
+      "no_cloud_worker_submission": true,
+      "output_filesystem": "xfs",
+      "output_root": "/mnt/spot-codex-state/tmp/ml-dataset-prime23-m3-15-f4-20261031",
+      "plan_axes": {
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "families": [
+          "prime"
+        ],
+        "generators": 1,
+        "keys": 1,
+        "m": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "n": [
+          23
+        ],
+        "seed": 2026103106,
+        "solvers": [
+          "f4"
+        ],
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 20000
+      },
+      "planned_cells": 26,
+      "portfolio_scope": "One fixed 26-cell natural prime n23 F4 block of a larger multi-family arity portfolio.",
+      "s3_content_addressed_prefix": "s3://setec-astronomy-artifacts/store/sha256",
+      "s3_logical_name_namespace": "restricted/ml-dataset-prime23-m3-15-f4-20261031",
+      "schema": "ml-dataset.prime23-m3-15-f4/v1",
+      "selected_shards": "0..25 inclusive",
+      "separate_positive_control_dependency": "Fixed known-positive F4 and tampered-witness negative verifier fixtures are outside the natural denominator and must pass before admission.",
+      "shard_count": 26,
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262"
+    }
+  },
+  "freeze": {
+    "commit": null,
+    "filed_before_affected_data": false,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "status": "draft"
+  },
+  "inadmissible": [
+    "replacing a seed or shard after failure",
+    "rerunning an attempted shard",
+    "dropping failed, timed-out or interrupted attempts",
+    "using restricted witnesses as public ML features",
+    "promoting missing S3 readback as durable",
+    "promoting a bounded negative as an exhaustive no-decomposition result",
+    "claiming timing advantage or exact fall degree from this fixed population",
+    "treating shared public key across m as independent key draws",
+    "assuming a nontrivial Frobenius orbit for prime without recorded coefficient-field degree and physical transport",
+    "combining a future planted-positive control with the natural 26-cell denominator",
+    "claiming a native F4 degree stop proves first or last fall degree",
+    "claiming affine S3 chain covers infinity partial-sum branches"
+  ],
+  "invalidation_rules": [
+    "Pinned c41bec15 binary, plan or protocol digest changes invalidate new admission.",
+    "Existing attempt marker or live worker blocks another attempt for that shard.",
+    "Failed native verify prevents method or scalar promotion.",
+    "Missing fresh S3 GET/hash match prevents durability promotion.",
+    "Point-count construction failure or timeout remains a counted cell and is never replaced by another curve seed."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and freeze/checker contract",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Native prime quadratic-twist and F4 capability",
+      "provenance": "internal",
+      "ref": "src/ml_dataset/curves.rs:626-683; src/ml_dataset/solvers.rs:746-838",
+      "verified_by": "Pinned c41bec15 source and native capabilities; per-cell construction and exact modulus remain observed."
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "plan/protocol SHA-256 before/after",
+      "shard index",
+      "argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes",
+      "native verify/report/export status",
+      "archive SHA-256 and bytes",
+      "S3 PUT and fresh GET receipt",
+      "solver and twist",
+      "prime F4 input, bounded native visitor and group-lift verification status",
+      "independent ECDLP scalar-recovery status"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Native verify passes and the retained manifest contains the complete-prime-field-polynomial-system input plus an explicit bounded result or stop; a method artifact does not imply a PDP witness.",
+        "id": "method-artifact-verified",
+        "kind": "exact",
+        "name": "Verified F4 method artifact",
+        "resolution": "1",
+        "source": "native cell manifest, F4 artifacts and dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Restricted archive and custody pointer pass S3 PUT and fresh GET byte-equality/hash checks.",
+        "id": "durable-cell",
+        "kind": "exact",
+        "name": "Durable cell",
+        "resolution": "1",
+        "source": "content-addressed S3 archive and pointer receipts",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate process spawn through wait; includes parent and cell work, excludes runner receipt writes. Operational diagnostic only.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-PRIME23-M3-15-F4-20261031",
+  "question": "Can all 26 fixed natural prime n23 m3..15 F4 cells across both quadratic twists retain bounded native outcomes and durable custody?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native mixed-radix order pairs both quadratic twists at each m. No timing-effect comparison is made.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact receipt and hash validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Fixed seed and one generator/key index. All m3..15 on both quadratic twists, exactly 26 cells; no replacement after timeout or failure. Arity labels are not independent public keys."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Native plan seed fixed before data; one prime curve seed index 0.",
+      "seeds": [
+        2026103106
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 13,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "Thirteen m values per twist arm; 26 fixed native cells. Exact accounting only, no inferential effect or power claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 2350.0,
+      "fixed_seconds": 10.0,
+      "measured_on": "Planning allowance only: 26 cells have a hard 2340s generate-only outer bound at 90s each. Finalization and S3 custody have separate bounded stages; not performance timings.",
+      "per_sample_seconds": 90.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All 26 plan indices0..25, at most one native attempt each; retain every outcome without replacement."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each generate has 30s inner and 90s outer cap; finite finalization and S3 stage caps. Stop on failed custody and resume finalization only; require 8GiB XFS free before new attempt. Overall campaign 8h ceiling."
+    }
+  ],
+  "study_dir": "research/ml_dataset_prime23_m3_15_f4_20261031",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "prime23-m3-15-f4-untwisted",
+          "prime23-m3-15-f4-twisted"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "All 26 indices accounted; each promoted prime F4 or PDP artifact requires native verification and S3 fresh readback."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Pinned clean source c41bec15 and binary SHA b8e0881e, checked per attempt.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Natural prime n23, m3..15, both quadratic twists, one curve seed and one generator/key; retain point-count construction failures.",
+        "name": "curve-arity-quadratic-twist",
+        "treatment": "crossed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1 and one native command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Shared host context retained; no timing-effect inference.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "30s inner cell and 90s outer runner cap; F4 has 5s native visitor and 20,000 event/group-lift work cap, not a full matrix-work cap.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "All 26 indices retained regardless of outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      },
+      {
+        "how": "XFS output with 8GiB free-space floor and restricted S3 custody.",
+        "name": "filesystem",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 2
+}

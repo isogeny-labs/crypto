@@ -18,7 +18,37 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+/// The isolation level a wall-clock figure needs (`docs/ecbench/README.md`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum Level {
+    L0,
+    L1,
+    L2,
+    L3,
+}
+
+impl Level {
+    pub fn name(self) -> &'static str {
+        match self {
+            Level::L0 => "L0",
+            Level::L1 => "L1",
+            Level::L2 => "L2",
+            Level::L3 => "L3",
+        }
+    }
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "L0" => Some(Level::L0),
+            "L1" => Some(Level::L1),
+            "L2" => Some(Level::L2),
+            "L3" => Some(Level::L3),
+            _ => None,
+        }
+    }
+}
+
 /// Checked native PMU lifecycle; legacy counters below retain their API.
+#[path = "isolation/checked.rs"]
 pub mod checked;
 
 /// One logical CPU's place in the machine.
@@ -397,9 +427,12 @@ pub fn plan_cpus(
 /// take, so a session and those tools never time at once.
 pub const DEFAULT_LOCK: &str = "/tmp/crypto-bench.lock";
 
-/// An exclusive `flock`, held until dropped.
+/// An exclusive `flock`, owned by the acquiring process until dropped.
+/// An inherited descriptor is not an ownership transfer to a forked child.
 pub struct BenchLock {
     _file: std::fs::File,
+    #[cfg(unix)]
+    owner_pid: libc::pid_t,
     pub path: String,
 }
 
@@ -420,9 +453,13 @@ impl BenchLock {
                 if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 {
                     break;
                 }
+                let error = std::io::Error::last_os_error();
+                if error.kind() != std::io::ErrorKind::WouldBlock {
+                    return Err(format!("cannot lock {path}: {error}"));
+                }
                 if !wait {
                     return Err(format!(
-                        "another benchmark holds {path}; pass --wait to queue behind it"
+                        "another benchmark holds {path}; pass --wait to queue behind it: {error}"
                     ));
                 }
                 if let Some(sig) = crate::cryptanalysis::ecbench::signals::interrupted() {
@@ -435,8 +472,34 @@ impl BenchLock {
         }
         Ok(Self {
             _file: file,
+            #[cfg(unix)]
+            // SAFETY: getpid has no preconditions.
+            owner_pid: unsafe { libc::getpid() },
             path: path.to_string(),
         })
+    }
+}
+
+impl BenchLock {
+    fn release_owner_lock(&self) {
+        #[cfg(unix)]
+        {
+            use std::os::unix::io::AsRawFd;
+            // A child dropping its inherited guard must not unlock the owner.
+            // SAFETY: getpid has no preconditions; _file still owns its fd.
+            if unsafe { libc::getpid() } == self.owner_pid {
+                // Release the shared open-file-description lock even if an
+                // unrelated concurrent child has not yet exec'd/closed its fd.
+                // Drop cannot report errors; File closure remains the fallback.
+                let _ = unsafe { libc::flock(self._file.as_raw_fd(), libc::LOCK_UN) };
+            }
+        }
+    }
+}
+
+impl Drop for BenchLock {
+    fn drop(&mut self) {
+        self.release_owner_lock();
     }
 }
 
@@ -1610,6 +1673,7 @@ pub struct HwCounters {
     #[cfg(target_os = "linux")]
     fds: Vec<(libc::c_int, u64)>,
     error: Option<String>,
+    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
     inherit: bool,
 }
 

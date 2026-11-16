@@ -1,0 +1,152 @@
+{
+  "schema": "crypto.pr2148-software-ci-repair/v1",
+  "recorded_at": "2026-10-18T13:03:04.393847+00:00",
+  "pre_repair_head": "eaedaf1c132ed1f1ff101edd10c75369ab5e2dfe",
+  "live_main_at_preview": "d9a3d4b8655017cd2cb1295f880083061a3fa8a8",
+  "merge_tree_preview": "clean, no base merge required by a known strict freshness gate",
+  "native_freshness_status": "passed",
+  "software_checks": [
+    {
+      "name": "leaderboard-freshness",
+      "argv": [
+        "python3",
+        "scripts/build_ic_leaderboard.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "leaderboard-freshness.stdout",
+      "stderr": "leaderboard-freshness.stderr"
+    },
+    {
+      "name": "leaderboard-path-controls",
+      "argv": [
+        "python3",
+        "scripts/test_check_ic_leaderboard_paths.py"
+      ],
+      "exit": 0,
+      "stdout": "leaderboard-path-controls.stdout",
+      "stderr": "leaderboard-path-controls.stderr"
+    },
+    {
+      "name": "leaderboard-input-coverage",
+      "argv": [
+        "python3",
+        "scripts/check_ic_leaderboard_paths.py"
+      ],
+      "exit": 0,
+      "stdout": "leaderboard-input-coverage.stdout",
+      "stderr": "leaderboard-input-coverage.stderr"
+    },
+    {
+      "name": "browser-freshness",
+      "argv": [
+        "python3",
+        "scripts/build_lab_browser.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "browser-freshness.stdout",
+      "stderr": "browser-freshness.stderr"
+    },
+    {
+      "name": "curve-identity-selftest",
+      "argv": [
+        "python3",
+        "scripts/curve_id.py",
+        "selftest"
+      ],
+      "exit": 0,
+      "stdout": "curve-identity-selftest.stdout",
+      "stderr": "curve-identity-selftest.stderr"
+    },
+    {
+      "name": "curve-name-lint",
+      "argv": [
+        "python3",
+        "scripts/check_curve_names.py"
+      ],
+      "exit": 0,
+      "stdout": "curve-name-lint.stdout",
+      "stderr": "curve-name-lint.stderr"
+    }
+  ],
+  "unresolved_external_gates": "Prior-head source-proven baseline defects, unresolved timing gate and CodeQL warm-cache cancellation remain unwaived. Current-head CI must be checked after publication.",
+  "scientific_jobs_started": 0,
+  "cloud_actions": 0,
+  "cloud_credentials_accessed": false,
+  "all_twenty_research_criteria": "partial",
+  "historical_full_release_suite": "4382 passed /0 failed /117existingignored, plus7exampletests at prior captured inputs. This is not a new full library test result on the refreshed trait bytes.",
+  "root_local_attempts": [
+    {
+      "record": "setup-attempt.json",
+      "qualification": "Missing optional build.rs query stopped candidate preparation; subsequent check lacked a candidate; no native result claimed."
+    },
+    {
+      "record": "identity-module-noop.json",
+      "qualification": "Helper module invocation was not a self-test; actual scripts/curve_id.py selftest passed separately."
+    }
+  ],
+  "known_external_gate_report": "https://github.com/aburan28/crypto/pull/2148#issuecomment-6250013971",
+  "historical_evidence_scope": "All 930 previously tracked campaign files compared; 929 unchanged; sole old-file change is the explicit living README erratum. Other new files are additive software provenance.",
+  "native_freshness_command": [
+    "target/release/curve_traits",
+    "check",
+    "--traits",
+    "/tmp/pr-followup-20261018T1227/crypto/traits-candidate.json"
+  ],
+  "native_freshness_exit": 0,
+  "native_freshness_qualification": "Complete native regeneration and full-byte comparison of audited candidate; working-tree traits bytes match that exact candidate.",
+  "native_freshness_recorded_at": "2026-10-18T12:55:53.746586+00:00",
+  "focused_release_validation": {
+    "rustc": "1.99.1",
+    "module_command": [
+      "cargo",
+      "+stable",
+      "test",
+      "--release",
+      "--locked",
+      "--lib",
+      "curve_traits"
+    ],
+    "module_passed": 36,
+    "module_failed": 0,
+    "module_ignored": 0,
+    "module_filtered_out": 4463,
+    "examples_command": [
+      "cargo",
+      "+stable",
+      "test",
+      "--release",
+      "--locked",
+      "--example",
+      "ideas_bounded_memory_export",
+      "--example",
+      "ideas_oracle_components",
+      "--example",
+      "ideas_oracle_factorial_summary"
+    ],
+    "example_targets": 3,
+    "example_tests_passed": 4,
+    "example_tests_failed": 0,
+    "qualification": "The two other example targets build with zero tests. Untouched n83 example tests and the full library suite were not rerun. These are software controls, not scientific trials.",
+    "receipt": "../pr2148-rust-lint-repair-20261018/validation.json"
+  },
+  "pre_publication_review": {
+    "submitted_reviews": 0,
+    "review_threads": 0,
+    "qualification": "Fresh GitHub reads for both open PRs at this check-in; internal byte review is not a GitHub approval."
+  },
+  "current_head_ci": "Not yet published at receipt finalization. All actual-head required/applicable CI must be inspected after push; local checks are not CI completion.",
+  "diff_hygiene_initial": {
+    "exit": 2,
+    "finding": "Only four newly added raw stdout copies had their genuine blank line at EOF, two in each new software receipt.",
+    "recovery": "Archive the two original payloads with deterministic gzip and verify exact decompressed SHA256. No source log bytes trimmed and no test/lint rule changed."
+  },
+  "final_staged_checks": {
+    "whole_name_lint_exit": 0,
+    "browser_freshness_exit": 0,
+    "git_diff_worktree_check_exit": 0,
+    "git_diff_index_check_exit": 0,
+    "archived_release_stdout_copies_exact": 4
+  }
+}

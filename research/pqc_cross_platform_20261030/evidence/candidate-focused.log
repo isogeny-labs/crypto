@@ -1,0 +1,102 @@
+   Compiling pqc-portable-checks v0.1.0 (/workspace/crypto/verification/pqc-portable)
+    Finished `release` profile [optimized] target(s) in 13.00s
+     Running unittests harness.rs (verification/pqc-portable/target/release/deps/pqc_portable_checks-2dc16aa84917f583)
+
+running 88 tests
+test hash::sha3::tests::sha3_256_abc ... ok
+test hash::sha3::tests::sha3_224_and_384_abc ... ok
+test hash::sha3::tests::sha3_256_empty ... ok
+test hash::sha3::tests::sha3_512_abc ... ok
+test hash::sha3::tests::sha3_256_long ... ok
+test hash::sha3::tests::sha3_512_empty ... ok
+test hash::sha3::tests::incremental_sponge_matches_one_shot_at_rate_boundaries ... ok
+test pqc::fast::keccak4::tests::lane0_permutation_matches_scalar ... ok
+test pqc::fast::keccak4::tests::shake256_x4_is_four_shake256s ... ok
+test pqc::fast::keccak::tests::absorbing_in_pieces_matches_absorbing_at_once ... ok
+test pqc::fast::keccak::tests::incremental_squeezing_continues_the_stream ... ok
+test pqc::fast::keccak::tests::permutation_matches_the_reference ... ok
+test pqc::fast::keccak::tests::sha3_matches_the_reference_at_every_length_across_a_block ... ok
+test pqc::fast::keccak::tests::shake_matches_the_reference_at_every_length_across_a_block ... ok
+test hash::sha3::tests::shake128_empty_32 ... ok
+test hash::sha3::tests::shake256_abc_32 ... ok
+test pqc::fast::keccak::tests::squeeze_blocks_agrees_with_squeeze ... ok
+test pqc::fast::keccak::tests::two_part_helpers_match_the_concatenation ... ok
+test pqc::fast::keccak4::tests::every_backend_matches_four_scalar_permutations ... ok
+test pqc::fast::ml_dsa::tests::inverse_ntt_undoes_the_forward_ntt_up_to_the_montgomery_factor ... ok
+test pqc::fast::ml_dsa::tests::kat_acvp_sign_deterministic ... ok
+test pqc::fast::ml_dsa::tests::kat_acvp_keygen ... ok
+test pqc::fast::ml_dsa::tests::kat_acvp_verify ... ok
+test pqc::fast::ml_dsa::tests::montgomery_constants_are_what_they_claim ... ok
+test pqc::fast::ml_dsa::tests::montgomery_reduce_is_multiplication_by_r_inverse ... ok
+test pqc::fast::ml_dsa::tests::a_flipped_bit_is_rejected ... ok
+test pqc::fast::ml_dsa::tests::power2_round_reconstructs ... ok
+test pqc::fast::ml_dsa::tests::ntt_multiplication_matches_schoolbook ... ok
+test pqc::fast::ml_dsa::tests::keygen_is_byte_identical_to_the_reference ... ok
+test pqc::fast::ml_dsa::tests::signing_is_identical_for_the_empty_and_multi_block_messages_under_both_hedges ... ok
+test pqc::fast::ml_dsa::tests::sizes_match_the_spec ... ok
+test pqc::fast::ml_dsa::tests::sign_is_byte_identical_to_the_reference ... ok
+test pqc::fast::ml_dsa::tests::zeta_table_is_the_bit_reversed_powers_of_1753 ... ok
+test pqc::fast::ml_kem::tests::avx2_compress_matches_scalar_for_every_input ... ok
+test pqc::fast::ml_dsa::tests::decompose_matches_the_literal_fips_definition_everywhere ... ok
+test pqc::fast::ml_kem::tests::avx2_rejection_sampling_matches_scalar ... ok
+test pqc::fast::ml_kem::tests::avx2_kernels_are_bit_identical_to_scalar ... ok
+test pqc::fast::ml_kem::tests::encaps_key_check_matches_the_reference ... ok
+test pqc::fast::ml_dsa::tests::verifier_agrees_with_the_reference_on_corrupted_input ... ok
+test pqc::fast::ml_kem::tests::encaps_matches_the_reference_byte_for_byte ... ok
+test pqc::fast::ml_kem::tests::keygen_capture_equals_preparing_from_bytes ... ok
+test pqc::fast::ml_kem::tests::keygen_matches_the_reference_byte_for_byte ... ok
+test pqc::fast::ml_kem::tests::decaps_matches_the_reference_including_implicit_rejection ... ok
+test pqc::fast::ml_kem::tests::malformed_lengths_are_rejected ... ok
+test pqc::fast::ml_kem::tests::montgomery_constants_are_what_they_claim ... ok
+test pqc::fast::ml_kem::tests::ntt_round_trips ... ok
+test pqc::fast::ml_dsa::tests::signatures_cross_verify_in_both_directions ... ok
+test pqc::fast::ml_kem::tests::packers_match_bitwise_encode_and_decode ... ok
+test pqc::fast::ml_kem::tests::prepared_rejects_wrong_lengths ... ok
+test pqc::fast::ml_kem::tests::random_round_trips_agree_with_the_reference ... ok
+test pqc::fast::ml_kem::tests::sample_noise_matches_one_call_at_a_time_on_every_backend ... ok
+test pqc::fast::ml_kem::tests::sample_ntt_x4_matches_sample_ntt_including_extra_blocks ... ok
+test pqc::fast::ml_kem::tests::twiddle_tables_hold_the_right_powers ... ok
+test pqc::ml_dsa::tests::decompose_reconstructs ... ok
+test pqc::ml_dsa::tests::different_seeds_produce_different_keys ... ok
+test pqc::ml_dsa::tests::flipped_bit_rejected ... ok
+test pqc::ml_dsa::tests::kat_acvp_keygen ... ok
+test pqc::ml_dsa::tests::kat_acvp_sign_deterministic ... ok
+test pqc::ml_dsa::tests::kat_acvp_verify ... ok
+test pqc::ml_dsa::tests::keygen_is_deterministic ... ok
+test pqc::ml_dsa::tests::malformed_sig_length_rejected ... ok
+test pqc::ml_dsa::tests::ntt_multiplication_matches_schoolbook ... ok
+test pqc::ml_dsa::tests::ntt_roundtrip_identity ... ok
+test pqc::ml_dsa::tests::power2_round_reconstructs ... ok
+test pqc::ml_dsa::tests::pubkey_size_matches_spec ... ok
+test pqc::ml_dsa::tests::sign_verify_roundtrip_deterministic ... ok
+test pqc::fast::ml_kem::tests::prepared_decaps_matches_the_reference_including_rejection ... ok
+test pqc::ml_dsa::tests::sign_verify_roundtrip_hedged ... ok
+test pqc::ml_dsa::tests::wrong_message_rejected ... ok
+test pqc::ml_dsa::tests::wrong_public_key_rejected ... ok
+test pqc::ml_kem::tests::byte_encode_handles_zero_and_dense_canonical_coefficients ... ok
+test pqc::ml_kem::tests::compress_decompress_error_bound ... ok
+test pqc::ml_kem::tests::decaps_rejects_malformed_lengths ... ok
+test pqc::ml_kem::tests::encaps_rejects_non_canonical_key ... ok
+test pqc::fast::ml_kem::tests::every_backend_matches_the_reference ... ok
+test pqc::ml_kem::tests::kat_ml_kem_1024 ... ok
+test pqc::ml_kem::tests::implicit_rejection_on_forged_ciphertext ... ok
+test pqc::ml_kem::tests::kat_ml_kem_512 ... ok
+test pqc::ml_kem::tests::kat_ml_kem_768_decaps ... ok
+test pqc::fast::ml_kem::tests::prepared_encaps_matches_the_reference ... ok
+test pqc::ml_kem::tests::kat_ml_kem_768_keygen_full ... ok
+test pqc::ml_kem::tests::kat_ml_kem_768_encaps_full ... ok
+test pqc::ml_kem::tests::ntt_multiplication_matches_schoolbook ... ok
+test pqc::ml_kem::tests::ntt_roundtrip ... ok
+test utils::random::tests::random_scalar_checked_rejects_empty_ranges ... ok
+test pqc::ml_kem::tests::negacyclic_wraparound ... ok
+test pqc::ml_kem::tests::roundtrip_all_parameter_sets_random_keys ... ok
+test pqc::ml_kem::tests::byte_encode_places_every_bit_in_little_endian_order ... ok
+
+test result: ok. 88 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+
+   Doc-tests pqc_portable_checks
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

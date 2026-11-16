@@ -1,0 +1,45 @@
+{
+  "namespace": "BKLinearAudit",
+  "proofs": [
+    {
+      "file": "RationalTorsion.lean",
+      "claim": "Actual rational-point encoding/finite group/prime-order Cauchy input",
+      "declarations": [
+        "actualCoordinates_injective",
+        "actual_rational_point_finite",
+        "actual_rational_prime_torsion"
+      ]
+    },
+    {
+      "file": "GenericFrobenius.lean",
+      "claim": "Actual matrix kernel/determinant imply trace/charpoly; coprime factors/Cayley-Hamilton/power criterion",
+      "declarations": [
+        "trace_from_fixed_vector",
+        "charpoly_from_fixed_vector",
+        "distinct_factors_divide_power",
+        "power_identity_iff"
+      ]
+    },
+    {
+      "file": "JordanException.lean",
+      "claim": "Actual Jordan matrix all-ring/all-modulus powers and everyprime counter retaining nonzero fixedvector/det",
+      "declarations": [
+        "jordan_mul",
+        "jordan_one_pow",
+        "jordan_modulus_period",
+        "jordan_prime_boundary"
+      ]
+    },
+    {
+      "file": "LinearCertificate.lean",
+      "claim": "Complete closed combined main and direct universal-negation control",
+      "declarations": [
+        "dropping_distinct_eigenvalues_false",
+        "qualified_BK_linear_certificate"
+      ]
+    }
+  ],
+  "local_gate": "22/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "Generic geometricrank2/Frobenius determinant/descent/actual torsion representation/characteristic-rank bridge."
+}

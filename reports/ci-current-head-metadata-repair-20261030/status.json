@@ -1,0 +1,54 @@
+{
+  "at": "2026-10-30T11:19:49.547149+00:00",
+  "checks": [
+    {
+      "check": "gate62",
+      "command": [
+        "python3",
+        "scripts/test_validation_gate.py"
+      ],
+      "returncode": 1,
+      "seconds": 0.549
+    },
+    {
+      "check": "panel-index",
+      "command": [
+        "python3",
+        "scripts/site/panel_index.py",
+        "--check"
+      ],
+      "returncode": 0,
+      "seconds": 0.201
+    },
+    {
+      "check": "workflow-wiring",
+      "command": [
+        "python3",
+        "tools/artifacts/wire_workflows.py",
+        "--check",
+        ".github/workflows/validation-gate.yml",
+        ".github/workflows/ecc2k130-status.yml"
+      ],
+      "returncode": 1,
+      "seconds": 0.215
+    },
+    {
+      "check": "catalog6",
+      "command": [
+        "python3",
+        "scripts/test_curve_catalog_consistency.py"
+      ],
+      "returncode": 0,
+      "seconds": 0.047
+    },
+    {
+      "check": "catalog-bindings",
+      "command": [
+        "python3",
+        "scripts/check_curve_catalog_consistency.py"
+      ],
+      "returncode": 0,
+      "seconds": 0.58
+    }
+  ]
+}

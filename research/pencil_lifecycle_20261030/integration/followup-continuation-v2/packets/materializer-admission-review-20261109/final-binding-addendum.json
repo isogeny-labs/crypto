@@ -1,0 +1,46 @@
+{
+  "schema": "source.review.binding-addendum/v1",
+  "reviewer": "/root/renew_norm",
+  "task": "T-1956",
+  "recorded_utc": "2026-11-09T17:24:42.916013+00:00",
+  "verdict": "final_bindings_consistent_pending_root_publication_and_live_admission",
+  "snapshot": "snapshot-bindings",
+  "preparation_sha256": "835560d84e521bef3592c3bad0351d3e56a166e6740f44fbbf437cf8c705331e",
+  "manifest_sha256": "d091522ea075e8a3ef4e9d5a01a21a533a4154270d308da3307a8dd8b07a84ae",
+  "source_unchanged": true,
+  "helper_unchanged": true,
+  "all_18_input_hashes_match": true,
+  "packet_manifest_matches": true,
+  "qualification_result_sha256": "e2e8d023147cb3770d6fef418993e2ceee2859ed43eb8d72d074f7c5f6332642",
+  "qualification_cases": 15,
+  "qualification_all_passed": true,
+  "qualification_exit": 0,
+  "qualification_execution_by_reviewer": false,
+  "git_commit_checked": "6d380c379d63c49f6e1366c09701242560f4dc68",
+  "git_content_checks": {
+    "materializer-admission-20261109/materialize.py": "6bfc278cdfb8cd5f2adad13f5e920a2baee131be9f7dedc4b472329f2f0da4f7",
+    "materializer-qualification-20261109/qualify.py": "efe039f547b2eaf0b590c0ff236b7932f12fcf0158b4dc6d845712c322c64d56",
+    "materializer-admission-review-20261109/final-review.json": "3b6894631d26faee94cb418451c2b6db59bcf64b855a34f6c4ef0e08adbf0a6d"
+  },
+  "publication_evidence_scope": "Copied root remote-readback receipt plus independently checked local Git object bytes. Final configuration publication has not occurred in this review.",
+  "campaign": {
+    "ceiling": 43200,
+    "charged": 120,
+    "remaining_before_reservation": 43080,
+    "materializer_reserved": 900,
+    "unreserved": 42180
+  },
+  "lease_identity_unchanged": {
+    "task_id": "55088225-11bd-4ca1-81ab-09314cc226e5",
+    "attempt_id": "785a55c6-089f-4351-9619-3ace74b8eb43",
+    "lease_id": "95a715ff-9efd-453a-86dd-2596138dc3b2",
+    "fencing_epoch": 1
+  },
+  "conditions": [
+    "Root publish and independently read back exact final config/source/review before launch.",
+    "Refresh exact live lease/fence and current no-overlap/unit/workspace absence/resource controls.",
+    "Root supervises at most one900-second materializer attempt, preserves terminal custody and conservative debit."
+  ],
+  "tests_or_payload_run": false,
+  "execution_approval_issued": false
+}

@@ -1,0 +1,572 @@
+{
+  "schema": "native-instrumentation-map/v1",
+  "modules": [
+    {
+      "module": "geometry",
+      "original": "feature-native-joint-window/lib.rs",
+      "original_sha256": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d",
+      "generated_sha256": "23b6bb6a482c19c62920b791724a224b3fbdbb1bb83fb127fed564ac9c04ba2c",
+      "reversed_exactly": true,
+      "edits": [
+        {
+          "old": "include_str!(\"../feature-native-window/points.tsv\")",
+          "new": "include_str!(\"../../feature-native-window/points.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"../feature-native-window/slots.tsv\")",
+          "new": "include_str!(\"../../feature-native-window/slots.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"baseline-geometry.tsv\")",
+          "new": "include_str!(\"../../feature-native-joint-window/baseline-geometry.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "fn add(self,b:Self)->Self{",
+          "new": "fn add(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::AddSub);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn sub(self,b:Self)->Self{",
+          "new": "fn sub(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::AddSub);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn mul(self,b:Self)->Self{",
+          "new": "fn mul(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::Product);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn inv(self)->Option<Self>{",
+          "new": "fn inv(self)->Option<Self>{crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::Inverse);",
+          "occurrences": 1
+        },
+        {
+          "old": "while s!=0{",
+          "new": "while s!=0{crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::EuclidStep);",
+          "occurrences": 1
+        },
+        {
+          "old": "crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::Inverse);",
+          "new": "crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::Inverse);if self.v==1{crate::meter::hit(crate::meter::Component::Geometry,crate::meter::Op::UnitInverse);}",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "module": "jets",
+      "original": "feature-native-division/lib.rs",
+      "original_sha256": "f1dde1055bd78ef0f9863bfbceeda76a384b8f15dfad3aba7715cb6591147f80",
+      "generated_sha256": "acd2534c0cf7004f42b824ff52118c52ca7d99b76526ff875bf22654730efc79",
+      "reversed_exactly": true,
+      "edits": [
+        {
+          "old": "include_str!(\"fixtures.tsv\")",
+          "new": "include_str!(\"../../feature-native-division/fixtures.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "fn add(self,b:Self)->Self{",
+          "new": "fn add(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::AddSub);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn sub(self,b:Self)->Self{",
+          "new": "fn sub(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::AddSub);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn mul(self,b:Self)->Self{",
+          "new": "fn mul(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::Product);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn neg(self)->Self{Self::new",
+          "new": "fn neg(self)->Self{crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::Neg);Self::new",
+          "occurrences": 1
+        },
+        {
+          "old": "fn inv(self)->Option<Self>{ inverse",
+          "new": "fn inv(self)->Option<Self>{crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::Inverse); inverse",
+          "occurrences": 1
+        },
+        {
+          "old": "while s!=0 {",
+          "new": "while s!=0 {crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::EuclidStep);",
+          "occurrences": 1
+        },
+        {
+          "old": "let rr=((r as u128",
+          "new": "let rr={crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::ScalarProduct);((r as u128",
+          "occurrences": 1
+        },
+        {
+          "old": "*r as u128)%modulus as u128)as u64;",
+          "new": "*r as u128)%modulus as u128)as u64};",
+          "occurrences": 1
+        },
+        {
+          "old": "let exponent=inverse(rr,modulus)",
+          "new": "let exponent={crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::ScalarInverse);inverse(rr,modulus)}",
+          "occurrences": 1
+        },
+        {
+          "old": "crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::Inverse);",
+          "new": "crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::Inverse);if self.v==1{crate::meter::hit(crate::meter::Component::Phase,crate::meter::Op::UnitInverse);}",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "module": "value",
+      "original": "feature-native-value-division/lib.rs",
+      "original_sha256": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93",
+      "generated_sha256": "c96039f69dfc9596539de4596c327fb9161e7db9a7f26ef00c7311bf78f43416",
+      "reversed_exactly": true,
+      "edits": [
+        {
+          "old": "#[path=\"../feature-native-division/lib.rs\"]",
+          "new": "#[path=\"jets.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"../feature-native-division/fixtures.tsv\")",
+          "new": "include_str!(\"../../feature-native-division/fixtures.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "fn add(self,b:Self)->Self{",
+          "new": "fn add(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::AddSub);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn sub(self,b:Self)->Self{",
+          "new": "fn sub(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::AddSub);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn mul(self,b:Self)->Self{",
+          "new": "fn mul(self,b:Self)->Self{crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::Product);",
+          "occurrences": 1,
+          "first_only": true
+        },
+        {
+          "old": "fn inv(self)->Option<Self>{",
+          "new": "fn inv(self)->Option<Self>{crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::Inverse);",
+          "occurrences": 1
+        },
+        {
+          "old": "while s!=0{",
+          "new": "while s!=0{crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::EuclidStep);",
+          "occurrences": 1
+        },
+        {
+          "old": "crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::Inverse);",
+          "new": "crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::Inverse);if self.v==1{crate::meter::hit(crate::meter::Component::Value,crate::meter::Op::UnitInverse);}",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "module": "polynomial",
+      "original": "feature-native-low-product/polynomial.rs",
+      "original_sha256": "4276f146fd13985e457ae099fa670dc0abc68be89c8a961c377cdc78fea7f260",
+      "generated_sha256": "141c27cad50f25df88cde6fc1f0e375e273f8ed6a04a7f806090dd4a690a13d2",
+      "reversed_exactly": true,
+      "edits": [
+        {
+          "old": "#[path=\"../feature-native-polynomial/lib.rs\"]",
+          "new": "#[path=\"../../feature-native-polynomial/lib.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"../feature-native-polynomial/fixtures.tsv\")",
+          "new": "include_str!(\"../../feature-native-polynomial/fixtures.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "fn fm(&self,a:u64,b:u64)->u64{",
+          "new": "fn fm(&self,a:u64,b:u64)->u64{crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::Product);",
+          "occurrences": 1
+        },
+        {
+          "old": "fn inverse(&self,a:u64)->Result<u64,Error>{",
+          "new": "fn inverse(&self,a:u64)->Result<u64,Error>{crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::Inverse);",
+          "occurrences": 1
+        },
+        {
+          "old": "while s!=0{",
+          "new": "while s!=0{crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::EuclidStep);",
+          "occurrences": 1
+        },
+        {
+          "old": "c[i]=(c[i]+x)%self.p;",
+          "new": "crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::AddSub);c[i]=(c[i]+x)%self.p;",
+          "occurrences": 1
+        },
+        {
+          "old": "c[i+j]=(c[i+j]+self.fm(x,y))%self.p;",
+          "new": "crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::AddSub);c[i+j]=(c[i+j]+self.fm(x,y))%self.p;",
+          "occurrences": 2
+        },
+        {
+          "old": "(self.p-x%self.p)%self.p",
+          "new": "crate::meter::value(crate::meter::Component::Polynomial,crate::meter::Op::Neg,(self.p-x%self.p)%self.p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(self.p-points[0]%self.p)%self.p",
+          "new": "crate::meter::value(crate::meter::Component::Polynomial,crate::meter::Op::Neg,(self.p-points[0]%self.p)%self.p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(self.p-tree.polynomial[0])%self.p",
+          "new": "crate::meter::value(crate::meter::Component::Polynomial,crate::meter::Op::Neg,(self.p-tree.polynomial[0])%self.p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(self.fm(value,x)+coefficient%self.p)%self.p",
+          "new": "crate::meter::value(crate::meter::Component::Polynomial,crate::meter::Op::AddSub,(self.fm(value,x)+coefficient%self.p)%self.p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p",
+          "new": "crate::meter::value(crate::meter::Component::Polynomial,crate::meter::Op::AddSub,(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(result[k+i]+v)%self.p",
+          "new": "crate::meter::value(crate::meter::Component::Polynomial,crate::meter::Op::AddSub,(result[k+i]+v)%self.p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(result[2*k+i]+v)%self.p",
+          "new": "crate::meter::value(crate::meter::Component::Polynomial,crate::meter::Op::AddSub,(result[2*k+i]+v)%self.p)",
+          "occurrences": 1
+        },
+        {
+          "old": "crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::Inverse);",
+          "new": "crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::Inverse);if a%self.p==1{crate::meter::hit(crate::meter::Component::Polynomial,crate::meter::Op::UnitInverse);}",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "module": "source",
+      "original": "feature-native-pair-seeds/routed/source.rs",
+      "original_sha256": "38813d07a4a2591f9d3593f59d01b1701e9f4f217d6689638a5cff9cbe4a551b",
+      "generated_sha256": "488cfa93083342862913c0721132575cf6ac341e4cf5b007ef3d0edbd6ea8d18",
+      "reversed_exactly": true,
+      "edits": [
+        {
+          "old": "#[path=\"../../feature-native-joint-window/lib.rs\"]",
+          "new": "#[path=\"geometry.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "#[path=\"../../feature-native-division/lib.rs\"]",
+          "new": "#[path=\"jets.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "#[path=\"../../feature-native-value-division/lib.rs\"]",
+          "new": "#[path=\"value.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "#[path=\"../../feature-native-low-product/polynomial.rs\"]",
+          "new": "#[path=\"polynomial.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"../../feature-native-shared-seeds/fixtures.tsv\")",
+          "new": "include_str!(\"../../feature-native-shared-seeds/fixtures.tsv\")",
+          "occurrences": 2
+        },
+        {
+          "old": "include_str!(\"../../feature-native-shared-seeds/points.tsv\")",
+          "new": "include_str!(\"../../feature-native-shared-seeds/points.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"../../feature-native-source/fixtures.tsv\")",
+          "new": "include_str!(\"../../feature-native-source/fixtures.tsv\")",
+          "occurrences": 2
+        },
+        {
+          "old": "fn mul(a:u64,b:u64,p:u64)->u64{",
+          "new": "fn mul(a:u64,b:u64,p:u64)->u64{crate::meter::hit(crate::meter::Component::Source,crate::meter::Op::Product);",
+          "occurrences": 1
+        },
+        {
+          "old": "fn inverse(a:u64,p:u64)->Result<u64,Error>{",
+          "new": "fn inverse(a:u64,p:u64)->Result<u64,Error>{crate::meter::hit(crate::meter::Component::Source,crate::meter::Op::Inverse);",
+          "occurrences": 1
+        },
+        {
+          "old": "while s!=0{",
+          "new": "while s!=0{crate::meter::hit(crate::meter::Component::Source,crate::meter::Op::EuclidStep);",
+          "occurrences": 1
+        },
+        {
+          "old": "(a[0]+p-b[0])%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::AddSub,(a[0]+p-b[0])%p)",
+          "occurrences": 2
+        },
+        {
+          "old": "(mul(3,mul(x,x,p),p)+self.a)%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::AddSub,(mul(3,mul(x,x,p),p)+self.a)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(mul(slope,slope,p)+p-mul(2,x,p))%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::AddSub,(mul(slope,slope,p)+p-mul(2,x,p))%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(mul(slope,(x+p-xx)%p,p)+p-y)%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::AddSub,(mul(slope,(x+p-xx)%p,p)+p-y)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(x+p-xx)%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::AddSub,(x+p-xx)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(self.source.base[0]+p-middle[0])%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::AddSub,(self.source.base[0]+p-middle[0])%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(p-u)%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,(p-u)%p)",
+          "occurrences": 2
+        },
+        {
+          "old": "(p-previous[0])%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,(p-previous[0])%p)",
+          "occurrences": 2
+        },
+        {
+          "old": "(p-scaled(s+e))%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,(p-scaled(s+e))%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(p-y)%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,(p-y)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(p-self.base_seed)%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,(p-self.base_seed)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "((n as u128*n as u128)%(p-1)as u128)as u64",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::ScalarProduct,((n as u128*n as u128)%(p-1)as u128)as u64)",
+          "occurrences": 2
+        },
+        {
+          "old": "calibrated==p-d",
+          "new": "calibrated==crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,p-d)",
+          "occurrences": 1
+        },
+        {
+          "old": "(p-u[0])%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,(p-u[0])%p)",
+          "occurrences": 2
+        },
+        {
+          "old": "(p-c[0])%p",
+          "new": "crate::meter::value(crate::meter::Component::Source,crate::meter::Op::Neg,(p-c[0])%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "crate::meter::hit(crate::meter::Component::Source,crate::meter::Op::Inverse);",
+          "new": "crate::meter::hit(crate::meter::Component::Source,crate::meter::Op::Inverse);if a==1{crate::meter::hit(crate::meter::Component::Source,crate::meter::Op::UnitInverse);}",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "module": "decoder",
+      "original": "feature-native-signmask/lib.rs",
+      "original_sha256": "0f55f45f4f7f6e8380517abea5680a89e46f48ae400ba5f15fc0268583890cbf",
+      "generated_sha256": "a9568b95b053cdb75a1b6a174442f30f25f9b8d7a6a7dcfbdda6c625328758d2",
+      "reversed_exactly": true,
+      "edits": [
+        {
+          "old": "include_str!(\"program.tsv\")",
+          "new": "include_str!(\"../../feature-native-signmask/program.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "support |= 1u64 << a;",
+          "new": "crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Bit);support |= 1u64 << a;",
+          "occurrences": 1
+        },
+        {
+          "old": "odd ^= 1u64 << a;",
+          "new": "crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Bit);odd ^= 1u64 << a;",
+          "occurrences": 1
+        },
+        {
+          "old": "value += c;",
+          "new": "crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::AddSub);value += c;",
+          "occurrences": 1
+        },
+        {
+          "old": "for t in &self.terms {",
+          "new": "for t in &self.terms {crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Term);crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Bit);",
+          "occurrences": 1
+        },
+        {
+          "old": "let c = if (t.odd & negative)",
+          "new": "let c = {crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Bit);crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Popcount);if (t.odd & negative)",
+          "occurrences": 1
+        },
+        {
+          "old": "} else { self.modulus - t.coefficient };",
+          "new": "} else { crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Neg);self.modulus - t.coefficient }};",
+          "occurrences": 1
+        },
+        {
+          "old": "0 => zero |= 1u64 << a,",
+          "new": "0 => {crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Bit);zero |= 1u64 << a},",
+          "occurrences": 1
+        },
+        {
+          "old": "-1 => negative |= 1u64 << a,",
+          "new": "-1 => {crate::meter::hit(crate::meter::Component::Decoder,crate::meter::Op::Bit);negative |= 1u64 << a},",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "module": "recovery",
+      "original": "feature-native-pair-seeds/routed/recovery.rs",
+      "original_sha256": "2984a88e0395a3877ea87846d13cbfd1b691b376053d852f8be796cd809f2e86",
+      "generated_sha256": "52c49ae6ecdbc265e20e15789f839e9e3f23639a58282037b4a8ee3682b5e14f",
+      "reversed_exactly": true,
+      "edits": [
+        {
+          "old": "#[path=\"source.rs\"]",
+          "new": "#[path=\"source.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "#[path=\"../../feature-native-signmask/lib.rs\"]",
+          "new": "#[path=\"decoder.rs\"]",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"../../feature-native-signmask/program.tsv\")",
+          "new": "include_str!(\"../../feature-native-signmask/program.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "include_str!(\"../../feature-native-recovery/targets.tsv\")",
+          "new": "include_str!(\"../../feature-native-recovery/targets.tsv\")",
+          "occurrences": 1
+        },
+        {
+          "old": "fn fm(a:u64,b:u64,p:u64)->u64{",
+          "new": "fn fm(a:u64,b:u64,p:u64)->u64{crate::meter::hit(crate::meter::Component::Verifier,crate::meter::Op::Product);",
+          "occurrences": 1
+        },
+        {
+          "old": "fn inv(a:u64,p:u64)->Result<u64,Error>{",
+          "new": "fn inv(a:u64,p:u64)->Result<u64,Error>{crate::meter::hit(crate::meter::Component::Verifier,crate::meter::Op::Inverse);",
+          "occurrences": 1
+        },
+        {
+          "old": "while s!=0{",
+          "new": "while s!=0{crate::meter::hit(crate::meter::Component::Verifier,crate::meter::Op::EuclidStep);",
+          "occurrences": 1
+        },
+        {
+          "old": "(y+v)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(y+v)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(fm(3,fm(x,x,p),p)+c.a)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(fm(3,fm(x,x,p),p)+c.a)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(v+p-y)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(v+p-y)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(u+p-x)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(u+p-x)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(fm(slope,slope,p)+p-x)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(fm(slope,slope,p)+p-x)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(xx+p-u)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(xx+p-u)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(fm(slope,(x+p-xx)%p,p)+p-y)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(fm(slope,(x+p-xx)%p,p)+p-y)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "(x+p-xx)%p",
+          "new": "crate::meter::value(crate::meter::Component::Verifier,crate::meter::Op::AddSub,(x+p-xx)%p)",
+          "occurrences": 1
+        },
+        {
+          "old": "pub fn new(curve:CurveSpec,width:usize,terms:&[(u64,Vec<usize>)])->Result<Self,Error>{",
+          "new": "pub fn new(curve:CurveSpec,width:usize,terms:&[(u64,Vec<usize>)])->Result<Self,Error>{let _meter_stage=crate::meter::enter(crate::meter::Stage::Setup);",
+          "occurrences": 1
+        },
+        {
+          "old": "pub fn prepare(&self)->Result<PreparedDecoder<'_>,Error>{",
+          "new": "pub fn prepare(&self)->Result<PreparedDecoder<'_>,Error>{let _meter_stage=crate::meter::enter(crate::meter::Stage::Prepare);",
+          "occurrences": 1
+        },
+        {
+          "old": "pub fn repaired_479()->Result<Self,Error>{",
+          "new": "pub fn repaired_479()->Result<Self,Error>{let _meter_stage=crate::meter::enter(crate::meter::Stage::Setup);",
+          "occurrences": 1
+        },
+        {
+          "old": "pub fn recover(&self,q:Option<[u64;2]>)->Result<Recovery,Error>{",
+          "new": "pub fn recover(&self,q:Option<[u64;2]>)->Result<Recovery,Error>{let _meter_stage=crate::meter::enter(crate::meter::Stage::Query);",
+          "occurrences": 1
+        },
+        {
+          "old": "let(point,verification_add_calls,verification_double_calls)=multiply(self.decoder.curve,scalar)?;",
+          "new": "let(point,verification_add_calls,verification_double_calls)={let _meter_verify=crate::meter::enter(crate::meter::Stage::Verify);multiply(self.decoder.curve,scalar)?};",
+          "occurrences": 1
+        },
+        {
+          "old": "crate::meter::hit(crate::meter::Component::Verifier,crate::meter::Op::Inverse);",
+          "new": "crate::meter::hit(crate::meter::Component::Verifier,crate::meter::Op::Inverse);if a==1{crate::meter::hit(crate::meter::Component::Verifier,crate::meter::Op::UnitInverse);}",
+          "occurrences": 1
+        }
+      ]
+    }
+  ]
+}

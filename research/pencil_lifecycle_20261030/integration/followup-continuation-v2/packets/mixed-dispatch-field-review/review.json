@@ -1,0 +1,37 @@
+{
+  "schema": "research.formal-component-review/v1",
+  "status": "validated_within_field_dispatch_scope",
+  "producer_manifest_sha256": "ef7216066ea3ae4f3eee9080624a00bb69c561326e6a70090203ac179f78847e",
+  "producer_source_sha256": "3bba5341c570eddbcb7fdfd3ea4c29eaacb101079ae0033021afcdfe3ad712c3",
+  "bindings_verified": 53,
+  "fresh_checks": {
+    "module": 0,
+    "producer_controls": 0,
+    "readback": 0,
+    "reviewer_controls": 0
+  },
+  "axiom_declarations": 3,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "reviewer_controls": [
+    "characteristic2 cancellation precedence",
+    "original-input aggregate validity in characteristic2",
+    "invalid-input mismatch remains None"
+  ],
+  "findings": [],
+  "authorship_disclosure": "Reviewer authored earlier Doubling dependency (independently reviewed), not this aggregate. No full transitive binary recheck.",
+  "preserved_reviewer_failures": [
+    "two manifest metadata-shape preparation errors; no Lean invocation during these failures"
+  ],
+  "excluded": [
+    "UInt64 dispatch correspondence",
+    "compiler/counters",
+    "class sum",
+    "whole walk"
+  ],
+  "scientific_execution": false,
+  "cost_ratio": null
+}

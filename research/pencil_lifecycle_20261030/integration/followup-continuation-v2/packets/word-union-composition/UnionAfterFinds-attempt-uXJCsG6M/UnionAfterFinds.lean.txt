@@ -1,0 +1,71 @@
+import WordAfter
+import ComposedUnionGlobal
+set_option autoImplicit false
+namespace SignedWord
+
+def reducedUnionPot (r : UInt64) (pu pv : Pot) (su sv : Int8) (a b : UInt64) : Pot :=
+ unionPot r (su*pu.s) (sv*pv.s) (reduced r a pu.a pv.a su sv) (reduced r b pu.b pv.b su sv)
+
+theorem reducedUnionPot_correct (r a b : UInt64) [Fact r.toNat.Prime] (pu pv : Pot) (su sv : Int8)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat)
+ (hpu : GoodPot r pu) (hpv : GoodPot r pv) (hs : Sign su) (ht : Sign sv) :
+ GoodPot r (reducedUnionPot r pu pv su sv a b) ∧
+ decPot r (reducedUnionPot r pu pv su sv a b)=
+ GraphForest.reducedPotential (decPot r pu) (decPot r pv) (sd r su) (sd r sv) (wd r a) (wd r b) := by
+ have h1:=reduced_correct r a pu.a pv.a su sv hp hr ha hpu.2.1 hpv.2.1 hs ht
+ have h2:=reduced_correct r b pu.b pv.b su sv hp hr hb hpu.2.2 hpv.2.2 hs ht
+ have h:=unionPot_correct r _ _ (su*pu.s) (sv*pv.s) hp h1.1 h2.1
+  (sign_mul _ _ hs hpu.1) (sign_mul _ _ ht hpv.1)
+ refine ⟨h.1,?_⟩
+ simpa only [reducedUnionPot,GraphForest.reducedPotential,decPot,
+  sd_mul r su pu.s hs hpu.1,sd_mul r sv pv.s ht hpv.1,h1.2,h2.2] using h.2
+
+def branchWord {n : Nat} (r : UInt64) (s : UnionState n) (ru rv : Fin n) (p : Pot) (forward : Bool) :=
+ if forward then joinWord r s ru rv p else joinWord r s rv ru (reversePot r p)
+
+theorem branchWord_refines {n : Nat} (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (ru rv : Fin n) (p : Pot) (forward : Bool)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (hgp : GoodPot r p) (hgf : FixedGood r s) :
+ unionDecode r (branchWord r s ru rv p forward)=
+ GraphForest.branch (unionDecode r s) ru rv (decPot r p) forward := by
+ cases forward
+ · have h:=joinWord_decode r s rv ru (reversePot r p) hp hr (reversePot_correct r p hp hgp).1 hgf
+   rw [(reversePot_correct r p hp hgp).2] at h
+   simpa [branchWord,GraphForest.branch] using h
+ · simpa [branchWord,GraphForest.branch] using joinWord_decode r s ru rv p hp hr hgp hgf
+
+theorem branchWord_good {n : Nat} (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (ru rv : Fin n) (p : Pot) (forward : Bool)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (hgp : GoodPot r p) (hgg : Good r s.graph) (hgf : FixedGood r s) :
+ Good r (branchWord r s ru rv p forward).graph ∧ FixedGood r (branchWord r s ru rv p forward) := by
+ cases forward
+ · simpa [branchWord] using joinWord_good r s rv ru (reversePot r p) hp hr (reversePot_correct r p hp hgp).1 hgg hgf
+ · simpa [branchWord] using joinWord_good r s ru rv p hp hr hgp hgg hgf
+
+theorem distinct_union_after_two_word_finds {n : Nat} (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (t w : State n) (u v ru rv : Fin n) (pu pv : Pot)
+ (rank : Fin n→Nat) (value : Fin n→F r) (su sv : Int8) (a b : UInt64) (k : F r)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s.graph) (hgf : FixedGood r s)
+ (hf : GraphFind.Forest (decode r s.graph) rank) (hv : GraphUnion.Valid (unionDecode r s) value k)
+ (h1 : Run r s.graph u t ru pu) (h2 : Run r t v w rv pv) (hd : ru≠rv)
+ (hs : Sign su) (ht : Sign sv) (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat)
+ (he : sd r su*value u+sd r sv*value v=wd r a+wd r b*k) (forward : Bool) :
+ let out:=branchWord r ⟨w,s.fixed⟩ ru rv (reducedUnionPot r pu pv su sv a b) forward
+ Good r out.graph ∧ FixedGood r out ∧
+ ∃ rank', GraphFind.Forest (unionDecode r out).graph rank' ∧ GraphUnion.Valid (unionDecode r out) value k := by
+ obtain ⟨hgt,hpu,hu⟩:=run_refines r hp hr s.graph t u ru pu h1 hg
+ obtain ⟨hgw,hpv,hv'⟩:=run_refines r hp hr t w v rv pv h2 hgt
+ have hpot:=reducedUnionPot_correct r a b pu pv su sv hp hr ha hb hpu hpv hs ht
+ have hsu : (sd r su*(decPot r pu).s)*(sd r su*(decPot r pu).s)=1 := by
+  simpa only [decPot,←sd_mul r su pu.s hs hpu.1] using sd_square r (su*pu.s) (sign_mul _ _ hs hpu.1)
+ have hsv : (sd r sv*(decPot r pv).s)*(sd r sv*(decPot r pv).s)=1 := by
+  simpa only [decPot,←sd_mul r sv pv.s ht hpv.1] using sd_square r (sv*pv.s) (sign_mul _ _ ht hpv.1)
+ have hfield:=GraphForest.edge_after_two_finds (unionDecode r s) (decode r t) (decode r w)
+  u v ru rv (decPot r pu) (decPot r pv) rank value (sd r su) (sd r sv) (wd r a) (wd r b) k hf hv hu hv' hd hsu hsv he forward
+ have href:=branchWord_refines r (⟨w,s.fixed⟩:UnionState n) ru rv (reducedUnionPot r pu pv su sv a b) forward hp hr hpot.1 hgf
+ rw [hpot.2] at href
+ have hgood:=branchWord_good r (⟨w,s.fixed⟩:UnionState n) ru rv (reducedUnionPot r pu pv su sv a b) forward hp hr hpot.1 hgw hgf
+ refine ⟨hgood.1,hgood.2,?_⟩
+ rw [href]
+ exact hfield
+end SignedWord
