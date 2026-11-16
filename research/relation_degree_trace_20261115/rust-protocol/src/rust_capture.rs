@@ -36,6 +36,14 @@ pub(super) struct Paths {
     export_final: Option<PathBuf>,
     #[serde(default)]
     export_rust_only: Option<PathBuf>,
+    #[serde(default)]
+    kernel_legacy: Option<PathBuf>,
+    #[serde(default)]
+    kernel_ordered: Option<PathBuf>,
+    #[serde(default)]
+    kernel_cached: Option<PathBuf>,
+    #[serde(default)]
+    kernel_both: Option<PathBuf>,
     mature: PathBuf,
     singular: PathBuf,
     msolve: PathBuf,
@@ -58,6 +66,9 @@ impl Paths {
     }
 }
 fn comparisons_for(samples: &[Value], routes: &[&str]) -> Option<Vec<Value>> {
+    comparisons_at(samples, routes, routes.len().checked_sub(1)?)
+}
+fn comparisons_at(samples: &[Value], routes: &[&str], at: usize) -> Option<Vec<Value>> {
     if samples.len() != routes.len() {
         return None;
     }
@@ -77,8 +88,78 @@ fn comparisons_for(samples: &[Value], routes: &[&str]) -> Option<Vec<Value>> {
         }
         costs.push(cost);
     }
-    let candidate = *costs.last()? as f64;
-    Some(costs[..costs.len()-1].iter().zip(routes).map(|(c,name)|json!({"control":name,"full_cost_single_call_ratio":*c as f64/candidate})).collect())
+    let candidate = *costs.get(at)? as f64;
+    Some(costs.iter().zip(routes).enumerate().filter(|(i,_)|*i!=at).map(|(_, (c,name))|json!({"control":name,"full_cost_single_call_ratio":*c as f64/candidate})).collect())
+}
+fn kernel_candidate(samples: &[Value]) -> Option<usize> {
+    if samples.len() != 23 {
+        return None;
+    }
+    (20..23)
+        .map(|i| Some((samples[i]["paid_wall_ns"].as_u64().filter(|n| *n > 0)?, i)))
+        .collect::<Option<Vec<_>>>()?
+        .into_iter()
+        .min()
+        .map(|(_, i)| i)
+}
+fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
+    if routes.len() != 23 {
+        return Value::Null;
+    }
+    let mut chosen = Value::Null;
+    let mut best = 15.;
+    for case in cases {
+        let Some(samples) = case["samples"].as_array() else {
+            continue;
+        };
+        let Some(at) = kernel_candidate(samples) else {
+            continue;
+        };
+        let Some(rows) = comparisons_at(samples, routes, at) else {
+            continue;
+        };
+        if (19..23)
+            .zip(["legacy", "ordered", "cached", "both"])
+            .any(|(i, mode)| {
+                samples[i]["answer"]["kernel_mode"] != mode
+                    || samples[i]["answer"]["completion_exports"] != 0
+                    || samples[i]["answer"]["root_api"] != true
+                    || samples[i]["answer"]["native_product_criterion"] != true
+            })
+        {
+            continue;
+        }
+        if [16, 17, 18]
+            .into_iter()
+            .zip([2, 1, 0])
+            .any(|(i, count)| samples[i]["answer"]["completion_exports"] != count)
+        {
+            continue;
+        }
+        let candidate = &samples[at];
+        if candidate["used_recovery"] != false
+            || candidate["answer"]["constructor"]["subset_succeeded"] != true
+            || candidate["answer"]["consumer"]["kind"] != "separate-rust-arithmetic"
+        {
+            continue;
+        }
+        let ratios: Vec<_> = rows
+            .iter()
+            .filter_map(|v| v["full_cost_single_call_ratio"].as_f64())
+            .collect();
+        if ratios.len() != 22 {
+            continue;
+        }
+        let score = ratios[1].min(ratios[2]);
+        if score < 15. || ratios.iter().any(|r| *r <= 1.) {
+            continue;
+        }
+        if chosen.is_null() || score > best {
+            best = score;
+            chosen = json!({"id":case["id"],"pipeline":routes[at],"kernel":candidate["answer"]["kernel_mode"],"candidate_index":at});
+        }
+    }
+    chosen
 }
 fn selected_for(cases: &[Value], routes: &[&str]) -> Value {
     let mut chosen = Value::Null;
@@ -132,11 +213,15 @@ pub(super) fn run_m31(prepared: &Path, out: &Path, config: &Path) -> Result<()> 
 pub(super) fn run_export(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     run_impl(prepared, out, config, 2)
 }
+pub(super) fn run_kernels(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, 3)
+}
 fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<()> {
     let config_bytes = fs::read(config)?;
     let paths: Paths = serde_json::from_slice(&config_bytes)?;
     let m31 = mode >= 1;
-    let exports = mode == 2;
+    let exports = mode >= 2;
+    let kernels = mode == 3;
     if m31 != paths.m31.is_some()
         || [
             &paths.export_both,
@@ -148,6 +233,17 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     {
         return Err("exact optional paths required for15/16/19-workflow modes".into());
     }
+    if [
+        &paths.kernel_legacy,
+        &paths.kernel_ordered,
+        &paths.kernel_cached,
+        &paths.kernel_both,
+    ]
+    .into_iter()
+    .any(|p| p.is_some() != kernels)
+    {
+        return Err("exact four optional kernel paths required in23 mode".into());
+    }
     let mut routes = ROUTES.to_vec();
     let mut replay_routes = paths.replay_routes().to_vec();
     if let Some(exe) = &paths.m31 {
@@ -158,6 +254,10 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("root-export-both", &paths.export_both),
         ("root-export-final", &paths.export_final),
         ("root-export-rust-only", &paths.export_rust_only),
+        ("root-kernel-legacy", &paths.kernel_legacy),
+        ("root-kernel-ordered", &paths.kernel_ordered),
+        ("root-kernel-cached", &paths.kernel_cached),
+        ("root-kernel-both", &paths.kernel_both),
     ] {
         if let Some(exe) = exe {
             routes.push(name);
@@ -202,6 +302,10 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("export_both", &paths.export_both),
         ("export_final", &paths.export_final),
         ("export_rust_only", &paths.export_rust_only),
+        ("kernel_legacy", &paths.kernel_legacy),
+        ("kernel_ordered", &paths.kernel_ordered),
+        ("kernel_cached", &paths.kernel_cached),
+        ("kernel_both", &paths.kernel_both),
     ] {
         if let Some(path) = path {
             identities.insert(name.into(), json!({"path":path,"sha256":file_hash(path)?}));
@@ -211,7 +315,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     write_new(&out.join("config.json"), &config_bytes)?;
     save(
         &out.join("pre-call.json"),
-        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
+        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if kernels{"EXACT_KERNEL_PAID_SCREEN_PROTOCOL.md"}else if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
     )?;
     let mut r = Runner {
         worker: paths.worker.clone(),
@@ -337,13 +441,18 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
                     sample["cross_pipeline_equality_ns"] = json!(equality_ns);
                 }
             }
+            let at = if kernels && !qualification {
+                kernel_candidate(&samples).unwrap_or(routes.len() - 1)
+            } else {
+                routes.len() - 1
+            };
             let rows = if qualification {
                 None
             } else {
-                comparisons_for(&samples, &routes)
+                comparisons_at(&samples, &routes, at)
             };
             Ok(
-                json!({"id":id,"variables":n,"input_sha256":input_hash,"samples":samples,"all_complete_bases_equal":equal,"comparisons":rows,"scope":if qualification{"correctness only; no ratios or selection"}else{"one call per workflow, no confidence"}}),
+                json!({"id":id,"variables":n,"input_sha256":input_hash,"samples":samples,"all_complete_bases_equal":equal,"comparisons":rows,"comparison_candidate_index":if qualification{Value::Null}else{json!(at)},"comparison_candidate":if qualification{Value::Null}else{json!(routes[at])},"scope":if qualification{"correctness only; no ratios or selection"}else{"one call per workflow, no confidence"}}),
             )
         })();
         let value = result
@@ -357,14 +466,21 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         unchanged &= file_hash(Path::new(pin["path"].as_str().ok_or("pin path")?))?
             == pin["sha256"].as_str().ok_or("pin hash")?;
     }
+    let kernel_selection = if !qualification && kernels {
+        selected_kernel(&cases, &routes)
+    } else {
+        Value::Null
+    };
     let family = if qualification {
         Value::Null
+    } else if kernels {
+        kernel_selection["id"].clone()
     } else {
         selected_for(&cases, &routes)
     };
     save(
         &out.join("summary.json"),
-        &json!({"schema":if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
+        &json!({"schema":if kernels{"exact-kernel-paid-screen/v1"}else if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"selected_kernel":kernel_selection,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
     )?;
     if !unchanged {
         return Err("changed executable identities".into());
@@ -374,6 +490,90 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn kernel_fixture() -> (Vec<&'static str>, Vec<Value>) {
+        let mut routes = ROUTES.to_vec();
+        routes.extend([
+            "root-sparse-m31",
+            "root-export-both",
+            "root-export-final",
+            "root-export-rust-only",
+            "root-kernel-legacy",
+            "root-kernel-ordered",
+            "root-kernel-cached",
+            "root-kernel-both",
+        ]);
+        let mut rows = complete();
+        rows[14]["paid_wall_ns"] = json!(20);
+        for i in 15..23 {
+            let mut row = rows[14].clone();
+            row["pipeline"] = json!(routes[i]);
+            row["paid_wall_ns"] = json!(match i {
+                19 => 4,
+                20 => 2,
+                21 => 3,
+                22 => 1,
+                _ => 20,
+            });
+            if (16..19).contains(&i) {
+                row["answer"]["completion_exports"] = json!(18 - i);
+            }
+            if i >= 19 {
+                row["answer"]["completion_exports"] = json!(0);
+                row["answer"]["kernel_mode"] =
+                    json!(["legacy", "ordered", "cached", "both"][i - 19]);
+            }
+            rows.push(row);
+        }
+        (routes, rows)
+    }
+    #[test]
+    fn kernel_selection_can_choose_ordered_or_both_but_never_ties_or_legacy() {
+        let (routes, rows) = kernel_fixture();
+        let result = selected_kernel(&[json!({"id":"case","samples":rows})], &routes);
+        assert_eq!(result["kernel"], "both");
+        let mut changed = rows.clone();
+        changed[20]["paid_wall_ns"] = json!(1);
+        changed[22]["paid_wall_ns"] = json!(2);
+        assert_eq!(
+            selected_kernel(&[json!({"id":"ordered","samples":changed})], &routes)["kernel"],
+            "ordered"
+        );
+        let cmp = comparisons_at(&changed, &routes, 20).unwrap();
+        assert_eq!(cmp.len(), 22);
+        assert!(cmp.iter().all(|c| c["control"] != "root-kernel-ordered"));
+        changed[22]["paid_wall_ns"] = json!(1);
+        assert!(selected_kernel(&[json!({"id":"tie","samples":changed})], &routes).is_null());
+        let mut changed = rows;
+        changed[19]["paid_wall_ns"] = json!(1);
+        assert!(
+            selected_kernel(&[json!({"id":"legacy-cheaper","samples":changed})], &routes).is_null()
+        );
+    }
+    #[test]
+    fn kernel_selection_rejects_missing_control_wrong_mode_recovery_and_under15() {
+        let (routes, rows) = kernel_fixture();
+        for i in 0..23 {
+            let mut bad = rows.clone();
+            bad[i]["status"] = json!("failed");
+            assert!(selected_kernel(&[json!({"id":"missing","samples":bad})], &routes).is_null());
+        }
+        for i in 19..23 {
+            let mut bad = rows.clone();
+            bad[i]["answer"]["kernel_mode"] = Value::Null;
+            assert!(
+                selected_kernel(&[json!({"id":"wrong-mode","samples":bad})], &routes).is_null()
+            );
+        }
+        let mut bad = rows.clone();
+        bad[22]["used_recovery"] = json!(true);
+        assert!(selected_kernel(&[json!({"id":"recovery","samples":bad})], &routes).is_null());
+        let mut bad = rows.clone();
+        bad[2]["paid_wall_ns"] = json!(14);
+        assert!(selected_kernel(&[json!({"id":"under","samples":bad})], &routes).is_null());
+        let mut bad = rows;
+        bad[22]["answer"]["constructor"]["subset_succeeded"] = json!(false);
+        assert!(selected_kernel(&[json!({"id":"fallback","samples":bad})], &routes).is_null());
+    }
     fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
         comparisons_for(samples, &ROUTES)
     }
@@ -501,6 +701,10 @@ mod tests {
             export_both: None,
             export_final: None,
             export_rust_only: None,
+            kernel_legacy: None,
+            kernel_ordered: None,
+            kernel_cached: None,
+            kernel_both: None,
             mature: "m".into(),
             singular: "s".into(),
             msolve: "ms".into(),

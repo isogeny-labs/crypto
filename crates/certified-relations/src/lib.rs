@@ -12,6 +12,27 @@ pub mod quotient;
 pub mod replay;
 pub mod workload;
 
+// Only the explicit native-owned factory selects these mathematically identical
+// kernel variants. Legacy public paths start in mode zero on every thread.
+thread_local! {
+    static NATIVE_KERNELS: std::cell::Cell<u8> = const { std::cell::Cell::new(0) };
+}
+fn native_kernel_bits() -> u8 {
+    NATIVE_KERNELS.with(|v| v.get())
+}
+fn with_native_kernel_bits<T>(bits: u8, work: impl FnOnce() -> T) -> T {
+    assert!(bits <= 3);
+    struct Restore(u8);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            NATIVE_KERNELS.with(|v| v.set(self.0));
+        }
+    }
+    let previous = NATIVE_KERNELS.with(|v| v.replace(bits));
+    let _restore = Restore(previous);
+    work()
+}
+
 #[derive(Clone, Copy, Debug, Default, Serialize)]
 pub struct Counters {
     pub modular_products: u64,
@@ -247,7 +268,13 @@ fn input_rows(inputs: &[Poly], n: usize) -> Vec<Row> {
         })
         .collect()
 }
-fn normal_form(mut row: Row, basis: &[Row], p: u64) -> Row {
+fn normal_form(row: Row, basis: &[Row], p: u64) -> Row {
+    if native_kernel_bits() & 2 != 0 {
+        return normal_form_cached(row, basis, p);
+    }
+    normal_form_legacy(row, basis, p)
+}
+fn normal_form_legacy(mut row: Row, basis: &[Row], p: u64) -> Row {
     let mut remainder = Poly::new();
     while !row.poly.is_empty() {
         let m = lead(&row.poly).clone();
@@ -255,6 +282,36 @@ fn normal_form(mut row: Row, basis: &[Row], p: u64) -> Row {
         if let Some(g) = basis.iter().find(|g| divides(lead(&g.poly), &m)) {
             let multiple = row_shift(g, &difference(&m, lead(&g.poly)));
             let factor = mul(c, inv(g.poly[lead(&g.poly)], p), p);
+            subtract_row(&mut row, &multiple, factor, p);
+        } else {
+            row.poly.remove(&m);
+            remainder.insert(m, c);
+        }
+    }
+    row.poly = remainder;
+    row
+}
+fn normal_form_cached(mut row: Row, basis: &[Row], p: u64) -> Row {
+    if row.poly.is_empty() {
+        return row;
+    }
+    // No reducer changes during this call. Option retains the legacy panic only
+    // if division actually reaches an invalid empty reducer.
+    let reducers: Vec<_> = basis
+        .iter()
+        .map(|g| (g, g.poly.keys().max_by(|a, b| cmp(a, b))))
+        .collect();
+    let mut remainder = Poly::new();
+    while !row.poly.is_empty() {
+        let m = lead(&row.poly).clone();
+        let c = row.poly[&m];
+        if let Some((g, lm)) = reducers
+            .iter()
+            .find(|(_, lm)| divides(lm.expect("nonzero polynomial"), &m))
+        {
+            let lm = lm.expect("nonzero polynomial");
+            let multiple = row_shift(g, &difference(&m, lm));
+            let factor = mul(c, inv(g.poly[lm], p), p);
             subtract_row(&mut row, &multiple, factor, p);
         } else {
             row.poly.remove(&m);
@@ -662,6 +719,12 @@ fn columns(n: usize, d: usize, exact: bool) -> usize {
     result
 }
 fn monomials(n: usize, d: usize, exact: bool) -> Vec<Mono> {
+    if native_kernel_bits() & 1 != 0 {
+        return monomials_ordered(n, d, exact);
+    }
+    monomials_legacy(n, d, exact)
+}
+fn monomials_legacy(n: usize, d: usize, exact: bool) -> Vec<Mono> {
     fn recurse(n: usize, left: usize, prefix: &mut Mono, out: &mut Vec<Mono>) {
         if n == 1 {
             let mut m = prefix.clone();
@@ -681,6 +744,26 @@ fn monomials(n: usize, d: usize, exact: bool) -> Vec<Mono> {
     }
     result.sort_by(|a, b| cmp(b, a));
     result
+}
+fn monomials_ordered(n: usize, d: usize, exact: bool) -> Vec<Mono> {
+    assert!(n > 0);
+    fn emit(index: usize, left: usize, m: &mut Mono, out: &mut Vec<Mono>) {
+        if index == 0 {
+            m[0] = left;
+            out.push(m.clone());
+            return;
+        }
+        for e in 0..=left {
+            m[index] = e;
+            emit(index - 1, left - e, m, out);
+        }
+    }
+    let mut out = Vec::new();
+    let mut m = vec![0; n];
+    for degree in (if exact { d..=d } else { 0..=d }).rev() {
+        emit(n - 1, degree, &mut m, &mut out);
+    }
+    out
 }
 fn certificate_degree(row: &Row, inputs: &[Poly]) -> usize {
     row.proof
@@ -1064,6 +1147,94 @@ pub fn analyze(system: &System, cap: usize, limit: usize) -> Result<Value, Strin
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn ordered_monomials_match_complete_legacy_vectors() {
+        for n in 1..=16 {
+            for d in 0..=if n <= 6 { 6 } else { 3 } {
+                for exact in [false, true] {
+                    assert_eq!(
+                        monomials_ordered(n, d, exact),
+                        monomials_legacy(n, d, exact),
+                        "n={n}, d={d}, exact={exact}"
+                    );
+                }
+            }
+        }
+    }
+    #[test]
+    fn cached_division_preserves_remainder_provenance_and_field_counts() {
+        for p in [2147483647, 9007199254740881] {
+            for n in [1, 3, 8, 16] {
+                let z = vec![0; n];
+                let mut a = z.clone();
+                a[0] = 2;
+                let mut b = z.clone();
+                b[n - 1] = 1;
+                let basis = input_rows(
+                    &[
+                        BTreeMap::from([(a, 3), (b, p - 1), (z.clone(), 7)]),
+                        BTreeMap::from([(z.clone(), 5)]),
+                    ],
+                    n,
+                );
+                let mut shift = z.clone();
+                shift[0] = 1;
+                let mut row = row_shift(&basis[0], &shift);
+                subtract_row(&mut row, &basis[1], 11, p);
+                reset_counters();
+                let old = normal_form_legacy(row.clone(), &basis, p);
+                let old_counts = serde_json::to_value(counters()).unwrap();
+                reset_counters();
+                let cached = normal_form_cached(row, &basis, p);
+                let cached_counts = serde_json::to_value(counters()).unwrap();
+                assert_eq!(old, cached);
+                assert_eq!(old_counts, cached_counts);
+                let empty = Row {
+                    poly: Poly::new(),
+                    proof: Proof::new(),
+                };
+                assert_eq!(
+                    normal_form_cached(empty.clone(), std::slice::from_ref(&empty), p),
+                    empty
+                );
+                let with_empty = vec![basis[0].clone(), empty.clone()];
+                assert_eq!(
+                    normal_form_cached(basis[0].clone(), &with_empty, p),
+                    normal_form_legacy(basis[0].clone(), &with_empty, p)
+                );
+                assert!(std::panic::catch_unwind(|| normal_form_cached(
+                    basis[0].clone(),
+                    std::slice::from_ref(&empty),
+                    p
+                ))
+                .is_err());
+                assert!(std::panic::catch_unwind(|| normal_form_legacy(
+                    basis[0].clone(),
+                    std::slice::from_ref(&empty),
+                    p
+                ))
+                .is_err());
+            }
+        }
+    }
+    #[test]
+    fn native_kernel_scope_restores_after_nested_error_and_panic() {
+        assert_eq!(native_kernel_bits(), 0);
+        let error: Result<(), &str> = with_native_kernel_bits(1, || {
+            assert_eq!(native_kernel_bits(), 1);
+            with_native_kernel_bits(3, || assert_eq!(native_kernel_bits(), 3));
+            assert_eq!(native_kernel_bits(), 1);
+            assert_eq!(std::thread::spawn(native_kernel_bits).join().unwrap(), 0);
+            Err("expected")
+        });
+        assert!(error.is_err());
+        assert_eq!(native_kernel_bits(), 0);
+        assert!(
+            std::panic::catch_unwind(|| with_native_kernel_bits(2, || panic!("scope probe")))
+                .is_err()
+        );
+        assert_eq!(native_kernel_bits(), 0);
+    }
 
     #[test]
     fn guarded_m31_products_match_wide_remainder_at_boundaries_and_fallbacks() {
@@ -1396,4 +1567,17 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn cached_division_matches_on_genuinely_non_groebner_nonmonic_lists() {
+        for p in [2147483647,9007199254740881] {for n in [3,8,16] {
+            let z=vec![0;n];let mut x2=z.clone();x2[0]=2;let mut y=z.clone();y[1]=1;let mut xy=z.clone();xy[0]=1;xy[1]=1;
+            let basis=input_rows(&[BTreeMap::from([(x2,3),(y,3)]),BTreeMap::from([(xy,5),(z,5)])],n);
+            let target=s_polynomial(&basis[0],&basis[1],p);
+            reset_counters();let old=normal_form_legacy(target.clone(),&basis,p);let before=serde_json::to_value(counters()).unwrap();
+            assert!(!old.poly.is_empty());
+            reset_counters();let cached=normal_form_cached(target,&basis,p);let after=serde_json::to_value(counters()).unwrap();
+            assert_eq!(old,cached);assert_eq!(before,after);
+        }}
+    }
+
 }

@@ -32,6 +32,41 @@ fn pending_native_wire_needs_complete_root_replay_and_rejects_changed_proof() {
     }
 }
 #[test]
+fn exact_kernel_choices_keep_full_root_proof_acceptance() {
+    let system = algebra::workload::generate(2147483647, 3, 7)
+        .unwrap()
+        .system;
+    let input = serde_json::to_vec(&system).unwrap();
+    let (old, _) = algebra::replay::produce_native_for_rust(&system, "compact-sparse")
+        .unwrap()
+        .into_parts();
+    let reference = verify_replay_certificate_json(&input, &old).unwrap();
+    for kernels in [
+        algebra::replay::NativeKernels::Legacy,
+        algebra::replay::NativeKernels::Ordered,
+        algebra::replay::NativeKernels::Cached,
+        algebra::replay::NativeKernels::Both,
+    ] {
+        let (wire, _) = algebra::replay::produce_native_for_rust_with_kernels(
+            &system,
+            "compact-sparse",
+            kernels,
+        )
+        .unwrap()
+        .into_parts();
+        assert_eq!(wire, old);
+        assert_eq!(
+            verify_replay_certificate_json(&input, &wire).unwrap().basis,
+            reference.basis
+        );
+        let mut bad: serde_json::Value = serde_json::from_slice(&wire).unwrap();
+        bad["basis"][0]["proof"] = serde_json::json!([]);
+        assert!(
+            verify_replay_certificate_json(&input, &serde_json::to_vec(&bad).unwrap()).is_err()
+        );
+    }
+}
+#[test]
 fn separate_replay_public_api_checks_complete_basis_and_changed_identity() {
     let system = algebra::workload::generate(2147483647, 3, 7)
         .unwrap()

@@ -28,19 +28,34 @@ fn main() -> Result<(), Box<dyn Error>> {
     run(true, true)
 }
 pub(crate) fn run(native_product: bool, rust_consumer: bool) -> Result<(), Box<dyn Error>> {
-    run_with_exports(native_product, rust_consumer, 2)
+    run_with_exports(native_product, rust_consumer, 2, None)
 }
 #[allow(dead_code)] // Called by the two explicit variant wrapper binaries.
 pub(crate) fn run_completion_variant(exports: usize) -> Result<(), Box<dyn Error>> {
-    run_with_exports(true, true, exports)
+    run_with_exports(true, true, exports, None)
+}
+#[allow(dead_code)]
+pub(crate) fn run_kernel_variant(which: usize) -> Result<(), Box<dyn Error>> {
+    let kernels = match which {
+        0 => replay::NativeKernels::Legacy,
+        1 => replay::NativeKernels::Ordered,
+        2 => replay::NativeKernels::Cached,
+        3 => replay::NativeKernels::Both,
+        _ => return Err("unknown native kernel variant".into()),
+    };
+    run_with_exports(true, true, 0, Some(kernels))
 }
 fn run_with_exports(
     native_product: bool,
     rust_consumer: bool,
     exports: usize,
+    kernels: Option<replay::NativeKernels>,
 ) -> Result<(), Box<dyn Error>> {
     if exports > 2 || (exports < 2 && (!native_product || !rust_consumer)) {
         return Err("completion variants require native product and full Rust consumer".into());
+    }
+    if kernels.is_some() && exports != 0 {
+        return Err("kernel variants require pending wire and full Rust replay".into());
     }
     let a: Vec<_> = std::env::args().collect();
     if a.len() == 4 && a[1] == "verify" {
@@ -61,7 +76,12 @@ fn run_with_exports(
     let (wire, constructor, witness) = if exports == 0 {
         // Opaque pending evidence, not an accepted basis. Retain bytes and invoke
         // the actual root checker below before any basis reaches the answer.
-        let (wire, constructor) = replay::produce_native_for_rust(&system, &a[2])?.into_parts();
+        let pending = if let Some(kernels) = kernels {
+            replay::produce_native_for_rust_with_kernels(&system, &a[2], kernels)?
+        } else {
+            replay::produce_native_for_rust(&system, &a[2])?
+        };
+        let (wire, constructor) = pending.into_parts();
         (wire, constructor, None)
     } else {
         let (witness, constructor) = if native_product {
@@ -144,7 +164,7 @@ fn run_with_exports(
             serde_json::Value::Null,
         )
     };
-    let answer = json!({"basis":basis,"constructor":constructor,"consumer":{"kind":if rust_consumer{"separate-rust-arithmetic"}else{"singular-identity"},"stats":stats},"native_product_criterion":native_product,"root_api":rust_consumer,"completion_exports":exports,"validation":"native root adapter, exact consumer selected; unsigned"});
+    let answer = json!({"basis":basis,"constructor":constructor,"consumer":{"kind":if rust_consumer{"separate-rust-arithmetic"}else{"singular-identity"},"stats":stats},"native_product_criterion":native_product,"root_api":rust_consumer,"completion_exports":exports,"kernel_mode":kernels,"validation":"native root adapter, exact consumer selected; unsigned"});
     save(&out.join("answer.json"), &serde_json::to_vec(&answer)?)?;
     println!("{}", serde_json::to_string(&answer)?);
     Ok(())

@@ -138,6 +138,34 @@ pub struct UnverifiedNativeWire {
     wire: Vec<u8>,
     constructor: serde_json::Value,
 }
+/// Exact native-kernel ablations. All modes retain the same complete checks.
+#[derive(Clone, Copy, Debug, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NativeKernels {
+    Legacy,
+    Ordered,
+    Cached,
+    Both,
+}
+impl NativeKernels {
+    fn bits(self) -> u8 {
+        match self {
+            Self::Legacy => 0,
+            Self::Ordered => 1,
+            Self::Cached => 2,
+            Self::Both => 3,
+        }
+    }
+}
+/// Scoped native-owned construction only; the opaque wire still requires full
+/// independent-code-path arithmetic replay before any accepted basis exists.
+pub fn produce_native_for_rust_with_kernels(
+    system: &System,
+    kind: &str,
+    kernels: NativeKernels,
+) -> Result<UnverifiedNativeWire, String> {
+    with_native_kernel_bits(kernels.bits(), || produce_native_for_rust(system, kind))
+}
 impl UnverifiedNativeWire {
     /// Transfer proof bytes and diagnostic metadata, never an accepted basis.
     pub fn into_parts(self) -> (Vec<u8>, serde_json::Value) {
@@ -599,6 +627,20 @@ mod tests {
                 assert_eq!(wire, expected);
                 assert_eq!(metadata, old.constructor);
                 assert_eq!(single.constructor, old.constructor);
+                for kernels in [
+                    NativeKernels::Legacy,
+                    NativeKernels::Ordered,
+                    NativeKernels::Cached,
+                    NativeKernels::Both,
+                ] {
+                    let (wire, metadata) =
+                        produce_native_for_rust_with_kernels(&system, kind, kernels)
+                            .unwrap()
+                            .into_parts();
+                    assert_eq!(wire, expected);
+                    assert_eq!(metadata, old.constructor);
+                    assert_eq!(native_kernel_bits(), 0);
+                }
             }
         }
     }
