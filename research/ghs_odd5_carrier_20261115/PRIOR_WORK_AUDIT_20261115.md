@@ -1,5 +1,7 @@
 # Prior-work audit for the odd-five carrier lead
 
+**Update, 16 November 2026:** Five exact degree-seven covers and nonzero 109- and 69-bit subgroup transfers were subsequently found. See `DEGREE7_FINDING.md`. The construction gate and no-map statements below describe the earlier audit snapshot and are superseded for masks 30, 103, 139, 194, and 233.
+
 16 November 2026 UTC. This audit records the scope of the sources actually checked. An unavailable full text or an unsuccessful exact-equation search is not evidence of publication priority.
 
 | Proposed differentiator | Checked prior work | Consequence for this project |

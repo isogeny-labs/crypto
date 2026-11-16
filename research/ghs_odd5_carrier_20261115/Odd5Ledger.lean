@@ -104,6 +104,22 @@ theorem degree_seven_linear_square_assignment_counts :
     (3^5 - 1 : Nat) * 3^5 = 58806 ∧
     (3^5 - 1 : Nat) * 5 * 3^4 = 98010 := by decide
 
+/- Arithmetic cross-checks for the five degree-seven cover receipts.
+   The polynomial identities and Jacobian maps are checked in Sage and Magma,
+   not proved by these arithmetic declarations. -/
+theorem degree_seven_quadratic_square_assignment_counts :
+    (3^5 : Nat) = 243 ∧ 5 * 3^4 = 405 := by decide
+
+theorem degree_seven_five_hits :
+    (List.filter (fun b => decide (b = 30 ∨ b = 103 ∨ b = 139 ∨
+       b = 194 ∨ b = 233)) [3, 27, 30, 103, 139, 167, 182, 194, 230, 233]).length = 5 := by decide
+
+theorem degree_seven_prime_transfer_arithmetic :
+    (218 : Nat) = 2 * 109 ∧ 7 < 109 ∧
+    174449211009094048378706606 =
+      2 * 109 * 2399 * 333566377062870325133 ∧
+    Nat.gcd 7 333566377062870325133 = 1 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -130,4 +146,7 @@ theorem degree_seven_linear_square_assignment_counts :
 #print axioms primitive_s11_projective_divisor
 #print axioms degree_seven_sparse_assignment_counts
 #print axioms degree_seven_linear_square_assignment_counts
+#print axioms degree_seven_quadratic_square_assignment_counts
+#print axioms degree_seven_five_hits
+#print axioms degree_seven_prime_transfer_arithmetic
 end GHSOdd5Ledger
