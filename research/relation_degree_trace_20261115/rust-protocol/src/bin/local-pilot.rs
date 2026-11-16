@@ -17,6 +17,8 @@ use compact_speed_analysis::cas_formats::{msolve_basis, singular_basis, Basis};
 const P: u64 = 2147483647;
 const ARMS: [Arm; 3] = [Arm::F4, Arm::Certified, Arm::Compact];
 const ORDERS: [&str; 6] = ["FEC", "ECF", "CFE", "CEF", "EFC", "FCE"];
+#[path = "../callgrind_capture.rs"]
+mod callgrind_capture;
 #[path = "../phase_capture.rs"]
 mod phase_capture;
 #[path = "../replay_capture.rs"]
@@ -773,6 +775,7 @@ fn main() -> Result<()> {
     Some("rust-screen")if a.len()==5=>rust_capture::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("m31-screen")if a.len()==5=>rust_capture::run_m31(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("export-screen")if a.len()==5=>rust_capture::run_export(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
+    Some("callgrind-profile")if a.len()==5=>callgrind_capture::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("root-paired")if a.len()==5=>root_paired::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen|scale-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }

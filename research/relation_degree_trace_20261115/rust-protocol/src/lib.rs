@@ -1,5 +1,6 @@
 //! Calculation-only adapter for COMPACT_ANALYSIS_CONTRACT.md.
 //! No process execution, fixture generation or execution-admission authority.
+pub mod callgrind;
 pub mod cas_formats;
 use serde::{Deserialize, Serialize};
 

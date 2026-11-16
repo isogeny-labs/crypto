@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0854Z-native-export-complete-paid-screen-20261116",
+  "latest_record": "20261116T0906Z-native-export-paired-development-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 205,
+    "measured": 206,
     "open": 1
   },
   "repo": "crypto",
@@ -13767,7 +13767,7 @@
     {
       "better": "neutral",
       "first": 45.0,
-      "latest": 114.0,
+      "latest": 108.0,
       "latest_derived": {},
       "metric": "complete_matching_answers",
       "points": [
@@ -13818,6 +13818,18 @@
           "spread": null,
           "summary": "All114 answers match/four paid recoveries/0 monitor contention. Firstn16 selects with primary27.641/17.629, oldM311.120/matchedBoth1.097/Final1.041. No paired15x or fastest-control claim; losses retained. PCCd1bcf8/1cbadd.",
           "value": 114.0
+        },
+        {
+          "commit": "b2f322425729",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0906Z-native-export-paired-development-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All A/A gates,21 blocks108 matching outputs,0 monitor contention, exports0 allpanels. Paid adjusted lowerF419.107/E12.792:10partial true15false. Every raw cost/guard/cap retained. PCCfa96a5/952d7c unsigned L0.",
+          "value": 108.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
@@ -13892,14 +13904,19 @@
     {
       "better": "higher",
       "first": 13.723612836801772,
-      "latest": 13.723612836801772,
-      "latest_derived": {},
+      "latest": 14.259076120119785,
+      "latest_derived": {
+        "improvement_vs_first_percent": 3.9018,
+        "improvement_vs_previous_percent": 3.9018
+      },
       "metric": "expanded_regeneration_over_candidate_full_paid",
       "points": [
         {
           "commit": "b2e61b478ef1",
           "date": "2026-11-16",
-          "derived": {},
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
           "n": 21,
           "record": "20261116T0827Z-m31-paired-development-20261116",
           "reference": null,
@@ -13910,6 +13927,24 @@
           ],
           "summary": "All A/A gates pass;21 blocks/108 matching answers,0 monitor contention. Named paid adjusted lower F419.860/E12.874:10x partial passes,15x fails. Prior candidate only1.027 in separate screen; no fastest/fresh/signed claim. PCCcd096e/6f927f.",
           "value": 13.723612836801772
+        },
+        {
+          "commit": "b2f322425729",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 3.9018,
+            "improvement_vs_previous_percent": 3.9018
+          },
+          "n": 21,
+          "record": "20261116T0906Z-native-export-paired-development-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            13.15047293237767,
+            14.791731812987711
+          ],
+          "summary": "All A/A gates,21 blocks108 matching outputs,0 monitor contention, exports0 allpanels. Paid adjusted lowerF419.107/E12.792:10partial true15false. Every raw cost/guard/cap retained. PCCfa96a5/952d7c unsigned L0.",
+          "value": 14.259076120119785
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
@@ -13918,14 +13953,19 @@
     {
       "better": "higher",
       "first": 21.43971514730975,
-      "latest": 21.43971514730975,
-      "latest_derived": {},
+      "latest": 21.36063824522828,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.3688,
+        "improvement_vs_previous_percent": -0.3688
+      },
       "metric": "f4_regeneration_over_candidate_full_paid",
       "points": [
         {
           "commit": "b2e61b478ef1",
           "date": "2026-11-16",
-          "derived": {},
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
           "n": 21,
           "record": "20261116T0827Z-m31-paired-development-20261116",
           "reference": null,
@@ -13936,6 +13976,24 @@
           ],
           "summary": "All A/A gates pass;21 blocks/108 matching answers,0 monitor contention. Named paid adjusted lower F419.860/E12.874:10x partial passes,15x fails. Prior candidate only1.027 in separate screen; no fastest/fresh/signed claim. PCCcd096e/6f927f.",
           "value": 21.43971514730975
+        },
+        {
+          "commit": "b2f322425729",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": -0.3688,
+            "improvement_vs_previous_percent": -0.3688
+          },
+          "n": 21,
+          "record": "20261116T0906Z-native-export-paired-development-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            20.33070388786237,
+            22.21359720268042
+          ],
+          "summary": "All A/A gates,21 blocks108 matching outputs,0 monitor contention, exports0 allpanels. Paid adjusted lowerF419.107/E12.792:10partial true15false. Every raw cost/guard/cap retained. PCCfa96a5/952d7c unsigned L0.",
+          "value": 21.36063824522828
         }
       ],
       "problem": "kernel:certified-relations-grevlex",
