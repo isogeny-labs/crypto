@@ -415,7 +415,11 @@ mod tests {
         let row = all
             .iter()
             .find(|r| {
-                is_univariate(&r.poly, expected.variable) && degree(&r.poly) == expected.degree
+                r.poly.keys().all(|m| {
+                    m.iter()
+                        .enumerate()
+                        .all(|(i, e)| i == expected.variable || *e == 0)
+                }) && degree(&r.poly) == expected.degree
             })
             .unwrap();
         assert_eq!(&selected, row, "original cofactor row must match exactly");
