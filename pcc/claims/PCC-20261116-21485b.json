@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T21:08:16Z",
+ "id": "PCC-20261116-21485b",
+ "kind": "statement",
+ "producer": {
+  "commit": "7d3f72bf8b9b42676642abab2de225eee8321a37",
+  "model": "",
+  "session": "codex-20261116-nist-exact-field-solver"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/primitive_field.cpp",
+    "sha256": "1add12d01856add1feb2e317d3ad09459e5da3f64d66cabff76e04492669093e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/primitive_giac_check.cpp",
+    "sha256": "fde79234f838485eec46f273a4a958e9de075b282d06927c7bb100b7aa27fdac"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/PRIMITIVE_SOLVER_PROTOCOL.md",
+    "sha256": "f0cf3f7be59077b35aa4cff617852833b9753d28fd14121246bd67380e2bc760"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-primitive-solver.sh",
+    "sha256": "74036311ca1986fd0ff25936a4af682b7c93788919daab0a6bc51dc502e8e40f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/primitive-solver-v2/field.json",
+    "sha256": "4b2796a9149271003ddfe3eb2764b7fbef25d844efe007850bfd4b37c5e55d09"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/primitive-solver-v2/check.json",
+    "sha256": "8c7dc0b3f69aa9a097c9ff1ebc0e3fb131c7426ddfd44eb05d1a7371e5c2e864"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/primitive-solver-v2/control.giac",
+    "sha256": "d0c2ac7f5c345719de0f63fb386b066add29cf96e8d9cfe68e95d804b606c428"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/primitive-solver-v2/backend.stderr",
+    "sha256": "ec1800fe89b5dd975e526bcfe2d41418dd13be64b518e6bd57c4180072582d44"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/primitive-solver-v2/post-call-source-manifest.sha256",
+    "sha256": "99df6d8e342fa32a77f0c2e3ab0a72112787149057b245e9eec470f730287437"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The exact original P192 Fp24 field has a native checked rank24 primitive power basis with irreducibility,24 basis round trips,576 products,24 inverses,24 Frobenius conversions and56 public-coordinate round trips. The separate native replay checks Giacs typed-generator reduction,two exact reduced-basis equalities,four prescribed-root evaluations,two input normal forms and an S-pair,with nonroot/corruption rejection. Producer-unverified; the actual divisor inverse remains unsolved."
+}
