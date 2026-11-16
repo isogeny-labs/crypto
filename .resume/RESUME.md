@@ -1,3 +1,12 @@
+# Running update (07:12Z, 16 November)
+
+Stage22ACTIVE session72120/runlocal-cover-comparison-20261116-22. FirstRHOwarmup
+passes actualscalar+native/outerreplay, secondICwarmuppasses; graph_bwarmuprunning,
+5attempts4completionsat07:12. NO finalmeasuredcomparison. Frozen3600cohortbound
+unchanged, no retries/compilation. ReporttemplatepreparedONLY/tmp/ic-cover-comparison-report-template.typ,
+renderafterexit. Originalcopiedanalyzer afterexit, allrawflow/hashes/report/publication.
+CI>=07:57absentevent. GoalACTIVE/localworks. No independent signed verdict.
+
 # Current checkpoint (07:07Z, 16 November)
 
 Stage22STILLRUNNING session72120, source23b4c1a70923c40aa2501e538bca0f159c941d69.
