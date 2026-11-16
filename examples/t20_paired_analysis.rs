@@ -56,9 +56,19 @@ fn read_time(path: &Path) -> Time {
         user: 0.0,
         sys: 0.0,
     };
+    let mut seen = [false; 3];
     for tok in text.split_whitespace() {
         if let Some((k, v)) = tok.split_once('=') {
-            let v: f64 = v.parse().unwrap_or(0.0);
+            let index = match k {
+                "real" => 0,
+                "user" => 1,
+                "sys" => 2,
+                _ => continue,
+            };
+            assert!(!seen[index], "duplicate {k} in {path:?}");
+            seen[index] = true;
+            let v: f64 = v.parse().expect("numeric process timing");
+            assert!(v.is_finite() && v >= 0.0, "invalid {k} in {path:?}");
             match k {
                 "real" => t.real = v,
                 "user" => t.user = v,
@@ -67,6 +77,10 @@ fn read_time(path: &Path) -> Time {
             }
         }
     }
+    assert!(
+        seen.into_iter().all(|v| v) && t.real > 0.0,
+        "incomplete process timing in {path:?}"
+    );
     t
 }
 
@@ -96,9 +110,13 @@ fn load_ic(dir: &Path, tag: &str) -> IcRun {
     let trace = summary["rank_column_trace"]
         .as_array()
         .expect("rank_column_trace");
+    assert_eq!(trace.len(), 600, "the frozen row requires 600 columns");
     let mut columns = vec![(0u64, 0u64, 0f64); trace.len()];
+    let mut seen = vec![false; trace.len()];
     for t in trace {
         let c = t[0].as_u64().unwrap() as usize;
+        assert!(c < seen.len() && !seen[c], "invalid or repeated column {c}");
+        seen[c] = true;
         columns[c] = (
             t[1].as_u64().unwrap(),
             t[2].as_u64().unwrap(),
@@ -114,8 +132,78 @@ fn load_ic(dir: &Path, tag: &str) -> IcRun {
     }
 }
 
+fn validate_ic_run(a: &IcRun) {
+    for (key, expected) in [
+        ("targets_solved", 1),
+        ("rank_relations", 600),
+        ("rank", 600),
+        ("n", 73),
+        ("a", 0),
+        ("threads", THREADS as u64),
+    ] {
+        assert_eq!(a.summary[key].as_u64(), Some(expected), "{}: {key}", a.tag);
+    }
+    assert_eq!(a.row["group_verified"].as_bool(), Some(true));
+    assert_eq!(a.row["recovered_scalar"].as_u64(), Some(KNOWN_ANSWER));
+    assert_eq!(a.row["exit_code"].as_u64(), Some(0));
+    assert_eq!(a.row["n"].as_u64(), Some(73));
+    assert_eq!(a.row["a"].as_u64(), Some(0));
+    assert_eq!(
+        a.row["generator"],
+        json!(["4735344536444938487862", "4753051995279452466153"])
+    );
+    assert_eq!(
+        a.row["target"],
+        json!(["1852858978593996699777", "7821257062942871962177"])
+    );
+    assert_eq!(
+        a.summary["base_hash"].as_str(),
+        Some("37f22aed4a55e30058bcdf9eb48a38238287b6fa6aec686a4bbe310016685c56")
+    );
+}
+
+fn outputs_match(x: &IcRun, y: &IcRun) -> bool {
+    x.columns.len() == y.columns.len()
+        && x.columns
+            .iter()
+            .zip(&y.columns)
+            .all(|(a, b)| a.0 == b.0 && a.1 == b.1)
+        && [
+            "n",
+            "a",
+            "generator",
+            "target",
+            "point_indices",
+            "x_codes",
+            "recovered_scalar",
+            "probes",
+        ]
+        .iter()
+        .all(|key| !x.row[*key].is_null() && x.row[*key] == y.row[*key])
+}
+
+fn validate_rho_draw(d: &Value, row: &Value, index: u64) {
+    assert_eq!(
+        d["verified"].as_bool(),
+        Some(true),
+        "unverified rho draw {index}"
+    );
+    assert_eq!(d["n"], row["n"]);
+    assert_eq!(d["a"], row["a"]);
+    assert_eq!(d["generator"], row["generator"]);
+    assert_eq!(d["published_q"], row["target"]);
+    assert_eq!(d["subgroup_order"].as_u64(), Some(86_020_738_150_056_119));
+    assert_eq!(d["field_modulus_low_terms"], json!([0, 2, 3, 4]));
+    assert_eq!(d["fixture_seed"].as_u64(), Some(910_000_000 + index));
+    assert_eq!(d["recovered_fixture_scalar"].as_u64(), Some(KNOWN_ANSWER));
+}
+
 fn phase(run: &IcRun, key: &str) -> f64 {
-    run.summary["timing_ms"][key].as_f64().unwrap_or(0.0) / 1000.0
+    let value = run.summary["timing_ms"][key]
+        .as_f64()
+        .expect("required phase timing");
+    assert!(value.is_finite() && value >= 0.0, "invalid phase {key}");
+    value / 1000.0
 }
 
 /// Wall seconds of everything that is not the rank stage, from the run.
@@ -243,26 +331,18 @@ fn main() {
         let verified = a.row["group_verified"].as_bool() == Some(true);
         let known = a.row["recovered_scalar"].as_u64() == Some(KNOWN_ANSWER);
         let exit0 = a.row["exit_code"].as_u64() == Some(0);
+        validate_ic_run(a);
         checks.push(
             json!({"arm": a.tag, "targets_solved_1": solved, "rank_relations_600": rel,
             "rank_600": rank, "group_verified": verified, "recovered_equals_sidecar_answer": known,
             "exit_code_0": exit0}),
         );
     }
-    let probes_equal = |x: &IcRun, y: &IcRun| {
-        x.columns
-            .iter()
-            .zip(&y.columns)
-            .all(|(a, b)| a.0 == b.0 && a.1 == b.1)
-    };
-    let target_probes_equal =
-        n1.row["probes"] == o1.row["probes"] && n1.row["probes"] == n2.row["probes"];
-    let identical = probes_equal(&n1, &o1)
-        && probes_equal(&n1, &n2)
-        && n1.row["point_indices"] == o1.row["point_indices"]
-        && n1.row["x_codes"] == o1.row["x_codes"]
-        && n1.row["recovered_scalar"] == o1.row["recovered_scalar"]
-        && target_probes_equal;
+    let identical = outputs_match(&n1, &o1) && outputs_match(&n1, &n2);
+    assert!(
+        identical,
+        "IC arms differ in identity, relation or probe counts"
+    );
     let flag = |k: &str, a: &IcRun| a.summary[k].clone();
     let switches = json!({
         "N1": {"lazy": flag("lazy_canonical_enabled", &n1), "prefetch": flag("probe_prefetch_enabled", &n1)},
@@ -391,6 +471,7 @@ fn main() {
             break;
         }
         let d = read_json(&jp);
+        validate_rho_draw(&d, &n1.row, i);
         let t = read_time(&runs.join(format!("rho_{i:02}.time")));
         rho_wall.push(t.real);
         rho_cpu.push(t.user + t.sys);
@@ -399,10 +480,16 @@ fn main() {
             rho_verified += 1;
         }
         for (k, key) in counter_keys.iter().enumerate() {
-            rho_counters[k] += d["charges"][*key].as_f64().unwrap_or(0.0);
+            let count = d["charges"][*key].as_f64().expect("required rho charge");
+            assert!(
+                count.is_finite() && count >= 0.0,
+                "invalid rho charge {key}"
+            );
+            rho_counters[k] += count;
         }
         rho_n += 1;
     }
+    assert_eq!(rho_n, 20, "the frozen comparison requires all 20 rho draws");
     let rho_ok = rho_n > 0;
     let mut rho_json = json!({"draws": rho_n, "verified": rho_verified});
     let sqrt_r = SUBGROUP_ORDER.sqrt();
@@ -724,4 +811,69 @@ fn svg(arms: &[&IcRun; 3], rho_wall: &[f64], ab: &Ratio, aa: &Ratio, ic_wall_new
         r##"<text x="20" y="552" font-size="10" fill="#555">Recorded values only; host: unisolated-class 4 vCPU KVM guest, IC pinned to cores 1-3. See analysis.json for the sources.</text></svg>"##
     );
     s
+}
+
+#[cfg(test)]
+mod admission_tests {
+    use super::*;
+
+    fn runs() -> std::path::PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("research/t20_n73_k600_e2e_20261019/runs")
+    }
+
+    #[test]
+    fn retained_rows_satisfy_identity_and_verification_gates() {
+        let n1 = load_ic(&runs(), "N1");
+        for tag in ["N1", "O1", "N2"] {
+            let row = load_ic(&runs(), tag);
+            validate_ic_run(&row);
+            assert!(outputs_match(&n1, &row));
+        }
+        for i in 1..=20 {
+            validate_rho_draw(
+                &read_json(&runs().join(format!("rho_{i:02}.jsonl"))),
+                &n1.row,
+                i,
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_unverified_or_wrong_target_ic_rows() {
+        for (key, value) in [
+            ("group_verified", json!(false)),
+            ("target", json!(["1", "2"])),
+        ] {
+            let mut row = load_ic(&runs(), "N1");
+            row.row[key] = value;
+            assert!(std::panic::catch_unwind(|| validate_ic_run(&row)).is_err());
+        }
+    }
+
+    #[test]
+    fn checks_the_second_new_arm_relation_and_target() {
+        let n1 = load_ic(&runs(), "N1");
+        for (key, value) in [
+            ("point_indices", json!([1, 2, 3, 4])),
+            ("target", json!(["1", "2"])),
+        ] {
+            let mut n2 = load_ic(&runs(), "N2");
+            n2.row[key] = value;
+            assert!(!outputs_match(&n1, &n2));
+        }
+    }
+
+    #[test]
+    fn rejects_unverified_wrong_target_or_wrong_seed_rho() {
+        let n1 = load_ic(&runs(), "N1");
+        for (key, value) in [
+            ("verified", json!(false)),
+            ("published_q", json!(["1", "2"])),
+            ("fixture_seed", json!(910_000_002)),
+        ] {
+            let mut rho = read_json(&runs().join("rho_01.jsonl"));
+            rho[key] = value;
+            assert!(std::panic::catch_unwind(|| validate_rho_draw(&rho, &n1.row, 1)).is_err());
+        }
+    }
 }
