@@ -1,0 +1,141 @@
+#!/usr/bin/env sage
+"""End-to-end degree-seven transfer, genus-five IC and Frobenius rho at s=3."""
+import hashlib
+import json
+import random
+import time
+from pathlib import Path
+
+PTH=Path(__file__).resolve().parent
+hit=json.loads((PTH/'degree7_quadratic_square_30.json').read_text())['hits'][0]
+F3=GF(3);Z=PolynomialRing(F3,'z');z=Z.gen()
+K=GF(3^5,'a',modulus=z^5+2*z+1)
+L=GF(3^15,'w');ek=K.embeddings(L)[0];a=ek(K.gen())
+k=L.subfield(3);e3=k.embeddings(L)[0];back=e3.section()
+R=PolynomialRing(L,'x');x=R.gen()
+f=x^11+x^9+2*x^8+x^7+2*x^5+x^3+x^2+x+1
+b=a+a^3
+A=R(sage_eval(hit['A'],locals={'a':a,'x':x},preparse=True))
+B=R(sage_eval(hit['B'],locals={'a':a,'x':x},preparse=True))
+C=R(sage_eval(hit['C'],locals={'a':a,'x':x},preparse=True))
+assert f*C^2==B*(A^3+2*A^2*B+b*B^3)
+Kx=PolynomialRing(K,'x');xx=Kx.gen();fk=xx^11+xx^9+2*xx^8+xx^7+2*xx^5+xx^3+xx^2+xx+1
+Qi0=[q for q,n in fk.factor() if q.degree()==2 for _ in range(n)][hit['poles'][0]]
+Qi=R([ek(c) for c in Qi0.list()])
+JL=HyperellipticCurve(f).jacobian();OL=JL(0);D0=JL(Qi,R(0))
+Rk=PolynomialRing(k,'x');xk=Rk.gen()
+fk2=xk^11+xk^9+2*xk^8+xk^7+2*xk^5+xk^3+xk^2+xk+1
+Yk=HyperellipticCurve(fk2);J=Yk.jacobian();O=J(0)
+N=ZZ(14350286);r=ZZ(65827);h=N//r
+assert N==2*109*r and is_prime(r) and J.cardinality()==N
+E=EllipticCurve(L,[0,2,0,0,b]);set_random_seed(20261116+3+30)
+P=E(0)
+for _ in range(30):
+ candidate=h*E.random_point()
+ if not candidate.is_zero():P=candidate;break
+assert P!=E(0) and r*P==E(0)
+secret=12345;Q=secret*P
+def pull(Pt):
+ U=(A-Pt[0]*B).monic();assert U.degree()==7 and U.is_squarefree() and gcd(U,C)==1
+ V=(Pt[1]*B^2*C.inverse_mod(U))%U
+ assert (V^2-f)%U==0
+ return JL(U,V)-D0
+def frobL(D,i):return JL(R([c^(3^(3*i)) for c in D[0].list()]),R([c^(3^(3*i)) for c in D[1].list()]))
+def trace(Pt):
+ D=pull(Pt);T=sum((frobL(D,i) for i in range(5)),OL)
+ assert frobL(T,1)==T
+ return J(Rk([back(c) for c in T[0].list()]),Rk([back(c) for c in T[1].list()]))
+timing={};start=time.process_time_ns()
+G=trace(P);H=trace(Q);G37=trace(37*P)
+assert G!=O and r*G==O and H==secret*G and G37==37*G
+timing['transfer_cpu_s']=(time.process_time_ns()-start)/1e9
+
+def digits(v,n):
+ c=[int(x) for x in v.polynomial().list()]
+ return tuple(c+[0]*(n-len(c)))
+pts=[p for p in Yk.rational_points() if p[2]!=0]
+base=[];base_index={}
+for pt in pts:
+ xi,yi=pt[0],pt[1]
+ if yi==0 or digits(yi,3)>digits(-yi,3):continue
+ base_index[xi]=len(base)
+ base.append(J(Rk([-xi,1]),Rk([yi])))
+n=len(base);assert n>0
+def smooth(D):
+ U,V=D[0],D[1]
+ row=[0]*n
+ if U.degree()==0:return row
+ for fac,mult in U.factor():
+  if fac.degree()!=1:return None
+  xi=-fac[0]/fac[1];yi=V(xi)
+  if yi==0:continue
+  j=base_index.get(xi)
+  if j is None:return None
+  bj=base[j][1][0]
+  if yi!=bj and yi!=-bj:return None
+  row[j]+=(1 if yi==bj else -1)*int(mult)
+ return row
+
+start=time.process_time_ns();rows=[];rhs=[];attempts=0;walk=O
+for aa in range(1,20001):
+ walk+=G;attempts=aa
+ row=smooth(walk)
+ if row is None:continue
+ rows.append(row);rhs.append(int(h*aa%r))
+ if len(rows)>=n and matrix(GF(r),rows).rank()==n:break
+else:raise RuntimeError('relation rank not reached within 20000 walk steps')
+M=matrix(GF(r),rows);logs=M.solve_right(vector(GF(r),rhs))
+assert all(int(logs[i]) * G==h*base[i] for i in range(n))
+timing['relations_and_la_cpu_s']=(time.process_time_ns()-start)/1e9
+start=time.process_time_ns();T=H;descent_attempts=0
+for tt in range(20001):
+ row=smooth(T);descent_attempts=tt+1
+ if row is not None:break
+ T+=G
+else:raise RuntimeError('target descent not reached within 20000 offsets')
+recover=(int(sum(row[i]*logs[i] for i in range(n)))*inverse_mod(h,r)-tt)%r
+assert recover*P==Q and recover*G==H and recover==secret
+timing['descent_verify_cpu_s']=(time.process_time_ns()-start)/1e9
+timing['ghs_total_cpu_s']=sum(timing.values())
+
+# The K-Frobenius eigenvalue has order three on this new r-primary subgroup.
+Fr=lambda Pt:E(Pt[0]^243,Pt[1]^243)
+S=PolynomialRing(GF(r),'t');t=S.gen()
+roots=[int(v) for v,mult in (t^2-26*t+243).roots()]
+lam=next(v for v in roots if Fr(P)==v*P)
+assert pow(lam,3,r)==1 and lam!=1 and Fr(Q)==lam*Q
+def key(Pt):return digits(Pt[0],15)+digits(Pt[1],15)
+def canon(Pt,aa,bb):
+ if Pt.is_zero():return Pt,aa,bb
+ choices=[(Pt,aa,bb)];D=Pt
+ for j in (1,2):
+  D=Fr(D);choices.append((D,aa*pow(lam,j,r)%r,bb*pow(lam,j,r)%r))
+ return min(choices,key=lambda z:key(z[0]))
+def rho_trial(seed):
+ rng=random.Random(seed);start=time.process_time_ns()
+ steps=[(rng.randrange(r),rng.randrange(r)) for _ in range(16)]
+ jumps=[u*P+v*Q for u,v in steps]
+ aa=rng.randrange(r);bb=rng.randrange(r);D=aa*P+bb*Q
+ seen={};count=0
+ while count<20000:
+  D,aa,bb=canon(D,aa,bb);state=key(D) if not D.is_zero() else ('O',)
+  if state in seen:
+   aa0,bb0=seen[state];den=(bb-bb0)%r
+   if den:
+    candidate=((aa0-aa)*inverse_mod(den,r))%r
+    if candidate*P==Q:return {'cpu_s':(time.process_time_ns()-start)/1e9,'steps':count,'scalar':int(candidate)}
+   seen={}
+  seen[state]=(aa,bb)
+  j=sum((i+1)*v for i,v in enumerate(state))%len(jumps) if state!=('O',) else 0
+  D+=jumps[j];aa=(aa+steps[j][0])%r;bb=(bb+steps[j][1])%r;count+=1
+ raise RuntimeError('rho cap reached')
+rho=[rho_trial(20261116+i) for i in range(30)]
+assert all(z['scalar']==secret for z in rho)
+out={'schema':'ghs.odd5.s3-full-attack/v1','source_sha256':hashlib.sha256(Path(__file__).with_suffix('').read_bytes()).hexdigest(),
+ 'bmask':30,'q':27,'source_order':int(N),'r':int(r),'validation_scalar':secret,
+ 'factor_base_size':n,'factor_base_rational_points':len(pts),'relation_attempts':attempts,'accepted_relations':len(rows),
+ 'relation_rank':int(M.rank()),'descent_attempts':descent_attempts,'recovered_scalar':int(recover),
+ 'timing':timing,'rho_eigenvalue':lam,'rho_trials':rho,'rho_median_cpu_s':sorted(z['cpu_s'] for z in rho)[len(rho)//2],
+ 'rho_median_steps':sorted(z['steps'] for z in rho)[len(rho)//2]}
+(PTH/'s3_full_attack.json').write_text(json.dumps(out,indent=2,sort_keys=True,default=int)+'\n')
+print(json.dumps({k:out[k] for k in ['schema','r','factor_base_size','relation_attempts','accepted_relations','relation_rank','descent_attempts','recovered_scalar','timing','rho_eigenvalue','rho_median_cpu_s','rho_median_steps']},sort_keys=True))
