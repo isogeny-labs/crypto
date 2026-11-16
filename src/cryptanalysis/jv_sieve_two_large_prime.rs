@@ -27,6 +27,10 @@ pub use dlp::{
 mod counted_linear;
 pub use counted_linear::CountedRelationSystem;
 
+#[path = "jv_sieve_quadratic_remainder.rs"]
+mod quadratic_remainder;
+pub use quadratic_remainder::{FilteredQuadraticRemainders, QuadraticRemainderRelation};
+
 /// Distinct roots of a nonzero polynomial of degree <= 2, or refusal.
 /// Repeated roots are refused, rather than silently treated as simple roots.
 fn low_degree_roots(ring: &FpRing, f: &[u64], sqrt: &[u64]) -> Option<Vec<u64>> {

@@ -1,5 +1,14 @@
 # Extension-field algebraic IC with graph elimination
 
+The [native quadratic remainder component](quadratic-remainder-component/README.md)
+adds a reusable opt-in degree-nine extractor and bounded signed class-graph
+adapter to the library. Its separate frozen-source release suite reports19
+passing checks, including4 new controls and actual p251/seed2 support. The
+incoming stage40 prototype and its recorded rank comparison below remain
+unchanged; these library controls do not reprice or compose that experiment.
+The original development claims and journal fork are preserved; canonical
+integration references are in the component report. [pcc:unverified]
+
 The [Runpod quadratic-remainder component40](runpod-extension-remainders-20261116-40/README.md)
 retains verified irreducible quadratic classes over Fp² as signed graph vertices.
 It reaches actual homogeneous rank491 at251904B rather than452608B for full
