@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:27:47Z",
+ "id": "PCC-20261116-68ee38",
+ "kind": "statement",
+ "producer": {
+  "commit": "f5472700fbf4b1eab4436406d3e9a2a22f230295",
+  "model": "",
+  "session": "codex-20261116-nist-three-e2e"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-openssl-v1/points.jsonl",
+    "sha256": "0a76175b61fcc09a4c5c9011e1d49eacc05332f59ddba159744d4b7211db9947"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-openssl-v1/checker.txt",
+    "sha256": "24d99d328072aca0c5066d53083ef1a797df838ef8fde675552dc1be7afa637b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/quotient-openssl-v1/canary.stderr",
+    "sha256": "294f40e3dcc56dc13c4c1b4c19632ea3974edd0a2dc43654fc5dbc0053858332"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/openssl_roundtrip_check.cpp",
+    "sha256": "f6b01ca16b569e02f819dd17bc304159808d657ace0e25da9264aa59bb5a6b94"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "A distinct OpenSSL elliptic-arithmetic checker accepts40 public P-192 known-answer source/TF=[6]/inverse6 point receipts across all eight coset quotient kernels and rejects a corrupted recovery point. It checks elliptic endpoint outputs, not independently the quotient arithmetic, target-curve geometry or DLP solving. No signed independent PCC verification is claimed."
+}

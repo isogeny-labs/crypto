@@ -1,0 +1,5587 @@
+{
+  "arm_names": [
+    "old_packed_APS",
+    "joint_public_batch_APS",
+    "joint_public_batch_APS_AA",
+    "cold_BSGS"
+  ],
+  "candidate_AA_drift": 0.017169641518991252,
+  "candidate_vs_BSGS_ratio": 0.8209469329936576,
+  "candidate_vs_old_ratio": 0.6503083993317922,
+  "cases": [
+    {
+      "caller_known_scalar_verifier_only": 1381898438,
+      "case": 0,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3701571,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 77,
+            "s3_pair_quadratics": 29568,
+            "s3_query_ns": 1989064,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 400051701,
+              "beta": 641726563,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1381898438,
+              "partition_indices": [
+                76,
+                322,
+                5956
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1314509,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3703623,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          668664405,
+          2034787544
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3342048,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 77,
+            "s3_pair_quadratics": 29568,
+            "s3_query_ns": 1870078,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 400051701,
+              "beta": 641726563,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1381898438,
+              "partition_indices": [
+                76,
+                322,
+                5956
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1083045,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3343714,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          668664405,
+          2034787544
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3411382,
+        "cold_giant_search_and_replay_ns": 1524924,
+        "cold_wall_ns": 4943955,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 117,
+        "giant_steps_visited": 29952,
+        "known_answer_in_solver": false,
+        "log": 1381898438,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          668664405,
+          2034787544
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6073633,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 77,
+            "s3_pair_quadratics": 29568,
+            "s3_query_ns": 2108261,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 400051701,
+              "beta": 641726563,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1381898438,
+              "partition_indices": [
+                76,
+                322,
+                5956
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3562394,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6076769,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          668664405,
+          2034787544
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        668664405,
+        2034787544
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 420683392,
+      "case": 1,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3763133,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 105,
+            "s3_pair_quadratics": 40320,
+            "s3_query_ns": 2377594,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 750338153,
+              "beta": 1401972538,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 420683392,
+              "partition_indices": [
+                104,
+                24,
+                10597
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1042771,
+            "verification_group_additions": 46,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3765665,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1507055253,
+          574346519
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3932177,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 105,
+            "s3_pair_quadratics": 40320,
+            "s3_query_ns": 2484407,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 750338153,
+              "beta": 1401972538,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 420683392,
+              "partition_indices": [
+                104,
+                24,
+                10597
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1076596,
+            "verification_group_additions": 46,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3933617,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1507055253,
+          574346519
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3390026,
+        "cold_giant_search_and_replay_ns": 628997,
+        "cold_wall_ns": 4027777,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 36,
+        "giant_steps_visited": 9216,
+        "known_answer_in_solver": false,
+        "log": 420683392,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1507055253,
+          574346519
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6196999,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 105,
+            "s3_pair_quadratics": 40320,
+            "s3_query_ns": 2519184,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 750338153,
+              "beta": 1401972538,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 420683392,
+              "partition_indices": [
+                104,
+                24,
+                10597
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3272395,
+            "verification_group_additions": 46,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6199714,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1507055253,
+          574346519
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1507055253,
+        574346519
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 686057669,
+      "case": 2,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2119499,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 20,
+            "s3_pair_quadratics": 7680,
+            "s3_query_ns": 648570,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1973986686,
+              "beta": 1194471696,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 686057669,
+              "partition_indices": [
+                19,
+                179,
+                175
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1093365,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2120879,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2056047507,
+          1099394790
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2132978,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 20,
+            "s3_pair_quadratics": 7680,
+            "s3_query_ns": 635199,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1973986686,
+              "beta": 1194471696,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 686057669,
+              "partition_indices": [
+                19,
+                179,
+                175
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1113779,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2134728,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2056047507,
+          1099394790
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3453501,
+        "cold_giant_search_and_replay_ns": 832723,
+        "cold_wall_ns": 4294596,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 58,
+        "giant_steps_visited": 14848,
+        "known_answer_in_solver": false,
+        "log": 686057669,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2056047507,
+          1099394790
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4066892,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 20,
+            "s3_pair_quadratics": 7680,
+            "s3_query_ns": 604007,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1973986686,
+              "beta": 1194471696,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 686057669,
+              "partition_indices": [
+                19,
+                179,
+                175
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3071803,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4068564,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2056047507,
+          1099394790
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2056047507,
+        1099394790
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 781953672,
+      "case": 3,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3227915,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 73,
+            "s3_pair_quadratics": 28032,
+            "s3_query_ns": 1776201,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1423177346,
+              "beta": 775429996,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 781953672,
+              "partition_indices": [
+                72,
+                242,
+                5410
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1080640,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3229383,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2107107009,
+          1388014996
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3065341,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 73,
+            "s3_pair_quadratics": 28032,
+            "s3_query_ns": 1659868,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1423177346,
+              "beta": 775429996,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 781953672,
+              "partition_indices": [
+                72,
+                242,
+                5410
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1028044,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3066677,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2107107009,
+          1388014996
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3154687,
+        "cold_giant_search_and_replay_ns": 923076,
+        "cold_wall_ns": 4086084,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 66,
+        "giant_steps_visited": 16896,
+        "known_answer_in_solver": false,
+        "log": 781953672,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2107107009,
+          1388014996
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5183344,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 73,
+            "s3_pair_quadratics": 28032,
+            "s3_query_ns": 1775631,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1423177346,
+              "beta": 775429996,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 781953672,
+              "partition_indices": [
+                72,
+                242,
+                5410
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3034676,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5184965,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2107107009,
+          1388014996
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2107107009,
+        1388014996
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1367329908,
+      "case": 4,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4834747,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 135,
+            "s3_pair_quadratics": 51840,
+            "s3_query_ns": 3280281,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 751848910,
+              "beta": 55188892,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1367329908,
+              "partition_indices": [
+                134,
+                267,
+                10165
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1152750,
+            "verification_group_additions": 55,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4836125,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          540131713,
+          261025906
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4769037,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 135,
+            "s3_pair_quadratics": 51840,
+            "s3_query_ns": 3264786,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 751848910,
+              "beta": 55188892,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1367329908,
+              "partition_indices": [
+                134,
+                267,
+                10165
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1120725,
+            "verification_group_additions": 55,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4770484,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          540131713,
+          261025906
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3402557,
+        "cold_giant_search_and_replay_ns": 1660144,
+        "cold_wall_ns": 5071221,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 116,
+        "giant_steps_visited": 29696,
+        "known_answer_in_solver": false,
+        "log": 1367329908,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          540131713,
+          261025906
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6867222,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 135,
+            "s3_pair_quadratics": 51840,
+            "s3_query_ns": 3285242,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 751848910,
+              "beta": 55188892,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1367329908,
+              "partition_indices": [
+                134,
+                267,
+                10165
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3204179,
+            "verification_group_additions": 55,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6868871,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          540131713,
+          261025906
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        540131713,
+        261025906
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1618273959,
+      "case": 5,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3710995,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 89,
+            "s3_pair_quadratics": 34176,
+            "s3_query_ns": 2189500,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1906066231,
+              "beta": 1548525768,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1618273959,
+              "partition_indices": [
+                88,
+                306,
+                7666
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1137923,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3712856,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          501069969,
+          780190283
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3572764,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 89,
+            "s3_pair_quadratics": 34176,
+            "s3_query_ns": 2113665,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1906066231,
+              "beta": 1548525768,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1618273959,
+              "partition_indices": [
+                88,
+                306,
+                7666
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1088041,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3574203,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          501069969,
+          780190283
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3077549,
+        "cold_giant_search_and_replay_ns": 1939390,
+        "cold_wall_ns": 5025068,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 137,
+        "giant_steps_visited": 35072,
+        "known_answer_in_solver": false,
+        "log": 1618273959,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          501069969,
+          780190283
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5640222,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 89,
+            "s3_pair_quadratics": 34176,
+            "s3_query_ns": 2116909,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1906066231,
+              "beta": 1548525768,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1618273959,
+              "partition_indices": [
+                88,
+                306,
+                7666
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3133550,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5641661,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          501069969,
+          780190283
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        501069969,
+        780190283
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1783227036,
+      "case": 6,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6487569,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 208,
+            "s3_pair_quadratics": 79872,
+            "s3_query_ns": 4976717,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1910592300,
+              "beta": 1663626504,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1783227036,
+              "partition_indices": [
+                207,
+                79,
+                8925
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1129063,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6489758,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1619586911,
+          1575063079
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6104580,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 208,
+            "s3_pair_quadratics": 79872,
+            "s3_query_ns": 4637722,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1910592300,
+              "beta": 1663626504,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1783227036,
+              "partition_indices": [
+                207,
+                79,
+                8925
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1095950,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6106123,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1619586911,
+          1575063079
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3015949,
+        "cold_giant_search_and_replay_ns": 1902829,
+        "cold_wall_ns": 4926187,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 151,
+        "giant_steps_visited": 38656,
+        "known_answer_in_solver": false,
+        "log": 1783227036,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1619586911,
+          1575063079
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 7974299,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 208,
+            "s3_pair_quadratics": 79872,
+            "s3_query_ns": 4659644,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1910592300,
+              "beta": 1663626504,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1783227036,
+              "partition_indices": [
+                207,
+                79,
+                8925
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 2973441,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 7975819,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1619586911,
+          1575063079
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1619586911,
+        1575063079
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1536729756,
+      "case": 7,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1728265,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 4,
+            "s3_pair_quadratics": 1536,
+            "s3_query_ns": 266334,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1163429345,
+              "beta": 1051376433,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1536729756,
+              "partition_indices": [
+                3,
+                134,
+                9104
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1090745,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1729546,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2013490747,
+          145813027
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1732615,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 4,
+            "s3_pair_quadratics": 1536,
+            "s3_query_ns": 264491,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1163429345,
+              "beta": 1051376433,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1536729756,
+              "partition_indices": [
+                3,
+                134,
+                9104
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1089252,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1733756,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2013490747,
+          145813027
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3278171,
+        "cold_giant_search_and_replay_ns": 1798476,
+        "cold_wall_ns": 5084947,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 130,
+        "giant_steps_visited": 33280,
+        "known_answer_in_solver": false,
+        "log": 1536729756,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2013490747,
+          145813027
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3696933,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 4,
+            "s3_pair_quadratics": 1536,
+            "s3_query_ns": 269505,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1163429345,
+              "beta": 1051376433,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1536729756,
+              "partition_indices": [
+                3,
+                134,
+                9104
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3053771,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3698883,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2013490747,
+          145813027
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2013490747,
+        145813027
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 718895263,
+      "case": 8,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1880396,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 9,
+            "s3_pair_quadratics": 3456,
+            "s3_query_ns": 397970,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 721507362,
+              "beta": 247254092,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 718895263,
+              "partition_indices": [
+                8,
+                244,
+                7726
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1099936,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1881719,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          898511805,
+          1974887767
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1891019,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 9,
+            "s3_pair_quadratics": 3456,
+            "s3_query_ns": 393347,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 721507362,
+              "beta": 247254092,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 718895263,
+              "partition_indices": [
+                8,
+                244,
+                7726
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1114840,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1892286,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          898511805,
+          1974887767
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3138688,
+        "cold_giant_search_and_replay_ns": 883897,
+        "cold_wall_ns": 4031042,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 61,
+        "giant_steps_visited": 15616,
+        "known_answer_in_solver": false,
+        "log": 718895263,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          898511805,
+          1974887767
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3826191,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 9,
+            "s3_pair_quadratics": 3456,
+            "s3_query_ns": 402314,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 721507362,
+              "beta": 247254092,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 718895263,
+              "partition_indices": [
+                8,
+                244,
+                7726
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3052951,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3827695,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          898511805,
+          1974887767
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        898511805,
+        1974887767
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 726336965,
+      "case": 9,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3502317,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 81,
+            "s3_pair_quadratics": 31104,
+            "s3_query_ns": 1992814,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1189058138,
+              "beta": 1930982693,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 726336965,
+              "partition_indices": [
+                80,
+                159,
+                9050
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1126072,
+            "verification_group_additions": 46,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3504161,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1323210702,
+          473254094
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3430373,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 81,
+            "s3_pair_quadratics": 31104,
+            "s3_query_ns": 1917930,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1189058138,
+              "beta": 1930982693,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 726336965,
+              "partition_indices": [
+                80,
+                159,
+                9050
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1120269,
+            "verification_group_additions": 46,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3431527,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1323210702,
+          473254094
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3252677,
+        "cold_giant_search_and_replay_ns": 853873,
+        "cold_wall_ns": 4115058,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 62,
+        "giant_steps_visited": 15872,
+        "known_answer_in_solver": false,
+        "log": 726336965,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1323210702,
+          473254094
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4989032,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 81,
+            "s3_pair_quadratics": 31104,
+            "s3_query_ns": 1797679,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1189058138,
+              "beta": 1930982693,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 726336965,
+              "partition_indices": [
+                80,
+                159,
+                9050
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 2831747,
+            "verification_group_additions": 46,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4990716,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1323210702,
+          473254094
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1323210702,
+        473254094
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 614179271,
+      "case": 10,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3342386,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 70,
+            "s3_pair_quadratics": 26880,
+            "s3_query_ns": 1792704,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1564431199,
+              "beta": 1384478518,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 614179271,
+              "partition_indices": [
+                69,
+                129,
+                1587
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1153326,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3343793,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          813927519,
+          1545665398
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2909382,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 70,
+            "s3_pair_quadratics": 26880,
+            "s3_query_ns": 1559024,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1564431199,
+              "beta": 1384478518,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 614179271,
+              "partition_indices": [
+                69,
+                129,
+                1587
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1010069,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2911101,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          813927519,
+          1545665398
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 2767684,
+        "cold_giant_search_and_replay_ns": 786163,
+        "cold_wall_ns": 3561426,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 52,
+        "giant_steps_visited": 13312,
+        "known_answer_in_solver": false,
+        "log": 614179271,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          813927519,
+          1545665398
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5282543,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 70,
+            "s3_pair_quadratics": 26880,
+            "s3_query_ns": 1756328,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1564431199,
+              "beta": 1384478518,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 614179271,
+              "partition_indices": [
+                69,
+                129,
+                1587
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3137527,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5284458,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          813927519,
+          1545665398
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        813927519,
+        1545665398
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 2073670042,
+      "case": 11,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3096624,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 67,
+            "s3_pair_quadratics": 25728,
+            "s3_query_ns": 1643772,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 282524890,
+              "beta": 976309836,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2073670042,
+              "partition_indices": [
+                66,
+                50,
+                3819
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1081241,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3098278,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          113215092,
+          1700970351
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3179530,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 67,
+            "s3_pair_quadratics": 25728,
+            "s3_query_ns": 1672801,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 282524890,
+              "beta": 976309836,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2073670042,
+              "partition_indices": [
+                66,
+                50,
+                3819
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1124075,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3180784,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          113215092,
+          1700970351
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3226901,
+        "cold_giant_search_and_replay_ns": 2578655,
+        "cold_wall_ns": 5814150,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 175,
+        "giant_steps_visited": 44800,
+        "known_answer_in_solver": false,
+        "log": 2073670042,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          113215092,
+          1700970351
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4955845,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 67,
+            "s3_pair_quadratics": 25728,
+            "s3_query_ns": 1553956,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 282524890,
+              "beta": 976309836,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2073670042,
+              "partition_indices": [
+                66,
+                50,
+                3819
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3004407,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4957764,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          113215092,
+          1700970351
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        113215092,
+        1700970351
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1639751586,
+      "case": 12,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4251260,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 139,
+            "s3_pair_quadratics": 53376,
+            "s3_query_ns": 2924779,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1443023362,
+              "beta": 1664674473,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1639751586,
+              "partition_indices": [
+                138,
+                77,
+                15434
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 987242,
+            "verification_group_additions": 56,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4252474,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          245949437,
+          1888997161
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4505439,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 139,
+            "s3_pair_quadratics": 53376,
+            "s3_query_ns": 3172349,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1443023362,
+              "beta": 1664674473,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1639751586,
+              "partition_indices": [
+                138,
+                77,
+                15434
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 988892,
+            "verification_group_additions": 56,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4507817,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          245949437,
+          1888997161
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3194576,
+        "cold_giant_search_and_replay_ns": 2054614,
+        "cold_wall_ns": 5257661,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 139,
+        "giant_steps_visited": 35584,
+        "known_answer_in_solver": false,
+        "log": 1639751586,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          245949437,
+          1888997161
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6446603,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 139,
+            "s3_pair_quadratics": 53376,
+            "s3_query_ns": 2966398,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1443023362,
+              "beta": 1664674473,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1639751586,
+              "partition_indices": [
+                138,
+                77,
+                15434
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3091768,
+            "verification_group_additions": 56,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6448324,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          245949437,
+          1888997161
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        245949437,
+        1888997161
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1528539071,
+      "case": 13,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2219699,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 21,
+            "s3_pair_quadratics": 8064,
+            "s3_query_ns": 675833,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 14399867,
+              "beta": 755645466,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1528539071,
+              "partition_indices": [
+                20,
+                155,
+                11045
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1146076,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2222064,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1740431940,
+          1833165853
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2111534,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 21,
+            "s3_pair_quadratics": 8064,
+            "s3_query_ns": 629885,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 14399867,
+              "beta": 755645466,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1528539071,
+              "partition_indices": [
+                20,
+                155,
+                11045
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1085333,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2113013,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1740431940,
+          1833165853
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3001436,
+        "cold_giant_search_and_replay_ns": 1793824,
+        "cold_wall_ns": 4803353,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 129,
+        "giant_steps_visited": 33024,
+        "known_answer_in_solver": false,
+        "log": 1528539071,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1740431940,
+          1833165853
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4158101,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 21,
+            "s3_pair_quadratics": 8064,
+            "s3_query_ns": 655533,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 14399867,
+              "beta": 755645466,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1528539071,
+              "partition_indices": [
+                20,
+                155,
+                11045
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3109789,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4159818,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1740431940,
+          1833165853
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1740431940,
+        1833165853
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 562040095,
+      "case": 14,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2193083,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 22,
+            "s3_pair_quadratics": 8448,
+            "s3_query_ns": 691648,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 14448132,
+              "beta": 1622736592,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 562040095,
+              "partition_indices": [
+                21,
+                134,
+                6656
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1130363,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2194407,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          629251027,
+          1312029483
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2259084,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 22,
+            "s3_pair_quadratics": 8448,
+            "s3_query_ns": 706541,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 14448132,
+              "beta": 1622736592,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 562040095,
+              "partition_indices": [
+                21,
+                134,
+                6656
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1158253,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2260691,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          629251027,
+          1312029483
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3196564,
+        "cold_giant_search_and_replay_ns": 717252,
+        "cold_wall_ns": 3922464,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 48,
+        "giant_steps_visited": 12288,
+        "known_answer_in_solver": false,
+        "log": 562040095,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          629251027,
+          1312029483
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4236982,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 22,
+            "s3_pair_quadratics": 8448,
+            "s3_query_ns": 675645,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 14448132,
+              "beta": 1622736592,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 562040095,
+              "partition_indices": [
+                21,
+                134,
+                6656
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3163907,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4238538,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          629251027,
+          1312029483
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        629251027,
+        1312029483
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 2135168400,
+      "case": 15,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4160881,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 111,
+            "s3_pair_quadratics": 42624,
+            "s3_query_ns": 2662261,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 263053413,
+              "beta": 1905584058,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2135168400,
+              "partition_indices": [
+                110,
+                87,
+                14388
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1115540,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4162158,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          932928784,
+          1595977563
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4272750,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 111,
+            "s3_pair_quadratics": 42624,
+            "s3_query_ns": 2728296,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 263053413,
+              "beta": 1905584058,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2135168400,
+              "partition_indices": [
+                110,
+                87,
+                14388
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1161818,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4274268,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          932928784,
+          1595977563
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3121694,
+        "cold_giant_search_and_replay_ns": 2514065,
+        "cold_wall_ns": 5644073,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 180,
+        "giant_steps_visited": 46080,
+        "known_answer_in_solver": false,
+        "log": 2135168400,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          932928784,
+          1595977563
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6051184,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 111,
+            "s3_pair_quadratics": 42624,
+            "s3_query_ns": 2625571,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 263053413,
+              "beta": 1905584058,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 2135168400,
+              "partition_indices": [
+                110,
+                87,
+                14388
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3052406,
+            "verification_group_additions": 47,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6052742,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          932928784,
+          1595977563
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        932928784,
+        1595977563
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1708072081,
+      "case": 16,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6421180,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 202,
+            "s3_pair_quadratics": 77568,
+            "s3_query_ns": 4870208,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1654370009,
+              "beta": 1909886471,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1708072081,
+              "partition_indices": [
+                201,
+                274,
+                13754
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1154494,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6422594,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1844609189,
+          526957790
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6445821,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 202,
+            "s3_pair_quadratics": 77568,
+            "s3_query_ns": 4889692,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1654370009,
+              "beta": 1909886471,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1708072081,
+              "partition_indices": [
+                201,
+                274,
+                13754
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1154254,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6446975,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1844609189,
+          526957790
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3213285,
+        "cold_giant_search_and_replay_ns": 1982149,
+        "cold_wall_ns": 5203602,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 144,
+        "giant_steps_visited": 36864,
+        "known_answer_in_solver": false,
+        "log": 1708072081,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1844609189,
+          526957790
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 8485401,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 202,
+            "s3_pair_quadratics": 77568,
+            "s3_query_ns": 4850618,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1654370009,
+              "beta": 1909886471,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1708072081,
+              "partition_indices": [
+                201,
+                274,
+                13754
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3231703,
+            "verification_group_additions": 53,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 8487201,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1844609189,
+          526957790
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1844609189,
+        526957790
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 808808949,
+      "case": 17,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6389371,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 232,
+            "s3_pair_quadratics": 89088,
+            "s3_query_ns": 4957011,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1965394386,
+              "beta": 1128885618,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 808808949,
+              "partition_indices": [
+                231,
+                275,
+                13107
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1056690,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6391207,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1554938936,
+          1305349925
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6101507,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 232,
+            "s3_pair_quadratics": 89088,
+            "s3_query_ns": 4760482,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1965394386,
+              "beta": 1128885618,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 808808949,
+              "partition_indices": [
+                231,
+                275,
+                13107
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 988879,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6102938,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1554938936,
+          1305349925
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3138209,
+        "cold_giant_search_and_replay_ns": 959092,
+        "cold_wall_ns": 4105429,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 69,
+        "giant_steps_visited": 17664,
+        "known_answer_in_solver": false,
+        "log": 808808949,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1554938936,
+          1305349925
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 8539163,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 232,
+            "s3_pair_quadratics": 89088,
+            "s3_query_ns": 5135504,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1965394386,
+              "beta": 1128885618,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 808808949,
+              "partition_indices": [
+                231,
+                275,
+                13107
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3031422,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 8540747,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1554938936,
+          1305349925
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1554938936,
+        1305349925
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 554272670,
+      "case": 18,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1836541,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 10,
+            "s3_pair_quadratics": 3840,
+            "s3_query_ns": 389212,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 451936978,
+              "beta": 1182213737,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 554272670,
+              "partition_indices": [
+                9,
+                7,
+                3709
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1076140,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1837860,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          585517247,
+          1906391189
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 1850334,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 10,
+            "s3_pair_quadratics": 3840,
+            "s3_query_ns": 387730,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 451936978,
+              "beta": 1182213737,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 554272670,
+              "partition_indices": [
+                9,
+                7,
+                3709
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1085298,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 1852011,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          585517247,
+          1906391189
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3033408,
+        "cold_giant_search_and_replay_ns": 661346,
+        "cold_wall_ns": 3702868,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 47,
+        "giant_steps_visited": 12032,
+        "known_answer_in_solver": false,
+        "log": 554272670,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          585517247,
+          1906391189
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3836947,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 10,
+            "s3_pair_quadratics": 3840,
+            "s3_query_ns": 398272,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 451936978,
+              "beta": 1182213737,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 554272670,
+              "partition_indices": [
+                9,
+                7,
+                3709
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3065903,
+            "verification_group_additions": 49,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3838670,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          585517247,
+          1906391189
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        585517247,
+        1906391189
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 1370878763,
+      "case": 19,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2646081,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 40,
+            "s3_pair_quadratics": 15360,
+            "s3_query_ns": 1102558,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 647207427,
+              "beta": 2010311651,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1370878763,
+              "partition_indices": [
+                39,
+                118,
+                8617
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1148009,
+            "verification_group_additions": 51,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2647373,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2124527069,
+          1198111198
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 2589549,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 40,
+            "s3_pair_quadratics": 15360,
+            "s3_query_ns": 1083547,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 647207427,
+              "beta": 2010311651,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1370878763,
+              "partition_indices": [
+                39,
+                118,
+                8617
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1113197,
+            "verification_group_additions": 51,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 2590904,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2124527069,
+          1198111198
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3014384,
+        "cold_giant_search_and_replay_ns": 1605542,
+        "cold_wall_ns": 4627995,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 116,
+        "giant_steps_visited": 29696,
+        "known_answer_in_solver": false,
+        "log": 1370878763,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2124527069,
+          1198111198
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4491418,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 40,
+            "s3_pair_quadratics": 15360,
+            "s3_query_ns": 1086279,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 647207427,
+              "beta": 2010311651,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 1370878763,
+              "partition_indices": [
+                39,
+                118,
+                8617
+              ],
+              "signs": [
+                -1,
+                -1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3027201,
+            "verification_group_additions": 51,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4493157,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2124527069,
+          1198111198
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2124527069,
+        1198111198
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 533668111,
+      "case": 20,
+      "chronological_order": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3713671,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 94,
+            "s3_pair_quadratics": 36096,
+            "s3_query_ns": 2207392,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1670955236,
+              "beta": 1128191099,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 533668111,
+              "partition_indices": [
+                93,
+                169,
+                7206
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1123382,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3715266,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          869808901,
+          1355073683
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3580462,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 94,
+            "s3_pair_quadratics": 36096,
+            "s3_query_ns": 2127891,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1670955236,
+              "beta": 1128191099,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 533668111,
+              "partition_indices": [
+                93,
+                169,
+                7206
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1082402,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3581673,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          869808901,
+          1355073683
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3063607,
+        "cold_giant_search_and_replay_ns": 680245,
+        "cold_wall_ns": 3752181,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 45,
+        "giant_steps_visited": 11520,
+        "known_answer_in_solver": false,
+        "log": 533668111,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          869808901,
+          1355073683
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5995172,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 1,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 94,
+            "s3_pair_quadratics": 36096,
+            "s3_query_ns": 2369689,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1670955236,
+              "beta": 1128191099,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 533668111,
+              "partition_indices": [
+                93,
+                169,
+                7206
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3242504,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5996865,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          869808901,
+          1355073683
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        869808901,
+        1355073683
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 414056305,
+      "case": 21,
+      "chronological_order": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4615203,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 124,
+            "s3_pair_quadratics": 47616,
+            "s3_query_ns": 3053947,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1828728866,
+              "beta": 2111324012,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 414056305,
+              "partition_indices": [
+                123,
+                76,
+                4836
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1157423,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4617034,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2069118567,
+          523277531
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4579411,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 124,
+            "s3_pair_quadratics": 47616,
+            "s3_query_ns": 3025567,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1828728866,
+              "beta": 2111324012,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 414056305,
+              "partition_indices": [
+                123,
+                76,
+                4836
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1158309,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4580876,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2069118567,
+          523277531
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3084350,
+        "cold_giant_search_and_replay_ns": 513285,
+        "cold_wall_ns": 3605730,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 35,
+        "giant_steps_visited": 8960,
+        "known_answer_in_solver": false,
+        "log": 414056305,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          2069118567,
+          523277531
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 6232522,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 124,
+            "s3_pair_quadratics": 47616,
+            "s3_query_ns": 2828914,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1828728866,
+              "beta": 2111324012,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 414056305,
+              "partition_indices": [
+                123,
+                76,
+                4836
+              ],
+              "signs": [
+                -1,
+                -1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3031198,
+            "verification_group_additions": 52,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 6234137,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          2069118567,
+          523277531
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        2069118567,
+        523277531
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 280288503,
+      "case": 22,
+      "chronological_order": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4076488,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 114,
+            "s3_pair_quadratics": 43776,
+            "s3_query_ns": 2681010,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1086934318,
+              "beta": 762820794,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 280288503,
+              "partition_indices": [
+                113,
+                158,
+                1293
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1047086,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4077880,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          698695177,
+          809103587
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 4094016,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 114,
+            "s3_pair_quadratics": 43776,
+            "s3_query_ns": 2629530,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1086934318,
+              "beta": 762820794,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 280288503,
+              "partition_indices": [
+                113,
+                158,
+                1293
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1087769,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 4095757,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          698695177,
+          809103587
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 2868354,
+        "cold_giant_search_and_replay_ns": 326371,
+        "cold_wall_ns": 3202046,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 24,
+        "giant_steps_visited": 6144,
+        "known_answer_in_solver": false,
+        "log": 280288503,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          698695177,
+          809103587
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5494857,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 114,
+            "s3_pair_quadratics": 43776,
+            "s3_query_ns": 2391486,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1086934318,
+              "beta": 762820794,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 280288503,
+              "partition_indices": [
+                113,
+                158,
+                1293
+              ],
+              "signs": [
+                -1,
+                1,
+                1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 2762980,
+            "verification_group_additions": 54,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5496467,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          698695177,
+          809103587
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        698695177,
+        809103587
+      ]
+    },
+    {
+      "caller_known_scalar_verifier_only": 209624853,
+      "case": 23,
+      "chronological_order": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "joint_public_batch_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3260499,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 66,
+            "s3_pair_quadratics": 25344,
+            "s3_query_ns": 1704571,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1348088639,
+              "beta": 90193213,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 209624853,
+              "partition_indices": [
+                65,
+                135,
+                15436
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1151125,
+            "verification_group_additions": 51,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3262061,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1917740563,
+          609737143
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "joint_public_batch_APS_AA": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 3258373,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": true,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 66,
+            "s3_pair_quadratics": 25344,
+            "s3_query_ns": 1706074,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1348088639,
+              "beta": 90193213,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 209624853,
+              "partition_indices": [
+                65,
+                135,
+                15436
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 285,
+            "source_setup_ns": 1151018,
+            "verification_group_additions": 51,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 3260014,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1917740563,
+          609737143
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "new_table_cold_BSGS": {
+        "baby_count": 46340,
+        "baby_normalization_batches": 182,
+        "ceil_sqrt_n": 46341,
+        "cofactor": 1,
+        "cold_baby_setup_ns": 3120650,
+        "cold_giant_search_and_replay_ns": 292592,
+        "cold_wall_ns": 3432015,
+        "complete_target_scalar_recovered": true,
+        "giant_normalization_batches": 18,
+        "giant_steps_visited": 4608,
+        "known_answer_in_solver": false,
+        "log": 209624853,
+        "method": "classical Shanks BSGS, mixed Jacobian and batch-normalized",
+        "n": 2147446831,
+        "p": 2147483647,
+        "public_Q": [
+          1917740563,
+          609737143
+        ],
+        "standing": "[pcc:unverified]"
+      },
+      "old_packed_APS": {
+        "attempts": [
+          {
+            "compact_x_index": false,
+            "elapsed_cold_ns": 5353672,
+            "jacobian_source": true,
+            "joint_batched_public_jumps": false,
+            "packed_x_index": true,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "rejected_duplicate_x": 0,
+            "rejected_identity": 0,
+            "round": 0,
+            "s3_batch_inversions": 66,
+            "s3_pair_quadratics": 25344,
+            "s3_query_ns": 1723834,
+            "s3_sqrts": 768,
+            "seed": "4150535f50523331",
+            "signed_candidates": 1,
+            "solution": {
+              "alpha": 1348088639,
+              "beta": 90193213,
+              "identity_equation": "alpha + beta * log = 0 (mod n)",
+              "log": 209624853,
+              "partition_indices": [
+                65,
+                135,
+                15436
+              ],
+              "signs": [
+                -1,
+                1,
+                -1
+              ],
+              "status": "verified"
+            },
+            "source_group_additions": 6215,
+            "source_setup_ns": 3234032,
+            "verification_group_additions": 51,
+            "x_fibre_precompute": true
+          }
+        ],
+        "classification": "generic decomposition / explicit pair support",
+        "cofactor": 1,
+        "cold_wall_ns": 5355612,
+        "complete_target_scalar_recovered": true,
+        "known_answer_in_solver": false,
+        "method": "published APS one relation; factored x-fibre S3 roots",
+        "n": 2147446831,
+        "p": 2147483647,
+        "profile": [
+          384,
+          384,
+          16384
+        ],
+        "public_Q": [
+          1917740563,
+          609737143
+        ],
+        "round_cap": 6,
+        "standing": "[pcc:unverified]"
+      },
+      "public_Q": [
+        1917740563,
+        609737143
+      ]
+    }
+  ],
+  "cases_count": 24,
+  "classification": "published APS m3 index calculus, generic pair-MITM-equivalent",
+  "cofactor": 1,
+  "fully_cold_ns": [
+    "134118157",
+    "87218164",
+    "85745937",
+    "106240928"
+  ],
+  "limits": "development Actions source-specific timings only; no PCC, optimized rho or external CAS comparison",
+  "mechanism": "precompute 64 public walk jumps by joint Jacobian double scalar + one batch inversion",
+  "n": 2147446831,
+  "p": 2147483647,
+  "paired_wins_candidate_vs_BSGS": 19,
+  "paired_wins_candidate_vs_old": 24,
+  "passes_preregistered_development_gate": true,
+  "profile": [
+    384,
+    384,
+    16384
+  ],
+  "protocol": "APS_JOINT_SHAMIR_BATCH_PROTOCOL_20261116.md",
+  "public_target_seed": "4a5333434f4c4431",
+  "source_setup_ns": [
+    "74377654",
+    "26795911",
+    "26280107"
+  ],
+  "standing": "[pcc:unverified]",
+  "verified_complete_scalar_recoveries": 96
+}

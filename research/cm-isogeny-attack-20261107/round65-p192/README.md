@@ -1,1 +1,0 @@
-Replay: cargo build --release --locked --offline --manifest-path native/Cargo.toml --bin denominator --bin denominator-p192; run denominator --check denominators.json and denominator-p192 "$PWD" --check P192-denominators.json. Hydrate .artifacts.json before hashes. Read scope.json, report.md and validation.json; component counts exclude separately retained preparation and setup.

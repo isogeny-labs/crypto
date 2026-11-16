@@ -1,0 +1,77 @@
+{
+  "schema": "crypto.linux-validation-attempts/v1",
+  "source_sha256": "903e05c84e97f666b22cbf6f074aab2bb302a5b56d9ebaa5efebe96a5b9dbf26",
+  "image": "sha256:a305ba95f2c6a487e5142245ff7de97c058c11a61e7c10e789f8db699e9a13ca",
+  "rustc": "1.99.1 (58cf8f9c3 2026-10-13), aarch64-unknown-linux-gnu",
+  "status": "RESOURCE_LIMIT_BEFORE_TEST_EXECUTION",
+  "Linux_tests_executed": 0,
+  "controls_still_unvalidated": "14 Linux-only process-provenance cases from the macOS full-library diagnostics",
+  "attempts": [
+    {
+      "root_optimization": 3,
+      "memory_mib": 6144,
+      "outcome": "Docker OOM; rustc SIGKILL; no tests started"
+    },
+    {
+      "root_optimization": 0,
+      "codegen_units": 256,
+      "memory_mib": 6144,
+      "outcome": "Host reboot interrupted compilation; no completion receipt"
+    },
+    {
+      "root_optimization": 0,
+      "codegen_units": 256,
+      "build_jobs": 1,
+      "cpus": 3,
+      "memory_mib_initial": 6144,
+      "memory_mib_final": 6500,
+      "outcome": "Docker OOM; rustc SIGKILL; no tests started",
+      "container_start_epoch": 1794857591,
+      "oom_epoch": 1794858330,
+      "time_bound_seconds": 1800
+    }
+  ],
+  "memory_amendment": {
+    "at": "2026-11-16T19:45:13.146672+00:00",
+    "scope": "software compilation only; no scientific measurement",
+    "container": "ecbench-evidence-linux-lowopt-reboot-20261116",
+    "old_memory_mib": 6144,
+    "new_memory_mib": 6500,
+    "existing_VM_bytes": 7529156608,
+    "VM_configuration_changed": false,
+    "reason": "cgroup has14million max-pressure events,1GiB swap and zero OOM events; small container-only increase within existing VM capacity reduces paging",
+    "time_bound_seconds": 1800,
+    "source_or_assertions_changed": false,
+    "cloud_resources_started": false
+  },
+  "source_and_registry_mounts": "read-only",
+  "runtime_network": "none",
+  "VM_settings_changed": false,
+  "cloud_workers_started": false,
+  "test_assertions_changed_or_skipped": false,
+  "Mac_release_opt3_attempt": "host interrupted; no completed result",
+  "Mac_scoped_validation": "11 selected chained-S3 tests pass at root opt0; separate receipt.json and PCC-20261116-b3179c",
+  "logs": {
+    "ecbench-linux-controls-20261116.log": {
+      "raw_sha256": "1a565bcabc8346d47ff9d4f7437bf57c9e8cc91c1a89dc126a90a7c30a05a2be",
+      "gzip_sha256": "916d67ee294c579e342c6f5b7d4fe0428622fca9c9c5de9b39b5fb455ee1c25a",
+      "bytes": 15640
+    },
+    "ecbench-linux-lowopt-controls-20261116.log": {
+      "raw_sha256": "c779b274c2af678c053be801ea631863cbbc6c736f546e3249d68354ad5ea0a1",
+      "gzip_sha256": "c63570432f93ff0cf88b2edee345599d84b7965f9c557bf7d420b34e9d1a4f79",
+      "bytes": 40
+    },
+    "ecbench-linux-lowopt-reboot-controls-20261116.log": {
+      "raw_sha256": "13f4e44eea2593484435357535354a3469fc163c6e768fc6a4a711ac0b6caf9b",
+      "gzip_sha256": "150b056391185075175dabce30c7bd373a476dc1099bc33022607985b9737fe1",
+      "bytes": 8179
+    },
+    "ecbench-chained-s3-repair-controls-20261116.log": {
+      "raw_sha256": "64d0e6a2bb6d785df891a62a3730f2b2c25e74bb093936fb12a1f11be463f843",
+      "gzip_sha256": "84f5f6153c1c4212c12d9ed2032070b08812909b62fd065a4104b80753e70d10",
+      "bytes": 14053
+    }
+  },
+  "scientific_measurement": false
+}

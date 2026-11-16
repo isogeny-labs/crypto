@@ -1,0 +1,66 @@
+name: Prime31 composed window4 public-y APS versus unfolded rho
+
+on:
+  push:
+    branches: [research/prime31-aps-window4-jumps-20261116]
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - .github/workflows/prime31-aps-composed-24q.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - .github/workflows/prime31-aps-composed-24q.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  composed-cold:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Test native Rust library and all focused APS arithmetic regressions
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
+      - name: New 24 fresh Q six-arm complete-cold matched comparison
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --aps-composed-win4-publicy-24q > prime31-aps-composed-win4-publicy-24q.json
+          python3 - <<'PY'
+          import json
+          p="prime31-aps-composed-win4-publicy-24q.json"
+          with open(p) as f: d=json.load(f)
+          assert d["cases_count"]==24 and len(d["cases"])==24
+          assert d["completed_calls"][:4]==[24]*4
+          assert d["aps_s3_sqrt_counts"][0]>0
+          assert d["aps_s3_sqrt_counts"][1]==d["aps_s3_sqrt_counts"][0]
+          assert d["aps_s3_sqrt_counts"][2:]==[0,0]
+          assert all(int(x)>0 for x in d["fully_cold_ns"])
+          assert all(int(x)>0 for x in d["aps_source_setup_ns"])
+          assert all(int(x)>0 for x in d["aps_s3_query_ns"])
+          print("APS 96/96 same S3 signed transcript; exact recovery PASS")
+          print("completed",d["completed_calls"],"all_144_complete",d["all_144_complete"])
+          print("cold_ns",d["fully_cold_ns"],"source_ns",d["aps_source_setup_ns"])
+          print("s3_ns",d["aps_s3_query_ns"],"sqrts",d["aps_s3_sqrt_counts"])
+          print("paired",d["paired_candidate_wins_over_binary_window4_rho32_rho64"])
+          print("candidate/binary",d["candidate_over_binary_ratio"],
+                "candidate/window4",d["candidate_over_window4_ratio"],
+                "candidate/faster_rho",d["candidate_over_faster_rho_ratio"],
+                "AA drift",d["candidate_AA_drift"],
+                "predeclared engineering gate",d["composed_engineering_gate_pass"])
+          PY
+      - name: Preserve every case including failed rho caps
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-aps-composed-win4-publicy-24q
+          path: prime31-aps-composed-win4-publicy-24q.json
+          if-no-files-found: warn

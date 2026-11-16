@@ -1,1 +1,0 @@
-Neutral component snapshot. Exact producer/review manifests and prospective relative publication paths are in index.json. Global packet labels are prospective until root integration. Previous snapshots are unchanged.

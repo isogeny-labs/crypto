@@ -1,0 +1,4274 @@
+{
+  "source_repository": "isogeny-labs/crypto",
+  "source_pr": 4391,
+  "source_sha": "42014773f0b79ff23e3ad2fd697cb03341a1802e",
+  "github_actions_run_id": 43817946682,
+  "job_id": 133134181765,
+  "job_url": "https://github.com/isogeny-labs/crypto/actions/runs/43817946682",
+  "worker": "ubuntu-24.04",
+  "compiler": "Rust 1.100.0 release",
+  "exact_program": "cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --unequal-384-confirm",
+  "job_conclusion": "success",
+  "result_kind": "development Rust producer measurement, [pcc:unverified]; source/head pinned; not independently signed or externally isolated",
+  "result": {
+    "all_complete": true,
+    "candidate_aa_within_5_percent": true,
+    "candidate_at_least_18_of_24_paired_wins": true,
+    "candidate_at_least_20_percent_cheaper": true,
+    "candidate_paired_wins": 21,
+    "cases_detail": [
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 56502296,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 315,
+                "s3_pair_quadratics": 483840,
+                "s3_query_ns": 53224885,
+                "s3_sqrts": 483840,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 45575413,
+                  "beta": 323967349,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 408794113,
+                  "partition_indices": [
+                    314,
+                    1195,
+                    162
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2985332,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 56504357,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 408794113,
+            "rounds": 1,
+            "s3_pair_queries": 483840,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14047853,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 134,
+                "s3_pair_quadratics": 51456,
+                "s3_query_ns": 7053956,
+                "s3_sqrts": 51456,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1011274440,
+                  "beta": 901704338,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 408794113,
+                  "partition_indices": [
+                    133,
+                    369,
+                    4336
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6702309,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 14049892,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 408794113,
+            "rounds": 1,
+            "s3_pair_queries": 51456,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13645993,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 134,
+                "s3_pair_quadratics": 51456,
+                "s3_query_ns": 6466343,
+                "s3_sqrts": 51456,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1011274440,
+                  "beta": 901704338,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 408794113,
+                  "partition_indices": [
+                    133,
+                    369,
+                    4336
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6876462,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 13647898,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 408794113,
+            "rounds": 1,
+            "s3_pair_queries": 51456,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 0,
+        "known_answer_caller_verifier_only": 408794113,
+        "public_Q": [
+          606761940,
+          1048193242
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9143326,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 38,
+                "s3_pair_quadratics": 14592,
+                "s3_query_ns": 2357670,
+                "s3_sqrts": 14592,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1465875046,
+                  "beta": 301105609,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1248148463,
+                  "partition_indices": [
+                    37,
+                    219,
+                    8321
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6500069,
+                "verification_group_additions": 52
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9145141,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1248148463,
+            "rounds": 1,
+            "s3_pair_queries": 14592,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9176054,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 38,
+                "s3_pair_quadratics": 14592,
+                "s3_query_ns": 2363102,
+                "s3_sqrts": 14592,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1465875046,
+                  "beta": 301105609,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1248148463,
+                  "partition_indices": [
+                    37,
+                    219,
+                    8321
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6518113,
+                "verification_group_additions": 52
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9177712,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1248148463,
+            "rounds": 1,
+            "s3_pair_queries": 14592,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 64993031,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 355,
+                "s3_pair_quadratics": 545280,
+                "s3_query_ns": 61781223,
+                "s3_sqrts": 545280,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1103675705,
+                  "beta": 88909039,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1248148463,
+                  "partition_indices": [
+                    354,
+                    773,
+                    279
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2915376,
+                "verification_group_additions": 56
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 64994992,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1248148463,
+            "rounds": 1,
+            "s3_pair_queries": 545280,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 1,
+        "known_answer_caller_verifier_only": 1248148463,
+        "public_Q": [
+          1233215737,
+          182477699
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13898293,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 62,
+                "s3_pair_quadratics": 95232,
+                "s3_query_ns": 10684437,
+                "s3_sqrts": 95232,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1854259720,
+                  "beta": 327281501,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 761404425,
+                  "partition_indices": [
+                    61,
+                    493,
+                    1460
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2922774,
+                "verification_group_additions": 46
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 13899688,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 761404425,
+            "rounds": 1,
+            "s3_pair_queries": 95232,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8421148,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 16,
+                "s3_pair_quadratics": 6144,
+                "s3_query_ns": 1652748,
+                "s3_sqrts": 6144,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 685237764,
+                  "beta": 1114512699,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 761404425,
+                  "partition_indices": [
+                    15,
+                    365,
+                    9420
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 6473618,
+                "verification_group_additions": 44
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8422869,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 761404425,
+            "rounds": 1,
+            "s3_pair_queries": 6144,
+            "source_group_additions": 23365
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8327479,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 16,
+                "s3_pair_quadratics": 6144,
+                "s3_query_ns": 1436395,
+                "s3_sqrts": 6144,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 685237764,
+                  "beta": 1114512699,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 761404425,
+                  "partition_indices": [
+                    15,
+                    365,
+                    9420
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 6605967,
+                "verification_group_additions": 44
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8329122,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 761404425,
+            "rounds": 1,
+            "s3_pair_queries": 6144,
+            "source_group_additions": 23365
+          }
+        ],
+        "case": 2,
+        "known_answer_caller_verifier_only": 761404425,
+        "public_Q": [
+          648963840,
+          2013496348
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14505603,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 170,
+                "s3_pair_quadratics": 65280,
+                "s3_query_ns": 7731860,
+                "s3_sqrts": 65280,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 260144594,
+                  "beta": 1005866394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1574603319,
+                  "partition_indices": [
+                    169,
+                    242,
+                    12038
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6471030,
+                "verification_group_additions": 55
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 14507339,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1574603319,
+            "rounds": 1,
+            "s3_pair_queries": 65280,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14563698,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 170,
+                "s3_pair_quadratics": 65280,
+                "s3_query_ns": 7818372,
+                "s3_sqrts": 65280,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 260144594,
+                  "beta": 1005866394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1574603319,
+                  "partition_indices": [
+                    169,
+                    242,
+                    12038
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6459976,
+                "verification_group_additions": 55
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 14565413,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1574603319,
+            "rounds": 1,
+            "s3_pair_queries": 65280,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 30721211,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 162,
+                "s3_pair_quadratics": 248832,
+                "s3_query_ns": 27510208,
+                "s3_sqrts": 248832,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1749100853,
+                  "beta": 1519813157,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1574603319,
+                  "partition_indices": [
+                    161,
+                    555,
+                    1485
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2914603,
+                "verification_group_additions": 57
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 30722887,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1574603319,
+            "rounds": 1,
+            "s3_pair_queries": 248832,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 3,
+        "known_answer_caller_verifier_only": 1574603319,
+        "public_Q": [
+          1451553663,
+          1963384170
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 98699111,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 548,
+                "s3_pair_quadratics": 841728,
+                "s3_query_ns": 95488748,
+                "s3_sqrts": 841728,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 515109210,
+                  "beta": 1368721561,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1536478958,
+                  "partition_indices": [
+                    547,
+                    717,
+                    503
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2922433,
+                "verification_group_additions": 56
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 98701099,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1536478958,
+            "rounds": 1,
+            "s3_pair_queries": 841728,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 15645095,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 193,
+                "s3_pair_quadratics": 74112,
+                "s3_query_ns": 8881785,
+                "s3_sqrts": 74112,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2075234146,
+                  "beta": 917183917,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1536478958,
+                  "partition_indices": [
+                    192,
+                    83,
+                    2946
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6477104,
+                "verification_group_additions": 54
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 15647229,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1536478958,
+            "rounds": 1,
+            "s3_pair_queries": 74112,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 15529915,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 193,
+                "s3_pair_quadratics": 74112,
+                "s3_query_ns": 8774221,
+                "s3_sqrts": 74112,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2075234146,
+                  "beta": 917183917,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1536478958,
+                  "partition_indices": [
+                    192,
+                    83,
+                    2946
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6467156,
+                "verification_group_additions": 54
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 15531699,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1536478958,
+            "rounds": 1,
+            "s3_pair_queries": 74112,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 4,
+        "known_answer_caller_verifier_only": 1536478958,
+        "public_Q": [
+          1700713216,
+          1760717297
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 19067732,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 281,
+                "s3_pair_quadratics": 107904,
+                "s3_query_ns": 12278192,
+                "s3_sqrts": 107904,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 315555731,
+                  "beta": 971947059,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 199745344,
+                  "partition_indices": [
+                    280,
+                    109,
+                    2616
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 6504032,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 19069434,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 199745344,
+            "rounds": 1,
+            "s3_pair_queries": 107904,
+            "source_group_additions": 23365
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 19082892,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 281,
+                "s3_pair_quadratics": 107904,
+                "s3_query_ns": 12316828,
+                "s3_sqrts": 107904,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 315555731,
+                  "beta": 971947059,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 199745344,
+                  "partition_indices": [
+                    280,
+                    109,
+                    2616
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 6477127,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 19084526,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 199745344,
+            "rounds": 1,
+            "s3_pair_queries": 107904,
+            "source_group_additions": 23365
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 21320032,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 105,
+                "s3_pair_quadratics": 161280,
+                "s3_query_ns": 18117782,
+                "s3_sqrts": 161280,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2059849236,
+                  "beta": 1179205055,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 199745344,
+                  "partition_indices": [
+                    104,
+                    707,
+                    961
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2908941,
+                "verification_group_additions": 47
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 21321445,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 199745344,
+            "rounds": 1,
+            "s3_pair_queries": 161280,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 5,
+        "known_answer_caller_verifier_only": 199745344,
+        "public_Q": [
+          907263462,
+          1890578417
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 26563981,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 137,
+                "s3_pair_quadratics": 210432,
+                "s3_query_ns": 23363750,
+                "s3_sqrts": 210432,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 406016975,
+                  "beta": 140919300,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1716396776,
+                  "partition_indices": [
+                    136,
+                    118,
+                    1254
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10799,
+                "source_setup_ns": 2916870,
+                "verification_group_additions": 47
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 26565323,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1716396776,
+            "rounds": 1,
+            "s3_pair_queries": 210432,
+            "source_group_additions": 10799
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11802562,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 103,
+                "s3_pair_quadratics": 39552,
+                "s3_query_ns": 5049407,
+                "s3_sqrts": 39552,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1159476273,
+                  "beta": 1550330335,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1716396776,
+                  "partition_indices": [
+                    102,
+                    308,
+                    4934
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6461425,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 11804215,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1716396776,
+            "rounds": 1,
+            "s3_pair_queries": 39552,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11866709,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 103,
+                "s3_pair_quadratics": 39552,
+                "s3_query_ns": 5101982,
+                "s3_sqrts": 39552,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1159476273,
+                  "beta": 1550330335,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1716396776,
+                  "partition_indices": [
+                    102,
+                    308,
+                    4934
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6478951,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 11868419,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1716396776,
+            "rounds": 1,
+            "s3_pair_queries": 39552,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 6,
+        "known_answer_caller_verifier_only": 1716396776,
+        "public_Q": [
+          1035124496,
+          2034474480
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8953389,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 34,
+                "s3_pair_quadratics": 13056,
+                "s3_query_ns": 2180957,
+                "s3_sqrts": 13056,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 755827771,
+                  "beta": 1353664390,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 313283630,
+                  "partition_indices": [
+                    33,
+                    284,
+                    7822
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6487094,
+                "verification_group_additions": 50
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8955102,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 313283630,
+            "rounds": 1,
+            "s3_pair_queries": 13056,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8986156,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 34,
+                "s3_pair_quadratics": 13056,
+                "s3_query_ns": 2210273,
+                "s3_sqrts": 13056,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 755827771,
+                  "beta": 1353664390,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 313283630,
+                  "partition_indices": [
+                    33,
+                    284,
+                    7822
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6490113,
+                "verification_group_additions": 50
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8987880,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 313283630,
+            "rounds": 1,
+            "s3_pair_queries": 13056,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 4658805,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 8,
+                "s3_pair_quadratics": 12288,
+                "s3_query_ns": 1424465,
+                "s3_sqrts": 12288,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1528564127,
+                  "beta": 1015724250,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 313283630,
+                  "partition_indices": [
+                    7,
+                    934,
+                    115
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2950278,
+                "verification_group_additions": 46
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 4660117,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 313283630,
+            "rounds": 1,
+            "s3_pair_queries": 12288,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 7,
+        "known_answer_caller_verifier_only": 313283630,
+        "public_Q": [
+          1516640716,
+          1679171832
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 48050389,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 267,
+                "s3_pair_quadratics": 410112,
+                "s3_query_ns": 44854628,
+                "s3_sqrts": 410112,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1583297329,
+                  "beta": 476130334,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1384990211,
+                  "partition_indices": [
+                    266,
+                    1001,
+                    41
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2912472,
+                "verification_group_additions": 45
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 48051616,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1384990211,
+            "rounds": 1,
+            "s3_pair_queries": 410112,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14752929,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 175,
+                "s3_pair_quadratics": 67200,
+                "s3_query_ns": 8004155,
+                "s3_sqrts": 67200,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1134864829,
+                  "beta": 366911029,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1384990211,
+                  "partition_indices": [
+                    174,
+                    348,
+                    11604
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6463686,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 14754619,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1384990211,
+            "rounds": 1,
+            "s3_pair_queries": 67200,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14701878,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 175,
+                "s3_pair_quadratics": 67200,
+                "s3_query_ns": 7946666,
+                "s3_sqrts": 67200,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1134864829,
+                  "beta": 366911029,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1384990211,
+                  "partition_indices": [
+                    174,
+                    348,
+                    11604
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6459766,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 14703518,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1384990211,
+            "rounds": 1,
+            "s3_pair_queries": 67200,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 8,
+        "known_answer_caller_verifier_only": 1384990211,
+        "public_Q": [
+          1016479869,
+          212346175
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8461639,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 22,
+                "s3_pair_quadratics": 8448,
+                "s3_query_ns": 1684752,
+                "s3_sqrts": 8448,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1745493746,
+                  "beta": 633182186,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1409136543,
+                  "partition_indices": [
+                    21,
+                    171,
+                    11338
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6481264,
+                "verification_group_additions": 56
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8463165,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1409136543,
+            "rounds": 1,
+            "s3_pair_queries": 8448,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8419819,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 22,
+                "s3_pair_quadratics": 8448,
+                "s3_query_ns": 1671003,
+                "s3_sqrts": 8448,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1745493746,
+                  "beta": 633182186,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1409136543,
+                  "partition_indices": [
+                    21,
+                    171,
+                    11338
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6463737,
+                "verification_group_additions": 56
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8421336,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1409136543,
+            "rounds": 1,
+            "s3_pair_queries": 8448,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 19007370,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 91,
+                "s3_pair_quadratics": 139776,
+                "s3_query_ns": 15801661,
+                "s3_sqrts": 139776,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1045188555,
+                  "beta": 1957759546,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1409136543,
+                  "partition_indices": [
+                    90,
+                    389,
+                    371
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2921344,
+                "verification_group_additions": 60
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 19008754,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1409136543,
+            "rounds": 1,
+            "s3_pair_queries": 139776,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 9,
+        "known_answer_caller_verifier_only": 1409136543,
+        "public_Q": [
+          1991927916,
+          71686472
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 78410279,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 442,
+                "s3_pair_quadratics": 678912,
+                "s3_query_ns": 75210616,
+                "s3_sqrts": 678912,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1465549461,
+                  "beta": 2136491044,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 594649248,
+                  "partition_indices": [
+                    441,
+                    1296,
+                    612
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2915628,
+                "verification_group_additions": 45
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 78411737,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 594649248,
+            "rounds": 1,
+            "s3_pair_queries": 678912,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9065460,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 33,
+                "s3_pair_quadratics": 12672,
+                "s3_query_ns": 2306435,
+                "s3_sqrts": 12672,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1518460063,
+                  "beta": 1156147344,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 594649248,
+                  "partition_indices": [
+                    32,
+                    77,
+                    11802
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6473415,
+                "verification_group_additions": 43
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9067099,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 594649248,
+            "rounds": 1,
+            "s3_pair_queries": 12672,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8878545,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 33,
+                "s3_pair_quadratics": 12672,
+                "s3_query_ns": 2129108,
+                "s3_sqrts": 12672,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1518460063,
+                  "beta": 1156147344,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 594649248,
+                  "partition_indices": [
+                    32,
+                    77,
+                    11802
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6463821,
+                "verification_group_additions": 43
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8880065,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 594649248,
+            "rounds": 1,
+            "s3_pair_queries": 12672,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 10,
+        "known_answer_caller_verifier_only": 594649248,
+        "public_Q": [
+          979527814,
+          454248938
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9857893,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 56,
+                "s3_pair_quadratics": 21504,
+                "s3_query_ns": 3094372,
+                "s3_sqrts": 21504,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1704069135,
+                  "beta": 1946697837,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 594483459,
+                  "partition_indices": [
+                    55,
+                    212,
+                    11418
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6478302,
+                "verification_group_additions": 46
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9868942,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 594483459,
+            "rounds": 1,
+            "s3_pair_queries": 21504,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9856251,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 56,
+                "s3_pair_quadratics": 21504,
+                "s3_query_ns": 3097630,
+                "s3_sqrts": 21504,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1704069135,
+                  "beta": 1946697837,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 594483459,
+                  "partition_indices": [
+                    55,
+                    212,
+                    11418
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6473640,
+                "verification_group_additions": 46
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9857879,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 594483459,
+            "rounds": 1,
+            "s3_pair_queries": 21504,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 14128859,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 64,
+                "s3_pair_quadratics": 98304,
+                "s3_query_ns": 10913584,
+                "s3_sqrts": 98304,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 272454041,
+                  "beta": 339550317,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 594483459,
+                  "partition_indices": [
+                    63,
+                    1350,
+                    1335
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2922576,
+                "verification_group_additions": 48
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 14130157,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 594483459,
+            "rounds": 1,
+            "s3_pair_queries": 98304,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 11,
+        "known_answer_caller_verifier_only": 594483459,
+        "public_Q": [
+          992358707,
+          631508111
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 97058954,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 547,
+                "s3_pair_quadratics": 840192,
+                "s3_query_ns": 93856416,
+                "s3_sqrts": 840192,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 946115746,
+                  "beta": 211696034,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 937068929,
+                  "partition_indices": [
+                    546,
+                    416,
+                    720
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2917329,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 97062198,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 937068929,
+            "rounds": 1,
+            "s3_pair_queries": 840192,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12923022,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 122,
+                "s3_pair_quadratics": 46848,
+                "s3_query_ns": 6158961,
+                "s3_sqrts": 46848,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 912464339,
+                  "beta": 281022896,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 937068929,
+                  "partition_indices": [
+                    121,
+                    271,
+                    10310
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6478206,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 12924709,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 937068929,
+            "rounds": 1,
+            "s3_pair_queries": 46848,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 12593239,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 122,
+                "s3_pair_quadratics": 46848,
+                "s3_query_ns": 5833288,
+                "s3_sqrts": 46848,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 912464339,
+                  "beta": 281022896,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 937068929,
+                  "partition_indices": [
+                    121,
+                    271,
+                    10310
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6471575,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 12594867,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 937068929,
+            "rounds": 1,
+            "s3_pair_queries": 46848,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 12,
+        "known_answer_caller_verifier_only": 937068929,
+        "public_Q": [
+          389156261,
+          631105741
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 7875609,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 8,
+                "s3_pair_quadratics": 3072,
+                "s3_query_ns": 1116299,
+                "s3_sqrts": 3072,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1049559362,
+                  "beta": 351069103,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1352897875,
+                  "partition_indices": [
+                    7,
+                    286,
+                    2976
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6464159,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 7878260,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1352897875,
+            "rounds": 1,
+            "s3_pair_queries": 3072,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 7861207,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 8,
+                "s3_pair_quadratics": 3072,
+                "s3_query_ns": 1103519,
+                "s3_sqrts": 3072,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1049559362,
+                  "beta": 351069103,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1352897875,
+                  "partition_indices": [
+                    7,
+                    286,
+                    2976
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6472496,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 7862716,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1352897875,
+            "rounds": 1,
+            "s3_pair_queries": 3072,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 73234615,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 417,
+                "s3_pair_quadratics": 640512,
+                "s3_query_ns": 70026784,
+                "s3_sqrts": 640512,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 146941758,
+                  "beta": 180020887,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1352897875,
+                  "partition_indices": [
+                    416,
+                    36,
+                    995
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2921554,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 73236986,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1352897875,
+            "rounds": 1,
+            "s3_pair_queries": 640512,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 13,
+        "known_answer_caller_verifier_only": 1352897875,
+        "public_Q": [
+          1523530676,
+          362883595
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 61465855,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 342,
+                "s3_pair_quadratics": 525312,
+                "s3_query_ns": 58263797,
+                "s3_sqrts": 525312,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1787826106,
+                  "beta": 1534701870,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1127368103,
+                  "partition_indices": [
+                    341,
+                    1277,
+                    1342
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2906860,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 61468558,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1127368103,
+            "rounds": 1,
+            "s3_pair_queries": 525312,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11433587,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 87,
+                "s3_pair_quadratics": 33408,
+                "s3_query_ns": 4652616,
+                "s3_sqrts": 33408,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 616190776,
+                  "beta": 518041619,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1127368103,
+                  "partition_indices": [
+                    86,
+                    271,
+                    12890
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6494534,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 11435448,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1127368103,
+            "rounds": 1,
+            "s3_pair_queries": 33408,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 11158216,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 87,
+                "s3_pair_quadratics": 33408,
+                "s3_query_ns": 4401061,
+                "s3_sqrts": 33408,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 616190776,
+                  "beta": 518041619,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1127368103,
+                  "partition_indices": [
+                    86,
+                    271,
+                    12890
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6461596,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 11159805,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1127368103,
+            "rounds": 1,
+            "s3_pair_queries": 33408,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 14,
+        "known_answer_caller_verifier_only": 1127368103,
+        "public_Q": [
+          1252403020,
+          389477180
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8428083,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 21,
+                "s3_pair_quadratics": 8064,
+                "s3_query_ns": 1665227,
+                "s3_sqrts": 8064,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2049536210,
+                  "beta": 66222623,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 834004897,
+                  "partition_indices": [
+                    20,
+                    95,
+                    6947
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6468197,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8431397,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 834004897,
+            "rounds": 1,
+            "s3_pair_queries": 8064,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8424627,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 21,
+                "s3_pair_quadratics": 8064,
+                "s3_query_ns": 1665397,
+                "s3_sqrts": 8064,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2049536210,
+                  "beta": 66222623,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 834004897,
+                  "partition_indices": [
+                    20,
+                    95,
+                    6947
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6473803,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8426012,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 834004897,
+            "rounds": 1,
+            "s3_pair_queries": 8064,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 4488169,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 7,
+                "s3_pair_quadratics": 10752,
+                "s3_query_ns": 1280783,
+                "s3_sqrts": 10752,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1334812442,
+                  "beta": 1571799597,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 834004897,
+                  "partition_indices": [
+                    6,
+                    1516,
+                    660
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2914379,
+                "verification_group_additions": 55
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 4489428,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 834004897,
+            "rounds": 1,
+            "s3_pair_queries": 10752,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 15,
+        "known_answer_caller_verifier_only": 834004897,
+        "public_Q": [
+          185372796,
+          486331544
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 35224668,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 190,
+                "s3_pair_quadratics": 291840,
+                "s3_query_ns": 32017843,
+                "s3_sqrts": 291840,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1688967055,
+                  "beta": 1156893662,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 257627989,
+                  "partition_indices": [
+                    189,
+                    1445,
+                    952
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2917963,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 35226590,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 257627989,
+            "rounds": 1,
+            "s3_pair_queries": 291840,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9907594,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 54,
+                "s3_pair_quadratics": 20736,
+                "s3_query_ns": 3139922,
+                "s3_sqrts": 20736,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 879875113,
+                  "beta": 1678867154,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 257627989,
+                  "partition_indices": [
+                    53,
+                    311,
+                    6871
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6482205,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9909087,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 257627989,
+            "rounds": 1,
+            "s3_pair_queries": 20736,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9824803,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 54,
+                "s3_pair_quadratics": 20736,
+                "s3_query_ns": 3050534,
+                "s3_sqrts": 20736,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 879875113,
+                  "beta": 1678867154,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 257627989,
+                  "partition_indices": [
+                    53,
+                    311,
+                    6871
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6488583,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9826306,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 257627989,
+            "rounds": 1,
+            "s3_pair_queries": 20736,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 16,
+        "known_answer_caller_verifier_only": 257627989,
+        "public_Q": [
+          1380348527,
+          437852526
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9733477,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 53,
+                "s3_pair_quadratics": 20352,
+                "s3_query_ns": 2976082,
+                "s3_sqrts": 20352,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2123345041,
+                  "beta": 1609074470,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 998226196,
+                  "partition_indices": [
+                    52,
+                    105,
+                    13466
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6472811,
+                "verification_group_additions": 57
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9736127,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 998226196,
+            "rounds": 1,
+            "s3_pair_queries": 20352,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9735726,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 53,
+                "s3_pair_quadratics": 20352,
+                "s3_query_ns": 2975381,
+                "s3_sqrts": 20352,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2123345041,
+                  "beta": 1609074470,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 998226196,
+                  "partition_indices": [
+                    52,
+                    105,
+                    13466
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6474869,
+                "verification_group_additions": 57
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9737184,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 998226196,
+            "rounds": 1,
+            "s3_pair_queries": 20352,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 19743035,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 97,
+                "s3_pair_quadratics": 148992,
+                "s3_query_ns": 16522544,
+                "s3_sqrts": 148992,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1914581977,
+                  "beta": 1475774305,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 998226196,
+                  "partition_indices": [
+                    96,
+                    559,
+                    423
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2926859,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 19744352,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 998226196,
+            "rounds": 1,
+            "s3_pair_queries": 148992,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 17,
+        "known_answer_caller_verifier_only": 998226196,
+        "public_Q": [
+          1899389973,
+          497482179
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 28334543,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 148,
+                "s3_pair_quadratics": 227328,
+                "s3_query_ns": 25121750,
+                "s3_sqrts": 227328,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 931861711,
+                  "beta": 661922195,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1139411245,
+                  "partition_indices": [
+                    147,
+                    266,
+                    1119
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2929741,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 28336650,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1139411245,
+            "rounds": 1,
+            "s3_pair_queries": 227328,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 16473774,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 215,
+                "s3_pair_quadratics": 82560,
+                "s3_query_ns": 9713786,
+                "s3_sqrts": 82560,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1697178222,
+                  "beta": 1651257377,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1139411245,
+                  "partition_indices": [
+                    214,
+                    330,
+                    4270
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6474577,
+                "verification_group_additions": 47
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 16475350,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1139411245,
+            "rounds": 1,
+            "s3_pair_queries": 82560,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 16382865,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 215,
+                "s3_pair_quadratics": 82560,
+                "s3_query_ns": 9610547,
+                "s3_sqrts": 82560,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1697178222,
+                  "beta": 1651257377,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1139411245,
+                  "partition_indices": [
+                    214,
+                    330,
+                    4270
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6485706,
+                "verification_group_additions": 47
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 16384425,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1139411245,
+            "rounds": 1,
+            "s3_pair_queries": 82560,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 18,
+        "known_answer_caller_verifier_only": 1139411245,
+        "public_Q": [
+          923442882,
+          1705122527
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9629094,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 50,
+                "s3_pair_quadratics": 19200,
+                "s3_query_ns": 2865378,
+                "s3_sqrts": 19200,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1521714256,
+                  "beta": 153171578,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 20980429,
+                  "partition_indices": [
+                    49,
+                    46,
+                    15747
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6469817,
+                "verification_group_additions": 42
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9632027,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 20980429,
+            "rounds": 1,
+            "s3_pair_queries": 19200,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 9617680,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 50,
+                "s3_pair_quadratics": 19200,
+                "s3_query_ns": 2854407,
+                "s3_sqrts": 19200,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1521714256,
+                  "beta": 153171578,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 20980429,
+                  "partition_indices": [
+                    49,
+                    46,
+                    15747
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6477847,
+                "verification_group_additions": 42
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 9619238,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 20980429,
+            "rounds": 1,
+            "s3_pair_queries": 19200,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 122658334,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 698,
+                "s3_pair_quadratics": 1072128,
+                "s3_query_ns": 119457160,
+                "s3_sqrts": 1072128,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1589845698,
+                  "beta": 78892007,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 20980429,
+                  "partition_indices": [
+                    697,
+                    1332,
+                    841
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2915169,
+                "verification_group_additions": 36
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 122660040,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 20980429,
+            "rounds": 1,
+            "s3_pair_queries": 1072128,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 19,
+        "known_answer_caller_verifier_only": 20980429,
+        "public_Q": [
+          1583851537,
+          911874822
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8227543,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 29,
+                "s3_pair_quadratics": 44544,
+                "s3_query_ns": 5021109,
+                "s3_sqrts": 44544,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 2016104145,
+                  "beta": 458880217,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1186771788,
+                  "partition_indices": [
+                    28,
+                    335,
+                    345
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2917480,
+                "verification_group_additions": 51
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8229842,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1186771788,
+            "rounds": 1,
+            "s3_pair_queries": 44544,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13598702,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 145,
+                "s3_pair_quadratics": 55680,
+                "s3_query_ns": 6838707,
+                "s3_sqrts": 55680,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1126254670,
+                  "beta": 2016559762,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1186771788,
+                  "partition_indices": [
+                    144,
+                    1,
+                    1476
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 6473673,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 13600241,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1186771788,
+            "rounds": 1,
+            "s3_pair_queries": 55680,
+            "source_group_additions": 23365
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 13514476,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 1,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 145,
+                "s3_pair_quadratics": 55680,
+                "s3_query_ns": 6755483,
+                "s3_sqrts": 55680,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1126254670,
+                  "beta": 2016559762,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1186771788,
+                  "partition_indices": [
+                    144,
+                    1,
+                    1476
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23365,
+                "source_setup_ns": 6463809,
+                "verification_group_additions": 49
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 13516078,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1186771788,
+            "rounds": 1,
+            "s3_pair_queries": 55680,
+            "source_group_additions": 23365
+          }
+        ],
+        "case": 20,
+        "known_answer_caller_verifier_only": 1186771788,
+        "public_Q": [
+          1313674882,
+          110766224
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 10452770,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 63,
+                "s3_pair_quadratics": 24192,
+                "s3_query_ns": 3421348,
+                "s3_sqrts": 24192,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 975858635,
+                  "beta": 409916199,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 971362254,
+                  "partition_indices": [
+                    62,
+                    8,
+                    9526
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6747133,
+                "verification_group_additions": 54
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 10455945,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 971362254,
+            "rounds": 1,
+            "s3_pair_queries": 24192,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 10155387,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 63,
+                "s3_pair_quadratics": 24192,
+                "s3_query_ns": 3388022,
+                "s3_sqrts": 24192,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 975858635,
+                  "beta": 409916199,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 971362254,
+                  "partition_indices": [
+                    62,
+                    8,
+                    9526
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6472977,
+                "verification_group_additions": 54
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 10156971,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 971362254,
+            "rounds": 1,
+            "s3_pair_queries": 24192,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 39061418,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 213,
+                "s3_pair_quadratics": 327168,
+                "s3_query_ns": 35861210,
+                "s3_sqrts": 327168,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 134826830,
+                  "beta": 1351474182,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 971362254,
+                  "partition_indices": [
+                    212,
+                    1273,
+                    588
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2915638,
+                "verification_group_additions": 58
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 39062921,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 971362254,
+            "rounds": 1,
+            "s3_pair_queries": 327168,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 21,
+        "known_answer_caller_verifier_only": 971362254,
+        "public_Q": [
+          530379013,
+          1852200452
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 54503053,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 301,
+                "s3_pair_quadratics": 462336,
+                "s3_query_ns": 51298354,
+                "s3_sqrts": 462336,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 203044521,
+                  "beta": 163483091,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2109893111,
+                  "partition_indices": [
+                    300,
+                    884,
+                    1455
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2922187,
+                "verification_group_additions": 57
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 54505101,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 2109893111,
+            "rounds": 1,
+            "s3_pair_queries": 462336,
+            "source_group_additions": 10798
+          },
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8878242,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 26,
+                "s3_pair_quadratics": 9984,
+                "s3_query_ns": 1987138,
+                "s3_sqrts": 9984,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 738573953,
+                  "beta": 1196008675,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2109893111,
+                  "partition_indices": [
+                    25,
+                    56,
+                    6315
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6605709,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8879842,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 2109893111,
+            "rounds": 1,
+            "s3_pair_queries": 9984,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 8667080,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 26,
+                "s3_pair_quadratics": 9984,
+                "s3_query_ns": 1868050,
+                "s3_sqrts": 9984,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 738573953,
+                  "beta": 1196008675,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 2109893111,
+                  "partition_indices": [
+                    25,
+                    56,
+                    6315
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6513528,
+                "verification_group_additions": 53
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 8668624,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 2109893111,
+            "rounds": 1,
+            "s3_pair_queries": 9984,
+            "source_group_additions": 23364
+          }
+        ],
+        "case": 22,
+        "known_answer_caller_verifier_only": 2109893111,
+        "public_Q": [
+          1930250276,
+          1777165550
+        ]
+      },
+      {
+        "arms": [
+          {
+            "arm": "unequal384",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 15267353,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 187,
+                "s3_pair_quadratics": 71808,
+                "s3_query_ns": 8463799,
+                "s3_sqrts": 71808,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1158092561,
+                  "beta": 1601099183,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1837033494,
+                  "partition_indices": [
+                    186,
+                    89,
+                    10985
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6515447,
+                "verification_group_additions": 57
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 15270764,
+            "complete_target_scalar_recovered": true,
+            "order": 0,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1837033494,
+            "rounds": 1,
+            "s3_pair_queries": 71808,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "unequal384_repeat",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 15226657,
+                "profile": [
+                  384,
+                  384,
+                  16384
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 187,
+                "s3_pair_quadratics": 71808,
+                "s3_query_ns": 8446304,
+                "s3_sqrts": 71808,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 1158092561,
+                  "beta": 1601099183,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1837033494,
+                  "partition_indices": [
+                    186,
+                    89,
+                    10985
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 23364,
+                "source_setup_ns": 6491445,
+                "verification_group_additions": 57
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 15228265,
+            "complete_target_scalar_recovered": true,
+            "order": 1,
+            "profile": [
+              384,
+              384,
+              16384
+            ],
+            "recovered_log": 1837033494,
+            "rounds": 1,
+            "s3_pair_queries": 71808,
+            "source_group_additions": 23364
+          },
+          {
+            "arm": "equal1536",
+            "attempts": [
+              {
+                "elapsed_cold_ns": 90690369,
+                "profile": [
+                  1536,
+                  1536,
+                  1536
+                ],
+                "rejected_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "s3_batch_inversions": 504,
+                "s3_pair_quadratics": 774144,
+                "s3_query_ns": 87472712,
+                "s3_sqrts": 774144,
+                "seed": "4150535f50523331",
+                "signed_candidates": 1,
+                "solution": {
+                  "alpha": 62997156,
+                  "beta": 383789058,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1837033494,
+                  "partition_indices": [
+                    503,
+                    1225,
+                    680
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_group_additions": 10798,
+                "source_setup_ns": 2920681,
+                "verification_group_additions": 57
+              }
+            ],
+            "bounded_failure": false,
+            "cold_wall_ns": 90692900,
+            "complete_target_scalar_recovered": true,
+            "order": 2,
+            "profile": [
+              1536,
+              1536,
+              1536
+            ],
+            "recovered_log": 1837033494,
+            "rounds": 1,
+            "s3_pair_queries": 774144,
+            "source_group_additions": 10798
+          }
+        ],
+        "case": 23,
+        "known_answer_caller_verifier_only": 1837033494,
+        "public_Q": [
+          684093599,
+          881397187
+        ]
+      }
+    ],
+    "classification": "published APS one-relation index calculus; generic MITM-equivalent",
+    "cofactor": 1,
+    "cold_total_ns": [
+      "1111687738",
+      "278384243",
+      "276235958"
+    ],
+    "experiment": "EXP-R31-APS-UNEQUAL-384-CONFIRM",
+    "field_prime": 2147483647,
+    "group_order": 2147446831,
+    "names": [
+      "equal1536",
+      "unequal384",
+      "unequal384_repeat"
+    ],
+    "passes_preregistered_development_gate": true,
+    "profiles": [
+      [
+        1536,
+        1536,
+        1536
+      ],
+      [
+        384,
+        384,
+        16384
+      ],
+      [
+        384,
+        384,
+        16384
+      ]
+    ],
+    "public_holdouts": 24,
+    "round_cap": 6,
+    "s3_pair_queries": [
+      9291264,
+      877824,
+      877824
+    ],
+    "scientific_limit": "not independently signed/isolated; no PKM/APS external IC frontier claim",
+    "source_group_additions": [
+      259153,
+      560739,
+      560739
+    ],
+    "standing": "[pcc:unverified]",
+    "successes": [
+      24,
+      24,
+      24
+    ]
+  }
+}

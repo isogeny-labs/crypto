@@ -1,0 +1,8 @@
+backmap_relations.cpp: In member function ‘BRImage BRMap::image(const Z&, const Z&) const’:
+backmap_relations.cpp:12:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   12 |         for(auto& c:curve.eval(x,y).c)require(c==Z(0),"local norm curve equation");auto aa=A.eval(x,y),bb=B.eval(x,y),v=V.eval(x,y),m=M.eval(x,y);out.orders={aa.order(),bb.order(),v.order(),m.order()};for(int n:out.orders)require(n<EB_PRECISION,"resolved local norm valuation");int ox=out.orders[0]-out.orders[1],oy=out.orders[2]-out.orders[3];
+      |         ^~~
+backmap_relations.cpp:12:84: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   12 |         for(auto& c:curve.eval(x,y).c)require(c==Z(0),"local norm curve equation");auto aa=A.eval(x,y),bb=B.eval(x,y),v=V.eval(x,y),m=M.eval(x,y);out.orders={aa.order(),bb.order(),v.order(),m.order()};for(int n:out.orders)require(n<EB_PRECISION,"resolved local norm valuation");int ox=out.orders[0]-out.orders[1],oy=out.orders[2]-out.orders[3];
+      |                                                                                    ^~~~
+cc1plus: all warnings being treated as errors

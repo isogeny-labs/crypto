@@ -66,6 +66,7 @@ pub mod archive;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
+pub mod binary_subtract;
 pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
@@ -1174,16 +1175,17 @@ mod tests {
     }
 
     /// **The `k`-sum table oracle recovers the planted logarithm** on a
-    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
-    /// has `k` summands, and the table holds one entry per negation orbit
-    /// of the signed `k`-sums of the base.
+    /// 24-bit prime-order curve with `k = 3` to `7` (`k = 6, 7` pack their
+    /// summand indices in 10 and 9 bits): every relation has `k` summands,
+    /// and the table holds one entry per negation orbit of the signed
+    /// `k`-sums of the base.
     #[test]
-    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
+    fn ksum_oracle_recovers_logs_with_three_to_seven_summands() {
         use super::plugins::{KSumOracle, PrimeAbscissaBase};
         use crate::cryptanalysis::ic_boundary::prime_instance_for;
         let inst = prime_instance_for(24, 5);
         let (ctx, planted) = ctx_and_planted(&inst);
-        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10), (6, 10), (7, 10)] {
             let mut spec = PipelineSpec {
                 factor_base: "prime-abscissa".into(),
                 oracle: "ksum".into(),

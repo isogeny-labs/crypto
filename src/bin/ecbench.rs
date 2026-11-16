@@ -40,6 +40,8 @@ mod pdp3_koblitz;
 mod pdp_split_oracle;
 #[path = "ecbench/pkm_tower.rs"]
 mod pkm_tower;
+#[path = "ecbench/retained_chain_study.rs"]
+mod retained_chain_study;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -68,6 +70,15 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Run the frozen retained-chain probe or complete toy relation pipeline.
+    /// Counters are raw observations; this command does not admit timings.
+    RetainedChainStudy {
+        #[arg(long)]
+        phase: String,
+        /// Must be a new directory; historical evidence is never overwritten.
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Check pinned diagnostic metadata without launching work.
     DiagnosticPreflight {
         #[arg(long)]
@@ -1220,6 +1231,7 @@ fn compare_pooled_cmd(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::RetainedChainStudy { phase, out } => retained_chain_study::run(&phase, &out)?,
         Cmd::DiagnosticPreflight {
             request,
             request_sha256,
@@ -1322,7 +1334,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     let f = |s: &str| s.parse::<f64>().unwrap_or(f64::NAN);
                     log2_r.insert(
                         r.workload.curve.slug.clone(),
-                        (r.workload.curve.r as f64).log2(),
+                        (r.workload.curve.r.to_f64()).log2(),
                     );
                     by.entry((r.workload.curve.slug.clone(), r.arm.clone()))
                         .or_default()
@@ -1710,7 +1722,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "  workload {} {} r=2^{:.2} A={} registered={} ec1={}",
                         w.workload_id,
                         w.curve.slug,
-                        (w.curve.r as f64).log2(),
+                        (w.curve.r.to_f64()).log2(),
                         w.curve.automorphisms_available,
                         w.curve.registered,
                         w.curve.ec1.as_deref().unwrap_or("-")
@@ -2162,7 +2174,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "| {} | {} | {:.2} | {} | {} | {} |",
                         w.workload_id,
                         w.slug,
-                        (w.r as f64).log2(),
+                        (w.r.to_f64()).log2(),
                         o(w.a_mean_s),
                         o(w.b_mean_s),
                         o(w.ratio_b_over_a)
@@ -2901,7 +2913,7 @@ fn audit_ir_one(
         "params": input.method.params,
         "curve": w.curve.slug,
         "family": w.curve.family,
-        "log2_r": (w.curve.r as f64).log2(),
+        "log2_r": (w.curve.r.to_f64()).log2(),
         "recovered": report.recovered.map(|x| x.to_string()),
         "solve_ir": ir.solve_ir,
         "bitops": block.bitops,
@@ -3132,7 +3144,7 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                             .collect();
                         methods::pooled_row_flags(
                             &r.workload.curve.family,
-                            (r.workload.curve.r as f64).log2(),
+                            (r.workload.curve.r.to_f64()).log2(),
                             &arm.method.family,
                             &runs,
                         )
@@ -3144,7 +3156,7 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                     arm.name,
                     arm.method.id,
                     slug,
-                    any.map(|r| (r.workload.curve.r as f64).log2())
+                    any.map(|r| (r.workload.curve.r.to_f64()).log2())
                         .unwrap_or(f64::NAN),
                     ok.len(),
                     mine.len(),
