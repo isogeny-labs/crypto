@@ -32,8 +32,8 @@ discriminant `26²−4·243=−296` is fundamental, so each has the maximal orde
 K-isomorphism classes in the trace +26 census `class_count.json`.
 
 **Theorem.** For each E_b in the table, no K-morphism `Y_K→E_b` has degree
-at most five. A K-morphism of degree at most twenty exists. Thus the minimum
-degree is in **[6,20]** for each exact target. Any such cover has degree
+at most six. A K-morphism of degree at most twenty exists. Thus the minimum
+degree is in **[7,20]** for each exact target. Any such cover has degree
 coprime to 109, and `φ_*φ^*=[deg φ]` makes pullback injective on the chosen
 order-109 subgroup of E_b(K). This gives an existence and subgroup-preservation
 bound into `J(Y)(K)`, not an evaluable map into `J(Y)(F3)`.
@@ -74,6 +74,25 @@ all listed irreducible factors have exponent one. Magma independently checks
 the full-equation obstruction; the two Sage constructions check the complete
 branch interpolation and exact candidate sets.
 
+For degree six, `DEGREE6_PROTOCOL.md` proves the ten complete denominator
+shapes after translating the image of the rational point at infinity to the
+elliptic origin. There are 60,518 monic denominators and 14,506,074 logical
+branch assignments per target. The `LQiQj` shape additionally tests all 242
+nonzero free numerator coefficients per assignment. The dominant `LH²` shape
+solves three high-coefficient equations in two field parameters, including
+the rank-deficient resultant case. The source-bound producer receipts for all
+ten b-masks contain zero full-equation hits. `DEGREE6_REPLAY_PROTOCOL.md`
+specifies a second implementation: it scans all first field parameters
+directly, solves a quadratic for the second, and reconstructs polynomial
+square roots coefficient by coefficient. `degree6_replay_manifest.json`
+checks exact agreement of both methods for all ten shapes and all five
+counters for each b-mask, with zero hits in every target. This is a
+computer-assisted exclusion of K-defined degree-six morphisms under the
+denominator-completeness argument, not a Lean formalization of that geometry.
+An inseparable degree-six map would factor Frobenius of degree three and a
+degree-two map from a geometric twist of Y, contradicting the earlier
+geometric degree-two exclusion.
+
 [Howe, Theorem 4.17 and Remark 4.18](https://arxiv.org/pdf/2110.04221)
 give a K-map of degree at most twenty to each E_b, since `J(Y)_K` lies in
 the isogeny class of `E_b^5` and `End(E_b)=Z[π]`. This completes the interval.
@@ -98,8 +117,8 @@ applies to every table row; targeted individual-equation searches returned
 irrelevant matches and cannot establish priority for any row.
 
 The theorem covers this one Y, these ten E_b, and K-defined curve morphisms.
-It leaves degrees six to twenty, other carriers in the same Weil-restriction
+It leaves degrees seven to twenty, other carriers in the same Weil-restriction
 class, correspondences, maps over larger fields, explicit E-to-E isogenies,
 an F3-rational subgroup transfer, and full same-target attack costs open.
-The 18 axiom-free declarations in `Odd5Ledger.lean` check arithmetic counts
+The 21 axiom-free declarations in `Odd5Ledger.lean` check arithmetic counts
 and degree ceilings only; they do not formalize geometry or exhaustiveness.

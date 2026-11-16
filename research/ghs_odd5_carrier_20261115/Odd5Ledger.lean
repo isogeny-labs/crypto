@@ -78,7 +78,7 @@ theorem trace26_class_screen_sizes :
     (10 : Nat) * 14446377 = 144463770 := by decide
 
 theorem trace26_cover_degrees_coprime_to_109 :
-    (List.range 21).all (fun d => decide (d < 6 ∨ Nat.gcd d 109 = 1)) = true := by decide
+    (List.range 21).all (fun d => decide (d < 7 ∨ Nat.gcd d 109 = 1)) = true := by decide
 
 #print axioms ordinary_class_count
 #print axioms selected_class_count
