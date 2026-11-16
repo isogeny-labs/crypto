@@ -1,6 +1,6 @@
 # Prime31 lead assessment after the 48-target folded/unfolded rho correction
 
-Status: source checked 2026-11-16; evidence producer-only [pcc:unverified]. **This document is a lead triage / protocol, not a new measured speed claim.**
+> **2026-11-16 exact B4/B8 support correction:** See [S9 signed-support ceiling and actual prime31 B8 census](S9_SIGNED_SUPPORT_CEILING_AND_B8_GATE_20261116.md). For B8 eight signed leaves the **entire** target image of the first eight rational-x base points contains only 187,136 nonidentity Q of 2,147,446,830. A 24-Q uniform natural-target panel has ≤0.21% chance of even one supported Q, *regardless of extractor quality*. Therefore the earlier requirement for a small natural-positive B8 panel is unsound. Replace it with blinded constructed-positive B4/B8 recall, exact negative controls, and a separate natural B31 complete solve. This is a coverage theorem/oracle correction, not nonenumerative extraction or a rho win. Rust source and focused Actions committed but execution not yet inspected. [pcc:unverified]\n\nStatus: source checked 2026-11-16; evidence producer-only [pcc:unverified]. **This document is a lead triage / protocol, not a new measured speed claim.**
 
 ## Fixed measured reference
 
