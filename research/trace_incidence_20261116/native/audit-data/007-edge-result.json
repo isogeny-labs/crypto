@@ -1,0 +1,29 @@
+{
+"schema":"paper-native-development-audit/v1",
+"pcc_standing":"unverified",
+"native_backend":"FLINT 3.1.0",
+"compiler":"14.2.0",
+"status":"passed",
+"timings_collected":false,
+"operation_count_scope":"Aggregate from all audit calls including invalid inputs, explicit psi tests and both literal backends; not one solve or a matched cost comparison",
+"group_scalar_checks":158,
+"division_polynomial_point_checks":375,
+"complete_translation_checks":0,
+"complete_root_finding_checks":26,
+"complete_pullback_root_finding_checks":13,
+"failures":0,
+"rows":[
+{"name":"root-invalid-nonmonic-p5","status":"passed","message":""},
+{"name":"root-invalid-repeated-p5","status":"passed","message":""},
+{"name":"root-invalid-zero-polynomial-p5","status":"passed","message":""},
+{"name":"root-invalid-nonsplit-p5","status":"passed","message":""},
+{"name":"pullback-invalid-nonmonic-p5","status":"passed","message":""},
+{"name":"pullback-invalid-repeated-p5","status":"passed","message":""},
+{"name":"pullback-invalid-zero-polynomial-p5","status":"passed","message":""},
+{"name":"pullback-invalid-nonsplit-p5","status":"passed","message":""},
+{"name":"anomalous-auxiliary-positive-characteristic-torsion","status":"passed","message":""}
+],
+"online_operation_counts":{"dense_reconstruction_calls":0,"division.evaluations":150,"division.normalized_states":1642,"lift.crt_merges":20,"lift.crt_terms":78,"lift.twoadic_calls":172,"paper.polynomial_gcd":270,"paper.quotient_inversions":20,"paper.quotient_multiplications":10774,"paper.quotient_power_calls":195,"point_add_calls":804,"point_add_field_inversions":189,"point_doublings":47,"point_mul_calls":171,"primary.exceptional_representatives":68,"primary.recursion_calls":72,"primary.representatives":216,"pullback_calls":17,"pullback_exception_candidates":56,"pullback_exception_linear_roots":27,"pullback_full_translation_calls":0,"pullback_image_characteristic_polynomials":0,"pullback_inverse_compositions":0,"pullback_linear_shortcuts":7,"pullback_output_product_validations":11,"pullback_recursion_calls":18,"pullback_recursion_degree_mass":34,"pullback_representatives_constructed":67,"pullback_scalar_evaluation_coefficients":316,"pullback_scalar_evaluations":110,"root.calls":30,"root.primary_prime_stages":44,"trace_reconstruction_calls":0,"translation_calls":0},
+"setup_operation_counts":{"datum.primality_checks":6,"datum.validation_calls":2,"point_add_calls":26,"point_add_field_inversions":10,"point_doublings":8,"point_mul_calls":12},
+"limitations":["Small synthetic fields only; not a formal proof or signed PCC verdict","No performance timing or comparison is collected","Static lexical guards and source review do not prove absence of every possible hidden dynamic algorithm","Datum construction enumeration occurs only in the audit; production receives only datum and polynomial coefficients"]
+}

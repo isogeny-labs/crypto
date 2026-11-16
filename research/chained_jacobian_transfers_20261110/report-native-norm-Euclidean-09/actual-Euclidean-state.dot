@@ -1,0 +1,15 @@
+digraph E {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf3fa",color="#456987",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.10"];
+ edge [color="#456987",fontname="DejaVu Sans",fontsize=10];
+ start [label="n in 1..222
+(0,1,223,n)"];
+ step [label="qq=trunc(r/nr)
+(nt,t-qq*nt,nr,r-qq*nr)"];
+ done [label="nr=0, r=1
+normalize t into 0..222",fillcolor="#eaf5ed"];
+ start -> step;step -> step [label="nr nonzero
+all intermediates signed64-safe"];
+ step -> done [label="proved termination
+within16 steps"];
+}

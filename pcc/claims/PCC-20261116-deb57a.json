@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:38:53Z",
+ "id": "PCC-20261116-deb57a",
+ "kind": "statement",
+ "producer": {
+  "commit": "86740131f4abef05cb2a31253835d4cdf1322ea1",
+  "model": "Codex",
+  "session": "trace-runpod-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-1/completion.json",
+    "sha256": "89e18dcb9e7ce1f65c22c1a7166d8a19fae7cd590abd5756acf4bcfeaa07bf4b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-1/cleanup.json",
+    "sha256": "55a71a1ae83daafe8e57010489ec31ad26b1aff6a7f655c28498502e7eba0445"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-1/custody.json",
+    "sha256": "e9649efc4c0ad3df9c1508397b909f8a2095586fedb261564e50b2c1da6d1156"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/runpod/attempt-1/cas-promotion.json",
+    "sha256": "e829d97cc5794961559b62f3360c7ee968e2d8abd3d1248f25278e583c96b9cc"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/runpod/attempt-1",
+ "statement": "First Runpod preflight stopped with exit129 before timing; the normalized deployment, archive digest/size, successful S3 custody/CAS readback and DELETE204 receipts are retained. All execution and correctness assertions remain unsigned; estimated compute fee is not a billing invoice."
+}

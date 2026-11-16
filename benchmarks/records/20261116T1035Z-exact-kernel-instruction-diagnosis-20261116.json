@@ -1,0 +1,103 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T10:37:57+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/kernel-callgrind-isolation-22-01.jsonl",
+        "--label",
+        "selected-both-kernel-instruction-diagnosis",
+        "--",
+        "/workspace/relation-native-qualifiers/callgrind-driver-6bd05b0e5-17",
+        "callgrind-profile",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/kernel-callgrind-results-22-01",
+        "research/relation_degree_trace_20261115/kernel-development/profile-config-22.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T10:36:05+00:00",
+      "wall_s": 3.931
+    }
+  ],
+  "commit": "d21884f83680008a10e35243d9ac4780b9c82f8c",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T10:35:47+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1035Z-exact-kernel-instruction-diagnosis-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "guest_instructions",
+      "note": "Single whole-process Ir profile, generation/parent excluded; no native time ratio",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 136731306.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 63032,
+      "path": "research/relation_degree_trace_20261115/kernel-profile-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a3/a339f9bf14bd923c9268055f184ff6f5d5c7307e89498a5d9d948b85a8066405",
+      "sha256": "a339f9bf14bd923c9268055f184ff6f5d5c7307e89498a5d9d948b85a8066405",
+      "uploaded": false
+    },
+    {
+      "bytes": 319,
+      "path": "research/relation_degree_trace_20261115/kernel-profile-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fe/fe74ea43e9e0739a34504a72c84d420df623042fa1333d1fb3a98ba4a53b5af1",
+      "sha256": "fe74ea43e9e0739a34504a72c84d420df623042fa1333d1fb3a98ba4a53b5af1",
+      "uploaded": false
+    },
+    {
+      "bytes": 1796,
+      "path": "research/relation_degree_trace_20261115/kernel-profile-01/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/70/70695fc22525162d0ceed28188ac3810e42c7f13c36c2751f91e2efc519f3090",
+      "sha256": "70695fc22525162d0ceed28188ac3810e42c7f13c36c2751f91e2efc519f3090",
+      "uploaded": false
+    },
+    {
+      "bytes": 227161,
+      "path": "research/relation_degree_trace_20261115/kernel-profile-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4f/4f840694d9cb252abd83cdedeb3e7bb993bd1d8a93faaa8ea9ef6fc366bae64b",
+      "sha256": "4f840694d9cb252abd83cdedeb3e7bb993bd1d8a93faaa8ea9ef6fc366bae64b",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/kernel-profile-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/kernel-profile-01/report-01/self.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/kernel-profile-01/report-01/self.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "exact-kernel-instruction-diagnosis-20261116",
+  "status": "measured",
+  "summary": "Selectedboth samebasis/pins/0monitorcontention;136731306guestIr reconcilesraw/log/selftotals. Lead/axpy/Btreeupdates remain attributed costs, overlappinginclusive not additive wall phases. No native speed ratio. PCC84b178/1ca715.",
+  "validation": null
+}

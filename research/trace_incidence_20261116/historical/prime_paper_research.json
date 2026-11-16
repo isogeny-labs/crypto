@@ -1,0 +1,97 @@
+{
+  "paper": {
+    "title": "Deterministic Root-Finding over Finite Fields with Elliptic Curves",
+    "arxiv": "2610.32508v1",
+    "sha256": "bf01081e0261633421a00577dbf35cf84864161e3758ad3c9abdc55327cc963c",
+    "sections_used": [
+      "1.2",
+      "2.3",
+      "2.4",
+      "2.5",
+      "5.1",
+      "8.1",
+      "8.4"
+    ]
+  },
+  "main_assessment": "The most relevant ECDLP inspiration is implicit set arithmetic and trace power projection, not the determinization of univariate root extraction.",
+  "direct_transfer_obstructions": [
+    "A homomorphism from a prime-order target subgroup to auxiliary smooth groups is trivial if that prime does not divide their orders.",
+    "An F_p-isogeny preserves rational point count, so an isogenous curve does not remove the target large prime factor.",
+    "The root-finding bound charges polynomial degree and excludes constructing/verifying the elliptic preprocessing datum.",
+    "The paper supplies no cheap multivariate selector or compact representation of all pair sums."
+  ],
+  "trace_reconstruction": {
+    "status": "Implemented blocked trace power projection and native quadratic recurrence in fast_trace/kernel.py; independently audited in trace_audit/. Suggested optimal fast cost remains a research target, not this implementation bound.",
+    "assumptions": "p>3, split squarefree input u, phi image multiplicities at most two; elliptic-translation domain exceptions handled separately.",
+    "formula": "q(T)=prod_distinct_images(T-t); a_k=Tr(phi^k); b_k=Tr(g phi^k). N_a=polynomial_part(q(T)*sum a_k T^(-k-1)); multiplicity=N_a/qprime mod q. N_b similarly; N_b/qprime interpolates g on singleton images.",
+    "suggested_fast_cost": "Otilde(C(d)+d log^2(p)) for a translation component, using standard fast power projection and recurrence algorithms; integration and independent proof review remain necessary.",
+    "reference_implementation": "paper_trace_kernel.py",
+    "checks": "paper_trace_kernel_checks.json"
+  },
+  "recommended_primary_kernel": {
+    "description": "Implicit first-relation incidence between three disjoint random labelled point pools; compute an incidence GCD or one witness without expanding every pair sum.",
+    "identity": "N(Z)=Res_X(F1(X), Res_Y(F2(Y), S3(X,Y,Z))); gcd(F3(Z),N(Z)) identifies candidate third coordinates for signed triples.",
+    "degree_warning": "The expanded norm can have degree 2 B^2. Keeping an expression implicit alone does not prove cheaper arithmetic.",
+    "three_pool_target": "B=Theta(r^(1/3)); complete setup+search+recovery O(B^(3/2-epsilon) polylog(r)) for fixed epsilon>0 would beat rho.",
+    "four_pool_target": "B=Theta(r^(1/4)); complete setup+search+recovery O(B^(2-epsilon) polylog(r)) would beat rho.",
+    "subexponential_boundary": "Either fixed-arity target gives a sub-rho exponent, not automatically a subexponential algorithm in log(r).",
+    "known_label_warning": "Geometry-only random labelled pools are valid APS inputs. An arbitrary structured PKM factor base does not come with known mixed labels for free."
+  },
+  "conventional_four_summand_cost_bridge": {
+    "assumptions": "Random-sum sparse regime; one relation per successful attempt; solver C(B)=B^gamma; sparse final solve Otilde(B^2); setup charged separately.",
+    "total": "Otilde(r*B^(gamma-3)+B^2)",
+    "optimal_B": "r^(1/(5-gamma)) for 0<=gamma<1",
+    "cost_exponent": "2/(5-gamma)",
+    "strict_rho_gate": "gamma<1; at gamma=1 the density-boundary exponent is 1/2."
+  },
+  "existing_repository_controls": [
+    "https://github.com/isogeny-labs/crypto/blob/main/research/prime31_ic_20261115/native/S3_QUOTIENT_GCD_ORACLE_20261115.md",
+    "https://github.com/isogeny-labs/crypto/blob/main/research/prime31_ic_20261115/native/PAIR_S3_ELIMINATION_POLYNOMIAL_20261115.md",
+    "https://github.com/isogeny-labs/crypto/blob/main/research/pkm_smooth_tower_20261114/REPORT.typ",
+    "https://github.com/isogeny-labs/crypto/blob/main/research/aps_followup_20261028/README.md"
+  ],
+  "first_experiment": {
+    "arms": [
+      "Existing explicit pair enumeration",
+      "Existing quotient/GCD oracle",
+      "Trace/power-projection implementation",
+      "Proposed implicit norm with witness extraction"
+    ],
+    "inputs": "Identical prime-order curves and public point pools at growing actual B; keep unstructured labelled pools separate from structured PKM bases.",
+    "controls": [
+      "Natural instances",
+      "Planted correctness controls",
+      "Exact negative controls where enumerable",
+      "Exceptional denominators and repeated coordinate images",
+      "Small p with deg(u)>=p where admissible"
+    ],
+    "metrics": [
+      "Cold total work including setup and failed attempts",
+      "Verified first informative relation",
+      "Memory and polynomial/algebra dimensions",
+      "Field operations and complete CPU time",
+      "Witness extraction and scalar verification"
+    ],
+    "stop_rules": [
+      "No exponent claim from bounded toy fits.",
+      "Do not advance a method merely because its eliminant has few roots.",
+      "If it materializes B^2 pair data or a B^2-dimensional algebra, record that cost before claiming a three-pool sub-B^(3/2) algorithm."
+    ]
+  },
+  "conclusion": "Measured faster divisor translation than the paper-style dense matrix control. Implicit incidence variants lose to native batched pair enumeration. No new faster complete prime-field ECDLP algorithm established.",
+  "implemented_experiments": {
+    "summary": "experiment_summary.json",
+    "trace_results": [
+      "fast_trace/results/summary.json",
+      "fast_trace/results_large/summary.json",
+      "fast_trace/results_paper/summary.json"
+    ],
+    "incidence_results": "incidence/benchmark_results.json",
+    "controls": "repo_controls/pair_benchmark.json",
+    "independent_checks": [
+      "trace_audit/audit_results.json",
+      "independent_pool_audit.json",
+      "cross_check_results.json"
+    ]
+  }
+}

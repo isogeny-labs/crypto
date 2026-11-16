@@ -1,0 +1,53 @@
+{
+  "schema": "ecbench.frozen-defect-proposal/v1",
+  "status": "OWNER_APPROVAL_PENDING",
+  "session": "research/ecc2k130_followups_20261116/F3-m83-counted/raw/sessions/smoke-k0n61",
+  "session_id": "ECBS1hbc0ef04c4f34",
+  "original_records_sha256": "5c937b749f9bb20f6541b19c9ed9e21c16f2392e103ee3b47e0995a272c629fb",
+  "capsule_expected_records_sha256": "2aa97366f892f7d1a2f4c887e9e5543397ff6d047016048932efaace40e92843",
+  "observed_records": 16,
+  "declared_records": 24,
+  "record_sequences": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "problem_checks": [
+    "last_seq",
+    "record_count",
+    "records_hash",
+    "status_counts"
+  ],
+  "artifact_hashes": {
+    "session.json": "4ed022b5b868e402cbfe10197d0f03b9176f966ec15009c6bf1b0c034000a75b",
+    "plan.json": "dc5462a368f57b58ddfe3e0c8c6d3b8cc503fca1e8a702ea1f8a96590deac359",
+    "records.jsonl": "5c937b749f9bb20f6541b19c9ed9e21c16f2392e103ee3b47e0995a272c629fb",
+    "spec.json": "e050606f483a02297378cce2b761bd254e9036f4c839ef436c2c986cc48e9314",
+    "host.json": "167988b12eda141660753bf325975b5f489aa8e4239dfb1c39e7e51719dc3dc8"
+  },
+  "original_source_commit": "54ccbfa7ed830a0d0882310f71d49eeb89eaed1a",
+  "artifact_manifest_commit": "02bdbb73473e56d42dba5269498d4d3dbc031b90",
+  "original_artifacts_changed": false,
+  "active_defect_catalog_changed": false,
+  "recovery_checked": [
+    "reachable Git path history: records.jsonl never tracked; original manifest pins the 16-record object",
+    "all registered local worktrees: no original 24-record file found",
+    "canonical store expected digest and object versions: absent at the checked key",
+    "root sha256 and objects legacy keys for expected digest: absent",
+    "original producing branch checkpoint prefix: absent"
+  ],
+  "policy": "docs/ecbench/DEFECTIVE_SESSIONS.md requires owner approval before activation; the verifier still runs and must fail with exactly the pinned problem checks"
+}

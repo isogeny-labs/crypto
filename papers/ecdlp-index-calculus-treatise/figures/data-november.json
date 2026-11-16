@@ -1,0 +1,70 @@
+{
+  "_comment": "Recorded values only, copied from the committed artefact named in each _source (paths relative to research/, with line numbers at commit 13df75511). make_fig_november.py lays them out and computes nothing. Every source marks these values [pcc:unverified] unless stated; none has a validation file or leaderboard row.",
+  "c25519_generic": {
+    "_unit": "arm S / rho-neg S at w = 0 on the Curve25519-family miniatures (k = bits of p)",
+    "twcj_j16": {"_source": "curve25519_tw_jumps_20261108/README.md:79,85 (k = 20, 24); curve25519_tw_scaling_20261108/README.md:69,74 (k = 28, 32)",
+      "k": [20, 24, 28, 32], "ratio": [1.358, 1.343, 1.395, 1.366], "lo": [1.232, 1.219, 1.345, 1.267], "hi": [1.497, 1.479, 1.446, 1.473]},
+    "f1_x07": {"_source": "curve25519_f1_walk_20261107/README.md:88,94; curve25519_tw_scaling_20261108/README.md:70,75",
+      "k": [20, 24, 28, 32], "ratio": [1.496, 1.570, 1.540, 1.595], "lo": [1.454, 1.465, 1.484, 1.508], "hi": [1.538, 1.684, 1.598, 1.687]},
+    "snc_tw2cj_lazy": {"_source": "curve25519_autolab_20261104/snc-panel/README.md:25-28 (five-curve mean)",
+      "k": [20, 24, 28, 32], "ratio": [1.61, 1.63, 1.74, 1.78]},
+    "snc_incumbent": {"_source": "curve25519_autolab_20261104/snc-panel/README.md:25-28 (inc / rho column)",
+      "k": [20, 24, 28, 32], "ratio": [1.72, 1.84, 1.94, 1.93]},
+    "twcj_cv0": {"_source": "curve25519_engine_items_20261110/README.md:47-48 (after the E1 fix)",
+      "k": [20, 24], "ratio": [1.217, 1.259], "lo": [1.166, 1.187], "hi": [1.271, 1.336]}
+  },
+  "table_work_pricing": {
+    "_source": "ecbench_table_work_pricing_20261108/README.md:97-102 (targetwalk study, w = 1; 'default' is the pre-2026-11-08 unpriced reading)",
+    "_unit": "arm S / rho-neg S at w = 1",
+    "rows": [
+      {"label": "f1-x07, k = 20", "before": 1.133, "after": 1.518},
+      {"label": "tw-x15, k = 20", "before": 1.061, "after": 1.599},
+      {"label": "twcj-x15, k = 20", "before": 0.831, "after": 1.360},
+      {"label": "twcj-x15, k = 24", "before": 0.749, "after": 1.388}
+    ]
+  },
+  "brent": {
+    "_source": "rho_frob_brent_20261106/README.md:11-18",
+    "_unit": "legacy rho-frob S / Brent v2 S, fully priced GAE (> 1: Brent v2 cheaper)",
+    "n": [13, 17, 19, 23, 29, 31, 37, 41],
+    "ratio": [0.718, 1.045, 1.071, 1.095, 0.805, 1.472, 1.065, 1.0008],
+    "lo": [0.580, 0.823, 0.988, 1.029, 0.408, 1.203, 1.014, 1.000],
+    "hi": [0.889, 1.326, 1.161, 1.164, 1.586, 1.803, 1.119, 1.002]
+  },
+  "rho_floor_p36": {
+    "_source": "ic_rho_floor_20261109/README.md:29-31 (vs ideal), 40-42 (paired ratios); 128 targets, L0",
+    "rho_neg_over_ideal": [1.024, 0.961, 1.091],
+    "res1eq_over_rho": [1.620, 1.501, 1.755],
+    "res1_over_rho": [2.762, 2.534, 3.019],
+    "floor_g": {"k": [1, 2, 4], "g": [1.5, 1.875, 2.46], "_source": "ic_rho_floor_20261109/README.md:59-60"}
+  },
+  "k4_char2": {
+    "_source": "gaudry_k4_char2_crossover_20261015/README.md:89-98 (geometric mean per size of IC / rho theory; m = 18 is one target and its rho run was still running; no session replayed)",
+    "m": [15, 16, 17, 18],
+    "ic_over_rho_theory": [3.64, 1.68, 0.95, 0.45],
+    "matrix_share_pct": [0.36, 0.68, 1.36, 2.57],
+    "_matrix_source": "gaudry_k4_char2_crossover_20261015/README.md:70-73"
+  },
+  "minors": {
+    "_source": "minors_guess_determine_20261107/RESULTS.md:86 (envelope = cheapest arm; charged F_p multiplications vs matched rho)",
+    "bits": [20, 24, 28, 32, 36, 40],
+    "ratio": [4.37, 6.11, 19.3, 81.9, 365, 1550],
+    "lo": [4.28, 5.75, 17.2, 71.8, 309, 1050],
+    "hi": [4.46, 6.51, 21.7, 93.1, 431, 2720]
+  },
+  "pkm_falldegree": {
+    "_source": "pkm_falldegree_unblock_20261107/RESULTS.md:119-129 (Kummer m = 2, prime P1, median d_F, tower arm) and :145 (random-coefficient null arm)",
+    "t": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "dF_tower": [3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6],
+    "dF_null": [3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6],
+    "_note": "null arm continues >=6 at t = 12..14 (censored); t = 12 later bracketed in RESULTS_T12_BRACKET.md:3"
+  },
+  "prime_medium_rho": {
+    "_source": "prime_medium_rho_cpc_20261109/RESULTS.md:14-16,20; prime_medium_tier_rho_20261107/RESULTS.md:72,80-82",
+    "M_medium": [1.067, 0.999, 1.134],
+    "alpha": [0.506, 0.483, 0.529],
+    "toy_tier_M": 1.380,
+    "runs": 432,
+    "log2r_range": [32.4, 49.0]
+  }
+}
