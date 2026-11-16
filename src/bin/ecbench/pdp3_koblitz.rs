@@ -546,6 +546,11 @@ pub struct Pdp3KoblitzOracle<'i> {
     scan_addends: Vec<FastPoint>,
     scan_sums: Vec<FastPoint>,
     scan_lambdas: Vec<u64>,
+    #[cfg(target_arch = "x86_64")]
+    scan_x3: Vec<u64>,
+    /// The signed base starts with one self-negative point, then adjacent
+    /// pairs. Checked once so every later relation scan can align its blocks.
+    scan_pair_layout: Option<bool>,
     /// Base size the table was built on; `0` under a Groebner engine.
     pair_table_points: usize,
     /// Third-summand window for windowed engines; `0` otherwise.
@@ -583,6 +588,9 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             scan_addends: Vec::new(),
             scan_sums: Vec::new(),
             scan_lambdas: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            scan_x3: Vec::new(),
+            scan_pair_layout: None,
             pair_table_points: 0,
             scan_window_len: 0,
             window_div: 0,
@@ -681,20 +689,79 @@ impl<'i> Pdp3KoblitzOracle<'i> {
         let g = ctx.group;
         if self.engine == Pdp3Engine::RootfindNegfoldBatch && self.summands == 3 {
             const SCAN_BLOCK: usize = 8;
-            for from in (0..fb.points.len()).step_by(SCAN_BLOCK) {
-                let to = (from + SCAN_BLOCK).min(fb.points.len());
+            let paired_layout = *self.scan_pair_layout.get_or_insert_with(|| {
+                fb.points.len() % 2 == 1
+                    && fb.neg_index.first() == Some(&0)
+                    && fb.points[1..].chunks_exact(2).enumerate().all(|(j, pair)| {
+                        let k = 1 + 2 * j;
+                        fb.neg_index[k] == k + 1
+                            && fb.neg_index[k + 1] == k
+                            && !pair[0].infinity
+                            && !pair[1].infinity
+                            && pair[0].x == pair[1].x
+                    })
+            });
+            let mut from = 0;
+            while from < fb.points.len() {
+                // The first point has no signed twin. Keeping it in its
+                // own block makes every following eight-point block four
+                // complete pairs, ready for the existing paired SIMD kernel.
+                let to = if paired_layout && from == 0 {
+                    1
+                } else {
+                    (from + SCAN_BLOCK).min(fb.points.len())
+                };
                 self.scan_addends.clear();
                 self.scan_addends
                     .extend(fb.points[from..to].iter().map(|&p| g.neg(p)));
                 self.scan_sums.clear();
                 self.scan_lambdas.clear();
-                g.0.add_many_lazy_paired_x(
-                    point,
-                    &self.scan_addends,
-                    &mut self.scan_sums,
-                    &mut self.scan_lambdas,
-                    &mut self.scan_scratch,
-                );
+                #[cfg(target_arch = "x86_64")]
+                let simd_paired = if paired_layout && from > 0 {
+                    let pairs = self.scan_addends.len() / 2;
+                    debug_assert_eq!(2 * pairs, self.scan_addends.len());
+                    debug_assert!(pairs <= SCAN_BLOCK / 2);
+                    let (mut px, mut pya, mut pyb) = ([0u64; 4], [0u64; 4], [0u64; 4]);
+                    for (j, pair) in self.scan_addends.chunks_exact(2).enumerate() {
+                        debug_assert_eq!(pair[0].x, pair[1].x);
+                        px[j] = pair[0].x;
+                        pya[j] = pair[0].y;
+                        pyb[j] = pair[1].y;
+                    }
+                    self.scan_x3.clear();
+                    g.0.add_many_lazy_soa_paired(
+                        point,
+                        &px[..pairs],
+                        &pya[..pairs],
+                        &pyb[..pairs],
+                        &mut self.scan_x3,
+                        &mut self.scan_lambdas,
+                        &mut self.scan_scratch,
+                        self.scan_addends.len() as u64,
+                    )
+                } else {
+                    false
+                };
+                #[cfg(not(target_arch = "x86_64"))]
+                let simd_paired = false;
+                #[cfg(target_arch = "x86_64")]
+                if simd_paired {
+                    self.scan_sums.extend(
+                        self.scan_x3
+                            .iter()
+                            .copied()
+                            .map(|x| FastPoint::affine(x, 0)),
+                    );
+                }
+                if !simd_paired {
+                    g.0.add_many_lazy_paired_x(
+                        point,
+                        &self.scan_addends,
+                        &mut self.scan_sums,
+                        &mut self.scan_lambdas,
+                        &mut self.scan_scratch,
+                    );
+                }
                 assert_eq!(self.scan_sums.len(), self.scan_addends.len());
                 assert_eq!(self.scan_lambdas.len(), self.scan_addends.len());
                 // The batch has already formed all sums, even if an early
@@ -718,6 +785,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
                         return Some(vec![from + offset, i, j]);
                     }
                 }
+                from = to;
             }
             return None;
         }
@@ -874,6 +942,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
              or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
+        self.scan_pair_layout = None;
         if self.engine == Pdp3Engine::F6IcPair {
             // Reuse within this pipeline solve, never across independent
             // records or replayed records in the auditor process.
@@ -1381,6 +1450,7 @@ mod engine_names {
             assert!(batch_ops.adds >= scalar_ops.adds);
             assert!(batch_ops.adds <= scalar_ops.adds + 7);
         }
+        assert_eq!(batch.scan_pair_layout, Some(true));
     }
 }
 

@@ -59,6 +59,15 @@ passed; a new pushed-source `publication-amendment-5.json` receipt must bind
 this exact source before any scientific execution. Earlier receipts remain
 valid only for their listed revisions.
 
+**Sixth before-data amendment:** [`AMENDMENT-6.md`](AMENDMENT-6.md)
+aligns the candidate's `m=3` scan to complete signed-pair blocks after its
+initial self-negative point, allowing the existing x86 paired SIMD kernel
+to run when its CPU, field and input conditions hold. The
+[source review](SIMD_PAIR_SCAN_REVIEW_20261115.md) records the route,
+fallback and checks. The fixed spec and Amendment 3 wall decision remain
+unchanged. A separate `publication-amendment-6.json` receipt must bind
+this source before a scientific job; earlier receipts remain historical.
+
 ## Admission obstruction
 
 The read-only [AWS monthly budget response](budget-monthly-readback.json)
