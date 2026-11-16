@@ -213,6 +213,163 @@ fn source_walk_profile(q:(u64,u64),seed:u64,ar:&mut Arithmetic,sizes:[usize;3])
     Ok((out,identity,duplicated))
 }
 
+// EXP-R31-APS-JACBATCH: batched projective normalization of the existing
+// public-label walk. This changes only source arithmetic, not the APS S3
+// oracle, partition labels, PRNG, group points, or candidate search semantics.
+// It is classical group arithmetic, not a new non-generic ECDLP method.
+#[derive(Clone,Copy,Debug)]
+struct JacPoint {x:u64,y:u64,z:u64}
+fn jac_affine(pt:(u64,u64))->JacPoint{
+    JacPoint{x:pt.0,y:pt.1,z:1}
+}
+fn jac_double(p:JacPoint)->JacPoint{
+    if p.z==0 || p.y==0{return JacPoint{x:0,y:1,z:0};}
+    let xx=mulp_mersenne(p.x,p.x);
+    let yy=mulp_mersenne(p.y,p.y);
+    let yyyy=mulp_mersenne(yy,yy);
+    let z2=mulp_mersenne(p.z,p.z);
+    let z4=mulp_mersenne(z2,z2);
+    let s=mulp_mersenne(4,mulp_mersenne(p.x,yy));
+    let m=addp(mulp_mersenne(3,xx),mulp_mersenne(PRIME31.a,z4));
+    let x=subp(mulp_mersenne(m,m),addp(s,s));
+    let y=subp(mulp_mersenne(m,subp(s,x)),mulp_mersenne(8,yyyy));
+    let z=mulp_mersenne(2,mulp_mersenne(p.y,p.z));
+    JacPoint{x,y,z}
+}
+fn jac_mixed(p:JacPoint,q:(u64,u64))->JacPoint{
+    if p.z==0{return jac_affine(q);}
+    let zz=mulp_mersenne(p.z,p.z);
+    let u2=mulp_mersenne(q.0,zz);
+    let s2=mulp_mersenne(q.1,mulp_mersenne(p.z,zz));
+    let h=subp(u2,p.x);
+    let r=subp(s2,p.y);
+    if h==0{
+        return if r==0{jac_double(p)}else{JacPoint{x:0,y:1,z:0}};
+    }
+    let hh=mulp_mersenne(h,h);
+    let hhh=mulp_mersenne(h,hh);
+    let v=mulp_mersenne(p.x,hh);
+    let x=subp(subp(mulp_mersenne(r,r),hhh),addp(v,v));
+    let y=subp(mulp_mersenne(r,subp(v,x)),mulp_mersenne(p.y,hhh));
+    let z=mulp_mersenne(p.z,h);
+    JacPoint{x,y,z}
+}
+// One Fp inversion per bounded block (Montgomery's trick), not one per
+// source walk step. Nonidentity is mandatory for an affine labelled point.
+fn normalize_jac_batch(block:&[(JacPoint,u64,u64)])
+    ->Result<Vec<Labelled>,String>{
+    if block.is_empty(){return Ok(Vec::new());}
+    let mut prefix=Vec::with_capacity(block.len()+1);
+    prefix.push(1u64);
+    for (p,_,_) in block{
+        if p.z==0 {return Err("identity in projective normalization block".into());}
+        prefix.push(mulp_mersenne(*prefix.last().ok_or("missing prefix")?,p.z));
+    }
+    let total=*prefix.last().ok_or("empty projective product")?;
+    let mut inv=pownp_mode::<true>(total,P-2);
+    if mulp_mersenne(total,inv)!=1{
+        return Err("projective batch denominator not invertible".into());
+    }
+    let mut out=vec![Labelled{pt:(0,0),a:0,b:0};block.len()];
+    for i in (0..block.len()).rev(){
+        let (p,a,b)=block[i];
+        let zi=mulp_mersenne(prefix[i],inv);
+        let z2=mulp_mersenne(zi,zi);
+        let z3=mulp_mersenne(z2,zi);
+        out[i]=Labelled{
+            pt:(mulp_mersenne(p.x,z2),mulp_mersenne(p.y,z3)),
+            a,b
+        };
+        inv=mulp_mersenne(inv,p.z);
+    }
+    if inv!=1{return Err("projective inverse-prefix invariant failed".into());}
+    Ok(out)
+}
+// Produces *exactly* the affine walk's public points/labels at the same PRNG
+// locations. Pending transition is deferred until next candidate so neither
+// the last in a batch nor the final accepted point consumes an extra PRNG.
+fn source_walk_profile_jac(q:(u64,u64),seed:u64,ar:&mut Arithmetic,
+    sizes:[usize;3])->Result<([Vec<Labelled>;3],u64,u64),String>{
+    const STEPS:usize=64;
+    const BATCH:usize=256;
+    let mut rng=seed^0x5741_4c4b_5f53_5445_u64;
+    let mut steps=Vec::with_capacity(STEPS);
+    for _ in 0..STEPS{
+        let jump=loop{
+            let a=prng(&mut rng)%N;
+            let b=prng(&mut rng)%N;
+            if a==0 && b==0 {continue;}
+            let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+            let bq=ar.scalar(PRIME31,b,Some(q));
+            if let Some(pt)=ar.add(PRIME31,ag,bq){
+                break Labelled{pt,a,b};
+            }
+        };
+        steps.push(jump);
+    }
+    let mut out:[Vec<Labelled>;3]=std::array::from_fn(|i|
+        Vec::with_capacity(sizes[i]));
+    let mut xs=HashSet::with_capacity(sizes.iter().sum());
+    let mut identity=0u64;
+    let mut duplicated=0u64;
+    for (part_idx,part) in out.iter_mut().enumerate(){
+        let count=sizes[part_idx];
+        let initial=loop{
+            let a=prng(&mut rng)%N;
+            let b=prng(&mut rng)%N;
+            if a==0 && b==0{continue;}
+            let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+            let bq=ar.scalar(PRIME31,b,Some(q));
+            if let Some(pt)=ar.add(PRIME31,ag,bq){
+                break Labelled{pt,a,b};
+            }
+            identity+=1;
+        };
+        let mut cur=jac_affine(initial.pt);
+        let (mut a,mut b)=(initial.a,initial.b);
+        let mut pending=false;
+        let mut transitions=0usize;
+        while part.len()<count{
+            let mut block=Vec::with_capacity(BATCH.min(count-part.len()));
+            for _ in 0..BATCH.min(count-part.len()){
+                if pending{
+                    let s=steps[(prng(&mut rng) as usize)&(STEPS-1)];
+                    let next_a=addn(a,s.a);
+                    let next_b=addn(b,s.b);
+                    let next=jac_mixed(cur,s.pt);
+                    if next.z!=0{
+                        cur=next;a=next_a;b=next_b;
+                    }else{
+                        identity+=1;
+                        let reset=loop{
+                            let ra=prng(&mut rng)%N;
+                            let rb=prng(&mut rng)%N;
+                            if ra==0 && rb==0{continue;}
+                            let ag=ar.scalar(PRIME31,ra,Some(PRIME31.g));
+                            let bq=ar.scalar(PRIME31,rb,Some(q));
+                            if let Some(pt)=ar.add(PRIME31,ag,bq){
+                                break Labelled{pt,a:ra,b:rb};
+                            }
+                            identity+=1;
+                        };
+                        cur=jac_affine(reset.pt);a=reset.a;b=reset.b;
+                    }
+                }
+                transitions+=1;
+                if transitions>count.saturating_mul(96).saturating_add(2_048){
+                    return Err("Jacobian walk failed to produce enough distinct x".into());
+                }
+                block.push((cur,a,b));
+                pending=true;
+            }
+            for pt in normalize_jac_batch(&block)?{
+                if xs.insert(pt.pt.0){part.push(pt);} else {duplicated+=1;}
+            }
+        }
+    }
+    Ok((out,identity,duplicated))
+}
+
 // S3(X,Y,U)= a U^2 + b U + c on the original prime31 curve.
 fn s3_coeff_mode<const FAST:bool>(x:u64,y:u64)->(u64,u64,u64) {
     let sum=addp(x,y);
