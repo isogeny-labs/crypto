@@ -123,6 +123,13 @@ fn retained_v5_k600_binding(ordinal: u64, base_dir: &Path) -> Result<Value> {
     }))
 }
 
+fn require_v5_one_thread(value: Option<&str>) -> Result<()> {
+    if value != Some("1") {
+        return Err("V5 one-thread cell requires RAYON_NUM_THREADS=1".into());
+    }
+    Ok(())
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 struct BaseSpec {
     a: u8,
@@ -1968,6 +1975,7 @@ fn main() -> Result<()> {
         },
         Some("primary-v5-retained-chain-cold")=>{
             if args.len()!=13 { return Err("primary-v5-retained-chain-cold ORDINAL BASE_DIR FIXTURE_DIR MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (exact retained K600; hard cgroup and external wall caps required)".into()); }
+            require_v5_one_thread(std::env::var("RAYON_NUM_THREADS").ok().as_deref())?;
             let ordinal=args[2].parse()?;
             let base_dir=Path::new(&args[3]);
             let binding=retained_v5_k600_binding(ordinal,base_dir)?;
@@ -2032,6 +2040,9 @@ mod tests {
         assert_eq!(receipt["case"]["symmetry_mask"], 18);
         assert_eq!(receipt["case"]["solver"]["backend"], "sat_cdcl");
         assert!(retained_v5_k600_binding(V5_RETAINED_K600_ORDINAL + 1, &base).is_err());
+        assert!(require_v5_one_thread(Some("1")).is_ok());
+        assert!(require_v5_one_thread(None).is_err());
+        assert!(require_v5_one_thread(Some("4")).is_err());
     }
     #[test]
     fn v2_object_gate_matches_the_frozen_size_receipt() {

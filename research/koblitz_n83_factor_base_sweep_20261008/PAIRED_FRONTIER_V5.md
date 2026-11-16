@@ -87,7 +87,9 @@ design bytes, then routes to the existing ordered-orbit chained SAT path. Its
 [frozen admission protocol](verification/v5-composed-adapter-20261116/PROTOCOL.md)
 separates the binding check from a later bounded relation run. This is an
 implemented exact adapter route, with no new relation, rank, target, or cold
-runtime measurement. Other masks, bases, and solver settings remain without a
+runtime measurement. The cold route requires `RAYON_NUM_THREADS=1` before
+launch; the [versioned thread-gate amendment](verification/v5-composed-adapter-20261116/THREAD_GATE_AMENDMENT.md)
+records why. Other masks, bases, and solver settings remain without a
 verified composed adapter; the global catalog status stays unchanged.
 
 The finite grid is complete only over its **declared** base recipes, pair shapes,
