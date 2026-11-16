@@ -1,0 +1,35 @@
+   Compiling sha2 v0.10.9
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+   Compiling streebog v0.10.2
+   Compiling factor-base v0.1.0 (/workspace/crypto/tools/factor-base)
+   Compiling ecdl-tensor-ic v0.1.0 (/workspace/crypto/crates/ecdl-tensor-ic)
+   Compiling volcano-cli v0.1.0 (/workspace/crypto/tools/volcano-cli)
+   Compiling crypto v0.1.0 (/workspace/crypto)
+error: this file contains an unclosed delimiter
+    --> src/cryptanalysis/ecbench/methods.rs:8824:3
+     |
+8674 | mod neg_strong_tests {
+     |                      - unclosed delimiter
+...
+8678 |     fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+     |                                                                    - unclosed delimiter
+8679 |         resolve(&MethodSpec {
+     |                -            - unclosed delimiter
+     |                |
+     |                unclosed delimiter
+...
+8686 | mod tensor_contraction_tests {
+     |                              - unclosed delimiter
+...
+8710 |     fn recovers_and_agrees_with_rho_negation_over_several_seeds() {
+     |                                                                   - another 2 unclosed delimiters begin from here
+...
+8783 |     fn refuses_other_curves_and_bad_parameters() {
+     |                                                  - this delimiter might not be properly closed...
+...
+8824 | }
+     | -^
+     | |
+     | ...as it matches this but it has different indentation
+
+error: could not compile `crypto` (lib test) due to 1 previous error
