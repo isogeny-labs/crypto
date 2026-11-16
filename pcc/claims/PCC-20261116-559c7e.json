@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T08:00:31Z",
+ "id": "PCC-20261116-559c7e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "2d54889ac1032d59fe8b5410ad26ff705cec5bd7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "2ce2645a90477ca57341e219d5d66d0614488aa2bdfc7af68652bec016f7115e",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-descent-final-04/CubicNormDescent.lean",
+   "theorem": "CubicNormDescent.norm_square"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact stated generic CommRing or canonical Fin223 arithmetic; original natural/modular square model only. Field/Jacobian/geometry/native word execution/cost correspondence separate. Immutable source, original dual-gate15/0 data pcc/claims/PCC-20261116-26ec43.json; unsigned until original standing.",
+ "statement": "theorem norm_square {R : Type} [CommRing R] (d a b c : R) : norm d (square0 d a b c) (square1 d a b c) (square2 a b c) = (norm d a b c)^2"
+}

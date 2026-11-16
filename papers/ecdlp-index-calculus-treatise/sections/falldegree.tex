@@ -289,6 +289,17 @@ The bound is attained at $n=17,19$.
   \item Certificate checker: \texttt{verify/cert\_check.py}, which
     rebuilds $F$ from the curve parameters by its own Möbius interpolation
     of $\Sem3$ values.
+  \item Implementation~C: a native Rust closure in this repository,
+    \art{examples/fd_m2_degrees.rs}, sharing no code with A or B. It
+    builds the descent in the repository's Boolean-ring library and runs
+    the full MutantXL closure ($=W_D$) and Boolean F4. In a pilot on a
+    4-core development host, which is not a measurement and has not been
+    independently checked, it reproduced the recorded $d_{\tilde F}$ of
+    eight instances (R11a, R13a, R15a, R19a, P17a, P21a, P21c, U33a) and
+    $1\notin W_4$ on T33a with $\operatorname{rank}W_4=48{,}068$, as
+    recorded. Planted solvable controls were never refuted up to $D=5$.
+    The calibration stage of the frozen protocols below repeats this
+    check before any new row is read.
   \end{itemize}
 \item \emph{Instances.}
   \begin{itemize}
@@ -957,21 +968,29 @@ shown it); $t=12$ ($N=24$), $d_F=6$ on both draws, ``holds'', the cap-6 runs
 taking $1{,}824.0$ and $1{,}762.8$\,s and $42{,}213{,}325{,}264{,}923$ and
 $42{,}213{,}325{,}353{,}310$ multiply-adds
 (\art{research/pkm_falldegree_unblock_20261107/RESULTS_T12_BRACKET.md}); $t=13$,
-$d_F=6$ on draw 1 and only $d_F\ge6$ on draw 0, whose cap-6 run was killed
-by three EC2 Spot interruptions, so ``undecided''
-(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T13_BRACKET.md});
-$t=14$, where $c^*=7$, has no bracket. Every draw has \texttt{grid\_zeros}
+$d_F=6$ on draw 1 in the bracket run
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T13_BRACKET.md}) and
+on draw 0 in a RunPod re-run of 15 November, whose cap-6 closure refutes
+after $12{,}372$\,s, so ``holds''
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_B.md});
+$t=14$, where $c^*=7$, gives $d_F\ge7$ on both draws: a first cap-6 attempt
+stopped oversize at degree 6, and re-runs on larger pods (Amendment 14)
+complete cap 6 without refuting; the cap-7 runs are pending
+(\art{research/prime_fall_degree_20261027/reports/growth-law-20261115/README.md}). Every draw has \texttt{grid\_zeros}
 $=0$, so none is decomposable. Since $c^*(12)=c^*(11)$, the $t=12$ cell
-cannot tell the C-step law from a flat 6. Further $t=13$ and $t=14$
-attempts await non-Spot capacity (owner decision 10,
-\art{research/ic_lead_queue_20261114/README.md}). A RunPod route was
-revised four times by 15 November and is not frozen; nothing ran
-(\art{research/pkm_falldegree_unblock_20261107/runpod_capped/}). Stage C
+cannot tell the C-step law from a flat 6, nor can $t=13$; the $t=14$ bound
+is the first cell that rules out a flat 6. These cells ran on RunPod after
+owner decision 10 (\art{research/ic_lead_queue_20261114/README.md}) moved
+them off EC2 Spot. Stage C
 of the same relaunch read ``grows in $m$'' on all six fixed-$t$ ladders
 ($t=2,3$; Kummer and 2-isogeny towers; $m$ from 2 up to the largest exact
 median), the median $d_F$ rising by 2 or 3 between $m=2$ and that $m$
 (\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_C.md}). All of
-these are \texttt{[pcc:unverified]}.
+these are \texttt{[pcc:unverified]}. Since 15 November the $\FF_p$-tower closure
+instrument (\art{src/cryptanalysis/hky_fp_tower.rs}, PR~\#4332) writes each
+closure $V_{F,c}$ to a progress file as it finishes, so a run stopped by a
+timeout keeps its decided degrees and resumes at the first undecided one;
+it changes no measured value.
 
 \paragraph{The no-fall degree at $m=3$.} For the two-$\Sem3$ chain on
 Kummer towers at $m=3$, the Nullstellensatz degree in the tower ring
@@ -1149,4 +1168,15 @@ null). None was observed in $n$ at a fixed base.
   (\S\ref{sec:fd-pkm}); the first run's rows remain lost, so the repeat
   is median-level only
   (\art{research/paper_opportunities_20261029/}).
+\item \emph{Requested data.} The runs that would enlarge the binary sample
+  and add F4 step degrees beside Table~1 of Kousidis and
+  Wiemers~\cite{kousidis2019} are preregistered as two protocols, frozen
+  before any data: \texttt{FD-BINARY-CLOSURE-EXT} and
+  \texttt{FD-F4-STEP-DEGREE}
+  (\art{research/fd_paper_data_request_20261029/}). Both run on
+  Implementation~C. Each must first pass a calibration stage that
+  reproduces every recorded outcome, an A/A check and a negative
+  control. No run has been made yet. New $d_{\tilde F}\ge5$ rows will be
+  marked \emph{closure only} until an independent certificate is
+  checked.
 \end{itemize}

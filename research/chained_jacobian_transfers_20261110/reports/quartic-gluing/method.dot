@@ -1,0 +1,23 @@
+digraph gluing {
+ graph [rankdir=LR,bgcolor="white",fontname="DejaVu Sans",label="Actual fixed F101 maps · global degrees/polarizations written933d35 · native4-glue642759 (unsigned)",labelloc=t,nodesep=.4];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=11];
+ edge [fontname="DejaVu Sans",fontsize=10];
+ B0 [label="E(1,46) × F(44,21)\n16 ×16 geometric4-points"];
+ B1 [label="E(26,58) × F(69,50)\n16 ×16 geometric4-points"];
+ B2 [label="E(59,27) × F(23,7)\n16 ×16 geometric4-points"];
+ C0 [label="Jac(C0)\n[56,0,13,0,6,0,1]\ncanonical sum degree4"];
+ C1 [label="Jac(C1)\n[68,0,42,0,26,0,1]\ncanonical sum degree4"];
+ C2 [label="Jac(C2)\n[19,0,10,0,22,0,1]\ncanonical sum degree4"];
+ T0 [label="Jac(T0)\n[31,75,74,54,71,55,1]\ncanonical sum degree16",fillcolor="#e4f2e7"];
+ T1 [label="Jac(T1)\n[95,26,19,27,94,91,1]\ncanonical sum degree16",fillcolor="#e4f2e7"];
+ T2 [label="Jac(T2)\n[95,93,43,39,92,17,1]\ncanonical sum degree16",fillcolor="#e4f2e7"];
+ B0 -> C0 [label="P0:degree4\npolarized norm2"];
+ C0 -> T0 [label="R0:degree4\npolarized norm2"];
+ B1 -> C1 [label="P1:degree4\npolarized norm2"];
+ C1 -> T1 [label="R1:degree4\npolarized norm2"];
+ B2 -> C2 [label="P2:degree4\npolarized norm2"];
+ C2 -> T2 [label="R2:degree4\npolarized norm2"];
+ {rank=same;B0;B1;B2;}
+ {rank=same;C0;C1;C2;}
+ {rank=same;T0;T1;T2;}
+}

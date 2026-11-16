@@ -1,0 +1,7 @@
+# Next bounded design
+
+1. Build fresh finite-domain original polynomial encoder:source domain product polynomials and exact S3chain with all intermediate variables. Independently compare encoded finite rootsets with generic kernel solver for F5,F7,GF8,GF9,then actual P224orbit fixtures. Preserve extension basis and full variable order. Declare baseline interface identities honestly;do not call a groupjoin F4/F5/F6. Freeze20hardinstances only after representative fullmatching backends exist. Initial90s,4GiB,onecore.
+2. Cost-based sparse block dispatcher:inspect actual fiber multiplicities and original-prefix forbidden states,choose direct cyclic last-label vs finite-state DP vs identity quotient;charge policy/setup. Keep positiveoutput-rich cases. A new holdout selection rule is necessary;all C88/C89cases are exposed.
+3. Restore C84exact residue-cover certificate,implement bounded all-solutions table-XOR search with node/memorycap returning unresolved. Preserve globally shared polynomial lifts and full original reconstruction. Prime fields need integral lifts rather than improper prime-subfield prefixes.
+
+Forbinary/Koblitz curves distinguish characteristic2semilinear/torsion constraints;foroddprime/extensions use suitable roots/factorization andfinitekernel backend. No universal nontrivial kernel or universal speed ratio assumed. Scope remains all requested fields and fulloriginal roots.

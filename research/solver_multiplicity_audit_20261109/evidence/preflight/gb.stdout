@@ -1,0 +1,45 @@
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  2       1       1       2 x 3          66.67%        1 new       0 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+reduce final basis        2 x 4          62.50%        2 new       0 zero         0.00 | 0.00         
+------------------------------------------------------------------------------------------------------
+
+---------------- TIMINGS ---------------
+overall(elapsed)        0.00 sec
+overall(cpu)            0.00 sec
+select                  0.00 sec   3.5%
+symbolic prep.          0.00 sec   0.0%
+update                  0.00 sec  25.6%
+convert                 0.00 sec   3.2%
+linear algebra          0.00 sec  20.3%
+reduce gb               0.00 sec   0.0%
+-----------------------------------------
+
+---------- COMPUTATIONAL DATA -----------
+size of basis                     2
+#terms in basis                   5
+#pairs reduced                    1
+#GM criterion                     2
+#redundant elements               1
+#rows reduced                     4
+#zero reductions                  0
+max. matrix data                  2 x 4 (62.500%)
+max. symbolic hash table size  2^11
+max. basis hash table size     2^16
+-----------------------------------------
+

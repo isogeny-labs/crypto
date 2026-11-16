@@ -1,0 +1,701 @@
+{
+  "metadata": {
+    "platform": "linux",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "python_flint": "0.9.0",
+    "affinity": [
+      0
+    ],
+    "flint_threads": 1,
+    "repeats": 3,
+    "source_sha256": {
+      "kernel.py": "f21a1cd194c9f780c1e571b230e9254a413f2964d1227e81fc6ae5eaf3def3a0",
+      "recurrence.cpp": "2c6fd757a8b815aef0bdf2af4a32c7794b7672ffb001af58591c7622f71632fd",
+      "benchmark.py": "c18d5ca40d380f6544cf00f807bdfe45f6c100b42532c767655869f7ca0ba2c6"
+    },
+    "scope": "Pinned CPU in shared container. Complete algorithm calls; per-fresh-process RSS includes interpreter/native libraries. Fixture generation and native-helper compilation are disclosed build/input preparation, excluded from both translation methods. Trace BM remains quadratic; no optimal modular-composition or ECDLP complexity claim."
+  },
+  "summary": [
+    {
+      "case": "p1000003-d8-generic",
+      "p": 1000003,
+      "degree": 8,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00045671600000000284,
+        "max_fresh_process_peak_rss_kib": 61980
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.000270061000000002,
+        "max_fresh_process_peak_rss_kib": 61980
+      },
+      "dense_over_trace": 0.5913105737482381
+    },
+    {
+      "case": "p1000003-d8-collision",
+      "p": 1000003,
+      "degree": 8,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00045576599999999634,
+        "max_fresh_process_peak_rss_kib": 61980
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.000198233000000006,
+        "max_fresh_process_peak_rss_kib": 61980
+      },
+      "dense_over_trace": 0.43494468652775237
+    },
+    {
+      "case": "p1000003-d8-exception_plus",
+      "p": 1000003,
+      "degree": 8,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00044161400000000683,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00030956899999999565,
+        "max_fresh_process_peak_rss_kib": 61980
+      },
+      "dense_over_trace": 0.70099453368777
+    },
+    {
+      "case": "p1000003-d8-exception_minus",
+      "p": 1000003,
+      "degree": 8,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0003831979999999943,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0003622360000000019,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense_over_trace": 0.9452972092756414
+    },
+    {
+      "case": "p1000003-d16-generic",
+      "p": 1000003,
+      "degree": 16,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0006273490000000131,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0005580560000000012,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense_over_trace": 0.8895463290767811
+    },
+    {
+      "case": "p1000003-d16-collision",
+      "p": 1000003,
+      "degree": 16,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0005812310000000015,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0004491549999999997,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense_over_trace": 0.7727650452229811
+    },
+    {
+      "case": "p1000003-d16-exception_plus",
+      "p": 1000003,
+      "degree": 16,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0006404380000000071,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.000527892000000002,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense_over_trace": 0.8242671421745683
+    },
+    {
+      "case": "p1000003-d16-exception_minus",
+      "p": 1000003,
+      "degree": 16,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0005127199999999943,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00048344699999999796,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense_over_trace": 0.9429064596661011
+    },
+    {
+      "case": "p1000003-d32-generic",
+      "p": 1000003,
+      "degree": 32,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0009090570000000048,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0014425770000000004,
+        "max_fresh_process_peak_rss_kib": 62108
+      },
+      "dense_over_trace": 1.5868938911421318
+    },
+    {
+      "case": "p1000003-d32-collision",
+      "p": 1000003,
+      "degree": 32,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0008209659999999994,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0008931230000000026,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense_over_trace": 1.0878927994582033
+    },
+    {
+      "case": "p1000003-d32-exception_plus",
+      "p": 1000003,
+      "degree": 32,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.000876619000000009,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0013592629999999994,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense_over_trace": 1.5505744228678426
+    },
+    {
+      "case": "p1000003-d32-exception_minus",
+      "p": 1000003,
+      "degree": 32,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0008444009999999946,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0013582420000000095,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense_over_trace": 1.6085272281771554
+    },
+    {
+      "case": "p1000003-d64-generic",
+      "p": 1000003,
+      "degree": 64,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0016703550000000053,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.005131613000000007,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense_over_trace": 3.0721690898042575
+    },
+    {
+      "case": "p1000003-d64-collision",
+      "p": 1000003,
+      "degree": 64,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0020075639999999964,
+        "max_fresh_process_peak_rss_kib": 62236
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0024881159999999986,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 1.239370700012554
+    },
+    {
+      "case": "p1000003-d64-exception_plus",
+      "p": 1000003,
+      "degree": 64,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0019413259999999932,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00508483400000001,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 2.619258177142854
+    },
+    {
+      "case": "p1000003-d64-exception_minus",
+      "p": 1000003,
+      "degree": 64,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0017550599999999958,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004994750000000006,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 2.845914099802866
+    },
+    {
+      "case": "p1000003-d128-generic",
+      "p": 1000003,
+      "degree": 128,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004721514999999996,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.023612012,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 5.000939740740001
+    },
+    {
+      "case": "p1000003-d128-collision",
+      "p": 1000003,
+      "degree": 128,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004833912000000003,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.010814762000000006,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 2.237269110401679
+    },
+    {
+      "case": "p1000003-d128-exception_plus",
+      "p": 1000003,
+      "degree": 128,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004396833999999995,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.020788029000000006,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 4.7279540232813035
+    },
+    {
+      "case": "p1000003-d128-exception_minus",
+      "p": 1000003,
+      "degree": 128,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004257206999999999,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.020606879999999994,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 4.84046934997523
+    },
+    {
+      "case": "p1000033-d8-generic",
+      "p": 1000033,
+      "degree": 8,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00040584099999999707,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0003496679999999974,
+        "max_fresh_process_peak_rss_kib": 62364
+      },
+      "dense_over_trace": 0.8615886517133556
+    },
+    {
+      "case": "p1000033-d8-collision",
+      "p": 1000033,
+      "degree": 8,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0006933269999999936,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0003406640000000044,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense_over_trace": 0.49134679595632014
+    },
+    {
+      "case": "p1000033-d8-exception_plus",
+      "p": 1000033,
+      "degree": 8,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0003873230000000019,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.00028563300000000735,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense_over_trace": 0.7374542694340536
+    },
+    {
+      "case": "p1000033-d8-exception_minus",
+      "p": 1000033,
+      "degree": 8,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0004012440000000089,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0002539559999999996,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense_over_trace": 0.6329216137811257
+    },
+    {
+      "case": "p1000033-d16-generic",
+      "p": 1000033,
+      "degree": 16,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0005465990000000018,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0005307769999999962,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense_over_trace": 0.9710537340902461
+    },
+    {
+      "case": "p1000033-d16-collision",
+      "p": 1000033,
+      "degree": 16,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0006530370000000021,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0004827460000000061,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense_over_trace": 0.7392322333956645
+    },
+    {
+      "case": "p1000033-d16-exception_plus",
+      "p": 1000033,
+      "degree": 16,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0006303339999999963,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0005154839999999966,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense_over_trace": 0.8177950102643989
+    },
+    {
+      "case": "p1000033-d16-exception_minus",
+      "p": 1000033,
+      "degree": 16,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0005252380000000112,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0004873719999999998,
+        "max_fresh_process_peak_rss_kib": 62492
+      },
+      "dense_over_trace": 0.9279069678888227
+    },
+    {
+      "case": "p1000033-d32-generic",
+      "p": 1000033,
+      "degree": 32,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0008839600000000031,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0013859430000000006,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense_over_trace": 1.5678797683153036
+    },
+    {
+      "case": "p1000033-d32-collision",
+      "p": 1000033,
+      "degree": 32,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0011766929999999926,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0009761360000000024,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense_over_trace": 0.8295587719141769
+    },
+    {
+      "case": "p1000033-d32-exception_plus",
+      "p": 1000033,
+      "degree": 32,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0009065740000000072,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.001531458999999999,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense_over_trace": 1.6892818457180403
+    },
+    {
+      "case": "p1000033-d32-exception_minus",
+      "p": 1000033,
+      "degree": 32,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0009253509999999979,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0013874650000000044,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense_over_trace": 1.4993932032277564
+    },
+    {
+      "case": "p1000033-d64-generic",
+      "p": 1000033,
+      "degree": 64,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.001730093000000002,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.005309275000000002,
+        "max_fresh_process_peak_rss_kib": 62620
+      },
+      "dense_over_trace": 3.068780117600612
+    },
+    {
+      "case": "p1000033-d64-collision",
+      "p": 1000033,
+      "degree": 64,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.002632930999999991,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0031321309999999963,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense_over_trace": 1.1895985880374407
+    },
+    {
+      "case": "p1000033-d64-exception_plus",
+      "p": 1000033,
+      "degree": 64,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.0018722340000000004,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004874432000000012,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense_over_trace": 2.603537805637549
+    },
+    {
+      "case": "p1000033-d64-exception_minus",
+      "p": 1000033,
+      "degree": 64,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.001679818999999999,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.005122188,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense_over_trace": 3.049249948952835
+    },
+    {
+      "case": "p1000033-d128-generic",
+      "p": 1000033,
+      "degree": 128,
+      "kind": "generic",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004703358000000005,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.022610208000000007,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense_over_trace": 4.807247927969758
+    },
+    {
+      "case": "p1000033-d128-collision",
+      "p": 1000033,
+      "degree": 128,
+      "kind": "collision",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.005295535000000004,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.010993757999999992,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense_over_trace": 2.076042930506546
+    },
+    {
+      "case": "p1000033-d128-exception_plus",
+      "p": 1000033,
+      "degree": 128,
+      "kind": "exception_plus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004565864000000003,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.021924933000000008,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense_over_trace": 4.801924236026302
+    },
+    {
+      "case": "p1000033-d128-exception_minus",
+      "p": 1000033,
+      "degree": 128,
+      "kind": "exception_minus",
+      "trace": {
+        "samples": 3,
+        "median_cpu_seconds": 0.004534198000000003,
+        "max_fresh_process_peak_rss_kib": 62748
+      },
+      "dense": {
+        "samples": 3,
+        "median_cpu_seconds": 0.022319022000000008,
+        "max_fresh_process_peak_rss_kib": 62876
+      },
+      "dense_over_trace": 4.922374805864233
+    }
+  ],
+  "failures": []
+}

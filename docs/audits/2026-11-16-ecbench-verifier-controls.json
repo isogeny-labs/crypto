@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench-verifier-sequence-controls/v1",
+  "synthetic_validation_control": true,
+  "before": {
+    "auditor_source_commit": "016b19ffa2",
+    "auditor_binary_sha256": "1d8ee2ffeba0b407a060937fa27258bb3d69466e79c2f7bc822a69bcec988e29",
+    "observed_records": 0,
+    "last_seq": 18446744073709551615,
+    "stop_seq": 18446744073709551615,
+    "accepted": true
+  },
+  "after": {
+    "accepted": false,
+    "rejected_fields": [
+      "last_seq",
+      "stop"
+    ],
+    "ordinary_empty_interruption_control_passes": true,
+    "audit_unit_tests_passed": 40
+  },
+  "source_sha256": {
+    "src/cryptanalysis/ecbench/audit.rs": "892ab73743cb1b2501a45683b0fd4b5933dd41a7e4f35a189dced51d6fd99e6d",
+    ".github/scripts/ecbench-hydrate-pointers.py": "e911046609e597f26d0f15858bf1cbb9b0bb8258cbd76005ee83b40b2137a579",
+    ".github/scripts/test_ecbench_hydrate_pointers.py": "40567696f21a15403868badcc789c3ab0c238d496fbc3d03293f2c55dfb9cc44"
+  },
+  "pointer_recovery": {
+    "sessions": 5,
+    "records": 5144,
+    "loader_controls_passed": 9,
+    "fresh_current_auditor_all_pass": true
+  },
+  "f3": {
+    "original_data_intentionally_unmodified": true,
+    "original_capsule_still_fails_four_checks": true,
+    "active_defect_catalog_unmodified": true,
+    "proposal_owner_approval_pending": true
+  },
+  "evidence_sha256": {
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/rho-t3-current-integrity.json": "e3f15b683ba3d4417ee81785a676950ae02544cbe360b68cad83de2d0bc6735a",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/rho-t4-current-integrity.json": "f5cb27a4571bfab1d889998f0e9c43bc17bb0578c277815c315fa24d88ec24ee",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/f3-changed-byte-control.log": "6429e943f8fa5401416ade452bb6a8631d0460a4889ee97b15f4d47c2790d98d",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/verifier-controls.log": "33f9fc4506b1f8239c3210c3d42c30613191ed07874e8418f6f8a27ac0f4c2d9",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/PC32-current-integrity.json": "80ffcbfffeabff671f0b8181c61b430c86e0de05dd00e5f31c36605f58698755",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/P40-current-integrity.json": "65b5863d9dbebfa7bfb1f9da6c02d97943f5660d10a76815db5a81799079bdbb",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/f3-exact-defect-control.log": "4b50d6a9808b26e3bc44fc620df62a530635b3a3577c516bdd21c0e8337cebe0",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/P36-current-integrity.json": "9e6c7610a792e51c08b59aab31ca3cea647d12271c1a7ab4dd5b3e2fae06f0ba",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/f3-original-integrity.json": "f9817a2523b99484da723c256eff528cf6fbe8c975f786ad68dc7d77498728af",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/sequence-overflow-after.json": "494b49d618c0310d26e63f403f26a808bd7c1cd818bbe37169fb55012fd2563d",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/f3-unexpected-problem-control.log": "cabd094e346afc5332718a7ec90fc2c91cbc10fb906d39730e1cd97a123e75a3",
+    "docs/audits/2026-11-16-ecbench-evidence-recovery/sequence-overflow-before.json": "4cff2defe061dadad2beabded934a998d7960fd8de511c556eb631e1588ec273"
+  }
+}
