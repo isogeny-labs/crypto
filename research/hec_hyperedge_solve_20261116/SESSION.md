@@ -14,3 +14,6 @@ None yet.
 
 ## Completed complete-solve gate
 Frozen01ac15121e29/checkpoint20261116T050035Z executed once:20terminalcases,12verified,8exhausted/cappedcontrols; exit0/emptystderr. All10highest-arityconfigurations recover113/136withsourceverification, plus2genus4H16threeLPcontrols. All20outcomesagreewithsolve_fastincludingNone. g3target0requires2068classesbeyondanchor-rankcompletion1447; target1requires1660. g4H10fourLP2139andH16fourLP1504forbothtargets. Descent target support31or20forg4exceedsfixedH10/16butcatalogueequationscorrectlyretainit. Next compare existingcompletecontrols as count/correctnessgate, not incomplete-policy speedratios.
+
+## Control build error and custody correction
+Historical table driver failed compilation on changed solve_for_last API. No scientific controls ran. Shell did not fail fast after missingbinaryhash, so initialfa522c7811partialmanifest is invalid execution custody; preserved both initial build/manifest and added AMENDMENT-CONTROLS.md. Local compatibility clone adds&stepsargument, leaving historical source unchanged; Fastignoresit andHybridusesitsseparatepath. Subsequent freeze usesfailfast+binaryexistencecheckbeforehash.

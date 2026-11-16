@@ -1,6 +1,6 @@
 #[path = "../hec_anchor_relations_20261114/anchor.rs"]
 mod anchor;
-#[path = "../hec_table_oracle_20261114/pipeline.rs"]
+#[path = "pipeline_compat.rs"]
 mod pipeline;
 #[path = "../../crates/hec-native-ic/src/table_factor.rs"]
 mod table_factor;
