@@ -49,3 +49,13 @@ on Ir events and dump/collection control. Installed under
 Receipts are validation/valgrind-local-*. No cryptographic instruction audit
 has run yet, and a future audit remains diagnostic, not proof of complete
 instrumentation or physical gate costs. [pcc:unverified]
+
+After26/27, shared Wiedemann/BM data scans/comparisons, two scalar additions
+per cover residual and selected stream-compatible modular samplers have
+exercised counters. Diagnostic27records actual rejected draws, separately
+priced integer multiply/add events and explicit unpriced subtraction/clz/
+shift counts, with per-phase conservation and unchanged RNGstream tests.
+The old inventory above describes its earlier checkpoint; generator
+internals, other sampling paths, native/container coverage and complete
+strongest-rho pricing remain open. No total or ranking is promoted.
+[pcc:unverified]

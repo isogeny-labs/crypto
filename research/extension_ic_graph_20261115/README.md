@@ -354,3 +354,12 @@ work-proxy guard:509rows/4577nonzeros become382rows/10904nonzeros. No candidate
 row is admitted or replayed; the original-solve fallback recovers correctly.
 The frozen projection criterion fails, so no timing follow-up follows from
 this validation. [pcc:unverified]
+
+The [selected uniform-draw validation](local-cover-uniform-draws-validation-20261116-27/report.pdf)
+completes both scalar recoveries and all three required-counter checks.
+Stream-compatible Rust sampling records78nativeIC/69graph rejected draws;
+the graph projects520rows to390 with every witness replayed and no fallback.
+Known native integer prices and explicit unpriced events remain separate;
+complete costs and comparative eligibility remain unknown/false. The full
+raw is retained exactly in authorized local custody with its hash; complete
+summary and native flow excerpt are published. [pcc:unverified]

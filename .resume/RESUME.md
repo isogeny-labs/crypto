@@ -1,4 +1,28 @@
-# Current checkpoint:27SOURCE READY, NOT RUN (16 November12:07Z)
+# Current checkpoint:27FINISHED, publish packet (16 November12:13Z)
+
+Source15121ac779cef32bc173916e74ce26e2a3976f09 publishedbeforeSOLE27call.
+Run /workspace/ic-local-runs/local-cover-uniform-draws-validation-20261116-27
+exit0/69.824s/2starts2complete; bothactualscalar119700578327681984/native+outerreplay.
+Pivot520->390/390replayed/0fallback/foreign0/OTHER0. OriginalcopiedRustqualifier
+global[]/endpoint+3countercriterionTRUE;completeFALSE,totalNULL,eligibility/followupFALSE.
+ICcalls2540/draws2618/reject78/knownintprice64315008;graph2410/2479/69/60901824.
+Unpricedsub/clz/shiftcountsconserved. Fullraw71991B LOCALexact+hash;fullsummary56332B
+exactGit; nativeRustflow2960B/source/build/strictClippyPASS.119frozen/preposthashPASS.
+FinalsinglePDFpagevisuallyinspected/exactbenchPDF/SVG/150dpiPNGhashPASS;originalsLOCAL.
+FrozenTypsttemplatefailedreservedshowhelper;originalsource/logretained,localpresentation
+copyrenamedhelperdisplay_value,dataunchanged. No scientific/compilejobactive.
+
+NEXTcommit/pushpacket/updatePRactual27result thenactualadapted2LPfinderreview/selection.
+KBMCPabsent/wrapper3queriesfailed(noexecutable),/tmp/ic-adapted-2lp-kb-*.log.
+JVprimary§3.3 smallFpabscissae/splitremainingquadratic,NOTirreducFp²largeprimes.
+Userstrongestcontinuationcheaperalgebraicfinder+graph;currentarbitrarycolumnprojection
+densifiesprojectedsolve(25),MSTfillguardrejects23. No newfinderimplementation/protocol
+selectedyet. Needreviewbaseline/exactcontracts thenimplementRustsourcechecks beforetrial.
+GoalACTIVE/no stopgoal/subagents;localworks. PR4288regular/automerge/no manualmerge.
+CIlast15121at12:08 appreview+migrateSUCCESS/otherlistsEMPTY/requiredgatesunconfirmed;
+next>=12:58absentevent/newsourcepublication.
+
+# Previous checkpoint:27SOURCE READY, NOT RUN (16 November12:07Z)
 
 FinalselectedsamplerchecksALLPASS:2native sampler tests(65,536outputs/finalRNGstate),
 19cover(oneignored),19sieve(twoignored),2Wiedemann,1BM,1publicworker; actualproduction
