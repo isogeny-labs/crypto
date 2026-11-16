@@ -1,0 +1,23 @@
+{
+  "id": "C102-xor-first-block-elimination",
+  "hypothesis": "Preserving affine XOR equations and eliminating them before nonlinear branching reduces effective search width versus the C101 generic gate encoding.",
+  "changed_assumption": "C101 used general Boolean gate equalities; next solver must consume native affine rows before AND clauses. No identical timeout retry.",
+  "contract": "Projection and back substitution preserve all 76 parameter assignments; every discarded cell needs an exact contradictory row; recover every original variable before all-roots completion.",
+  "experiments": [
+    {
+      "id": "xor-block-oracles-next",
+      "budget_seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0,
+      "test": "Exhaust all small circuits; compare eliminated/back-substituted model sets with literal truth tables, including rank drops and exceptional branches."
+    },
+    {
+      "id": "xor-block-hard-next",
+      "budget_seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0,
+      "test": "Freeze same guarded CNF and changed affine-first implementation; compare necessary-search progress, total time and RSS; unknown remains inconclusive."
+    }
+  ],
+  "qualified_speedup": null
+}

@@ -1,0 +1,23 @@
+digraph CantorAudit {
+  graph [rankdir=TB,bgcolor="white",fontname="DejaVu Sans",nodesep=0.22,ranksep=0.28,pad=0.08];
+  node [shape=box,style="rounded,filled",fillcolor="#edf4fa",color="#3c6382",fontname="DejaVu Sans",fontsize=10,margin="0.11,0.07"];
+  edge [color="#536878",arrowsize=0.65];
+  curve [label="F3: f = X5 - X\nmonic, separable, degree 5"];
+  pairs [label="Complete reduced-pair model\n8 pairs; every v = 0"];
+  factors [label="Four pairwise coprime factors\nX, X - 1, X + 1, X2 + 1"];
+  compose [label="Actual gcd and exact quotient\nw = u1 u2 / gcd(u1,u2)2\nmonic w divides f"];
+  reduce [label="All 64 Cantor reductions\ndeg w <= 2: keep w\ndeg w > 2: output f / w"];
+  group [label="Unique output = group addition\nproved through complete bijection\nwith (Z/2Z)3"];
+  whole [label="Ambient: 7 / 8 smooth\nnonzero smooth: 6 / 8",fillcolor="#edf8ee",color="#42834c"];
+  subgroup [label="Proper cyclic subgroup <(X,0)>\norder 2; smooth: 2 / 2\nnonzero smooth: 1 / 2",fillcolor="#edf8ee",color="#42834c"];
+  disproof [label="Universal finite equality is false\nincluding identity: 1 != 7/8\nexcluding it from numerator: 1/2 != 3/4",fillcolor="#fff2dc",color="#a87522"];
+  gap [label="Separate open obligations\ngeometric Picard identification\nlarge-prime / asymptotic / scaling regimes",style="rounded,dashed",fillcolor="white",color="#9c5c5c"];
+  curve -> pairs; curve -> factors;
+  pairs -> compose; factors -> compose;
+  compose -> reduce -> group;
+  group -> whole; group -> subgroup;
+  whole -> disproof; subgroup -> disproof;
+  group -> gap [style=dashed];
+  {rank=same;pairs;factors}
+  {rank=same;whole;subgroup}
+}

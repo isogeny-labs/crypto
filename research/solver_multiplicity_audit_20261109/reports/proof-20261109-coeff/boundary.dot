@@ -1,0 +1,12 @@
+digraph boundary {
+  graph [rankdir=LR, bgcolor="white", fontname="DejaVu Sans", nodesep=0.3, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f7", fontname="DejaVu Sans", fontsize=11, margin=0.14];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#526778"];
+  raw [label="Actual preflight log\nannounces k^344\nprints -2147483648 for k=2"];
+  source [label="Pinned C source\npow → int32_t → mod 5\ncast precedes field reduction"];
+  kernel [label="Lean arithmetic\n2^344 > 2147483647\n2^344 = 1 in F5\nprinted value = 2 in F5", fillcolor="#f8eddf"];
+  scope [label="Observed coefficient discrepancy\nC11 conversion boundary\nC/libm trace not formalized", fillcolor="#e6f1e9"];
+  raw -> source;
+  source -> kernel;
+  kernel -> scope;
+}

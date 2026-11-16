@@ -1,0 +1,29 @@
+{
+  "schema": "typed_ancestry_metadata_fixtures_v1",
+  "tests": [
+    "valid path-receipt",
+    "valid modern",
+    "valid relocation",
+    "valid explicit null roots",
+    "valid hash-bound legacy root missing parent key",
+    "rejected unverified missing root key",
+    "rejected altered receipt statehash despite unchanged journal/path",
+    "rejected ancestry cycle",
+    "rejected relocation parent_journal_sha256",
+    "rejected relocation parent_terminal_sha256",
+    "rejected relocation parent_path",
+    "rejected ambiguous format",
+    "rejected invalid program",
+    "rejected journal_sha256",
+    "rejected last_record_sha256",
+    "rejected sealed_path",
+    "rejected state_sha256",
+    "rejected unsupported/incomplete",
+    "rejected unsupported/incomplete",
+    "rejected unsupported/incomplete",
+    "rejected unsupported/incomplete",
+    "rejected path escape"
+  ],
+  "passed": 22,
+  "scientific_executions": 0
+}

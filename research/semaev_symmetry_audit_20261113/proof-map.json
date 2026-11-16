@@ -1,0 +1,69 @@
+{
+  "namespace": "SemaevSymmetryAudit",
+  "proofs": [
+    {
+      "file": "NewestThree.lean",
+      "claim": "Actual inner/outer newest-three adjacent swaps, original canonical polynomial",
+      "declarations": [
+        "sourceBalanced_innerSwap",
+        "canonical_innerSwap",
+        "canonical_outerSwap"
+      ]
+    },
+    {
+      "file": "ThreeActions.lean",
+      "claim": "Actual three-variable equivalence and all newest-three permutations",
+      "declarations": [
+        "threeEquiv_outer",
+        "threeEquiv_inner",
+        "canonical_newest_three_permutation"
+      ]
+    },
+    {
+      "file": "CanonicalTower.lean",
+      "claim": "Actual InputRing/tower/scalar equivalence, mapped existing canonical object and recurrence",
+      "declarations": [
+        "inputEquiv_scalar",
+        "towerCanonical_succ",
+        "towerCanonical_degree",
+        "towerCanonical_double",
+        "adjacent_scalar"
+      ]
+    },
+    {
+      "file": "AdjacentCanonical.lean",
+      "claim": "Literal S3/S4 bases and all canonical adjacent swaps",
+      "declarations": [
+        "towerCanonical_base_pair",
+        "towerCanonical_four_middle",
+        "towerCanonical_adjacent"
+      ]
+    },
+    {
+      "file": "TowerVariables.lean",
+      "claim": "Actual MV equivalence, all coordinate/scalar images and adjacent renamings",
+      "declarations": [
+        "towerEquiv_C",
+        "towerEquiv_X",
+        "adjacent_variable",
+        "towerEquiv_adjacent"
+      ]
+    },
+    {
+      "file": "FullSymmetry.lean",
+      "claim": "Finite permutation generation, full IsSymmetric and pullback with variable/scalar semantics",
+      "declarations": [
+        "symmetric_of_fin_adjacent",
+        "canonicalMv_isSymmetric",
+        "canonicalMv_actual",
+        "permuteCanonical_variable",
+        "permuteCanonical_scalar",
+        "permuteCanonical_actual",
+        "actual_all_input_symmetry_with_control"
+      ]
+    }
+  ],
+  "hypotheses": "Every FieldK, actual WeierstrassCurveW, stage n>=0/arityn+3>=3. No characteristic/nonsingularity restriction for this algebraic identity. The independent-b rational counterexample is inherited from the source-order packet and is not a source curve.",
+  "local_gate": "90/0failures/0trusted",
+  "signed_standing": "not established"
+}

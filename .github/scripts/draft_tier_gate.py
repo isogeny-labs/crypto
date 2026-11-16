@@ -43,6 +43,10 @@ FAST_TIER = {
 # Workflows whose exact bytes are pinned by a sealed evidence record or an
 # exact implementation-version dependency; editing them breaks that record.
 PINNED = {
+    # Exact workflow bytes are PCC subjects; keep the narrow native unit /
+    # offline replay workflows unchanged (79e22c and e8686a respectively).
+    "p256-aux-smooth.yml",
+    "p256-aux-linear.yml",
     "weak-curve-lean.yml",
     "weak-curve-conjectures.yml",
     "release.yml",

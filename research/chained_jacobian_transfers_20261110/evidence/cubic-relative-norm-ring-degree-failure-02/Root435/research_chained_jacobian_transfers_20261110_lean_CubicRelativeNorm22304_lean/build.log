@@ -1,0 +1,164 @@
+'CubicConstructorFrobenius22301.constructor_guard' does not depend on any axioms
+'CubicConstructorFrobenius22301.skipped_candidate_two' does not depend on any axioms
+'CubicConstructorFrobenius22301.selected_candidate_three' does not depend on any axioms
+'CubicConstructorFrobenius22301.no_base_cubic_root_three' depends on axioms: [propext, Quot.sound]
+'CubicConstructorFrobenius22301.frobenius_coefficients' depends on axioms: [propext, Quot.sound]
+'CubicConstructorFrobenius22301.constructor_size' does not depend on any axioms
+'CubicConstructorFrobenius22301.group_power' depends on axioms: [propext]
+'CubicConstructorFrobenius22301.coefficient_power' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicConstructorFrobenius22301.generator_frobenius' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicConstructorFrobenius22301.squared_generator_frobenius' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicConstructorFrobenius22301.basis_frobenius_three' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicConstructorFrobenius22301.fixed_coefficient_subspace' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFullFrobenius22302.frobenius_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFullFrobenius22302.base_fermat' depends on axioms: [propext, Quot.sound]
+'CubicFullFrobenius22302.embed_injective' depends on axioms: [propext]
+'CubicFullFrobenius22302.embed_add' depends on axioms: [propext]
+'CubicFullFrobenius22302.embed_mul' depends on axioms: [propext]
+'CubicFullFrobenius22302.embed_pow' depends on axioms: [propext, Quot.sound]
+'CubicFullFrobenius22302.embedded_coefficients_fixed' depends on axioms: [propext, Quot.sound]
+'CubicFullFrobenius22302.embedded_action_constants' depends on axioms: [propext]
+'CubicFullFrobenius22302.full_expression' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFullFrobenius22302.three_power_steps' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFullFrobenius22302.fixed_expression_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicBasisInjectivity22303.coefficient_embedding_injective' depends on axioms: [propext]
+'CubicBasisInjectivity22303.coefficient_embedding_add' depends on axioms: [propext]
+'CubicBasisInjectivity22303.coefficient_embedding_mul' depends on axioms: [propext]
+'CubicBasisInjectivity22303.coefficient_embedding_pow' depends on axioms: [propext, Quot.sound]
+'CubicBasisInjectivity22303.coefficient_embedding_fixed' depends on axioms: [propext, Quot.sound]
+'CubicBasisInjectivity22303.coefficient_embedding_constants' depends on axioms: [propext]
+'CubicBasisInjectivity22303.three_coefficient_separation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicBasisInjectivity22303.cubic_generator_cancel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicBasisInjectivity22303.cubic_squared_generator_cancel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicBasisInjectivity22303.encode_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicBasisInjectivity22303.fixed_expression_without_injectivity' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'CubicBasisInjectivity22303.zero_generator_not_injective' depends on axioms: [propext, Quot.sound]
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/CubicRelativeNorm22304.lean:406:2: error: `grind` failed
+case grind
+R : Type
+inst : CommRing R
+inst_1 : IsCharP R 223
+z : R
+hz : z ^ 3 = 3
+x : Fin 223 × Fin 223 × Fin 223
+hc : encode z x ^ 223 * (encode z x ^ 223) ^ 223 = encode z (cofactor x)
+hn : encode z x * encode z (cofactor x) = embed (coefficientNorm x)
+h : ¬encode z x * encode z x ^ 223 * (encode z x ^ 223) ^ 223 = embed (coefficientNorm x)
+fst fst_1 snd_1 : Fin 223
+h_1 : (fst, fst_1, snd_1) = x
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] IsCharP R 223
+    [prop] z ^ 3 = 3
+    [prop] encode z x ^ 223 * (encode z x ^ 223) ^ 223 = encode z (cofactor x)
+    [prop] encode z x * encode z (cofactor x) = embed (coefficientNorm x)
+    [prop] ¬encode z x * encode z x ^ 223 * (encode z x ^ 223) ^ 223 = embed (coefficientNorm x)
+    [prop] (fst, fst_1, snd_1) = x
+    [prop] ↑snd_1 = ↑x.snd.snd
+    [prop] ↑x.snd.snd ≤ 222
+    [prop] ↑snd_1 ≤ 222
+    [prop] ↑fst_1 = ↑x.snd.fst
+    [prop] ↑x.snd.fst ≤ 222
+    [prop] ↑fst_1 ≤ 222
+    [prop] ↑fst = ↑x.fst
+    [prop] ↑x.fst ≤ 222
+    [prop] ↑fst ≤ 222
+    [prop] ↑snd_1 ≤ 222
+    [prop] ↑x.snd.snd ≤ 222
+    [prop] ↑fst_1 ≤ 222
+    [prop] ↑x.snd.fst ≤ 222
+    [prop] ↑fst ≤ 222
+    [prop] ↑x.fst ≤ 222
+    [prop] ↑fst ≤ 222
+    [prop] ↑fst_1 ≤ 222
+    [prop] ↑snd_1 ≤ 222
+  [eqc] True propositions
+    [prop] IsCharP R 223
+    [prop] ↑fst ≤ 222
+    [prop] ↑fst_1 ≤ 222
+    [prop] ↑snd_1 ≤ 222
+    [prop] ↑x.snd.fst ≤ 222
+    [prop] ↑x.fst ≤ 222
+    [prop] ↑x.snd.snd ≤ 222
+  [eqc] False propositions
+    [prop] encode z x * encode z x ^ 223 * (encode z x ^ 223) ^ 223 = embed (coefficientNorm x)
+  [eqc] Equivalence classes
+    [eqc] {x, (fst, fst_1, snd_1), (x.fst, x.snd)}
+    [eqc] {fst, x.fst}
+      [eqc] {(x.fst, x.snd).fst}
+    [eqc] {fst_1, x.snd.fst}
+      [eqc] {(x.snd.fst, x.snd.snd).fst}
+    [eqc] {snd_1, x.snd.snd}
+      [eqc] {(x.snd.fst, x.snd.snd).snd}
+    [eqc] {cofactor x, ((cofactor x).fst, (cofactor x).snd)}
+    [eqc] {↑fst, ↑x.fst}
+    [eqc] {↑fst_1, ↑x.snd.fst}
+    [eqc] {↑snd_1, ↑x.snd.snd}
+    [eqc] {embed (coefficientNorm x), encode z x * encode z (cofactor x)}
+    [eqc] {3, z ^ 3}
+    [eqc] {x.snd, (fst_1, snd_1), (x.snd.fst, x.snd.snd)}
+      [eqc] {(x.fst, x.snd).snd}
+    [eqc] {(cofactor x).snd, ((cofactor x).snd.fst, (cofactor x).snd.snd)}
+      [eqc] {((cofactor x).fst, (cofactor x).snd).snd}
+    [eqc] {encode z (cofactor x), encode z x ^ 223 * (encode z x ^ 223) ^ 223}
+    [eqc] others
+      [eqc] {↑↑fst, ↑↑x.fst}
+      [eqc] {↑↑fst_1, ↑↑x.snd.fst}
+      [eqc] {↑↑snd_1, ↑↑x.snd.snd}
+      [eqc] {(cofactor x).snd.fst, ((cofactor x).snd.fst, (cofactor x).snd.snd).fst}
+      [eqc] {(cofactor x).fst, ((cofactor x).fst, (cofactor x).snd).fst}
+      [eqc] {(cofactor x).snd.snd, ((cofactor x).snd.fst, (cofactor x).snd.snd).snd}
+  [cases] Case analyses
+    [cases] [1/1]: x
+      [cases] source: Initial goal
+  [ematch] E-matching patterns
+    [thm] Nat.pow_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Nat.div_pow_of_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Fin.isLt: [@Fin.val #1 #0]
+  [cutsat] Assignment satisfying linear constraints
+    [assign] fst := 0
+    [assign] fst_1 := 0
+    [assign] snd_1 := 0
+    [assign] x.snd.fst := 0
+    [assign] (x.snd.fst, x.snd.snd).fst := 0
+    [assign] x.fst := 0
+    [assign] (x.fst, x.snd).fst := 0
+    [assign] x.snd.snd := 0
+    [assign] (x.snd.fst, x.snd.snd).snd := 0
+  [ring] Rings
+    [ring] Ring `Int`
+      [basis] Basis
+        [_] ↑↑x.snd.snd + -1 * ↑↑snd_1 = 0
+        [_] ↑↑x.snd.fst + -1 * ↑↑fst_1 = 0
+        [_] ↑↑x.fst + -1 * ↑↑fst = 0
+    [ring] Ring `R`
+      [basis] Basis
+        [_] z ^ 3 + 220 = 0
+      [diseqs] Disequalities
+        [_] ¬encode z x ^ 49953 + 222 * (encode z x * encode z (cofactor x)) = 0
+[grind] Issues
+  [issue] ring polynomial degree 49952 exceeds threshold `(ringMaxDegree := 49952)`
+[grind] Diagnostics
+  [ematch] E-matching Diagnostics
+    [thm] Theorem Instance Count
+      [thm] Fin.isLt ↦ 3
+  [cases] Cases instances
+    [cases] Prod ↦ 1
+'CubicRelativeNorm22304.coefficient_embedding_zero_one' depends on axioms: [propext]
+'CubicRelativeNorm22304.coefficient_embedding_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.coefficient_embedding_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.coefficient_embedding_three_nine' depends on axioms: [propext]
+'CubicRelativeNorm22304.coefficient_product_encoding' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.scalar_encoding' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.conjugate_cofactor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.cofactor_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.full_relative_norm' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.full_relative_trace' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.coefficient_norm_multiplicative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.certified_norm_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicRelativeNorm22304.norm_nonadditivity_control' depends on axioms: [propext, Quot.sound]
+'CubicRelativeNorm22304.zero_norm_no_inverse_control' depends on axioms: [propext, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0
