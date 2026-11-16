@@ -195,7 +195,7 @@ fn algebraic(
         }
         if prod_inv!=1 {return Err("batch inverse invariant failed".into());}
         for (j,f) in coefficients.into_iter().enumerate() {
-            let (a,b,c)=f;
+            let (_a,b,c)=f;
             let mut roots=Vec::with_capacity(2);
             if let Some(root)=sqrts[j] {
                 roots.push(mulp(subp(root,b),inverses[j]));
