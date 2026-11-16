@@ -1,0 +1,19 @@
+LIB "linalg.lib";
+proc require78(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../50/source-data/relative-finite50.sing"));
+require78(relativeIdeal50[1]==v^2+v+u^3+u,"U078_SOURCE_QUADRATIC");
+poly F78=relativeIdeal50[2];
+poly specialized78=subst(F78,u,0);
+poly expected78=t^16+(v+1)*t^8+v+1;
+require78(specialized78==expected78,"U078_FULL_DEGREE16_SPECIALIZATION");
+poly atV0_78=subst(specialized78,v,0);
+poly atV1_78=subst(specialized78,v,1);
+require78(atV0_78==(t^2+t+1)^8 && atV1_78==t^16,"U078_BOTH_COMPONENT_FACTORS");
+require78(atV0_78!=t^8+t^4+1,"U078_WRONG_FACTOR_REJECTED");
+ideal total78=std(ideal(relativeIdeal50[1],relativeIdeal50[2],u));
+ideal zero78=std(ideal(relativeIdeal50[1],relativeIdeal50[2],u,v));
+ideal one78=std(ideal(relativeIdeal50[1],relativeIdeal50[2],u,v+1));
+require78(vdim(total78)==32 && vdim(zero78)==16 && vdim(one78)==16,"U078_COMPLETE_FIBER_LENGTHS");
+require78(vdim(std(ideal(u,v,t^2+t+1)))==2 && vdim(std(ideal(u,v+1,t)))==1,"U078_REDUCED_RESIDUE_DEGREES");
+print("U078_RESULT total_dim=32 v0_dim=16 v1_dim=16 v0_reduced_degree=2 v1_reduced_degree=1 factor_exponents=8,16 wrong_factor_rejected=1");
+print("FULL_U0_78_ALL_CHECKS_PASS");quit;

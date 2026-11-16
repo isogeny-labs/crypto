@@ -1,0 +1,141 @@
+{
+  "schema": "lean-example-validation/v1",
+  "recorded_at": "2026-11-15T20:21:25.054Z",
+  "input_base_commit": "5e2b86ebdd65b223eec365cdfa3cac7116196ac5",
+  "lean_toolchain": "leanprover/lean4:v4.24.0",
+  "mathlib": {
+    "url": "https://github.com/leanprover-community/mathlib4.git",
+    "type": "git",
+    "subDir": null,
+    "scope": "",
+    "rev": "f897ebcf72cd16f89ab4577d0c826cd14afaafc7",
+    "name": "mathlib",
+    "manifestFile": "lake-manifest.json",
+    "inputRev": "v4.24.0",
+    "inherited": false,
+    "configFile": "lakefile.lean"
+  },
+  "checks": {
+    "assembly_probe": {
+      "exit": 0
+    },
+    "full_lake_build": {
+      "exit": 0
+    },
+    "explicit_axiom_audit": {
+      "exit": 0
+    },
+    "repository_gate": {
+      "exit": 0,
+      "audited_theorems": 50,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "report_pdf": {
+      "pages": 1,
+      "visually_inspected": true
+    },
+    "pcc_status": "unsigned"
+  },
+  "files": [
+    {
+      "path": "examples/cross_characteristic_ecdlp/CrossCharacteristicExample.lean",
+      "bytes": 6771,
+      "sha256": "db1c24ddc85133139fe13215c8e581b56e09b95c15f696220a757e77d5e4dc78"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/CrossCharacteristicTwo.lean",
+      "bytes": 4850,
+      "sha256": "a0ab0072e8192f80ee41463e8b5a425a8de224048f4da3b9c9a66be3717f2631"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/AxiomAudit.lean",
+      "bytes": 891,
+      "sha256": "53f381b0f57c40ea71afdcd816b4286508409323acae73e41a6bc67bc0e467ad"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/lakefile.toml",
+      "bytes": 333,
+      "sha256": "f29fcc42a664997432a8fe528f417ec88843d955905db1a445c6a3a1a6e72afa"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/lake-manifest.json",
+      "bytes": 3106,
+      "sha256": "6598401a491d5e379db21cfeccd548f6af3f2d0899a89630241343f03fd720c3"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/lean-toolchain",
+      "bytes": 25,
+      "sha256": "42779d67b81608af8a12aa4328d2ab47ca201925b3b2bd68369587b5340bb434"
+    },
+    {
+      "path": "tools/lean/proof-gate.sh",
+      "bytes": 11159,
+      "sha256": "2fe88bb302db587bbb6ede217fc646cf8fa35f9b9a2980e4a15dae273b8df6eb"
+    },
+    {
+      "path": "tools/lean/AuditAxioms.lean",
+      "bytes": 4004,
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "path": "tools/lean/trusted-native.txt",
+      "bytes": 528,
+      "sha256": "934d0322ac07faec9502186b206c289cdeed7fb9a54f700cc097124476b6bf15"
+    },
+    {
+      "path": "pcc/claims/PCC-20261115-8b013d.json",
+      "bytes": 765,
+      "sha256": "75162b090c9c857c04f87fafca3d2a16734b0fe9c43db72926c40f419f07a8fb"
+    },
+    {
+      "path": "pcc/claims/PCC-20261115-6a7830.json",
+      "bytes": 800,
+      "sha256": "7a27186dd838e0a83cb5afc1525a8877e03baefbf3ea46234d9558e1c76ced06"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/.artifacts.json",
+      "bytes": 169,
+      "sha256": "f26df3204c13598d10e5cc63ac2ea038886c76fec127f795714663b0e09e0b81"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/.gitignore",
+      "bytes": 145,
+      "sha256": "d402878013c8fd7d7df9c2a0e75377f115af1a4b2974f389cacf518f518fa18a"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/binary-transfer.svg",
+      "bytes": 1942,
+      "sha256": "3402f0cbc4adebef53e69ce48067a1e09c5e5fac9ad341fc46b2b67d6f862a02"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/binary-transfer.png",
+      "bytes": 254069,
+      "sha256": "745e53ca40426955cfca389682987e764903a0bb1b413b651f186cab2bc9973b"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/binary-report.html",
+      "bytes": 3484,
+      "sha256": "77df50a5f65babe34ecd0ceda97d331fd88c98dce0596608aa2324bb2be9f5e0"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/binary-report.pdf",
+      "bytes": 272971,
+      "sha256": "3470fd657200206608b040370913aaa4e0f6abced5047771a08775f189d0d2d5"
+    },
+    {
+      "path": "examples/cross_characteristic_ecdlp/receipts/characteristic-two-20261115/pr-body.md",
+      "bytes": 3165,
+      "sha256": "ced844d161cc5af03851d643b12b14653870508c469755187616f56b9931ed7a"
+    }
+  ],
+  "historical_files_unchanged_since_input_base": [
+    "examples/cross_characteristic_ecdlp/CrossCharacteristicExample.lean",
+    "examples/cross_characteristic_ecdlp/.artifacts.json",
+    "examples/cross_characteristic_ecdlp/.gitignore",
+    "examples/cross_characteristic_ecdlp/report.html",
+    "examples/cross_characteristic_ecdlp/report.pdf",
+    "examples/cross_characteristic_ecdlp/transfer.svg"
+  ],
+  "current_addition_ledger_base_bytes_preserved": true
+}

@@ -1,0 +1,12 @@
+Finset.prod_inv_distrib.{u_1, u_5} {ι : Type u_1} {G : Type u_5} {s : Finset ι} [DivisionCommMonoid G] (f : ι → G) :
+  ∏ x ∈ s, (f x)⁻¹ = (∏ x ∈ s, f x)⁻¹
+inv_pow.{u_1} {α : Type u_1} [DivisionMonoid α] (a : α) (n : ℕ) : a⁻¹ ^ n = (a ^ n)⁻¹
+PowerSeries.coeff_coe.{u_1} {R : Type u_1} [Semiring R] (f : PowerSeries R) (i : ℤ) :
+  ((HahnSeries.ofPowerSeries ℤ R) f).coeff i = if i < 0 then 0 else (PowerSeries.coeff i.natAbs) f
+PowerSeries.coeff_trunc.{u_1} {R : Type u_1} [Semiring R] (m n : ℕ) (φ : PowerSeries R) :
+  ((PowerSeries.trunc n) φ).coeff m = if m < n then (PowerSeries.coeff m) φ else 0
+PowerSeries.coeff_coe_trunc_of_lt.{u_2} {R : Type u_2} [CommSemiring R] {n m : ℕ} {f : PowerSeries R} (h : n < m) :
+  (PowerSeries.coeff n) ↑((PowerSeries.trunc m) f) = (PowerSeries.coeff n) f
+PowerSeries.trunc_mul_trunc.{u_2} {R : Type u_2} [CommSemiring R] {n : ℕ} (f g : PowerSeries R) :
+  (PowerSeries.trunc n) (f * ↑((PowerSeries.trunc n) g)) = (PowerSeries.trunc n) (f * g)
+Polynomial.coeff_one.{u} {R : Type u} [Semiring R] {n : ℕ} : (Polynomial.coeff 1) n = if n = 0 then 1 else 0

@@ -1,0 +1,59 @@
+{
+  "schema": "independent-recorded-evidence-review/v1",
+  "created_utc": "2026-11-13T02:49:39.455411+00:00",
+  "decision": "CORRECT_COMPLETE_EMPTY_COMPARISON_NO_BERNSTEIN_HEADROOM",
+  "operation": "Recordedhash/coverage/rootunion/batch/maskchecks; no candidate/solverrerun",
+  "results": [
+    {
+      "mode": "controls",
+      "root_union_size": 38,
+      "all_arm_unions_equal": true,
+      "completed_native_fibers": 135,
+      "recovery_batches": 7,
+      "empty_batches": 1,
+      "mask_rows": 10,
+      "vectors": 250,
+      "old_candidate_u_checks": 2250,
+      "bernstein_candidate_u_checks": 1125,
+      "bernstein_extra_exclusions": 0,
+      "wall_seconds": 6.094244884999966,
+      "peak_process_rss_kib": 194244,
+      "native_rss_kib": [
+        14336,
+        15980
+      ],
+      "medians": null,
+      "prediction_supported": null,
+      "raw_sha256": "a3b8a73b422b3af90cbf7e2b2cf9d531dc1c7002943bbd7441ad642fa86a3850"
+    },
+    {
+      "mode": "profile",
+      "root_union_size": 0,
+      "all_arm_unions_equal": true,
+      "completed_native_fibers": 240,
+      "recovery_batches": 12,
+      "empty_batches": 6,
+      "mask_rows": 30,
+      "vectors": 750,
+      "old_candidate_u_checks": 12000,
+      "bernstein_candidate_u_checks": 0,
+      "bernstein_extra_exclusions": 0,
+      "wall_seconds": 36.45165177000001,
+      "peak_process_rss_kib": 194208,
+      "native_rss_kib": [
+        14336,
+        17116
+      ],
+      "medians": {
+        "all": 9.12657384399995,
+        "bern": 0.8472978529999864,
+        "old": 0.8193719170000122
+      },
+      "prediction_supported": false,
+      "raw_sha256": "6fcbe06c44a07b8d61aca5ea1cb81f087eef7d13fa96164a766dd25b753cc758"
+    }
+  ],
+  "interpretation": "Old5Dclosesall80; actualBernsteinrefinementgatedoff. Noactualnewpruningbenefitwastested; slighttimingdifferenceisunqualified.",
+  "qualified_gain": false,
+  "global_original_roots": false
+}

@@ -1,0 +1,30 @@
+LIB "linalg.lib";
+proc require57(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../space57-02/complete-space57.sing"));
+matrix zero57[48][24];
+require57(nrows(constraints57)==48 && ncols(constraints57)==68 && nrows(kernel57)==68 && ncols(kernel57)==24,"CHECK57_FULL_MATRIX_SHAPES");
+require57(rowChange57*rowInverse57==unitmat(48) && rowInverse57*rowChange57==unitmat(48),"CHECK57_BOTH_ROW_INVERSES");
+require57(constraints57==rowChange57*ordinary57,"CHECK57_DESCENT_ROW_IDENTITY");
+require57(constraints57*kernel57==zero57 && recovery57*kernel57==unitmat(24),"CHECK57_KERNEL_AND_COORDINATE_PRODUCTS");
+require57(kernel57*recovery57+homotopy57*constraints57==unitmat(68),"CHECK57_COMPLETE_RECOVERY");
+require57(mat_rk(constraints57)==44 && mat_rk(kernel57)==24 && mat_rk(jets57)==68,"CHECK57_ALL_RANKS");
+require57(jets57*controlColumns57==controlJets57,"CHECK57_FULL_CONTROL_JETS");
+require57(sigma57*sigma57==unitmat(68) && sigma57*kernel57==kernel57*sigmaRestricted57 && sigmaRestricted57*sigmaRestricted57==unitmat(24),"CHECK57_ACTUAL_INVOLUTION_PRODUCTS");
+require57(mat_rk(sigmaRestricted57+unitmat(24))==10,"CHECK57_ACTUAL_NILPOTENT_RANK");
+matrix badKernel57=kernel57;int j57=1;while(ordinary57[1,j57]==0){j57++;}badKernel57[j57,1]=badKernel57[j57,1]+1;
+require57(ordinary57*badKernel57!=zero57,"CHECK57_CHANGED_KERNEL_REJECTED");
+execute(read("../field57-01/field-space57.sing"));ideal sourceGB57=std(sourceIdeal57);
+require57(vdim(sourceGB57)==32 && size(completeValues57)==24 && size(dividedValues57)==24,"CHECK57_ACTUAL_FIELD_SHAPES");
+ideal allValues57=completeValues57;ideal allDivided57=dividedValues57;ideal actualIdeal57=sourceIdeal57;poly A57=actualA57;poly invA57=inverseA57;
+execute(read("../../../50/runs/rr-field50-01/rr-field50.sing"));
+map fieldMap57=fieldSpace57,l,v;ideal GB57=std(fieldMap57(actualIdeal57));ideal actual57=fieldMap57(allValues57);ideal divided57=fieldMap57(allDivided57);poly actualA57=fieldMap57(A57);poly actualInverse57=fieldMap57(invA57);
+map columnsMap57=completeSpace57,0;matrix columns57=columnsMap57(kernel57);
+poly reconstructed57;int i57;int k57;
+for(k57=1;k57<=24;k57++){
+ reconstructed57=0;for(i57=1;i57<=68;i57++){reconstructed57=reconstructed57+columns57[i57,k57]*rrValues50[i57];}
+ require57(reduce(reconstructed57+actual57[k57],GB57)==0,"CHECK57_ALL24_ACTUAL_RECONSTRUCTIONS");
+ require57(reduce(actualA57*divided57[k57]+actual57[k57],GB57)==0,"CHECK57_ALL24_DIVISION_IDENTITIES");
+}
+require57(reduce(actualA57*actualInverse57+1,GB57)==0,"CHECK57_GENERIC_INVERSE");
+print("CHECK57_RESULT constraint_rank=44 complete_dimension=24 independent_jets=68 field_degree=32 field_reconstructions=24 division_products=24 sigma_nilpotent_rank=10 corrupted_kernel_rejected=1");
+print("CHECK57_ALL_CHECKS_PASS");quit;
