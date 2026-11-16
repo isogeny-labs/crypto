@@ -1,3 +1,64 @@
+# Current checkpoint:41COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet then anchored descent
+
+GoalACTIVE/RustgraphIC+cheapextensionfieldrelations towardrho parity. ALLscienceRust,
+ALLmeasurementsRunpod;no subagents/stopgoal. Everyownpaidpod32–41DELETED, no activejob.
+Currentbranch feat/extension-ic-quadratic-remainder-pipeline,sourcefcda1e22cb0c5424ca3244f783e69be8b99792f4;
+DRAFTPR4453 https://github.com/isogeny-labs/crypto/pull/4453. OldPR4288merged365d2b95f.
+Sourcefromold1d6ancestor;mainaheadincludingCargo.toml/lockandsharedjournal/ledger.
+Afterpacketpublicationresolvefreshbranchmainconflicts preservingALLsharedentries;
+doNOTrewritefrozen41sourceproof/data. MarkPRreadythroughnormalgates,nomanualmerge/bypass.
+
+41soleRunpodPOST20221:52:07Z,freshp1009seed389/L263807419614139553.
+ALL7workers/copiedqualifier0 recover242624768583643540; every-source/norm/Cantor/class/
+witness/rank/product/kernel/descent/residuallabel/affine/unreducedtarget/LAconservation/
+rhooptions/nativecounts PASS.1coldround0warm/retry/excluded,904.231swholepracticalityonly.
+ObservedINCOMPLETE4525556132414originalIC/6415031980400fullsmoothkernel/
+5645040401736remainderkernel;ρplain1/neg1/plain16/neg16=196545134504212/
+181105019144798/109992238398614/274525819370690. No ratios/fullcost/bands/T1/parityadmission.
+PairedRelations2315702506728→1524569935776,LA671651053392→692792045680,
+Descent3426280619436identical3415residuals/2descents;originalIC1734424925904/1728resid.
+OriginalICsubtotalstilllower. Pairedh/kernel/descents/affinerows/postcollectionLA/
+allotherphasesidentical;218commoncompletebatchprefixes. Fullbase509/homrank508,
+fullrank510/quotient2. Fullsmooth363520B/509fullsrc/509rows;candidate223232B/297full+
+11419partial/11206vertices/213collisions/510rows,27refusals/0duplicates.
+PCCresult7d4d7eUNVERIFIED/source0b939eUNVERIFIED. Rootlib21/example3/qualifier56PASS,
+strictClippy/build0,7armtransportcontrolsPASS; no globalparentsuitePASSclaim.
+
+LOCAL/workspace/ic-runpod-runs/runpod-extension-pipeline-20261116-41/returned/task/run
+319339Bfullsmooth/4515586Bcandidate/32230595BexportLOCALhashbound,summary42425BGit,
+IC7397B/fourrhos~13kGit.338publishedsourceblobs/portablepre/preworker/post/qualifiedhash
+PASS/privatepatternscanPASS. Ownuoehapnoz96luyDELETE204+independentGET40422:11:07Z,
+guardmarked;CPU48/4vCPU8GiBcpu3c/.12h/pinnedimage/7200slifetime. No activepaidpod.
+FinalonepagePDFVIEWEDunclipped;exactPDF/SVG/150dpiPNG/nativefigurehashPASS.
+Packetstudy/runpod-extension-pipeline-20261116-41;bench20261116-runpod-extension-pipeline.
+Workspace restartaftercleanupready;hashrecheckcorrectcwdPASS. Originalraw/qualifier/
+summary/export unchanged. Packet/lesson/PCC/journal/resumeNOTYETCOMMITTEDatthischeckpoint.
+
+NEXTpublish41packetandactualPRbodyAFTERfullproselint0,resolvemainconflicts/normalCI.
+Then42selectRustanchoredquadraticdescentcomponentusingpublicRootAPIs,avoidRootrebuild
+wherepossible. StaticLEAD_ANCHORED_QUADRATIC_DESCENT.md PINNED byPCCd04ceeUNVERIFIED,
+finalstaticonepageVIEWED/hashPASS;DO NOTeditpinnednote/figmanifest. No42code/protocol/call.
+ActualRootNagao: publicweil_forms andsolve_zero_dim_traced/count_public/opts_for_mode;
+S=(C²H-A²)/u_R monicFpdegree6, currentroots.len()!=6rejectsquadbeforeAconstruction.
+C=x+mu,A=-xv_R+lambda0u_R+lambda1xu_R-mu v_R. For4small+irreducU, proveexactnorm/
+disjointsquarefree/coprime/nonramified/support,V=-A/CmodU,V²=HmodU,canonical±D.
+PrincipalR+sum(sP B)+cD D=0 plusanchor sum(sA B)+cA D=0 gives
+R=-sum(sP B)+cD*cA*sum(sA B); affineeta=dot(smallrow,h),target-b,RHSa.
+Variantsoneanchor/twoanchors/affinepartialgraph/moreanchorcollection;alluntested.
+NeedinputprojectionONLYpubliccurve+homogeneouscollection+h/anchors, EXCLUDEoldscalar,
+oldtargetdescents/affinerows. Recordedcomponentprecomputationexplicitlyexcluded,no41
+repricing/composition/newDLPsampleclaim. SeparateF4/cofactorstreamidenticalbotharms,
+actualaffine2coltargetrank/ellipticreplayandindependentoriginal/group/witnesschecks.
+No new experiment untilpriorpiecejournalreview/protocolfreeze/controlspass/sourcepublish.
+
+Privateauthpointer/tmp/ic-runpod-auth-location;NEVERprintAPIkey/header/token/envresponse.
+Task41/pod41receiptsretained/deletedmarker;allotherownpodsdeleted. S3gate1missingprofile/
+token,prioruserRunpodauthorizationpersists/noask/noS3claim. Canonicalprotocolsources
+VLT1encrypted/unavailable,KBtoolsabsent/wrappernoexe;don'tprintciphertextorclaimabsence.
+Concreteactionloops/commentary<=60seconds;avoidlongspeculativeanalysiswithouttools.
+
+--- Previous checkpoint retained verbatim ---
+
 # Current checkpoint:41READY; publish fresh branch and dispatch once
 
 ACTIVE goal Rust graph IC + cheap extension-field relation finder towardrho parity.
