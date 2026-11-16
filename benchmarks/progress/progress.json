@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0331Z-hec-jetfree631",
+  "latest_record": "20261116T0351Z-hec-tensor631",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 8,
     "invalid": 4,
-    "measured": 215,
+    "measured": 216,
     "open": 1
   },
   "repo": "crypto",
@@ -10590,12 +10590,61 @@
     },
     {
       "better": "lower",
+      "first": 1.478166542,
+      "latest": 1.478166542,
+      "latest_derived": {},
+      "metric": "baseline_a_component_wall",
+      "points": [
+        {
+          "commit": "0911e248f439",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0351Z-hec-tensor631",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.44852325,
+            2.065583333
+          ],
+          "summary": "All20cells verified; stability gate fails; observed1.146ratio unqualified; 10xrejected; phase evidence redirects mechanism.",
+          "value": 1.478166542
+        }
+      ],
+      "problem": "ic:hec-f631-c49-inverse-pair",
+      "unit": "wall_s"
+    },
+    {
+      "better": "higher",
+      "first": 1.145538339604,
+      "latest": 1.145538339604,
+      "latest_derived": {},
+      "metric": "baseline_a_over_tensor_a",
+      "points": [
+        {
+          "commit": "0911e248f439",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0351Z-hec-tensor631",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All20cells verified; stability gate fails; observed1.146ratio unqualified; 10xrejected; phase evidence redirects mechanism.",
+          "value": 1.145538339604
+        }
+      ],
+      "problem": "ic:hec-f631-c49-inverse-pair",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 1.503780333,
-      "latest": 6.329883375,
+      "latest": 1.290368459,
       "latest_derived": {
-        "improvement_vs_first_percent": -320.9314,
-        "improvement_vs_previous_percent": -320.9314,
-        "value_over_reference": 1.075051
+        "improvement_vs_first_percent": 14.1917,
+        "improvement_vs_previous_percent": 79.6147,
+        "value_over_reference": 0.872952
       },
       "metric": "inverse_component_wall",
       "points": [
@@ -10635,6 +10684,25 @@
           ],
           "summary": "All10cells verified; ratio0.930 with strong run-order drift; tenfold gate failed; no demonstrated speedup; component only.",
           "value": 6.329883375
+        },
+        {
+          "commit": "0911e248f439",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 14.1917,
+            "improvement_vs_previous_percent": 79.6147,
+            "value_over_reference": 0.872952
+          },
+          "n": 5,
+          "record": "20261116T0351Z-hec-tensor631",
+          "reference": 1.478166542,
+          "reference_kind": "baseline",
+          "spread": [
+            1.27559625,
+            1.407780416
+          ],
+          "summary": "All20cells verified; stability gate fails; observed1.146ratio unqualified; 10xrejected; phase evidence redirects mechanism.",
+          "value": 1.290368459
         }
       ],
       "problem": "ic:hec-f631-c49-inverse-pair",
@@ -10737,6 +10805,29 @@
       ],
       "problem": "ic:hec-f631-c49-inverse-pair",
       "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "stability_pass",
+      "points": [
+        {
+          "commit": "0911e248f439",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 1,
+          "record": "20261116T0351Z-hec-tensor631",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All20cells verified; stability gate fails; observed1.146ratio unqualified; 10xrejected; phase evidence redirects mechanism.",
+          "value": 0.0
+        }
+      ],
+      "problem": "ic:hec-f631-c49-inverse-pair",
+      "unit": "count"
     },
     {
       "better": "neutral",

@@ -1,5 +1,7 @@
 # Benchmarks
 
+The [controlled compiled-map comparison](20261115-hec-tensor631/) verifies all twenty cells but fails its frozen stability qualification: baseline-A max/min 1.426 exceeds 1.25. A/A medians pass; the observed 1.146 ratio is unqualified and the 10x gate fails. Phase data show section work is minor and repeated generation/reconstruction remain material. No cold end-to-end claim. [Record](records/20261116T0351Z-hec-tensor631.json) [pcc:unverified].
+
 The [production section-shortcut comparison](20261115-hec-jetfree631/) verifies all ten cells but demonstrates no stable speedup: median previous-direct/production ratio 0.930, with strong run-order drift in both arms. The registered 10x gate fails. Component accounting only; separate from the prior 1.621x cohort and outside admitted results. [Record](records/20261116T0331Z-hec-jetfree631.json) [pcc:unverified].
 
 The [F631 inverse component comparison](20261115-hec-inversecost631/) verifies all ten cells. Direct symmetric inversion has median 1.503780 s versus ordered 2.437092 s, a derived 1.621x component gain; the 10x gate fails. Quotient setup and public-coordinate preparation are reused outside the timer. Shared ARM host, unvalidated producer evidence; no cold end-to-end gain or admitted leaderboard change. [Record](records/20261116T0314Z-hec-inversecost631.json) [pcc:unverified].
