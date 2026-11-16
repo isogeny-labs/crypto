@@ -1,0 +1,24 @@
+import SameUMixed
+set_option autoImplicit false
+open Polynomial MixedCancellation SameUMixed
+-- Two distinct noninverse ordinates over the singular monic quintic X^5.
+theorem singular_input1 : support (0:ℚ) 0 ∣ X^5-(ordinate (1:ℚ) 0)^2 := by
+ refine ⟨X^3-1,?_⟩
+ simp only [MixedCancellation.support,ordinate,C_0,C_1]
+ ring
+theorem singular_input2 : support (0:ℚ) 0 ∣ X^5-(ordinate (2:ℚ) 0)^2 := by
+ refine ⟨X^3-C 4,?_⟩
+ norm_num [MixedCancellation.support,ordinate]
+ <;> ring
+-- Applies the actual theorem with all its original congruence premises.
+example : let x := ((0:ℚ)-0)/(1-2)
+ x^2+0*x+0=0 ∧ (X-C x) ∣ X^5-(C (1*x+0))^2 := by
+ exact extracted_point_valid (X^5:ℚ[X]) 0 0 1 0 2 0 singular_input1 singular_input2
+  (by norm_num) (by norm_num)
+-- The source-extracted point ordinate is zero: validity does not imply nonzero y.
+example : (1:ℚ)*((0-0)/(1-2))+0=0 := by norm_num
+-- Without the noninverse guard, extracted x need not be a support root.
+example : support (0:ℚ) 1 ∣ (X^5+X^3+1)-(ordinate (0:ℚ) 1)^2 := by
+ refine ⟨X^3,?_⟩
+ simp only [MixedCancellation.support,ordinate,C_0,C_1]
+ ring

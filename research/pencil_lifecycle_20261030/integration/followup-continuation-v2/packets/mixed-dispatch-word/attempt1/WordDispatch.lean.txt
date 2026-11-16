@@ -1,0 +1,58 @@
+import WordTriple
+set_option autoImplicit false
+set_option maxRecDepth 12000
+set_option maxHeartbeats 2000000
+namespace PencilWordRefinement
+namespace FullMixed
+inductive Tag | common | cancellation | mismatch | tripling | positiveDistinct
+ deriving DecidableEq
+abbrev Value := Sum WordD1 WeightedWord
+def dispatch (p a0 a1 a2 a3 : UInt64) (a : WordD1) (b : WeightedWord) : Option Value × Tag :=
+ if (mixedWords p a b).k≠0 then ((genericWordDispatch p a b a3).map Sum.inr,.common)
+ else if (mixedWords p a b).l=wordNeg p (mixedWords p a b).ry then (some (.inl (mixedWords p a b).point),.cancellation)
+ else if (mixedWords p a b).l≠(mixedWords p a b).ry then (none,.mismatch)
+ else if positiveXz p a b=(mixedWords p a b).point.x then (some (.inr (tripleWords p a1 a2 a3 a)),.tripling)
+ else ((genericWordDispatch p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).map Sum.inr,.positiveDistinct)
+def valid (p : UInt64) [Fact p.toNat.Prime] (f : Polynomial (ZMod p.toNat)) : Value → Prop
+ | .inl a => a.canonical p ∧ a.z≠0 ∧ a.w≠0 ∧ a.normalizedValid p f
+ | .inr b => b.canonical p ∧ b.z≠0 ∧ b.w≠0 ∧ b.normalizedValid p f
+attribute [local irreducible] mixedWords genericWords tripleWords dblWordPayload positiveXz
+
+theorem source_order_total_valid (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31) (a0 a1 a2 a3 : UInt64) (a : WordD1) (b : WeightedWord)
+ (h0 : a0.toNat<p.toNat) (h1 : a1.toNat<p.toNat) (h2 : a2.toNat<p.toNat) (h3 : a3.toNat<p.toNat)
+ (ha : a.canonical p) (hb : b.canonical p)
+ (haz : a.z≠0) (haw : a.w≠0) (hbz : b.z≠0) (hbw : b.w≠0)
+ (hva : a.normalizedValid p (MixedGeneric.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)))
+ (hvb : b.normalizedValid p (MixedGeneric.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat))) :
+ ∃ v tag, dispatch p a0 a1 a2 a3 a b=(some v,tag) ∧
+ valid p (MixedGeneric.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)) v ∧ tag≠.mismatch := by
+ obtain ⟨hn,hcancel⟩ := mixed_word_branch_invariant p _ a b hfive hbound ha hb haz haw hbz hbw hva hvb
+ by_cases hk : (mixedWords p a b).k=0
+ · by_cases hc : (mixedWords p a b).l=wordNeg p (mixedWords p a b).ry
+   · have cls : mixedClassifyWord p a b=.cancellation := by simp only [mixedClassifyWord,hk,ne_eq,not_true_eq_false,ite_false,hc,ite_true]
+     exact ⟨.inl (mixedWords p a b).point,.cancellation,by simp only [dispatch,hk,ne_eq,not_true_eq_false,ite_false,hc,ite_true],hcancel cls,by decide⟩
+   · have hp : (mixedWords p a b).l=(mixedWords p a b).ry := by
+       by_contra hm
+       apply hn
+       simp only [mixedClassifyWord,hk,ne_eq,not_true_eq_false,ite_false]
+       rw [if_neg hc];simp only [hm,ite_true]
+     have cls : mixedClassifyWord p a b=.positiveCoincidence := by
+       simp only [mixedClassifyWord,hk,ne_eq,not_true_eq_false,ite_false]
+       rw [if_neg hc];simp only [hp,ne_eq,not_true_eq_false,ite_false]
+     by_cases he : positiveXz p a b=(mixedWords p a b).point.x
+     · obtain ⟨_,_,cc,cz,cw,cv⟩ := repeated_word_preserves p hfive hbound a0 a1 a2 a3 a b h1 h2 h3 ha hb haz haw hbz hbw hva hvb hk hc he
+       exact ⟨.inr (tripleWords p a1 a2 a3 a),.tripling,by simp only [dispatch,hk,ne_eq,not_true_eq_false,ite_false];rw [if_neg hc];simp only [hp,ne_eq,not_true_eq_false,ite_false,he,ite_true],⟨cc,cz,cw,cv⟩,by decide⟩
+     · obtain ⟨_,hd,cc,cz,cw,cv⟩ := positive_word_preserves p hfive hbound a0 a1 a2 a3 a b h0 h1 h2 h3 ha hb haz haw hbz hbw hva hvb hk hc he
+       have gd : genericWordDispatch p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3 = some (genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload := by
+         simpa only [positiveWordDispatch,cls,ite_true,he,ite_false] using hd
+       exact ⟨.inr (genericWords p (mixedWords p a b).point (dblWordPayload p a0 a1 a2 a3 a) a3).payload,.positiveDistinct,by simp only [dispatch,hk,ne_eq,not_true_eq_false,ite_false];rw [if_neg hc];simp only [hp,ne_eq,not_true_eq_false,ite_false,he,gd,Option.map_some],⟨cc,cz,cw,cv⟩,by decide⟩
+ · have fg : MixedGeneric.genericK (a.decode p) (b.decodeTwo p)≠0 := by
+     intro hzero
+     have hz := (generic_guard_decode p hfive hbound a b a3 ha hb h3).mpr hzero
+     rw [generic_outer_guard p hfive hbound a b a3 ha hb h3] at hz
+     exact hk hz
+   obtain ⟨hd,cc,cz,cw,cv⟩ := generic_word_preserves p (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) a3 a b hfive hbound ha hb h3 haz haw hbz hbw hva hvb fg
+   exact ⟨.inr (genericWords p a b a3).payload,.common,by simp only [dispatch,hk,ne_eq,not_false_eq_true,ite_true,hd,Option.map_some],⟨cc,cz,cw,cv⟩,by decide⟩
+end FullMixed
+end PencilWordRefinement

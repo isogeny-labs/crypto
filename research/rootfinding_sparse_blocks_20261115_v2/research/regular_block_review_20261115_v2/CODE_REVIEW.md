@@ -1,0 +1,15 @@
+# Static code review — admitted for bounded conditional experiment
+
+Reviewed final author worker and all direct/transitive project helper bodies before pinning: quartic_cell worker, BinaryField arithmetic, polynomial division/powering/root isolation, package initializer. Reviewed proof/input rules and actual fixture representation. No worker import, candidate execution, compilation or scientific tests were performed by this reviewer.
+
+Admission is for the declared fixed-h/a/ordinate regular norm branch only. Exact global F2-affinity follows from the symbolic constant/k/k² derivation. Literal norm convolution and exact fixed-factor division are used; a norm-root/derivative formula is tested against exhaustive raw r/s values in small fields. Independent multiset product checks test nilpotent support and emitted ordered source tuples. Source basis products are computed generically for the nonprefix GF4 fixture; prefix shortcuts are restricted by exact basis equality.
+
+The exact incidence scan connects every column co-occurring in a row; isolated columns remain free; contradictory zero-mask rows are handled. Dense and component consistency is compared, and consistent sparse output has a valid particular plus a complete independent kernel of the dense nullity. This proves affine-set equality. Full/active row density are separate. This is a block diagonal sufficient probe, not an implemented general matching/SCC triangular decomposition.
+
+Actual profile verifies GF83, original source basis/zero offset, rational source/target, admitted h and span dimensions. The measured family rank/nullity controls whether <=4096 states may be enumerated. Any larger family remains incomplete; the forbidden common-factor k=h is retained as excluded UNKNOWN. Exact cubic support uses the linearized subspace recurrence modulo the cubic, never a scan of 2^18 sources. Capped root isolation propagates incomplete fiber status.
+
+Controls exercise GF4/GF8/GF16 and both selected ordinates of the first available nonzero source x. The GF8 domain was widened before freeze to avoid a statically proved vacuous a=1 fixture. Each selected field requires at least one norm cell; a total positive norm parameter is required, with per-field counts reported. Positive coverage remains an observation until the preregistered run; passing scalar arithmetic alone would not establish it.
+
+Exactly six scientific_result_v1 fields are emitted, with exclusive raw gzip artifact. Internal80s work checks,84s post-serialization late demotion and88s print bound supplement an external90s process deadline. Late profile results clear scoped exact counts/completion. A worker PASS with a capped family is not a complete conditional solver or release success. Peak self RSS and same-process repetitions are diagnostic, not cold timings/aggregate tree RAM. No speed ratio, global original-root completeness or novelty is admitted. Original ordinate, auxiliary, nonrational, pole, torsion and other h/a/y branches remain outside scope.
+
+Admit source-pinned controls, then dependent actual profile under90s,4GiB,1core.

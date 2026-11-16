@@ -385,13 +385,21 @@ pub fn normalise(name: &str) -> String {
         .collect()
 }
 
-/// Parse the alias table now.  The measured `ecbench` child calls this
-/// before its solve marker: the table is about 750 KB of JSON, and parsing
-/// it on first use inside a solve (an index-calculus method looks its
-/// calibration row up by name) put some 24 million instructions of
-/// harness work into the method's set-up.
+/// Prepare the alias table for lookups.  The measured `ecbench` child
+/// calls this before its solve marker, so that nothing a solve looks up by
+/// name (an index-calculus method finds its calibration row this way) is
+/// paid for inside the measured interval.
+///
+/// Lookups read the table's text by binary search ([`resolve_key`]), so
+/// there is nothing to parse: the table has grown to 3.6 MB and 42,000
+/// names, and building the map from it cost 197 million instructions in
+/// every child (2026-11-01, Callgrind), 150 times the 20-bit rho solve the
+/// child was started for.  What remains to prepare is locating the
+/// `"aliases"` object, a few bytes into the text.  The map is still built
+/// on the escape path (a name JSON would escape) and in the tests that
+/// check the search against it.
 pub fn warm() {
-    let _ = aliases();
+    let _ = alias_text();
 }
 
 /// Every name the registry knows, normalised, mapped to its curve's slug.
@@ -413,7 +421,9 @@ fn aliases() -> &'static HashMap<String, String> {
 /// standard name or a registered legacy spelling.  `None` when the
 /// registry does not know the name.
 pub fn resolve(name: &str) -> Option<&'static str> {
-    aliases().get(&normalise(name)).map(String::as_str)
+    // By binary search over the table's text; the map is consulted only
+    // for a key the search cannot read exactly, so the answer is the map's.
+    resolve_key(&normalise(name))
 }
 
 /// Whether two names denote one curve: equal as written, or resolved by

@@ -42,11 +42,30 @@ The `minimal` profile is the root files, the dot-directories (`.github/`,
 - every `include_str!`/`include_bytes!` target and every `#[path = "…"]`
   module, with its directory (they must exist to compile);
 - every `research/` path a string literal in `src/` or `tests/` names
-  (`cargo test` reads them).
+  (`cargo test` reads them);
+- every crate `Cargo.toml` depends on by path (`name = { path = "…" }`),
+  followed transitively, reading a missing manifest from `HEAD` on a cold
+  checkout. Each gets its manifest, lockfile, build script, `src/`, declared
+  target directories, and literal compile-time includes and path modules,
+  without pulling all its data. Applying the profile makes a second pass
+  after dependency sources arrive to discover those includes. Cargo reads
+  every path dependency's manifest, so one excluded `Cargo.toml` breaks the
+  whole workspace build. Until 2026-11-02 the heavy
+  `research/pencil_large_prime_20261029` lost its manifest this way, in both
+  profiles. The `harness` profile emits the same rules.
 
 Every other directory, the rest of `research/` included, stays off disk until
 named with `add --path` (end a directory with `/`). Use it for code, docs and
 CI work and for any study whose directory you name.
+
+`bash scripts/test-sparse-checkout.sh` checks cold dependency discovery,
+transitive targets, compile-time fixtures and working-tree manifest changes
+in a temporary local Git repository. It needs neither network nor a Rust build.
+
+The Certicom device tests compile the tracked CPU emulator at runtime. Before
+running the full library suite in a minimal checkout, materialize its source
+and headers with `scripts/sparse-checkout.sh add --path gpu/certicom/`.
+This default test backend does not require GPU hardware.
 
 ## The equivalent with plain git
 

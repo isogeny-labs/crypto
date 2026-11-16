@@ -1,0 +1,714 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-BINARY-M2-PAIR-20261028",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "BINARY_PAIR_DESIGN.md"
+  },
+  "question": "Do checked pair-product inclusions and invertible coordinate changes certify exact original-top regularity on all12 retained binary/Koblitz m2 ell27 inputs?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "text": "Complete original-source equality, Rabin field certificate, product-span XOR witnesses, checked inverse and pair relations plus lower projection certify the exact first vanishing degree where all conditions pass.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "text": "No full Hilbert function, solving degree, LFD, timing, elite-base or universal conclusion; Lean formalizes only the elementary slot bound.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "original-koblitz",
+      "role": "baseline",
+      "description": "original retained koblitz m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "binary_pair"
+          ]
+        ],
+        "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "family": "koblitz",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "original-binary",
+      "role": "baseline",
+      "description": "original retained binary m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "binary_pair"
+          ]
+        ],
+        "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "family": "binary",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "description": "baseline retained koblitz m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "binary_pair"
+          ]
+        ],
+        "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "family": "koblitz",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "description": "baseline retained binary m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "binary_pair"
+          ]
+        ],
+        "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "family": "binary",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "description": "spike40 retained koblitz m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "binary_pair"
+          ]
+        ],
+        "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "family": "koblitz",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "description": "spike40 retained binary m2 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "binary_pair"
+          ]
+        ],
+        "binary_sha256": "026b665ccbff0a8c28d5c8bc5cbe33fe74727e2691ce222e5be4f34da484fecb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m": 2,
+        "family": "binary",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Runtime explicit squarefree Macaulay matrices for ell1..4 verify degree ell+1 in four positive cases;128 independent arithmetic checks and512 direct S3 assignments."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Four target1 cases must reject product inclusion; rejection does not imply a different degree. Singular/corrupted inverses, changed XOR rows and non-Boolean witnesses are rejected in unit controls."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "dataset",
+        "levels": [
+          "original",
+          "baseline",
+          "spike40"
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      },
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One pinned Rust binary, source commit and single thread"
+      },
+      {
+        "name": "input",
+        "treatment": "fixed",
+        "how": "Twelve exact input/system hashes; no new sampling or preprocessing"
+      },
+      {
+        "name": "dataset",
+        "treatment": "crossed",
+        "how": "Original fixed-base and paired baseline/spike40; duplicates are retained identities, not independent samples"
+      },
+      {
+        "name": "characteristic",
+        "treatment": "fixed",
+        "how": "F2 and checked extension K=F2[z]/f83; full Rabin certificate"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing-host fallback after retained EKS shared-bucket denial; no timing comparison"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Original,baseline,spike40; koblitz,binary; planted,natural"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "120s producer/replay,2GiB,no retries"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Full source, every coordinate inclusion and pair coefficient checked; all failures retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "original-koblitz",
+          "original-binary",
+          "baseline-koblitz",
+          "baseline-binary",
+          "spike40-koblitz",
+          "spike40-binary"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All source, field, span, inverse, lower, explicit controls and fresh replay checks pass"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact deterministic computation, no clock comparison",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "Entire pre-existing12-ID panel fixed before this calculation; no new draw depends on checker arm. Original planted targets differ from paired targets; duplicates are provenance identities, not independent statistical samples.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Six dataset/family arms times two retained target identities; exact certificate and replay, no statistical comparison."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 260,
+      "measured_on": "Five development tests passed;260s is a budget, not a performance prediction"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "dreg_exact",
+        "name": "dreg_exact",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Matching original-top lower and upper degrees",
+        "source": "certificates/summary.json dreg_exact",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "dreg_lower_bound",
+        "name": "dreg_lower_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Nonzero degree27 lower quotient witness plus1",
+        "source": "certificates/summary.json dreg_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dreg_upper_bound",
+        "name": "dreg_upper_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Verified27 pair products and square equations imply degree28 vanishes",
+        "source": "certificates/summary.json dreg_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "q_rank",
+        "name": "q_rank",
+        "unit": "rank",
+        "kind": "counted",
+        "definition": "F2 rank of original quadratic coordinate rows",
+        "source": "certificates/summary.json q_rank",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "product_rank",
+        "name": "product_rank",
+        "unit": "rank",
+        "kind": "counted",
+        "definition": "F2 rank of product coordinate rows",
+        "source": "certificates/summary.json product_rank",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "dreg_exact",
+      "dreg_lower_bound",
+      "dreg_upper_bound",
+      "q_rank",
+      "product_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "2Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 260,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All12 retained sources, field/span/inverse/pair/lower checks, then12 fresh-process replays. Preserve per-case errors and continue remaining cases."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "120s each producer/replay,2GiB,no retries; all partial data preserved"
+    }
+  ],
+  "invalidation_rules": [
+    "Any full source or metadata mismatch invalidates that case",
+    "Failed field/span/inverse/pair/lower or replay condition gives no accepted exact certificate",
+    "All times diagnostic; no performance claim"
+  ],
+  "decision_rule": {
+    "text": "Record exact degrees only after all checks and replay pass; errors remain explicit",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "exact",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/binary_pair.rs",
+      "sha256": "df76ebcec2c08e937615ea26c46d6eacbf3d0853e6fe53d54afacb72d57494f1"
+    },
+    "inputs": [
+      "Twelve pinned input.json/system.sing pairs"
+    ],
+    "outputs": [
+      "certificates/*.json",
+      "replay.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Exact degree by dataset/family with former intervals; original-top Hilbert bounds, not exact Hilbert function"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Characteristic2 summation polynomials and Weil descent coordinate structure",
+      "verified_by": "Primary text read before implementation; BINARY_PAIR_DESIGN.md"
+    },
+    {
+      "ref": "https://fredrikj.net/fdoc/html/algorithms/polynomials/irreducibility.html",
+      "provenance": "retrieved",
+      "claim": "Rabin criterion conditions specialized and checked",
+      "verified_by": "Primary text read before implementation; BINARY_PAIR_DESIGN.md"
+    },
+    {
+      "ref": "https://web.maths.unsw.edu.au/~csg/papers/fpaper.pdf",
+      "provenance": "retrieved",
+      "claim": "Rabin and modular polynomial operations",
+      "verified_by": "Primary text read before implementation; BINARY_PAIR_DESIGN.md"
+    },
+    {
+      "ref": "https://stacks.math.columbia.edu/tag/05G3",
+      "provenance": "retrieved",
+      "claim": "Quotient algebra base change",
+      "verified_by": "Primary text read before implementation; BINARY_PAIR_DESIGN.md"
+    }
+  ],
+  "extensions": {
+    "cases": [
+      {
+        "key": "original-koblitz-m2-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m2-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m2-planted",
+        "input_sha256": "59d5623b9e393827d5c6ce3610108a36c9400c1d86855a103eb5b57df327b8af",
+        "source_sha256": "36f1afc96a3cdfa4611d5bedcfe4002acfef178f82051f36db70d0e4bde5c9f5",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m2-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m2-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m2-natural",
+        "input_sha256": "1a2b46e0cc48b2f55a4a4c96bbac274827a4fd428b346b28591f392ee796547a",
+        "source_sha256": "610b2f18a0ece84e5ca1c004963a4079c0aa7b4e7db403402bc97db94c16109e",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-binary-m2-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m2-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m2-planted",
+        "input_sha256": "46ab88bc974568dd4aef416e15ab6f7bb99bb3dcb3ea98fed9a89ab30c1e6b32",
+        "source_sha256": "90f746845f53f0bb9b500270c829c7e24e4de41ebe2a00745d269dba6222e93d",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m2-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m2-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m2-natural",
+        "input_sha256": "cf3635a6b3de856cf4e90c08ea4ae3d93719657d325247afd4b371e9ed07bc43",
+        "source_sha256": "2907e70d84b10f9a0eabbc6fd9dff83197655fb95e856095820e4cb62c237fa3",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-koblitz-m2-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m2-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m2-planted",
+        "input_sha256": "231b4b9a5e1543ea42ed1218eb4f750e1dd0d1c34ecba856be5d5090b3f4677b",
+        "source_sha256": "8f106faf3b1de580ccc4c55664d2723741bf5bd1aeacff97a578d76d8f87e0b4",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m2-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m2-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m2-natural",
+        "input_sha256": "1e05e959d5aebb7664b579c807ba4bf3bbc8d5eb6b2070883edf425c898ffd91",
+        "source_sha256": "610b2f18a0ece84e5ca1c004963a4079c0aa7b4e7db403402bc97db94c16109e",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-binary-m2-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m2-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m2-planted",
+        "input_sha256": "8a5413b5b4306af01d7f3158f190fe0eeb9daac1668bf1024f053530f8fbbbac",
+        "source_sha256": "c4a4778e5aa677d4e33e3b44eda0838591be74b2304f1f3cc8b558df509b4c5c",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m2-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m2-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m2-natural",
+        "input_sha256": "ed95d632a056f35c4b9c07d0a99a24571e30312d80ed7858f8529f5443e3d1f0",
+        "source_sha256": "2907e70d84b10f9a0eabbc6fd9dff83197655fb95e856095820e4cb62c237fa3",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "spike40-koblitz-m2-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m2-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m2-planted",
+        "input_sha256": "84120a02436f5c2695156e7389639e794966d6ab089fb66e389ff113da3ae434",
+        "source_sha256": "515c8e2a10e464e0b8d851800ea94d05b41f352a8ca7a10007c60f53e5070fdc",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m2-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m2-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m2-natural",
+        "input_sha256": "f2f9ab72ea88a4e776f3308d55fdf2623809f0f359a4b0f657aecba70b9b85ab",
+        "source_sha256": "17f8ad981276e15857077ad561d4de93a878e1f4417a6528affd66327f558a14",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-binary-m2-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m2-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m2-planted",
+        "input_sha256": "f6d1c164ce10aaf7152087c76d920b69aa1b1ef567314783a410bc7748f28bdd",
+        "source_sha256": "4b3d246ad308f0af7913c48d9f51b37d349b94af06ac6a0980a39e6893188a47",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m2-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m2-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m2-natural",
+        "input_sha256": "89b09154a64c73a25069948345330c4971ecd3177b77382b44f51ff7f51eeb92",
+        "source_sha256": "d08d4006bc920fa696304bb38d0665b7139a6825fdf7b439acd70f4405587129",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      }
+    ],
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-binary-m2-pair-20261028-r1/local/",
+    "detailed_design": "BINARY_PAIR_DESIGN.md",
+    "file_layout": "BINARY_PAIR_FORMAT.json",
+    "backend_reason": "Existing-host fallback after retained EKS shared-bucket denial; current inventory has no duplicate; no IAM/capacity change",
+    "formalization": "Elementary27-slot degree bound only; full written/native algebraic bridges not formalized"
+  },
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "95cf1fbd579f98e7b766b3fceb105b833d90c372566e180defe027e13cf95ad6",
+    "commit": "ac08cf2f9029145b48e799c1de5ede0564732b3d",
+    "frozen_at": "2026-10-28T17:13:36Z",
+    "filed_before_affected_data": true
+  }
+}

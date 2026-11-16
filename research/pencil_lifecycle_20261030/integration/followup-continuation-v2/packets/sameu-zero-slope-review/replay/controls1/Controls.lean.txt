@@ -1,0 +1,41 @@
+import ZeroSlope
+import Mathlib.Algebra.Field.ZMod
+set_option autoImplicit false
+open Polynomial MixedCancellation SameUMixed SameUZeroSlope
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+def a : D2 ℚ := ⟨0,0,1,0,1,1⟩
+def b : D2 ℚ := ⟨0,0,2,0,1,1⟩
+theorem va : validTwo (X^5:ℚ[X]) a := by
+ norm_num only [validTwo,nq,nr,ns,nt,a,one_pow,mul_one,div_one]
+ refine ⟨X^3-1,?_⟩
+ simp only [MixedCancellation.support,ordinate,C_0,C_1]; ring
+theorem vb : validTwo (X^5:ℚ[X]) b := by
+ norm_num only [validTwo,nq,nr,ns,nt,b,one_pow,mul_one,div_one]
+ refine ⟨X^3-(C 2)^2,?_⟩
+ norm_num [MixedCancellation.support,ordinate] <;> ring
+-- Full original-validity application, not just a computed conclusion.
+example : sourceK a b≠0 := by
+ exact source_zero_slope_excluded (X^5:ℚ[X]) a b
+  (by norm_num [a]) (by norm_num [a]) (by norm_num [b]) (by norm_num [b])
+  va vb (by norm_num [a,b,crossQ]) (by norm_num [a,b,crossR])
+  (by norm_num [a,b,crossS,crossT]) (by norm_num [a,b,crossS,crossT])
+-- Equal branch is a necessary exclusion, with valid input.
+example : sourceK a a=0 ∧ crossS a a=crossS a a ∧ crossT a a=crossT a a := by
+ norm_num [sourceK,a,crossS,crossT]
+-- A constant inverse pair has equal slopes and valid shared support.
+example : (0:ℚ)= -0 ∧ (1:ℚ)= -(-1) ∧ (0:ℚ)-0=0 := by norm_num
+example : support (0:ℚ) 0 ∣ (1:ℚ[X])-(ordinate (0:ℚ) 1)^2 := by simp [ordinate]
+example : support (0:ℚ) 0 ∣ (1:ℚ[X])-(ordinate (0:ℚ) (-1))^2 := by simp [ordinate]
+-- Characteristic two needs no exceptional field assumption.
+example : ((0:ZMod 2)=(0:ZMod 2) ∧ (1:ZMod 2)=(1:ZMod 2)) ∨
+ ((0:ZMod 2)= -(0:ZMod 2) ∧ (1:ZMod 2)= -(1:ZMod 2)) := by
+ apply equal_slope_classification (1:(ZMod 2)[X]) 0 0 0 1 0 1
+ all_goals simp [ordinate]
+-- Without validity, equal slope alone permits neither equal nor inverse.
+example : (1:ℚ)=(1:ℚ) ∧ ¬((1:ℚ)=1 ∧ (0:ℚ)=1) ∧
+ ¬((1:ℚ)= -1 ∧ (0:ℚ)= -1) := by norm_num
+
+example : ¬(support (0:ℚ) 0 ∣ (X^5:ℚ[X])-(ordinate (1:ℚ) 1)^2) := by
+ rintro ⟨g,h⟩
+ have hh := congrArg (fun p : ℚ[X] => p.coeff 0) h
+ norm_num [MixedCancellation.support,ordinate,pow_two,coeff_mul] at hh

@@ -1,0 +1,132 @@
+\documentclass[11pt]{article}
+\usepackage[margin=.78in]{geometry}
+\usepackage{amsmath,amssymb,graphicx,booktabs,hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+{\LARGE Quadratic twists: three proposed research routes}\\
+2026-11-05\quad Follow-up to merged PR2381
+
+\textbf{Status.} These are design hypotheses, with PCC statement standing
+\texttt{unverified}. There is no new scientific run, theorem, native algorithm,
+measurement or gain in this proposal record. [pcc:unverified]
+
+\begin{center}\includegraphics[width=\linewidth,height=2.5in,keepaspectratio]{routes.pdf}\end{center}
+
+{\Large 1. Shared degree-limited collector}
+
+Use an actual scalar-preserving subgroup map with an explicit inverse, and
+transport one ordered factor base. For actual unknown $Q$, the two models
+supply admitted coefficient rows in the SAME space over $\mathbf F_r$.
+The curve field and relation field are different objects.
+
+Let $R_E(D,Q)$ and $R_T(D,\phi(Q))$ be degree-limited row sets. The proposed
+discriminant is extra useful rank of their combined span relative to either
+standalone span, under the SAME total-work prefix. This is a hypothesis,
+not a measured gain. [pcc:unverified]
+
+A complete-or-unknown oracle may release the same full set or no rows.
+Test this guard explicitly before interpreting per-query complementarity.
+Across query prefixes, use frozen main-only, twist-only, alternating and
+dual-model schedules. Charge both dual calls, all failures, setup, routing,
+maps, matrices and row work. A post-hoc best-chart oracle is diagnostic only.
+
+Actual source recovery requires original-valid rows, legitimate public base
+logs and an original-point scalar check. Rank-deficient setup blocks every
+dependent target. No label oracle or unlimited fallback is admissible.
+
+\small PCC statement: \texttt{PCC-20261105-1f629a}. All scientific assertions remain
+unverified. The machine plan and detailed acceptance conditions are adjacent.
+\clearpage
+{\LARGE 2. Full-target chord and membership chart}
+
+For an elliptic short model $y^2=x^3+Ax+B$ in characteristic other than 2 or 3,
+start with a nonidentity actual target $R=(a,b)$. Candidate lines through $-R$:
+\[
+ y=\lambda(x-a)-b.
+\]
+The proposed residual intersection quadratic is
+\[
+ q_\lambda(X)=X^2-sX+p,\qquad s=\lambda^2-a,
+\]
+\[
+ p=a\lambda^2+2b\lambda+a^2+A.
+\]
+The first proof target is the curve-minus-line factorization by
+$(X-a)q_\lambda(X)$, using the actual target equation. [pcc:unverified]
+
+For a three-abscissa base,
+\[
+ F_B(X)=X^3-c_1X^2+c_2X-c_3,
+\]
+the candidate remainder modulo $q_\lambda$ is $UX+V$, with
+\[
+ U=s^2-p-c_1s+c_2,\qquad V=(c_1-s)p-c_3.
+\]
+Distinct-root membership would require $U=V=0$ and actual field/point lifts.
+The proposed cancellation $V+aU$ gives a quartic/cubic gcd starting chart.
+These are unverified formulas awaiting a faithful pinned Lean proof and
+source-bound identity controls. No constant-degree claim for growing bases
+is made. [pcc:unverified]
+
+\textbf{Keep all branches.} A square-free base polynomial need not contain
+a repeated-root quadratic. Keep diagonal/tangent, origin, vertical-line,
+coincident-target, splitting, denominator and sign cases explicitly.
+Establish coverage before admitting a reduced system.
+
+Offer the same chart to the source, twist and transported controls. Record
+matrix degree, expanded original-input witness degree, weighted/pulled-back
+degree, extraction and group work separately. Compare against an applicable
+source-side univariate reference. Pair tables cannot supply candidate stopping.
+
+\small PCC statement: \texttt{PCC-20261105-585d85}. Background:
+\href{https://eprint.iacr.org/2004/031}{Semaev};
+\href{https://arxiv.org/pdf/1503.08001}{Kosters--Yeo, sections 2 and 4--5}.
+Input and first-fall degrees do not by themselves supply solving-cost evidence.
+\clearpage
+{\LARGE 3. Twist variable and source trace}
+
+Let $K=\mathbf F_{q^2}$ and $\tau(X)=X+\operatorname{Frob}_q(X)$.
+Use an actual additive twist embedding $\psi$ onto the Frobenius-minus subgroup.
+Let $B_i,Q$ lie in an explicit cyclic subgroup of odd order $r$, and choose
+public $h$ with $2h\equiv1\pmod r$. Candidate lifts are
+\[
+ C_i=\psi(T_i),\quad A_i=[h]B_i+C_i,\quad A_Q=[h]Q.
+\]
+The target equivalence is
+\[
+ \bigl(\exists T,\ \sum_i c_iA_i=A_Q+\psi(T)\bigr)
+ \quad\Longleftrightarrow\quad \sum_i c_iB_i=Q.
+\]
+Apply trace in one direction and construct the residual twist point in the
+other. This is an unverified theorem target on actual groups, not a completed
+conditional substitute or a global rational-group isomorphism. [pcc:unverified]
+
+Retain $T$ as an auxiliary variable and test intermediate equation demand.
+Charge the extension variables, field arithmetic and maps; retain expanded
+source witnesses. Compare against a source auxiliary-variable encoding and
+collapse witnesses projecting to the same coefficient row before rank.
+Multiple twist witnesses alone are not multiple useful relations.
+
+\small PCC statement: \texttt{PCC-20261105-cfd582}. Background:
+\href{https://arxiv.org/pdf/1405.1059}{Gorla--Massierer, trace and relation construction};
+\href{https://sacworkshop.org/SAC20/files/preproceedings/18-IndexCalculus.pdf}{Galbraith--Granger--Merz--Petit, Frobenius-compatible bases}.
+\normalsize
+
+\textbf{First scope.} Collector and chord completeness preflight first;
+trace construction queued. Draft cards are not runs or task leases. Before
+new data: current source/identity pins, native producer and separate arithmetic
+auditor, faithful Lean, canonical frozen protocol, controls and report.
+Use at most two existing local workers, 600-second stages and one focused
+window no longer than 3600 seconds. No paid provisioning.
+
+\textbf{Concrete launch dependency.} Prior checkpoint approval covers only
+the old branch. Additional scope is required for
+\path{s3://setec-astronomy-artifacts/checkpoints/crypto/codex__twist-collector-and-slope/}.
+Use the current unmodified official gate after approval; no gate/upload is
+performed now. The merged branch and old evidence remain unchanged.
+
+\textbf{Visual scope.} This diagram records proposed routes only. There are
+no new numeric results, so canonical quantitative graphs and benchmarks remain
+unchanged. See adjacent README, IDEAS, PLAN and LAUNCH\_GATES for source links,
+PCC status, controls and the exact open dependencies. [pcc:unverified]
+\end{document}

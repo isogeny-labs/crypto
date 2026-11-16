@@ -1,0 +1,22 @@
+import Nonbranch
+import Mathlib.Data.ZMod.Basic
+namespace NonbranchControls
+theorem selected_factor : ((1:ZMod 7)-1*1)=0 := by decide
+theorem norm_does_not_select : ((-1:ZMod 7)-1)*((-1:ZMod 7)+1)=0 ∧ ((-1:ZMod 7)-1)≠0 := by decide
+theorem zero_scalar_not_unit : ¬ IsUnit (0:ZMod 7) := by exact not_isUnit_zero
+theorem characteristic_two_excluded : (2:ZMod 2)=0 := by decide
+end NonbranchControls
+#print axioms ActualNonbranchNorm.affine_curve
+#print axioms ActualNonbranchNorm.germ_curve
+#print axioms ActualNonbranchNorm.point_affine_eval
+#print axioms ActualNonbranchNorm.scalar_unit
+#print axioms ActualNonbranchNorm.numerator_nonunit
+#print axioms ActualNonbranchNorm.stalk_norm
+#print axioms ActualNonbranchNorm.concrete_norm_order
+#print axioms ActualNonbranchNorm.source_norm_identity
+#print axioms ActualNonbranchNorm.source_actual_norm_order
+#print axioms NonbranchControls.selected_factor
+#print axioms NonbranchControls.norm_does_not_select
+#print axioms NonbranchControls.zero_scalar_not_unit
+#print axioms NonbranchControls.characteristic_two_excluded
+#print axioms ActualNonbranchNorm.point_scalar

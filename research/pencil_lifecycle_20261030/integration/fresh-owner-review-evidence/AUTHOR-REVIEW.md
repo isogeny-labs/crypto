@@ -1,0 +1,39 @@
+# Fresh native owner adapter: private unapplied proposal
+
+Status: native adapter and actual fresh-image packaging proposal implemented; four bounded software fixtures and strict all-target Clippy pass. No shared source changed, no image built/published, no cloud calls, no scientific execution, no scientific admission. This is not a complete fresh-epoch deployment. User campaign limits remain 25,200 active-worker seconds and 2026-10-30 22:08:40 UTC, without reset.
+
+## Sources and approach
+
+Read repository AGENTS.md, newest session log, remaining-worker-admission-and-fresh-owner-plan.md, owner-receipt-base-independent-review.md and owner-enclosing-v2-independent-review.md before implementation. Reused the retained controller owner implementation's CLOCK_MONOTONIC/boot/time-namespace observation, no-follow component traversal with bounded regular-file reads, duplicate-key rejection, SHA-derived preparation clock binding, evidence synchronization and wait4 status handling. Read existing io::sha_file, supervisor::starttime, run-ecbench, cloud::fresh_job, Dockerfile.ecbench, build-bundle and publish-image. No new literature or novelty claim. Primary source verification used retained implementation and its prior reviews; no external services were contacted under this delegated scope.
+
+The standalone crate copies these narrow reviewed primitives rather than refactoring the computation owner's already-tested source while root validation runs. Semantic reuse is not shared-code parity enforcement; a later deduplication needs a separate reviewed change. Existing computation owner is untouched.
+
+## Implemented source boundaries
+
+`isolab-fresh-owner CONFIG EXPECTED_CONFIG_SHA256` requires an absolute bounded no-follow config read, external expected exact SHA, duplicate-free JSON and deny-unknown typed configuration. Configuration binds phase, request/launch/spec/binary hashes, Pod UID, Job UID, image digest, executable, exact argv, session/output receipt and absolute stop. It verifies the executable and exact launch/spec bytes before spawn. Run argv must name the bound spec, output and diagnostic launch; replay argv must name the bound session and replay-all. Config includes raw SHA hex for image digest, excluding the `sha256:` prefix.
+
+Adapter owns the direct child using spawn plus setsid and wait4. It separately records successful terminal wait, exit/signal status, post-exec binary hash and PID starttime, monotonic observations and direct-child rusage. Run can bind preparation/journal with the inherited bounded clock checks. Replay deliberately never fabricates runner preparation or a session closure. A fast child may finish before postexec identity is observed; its receipt remains partial. A child failure stays a failure even if publication succeeds; publication failure is stderr-visible and cannot be taken as a valid receipt. Receipt publication uses create-new temporary, hard-link-no-overwrite and file/directory sync.
+
+Adapter handles TERM/INT by a process-group SIGKILL hard stop and checks absolute deadline while polling. It gives at most 100 milliseconds for reap observation after hard stop; absence stays partial and returns125. This is bounded observation, not a claim of guaranteed allocation teardown or active-worker enforcement. Existing allocation owner must keep uncertain charges. No new grace budget is authorized. Normal completion with surviving descendants is marked unobserved group quiescence; this adapter does not certify allocation release.
+
+All receipts keep total_active_worker_ns, exact_kernel_exit_ns, accepted_external_closure and publication tail null. Output is same-UID trusted instrumentation, explicitly not root-private. Expected-config SHA is an external caller binding, not inherent trust in a self-generated config. Controller must authenticate exact receipt bytes, expected Pod/request/Job/image and source/binary independently. Native observation does not prove mathematical correctness or L2.
+
+## Actual fresh image packaging proposal
+
+The patch targets `taskq/deploy/eks-karpenter/Dockerfile.ecbench`, build-bundle and publish-image, not merely resume/Dockerfile.runtime. build-bundle builds the adapter from its locked standalone native crate for x86_64-unknown-linux-musl, checks static x86-64 ELF, and records its digest. Publisher verifies that digest as data, copies the explicit extra binary into its fresh Docker context, and includes its digest in the image receipt. Dockerfile installs `/usr/local/bin/isolab-fresh-owner` in the actual task image referenced by request.build.image_uri. Existing runtime image is unchanged. These are source proposals; musl build, Docker build and publisher fixtures were not executed.
+
+## Required wiring still outstanding
+
+1. Controller must prospectively bind owner binary hash and exact owner-config template, request/launch/spec/image identities and immutable effective cutoff; supply real Job UID and Pod UID through existing downward identity paths. Self-declared fields are insufficient. Review schema/Build compatibility before adding this new field to a production request.
+2. Wrapper must create separate `run` and `replay` configs/receipts, each with its own exact argv and phase, and replace both direct ecbench invocations with the native owner. Redirect stdout/stderr exactly as now. It must verify adapter digest from pinned build metadata before invocation, require expected receipt after child completion, and preserve original failures. Actual source wiring is not in this patch: existing wrapper remains unchanged and still runs ecbench directly.
+3. Receipt collection for failed fresh Job must happen before the controller's early failure return. Preserve partial receipts and immutable exact digests through existing upload/collection; do not gate evidence retention on successful L2/replay.
+4. Consumer of the new fresh-owner-observation/v1 schema is not implemented. Existing ecbench_owner_closure CLI consumes computation owner's schema; do not claim it accepts this one. A reviewer must map the independently authenticated fields and require full native journal validation before accepting enclosing closure.
+5. Allocation admission/ledger, all setup/settling/replay/comparison/upload/cleanup costs, timing qualification and prospective protocol review remain separate. This patch neither resets budget nor admits experiments.
+
+## Software validation
+
+Final source SHA256 a042f527f9eef7802afda214b765de023afef8bcbf30921fe2217b1cdcee23ea. Native offline locked tests `test-v4.log`: 4 passed,0 failed. Tests cover nested duplicate JSON/hash shape; immutable receipt collision; no-follow symlink and byte cap; actual /bin/false run and /bin/true replay direct-child waits with exact exit preservation, null active-worker and replay closure, and expired deadline rejection. These two executables perform no mathematics. `clippy-v4.log` all-target strict Clippy passed. `bash -n` passed for both proposed build/publish scripts. Private target directory `/tmp/pencil-fresh-owner-private-target` was independent of root build.
+
+Earlier test-v1 recorded two passing initial fixtures and two function-cast warnings; code now casts function through a pointer. test-v3 recorded four passes before final launch path validation, retained separately. No signal termination fixture, valid full preparation/journal closure fixture, Pod mismatch consumer fixture, musl/package integration test or real mounted-container qualification has run. These remain outstanding and must not be inferred from four passes.
+
+Patch SHA256 eec8c8d841c6021f949cb58d1f873bd9473ae0f64b3e814281239fd25cc12fe6. `source-manifest-v1.json` supplies each exact base/proposed hash. Shared source edits and all activation remain root-owned subsequent work requiring review. No claim of independent review is made by this author note.

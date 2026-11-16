@@ -1,0 +1,47 @@
+def validPoint (f : K[X]) (a : WeightedAdd11.Input K) : Prop :=
+ (X-C (WeightedAdd11.nx a)) ∣ f-(C (WeightedAdd11.ny a))^2
+def validTwo (f : K[X]) (b : D2 K) : Prop :=
+ support (nq b) (nr b) ∣ f-(ordinate (ns b) (nt b))^2
+
+theorem shared_support_conclusions (f : K[X]) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint f a) (hb : validTwo f b) (hk : rawK a b=0) :
+ (a.y*rawW3 b = -(rawY3 a b*a.w) ∨ a.y*rawW3 b = rawY3 a b*a.w) ∧
+ (other a b).z ≠ 0 ∧ (other a b).w ≠ 0 ∧ validPoint f (other a b) := by
+ obtain ⟨hK,hL,hR,hx4,hy4⟩ := scales a b haz haw hbz hbw
+ have hscale : a.z^4*b.z^4*a.w ≠ 0 := mul_ne_zero (mul_ne_zero (pow_ne_zero 4 haz) (pow_ne_zero 4 hbz)) haw
+ rw [hK] at hk
+ have hx := (mul_eq_zero.mp hk).resolve_left hscale
+ have halt := ordinate_alternatives f (WeightedAdd11.nx a) (WeightedAdd11.ny a) (nq b) (nr b) (ns b) (nt b) hx ha hb
+ have hout := (extracted_valid f (WeightedAdd11.nx a) (nq b) (nr b) (ns b) (nt b) hx hb).2
+ refine ⟨?_,mul_ne_zero haz hbz,hbw,?_⟩
+ · rw [hL,hR]
+   rcases halt with hn | hp
+   · left; rw [hn,mul_neg]
+   · right; rw [hp]
+ · unfold validPoint
+   rw [hx4,hy4]
+   exact hout
+
+inductive Branch | common | cancellation | mismatch | positiveCoincidence
+ deriving DecidableEq
+
+def classify [DecidableEq K] (a : WeightedAdd11.Input K) (b : D2 K) : Branch :=
+ if rawK a b ≠ 0 then .common
+ else if a.y*rawW3 b = -(rawY3 a b*a.w) then .cancellation
+ else if a.y*rawW3 b ≠ rawY3 a b*a.w then .mismatch else .positiveCoincidence
+
+theorem mismatch_excluded [DecidableEq K] (f : K[X]) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint f a) (hb : validTwo f b) : classify a b ≠ .mismatch := by
+ by_cases hk : rawK a b=0
+ · have hh := (shared_support_conclusions f a b haz haw hbz hbw ha hb hk).1
+   rcases hh with hn | hp <;> simp [classify,hk,*]
+ · simp [classify,hk]
+
+theorem cancellation_preserves [DecidableEq K] (f : K[X]) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint f a) (hb : validTwo f b) (hk : rawK a b=0)
+ (hc : a.y*rawW3 b = -(rawY3 a b*a.w)) :
+ classify a b = .cancellation ∧ (other a b).z ≠ 0 ∧ (other a b).w ≠ 0 ∧ validPoint f (other a b) := by
+ exact ⟨by simp [classify,hk,hc],(shared_support_conclusions f a b haz haw hbz hbw ha hb hk).2⟩

@@ -1,0 +1,98 @@
+{
+  "schema": "consumer-generic-filter-final-validation/v1",
+  "source_commit": "086b4cd590d2e871ca9e119c389470c9a9232f94",
+  "cli_sha256": "31ac84b125fcdaa382df7650833d4295ec99a4aa87b9e49dcbd36e60ee4f0047",
+  "release_tests": {
+    "library_passed": 106,
+    "cli_passed": 7,
+    "failed": 0,
+    "ordinary_opt_in_ignored": 3
+  },
+  "strict_clippy_passed": true,
+  "format_passed": true,
+  "generic_retained_panel": {
+    "schema": "consumer-generic-filter-software-review/v1",
+    "producer_source": "58bd5ab64424f7710540e0aea502225de6e6c438",
+    "producer_binary": "968a316daab4084ef61fd46c779832b9ebd9e482e58492674bc82174c4b1cfb7",
+    "runs_audited": 40,
+    "completed_batches": 24,
+    "censored_prefixes": 0,
+    "positive_recoveries": 22,
+    "no_recovery_cells": 3,
+    "multi_batch_cells": 1,
+    "nontrivial_source_combinations": 337,
+    "legacy_koblitz_cells": 4,
+    "coverage": [
+      [
+        "binary",
+        0,
+        false
+      ],
+      [
+        "binary",
+        0,
+        true
+      ],
+      [
+        "binary",
+        1,
+        false
+      ],
+      [
+        "binary",
+        1,
+        true
+      ],
+      [
+        "koblitz",
+        0,
+        true
+      ],
+      [
+        "prime",
+        1,
+        false
+      ],
+      [
+        "prime",
+        1,
+        true
+      ]
+    ],
+    "errors": [],
+    "mathematics_globally_verified": false,
+    "execution_complete": false,
+    "total_cost_verified": false,
+    "scientific_observation": false
+  },
+  "retained_outcomes": [
+    {
+      "status": "budget_exhausted",
+      "count": 3
+    },
+    {
+      "status": "timeout",
+      "count": 11
+    },
+    {
+      "status": "verified",
+      "count": 26
+    }
+  ],
+  "producer_replay": {
+    "attempted": 40,
+    "passed": 40,
+    "failed": []
+  },
+  "rehashed_tamper_rejections": 10,
+  "legacy_root_panel": {
+    "cells": 51,
+    "root_sets": 30,
+    "internal_hashes": 1738
+  },
+  "production_policy_censor_coverage": false,
+  "root_runtime_equivalent_to": "88707e16b99f54976cfbcbe78c0f49379ab69da7",
+  "full_root_suite_rerun": false,
+  "scientific_dataset_generated": false,
+  "scope_complete": false
+}

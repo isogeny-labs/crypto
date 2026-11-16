@@ -1,0 +1,43 @@
+import WordPositive
+open Polynomial PencilWordRefinement
+set_option maxHeartbeats 2000000
+instance : Fact (7:UInt64).toNat.Prime := ⟨by decide⟩
+def aa : WordD1 := ⟨0,1,2,2⟩
+def bb : WeightedWord := ⟨5,0,0,3,3,2⟩
+example : let c := (genericWords 7 (mixedWords 7 aa bb).point (dblWordPayload 7 1 6 0 0 aa) 0).payload
+ aa.y≠0 ∧ positiveWordDispatch 7 1 6 0 0 aa bb=some c ∧ c.canonical 7 ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid 7 (MixedGeneric.curve (1:ZMod (7:UInt64).toNat) 6 0 0) := by
+ apply positive_word_preserves
+ · decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical aa;decide
+ · unfold WeightedWord.canonical bb;decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,MixedCancellation.validPoint,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny,aa]
+   refine ⟨X^4-1,?_⟩
+   have h64 : (64:ZMod (7:UInt64).toNat)=1 := by decide
+   have h6 : (6:ZMod (7:UInt64).toNat)= -1 := by decide
+   simp [MixedGeneric.curve,h64,h6];ring
+ · norm_num [WeightedWord.normalizedValid,MixedCancellation.validTwo,WeightedWord.decodeTwo,MixedCancellation.nq,MixedCancellation.nr,MixedCancellation.ns,MixedCancellation.nt,MixedCancellation.support,MixedCancellation.ordinate,bb]
+   refine ⟨X^3+X^2+X+1,?_⟩
+   have h486 : (486:ZMod (7:UInt64).toNat)=3 := by decide
+   have h9 : (9:ZMod (7:UInt64).toNat)=2 := by decide
+   have hd : (5:ZMod (7:UInt64).toNat)/2= -1 := by apply (div_eq_iff (by decide : (2:ZMod (7:UInt64).toNat)≠0)).mpr;decide
+   have h6 : (6:ZMod (7:UInt64).toNat)= -1 := by decide
+   simp only [MixedGeneric.curve,h486,h9,hd,h6]
+   norm_num
+   rw [div_self (by decide : (3:ZMod (7:UInt64).toNat)≠0)]
+   simp;ring
+ · decide
+ · decide
+ · decide
+example : positiveWordDispatch 7 0 0 0 0 ⟨0,0,1,1⟩ ⟨6,0,0,0,1,1⟩=none := by decide
+example : positiveWordDispatch 7 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩=none := by decide
+example : ¬ (⟨0,7,2,2⟩:WordD1).canonical 7 := by unfold WordD1.canonical;decide

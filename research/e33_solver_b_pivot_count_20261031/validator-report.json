@@ -1,0 +1,5601 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "date": "2026-11-01",
+ "row": "E33 (GLV note §9.35/§9.37): solver B's pivot selection counted (chain-sparsest-counted), B' (chain-sparsest-inc), B'' (chain-sparsest-est); Stage A (10 curves x 1,000 calls x 7 solvers) and end to end (3 solvers x 10 curves x 2 arms, Karatsuba); evidence directory research/e33_solver_b_pivot_count_20261031. No leaderboard row: E33 claims no improvement across the band.",
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E33; this recompute is its own standard-library Rust program (validate_e33.rs: JSON parser and SHA-256 carried over from the E27 validator's validate_e27.rs) and shares no code with examples/e33_tables.rs, examples/e33_checks.rs, experiments/37_solver_b_pivot_count/summary.json or tables.md, none of which it reads",
+ "script": {
+  "path": "validate_e33.rs",
+  "sha256": "3f28498a6dd1c0b3c44a48035c06b3773e6e5196aa252e3cfe2055011b717843"
+ },
+ "claims_checked": {
+  "note": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md",
+  "section": "§9.37 as corrected by the producer's erratum commits 2e90c88792 (13 figures) and 61c4dfecc8 (a fourteenth), made in place after this validator's interim reports",
+  "note_blob_at_validation": "42faa8b0b00522ddd66f1b0f0aec21274823373f",
+  "erratum_commits": [
+   "2e90c8879282c45129f5353fb9ccc49066dc535d",
+   "61c4dfecc8e21f8b420738d446bf9f1209d8b7d6"
+  ],
+  "note_blob_at_61c4dfecc8": "5d914272c4fc3cab22b71c426da41725221ac0a0"
+ },
+ "status_rule": "pass only if every check holds, every headline agrees within half a unit of its last printed digit, every recomputed G2.124-G2.133 verdict equals the claimed one and every prose figure lies within the recomputed range",
+ "raw_data": [
+  {
+   "path": "../../experiments/30_gls_v4/p101s1.json",
+   "sha256": "e73678810c24da921589f8e77d8ad83d894dc5ff023e7913508ef6b201438db7"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p101s2.json",
+   "sha256": "4aae4ec5866654358f72e1df8b9d021b751eb6cba2e3d7ae1f54293d6c9bbd91"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p149s1.json",
+   "sha256": "d35fe1354818e709a43c1d7520ffa7269f75ac9fdad08ae69c69d28edde25db7"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p149s2.json",
+   "sha256": "8b86c30cb57af6e563ee2888f8860dab9090a6c9171e3fda0218ffacd07f6f85"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p197s1.json",
+   "sha256": "99ab02e0f3143f09259e3be67c9916912feb197753c7679e1b9740ef7358c935"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p197s2.json",
+   "sha256": "e2db47a63c72e035f701b8d8e62cfb031b21681fc16b7e696c30f151dcc6451b"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p269s1.json",
+   "sha256": "ca89fc4676ba87f1ed5d8bfb1d7f02fc7166d0b9440bb864e0f7bc4dc26f208a"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p269s2.json",
+   "sha256": "d1aa960d1537b7b4510d236bc32c34fa63c59e605c60ecccadde800ed489f8da"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p397s1.json",
+   "sha256": "c01cde05204b4dbd42f89c7b8ff7283ad6681bcf86a2aaf882f1d92e3ae245a0"
+  },
+  {
+   "path": "../../experiments/30_gls_v4/p397s2.json",
+   "sha256": "ca27c4538a37d8c225b462d86aa02a5a2766364f2787bfe72a0227a89cdcf664"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p101s1.json",
+   "sha256": "de2bb0e38fc0d9cb0b74af2e11678aad41431f3604381eccf6df9c458049a4b9"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p101s2.json",
+   "sha256": "51784a128fb1c8adc8a2de43582879c6ffe56b850e2b4cd7f879ebfb54d8e874"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p149s1.json",
+   "sha256": "c7974e807e342049449de10a2782674cbbcb9c05cadaaf8aac474e3d7c329fe7"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p149s2.json",
+   "sha256": "3615f0a21fadb700da28cfcb6825ebfa3b4e2264d515efa65383cdee779fcc10"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p197s1.json",
+   "sha256": "a6f8ef21cc1656e4cc42c73435a2c9dc3753b7577e712464ec8f651ada457692"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p197s2.json",
+   "sha256": "115f52f8e771f4b444e51a535edaebb71b5f90e149dffa238343a41192c3bcdb"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p269s1.json",
+   "sha256": "255ba82997d4ba9677f942592b172e4b400240eb5a838168e0a53671cfaffbb0"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p269s2.json",
+   "sha256": "2ebf943756f145032ca7f1c210e73a9c79a38808ddece98a321e6be9b32c4203"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p397s1.json",
+   "sha256": "0cfe08c57e10a67ecc3c8dded74a82804caa484da930963e9021fe00abf8fdac"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain-sparsest_p397s2.json",
+   "sha256": "b84a48c6db3c660bd02136d45553f86f65818169a6cf75143f5ee0e6298d6b2d"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p101s1.json",
+   "sha256": "b36f3a9fdb704233d1af8d93d59ec1a683a8a964ceaa3d71743e9ad25d3c3b39"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p101s2.json",
+   "sha256": "a090dc3efe4585a4532f86eb8966b7995b007b8f94b421ee4f38094b379e6653"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p149s1.json",
+   "sha256": "94f077092d14eb94072cd373a1cd3d8183ece90f320619f91d04bb9b69c643ce"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p149s2.json",
+   "sha256": "210c65f16dab920edf43031868b88197336439c2e93599575c4bfee8e176cb06"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p197s1.json",
+   "sha256": "33fc49156cbbd88df15fe9fd8d4c759f0a730718a2da329c3de46cf4b2572b8d"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p197s2.json",
+   "sha256": "2ac24660a68e713a5a0b4c17f04fa7268b84efd0c7afae56e69972bf69647d7e"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p269s1.json",
+   "sha256": "1549c869ea9192de424fd15dec1e074ea51fbfe018023df75d49d3b6a3717277"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p269s2.json",
+   "sha256": "2bf95cc827b0ca91d7941b7268efacc523e7c289bd12e792083bd5e825a4b388"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p397s1.json",
+   "sha256": "2fb42a34c4c84a22a6fa88a7b54ddf5a41c98b89783b06db43c2b64324915bde"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p397s2.json",
+   "sha256": "4398fc1c6ed6c699493ad2b916a604bad086a64c70ac4c568a378b8482e3ded6"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s1.json",
+   "sha256": "39d93707a3dc8430fce2df47886012ea6545b63b02d8cdf58990eb4e6d3adadb"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s2.json",
+   "sha256": "bc4c3a81a1a7de63ddf204a4b8b289ae6bcc200f33a7bcc6251e65430afd31f9"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s1.json",
+   "sha256": "71618ef39d4b6ca0ec0a38b3667288393d087572cc6d97208e5d331baed0d5f7"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s2.json",
+   "sha256": "683e68771a3615fc2cacfa573736b156478899cbe8d99a81e4edaf611a3a8b24"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s1.json",
+   "sha256": "db97629bc6887c37fd5b3b06bd62b37e14936c660022af252e653a0a796c0d10"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s2.json",
+   "sha256": "d86f811e85852e311ee8583823ef5a3619635c0511148038c6cf99f83ed1f38a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s1.json",
+   "sha256": "ed045d101098b39e58686b48cc663aaedb8b40920f13f8824be7badebe5c817a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+   "sha256": "a67423a8acf8fab3fd32276b31374ab60deef3864d2c4129a0b63db14f232e1a"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s1.json",
+   "sha256": "cb469c62cbf518eb8610f42e50dff859b28c480c4d9776fe9921bf1e3465eabd"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s2.json",
+   "sha256": "7fbc78e9ffc61aeca3353f14d70badf51624b15e2344cd380b066951f847fd0c"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/stage_w.json",
+   "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+  },
+  {
+   "path": "../../experiments/32_walk_karatsuba/summary.json",
+   "sha256": "b20666d943bd0c3e2ab593dedfeef63eb06ea7a66449fb89c341d147f23c46d2"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/.artifacts.json",
+   "sha256": "eb61e9f9c8c75009302569313098fd61a9699da928eb673c750aefd7aec357b6"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p101s1.json",
+   "sha256": "f1966eb74cf6ae36391ec3edfcb0f3420bbba5a07a6f398ad22c4dd6faab9209"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p101s2.json",
+   "sha256": "50a4bf894d4ce7cfa89b3182237d958cde875e4a2daba01486aaca753ac9e2fc"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s1.json",
+   "sha256": "d80112cb9edf3ec559f2575b530a1d6940e7f8f17bca8a6812df75a480b02983"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s2.json",
+   "sha256": "c2dc68e5a8fae94c0eb7b3efc469d55390211ef476bc27a372c8c099608f9b48"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p197s1.json",
+   "sha256": "209450367a56d1eb42ae7f81708590e351199a1b4d1b711e3f6b7de2cb6448f3"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p197s2.json",
+   "sha256": "57124d855b718807a06ea2230e056e9d6121496542eda7bcde7e7476138546ec"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p269s1.json",
+   "sha256": "ce9ca8880b883ec936b4791f15aad06d7e143908f14a7db0367d94c7bd661817"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p269s2.json",
+   "sha256": "41af6a5c46eac03eb78113e795a5967f3d9ec59b1de1b1979312a19d7f717eeb"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p397s1.json",
+   "sha256": "a98563811f5d254592b15900804ffe9b22f6c09170b60820006c71709c848deb"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p397s2.json",
+   "sha256": "feeee03c1e9a05636a6a85e0fde377feb5ace41d91f8f6572f44a27280b334cc"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s1.json",
+   "sha256": "1c23431757de050aa7c884a8e78b1f1def80c079ed1421dfddadcae60128a013"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s2.json",
+   "sha256": "5f5e8d7f403d9c61a861cfeb746fd818b9b654d2736c129c2933e49ffc74c0ff"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s1.json",
+   "sha256": "94a7146419c2e6ac0acf5a8c8bcabd3e9c78380ae921a023532aea4fd63edc04"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s2.json",
+   "sha256": "453ca86e0cc69ed7c2216b11cb8c667f6baf23923f3b08d22409a36ae04bfab7"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p197s1.json",
+   "sha256": "dbeebea84d442d407bc87caf289b09a177f4441ac55cf88592840e6c040c426c"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p197s2.json",
+   "sha256": "18aec35d7b62bc252041f30ebec2da3ca47eeb32c8b734cf7552ecf97c1304f2"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p269s1.json",
+   "sha256": "cd34743bbe2764fb0649a8878d1224f2e396b07a26fb600bf7e6f2cbb7ecd58b"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p269s2.json",
+   "sha256": "87115d63e443a62d512bdc5759e31ab6dc23c5faaa62b7623c53f78d95fde3c8"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p397s1.json",
+   "sha256": "ddd7c37a71d7a14c61c0dfd2faa73f37e50bc7c931ad6c0a81eb9ed28a06ff95"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p397s2.json",
+   "sha256": "bf26a6374a4b10797b7a2fb5b364b28a3ed27e6cdd1bedf481b6e5586bf7bda2"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s1.json",
+   "sha256": "602cd53b2beb8a7f726668e5204e8518798e5e816bfd8149aa7aa9ffa7d2d6d7"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s2.json",
+   "sha256": "feda2fa0f4fa321e66e04183704b72d79be4e09e437cc8b7e6c7a58ec98e804e"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s1.json",
+   "sha256": "fd50b814baa695cce7998593ef422c32b4ff11a075efb72b4d0038bc4fd9c9be"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s2.json",
+   "sha256": "a7e2709d317e95db35f2eecda77449366e9c9a17c921df856fd5522c6e662501"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p197s1.json",
+   "sha256": "ba8388231befd3fc1b1d9a505ad5317a155b34e6d35109669819b8536be89e2d"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p197s2.json",
+   "sha256": "66eedae183a0207ad3b9977c220bde0083d64b035e0ce1bd9596b64d26d7fa8e"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p269s1.json",
+   "sha256": "80b9cf01b09d0662807a6cb0d65fb33a67b4194f1194f18bd3c5f5b858f57390"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p269s2.json",
+   "sha256": "9f35eb49877a9261d884e10871741d52328f84ddeb77f9a6ccf441602c8ec877"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p397s1.json",
+   "sha256": "e4311b0835b2470ffc14f8a04bb1b28aece87016a9382a348e0685d1a80428a6"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p397s2.json",
+   "sha256": "606e2de76992e1ebbc510b2da7231e7c023ffe4a09de665e58e262bc9be58b13"
+  },
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/identity_existing_solvers.json",
+   "sha256": "6e307655de5b2c031789bc71adaa01319618fee880e45229c94b43c3d2e00d23"
+  }
+ ],
+ "raw_data_artifact_store": [
+  {
+   "path": "../../experiments/37_solver_b_pivot_count/stage_a.json",
+   "sha256": "7bc6e00bd69f353a6d07c345e86ef50c33e6ea9a95535476b8bfd20bbe87d3d8",
+   "manifest": "../../experiments/37_solver_b_pivot_count/.artifacts.json",
+   "note": "read from the local copy, whose sha256 equals the manifest's; fetch with tools/artifacts in a fresh clone"
+  }
+ ],
+ "headline": [
+  {
+   "name": "B initial counts: calls with rows x cols = 393 x 448 = 176,064",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "176,064 on 9,999 calls",
+   "claimed": 9999,
+   "recomputed": 9999,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "count of Stage A calls with sel[0] of chain-sparsest-counted = 176,064"
+  },
+  {
+   "name": "B initial counts: calls with 396 x 448",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "396 · 448 on one",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "count of Stage A calls with sel[0] = 177,408"
+  },
+  {
+   "name": "B initial counts per call (the 9,999 calls)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "176,064",
+   "claimed": 176064,
+   "recomputed": 176064,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "393 * 448"
+  },
+  {
+   "name": "B comparisons per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3,681–3,713",
+   "claimed": 3681,
+   "recomputed": 3680.792,
+   "rel_tol": 0.00013583265430589515,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B comparisons per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3,681–3,713",
+   "claimed": 3713,
+   "recomputed": 3713.33,
+   "rel_tol": 0.00013466199851871802,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B count updates (recounts) per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "8.69–8.77·10⁵",
+   "claimed": 869000,
+   "recomputed": 869301.922,
+   "rel_tol": 0.0005753739936708861,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B count updates (recounts) per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "8.69–8.77·10⁵",
+   "claimed": 877000,
+   "recomputed": 877105.37,
+   "rel_tol": 0.0005701254281641961,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B selection total per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.049–1.057·10⁶",
+   "claimed": 1049000,
+   "recomputed": 1049048.058,
+   "rel_tol": 0.0004766444237368923,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B selection total per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.049–1.057·10⁶",
+   "claimed": 1057000,
+   "recomputed": 1056882.7,
+   "rel_tol": 0.0004730368973509934,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B' initial counts per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "506–507",
+   "claimed": 506,
+   "recomputed": 505.852,
+   "rel_tol": 0.0009881422934782608,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B' initial counts per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "506–507",
+   "claimed": 507,
+   "recomputed": 506.741,
+   "rel_tol": 0.000986193294871795,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B' count updates per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.89–2.94·10⁵",
+   "claimed": 289000,
+   "recomputed": 288884.528,
+   "rel_tol": 0.0017301038079584777,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B' count updates per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.89–2.94·10⁵",
+   "claimed": 294000,
+   "recomputed": 294201.34,
+   "rel_tol": 0.0017006802738095239,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B' selection total per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.93–2.98·10⁵",
+   "claimed": 293000,
+   "recomputed": 293071.172,
+   "rel_tol": 0.00170648464334471,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B' selection total per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.93–2.98·10⁵",
+   "claimed": 298000,
+   "recomputed": 298421.411,
+   "rel_tol": 0.001677852350671141,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' initial counts per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "506–507",
+   "claimed": 506,
+   "recomputed": 505.852,
+   "rel_tol": 0.0009881422934782608,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' initial counts per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "506–507",
+   "claimed": 507,
+   "recomputed": 506.741,
+   "rel_tol": 0.000986193294871795,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' comparisons per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4,070–4,105",
+   "claimed": 4070,
+   "recomputed": 4069.529,
+   "rel_tol": 0.00012285012297297298,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' comparisons per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4,070–4,105",
+   "claimed": 4105,
+   "recomputed": 4105.054,
+   "rel_tol": 0.00012180267978075519,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' count updates per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "8,121–8,192",
+   "claimed": 8121,
+   "recomputed": 8121.042,
+   "rel_tol": 0.00006156877238024874,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' count updates per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "8,121–8,192",
+   "claimed": 8192,
+   "recomputed": 8192.108,
+   "rel_tol": 0.00006103515631103516,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' selection total per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "12,696–12,804",
+   "claimed": 12696,
+   "recomputed": 12696.423,
+   "rel_tol": 0.00003938248271109011,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B'' selection total per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "12,696–12,804",
+   "claimed": 12804,
+   "recomputed": 12803.903,
+   "rel_tol": 0.00003905029682130584,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B recounts as a share of the pass, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "83 %",
+   "claimed": 0.83,
+   "recomputed": 0.8286578630699872,
+   "rel_tol": 0.006024096391566266,
+   "agrees": true,
+   "definition": "B count updates / B total, per curve"
+  },
+  {
+   "name": "B recounts as a share of the pass, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "83 %",
+   "claimed": 0.83,
+   "recomputed": 0.8298985024544351,
+   "rel_tol": 0.006024096391566266,
+   "agrees": true,
+   "definition": "B count updates / B total, per curve"
+  },
+  {
+   "name": "B'/B selection work, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.279–0.282",
+   "claimed": 0.279,
+   "recomputed": 0.2793686807435089,
+   "rel_tol": 0.0017921146971326164,
+   "agrees": true,
+   "definition": "Stage A mean B' total / mean B total, per curve"
+  },
+  {
+   "name": "B'/B selection work, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.279–0.282",
+   "claimed": 0.282,
+   "recomputed": 0.2823600111914028,
+   "rel_tol": 0.001773049647163121,
+   "agrees": true,
+   "definition": "Stage A mean B' total / mean B total, per curve"
+  },
+  {
+   "name": "C median B'', min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.71–4.02·10⁵",
+   "claimed": 371000,
+   "recomputed": 371479,
+   "rel_tol": 0.0013477088962264153,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "C median B'', max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.71–4.02·10⁵",
+   "claimed": 402000,
+   "recomputed": 401778,
+   "rel_tol": 0.0012437810957711443,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "C median B, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.04–3.33·10⁵",
+   "claimed": 304000,
+   "recomputed": 304103,
+   "rel_tol": 0.0016447368437500001,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "C median B, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.04–3.33·10⁵",
+   "claimed": 333000,
+   "recomputed": 333134,
+   "rel_tol": 0.001501501503003003,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "C median A, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "6.01–6.34·10⁵",
+   "claimed": 601000,
+   "recomputed": 600890,
+   "rel_tol": 0.0008319467562396007,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "C median A, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "6.01–6.34·10⁵",
+   "claimed": 634000,
+   "recomputed": 633960,
+   "rel_tol": 0.0007886435339116719,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "C median B''/B, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.205–1.222",
+   "claimed": 1.205,
+   "recomputed": 1.2054993025157534,
+   "rel_tol": 0.00041493775975103735,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "C median B''/B, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.205–1.222",
+   "claimed": 1.222,
+   "recomputed": 1.2215565121028074,
+   "rel_tol": 0.0004091653031914894,
+   "agrees": true,
+   "definition": "median of the per-call C (Weil + solve, F_p multiplications) over the curve's 1,000 calls as the record defines call_median (sorted[n/2], the upper median; recomputed from the per-call arrays); the midpoint median is listed in stage_a.per_curve.C_midpoint_median_by_solver"
+  },
+  {
+   "name": "lead-scan reads per call, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "79,114–79,119",
+   "claimed": 79114,
+   "recomputed": 79114.308,
+   "rel_tol": 0.000006319993939125819,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "lead-scan reads per call, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "79,114–79,119",
+   "claimed": 79119,
+   "recomputed": 79118.757,
+   "rel_tol": 0.000006319594541134241,
+   "agrees": true,
+   "definition": "Stage A mean over the 1,000 calls of each curve; range over the ten curves"
+  },
+  {
+   "name": "B comparisons as a share of B's selection total (G2.125), min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.35 %",
+   "claimed": 0.0035,
+   "recomputed": 0.0035086155347439345,
+   "rel_tol": 0.0142857143,
+   "agrees": true,
+   "definition": "per curve"
+  },
+  {
+   "name": "B comparisons as a share of B's selection total (G2.125), max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.35 %",
+   "claimed": 0.0035,
+   "recomputed": 0.003513474106445304,
+   "rel_tol": 0.0142857143,
+   "agrees": true,
+   "definition": "per curve"
+  },
+  {
+   "name": "B'' gives up this share of B's saving in mean C, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "22.5–22.7 %",
+   "claimed": 0.225,
+   "recomputed": 0.225006059671479,
+   "rel_tol": 0.0022222222244444446,
+   "agrees": true,
+   "definition": "(mean C B'' - mean C B) / (mean C A - mean C B), per curve"
+  },
+  {
+   "name": "B'' gives up this share of B's saving in mean C, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "22.5–22.7 %",
+   "claimed": 0.227,
+   "recomputed": 0.22725353808752752,
+   "rel_tol": 0.0022026431740088106,
+   "agrees": true,
+   "definition": "(mean C B'' - mean C B) / (mean C A - mean C B), per curve"
+  },
+  {
+   "name": "B'' saving against A's mean C, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.30–2.33·10⁵",
+   "claimed": 230000,
+   "recomputed": 229604.402,
+   "rel_tol": 0.0021739130456521743,
+   "agrees": true,
+   "definition": "mean C A - mean C B'', per curve"
+  },
+  {
+   "name": "B'' saving against A's mean C, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.30–2.33·10⁵",
+   "claimed": 233000,
+   "recomputed": 232605.23199999996,
+   "rel_tol": 0.0021459227489270386,
+   "agrees": true,
+   "definition": "mean C A - mean C B'', per curve"
+  },
+  {
+   "name": "G2.133: S_A/S_B'' with lead scans priced, 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.035–1.036",
+   "claimed": 1.035,
+   "recomputed": 1.034664327332928,
+   "rel_tol": 0.0004830917879227054,
+   "agrees": true,
+   "definition": "Stage A mean per-call S(g) + 97 g lead-scan reads, every arm (existing and A take A counted's lead scans); ratio per curve"
+  },
+  {
+   "name": "G2.133: S_A/S_B'' with lead scans priced, 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.035–1.036",
+   "claimed": 1.036,
+   "recomputed": 1.036004777566327,
+   "rel_tol": 0.00048262548310810813,
+   "agrees": true,
+   "definition": "Stage A mean per-call S(g) + 97 g lead-scan reads, every arm (existing and A take A counted's lead scans); ratio per curve"
+  },
+  {
+   "name": "G2.133: S_A/S_B'' with lead scans priced, 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.962–0.963",
+   "claimed": 0.962,
+   "recomputed": 0.9618363960810763,
+   "rel_tol": 0.0005197505202702704,
+   "agrees": true,
+   "definition": "Stage A mean per-call S(g) + 97 g lead-scan reads, every arm (existing and A take A counted's lead scans); ratio per curve"
+  },
+  {
+   "name": "G2.133: S_A/S_B'' with lead scans priced, 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.962–0.963",
+   "claimed": 0.963,
+   "recomputed": 0.9627755966053426,
+   "rel_tol": 0.0005192108001038422,
+   "agrees": true,
+   "definition": "Stage A mean per-call S(g) + 97 g lead-scan reads, every arm (existing and A take A counted's lead scans); ratio per curve"
+  },
+  {
+   "name": "G2.133: S_E25/S_B'' with lead scans priced, 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.986–0.999",
+   "claimed": 0.986,
+   "recomputed": 0.9860465350383466,
+   "rel_tol": 0.0005070993919878297,
+   "agrees": true,
+   "definition": "Stage A mean per-call S(g) + 97 g lead-scan reads, every arm (existing and A take A counted's lead scans); ratio per curve"
+  },
+  {
+   "name": "G2.133: S_E25/S_B'' with lead scans priced, 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.986–0.999",
+   "claimed": 0.999,
+   "recomputed": 0.9991814472382792,
+   "rel_tol": 0.0005005005010010011,
+   "agrees": true,
+   "definition": "Stage A mean per-call S(g) + 97 g lead-scan reads, every arm (existing and A take A counted's lead scans); ratio per curve"
+  },
+  {
+   "name": "Macaulay entries at 1 GAE, F_p multiplications per call",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.7·10⁷",
+   "claimed": 17000000,
+   "recomputed": 17078208,
+   "rel_tol": 0.02941176473529412,
+   "agrees": true,
+   "definition": "97 * 176,064"
+  },
+  {
+   "name": "end to end selection per call, B, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.049–1.057·10⁶",
+   "claimed": 1049000,
+   "recomputed": 1049178.4369563628,
+   "rel_tol": 0.0004766444237368923,
+   "agrees": true,
+   "definition": "pivot_selection_ops / call.calls per arm record; range over the 20 rows"
+  },
+  {
+   "name": "end to end selection per call, B, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.049–1.057·10⁶",
+   "claimed": 1057000,
+   "recomputed": 1056762.3054177256,
+   "rel_tol": 0.0004730368973509934,
+   "agrees": true,
+   "definition": "pivot_selection_ops / call.calls per arm record; range over the 20 rows"
+  },
+  {
+   "name": "end to end selection per call, B', min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.93–2.98·10⁵",
+   "claimed": 293000,
+   "recomputed": 293195.98212777934,
+   "rel_tol": 0.00170648464334471,
+   "agrees": true,
+   "definition": "pivot_selection_ops / call.calls per arm record; range over the 20 rows"
+  },
+  {
+   "name": "end to end selection per call, B', max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.93–2.98·10⁵",
+   "claimed": 298000,
+   "recomputed": 298389.1878669276,
+   "rel_tol": 0.001677852350671141,
+   "agrees": true,
+   "definition": "pivot_selection_ops / call.calls per arm record; range over the 20 rows"
+  },
+  {
+   "name": "end to end selection per call, B'', min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "12,694–12,802",
+   "claimed": 12694,
+   "recomputed": 12694.303169846258,
+   "rel_tol": 0.0000393886876083189,
+   "agrees": true,
+   "definition": "pivot_selection_ops / call.calls per arm record; range over the 20 rows"
+  },
+  {
+   "name": "end to end selection per call, B'', max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "12,694–12,802",
+   "claimed": 12802,
+   "recomputed": 12802.488482794788,
+   "rel_tol": 0.000039056397476956724,
+   "agrees": true,
+   "definition": "pivot_selection_ops / call.calls per arm record; range over the 20 rows"
+  },
+  {
+   "name": "S_E25/S_X with X = B at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.53–4.76",
+   "claimed": 4.53,
+   "recomputed": 4.529347808397569,
+   "rel_tol": 0.0011037527604856514,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0"
+  },
+  {
+   "name": "S_E25/S_X with X = B at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.53–4.76",
+   "claimed": 4.76,
+   "recomputed": 4.755341076027732,
+   "rel_tol": 0.0010504201691176472,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0"
+  },
+  {
+   "name": "S_E25/S_X with X = B at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.274–0.276",
+   "claimed": 0.274,
+   "recomputed": 0.2739198704844731,
+   "rel_tol": 0.0018248175200729928,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0.1"
+  },
+  {
+   "name": "S_E25/S_X with X = B at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.274–0.276",
+   "claimed": 0.276,
+   "recomputed": 0.27550715571905116,
+   "rel_tol": 0.0018115942047101448,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0.1"
+  },
+  {
+   "name": "S_E25/S_X with X = B at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.157–0.158",
+   "claimed": 0.157,
+   "recomputed": 0.15651010895125178,
+   "rel_tol": 0.0031847133789808923,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 1"
+  },
+  {
+   "name": "S_E25/S_X with X = B at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.157–0.158",
+   "claimed": 0.158,
+   "recomputed": 0.15772000271513387,
+   "rel_tol": 0.0031645569651898736,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 1"
+  },
+  {
+   "name": "S_A/S_X with X = B at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.82–1.86",
+   "claimed": 1.82,
+   "recomputed": 1.8221120738675625,
+   "rel_tol": 0.00274725275,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0"
+  },
+  {
+   "name": "S_A/S_X with X = B at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.82–1.86",
+   "claimed": 1.86,
+   "recomputed": 1.8630576411494257,
+   "rel_tol": 0.0026881720456989246,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0"
+  },
+  {
+   "name": "S_A/S_X with X = B at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.193–0.197",
+   "claimed": 0.193,
+   "recomputed": 0.19254066918847784,
+   "rel_tol": 0.0025906735777202075,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0.1"
+  },
+  {
+   "name": "S_A/S_X with X = B at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.193–0.197",
+   "claimed": 0.197,
+   "recomputed": 0.19653360683649926,
+   "rel_tol": 0.002538071068527919,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0.1"
+  },
+  {
+   "name": "S_A/S_X with X = B at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.149–0.152",
+   "claimed": 0.149,
+   "recomputed": 0.14866516414945893,
+   "rel_tol": 0.0033557047013422826,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 1"
+  },
+  {
+   "name": "S_A/S_X with X = B at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.149–0.152",
+   "claimed": 0.152,
+   "recomputed": 0.15247503134501747,
+   "rel_tol": 0.0032894736875000007,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 1"
+  },
+  {
+   "name": "S_X/rho with X = B at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.45·10³–2.19·10⁵",
+   "claimed": 3450,
+   "recomputed": 3446.2073838983474,
+   "rel_tol": 0.001449275363768116,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0"
+  },
+  {
+   "name": "S_X/rho with X = B at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.45·10³–2.19·10⁵",
+   "claimed": 219000,
+   "recomputed": 219434.24421614545,
+   "rel_tol": 0.0022831050251141552,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0"
+  },
+  {
+   "name": "S_X/rho with X = B at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.10·10⁵–7.17·10⁶",
+   "claimed": 110000,
+   "recomputed": 110374.68074313729,
+   "rel_tol": 0.00454545455,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0.1"
+  },
+  {
+   "name": "S_X/rho with X = B at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.10·10⁵–7.17·10⁶",
+   "claimed": 7170000,
+   "recomputed": 7171727.42850779,
+   "rel_tol": 0.0006973500704323571,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0.1"
+  },
+  {
+   "name": "S_X/rho with X = B at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "6.10·10⁵–4.40·10⁷",
+   "claimed": 610000,
+   "recomputed": 609892.1424040343,
+   "rel_tol": 0.0008196721319672132,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 1"
+  },
+  {
+   "name": "S_X/rho with X = B at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "6.10·10⁵–4.40·10⁷",
+   "claimed": 44000000,
+   "recomputed": 44044626.2392339,
+   "rel_tol": 0.0011363636375,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 1"
+  },
+  {
+   "name": "S_E25/S_X with X = B' at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.53–4.76",
+   "claimed": 4.53,
+   "recomputed": 4.529347808397569,
+   "rel_tol": 0.0011037527604856514,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0"
+  },
+  {
+   "name": "S_E25/S_X with X = B' at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.53–4.76",
+   "claimed": 4.76,
+   "recomputed": 4.755341076027732,
+   "rel_tol": 0.0010504201691176472,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0"
+  },
+  {
+   "name": "S_E25/S_X with X = B' at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.678–0.683",
+   "claimed": 0.678,
+   "recomputed": 0.6784845848758915,
+   "rel_tol": 0.000737463127581121,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0.1"
+  },
+  {
+   "name": "S_E25/S_X with X = B' at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.678–0.683",
+   "claimed": 0.683,
+   "recomputed": 0.6831724017423614,
+   "rel_tol": 0.0007320644224011713,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0.1"
+  },
+  {
+   "name": "S_E25/S_X with X = B' at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.404–0.407",
+   "claimed": 0.404,
+   "recomputed": 0.40407853327908977,
+   "rel_tol": 0.0012376237636138616,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 1"
+  },
+  {
+   "name": "S_E25/S_X with X = B' at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.404–0.407",
+   "claimed": 0.407,
+   "recomputed": 0.40698656630041347,
+   "rel_tol": 0.00122850122972973,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 1"
+  },
+  {
+   "name": "S_A/S_X with X = B' at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.82–1.86",
+   "claimed": 1.82,
+   "recomputed": 1.8221120738675625,
+   "rel_tol": 0.00274725275,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0"
+  },
+  {
+   "name": "S_A/S_X with X = B' at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.82–1.86",
+   "claimed": 1.86,
+   "recomputed": 1.8630576411494257,
+   "rel_tol": 0.0026881720456989246,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0"
+  },
+  {
+   "name": "S_A/S_X with X = B' at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.478–0.487",
+   "claimed": 0.478,
+   "recomputed": 0.4777622246940062,
+   "rel_tol": 0.0010460251056485358,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0.1"
+  },
+  {
+   "name": "S_A/S_X with X = B' at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.478–0.487",
+   "claimed": 0.487,
+   "recomputed": 0.4868071884946983,
+   "rel_tol": 0.0010266940462012322,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0.1"
+  },
+  {
+   "name": "S_A/S_X with X = B' at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.384–0.393",
+   "claimed": 0.384,
+   "recomputed": 0.38390301620152584,
+   "rel_tol": 0.0013020833346354167,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 1"
+  },
+  {
+   "name": "S_A/S_X with X = B' at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.384–0.393",
+   "claimed": 0.393,
+   "recomputed": 0.3934246305817321,
+   "rel_tol": 0.0012722646323155215,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 1"
+  },
+  {
+   "name": "S_X/rho with X = B' at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.45·10³–2.19·10⁵",
+   "claimed": 3450,
+   "recomputed": 3446.2073838983474,
+   "rel_tol": 0.001449275363768116,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0"
+  },
+  {
+   "name": "S_X/rho with X = B' at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.45·10³–2.19·10⁵",
+   "claimed": 219000,
+   "recomputed": 219434.24421614545,
+   "rel_tol": 0.0022831050251141552,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0"
+  },
+  {
+   "name": "S_X/rho with X = B' at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.45·10⁴–2.89·10⁶",
+   "claimed": 44500,
+   "recomputed": 44481.57219914014,
+   "rel_tol": 0.0011235955067415732,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0.1"
+  },
+  {
+   "name": "S_X/rho with X = B' at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.45·10⁴–2.89·10⁶",
+   "claimed": 2890000,
+   "recomputed": 2890655.3859122368,
+   "rel_tol": 0.0017301038079584777,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0.1"
+  },
+  {
+   "name": "S_X/rho with X = B' at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.36·10⁵–1.71·10⁷",
+   "claimed": 236000,
+   "recomputed": 236178.70044648158,
+   "rel_tol": 0.0021186440699152544,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 1"
+  },
+  {
+   "name": "S_X/rho with X = B' at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.36·10⁵–1.71·10⁷",
+   "claimed": 17100000,
+   "recomputed": 17058019.196370956,
+   "rel_tol": 0.0029239766111111114,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 1"
+  },
+  {
+   "name": "S_E25/S_X with X = B'' at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.83–3.98",
+   "claimed": 3.83,
+   "recomputed": 3.8272859385935933,
+   "rel_tol": 0.0013054830300261097,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0"
+  },
+  {
+   "name": "S_E25/S_X with X = B'' at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "3.83–3.98",
+   "claimed": 3.98,
+   "recomputed": 3.9836233449135103,
+   "rel_tol": 0.0012562814082914574,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0"
+  },
+  {
+   "name": "S_E25/S_X with X = B'' at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.457–1.497",
+   "claimed": 1.457,
+   "recomputed": 1.4571371957595298,
+   "rel_tol": 0.00034317089945092656,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0.1"
+  },
+  {
+   "name": "S_E25/S_X with X = B'' at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.457–1.497",
+   "claimed": 1.497,
+   "recomputed": 1.4970791986487169,
+   "rel_tol": 0.0003340013363393454,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 0.1"
+  },
+  {
+   "name": "S_E25/S_X with X = B'' at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.980–0.997",
+   "claimed": 0.98,
+   "recomputed": 0.9804632400879411,
+   "rel_tol": 0.0005102040821428572,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 1"
+  },
+  {
+   "name": "S_E25/S_X with X = B'' at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.980–0.997",
+   "claimed": 0.997,
+   "recomputed": 0.9966487077075532,
+   "rel_tol": 0.0005015045140421264,
+   "agrees": true,
+   "definition": "S_E25(g) = E25 total + g*97*E25 macaulay_entries (schoolbook); S_X,sch(g) = E31 B total + (X total - B counted total) + g*97*(X macaulay_entries + X pivot_selection_ops); g = 1"
+  },
+  {
+   "name": "S_A/S_X with X = B'' at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.538–1.558",
+   "claimed": 1.538,
+   "recomputed": 1.5376152131086673,
+   "rel_tol": 0.0003250975295838752,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0"
+  },
+  {
+   "name": "S_A/S_X with X = B'' at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.538–1.558",
+   "claimed": 1.558,
+   "recomputed": 1.5581455630968364,
+   "rel_tol": 0.00032092426219512194,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0"
+  },
+  {
+   "name": "S_A/S_X with X = B'' at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.046–1.048",
+   "claimed": 1.046,
+   "recomputed": 1.0461308557328493,
+   "rel_tol": 0.0004780114727533461,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0.1"
+  },
+  {
+   "name": "S_A/S_X with X = B'' at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.046–1.048",
+   "claimed": 1.048,
+   "recomputed": 1.0478795990710252,
+   "rel_tol": 0.0004770992371183206,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 0.1"
+  },
+  {
+   "name": "S_A/S_X with X = B'' at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.9465–0.9480",
+   "claimed": 0.9465,
+   "recomputed": 0.9464783398803243,
+   "rel_tol": 0.00005282620184891707,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 1"
+  },
+  {
+   "name": "S_A/S_X with X = B'' at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.9465–0.9480",
+   "claimed": 0.948,
+   "recomputed": 0.947986965857213,
+   "rel_tol": 0.0000527426160864979,
+   "agrees": true,
+   "definition": "S_A(g) = E27 total + g*97*E27 macaulay_entries; S_X(g) = X total + g*97*(X macaulay_entries + X pivot_selection_ops), Karatsuba; g = 1"
+  },
+  {
+   "name": "S_X/rho with X = B'' at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.12·10³–2.61·10⁵",
+   "claimed": 4120,
+   "recomputed": 4115.294328345657,
+   "rel_tol": 0.001213592234223301,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0"
+  },
+  {
+   "name": "S_X/rho with X = B'' at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.12·10³–2.61·10⁵",
+   "claimed": 261000,
+   "recomputed": 261482.03640208603,
+   "rel_tol": 0.0019157088141762452,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0"
+  },
+  {
+   "name": "S_X/rho with X = B'' at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.03·10⁴–1.33·10⁶",
+   "claimed": 20300,
+   "recomputed": 20280.58844793658,
+   "rel_tol": 0.0024630541896551728,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0.1"
+  },
+  {
+   "name": "S_X/rho with X = B'' at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.03·10⁴–1.33·10⁶",
+   "claimed": 1330000,
+   "recomputed": 1331440.928531725,
+   "rel_tol": 0.0037593985,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 0.1"
+  },
+  {
+   "name": "S_X/rho with X = B'' at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "9.58·10⁴–7.01·10⁶",
+   "claimed": 95800,
+   "recomputed": 95796.92597658971,
+   "rel_tol": 0.0005219206685803758,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 1"
+  },
+  {
+   "name": "S_X/rho with X = B'' at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "9.58·10⁴–7.01·10⁶",
+   "claimed": 7010000,
+   "recomputed": 7006185.205754339,
+   "rel_tol": 0.0007132667624821684,
+   "agrees": true,
+   "definition": "S_X(g) / (rho_iii + g*97*steps), rho_iii = E27 walk (iii) mean without the [d]G check; g = 1"
+  },
+  {
+   "name": "running text: B'' behind A at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.946–0.948",
+   "claimed": 0.946,
+   "recomputed": 0.9464783398803243,
+   "rel_tol": 0.0005285412267441861,
+   "agrees": true,
+   "definition": "S_A/S_B'' at 1 GAE over the 20 rows, printed to three places in 'What it says'"
+  },
+  {
+   "name": "running text: B'' behind A at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.946–0.948",
+   "claimed": 0.948,
+   "recomputed": 0.947986965857213,
+   "rel_tol": 0.000527426160864979,
+   "agrees": true,
+   "definition": "S_A/S_B'' at 1 GAE over the 20 rows, printed to three places in 'What it says'"
+  },
+  {
+   "name": "running text: B'' ahead of A at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.54–1.56×",
+   "claimed": 1.54,
+   "recomputed": 1.5376152131086673,
+   "rel_tol": 0.00324675325,
+   "agrees": true,
+   "definition": "S_A/S_B'' at 0 GAE over the 20 rows"
+  },
+  {
+   "name": "running text: B'' ahead of A at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.54–1.56×",
+   "claimed": 1.56,
+   "recomputed": 1.5581455630968364,
+   "rel_tol": 0.0032051282083333335,
+   "agrees": true,
+   "definition": "S_A/S_B'' at 0 GAE over the 20 rows"
+  },
+  {
+   "name": "S_A/rho (E27 solver A, walk (iii)) at 0 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "6.39·10³–4.06·10⁵",
+   "claimed": 6390,
+   "recomputed": 6391.730928925254,
+   "rel_tol": 0.0007824726142410017,
+   "agrees": true,
+   "definition": "(E27 total + g*97*entries) / (rho_iii + g*97*steps)"
+  },
+  {
+   "name": "S_A/rho (E27 solver A, walk (iii)) at 0 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "6.39·10³–4.06·10⁵",
+   "claimed": 406000,
+   "recomputed": 405543.5536728417,
+   "rel_tol": 0.0012315270948275864,
+   "agrees": true,
+   "definition": "(E27 total + g*97*entries) / (rho_iii + g*97*steps)"
+  },
+  {
+   "name": "S_A/rho (E27 solver A, walk (iii)) at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.13·10⁴–1.39·10⁶",
+   "claimed": 21300,
+   "recomputed": 21251.614891748253,
+   "rel_tol": 0.0023474178427230047,
+   "agrees": true,
+   "definition": "(E27 total + g*97*entries) / (rho_iii + g*97*steps)"
+  },
+  {
+   "name": "S_A/rho (E27 solver A, walk (iii)) at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "2.13·10⁴–1.39·10⁶",
+   "claimed": 1390000,
+   "recomputed": 1394064.3080821137,
+   "rel_tol": 0.003597122305755396,
+   "agrees": true,
+   "definition": "(E27 total + g*97*entries) / (rho_iii + g*97*steps)"
+  },
+  {
+   "name": "S_A/rho (E27 solver A, walk (iii)) at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "9.07·10⁴–6.64·10⁶",
+   "claimed": 90700,
+   "recomputed": 90669.71546396094,
+   "rel_tol": 0.0005512679167585448,
+   "agrees": true,
+   "definition": "(E27 total + g*97*entries) / (rho_iii + g*97*steps)"
+  },
+  {
+   "name": "S_A/rho (E27 solver A, walk (iii)) at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "9.07·10⁴–6.64·10⁶",
+   "claimed": 6640000,
+   "recomputed": 6636884.883024465,
+   "rel_tol": 0.0007530120489457833,
+   "agrees": true,
+   "definition": "(E27 total + g*97*entries) / (rho_iii + g*97*steps)"
+  },
+  {
+   "name": "best row B'' S/rho at 0 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "4.12·10³× (p = 397 seed 1, arm B)",
+   "claimed": 4120,
+   "recomputed": 4115.294328345657,
+   "rel_tol": 0.001213592234223301,
+   "agrees": true,
+   "definition": "minimum over the 20 rows"
+  },
+  {
+   "name": "best row A S/rho at 0 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "6.39·10³× (p = 397 seed 1, arm B)",
+   "claimed": 6390,
+   "recomputed": 6391.730928925254,
+   "rel_tol": 0.0007824726142410017,
+   "agrees": true,
+   "definition": "minimum over the 20 rows"
+  },
+  {
+   "name": "G2.129: the earlier validator's lower-bound S_E25/S_B at 0.1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.885–0.899",
+   "claimed": 0.885,
+   "recomputed": 0.8845149390290296,
+   "rel_tol": 0.0005649717519774012,
+   "agrees": true,
+   "definition": "S_E25 / (E31 B total + g*97*(E_E31 + (2 E_E25 - E_E31))), the first pass alone priced from the lower bound 2 E_E25 - E_E31"
+  },
+  {
+   "name": "G2.129: the earlier validator's lower-bound S_E25/S_B at 0.1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.885–0.899",
+   "claimed": 0.899,
+   "recomputed": 0.8985192901872951,
+   "rel_tol": 0.0005561735266963293,
+   "agrees": true,
+   "definition": "S_E25 / (E31 B total + g*97*(E_E31 + (2 E_E25 - E_E31))), the first pass alone priced from the lower bound 2 E_E25 - E_E31"
+  },
+  {
+   "name": "G2.129: the earlier validator's lower-bound S_E25/S_B at 1 GAE, min",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.542–0.544",
+   "claimed": 0.542,
+   "recomputed": 0.5420541653144952,
+   "rel_tol": 0.0009225092260147601,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "G2.129: the earlier validator's lower-bound S_E25/S_B at 1 GAE, max",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.542–0.544",
+   "claimed": 0.544,
+   "recomputed": 0.5435453811834048,
+   "rel_tol": 0.0009191176479779413,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  }
+ ],
+ "headline_disagreements": [],
+ "prose_figures": [
+  {
+   "name": "B's selection pass reads the matrix about six times per call",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "about six times",
+   "recomputed_min": 5.958288179643121,
+   "recomputed_max": 6.002832492729916,
+   "consistent": true,
+   "definition": "B total / B initial pass, per curve"
+  },
+  {
+   "name": "B' keeps B's choices for 28 % of the work",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "28 %",
+   "recomputed_min": 0.2793686807435089,
+   "recomputed_max": 0.2823600111914028,
+   "consistent": true,
+   "definition": "B'/B per curve"
+  },
+  {
+   "name": "B recount 8.7·10⁵ (G2.125)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "8.7·10⁵",
+   "recomputed_min": 869301.922,
+   "recomputed_max": 877105.37,
+   "consistent": true,
+   "definition": "per curve"
+  },
+  {
+   "name": "B initial 1.76·10⁵ (G2.125)",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.76·10⁵",
+   "recomputed_min": 176064,
+   "recomputed_max": 176065.344,
+   "consistent": true,
+   "definition": "per curve"
+  },
+  {
+   "name": "B'' selection operations per call",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.27·10⁴",
+   "recomputed_min": 12696.423,
+   "recomputed_max": 12803.903,
+   "consistent": true,
+   "definition": "per curve"
+  },
+  {
+   "name": "B'' selection operations at 1 GAE, F_p multiplications per call",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.2·10⁶",
+   "recomputed_min": 1231553.031,
+   "recomputed_max": 1241978.591,
+   "consistent": true,
+   "definition": "97 * B'' total, per curve"
+  },
+  {
+   "name": "running text: B falls to 0.19x A at 0.1 GAE",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "0.19×",
+   "recomputed_min": 0.19254066918847784,
+   "recomputed_max": 0.19653360683649926,
+   "consistent": true,
+   "definition": "S_A/S_B at 0.1 GAE over the 20 rows"
+  },
+  {
+   "name": "section title: B's pivot selection costs 1.05e6 native operations per call",
+   "source": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.37",
+   "printed": "1.05·10⁶",
+   "recomputed_min": 1049178.4369563628,
+   "recomputed_max": 1056762.3054177256,
+   "consistent": true,
+   "definition": "end-to-end selection per call, B"
+  }
+ ],
+ "prose_disagreements": [],
+ "checks": [
+  {
+   "check": "pre-registration 27663cc4d7 is an ancestor of the code commit c443138920 and is older than it; it changes Markdown only (the note and the session log)",
+   "holds": true,
+   "detail": "prereg 1793465010 < code 1793468555; files [\"docs/session-logs/2026-10-31.md\", \"research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md\"]"
+  },
+  {
+   "check": "the code commit precedes the Stage A records commit (8d8155d8b1) and the results commit (4852cd4bec); both descend from it",
+   "holds": true,
+   "detail": "code 1793468555 < stage A 1793553830, results 1793564180"
+  },
+  {
+   "check": "the pre-E33 build used for the validator's identity replay is the code commit's parent bd0118f39",
+   "holds": true,
+   "detail": "bd0118f393537a2e610336e5d45f5426a6a0fa83"
+  },
+  {
+   "check": "every E33 run record (stage_a.json, identity_existing_solvers.json, checks.log, 30 end-to-end records) was first committed after the code commit",
+   "holds": true,
+   "detail": "33 records"
+  },
+  {
+   "check": "§9.35 (the registration, G2.124-G2.133) in the current note is byte-identical to the text committed in 27663cc4d7",
+   "holds": true,
+   "detail": "8085 bytes then, 8085 bytes now (trailing blank lines aside)"
+  },
+  {
+   "check": "binary_commit.txt names the code commit",
+   "holds": true,
+   "detail": "c4431389209ae4a8d83bc916bbb233eb4a8438cb"
+  },
+  {
+   "check": "c689d19821 (compile fix) leaves gaudry_quartic.rs, quartic_folds.rs, quartic_pipeline_gls.rs and e33_stage_a.rs unchanged against c443138920 (its klein_v4.rs change is inside mod tests)",
+   "holds": true,
+   "detail": "no diff"
+  },
+  {
+   "check": "the local stage_a.json matches the artifact manifest (sha256 and bytes)",
+   "holds": true,
+   "detail": "7bc6e00bd69f353a6d07c345e86ef50c33e6ea9a95535476b8bfd20bbe87d3d8, 2684198 bytes"
+  },
+  {
+   "check": "Stage A: 10 curves x 1,000 calls, the seven solvers in order; agree = 1,000 for every solver; phases_equal = [1000,1000,1000]; digest_equal_b[B counted, B'] = 1,000; B' count mismatches 0",
+   "holds": true,
+   "detail": "10000 calls"
+  },
+  {
+   "check": "Stage A per call: A counted = A and B counted = B' = B in C, echelon multiplications and entries; B'' has B's entries; uncounted solvers and A counted carry no selection work; uncounted solvers no lead scans; B' makes B counted's comparisons",
+   "holds": true,
+   "detail": "10,000 of 10,000 calls"
+  },
+  {
+   "check": "Stage A: every recorded summary (median, means, S(0/0.1/1), fallbacks, solved) equals a recompute from the per-call arrays",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "Stage A: lead-scan reads identical for A counted, B counted, B' and B'' on every call",
+   "holds": true,
+   "detail": "10000 of 10000"
+  },
+  {
+   "check": "B counted's initial pass reads rows x cols of the chain echelon: equal to the call's Macaulay entries on every call without a fallback; the calls where they differ are exactly the fallbacks (whose entries are the fallback matrix's, doubled); every value is a multiple of cols = 448",
+   "holds": true,
+   "detail": "9934 equal, 66 differ (fallbacks recorded 66: 4 with entries 2x the initial pass, 62 with a larger fallback matrix); values {176064: 9999, 177408: 1}"
+  },
+  {
+   "check": "carry rule of §9.35: B'' was carried end to end only if its Stage A per-call S at 0.1 GAE is below A's on every curve",
+   "holds": true,
+   "detail": "p101s1 1.0462, p101s2 1.0466, p149s1 1.0474, p149s2 1.0467, p197s1 1.0476, p197s2 1.0470, p269s1 1.0476, p269s2 1.0478, p397s1 1.0479, p397s2 1.0483"
+  },
+  {
+   "check": "matched rho: walk (iii) of E27 (stage_w.json, <±psi> fold, batched arithmetic, 16 walks per curve) recomputed as the mean of fp_muls - verify_fp_muls; all walks correct, one logarithm per curve; equal to E27's summary rho_e27 and walk_steps on all 20 rows",
+   "holds": true,
+   "detail": "10 curves"
+  },
+  {
+   "check": "30 end-to-end records: two arms each (A, B), the solver tag, fp4_product karatsuba, p and seed as named",
+   "holds": true,
+   "detail": "20 rows"
+  },
+  {
+   "check": "end to end: pivot_selection sums to pivot_selection_ops in every row",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "scalars: in all 60 arm records the index calculus solved, its logarithm checked (folded.correct) and equal to walk (iii)'s logarithm; all 48 pipeline walks per arm correct with that logarithm; no check or re-add failures",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "B' records equal B counted's on every leaf apart from the solver tag and the selection fields (pivot_selection, pivot_selection_ops), wall-clock aside",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "B'' records equal B counted's apart from the solver tag, the selection fields, solve_muls, total_muls, ratio and call.{mean,median,min,max,p10,p90} (what derives from the solve), and total_muls - solve_muls is the same in every arm",
+   "holds": true,
+   "detail": "differing paths: {\"$[*].call.max\", \"$[*].call.mean\", \"$[*].call.median\", \"$[*].call.min\", \"$[*].call.p10\", \"$[*].call.p90\", \"$[*].pivot_selection[*]\", \"$[*].pivot_selection_ops\", \"$[*].ratio\", \"$[*].solve_muls\", \"$[*].solver\", \"$[*].total_muls\"}"
+  },
+  {
+   "check": "end to end, lead-scan reads equal across B, B', B'' in every arm record",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "B counted reproduces every non-product field of E31 B's records: each differing leaf also differs between E31 A (schoolbook) and E27 A (Karatsuba), or is the solver tag; keys only in E33 are keys that E27's records also carry and E31's lack (fp4_product, ic_fp_inversions, folded.recovered and the walks' recovered, verify_fp_muls, verify_group_ops, visit_digest) or the E33 fields",
+   "holds": true,
+   "detail": "8200 leaves compared, 5900 identical, 2280 product-dependent differences; other differing paths {\"$[*].solver\"}; first violations []; keys only in E33 {\"$[*].folded.recovered\", \"$[*].fp4_product\", \"$[*].ic_fp_inversions\", \"$[*].lead_scan_reads\", \"$[*].pivot_selection\", \"$[*].pivot_selection_ops\", \"$[*].rho[*].recovered\", \"$[*].rho[*].verify_fp_muls\", \"$[*].rho[*].verify_group_ops\", \"$[*].rho[*].visit_digest\"}"
+  },
+  {
+   "check": "B counted against E27 A (same arithmetic, other pivot rule): only solver identity and cost fields differ (solver, solve_muls, total_muls, ratio, solver_fallbacks, call statistics); relations, logs, decompositions, residuals and walks are equal",
+   "holds": true,
+   "detail": "differing generic paths {\"$[*].call.max\", \"$[*].call.mean\", \"$[*].call.median\", \"$[*].call.min\", \"$[*].call.p10\", \"$[*].call.p90\", \"$[*].ratio\", \"$[*].solve_muls\", \"$[*].solver\", \"$[*].total_muls\"}"
+  },
+  {
+   "check": "macaulay_entries equal across E27 A, E31 B, B, B', B'' per arm record",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "check": "the best row is p = 397 seed 1 arm B for both B'' and A",
+   "holds": true,
+   "detail": "B'': p=397 seed 1 arm B; A: p=397 seed 1 arm B"
+  },
+  {
+   "check": "no variant is ranked against A or E25 across the band (the order flips inside the band on every pair)",
+   "holds": true,
+   "detail": "false"
+  },
+  {
+   "check": "identity_existing_solvers.json: its canonical hash of E27's stored p = 101 seed 2 record (jq -S -c, wall-clock keys dropped) is recomputed by the validator's own canonicaliser and equals the old and new chain --karatsuba hashes, so both builds reproduced E27's stored record",
+   "holds": true,
+   "detail": "add9562606ed7919b29b9f203c25479a3c92f3291c3e49c7e1ec049ddea74959; four configurations old = new: true"
+  },
+  {
+   "check": "identity_existing_solvers.json: 1,206-1,214 leaves per configuration as stated (macaulay, chain, chain-sparsest, chain --karatsuba)",
+   "holds": true,
+   "detail": "[1206, 1210, 1210, 1214]"
+  }
+ ],
+ "check_failures": [],
+ "verdicts_recomputed": [
+  {
+   "id": "G2.124",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "Stage A identity true/true; end-to-end rules B' true, B'' true, E31 B true, outputs vs E27 A true; producer's checks.log true and identity_existing_solvers.json true; validator's own controls true and identity replay true; unit tests not executed (disclosed by the producer)"
+  },
+  {
+   "id": "G2.125",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "pooled mean total 1053461.8; comparisons 0.3511 %; recount 873698.7 > initial 176064.1"
+  },
+  {
+   "id": "G2.126",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "B'/B per curve 0.2794-0.2824, pooled 0.2811"
+  },
+  {
+   "id": "G2.127",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "B'' per curve 12696.4-12803.9 (pooled 12756.3); C median B''/B 1.2055-1.2216"
+  },
+  {
+   "id": "G2.128",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "unresolved (0 GAE: B ahead on 20, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 20, tied on 0; 1 GAE: B ahead on 0, behind on 20, tied on 0)"
+  },
+  {
+   "id": "G2.129",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "unresolved (0 GAE: B ahead on 20, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 20, tied on 0; 1 GAE: B ahead on 0, behind on 20, tied on 0)"
+  },
+  {
+   "id": "G2.130",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "unresolved (0 GAE: B' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 20, tied on 0; 1 GAE: B' ahead on 0, behind on 20, tied on 0); unresolved (0 GAE: B' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 20, tied on 0; 1 GAE: B' ahead on 0, behind on 20, tied on 0)"
+  },
+  {
+   "id": "G2.131",
+   "claimed": "falsified",
+   "recomputed": "falsified",
+   "agrees": true,
+   "detail": "against A as registered: true (unresolved (0 GAE: B'' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 20, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 20, tied on 0)); against E25 ahead at every weight: false (unresolved (0 GAE: B'' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 20, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 20, tied on 0))"
+  },
+  {
+   "id": "G2.132",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "S_B/rho at 0 GAE 3.4462e3-2.1943e5; rho ahead of every row of B, B', B'' at every weight: true"
+  },
+  {
+   "id": "G2.133",
+   "claimed": "holds",
+   "recomputed": "holds",
+   "agrees": true,
+   "detail": "lead scans identical on 10000/10000 calls; Stage A orders unchanged with lead scans priced: true; end-to-end orders unchanged (A and E25 priced with X's lead scans): true"
+  }
+ ],
+ "verdict_disagreements": [],
+ "first_added": [
+  {
+   "path": "experiments/37_solver_b_pivot_count/stage_a.json",
+   "first_added": "8d8155d8b15513b6fa8ee9ebae98c4ad152bcf8e 1793553830"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/identity_existing_solvers.json",
+   "first_added": "8d8155d8b15513b6fa8ee9ebae98c4ad152bcf8e 1793553830"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/checks.log",
+   "first_added": "c689d19821d97949e13c4294bd44d5175c0bd555 1793558293"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p101s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p101s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p149s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p197s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p197s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p269s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p269s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p397s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-counted_karatsuba_p397s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p101s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p149s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p197s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p197s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p269s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p269s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p397s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-inc_karatsuba_p397s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p101s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p149s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p197s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p197s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p269s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p269s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p397s1.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  },
+  {
+   "path": "experiments/37_solver_b_pivot_count/e2e_chain-sparsest-est_karatsuba_p397s2.json",
+   "first_added": "4852cd4beceb23aa4643b669fd7877bd238ca3c9 1793564180"
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.37 as committed in 4852cd4bec: 14 printed figures",
+   "recomputed": "B' count updates printed 2.92-2.98e5, records 288,884.5-294,201.3 (2.89-2.94e5; the producer's stage_a.log agrees with the records); truncated means: B comparisons min 3,680 (3,680.79), B' and B'' initial 505-506 (505.85-506.74), B'' comparisons min 4,069 (4,069.53), B'' total max 12,803 (12,803.90), C median B''/B max 1.221 (1.22156); double rounding: S_A/S_B at 1 GAE max 0.153 (0.152475), S_E25/S_B' at 0.1 GAE min 0.679 (0.678485), S_E25/S_B'' at 1 GAE min 0.981 (0.980463), and in the prose S_A/S_B'' at 1 GAE 0.947-0.948 (0.946478-0.947987)",
+   "disposition": "reported to the producer during this validation; corrected in place by erratum commits 2e90c88792 (13 figures) and 61c4dfecc8 (the fourteenth), each with an Erratum paragraph in §9.37 quoting the raw values. Every headline here is checked against the corrected text; against the text of 4852cd4bec the report would have failed on these 14 figures",
+   "effect": "none on any verdict or rank: G2.124-G2.130, G2.132, G2.133 hold, G2.131 is falsified against E25 at 1 GAE, no variant is ranked against A or E25"
+  },
+  {
+   "id": "E2",
+   "claim": "G2.124 as registered (§9.35): 'B counted and B' choose B's pivot in every column (equal digests)'; §9.37: 'B' chose B's pivot in every column of every call (equal digests)'; stage_a.json digest_equal_b",
+   "recomputed": "digest_equal_b[0] compares B counted's digest with itself (nonzero only) and digest_equal_b[1] compares B' with B counted: the uncounted solver B emits no digest. B' = B counted holds on every call by digest; B counted = B rests on equal C, echelon multiplications and phase counts on all 10,000 calls and on reading both routines (same key, same order, same recount domain); the validator's control shows one second-best pivot changes the phase counts on 57 of 64 calls, so the phase-count proxy is strong but not a proof per call",
+   "effect": "none on any number (the counted work is B counted's own, and §9.37's 'B' denotes B as built, counted); the registered digest comparison of B counted against the uncounted B was not available as such, and is replaced here by the code reading, the phase counts and the proxy's measured power"
+  },
+  {
+   "id": "E3",
+   "claim": "§9.35 registered three negative controls for G2.124 (second-best pivot, count off by one, E31's perturbed coefficient); §9.37 reports the first two",
+   "recomputed": "the validator ran all three on its own calls: second-best pivot 64/64 detected by the digest (outputs unchanged 64/64), off by one 64/64 flagged, perturbed coefficient 32/32 non-empty sets changed (B counted and B'')",
+   "effect": "none: the third control holds; its absence from §9.37 is an omission of reporting, not a failed control"
+  }
+ ],
+ "stage_a": {
+  "calls": 10000,
+  "b_initial_values": {
+   "176064": 9999,
+   "177408": 1
+  },
+  "b_initial_equal_entries_calls": 9934,
+  "b_initial_half_entries_calls_fallback": 4,
+  "b_counted_digest_note": "digest_equal_b[0] compares B counted's digest with itself (nonzero only): the uncounted B emits no digest, so 'B counted chooses B's pivots' rests on equal C, echelon multiplications and phase counts on every call, on the code (same key (count, index) over the sorted bucket, same recount domain row[lead..]: checked by reading echelon_by_lead_with and echelon_by_lead_counted at c443138920) and on the unexecuted unit test; the validator's own control measured how often one second-best pivot changes the phase counts",
+  "b2_digest_equal_b_calls": 0,
+  "pooled_selection_mean": [
+   1053461.7694,
+   296146.9231,
+   12756.3037
+  ],
+  "per_curve": [
+   {
+    "p": 101,
+    "seed": 1,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     505.895,
+     505.895
+    ],
+    "sel_compare": [
+     3681.352,
+     3681.352,
+     4069.613
+    ],
+    "sel_update": [
+     869486.735,
+     289120.579,
+     8121.216
+    ],
+    "sel_total": [
+     1049232.087,
+     293307.826,
+     12696.724
+    ],
+    "C_median_by_solver": [
+     1617013,
+     600981,
+     600981,
+     304257,
+     304257,
+     304257,
+     371483
+    ],
+    "C_midpoint_median_by_solver": [
+     1617003.5,
+     600978,
+     600978,
+     304251.5,
+     304251.5,
+     304251.5,
+     371482.5
+    ],
+    "C_mean_by_solver": [
+     1635538.662,
+     650767.829,
+     650767.829,
+     354501.768,
+     354501.768,
+     354501.768,
+     421163.427
+    ],
+    "lead_scan_mean": 79118.057,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1635538.662,
+      3358703.7756000473,
+      18867189.798
+     ],
+     [
+      650767.829,
+      2409771.1057999902,
+      18240800.597
+     ],
+     [
+      650767.829,
+      2409771.1057999902,
+      18240800.597
+     ],
+     [
+      354501.768,
+      2113505.0447999667,
+      17944534.536
+     ],
+     [
+      354501.768,
+      12291056.288699996,
+      119720046.975
+     ],
+     [
+      354501.768,
+      4958590.957000001,
+      46395393.658
+     ],
+     [
+      421163.427,
+      2303324.9265999985,
+      19242778.423
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1635538.662,
+      4126148.9284999454,
+      26541641.327
+     ],
+     [
+      650767.829,
+      3177216.258699952,
+      25915252.126
+     ],
+     [
+      650767.829,
+      3177216.258699952,
+      25915252.126
+     ],
+     [
+      354501.768,
+      2880950.197699955,
+      25618986.065
+     ],
+     [
+      354501.768,
+      13058501.441600006,
+      127394498.504
+     ],
+     [
+      354501.768,
+      5726036.109900003,
+      54069845.187
+     ],
+     [
+      421163.427,
+      3070770.079500003,
+      26917229.952
+     ]
+    ]
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "sel_init_B_Bp_Bpp": [
+     176065.344,
+     505.852,
+     505.852
+    ],
+    "sel_compare": [
+     3680.792,
+     3680.792,
+     4069.529
+    ],
+    "sel_update": [
+     869301.922,
+     288884.528,
+     8121.042
+    ],
+    "sel_total": [
+     1049048.058,
+     293071.172,
+     12696.423
+    ],
+    "C_median_by_solver": [
+     1616974,
+     600890,
+     600890,
+     304103,
+     304103,
+     304103,
+     371479
+    ],
+    "C_midpoint_median_by_solver": [
+     1616972.5,
+     600881.5,
+     600881.5,
+     304100.5,
+     304100.5,
+     304100.5,
+     371470
+    ],
+    "C_mean_by_solver": [
+     1632675.319,
+     642782.136,
+     642782.136,
+     346338.286,
+     346338.286,
+     346338.286,
+     413098.611
+    ],
+    "lead_scan_mean": 79118.757,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1632675.319,
+      3353063.594200047,
+      18836558.071
+     ],
+     [
+      642782.136,
+      2394510.8783999896,
+      18160069.56
+     ],
+     [
+      642782.136,
+      2394510.8783999896,
+      18160069.56
+     ],
+     [
+      346338.286,
+      2098067.0283999667,
+      17863625.71
+     ],
+     [
+      346338.286,
+      12273833.190999998,
+      119621287.336
+     ],
+     [
+      346338.286,
+      4940857.396800006,
+      46291529.394
+     ],
+     [
+      413098.611,
+      2287982.656499999,
+      19161939.066
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1632675.319,
+      4120515.5370999426,
+      26511077.5
+     ],
+     [
+      642782.136,
+      3161962.8212999487,
+      25834588.989
+     ],
+     [
+      642782.136,
+      3161962.8212999487,
+      25834588.989
+     ],
+     [
+      346338.286,
+      2865518.9712999514,
+      25538145.139
+     ],
+     [
+      346338.286,
+      13041285.133899972,
+      127295806.765
+     ],
+     [
+      346338.286,
+      5708309.339699998,
+      53966048.823
+     ],
+     [
+      413098.611,
+      3055434.599400005,
+      26836458.495
+     ]
+    ]
+   },
+   {
+    "p": 149,
+    "seed": 1,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.23,
+     506.23
+    ],
+    "sel_compare": [
+     3693.604,
+     3693.604,
+     4083.185
+    ],
+    "sel_update": [
+     872469.517,
+     291091.266,
+     8148.37
+    ],
+    "sel_total": [
+     1052227.121,
+     295291.1,
+     12737.785
+    ],
+    "C_median_by_solver": [
+     1632660,
+     612064,
+     612064,
+     313237,
+     313237,
+     313237,
+     381297
+    ],
+    "C_midpoint_median_by_solver": [
+     1632658,
+     612058,
+     612058,
+     313233.5,
+     313233.5,
+     313233.5,
+     381287
+    ],
+    "C_mean_by_solver": [
+     1640795.193,
+     640025.385,
+     640025.385,
+     341671.534,
+     341671.534,
+     341671.534,
+     409025.146
+    ],
+    "lead_scan_mean": 79115.229,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1640795.193,
+      3356985.6186000467,
+      18802699.449
+     ],
+     [
+      640025.385,
+      2376540.1817999873,
+      18005173.353
+     ],
+     [
+      640025.385,
+      2376540.1817999873,
+      18005173.353
+     ],
+     [
+      341671.534,
+      2078186.3307999666,
+      17706819.502
+     ],
+     [
+      341671.534,
+      12284789.404500017,
+      119772850.239
+     ],
+     [
+      341671.534,
+      4942510.000800003,
+      46350056.202
+     ],
+     [
+      409025.146,
+      2269096.4572999994,
+      19009738.259
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1640795.193,
+      4124403.3398999395,
+      26476876.662
+     ],
+     [
+      640025.385,
+      3143957.903099947,
+      25679350.566
+     ],
+     [
+      640025.385,
+      3143957.903099947,
+      25679350.566
+     ],
+     [
+      341671.534,
+      2845604.0520999497,
+      25380996.715
+     ],
+     [
+      341671.534,
+      13052207.12579999,
+      127447027.452
+     ],
+     [
+      341671.534,
+      5709927.722099992,
+      54024233.415
+     ],
+     [
+      409025.146,
+      3036514.178599999,
+      26683915.472
+     ]
+    ]
+   },
+   {
+    "p": 149,
+    "seed": 2,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.191,
+     506.191
+    ],
+    "sel_compare": [
+     3693.066,
+     3693.066,
+     4082.774
+    ],
+    "sel_update": [
+     872325.662,
+     291030.61,
+     8147.548
+    ],
+    "sel_total": [
+     1052082.728,
+     295229.867,
+     12736.513
+    ],
+    "C_median_by_solver": [
+     1633472,
+     612068,
+     612068,
+     313320,
+     313320,
+     313320,
+     381118
+    ],
+    "C_midpoint_median_by_solver": [
+     1633459.5,
+     612060.5,
+     612060.5,
+     313317.5,
+     313317.5,
+     313317.5,
+     381112.5
+    ],
+    "C_mean_by_solver": [
+     1653825.435,
+     658073.337,
+     658073.337,
+     359603.357,
+     359603.357,
+     359603.357,
+     426916.043
+    ],
+    "lead_scan_mean": 79115.369,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1653825.435,
+      3375595.6110000485,
+      18871527.195
+     ],
+     [
+      658073.337,
+      2410871.096999991,
+      18186050.937
+     ],
+     [
+      658073.337,
+      2410871.096999991,
+      18186050.937
+     ],
+     [
+      359603.357,
+      2112401.1169999666,
+      17887580.957
+     ],
+     [
+      359603.357,
+      12317603.578600008,
+      119939605.573
+     ],
+     [
+      359603.357,
+      4976130.8269000035,
+      46524878.056
+     ],
+     [
+      426916.043,
+      2303257.9790999996,
+      19190335.404
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1653825.435,
+      4143014.6902999408,
+      26545717.988
+     ],
+     [
+      658073.337,
+      3178290.1762999464,
+      25860241.73
+     ],
+     [
+      658073.337,
+      3178290.1762999464,
+      25860241.73
+     ],
+     [
+      359603.357,
+      2879820.1962999497,
+      25561771.75
+     ],
+     [
+      359603.357,
+      13085022.657899993,
+      127613796.366
+     ],
+     [
+      359603.357,
+      5743549.906199999,
+      54199068.849
+     ],
+     [
+      426916.043,
+      3070677.058399995,
+      26864526.197
+     ]
+    ]
+   },
+   {
+    "p": 197,
+    "seed": 1,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.429,
+     506.429
+    ],
+    "sel_compare": [
+     3699.701,
+     3699.701,
+     4090.193
+    ],
+    "sel_update": [
+     873892.915,
+     292193.409,
+     8162.386
+    ],
+    "sel_total": [
+     1053656.616,
+     296399.539,
+     12759.008
+    ],
+    "C_median_by_solver": [
+     1645617,
+     620058,
+     620058,
+     320425,
+     320425,
+     320425,
+     388563
+    ],
+    "C_midpoint_median_by_solver": [
+     1645603,
+     620055,
+     620055,
+     320420,
+     320420,
+     320420,
+     388557.5
+    ],
+    "C_mean_by_solver": [
+     1662210.597,
+     643710.91,
+     643710.91,
+     344325.203,
+     344325.203,
+     344325.203,
+     412033.362
+    ],
+    "lead_scan_mean": 79114.329,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1662210.597,
+      3377006.0850000484,
+      18810165.477
+     ],
+     [
+      643710.91,
+      2374020.189999989,
+      17946803.71
+     ],
+     [
+      643710.91,
+      2374020.189999989,
+      17946803.71
+     ],
+     [
+      344325.203,
+      2074634.482999967,
+      17647418.003
+     ],
+     [
+      344325.203,
+      12295103.6582,
+      119852109.755
+     ],
+     [
+      344325.203,
+      4949710.0112999985,
+      46398173.286
+     ],
+     [
+      412033.362,
+      2266105.019600001,
+      18952749.938
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1662210.597,
+      4144415.0762999374,
+      26484255.39
+     ],
+     [
+      643710.91,
+      3141429.181299945,
+      25620893.623
+     ],
+     [
+      643710.91,
+      3141429.181299945,
+      25620893.623
+     ],
+     [
+      344325.203,
+      2842043.474299948,
+      25321507.916
+     ],
+     [
+      344325.203,
+      13062512.649499983,
+      127526199.668
+     ],
+     [
+      344325.203,
+      5717119.002600004,
+      54072263.199
+     ],
+     [
+      412033.362,
+      3033514.010900004,
+      26626839.851
+     ]
+    ]
+   },
+   {
+    "p": 197,
+    "seed": 2,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.419,
+     506.419
+    ],
+    "sel_compare": [
+     3700.22,
+     3700.22,
+     4091.144
+    ],
+    "sel_update": [
+     874072.641,
+     292235.972,
+     8164.288
+    ],
+    "sel_total": [
+     1053836.861,
+     296442.611,
+     12761.851
+    ],
+    "C_median_by_solver": [
+     1646416,
+     620152,
+     620152,
+     320741,
+     320741,
+     320741,
+     388836
+    ],
+    "C_midpoint_median_by_solver": [
+     1646406.5,
+     620150,
+     620150,
+     320741,
+     320741,
+     320741,
+     388826.5
+    ],
+    "C_mean_by_solver": [
+     1674483.624,
+     658258.17,
+     658258.17,
+     358951.477,
+     358951.477,
+     358951.477,
+     426713.704
+    ],
+    "lead_scan_mean": 79115.004,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1674483.624,
+      3393463.9248000486,
+      18864286.632
+     ],
+     [
+      658258.17,
+      2402060.5379999904,
+      18096281.85
+     ],
+     [
+      658258.17,
+      2402060.5379999904,
+      18096281.85
+     ],
+     [
+      358951.477,
+      2102753.8449999667,
+      17796975.157
+     ],
+     [
+      358951.477,
+      12324971.396699985,
+      120019150.674
+     ],
+     [
+      358951.477,
+      4978247.171700004,
+      46551908.424
+     ],
+     [
+      426713.704,
+      2294306.026700002,
+      19102636.931
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1674483.624,
+      4160879.4635999375,
+      26538442.02
+     ],
+     [
+      658258.17,
+      3169476.0767999454,
+      25770437.238
+     ],
+     [
+      658258.17,
+      3169476.0767999454,
+      25770437.238
+     ],
+     [
+      358951.477,
+      2870169.3837999497,
+      25471130.545
+     ],
+     [
+      358951.477,
+      13092386.9355,
+      127693306.062
+     ],
+     [
+      358951.477,
+      5745662.710499992,
+      54226063.812
+     ],
+     [
+      426713.704,
+      3061721.5654999996,
+      26776792.319
+     ]
+    ]
+   },
+   {
+    "p": 269,
+    "seed": 1,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.579,
+     506.579
+    ],
+    "sel_compare": [
+     3707.292,
+     3707.292,
+     4098.61
+    ],
+    "sel_update": [
+     875679.868,
+     293254.258,
+     8179.22
+    ],
+    "sel_total": [
+     1055451.16,
+     297468.129,
+     12784.409
+    ],
+    "C_median_by_solver": [
+     1650218,
+     623969,
+     623969,
+     323602,
+     323602,
+     323602,
+     391883
+    ],
+    "C_midpoint_median_by_solver": [
+     1650182.5,
+     623965.5,
+     623965.5,
+     323598.5,
+     323598.5,
+     323598.5,
+     391881.5
+    ],
+    "C_mean_by_solver": [
+     1660631.055,
+     647639.638,
+     647639.638,
+     347366.338,
+     347366.338,
+     347366.338,
+     415504.976
+    ],
+    "lead_scan_mean": 79114.308,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1660631.055,
+      3375426.543000048,
+      18808585.935
+     ],
+     [
+      647639.638,
+      2377948.9179999884,
+      17950732.438
+     ],
+     [
+      647639.638,
+      2377948.9179999884,
+      17950732.438
+     ],
+     [
+      347366.338,
+      2077675.617999967,
+      17650459.138
+     ],
+     [
+      347366.338,
+      12315551.870000001,
+      120029221.658
+     ],
+     [
+      347366.338,
+      4963116.469299999,
+      46504867.651
+     ],
+     [
+      415504.976,
+      2269823.0233000014,
+      18958685.449
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1660631.055,
+      4142835.330599936,
+      26482673.811
+     ],
+     [
+      647639.638,
+      3145357.7055999446,
+      25624820.314
+     ],
+     [
+      647639.638,
+      3145357.7055999446,
+      25624820.314
+     ],
+     [
+      347366.338,
+      2845084.405599949,
+      25324547.014
+     ],
+     [
+      347366.338,
+      13082960.657599991,
+      127703309.534
+     ],
+     [
+      347366.338,
+      5730525.256900007,
+      54178955.527
+     ],
+     [
+      415504.976,
+      3037231.810899995,
+      26632773.325
+     ]
+    ]
+   },
+   {
+    "p": 269,
+    "seed": 2,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.608,
+     506.608
+    ],
+    "sel_compare": [
+     3707.241,
+     3707.241,
+     4098.623
+    ],
+    "sel_update": [
+     875716.382,
+     293329.719,
+     8179.246
+    ],
+    "sel_total": [
+     1055487.623,
+     297543.568,
+     12784.477
+    ],
+    "C_median_by_solver": [
+     1651643,
+     624544,
+     624544,
+     324142,
+     324142,
+     324142,
+     392462
+    ],
+    "C_midpoint_median_by_solver": [
+     1651633,
+     624539.5,
+     624539.5,
+     324140.5,
+     324140.5,
+     324140.5,
+     392455
+    ],
+    "C_mean_by_solver": [
+     1663793.889,
+     643043.811,
+     643043.811,
+     342809.558,
+     342809.558,
+     342809.558,
+     410890.027
+    ],
+    "lead_scan_mean": 79115.153,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1663793.889,
+      3377194.4394000485,
+      18797799.393
+     ],
+     [
+      643043.811,
+      2368855.3949999874,
+      17901159.651
+     ],
+     [
+      643043.811,
+      2368855.3949999874,
+      17901159.651
+     ],
+     [
+      342809.558,
+      2068621.1419999672,
+      17600925.398
+     ],
+     [
+      342809.558,
+      12306851.085099999,
+      119983224.829
+     ],
+     [
+      342809.558,
+      4954793.751600001,
+      46462651.494
+     ],
+     [
+      410890.027,
+      2260711.0379,
+      18909100.136
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1663793.889,
+      4144611.4234999386,
+      26471969.234
+     ],
+     [
+      643043.811,
+      3136272.3790999455,
+      25575329.492
+     ],
+     [
+      643043.811,
+      3136272.3790999455,
+      25575329.492
+     ],
+     [
+      342809.558,
+      2836038.1260999492,
+      25275095.239
+     ],
+     [
+      342809.558,
+      13074268.069200005,
+      127657394.67
+     ],
+     [
+      342809.558,
+      5722210.735700001,
+      54136821.335
+     ],
+     [
+      410890.027,
+      3028128.021999999,
+      26583269.977
+     ]
+    ]
+   },
+   {
+    "p": 397,
+    "seed": 1,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.741,
+     506.741
+    ],
+    "sel_compare": [
+     3713.33,
+     3713.33,
+     4105.054
+    ],
+    "sel_update": [
+     877105.37,
+     294201.34,
+     8192.108
+    ],
+    "sel_total": [
+     1056882.7,
+     298421.411,
+     12803.903
+    ],
+    "C_median_by_solver": [
+     1663086,
+     633960,
+     633960,
+     333134,
+     333134,
+     333134,
+     401778
+    ],
+    "C_midpoint_median_by_solver": [
+     1663085,
+     633959,
+     633959,
+     333129,
+     333129,
+     333129,
+     401772
+    ],
+    "C_mean_by_solver": [
+     1674046.124,
+     648277.612,
+     648277.612,
+     347318.185,
+     347318.185,
+     347318.185,
+     415672.38
+    ],
+    "lead_scan_mean": 79114.674,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1674046.124,
+      3386051.7368000485,
+      18794102.252
+     ],
+     [
+      648277.612,
+      2369591.499999986,
+      17861416.492
+     ],
+     [
+      648277.612,
+      2369591.499999986,
+      17861416.492
+     ],
+     [
+      347318.185,
+      2068632.0729999666,
+      17560457.065
+     ],
+     [
+      347318.185,
+      12320394.263,
+      120078078.965
+     ],
+     [
+      347318.185,
+      4963319.759699995,
+      46507333.932
+     ],
+     [
+      415672.38,
+      2261184.1271000016,
+      18870789.851
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1674046.124,
+      4153464.074599936,
+      26468225.63
+     ],
+     [
+      648277.612,
+      3137003.837799945,
+      25535539.87
+     ],
+     [
+      648277.612,
+      3137003.837799945,
+      25535539.87
+     ],
+     [
+      347318.185,
+      2836044.4107999476,
+      25234580.443
+     ],
+     [
+      347318.185,
+      13087806.60080001,
+      127752202.343
+     ],
+     [
+      347318.185,
+      5730732.097499999,
+      54181457.31
+     ],
+     [
+      415672.38,
+      3028596.464899999,
+      26544913.229
+     ]
+    ]
+   },
+   {
+    "p": 397,
+    "seed": 2,
+    "sel_init_B_Bp_Bpp": [
+     176064,
+     506.708,
+     506.708
+    ],
+    "sel_compare": [
+     3712.652,
+     3712.652,
+     4104.412
+    ],
+    "sel_update": [
+     876936.088,
+     294074.648,
+     8190.824
+    ],
+    "sel_total": [
+     1056712.74,
+     298294.008,
+     12801.944
+    ],
+    "C_median_by_solver": [
+     1661986,
+     633419,
+     633419,
+     332624,
+     332624,
+     332624,
+     400978
+    ],
+    "C_midpoint_median_by_solver": [
+     1661959.5,
+     633417.5,
+     633417.5,
+     332623.5,
+     332623.5,
+     332623.5,
+     400968
+    ],
+    "C_mean_by_solver": [
+     1657157.382,
+     638537.401,
+     638537.401,
+     337598.478,
+     337598.478,
+     337598.478,
+     405987.913
+    ],
+    "lead_scan_mean": 79114.495,
+    "S_mean_by_solver_0_01_1": [
+     [
+      1657157.382,
+      3366373.119600047,
+      18749314.758
+     ],
+     [
+      638537.401,
+      2350855.896999986,
+      17761722.361
+     ],
+     [
+      638537.401,
+      2350855.896999986,
+      17761722.361
+     ],
+     [
+      337598.478,
+      2049916.973999967,
+      17460783.438
+     ],
+     [
+      337598.478,
+      12300030.552000001,
+      119961919.218
+     ],
+     [
+      337598.478,
+      4943368.851600009,
+      46395302.214
+     ],
+     [
+      405987.913,
+      2242485.265799999,
+      18770961.441
+     ]
+    ],
+    "S_mean_with_lead_by_solver_0_01_1": [
+     [
+      1657157.382,
+      4133783.7210999364,
+      26423420.773
+     ],
+     [
+      638537.401,
+      3118266.4984999457,
+      25435828.376
+     ],
+     [
+      638537.401,
+      3118266.4984999457,
+      25435828.376
+     ],
+     [
+      337598.478,
+      2817327.5754999495,
+      25134889.453
+     ],
+     [
+      337598.478,
+      13067441.153500002,
+      127636025.233
+     ],
+     [
+      337598.478,
+      5710779.453099991,
+      54069408.229
+     ],
+     [
+      405987.913,
+      3009895.867300002,
+      26445067.456
+     ]
+    ]
+   }
+  ],
+  "orders": [
+   {
+    "variant": "B",
+    "against": "A",
+    "without_lead_scans": {
+     "left": "B",
+     "right": "A",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B ahead on 10, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 10, tied on 0; 1 GAE: B ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    },
+    "with_lead_scans": {
+     "left": "B",
+     "right": "A",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B ahead on 10, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 10, tied on 0; 1 GAE: B ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    }
+   },
+   {
+    "variant": "B",
+    "against": "E25 (existing)",
+    "without_lead_scans": {
+     "left": "B",
+     "right": "E25 (existing)",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B ahead on 10, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 10, tied on 0; 1 GAE: B ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    },
+    "with_lead_scans": {
+     "left": "B",
+     "right": "E25 (existing)",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B ahead on 10, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 10, tied on 0; 1 GAE: B ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    }
+   },
+   {
+    "variant": "B'",
+    "against": "A",
+    "without_lead_scans": {
+     "left": "B'",
+     "right": "A",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 10, tied on 0; 1 GAE: B' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    },
+    "with_lead_scans": {
+     "left": "B'",
+     "right": "A",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 10, tied on 0; 1 GAE: B' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    }
+   },
+   {
+    "variant": "B'",
+    "against": "E25 (existing)",
+    "without_lead_scans": {
+     "left": "B'",
+     "right": "E25 (existing)",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 10, tied on 0; 1 GAE: B' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    },
+    "with_lead_scans": {
+     "left": "B'",
+     "right": "E25 (existing)",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 10, tied on 0; 1 GAE: B' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    }
+   },
+   {
+    "variant": "B''",
+    "against": "A",
+    "without_lead_scans": {
+     "left": "B''",
+     "right": "A",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B'' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 10, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    },
+    "with_lead_scans": {
+     "left": "B''",
+     "right": "A",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B'' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 10, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    }
+   },
+   {
+    "variant": "B''",
+    "against": "E25 (existing)",
+    "without_lead_scans": {
+     "left": "B''",
+     "right": "E25 (existing)",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B'' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 10, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    },
+    "with_lead_scans": {
+     "left": "B''",
+     "right": "E25 (existing)",
+     "rows": 10,
+     "per_weight": [
+      {
+       "gae": "0",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "0.1",
+       "left_cheaper": 10,
+       "left_dearer": 0,
+       "tied": 0
+      },
+      {
+       "gae": "1",
+       "left_cheaper": 0,
+       "left_dearer": 10,
+       "tied": 0
+      }
+     ],
+     "rank": "unresolved (0 GAE: B'' ahead on 10, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 10, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 10, tied on 0)",
+     "order_holds_across_band": false
+    }
+   }
+  ]
+ },
+ "end_to_end": {
+  "rows": 20,
+  "ratios": [
+   {
+    "variant": "B",
+    "quantity": "S_E25/S_X",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 4.529347808397569,
+      "max": 4.755341076027732,
+      "median": 4.677257716006803
+     },
+     {
+      "gae": "0.1",
+      "min": 0.2739198704844731,
+      "max": 0.27550715571905116,
+      "median": 0.2746822496514223
+     },
+     {
+      "gae": "1",
+      "min": 0.15651010895125178,
+      "max": 0.15772000271513387,
+      "median": 0.15702304974018405
+     }
+    ]
+   },
+   {
+    "variant": "B",
+    "quantity": "S_A/S_X",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 1.8221120738675625,
+      "max": 1.8630576411494257,
+      "median": 1.84649450627287
+     },
+     {
+      "gae": "0.1",
+      "min": 0.19254066918847784,
+      "max": 0.19653360683649926,
+      "median": 0.19397864704986
+     },
+     {
+      "gae": "1",
+      "min": 0.14866516414945893,
+      "max": 0.15247503134501747,
+      "median": 0.15009363053620528
+     }
+    ]
+   },
+   {
+    "variant": "B",
+    "quantity": "S_X/rho",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 3446.2073838983474,
+      "max": 219434.24421614545,
+      "median": 16861.34942493198
+     },
+     {
+      "gae": "0.1",
+      "min": 110374.68074313729,
+      "max": 7171727.42850779,
+      "median": 545486.8155596639
+     },
+     {
+      "gae": "1",
+      "min": 609892.1424040343,
+      "max": 44044626.2392339,
+      "median": 3215221.395286411
+     }
+    ]
+   },
+   {
+    "variant": "B'",
+    "quantity": "S_E25/S_X",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 4.529347808397569,
+      "max": 4.755341076027732,
+      "median": 4.677257716006803
+     },
+     {
+      "gae": "0.1",
+      "min": 0.6784845848758915,
+      "max": 0.6831724017423614,
+      "median": 0.6812609888102141
+     },
+     {
+      "gae": "1",
+      "min": 0.40407853327908977,
+      "max": 0.40698656630041347,
+      "median": 0.40532153455257713
+     }
+    ]
+   },
+   {
+    "variant": "B'",
+    "quantity": "S_A/S_X",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 1.8221120738675625,
+      "max": 1.8630576411494257,
+      "median": 1.84649450627287
+     },
+     {
+      "gae": "0.1",
+      "min": 0.4777622246940062,
+      "max": 0.4868071884946983,
+      "median": 0.48104617971344277
+     },
+     {
+      "gae": "1",
+      "min": 0.38390301620152584,
+      "max": 0.3934246305817321,
+      "median": 0.38745293894907007
+     }
+    ]
+   },
+   {
+    "variant": "B'",
+    "quantity": "S_X/rho",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 3446.2073838983474,
+      "max": 219434.24421614545,
+      "median": 16861.34942493198
+     },
+     {
+      "gae": "0.1",
+      "min": 44481.57219914014,
+      "max": 2890655.3859122368,
+      "median": 219941.5911106883
+     },
+     {
+      "gae": "1",
+      "min": 236178.70044648158,
+      "max": 17058019.196370956,
+      "median": 1245572.4569992973
+     }
+    ]
+   },
+   {
+    "variant": "B''",
+    "quantity": "S_E25/S_X",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 3.8272859385935933,
+      "max": 3.9836233449135103,
+      "median": 3.9318628264893336
+     },
+     {
+      "gae": "0.1",
+      "min": 1.4571371957595298,
+      "max": 1.4970791986487169,
+      "median": 1.4835587406132622
+     },
+     {
+      "gae": "1",
+      "min": 0.9804632400879411,
+      "max": 0.9966487077075532,
+      "median": 0.9906260900873258
+     }
+    ]
+   },
+   {
+    "variant": "B''",
+    "quantity": "S_A/S_X",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 1.5376152131086673,
+      "max": 1.5581455630968364,
+      "median": 1.5495894187448844
+     },
+     {
+      "gae": "0.1",
+      "min": 1.0461308557328493,
+      "max": 1.0478795990710252,
+      "median": 1.0472755113497811
+     },
+     {
+      "gae": "1",
+      "min": 0.9464783398803243,
+      "max": 0.947986965857213,
+      "median": 0.9470543505494565
+     }
+    ]
+   },
+   {
+    "variant": "B''",
+    "quantity": "S_X/rho",
+    "per_weight": [
+     {
+      "gae": "0",
+      "min": 4115.294328345657,
+      "max": 261482.03640208603,
+      "median": 20105.01755818558
+     },
+     {
+      "gae": "0.1",
+      "min": 20280.58844793658,
+      "max": 1331440.928531725,
+      "median": 100860.57562344882
+     },
+     {
+      "gae": "1",
+      "min": 95796.92597658971,
+      "max": 7006185.205754339,
+      "median": 508735.74412735633
+     }
+    ]
+   }
+  ],
+  "orders_across_band": [
+   {
+    "left": "B",
+    "right": "A (E27, Karatsuba)",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     }
+    ],
+    "rank": "unresolved (0 GAE: B ahead on 20, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 20, tied on 0; 1 GAE: B ahead on 0, behind on 20, tied on 0)",
+    "order_holds_across_band": false
+   },
+   {
+    "left": "B",
+    "right": "E25 (schoolbook)",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     }
+    ],
+    "rank": "unresolved (0 GAE: B ahead on 20, behind on 0, tied on 0; 0.1 GAE: B ahead on 0, behind on 20, tied on 0; 1 GAE: B ahead on 0, behind on 20, tied on 0)",
+    "order_holds_across_band": false
+   },
+   {
+    "left": "rho (walk iii)",
+    "right": "B",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     }
+    ],
+    "rank": "rho (walk iii) ahead of B on every row at every weight: ranked",
+    "order_holds_across_band": true
+   },
+   {
+    "left": "B'",
+    "right": "A (E27, Karatsuba)",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     }
+    ],
+    "rank": "unresolved (0 GAE: B' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 20, tied on 0; 1 GAE: B' ahead on 0, behind on 20, tied on 0)",
+    "order_holds_across_band": false
+   },
+   {
+    "left": "B'",
+    "right": "E25 (schoolbook)",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     }
+    ],
+    "rank": "unresolved (0 GAE: B' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B' ahead on 0, behind on 20, tied on 0; 1 GAE: B' ahead on 0, behind on 20, tied on 0)",
+    "order_holds_across_band": false
+   },
+   {
+    "left": "rho (walk iii)",
+    "right": "B'",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     }
+    ],
+    "rank": "rho (walk iii) ahead of B' on every row at every weight: ranked",
+    "order_holds_across_band": true
+   },
+   {
+    "left": "B''",
+    "right": "A (E27, Karatsuba)",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     }
+    ],
+    "rank": "unresolved (0 GAE: B'' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 20, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 20, tied on 0)",
+    "order_holds_across_band": false
+   },
+   {
+    "left": "B''",
+    "right": "E25 (schoolbook)",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 0,
+      "left_dearer": 20,
+      "tied": 0
+     }
+    ],
+    "rank": "unresolved (0 GAE: B'' ahead on 20, behind on 0, tied on 0; 0.1 GAE: B'' ahead on 20, behind on 0, tied on 0; 1 GAE: B'' ahead on 0, behind on 20, tied on 0)",
+    "order_holds_across_band": false
+   },
+   {
+    "left": "rho (walk iii)",
+    "right": "B''",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     }
+    ],
+    "rank": "rho (walk iii) ahead of B'' on every row at every weight: ranked",
+    "order_holds_across_band": true
+   },
+   {
+    "left": "rho (walk iii)",
+    "right": "A (E27)",
+    "rows": 20,
+    "per_weight": [
+     {
+      "gae": "0",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "0.1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     },
+     {
+      "gae": "1",
+      "left_cheaper": 20,
+      "left_dearer": 0,
+      "tied": 0
+     }
+    ],
+    "rank": "rho (walk iii) ahead of A (E27) on every row at every weight: ranked",
+    "order_holds_across_band": true
+   }
+  ],
+  "scalars": [
+   {
+    "p": 101,
+    "seed": 1,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 1538068,
+    "walk_iii_logarithm": 1538068,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 101,
+    "seed": 1,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 1538068,
+    "walk_iii_logarithm": 1538068,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 557533,
+    "walk_iii_logarithm": 557533,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 557533,
+    "walk_iii_logarithm": 557533,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 149,
+    "seed": 1,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 4914788,
+    "walk_iii_logarithm": 4914788,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 149,
+    "seed": 1,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 4914788,
+    "walk_iii_logarithm": 4914788,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 149,
+    "seed": 2,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 2874927,
+    "walk_iii_logarithm": 2874927,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 149,
+    "seed": 2,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 2874927,
+    "walk_iii_logarithm": 2874927,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 197,
+    "seed": 1,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 79622603,
+    "walk_iii_logarithm": 79622603,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 197,
+    "seed": 1,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 79622603,
+    "walk_iii_logarithm": 79622603,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 197,
+    "seed": 2,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 7399960,
+    "walk_iii_logarithm": 7399960,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 197,
+    "seed": 2,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 7399960,
+    "walk_iii_logarithm": 7399960,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 269,
+    "seed": 1,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 270725152,
+    "walk_iii_logarithm": 270725152,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 269,
+    "seed": 1,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 270725152,
+    "walk_iii_logarithm": 270725152,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 269,
+    "seed": 2,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 309622187,
+    "walk_iii_logarithm": 309622187,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 269,
+    "seed": 2,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 309622187,
+    "walk_iii_logarithm": 309622187,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 397,
+    "seed": 1,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 1275612762,
+    "walk_iii_logarithm": 1275612762,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 397,
+    "seed": 1,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 1275612762,
+    "walk_iii_logarithm": 1275612762,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 397,
+    "seed": 2,
+    "arm": "A",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 1421554453,
+    "walk_iii_logarithm": 1421554453,
+    "all_48_pipeline_walks_correct": true
+   },
+   {
+    "p": 397,
+    "seed": 2,
+    "arm": "B",
+    "ic_solved_correct_all_variants": true,
+    "ic_recovered": 1421554453,
+    "walk_iii_logarithm": 1421554453,
+    "all_48_pipeline_walks_correct": true
+   }
+  ],
+  "b2_vs_b_counted_differing_paths": [
+   "$[*].call.max",
+   "$[*].call.mean",
+   "$[*].call.median",
+   "$[*].call.min",
+   "$[*].call.p10",
+   "$[*].call.p90",
+   "$[*].pivot_selection[*]",
+   "$[*].pivot_selection_ops",
+   "$[*].ratio",
+   "$[*].solve_muls",
+   "$[*].solver",
+   "$[*].total_muls"
+  ],
+  "b_counted_vs_e27_a_differing_paths": [
+   "$[*].call.max",
+   "$[*].call.mean",
+   "$[*].call.median",
+   "$[*].call.min",
+   "$[*].call.p10",
+   "$[*].call.p90",
+   "$[*].ratio",
+   "$[*].solve_muls",
+   "$[*].solver",
+   "$[*].total_muls"
+  ],
+  "per_row": [
+   {
+    "p": 101,
+    "seed": 1,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      14798608704,
+      504725232146.80005,
+      4914064843132
+     ],
+     [
+      14798608704,
+      203767472378.40002,
+      1904487245448
+     ],
+     [
+      17536717487,
+      94821283390.70001,
+      790382376524
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      14926783086,
+      504853406528.80005,
+      4914193017514
+     ],
+     [
+      14926783086,
+      203895646760.40002,
+      1904615419830
+     ],
+     [
+      17664891869,
+      94949457772.70001,
+      790510550906
+     ]
+    ],
+    "S_A_0_01_1": [
+     26964723596,
+     99195470335.20001,
+     749272190988
+    ],
+    "S_E25_0_01_1": [
+     67608592257,
+     138354386637.8,
+     775066536065
+    ],
+    "rho_0_01_1": [
+     351834.8125,
+     371304.53125,
+     546532
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1049178.4369563628,
+     293225.5784421217,
+     12694.303169846258
+    ]
+   },
+   {
+    "p": 101,
+    "seed": 1,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      7558639450,
+      260145075034.00003,
+      2533422995290
+     ],
+     [
+      7558639450,
+      104939323913.70001,
+      981365484087
+     ],
+     [
+      8970748676,
+      48751484878.50001,
+      406778110701
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      7625002792,
+      260211438376.00003,
+      2533489358632
+     ],
+     [
+      7625002792,
+      105005687255.70001,
+      981431847429
+     ],
+     [
+      9037112018,
+      48817848220.50001,
+      406844474043
+     ]
+    ],
+    "S_A_0_01_1": [
+     13833208042,
+     51007504182.8,
+     385576169450
+    ],
+    "S_E25_0_01_1": [
+     34825654827,
+     71286047108.6,
+     399429577643
+    ],
+    "rho_0_01_1": [
+     351834.8125,
+     371304.53125,
+     546532
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1049203.3003874137,
+     293245.96792024944,
+     12695.131862420863
+    ]
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      5368700245,
+      184506699104.80002,
+      1796748688843
+     ],
+     [
+      5368700245,
+      74434643135.6,
+      696028129151
+     ],
+     [
+      6370285500,
+      34595008745.100006,
+      288617517951
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      5416154893,
+      184554153752.80002,
+      1796796143491
+     ],
+     [
+      5416154893,
+      74482097783.6,
+      696075583799
+     ],
+     [
+      6417740148,
+      34642463393.100006,
+      288664972599
+     ]
+    ],
+    "S_A_0_01_1": [
+     9818244813,
+     36194585382.600006,
+     273581650509
+    ],
+    "S_E25_0_01_1": [
+     24712296642,
+     50569994197.200005,
+     283289272194
+    ],
+    "rho_0_01_1": [
+     272685.75,
+     284252.39375,
+     388352.1875
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1049208.8318454365,
+     293203.85942704865,
+     12695.197534976682
+    ]
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      2553257515,
+      87373994386.1,
+      850760626226
+     ],
+     [
+      2553257515,
+      35261317559.100006,
+      329633857956
+     ],
+     [
+      3027647044,
+      16401353496.800001,
+      136764711572
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      2576029693,
+      87396766564.1,
+      850783398404
+     ],
+     [
+      2576029693,
+      35284089737.100006,
+      329656630134
+     ],
+     [
+      3050419222,
+      16424125674.800001,
+      136787483750
+     ]
+    ],
+    "S_A_0_01_1": [
+     4659726750,
+     17158315498.800001,
+     129645614238
+    ],
+    "S_E25_0_01_1": [
+     11695092130,
+     23939710978,
+     134141280610
+    ],
+    "rho_0_01_1": [
+     272685.75,
+     284252.39375,
+     388352.1875
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1049238.8909372361,
+     293195.98212777934,
+     12696.076555023923
+    ]
+   },
+   {
+    "p": 149,
+    "seed": 1,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      123894878344,
+      4331434794436.3003,
+      42199294039267
+     ],
+     [
+      123894878344,
+      1745839540344.9001,
+      16343341498353
+     ],
+     [
+      147635503314,
+      804136746978.8,
+      6712647939962
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      125041339246,
+      4332581255338.3003,
+      42200440500169
+     ],
+     [
+      125041339246,
+      1746986001246.9001,
+      16344487959255
+     ],
+     [
+      148781964216,
+      805283207880.8,
+      6713794400864
+     ]
+    ],
+    "S_A_0_01_1": [
+     228974148611,
+     841958748419.0001,
+     6358820146691
+    ],
+    "S_E25_0_01_1": [
+     582509291729,
+     1187473495735.4,
+     6632151331793
+    ],
+    "rho_0_01_1": [
+     564610.5,
+     603959.7625,
+     958103.125
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1052326.9127549368,
+     295378.90890994074,
+     12739.749831035992
+    ]
+   },
+   {
+    "p": 149,
+    "seed": 1,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      46600155699,
+      1624343809258.1,
+      15824036691290
+     ],
+     [
+      46600155699,
+      654886587754.3,
+      6129464476252
+     ],
+     [
+      55501234614,
+      301797198761,
+      2518460876084
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      47030393667,
+      1624774047226.1,
+      15824466929258
+     ],
+     [
+      47030393667,
+      655316825722.3,
+      6129894714220
+     ],
+     [
+      55931472582,
+      302227436729,
+      2518891114052
+     ]
+    ],
+    "S_A_0_01_1": [
+     85999708286,
+     315979198468.4,
+     2385794610110
+    ],
+    "S_E25_0_01_1": [
+     218535034476,
+     445405990956,
+     2487244599276
+    ],
+    "rho_0_01_1": [
+     564610.5,
+     603959.7625,
+     958103.125
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1052324.8137704867,
+     295379.40907782724,
+     12739.788527371324
+    ]
+   },
+   {
+    "p": 149,
+    "seed": 2,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      21481490408,
+      745539865418.0001,
+      7262065240508
+     ],
+     [
+      21481490408,
+      300680663767.80005,
+      2813473224006
+     ],
+     [
+      25566142985,
+      138671129197.90002,
+      1156616005114
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      21679440050,
+      745737815060.0001,
+      7262263190150
+     ],
+     [
+      21679440050,
+      300878613409.80005,
+      2813671173648
+     ],
+     [
+      25764092627,
+      138869078839.90002,
+      1156813954756
+     ]
+    ],
+    "S_A_0_01_1": [
+     39561022727,
+     145179101178.2,
+     1095741807239
+    ],
+    "S_E25_0_01_1": [
+     100505737317,
+     204634009374.6,
+     1141788457893
+    ],
+    "rho_0_01_1": [
+     554206.3125,
+     592667.41875,
+     938817.375
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1052351.7637038871,
+     295369.4518115045,
+     12739.888767846827
+    ]
+   },
+   {
+    "p": 149,
+    "seed": 2,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      12154593992,
+      420634926234.60004,
+      4096957916418
+     ],
+     [
+      12154593992,
+      169691217321.1,
+      1587520827283
+     ],
+     [
+      14458614519,
+      78304180059.20001,
+      652914269921
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      12266512184,
+      420746844426.60004,
+      4097069834610
+     ],
+     [
+      12266512184,
+      169803135513.1,
+      1587632745475
+     ],
+     [
+      14570532711,
+      78416098251.20001,
+      653026188113
+     ]
+    ],
+    "S_A_0_01_1": [
+     22353365025,
+     81975579335.40001,
+     618575508129
+    ],
+    "S_E25_0_01_1": [
+     56705564507,
+     115455734228.6,
+     644207261723
+    ],
+    "rho_0_01_1": [
+     554206.3125,
+     592667.41875,
+     938817.375
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1052339.4904611423,
+     295361.3345915262,
+     12739.84767088015
+    ]
+   },
+   {
+    "p": 197,
+    "seed": 1,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      18087622787,
+      628281000841.0001,
+      6120021403327
+     ],
+     [
+      18087622787,
+      253374141845.7,
+      2370952813374
+     ],
+     [
+      21545760323,
+      116405415106.8,
+      970142308161
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      18260214701,
+      628453592755.0001,
+      6120193995241
+     ],
+     [
+      18260214701,
+      253546733759.7,
+      2371125405288
+     ],
+     [
+      21718352237,
+      116578007020.8,
+      970314900075
+     ]
+    ],
+    "S_A_0_01_1": [
+     33364322762,
+     121907009162.00002,
+     918791186762
+    ],
+    "S_E25_0_01_1": [
+     85316189300,
+     172888481492,
+     961039111220
+    ],
+    "rho_0_01_1": [
+     709525.125,
+     762428.925,
+     1238563.125
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1053982.8672781435,
+     296492.4382839448,
+     12763.28500313578
+    ]
+   },
+   {
+    "p": 197,
+    "seed": 1,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      13434898262,
+      465435490414.7001,
+      4533440819789
+     ],
+     [
+      13434898262,
+      187746563210.90002,
+      1756551547751
+     ],
+     [
+      15996053637,
+      86294135070.00002,
+      718976867967
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      13562826890,
+      465563419042.7001,
+      4533568748417
+     ],
+     [
+      13562826890,
+      187874491838.90002,
+      1756679476379
+     ],
+     [
+      16123982265,
+      86422063698.00002,
+      719104796595
+     ]
+    ],
+    "S_A_0_01_1": [
+     24750444620,
+     90369691224.80002,
+     680942910668
+    ],
+    "S_E25_0_01_1": [
+     63223472776,
+     128100847240,
+     711997217416
+    ],
+    "rho_0_01_1": [
+     709525.125,
+     762428.925,
+     1238563.125
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1053953.7600412765,
+     296486.3193364026,
+     12762.716462930624
+    ]
+   },
+   {
+    "p": 197,
+    "seed": 2,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      9281658396,
+      323016594279.10004,
+      3146631017227
+     ],
+     [
+      9281658396,
+      130241911868.80002,
+      1218884193124
+     ],
+     [
+      11060082929,
+      59812437071.700005,
+      498583624356
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      9371238762,
+      323106174645.10004,
+      3146720597593
+     ],
+     [
+      9371238762,
+      130331492234.80002,
+      1218973773490
+     ],
+     [
+      11149663295,
+      59902017437.700005,
+      498673204722
+     ]
+    ],
+    "S_A_0_01_1": [
+     17136680229,
+     62640887531.4,
+     472178753253
+    ],
+    "S_E25_0_01_1": [
+     43878678034,
+     88899937080.4,
+     494091268498
+    ],
+    "rho_0_01_1": [
+     677271.3125,
+     726927.43125,
+     1173832.5
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1053996.5097957007,
+     296499.9935965848,
+     12763.39758347309
+    ]
+   },
+   {
+    "p": 197,
+    "seed": 2,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      5480924754,
+      190821002859.90002,
+      1858881705813
+     ],
+     [
+      5480924754,
+      76936457881.90001,
+      720036256033
+     ],
+     [
+      6531453105,
+      35329800477.700005,
+      294514926832
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      5534073492,
+      190874151597.90002,
+      1858934854551
+     ],
+     [
+      5534073492,
+      76989606619.90001,
+      720089404771
+     ],
+     [
+      6584601843,
+      35382949215.700005,
+      294568075570
+     ]
+    ],
+    "S_A_0_01_1": [
+     10121590489,
+     37001021170.600006,
+     278915897305
+    ],
+    "S_E25_0_01_1": [
+     25919573654,
+     52516340438,
+     291887241494
+    ],
+    "rho_0_01_1": [
+     677271.3125,
+     726927.43125,
+     1173832.5
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1053945.1109032258,
+     296482.2244516129,
+     12762.997612903226
+    ]
+   },
+   {
+    "p": 269,
+    "seed": 1,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      28669848598,
+      1009699327600.7001,
+      9838964638625
+     ],
+     [
+      28669848598,
+      406864638256.10004,
+      3810617745179
+     ],
+     [
+      34252429902,
+      186013046863.30002,
+      1551858599515
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      28956396052,
+      1009985875054.7001,
+      9839251186079
+     ],
+     [
+      28956396052,
+      407151185710.10004,
+      3810904292633
+     ],
+     [
+      34538977356,
+      186299594317.30002,
+      1552145146969
+     ]
+    ],
+    "S_A_0_01_1": [
+     53286038394,
+     194879075187.6,
+     1469216406330
+    ],
+    "S_E25_0_01_1": [
+     136903497485,
+     277415835705.80005,
+     1542026879693
+    ],
+    "rho_0_01_1": [
+     1117087.875,
+     1209872.61875,
+     2044935.3125
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1055441.122557748,
+     297484.368185477,
+     12783.91273751738
+    ]
+   },
+   {
+    "p": 269,
+    "seed": 1,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      16519096076,
+      581355320146.8,
+      5664881336784
+     ],
+     [
+      16519096076,
+      234273960080.40002,
+      2194067736120
+     ],
+     [
+      19733696161,
+      107119659491.3,
+      893593329464
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      16684387970,
+      581520612040.8,
+      5665046628678
+     ],
+     [
+      16684387970,
+      234439251974.40002,
+      2194233028014
+     ],
+     [
+      19898988055,
+      107284951385.3,
+      893758621358
+     ]
+    ],
+    "S_A_0_01_1": [
+     30691610728,
+     112223588449.6,
+     846011387944
+    ],
+    "S_E25_0_01_1": [
+     78830518113,
+     159732010113,
+     887845438113
+    ],
+    "rho_0_01_1": [
+     1117087.875,
+     1209872.61875,
+     2044935.3125
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1055461.6907662,
+     297489.7054250429,
+     12784.198762895334
+    ]
+   },
+   {
+    "p": 269,
+    "seed": 2,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      10614339896,
+      375645738404.30005,
+      3660928324979
+     ],
+     [
+      10614339896,
+      151301934729.2,
+      1417490288228
+     ],
+     [
+      12691450348,
+      69106746106.40001,
+      576844407932
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      10722088340,
+      375753486848.30005,
+      3661036073423
+     ],
+     [
+      10722088340,
+      151409683173.2,
+      1417598036672
+     ],
+     [
+      12799198792,
+      69214494550.40001,
+      576952156376
+     ]
+    ],
+    "S_A_0_01_1": [
+     19775127049,
+     72406513801,
+     546088994569
+    ],
+    "S_E25_0_01_1": [
+     50987187104,
+     103260048819.20001,
+     573715804256
+    ],
+    "rho_0_01_1": [
+     1107117.8125,
+     1199058.65625,
+     2026526.25
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1055456.0784885627,
+     297501.46149308514,
+     12784.089663760897
+    ]
+   },
+   {
+    "p": 269,
+    "seed": 2,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      5246950193,
+      185635728676.90002,
+      1809134735032
+     ],
+     [
+      5246950193,
+      74771163385.3,
+      700489082116
+     ],
+     [
+      6273361166,
+      34153535435.000004,
+      285075103856
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      5300613665,
+      185689392148.90002,
+      1809188398504
+     ],
+     [
+      5300613665,
+      74824826857.3,
+      700542745588
+     ],
+     [
+      6327024638,
+      34207198907.000004,
+      285128767328
+     ]
+    ],
+    "S_A_0_01_1": [
+     9773820165,
+     35784126501,
+     269876883525
+    ],
+    "S_E25_0_01_1": [
+     25202029895,
+     51033771181.4,
+     283519442759
+    ],
+    "rho_0_01_1": [
+     1107117.8125,
+     1199058.65625,
+     2026526.25
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1055461.662378142,
+     297497.8300285165,
+     12783.996949399827
+    ]
+   },
+   {
+    "p": 397,
+    "seed": 1,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      15079211870,
+      526182265338.00006,
+      5126109746550
+     ],
+     [
+      15079211870,
+      212106305158.10004,
+      1985350144751
+     ],
+     [
+      17997831164,
+      96755599622.1,
+      805575515745
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      15236404952,
+      526339458420.00006,
+      5126266939632
+     ],
+     [
+      15236404952,
+      212263498240.10004,
+      1985507337833
+     ],
+     [
+      18155024246,
+      96912792704.1,
+      805732708827
+     ]
+    ],
+    "S_A_0_01_1": [
+     27927862989,
+     101383647405.00002,
+     762485707149
+    ],
+    "S_E25_0_01_1": [
+     71928854428,
+     145010287132,
+     802743181468
+    ],
+    "rho_0_01_1": [
+     2532750.875,
+     2767428.43125,
+     4879526.4375
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1056757.8208221104,
+     298379.4400515283,
+     12802.34905726666
+    ]
+   },
+   {
+    "p": 397,
+    "seed": 1,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      8728384767,
+      305454029578.7,
+      2975984832884
+     ],
+     [
+      8728384767,
+      123099567570.6,
+      1152440212803
+     ],
+     [
+      10423015311,
+      56125077073.3,
+      467443632934
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      8819969973,
+      305545614784.7,
+      2976076418090
+     ],
+     [
+      8819969973,
+      123191152776.6,
+      1152531798009
+     ],
+     [
+      10514600517,
+      56216662279.3,
+      467535218140
+     ]
+    ],
+    "S_A_0_01_1": [
+     16188662103,
+     58812323261.4,
+     442425273687
+    ],
+    "S_E25_0_01_1": [
+     41737731799,
+     84160795715.8,
+     465968370967
+    ],
+    "rho_0_01_1": [
+     2532750.875,
+     2767428.43125,
+     4879526.4375
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1056762.3054177256,
+     298384.43325668643,
+     12802.488482794788
+    ]
+   },
+   {
+    "p": 397,
+    "seed": 2,
+    "arm": "A",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      27634702228,
+      966051993406.9001,
+      9411807614017
+     ],
+     [
+      27634702228,
+      389397433992.2,
+      3645262019870
+     ],
+     [
+      32993590150,
+      177599607527.1,
+      1479053763921
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      27921106648,
+      966338397826.9001,
+      9412094018437
+     ],
+     [
+      27921106648,
+      389683838412.2,
+      3645548424290
+     ],
+     [
+      33279994570,
+      177886011947.1,
+      1479340168341
+     ]
+    ],
+    "S_A_0_01_1": [
+     51225062800,
+     186096390697.60004,
+     1399938341776
+    ],
+    "S_E25_0_01_1": [
+     131255013245,
+     265438297949,
+     1473087860285
+    ],
+    "rho_0_01_1": [
+     2268122.8125,
+     2476079.29375,
+     4347687.625
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1056751.2855940096,
+     298387.14110038144,
+     12802.186921968083
+    ]
+   },
+   {
+    "p": 397,
+    "seed": 2,
+    "arm": "B",
+    "S_X_karatsuba_B_Bp_Bpp_0_01_1": [
+     [
+      11894554752,
+      415634723121.00006,
+      4049296238442
+     ],
+     [
+      11894554752,
+      167538924226.2,
+      1568338249494
+     ],
+     [
+      14200254126,
+      76417095130,
+      636368664166
+     ]
+    ],
+    "S_X_schoolbook_B_Bp_Bpp_0_01_1": [
+     [
+      12018420390,
+      415758588759.00006,
+      4049420104080
+     ],
+     [
+      12018420390,
+      167662789864.2,
+      1568462115132
+     ],
+     [
+      14324119764,
+      76540960768,
+      636492529804
+     ]
+    ],
+    "S_A_0_01_1": [
+     22044076955,
+     80072751054.20001,
+     602330817947
+    ],
+    "S_E25_0_01_1": [
+     56478967827,
+     114209464236.6,
+     633783931923
+    ],
+    "rho_0_01_1": [
+     2268122.8125,
+     2476079.29375,
+     4347687.625
+    ],
+    "selection_per_call_B_Bp_Bpp": [
+     1056762.1489058887,
+     298389.1878669276,
+     12802.282630611398
+    ]
+   }
+  ]
+ },
+ "gae_band": {
+  "definition": "medians over the ten curves of arm B (E25's GLS-fold benchmark arm): ic = S_X(g) = total_muls + g*97*(macaulay_entries + pivot_selection_ops) (Karatsuba products); rho = walk (iii) mean without the [d]G check + g*97*mean steps",
+  "B_counted": {
+   "0": {
+    "ic": 10311469759.5,
+    "rho": 693398.21875
+   },
+   "0.1": {
+    "ic": 360544376349.85004,
+    "rho": 744678.1781250001
+   },
+   "1": {
+    "ic": 3512640535663,
+    "rho": 1206197.8125
+   }
+  },
+  "B_prime": {
+   "0": {
+    "ic": 10311469759.5,
+    "rho": 693398.21875
+   },
+   "0.1": {
+    "ic": 145319245898.40002,
+    "rho": 744678.1781250001
+   },
+   "1": {
+    "ic": 1360389231148.5,
+    "rho": 1206197.8125
+   }
+  },
+  "B_double_prime": {
+   "0": {
+    "ic": 12311634718.5,
+    "rho": 693398.21875
+   },
+   "0.1": {
+    "ic": 66271086101.65,
+    "rho": 744678.1781250001
+   },
+   "1": {
+    "ic": 551906148550,
+    "rho": 1206197.8125
+   }
+  }
+ },
+ "limitations": [
+  "Local container (4 vCPU, shared with two other validators), not isolab-eks: operation counts only; no wall time is compared or claimed.",
+  "The in-crate unit tests (e33_counted_pivot_selection_is_bit_identical, e33_counted_echelon_equals_the_uncounted_one) were not executed by the producer or by this validator (a release test build of the library needs about 9 GB; building one was ruled out for this shared container). Their content is covered here by the Stage A per-call identity, the end-to-end identity rules and the validator's own controls through the public API, not by the tests themselves.",
+  "B counted's pivot digest is compared with B'' and B' only: the uncounted B emits no digest. Equality of B counted's pivots with B's is supported by equal C, echelon multiplications and phase counts on all 10,000 Stage A calls, by reading both routines at c443138920 (same key, same order, same recount domain), and by the validator's measurement of how often a single second-best pivot changes the phase counts (replay/controls).",
+  "S_E25/S_X uses X's schoolbook S constructed as E31 B's schoolbook total re-priced by X's own solve (X total - B counted total, both Karatsuba); the solve is in F_p and does not depend on the F_p4 product, and the B'' identity check shows total - solve is equal between B'' and B counted in every arm.",
+  "G2.133 prices E25's and A's lead scans with A counted's (Stage A) or X's own (end to end): the existing solver and E27's records do not emit lead_scan_reads."
+ ]
+}

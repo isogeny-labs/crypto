@@ -1,0 +1,394 @@
+diff --git a/src/cryptanalysis/koblitz_index_calculus.rs b/src/cryptanalysis/koblitz_index_calculus.rs
+index b7cd8afd2b..709459fdf3 100644
+--- a/src/cryptanalysis/koblitz_index_calculus.rs
++++ b/src/cryptanalysis/koblitz_index_calculus.rs
+@@ -3986,7 +3986,9 @@ pub(crate) fn filter_bits_for(keys: usize) -> u32 {
+ 
+ /// `extra` for [`filter_slot`]: every bit for three probes, none for one.
+ pub(crate) const fn filter_extra(probes: u8) -> u64 {
+-    if probes >= 3 {
++    if probes == FILTER_PROBES_BLOCKED {
++        FILTER_EXTRA_BLOCKED
++    } else if probes >= 3 {
+         u64::MAX
+     } else {
+         0
+@@ -4009,6 +4011,172 @@ pub(crate) fn filter_slot(h: u64, mask: u64, extra: u64) -> (usize, u64) {
+ /// [`filter_extra`] for this module's own builds.
+ const FILTER_EXTRA: u64 = filter_extra(FILTER_PROBES);
+ 
++/// Probes a key sets in the **blocked** presence filter: one bit in each
++/// of the eight words of a 64-byte line its hash names, so a probe still
++/// touches one cache line (a split-block Bloom filter).  Built only on the
++/// folded table's partitioned path, and only with `KIC_FILTER=blocked`;
++/// the default build sets [`FILTER_PROBES`] bits in one word, as before.
++pub const FILTER_PROBES_BLOCKED: u8 = 8;
++
++/// Filter bits per stored key in the blocked layout, before rounding up to
++/// a power of two.
++const FILTER_BITS_PER_KEY_BLOCKED: usize = 16;
++
++/// [`filter_extra`] of a blocked filter: a tag, never a bit mask.
++const FILTER_EXTRA_BLOCKED: u64 = 0xb10c;
++
++/// Odd multipliers choosing the bit in each word of a block (the
++/// split-block Bloom filter's salts).
++const BLOCK_SALTS: [u32; 8] = [
++    0x47b6_137b,
++    0x4497_4d91,
++    0x8824_ad5b,
++    0xa2b7_289d,
++    0x7054_95c7,
++    0x2df1_424b,
++    0x9efc_4947,
++    0x5c6b_fb31,
++];
++
++/// Whether this process builds folded tables with the blocked filter
++/// (`KIC_FILTER=blocked`).  Only the filter's layout changes: every key
++/// it admits is still checked against the entries, so every answer is
++/// the default build's.
++pub(crate) fn filter_blocked_requested() -> bool {
++    static BLOCKED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
++    *BLOCKED.get_or_init(|| std::env::var("KIC_FILTER").is_ok_and(|v| v.starts_with("blocked")))
++}
++
++/// Bits a key in the blocked layout: 16, or 8 with `KIC_FILTER=blocked8`
++/// (the default filter's size, for the exploration's size control).
++fn filter_bits_per_key_blocked() -> usize {
++    static BITS: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
++    *BITS.get_or_init(|| {
++        if std::env::var("KIC_FILTER").is_ok_and(|v| v == "blocked8") {
++            8
++        } else {
++            FILTER_BITS_PER_KEY_BLOCKED
++        }
++    })
++}
++
++/// The blocked filter's width in bits, as a power of two, within
++/// `2^9..=2^32` (at least one 512-bit block).
++pub(crate) fn filter_bits_blocked(keys: usize) -> u32 {
++    (usize::BITS
++        - keys
++            .max(1)
++            .saturating_mul(filter_bits_per_key_blocked())
++            .leading_zeros())
++    .clamp(9, 32)
++}
++
++/// The first word of a key's block, counted from the filter's aligned
++/// start: the hash's bits below the mask name the block.
++#[inline(always)]
++fn block_word(h: u64, mask: u64) -> usize {
++    (((h & mask) >> 9) as usize) * 8
++}
++
++/// The bit a key sets in each word of its block, from the hash's top half,
++/// which the block index (at most 32 bits) never reaches.
++#[inline(always)]
++fn block_bits(h: u64) -> [u64; 8] {
++    let x = (h >> 32) as u32;
++    BLOCK_SALTS.map(|salt| 1u64 << (x.wrapping_mul(salt) >> 26))
++}
++
++/// Whether every bit [`block_bits`] names is set in the eight words at
++/// `line`: one 512-bit load, the eight salted products and shifts as
++/// lanes, one test.  The same answer as the scalar loop.
++///
++/// # Safety
++///
++/// The CPU must have AVX-512F, and `line` must point at eight readable
++/// words.
++#[cfg(target_arch = "x86_64")]
++#[target_feature(enable = "avx512f")]
++unsafe fn block_admits_avx512(line: *const u64, h: u64) -> bool {
++    use std::arch::x86_64::*;
++    let x = _mm512_set1_epi64(i64::from((h >> 32) as u32));
++    let salts = _mm512_set_epi64(
++        BLOCK_SALTS[7] as i64,
++        BLOCK_SALTS[6] as i64,
++        BLOCK_SALTS[5] as i64,
++        BLOCK_SALTS[4] as i64,
++        BLOCK_SALTS[3] as i64,
++        BLOCK_SALTS[2] as i64,
++        BLOCK_SALTS[1] as i64,
++        BLOCK_SALTS[0] as i64,
++    );
++    // Each 64-bit lane: its low half is `x · salt mod 2^32`, its high half
++    // 0 · 0; shifting the halves by 26 leaves the bit index as the lane.
++    let idx = _mm512_srli_epi32::<26>(_mm512_mullo_epi32(x, salts));
++    let bits = _mm512_sllv_epi64(_mm512_set1_epi64(1), idx);
++    let words = _mm512_loadu_si512(line as *const _);
++    let missing = _mm512_andnot_si512(words, bits);
++    _mm512_test_epi64_mask(missing, missing) == 0
++}
++
++/// Set every bit [`block_bits`] names in the eight words at `line`: one
++/// load, OR and store.  The same words as the scalar loop.
++///
++/// # Safety
++///
++/// The CPU must have AVX-512F, and `line` must point at eight writable
++/// words no other thread writes.
++#[cfg(target_arch = "x86_64")]
++#[target_feature(enable = "avx512f")]
++unsafe fn block_set_avx512(line: *mut u64, h: u64) {
++    use std::arch::x86_64::*;
++    let x = _mm512_set1_epi64(i64::from((h >> 32) as u32));
++    let salts = _mm512_set_epi64(
++        BLOCK_SALTS[7] as i64,
++        BLOCK_SALTS[6] as i64,
++        BLOCK_SALTS[5] as i64,
++        BLOCK_SALTS[4] as i64,
++        BLOCK_SALTS[3] as i64,
++        BLOCK_SALTS[2] as i64,
++        BLOCK_SALTS[1] as i64,
++        BLOCK_SALTS[0] as i64,
++    );
++    let idx = _mm512_srli_epi32::<26>(_mm512_mullo_epi32(x, salts));
++    let bits = _mm512_sllv_epi64(_mm512_set1_epi64(1), idx);
++    let words = _mm512_loadu_si512(line as *const _);
++    _mm512_storeu_si512(line as *mut _, _mm512_or_si512(words, bits));
++}
++
++/// Ask for 2 MiB pages on a fresh, untouched filter allocation
++/// (`KIC_FILTER_HUGE=1`; Linux transparent huge pages in `madvise` mode).
++/// Advice only: the words and every answer are the same either way.
++fn advise_huge_filter(words: &mut [u64]) {
++    static HUGE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
++    if !*HUGE.get_or_init(|| std::env::var("KIC_FILTER_HUGE").is_ok_and(|v| v == "1")) {
++        return;
++    }
++    #[cfg(target_os = "linux")]
++    {
++        const PAGE: usize = 2 << 20;
++        let start = words.as_mut_ptr() as usize;
++        let end = start + std::mem::size_of_val(words);
++        let (lo, hi) = (start.next_multiple_of(PAGE), end / PAGE * PAGE);
++        if hi > lo {
++            // SAFETY: `lo..hi` lies inside `words`' own allocation, and
++            // MADV_HUGEPAGE changes no contents.
++            unsafe {
++                libc::madvise(lo as *mut libc::c_void, hi - lo, libc::MADV_HUGEPAGE);
++            }
++        }
++    }
++}
++
++/// Words to skip so that `words[offset..]` starts on a 64-byte line.  A
++/// blocked filter keeps eight spare words for it.
++#[inline(always)]
++fn line_offset(words: &[u64]) -> usize {
++    ((64 - (words.as_ptr() as usize & 63)) & 63) / 8
++}
++
+ /// **Every pair sum of a factor base**, `P_i + P_j` for `i ≤ j`, sorted
+ /// by packed point identity so a sum can be looked up by binary search.
+ ///
+@@ -4261,6 +4429,9 @@ pub struct PairSumTable {
+     present_mask: u64,
+     /// [`filter_extra`] of the probes the filter was built with.
+     filter_extra: u64,
++    /// Words of `present` before its first 64-byte line, for a blocked
++    /// filter ([`FILTER_PROBES_BLOCKED`]); 0 otherwise.
++    present_off: usize,
+     /// Whether the stored keys are folded by the signed Frobenius group
+     /// `G = ⟨π, −1⟩`.
+     ///
+@@ -5150,6 +5321,7 @@ impl PairSumTable {
+             present,
+             present_mask,
+             filter_extra: FILTER_EXTRA,
++            present_off: 0,
+             fold: false,
+             canon: None,
+             orbit_start: Vec::new(),
+@@ -5270,6 +5442,7 @@ impl PairSumTable {
+             present,
+             present_mask,
+             filter_extra: FILTER_EXTRA,
++            present_off: 0,
+             fold: false,
+             canon: None,
+             orbit_start: Vec::new(),
+@@ -5393,6 +5566,7 @@ impl PairSumTable {
+             present,
+             present_mask,
+             filter_extra: FILTER_EXTRA,
++            present_off: 0,
+             fold: false,
+             canon: None,
+             orbit_start: Vec::new(),
+@@ -5531,9 +5705,17 @@ impl PairSumTable {
+         // At one thread there is one run, and its filter is the filter.
+         // Every bit is set either way, so the filter is the same.
+         const FILL_AHEAD: usize = 16;
+-        let filter_bits = filter_bits_for(total);
++        let blocked = filter_blocked_requested();
++        let filter_bits = if blocked {
++            filter_bits_blocked(total)
++        } else {
++            filter_bits_for(total)
++        };
+         let present_mask = (1u64 << filter_bits) - 1;
+         let filter_words = (1usize << filter_bits) / 64;
++        // A blocked filter keeps eight spare words, so its blocks can start
++        // on a 64-byte line wherever the allocator put it.
++        let spare = if blocked { 8 } else { 0 };
+         let per_part = buckets / parts;
+         // Capacity, not length: skewed partitions can grow their streams.
+         // This bounds the extra filter copies; it is not an RSS limit for
+@@ -5567,11 +5749,13 @@ impl PairSumTable {
+             sorted_hash.as_mut_ptr() as usize,
+             sorted_id.as_mut_ptr() as usize,
+         );
+-        let filters: Vec<Vec<u64>> = bucket_start[..buckets]
++        let filters: Vec<(Vec<u64>, usize)> = bucket_start[..buckets]
+             .par_chunks_mut(per_part * parts_per_run)
+             .enumerate()
+             .map(|(run, run_starts)| {
+-                let mut present = vec![0u64; filter_words];
++                let mut present = vec![0u64; filter_words + spare];
++                advise_huge_filter(&mut present);
++                let off = if blocked { line_offset(&present) } else { 0 };
+                 for (k, starts) in run_starts.chunks_mut(per_part).enumerate() {
+                     let p = run * parts_per_run + k;
+                     let first = p * per_part;
+@@ -5592,7 +5776,12 @@ impl PairSumTable {
+                         let (hs, ws, ids) = (&hs[p], &ws[p], &ids[p]);
+                         for (i, (&h, &w)) in hs.iter().zip(ws).enumerate() {
+                             if let Some(&ahead) = hs.get(i + FILL_AHEAD) {
+-                                prefetch(&present[filter_slot(ahead, present_mask, 0).0]);
++                                let w = if blocked {
++                                    off + block_word(ahead, present_mask)
++                                } else {
++                                    filter_slot(ahead, present_mask, 0).0
++                                };
++                                prefetch(&present[w]);
+                             }
+                             let b = (h >> bucket_shift) as usize - first;
+                             // SAFETY: partition `p` owns
+@@ -5608,24 +5797,43 @@ impl PairSumTable {
+                                 }
+                             }
+                             at[b] += 1;
+-                            let (word, bits) = filter_slot(h, present_mask, FILTER_EXTRA);
+-                            present[word] |= bits;
++                            if blocked {
++                                let base = off + block_word(h, present_mask);
++                                let line = &mut present[base..base + 8];
++                                #[cfg(target_arch = "x86_64")]
++                                if std::arch::is_x86_feature_detected!("avx512f") {
++                                    // SAFETY: AVX-512F was just detected, and
++                                    // `line` is eight words of this run's own
++                                    // filter.
++                                    unsafe { block_set_avx512(line.as_mut_ptr(), h) };
++                                    continue;
++                                }
++                                for (w, bit) in line.iter_mut().zip(block_bits(h)) {
++                                    *w |= bit;
++                                }
++                            } else {
++                                let (word, bits) = filter_slot(h, present_mask, FILTER_EXTRA);
++                                present[word] |= bits;
++                            }
+                         }
+                     }
+                 }
+-                present
++                (present, off)
+             })
+             .collect();
+         bucket_start[buckets] = total as u32;
+-        let present = filters
++        let (present, _) = filters
+             .into_iter()
+-            .reduce(|mut all, run| {
+-                for (a, r) in all.iter_mut().zip(&run) {
++            .reduce(|(mut all, all_off), (run, run_off)| {
++                for (a, r) in all[all_off..all_off + filter_words]
++                    .iter_mut()
++                    .zip(&run[run_off..run_off + filter_words])
++                {
+                     *a |= r;
+                 }
+-                all
++                (all, all_off)
+             })
+-            .unwrap_or_else(|| vec![0u64; filter_words]);
++            .unwrap_or_else(|| (vec![0u64; filter_words + spare], 0));
+         // Two pairs of one bucket with one hash: one canonical key twice.
+         // The hash of key 0 (the point at infinity) is not a sum of two
+         // base points in any useful sense, and every row has one.
+@@ -5945,7 +6153,13 @@ impl PairSumTable {
+                 words: rests,
+                 present,
+                 present_mask,
+-                filter_probes: FILTER_PROBES,
++                // `fold_partitioned` builds the blocked layout when asked;
++                // the two-pass fallback always builds the default one.
++                filter_probes: if partition && filter_blocked_requested() {
++                    FILTER_PROBES_BLOCKED
++                } else {
++                    FILTER_PROBES
++                },
+                 canon_tables: Vec::new(),
+             },
+             tagged,
+@@ -5999,6 +6213,11 @@ impl PairSumTable {
+             negated_y,
+             bucket_start: parts.bucket_start,
+             bucket_shift: parts.bucket_shift,
++            present_off: if parts.filter_probes == FILTER_PROBES_BLOCKED {
++                line_offset(&parts.present)
++            } else {
++                0
++            },
+             present: parts.present,
+             present_mask: parts.present_mask,
+             filter_extra: filter_extra(parts.filter_probes),
+@@ -6257,7 +6476,9 @@ impl PairSumTable {
+             words: &self.rests,
+             present: &self.present,
+             present_mask: self.present_mask,
+-            filter_probes: if self.filter_extra != 0 {
++            filter_probes: if self.filter_extra == FILTER_EXTRA_BLOCKED {
++                FILTER_PROBES_BLOCKED
++            } else if self.filter_extra != 0 {
+                 FILTER_PROBES
+             } else {
+                 1
+@@ -6520,6 +6741,9 @@ impl PairSumTable {
+     /// [`Self::filter_word`] for a precomputed `pair_filter_hash(key)`.
+     #[inline]
+     fn filter_word_hash(&self, h: u64) -> usize {
++        if self.filter_extra == FILTER_EXTRA_BLOCKED {
++            return self.present_off + block_word(h, self.present_mask);
++        }
+         ((h & self.present_mask) as usize) >> 6
+     }
+ 
+@@ -6535,6 +6759,22 @@ impl PairSumTable {
+     #[inline]
+     fn admitted_hash(&self, h: u64) -> bool {
+         group_op_count::count_filter_probes(1);
++        if self.filter_extra == FILTER_EXTRA_BLOCKED {
++            let base = self.present_off + block_word(h, self.present_mask);
++            let line = &self.present[base..base + 8];
++            #[cfg(target_arch = "x86_64")]
++            if std::arch::is_x86_feature_detected!("avx512f") {
++                // SAFETY: AVX-512F was just detected, and `line` holds
++                // eight words.
++                return unsafe { block_admits_avx512(line.as_ptr(), h) };
++            }
++            let bits = block_bits(h);
++            let mut missing = 0u64;
++            for i in 0..8 {
++                missing |= bits[i] & !line[i];
++            }
++            return missing == 0;
++        }
+         let (word, bits) = filter_slot(h, self.present_mask, self.filter_extra);
+         self.present[word] & bits == bits
+     }

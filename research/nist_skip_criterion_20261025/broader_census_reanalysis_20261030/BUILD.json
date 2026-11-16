@@ -1,0 +1,30 @@
+{
+  "kind": "broader-census-native-build/v1",
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "native_build_exit": 0,
+  "development_controls": {
+    "producer": 0,
+    "verifier": 0
+  },
+  "resource_ceiling_KiB": 1572864,
+  "binary_records": [
+    {
+      "path": "/workspace/nist-broader-census-build-001/producer",
+      "bytes": 87296,
+      "sha256": "e1cfa8005344c43f54fd6ffcb1e858ffdde680f9296d4c2f198d690f66787403"
+    },
+    {
+      "path": "/workspace/nist-broader-census-build-001/verify",
+      "bytes": 88080,
+      "sha256": "9d101a69a38228649d3486f8c1d11e7fea877b8b2c77b5b71aee467a629ec183"
+    },
+    {
+      "path": "/workspace/nist-broader-census-build-001/tamper",
+      "bytes": 41416,
+      "sha256": "506a32dd748c9375f6d49f75f81d4a01ad0bbaa8fb9b16a864570a9defa27220"
+    }
+  ],
+  "shared_io": "io.hpp handles TSV parsing and writing only",
+  "arithmetic": "producer:GMP residue enumeration and affine arithmetic; verifier:PARI kronecker/ellmul/proved isprime; shared GMP integer family",
+  "scientific_cohort_execution_started": false
+}

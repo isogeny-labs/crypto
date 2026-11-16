@@ -1,0 +1,130 @@
+{
+  "schema": "software.validation_snapshot/v1",
+  "created_utc": "2026-10-31T00:54:28.845982+00:00",
+  "scope": "software validation, separate from scientific results",
+  "review_kind": "producer self-audit; not independent",
+  "source_or_runtime_edits": false,
+  "checks": [
+    {
+      "name": "corrected retained-data typed wrapper",
+      "result": "passed",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "name": "full library default-concurrency run",
+      "result": "failed",
+      "passed": 5792,
+      "failed": 1,
+      "ignored": 128,
+      "failure": "gpu.rs1270 nonblocking BenchLock reacquisition"
+    },
+    {
+      "name": "isolated capsule replay",
+      "result": "passed",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "name": "deterministic inherited-FD mechanism",
+      "result": "passed",
+      "attempts": 1,
+      "errno_while_child_holds": 11,
+      "original_failure_cause_established": false
+    },
+    {
+      "name": "reduced-concurrency full run and additional checks",
+      "result": "pending at snapshot; owned by root"
+    }
+  ],
+  "references": [
+    {
+      "group": "typed",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/final-software-checks/typed-retained/stdout",
+      "sha256": "308c41045bc798d04f631d220811bb3cd30e2b81fee8f3b22637f8f8494ba04c"
+    },
+    {
+      "group": "typed",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/final-software-checks/typed-retained/receipt.json",
+      "sha256": "ceead78e651315434565d8de568dfc3a8b67f332d7e3f998f1831ffa2898adc5"
+    },
+    {
+      "group": "typed",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/final-software-checks/typed-retained/command.json",
+      "sha256": "5f73fcedb6125f7a66b0e4af781365c981c7d90a6beb372237bd862bc63b7208"
+    },
+    {
+      "group": "full",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/final-software-checks/full-lib/stdout",
+      "sha256": "bdd5ba82b319e9e19b461af999cd824a4f89be9fc4c0ee874a53e3da4cc9f107"
+    },
+    {
+      "group": "full",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/final-software-checks/full-lib/receipt.json",
+      "sha256": "565fd0c1bdff90db56dac4f42b1a586c12378e272a28d4aef4a3dc7d4705c801"
+    },
+    {
+      "group": "full",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/final-software-checks/full-lib/command.json",
+      "sha256": "c0b65c6d0df92eb7add323ca512470cee86c9adf02971f867e731566e94f6cdf"
+    },
+    {
+      "group": "isolated",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/gpu-capsule-failure-replay/stdout",
+      "sha256": "7f1b2434e6cee18aa804d886ceca744a2e80d29abba0001991b9dddade886731"
+    },
+    {
+      "group": "isolated",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/gpu-capsule-failure-replay/receipt.json",
+      "sha256": "03c12e239eba2fb974ca253b238f39f6e256a3cff0de56c56e85b10ba43d4838"
+    },
+    {
+      "group": "isolated",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/preflight-review/gpu-capsule-failure-replay/command.json",
+      "sha256": "d46c99732e12be882562cbc1d379c7c46ff69dcd0ef289b0ba4e4e62b362d718"
+    },
+    {
+      "group": "mechanism",
+      "path": "/var/tmp/pencil-flock-barrier-check-20261031-v1/PLAN.md",
+      "sha256": "ccad5caf676eb2914b704edae3e378efebab851d1b3ed9eaa985f9158c142f8e"
+    },
+    {
+      "group": "mechanism",
+      "path": "/var/tmp/pencil-flock-barrier-check-20261031-v1/check.py",
+      "sha256": "26ccb6daf94a7255c5317a24acb46281c8e7d8ea8693a322404afc544f59d2b8"
+    },
+    {
+      "group": "mechanism",
+      "path": "/var/tmp/pencil-flock-barrier-check-20261031-v1/preexecution.json",
+      "sha256": "44acc607c293a5e2c9705d0854ac3996dacc15a70c7f8ff31c0a821d06c4090f"
+    },
+    {
+      "group": "mechanism",
+      "path": "/var/tmp/pencil-flock-barrier-check-20261031-v1/stdout",
+      "sha256": "9494c0567002c9b10f10967d07455e18f5d3f9c2414c36d653407419e323ead8"
+    },
+    {
+      "group": "mechanism",
+      "path": "/var/tmp/pencil-flock-barrier-check-20261031-v1/receipt.json",
+      "sha256": "c95503117c7b01d5e99b0016d4bc5169260475ed5db613ad0cf6d8607ffe20a0"
+    },
+    {
+      "group": "mechanism",
+      "path": "/var/tmp/pencil-flock-barrier-check-20261031-v1/manifest.json",
+      "sha256": "1c6c45cea42f1120e60fd11f7a62c929436e26e27c3f6ac7396fc3dc943a9905"
+    }
+  ],
+  "mechanism_self_audit": {
+    "all_manifest_hashes_match": true,
+    "preexecution_hashes_match": true,
+    "control_receipts_match_claims": true,
+    "source_checked": true,
+    "limitations": [
+      "producer self-audit",
+      "no independent replay",
+      "no original failing syscall trace",
+      "POSIX Python flock/fork diagnostic, not actual Rust BenchLock reproduction"
+    ]
+  }
+}
