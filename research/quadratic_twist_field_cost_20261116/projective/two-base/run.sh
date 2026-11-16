@@ -4,7 +4,7 @@ set -euo pipefail
 mode=${1:?build or execute};out=${2:?fresh output};ref=${3:?connected reference}
 cd "$(git rev-parse --show-toplevel)";scope=research/quadratic_twist_field_cost_20261116/projective/two-base
 [[ $(git branch --show-current) = codex/twist-field-cost && $(git remote get-url origin) = https://github.com/isogeny-labs/crypto.git && -z $(git status --porcelain) ]]
-[[ $out = /tmp/twist-two-base-run02-20261116 ]]
+[[ $out = /tmp/twist-two-base-run03-20261116 ]]
 [[ $(date -u +%s) -ge $(date -u -d '2026-11-16T18:45:00Z' +%s) ]]
 run(){ local name=$1 expected=$2 remaining cap code=0;shift 2;remaining=$(($(date -u -d '2026-11-16T19:45:00Z' +%s)-$(date -u +%s)));[[ $remaining -gt 0 ]];cap=$remaining;[[ $cap -le 600 ]]||cap=600
  printf '%q ' "$@" > "$out/$name.command";printf '\n' >> "$out/$name.command";date -u +%FT%TZ > "$out/$name.started-at"
@@ -12,7 +12,7 @@ run(){ local name=$1 expected=$2 remaining cap code=0;shift 2;remaining=$(($(dat
  date -u +%FT%TZ > "$out/$name.finished-at";printf '%s\n' "$code" > "$out/$name.exit";printf '%s\t%s\t%s\n' "$name" "$code" "$expected" >> "$out/stages.tsv";[[ $code = "$expected" ]]
 }
 if [[ $mode = build ]];then
- [[ ! -e $out && ! -e /tmp/twist-two-base-idc-target02-20261116 ]];mkdir -m 700 "$out";cp "$ref" "$out/build-ref.json"
+ [[ ! -e $out && ! -e /tmp/twist-two-base-idc-target03-20261116 ]];mkdir -m 700 "$out";cp "$ref" "$out/build-ref.json"
  jq -e --arg h "$(git rev-parse HEAD)" '.head==$h and .state=="open" and .auto_merge==null and .source=="connected-github-read"' "$ref" > "$out/ref-check.log"
  run qualifier-build 0 g++ -std=c++20 -O2 -s -I/workspace/twist-native-tooling/include "$scope/qualify.cpp" -lcrypto -o "$out/qualifier.immutable"
  chmod 500 "$out/qualifier.immutable";sha256sum "$out/qualifier.immutable" > "$out/qualifier.sha256"
@@ -23,8 +23,8 @@ if [[ $mode = build ]];then
  run analysis-build 0 g++ -std=c++20 -O2 -s -I/workspace/twist-native-tooling/include "$scope/analyze.cpp" -lcrypto -o "$out/analysis"
  run math-audit-build 0 /workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/rustc --edition=2021 -O -C strip=symbols "$scope/math-audit.rs" -o "$out/math-audit"
  run cap-probe-build 0 /workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/rustc --edition=2021 -O -C strip=symbols "$scope/source-cap2-probe.rs" -o "$out/source-cap2-probe"
- run idc-build 0 env RUSTC=/workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/rustc CARGO_HOME=/tmp/twist-two-base-cargo CARGO_TARGET_DIR=/tmp/twist-two-base-idc-target02-20261116 /workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/cargo build --offline --locked --release --jobs 2 --manifest-path "$scope/idc/Cargo.toml"
- cp /tmp/twist-two-base-idc-target02-20261116/release/twist-two-base-idc "$out/idc";chmod 500 "$out/idc"
+ run idc-build 0 env RUSTC=/workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/rustc CARGO_HOME=/tmp/twist-two-base-cargo CARGO_TARGET_DIR=/tmp/twist-two-base-idc-target03-20261116 /workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/cargo build --offline --locked --release --jobs 2 --manifest-path "$scope/idc/Cargo.toml"
+ cp /tmp/twist-two-base-idc-target03-20261116/release/twist-two-base-idc "$out/idc";chmod 500 "$out/idc"
 
  run protocol-check 0 python3 /workspace/canonical-protocol-20261115/tools/experiment_protocol.py validate "$scope/protocol.json"
  "$out/qualifier.immutable" build "$scope/PINS.json" "$ref" "$out" "$out/build-manifest.json" > "$out/build-qualification.log" 2>&1

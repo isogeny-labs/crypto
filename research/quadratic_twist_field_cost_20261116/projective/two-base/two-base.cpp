@@ -172,7 +172,7 @@ void patch(const std::string&mode){
      if(mode=="witness"){auto pos=t[8].find(',');need(pos!=std::string::npos,"actual witness");t[8]=t[8].substr(0,pos+1)+std::to_string((std::stoi(t[8].substr(pos+1))+1)%3721);done=true;}
      if(mode=="root"&&std::stoi(t[10])>0){t[11]=std::to_string((std::stoi(t[11])+1)%3721);done=true;}
      if(mode=="drop-proportional"&&t[7].starts_with("3,")){t={"BR",t[1],t[2],"U","2"};done=true;}
-     if(mode=="missing-empty-branch"&&t[10]=="0"){done=true;remove=true;}
+     if(mode=="missing-empty-branch"&&std::stoi(t[11+std::stoi(t[10])])==0){done=true;remove=true;}
     }
    }
    if(remove)continue;if(done){for(size_t i=0;i<t.size();i++){if(i)output<<' ';output<<t[i];}output<<'\n';}else output<<line<<'\n';

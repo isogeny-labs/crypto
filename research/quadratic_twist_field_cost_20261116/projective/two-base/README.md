@@ -22,3 +22,6 @@ Pre-data completeness amendment: generic quadratic extraction receives a coeffic
 
 ## Pre-data dependency amendment v3
 Build01 compiled the C++ and Rust study instruments but the official identity caller failed because its manifest omitted hex. Exact failed source/logs retained locally. No Lean, identity or recovery data ran. Add only pinned hex0.4.3, refresh dependency inventory, and use fresh build/output directories. No arithmetic/proof/analysis/population change; the SAME19:45UTC deadline remains. [pcc:unverified]
+
+## Observed-control amendment v4
+Run02 completed both positive/negative proof checks, source-bound identity checks, fixed cap controls, quadratic primitive checks and all C/A/B semantic replay. Its missing-empty-branch generator failed to find a zero COVER-root branch; the actual intended empty branch has zero ADMITTED rows. Change only that selector, preserving exact original outputs/failure. Full corrected replication, not blinded confirmation; no cost data ran. Algorithms/frontier/population/deadline unchanged. [pcc:unverified]
