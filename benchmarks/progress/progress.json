@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1001Z-ic-positive-control-capped",
+  "latest_record": "20261116T1540Z-genus4-positive-control",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 206,
+    "measured": 207,
     "open": 1
   },
   "repo": "crypto",
@@ -24471,6 +24471,32 @@
     },
     {
       "better": "lower",
+      "first": 0.233,
+      "latest": 0.233,
+      "latest_derived": {},
+      "metric": "la_mul_w_over_c_p8209",
+      "points": [
+        {
+          "commit": "2ca7ece552ad",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 12,
+          "record": "20261116T1540Z-genus4-positive-control",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.23,
+            0.236
+          ],
+          "summary": "Genus 4 (h<=2, p=8209): IC arm w (coordinate Wiedemann + capped unit-T walk) below matched negation rho at w=0, 0.1, 1 (w=1: 0.528 [0.382, 0.754]); LA 0.23x of baseline. Positive control, not an ECDLP result. [pcc:unverified], review pending.",
+          "value": 0.233
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 3.69,
       "latest": 3.69,
       "latest_derived": {},
@@ -32302,6 +32328,32 @@
     },
     {
       "better": "lower",
+      "first": 0.099,
+      "latest": 0.099,
+      "latest_derived": {},
+      "metric": "w_over_rho_w01_p8209",
+      "points": [
+        {
+          "commit": "2ca7ece552ad",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 12,
+          "record": "20261116T1540Z-genus4-positive-control",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.072,
+            0.141
+          ],
+          "summary": "Genus 4 (h<=2, p=8209): IC arm w (coordinate Wiedemann + capped unit-T walk) below matched negation rho at w=0, 0.1, 1 (w=1: 0.528 [0.382, 0.754]); LA 0.23x of baseline. Positive control, not an ECDLP result. [pcc:unverified], review pending.",
+          "value": 0.099
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 8.75,
       "latest": 8.75,
       "latest_derived": {},
@@ -32321,6 +32373,32 @@
           ],
           "summary": "Genus-3 positive control arm W (capped unit-T walk + fallback roots + coordinate Wiedemann): 0.79-0.90x of S at every p>=4099; distance to matched rho at p=32771: w=0.1 7.44 (original C) -> 1.72, w=1 40.2 -> 8.75; 5a unresolved. [pcc:unverified]",
           "value": 8.75
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.528,
+      "latest": 0.528,
+      "latest_derived": {},
+      "metric": "w_over_rho_w1_p8209",
+      "points": [
+        {
+          "commit": "2ca7ece552ad",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 12,
+          "record": "20261116T1540Z-genus4-positive-control",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.382,
+            0.754
+          ],
+          "summary": "Genus 4 (h<=2, p=8209): IC arm w (coordinate Wiedemann + capped unit-T walk) below matched negation rho at w=0, 0.1, 1 (w=1: 0.528 [0.382, 0.754]); LA 0.23x of baseline. Positive control, not an ECDLP result. [pcc:unverified], review pending.",
+          "value": 0.528
         }
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
