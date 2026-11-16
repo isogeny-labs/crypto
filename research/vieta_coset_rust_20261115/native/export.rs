@@ -15,14 +15,16 @@ fn main() {
     assert!(a.len() >= 6, "export PROTOCOL PANEL KIND OUTPUT RAW...");
     let p: Value = serde_json::from_slice(&fs::read(&a[1]).unwrap()).unwrap();
     let base = std::env::var("VIETA_EXPORT_BASE").unwrap_or_else(|_| "scale-20261115T2053Z".into());
-    let host = format!(
-        "{base}/{}",
-        if a[2] == "three-repair" {
-            "repair/isolation.jsonl"
-        } else {
-            "main/isolation.jsonl"
-        }
-    );
+    let host = std::env::var("VIETA_EXPORT_HOST").unwrap_or_else(|_| {
+        format!(
+            "{base}/{}",
+            if a[2] == "three-repair" {
+                "repair/isolation.jsonl"
+            } else {
+                "main/isolation.jsonl"
+            }
+        )
+    });
     let mut runs = vec![];
     let mut files = vec![];
     let mut completed = 0;

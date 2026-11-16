@@ -827,7 +827,8 @@ def n83_d18_vsids_gate(ref, since):
 def vieta_component(ref, since):
     """Export stored native observations; censored records do not imply admission."""
     for slug in ("20261115T2104Z-vieta-coset-local-scale",
-                 "20261115T2147Z-vieta-three-fixture-repair"):
+                 "20261115T2147Z-vieta-three-fixture-repair",
+                 "20261116T1553Z-vieta-polynomial-backends"):
         path = f"benchmarks/records/{slug}.json"
         for date, commit, text in file_history(ref, path, since):
             record = json.loads(text)

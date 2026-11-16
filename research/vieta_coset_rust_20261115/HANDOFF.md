@@ -1,5 +1,29 @@
 # Vieta Rust port: continuation receipt
 
+## Substantive continuation — 16 November, 16:35 UTC
+
+User requested continuation after the closeout. PR4410 now carries opt-in
+Karatsuba/Newton arithmetic and the completed matched continuation panel.
+See continuation-20261116/RESULTS.md and report.pdf. Main192 calls all succeed;
+supplement12 calls have4 lookup successes/8 polynomial30s deadlines. Wide scalar
+replay matches196 successful calls, retaining8 failures [pcc:unverified].
+Conditioned field-multiplication ratio schoolbook/Karatsuba is2.1469 at
+word62/m16384 and1.8604 at P224/m2048. Successful queries invoke zero Newton
+divisions. Seven unit groups/four CLI tests, clippy and formatting pass;
+root focused build hit its explicit180s preparation cap, no full-suite pass.
+All clocks belowL2. Measured qualifier/analysis are pinned to source9814b4bb5c;
+no build/test/heavy analysis ran during the measured interval.
+
+The sibling SPLIT_TOWER_BOUND.md gives a hand conditional extension to full
+split rational-map towers, d_F<=2*sum(q_i−1)+2, and an interpolation-free
+homogeneous evaluator construction. A separate Rust F17 symbolic example is
+retained. It is not a general rational/isogeny solver implementation or formal
+validation. Original pinned proof/data/protocols remain unchanged.
+
+Remaining publication tasks: register pending theoretical statement, push final
+reports/record, update current-head PR4410 and inspect its actual gates. No
+measurement active. Retain original closeout notes below as history.
+
 ## Publication closed — 16 November, 07:30 UTC
 
 Results PR4358 merged at03:20:47 UTC as a79fc35e35c1be023e8c862cb74128b356c4ef30.
