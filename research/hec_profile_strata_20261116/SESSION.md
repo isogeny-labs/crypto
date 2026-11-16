@@ -11,3 +11,9 @@ Build/hash/freeze/checkpoint/gateandexecuteboundedcountgateonce. Full10xgoalacti
 
 ## Errors
 None yet.
+
+## Completed targeted partition screen
+Frozen9dabb35afe93/checkpoint20261116T053157Z executed once:63families/112policies,3694residualclasschecks,allfullprincipal/independentfinalranks pass,exit0/emptystderr. Bestrepeated/complete-distincttrainingfirstcounts:g2634/701,g31412/1417,g41334/1501. Alloptimistic10foldthresholdsfalse;2LPg3/g4controlsnoncompletingandunrankable. Bestlabels4+1+1;2+2+1+1+1;2+2+2+2respectively. Selectedamong57repeatedfamilies,trainingonly. No timingcampaignjustified.
+
+## New post-screen derivation to verify
+For nonbranchinputs, primitiveinterpolationrawrowshouldequaloriginalweightedinputplusdecompositionofitsnegativeCantorreduction, INCLUDINGcommonfactors. Residualdivisorsneednotbeequalwhenconditionscancel; fullsignedrowisthecorrectinvariant. Deriveeffective-zero-divisordecompositionV(h)=L+conjugate(L)+verticalremainder;originalresidual=conjugate(L)+primitive_residual+verticalremainder. Removingverticalpairsleavessamemergednonbranchrowandunchangedprimitivebranchcontribution. ThiswouldallowreplacingGaussianconstructorwithgroupreduction,notchanginginformation/yield. Need separatelyfrozenrow/smoothnessgateanddirectedcommonbranchfactorfixture beforeclaimingtestedidentity.
