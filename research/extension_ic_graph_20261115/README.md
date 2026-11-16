@@ -19,6 +19,17 @@ scale condition fails. Workers receive no planted answer and rebuild their
 own public transfer.
 [pcc:unverified]
 
+The [public-target two-LP validation](local-cover-two-lp-dlp-validation-20261116-29/report.pdf)
+now executes the complete new scalar-recovery path. Original IC and adapted
+two-LP graph IC both return147253026768918773, with native/extra elliptic
+replay and held-out agreement. All1122affine certificates replay and an
+independent batch linear solve finds the same target, with rank398 over
+397small-base coordinates plus the target. The priced subtotal remains
+incomplete: the reused RREF's7,711,970modular products and local subtractions
+bypass hooks, as explicitly recorded in a post-call audit without rewriting
+the frozen measurements. No speed/cost/rho verdict is asserted.
+[pcc:unverified]
+
 ## Three graph representations in the Rust integration
 
 | Representation | Vertices and edges | Computation |

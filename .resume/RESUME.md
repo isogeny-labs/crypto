@@ -1,4 +1,39 @@
-# Current checkpoint:29SOURCE READY, NOTRUN (16 November13:36Z)
+# Current checkpoint:29FINISHED, publish then RREF arithmetic coverage (16 November13:53Z)
+
+Sourceaf48df0d30dccce461370cc8e787a45c2640134d PUBLISHEDBEFOREsole29call.
+Run /workspace/ic-local-runs/local-cover-two-lp-dlp-validation-20261116-29
+exit0/125.248s,fixture+2workerssuccessful/2starts2complete. Bothactualscalars
+147253026768918773/native+extraellreplay/heldoutagreement. CopiedRustqualifier
+fullrecoveryTRUE/independentaffineTargetSAME;172source/precall/preworkers/posthashPASS.
+Candidatefullbase530/small397/1018081B/534807lines/1253verifiedsources
+(132zero,467one,654twoLP),2descents/1019residuals1018advances. Graph1255inputs/
+133LPvertices/pivots1646merges990cycles/0peelingfillfallback ->1122rows/replays,
+21271nnz/rank398/1solveattempt. Fullcost/comparative/rhoFALSE,totalNULL.
+Originalsummary14738B+ICraw7384BexactGit,2LPraw1020695BLOCALexact/hashbound.
+SinglePDFpagevisuallyinspected/exactbenchPDF/SVG/150dpiPNGhashPASS/originalsLOCAL.
+No activecompiler/scientificjob. LastHEADaf48+DIRTY29packet/journal/resume.
+
+CRITICALPOSTCALLCOVERAGE: RelationSystem local residual_walk::mul_mod/sub_mod
+andFixedFactor::mul haveNOmodularhooks. Recordedlegacyproducts7711970 outside
+primitivesubtotal; subtractioncountnotseparatelyemitted; inv_mod alreadyhooked.
+Do NOT inferRREFspeed/costfromobservedLA11316546940. Raw/originalqualifier/summary
+UNCHANGED; coverage-audit.json/postcallreportnote explicit. Wholeobservedsubtotal
+3080275208820IC vs7186744533268candidate;relationphase1679089021154vs6152303556284,
+sofixedfullBspaceoversupplyconcreteissue. RREFmissingmathmeansstillno primaryranking.
+
+NEXTcommit/push29packet/updatePRactualscalar+gapbeforefurthercode. Thenlog/select
+exactRREFmul/addhookpatch(withoutinvdoublecharge), small/wide/legacyvalue controls,
+possiblynative replay of immutable29matrix forcounterconservation beforeanynew
+wholetrial. Neednotrerunwhole29unchanged. Adaptive/streamingLPcollectionavoidoversupply
+isfuturealgorithmidea, NOTyetselected/protocolled. Do notspend5-8minutesonspeculation;
+shorttool/actionloops,commentary<=60s. GoalACTIVE/localusable/no stopgoal/subagents.
+
+PR4288regular/automerge/no manualmerge. CIlastaf48read13:38appreview+migrateSUCCESS/
+otherlistsEMPTY/requiredgatesreviewUNCONFIRMED;next>=14:28absentevent/newpublication.
+S3uploadunavailable,userexplicitlocalorRunpodauthorizationpersists;Git/localcustody
+usable,no credentialquestions. Preservealloldnegative/censoredprotocols/results.
+
+# Previous checkpoint:29SOURCE READY, NOTRUN (16 November13:36Z)
 
 NEWtypedaffine/protectedtarget2LPfullpipeline+publicworkers implemented,
 allfinalsourcechecksPASS. Native22sieve(twoignored)/12genericfilter/3RREF/
