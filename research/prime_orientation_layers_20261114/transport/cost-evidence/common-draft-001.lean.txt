@@ -1,0 +1,57 @@
+module
+public import OrientationTransport
+import all OrientationCompact
+public section
+noncomputable section
+namespace OrientationCommonDenominator
+open Finset Polynomial OrientationBivariate
+
+def geometric {R : Type*} [CommRing R] (x : R) (k : ℕ) : R := ∑ j ∈ range k,(1-x)^j
+
+def clearedGeometric {R : Type*} [CommRing R] (d A : R) : ℕ → R
+  | 0 => 0
+  | k+1 => d*clearedGeometric d A k+d*(d-A)^k
+
+theorem geometric_succ {R : Type*} [CommRing R] (x : R) (k : ℕ) :
+    geometric x (k+1)=geometric x k+(1-x)^k := sum_range_succ _ _
+
+theorem cleared_identity {R : Type*} [CommRing R] (d e A : R) (hde : d*e=1) (k : ℕ) :
+    clearedGeometric d A k=d^k*geometric (e*A) k := by
+  induction k with
+  | zero => simp [clearedGeometric,geometric]
+  | succ k ih =>
+    rw [clearedGeometric,ih,geometric_succ]
+    have he : d*(1-e*A)=d-A := by rw [mul_sub,mul_one,← mul_assoc,hde,one_mul]
+    have hp : (d-A)^k=d^k*(1-e*A)^k := by rw [← he,mul_pow]
+    rw [hp,pow_succ]
+    ring
+
+theorem cleared_map {R S : Type*} [CommRing R] [CommRing S]
+    (f : R →+* S) (d A : R) (k : ℕ) :
+    f (clearedGeometric d A k)=clearedGeometric (f d) (f A) k := by
+  induction k with
+  | zero => simp [clearedGeometric]
+  | succ k ih => simp only [clearedGeometric,map_add,map_mul,map_pow,map_sub,ih]
+
+def integerMap : (ℤ[X])[X] →+* (ℚ[X])[X] :=
+  Polynomial.mapRingHom (Polynomial.mapRingHom (Int.castRingHom ℚ))
+
+def integerNumerator (d : ℤ) (A : (ℤ[X])[X]) (k : ℕ) : (ℤ[X])[X] :=
+  clearedGeometric (C (C d)) A k
+
+theorem integerMap_constant (d : ℤ) : integerMap (C (C d))=C (C (d:ℚ)) := by
+  simp [integerMap]
+
+theorem integer_bivariate_clearing (d : ℤ) (hd : d ≠ 0) (A : (ℤ[X])[X]) (k : ℕ) :
+    C (C ((d:ℚ)^k))*geometricRows (C (C ((d:ℚ)⁻¹))*integerMap A) k=
+      integerMap (integerNumerator d A k) := by
+  have hq : (d:ℚ) ≠ 0 := by exact_mod_cast hd
+  have hu : (C (C (d:ℚ)) : (ℚ[X])[X])*C (C ((d:ℚ)⁻¹))=1 := by
+    rw [← map_mul,← map_mul,mul_inv_cancel₀ hq,map_one,map_one]
+  have H := cleared_identity (C (C (d:ℚ))) (C (C ((d:ℚ)⁻¹))) (integerMap A) hu k
+  rw [integerNumerator,cleared_map,integerMap_constant]
+  simpa only [geometric,geometricRows,map_pow] using H.symm
+
+end OrientationCommonDenominator
+#print axioms OrientationCommonDenominator.cleared_identity
+#print axioms OrientationCommonDenominator.integer_bivariate_clearing
