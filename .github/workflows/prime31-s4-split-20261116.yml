@@ -52,6 +52,11 @@ jobs:
         run: |
           cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_anchor2_m6_support_validator
           cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_anchor2_m6_support_validator
+      - name: Prime31 symmetric m8 finite-root and signed-infinity exactness (Rust)
+        timeout-minutes: 3
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_symmetric_root_gate
       - name: Rust APS one-relation solver algebraic correctness tests
         timeout-minutes: 2
         run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
