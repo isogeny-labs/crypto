@@ -1,0 +1,4247 @@
+{
+  "total_ir": 111865803,
+  "functions": [
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::axpy_in_place::<alloc::vec::Vec<usize>>",
+      "self_ir": 14713175,
+      "inclusive_ir": 23551269
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::lead",
+      "self_ir": 14074655,
+      "inclusive_ir": 14074655
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>::insert",
+      "self_ir": 6000997,
+      "inclusive_ir": 7707703
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "free",
+      "self_ir": 5140663,
+      "inclusive_ir": 9402689
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000a0fe0",
+      "self_ir": 4973151,
+      "inclusive_ir": 5189158
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<usize> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<usize, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<usize>, core::slice::iter::Iter<usize>>, certified_relations::plus::{closure#0}>>>::from_iter",
+      "self_ir": 4456144,
+      "inclusive_ir": 6407367
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "relation_replay_checker::add_term",
+      "self_ir": 3480336,
+      "inclusive_ir": 8383851
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "malloc",
+      "self_ir": 3308370,
+      "inclusive_ir": 6233655
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>::remove::<alloc::vec::Vec<usize>>",
+      "self_ir": 3099851,
+      "inclusive_ir": 4678699
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000a02e0",
+      "self_ir": 2781166,
+      "inclusive_ir": 4654806
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::normal_form",
+      "self_ir": 2758395,
+      "inclusive_ir": 16808768
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::shared::smallsort::insertion_sort_shift_left::<(alloc::vec::Vec<usize>, u64), <[(alloc::vec::Vec<usize>, u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::iter::traits::collect::FromIterator<(alloc::vec::Vec<usize>, u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::shift::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 2329899,
+      "inclusive_ir": 2329899
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::change_order",
+      "self_ir": 2175204,
+      "inclusive_ir": 17849438
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000162880",
+      "self_ir": 1758121,
+      "inclusive_ir": 1758121
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000a20c0",
+      "self_ir": 1753236,
+      "inclusive_ir": 4792980
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Keys<alloc::vec::Vec<usize>, u64>, certified_relations::degree::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<usize, <usize as core::cmp::Ord>::max>",
+      "self_ir": 1715001,
+      "inclusive_ir": 1715001
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Owned, alloc::vec::Vec<usize>, u64, alloc::collections::btree::node::marker::LeafOrInternal>>::bulk_push::<alloc::collections::btree::dedup_sorted_iter::DedupSortedIter<alloc::vec::Vec<usize>, u64, alloc::vec::into_iter::IntoIter<(alloc::vec::Vec<usize>, u64)>>, alloc::alloc::Global>",
+      "self_ir": 1694976,
+      "inclusive_ir": 2704526
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::iter::adapters::try_process::<core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<usize>, core::slice::iter::Iter<usize>>, relation_replay_checker::sum_monomials::{closure#0}>, usize, core::result::Result<!, alloc::string::String>, <core::result::Result<alloc::vec::Vec<usize>, alloc::string::String> as core::iter::traits::collect::FromIterator<core::result::Result<usize, alloc::string::String>>>::from_iter<core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<usize>, core::slice::iter::Iter<usize>>, relation_replay_checker::sum_monomials::{closure#0}>>::{closure#0}, alloc::vec::Vec<usize>>",
+      "self_ir": 1456390,
+      "inclusive_ir": 7697921
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::shift::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<(alloc::vec::Vec<usize>, u64), <alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)>>::extend_trusted<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::shift::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 1416787,
+      "inclusive_ir": 7127276
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::SliceRead>>::parse_integer",
+      "self_ir": 1358724,
+      "inclusive_ir": 1505636
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "realloc",
+      "self_ir": 1346484,
+      "inclusive_ir": 6139844
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::SeqAccess<_> as serde_core::de::SeqAccess>::next_element_seed::has_next_element::<serde_json::read::SliceRead>",
+      "self_ir": 1327435,
+      "inclusive_ir": 1327435
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000009ed80",
+      "self_ir": 1274120,
+      "inclusive_ir": 1519065
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::axpy_in_place::<(usize, alloc::vec::Vec<usize>)>",
+      "self_ir": 1095827,
+      "inclusive_ir": 1954170
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::marker::PhantomData<usize> as serde_core::de::DeserializeSeed>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>",
+      "self_ir": 1086666,
+      "inclusive_ir": 2076479
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::rewrite",
+      "self_ir": 1086562,
+      "inclusive_ir": 17463383
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::Row>, certified_relations::normal_form_cached::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<(&certified_relations::Row, core::option::Option<&alloc::vec::Vec<usize>>), <alloc::vec::Vec<(&certified_relations::Row, core::option::Option<&alloc::vec::Vec<usize>>)>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::Row>, certified_relations::normal_form_cached::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 953348,
+      "inclusive_ir": 953348
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::monomials_ordered::emit'2",
+      "self_ir": 908621,
+      "inclusive_ir": 28791134
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::IntoIter<alloc::vec::Vec<usize>, u64>>::dying_next",
+      "self_ir": 898183,
+      "inclusive_ir": 1131274
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<relation_replay_checker::Arithmetic>::identity",
+      "self_ir": 826870,
+      "inclusive_ir": 17919131
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVecInner>::finish_grow",
+      "self_ir": 770088,
+      "inclusive_ir": 7411811
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000162120",
+      "self_ir": 761991,
+      "inclusive_ir": 761991
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rdl_alloc",
+      "self_ir": 718758,
+      "inclusive_ir": 6949890
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Dying, alloc::vec::Vec<usize>, u64, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::deallocating_next::<alloc::alloc::Global>",
+      "self_ir": 632811,
+      "inclusive_ir": 632811
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<usize> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 621194,
+      "inclusive_ir": 5949818
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, alloc::vec::Vec<usize>>",
+      "self_ir": 620234,
+      "inclusive_ir": 1452146
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000009eaf0",
+      "self_ir": 617393,
+      "inclusive_ir": 617393
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::str::converts::from_utf8",
+      "self_ir": 577455,
+      "inclusive_ir": 577455
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_key::<str>",
+      "self_ir": 577172,
+      "inclusive_ir": 630968
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>",
+      "self_ir": 477898,
+      "inclusive_ir": 6012127
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, alloc::vec::Vec<usize>, u64, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::KV>>::remove_leaf_kv::<<alloc::collections::btree::map::entry::OccupiedEntry<alloc::vec::Vec<usize>, u64>>::remove_kv::{closure#0}, alloc::alloc::Global>",
+      "self_ir": 446977,
+      "inclusive_ir": 753878
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, alloc::vec::Vec<usize>, u64, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::insert_recursing::<alloc::alloc::Global, <alloc::collections::btree::map::entry::VacantEntry<alloc::vec::Vec<usize>, u64>>::insert_entry::{closure#0}>",
+      "self_ir": 432536,
+      "inclusive_ir": 596578
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::read::SliceRead>::skip_to_escape",
+      "self_ir": 429764,
+      "inclusive_ir": 429764
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::verify",
+      "self_ir": 417649,
+      "inclusive_ir": 12265627
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<u64 as itoa::Unsigned>::fmt",
+      "self_ir": 411527,
+      "inclusive_ir": 411527
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64>>::insert",
+      "self_ir": 403486,
+      "inclusive_ir": 640431
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Keys<alloc::vec::Vec<usize>, u64>, relation_replay_checker::polynomial_degree::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<usize, <usize as core::cmp::Ord>::max>",
+      "self_ir": 383664,
+      "inclusive_ir": 383664
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rdl_realloc",
+      "self_ir": 379742,
+      "inclusive_ir": 6518811
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::degree",
+      "self_ir": 364986,
+      "inclusive_ir": 2079423
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__umodti3",
+      "self_ir": 344904,
+      "inclusive_ir": 344904
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), alloc::collections::btree::set_val::SetValZST>>::insert",
+      "self_ir": 338786,
+      "inclusive_ir": 457978
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::entry::VacantEntry<alloc::vec::Vec<usize>, u64>>::insert_entry",
+      "self_ir": 313341,
+      "inclusive_ir": 961840
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Owned, (usize, alloc::vec::Vec<usize>), u64, alloc::collections::btree::node::marker::LeafOrInternal>>::bulk_push::<alloc::collections::btree::dedup_sorted_iter::DedupSortedIter<(usize, alloc::vec::Vec<usize>), u64, alloc::vec::into_iter::IntoIter<((usize, alloc::vec::Vec<usize>), u64)>>, alloc::alloc::Global>",
+      "self_ir": 294679,
+      "inclusive_ir": 425449
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::read::SliceRead as serde_json::read::Read>::parse_str",
+      "self_ir": 289751,
+      "inclusive_ir": 1296345
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::iter::traits::collect::FromIterator<(alloc::vec::Vec<usize>, u64)>>::from_iter::<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::shift::{closure#0}>>",
+      "self_ir": 275763,
+      "inclusive_ir": 13026548
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<relation_replay_checker::Multiplier as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 270750,
+      "inclusive_ir": 5134034
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::MapAccess<_> as serde_core::de::MapAccess>::next_key_seed::has_next_key::<serde_json::read::SliceRead>",
+      "self_ir": 248926,
+      "inclusive_ir": 248926
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)> as alloc::vec::spec_from_iter::SpecFromIter<(alloc::vec::Vec<usize>, u64), core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::shift::{closure#0}>>>::from_iter",
+      "self_ir": 247881,
+      "inclusive_ir": 7624127
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::IntoIter<(usize, alloc::vec::Vec<usize>), u64>>::dying_next",
+      "self_ir": 245059,
+      "inclusive_ir": 293984
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::SeqAccess<serde_json::read::SliceRead> as serde_core::de::SeqAccess>::next_element_seed::<core::marker::PhantomData<usize>>",
+      "self_ir": 238140,
+      "inclusive_ir": 664290
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<((usize, alloc::vec::Vec<usize>), u64), <alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)>>::extend_trusted<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 231424,
+      "inclusive_ir": 928302
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<_, _, _> as core::clone::Clone>::clone::clone_subtree::<alloc::vec::Vec<usize>, u64, alloc::alloc::Global>",
+      "self_ir": 217779,
+      "inclusive_ir": 952253
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::compact::row_shape",
+      "self_ir": 217402,
+      "inclusive_ir": 969727
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::row_shift",
+      "self_ir": 205075,
+      "inclusive_ir": 9453691
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::Value as serde_core::ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut alloc::vec::Vec<u8>>>'2",
+      "self_ir": 191950,
+      "inclusive_ir": 890583
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::pow",
+      "self_ir": 176768,
+      "inclusive_ir": 176768
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::entry::OccupiedEntry<alloc::vec::Vec<usize>, u64>>::remove_kv",
+      "self_ir": 170982,
+      "inclusive_ir": 1062953
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::axpy::<alloc::vec::Vec<usize>>",
+      "self_ir": 157740,
+      "inclusive_ir": 23709009
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)> as alloc::vec::spec_from_iter::SpecFromIter<((usize, alloc::vec::Vec<usize>), u64), core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}>>>::from_iter",
+      "self_ir": 150632,
+      "inclusive_ir": 1150343
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::SliceRead>>::parse_number",
+      "self_ir": 146912,
+      "inclusive_ir": 146912
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::compact::verify_impl",
+      "self_ir": 138803,
+      "inclusive_ir": 15823251
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<usize>>::grow_one",
+      "self_ir": 129504,
+      "inclusive_ir": 1674593
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000009ebd0",
+      "self_ir": 129062,
+      "inclusive_ir": 167375
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::slice::iter::Iter<alloc::vec::Vec<usize>> as core::iter::traits::iterator::Iterator>::try_fold::<(), <core::iter::adapters::enumerate::Enumerate<_> as core::iter::traits::iterator::Iterator>::try_fold::enumerate<&alloc::vec::Vec<usize>, (), core::ops::control_flow::ControlFlow<()>, core::iter::traits::iterator::Iterator::any::check<(usize, &alloc::vec::Vec<usize>), relation_replay_checker::verify_json::{closure#2}>::{closure#0}>::{closure#0}, core::ops::control_flow::ControlFlow<()>>",
+      "self_ir": 128775,
+      "inclusive_ir": 128775
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter::<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}>>",
+      "self_ir": 125490,
+      "inclusive_ir": 1882037
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::projection::times",
+      "self_ir": 124535,
+      "inclusive_ir": 3871283
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, usize>",
+      "self_ir": 123434,
+      "inclusive_ir": 648513
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut certified_relations::cheap::recognize::{closure#0} as core::ops::function::FnMut<(&usize,)>>::call_mut",
+      "self_ir": 121620,
+      "inclusive_ir": 121620
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, alloc::vec::Vec<usize>, u64, alloc::collections::btree::node::marker::LeafOrInternal>, alloc::collections::btree::node::marker::KV>>::remove_kv_tracking::<<alloc::collections::btree::map::entry::OccupiedEntry<alloc::vec::Vec<usize>, u64>>::remove_kv::{closure#0}, alloc::alloc::Global>",
+      "self_ir": 117390,
+      "inclusive_ir": 871268
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, (usize, alloc::vec::Vec<usize>), u64, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::insert_recursing::<alloc::alloc::Global, <alloc::collections::btree::map::entry::VacantEntry<(usize, alloc::vec::Vec<usize>), u64>>::insert_entry::{closure#0}>",
+      "self_ir": 110949,
+      "inclusive_ir": 155506
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::axpy::<(usize, alloc::vec::Vec<usize>)>",
+      "self_ir": 105090,
+      "inclusive_ir": 2059260
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>> as core::ops::drop::Drop>::drop",
+      "self_ir": 96055,
+      "inclusive_ir": 676792
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>::get::<alloc::vec::Vec<usize>>",
+      "self_ir": 87934,
+      "inclusive_ir": 87934
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::replay::proof::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<certified_relations::replay::CofactorTerm, <alloc::vec::Vec<certified_relations::replay::CofactorTerm>>::extend_trusted<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::replay::proof::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 83844,
+      "inclusive_ir": 278169
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<usize>>",
+      "self_ir": 80910,
+      "inclusive_ir": 6064890
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rust_no_alloc_shim_is_unstable_v2",
+      "self_ir": 80558,
+      "inclusive_ir": 80558
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rdl_dealloc",
+      "self_ir": 80556,
+      "inclusive_ir": 9482855
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rust_dealloc",
+      "self_ir": 80556,
+      "inclusive_ir": 9563411
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::cheap::recognize",
+      "self_ir": 80070,
+      "inclusive_ir": 665848
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rust_alloc",
+      "self_ir": 79862,
+      "inclusive_ir": 7029752
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::cmp::PartialEq>::eq",
+      "self_ir": 75550,
+      "inclusive_ir": 106462
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000009e390",
+      "self_ir": 68828,
+      "inclusive_ir": 68828
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::shared::smallsort::insert_tail::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 67073,
+      "inclusive_ir": 67073
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::System>::decode",
+      "self_ir": 66954,
+      "inclusive_ir": 1083530
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<serde_json::value::Value>'2",
+      "self_ir": 66526,
+      "inclusive_ir": 1325854
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::entry::VacantEntry<(usize, alloc::vec::Vec<usize>), u64>>::insert_entry",
+      "self_ir": 66165,
+      "inclusive_ir": 236945
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::replay::CofactorTerm as serde_core::ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut alloc::vec::Vec<u8>>>",
+      "self_ir": 64980,
+      "inclusive_ir": 1901993
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::compact::admitted",
+      "self_ir": 64156,
+      "inclusive_ir": 76174
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, (usize, alloc::vec::Vec<usize>), alloc::collections::btree::set_val::SetValZST, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::insert_recursing::<alloc::alloc::Global, <alloc::collections::btree::map::entry::VacantEntry<(usize, alloc::vec::Vec<usize>), alloc::collections::btree::set_val::SetValZST>>::insert_entry::{closure#0}>",
+      "self_ir": 63887,
+      "inclusive_ir": 74281
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::number::Number as core::convert::From<u64>>::from",
+      "self_ir": 61605,
+      "inclusive_ir": 433034
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::stable::drift::sort::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 58912,
+      "inclusive_ir": 58912
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::IntoIter<(usize, alloc::vec::Vec<usize>), alloc::collections::btree::set_val::SetValZST>>::dying_next",
+      "self_ir": 56605,
+      "inclusive_ir": 71568
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<relation_replay_checker::Pair as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 56079,
+      "inclusive_ir": 526255
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<certified_relations::Term as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 54000,
+      "inclusive_ir": 1252570
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::BalancingContext<alloc::vec::Vec<usize>, u64>>::merge_tracking_child_edge::<alloc::alloc::Global>",
+      "self_ir": 53442,
+      "inclusive_ir": 111188
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Dying, (usize, alloc::vec::Vec<usize>), u64, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::deallocating_next::<alloc::alloc::Global>",
+      "self_ir": 53410,
+      "inclusive_ir": 61771
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::marker::PhantomData<u64> as serde_core::de::DeserializeSeed>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>",
+      "self_ir": 52920,
+      "inclusive_ir": 240631
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::Row> as core::ops::drop::Drop>::drop",
+      "self_ir": 52368,
+      "inclusive_ir": 375911
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000e870",
+      "self_ir": 51531,
+      "inclusive_ir": 150241
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "calloc",
+      "self_ir": 51154,
+      "inclusive_ir": 130704
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Keys<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::quotient::compact::original_bound::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<usize, <usize as core::cmp::Ord>::max>",
+      "self_ir": 49540,
+      "inclusive_ir": 49540
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::dedup_sorted_iter::DedupSortedIter<alloc::vec::Vec<usize>, u64, core::array::iter::IntoIter<(alloc::vec::Vec<usize>, u64), 1>> as core::iter::traits::iterator::Iterator>::next",
+      "self_ir": 49528,
+      "inclusive_ir": 49528
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<relation_replay_checker::InputTerm as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 49410,
+      "inclusive_ir": 1165094
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::scale",
+      "self_ir": 49348,
+      "inclusive_ir": 49348
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000a220",
+      "self_ir": 49059,
+      "inclusive_ir": 69132
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::ops::drop::Drop>::drop",
+      "self_ir": 48744,
+      "inclusive_ir": 313383
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Multiplier> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 48631,
+      "inclusive_ir": 5338510
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::iterator::Iterator>::next",
+      "self_ir": 46715,
+      "inclusive_ir": 46715
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::coordinate",
+      "self_ir": 46545,
+      "inclusive_ir": 9189310
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000064ff0",
+      "self_ir": 44884,
+      "inclusive_ir": 71604
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::Serializer as serde_core::ser::Serializer>::collect_seq::<&alloc::vec::Vec<usize>>",
+      "self_ir": 44640,
+      "inclusive_ir": 469435
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::projection::gcd",
+      "self_ir": 44198,
+      "inclusive_ir": 1086156
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::navigate::LazyLeafRange<alloc::collections::btree::node::marker::Dying, alloc::vec::Vec<usize>, u64>>::take_front",
+      "self_ir": 43288,
+      "inclusive_ir": 43288
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<relation_replay_checker::InputTerm>>, relation_replay_checker::original::{closure#0}>, core::result::Result<!, alloc::string::String>> as core::iter::traits::iterator::Iterator>::next",
+      "self_ir": 43071,
+      "inclusive_ir": 312073
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Owned, alloc::vec::Vec<usize>, u64, alloc::collections::btree::node::marker::LeafOrInternal>>::bulk_push::<alloc::collections::btree::dedup_sorted_iter::DedupSortedIter<alloc::vec::Vec<usize>, u64, core::array::iter::IntoIter<(alloc::vec::Vec<usize>, u64), 1>>, alloc::alloc::Global>",
+      "self_ir": 42280,
+      "inclusive_ir": 91808
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::chain::Chain<alloc::collections::btree::map::Keys<alloc::vec::Vec<usize>, u64>, alloc::collections::btree::map::Keys<alloc::vec::Vec<usize>, u64>> as core::iter::traits::iterator::Iterator>::try_fold::<(), core::iter::traits::iterator::Iterator::any::check<&alloc::vec::Vec<usize>, certified_relations::quotient::coordinate::{closure#0}>::{closure#0}, core::ops::control_flow::ControlFlow<()>>",
+      "self_ir": 42045,
+      "inclusive_ir": 51165
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::entry::VacantEntry<(usize, alloc::vec::Vec<usize>), alloc::collections::btree::set_val::SetValZST>>::insert_entry",
+      "self_ir": 40932,
+      "inclusive_ir": 119192
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::SliceRead>>::end_seq",
+      "self_ir": 40603,
+      "inclusive_ir": 40603
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<usize> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<usize, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<usize>, core::slice::iter::Iter<usize>>, relation_replay_checker::verify_json::{closure#3}>>>::from_iter",
+      "self_ir": 39501,
+      "inclusive_ir": 48393
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::SliceRead>>::end_map",
+      "self_ir": 36126,
+      "inclusive_ir": 36126
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "relation_replay_checker::verify_json",
+      "self_ir": 35161,
+      "inclusive_ir": 27190145
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<u8>>::extend_from_slice",
+      "self_ir": 32638,
+      "inclusive_ir": 52306
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<relation_replay_checker::Term as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 32025,
+      "inclusive_ir": 749049
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "relation_replay_checker::leading",
+      "self_ir": 31896,
+      "inclusive_ir": 31896
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::replay::quotient_witness",
+      "self_ir": 31596,
+      "inclusive_ir": 8700201
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64> as core::iter::traits::iterator::Iterator>::next",
+      "self_ir": 31472,
+      "inclusive_ir": 31472
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000ae90",
+      "self_ir": 31283,
+      "inclusive_ir": 100415
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<usize> as core::clone::Clone>::clone",
+      "self_ir": 30555,
+      "inclusive_ir": 82309
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::s_polynomial",
+      "self_ir": 28586,
+      "inclusive_ir": 322672
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::shared::smallsort::insertion_sort_shift_left::<certified_relations::Row, <[certified_relations::Row]>::sort_by<certified_relations::reference::{closure#4}>::{closure#0}>",
+      "self_ir": 25444,
+      "inclusive_ir": 208324
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::convert::From<[(alloc::vec::Vec<usize>, u64); 1]>>::from",
+      "self_ir": 25368,
+      "inclusive_ir": 148805
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::replay::complete_impl",
+      "self_ir": 24462,
+      "inclusive_ir": 9810514
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::marker::PhantomData<i64> as serde_core::de::DeserializeSeed>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>",
+      "self_ir": 23760,
+      "inclusive_ir": 110626
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::BalancingContext<alloc::vec::Vec<usize>, u64>>::bulk_steal_left",
+      "self_ir": 23688,
+      "inclusive_ir": 37800
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000013780",
+      "self_ir": 23661,
+      "inclusive_ir": 23661
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::projection::product",
+      "self_ir": 23236,
+      "inclusive_ir": 408741
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__strtoul_internal",
+      "self_ir": 22142,
+      "inclusive_ir": 22142
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)> as alloc::vec::spec_from_iter::SpecFromIter<(alloc::vec::Vec<usize>, u64), core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<core::array::iter::IntoIter<(usize, usize, u64), 9>, certified_relations::cheap::f3::{closure#1}>, certified_relations::cheap::f3::{closure#2}>>>::from_iter",
+      "self_ir": 21390,
+      "inclusive_ir": 122708
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__modti3",
+      "self_ir": 19980,
+      "inclusive_ir": 32400
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::check_reference_impl",
+      "self_ir": 18434,
+      "inclusive_ir": 9585266
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<certified_relations::Row>",
+      "self_ir": 18421,
+      "inclusive_ir": 225418
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::compact::solve_impl",
+      "self_ir": 17343,
+      "inclusive_ir": 68096113
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rust_realloc",
+      "self_ir": 17261,
+      "inclusive_ir": 6536072
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, alloc::vec::Vec<certified_relations::replay::CofactorTerm>>",
+      "self_ir": 17198,
+      "inclusive_ir": 956186
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "relation_replay_checker::decode",
+      "self_ir": 16625,
+      "inclusive_ir": 85618
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::dedup_sorted_iter::DedupSortedIter<(usize, alloc::vec::Vec<usize>), u64, core::array::iter::IntoIter<((usize, alloc::vec::Vec<usize>), u64), 1>> as core::iter::traits::iterator::Iterator>::next",
+      "self_ir": 15750,
+      "inclusive_ir": 15750
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000163280",
+      "self_ir": 15725,
+      "inclusive_ir": 15725
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000024740",
+      "self_ir": 15243,
+      "inclusive_ir": 15243
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::quotient::coefficient::{closure#0}>, certified_relations::quotient::coefficient::{closure#1}> as core::iter::traits::iterator::Iterator>::next",
+      "self_ir": 14490,
+      "inclusive_ir": 51939
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::cheap::Recognized> as core::ops::drop::Drop>::drop",
+      "self_ir": 14037,
+      "inclusive_ir": 100033
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<u64> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u64, core::iter::adapters::chain::Chain<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<u64>>, certified_relations::quotient::dependence::{closure#0}::{closure#0}>, core::array::iter::IntoIter<u64, 1>>>>::from_iter",
+      "self_ir": 13608,
+      "inclusive_ir": 18380
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::encode::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<certified_relations::Term, <alloc::vec::Vec<certified_relations::Term>>::extend_trusted<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::encode::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 13510,
+      "inclusive_ir": 52185
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rdl_alloc_zeroed",
+      "self_ir": 13224,
+      "inclusive_ir": 143678
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::ser::format_escaped_str::<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter>",
+      "self_ir": 12902,
+      "inclusive_ir": 13748
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Owned, (usize, alloc::vec::Vec<usize>), u64, alloc::collections::btree::node::marker::LeafOrInternal>>::bulk_push::<alloc::collections::btree::dedup_sorted_iter::DedupSortedIter<(usize, alloc::vec::Vec<usize>), u64, core::array::iter::IntoIter<((usize, alloc::vec::Vec<usize>), u64), 1>>, alloc::alloc::Global>",
+      "self_ir": 12600,
+      "inclusive_ir": 28350
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::replay::PairReduction as serde_core::ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut alloc::vec::Vec<u8>>>",
+      "self_ir": 12564,
+      "inclusive_ir": 228549
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::difference",
+      "self_ir": 12480,
+      "inclusive_ir": 20773
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::navigate::LazyLeafRange<alloc::collections::btree::node::marker::Dying, (usize, alloc::vec::Vec<usize>), u64>>::take_front",
+      "self_ir": 12474,
+      "inclusive_ir": 12474
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "compiler_builtins::int::specialized_div_rem::u128_div_rem",
+      "self_ir": 12420,
+      "inclusive_ir": 12420
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::replay::decode_poly",
+      "self_ir": 12369,
+      "inclusive_ir": 64412
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::ops::drop::Drop>::drop",
+      "self_ir": 12360,
+      "inclusive_ir": 87399
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Multiplier>>",
+      "self_ir": 12036,
+      "inclusive_ir": 5355030
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<core::option::Option<certified_relations::Row>> as core::ops::drop::Drop>::drop",
+      "self_ir": 11795,
+      "inclusive_ir": 80384
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<relation_replay_checker::Pair as serde_core::de::Deserialize>::deserialize::__FieldVisitor as serde_core::de::Visitor>::visit_str::<serde_json::error::Error>",
+      "self_ir": 10971,
+      "inclusive_ir": 10971
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::projection::quadratic_resultant",
+      "self_ir": 10664,
+      "inclusive_ir": 1483153
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<certified_relations::Term> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 10320,
+      "inclusive_ir": 1307792
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::InputTerm> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 10320,
+      "inclusive_ir": 1223529
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, alloc::vec::Vec<alloc::vec::Vec<certified_relations::replay::CofactorTerm>>>",
+      "self_ir": 10290,
+      "inclusive_ir": 998001
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<certified_relations::replay::Witness>",
+      "self_ir": 9922,
+      "inclusive_ir": 297505
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<relation_replay_checker::Witness>",
+      "self_ir": 9922,
+      "inclusive_ir": 298897
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::replay::CanonicalTerm as serde_core::ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut alloc::vec::Vec<u8>>>",
+      "self_ir": 9450,
+      "inclusive_ir": 252623
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000a0a0",
+      "self_ir": 9370,
+      "inclusive_ir": 20073
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::monic",
+      "self_ir": 9021,
+      "inclusive_ir": 59797
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::cheap::f3",
+      "self_ir": 9000,
+      "inclusive_ir": 255769
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_bool::<serde_core::de::impls::BoolVisitor>",
+      "self_ir": 8748,
+      "inclusive_ir": 8748
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::shared::smallsort::small_sort_general_with_scratch::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::convert::From<[((usize, alloc::vec::Vec<usize>), u64); 1]>>::from::{closure#0}>::{closure#0}>",
+      "self_ir": 8664,
+      "inclusive_ir": 10076
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::is_univariate",
+      "self_ir": 8565,
+      "inclusive_ir": 8565
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<certified_relations::replay::Member>",
+      "self_ir": 8341,
+      "inclusive_ir": 151423
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<relation_replay_checker::Member>",
+      "self_ir": 8341,
+      "inclusive_ir": 150735
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<relation_replay_checker::Member as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 8190,
+      "inclusive_ir": 3055926
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::string::String, serde_json::value::Value>>::insert",
+      "self_ir": 7880,
+      "inclusive_ir": 30256
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::convert::From<[((usize, alloc::vec::Vec<usize>), u64); 1]>>::from",
+      "self_ir": 7612,
+      "inclusive_ir": 63318
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::value::to_value::<&&(alloc::vec::Vec<usize>, u64)>",
+      "self_ir": 7410,
+      "inclusive_ir": 520832
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Term> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 7315,
+      "inclusive_ir": 784192
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000013e00",
+      "self_ir": 7214,
+      "inclusive_ir": 10556
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<usize> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<usize, core::iter::adapters::filter::Filter<core::ops::range::Range<usize>, certified_relations::cheap::recognize::{closure#0}>>>::from_iter",
+      "self_ir": 7200,
+      "inclusive_ir": 130380
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>, certified_relations::input_rows::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<certified_relations::Row, <alloc::vec::Vec<certified_relations::Row>>::extend_trusted<core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>, certified_relations::input_rows::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 6776,
+      "inclusive_ir": 275258
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Pair> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 6559,
+      "inclusive_ir": 544158
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Keys<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::certificate_degree::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<usize, <usize as core::cmp::Ord>::max>",
+      "self_ir": 6429,
+      "inclusive_ir": 58253
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<[alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>; 2]>",
+      "self_ir": 6330,
+      "inclusive_ir": 40259
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, bool>",
+      "self_ir": 5994,
+      "inclusive_ir": 38232
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::memchr::memrchr_aligned",
+      "self_ir": 5991,
+      "inclusive_ir": 5991
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::cheap::pair_metadata",
+      "self_ir": 5811,
+      "inclusive_ir": 779742
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)> as alloc::vec::spec_from_iter::SpecFromIter<(alloc::vec::Vec<usize>, u64), core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::quotient::inverse_mod::{closure#0}>, certified_relations::quotient::inverse_mod::{closure#1}>>>::from_iter",
+      "self_ir": 5625,
+      "inclusive_ir": 11415
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<relation_replay_checker::Multiplier>>::grow_one",
+      "self_ir": 5400,
+      "inclusive_ir": 105185
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000015f00",
+      "self_ir": 5366,
+      "inclusive_ir": 5366
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::projection::swap::{closure#2}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<((usize, alloc::vec::Vec<usize>), u64), <alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)>>::extend_trusted<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::projection::swap::{closure#2}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 5154,
+      "inclusive_ir": 18829
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::Serializer as serde_core::ser::Serializer>::serialize_seq",
+      "self_ir": 4998,
+      "inclusive_ir": 32543
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)> as alloc::vec::spec_from_iter::SpecFromIter<(alloc::vec::Vec<usize>, u64), core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::quotient::coefficient::{closure#0}>, certified_relations::quotient::coefficient::{closure#1}>>>::from_iter",
+      "self_ir": 4635,
+      "inclusive_ir": 63963
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::into_iter::IntoIter<certified_relations::Row> as core::iter::traits::iterator::Iterator>::try_fold::<(), core::iter::traits::iterator::Iterator::any::check<certified_relations::Row, certified_relations::check_reference_impl::{closure#2}>::{closure#0}, core::ops::control_flow::ControlFlow<()>>",
+      "self_ir": 4451,
+      "inclusive_ir": 7896554
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(&certified_relations::Row, core::option::Option<&alloc::vec::Vec<usize>>)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(&certified_relations::Row, core::option::Option<&alloc::vec::Vec<usize>>), core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::Row>, certified_relations::normal_form_cached::{closure#0}>>>::from_iter",
+      "self_ir": 4324,
+      "inclusive_ir": 962691
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, alloc::vec::Vec<certified_relations::replay::CanonicalTerm>>",
+      "self_ir": 4305,
+      "inclusive_ir": 261968
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<alloc::vec::Vec<u64>> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<alloc::vec::Vec<u64>, core::iter::adapters::map::Map<core::ops::range::Range<usize>, certified_relations::quotient::dependence::{closure#0}>>>::from_iter",
+      "self_ir": 4209,
+      "inclusive_ir": 23785
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::StrRead>>::parse_any_number",
+      "self_ir": 4084,
+      "inclusive_ir": 20292
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<relation_replay_checker::Term>>::grow_one",
+      "self_ir": 3840,
+      "inclusive_ir": 56408
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<certified_relations::System>",
+      "self_ir": 3748,
+      "inclusive_ir": 67146
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<relation_replay_checker::Input>",
+      "self_ir": 3748,
+      "inclusive_ir": 66872
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000007cb0",
+      "self_ir": 3719,
+      "inclusive_ir": 6112
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::shared::smallsort::insertion_sort_shift_left::<&alloc::string::String, <&alloc::string::String as core::cmp::PartialOrd>::lt>",
+      "self_ir": 3707,
+      "inclusive_ir": 7799
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_sputbackc",
+      "self_ir": 3696,
+      "inclusive_ir": 3696
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<usize>, u64), alloc::collections::btree::map::IntoIter<alloc::vec::Vec<usize>, u64>>>::from_iter",
+      "self_ir": 3610,
+      "inclusive_ir": 18214
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::Serializer as serde_core::ser::Serializer>::serialize_tuple",
+      "self_ir": 3610,
+      "inclusive_ir": 21448
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::replay::CofactorTerm> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<certified_relations::replay::CofactorTerm, core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::replay::proof::{closure#0}>>>::from_iter",
+      "self_ir": 3552,
+      "inclusive_ir": 296556
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "getdelim",
+      "self_ir": 3497,
+      "inclusive_ir": 7605
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::IntoIter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::quotient::change_order::{closure#1}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<((usize, alloc::vec::Vec<usize>), u64), <alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)>>::extend_trusted<core::iter::adapters::map::Map<alloc::collections::btree::map::IntoIter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::quotient::change_order::{closure#1}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 3477,
+      "inclusive_ir": 9633
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::iter::traits::collect::FromIterator<(alloc::vec::Vec<usize>, u64)>>::from_iter::<core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::quotient::coefficient::{closure#0}>, certified_relations::quotient::coefficient::{closure#1}>>",
+      "self_ir": 3240,
+      "inclusive_ir": 98800
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::subtract_row",
+      "self_ir": 3240,
+      "inclusive_ir": 485799
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, alloc::string::String, serde_json::value::Value, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::insert_recursing::<alloc::alloc::Global, <alloc::collections::btree::map::entry::VacantEntry<alloc::string::String, serde_json::value::Value>>::insert_entry::{closure#0}>",
+      "self_ir": 3236,
+      "inclusive_ir": 4415
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::IntoIter<alloc::string::String, serde_json::value::Value>>::dying_next",
+      "self_ir": 3184,
+      "inclusive_ir": 4718
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::NumberValueEmitter as serde_core::ser::Serializer>::serialize_str",
+      "self_ir": 2989,
+      "inclusive_ir": 41937
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<_, _, _> as core::clone::Clone>::clone::clone_subtree::<(usize, alloc::vec::Vec<usize>), u64, alloc::alloc::Global>",
+      "self_ir": 2940,
+      "inclusive_ir": 10632
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::Serializer as serde_core::ser::Serializer>::collect_seq::<&alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)>>",
+      "self_ir": 2888,
+      "inclusive_ir": 527352
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::projection::quadratic_resultant::{closure#0}",
+      "self_ir": 2880,
+      "inclusive_ir": 18320
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::StrRead>>::scan_integer",
+      "self_ir": 2873,
+      "inclusive_ir": 3853
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, alloc::vec::Vec<certified_relations::replay::PairReduction>>",
+      "self_ir": 2779,
+      "inclusive_ir": 231515
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&serde_json::value::Value as serde_core::ser::Serialize>::serialize::<serde_json::value::ser::Serializer>'2",
+      "self_ir": 2586,
+      "inclusive_ir": 131248
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeStruct>::serialize_field::<alloc::string::String>",
+      "self_ir": 2450,
+      "inclusive_ir": 44387
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<u64> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u64, core::iter::adapters::map::Map<core::ops::range::Range<usize>, certified_relations::quotient::dependence::{closure#3}>>>::from_iter",
+      "self_ir": 2394,
+      "inclusive_ir": 3382
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::number::Number as core::convert::From<serde_json::de::ParserNumber>>::from",
+      "self_ir": 2352,
+      "inclusive_ir": 6536
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::quotient::compact::Chain>::push",
+      "self_ir": 2345,
+      "inclusive_ir": 4909356
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<alloc::string::String, serde_json::value::Value>'2",
+      "self_ir": 2260,
+      "inclusive_ir": 38084
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::projection::subset_quadratic",
+      "self_ir": 2252,
+      "inclusive_ir": 4540503
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<certified_relations::Term>>::grow_one",
+      "self_ir": 2160,
+      "inclusive_ir": 33172
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<usize> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<usize, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<usize>, core::slice::iter::Iter<usize>>, relation_replay_checker::verify_json::{closure#5}>>>::from_iter",
+      "self_ir": 2124,
+      "inclusive_ir": 3060
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<([usize; 2], u64, u64), alloc::collections::btree::set_val::SetValZST>>::insert",
+      "self_ir": 2101,
+      "inclusive_ir": 3109
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__isoc23_sscanf",
+      "self_ir": 2058,
+      "inclusive_ir": 80143
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::replay::member",
+      "self_ir": 2030,
+      "inclusive_ir": 210135
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008e140",
+      "self_ir": 1974,
+      "inclusive_ir": 4591
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_string::<serde_core::de::impls::StringVisitor>",
+      "self_ir": 1920,
+      "inclusive_ir": 21589
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::iter::traits::collect::FromIterator<(alloc::vec::Vec<usize>, u64)>>::from_iter::<core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<core::array::iter::IntoIter<(usize, usize, u64), 9>, certified_relations::cheap::f3::{closure#1}>, certified_relations::cheap::f3::{closure#2}>>",
+      "self_ir": 1920,
+      "inclusive_ir": 245089
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Owned, &alloc::string::String, alloc::collections::btree::set_val::SetValZST, alloc::collections::btree::node::marker::LeafOrInternal>>::bulk_push::<alloc::collections::btree::dedup_sorted_iter::DedupSortedIter<&alloc::string::String, alloc::collections::btree::set_val::SetValZST, core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<&alloc::string::String>, <alloc::collections::btree::set::BTreeSet<&alloc::string::String>>::from_sorted_iter<alloc::vec::into_iter::IntoIter<&alloc::string::String>>::{closure#0}>>, alloc::alloc::Global>",
+      "self_ir": 1908,
+      "inclusive_ir": 3568
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::replay::Member as serde_core::ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut alloc::vec::Vec<u8>>>",
+      "self_ir": 1890,
+      "inclusive_ir": 1115029
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::StrRead>>::parse_any_signed_number",
+      "self_ir": 1862,
+      "inclusive_ir": 22154
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::replay::CanonicalTerm> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<certified_relations::replay::CanonicalTerm, core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::replay::polynomial::{closure#0}>>>::from_iter",
+      "self_ir": 1855,
+      "inclusive_ir": 61575
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000161e80",
+      "self_ir": 1802,
+      "inclusive_ir": 1802
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Term>>",
+      "self_ir": 1785,
+      "inclusive_ir": 786642
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001e600",
+      "self_ir": 1750,
+      "inclusive_ir": 190326
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter::<core::iter::adapters::map::Map<alloc::collections::btree::map::IntoIter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::quotient::change_order::{closure#1}>>",
+      "self_ir": 1672,
+      "inclusive_ir": 26166
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<alloc::vec::Vec<usize>>>::grow_one",
+      "self_ir": 1656,
+      "inclusive_ir": 134935
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeStruct>::end",
+      "self_ir": 1646,
+      "inclusive_ir": 1760
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::projection::swap::{closure#1}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<(alloc::vec::Vec<usize>, u64), <alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)>>::extend_trusted<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::projection::swap::{closure#1}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 1638,
+      "inclusive_ir": 3180
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000001655c0",
+      "self_ir": 1621,
+      "inclusive_ir": 1621
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::BalancingContext<alloc::vec::Vec<usize>, u64>>::bulk_steal_right",
+      "self_ir": 1620,
+      "inclusive_ir": 2940
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>::push_mut",
+      "self_ir": 1604,
+      "inclusive_ir": 6909
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::number::Number as core::str::traits::FromStr>::from_str",
+      "self_ir": 1568,
+      "inclusive_ir": 30258
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<certified_relations::Term>>",
+      "self_ir": 1530,
+      "inclusive_ir": 1309892
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::InputTerm>>",
+      "self_ir": 1530,
+      "inclusive_ir": 1225629
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::Value as serde_core::ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut alloc::vec::Vec<u8>>>",
+      "self_ir": 1498,
+      "inclusive_ir": 265250
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::cheap::Recognized> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<certified_relations::cheap::Recognized, core::iter::adapters::filter_map::FilterMap<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>, certified_relations::cheap::consequences::{closure#0}>>>::from_iter",
+      "self_ir": 1491,
+      "inclusive_ir": 669055
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000003680",
+      "self_ir": 1476,
+      "inclusive_ir": 13048
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::vec::Vec<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)>>>",
+      "self_ir": 1438,
+      "inclusive_ir": 23983
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Member> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 1431,
+      "inclusive_ir": 3062287
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::shared::smallsort::sort4_stable::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 1412,
+      "inclusive_ir": 1412
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000bf50",
+      "self_ir": 1292,
+      "inclusive_ir": 4072
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVecInner>::try_allocate_in",
+      "self_ir": 1230,
+      "inclusive_ir": 9722
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_setb",
+      "self_ir": 1193,
+      "inclusive_ir": 1259
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_getattr_np",
+      "self_ir": 1153,
+      "inclusive_ir": 92579
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)> as alloc::vec::spec_from_iter::SpecFromIter<((usize, alloc::vec::Vec<usize>), u64), core::iter::adapters::map::Map<alloc::collections::btree::map::IntoIter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::quotient::change_order::{closure#1}>>>::from_iter",
+      "self_ir": 1121,
+      "inclusive_ir": 12166
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001b390",
+      "self_ir": 1081,
+      "inclusive_ir": 1081
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::inv",
+      "self_ir": 1080,
+      "inclusive_ir": 103320
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::variable",
+      "self_ir": 1080,
+      "inclusive_ir": 11730
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::iter::traits::collect::FromIterator<(alloc::vec::Vec<usize>, u64)>>::from_iter::<core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::quotient::inverse_mod::{closure#0}>, certified_relations::quotient::inverse_mod::{closure#1}>>",
+      "self_ir": 1050,
+      "inclusive_ir": 24870
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeMap>::serialize_entry::<alloc::string::String, serde_json::value::Value>'2",
+      "self_ir": 1050,
+      "inclusive_ir": 52531
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000093a0",
+      "self_ir": 1034,
+      "inclusive_ir": 12855
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeMap>::serialize_key::<str>",
+      "self_ir": 1022,
+      "inclusive_ir": 3864
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<&alloc::string::String, alloc::collections::btree::set_val::SetValZST> as core::ops::drop::Drop>::drop",
+      "self_ir": 1011,
+      "inclusive_ir": 1614
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeStruct>::serialize_field::<usize>",
+      "self_ir": 1008,
+      "inclusive_ir": 24019
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008cd80",
+      "self_ir": 991,
+      "inclusive_ir": 991
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::de::Deserializer<serde_json::read::StrRead>>::scan_number",
+      "self_ir": 980,
+      "inclusive_ir": 980
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::clone::Clone>::clone",
+      "self_ir": 975,
+      "inclusive_ir": 66357
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "alloc::vec::in_place_collect::from_iter_in_place::<core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, certified_relations::replay::complete_impl::{closure#1}>, core::result::Result<!, alloc::string::String>>, alloc::vec::Vec<certified_relations::replay::CofactorTerm>>",
+      "self_ir": 966,
+      "inclusive_ir": 8077026
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008cdf0",
+      "self_ir": 953,
+      "inclusive_ir": 1944
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000a0530",
+      "self_ir": 944,
+      "inclusive_ir": 1303
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::vec::Vec<certified_relations::Term>> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 920,
+      "inclusive_ir": 1313546
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::vec::Vec<relation_replay_checker::InputTerm>> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 920,
+      "inclusive_ir": 1229150
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::vec::Vec<relation_replay_checker::Multiplier>> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 920,
+      "inclusive_ir": 2874308
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::string::String> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>",
+      "self_ir": 894,
+      "inclusive_ir": 25942
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000009eea0",
+      "self_ir": 858,
+      "inclusive_ir": 1112
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000c2a0",
+      "self_ir": 848,
+      "inclusive_ir": 1492
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000147c0",
+      "self_ir": 816,
+      "inclusive_ir": 816
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "__tunable_get_val",
+      "self_ir": 793,
+      "inclusive_ir": 793
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeMap>::serialize_entry::<alloc::string::String, serde_json::value::Value>",
+      "self_ir": 750,
+      "inclusive_ir": 62191
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::Serializer as serde_core::ser::Serializer>::collect_seq::<&alloc::vec::Vec<serde_json::value::Value>>",
+      "self_ir": 734,
+      "inclusive_ir": 30100
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::entry::VacantEntry<alloc::string::String, serde_json::value::Value>>::insert_entry",
+      "self_ir": 714,
+      "inclusive_ir": 6711
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001de30",
+      "self_ir": 705,
+      "inclusive_ir": 222642
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<alloc::string::String, serde_json::value::Value>",
+      "self_ir": 704,
+      "inclusive_ir": 268400
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "__rustc::__rust_alloc_zeroed",
+      "self_ir": 696,
+      "inclusive_ir": 144374
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000024520",
+      "self_ir": 673,
+      "inclusive_ir": 673
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000076e0",
+      "self_ir": 672,
+      "inclusive_ir": 4082
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::BalancingContext<(usize, alloc::vec::Vec<usize>), u64>>::bulk_steal_left",
+      "self_ir": 672,
+      "inclusive_ir": 1064
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, ([usize; 2], u64, u64), alloc::collections::btree::set_val::SetValZST, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::insert_recursing::<alloc::alloc::Global, <alloc::collections::btree::map::entry::VacantEntry<([usize; 2], u64, u64), alloc::collections::btree::set_val::SetValZST>>::insert_entry::{closure#0}>",
+      "self_ir": 655,
+      "inclusive_ir": 956
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>> as alloc::vec::spec_from_iter::SpecFromIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>, core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::replay::Member>, certified_relations::replay::complete_impl::{closure#0}>, core::result::Result<!, alloc::string::String>>>>::from_iter",
+      "self_ir": 653,
+      "inclusive_ir": 66683
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, alloc::vec::Vec<certified_relations::replay::Member>>",
+      "self_ir": 646,
+      "inclusive_ir": 1115953
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000025d60",
+      "self_ir": 640,
+      "inclusive_ir": 640
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "alloc::vec::in_place_collect::from_iter_in_place::<core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, relation_replay_checker::verify_json::{closure#7}>, alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)>>",
+      "self_ir": 635,
+      "inclusive_ir": 18904
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::prime",
+      "self_ir": 628,
+      "inclusive_ir": 24036
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::ffi::c_str::CStr>::from_bytes_with_nul",
+      "self_ir": 620,
+      "inclusive_ir": 620
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000006660",
+      "self_ir": 619,
+      "inclusive_ir": 1452
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>> as core::clone::Clone>::clone",
+      "self_ir": 617,
+      "inclusive_ir": 76411
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as <[_]>::to_vec_in::ConvertVec>::to_vec::<alloc::alloc::Global>",
+      "self_ir": 611,
+      "inclusive_ir": 78403
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::replay::Member> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<certified_relations::replay::Member, core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::Row>, certified_relations::replay::member>>>::from_iter",
+      "self_ir": 592,
+      "inclusive_ir": 210831
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::ser::to_vec::<serde_json::value::Value>",
+      "self_ir": 588,
+      "inclusive_ir": 269092
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::iter::adapters::try_process::<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<relation_replay_checker::InputTerm>>, relation_replay_checker::original::{closure#0}>, alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>, core::result::Result<!, alloc::string::String>, <core::result::Result<alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, alloc::string::String> as core::iter::traits::collect::FromIterator<core::result::Result<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>, alloc::string::String>>>::from_iter<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<relation_replay_checker::InputTerm>>, relation_replay_checker::original::{closure#0}>>::{closure#0}, alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>",
+      "self_ir": 556,
+      "inclusive_ir": 314249
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008fa80",
+      "self_ir": 552,
+      "inclusive_ir": 552
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "native_fused_baseline::adapter::run_kernel_variant",
+      "self_ir": 542,
+      "inclusive_ir": 111545906
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::Serializer as serde_core::ser::Serializer>::collect_seq::<&alloc::vec::Vec<core::option::Option<usize>>>",
+      "self_ir": 536,
+      "inclusive_ir": 5288
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001be40",
+      "self_ir": 534,
+      "inclusive_ir": 534
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000bc70",
+      "self_ir": 528,
+      "inclusive_ir": 554
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000023da0",
+      "self_ir": 514,
+      "inclusive_ir": 514
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000016170",
+      "self_ir": 504,
+      "inclusive_ir": 5870
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000062f0",
+      "self_ir": 490,
+      "inclusive_ir": 692
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>> as core::iter::traits::iterator::Iterator>::try_fold::<alloc::vec::in_place_drop::InPlaceDrop<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, core::iter::adapters::filter::filter_try_fold<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>, alloc::vec::in_place_drop::InPlaceDrop<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, core::result::Result<alloc::vec::in_place_drop::InPlaceDrop<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, !>, relation_replay_checker::original::{closure#1}, alloc::vec::in_place_collect::write_in_place_with_drop<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>::{closure#0}>::{closure#0}, core::result::Result<alloc::vec::in_place_drop::InPlaceDrop<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, !>>",
+      "self_ir": 480,
+      "inclusive_ir": 480
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001a800",
+      "self_ir": 477,
+      "inclusive_ir": 477
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<relation_replay_checker::Witness as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 468,
+      "inclusive_ir": 6483171
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::collections::btree::map::IntoIter<alloc::string::String, serde_json::value::Value>>",
+      "self_ir": 465,
+      "inclusive_ir": 297905
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<core::option::Option<certified_relations::Row>> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<core::option::Option<certified_relations::Row>, core::iter::adapters::map::Map<core::slice::iter::Iter<core::option::Option<certified_relations::Row>>, certified_relations::quotient::solve_impl::{closure#7}>>>::from_iter",
+      "self_ir": 455,
+      "inclusive_ir": 22799
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::Row> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<certified_relations::Row, core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::Row>, certified_relations::check_reference_impl::{closure#1}>>>::from_iter",
+      "self_ir": 452,
+      "inclusive_ir": 26440
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000017e70",
+      "self_ir": 441,
+      "inclusive_ir": 7276
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::Serializer as serde_core::ser::Serializer>::collect_seq::<&alloc::vec::Vec<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)>>>",
+      "self_ir": 428,
+      "inclusive_ir": 528137
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000023bb0",
+      "self_ir": 424,
+      "inclusive_ir": 424
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::monomials",
+      "self_ir": 423,
+      "inclusive_ir": 2070301
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::one",
+      "self_ir": 420,
+      "inclusive_ir": 5745
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008fad0",
+      "self_ir": 414,
+      "inclusive_ir": 414
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001ade0",
+      "self_ir": 405,
+      "inclusive_ir": 660
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(usize, &certified_relations::cheap::PairMetadata)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(usize, &certified_relations::cheap::PairMetadata), core::iter::adapters::filter::Filter<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<certified_relations::cheap::PairMetadata>>, certified_relations::projection::subset_quadratic::{closure#0}>>>::from_iter",
+      "self_ir": 403,
+      "inclusive_ir": 1390
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<alloc::vec::Vec<usize>>>::push_mut",
+      "self_ir": 388,
+      "inclusive_ir": 2218
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000011840",
+      "self_ir": 385,
+      "inclusive_ir": 385
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000025b80",
+      "self_ir": 379,
+      "inclusive_ir": 379
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000bda0",
+      "self_ir": 370,
+      "inclusive_ir": 437
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&serde_json::value::Value as serde_core::ser::Serialize>::serialize::<serde_json::value::ser::Serializer>",
+      "self_ir": 370,
+      "inclusive_ir": 62637
+    },
+    {
+      "object": "/workspace/native-cas/lib/libgcc_s.so.1",
+      "name": "__cpu_indicator_init@GCC_4.8.0",
+      "self_ir": 367,
+      "inclusive_ir": 367
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::stable::drift::sort::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::projection::swap::{closure#2}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 365,
+      "inclusive_ir": 10491
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::vec::Vec<alloc::vec::Vec<certified_relations::replay::CofactorTerm>>>",
+      "self_ir": 362,
+      "inclusive_ir": 429
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::set::BTreeSet<&alloc::string::String> as core::iter::traits::collect::FromIterator<&alloc::string::String>>::from_iter::<core::slice::iter::Iter<alloc::string::String>>",
+      "self_ir": 358,
+      "inclusive_ir": 12288
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "sbrk",
+      "self_ir": 337,
+      "inclusive_ir": 425
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<certified_relations::Row>>::grow_one",
+      "self_ir": 336,
+      "inclusive_ir": 6094
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<relation_replay_checker::Pair>>::grow_one",
+      "self_ir": 336,
+      "inclusive_ir": 7583
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000012670",
+      "self_ir": 334,
+      "inclusive_ir": 461
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<([usize; 2], u64, u64), alloc::collections::btree::set_val::SetValZST> as core::ops::drop::Drop>::drop",
+      "self_ir": 322,
+      "inclusive_ir": 523
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::stable::driftsort_main::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::proof_shift::{closure#0}>>::{closure#0}>::{closure#0}, alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)>>",
+      "self_ir": 320,
+      "inclusive_ir": 59232
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<certified_relations::System as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 311,
+      "inclusive_ir": 1324423
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022ff0",
+      "self_ir": 308,
+      "inclusive_ir": 308
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000148b0",
+      "self_ir": 301,
+      "inclusive_ir": 1117
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<relation_replay_checker::Input as serde_core::de::Deserialize>::deserialize::__Visitor>",
+      "self_ir": 299,
+      "inclusive_ir": 1247264
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000004c80",
+      "self_ir": 290,
+      "inclusive_ir": 290
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000011940",
+      "self_ir": 290,
+      "inclusive_ir": 711
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000005d00",
+      "self_ir": 286,
+      "inclusive_ir": 803
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::monomials_ordered::emit",
+      "self_ir": 280,
+      "inclusive_ir": 2068998
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "_dl_catch_exception",
+      "self_ir": 273,
+      "inclusive_ir": 13377
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_underflow",
+      "self_ir": 272,
+      "inclusive_ir": 716
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000007190",
+      "self_ir": 266,
+      "inclusive_ir": 1859
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeMap>::end",
+      "self_ir": 266,
+      "inclusive_ir": 266
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000013760",
+      "self_ir": 264,
+      "inclusive_ir": 264
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__libc_sigaction",
+      "self_ir": 264,
+      "inclusive_ir": 264
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::env::args_os",
+      "self_ir": 261,
+      "inclusive_ir": 1754
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000023bc0",
+      "self_ir": 253,
+      "inclusive_ir": 253
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<usize> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<usize, core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, certified_relations::degree>>>::from_iter",
+      "self_ir": 253,
+      "inclusive_ir": 19985
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000005aa0",
+      "self_ir": 251,
+      "inclusive_ir": 1201
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::replay::native_product_impl",
+      "self_ir": 250,
+      "inclusive_ir": 78975727
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000004dd0",
+      "self_ir": 240,
+      "inclusive_ir": 466
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::env::Args as core::iter::traits::iterator::Iterator>::next",
+      "self_ir": 236,
+      "inclusive_ir": 861
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::vec::Vec<alloc::vec::Vec<usize>>>",
+      "self_ir": 235,
+      "inclusive_ir": 3902
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000015a30",
+      "self_ir": 228,
+      "inclusive_ir": 228
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::sys::fs::unix::try_statx",
+      "self_ir": 227,
+      "inclusive_ir": 247
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::rt::lang_start_internal",
+      "self_ir": 226,
+      "inclusive_ir": 111640345
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::certificate_degree",
+      "self_ir": 219,
+      "inclusive_ir": 59036
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001a9a0",
+      "self_ir": 215,
+      "inclusive_ir": 1341
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000016260",
+      "self_ir": 212,
+      "inclusive_ir": 212
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001af30",
+      "self_ir": 212,
+      "inclusive_ir": 885
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "_dl_allocate_tls_init",
+      "self_ir": 212,
+      "inclusive_ir": 322
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022e60",
+      "self_ir": 197,
+      "inclusive_ir": 197
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::sys::fs::unix::File>::open_c",
+      "self_ir": 183,
+      "inclusive_ir": 325
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::Row>, certified_relations::quotient::compact::solve_impl::{closure#12}> as core::iter::traits::iterator::Iterator>::reduce::<<usize as core::cmp::Ord>::max>",
+      "self_ir": 177,
+      "inclusive_ir": 7397
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<core::option::Option<certified_relations::Row>>>::extend_with",
+      "self_ir": 176,
+      "inclusive_ir": 176
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000012470",
+      "self_ir": 174,
+      "inclusive_ir": 218
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<alloc::string::String> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<alloc::string::String, std::env::Args>>::from_iter",
+      "self_ir": 170,
+      "inclusive_ir": 1296
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000bad0",
+      "self_ir": 169,
+      "inclusive_ir": 609
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__cxa_finalize",
+      "self_ir": 168,
+      "inclusive_ir": 213
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000c200",
+      "self_ir": 167,
+      "inclusive_ir": 175
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001b140",
+      "self_ir": 164,
+      "inclusive_ir": 2355
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008d710",
+      "self_ir": 164,
+      "inclusive_ir": 364
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<alloc::vec::Vec<u8>>>::grow_one",
+      "self_ir": 162,
+      "inclusive_ir": 2089
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::replay::CofactorTerm> as alloc::vec::spec_from_elem::SpecFromElem>::from_elem::<alloc::alloc::Global>",
+      "self_ir": 161,
+      "inclusive_ir": 671
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000007090",
+      "self_ir": 159,
+      "inclusive_ir": 592
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__underflow",
+      "self_ir": 159,
+      "inclusive_ir": 875
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_flush_all",
+      "self_ir": 158,
+      "inclusive_ir": 179
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000006e50",
+      "self_ir": 153,
+      "inclusive_ir": 550
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000ba00",
+      "self_ir": 153,
+      "inclusive_ir": 440
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<certified_relations::Row> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<certified_relations::Row, core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>, certified_relations::input_rows::{closure#0}>>>::from_iter",
+      "self_ir": 153,
+      "inclusive_ir": 276321
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::path::Path>::_join",
+      "self_ir": 150,
+      "inclusive_ir": 1217
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "getauxval",
+      "self_ir": 145,
+      "inclusive_ir": 145
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000001f70",
+      "self_ir": 141,
+      "inclusive_ir": 459
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000011770",
+      "self_ir": 135,
+      "inclusive_ir": 135
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::replay::produce_native_for_rust",
+      "self_ir": 135,
+      "inclusive_ir": 81619139
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000005250",
+      "self_ir": 134,
+      "inclusive_ir": 134
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000232a0",
+      "self_ir": 133,
+      "inclusive_ir": 133
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000110a0",
+      "self_ir": 130,
+      "inclusive_ir": 150116
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008f340",
+      "self_ir": 130,
+      "inclusive_ir": 130
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "alloc::io::read::default_read_to_end::<std::fs::File>",
+      "self_ir": 128,
+      "inclusive_ir": 224
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "getline",
+      "self_ir": 126,
+      "inclusive_ir": 7731
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_switch_to_get_mode",
+      "self_ir": 120,
+      "inclusive_ir": 120
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__default_morecore",
+      "self_ir": 120,
+      "inclusive_ir": 545
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<&alloc::string::String, alloc::collections::btree::set_val::SetValZST>>::bulk_build_from_sorted_iter::<core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<&alloc::string::String>, <alloc::collections::btree::set::BTreeSet<&alloc::string::String>>::from_sorted_iter<alloc::vec::into_iter::IntoIter<&alloc::string::String>>::{closure#0}>>",
+      "self_ir": 120,
+      "inclusive_ir": 3844
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter::<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::projection::swap::{closure#2}>>",
+      "self_ir": 118,
+      "inclusive_ir": 39212
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64> as core::iter::traits::collect::FromIterator<(alloc::vec::Vec<usize>, u64)>>::from_iter::<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::projection::swap::{closure#1}>>",
+      "self_ir": 118,
+      "inclusive_ir": 7132
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x000000000008f3c0",
+      "self_ir": 117,
+      "inclusive_ir": 247
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::sys::pal::unix::stack_overflow::thread_info::set_current_info",
+      "self_ir": 114,
+      "inclusive_ir": 505
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000a1f90",
+      "self_ir": 112,
+      "inclusive_ir": 472
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001b220",
+      "self_ir": 111,
+      "inclusive_ir": 2466
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_fopen",
+      "self_ir": 108,
+      "inclusive_ir": 235
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::value::to_value::<&certified_relations::quotient::compact::Info>",
+      "self_ir": 108,
+      "inclusive_ir": 25273
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<(alloc::vec::Vec<usize>, u64)> as alloc::vec::spec_from_iter::SpecFromIter<(alloc::vec::Vec<usize>, u64), core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<alloc::vec::Vec<usize>, u64>, certified_relations::projection::swap::{closure#1}>>>::from_iter",
+      "self_ir": 106,
+      "inclusive_ir": 3390
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::option::Option<certified_relations::Row> as alloc::vec::spec_from_elem::SpecFromElem>::from_elem::<alloc::alloc::Global>",
+      "self_ir": 106,
+      "inclusive_ir": 1579
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000006240",
+      "self_ir": 105,
+      "inclusive_ir": 123
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<serde_json::value::Value>",
+      "self_ir": 105,
+      "inclusive_ir": 298010
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Member>>",
+      "self_ir": 104,
+      "inclusive_ir": 3062429
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000003640",
+      "self_ir": 102,
+      "inclusive_ir": 10345
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::string::String>>",
+      "self_ir": 102,
+      "inclusive_ir": 26082
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "sigaction",
+      "self_ir": 100,
+      "inclusive_ir": 364
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)> as alloc::vec::spec_from_iter::SpecFromIter<((usize, alloc::vec::Vec<usize>), u64), core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::projection::swap::{closure#2}>>>::from_iter",
+      "self_ir": 96,
+      "inclusive_ir": 21005
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::sys::sync::once::futex::Once>::call",
+      "self_ir": 96,
+      "inclusive_ir": 356
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::io::stdio::StdoutLock as core::io::write::Write>::write_all",
+      "self_ir": 95,
+      "inclusive_ir": 6306
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001a900",
+      "self_ir": 92,
+      "inclusive_ir": 418
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__libc_early_init",
+      "self_ir": 91,
+      "inclusive_ir": 333
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000012d50",
+      "self_ir": 90,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_link_in",
+      "self_ir": 90,
+      "inclusive_ir": 111
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<relation_replay_checker::Witness as serde_core::de::Deserialize>::deserialize::__FieldVisitor as serde_core::de::Visitor>::visit_str::<serde_json::error::Error>",
+      "self_ir": 90,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "brk",
+      "self_ir": 88,
+      "inclusive_ir": 88
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::fs::OpenOptions>::_open",
+      "self_ir": 86,
+      "inclusive_ir": 605
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::vec::Vec<alloc::string::String>>",
+      "self_ir": 86,
+      "inclusive_ir": 947
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "open",
+      "self_ir": 85,
+      "inclusive_ir": 142
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>> as core::ops::drop::Drop>::drop",
+      "self_ir": 84,
+      "inclusive_ir": 84
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::fs::File as core::io::write::Write>::write_all",
+      "self_ir": 84,
+      "inclusive_ir": 174
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000042050",
+      "self_ir": 83,
+      "inclusive_ir": 1662
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000005e20",
+      "self_ir": 81,
+      "inclusive_ir": 884
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "(below main)",
+      "self_ir": 80,
+      "inclusive_ir": 111642251
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>",
+      "self_ir": 80,
+      "inclusive_ir": 480651
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::stable::driftsort_main::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::projection::swap::{closure#2}>>::{closure#0}>::{closure#0}, alloc::vec::Vec<((usize, alloc::vec::Vec<usize>), u64)>>",
+      "self_ir": 80,
+      "inclusive_ir": 10571
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::sys::stdio::unix::Stdout as core::io::write::Write>::write_all",
+      "self_ir": 78,
+      "inclusive_ir": 134
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::fmt::write",
+      "self_ir": 77,
+      "inclusive_ir": 6451
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::fs::read::inner",
+      "self_ir": 75,
+      "inclusive_ir": 879
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000014f40",
+      "self_ir": 74,
+      "inclusive_ir": 1409
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<relation_replay_checker::Stats as serde_core::ser::Serialize>::serialize::<serde_json::value::ser::Serializer>",
+      "self_ir": 73,
+      "inclusive_ir": 12450
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::raw_vec::RawVec<certified_relations::HilbertEvent>>::grow_one",
+      "self_ir": 72,
+      "inclusive_ir": 989
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000015890",
+      "self_ir": 71,
+      "inclusive_ir": 71
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000014740",
+      "self_ir": 69,
+      "inclusive_ir": 10625
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "bcmp",
+      "self_ir": 69,
+      "inclusive_ir": 69
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022d50",
+      "self_ir": 68,
+      "inclusive_ir": 68
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_un_link",
+      "self_ir": 68,
+      "inclusive_ir": 89
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::value::to_value::<&&str>",
+      "self_ir": 66,
+      "inclusive_ir": 323
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "native_fused_baseline::adapter::save",
+      "self_ir": 64,
+      "inclusive_ir": 903
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000013070",
+      "self_ir": 62,
+      "inclusive_ir": 96
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::marker::PhantomData<u32> as serde_core::de::DeserializeSeed>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>",
+      "self_ir": 61,
+      "inclusive_ir": 107
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "fclose",
+      "self_ir": 59,
+      "inclusive_ir": 404
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeStruct>::serialize_field::<alloc::vec::Vec<core::option::Option<usize>>>",
+      "self_ir": 58,
+      "inclusive_ir": 5987
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeStruct>::serialize_field::<alloc::vec::Vec<usize>>",
+      "self_ir": 58,
+      "inclusive_ir": 5996
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::value::ser::SerializeMap as serde_core::ser::SerializeStruct>::serialize_field::<certified_relations::projection::Work>",
+      "self_ir": 58,
+      "inclusive_ir": 3253
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::sys::pal::unix::stack_overflow::imp::make_handler",
+      "self_ir": 58,
+      "inclusive_ir": 240
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022f40",
+      "self_ir": 57,
+      "inclusive_ir": 57
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&std::io::stdio::Stdout as core::io::write::Write>::write_fmt",
+      "self_ir": 56,
+      "inclusive_ir": 6507
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000007ab0",
+      "self_ir": 54,
+      "inclusive_ir": 54
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>::forget_allocation_drop_remaining",
+      "self_ir": 54,
+      "inclusive_ir": 54
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::sync::once::Once>::call_once::<std::rt::cleanup::{closure#0}>::{closure#0}",
+      "self_ir": 54,
+      "inclusive_ir": 182
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001e500",
+      "self_ir": 53,
+      "inclusive_ir": 3192
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::vec::Vec<certified_relations::Term>>>",
+      "self_ir": 53,
+      "inclusive_ir": 1313618
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::vec::Vec<relation_replay_checker::InputTerm>>>",
+      "self_ir": 53,
+      "inclusive_ir": 1229222
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<alloc::vec::Vec<relation_replay_checker::Multiplier>>>",
+      "self_ir": 53,
+      "inclusive_ir": 2874380
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<relation_replay_checker::Pair>>",
+      "self_ir": 53,
+      "inclusive_ir": 544230
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_close_it",
+      "self_ir": 50,
+      "inclusive_ir": 166
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::io::buffered::bufwriter::BufWriter<std::io::stdio::StdoutRaw>>::flush_buf",
+      "self_ir": 50,
+      "inclusive_ir": 76
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::slice::sort::stable::quicksort::quicksort::<((usize, alloc::vec::Vec<usize>), u64), <[((usize, alloc::vec::Vec<usize>), u64)]>::sort_by<<alloc::collections::btree::map::BTreeMap<(usize, alloc::vec::Vec<usize>), u64> as core::iter::traits::collect::FromIterator<((usize, alloc::vec::Vec<usize>), u64)>>::from_iter<core::iter::adapters::map::Map<alloc::collections::btree::map::Iter<(usize, alloc::vec::Vec<usize>), u64>, certified_relations::projection::swap::{closure#2}>>::{closure#0}>::{closure#0}>",
+      "self_ir": 50,
+      "inclusive_ir": 10126
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001ad20",
+      "self_ir": 48,
+      "inclusive_ir": 48
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strlen",
+      "self_ir": 48,
+      "inclusive_ir": 48
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strnlen",
+      "self_ir": 48,
+      "inclusive_ir": 48
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcschr",
+      "self_ir": 48,
+      "inclusive_ir": 48
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_doallocate",
+      "self_ir": 47,
+      "inclusive_ir": 256
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "sysconf",
+      "self_ir": 47,
+      "inclusive_ir": 52
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeMap>::serialize_entry::<str, u32>",
+      "self_ir": 47,
+      "inclusive_ir": 203
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000f7e70",
+      "self_ir": 45,
+      "inclusive_ir": 45
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "fopen",
+      "self_ir": 44,
+      "inclusive_ir": 2215
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "memset",
+      "self_ir": 44,
+      "inclusive_ir": 44
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wmemchr",
+      "self_ir": 44,
+      "inclusive_ir": 44
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000029a20",
+      "self_ir": 43,
+      "inclusive_ir": 81
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000012d00",
+      "self_ir": 42,
+      "inclusive_ir": 42
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "memcpy",
+      "self_ir": 42,
+      "inclusive_ir": 42
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "memmove",
+      "self_ir": 42,
+      "inclusive_ir": 42
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::de::from_trait::<serde_json::read::SliceRead, relation_replay_checker::Witness>",
+      "self_ir": 42,
+      "inclusive_ir": 6483213
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000bec0",
+      "self_ir": 41,
+      "inclusive_ir": 89
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001b3f0",
+      "self_ir": 41,
+      "inclusive_ir": 428
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::sys::fs::metadata",
+      "self_ir": 41,
+      "inclusive_ir": 328
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000007670",
+      "self_ir": 40,
+      "inclusive_ir": 40
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001dd60",
+      "self_ir": 40,
+      "inclusive_ir": 927
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "alloc::io::read::default_read_to_end::small_probe_read::<std::fs::File>",
+      "self_ir": 40,
+      "inclusive_ir": 68
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__cxa_atexit",
+      "self_ir": 39,
+      "inclusive_ir": 70
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_mutex_lock",
+      "self_ir": 39,
+      "inclusive_ir": 39
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000005310",
+      "self_ir": 38,
+      "inclusive_ir": 726
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000167470",
+      "self_ir": 38,
+      "inclusive_ir": 38
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::projection::Work as serde_core::ser::Serialize>::serialize::<serde_json::value::ser::Serializer>",
+      "self_ir": 38,
+      "inclusive_ir": 1943
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "alloc::vec::in_place_collect::from_iter_in_place::<core::iter::adapters::filter::Filter<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, relation_replay_checker::original::{closure#1}>, alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>",
+      "self_ir": 38,
+      "inclusive_ir": 573
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::iter::adapters::try_process::<core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, certified_relations::replay::complete_impl::{closure#1}>, alloc::vec::Vec<certified_relations::replay::CofactorTerm>, core::result::Result<!, alloc::string::String>, <core::result::Result<alloc::vec::Vec<alloc::vec::Vec<certified_relations::replay::CofactorTerm>>, alloc::string::String> as core::iter::traits::collect::FromIterator<core::result::Result<alloc::vec::Vec<certified_relations::replay::CofactorTerm>, alloc::string::String>>>::from_iter<core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, certified_relations::replay::complete_impl::{closure#1}>>::{closure#0}, alloc::vec::Vec<alloc::vec::Vec<certified_relations::replay::CofactorTerm>>>",
+      "self_ir": 37,
+      "inclusive_ir": 8077063
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000012270",
+      "self_ir": 36,
+      "inclusive_ir": 78
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_attr_setaffinity_np",
+      "self_ir": 36,
+      "inclusive_ir": 525
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_mutex_unlock",
+      "self_ir": 36,
+      "inclusive_ir": 36
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wmemset",
+      "self_ir": 36,
+      "inclusive_ir": 36
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "write",
+      "self_ir": 36,
+      "inclusive_ir": 112
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::io::buffered::bufwriter::BufWriter<std::io::stdio::StdoutRaw>>::write_all_cold",
+      "self_ir": 36,
+      "inclusive_ir": 141
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::io::write::default_write_fmt::Adapter<std::io::stdio::StdoutLock> as core::fmt::Write>::write_str",
+      "self_ir": 36,
+      "inclusive_ir": 6342
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::quotient::compact::solve_sparse_impl",
+      "self_ir": 36,
+      "inclusive_ir": 68096178
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::de::from_trait::<serde_json::read::SliceRead, certified_relations::System>",
+      "self_ir": 36,
+      "inclusive_ir": 1324459
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::de::from_trait::<serde_json::read::SliceRead, relation_replay_checker::Input>",
+      "self_ir": 36,
+      "inclusive_ir": 1247300
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::sys::fs::unix::DirBuilder>::mkdir",
+      "self_ir": 35,
+      "inclusive_ir": 184
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001cc10",
+      "self_ir": 34,
+      "inclusive_ir": 221901
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000aaa10",
+      "self_ir": 34,
+      "inclusive_ir": 54
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::fs::File as core::io::write::Write>::write",
+      "self_ir": 34,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "certified_relations::replay::produce_native_for_rust_with_kernels",
+      "self_ir": 34,
+      "inclusive_ir": 81619178
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_open",
+      "self_ir": 33,
+      "inclusive_ir": 73
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "close",
+      "self_ir": 33,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "native_fused_baseline::adapter::read",
+      "self_ir": 33,
+      "inclusive_ir": 1240
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::io::stdio::_print",
+      "self_ir": 33,
+      "inclusive_ir": 6709
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000238e0",
+      "self_ir": 32,
+      "inclusive_ir": 32
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "signal",
+      "self_ir": 32,
+      "inclusive_ir": 124
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::vec::into_iter::IntoIter<certified_relations::Row> as core::ops::drop::Drop>::drop",
+      "self_ir": 32,
+      "inclusive_ir": 195
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::vec::Vec<certified_relations::Row>>",
+      "self_ir": 32,
+      "inclusive_ir": 142416
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "serde_json::value::to_value::<&core::option::Option<certified_relations::replay::NativeKernels>>",
+      "self_ir": 32,
+      "inclusive_ir": 218
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000025f00",
+      "self_ir": 31,
+      "inclusive_ir": 31
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000041980",
+      "self_ir": 31,
+      "inclusive_ir": 31
+    },
+    {
+      "object": "/workspace/native-cas/lib/libgcc_s.so.1",
+      "name": "btree_destroy",
+      "self_ir": 30,
+      "inclusive_ir": 30
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::vec::Vec<core::option::Option<certified_relations::Row>>>",
+      "self_ir": 30,
+      "inclusive_ir": 56588
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000bb6a0",
+      "self_ir": 29,
+      "inclusive_ir": 29
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001d8d0",
+      "self_ir": 28,
+      "inclusive_ir": 2734
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000003420",
+      "self_ir": 27,
+      "inclusive_ir": 583
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000230d0",
+      "self_ir": 27,
+      "inclusive_ir": 49
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000025d00",
+      "self_ir": 27,
+      "inclusive_ir": 85
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<certified_relations::quotient::compact::Certificate>",
+      "self_ir": 27,
+      "inclusive_ir": 201663
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__sigsetjmp",
+      "self_ir": 26,
+      "inclusive_ir": 26
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<<alloc::io::buffered::bufwriter::BufWriter<_>>::flush_buf::BufGuard as core::ops::drop::Drop>::drop",
+      "self_ir": 26,
+      "inclusive_ir": 26
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::sync::once::Once>::call_once_force::<<std::sync::once_lock::OnceLock<std::sync::reentrant_lock::ReentrantLock<core::cell::RefCell<alloc::io::buffered::linewriter::LineWriter<std::io::stdio::StdoutRaw>>>>>::initialize<<std::sync::once_lock::OnceLock<std::sync::reentrant_lock::ReentrantLock<core::cell::RefCell<alloc::io::buffered::linewriter::LineWriter<std::io::stdio::StdoutRaw>>>>>::get_or_init<std::io::stdio::stdout::{closure#0}>::{closure#0}, !>::{closure#0}>::{closure#0}",
+      "self_ir": 26,
+      "inclusive_ir": 78
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000023090",
+      "self_ir": 25,
+      "inclusive_ir": 25
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000095190",
+      "self_ir": 25,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__read_nocancel",
+      "self_ir": 25,
+      "inclusive_ir": 25
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::iter::adapters::try_process::<core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::replay::Member>, certified_relations::replay::complete_impl::{closure#0}>, alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>, core::result::Result<!, alloc::string::String>, <core::result::Result<alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>, alloc::string::String> as core::iter::traits::collect::FromIterator<core::result::Result<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>, alloc::string::String>>>::from_iter<core::iter::adapters::map::Map<core::slice::iter::Iter<certified_relations::replay::Member>, certified_relations::replay::complete_impl::{closure#0}>>::{closure#0}, alloc::vec::Vec<alloc::collections::btree::map::BTreeMap<alloc::vec::Vec<usize>, u64>>>",
+      "self_ir": 25,
+      "inclusive_ir": 66708
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000034a0",
+      "self_ir": 24,
+      "inclusive_ir": 24
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000018570",
+      "self_ir": 24,
+      "inclusive_ir": 24
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001ae80",
+      "self_ir": 24,
+      "inclusive_ir": 24
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000029c30",
+      "self_ir": 24,
+      "inclusive_ir": 111642075
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "memrchr",
+      "self_ir": 24,
+      "inclusive_ir": 24
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "rindex",
+      "self_ir": 24,
+      "inclusive_ir": 24
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strchrnul",
+      "self_ir": 24,
+      "inclusive_ir": 24
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcscmp",
+      "self_ir": 24,
+      "inclusive_ir": 24
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000001f00",
+      "self_ir": 23,
+      "inclusive_ir": 578
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000e710",
+      "self_ir": 23,
+      "inclusive_ir": 28
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_doallocbuf",
+      "self_ir": 23,
+      "inclusive_ir": 279
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__open_nocancel",
+      "self_ir": 23,
+      "inclusive_ir": 23
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wmemcmp",
+      "self_ir": 23,
+      "inclusive_ir": 23
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<alloc::io::buffered::linewriter::LineWriter<std::io::stdio::StdoutRaw>>",
+      "self_ir": 23,
+      "inclusive_ir": 128
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000024a0",
+      "self_ir": 22,
+      "inclusive_ir": 2706
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000029b00",
+      "self_ir": 22,
+      "inclusive_ir": 22
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__memset_chk",
+      "self_ir": 22,
+      "inclusive_ir": 22
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "memchr",
+      "self_ir": 22,
+      "inclusive_ir": 22
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "mmap",
+      "self_ir": 22,
+      "inclusive_ir": 22
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::fmt::Formatter>::pad",
+      "self_ir": 22,
+      "inclusive_ir": 6163
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::sync::once_lock::OnceLock<std::sync::reentrant_lock::ReentrantLock<core::cell::RefCell<alloc::io::buffered::linewriter::LineWriter<std::io::stdio::StdoutRaw>>>>>::initialize::<<std::sync::once_lock::OnceLock<std::sync::reentrant_lock::ReentrantLock<core::cell::RefCell<alloc::io::buffered::linewriter::LineWriter<std::io::stdio::StdoutRaw>>>>>::get_or_init<std::io::stdio::stdout::{closure#0}>::{closure#0}, !>",
+      "self_ir": 22,
+      "inclusive_ir": 149
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__memcpy_chk",
+      "self_ir": 21,
+      "inclusive_ir": 21
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__memmove_chk",
+      "self_ir": 21,
+      "inclusive_ir": 21
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__mempcpy_chk",
+      "self_ir": 21,
+      "inclusive_ir": 21
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "mempcpy",
+      "self_ir": 21,
+      "inclusive_ir": 21
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000002290",
+      "self_ir": 20,
+      "inclusive_ir": 10655
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000003510",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000184e0",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000018730",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022c50",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022d70",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000164a00",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_read",
+      "self_ir": 20,
+      "inclusive_ir": 45
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_getaffinity_np",
+      "self_ir": 20,
+      "inclusive_ir": 35
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "statx",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strcasecmp",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strcasecmp_l",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strncasecmp",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strncasecmp_l",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strncmp",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<std::fs::DirBuilder>::_create",
+      "self_ir": 20,
+      "inclusive_ir": 204
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::io::stdio::print_to_buffer_if_capture_used",
+      "self_ir": 20,
+      "inclusive_ir": 20
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000011f40",
+      "self_ir": 19,
+      "inclusive_ir": 53
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000012300",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "getrlimit",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "index",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "read",
+      "self_ir": 18,
+      "inclusive_ir": 56
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "stpncpy",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strcmp",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strncpy",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcslen",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcsnlen",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "core::ptr::drop_glue::<core::option::Option<certified_relations::replay::Witness>>",
+      "self_ir": 18,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000435a0",
+      "self_ir": 17,
+      "inclusive_ir": 17
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcpncpy",
+      "self_ir": 17,
+      "inclusive_ir": 17
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcscat",
+      "self_ir": 17,
+      "inclusive_ir": 17
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcsncpy",
+      "self_ir": 17,
+      "inclusive_ir": 17
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000034e0",
+      "self_ir": 16,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000013010",
+      "self_ir": 16,
+      "inclusive_ir": 16
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__ctype_init",
+      "self_ir": 16,
+      "inclusive_ir": 16
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "stpcpy",
+      "self_ir": 16,
+      "inclusive_ir": 16
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strcat",
+      "self_ir": 16,
+      "inclusive_ir": 16
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strcpy",
+      "self_ir": 16,
+      "inclusive_ir": 16
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<u32 as itoa::Unsigned>::fmt",
+      "self_ir": 16,
+      "inclusive_ir": 16
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001d2c0",
+      "self_ir": 15,
+      "inclusive_ir": 111865803
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022f00",
+      "self_ir": 15,
+      "inclusive_ir": 15
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_default_finish",
+      "self_ir": 15,
+      "inclusive_ir": 15
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "wcscpy",
+      "self_ir": 15,
+      "inclusive_ir": 15
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001d3c0",
+      "self_ir": 14,
+      "inclusive_ir": 2626
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022710",
+      "self_ir": 14,
+      "inclusive_ir": 14
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x00000000000909d0",
+      "self_ir": 14,
+      "inclusive_ir": 264
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "0x000000000031cc70",
+      "self_ir": 14,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_attr_init",
+      "self_ir": 13,
+      "inclusive_ir": 18
+    },
+    {
+      "object": "/workspace/native-cas/lib/libgcc_s.so.1",
+      "name": "0x0000000000005960",
+      "self_ir": 13,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/workspace/relation-tools/valgrind-3.24/usr/libexec/valgrind/vgpreload_core-amd64-linux.so",
+      "name": "0x00000000000010c0",
+      "self_ir": 13,
+      "inclusive_ir": 90
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000004c10",
+      "self_ir": 12,
+      "inclusive_ir": 34
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000013000",
+      "self_ir": 12,
+      "inclusive_ir": 12
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022ed0",
+      "self_ir": 12,
+      "inclusive_ir": 12
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_finish",
+      "self_ir": 12,
+      "inclusive_ir": 27
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_attr_destroy",
+      "self_ir": 12,
+      "inclusive_ir": 144
+    },
+    {
+      "object": "/workspace/native-cas/lib/libgcc_s.so.1",
+      "name": "0x00000000000059a0",
+      "self_ir": 12,
+      "inclusive_ir": 12
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "0x000000000031ccb0",
+      "self_ir": 12,
+      "inclusive_ir": 12
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<core::result::Result<(), alloc::boxed::Box<dyn core::error::Error>> as std::process::Termination>::report",
+      "self_ir": 12,
+      "inclusive_ir": 12
+    },
+    {
+      "object": "/workspace/relation-tools/valgrind-3.24/usr/libexec/valgrind/vgpreload_core-amd64-linux.so",
+      "name": "0x0000000000001100",
+      "self_ir": 12,
+      "inclusive_ir": 12
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000011910",
+      "self_ir": 11,
+      "inclusive_ir": 33
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000015260",
+      "self_ir": 11,
+      "inclusive_ir": 16
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000029a90",
+      "self_ir": 11,
+      "inclusive_ir": 11
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__call_tls_dtors",
+      "self_ir": 11,
+      "inclusive_ir": 11
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "(below main)",
+      "self_ir": 11,
+      "inclusive_ir": 111642262
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "main",
+      "self_ir": 11,
+      "inclusive_ir": 111640356
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001db20",
+      "self_ir": 10,
+      "inclusive_ir": 10635
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "getpagesize",
+      "self_ir": 10,
+      "inclusive_ir": 10
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "sigaltstack",
+      "self_ir": 10,
+      "inclusive_ir": 10
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001af80",
+      "self_ir": 9,
+      "inclusive_ir": 9
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "poll",
+      "self_ir": 9,
+      "inclusive_ir": 28
+    },
+    {
+      "object": "/workspace/native-cas/lib/libgcc_s.so.1",
+      "name": "release_registered_frames",
+      "self_ir": 9,
+      "inclusive_ir": 39
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::rt::lang_start::<core::result::Result<(), alloc::boxed::Box<dyn core::error::Error>>>::{closure#0}",
+      "self_ir": 9,
+      "inclusive_ir": 111545933
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000000bde0",
+      "self_ir": 8,
+      "inclusive_ir": 8
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000022c30",
+      "self_ir": 8,
+      "inclusive_ir": 8
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "0x0000000000089ad0",
+      "self_ir": 8,
+      "inclusive_ir": 102
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_unsave_markers",
+      "self_ir": 8,
+      "inclusive_ir": 8
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_attr_getstack",
+      "self_ir": 8,
+      "inclusive_ir": 8
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000021f30",
+      "self_ir": 7,
+      "inclusive_ir": 7
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<serde_json::ser::Compound<&mut alloc::vec::Vec<u8>, serde_json::ser::CompactFormatter> as serde_core::ser::SerializeStruct>::serialize_field::<alloc::vec::Vec<certified_relations::replay::PairReduction>>",
+      "self_ir": 7,
+      "inclusive_ir": 231522
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__errno_location",
+      "self_ir": 6,
+      "inclusive_ir": 6
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strcspn",
+      "self_ir": 6,
+      "inclusive_ir": 6
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strpbrk",
+      "self_ir": 6,
+      "inclusive_ir": 6
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "strspn",
+      "self_ir": 6,
+      "inclusive_ir": 6
+    },
+    {
+      "object": "???",
+      "name": "0x0000000000510138",
+      "self_ir": 6,
+      "inclusive_ir": 6
+    },
+    {
+      "object": "???",
+      "name": "0x000000000483b000",
+      "self_ir": 6,
+      "inclusive_ir": 6
+    },
+    {
+      "object": "???",
+      "name": "0x0000000004843000",
+      "self_ir": 6,
+      "inclusive_ir": 6
+    },
+    {
+      "object": "???",
+      "name": "0x00000000048b83d0",
+      "self_ir": 6,
+      "inclusive_ir": 396
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000123f0",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x0000000000017e50",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x00000000000230b0",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "__close_nocancel",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "exit",
+      "self_ir": 5,
+      "inclusive_ir": 1667
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "fstat",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "mkdir",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "mprotect",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/workspace/native-cas/lib/libgcc_s.so.1",
+      "name": "0x00000000000058f0",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "0x000000000031cc00",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<alloc::string::String as core::fmt::Display>::fmt",
+      "self_ir": 5,
+      "inclusive_ir": 6173
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<certified_relations::NATIVE_KERNELS::{K#0}::{closure#1} as core::ops::function::FnOnce<(core::option::Option<&mut core::option::Option<core::cell::Cell<u8>>>,)>>::call_once",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "<str as core::fmt::Display>::fmt",
+      "self_ir": 5,
+      "inclusive_ir": 6168
+    },
+    {
+      "object": "/workspace/relation-tools/valgrind-3.24/usr/libexec/valgrind/vgpreload_core-amd64-linux.so",
+      "name": "0x0000000000001050",
+      "self_ir": 5,
+      "inclusive_ir": 5
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "_dl_audit_preinit",
+      "self_ir": 4,
+      "inclusive_ir": 4
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::sys::args::unix::imp::ARGV_INIT_ARRAY::init_wrapper",
+      "self_ir": 4,
+      "inclusive_ir": 4
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::sys::backtrace::__rust_begin_short_backtrace::<fn() -> core::result::Result<(), alloc::boxed::Box<dyn core::error::Error>>, core::result::Result<(), alloc::boxed::Box<dyn core::error::Error>>>",
+      "self_ir": 4,
+      "inclusive_ir": 111545912
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_Exit",
+      "self_ir": 3,
+      "inclusive_ir": 3
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "gettid",
+      "self_ir": 3,
+      "inclusive_ir": 3
+    },
+    {
+      "object": "???",
+      "name": "0x0000000000510150",
+      "self_ir": 3,
+      "inclusive_ir": 3
+    },
+    {
+      "object": "???",
+      "name": "0x000000000483b284",
+      "self_ir": 3,
+      "inclusive_ir": 3
+    },
+    {
+      "object": "???",
+      "name": "0x00000000048665d8",
+      "self_ir": 3,
+      "inclusive_ir": 3
+    },
+    {
+      "object": "???",
+      "name": "0x00000000048b83d8",
+      "self_ir": 3,
+      "inclusive_ir": 2146
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "_dl_debug_state",
+      "self_ir": 2,
+      "inclusive_ir": 2
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_close",
+      "self_ir": 2,
+      "inclusive_ir": 7
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_IO_file_stat",
+      "self_ir": 2,
+      "inclusive_ir": 7
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "_setjmp",
+      "self_ir": 2,
+      "inclusive_ir": 28
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "name": "pthread_self",
+      "self_ir": 2,
+      "inclusive_ir": 2
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "native_fused_baseline::main",
+      "self_ir": 2,
+      "inclusive_ir": 111545908
+    },
+    {
+      "object": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "name": "0x000000000001ccd0",
+      "self_ir": 1,
+      "inclusive_ir": 1
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "crypto_lib::cryptanalysis::f4_fp::certified::verify_replay_certificate_json",
+      "self_ir": 1,
+      "inclusive_ir": 27190146
+    },
+    {
+      "object": "/workspace/relation-native-qualifiers/root-fused-baseline-cfb9e82a0-36",
+      "name": "std::env::args",
+      "self_ir": 1,
+      "inclusive_ir": 1755
+    },
+    {
+      "object": "???",
+      "name": "0x000000000483b030",
+      "self_ir": 1,
+      "inclusive_ir": 72
+    },
+    {
+      "object": "???",
+      "name": "0x00000000048433b8",
+      "self_ir": 1,
+      "inclusive_ir": 72
+    }
+  ]
+}

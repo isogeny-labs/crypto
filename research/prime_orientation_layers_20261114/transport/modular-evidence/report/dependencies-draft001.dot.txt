@@ -1,0 +1,12 @@
+digraph G {
+  rankdir=LR; graph [bgcolor="white",nodesep=.22,ranksep=.35];
+  node [shape=box,style="rounded,filled",fillcolor="#eaf1fa",fontname="Helvetica",fontsize=11];
+  A [label="Actual scalar/grid/mask atoms"];
+  B [label="Constructed numerator + denominator\nactual right factor"];
+  C [label="Derived work precision p+E\nE <= actual budget"];
+  D [label="Constructed arithmetic expression\nfinite coefficient boxes"];
+  E [label="Actual trim/crossing/scalar\ncanonical coefficient agreement"];
+  F [label="OPEN: scalar-only builder\nexpression + bit + total entry cost",fillcolor="#fff0d8",style="rounded,dashed"];
+  A -> B; B -> C; B -> D; C -> E; D -> E;
+  E -> F [style=dashed,label="next obligation",fontname="Helvetica",fontsize=10];
+}
