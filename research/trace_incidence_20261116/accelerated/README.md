@@ -128,3 +128,7 @@ Pre-data launch correction: use `launch-v2.sh`, `bootstrap-v2.sh`, `job-v2.sh`,
 workflow. `AMENDMENT_v2.json` records the sparse-checkout correction and explicit
 standalone lockfile pin. The first launch snapshot and its manifest remain
 unchanged; scientific kernels and all development evidence are unchanged.
+
+The v2 manifest also passes in a separate sparse checkout using read-only local
+Git object alternates (PCC-20261116-f44cc0). This checks source-path coverage;
+object transfer and paid execution are separate requirements. [pcc:unverified]
