@@ -1,0 +1,48 @@
+   Compiling prime-degree-certificate v0.1.0 (/workspace/crypto/research/prime_factor_base_degree_20261031/native)
+    Finished `release` profile [optimized] target(s) in 2.70s
+     Running unittests main.rs (research/prime_factor_base_degree_20261031/native/target/release/deps/prime_degree_certificate-337b28e04fec5ead)
+
+running 8 tests
+test pilot::tests::candidate_lift_filter_and_membership ... ok
+test pilot::tests::exported_s3_matches_one_exact_point_sum ... ok
+test pilot::tests::known_group_law_and_order ... ok
+test tests::ordinary_powers_are_not_boolean ... ok
+test tests::exact_degree_three_over_odd_primes ... ok
+test tests::rejects_corruption_and_wrong_field ... ok
+test tests::sat_and_capped_unsat_remain_unresolved ... ok
+test tests::checks_all_linear_generator_pairs_over_five ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests secant_graph.rs (research/prime_factor_base_degree_20261031/native/target/release/deps/secant_graph_certificate-7506ca052981686e)
+
+running 18 tests
+test identity::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test identity::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test identity::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity::tests::tampering_with_the_digest_is_detected ... ok
+test identity::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+test tests::certificate_is_bound_and_replayed ... ok
+test identity::tests::schoenhage_identity_certifies_and_checks ... ok
+test tests::fully_split_graph_factorization ... ok
+test tests::exported_inputs_include_known_secant_and_tangent_roots ... ok
+test tests::fixture_preserves_signs_columns_and_canonical_hashes ... ok
+test tests::omitted_curve_constraint_is_detected ... ok
+test tests::secant_identity_over_integers ... ok
+test top::tests::corruption_or_discarded_branch_is_rejected ... ok
+test top::tests::exact_degree_three_has_upper_and_lower_proof_in_every_branch ... ok
+test tests::exporter_preserves_every_branch_and_control_membership ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking prime-degree-certificate v0.1.0 (/workspace/crypto/research/prime_factor_base_degree_20261031/native)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.27s
+   Compiling prime-degree-certificate v0.1.0 (/workspace/crypto/research/prime_factor_base_degree_20261031/native)
+    Finished `release` profile [optimized] target(s) in 3.47s
+'SecantGraphTop.all_above' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SecantGraphTop.survives_at_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SecantGraphTop.first_full_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SecantGraphTop.strict_dense_reduction' depends on axioms: [propext, Quot.sound]

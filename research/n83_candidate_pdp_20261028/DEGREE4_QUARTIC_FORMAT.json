@@ -1,0 +1,90 @@
+{
+  "schema": "n83.degree-four-quartic-format/v1",
+  "scope": "Complete-or-capped Boolean normal-form V4 closure from four immutable parent layers; global LFD upper remains a separate gate",
+  "layout": {
+    "protocol-degree4-quartic.json": "Frozen instrument, twelve unchanged m3 identities, limits and four parent archives",
+    "case-specs/KEY.json": "Exact frozen case. propagation_case is the unchanged predecessor case; propagation_files binds eight predecessor payloads",
+    "inputs/ARM/ID/": "Byte-identical original input.json and system.sing",
+    "v2/ARM/ID/": "Saved complete V2 basis, operations and result; fully replayed",
+    "cases/KEY/added.rows.hybrid": "New independent hybrid rows, each with its global insertion ID",
+    "cases/KEY/blocked.row.hybrid": "Same header; zero or one unadmitted row with ID u64::MAX. A partial reduction or payload-blocked independent remainder is retained but excluded from rank",
+    "cases/KEY/operations.jsonl": "Every attempted allowed variable product, ordered reducers, hashes, reduction status and insertion ID, including zero and blocked candidates",
+    "cases/KEY/progress.jsonl": "Append-only deterministic counters every32 attempts and at every clean stop",
+    "cases/KEY/state.json": "Caps, counts, next source, blocked operation, pending count and complete_v4_normal_forms",
+    "cases/KEY/pending.json": "Entire compact queue: both initial group row-ID lists, group/variable/index cursors, urgent row/next-variable tasks, total pending products",
+    "cases/KEY/affine.json": "Unit/linear global row IDs, free variables, all checked assignments and failed equation IDs. Enumeration only when at most12 free variables",
+    "cases/KEY/closure.json": "Mathematical outcome before external bindings",
+    "cases/KEY/result.json": "Outcome plus frozen input binding and verified propagation parent hash",
+    "controls/": "Genuine quartic cancellation, positive xyz+1 and negative xyz. Includes original systems, independently enumerated dense V3/V4, hybrid traces and fresh replay checks",
+    "development-validation/": "All28 native tests and independent runtime control summary; earlier failed build log retained in source support",
+    "summary.json": "Native join of statuses and outcomes; numeric conclusions only for producer and fresh replay exit0",
+    "status/summary-after-KEY.json": "Write-once cumulative summary after each case",
+    "logs/,replay/,host.txt,terminal.json": "Process outcomes, non-secret host and diagnostic launcher boundaries; no timing comparison",
+    "manifest.sha256": "Hashes of every final raw payload except this inventory",
+    "uploader.stop": "Drains background upload before the final manifest and upload"
+  },
+  "hybrid_rows_binary": {
+    "magic": "N83Q4H1\n",
+    "header_bytes": 44,
+    "header_after_magic": [
+      "variables:u32le",
+      "lower_columns:u64le",
+      "all_columns:u64le",
+      "lower_words:u64le",
+      "initial_parent_rows:u64le"
+    ],
+    "record": [
+      "global_row_id:u64le",
+      "quartic_nonzeros:u64le",
+      "lower_words*u64le dense block",
+      "quartic_nonzeros*u32le ascending distinct global column indices"
+    ],
+    "record_bytes": "16 + 8*lower_words + 4*quartic_nonzeros",
+    "lower_block": "Graded colex squarefree monomials through degree3; little-endian words, LSB-first bits; zero padding",
+    "quartic_columns": "For zero-based h<i<j<k: lower_columns + C(k,4)+C(j,3)+C(i,2)+h",
+    "production_lower_block": {
+      "variables": 164,
+      "lower_columns": 735295,
+      "lower_words": 11489,
+      "lower_bytes": 91912
+    },
+    "initial_basis": "Complete V3 insertion IDs followed by predecessor propagation insertion IDs. Reconstruct only by verifying all four parents",
+    "hash_value_bytes": "quartic_nonzeros:u64le || dense lower block || ascending u32le quartic indices; excludes global row ID",
+    "partial": "A header or prefix does not assert completion. Successful full byte replay rejects truncation, alteration and trailing data"
+  },
+  "operations": {
+    "attempt": "Zero-based product attempt, including blocked attempt",
+    "source_row": "Existing global row ID with stored degree<=3",
+    "variable": "Zero-based variable index; ordinary product degree<=4",
+    "source_kind": "initial_added, initial_v3, or new_consequence",
+    "product_sha256": "Canonical value bytes before reduction",
+    "xor_basis_rows": "Ordered global reducer IDs; each reducer already admitted",
+    "remainder_sha256": "Canonical value bytes after the recorded full or partial reduction",
+    "remainder_degree": "Stored multilinear degree; zero encoded0",
+    "reduction_complete": "False only if weight cap interrupts reduction; partially reduced row is saved separately",
+    "inserted_row": "Global ID or null for zero/blocked candidate",
+    "blocked": "Current source remains pending and no rank is charged",
+    "membership_degree_bound": "Always4; Boolean reductions are justified by original field equations"
+  },
+  "queue_order": "Initial added-parent rows first, complete-V3 cubic rows second; variables outer, ascending row IDs inner. Every new degree<=3 row gets an urgent FIFO all-variable task. Advance old task before adding new one.",
+  "limits": {
+    "new_rows": 16384,
+    "new_basis_payload_bytes": 2147483648,
+    "product_attempts": 131072,
+    "quartic_nonzeros_per_active_reduction": 1048576,
+    "affine_free_variables": 12,
+    "virtual_memory_bytes": 8589934592,
+    "seconds_per_producer_or_replay": 1800,
+    "kill_grace_seconds": 5,
+    "outer_seconds": 48000
+  },
+  "stopping": "Unit, queue exhaustion, row cap, operation cap, or weight/payload block during an attempt. Unit precedes simultaneous boundaries. Every case attempted once; no automatic retries.",
+  "claims": {
+    "complete_v4": "All permitted products covered, no pending work or blocked operation; graded echelon argument proves complete Boolean normal-form image of V4",
+    "global_upper": "Only a unit in V4 or exhaustive affine ideal equality; complete V4 alone is insufficient",
+    "exact_four": "Inherited replayed strict lower4 plus certified global upper4",
+    "caps": "No cap or stall gives lower5 or global stabilization; null exact/upper remains unknown",
+    "rank": "Membership/span accounting only; not a factor-base quality ranking or regularity measure",
+    "review": "Producer/fresh/S3 replay does not constitute independent scientific review"
+  }
+}

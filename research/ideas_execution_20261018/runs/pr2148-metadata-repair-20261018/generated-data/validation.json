@@ -1,0 +1,190 @@
+{
+  "schema": "living-generated-provenance-repair/v1",
+  "recorded_at": "2026-10-18T08:19:56+00:00",
+  "head_sha": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+  "scope": [
+    "docs/ic/leaderboard.json",
+    "docs/ic/LEADERBOARD.md",
+    "docs/ic-leaderboard.html",
+    "docs/browser/data.json"
+  ],
+  "input_evidence_files_verified": 217,
+  "builder_source_files_verified": 2,
+  "materialized_missing_tracked_files": 21,
+  "input_completeness": {
+    "declared_sources": 29,
+    "dynamic_candidate_reports": 181,
+    "dynamic_sets": 36,
+    "v3_parameter_files": 6,
+    "ledger_files": 1,
+    "full_committed_glob_equals_filesystem": true,
+    "bytes_restored_from_head_only": true
+  },
+  "leaderboard_delta": {
+    "json_leaf_changes": [
+      {
+        "path": "/sources/curves_yaml/sha256",
+        "kind": "changed",
+        "before": "ab4891397fe07fca9478d96e1533c167a885b7557be9e6801025d14fec0976c5",
+        "after": "658a422ce97ef3ea505ed6337fe4680e146f1b951b208688a13f9199bbdd5712"
+      }
+    ],
+    "numeric_changes": 0,
+    "array_length_changes": [],
+    "markdown_digest_prefix_only": true,
+    "html_digest_prefix_only": true
+  },
+  "browser_delta": {
+    "raw_leaf_changes": [
+      {
+        "path": "/sources/docs~1ic~1leaderboard.json",
+        "kind": "changed",
+        "before": "49c52128766a7641ce353bae63b4422ee1b8b5caf0dcf19e8011cc77795debc1",
+        "after": "96387b63f1d93e3cf7cc01b10a73937e0951b643b6d59b52f4b4a0dde238844e"
+      }
+    ],
+    "raw_numeric_changes": 0,
+    "raw_array_length_changes": [],
+    "counts_before": {
+      "curves": 2572,
+      "methods": 211,
+      "factor_bases": 672,
+      "candidates": 271,
+      "rounds": 30,
+      "sessions": 226,
+      "yields": 14648
+    },
+    "counts_after": {
+      "curves": 2572,
+      "methods": 211,
+      "factor_bases": 672,
+      "candidates": 271,
+      "rounds": 30,
+      "sessions": 226,
+      "yields": 14648
+    },
+    "official_output_matches_reviewed_candidate": true
+  },
+  "checks": [
+    {
+      "name": "build",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_ic_leaderboard.py",
+      "exit": 0,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/build.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/build.stderr"
+    },
+    {
+      "name": "builder-check",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_ic_leaderboard.py --check",
+      "exit": 0,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/builder-check.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/builder-check.stderr"
+    },
+    {
+      "name": "path-selftests",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_check_ic_leaderboard_paths.py",
+      "exit": 0,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/path-selftests.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/path-selftests.stderr"
+    },
+    {
+      "name": "path-check",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/check_ic_leaderboard_paths.py",
+      "exit": 0,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/path-check.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/path-check.stderr"
+    },
+    {
+      "name": "browser-check",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py --check (before downstream regeneration)",
+      "exit": 1,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-check.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-check.stderr"
+    },
+    {
+      "name": "browser-candidate",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py --out /tmp/pr-followup-20261018/crypto/leaderboard/browser-candidate.json",
+      "exit": 0,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-candidate.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-candidate.stderr"
+    },
+    {
+      "name": "browser-build",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py",
+      "exit": 0,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-build.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-build.stderr"
+    },
+    {
+      "name": "browser-check-final",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/build_lab_browser.py --check (after regeneration)",
+      "exit": 0,
+      "stdout": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-check-final.stdout",
+      "stderr": "/tmp/pr-followup-20261018/crypto/leaderboard/browser-check-final.stderr"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/ic/leaderboard.json",
+      "before_bytes": 1543199,
+      "after_bytes": 1543199,
+      "before_sha256": "49c52128766a7641ce353bae63b4422ee1b8b5caf0dcf19e8011cc77795debc1",
+      "after_sha256": "96387b63f1d93e3cf7cc01b10a73937e0951b643b6d59b52f4b4a0dde238844e",
+      "changed": true
+    },
+    {
+      "path": "docs/ic/LEADERBOARD.md",
+      "before_bytes": 30907,
+      "after_bytes": 30907,
+      "before_sha256": "8f63ffd34d3381d7f41f8f0e8ea663c1d380899107b0e36ffb943ee7dd1e9f8b",
+      "after_sha256": "647f0f4c8432d101cf9356d4518d4904537dc2b5db60c9bc7a86cc088a3ea9ba",
+      "changed": true
+    },
+    {
+      "path": "docs/ic-leaderboard.html",
+      "before_bytes": 460821,
+      "after_bytes": 460821,
+      "before_sha256": "109e29ae3813c925e35eb8373e2dc2138dbeb1af9c9e0b7531f172dad03e0e68",
+      "after_sha256": "ce05ec6fcf50e802b67804900ed3793ed9afacf0cb7731913a4ca8914b94dc2d",
+      "changed": true
+    },
+    {
+      "path": "docs/browser/data.json",
+      "before_sha256": "3af53b79eb31cad149dc49f2b38caacb9520d831148e6e1474aeefc85cac4eb1",
+      "after_sha256": "6b32ab68d2bf6138ecf23eda9b7629a7271ff2f0773995ffc473b32a8ea47fd3",
+      "before_bytes": 31625668,
+      "after_bytes": 31625668,
+      "changed": true
+    }
+  ],
+  "provenance_chain": {
+    "recorded_at": "2026-10-18T08:17:43+00:00",
+    "base_revision": "b7cafe04485eb97d873dffef698e7337cfb38cfe",
+    "base_crosswalk_sha256": "ab4891397fe07fca9478d96e1533c167a885b7557be9e6801025d14fec0976c5",
+    "head_revision": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+    "head_crosswalk_sha256": "658a422ce97ef3ea505ed6337fe4680e146f1b951b208688a13f9199bbdd5712",
+    "leaderboard_before": {
+      "path": "docs/ic/leaderboard.json",
+      "before_bytes": 1543199,
+      "after_bytes": 1543199,
+      "before_sha256": "49c52128766a7641ce353bae63b4422ee1b8b5caf0dcf19e8011cc77795debc1",
+      "after_sha256": "96387b63f1d93e3cf7cc01b10a73937e0951b643b6d59b52f4b4a0dde238844e",
+      "changed": true
+    },
+    "browser_before_sha256": "3af53b79eb31cad149dc49f2b38caacb9520d831148e6e1474aeefc85cac4eb1",
+    "browser_candidate_sha256": "6b32ab68d2bf6138ecf23eda9b7629a7271ff2f0773995ffc473b32a8ea47fd3",
+    "causal_chain": "crosswalk alias append changed source digest; official leaderboard updates only curves_yaml source digest; official lab browser updates only leaderboard source digest; all numeric and scientific values unchanged"
+  },
+  "limitations": [
+    "Conductor command unavailable: exit127 for original and expanded scopes. Parent explicitly delegated exact outputs.",
+    "Initial materialization preflight assumed five candidate reports per set; actual committed glob includes a retained r5-retry1 file. It stopped before writes. Corrected enumeration follows exact official glob and verifies equality.",
+    "Initial browser --check failed because its recorded leaderboard digest referenced the old generated output. Parent expanded scope only after a /tmp candidate proved a single digest-only raw delta."
+  ],
+  "no_research_runs": true,
+  "scientific_values_changed": false,
+  "scientific_promotions": false,
+  "source_edits": false,
+  "frozen_evidence_rewrites": false,
+  "sparse_patterns_changed": false,
+  "git_index_or_commit_mutations": false
+}

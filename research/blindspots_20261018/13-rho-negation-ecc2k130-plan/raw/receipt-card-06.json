@@ -1,0 +1,229 @@
+{
+  "card_id": "CARD-BLINDSPOT-13-06",
+  "card_path": "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/card-06.yaml",
+  "card_sha256": "1dac0112554b5cf689a530dc04e43af7c413a5dbb0d41a0a4819c246a79a8669",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw",
+        "target/blindspots-13/card-06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-13/card-06/b13",
+        "examples/blindspots_13_rho_negation.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.897,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.897,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-13/card-06/b13",
+        "sweep",
+        "--bits",
+        "48",
+        "--t0",
+        "32",
+        "--t1",
+        "48",
+        "--rs",
+        "16",
+        "--arms",
+        "base,none,dbl,min2,la,per2,per4,per8,per16,per32,per64,laper16,laper32,laper64",
+        "--seed-offset",
+        "7000000",
+        "--out",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t32-48.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 87.078,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sweep",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t32-48.jsonl": "297cb672cd0c7a971f9da92a3a9c55bb3547d62bb4785bdf01da0861809dfa49"
+      },
+      "seconds": 87.078,
+      "stderr_sha256": "896c8836ef550386f1312ebb252bbf5e44c926d43eeb79b57be17ff0cf52a04a",
+      "stderr_tail": [
+        "sweep bits=48 targets 32..48 arms [\"base\", \"none\", \"dbl\", \"min2\", \"la\", \"per2\", \"per4\", \"per8\", \"per16\", \"per32\", \"per64\", \"laper16\", \"laper32\", \"laper64\"] rs [16]: 224 records in 87.1s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-13/card-06/b13",
+        "sweep",
+        "--bits",
+        "48",
+        "--t0",
+        "32",
+        "--t1",
+        "48",
+        "--rs",
+        "16",
+        "--arms",
+        "baseb",
+        "--seed-offset",
+        "9000011",
+        "--out",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t32-48-baseb.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.151,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sweep-baseb",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t32-48-baseb.jsonl": "fd695787d6a393d0eafe9d7ebff15f00d8b89cf36812399bedf080c8ebcf3775"
+      },
+      "seconds": 3.151,
+      "stderr_sha256": "98b4979dc3902f36df91fdc6e8642405c816d40300fbbf334a543f094d0e51d0",
+      "stderr_tail": [
+        "sweep bits=48 targets 32..48 arms [\"baseb\"] rs [16]: 16 records in 3.1s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-13/card-06/b13"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-13/card-06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "49344caea16f3cf9b88d2b27104db18b8ac296df",
+  "dirty_after": [
+    "esearch/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t32-48.jsonl",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-06-sweep-baseb.stderr.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-06-sweep.stderr.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r16-t32-48-baseb.jsonl"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

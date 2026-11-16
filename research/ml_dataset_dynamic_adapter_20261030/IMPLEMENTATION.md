@@ -1,0 +1,17 @@
+# Bounded dynamic-prime adapter foundation
+
+2026-10-30. This implementation follows the exact copied contracts under `contracts/` (source and SHA-256 identities in SOURCE.json). Root T887 owns the child and additive private registration; no dispatcher activation or cloud run is authorized here.
+
+This increment constructs the original odd-characteristic S3 chain and leaf membership equations for m=4..15, K=1..32, V=2m-2. It borrows the already-certified Fp64Arithmetic context, accepts canonical sorted distinct x coordinates, and emits dynamic::InputPolynomial directly. It uses fixed arrays, insertion canonicalization, charged exact surviving term allocations, and a shared cumulative parent ledger with nonrefundable local work tickets. Costs are modeled work and requested storage, not instruction counts or RSS. Domain/group/public parsing and setup admission remain caller prerequisites.
+
+Sources checked: frozen STAGE3_ADAPTER_DESIGN and RESOURCE_BOUNDS; original `solvers.rs::prime_chain_polynomials` (symmetric odd-characteristic S3 expansion and chain ordering); `f4_prime_dynamic.rs` canonical monomial and input interfaces; `fp_backend.rs::Fp64Arithmetic::try_new` certification boundary. This implements existing equations, not a novel mathematical construction. Rust allocation semantics: https://doc.rust-lang.org/std/vec/struct.Vec.html#method.try_reserve_exact ; admission bounds requested capacity and does not assume allocator usable capacity equals the request.
+
+Controls: all arities against the unchanged legacy builder, target substitutions and zero coefficients/cancellation, widest m15/K32 at 2^61-1, exact/one-less work and storage, expired original deadline, rejected noncanonical/unsorted/duplicate domains and coefficients, cumulative second-call accounting. Root serializes compilation/test execution. Authored tests are not passed tests until root records actual results.
+
+Remaining full scope: signed-domain/public binding, typed counting/writing and capture, native invocation, retained-basis handling, linear and nonlinear extraction, independently verified derivation, signed group traversal and all-twist useful-work controls. This foundation neither solves PDP nor establishes an algebraic negative or any fall-degree claim.
+
+## Implemented foundation (runtime gates pending)
+
+The private child now emits dynamic canonical inputs without maps, JSON Values, nested exponent vectors or domain clones. Original S3 target substitution and all membership equations remain unchanged. Fixed scratch admission uses size_of layouts; each surviving polynomial gets one exact requested term allocation. Local work tickets charge the parent once and preserve consumed reservations after failures. Deadline checks precede every bounded term/comparison/update chunk and terminal return. Six test functions cover all m=4..15 with four coefficient/target recipes and three domains, m15/K32 at 2^61-1, exact/one-less aggregate admission, canonical input refusal, cumulative repeated calls and ticket/atomic accounting. This is software fixture validation to be executed by the root, not a scientific experiment.
+
+The constructor intentionally takes sorted distinct canonical x codes and a certified field reference; it does not perform signed-point deduplication/public binding or debit setup again. Its caller must use the original attempt ledger and account setup once. The scoped child is registered privately but no runtime dispatch route selects it. No standalone corpus cell or new claim has been generated.

@@ -1,0 +1,31 @@
+{
+  "schema": "pkm.detached-development-validation/v1",
+  "recorded_utc": "2026-10-30T08:39:17.567907+00:00",
+  "source_head_before_metadata": "7396d55f4f93719e88fae3f81b1a49e3f5e209f5",
+  "source_merge": "4e063aa5bb048bd474c967d7c000aee741d51967",
+  "directory": "/workspace/pr2949-integration-20261030/retry-20261030T0838Z",
+  "supervisor_pid": 15115,
+  "session_id": 15115,
+  "process_group": 15115,
+  "parent_after_launch": 1,
+  "launch": "nohup setsid bash native-validation.sh > supervisor.log 2>&1 < /dev/null &",
+  "script_sha256": "2b730d19938a34daf125bf821ac3a810ed356463f07594fc36650e37c45412fd",
+  "source_bindings_sha256": "335225d4770940c304ff35cf1b346f44ee808f93d7a0797d541c8cfff516eb8e",
+  "state": "RUNNING, compiling first example test command; no result yet",
+  "scientific_panels_run": 0,
+  "comparison_admissible": false,
+  "goal_complete": false,
+  "prior_attempt_preserved": true,
+  "auto_merge_paused": true,
+  "push": "not performed; native validation pending",
+  "autofix": {
+    "run": 41019218473,
+    "result": "failure",
+    "step": "Require ANTHROPIC_API_KEY",
+    "scope": "unavailable autofix service credential; not a native code failure or required merge check"
+  },
+  "followup_counter": {
+    "consecutive_unchanged": 0,
+    "reason": "new interruption diagnosis and detached retry"
+  }
+}

@@ -1,0 +1,3 @@
+# Prior source and construction
+
+The completed ordinary-fiber-independent-review identifies native solve4 as remaining. Existing row-fold proofs establish ordered native modular multiply/add refinement, not elimination. Reuse WordComparator.mul_decode/product_bound under p<=2^32. Gaussian row replacement is classical: Mathlib Matrix.updateRow_eq_transvection and inverse transvection identities provide primary prior art; this packet specializes source suffix updates and augmented RHS. References read prospectively: https://leanprover-community.github.io/mathlib4_docs/Mathlib/LinearAlgebra/Matrix/Transvection.html and https://leanprover-community.github.io/mathlib4_docs/Init/Data/UInt/Lemmas.html . No novelty claim for Gaussian elimination.

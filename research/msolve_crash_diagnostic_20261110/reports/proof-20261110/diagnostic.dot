@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=11];
+ input [label="Fixed Boolean ideal over F65537\nPinned unchanged msolve0.6.5 source"];
+ cells [label="Predata protocol: 2 modes x 2 exact LA x 2 builds\n8 calls; one attempt; 5s watchdog each"];
+ original [label="Original build\nl1ordinary exact PASS; l2ordinary139\nsaturation: both timeout124",fillcolor="#fff1d5"];
+ instrument [label="Address + undefined build\nAll4 stop at hash.c409 signed1<<31",fillcolor="#fbe3df"];
+ retained [label="All8 outcomes and exact raw files retained\nFlow:6completed,2timeout,0excluded"];
+ scope [label="Earlier shift diagnostic does not identify crash cause\nPrior Lean F4Run/saturation theorem unchanged\nNative execution remains unsigned",fillcolor="#fff1d5"];
+ input -> cells; cells -> original; cells -> instrument;
+ original -> retained; instrument -> retained; retained -> scope;
+}

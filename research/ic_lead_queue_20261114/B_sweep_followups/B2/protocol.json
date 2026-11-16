@@ -1,0 +1,693 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "CRYPTO-ic-lead-queue-B2-kangaroo-medium-20261114",
+  "version": 1,
+  "created": "2026-11-14",
+  "repository": "crypto",
+  "study_dir": "research/ic_lead_queue_20261114/B_sweep_followups/B2",
+  "authors": [
+    "Track B sweep follow-ups (desk and design)"
+  ],
+  "links": {
+    "lead": "crypto-autoresearcher:knowledge/leads/ecdlp/generic/LEAD-RHO-kangaroo-interval.yaml",
+    "narrative": "research/ic_lead_queue_20261114/B_sweep_followups/B2/PROTOCOL.md",
+    "prior": "research/prime_medium_rho_cpc_20261109"
+  },
+  "question": "On the six 33- to 41-bit prime-order curves of the medium-tier studies, is the paired S ratio R = S(kangaroo.vow_v2)/S(rho.plain) at w = 0 inside [1.3, 2.4]?",
+  "claims": [
+    {
+      "id": "K1",
+      "text": "Every counted run recovers its planted target and replays identically.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "K2",
+      "text": "The pooled 95% interval of S(kang)/S(rho-plain) at w = 0 lies inside [1.3, 2.4].",
+      "class": "comparative",
+      "decided_by": [
+        "C-R"
+      ],
+      "if_supported": "closed_dominated stays, with a sealed medium-tier number",
+      "if_not_supported": "the range is corrected from data (below, above or wide), or the row is reopened if the interval reaches 1"
+    },
+    {
+      "id": "K3",
+      "text": "Every full-group method here is at or above matched rho (the distance remaining).",
+      "class": "comparative",
+      "decided_by": [
+        "C-R-NEG"
+      ],
+      "if_supported": "reported as the distance remaining, not as a gate",
+      "if_not_supported": "a method below matched rho would be escalated to the breakthrough reviewers"
+    },
+    {
+      "id": "K4",
+      "text": "Nothing here is a security statement about any curve or about ECDLP at cryptographic sizes.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "On the full group, a two-kangaroo DP solver costs between 1.3 and 2.4 times matched r-adding rho (rho.plain).",
+      "mechanism": "kangaroo needs about 2 sqrt(r) steps against about 1.25 sqrt(r) for rho before overheads",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "s",
+          "direction": "higher",
+          "minimum_effect": "R about 1.5 (range 1.4 to 1.65): declared expected S 2.0 over the rho.plain floor 1.2533 gives 1.60; atlas 2.203 x floor over measured rho.plain 1.487 x floor gives 1.48; against rho.negation 2.203/1.067 = 2.06 (derived)",
+          "provenance": {
+            "written_at": "2026-11-14",
+            "first_recorded_in": "research/ic_lead_queue_20261114/B_sweep_followups/B2/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/prime_medium_rho_cpc_20261109/RESULTS.md",
+                "measured": "rho.negation 1.067 [0.999, 1.134] x floor; rho.plain 1.487 [1.392, 1.577] x negation floor; bsgs.textbook/bsgs.negation 1.489 [1.463, 1.516]"
+              },
+              {
+                "path": "research/prime_field_lead_assessment_20261107/atlas_survey.md",
+                "measured": "kangaroo closed_dominated 2.203 x floor (small sizes)"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-AA",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "bsgs-tb",
+      "expected_detection": "bsgs-tb/bsgs-neg in job PC: 95% lower end above 1.2 and point in [1.43, 1.55] (cpc 1.489, confirm 1.4639); in session rho-plain/rho-neg lower end above 1.2 and point in [1.25, 1.60] (M1 1.443)",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "kang-aa",
+      "null_population": {
+        "description": "kangaroo, rho.negation and bsgs.negation each against their own A/A arm: expected effect exactly nothing",
+        "generator": "same workloads and algorithm seeds as the paired arm",
+        "n": 864,
+        "why_n": "one pair per measured workload-round of K1",
+        "matched_on": [
+          "curves",
+          "targets",
+          "seeds",
+          "session",
+          "pricing"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation, matched rho",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "A/A of rho-neg",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "rho-plain",
+      "role": "baseline",
+      "description": "rho.plain, the denominator of R",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.plain"
+      }
+    },
+    {
+      "id": "kang",
+      "role": "candidate",
+      "description": "kangaroo.vow_v2, the numerator of R",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "kangaroo.vow_v2"
+      }
+    },
+    {
+      "id": "kang-aa",
+      "role": "control_negative",
+      "description": "negative control and A/A of kang",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "kangaroo.vow_v2"
+      }
+    },
+    {
+      "id": "bsgs-neg",
+      "role": "baseline",
+      "description": "job PC: bsgs.negation",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.negation"
+      }
+    },
+    {
+      "id": "bsgs-tb",
+      "role": "control_positive",
+      "description": "job PC positive control: bsgs.textbook",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.textbook"
+      }
+    },
+    {
+      "id": "bsgs-neg-aa",
+      "role": "control_aa",
+      "description": "job PC A/A of bsgs-neg",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.negation"
+      }
+    }
+  ],
+  "analysis_plan": {
+    "script": {
+      "path": "research/ic_lead_queue_20261114/B_sweep_followups/B2/analysis.sh",
+      "sha256": "d6a0c1100d26de3493ab13b4daaf9b44afed05e7514b6b960561ccd468ce02ca"
+    },
+    "inputs": [
+      "K1/records.jsonl",
+      "PC/records.jsonl",
+      "spec-K1.json",
+      "spec-PC.json",
+      "seeds.json"
+    ],
+    "outputs": [
+      "analysis/R-*.json",
+      "analysis/g2-*.json",
+      "analysis/g3a.json",
+      "analysis/g3b.json",
+      "analysis/band-K1.json",
+      "analysis/table-K1.md"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "decision_rule": {
+    "text": "Gates: G1 verify --replay-all 0 problems in K1 and PC; G2 A/A paired counts identical (kang, rho-neg, bsgs-neg); G3 positive controls (a) rho-plain/rho-neg lower end above 1.2 and point in [1.25, 1.60], (b) bsgs-tb/bsgs-neg lower end above 1.2 and point in [1.43, 1.55]; G4 at least 90% complete pairs, no arm censored above 1%. Verdict on R = S(kang)/S(rho-plain), pooled, w = 0, interval [L, U]: dominated_supported if L >= 1.3 and U <= 2.4; dominated_below_range if 1.0 < L < 1.3 and U <= 2.4; dominated_above_range if L >= 1.3 and U > 2.4; dominated_wide if 1.0 < L < 1.3 and U > 2.4; unresolved if the interval contains 1; kangaroo_cheaper if U < 1; any gate failure is inconclusive. See PROTOCOL.md section 8.",
+    "comparison_ids": [
+      "C-R",
+      "C-R-NEG"
+    ],
+    "threshold": "R interval against [1.3, 2.4] and 1",
+    "statistic": "ratio of total cost over pooled paired workloads, charged at w = 0 (0.1 and 1 reported)",
+    "interval": "ecbench compare workload-cluster bootstrap, 4,000 resamples, seed 275055567897761",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "R and R - 1 in percent; distance to matched rho",
+    "verdict_vocabulary": [
+      "dominated_supported",
+      "dominated_below_range",
+      "dominated_above_range",
+      "dominated_wide",
+      "unresolved",
+      "kangaroo_cheaper",
+      "inconclusive"
+    ]
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab (cpu-l2-spot)",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true,
+      "memory": "4Gi",
+      "job_seconds": 3600
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "extensions": {
+    "crypto": {
+      "spec_sha256": {
+        "B2/spec-K1.json": "2d4f45e007e12e9b0111842fe2c5831786bcd0a61cc300ce5905cdb236dbc448",
+        "B2/spec-PC.json": "617937b74c9a0c050ebc4d6a3ce2b578fbaf99aad199264da427d1e9f195c8c4"
+      },
+      "seeds_sha256": {
+        "B2/seeds.json": "6c631de2ffd2891d5f8bd3a6d74e653acfc5fc73a367f0d9478589c6bb67e151"
+      },
+      "protocol_md_sha256": {
+        "B2/PROTOCOL.md": {
+          "sha256": "1a217c40381786a3f3e06c68dc5d5792d0d58cafe4f08ac7c9b740936851fccd",
+          "bytes": 16952,
+          "note": "the file as it stood before the freeze entry under Amendments was appended; check with head -c bytes"
+        }
+      },
+      "source_revision": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+      "image": "publish_only build of source_revision; its digest and the ecbench sha256 are recorded at launch from the build receipt",
+      "bench_record": "benchmarks/records/20261114T1957Z-b2-kangaroo-medium-tier.json",
+      "plan_spec_ids": {
+        "K1": "ECS1h73ec912e684a",
+        "PC": "ECS1h838d79f8b2b8"
+      },
+      "curves_sha256": {
+        "research/prime_medium_tier_rho_20261107/curves.json": "6ccc0acb15d99a5593fcfce6b9dc57ddfd6141f87b35e2a96f41043569ad3680"
+      }
+    }
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "10be9a4e1613fc59d4c7d60b9a4b09007b2ded9981509875f1cada8e26bbda86",
+    "commit": "a9f62b745f3d2c69fc833d292c440c623832762c",
+    "frozen_at": "2026-11-14T20:00:39Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "changing curves, targets, seeds, the weights, the gates or the verdict ranges after data",
+    "re-running a session because of its result; dropping a curve or workload outside the invalidation rules",
+    "reading a kangaroo or rho cost from a run whose positive control or A/A failed",
+    "any timing claim; any security statement"
+  ],
+  "invalidation_rules": [
+    "a run not verified or not matching its target is excluded and counted per arm; a gate failure voids the reading",
+    "an interrupted session is incomplete and rerun once; wall-clock values are descriptive only"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:research/prime_medium_rho_cpc_20261109/RESULTS.md",
+      "provenance": "internal",
+      "claim": "M = 1.067 x floor; rho.plain 1.487 x floor; bsgs.textbook/bsgs.negation 1.489",
+      "verified_by": "read 2026-11-14"
+    },
+    {
+      "ref": "crypto:research/prime_field_lead_assessment_20261107/atlas_survey.md",
+      "provenance": "internal",
+      "claim": "kangaroo-interval closed_dominated 2.203 x floor",
+      "verified_by": "read 2026-11-14"
+    }
+  ],
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "cost.total_gae",
+      "cost.unpriced",
+      "counters.relations_found",
+      "counters.targets_tried",
+      "phases[].native",
+      "work_native.table_insert_attempts"
+    ],
+    "record": [
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "cpu_model",
+      "kernel_release",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s",
+        "name": "charged S at weight w",
+        "unit": "GAE / sqrt(r)",
+        "kind": "counted",
+        "definition": "(cost.total_gae + w * priced native operations) / sqrt(r), table work priced by default",
+        "source": "records.jsonl cost, work_native",
+        "formula": "ratio of total cost over pooled paired workloads",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "s_unpriced",
+        "name": "S under --no-price-table-work",
+        "unit": "GAE / sqrt(r)",
+        "kind": "counted",
+        "definition": "the pre-2026-11-08 reading",
+        "source": "records.jsonl",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        262101475107005,
+        21344195110516,
+        64010579100382,
+        35920352509606,
+        275055567897761
+      ],
+      "nonce": null,
+      "note": "seeds.json: seed(tag) = int(SHA-256(prefix + tag)[0:12 hex], 16), prefix ic_lead_queue_20261114/B2/v1/"
+    },
+    "instance_sampling": {
+      "rule": "six fixed curves of the medium-tier studies; fresh planted target blocks K1 (24 per curve) and PC (16 per curve)",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "counted units, fixed commands, no free analysis parameter",
+      "unmasked_at": null
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "R with 95% interval and the range [1.3, 2.4]",
+      "per-curve S by arm",
+      "distance to matched rho per arm across the band"
+    ],
+    "report_dir": "research/ic_lead_queue_20261114/B_sweep_followups/B2/report"
+  },
+  "sample_size": {
+    "instances": 144,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": 4000,
+      "min_attainable_two_sided_p": 0.0005,
+      "passes": true,
+      "note": "PROTOCOL.md section 7: half-width about 5.6% at 144 workloads (M1: 9.6% at 48), at most 8.4% if kangaroo variance is 1.5 times rho.plain"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 600,
+      "per_sample_seconds": 0.5,
+      "threads": 1,
+      "estimated_total_seconds": 2500,
+      "measured_on": "development check: rho.negation median 27.6 ms at 32.37 bits, scaled by sqrt(r); estimate"
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: jobs K1 and PC, then the analysis",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "budget: USD 5 including one rerun",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "an interrupted or failed-admission session is kept and rerun once; a second failure stops and is reported",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "rho.plain",
+          "kangaroo.vow_v2",
+          "bsgs.textbook",
+          "bsgs.negation"
+        ]
+      },
+      {
+        "name": "curve size",
+        "levels": [
+          32.37,
+          32.74,
+          36.03,
+          36.43,
+          40.44,
+          40.81
+        ]
+      }
+    ],
+    "crosses_map": true,
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "ecbench from the publish_only image of 0c2cc1b408",
+        "how": "one binary for both jobs"
+      },
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "how": "the six curves of curves.json"
+      },
+      {
+        "name": "target",
+        "treatment": "randomized",
+        "how": "fresh blocks, seeds in seeds.json"
+      },
+      {
+        "name": "algorithm seed",
+        "treatment": "randomized",
+        "how": "one per workload-round, shared by every arm"
+      },
+      {
+        "name": "arm order",
+        "treatment": "randomized",
+        "value": "alternate",
+        "how": "balanced over six rounds"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "L2 per record; counts do not depend on the host"
+      },
+      {
+        "name": "spot preemption",
+        "treatment": "measured",
+        "how": "an interrupted session is incomplete and rerun once"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "analysis.sh, commands frozen"
+      },
+      {
+        "name": "pricing",
+        "treatment": "crossed",
+        "how": "w = 0 decides; 0.1 and 1 reported; --price-table-work fixed (moot for these arms)"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-R",
+        "arms": [
+          "kang",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "reason": "the lead comparison R"
+      },
+      {
+        "id": "C-R-NEG",
+        "arms": [
+          "kang",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "reason": "the matched-rho distance"
+      },
+      {
+        "id": "C-AA",
+        "arms": [
+          "kang-aa",
+          "kang"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "A/A: identical method, expected effect exactly nothing"
+      }
+    ]
+  },
+  "amendments": []
+}

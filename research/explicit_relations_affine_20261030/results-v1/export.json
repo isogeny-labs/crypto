@@ -1,0 +1,1002 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "ER-AFFINE-v1-hnvmwjamem9ox9",
+  "created": "2026-10-31T03:01:37.468591+00:00",
+  "protocol": {
+    "path": "../protocol.json",
+    "sha256": "2cfc1be77efbdc0d65031c1a42a19a72aca407aa69459e4440731993a92dad66",
+    "protocol_id": "EXPLICIT-RELATIONS-AFFINE-20261030",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "ecbench-affine-v1",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "333712634ae2fa0694236a530b7a5efd1be3efc5",
+    "dirty": false
+  },
+  "backend": "runpod",
+  "host": {
+    "path": "gpu-before.txt",
+    "sha256": "1d35c3eb124b28b6e0e46aa6a6a0fcb168403c402ebe8e38993604545f91aaaf",
+    "class_id": "runpod-hnvmwjamem9ox9",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "gpu": "RTX 4090"
+    }
+  },
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "binary_sha256": "8e1efdc7f1f83d4c6b574dd7f34f1bc1f187a8e74a16fe6aa46577c51d0402de",
+      "commit": "333712634ae2fa0694236a530b7a5efd1be3efc5"
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "binary_sha256": "8bd4aa4a1c844b323f6dfd326b33885a646bbff10b970771b25f8daf3c4a4083",
+      "commit": "333712634ae2fa0694236a530b7a5efd1be3efc5"
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "binary_sha256": "8e1efdc7f1f83d4c6b574dd7f34f1bc1f187a8e74a16fe6aa46577c51d0402de",
+      "commit": "333712634ae2fa0694236a530b7a5efd1be3efc5"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "hnvmwjamem9ox9-52-101-b",
+      "arm": "b",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 7.230646247,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 7.213224177,
+          "verify_seconds": 0.007903628,
+          "bases_ms": 7.102621,
+          "targets_ms": 50.142711,
+          "oracle_ms": 6774.155551,
+          "linear_ms": 19.862563,
+          "replay_ms": 4.024096,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-52-101-v",
+      "arm": "v",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.99876412,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.979429175,
+          "verify_seconds": 0.008393445,
+          "bases_ms": 6.647215,
+          "targets_ms": 50.152139,
+          "oracle_ms": 6592.086659,
+          "linear_ms": 19.871364,
+          "replay_ms": 4.023526,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-52-101-x",
+      "arm": "x",
+      "instance_id": "52",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 7.194883106,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 7.177102423,
+          "verify_seconds": 0.008794988,
+          "bases_ms": 7.149192,
+          "targets_ms": 50.498103,
+          "oracle_ms": 6778.939921,
+          "linear_ms": 19.7635,
+          "replay_ms": 4.011496,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-52-202-x",
+      "arm": "x",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.25930589,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.24129528,
+          "verify_seconds": 0.008341302,
+          "bases_ms": 7.266256,
+          "targets_ms": 29.650148,
+          "oracle_ms": 4832.886218,
+          "linear_ms": 9.784132,
+          "replay_ms": 1.822012,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-52-202-v",
+      "arm": "v",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.180572342,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.163134971,
+          "verify_seconds": 0.008366904,
+          "bases_ms": 7.140442,
+          "targets_ms": 34.31381,
+          "oracle_ms": 4764.997701,
+          "linear_ms": 21.991515,
+          "replay_ms": 4.161852,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-52-202-b",
+      "arm": "b",
+      "instance_id": "52",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.257107625,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.238852576,
+          "verify_seconds": 0.009029356,
+          "bases_ms": 6.813371,
+          "targets_ms": 34.39253,
+          "oracle_ms": 4862.372149,
+          "linear_ms": 21.971304,
+          "replay_ms": 4.108459,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-63-101-b",
+      "arm": "b",
+      "instance_id": "63",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 2637.015963287,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 2636.991553184,
+          "verify_seconds": 0.009087847,
+          "bases_ms": 6.820001,
+          "targets_ms": 181.617043,
+          "oracle_ms": 2636361.407966,
+          "linear_ms": 110.218931,
+          "replay_ms": 4.099763,
+          "relations": 338,
+          "attempts": 15737
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-63-101-v",
+      "arm": "v",
+      "instance_id": "63",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 2644.876299599,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 2644.849779739,
+          "verify_seconds": 0.010422668,
+          "bases_ms": 7.293484,
+          "targets_ms": 181.630624,
+          "oracle_ms": 2644155.703774,
+          "linear_ms": 113.70334,
+          "replay_ms": 4.09365,
+          "relations": 338,
+          "attempts": 15737
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-63-101-x",
+      "arm": "x",
+      "instance_id": "63",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 2636.279905001,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 2636.255738237,
+          "verify_seconds": 0.010001583,
+          "bases_ms": 6.70411,
+          "targets_ms": 182.957465,
+          "oracle_ms": 2635590.68142,
+          "linear_ms": 102.726249,
+          "replay_ms": 4.088717,
+          "relations": 338,
+          "attempts": 15737
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-63-202-x",
+      "arm": "x",
+      "instance_id": "63",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1206.957991947,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1206.938904377,
+          "verify_seconds": 0.00859286,
+          "bases_ms": 6.780086,
+          "targets_ms": 159.207002,
+          "oracle_ms": 1206296.30523,
+          "linear_ms": 105.615862,
+          "replay_ms": 4.158761,
+          "relations": 344,
+          "attempts": 13733
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-63-202-v",
+      "arm": "v",
+      "instance_id": "63",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1190.614023499,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1190.595552517,
+          "verify_seconds": 0.007622168,
+          "bases_ms": 7.347061,
+          "targets_ms": 156.618474,
+          "oracle_ms": 1189984.472859,
+          "linear_ms": 90.82479,
+          "replay_ms": 4.160756,
+          "relations": 344,
+          "attempts": 13733
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    },
+    {
+      "run_id": "hnvmwjamem9ox9-63-202-b",
+      "arm": "b",
+      "instance_id": "63",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 1207.343629487,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 1207.318937206,
+          "verify_seconds": 0.009996008,
+          "bases_ms": 6.932886,
+          "targets_ms": 158.174297,
+          "oracle_ms": 1206682.066067,
+          "linear_ms": 106.115755,
+          "replay_ms": 4.171277,
+          "relations": 344,
+          "attempts": 13733
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh-process paper-driver --verify; scalar+1 rejection; cross-formula and baseline-repeat certificate byte equality"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "certificate-audit.json",
+          "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+          "bytes": 13800,
+          "kind": "raw"
+        },
+        {
+          "path": "archive-manifest.json",
+          "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+          "bytes": 22170,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "hnvmwjamem9ox9"
+    }
+  ],
+  "files": [
+    {
+      "path": "rows.csv",
+      "sha256": "76a32cdf0293c45584d190286af91637381c48b7cd9912792a5739eb78058978",
+      "bytes": 1884,
+      "kind": "raw"
+    },
+    {
+      "path": "certificate-audit.json",
+      "sha256": "505a01e08c50140c2c91d704a677573da56361f8b84e844d25accf68ca78512c",
+      "bytes": 13800,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-manifest.json",
+      "sha256": "f5cefcd48c058fff9e620ab798b85c70319e7bc409fb608b021bfe1c73b8fc65",
+      "bytes": 22170,
+      "kind": "raw"
+    },
+    {
+      "path": "curves.txt",
+      "sha256": "64e5335d0a39eb574afb3072208ac6237425d484d17c69634e55c112fcf4d9c5",
+      "bytes": 164,
+      "kind": "raw"
+    },
+    {
+      "path": "instruments.sha256",
+      "sha256": "ce40d64d29a82372834fb447c30dd1f063d84014493bfdd7ce53849f7e59bf4e",
+      "bytes": 932,
+      "kind": "raw"
+    },
+    {
+      "path": "receipt.json",
+      "sha256": "5a070cef8d71df836db596eb724d92144e87a05d3f24f304ddbca7ba1d52cbec",
+      "bytes": 410,
+      "kind": "raw"
+    },
+    {
+      "path": "deletion.txt",
+      "sha256": "b05a48ad62aa8c01b5896c7b35700e5e7eb17211cde2895606d365712cbf5098",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "source-commit.txt",
+      "sha256": "2e0e9ddc35c0e81fc6945b1ba3a8704ae30875206a10ef168c7715b9e147cd64",
+      "bytes": 41,
+      "kind": "raw"
+    },
+    {
+      "path": "source-checkout.sha256",
+      "sha256": "ac575e7cef14e00eff2b2d5246162123e4b60ff891199cf5d191ec8133f72fbb",
+      "bytes": 86,
+      "kind": "raw"
+    },
+    {
+      "path": "source-rehearsal.json",
+      "sha256": "99797d581cab86f42df67c0899bf29af37fada057f01b2c641aa4d2f9c880753",
+      "bytes": 196855,
+      "kind": "raw"
+    },
+    {
+      "path": "coverage.json",
+      "sha256": "9203f27b102f78a1b53c417b37b98861c2bc5a42a313548d146bd5a5113687c8",
+      "bytes": 147,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../analyze.rs",
+      "sha256": "0a24bd05c6164a3189d7b30caec809728dcde7a46d6f24f788a8623572146f0f",
+      "bytes": 5462,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "summary.txt",
+        "sha256": "8c5de31756acf6037257bccf0be03a337701aa70c256b9abe4248651febf4bde",
+        "bytes": 74,
+        "kind": "analysis"
+      },
+      {
+        "path": "scaling.svg",
+        "sha256": "c64d62f34e74e607f98c9f0a6aed34692ba4136a3ed9120d408ca4168a72aec0",
+        "bytes": 2792,
+        "kind": "analysis"
+      },
+      {
+        "path": "analysis.log",
+        "sha256": "8509465d0131dac88250eea093d9ebe497fead71ec9daf6b0fc9358dbc0b6b11",
+        "bytes": 105,
+        "kind": "analysis"
+      },
+      {
+        "path": "ratios.csv",
+        "sha256": "1156888f8883e7ff42cc34ca2d911e01a627560b55e1444ba52a4eb0074b3b71",
+        "bytes": 451,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Protocol maximum12 executions; recorded12; unattempted0 under frozen stopping rule. Canonical flow counts recorded process outcomes, including explicit limit failures as completed failed processes; coverage.json separately counts verified recoveries. Limited native statuses map to failed; counters retain original labels. No timeouts or limits excluded. Baseline repeat at both field sizes; ratios are descriptive per input only. All clocks are L0/wall_valid=false. No human blinding."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "Service binary hash is the arm identity; shared driver hash is recorded separately in instruments.sha256. Complete raw certificates and relation logs are in the content-hashed S3 archive; archive-manifest.json hashes every member and certificate-audit.json retains replay and negative-control outputs. These manifests do not replace the native certificate replay, which ran on the GPU host. Pod deletion verified. No root crypto plug-in build was performed locally."
+    }
+  ],
+  "reviews_dir": "reviews",
+  "flow": {
+    "planned": 12,
+    "attempted": 12,
+    "completed": 12,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  }
+}

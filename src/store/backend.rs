@@ -15,28 +15,75 @@
 //!   (`If-None-Match: *`) with a SHA-256 that S3 itself checks.
 
 use std::fs;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 use base64::Engine;
 
 use super::index::validate_sha256;
+use crate::hash::sha256::Sha256;
+
+/// Explicit command attempts and object body bytes, not an AWS billing meter.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Operation {
+    Head,
+    Put,
+    Get,
+    List,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Phase {
+    Snapshot,
+    Finalize,
+    Restore,
+    Control,
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RequestSpec {
+    pub operation: Operation,
+    pub phase: Phase,
+    pub bucket: String,
+    pub key: String,
+    pub upload_bytes: u64,
+    pub download_bytes: u64,
+}
+
+pub trait S3Admission: Send + Sync {
+    /// Must durably charge this attempt before returning. No refund on failure.
+    fn reserve(&self, request: &RequestSpec) -> Result<(), String>;
+}
+
+#[derive(Clone)]
+pub struct S3Guard {
+    pub admission: Arc<dyn S3Admission>,
+    pub phase: Phase,
+    pub timeout_secs: u64,
+}
 
 /// What the remote reports about an object without downloading it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Meta {
     pub bytes: u64,
     /// The object's SHA-256 when the backend knows it: S3's stored checksum,
-    /// the digest recorded in a multipart object's metadata, or the key of a
-    /// [`DirBackend`] object.
+    /// the digest recorded in a multipart object's metadata, or the hash of a
+    /// [`DirBackend`] object's bytes.
     pub sha256: Option<String>,
 }
 
 pub trait Backend {
     fn describe(&self) -> String;
     fn head(&self, key: &str) -> Result<Option<Meta>, String>;
-    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<(), String>;
+    /// Returns true when this call created the object, false when a
+    /// concurrent writer created verified identical bytes first.
+    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<bool, String>;
     fn get(&self, key: &str, dest: &Path) -> Result<(), String>;
     /// Keys under a prefix, with sizes.
     fn list(&self, prefix: &str) -> Result<Vec<(String, u64)>, String>;
@@ -154,18 +201,61 @@ impl Backend for DirBackend {
     fn head(&self, key: &str) -> Result<Option<Meta>, String> {
         let path = self.path(key)?;
         match fs::metadata(&path) {
-            Ok(m) if m.is_file() => Ok(Some(Meta {
-                bytes: m.len(),
-                sha256: key.rsplit('/').next().map(str::to_string),
-            })),
+            Ok(m) if m.is_file() => {
+                let (sha256, bytes) = super::hash_file(&path)?;
+                Ok(Some(Meta {
+                    bytes,
+                    sha256: Some(sha256),
+                }))
+            }
             Ok(_) => Err(format!("{} is not a file", path.display())),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
             Err(e) => Err(format!("{}: {e}", path.display())),
         }
     }
 
-    fn put(&self, key: &str, src: &Path, _sha256: &str) -> Result<(), String> {
-        copy_into(src, &self.path(key)?)
+    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<bool, String> {
+        let dest = self.path(key)?;
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
+        }
+        let tmp = dest.with_extension(format!(
+            "upload-{}-{}",
+            std::process::id(),
+            rand::random::<u64>()
+        ));
+        let result = (|| {
+            let mut input = fs::File::open(src).map_err(|e| format!("{}: {e}", src.display()))?;
+            let mut output = fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&tmp)
+                .map_err(|e| format!("{}: {e}", tmp.display()))?;
+            std::io::copy(&mut input, &mut output).map_err(|e| format!("copy: {e}"))?;
+            output
+                .sync_all()
+                .map_err(|e| format!("{}: {e}", tmp.display()))?;
+            let (actual, bytes) = super::hash_file(&tmp)?;
+            if actual != sha256 {
+                return Err("source file changed during artifact upload".into());
+            }
+            match fs::hard_link(&tmp, &dest) {
+                Ok(()) => Ok(true),
+                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                    let (present, present_bytes) = super::hash_file(&dest)?;
+                    if present == sha256 && present_bytes == bytes {
+                        Ok(false)
+                    } else {
+                        Err(format!(
+                            "{key}: another object holds this content-addressed key"
+                        ))
+                    }
+                }
+                Err(e) => Err(format!("{}: {e}", dest.display())),
+            }
+        })();
+        let _ = fs::remove_file(&tmp);
+        result
     }
 
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
@@ -212,6 +302,10 @@ impl Backend for DirBackend {
 
 /// Largest object sent as one `put-object` (S3 allows 5 GiB; stay under it).
 pub const SINGLE_PUT_MAX: u64 = 4 << 30;
+const MIN_MULTIPART_PART: u64 = 5 << 20;
+const DEFAULT_MULTIPART_PART: u64 = 64 << 20;
+const MAX_MULTIPART_PART: u64 = 5 << 30;
+const MAX_MULTIPART_PARTS: u64 = 10_000;
 
 pub fn hex_to_b64(hex_digest: &str) -> Result<String, String> {
     validate_sha256(hex_digest)?;
@@ -238,6 +332,7 @@ pub struct S3Backend {
     pub endpoint: Option<String>,
     /// The `aws` executable (`CRYPTO_STORE_AWS` overrides the name).
     pub aws: String,
+    pub guard: Option<S3Guard>,
 }
 
 /// The argument vectors are pure functions, so they are tested without a
@@ -311,22 +406,222 @@ impl S3Backend {
         Ok(a)
     }
 
-    /// A multipart upload for objects past the single-PUT limit. S3 cannot
-    /// check a whole-object SHA-256 across parts, so the digest travels as
-    /// user metadata and the download is hashed.
-    pub fn put_multipart_args(&self, key: &str, src: &Path, sha256_hex: &str) -> Vec<String> {
+    /// Initiate an upload whose parts are checked by S3. The full-file digest
+    /// is also carried in metadata for later HEAD and download checks.
+    pub fn create_multipart_args(&self, key: &str, sha256_hex: &str) -> Vec<String> {
         let mut a: Vec<String> = vec![
-            "s3".into(),
-            "cp".into(),
-            src.display().to_string(),
-            self.uri(key),
+            "s3api".into(),
+            "create-multipart-upload".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
             "--metadata".into(),
             format!("sha256={sha256_hex}"),
-            "--no-progress".into(),
-            "--only-show-errors".into(),
+            "--checksum-algorithm".into(),
+            "SHA256".into(),
+            "--checksum-type".into(),
+            "COMPOSITE".into(),
+            "--output".into(),
+            "json".into(),
         ];
         a.extend(self.endpoint_args());
         a
+    }
+
+    pub fn upload_part_args(
+        &self,
+        key: &str,
+        upload_id: &str,
+        number: u64,
+        src: &Path,
+        checksum: &str,
+    ) -> Vec<String> {
+        let mut a = vec![
+            "s3api".into(),
+            "upload-part".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--upload-id".into(),
+            upload_id.into(),
+            "--part-number".into(),
+            number.to_string(),
+            "--body".into(),
+            src.display().to_string(),
+            "--checksum-sha256".into(),
+            checksum.into(),
+            "--output".into(),
+            "json".into(),
+        ];
+        a.extend(self.endpoint_args());
+        a
+    }
+
+    pub fn complete_multipart_args(
+        &self,
+        key: &str,
+        upload_id: &str,
+        parts: &serde_json::Value,
+    ) -> Vec<String> {
+        let mut a = vec![
+            "s3api".into(),
+            "complete-multipart-upload".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--upload-id".into(),
+            upload_id.into(),
+            "--multipart-upload".into(),
+            parts.to_string(),
+            "--if-none-match".into(),
+            "*".into(),
+            "--checksum-type".into(),
+            "COMPOSITE".into(),
+            "--output".into(),
+            "json".into(),
+        ];
+        a.extend(self.endpoint_args());
+        a
+    }
+
+    pub fn abort_multipart_args(&self, key: &str, upload_id: &str) -> Vec<String> {
+        let mut a = vec![
+            "s3api".into(),
+            "abort-multipart-upload".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--upload-id".into(),
+            upload_id.into(),
+        ];
+        a.extend(self.endpoint_args());
+        a
+    }
+
+    fn put_multipart(
+        &self,
+        key: &str,
+        src: &Path,
+        sha256: &str,
+        len: u64,
+        part_size: u64,
+    ) -> Result<bool, String> {
+        if !(MIN_MULTIPART_PART..=MAX_MULTIPART_PART).contains(&part_size)
+            || len.div_ceil(part_size) > MAX_MULTIPART_PARTS
+        {
+            return Err("invalid multipart part size or too many parts".into());
+        }
+        let created = self.run(&self.create_multipart_args(key, sha256))?;
+        if !created.status.success() {
+            return Err(self.failure("create-multipart-upload", &created));
+        }
+        let create_json: serde_json::Value = serde_json::from_slice(&created.stdout)
+            .map_err(|e| format!("create-multipart-upload output: {e}"))?;
+        let upload_id = create_json
+            .get("UploadId")
+            .and_then(|v| v.as_str())
+            .ok_or("create-multipart-upload returned no UploadId")?;
+        let outcome = (|| {
+            let mut source = fs::File::open(src).map_err(|e| format!("{}: {e}", src.display()))?;
+            let mut full_hash = Sha256::new();
+            let mut uploaded = 0u64;
+            let mut parts = Vec::new();
+            let mut buffer = vec![0u8; 1 << 20];
+            while uploaded < len {
+                let number = parts.len() as u64 + 1;
+                let part_path = std::env::temp_dir().join(format!(
+                    "crypto-store-multipart-{}-{}",
+                    std::process::id(),
+                    rand::random::<u64>()
+                ));
+                let mut part = fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(&part_path)
+                    .map_err(|e| format!("{}: {e}", part_path.display()))?;
+                let mut part_hash = Sha256::new();
+                let mut remaining = part_size.min(len - uploaded);
+                let write_result = (|| -> Result<(), String> {
+                    while remaining > 0 {
+                        let chunk_len = remaining.min(buffer.len() as u64) as usize;
+                        let n = source
+                            .read(&mut buffer[..chunk_len])
+                            .map_err(|e| format!("{}: {e}", src.display()))?;
+                        if n == 0 {
+                            return Err("source file shortened during multipart upload".into());
+                        }
+                        part.write_all(&buffer[..n])
+                            .map_err(|e| format!("{}: {e}", part_path.display()))?;
+                        full_hash.update(&buffer[..n]);
+                        part_hash.update(&buffer[..n]);
+                        uploaded += n as u64;
+                        remaining -= n as u64;
+                    }
+                    Ok(())
+                })();
+                drop(part);
+                if let Err(e) = write_result {
+                    let _ = fs::remove_file(&part_path);
+                    return Err(e);
+                }
+                let checksum =
+                    base64::engine::general_purpose::STANDARD.encode(part_hash.finalize());
+                let response =
+                    self.run(&self.upload_part_args(key, upload_id, number, &part_path, &checksum));
+                let _ = fs::remove_file(&part_path);
+                let response = response?;
+                if !response.status.success() {
+                    return Err(self.failure("upload-part", &response));
+                }
+                let reply: serde_json::Value = serde_json::from_slice(&response.stdout)
+                    .map_err(|e| format!("upload-part output: {e}"))?;
+                let etag = reply
+                    .get("ETag")
+                    .and_then(|v| v.as_str())
+                    .ok_or("upload-part returned no ETag")?;
+                if reply.get("ChecksumSHA256").and_then(|v| v.as_str()) != Some(&checksum) {
+                    return Err(format!(
+                        "upload-part {number} returned a different SHA-256 checksum"
+                    ));
+                }
+                parts.push(serde_json::json!({
+                    "PartNumber": number, "ETag": etag, "ChecksumSHA256": checksum
+                }));
+            }
+            if source.read(&mut buffer[..1]).map_err(|e| e.to_string())? != 0
+                || hex::encode(full_hash.finalize()) != sha256
+            {
+                return Err("source file changed during multipart upload".into());
+            }
+            let manifest = serde_json::json!({"Parts": parts});
+            let completed = self.run(&self.complete_multipart_args(key, upload_id, &manifest))?;
+            if !completed.status.success() {
+                let stderr = String::from_utf8_lossy(&completed.stderr);
+                if stderr.contains("PreconditionFailed")
+                    || stderr.contains("ConditionalRequestConflict")
+                {
+                    let _ = self.run(&self.abort_multipart_args(key, upload_id));
+                    return match self.head(key)? {
+                        Some(m) if m.bytes == len && m.sha256.as_deref() == Some(sha256) => {
+                            Ok(false)
+                        }
+                        _ => Err(format!(
+                            "{key}: another object holds this content-addressed key"
+                        )),
+                    };
+                }
+                return Err(self.failure("complete-multipart-upload", &completed));
+            }
+            Ok(true)
+        })();
+        if outcome.is_err() {
+            let _ = self.run(&self.abort_multipart_args(key, upload_id));
+        }
+        outcome
     }
 
     pub fn get_args(&self, key: &str, dest: &Path) -> Vec<String> {
@@ -391,6 +686,54 @@ impl S3Backend {
     }
 
     fn run(&self, args: &[String]) -> Result<Output, String> {
+        self.run_with_download(args, 0)
+    }
+
+    fn run_with_download(&self, args: &[String], download_bytes: u64) -> Result<Output, String> {
+        if let Some(guard) = &self.guard {
+            if self.endpoint.is_some() || self.bucket.ends_with("--x-s3") {
+                return Err("budgeted transport requires an ordinary AWS S3 bucket without endpoint override".into());
+            }
+            let value = |name: &str| -> Result<&str, String> {
+                args.windows(2)
+                    .find(|a| a[0] == name)
+                    .map(|a| a[1].as_str())
+                    .ok_or_else(|| format!("budgeted command missing {name}"))
+            };
+            if args.first().map(String::as_str) != Some("s3api") {
+                return Err("budgeted transport forbids high-level/multipart commands".into());
+            }
+            let operation = match args.get(1).map(String::as_str) {
+                Some("head-object") => Operation::Head,
+                Some("put-object") => Operation::Put,
+                Some("get-object") => Operation::Get,
+                Some("list-objects-v2") => Operation::List,
+                _ => return Err("unsupported budgeted S3 command".into()),
+            };
+            let key = value(if operation == Operation::List {
+                "--prefix"
+            } else {
+                "--key"
+            })?;
+            let upload_bytes = if operation == Operation::Put {
+                let metadata = fs::symlink_metadata(value("--body")?).map_err(|e| e.to_string())?;
+                if !metadata.is_file() || metadata.len() > SINGLE_PUT_MAX {
+                    return Err("budgeted PUT requires a regular single-PUT source".into());
+                }
+                metadata.len()
+            } else {
+                0
+            };
+            guard.admission.reserve(&RequestSpec {
+                operation,
+                phase: guard.phase,
+                bucket: self.bucket.clone(),
+                key: key.into(),
+                upload_bytes,
+                download_bytes,
+            })?;
+            return bounded_command(&self.aws, args, guard.timeout_secs);
+        }
         Command::new(&self.aws)
             .args(args)
             .stdin(Stdio::null())
@@ -408,9 +751,274 @@ impl S3Backend {
             })
     }
 
+    /// Pin the remote representation before reserving its complete body. The
+    /// preliminary HEAD is independently admitted. A Range limits nonempty
+    /// bodies even if an object is replaced; response metadata must still name
+    /// the complete expected representation, not just a matching prefix.
+    fn guarded_get(&self, key: &str, dest: &Path) -> Result<(), String> {
+        let head = self.run(&self.head_args(key))?;
+        if !head.status.success() {
+            return Err(self.failure("head-object before bounded GET", &head));
+        }
+        let meta = parse_head(&head.stdout)?;
+        let value: serde_json::Value =
+            serde_json::from_slice(&head.stdout).map_err(|e| e.to_string())?;
+        let etag = value
+            .get("ETag")
+            .and_then(|v| v.as_str())
+            .filter(|s| !s.is_empty() && s.len() <= 256 && !s.chars().any(char::is_control))
+            .ok_or("bounded GET requires an ETag")?;
+        let mut args = vec![
+            "s3api".into(),
+            "get-object".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--if-match".into(),
+            etag.into(),
+            "--output".into(),
+            "json".into(),
+        ];
+        if meta.bytes > 0 {
+            args.extend(["--range".into(), format!("bytes=0-{}", meta.bytes - 1)]);
+        }
+        // Destination is a caller-owned scratch file, never a committed object.
+        args.push(dest.display().to_string());
+        let out = self.run_with_download(&args, meta.bytes)?;
+        if !out.status.success() {
+            return Err(self.failure("bounded get-object", &out));
+        }
+        let reply: serde_json::Value =
+            serde_json::from_slice(&out.stdout).map_err(|e| e.to_string())?;
+        let full_range = if meta.bytes == 0 {
+            None
+        } else {
+            Some(format!("bytes 0-{}/{}", meta.bytes - 1, meta.bytes))
+        };
+        if reply.get("ContentLength").and_then(|v| v.as_u64()) != Some(meta.bytes)
+            || reply.get("ETag").and_then(|v| v.as_str()) != Some(etag)
+            || (meta.bytes > 0
+                && reply.get("ContentRange").and_then(|v| v.as_str()) != full_range.as_deref())
+            || fs::metadata(dest).map_err(|e| e.to_string())?.len() != meta.bytes
+        {
+            return Err("bounded GET returned a different size, range, or ETag".into());
+        }
+        Ok(())
+    }
+
+    fn guarded_list(&self, prefix: &str) -> Result<Vec<(String, u64)>, String> {
+        #[derive(serde::Deserialize)]
+        #[serde(rename_all = "PascalCase")]
+        struct Item {
+            key: String,
+            size: u64,
+        }
+        #[derive(serde::Deserialize)]
+        #[serde(rename_all = "PascalCase")]
+        struct Page {
+            name: String,
+            prefix: String,
+            key_count: u64,
+            is_truncated: bool,
+            #[serde(default)]
+            contents: Vec<Item>,
+            #[serde(default)]
+            common_prefixes: Vec<serde_json::Value>,
+            next_continuation_token: Option<String>,
+        }
+        let mut result = Vec::new();
+        let mut token: Option<String> = None;
+        let mut seen = std::collections::BTreeSet::new();
+        let mut seen_keys = std::collections::BTreeSet::new();
+        loop {
+            let mut args = self.list_args(prefix);
+            args.extend(["--no-paginate".into(), "--max-keys".into(), "1000".into()]);
+            if let Some(t) = &token {
+                args.extend(["--continuation-token".into(), t.clone()]);
+            }
+            let out = self.run(&args)?;
+            if !out.status.success() {
+                return Err(self.failure("list-objects-v2", &out));
+            }
+            let v: Page = serde_json::from_slice(&out.stdout).map_err(|e| e.to_string())?;
+            if v.name != self.bucket || v.prefix != self.full_key(prefix) {
+                return Err("budgeted listing changed bucket or prefix".into());
+            }
+            let strip = if self.prefix.is_empty() {
+                String::new()
+            } else {
+                format!("{}/", self.prefix)
+            };
+            if v.contents.len() > 1000
+                || v.key_count != v.contents.len() as u64
+                || !v.common_prefixes.is_empty()
+                || v.contents
+                    .iter()
+                    .any(|item| !item.key.starts_with(&self.full_key(prefix)))
+            {
+                return Err("budgeted listing has invalid members/count".into());
+            }
+            for item in v.contents {
+                if !seen_keys.insert(item.key.clone()) {
+                    return Err("listing repeated an object across pages".into());
+                }
+                let relative = item
+                    .key
+                    .strip_prefix(&strip)
+                    .ok_or("listing key outside store prefix")?;
+                result.push((relative.to_owned(), item.size));
+                if result.len() > 1_000_000 {
+                    return Err("budgeted listing exceeds local member cap".into());
+                }
+            }
+            match v.is_truncated {
+                false => {
+                    if v.next_continuation_token.is_some() {
+                        return Err("complete listing unexpectedly has next token".into());
+                    }
+                    break;
+                }
+                true => {
+                    let next = v
+                        .next_continuation_token
+                        .filter(|s| !s.is_empty() && s.len() <= 8192)
+                        .ok_or("truncated listing lacks bounded continuation token")?;
+                    if !seen.insert(next.clone()) {
+                        return Err("listing continuation token repeated".into());
+                    }
+                    token = Some(next);
+                }
+            }
+        }
+        result.sort();
+        Ok(result)
+    }
+
     fn failure(&self, what: &str, out: &Output) -> String {
         let err = String::from_utf8_lossy(&out.stderr);
         format!("aws {what} failed ({}): {}", out.status, err.trim())
+    }
+}
+
+/// Drain bounded pipes concurrently and kill the entire command process group
+/// on timeout/overflow, including grandchildren holding inherited pipes open.
+fn bounded_command(aws: &str, args: &[String], timeout_secs: u64) -> Result<Output, String> {
+    #[cfg(not(unix))]
+    {
+        let _ = (aws, args, timeout_secs);
+        Err("budgeted S3 subprocess isolation requires Unix".into())
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        use std::sync::atomic::{AtomicBool, Ordering};
+        if !(1..=3600).contains(&timeout_secs) {
+            return Err("invalid budgeted command timeout".into());
+        }
+        let mut command = Command::new(aws);
+        command
+            .args(args)
+            .args(["--no-cli-pager", "--no-cli-auto-prompt"])
+            .env("AWS_MAX_ATTEMPTS", "1")
+            .env("AWS_RETRY_MODE", "standard")
+            .env("AWS_PAGER", "")
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        #[cfg(target_os = "linux")]
+        let parent = std::process::id();
+        unsafe {
+            command.pre_exec(move || {
+                if libc::setpgid(0, 0) != 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                #[cfg(target_os = "linux")]
+                if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0
+                    || libc::getppid() as u32 != parent
+                {
+                    return Err(std::io::Error::other("budgeted command parent unavailable"));
+                }
+                Ok(())
+            });
+        }
+        let mut child = command
+            .spawn()
+            .map_err(|e| format!("budgeted AWS command spawn failed: {e}"))?;
+        let pid = child.id() as i32;
+        let overflow = Arc::new(AtomicBool::new(false));
+        let reader = |mut stream: Box<dyn Read + Send>, limit: usize, flag: Arc<AtomicBool>| {
+            std::thread::spawn(move || -> Result<Vec<u8>, String> {
+                let mut bytes = Vec::new();
+                let mut buf = [0u8; 8192];
+                loop {
+                    let n = stream.read(&mut buf).map_err(|e| e.to_string())?;
+                    if n == 0 {
+                        break;
+                    }
+                    if bytes.len().saturating_add(n) > limit {
+                        flag.store(true, Ordering::SeqCst);
+                    } else {
+                        bytes.extend_from_slice(&buf[..n]);
+                    }
+                }
+                Ok(bytes)
+            })
+        };
+        let stdout = reader(
+            Box::new(child.stdout.take().expect("piped stdout")),
+            2 * 1024 * 1024,
+            overflow.clone(),
+        );
+        let stderr = reader(
+            Box::new(child.stderr.take().expect("piped stderr")),
+            64 * 1024,
+            overflow.clone(),
+        );
+        let start = Instant::now();
+        let mut reason = None;
+        let status = loop {
+            if overflow.load(Ordering::SeqCst)
+                || start.elapsed() >= Duration::from_secs(timeout_secs)
+            {
+                reason = Some("budgeted AWS command exceeded output or time limit".to_string());
+                unsafe {
+                    libc::kill(-pid, libc::SIGKILL);
+                }
+                break child.wait().map_err(|e| e.to_string());
+            }
+            match child.try_wait() {
+                Ok(Some(s)) => break Ok(s),
+                Ok(None) => std::thread::sleep(Duration::from_millis(20)),
+                Err(e) => {
+                    unsafe {
+                        libc::kill(-pid, libc::SIGKILL);
+                    }
+                    let _ = child.wait();
+                    break Err(e.to_string());
+                }
+            }
+        };
+        unsafe {
+            libc::kill(-pid, libc::SIGKILL);
+        }
+        let stdout = stdout
+            .join()
+            .map_err(|_| "AWS stdout reader panicked".to_string())??;
+        let stderr = stderr
+            .join()
+            .map_err(|_| "AWS stderr reader panicked".to_string())??;
+        if overflow.load(Ordering::SeqCst) {
+            reason = Some("budgeted AWS command exceeded output limit".into());
+        }
+        if let Some(reason) = reason {
+            return Err(reason);
+        }
+        Ok(Output {
+            status: status?,
+            stdout,
+            stderr,
+        })
     }
 }
 
@@ -426,15 +1034,32 @@ pub fn parse_head(stdout: &[u8]) -> Result<Meta, String> {
         .get("ContentLength")
         .and_then(|n| n.as_u64())
         .ok_or("head-object output has no ContentLength")?;
-    // A single-PUT object carries S3's own SHA-256; a multipart one carries
-    // the digest we put in its metadata.
-    let sha256 = match v.get("ChecksumSHA256").and_then(|s| s.as_str()) {
-        Some(b64) => Some(b64_to_hex(b64)?),
-        None => v
-            .get("Metadata")
-            .and_then(|m| m.get("sha256"))
-            .and_then(|s| s.as_str())
-            .map(str::to_string),
+    // A multipart SHA-256 checksum may be composite rather than the digest
+    // of the object's bytes. Our multipart path records that full digest in
+    // user metadata. A single PUT uses S3's direct checksum.
+    let metadata_sha256 = v
+        .get("Metadata")
+        .and_then(|m| m.get("sha256"))
+        .and_then(|s| s.as_str())
+        .map(str::to_string);
+    let sha256 = if v.get("ChecksumType").and_then(|s| s.as_str()) == Some("COMPOSITE") {
+        metadata_sha256
+    } else {
+        match v.get("ChecksumSHA256").and_then(|s| s.as_str()) {
+            Some(b64) => {
+                let direct = b64_to_hex(b64)?;
+                if metadata_sha256
+                    .as_ref()
+                    .is_some_and(|stored| stored != &direct)
+                {
+                    return Err(
+                        "head-object direct checksum disagrees with SHA-256 metadata".into(),
+                    );
+                }
+                Some(direct)
+            }
+            None => metadata_sha256,
+        }
     };
     Ok(Meta { bytes, sha256 })
 }
@@ -539,17 +1164,48 @@ impl Backend for S3Backend {
         Err(msg)
     }
 
-    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<(), String> {
+    fn put(&self, key: &str, src: &Path, sha256: &str) -> Result<bool, String> {
         let len = fs::metadata(src)
             .map_err(|e| format!("{}: {e}", src.display()))?
             .len();
-        if len > SINGLE_PUT_MAX {
-            let out = self.run(&self.put_multipart_args(key, src, sha256))?;
-            return if out.status.success() {
-                Ok(())
-            } else {
-                Err(self.failure("s3 cp (multipart upload)", &out))
+        let threshold = match std::env::var("CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES") {
+            Ok(v) => {
+                let parsed = v
+                    .parse::<u64>()
+                    .map_err(|_| "invalid CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES")?;
+                if !(MIN_MULTIPART_PART..=SINGLE_PUT_MAX).contains(&parsed) {
+                    return Err(
+                        "CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES must be between 5 MiB and 4 GiB"
+                            .into(),
+                    );
+                }
+                parsed
+            }
+            Err(std::env::VarError::NotPresent) => SINGLE_PUT_MAX,
+            Err(e) => return Err(format!("CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES: {e}")),
+        };
+        if len > threshold {
+            if self.guard.is_some() {
+                return Err("budgeted publication forbids multipart upload".into());
+            }
+            let minimum_part_size = DEFAULT_MULTIPART_PART.max(len.div_ceil(MAX_MULTIPART_PARTS));
+            let part_size = match std::env::var("CRYPTO_STORE_MULTIPART_PART_BYTES") {
+                Ok(v) => {
+                    let parsed = v
+                        .parse::<u64>()
+                        .map_err(|_| "invalid CRYPTO_STORE_MULTIPART_PART_BYTES")?;
+                    if !(MIN_MULTIPART_PART..=MAX_MULTIPART_PART).contains(&parsed) {
+                        return Err(
+                            "CRYPTO_STORE_MULTIPART_PART_BYTES must be between 5 MiB and 5 GiB"
+                                .into(),
+                        );
+                    }
+                    parsed
+                }
+                Err(std::env::VarError::NotPresent) => minimum_part_size,
+                Err(e) => return Err(format!("CRYPTO_STORE_MULTIPART_PART_BYTES: {e}")),
             };
+            return self.put_multipart(key, src, sha256, len, part_size);
         }
         let out = self.run(&self.put_object_args(key, src, sha256)?)?;
         if !out.status.success() {
@@ -558,11 +1214,7 @@ impl Backend for S3Backend {
                 // Someone stored this key first. Content addressing makes
                 // that fine only if what is there is what we meant to store.
                 return match self.head(key)? {
-                    Some(m)
-                        if m.bytes == len && m.sha256.as_deref().is_none_or(|s| s == sha256) =>
-                    {
-                        Ok(())
-                    }
+                    Some(m) if m.bytes == len && m.sha256.as_deref() == Some(sha256) => Ok(false),
                     _ => Err(format!(
                         "{key}: an object with a different size or digest already holds this key"
                     )),
@@ -579,12 +1231,15 @@ impl Backend for S3Backend {
                 reply.get("ChecksumSHA256")
             ));
         }
-        Ok(())
+        Ok(true)
     }
 
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
         if let Some(dir) = dest.parent() {
             fs::create_dir_all(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
+        }
+        if self.guard.is_some() {
+            return self.guarded_get(key, dest);
         }
         let out = self.run(&self.get_args(key, dest))?;
         if out.status.success() {
@@ -596,6 +1251,9 @@ impl Backend for S3Backend {
     }
 
     fn list(&self, prefix: &str) -> Result<Vec<(String, u64)>, String> {
+        if self.guard.is_some() {
+            return self.guarded_list(prefix);
+        }
         let out = self.run(&self.list_args(prefix))?;
         if !out.status.success() {
             return Err(self.failure("list-objects-v2", &out));
@@ -621,6 +1279,7 @@ mod tests {
             prefix: prefix.into(),
             endpoint: endpoint.map(str::to_string),
             aws: "aws".into(),
+            guard: None,
         }
     }
 
@@ -715,20 +1374,38 @@ mod tests {
                 "http://localhost:9000"
             ]
         );
+        let create = b.create_multipart_args(&key, D);
         assert_eq!(
-            b.put_multipart_args(&key, Path::new("/tmp/f"), D),
+            &create[..6],
             [
-                "s3",
-                "cp",
-                "/tmp/f",
-                &format!("s3://bkt/{full}"),
-                "--metadata",
-                &format!("sha256={D}"),
-                "--no-progress",
-                "--only-show-errors",
-                "--endpoint-url",
-                "http://localhost:9000"
+                "s3api",
+                "create-multipart-upload",
+                "--bucket",
+                "bkt",
+                "--key",
+                &full
             ]
+        );
+        assert!(create
+            .windows(2)
+            .any(|w| w == ["--metadata", &format!("sha256={D}")]));
+        assert!(create
+            .windows(2)
+            .any(|w| w == ["--checksum-type", "COMPOSITE"]));
+        let part = b.upload_part_args(&key, "upload-1", 2, Path::new("/tmp/f"), "checksum");
+        assert!(part.windows(2).any(|w| w == ["--part-number", "2"]));
+        assert!(part
+            .windows(2)
+            .any(|w| w == ["--checksum-sha256", "checksum"]));
+        let complete =
+            b.complete_multipart_args(&key, "upload-1", &serde_json::json!({"Parts": []}));
+        assert!(complete.windows(2).any(|w| w == ["--if-none-match", "*"]));
+        assert!(complete
+            .windows(2)
+            .any(|w| w == ["--checksum-type", "COMPOSITE"]));
+        assert_eq!(
+            b.abort_multipart_args(&key, "upload-1")[1],
+            "abort-multipart-upload"
         );
         assert_eq!(
             b.get_args(&key, Path::new("/tmp/g"))[2],
@@ -765,6 +1442,24 @@ mod tests {
         .unwrap();
         assert_eq!(c.sha256.as_deref(), Some(D));
         assert!(parse_head(br#"{"ContentLength": 9, "ChecksumSHA256": "AAAA"}"#).is_err());
+        let composite = parse_head(
+            format!(
+                r#"{{"ContentLength": 9, "ChecksumType": "COMPOSITE", "ChecksumSHA256": "{}", "Metadata": {{"sha256": "{D}"}}}}"#,
+                hex_to_b64(&"00".repeat(32)).unwrap()
+            )
+            .as_bytes(),
+        )
+        .unwrap();
+        assert_eq!(composite.sha256.as_deref(), Some(D));
+        assert!(parse_head(
+            format!(
+                r#"{{"ContentLength": 9, "ChecksumType": "FULL_OBJECT", "ChecksumSHA256": "{}", "Metadata": {{"sha256": "{}"}}}}"#,
+                hex_to_b64(D).unwrap(),
+                "00".repeat(32)
+            )
+            .as_bytes()
+        )
+        .is_err());
 
         let l = parse_list(
             br#"{"Contents":[{"Key":"p/sha256/ab/x","Size":3},{"Key":"p/sha256/aa/y","Size":5}]}"#,
@@ -810,10 +1505,15 @@ mod tests {
         fs::create_dir_all(&root).unwrap();
         fs::write(&src, b"hello").unwrap();
         let b = DirBackend::new(root.join("remote"));
-        let key = object_key(D).unwrap();
+        let digest = hex::encode(crate::hash::sha256::sha256(b"hello"));
+        let key = object_key(&digest).unwrap();
         assert_eq!(b.head(&key).unwrap(), None);
-        b.put(&key, &src, D).unwrap();
+        assert!(b.put(&key, &src, &digest).unwrap());
+        assert!(!b.put(&key, &src, &digest).unwrap());
         assert_eq!(b.head(&key).unwrap().unwrap().bytes, 5);
+        fs::write(&src, b"other").unwrap();
+        assert!(b.put(&key, &src, &digest).is_err());
+        assert_eq!(fs::read(b.path(&key).unwrap()).unwrap(), b"hello");
         let dest = root.join("out/dest.bin");
         b.get(&key, &dest).unwrap();
         assert_eq!(fs::read(&dest).unwrap(), b"hello");
@@ -824,5 +1524,260 @@ mod tests {
         }
         assert!(b.get("sha256/zz/none", &root.join("nope")).is_err());
         let _ = fs::remove_dir_all(&root);
+    }
+}
+
+#[cfg(all(test, unix))]
+mod guarded_transport_tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+    use std::sync::Mutex;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[derive(Default)]
+    struct Meter {
+        calls: Mutex<Vec<RequestSpec>>,
+        max_calls: usize,
+        max_download: u64,
+    }
+    impl S3Admission for Meter {
+        fn reserve(&self, r: &RequestSpec) -> Result<(), String> {
+            let mut calls = self.calls.lock().unwrap();
+            if calls.len() >= self.max_calls || r.download_bytes > self.max_download {
+                return Err("test budget exhausted".into());
+            }
+            calls.push(r.clone());
+            Ok(())
+        }
+    }
+    struct Fixture {
+        root: PathBuf,
+        backend: S3Backend,
+        meter: Arc<Meter>,
+    }
+    impl Fixture {
+        fn new(body: &str, max_calls: usize, max_download: u64) -> Self {
+            let root = std::env::temp_dir().join(format!(
+                "guarded-s3-{}-{}",
+                std::process::id(),
+                SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            fs::create_dir(&root).unwrap();
+            let aws = root.join("aws");
+            fs::write(&aws,format!("#!/bin/sh\nset -eu\n[ \"$AWS_MAX_ATTEMPTS\" = 1 ]\n[ \"$AWS_RETRY_MODE\" = standard ]\n{body}\n")).unwrap();
+            fs::set_permissions(&aws, fs::Permissions::from_mode(0o700)).unwrap();
+            let meter = Arc::new(Meter {
+                calls: Mutex::new(Vec::new()),
+                max_calls,
+                max_download,
+            });
+            let backend = S3Backend {
+                bucket: "setec-astronomy-artifacts".into(),
+                prefix: "research/fixture".into(),
+                endpoint: None,
+                aws: aws.display().to_string(),
+                guard: Some(S3Guard {
+                    admission: meter.clone(),
+                    phase: Phase::Snapshot,
+                    timeout_secs: 5,
+                }),
+            };
+            Self {
+                root,
+                backend,
+                meter,
+            }
+        }
+        fn ops(&self) -> Vec<Operation> {
+            self.meter
+                .calls
+                .lock()
+                .unwrap()
+                .iter()
+                .map(|r| r.operation)
+                .collect()
+        }
+    }
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.root);
+        }
+    }
+
+    const DOWNLOAD: &str = r#"
+case "$2" in
+head-object) printf '%s\n' '{"ContentLength":3,"ETag":"\"fixed\""}' ;;
+get-object)
+  have_range=no
+  previous=''
+  destination=''
+  for arg in "$@"; do
+    [ "$previous" != --range ] || { [ "$arg" = bytes=0-2 ]; have_range=yes; }
+    case "$arg" in */download) destination="$arg";; esac
+    previous="$arg"
+  done
+  [ "$have_range" = yes ]
+  [ -n "$destination" ]
+  printf abc > "$destination"
+  printf '%s\n' '{"ContentLength":3,"ETag":"\"fixed\"","ContentRange":"bytes 0-2/3"}' ;;
+*) exit 8 ;;
+esac
+"#;
+    #[test]
+    fn guarded_get_is_pinned_bounded_and_individually_admitted() {
+        let f = Fixture::new(DOWNLOAD, 2, 3);
+        let dest = f.root.join("download");
+        f.backend.get("object", &dest).unwrap();
+        assert_eq!(fs::read(dest).unwrap(), b"abc");
+        assert_eq!(f.ops(), [Operation::Head, Operation::Get]);
+        let calls = f.meter.calls.lock().unwrap();
+        assert_eq!(calls[1].download_bytes, 3);
+        assert_eq!(calls[0].key, "research/fixture/object");
+    }
+    #[test]
+    fn head_advertised_length_is_admitted_before_get() {
+        let f = Fixture::new(DOWNLOAD, 2, 2);
+        let dest = f.root.join("download");
+        assert!(f
+            .backend
+            .get("object", &dest)
+            .unwrap_err()
+            .contains("exhausted"));
+        assert!(!dest.exists());
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn zero_budget_does_not_execute_aws() {
+        let f = Fixture::new("exit 77", 0, 0);
+        let message = f.backend.head("object").unwrap_err();
+        assert!(message.contains("budget"));
+        assert!(f.ops().is_empty());
+    }
+    #[test]
+    fn put_collision_charges_internal_head() {
+        let f = Fixture::new(
+            r#"case "$2" in
+put-object) echo 'An error occurred (PreconditionFailed)' >&2; exit 1 ;;
+head-object) printf '%s\n' '{"ContentLength":3,"Metadata":{"sha256":"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}' ;;
+*) exit 8;; esac"#,
+            2,
+            0,
+        );
+        let source = f.root.join("source");
+        fs::write(&source, b"abc").unwrap();
+        let digest = crate::store::hash_file(&source).unwrap().0;
+        assert!(!f.backend.put("object", &source, &digest).unwrap());
+        assert_eq!(f.ops(), [Operation::Put, Operation::Head]);
+        assert_eq!(f.meter.calls.lock().unwrap()[0].upload_bytes, 3);
+    }
+    #[test]
+    fn denied_head_probe_is_admitted_and_strict() {
+        let f = Fixture::new(
+            r#"case "$2" in
+head-object) echo 'An error occurred (403) when calling HeadObject: Forbidden' >&2; exit 1 ;;
+list-objects-v2) printf '%s\n' '{"Name":"setec-astronomy-artifacts","Prefix":"research/fixture/object","MaxKeys":1,"KeyCount":0,"IsTruncated":false}' ;;
+*) exit 8;; esac"#,
+            2,
+            0,
+        );
+        assert_eq!(f.backend.head("object").unwrap(), None);
+        assert_eq!(f.ops(), [Operation::Head, Operation::List]);
+    }
+    #[test]
+    fn denied_probe_cannot_spend_unreserved_list_credit() {
+        let f = Fixture::new(
+            "echo 'An error occurred (403) when calling HeadObject: Forbidden' >&2; exit 1",
+            1,
+            0,
+        );
+        assert!(f.backend.head("object").is_err());
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn non403_forbidden_never_runs_absence_probe() {
+        let f = Fixture::new("echo 'proxy Forbidden' >&2; exit 1", 2, 0);
+        assert!(f.backend.head("object").is_err());
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn altered_range_is_not_a_complete_object() {
+        let script = DOWNLOAD.replace("bytes 0-2/3", "bytes 0-2/4");
+        let f = Fixture::new(&script, 2, 3);
+        assert!(f
+            .backend
+            .get("object", &f.root.join("download"))
+            .unwrap_err()
+            .contains("different"));
+        assert_eq!(f.ops(), [Operation::Head, Operation::Get]);
+    }
+    #[test]
+    fn empty_object_uses_pinned_zero_byte_get() {
+        let f = Fixture::new(
+            r#"case "$2" in
+head-object) printf '%s\n' '{"ContentLength":0,"ETag":"\"empty\""}';;
+get-object)
+ for arg in "$@"; do [ "$arg" != --range ]; case "$arg" in */download) : > "$arg";; esac; done
+ printf '%s\n' '{"ContentLength":0,"ETag":"\"empty\""}';;
+*) exit 8;; esac"#,
+            2,
+            0,
+        );
+        f.backend.get("object", &f.root.join("download")).unwrap();
+        assert_eq!(f.ops(), [Operation::Head, Operation::Get]);
+    }
+    #[test]
+    fn explicit_list_pages_each_consume_credit() {
+        let f = Fixture::new(
+            r#"
+next=no
+for arg in "$@"; do [ "$arg" != second ] || next=yes; done
+if [ "$next" = no ]; then
+printf '%s\n' '{"Name":"setec-astronomy-artifacts","Prefix":"research/fixture/objects/","KeyCount":1,"IsTruncated":true,"Contents":[{"Key":"research/fixture/objects/a","Size":3}],"NextContinuationToken":"second"}'
+else
+printf '%s\n' '{"Name":"setec-astronomy-artifacts","Prefix":"research/fixture/objects/","KeyCount":1,"IsTruncated":false,"Contents":[{"Key":"research/fixture/objects/b","Size":4}]}'
+fi"#,
+            2,
+            0,
+        );
+        assert_eq!(
+            f.backend.list("objects/").unwrap(),
+            vec![("objects/a".into(), 3), ("objects/b".into(), 4)]
+        );
+        assert_eq!(f.ops(), [Operation::List, Operation::List]);
+    }
+    #[test]
+    fn spawned_command_timeout_remains_charged() {
+        let mut f = Fixture::new("sleep 20", 1, 0);
+        f.backend.guard.as_mut().unwrap().timeout_secs = 1;
+        let begin = Instant::now();
+        assert!(f.backend.head("object").unwrap_err().contains("limit"));
+        assert!(begin.elapsed() < Duration::from_secs(8));
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn output_overflow_is_bounded_and_charged() {
+        let f = Fixture::new("head -c 2200000 /dev/zero", 1, 0);
+        assert!(f.backend.head("object").unwrap_err().contains("output"));
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn scope_rejects_custom_endpoint_and_multipart_before_spawn() {
+        let mut f = Fixture::new("exit 77", 10, 100);
+        f.backend.endpoint = Some("https://example.invalid".into());
+        assert!(f.backend.head("object").unwrap_err().contains("endpoint"));
+        assert!(f.ops().is_empty());
+        f.backend.endpoint = None;
+        let source = f.root.join("large");
+        let file = fs::File::create(&source).unwrap();
+        file.set_len(SINGLE_PUT_MAX + 1).unwrap();
+        assert!(f
+            .backend
+            .put("object", &source, &"a".repeat(64))
+            .unwrap_err()
+            .contains("multipart"));
+        assert!(f.ops().is_empty());
     }
 }

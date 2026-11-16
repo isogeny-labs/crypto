@@ -1,0 +1,89 @@
+diff -ruN -x .cargo-ok -x target -x Cargo.lock cryptominisat-5.8.0-pristine/build.rs cryptominisat-patched/build.rs
+--- cryptominisat-5.8.0-pristine/build.rs	2026-11-15 03:30:30.667142066 +0000
++++ cryptominisat-patched/build.rs	2026-11-15 03:32:24.510768845 +0000
+@@ -19,6 +19,9 @@
+                    .define("NOZLIB", "ON")
+                    .define("NOM4RI", "ON")
+                    .define("STATS", "OFF")
++                   .define("NOSQLITE", "ON")
++                   .cxxflag("-include")
++                   .cxxflag("cstdint")
+                    .define("NOVALGRIND", "ON")
+                    .define("ENABLE_TESTING", "OFF")
+                    .build();
+diff -ruN -x .cargo-ok -x target -x Cargo.lock cryptominisat-5.8.0-pristine/cryptominisat/src/cryptominisat_c.cpp cryptominisat-patched/cryptominisat/src/cryptominisat_c.cpp
+--- cryptominisat-5.8.0-pristine/cryptominisat/src/cryptominisat_c.cpp	2026-11-15 03:30:31.119013690 +0000
++++ cryptominisat-patched/cryptominisat/src/cryptominisat_c.cpp	2026-11-15 03:30:30.518845428 +0000
+@@ -173,4 +173,20 @@
+     DLL_PUBLIC void cmsat_set_max_time(SATSolver* self, double max_time) NOEXCEPT_START {
+         self->set_max_time(max_time);
+     } NOEXCEPT_END
++
++    DLL_PUBLIC void cmsat_set_max_confl(SATSolver* self, int64_t max_confl) NOEXCEPT_START {
++        self->set_max_confl(max_confl);
++    } NOEXCEPT_END
++
++    DLL_PUBLIC uint64_t cmsat_get_sum_conflicts(const SATSolver* self) NOEXCEPT_START {
++        return self->get_sum_conflicts();
++    } NOEXCEPT_END
++
++    DLL_PUBLIC uint64_t cmsat_get_sum_propagations(const SATSolver* self) NOEXCEPT_START {
++        return self->get_sum_propagations();
++    } NOEXCEPT_END
++
++    DLL_PUBLIC uint64_t cmsat_get_sum_decisions(const SATSolver* self) NOEXCEPT_START {
++        return self->get_sum_decisions();
++    } NOEXCEPT_END
+ }
+diff -ruN -x .cargo-ok -x target -x Cargo.lock cryptominisat-5.8.0-pristine/cryptominisat/src/cryptominisat_c.h.in cryptominisat-patched/cryptominisat/src/cryptominisat_c.h.in
+--- cryptominisat-5.8.0-pristine/cryptominisat/src/cryptominisat_c.h.in	2026-11-15 03:30:31.119083203 +0000
++++ cryptominisat-patched/cryptominisat/src/cryptominisat_c.h.in	2026-11-15 03:30:30.510251417 +0000
+@@ -83,6 +83,10 @@
+ CMS_DLL_PUBLIC void cmsat_set_yes_comphandler(SATSolver* self) NOEXCEPT;
+ CMS_DLL_PUBLIC c_lbool cmsat_simplify(SATSolver* self, const c_Lit* assumptions, size_t num_assumptions) NOEXCEPT;
+ CMS_DLL_PUBLIC void cmsat_set_max_time(SATSolver* self, double max_time) NOEXCEPT;
++CMS_DLL_PUBLIC void cmsat_set_max_confl(SATSolver* self, int64_t max_confl) NOEXCEPT;
++CMS_DLL_PUBLIC uint64_t cmsat_get_sum_conflicts(const SATSolver* self) NOEXCEPT;
++CMS_DLL_PUBLIC uint64_t cmsat_get_sum_propagations(const SATSolver* self) NOEXCEPT;
++CMS_DLL_PUBLIC uint64_t cmsat_get_sum_decisions(const SATSolver* self) NOEXCEPT;
+ 
+ #ifdef __cplusplus
+ } // end extern c
+diff -ruN -x .cargo-ok -x target -x Cargo.lock cryptominisat-5.8.0-pristine/src/lib.rs cryptominisat-patched/src/lib.rs
+--- cryptominisat-5.8.0-pristine/src/lib.rs	2026-11-15 03:30:31.167751541 +0000
++++ cryptominisat-patched/src/lib.rs	2026-11-15 03:32:24.510284132 +0000
+@@ -100,6 +100,10 @@
+     fn cmsat_set_yes_comphandler(this: *mut SATSolver);
+     fn cmsat_print_stats(this: *mut SATSolver);
+     fn cmsat_set_max_time(this: *mut SATSolver, max_time: f64);
++    fn cmsat_set_max_confl(this: *mut SATSolver, max_confl: i64);
++    fn cmsat_get_sum_conflicts(this: *const SATSolver) -> u64;
++    fn cmsat_get_sum_propagations(this: *const SATSolver) -> u64;
++    fn cmsat_get_sum_decisions(this: *const SATSolver) -> u64;
+ }
+ 
+ pub struct Solver(*mut SATSolver);
+@@ -181,6 +185,23 @@
+         unsafe { cmsat_set_max_time(self.0, max_time) }
+     }
+ 
++    /// Stop after this many conflicts (CMS `set_max_confl`); the solve then returns Undef.
++    pub fn set_max_confl(&mut self, max_confl: i64) {
++        unsafe { cmsat_set_max_confl(self.0, max_confl) }
++    }
++    /// Conflicts since construction, summed over threads.
++    pub fn sum_conflicts(&self) -> u64 {
++        unsafe { cmsat_get_sum_conflicts(self.0) }
++    }
++    /// Propagations since construction, summed over threads.
++    pub fn sum_propagations(&self) -> u64 {
++        unsafe { cmsat_get_sum_propagations(self.0) }
++    }
++    /// Decisions since construction, summed over threads.
++    pub fn sum_decisions(&self) -> u64 {
++        unsafe { cmsat_get_sum_decisions(self.0) }
++    }
++
+     pub fn set_default_polarity(&mut self, polar: bool) {
+         unsafe { cmsat_set_default_polarity(self.0, polar) }
+     }

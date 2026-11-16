@@ -1,0 +1,15 @@
+The existing native reservation wrapper lacked the process-resident observations needed to assess the actual cubic-transfer solvers under current ecbench grading. Add optional hooks to both real solver entry points and a standalone native runner that reuses the shared host, isolation, signal, PMU and grading code.
+
+The grading section moves byte-for-byte, with the old public paths retained as reexports. The runner binds executable/library/public-input bytes, preserves failed attempts and missing observations, kills remaining process groups, and keeps the original timeout despite watchdog scheduling delays. Raw records never grant mathematical or performance admission. [pcc:unverified]
+
+Validation: 77 standalone library tests and the lifecycle integration test passed; both real native solver entry points built. The lifecycle controls passed again after the deadline fix. The actual C++ driver's invalid-argument path preserved its expected exit 2 and L0 observations. These are development controls, with no ECDLP benchmark execution. [pcc:unverified]
+
+**Validation remains incomplete.** The full-root release attempt stopped in dependencies after disk exhaustion; Clippy is absent. The new VFS clone failed, so the successful C++ build used scratch space in the existing idle container. The old cached userspace also emits a weak GLIBC_2.39 warning for the host-built observer; a qualified image must bind a compatible userspace/toolchain. Retain these limits during review; the standalone suite does not replace full-root validation. [pcc:unverified]
+
+The canonical protocol checker accepts the new **draft**, retaining 400 measured executions and 80 warmups. Analysis/panel/export integration, strongest-source-reference review, qualified pilot estimates, final image, checkpoint admission, complete pricing and independent replay remain pending. The fresh AWS preflight still denies the required budget/launcher/registry access. No scientific run was submitted. [pcc:unverified]
+
+Evidence: `PCC-20261105-740808` (component controls), `PCC-20261105-f3b1ab` (draft/access), and `PCC-20261105-8538a7` (completed deadline regression and explicit correction of the premature partial receipt `PCC-20261105-a3f112`). All have unverified standing; raw partial and final receipts are preserved. [pcc:unverified]
+
+Sources checked (KB): no MCP tools or wrapper executable available. Reviewed current ecbench/native sources, IsoLab contracts, canonical experiment-protocol skill/example/schema/checker and ecdb access instructions; no new curve fact or novelty claim is made.
+
+Publication status: the current head remains `fbe4aedf214598b84bc4ebf381126798a68768c6`. The journal-only merge conflict is still pending; Copilot has not responded to the existing request, so the conflicted file remains untouched. Current-head checks/reviews are not a pass, full-library validation remains incomplete, and auto-merge stays disabled. Preserve the pinned protocol draft and create a separate versioned final protocol before freezing. [pcc:unverified]

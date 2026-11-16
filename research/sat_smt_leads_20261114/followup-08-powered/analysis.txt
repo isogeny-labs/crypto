@@ -1,0 +1,149 @@
+DECISION {"l": 5, "rule": "alive if upper<0.8; kill if lower>0.8; else inconclusive", "gm": 0.7928, "ci95": [0.7731, 0.8121], "n": 24, "verdict": "INCONCLUSIVE"}
+L_TREND {"ln_gm_l5_minus_l3": {"diff": 0.2951, "ci95": [0.2558, 0.3345], "reading": "rises"}, "ln_gm_l5_minus_l4": {"diff": 0.0599, "ci95": [0.0466, 0.0724], "reading": "rises"}}
+
+== l=3 n=11 targets=60 (unsat 50 + sat 10) decomposable abscissae=19 errors=0 refs={'linear_2plus1_leaf_solves': 8, 'mitm': 40, 'enumeration': 85}
+ primary INC/BEST unsat second half: {'n': 25, 'gm': 0.5902, 'ci95': [0.5539, 0.6283]}
+ null ref FRESH-A2/BEST: {'n': 25, 'gm': 1.151, 'ci95': [1.0955, 1.2124]}
+ A/A FRESH-A2/FRESH-A: {'n': 25, 'gm': 1.0742, 'ci95': [1.0102, 1.1446], 'sd_ln': 0.1634}
+  position_slope_INC_over_BEST {'n': 49, 'per_target': -0.00327, 'ci95': [-0.00564, -0.00093], 'per_10_targets_factor': 0.9679, 'per_10_ci95': [0.9451, 0.9907]}
+  position_slope_FRESH-A2_over_BEST {'n': 49, 'per_target': 0.00192, 'ci95': [-0.00047, 0.00447], 'per_10_targets_factor': 1.0194, 'per_10_ci95': [0.9953, 1.0457]}
+  position_slope_INC2_over_BEST {'n': 49, 'per_target': -0.00439, 'ci95': [-0.00742, -0.00129], 'per_10_targets_factor': 0.9571, 'per_10_ci95': [0.9285, 0.9872]}
+  best-arm counts (unsat second): {'FRESH-A': 14, 'FRESH-U': 1, 'SPEC': 10}  propagations INC/best-arm: 0.7212
+  [unsat_second] medians {'INC': 116, 'INC2': 114, 'FRESH-A': 204, 'FRESH-U': 290, 'SPEC': 212, 'FRESH-A2': 227, 'BEST': 199}
+     INC/BEST           {'n': 25, 'gm': 0.5902, 'ci95': [0.5539, 0.6283], 'ratio_of_sums': 0.5922}
+     INC2/BEST          {'n': 25, 'gm': 0.5866, 'ci95': [0.549, 0.6298], 'ratio_of_sums': 0.589}
+     FRESH-A2/BEST      {'n': 25, 'gm': 1.151, 'ci95': [1.0955, 1.2124], 'ratio_of_sums': 1.1514}
+     INC/FRESH-A        {'n': 25, 'gm': 0.5508, 'ci95': [0.5126, 0.5907], 'ratio_of_sums': 0.5502}
+     INC/FRESH-U        {'n': 25, 'gm': 0.4086, 'ci95': [0.3744, 0.4485], 'ratio_of_sums': 0.4024}
+     INC/SPEC           {'n': 25, 'gm': 0.5288, 'ci95': [0.4881, 0.569], 'ratio_of_sums': 0.528}
+     INC2/FRESH-A2      {'n': 25, 'gm': 0.5096, 'ci95': [0.4834, 0.5374], 'ratio_of_sums': 0.5115}
+     FRESH-A2/FRESH-A   {'n': 25, 'gm': 1.0742, 'ci95': [1.0102, 1.1446], 'ratio_of_sums': 1.0698}
+     FRESH-A/SPEC       {'n': 25, 'gm': 0.9601, 'ci95': [0.8941, 1.033], 'ratio_of_sums': 0.9596}
+  [unsat_first] medians {'INC': 134.5, 'INC2': 139.0, 'FRESH-A': 238.0, 'FRESH-U': 316.5, 'SPEC': 211.5, 'FRESH-A2': 211.0, 'BEST': 205.0}
+     INC/BEST           {'n': 24, 'gm': 0.6408, 'ci95': [0.601, 0.6844], 'ratio_of_sums': 0.6396}
+     INC2/BEST          {'n': 24, 'gm': 0.6705, 'ci95': [0.6122, 0.7344], 'ratio_of_sums': 0.67}
+     FRESH-A2/BEST      {'n': 24, 'gm': 1.0384, 'ci95': [0.9643, 1.118], 'ratio_of_sums': 1.0347}
+     INC/FRESH-A        {'n': 24, 'gm': 0.56, 'ci95': [0.5254, 0.5965], 'ratio_of_sums': 0.5612}
+     INC/FRESH-U        {'n': 24, 'gm': 0.4316, 'ci95': [0.3991, 0.4685], 'ratio_of_sums': 0.4294}
+     INC/SPEC           {'n': 24, 'gm': 0.6098, 'ci95': [0.5662, 0.6588], 'ratio_of_sums': 0.6062}
+     INC2/FRESH-A2      {'n': 24, 'gm': 0.6457, 'ci95': [0.6055, 0.6912], 'ratio_of_sums': 0.6476}
+     FRESH-A2/FRESH-A   {'n': 24, 'gm': 0.9075, 'ci95': [0.8492, 0.9754], 'ratio_of_sums': 0.9079}
+     FRESH-A/SPEC       {'n': 24, 'gm': 1.0889, 'ci95': [1.0091, 1.1821], 'ratio_of_sums': 1.0801}
+  [unsat_all] medians {'INC': 126, 'INC2': 125, 'FRESH-A': 223, 'FRESH-U': 316, 'SPEC': 212, 'FRESH-A2': 224, 'BEST': 202}
+     INC/BEST           {'n': 49, 'gm': 0.6145, 'ci95': [0.586, 0.6439], 'ratio_of_sums': 0.616}
+     INC2/BEST          {'n': 49, 'gm': 0.6263, 'ci95': [0.5912, 0.6644], 'ratio_of_sums': 0.6297}
+     FRESH-A2/BEST      {'n': 49, 'gm': 1.0944, 'ci95': [1.044, 1.1461], 'ratio_of_sums': 1.0927}
+     INC/FRESH-A        {'n': 49, 'gm': 0.5553, 'ci95': [0.5289, 0.5828], 'ratio_of_sums': 0.5559}
+     INC/FRESH-U        {'n': 49, 'gm': 0.4197, 'ci95': [0.3958, 0.4463], 'ratio_of_sums': 0.416}
+     INC/SPEC           {'n': 49, 'gm': 0.567, 'ci95': [0.5357, 0.5995], 'ratio_of_sums': 0.5661}
+     INC2/FRESH-A2      {'n': 49, 'gm': 0.5723, 'ci95': [0.5432, 0.6045], 'ratio_of_sums': 0.5763}
+     FRESH-A2/FRESH-A   {'n': 49, 'gm': 0.989, 'ci95': [0.9392, 1.0431], 'ratio_of_sums': 0.9861}
+     FRESH-A/SPEC       {'n': 49, 'gm': 1.0211, 'ci95': [0.9664, 1.0808], 'ratio_of_sums': 1.0183}
+  [sat_all] medians {'INC': 82.5, 'INC2': 44.5, 'FRESH-A': 145.5, 'FRESH-U': 263.0, 'SPEC': 148.0, 'FRESH-A2': 142.0, 'BEST': 118.5}
+     INC/BEST           {'n': 10, 'gm': 0.6221, 'ci95': [0.4593, 0.82], 'ratio_of_sums': 0.6401}
+     INC2/BEST          {'n': 10, 'gm': 0.322, 'ci95': [0.1719, 0.5571], 'ratio_of_sums': 0.4436}
+     FRESH-A2/BEST      {'n': 10, 'gm': 1.1374, 'ci95': [0.8686, 1.5046], 'ratio_of_sums': 1.1443}
+     INC/FRESH-A        {'n': 10, 'gm': 0.5361, 'ci95': [0.3911, 0.727], 'ratio_of_sums': 0.5452}
+     INC/FRESH-U        {'n': 10, 'gm': 0.2796, 'ci95': [0.2243, 0.3391], 'ratio_of_sums': 0.2991}
+     INC/SPEC           {'n': 10, 'gm': 0.4965, 'ci95': [0.3586, 0.6666], 'ratio_of_sums': 0.516}
+     INC2/FRESH-A2      {'n': 10, 'gm': 0.2831, 'ci95': [0.13, 0.5704], 'ratio_of_sums': 0.3877}
+     FRESH-A2/FRESH-A   {'n': 10, 'gm': 0.9801, 'ci95': [0.6775, 1.4094], 'ratio_of_sums': 0.9746}
+     FRESH-A/SPEC       {'n': 10, 'gm': 0.9262, 'ci95': [0.706, 1.2316], 'ratio_of_sums': 0.9465}
+
+== l=4 n=13 targets=60 (unsat 50 + sat 10) decomposable abscissae=231 errors=0 refs={'linear_2plus1_leaf_solves': 16, 'mitm': 144, 'enumeration': 683}
+ primary INC/BEST unsat second half: {'n': 25, 'gm': 0.7467, 'ci95': [0.7198, 0.7751]}
+ null ref FRESH-A2/BEST: {'n': 25, 'gm': 1.2085, 'ci95': [1.1707, 1.2479]}
+ A/A FRESH-A2/FRESH-A: {'n': 25, 'gm': 1.0067, 'ci95': [0.9768, 1.039], 'sd_ln': 0.0814}
+  position_slope_INC_over_BEST {'n': 50, 'per_target': -0.00439, 'ci95': [-0.00637, -0.00247], 'per_10_targets_factor': 0.9571, 'per_10_ci95': [0.9382, 0.9756]}
+  position_slope_FRESH-A2_over_BEST {'n': 50, 'per_target': 0.00064, 'ci95': [-0.00081, 0.00207], 'per_10_targets_factor': 1.0064, 'per_10_ci95': [0.992, 1.021]}
+  position_slope_INC2_over_BEST {'n': 50, 'per_target': -0.00485, 'ci95': [-0.00642, -0.00326], 'per_10_targets_factor': 0.9527, 'per_10_ci95': [0.9378, 0.9679]}
+  best-arm counts (unsat second): {'FRESH-A': 0, 'FRESH-U': 0, 'SPEC': 25}  propagations INC/best-arm: 1.2067
+  [unsat_second] medians {'INC': 925, 'INC2': 915, 'FRESH-A': 1479, 'FRESH-U': 1519, 'SPEC': 1244, 'FRESH-A2': 1486, 'BEST': 1244}
+     INC/BEST           {'n': 25, 'gm': 0.7467, 'ci95': [0.7198, 0.7751], 'ratio_of_sums': 0.7481}
+     INC2/BEST          {'n': 25, 'gm': 0.7617, 'ci95': [0.7296, 0.7991], 'ratio_of_sums': 0.7665}
+     FRESH-A2/BEST      {'n': 25, 'gm': 1.2085, 'ci95': [1.1707, 1.2479], 'ratio_of_sums': 1.2075}
+     INC/FRESH-A        {'n': 25, 'gm': 0.622, 'ci95': [0.5991, 0.6464], 'ratio_of_sums': 0.6234}
+     INC/FRESH-U        {'n': 25, 'gm': 0.602, 'ci95': [0.5807, 0.6248], 'ratio_of_sums': 0.6033}
+     INC/SPEC           {'n': 25, 'gm': 0.7467, 'ci95': [0.7198, 0.7751], 'ratio_of_sums': 0.7481}
+     INC2/FRESH-A2      {'n': 25, 'gm': 0.6303, 'ci95': [0.6024, 0.6661], 'ratio_of_sums': 0.6348}
+     FRESH-A2/FRESH-A   {'n': 25, 'gm': 1.0067, 'ci95': [0.9768, 1.039], 'ratio_of_sums': 1.0062}
+     FRESH-A/SPEC       {'n': 25, 'gm': 1.2005, 'ci95': [1.167, 1.2359], 'ratio_of_sums': 1.2}
+  [unsat_first] medians {'INC': 1050, 'INC2': 1090, 'FRESH-A': 1484, 'FRESH-U': 1530, 'SPEC': 1288, 'FRESH-A2': 1516, 'BEST': 1288}
+     INC/BEST           {'n': 25, 'gm': 0.8461, 'ci95': [0.7982, 0.898], 'ratio_of_sums': 0.8546}
+     INC2/BEST          {'n': 25, 'gm': 0.8689, 'ci95': [0.83, 0.9091], 'ratio_of_sums': 0.874}
+     FRESH-A2/BEST      {'n': 25, 'gm': 1.1823, 'ci95': [1.1463, 1.2202], 'ratio_of_sums': 1.1824}
+     INC/FRESH-A        {'n': 25, 'gm': 0.7226, 'ci95': [0.6832, 0.7666], 'ratio_of_sums': 0.7302}
+     INC/FRESH-U        {'n': 25, 'gm': 0.7066, 'ci95': [0.6657, 0.7564], 'ratio_of_sums': 0.7134}
+     INC/SPEC           {'n': 25, 'gm': 0.8434, 'ci95': [0.797, 0.8938], 'ratio_of_sums': 0.8516}
+     INC2/FRESH-A2      {'n': 25, 'gm': 0.735, 'ci95': [0.7014, 0.7722], 'ratio_of_sums': 0.7392}
+     FRESH-A2/FRESH-A   {'n': 25, 'gm': 1.0097, 'ci95': [0.982, 1.0368], 'ratio_of_sums': 1.0103}
+     FRESH-A/SPEC       {'n': 25, 'gm': 1.1672, 'ci95': [1.1293, 1.2037], 'ratio_of_sums': 1.1662}
+  [unsat_all] medians {'INC': 974.0, 'INC2': 996.5, 'FRESH-A': 1482.5, 'FRESH-U': 1528.0, 'SPEC': 1253.0, 'FRESH-A2': 1497.0, 'BEST': 1253.0}
+     INC/BEST           {'n': 50, 'gm': 0.7949, 'ci95': [0.7651, 0.8274], 'ratio_of_sums': 0.802}
+     INC2/BEST          {'n': 50, 'gm': 0.8135, 'ci95': [0.7849, 0.8447], 'ratio_of_sums': 0.8209}
+     FRESH-A2/BEST      {'n': 50, 'gm': 1.1953, 'ci95': [1.1686, 1.2226], 'ratio_of_sums': 1.1948}
+     INC/FRESH-A        {'n': 50, 'gm': 0.6704, 'ci95': [0.6445, 0.6996], 'ratio_of_sums': 0.6768}
+     INC/FRESH-U        {'n': 50, 'gm': 0.6522, 'ci95': [0.6259, 0.683], 'ratio_of_sums': 0.6581}
+     INC/SPEC           {'n': 50, 'gm': 0.7936, 'ci95': [0.7645, 0.8256], 'ratio_of_sums': 0.8005}
+     INC2/FRESH-A2      {'n': 50, 'gm': 0.6806, 'ci95': [0.6545, 0.7094], 'ratio_of_sums': 0.687}
+     FRESH-A2/FRESH-A   {'n': 50, 'gm': 1.0082, 'ci95': [0.9878, 1.0294], 'ratio_of_sums': 1.0083}
+     FRESH-A/SPEC       {'n': 50, 'gm': 1.1837, 'ci95': [1.1577, 1.2092], 'ratio_of_sums': 1.1829}
+  [sat_all] medians {'INC': 693, 'INC2': 578, 'FRESH-A': 1125, 'FRESH-U': 933, 'SPEC': 793, 'FRESH-A2': 1100, 'BEST': 687}
+     INC/BEST           {'n': 9, 'gm': 0.8137, 'ci95': [0.2816, 2.0129], 'ratio_of_sums': 1.0523}
+     INC2/BEST          {'n': 9, 'gm': 0.7885, 'ci95': [0.3979, 1.4131], 'ratio_of_sums': 0.9435}
+     FRESH-A2/BEST      {'n': 9, 'gm': 2.1664, 'ci95': [1.3374, 3.4607], 'ratio_of_sums': 1.9269}
+     INC/FRESH-A        {'n': 9, 'gm': 0.4576, 'ci95': [0.1609, 1.0852], 'ratio_of_sums': 0.6221}
+     INC/FRESH-U        {'n': 9, 'gm': 0.5201, 'ci95': [0.2057, 1.1856], 'ratio_of_sums': 0.6832}
+     INC/SPEC           {'n': 9, 'gm': 0.532, 'ci95': [0.2093, 1.1683], 'ratio_of_sums': 0.731}
+     INC2/FRESH-A2      {'n': 9, 'gm': 0.364, 'ci95': [0.1531, 0.7423], 'ratio_of_sums': 0.4897}
+     FRESH-A2/FRESH-A   {'n': 9, 'gm': 1.2183, 'ci95': [0.8341, 1.8928], 'ratio_of_sums': 1.1392}
+     FRESH-A/SPEC       {'n': 9, 'gm': 1.1626, 'ci95': [0.8198, 1.6637], 'ratio_of_sums': 1.1751}
+
+== l=5 n=17 targets=60 (unsat 50 + sat 10) decomposable abscissae=2679 errors=0 refs={'linear_2plus1_leaf_solves': 32, 'mitm': 544, 'enumeration': 5461}
+ primary INC/BEST unsat second half: {'n': 24, 'gm': 0.7928, 'ci95': [0.7731, 0.8121]}
+ null ref FRESH-A2/BEST: {'n': 24, 'gm': 1.1889, 'ci95': [1.1593, 1.2204]}
+ A/A FRESH-A2/FRESH-A: {'n': 24, 'gm': 1.0118, 'ci95': [0.9917, 1.0335], 'sd_ln': 0.054}
+  position_slope_INC_over_BEST {'n': 49, 'per_target': -0.00319, 'ci95': [-0.00439, -0.00194], 'per_10_targets_factor': 0.9686, 'per_10_ci95': [0.957, 0.9808]}
+  position_slope_FRESH-A2_over_BEST {'n': 49, 'per_target': -0.00017, 'ci95': [-0.00119, 0.00088], 'per_10_targets_factor': 0.9983, 'per_10_ci95': [0.9882, 1.0088]}
+  position_slope_INC2_over_BEST {'n': 49, 'per_target': -0.00374, 'ci95': [-0.00504, -0.00249], 'per_10_targets_factor': 0.9633, 'per_10_ci95': [0.9509, 0.9755]}
+  best-arm counts (unsat second): {'FRESH-A': 1, 'FRESH-U': 3, 'SPEC': 20}  propagations INC/best-arm: 1.2315
+  [unsat_second] medians {'INC': 6509.5, 'INC2': 6537.0, 'FRESH-A': 9568.5, 'FRESH-U': 8764.0, 'SPEC': 8218.5, 'FRESH-A2': 9721.0, 'BEST': 8218.5}
+     INC/BEST           {'n': 24, 'gm': 0.7928, 'ci95': [0.7731, 0.8121], 'ratio_of_sums': 0.7924}
+     INC2/BEST          {'n': 24, 'gm': 0.7995, 'ci95': [0.7825, 0.8167], 'ratio_of_sums': 0.7991}
+     FRESH-A2/BEST      {'n': 24, 'gm': 1.1889, 'ci95': [1.1593, 1.2204], 'ratio_of_sums': 1.1887}
+     INC/FRESH-A        {'n': 24, 'gm': 0.6746, 'ci95': [0.6583, 0.6906], 'ratio_of_sums': 0.6745}
+     INC/FRESH-U        {'n': 24, 'gm': 0.732, 'ci95': [0.7151, 0.749], 'ratio_of_sums': 0.7312}
+     INC/SPEC           {'n': 24, 'gm': 0.7832, 'ci95': [0.7563, 0.8085], 'ratio_of_sums': 0.7818}
+     INC2/FRESH-A2      {'n': 24, 'gm': 0.6724, 'ci95': [0.6571, 0.6873], 'ratio_of_sums': 0.6722}
+     FRESH-A2/FRESH-A   {'n': 24, 'gm': 1.0118, 'ci95': [0.9917, 1.0335], 'ratio_of_sums': 1.0118}
+     FRESH-A/SPEC       {'n': 24, 'gm': 1.1609, 'ci95': [1.1164, 1.204], 'ratio_of_sums': 1.1591}
+  [unsat_first] medians {'INC': 6943, 'INC2': 7100, 'FRESH-A': 9637, 'FRESH-U': 8755, 'SPEC': 8042, 'FRESH-A2': 9706, 'BEST': 8042}
+     INC/BEST           {'n': 25, 'gm': 0.869, 'ci95': [0.8394, 0.9005], 'ratio_of_sums': 0.8696}
+     INC2/BEST          {'n': 25, 'gm': 0.8966, 'ci95': [0.8654, 0.9311], 'ratio_of_sums': 0.8972}
+     FRESH-A2/BEST      {'n': 25, 'gm': 1.1995, 'ci95': [1.1651, 1.2373], 'ratio_of_sums': 1.1988}
+     INC/FRESH-A        {'n': 25, 'gm': 0.7294, 'ci95': [0.7093, 0.7514], 'ratio_of_sums': 0.7306}
+     INC/FRESH-U        {'n': 25, 'gm': 0.802, 'ci95': [0.778, 0.8294], 'ratio_of_sums': 0.8028}
+     INC/SPEC           {'n': 25, 'gm': 0.8613, 'ci95': [0.8281, 0.8962], 'ratio_of_sums': 0.8613}
+     INC2/FRESH-A2      {'n': 25, 'gm': 0.7475, 'ci95': [0.7255, 0.7706], 'ratio_of_sums': 0.7485}
+     FRESH-A2/FRESH-A   {'n': 25, 'gm': 1.0069, 'ci95': [0.9817, 1.0331], 'ratio_of_sums': 1.0071}
+     FRESH-A/SPEC       {'n': 25, 'gm': 1.1808, 'ci95': [1.1484, 1.2118], 'ratio_of_sums': 1.1789}
+  [unsat_all] medians {'INC': 6639, 'INC2': 6784, 'FRESH-A': 9602, 'FRESH-U': 8755, 'SPEC': 8170, 'FRESH-A2': 9706, 'BEST': 8170}
+     INC/BEST           {'n': 49, 'gm': 0.8308, 'ci95': [0.8111, 0.8522], 'ratio_of_sums': 0.8317}
+     INC2/BEST          {'n': 49, 'gm': 0.8476, 'ci95': [0.8258, 0.8716], 'ratio_of_sums': 0.849}
+     FRESH-A2/BEST      {'n': 49, 'gm': 1.1943, 'ci95': [1.1712, 1.2191], 'ratio_of_sums': 1.1938}
+     INC/FRESH-A        {'n': 49, 'gm': 0.7021, 'ci95': [0.6872, 0.7173], 'ratio_of_sums': 0.7032}
+     INC/FRESH-U        {'n': 49, 'gm': 0.7669, 'ci95': [0.7494, 0.7863], 'ratio_of_sums': 0.7676}
+     INC/SPEC           {'n': 49, 'gm': 0.8221, 'ci95': [0.7991, 0.8467], 'ratio_of_sums': 0.8222}
+     INC2/FRESH-A2      {'n': 49, 'gm': 0.7097, 'ci95': [0.6934, 0.7272], 'ratio_of_sums': 0.7112}
+     FRESH-A2/FRESH-A   {'n': 49, 'gm': 1.0093, 'ci95': [0.9923, 1.0266], 'ratio_of_sums': 1.0094}
+     FRESH-A/SPEC       {'n': 49, 'gm': 1.171, 'ci95': [1.1438, 1.1976], 'ratio_of_sums': 1.1691}
+  [sat_all] medians {'INC': 2549.5, 'INC2': 2547.0, 'FRESH-A': 6794.0, 'FRESH-U': 3932.5, 'SPEC': 2800.0, 'FRESH-A2': 6792.5, 'BEST': 2425.5}
+     INC/BEST           {'n': 10, 'gm': 0.9481, 'ci95': [0.3979, 2.4008], 'ratio_of_sums': 0.9868}
+     INC2/BEST          {'n': 10, 'gm': 1.1934, 'ci95': [0.6346, 2.1387], 'ratio_of_sums': 1.2163}
+     FRESH-A2/BEST      {'n': 10, 'gm': 2.9654, 'ci95': [1.7506, 5.4378], 'ratio_of_sums': 2.4634}
+     INC/FRESH-A        {'n': 10, 'gm': 0.3579, 'ci95': [0.207, 0.582], 'ratio_of_sums': 0.4286}
+     INC/FRESH-U        {'n': 10, 'gm': 0.5858, 'ci95': [0.284, 1.2121], 'ratio_of_sums': 0.6232}
+     INC/SPEC           {'n': 10, 'gm': 0.692, 'ci95': [0.314, 1.6983], 'ratio_of_sums': 0.746}
+     INC2/FRESH-A2      {'n': 10, 'gm': 0.4024, 'ci95': [0.2087, 0.761], 'ratio_of_sums': 0.4938}
+     FRESH-A2/FRESH-A   {'n': 10, 'gm': 1.1192, 'ci95': [0.9183, 1.408], 'ratio_of_sums': 1.0699}
+     FRESH-A/SPEC       {'n': 10, 'gm': 1.9338, 'ci95': [1.1525, 3.7529], 'ratio_of_sums': 1.7405}

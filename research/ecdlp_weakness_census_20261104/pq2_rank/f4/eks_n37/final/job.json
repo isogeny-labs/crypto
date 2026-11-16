@@ -1,0 +1,224 @@
+{
+    "apiVersion": "batch/v1",
+    "kind": "Job",
+    "metadata": {
+        "creationTimestamp": "2026-11-08T04:45:29Z",
+        "generation": 1,
+        "labels": {
+            "isolab.dev/job": "true"
+        },
+        "name": "pq2-msolve-n37-e63bf8e5",
+        "namespace": "isolab",
+        "resourceVersion": "11522886",
+        "uid": "334e45a5-4da2-4993-a97a-60b00603e205"
+    },
+    "spec": {
+        "activeDeadlineSeconds": 21600,
+        "backoffLimit": 0,
+        "completionMode": "NonIndexed",
+        "completions": 1,
+        "manualSelector": false,
+        "parallelism": 1,
+        "podReplacementPolicy": "TerminatingOrFailed",
+        "selector": {
+            "matchLabels": {
+                "batch.kubernetes.io/controller-uid": "334e45a5-4da2-4993-a97a-60b00603e205"
+            }
+        },
+        "suspend": false,
+        "template": {
+            "metadata": {
+                "annotations": {
+                    "karpenter.sh/do-not-disrupt": "true"
+                },
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "334e45a5-4da2-4993-a97a-60b00603e205",
+                    "batch.kubernetes.io/job-name": "pq2-msolve-n37-e63bf8e5",
+                    "controller-uid": "334e45a5-4da2-4993-a97a-60b00603e205",
+                    "isolab.dev/job": "true",
+                    "job-name": "pq2-msolve-n37-e63bf8e5"
+                }
+            },
+            "spec": {
+                "affinity": {
+                    "podAntiAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": [
+                            {
+                                "labelSelector": {
+                                    "matchLabels": {
+                                        "isolab.dev/job": "true"
+                                    }
+                                },
+                                "topologyKey": "kubernetes.io/hostname"
+                            }
+                        ]
+                    }
+                },
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "/opt/msolve/run.sh",
+                            "4"
+                        ],
+                        "env": [
+                            {
+                                "name": "HOME",
+                                "value": "/work"
+                            },
+                            {
+                                "name": "AWS_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "AWS_DEFAULT_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "POD_UID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.uid"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "ISOLAB_JOB_ID",
+                                "value": "pq2-msolve-n37-e63bf8e5"
+                            },
+                            {
+                                "name": "ISOLAB_OUTPUT_DIR",
+                                "value": "/work/results"
+                            },
+                            {
+                                "name": "ISOLAB_RESULTS_URI",
+                                "value": "s3://isolab-results-104186811093-us-east-2/runs/pq2-msolve-n37-e63bf8e5/$(POD_UID)/"
+                            },
+                            {
+                                "name": "RAYON_NUM_THREADS",
+                                "value": "8"
+                            },
+                            {
+                                "name": "OMP_NUM_THREADS",
+                                "value": "8"
+                            }
+                        ],
+                        "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:21d4b8333a0a23395c4b9af9df6696a513948186332c4c71e82d59db4815b49c",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "task",
+                        "resources": {
+                            "limits": {
+                                "cpu": "8",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "100Gi"
+                            },
+                            "requests": {
+                                "cpu": "8",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "100Gi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/work",
+                                "name": "work"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ],
+                        "workingDir": "/work"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                    "isolab.dev/pool": "cpu-spot"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "runner",
+                "serviceAccountName": "runner",
+                "terminationGracePeriodSeconds": 60,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/workload",
+                        "operator": "Equal",
+                        "value": "cpu"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "8Gi"
+                        },
+                        "name": "work"
+                    },
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "tmp"
+                    }
+                ]
+            }
+        },
+        "ttlSecondsAfterFinished": 86400
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": "2026-11-08T10:45:29Z",
+                "lastTransitionTime": "2026-11-08T10:45:29Z",
+                "message": "Job was active longer than specified deadline",
+                "reason": "DeadlineExceeded",
+                "status": "True",
+                "type": "FailureTarget"
+            },
+            {
+                "lastProbeTime": "2026-11-08T10:46:31Z",
+                "lastTransitionTime": "2026-11-08T10:46:31Z",
+                "message": "Job was active longer than specified deadline",
+                "reason": "DeadlineExceeded",
+                "status": "True",
+                "type": "Failed"
+            }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-11-08T04:45:29Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+    }
+}

@@ -1,0 +1,73 @@
+\section{Isogeny oracles: generic and coordinate-aware models}
+
+\subsection{The generic statement}
+The source's Theorem 15.1 works with independent random encodings of
+order-$r$ subgroups on curves in one rational isogeny class, where $r$
+is prime and coprime to the cofactor \cite{isogenySource}. The action of
+each isogeny on chosen subgroup generators is supplied as a public
+scalar. A homomorphism between these cyclic subgroups is either zero
+or an isomorphism. Its answer on a point with formal logarithm $a+bx$
+has formal logarithm $\lambda(a+bx)$ in the destination.
+
+Thus addition, negation and map queries preserve linear formal
+expressions. Unless two distinct expressions collide at the uniform
+secret $x\in\F_r$, the encoded transcript supplies no equation for it.
+For $L$ initial handles and $Q$ queries, a collision union bound has the
+usual order $O((L+Q)^2/r)$, plus the probability of an uninformed final
+guess. The source writes a particular $(Q+2)^2/r+1/r$ expression;
+its exact constant requires fixing initial-handle and domain accounting.
+We use only the model-dependent birthday-order implication here.
+
+This is a statement about independently encoded subgroup operations,
+not rational coordinate access. Known map scalars are part of its
+hypotheses; the cost of constructing those scalars or a useful geometric
+map cannot be inferred from isogeny degree alone. Pairing oracles and
+$p$-adic lifts are outside this stated interface.
+
+\subsection{Why coordinate-aware elimination needs more hypotheses}
+The source's later algebraic-group-model analysis
+\cite{agmIsogeny} permits coordinate computations but requires every
+point submitted to an isogeny oracle to carry an algebraic
+representation over received points. It eliminates the oracles given
+a \emph{class-joint instance}: $(P_j,xP_j)$ with the same unknown $x$
+on every touched curve. It also gives the converse reduction. Eliminating
+those transported challenges further needs an explicit computable
+transport, for example a known spanning tree of isogenies, with its
+cost charged.
+
+Accordingly, the defensible conclusion is relative equivalence to the
+transported challenges under the declared query restriction. Without
+that restriction, arbitrary coordinate-generated factor-base points can
+be submitted: the oracle is then a transport service for new points,
+and direct map evaluation has a degree-dependent cost. Without
+computable transport, the class-joint inputs are additional information
+rather than a free reduction to a single input.
+
+The source also rejects ``isogenies change constants, never exponents''
+as a general assertion: composite binary extension fields can contain
+GHS-weak and non-weak members in one isogeny class. Its prime-field
+exponent assertion is labelled a conjecture. Neither the generic theorem
+nor the coordinate-aware relative reduction resolves it.
+
+\subsection{Transported decomposition counts require the full pullback}
+An elementary counting result usefully separates a transfer from a new
+base choice. Let $\varphi:H\to H'$ be a homomorphism of finite abelian
+groups, let $K=\ker\varphi$, choose $D'\subseteq\operatorname{im}\varphi$
+and let $D=\varphi^{-1}(D')$. For ordered decompositions and $m\geq1$,
+\[
+ d_D(R)=|K|^{m-1}d_{D'}(\varphi R).
+\]
+For each codomain tuple, pick arbitrary preimages of its first $m-1$
+entries. The last entry is uniquely determined by requiring their sum
+to be $R$ and has the required image. There are exactly $|K|^{m-1}$
+choices. This is the corrected finite-group form already used in the
+programme manuscript \cite{transferSource}.
+
+The image condition and full-pullback hypothesis matter. A codomain
+point outside the image has no rational preimage; an arbitrarily chosen
+subset of a fibre need not have $|K|$ lifts. The raw transfer note's
+product-of-fibre-sizes display must be read tuplewise on the image, or
+replaced by the formula above. Counts do not conserve arithmetic cost,
+base membership degree, field of definition, or available endomorphisms.
+A statement that every representation search can only lose does not
+follow from this counting identity alone.

@@ -1,0 +1,23 @@
+== Gate A
+A1 closure_degree=4 (committed dense: 4)
+A2 closure_degree=null closure_rank=131588 (committed dense: null, 131588)
+== Positive control P (refutes at 4?)
+P.d1 4 identity=true
+P.d4 4 identity=true
+P.d5 4 identity=true
+P.d7 4 identity=true
+P refutes on 4 of 4
+== S5 (all 32 branches per draw)
+draw 1: refute 28, saturated-unrefuted 4, unmeasured 0, identity_check true 32/32 -> does not suffice
+draw 4: refute 32, saturated-unrefuted 0, unmeasured 0, identity_check true 32/32 -> suffices
+draw 5: refute 32, saturated-unrefuted 0, unmeasured 0, identity_check true 32/32 -> suffices
+draw 7: refute 32, saturated-unrefuted 0, unmeasured 0, identity_check true 32/32 -> suffices
+S5 suffices on 3 of 4 draws
+VERDICT: k* <= 5 at l = 9 (saturation reading)
+== Whole-summand residual (PREREG_SUMMAND.md)
+l=7:       4 3      12 4 
+  nonzero x1:      12 4 
+l=8:       6 3      10 4 
+  nonzero x1:       2 3      10 4 
+l=9:       4 3      12 4 
+  nonzero x1:      12 4 

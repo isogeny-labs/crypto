@@ -1,0 +1,54 @@
+{
+  "schema": "ecdlp-ic-leads/v1",
+  "date": "2026-10-30",
+  "leads": [
+    {
+      "id": "derived-final-slot",
+      "status": "implemented_generic",
+      "application": "Derive the last summand and look it up in the archived base.",
+      "source": "Existing finite::decompose and IC subtract oracles; PKM factor-base prior art",
+      "touchpoint": "tools/factor-base/src/decomposition.rs",
+      "limit": "Generic search; index/validation/setup and query count matter; no sub-rho inference"
+    },
+    {
+      "id": "actual-width",
+      "status": "existing_backend_next_control",
+      "application": "Plan the actual selector network before choosing its contractor.",
+      "source": "Hexagon 2610.00613v1; bounded locality and treewidth qualifications",
+      "touchpoint": "crates/hashed-ecdl-tensor/src/width.rs",
+      "limit": "Charge decoder graph size, cutsets, precision and setup; structural rank is not useful relation rank"
+    },
+    {
+      "id": "useful-rank",
+      "status": "existing_backend_next_control",
+      "application": "Retain odd-prime coefficients, original labels and slot identities when eliminating partial relations.",
+      "source": "Existing nested-base collector and sparse provenance verification",
+      "touchpoint": "crates/hashed-ecdl-tensor/src/partial.rs",
+      "limit": "Hits and cycle counts do not establish a target-bearing dependency; no XOR cancellation over odd order"
+    },
+    {
+      "id": "weighted-cost",
+      "status": "reference_only",
+      "application": "Test exact local-cost distributions before adopting a heuristic cost objective.",
+      "source": "Hexagon 2610.00594v1",
+      "touchpoint": "crates/hashed-ecdl-tensor/src/weighted.rs",
+      "limit": "Exhaustive reference; global fill-in objectives need not have the required locality"
+    },
+    {
+      "id": "algebraic-tower",
+      "status": "open_research",
+      "application": "Require an actual constrained PDP solver and degree/width evidence for structured prime bases.",
+      "source": "PKM sections 3.1\u20133.4; pkm_dickson_torus_20261015; Hexagon 2610.00327v1",
+      "touchpoint": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+      "limit": "Existing torus leading-form obstruction remains; small input or first-fall degree does not bound certificate/solving degree"
+    },
+    {
+      "id": "overlap-coverage",
+      "status": "existing_checks_required",
+      "application": "Select using deduplicated subgroup points and actual decompositions, not component-set retention.",
+      "source": "Hexagon 2610.00328v1",
+      "touchpoint": "tools/factor-base/src/recipe.rs",
+      "limit": "Union retention need not follow from per-component retention; no population inference from supplied targets"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:14:33: warning: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:10:0: warning: automatically included section variable(s) unused in theorem `GraphForest.root_reach`:
+  [Field K]
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:16:0: warning: automatically included section variable(s) unused in theorem `GraphForest.reach_parent`:
+  [Field K]
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Field K] [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:26:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Decidable (Reach s x child)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:23: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:41: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:52: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:46:28: warning: `if_false` has been deprecated: Use `ite_false` instead
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:48:11: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:49:11: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:34: warning: declaration uses `sorry`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:28:8: warning: declaration uses `sorry`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:14: warning: This simp argument is unused:
+  compress
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [if_pos rfl, bumped, if_neg hnp, if_pos (Reach.refl child)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:23: warning: This simp argument is unused:
+  if_pos rfl
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [compress, bumped, if_neg hnp, if_pos (Reach.refl child)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:41: warning: This simp argument is unused:
+  if_neg hnp
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [compress, if_pos rfl, bumped, if_pos (Reach.refl child)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:39:52: warning: This simp argument is unused:
+  if_pos (Reach.refl child)
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [compress, if_pos rfl, bumped, if_neg hnp]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:46:16: warning: This simp argument is unused:
+  compress
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hx, if_false, bumped]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:46:25: warning: This simp argument is unused:
+  hx
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [compress, if_false, bumped]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:46:28: warning: This simp argument is unused:
+  if_false
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [compress, hx, bumped]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:48:7: warning: Unused tactic linter: `rw [if_pos hxc, if_pos (he.mp hxc)]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:48:43: warning: Unused tactic linter: `omega` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:49:7: warning: Unused tactic linter: `rw [if_neg hxc, if_neg (fun h => hxc (he.mpr h))]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:49:55: warning: Unused tactic linter: `exact hr` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:48:43: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:49:55: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/var/tmp/graph-forest-closure-20261101/invocation-7zvriwfx/snapshot/Forest.lean:60:18: error: Function expected at
+  ih
+but this term has type
+  t.parent z = z
+
+Note: Expected a function because this term is being applied to the argument
+  hz

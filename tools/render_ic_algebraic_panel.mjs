@@ -15,8 +15,35 @@ assert.equal(data.status,'recomputed_from_raw');
 assert.equal(data.complete_dlp_cost,null);
 assert.equal(data.rho_ratio,null);
 const hash=createHash('sha256').update(raw).digest('hex');
+const zero=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/guess-zero-draw6-20261025/row.json')));
+const quartic=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/quartic-smoke-20261025-02.json')));
+const subgroup=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json')));
+const qualified=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/qualified-queries-20261025/summary.json')));
+const closures=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/qualified-closure-replay-20261025/summary.json')));
+const completed=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/guess-completion-20261025-01/summary.json')));
+const projection=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/cofactor-projection-20261025/receipt.json')));
+const followup=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/publication-followup-audit-v3-20261026/output.json')));
+const wide=[16,17,18].map(m=>JSON.parse(readFileSync(resolve(root,study+`pipeline-receipts/wide-core-audit-20261025/m${m}/output.json`))));
+assert.equal(zero.status,'refuted');
+assert.equal(zero.draw,6);
+assert.deepEqual(zero.guessed_variables,[]);
+assert.equal(quartic.verified_records,24);
+assert.equal(quartic.replays.length,24);
+assert.ok(quartic.replays.every(r=>r.reproduced));
+assert.equal(subgroup.schema,'ic-fixture-subgroups/v2');
+assert.equal(subgroup.status,'all_lifts_trace_orders_and_membership_checks_agree');
+assert.equal(qualified.rows,2048);
+assert.equal(qualified.independent_point_arithmetic_rows_verified,2048);
+assert.equal(closures.recorded_attempts,158);
+assert.equal(completed.status,'all_registered_attempts_terminated_native_raw_accounting_recomputed');
+assert.equal(completed.total_attempts_including_old_draw0_k3,124);
+assert.equal(projection.status,'all_finite_projected_membership_and_relation_checks_agree');
+assert.equal(projection.selected_projected_witness_relations,3);
+assert.equal(followup.status,'native_profile_accounting_and_partial_scalar_checks_pass');
+assert.ok(closures.groups.every(g=>g.independent_hky_verified===g.attempts && g.refuted===0 && g.unknown===0));
+assert.ok(wide.every(r=>r.status==='verified' && typeof r.r_decimal==='string' && typeof r.group_order_decimal==='string'));
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:8});
-const base='https://github.com/aburan28/crypto/blob/main/'+study;
+const base='https://github.com/isogeny-labs/crypto/blob/main/'+study;
 const begin='<!-- BEGIN IC ALGEBRAIC FOLLOWUP -->';
 const end='<!-- END IC ALGEBRAIC FOLLOWUP -->';
 const block=`${begin}
@@ -29,8 +56,16 @@ ${data.panels.map(p=>`<tr><td>${p.degree}</td><td>${fmt(p.complete_extractions)}
 </tbody></table></div>
 <figure><img src="ic/algebraic-crossover-closure-ratios.svg" alt="Paired symmetric to direct solver-word ratios at closure caps two, three and four, over fields of degree thirteen to thirty-one" style="display:block;width:100%;max-width:900px;margin:auto;background:white"><figcaption>304 completed matched pairs per cap; native deterministic counts, no population interval or wall-time comparison. All completed extractions agree with an independent point oracle.</figcaption></figure>
 <p>At n=31, ell=4, the recorded geometric product dimensions are 4/7/10, versus 4/10/20 for random bases. That representation advantage does not establish a full-query gain. In the completed symmetric queries, 8,100 algebraic roots yield four verified x-multisets; 8,096 fail splitting or signed lifting.</p>
-<p>The balanced ell=8 three-set [7,15,23] fails on all eight assignments of original draw 0: each saturates degree four without refuting, charging ${fmt(data.balanced_guess_draw0.total_word_ops)} solver word operations in total. This rejects that set on that draw, not a global minimum. Smaller capped attempts and other draws remain separate obligations.</p>
-<p>No new complete-price IC/rho ratio is admitted. Complete-DLP smoke has missing native construction/split costs and a legacy wall-priced displayed S; use its native bands with those omissions stated. The progress ratio chart, leaderboard, best-of and exponent figures retain their existing values. Larger closure/guess panels and the quartic crossover ladder remain open.</p>
+<p>The registered ell=8 balanced-prefix campaign has ended: ${fmt(completed.total_attempts_including_old_draw0_k3)} attempts contain ${completed.producer_refuted} refutations, ${completed.producer_saturated_nonrefuting} nonrefuting fixed points and ${completed.producer_unknown} timeout. First passing prefix k is ${completed.draws.map(r=>r.balanced_prefix_minimum).join('/')} on draws 0/3/5/6, within prefixes of [7,15,23,24]. All 64 k4 branches refute, charging ${fmt(completed.k4_all_branch_solver_words)} solver words. Failed smaller prefixes are charged separately; the full experimental total stays unknown because one attempt is censored. These are finite Boolean minima in the registered family. Independent HKY verdict replay has not run; its queue stopped across the workspace restart. <a href="${base}reports/run-completed-balanced-guess-20261025/report.pdf">Completed guessing report</a>.</p>
+<p>The x-only guessing fixtures do not specify a full curve or subgroup. A native audit checks explicit E0 and trace-one-a twist models in each exact field: ${fmt(subgroup.totals.in_generated_subgroup)} of ${fmt(subgroup.totals.lifted_target_models)} original/fresh target x-values lie in the declared cyclic subgroups, ${fmt(subgroup.totals.outside_generated_subgroup)} lie outside and ${fmt(subgroup.totals.generated_subgroup_unknown)} remain unknown. The initial 152 nulls are retained in a separate receipt; exact enumeration of an 11-point subgroup resolves them in the amended audit. This remains a uniform field-x fixture law, not an ordinary subgroup-query law.</p>
+<p>All seven original E0 bases have no original points in its largest prime subgroup (r=991); draw 6 has none on either chosen model. A separate cofactor audit nevertheless verifies nonempty projected bases hP on every draw and both models, and three projected witness relations at nonzero hR. Thus the strict membership audit does not rule out projected IC. Its target/preimage law, base logarithms, scalar recovery and full costs remain open. The separate qualified panel retains its strict original-point contract. <a href="${base}reports/run-fixture-subgroups-enumerated-20261025/report.pdf">Subgroup report</a> · <a href="${base}reports/run-cofactor-projection-20261025/report.pdf">Cofactor alternative</a>.</p>
+<p>Original draw 6 refutes at degree four with zero guesses: ${fmt(zero.columns)} columns and ${fmt(zero.closure_word_ops)} solver word operations. Independent solver/cost replay is outstanding. Larger N=58/60/100 probes saturate without refuting at degrees two and three; all degree-four outcomes remain unknown after allocation or entry caps.</p>
+<p>A separate qualified panel retains ${fmt(qualified.rows)} public hash-to-subgroup queries on four explicitly selected a=0, full-degree-b models. All finite-chain and independent point-arithmetic replays agree: ${fmt(qualified.boolean_sat)} have Boolean roots and ${fmt(qualified.point_sat)} have actual signed subgroup decompositions. These different contracts are preserved, including empty bases and quota shortages. The selected 55 negative and 24 positive controls give ${fmt(closures.recorded_attempts)} nonrefuting D2/D3 fixed points, all independently rank/verdict checked with HKY. Degree four, complete guessing minima and full prices remain open. <a href="${base}reports/run-qualified-queries-20261025/report.pdf">Qualified queries</a> · <a href="${base}reports/run-qualified-closures-20261025/report.pdf">Closure report</a>.</p>
+<p>The separate quartic smoke now has 24/24 verified records and 24/24 identical deterministic replays over base-field sizes 6/8/10/12. Its prices use deterministic count conventions; construction, physical conversion and the wider crossover ladder remain separate obligations.</p>
+<p>The standalone widened quartic core passes independent arithmetic, exact group-order, high-scalar and encoding controls at extension degrees ${wide.map(r=>r.n).join('/')}, with identical replays. Full wide factor-base/oracle/relation/linear-algebra and ecbench adapters are still missing. The additional m14/m15 diagnostics are interrupted: they retain ${followup.partial_quartics.map(r=>r.recorded+'/'+r.registered).join(' and ')} records, with ${followup.partial_quartics.map(r=>r.independent_scalar_checks).join('/')} successful rho answers independently checked. Every recorded IC attempt times out or is interrupted; missing costs stay unknown. Original L2 requirements remain open. <a href="${base}reports/run-partial-quartics-20261026/report.pdf">Partial-session report</a> · <a href="${base}reports/run-wide-core-audit-20261025/report.pdf">Wide-core report</a>.</p>
+<figure><img src="ic/algebraic-partial-quartics.svg" alt="Interrupted quartic sessions: m14 records eleven verified rho answers, five IC timeouts and one interrupted IC attempt; m15 records ten verified rho answers and five IC timeouts; seven and nine executions are missing" style="display:block;width:100%;max-width:900px;margin:auto;background:white"><figcaption>Retained execution outcomes only. All successful scalar answers independently verify; neither session establishes a complete IC comparison.</figcaption></figure>
+<p>The narrow constructor exclusion preserves all seven frozen fields and records ${followup.constructor.arms.map(r=>fmt(r.whole_process_ir)).join(' versus ')} simulated whole-process instructions. Its recorded source passes ${fmt(followup.constructor.library_passed)} library tests. This is attribution including loader and Valgrind costs; native runtime, A/A/A-B, fastest-external-tool and complete-IC qualification remain missing. <a href="${base}reports/run-narrow-constructor-20261026/report.pdf">Constructor report</a>.</p>
+<p>No new complete-price IC/rho ratio is admitted. Completed n13/n23 solver charges use pinned word rates; the earlier wall-pricing explanation was incorrect and has an explicit native accounting audit. Construction/split costs remain incomplete in both raw S and the native bands. The progress ratio chart, leaderboard, best-of and exponent figures retain their existing values. Larger closure/guess panels and the quartic crossover ladder remain open.</p>
 <p class="dash-footnote"><a href="${base}README.md">Requirement statuses and evidence</a> · <a href="${base}reports/local-structural-20261025/report.pdf">Inspected results PDF</a> · <a href="${base}report-data.json">Native recomputation</a>. Dataset SHA-256 <code>${hash}</code>. Raw rows and failed attempts are in the hash-checked evidence archive; no fastest-CAS, GPU or asymptotic claim.</p>
 </section>
 ${end}`;
@@ -48,12 +83,16 @@ if(current.includes(begin)) {
 }
 const svg=readFileSync(resolve(root,study+'reports/local-structural-20261025/closure-ratios.svg'));
 const copy=resolve(root,'docs/ic/algebraic-crossover-closure-ratios.svg');
+const partialSvg=readFileSync(resolve(root,study+'reports/run-partial-quartics-20261026/partial-quartic-outcomes.svg'));
+const partialCopy=resolve(root,'docs/ic/algebraic-partial-quartics.svg');
 if(process.argv.includes('--check')) {
   assert.equal(current,page,'Algebraic panel is stale');
   assert.deepEqual(readFileSync(copy),svg,'Algebraic graph copy is stale');
+  assert.deepEqual(readFileSync(partialCopy),partialSvg,'Partial quartic graph copy is stale');
   console.log('PASS: native evidence panel and graph copy agree');
 } else {
   writeFileSync(pagePath,page);
   writeFileSync(copy,svg);
+  writeFileSync(partialCopy,partialSvg);
   console.log('Rendered finite algebraic panel and graph copy');
 }

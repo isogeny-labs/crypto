@@ -13,8 +13,26 @@ Sources (all committed, read at --ref unless noted):
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
                                 proved complete integer records in the all-21 selection census
+  research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json
+                                retained original orders in the period-software trial
+  research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json
+                                distinct original orders in the recovered FreeLIP replay
+  research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json
+                                independently checked saved work-count cells, not security
+  research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json
+                                verified point-trait cells on 21 choices; repeated controls, not security
+  research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json
+                                verified fixed-cohort cutoff coverage, not random sampling or security
+  research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
+                                verified broader recorded-census coverage, not historical use or security
+  research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json
+                                exact fixed-score allocation coverage, not sampled curves or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/explicit_relations_e2e_20261030/results-v*/
+                                exact recovery counts and bounded two-target frontier; no L0 timing rank
+  research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json
+                                bounded D18 solver-policy gate on the a=0 N83 curve; no complete-cost rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -22,9 +40,11 @@ Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 # problem, unit, better (higher|lower|neutral), kind (gauge|event), label, source.
 # Reads committed state at --ref via `git show`; never the working tree. stdlib only.
 import argparse
+import atexit
 import datetime as dt
 import json
 import os
+import posixpath
 import subprocess
 import sys
 from pathlib import Path
@@ -40,9 +60,41 @@ def _git(*args, check=True):
     return p.stdout
 
 
+_object_reader = None
+
+
+def _close_object_reader():
+    global _object_reader
+    if _object_reader is not None:
+        _object_reader.stdin.close()
+        _object_reader.stdout.close()
+        _object_reader.wait()
+        _object_reader = None
+
+
+atexit.register(_close_object_reader)
+
+
 def show(ref, path):
-    p = subprocess.run(["git", "-C", str(REPO), "show", f"{ref}:{path}"], capture_output=True, text=True)
-    return p.stdout if p.returncode == 0 else None
+    """Read committed blobs through one Git process, preserving missing=None."""
+    global _object_reader
+    if _object_reader is None:
+        _object_reader = subprocess.Popen(
+            ["git", "-C", str(REPO), "cat-file", "--batch"],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    reader = _object_reader
+    reader.stdin.write(f"{ref}:{path}\n".encode())
+    reader.stdin.flush()
+    header = reader.stdout.readline().split()
+    if header and header[-1] == b"missing":
+        return None
+    if len(header) != 3 or header[1] != b"blob":
+        raise RuntimeError(f"invalid committed metrics source: {path}")
+    size = int(header[2])
+    data = reader.stdout.read(size)
+    if len(data) != size or reader.stdout.read(1) != b"\n":
+        raise RuntimeError(f"truncated committed metrics source: {path}")
+    return data.decode()
 
 
 def ls(ref, path=""):
@@ -183,6 +235,129 @@ def e2e_runs(ref):
          label="ic e2e gate history records", source="docs/ic/ci/runs/")
 
 
+def algebraic_stage(ref, since):
+    """Coverage of finite native panels, kept separate from pipeline ratios."""
+    path = "research/ic_algebraic_crossover_20261023/report-data.json"
+    for date, commit, txt in file_history(ref, path, since):
+        d = json.loads(txt)
+        if d.get("schema") != "ic-campaign-report-data/v1" or d.get("status") != "recomputed_from_raw":
+            continue
+        for panel in d.get("panels", []):
+            degree = panel.get("degree")
+            for field, label in (("paired_queries", "completed direct/symmetric pairs"),
+                                 ("symmetric_lower_words", "pairs with lower symmetric solver words")):
+                emit(f"ic.algebraic.closure-d{degree}.{field}", panel.get(field), date=date,
+                     problem=P_IC, unit="count", better="neutral",
+                     label=f"finite closure cap {degree}: {label}; stage only",
+                     source=f"{path}@{commit}")
+
+
+def algebraic_audits(ref, since):
+    """Recorded finite correctness/relevance counts, never a performance index."""
+    study = "research/ic_algebraic_crossover_20261023/pipeline-receipts/"
+    sources = [
+        ("fresh-target-relevance-20261025/receipt.json", "ic-fresh-target-relevance/v1",
+         "status", "all_target_roots_and_trace_criteria_agree", [
+             (("totals", field), f"ic.algebraic.fresh-target.{field}",
+              f"fresh Boolean fixtures: {label} on E0 reference; this audit checks lifts only")
+             for field, label in [
+                 ("sat_liftable", "SAT, target liftable"),
+                 ("sat_nonliftable", "SAT, target nonliftable"),
+                 ("unsat_liftable", "UNSAT, target liftable"),
+                 ("unsat_nonliftable", "UNSAT, target nonliftable"),
+             ]]),
+        ("quartic-smoke-20261025-02.json", "ecbench.audit/v1", "ok", True, [
+            (("verified_records",), "ic.algebraic.quartic-smoke.verified_records",
+             "quartic m6/8/10/12 smoke: verified records; counted L0 only")]),
+        ("external-cas-strengthened-20261025/replay.json", "ic-cas-correctness-replay/v1",
+         "status", "all_external_zero_sets_equal", [
+             (("cases",), "ic.algebraic.external-cas.correctness_cases",
+              "finite systems with equal Singular/native Boolean zero sets; no speed comparison")]),
+        ("fixture-subgroups-enumerated-20261025/receipt.json", "ic-fixture-subgroups/v2",
+         "status", "all_lifts_trace_orders_and_membership_checks_agree", [
+             (("totals", field), f"ic.algebraic.fixture-subgroups.{field}", label)
+             for field, label in [
+                 ("in_generated_subgroup", "original/fresh targets inside declared reference/twist G"),
+                 ("outside_generated_subgroup", "original/fresh targets outside declared reference/twist G"),
+                 ("generated_subgroup_unknown", "original/fresh targets with unresolved declared subgroup membership"),
+             ]]),
+        ("qualified-queries-20261025/summary.json", "ic-qualified-query-summary/v1",
+         "status", "all_2048_finite_chain_counts_and_paired_targets_verified", [
+             ((field,), f"ic.algebraic.qualified-queries.{field}", label)
+             for field, label in [
+                 ("rows", "additional qualified a0/full-degree-b query draws"),
+                 ("boolean_sat", "additional qualified queries with finite-chain roots"),
+                 ("point_sat", "additional qualified queries with actual subgroup point decompositions"),
+                 ("independent_point_arithmetic_rows_verified", "qualified point counts checked by independent arithmetic"),
+                 ("paired_target_count", "underlying public targets paired across qualified basis families"),
+             ]]),
+        *[(f"wide-core-audit-20261025/m{m}/output.json", "ic-quartic-wide-core-audit/v1",
+           "status", "verified", [
+               ((field,), f"ic.algebraic.wide-core.m{m}.{field}", f"m{m} wide-core {label}; full IC unmeasured")
+               for field, label in [
+                   ("independent_field_products", "independent field-product controls"),
+                   ("independent_scalar_controls", "independent full-width scalar controls"),
+               ]]) for m in (16, 17, 18)],
+    ]
+    for relative, schema, key, expected, fields in sources:
+        path = study + relative
+        for date, commit, txt in file_history(ref, path, since):
+            data = json.loads(txt)
+            if data.get("schema") != schema or data.get(key) != expected:
+                continue
+            for keys, metric, label in fields:
+                value = data
+                for part in keys:
+                    value = value.get(part) if isinstance(value, dict) else None
+                emit(metric, value, date=date, problem=P_IC, unit="count", better="neutral",
+                     label=label, source=f"{path}@{commit}")
+    path = study + "qualified-closure-replay-20261025/summary.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("schema") != "ic-qualified-closure-summary/v1":
+            continue
+        for group in data.get("groups", []):
+            degree = group.get("degree")
+            kind = "positive" if group.get("sat_control") else "negative"
+            for field in ("nonrefuting", "independent_hky_verified"):
+                emit(f"ic.algebraic.qualified-closure.d{degree}.{kind}.{field}", group.get(field),
+                     date=date, problem=P_IC, unit="count", better="neutral",
+                     label=f"qualified {kind} D{degree} {field}; finite closure only",
+                     source=f"{path}@{commit}")
+
+
+def completed_guess(ref, since):
+    """Frozen producer counts; separate from independent HKY and full IC price."""
+    study = "research/ic_algebraic_crossover_20261023/pipeline-receipts/"
+    path = study + "guess-completion-20261025-01/summary.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "all_registered_attempts_terminated_native_raw_accounting_recomputed":
+            continue
+        for field in ("producer_refuted", "producer_saturated_nonrefuting", "producer_unknown"):
+            emit(f"ic.algebraic.completed-guess.{field}", data.get(field), date=date,
+                 problem=P_IC, unit="count", better="neutral",
+                 label=f"registered original Boolean branches: {field}; producer classification",
+                 source=f"{path}@{commit}")
+        for row in data.get("draws", []):
+            for field, unit in (("balanced_prefix_minimum", "count"),
+                                ("passing_set_solver_words", "solver_word_ops"),
+                                ("search_through_first_passing_set_solver_words", "solver_word_ops")):
+                emit(f"ic.algebraic.completed-guess.draw{row['draw']}.{field}", row.get(field),
+                     date=date, problem=P_IC, unit=unit, better="neutral",
+                     label=f"draw {row['draw']} registered balanced prefix: {field}; no global minimum or full price",
+                     source=f"{path}@{commit}")
+    path = study + "cofactor-projection-20261025/receipt.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "all_finite_projected_membership_and_relation_checks_agree":
+            continue
+        for field in ("selected_projected_witness_relations", "selected_all_summands_in_prime_subgroup_relations"):
+            emit(f"ic.algebraic.cofactor-projection.{field}", data.get(field), date=date,
+                 problem=P_IC, unit="count", better="neutral",
+                 label=f"one canonical-sign witness per original SAT draw: {field}; no base logs or full IC",
+                 source=f"{path}@{commit}")
+
 
 def photo_volcano(ref):
     path = 'research/photo_volcano_restart_20261017/reports/completion_20261025/completion.json'
@@ -230,6 +405,30 @@ def nist_factorization(ref, since):
                  problem="nist-skipped-curve-factorization", unit=unit, better=better,
                  label=label, source=source)
 
+def publication_followup(ref, since):
+    """Native retained-profile/scalar diagnostics; no full IC performance index."""
+    path = "research/ic_algebraic_crossover_20261023/pipeline-receipts/publication-followup-audit-v3-20261026/output.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("status") != "native_profile_accounting_and_partial_scalar_checks_pass":
+            continue
+        for arm in data.get("constructor", {}).get("arms", []):
+            emit(f"ic.algebraic.narrow-constructor.{arm['arm']}.ir", arm.get("whole_process_ir"),
+                 date=date, problem=P_IC, unit="simulated_Ir", better="neutral",
+                 label=f"narrow6 {arm['arm']}: simulated whole-process Ir including loader/Valgrind; no native speedup",
+                 source=f"{path}@{commit}")
+        for row in data.get("partial_quartics", []):
+            for field in ("recorded", "missing_registered_executions", "independent_scalar_checks"):
+                emit(f"ic.algebraic.partial-quartic.m{row['m']}.{field}", row.get(field),
+                     date=date, problem=P_IC, unit="count", better="neutral",
+                     label=f"interrupted m{row['m']}: {field}; no completed IC comparison",
+                     source=f"{path}@{commit}")
+            for arm, statuses in row.get("counts", {}).items():
+                for status, value in statuses.items():
+                    emit(f"ic.algebraic.partial-quartic.m{row['m']}.{arm}.{status}", value,
+                         date=date, problem=P_IC, unit="count", better="neutral",
+                         label=f"interrupted m{row['m']} {arm}: {status}; missing/censored costs unknown",
+                         source=f"{path}@{commit}")
 def nist_selection_factor_census(ref, since):
     path = "research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json"
     for date, commit, text in file_history(ref, path, since):
@@ -244,6 +443,16 @@ def nist_selection_factor_census(ref, since):
                  label=f"NIST all-21 census: complete {family} records", source=source)
 
 
+def nist_selection_period_ecpp(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_ecpp.retained_rows", data.get("rows"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Period ECPP trial: original cohort rows retained, including indeterminate",
+             source=f"{path}@{commit}")
+
+
 def nist_selection_exact_embedding(ref, since):
     path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
     for date, commit, text in file_history(ref, path, since):
@@ -251,6 +460,92 @@ def nist_selection_exact_embedding(ref, since):
         emit("nist.selection_exact_embedding.certified_rows", data.get("passed"),
              date=date, problem="nist-candidate-selection", unit="curves", better="higher",
              label="NIST all-21 census: exact embedding degrees with direct-power certificates",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_freelip(ref, since):
+    path = "research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_freelip.distinct_orders", data.get("distinct_orders"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Recovered FreeLIP replay: distinct original orders, not repeated-call count",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_period_work(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_work.verified_cells", data.get("cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="Saved ECPP work: independently checked count cells; no historical-rule claim",
+             source=f"{path}@{commit}")
+
+
+
+
+def nist_selection_generator_traits(ref, since):
+    """Export recorded coverage only; do not compute curve traits or estimates."""
+    path = "research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_generator_traits.verified_cells", data.get("trait_cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: verified point-trait cells under repeated controls; not security",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_strict_elkies(ref, since):
+    """Export recorded exact-character coverage, without recomputing a result."""
+    path = "research/nist_skip_criterion_20261025/strict_elkies_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_strict_elkies.verified_character_cells",
+             data.get("odd_prime_character_cells_checked"), date=date,
+             problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: strict-character cells verified; no historical-use or security claim",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_expanded_cutoff(ref, since):
+    """Export independently verified coverage from committed records only."""
+    path = "research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("integer_cutoffs", "cutoffs")):
+            emit(f"nist.selection_expanded_cutoff.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Fixed 21-curve cohort: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
+
+
+def nist_selection_broader_census(ref, since):
+    """Export recorded exact coverage only, without computing a new curve trait."""
+    path = "research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_six_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("seed_positions", "positions")):
+            emit(f"nist.selection_broader_census.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Broader recorded census: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
+
+
+def nist_selection_exact_pair_audit(ref, since):
+    """Export the verified allocation inventory; do not compute a statistic."""
+    path = "research/nist_skip_criterion_20261025/exact_pair_audit_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        emit("nist.selection_exact_pair_audit.verified_assignments", data.get("assignments"),
+             date=date, problem="nist-candidate-selection", unit="label assignments", better="neutral",
+             label="Verified fixed-score allocation inventory; not sampled curves or security",
              source=f"{path}@{commit}")
 
 
@@ -470,6 +765,227 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def ic_packed_filter(ref, since):
+    """The membership filter on the packed pair table (a wall component, not a whole-pipeline row):
+    at 32 bits, the corrected whole-solve wall per charged GAE dgbf / dgb and its 95% upper end,
+    from the native `ecbench compare` output; beside it the counted distance to the same-session
+    rho.negation at w = 0, copied from the validator's j4.json."""
+    study = "research/ic_packed_filter_20261029"
+    path = f"{study}/P32/wall/analysis/compare-dgb__dgbf-w0.json"
+    for date, commit, text in file_history(ref, path, since):
+        w = json.loads(text).get("wall", {})
+        src = f"{path}@{commit}"
+        emit("ic_component.packed_filter.p32.wall_ratio", w.get("corrected_ratio"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC packed-table filter, corrected wall per charged GAE dgbf / dgb, 32 bits (component)",
+             source=src)
+        emit("ic_component.packed_filter.p32.wall_ratio_ci95_hi", (w.get("corrected_ci95") or [None, None])[1], date=date,
+             problem=P_IC, unit="ratio", better="lower",
+             label="IC packed-table filter, upper end of the corrected 95% interval, 32 bits (component)", source=src)
+    path = f"{study}/validation/code/out/j4.json"
+    for date, commit, text in file_history(ref, path, since):
+        j = json.loads(text).get("P32-counted", {}).get("dgbf/rho-neg", {}).get("0.0", {})
+        emit("ic_component.packed_filter.p32.dgbf_over_rho_neg_w0", j.get("ratio_b_over_a"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC packed-table filter, counted S' dgbf / rho-neg at w = 0, 32 bits (distance remaining)",
+             source=f"{path}@{commit}")
+
+
+def explicit_gpu_frontier(ref, since, study="research/explicit_relations_e2e_20261030",
+                          metric_prefix="gpu.explicit_relations"):
+    """Exact completed-panel counts; no timing or global-maximum claims."""
+    revision = _git("rev-parse", ref).strip()[:12]
+    paths = [p for p in ls(ref, study) if p.endswith("/coverage.json")]
+    requested = [f"{p.rsplit('/', 1)[0]}/{name}" for p in paths
+                 for name in ("coverage.json", "export.json", "frontier.txt")]
+    # One Git process avoids per-file process and remote-filesystem overhead.
+    batch = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                           input="".join(f"{ref}:{p}\n" for p in requested).encode(),
+                           capture_output=True, check=True).stdout
+    blobs, offset = {}, 0
+    for path in requested:
+        end = batch.index(b"\n", offset)
+        header = batch[offset:end].split()
+        offset = end + 1
+        if header[-1] == b"missing":
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"invalid committed GPU source: {path}")
+        size = int(header[2])
+        blobs[path] = batch[offset:offset + size].decode()
+        if batch[offset + size:offset + size + 1] != b"\n":
+            raise ValueError(f"truncated committed GPU source: {path}")
+        offset += size + 1
+    for path in paths:
+        directory = path.rsplit("/", 1)[0]
+        name = directory.rsplit("/", 1)[-1]
+        if not name.startswith("results-v") or not name[9:].isdigit():
+            continue
+        coverage_text = blobs.get(path)
+        export_text = blobs.get(f"{directory}/export.json")
+        if not coverage_text or not export_text:
+            continue
+        coverage, export = json.loads(coverage_text), json.loads(export_text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        verified = sum(r.get("status") == "succeeded" and
+                       r.get("verification", {}).get("status") == "verified" for r in runs)
+        if len(runs) != coverage.get("attempted") or verified != coverage.get("verified_recoveries"):
+            raise ValueError(f"inconsistent completed GPU panel: {path}")
+        prefix = f"{metric_prefix}.{name[8:]}"
+        source = f"{path}@{revision}"
+        for suffix, value, label in (
+            ("attempted", coverage["attempted"], "recorded executions"),
+            ("verified_recoveries", verified, "fresh CPU-replayed recoveries"),
+            ("timeouts", sum(r.get("status") == "timeout" for r in runs), "retained solve timeouts"),
+        ):
+            emit(f"{prefix}.{suffix}", value, date=date, problem="gpu-generic-decomposition",
+                 unit="count", better="neutral", label=f"GPU {name}: {label}; fixed bounded panel, L0",
+                 source=source)
+        frontier = blobs.get(f"{directory}/frontier.txt")
+        if frontier:
+            key, _, value = frontier.strip().partition("=")
+            if key == "largest_complete_bits" and value.isdigit():
+                emit(f"{prefix}.complete_field_bits", int(value), date=date,
+                     problem="gpu-generic-decomposition", unit="field bits", better="neutral",
+                     label=f"GPU {name}: complete two-target rung under fixed limits; not a global maximum",
+                     source=f"{directory}/frontier.txt@{revision}")
+
+
+
+def explicit_gpu_profile(ref, since):
+    """Committed diagnostic coverage only; no recovery or timing promotion."""
+    study = "research/explicit_relations_profile_20261031"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for version in (1, 2):
+        path = f"{study}/results-v{version}/export.json"
+        text = show(ref, path)
+        if text is None:
+            continue
+        export = json.loads(text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        if len(runs) != export.get("flow", {}).get("attempted"):
+            raise ValueError(f"inconsistent GPU profile coverage: {path}")
+        verified = [r for r in runs if r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified"]
+        if version == 1:
+            samples = (
+                ("verified_cells", len(verified), "byte-exact query replay cells"),
+                ("verified_queries", sum(r["measurements"]["counted"]["verified_queries"]
+                                         for r in verified), "byte-exact query replies"),
+            )
+        else:
+            samples = (
+                ("timeline_profiles", sum(r["arm"] == "t" for r in verified),
+                 "successful Nsight Systems traces"),
+                ("counter_unavailable", sum(r["measurements"]["counters"].get("native_status")
+                                             == "unsupported" for r in runs),
+                 "retained unavailable hardware-counter profiles"),
+            )
+        for suffix, value, label in samples:
+            emit(f"gpu.explicit_relations.profile.v{version}.{suffix}", value,
+                 date=date, problem="gpu-query-diagnostics", unit="count",
+                 better="neutral", label=f"GPU profile v{version}: {label}; fixed prefixes",
+                 source=f"{path}@{revision}")
+
+
+def explicit_gpu_fullcache(ref, since):
+    """Read both committed strata; retain preflight failures separately."""
+    study = "research/explicit_relations_fullcache_20261101"
+    revision = _git("rev-parse", ref).strip()[:12]
+    for path in ls(ref, study):
+        directory, _, name = path.rpartition("/")
+        version = directory.rsplit("/", 1)[-1]
+        if not version.startswith("results-v") or not version[9:].isdigit():
+            continue
+        if name not in ("failure.json", "export-small.json", "export.json"):
+            continue
+        record = json.loads(show(ref, path))
+        date = record.get("created", record.get("observed_at", ""))[:10]
+        if len(date) != 10 or date < since:
+            continue
+        prefix = f"gpu.explicit_relations.fullcache.{version[8:]}"
+        if name == "failure.json":
+            if record.get("kind") != "preflight_failure" or record.get("attempted_recovery_cells") != 0:
+                raise ValueError(f"invalid GPU preflight record: {path}")
+            samples = [("preflight_failures", 1, "retained preflight failure; zero recovery attempts")]
+        else:
+            runs = record.get("runs", [])
+            attempted = sum(r.get("attempts", 0) >= 1 for r in runs)
+            if attempted != record.get("flow", {}).get("attempted"):
+                raise ValueError(f"inconsistent GPU full-cache coverage: {path}")
+            protocol_path = posixpath.normpath(f"{directory}/{record['protocol']['path']}")
+            protocol = json.loads(show(ref, protocol_path))
+            sample = protocol["sample_size"]
+            planned = len(protocol["arms"]) * sample["instances"] * (
+                sample["replicates"] + sample.get("warmups", 0))
+            if attempted > planned:
+                raise ValueError(f"GPU full-cache attempts exceed protocol: {path}")
+            prefix += ".small" if name == "export-small.json" else ".large"
+            samples = [
+                ("planned", planned, "protocol-planned executions"),
+                ("attempted", attempted, "recorded complete-recovery executions"),
+                ("verified_recoveries", sum(r.get("status") == "succeeded" and
+                    r.get("verification", {}).get("status") == "verified" for r in runs),
+                 "fresh CPU-replayed recoveries"),
+                ("timeouts", sum(r.get("status") == "timeout" for r in runs),
+                 "retained solve timeouts"),
+                ("failed", sum(r.get("status") == "failed" for r in runs),
+                 "retained failed or resource-limited executions"),
+                ("interrupted", sum(r.get("status") == "interrupted" for r in runs),
+                 "retained interrupted executions; no complete clock"),
+                ("not_attempted", planned - attempted,
+                 "planned cells not started after infrastructure stop"),
+            ]
+        for suffix, value, label in samples:
+            emit(f"{prefix}.{suffix}", value, date=date,
+                 problem="gpu-generic-decomposition", unit="count", better="neutral",
+                 label=f"Full-cache {version}: {label}; fixed bounded panel, L0",
+                 source=f"{path}@{revision}")
+
+
+def n83_d18_vsids_gate(ref, since):
+    path = ("research/koblitz_n83_factor_base_sweep_20261008/verification/"
+            "d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/audit.json")
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "n83.d18-vsids-raw-audit/v1":
+            continue
+        if record.get("status") != "PASS_CENSORED_NATURAL":
+            continue
+        positive = record.get("positive", {})
+        natural = record.get("natural", {})
+        if positive.get("status") != "SAT_PENDING_XCNF_REPLAY" or natural.get("status") != "INDETERMINATE":
+            continue
+        source = f"{path}@{commit}"
+        emit("n83.a0.d18_vsids.positive_conflicts", positive.get("conflicts"),
+             date=date, problem=P_IC, unit="conflicts", better="neutral",
+             label="Constructed D18 positive, VSIDS-only branching; L0 local, PCC unverified",
+             source=source)
+        emit("n83.a0.d18_vsids.natural_censored_queries", 1,
+             date=date, problem=P_IC, unit="queries", better="neutral",
+             label="One public natural D18 query capped without a model; no relation-yield estimate, PCC unverified",
+             source=source)
+
+
+def vieta_component(ref, since):
+    """Export stored native observations; censored records do not imply admission."""
+    for slug in ("20261115T2104Z-vieta-coset-local-scale",
+                 "20261115T2147Z-vieta-three-fixture-repair"):
+        path = f"benchmarks/records/{slug}.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            for metric in record.get("metrics", []):
+                emit(f"vieta.component.{metric['name']}", metric.get("value"),
+                     date=date, problem="vieta-coset-component",
+                     unit=metric.get("unit", ""), better="neutral",
+                     label="Generic-reference operation counts; censored epoch, PCC unverified",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -478,10 +994,24 @@ def main():
     perf_history(a.since)
     benchmarks(a.ref, a.since)
     e2e_runs(a.ref)
+    algebraic_stage(a.ref, a.since)
+    algebraic_audits(a.ref, a.since)
+    completed_guess(a.ref, a.since)
+    publication_followup(a.ref, a.since)
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
+    nist_selection_period_ecpp(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    nist_selection_freelip(a.ref, a.since)
+    nist_selection_period_work(a.ref, a.since)
+    nist_selection_generator_traits(a.ref, a.since)
+    nist_selection_strict_elkies(a.ref, a.since)
+    nist_selection_expanded_cutoff(a.ref, a.since)
+    nist_selection_broader_census(a.ref, a.since)
+    nist_selection_exact_pair_audit(a.ref, a.since)
+
+
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
     curve_traits(a.ref)
@@ -490,6 +1020,14 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    ic_packed_filter(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",
+                          "gpu.explicit_relations.affine")
+    explicit_gpu_profile(a.ref, a.since)
+    explicit_gpu_fullcache(a.ref, a.since)
+    n83_d18_vsids_gate(a.ref, a.since)
+    vieta_component(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

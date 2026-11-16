@@ -1,0 +1,193 @@
+{
+  "card_id": "CARD-BLINDSPOT-04-13",
+  "card_path": "research/blindspots_20261018/04-presentation-search/card-13.yaml",
+  "card_sha256": "2cdd5fe530fbc8ceafbfff7d54e15da6e0e2e349ad9744e06d2a9bb62fc56d5d",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-04/card-13"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-04/card-13/b04",
+        "examples/blindspots_04_presentation_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.249,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 8.249,
+      "stderr_sha256": "4dc0b77782bbda8e469851e351f2200cb2fb287e66c887fe3570f9a0c9e520c1",
+      "stderr_tail": [
+        "138 |     low: u64,",
+        "    |     ^^^",
+        "    |",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: fields `rss_kb` and `seed_rows` are never read",
+        "    --> examples/blindspots_04_presentation_search.rs:2656:5",
+        "     |",
+        "2647 | struct DegreeResult {",
+        "     |        ------------ fields in this struct",
+        "...",
+        "2656 |     rss_kb: u64,",
+        "     |     ^^^^^^",
+        "2657 |     seed_rows: usize,",
+        "     |     ^^^^^^^^^",
+        "     |",
+        "     = note: `DegreeResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis",
+        "",
+        "warning: 2 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-13/b04",
+        "cell",
+        "--n",
+        "15",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--arms",
+        "b",
+        "--dmax-b",
+        "3",
+        "--first",
+        "1",
+        "--random",
+        "1",
+        "--planted",
+        "0",
+        "--time-limit",
+        "330",
+        "--job-time",
+        "320"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 238.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "b-cell4-t1",
+      "index": 3,
+      "outputs": {},
+      "seconds": 238.008,
+      "stderr_sha256": "a44d269596129eebf968a800f118c833e7ae56d871330435f12fd4760ffc8622",
+      "stderr_tail": [
+        "cell n=15 l=3 m=4 draw=0 curve d1=9852 d2=16801 a=19593 b=3931 basis=[1, 30005, 26016] setup 0.0s",
+        "cell done in 237.9s"
+      ],
+      "stdout_sha256": "beb9da6ca0c4c9cd26e6f7cfddf169700c34cd4d8985caeed6c4c73dfe262f4f",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":15,\"l\":3,\"m\":4,\"draw\":0,\"arm\":\"b\",\"kind\":\"random\",\"t\":1,\"nv0\":118,\"elim\":15,\"nv\":103,\"eqs\":120,\"ech_rows\":120,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"not-reached\",\"D\":null,\"D_lb\":4,\"last_degree\":3,\"recovered_ok\":null,\"matrix_rows\":433196,\"matrix_cols\":182208,\"word_ops_last\":294578516242,\"word_ops_total\":294578592733,\"peak_basis_bytes\":2019434424,\"secs\":237.846,\"rss_peak_kb\":2093048,\"degrees\":[{\"d\":2,\"cols\":5357,\"rank\":120,\"target\":5357,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":120,\"products\":0,\"falls\":0,\"word_ops\":76491,\"peak_basis_bytes\":58928,\"rows_total\":120},{\"d\":3,\"cols\":182208,\"rank\":170781,\"target\":182208,\"out\":\"saturated\",\"secs\":237.776,\"seed_rows\":120,\"products\":433076,\"falls\":4225,\"word_ops\":294578516242,\"peak_basis_bytes\":2019434424,\"rows_total\":433196}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-04/card-13/b04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "0dca7968dedfa7770fb3c48831f44948ba22143b",
+  "dirty_after": [
+    "esearch/blindspots_20261018/08-learned-sat-branching/PROTOCOL.md",
+    "research/blindspots_20261018/04-presentation-search/raw/card-13-b-cell4-t1.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-13-b-cell4-t1.log",
+    "research/blindspots_20261018/08-learned-sat-branching/card-01.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-02.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-03.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-04.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-05.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-06.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-07.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-08.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-09.yaml",
+    "research/blindspots_20261018/08-learned-sat-branching/card-10.yaml"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

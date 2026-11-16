@@ -1,0 +1,74 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-conductor-gap-size-20261026-1
+experiment_id: conductor_gap_size_ladder_20261026
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: ee0f5489b8a946ccb6ea870c56b7fea6e8300993
+receipt: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.receipt.json
+binds:
+- path: research/conductor_gap_size_ladder_20261026/PROTOCOL.md
+  sha256: 20f7d7d5adaaa23deeaca824ac2170679f10c24672675fd62b7ffb95ef1e7a4d
+- path: research/conductor_gap_size_ladder_20261026/feasibility.cpp
+  sha256: bfcfb248902814126a1b3db79bbd265da77049f79d1f75f89931d4a303e34a14
+- path: research/conductor_gap_size_ladder_20261026/verify.cpp
+  sha256: a865d26aba45c23f7128c2895f188af1ec0473ae68f94a6628b979e300d88fab
+- path: research/conductor_gap_crater_design_20261025/design.json
+  sha256: 915c8956161272e9171dcc7201ac9d1dbaa53973c85320d9a30749a5204680c9
+- path: target/conductor-gap-size-plan
+  sha256: 24c6873d223d455cd186584da8ca18368a3d87f4ffb3fb6f6340eb628e491f76
+- path: target/conductor-gap-size-verify
+  sha256: 15a2f91ef16eb8ee24a9aa97fd514c001488d497fb974e82d9b8d2c2bc4e26f8
+must_not_exist:
+- research/conductor_gap_size_ladder_20261026/results
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.receipt.json
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.self-test.stdout
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.self-test.stderr
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.search.stdout
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.search.stderr
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.verify.stdout
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.verify.stderr
+commands:
+- id: self-test
+  argv:
+  - target/conductor-gap-size-plan
+  - --self-test
+  timeout_seconds: 30
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.self-test.stdout
+  stderr: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.self-test.stderr
+  outputs: []
+- id: search
+  argv:
+  - target/conductor-gap-size-plan
+  - research/conductor_gap_crater_design_20261025/design.json
+  - research/conductor_gap_size_ladder_20261026/results
+  timeout_seconds: 930
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.search.stdout
+  stderr: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.search.stderr
+  outputs:
+  - research/conductor_gap_size_ladder_20261026/results/candidates.csv
+  - research/conductor_gap_size_ladder_20261026/results/design.json
+- id: verify
+  argv:
+  - target/conductor-gap-size-verify
+  - research/conductor_gap_size_ladder_20261026/results/candidates.csv
+  - research/conductor_gap_size_ladder_20261026/results/verification.json
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.verify.stdout
+  stderr: research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.verify.stderr
+  outputs:
+  - research/conductor_gap_size_ladder_20261026/results/verification.json
+bus_address: executor-mechanical-conductor-gap-size
+background: true
+write_scope:
+- research/conductor_gap_size_ladder_20261026/
+stop_when:
+- Any command exits with a status other than 0.
+- Any command is stopped by its declared timeout.
+- The tool refuses a bound digest, the pinned HEAD, or a must_not_exist path.

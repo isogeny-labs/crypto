@@ -1,0 +1,213 @@
+{
+  "coordination": "Conductor unavailable127; documented warn-and-continue fallback. Research-KB MCP/CLI unavailable; used exact existing workflow, audit script, actual job-step timing metadata and repository contract. Workspace full; no existing files removed, reviewed payload prepared on separate /tmp mount.",
+  "groups": [
+    {
+      "lane": 0,
+      "observed_serial_audit_seconds": 1136,
+      "shards": "4"
+    },
+    {
+      "lane": 1,
+      "observed_serial_audit_seconds": 1149,
+      "shards": "8 5 7 0 15"
+    },
+    {
+      "lane": 2,
+      "observed_serial_audit_seconds": 1102,
+      "shards": "11 9 3 13"
+    },
+    {
+      "lane": 3,
+      "observed_serial_audit_seconds": 1132,
+      "shards": "1 12 6 10 2 14"
+    }
+  ],
+  "limits": "Local controls use a fake auditor solely to observe scheduling and failure propagation. No real-data audit, science, historical timing/performance result or storage admission was produced locally. Original real16-shard successes remain historical. New full current-head CI and actual <=30 executed-job count are required.",
+  "local_validation": {
+    "actionlint_1_7_12": true,
+    "bash_syntax": true,
+    "exact_partition_0_through_15": true,
+    "failure_of_each_individual_shard_retains_all16_invocations_and_fails_only_owning_lane": true,
+    "other_jobs_and_hydration_steps_semantically_exact": true
+  },
+  "native_pr_hold": "PR3463 also has genuine overlapping generated registry/alias/catalog and historical report-binding conflicts with newer main. This scheduling repair does not resolve or waive them; no source/frozen/PCC side is selected.",
+  "new_workflow_sha256": "58551955ca5bb03cf577ace4001e24e4bf89e6b5fd05d35c4a955de97952e8d0",
+  "observed_timings": [
+    {
+      "job_id": 127478369743,
+      "seconds": 1136,
+      "shard": 4
+    },
+    {
+      "job_id": 127478369765,
+      "seconds": 203,
+      "shard": 5
+    },
+    {
+      "job_id": 127478369820,
+      "seconds": 360,
+      "shard": 1
+    },
+    {
+      "job_id": 127478369842,
+      "seconds": 245,
+      "shard": 9
+    },
+    {
+      "job_id": 127478369882,
+      "seconds": 143,
+      "shard": 10
+    },
+    {
+      "job_id": 127478369887,
+      "seconds": 209,
+      "shard": 6
+    },
+    {
+      "job_id": 127478369936,
+      "seconds": 85,
+      "shard": 2
+    },
+    {
+      "job_id": 127478369946,
+      "seconds": 702,
+      "shard": 8
+    },
+    {
+      "job_id": 127478369952,
+      "seconds": 572,
+      "shard": 11
+    },
+    {
+      "job_id": 127478369956,
+      "seconds": 186,
+      "shard": 3
+    },
+    {
+      "job_id": 127478369962,
+      "seconds": 38,
+      "shard": 14
+    },
+    {
+      "job_id": 127478370007,
+      "seconds": 121,
+      "shard": 7
+    },
+    {
+      "job_id": 127478370009,
+      "seconds": 99,
+      "shard": 13
+    },
+    {
+      "job_id": 127478370133,
+      "seconds": 62,
+      "shard": 0
+    },
+    {
+      "job_id": 127478370146,
+      "seconds": 297,
+      "shard": 12
+    },
+    {
+      "job_id": 127478370183,
+      "seconds": 61,
+      "shard": 15
+    }
+  ],
+  "parent": "68ec44f2c8a2b4e8feaa8ccbfc7c3873bb93f6cb",
+  "preservation": "Base tree retained except workflow, this receipt and an append to the complete current public parent journal; no production/research/registry/ledger/shared policy/tool changes.",
+  "problem": "All16 logical ecbench audits passed, but16 execution jobs made the full source PR exceed the authorized30-job budget.",
+  "repair": "Pack the same16 K/16 audit invocations into4 sequential execution lanes, with shared per-lane listing/hydration. Continue other assigned shards after any failure, then fail the owning lane.",
+  "routing_controls": [
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": null,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 0,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 1,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 2,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 3,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 4,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 5,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 6,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 7,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 8,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 9,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 10,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 11,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 12,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 13,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 14,
+      "only_owning_lane_fails": true
+    },
+    {
+      "all_16_invocations_retained": true,
+      "failed_shard": 15,
+      "only_owning_lane_fails": true
+    }
+  ],
+  "schema": "pr-maintenance/v1",
+  "scope": "Scheduling only. Every original logical audit invocation runs. No session population, auditor/binary, replay mode, frozen pin, defective/incomplete disposition, assertion, permission, runner, trigger, guard, command argument, job40m or step30m bound is relaxed.",
+  "source_run": 42086855965,
+  "source_workflow_sha256": "74362f61fe0e62b6777aaa63c93805607f4101088b437c6c228e03fb42e51748",
+  "standing": "unverified"
+}

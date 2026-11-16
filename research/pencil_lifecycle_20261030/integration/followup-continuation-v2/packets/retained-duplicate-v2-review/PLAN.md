@@ -1,0 +1,2 @@
+# Additive v2 prospective source review
+Verify nested failed-disposition statuses propagate to audit_pass and exit; setup/constructor copies checked per physical target and aggregated once, inconsistency invalidates totals/pass. Check byte-identical archive/index/labels/native algorithm and cap; inspect exact delta. Source/hash/AST checks only, no native execution or compilation. Preserve v1 review and distinguish coverage from accepted audit.

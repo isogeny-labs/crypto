@@ -1,0 +1,17 @@
+import ExactDivision
+set_option autoImplicit false
+namespace NativeDivision
+open Polynomial ScaleTrim MonicRemainder
+
+theorem quotient_index_bound (a b r:List UInt64) (hr:r.length≤a.length) (hl:b.length≤r.length) :
+ r.length-b.length<a.length-b.length+1 := by omega
+
+theorem returns_given_exact (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (hm:b.getLast?=some 1) (fuel:Nat) (hf:a.length≤fuel) (wanted:(ZMod p.toNat)[X])
+ (hw:wordsPoly p a=wanted*wordsPoly p b) : checkedDiv p b a fuel=some (wanted,[]) := by
+ have hd:wordsPoly p b∣wordsPoly p a:=⟨wanted,by simpa [mul_comm] using hw⟩
+ obtain ⟨q,hq⟩:=(exact_iff_divisible p b a hp hb hbs ha hm fuel hf).mpr hd
+ have he:=quotient_unique p b a hp hb hbs ha hm fuel q wanted hq hw
+ simpa [he] using hq
+end NativeDivision

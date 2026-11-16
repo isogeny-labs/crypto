@@ -1,0 +1,56 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-01-REPLAY-R04
+experiment_id: BLINDSPOT-01-REPLAY
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r04.json
+must_not_exist:
+  - research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r04.json
+  - research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.stderr
+  - research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.stderr
+binds:
+  - {path: research/blindspots_20261018/instruments/blindspots_01_fp2_gaudry.rs, sha256: 0629a73c7ff443e70c6ce16c0872b98a5aebc5a71d25f7bff60156c8693ff559}
+commands:
+  - id: make-bin-dir
+    argv: ["mkdir", "-p", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04"]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01", "research/blindspots_20261018/instruments/blindspots_01_fp2_gaudry.rs"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+  - id: torsion-b40-i2
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01", "run", "--family", "torsion", "--bits", "40", "--idx", "2", "--arms", "ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7", "--inv-cost", "4", "--crosscheck", "10", "--quiet", "--out", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl"]
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.stderr
+    outputs: ["research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl"]
+  - id: prime-b40-i2
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01", "run", "--family", "prime", "--bits", "40", "--idx", "2", "--arms", "ic-a:0-1,rho-neg:0-7", "--inv-cost", "4", "--crosscheck", "10", "--quiet", "--out", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.jsonl"]
+    timeout_seconds: 200
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.stderr
+    outputs: ["research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.jsonl"]
+  - id: remove-bin
+    argv: ["rm", "-f", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01"]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04"]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-01-replay
+background: false
+write_scope:
+  - research/blindspots_20261018/01-fp2-gaudry-k2/replay/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "Replay of recorded blind-spot item 01 runs for the validation gate; the repository root is /home/user/crypto; the expected run time is about 175 s."

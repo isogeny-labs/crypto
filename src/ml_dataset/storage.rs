@@ -586,7 +586,9 @@ pub(super) fn prepare_s3_publication(
                 ));
             }
         }
-        None => backend.put(key, source, &artifact.sha256)?,
+        None => {
+            backend.put(key, source, &artifact.sha256)?;
+        }
     }
     Ok(())
 }
@@ -640,7 +642,7 @@ fn publish_object(
                 .is_some_and(|sha| sha != &artifact.sha256)
         {
             return Err(format!(
-                "{key}: existing remote object has mismatched size or digest; refusing overwrite"
+                "{key}: remote round-trip integrity precheck: existing object has mismatched size or digest; refusing overwrite"
             ));
         }
         roundtrip(store, artifact, root)?;
@@ -851,6 +853,9 @@ pub fn publish_budgeted(
         Some(_) => {}
         None => return Err("dataset publication requires an explicit S3 or file remote".into()),
     }
+    if matches!(cfg.remote, Some(RemoteSpec::S3 { .. })) && budget.is_none() {
+        return Err("S3 dataset publication requires cumulative command admission".into());
+    }
     // The existing store's multipart path does not enforce If-None-Match.
     // Dataset producers must chunk large objects before publication.
     if matches!(cfg.remote, Some(RemoteSpec::S3 { .. }))
@@ -1025,18 +1030,19 @@ mod tests {
                 sha256: None,
             }))
         }
-        fn put(&self, _key: &str, source: &Path, _sha256: &str) -> Result<(), String> {
+        fn put(&self, _key: &str, source: &Path, _sha256: &str) -> Result<bool, String> {
             self.calls.borrow_mut().push("conditional-put");
             if let Some(error) = &self.put_error {
                 return Err(error.clone());
             }
             let mut object = self.object.borrow_mut();
-            if object.is_none() {
+            let created = object.is_none();
+            if created {
                 *object = Some(fs::read(source).map_err(|e| e.to_string())?);
             }
             // A same-size existing object with unavailable checksum is accepted
             // by the native backend after 412; only full readback proves bytes.
-            Ok(())
+            Ok(created)
         }
         fn get(&self, _key: &str, destination: &Path) -> Result<(), String> {
             self.calls.borrow_mut().push("get");
@@ -1546,7 +1552,7 @@ mod tests {
                 .join(object_key(&artifacts[0].sha256).unwrap());
         fs::write(&remote_path, b"ghijkl").unwrap();
         let err = publish(&f.0, &artifacts, &manifest, f.cfg(), "datasets/test").unwrap_err();
-        assert!(err.contains("round-trip"), "{err}");
+        assert!(err.contains("mismatched size or digest"), "{err}");
         assert_eq!(fs::read(remote_path).unwrap(), b"ghijkl");
     }
 

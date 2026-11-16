@@ -39,17 +39,24 @@
 //!
 //! - [`inject_fault_round_9`] — produce a (correct, faulted) ciphertext
 //!   pair given a plaintext, key, and fault byte.
-//! - [`dfa_recover_last_round_key_byte`] — for one column position
+//! - [`dfa_recover_last_round_key_byte_candidates`] — for one position
 //!   and one (correct, faulted) byte pair, enumerate the candidate
 //!   key-byte values.
-//! - [`dfa_full_recovery`] — combine multiple fault injections to
-//!   uniquely recover K_R10, then invert the schedule to get K_master.
+//! - [`dfa_full_recovery`] — intersect the exact MixColumns fault
+//!   equations from observed round-9 single-byte fault pairs, invert
+//!   a unique K_R10, and replay every supplied plaintext/ciphertext.
+//! - [`invert_aes128_schedule_from_last_round_key`] — recover K_master
+//!   once K_R10 has been established by a fault-equation solver.
 //! - [`format_dfa_visualization`] — ASCII diagram of the fault
 //!   propagation: where the byte was flipped, which 4 ciphertext
 //!   bytes it lands at, and the per-column candidate counts.
+//!
+//! [`dfa_per_column_candidates`] remains a heuristic visualization
+//! helper. Use [`dfa_full_recovery`] for the specified fault model.
 
 use super::reduced::{ReducedAes128, RoundOps};
 use super::visualize::{format_recovery_progress, format_state_grid};
+use std::collections::HashSet;
 
 // ── AES inverse S-box (FIPS PUB 197) ─────────────────────────────────
 
@@ -267,35 +274,214 @@ pub fn dfa_per_column_candidates(correct_ct: &[u8; 16], faulted_ct: &[u8; 16]) -
     out
 }
 
-/// **Test if the AES master key is recoverable** given a known
-/// last-round key.  Inverts the AES-128 key schedule by re-expanding
-/// from K_R10 backwards.  This is what `dfa_full_recovery` calls
-/// once it has uniquely determined K_R10.
+/// Recover the AES-128 master key from the 10th-round key by reversing
+/// the key schedule. The caller must first establish K_R10 from fault
+/// equations; this function does not infer it from ciphertext pairs.
 pub fn invert_aes128_schedule_from_last_round_key(k_r10: &[u8; 16]) -> [u8; 16] {
-    // We use the standard trick: AES key schedule is linear in the
-    // round-key columns, so given K_R10 we can step backwards 10
-    // times to recover K_R0 (= master key).
-    let mut w: Vec<[u8; 4]> = Vec::with_capacity(44);
-    // Initialise last 4 words from K_R10.
+    let mut round_key = [[0u8; 4]; 4];
     for c in 0..4 {
-        w.push([
+        round_key[c] = [
             k_r10[c * 4],
             k_r10[c * 4 + 1],
             k_r10[c * 4 + 2],
             k_r10[c * 4 + 3],
-        ]);
+        ];
     }
-    // Step backwards: w[i - 4] = w[i] XOR (something depending on
-    // w[i-1], possibly with sub_word/rot_word).
-    //
-    // Simpler & known-correct: enumerate possible K_master values and
-    // check that key_expansion(K_master)[40..44] == K_R10.  This is
-    // O(2^128) worst case, but for the test we just verify the
-    // function exists.  See the test for the working version.
-    //
-    // Stub: return zero.  The full inverter is in the test.
-    let _ = w;
-    [0u8; 16]
+    ReducedAes128::invert_schedule(10, &round_key)
+}
+
+/// One observed AES-128 encryption with a single-byte fault injected at
+/// the start of round 9, before SubBytes. The fault position and value
+/// need not be known. The plaintext is used for independent replay.
+#[derive(Clone, Copy, Debug)]
+pub struct DfaFaultPair {
+    pub plaintext: [u8; 16],
+    pub correct_ciphertext: [u8; 16],
+    pub faulted_ciphertext: [u8; 16],
+}
+
+/// A bounded result. Missing columns or multiple surviving four-byte
+/// candidates leave the key absent; they are not treated as a zero key.
+#[derive(Clone, Debug)]
+pub struct DfaRecovery {
+    pub pairs_used: usize,
+    pub faulted_pairs_replayed: usize,
+    pub pairs_by_column: [usize; 4],
+    pub candidates_by_column: [usize; 4],
+    pub last_round_key: Option<[u8; 16]>,
+    pub master_key: Option<[u8; 16]>,
+    pub verified: bool,
+}
+
+#[inline]
+fn aes_xtime(x: u8) -> u8 {
+    (x << 1) ^ if x & 0x80 != 0 { 0x1b } else { 0 }
+}
+
+/// MixColumns coefficient for output row `row` and one active input
+/// row `source`.
+#[inline]
+fn fault_coefficient(row: usize, source: usize, delta: u8) -> u8 {
+    const MIX: [[u8; 4]; 4] = [[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]];
+    match MIX[row][source] {
+        1 => delta,
+        2 => aes_xtime(delta),
+        3 => aes_xtime(delta) ^ delta,
+        _ => unreachable!(),
+    }
+}
+
+/// Recover an AES-128 key from correct/faulted ciphertext pairs under the
+/// single-byte start-of-round-9 fault model. A pair must have exactly one
+/// changed ciphertext byte in each row, and all four changed positions
+/// must map back through final ShiftRows to one round-9 MixColumns column.
+/// The solver enumerates the unknown fault row and nonzero post-SubBytes
+/// difference, intersects four-byte last-round-key tuples by column,
+/// and accepts a unique key only after full AES replay on every pair.
+pub fn dfa_full_recovery(pairs: &[DfaFaultPair]) -> Result<DfaRecovery, String> {
+    if pairs.is_empty() || pairs.len() > 64 {
+        return Err("round-9 DFA requires 1..=64 fault pairs".into());
+    }
+    let mut survivors: [Option<HashSet<[u8; 4]>>; 4] = std::array::from_fn(|_| None);
+    let mut pairs_by_column = [0usize; 4];
+    for (pair_index, pair) in pairs.iter().enumerate() {
+        let mut positions = [usize::MAX; 4];
+        let mut active = 0usize;
+        for index in 0..16 {
+            if pair.correct_ciphertext[index] != pair.faulted_ciphertext[index] {
+                active += 1;
+                let row = index % 4;
+                if positions[row] != usize::MAX {
+                    return Err(format!(
+                        "fault pair {pair_index} changes two bytes in row {row}"
+                    ));
+                }
+                positions[row] = index;
+            }
+        }
+        if active != 4 || positions.contains(&usize::MAX) {
+            return Err(format!(
+                "fault pair {pair_index} must change exactly one byte in each row"
+            ));
+        }
+        let column = (positions[0] / 4) % 4;
+        if (0..4).any(|row| (positions[row] / 4 + row) % 4 != column) {
+            return Err(format!(
+                "fault pair {pair_index} is not one round-9 MixColumns column"
+            ));
+        }
+        pairs_by_column[column] += 1;
+
+        // For each row, index every round-10 key-byte guess by the
+        // difference it produces before the final SubBytes. Each pair
+        // costs 4 × 256 inverse-S-box evaluations rather than rescanning
+        // key guesses for every fault-value hypothesis.
+        let mut by_delta: [[Vec<u8>; 256]; 4] =
+            std::array::from_fn(|_| std::array::from_fn(|_| Vec::new()));
+        for row in 0..4 {
+            let index = positions[row];
+            for guess in 0u16..=255 {
+                let guess = guess as u8;
+                let difference = INV_SBOX[(pair.correct_ciphertext[index] ^ guess) as usize]
+                    ^ INV_SBOX[(pair.faulted_ciphertext[index] ^ guess) as usize];
+                by_delta[row][difference as usize].push(guess);
+            }
+        }
+        let mut candidates = HashSet::new();
+        for source_row in 0..4 {
+            for difference in 1u16..=255 {
+                let difference = difference as u8;
+                let choices: [&[u8]; 4] = std::array::from_fn(|row| {
+                    by_delta[row][fault_coefficient(row, source_row, difference) as usize]
+                        .as_slice()
+                });
+                for &k0 in choices[0] {
+                    for &k1 in choices[1] {
+                        for &k2 in choices[2] {
+                            for &k3 in choices[3] {
+                                candidates.insert([k0, k1, k2, k3]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if candidates.is_empty() {
+            return Err(format!(
+                "fault pair {pair_index} has no key tuple under the round-9 model"
+            ));
+        }
+        survivors[column] = Some(match survivors[column].take() {
+            None => candidates,
+            Some(previous) => previous.intersection(&candidates).copied().collect(),
+        });
+        if survivors[column].as_ref().is_some_and(HashSet::is_empty) {
+            return Err(format!(
+                "fault pair {pair_index} contradicts earlier pairs in column {column}"
+            ));
+        }
+    }
+    let candidates_by_column =
+        std::array::from_fn(|column| survivors[column].as_ref().map_or(0, HashSet::len));
+    let mut report = DfaRecovery {
+        pairs_used: pairs.len(),
+        faulted_pairs_replayed: 0,
+        pairs_by_column,
+        candidates_by_column,
+        last_round_key: None,
+        master_key: None,
+        verified: false,
+    };
+    if candidates_by_column.iter().any(|&count| count != 1) {
+        return Ok(report);
+    }
+    let mut last_round = [0u8; 16];
+    for column in 0..4 {
+        let tuple = *survivors[column].as_ref().unwrap().iter().next().unwrap();
+        for row in 0..4 {
+            let output_column = (column + 4 - row) % 4;
+            last_round[output_column * 4 + row] = tuple[row];
+        }
+    }
+    let master = invert_aes128_schedule_from_last_round_key(&last_round);
+    let cipher = ReducedAes128::new(&master, 10, false);
+    if pairs
+        .iter()
+        .any(|pair| cipher.encrypt(&pair.plaintext) != pair.correct_ciphertext)
+    {
+        return Err("unique DFA candidate failed full AES plaintext/ciphertext replay".into());
+    }
+    for (pair_index, pair) in pairs.iter().enumerate() {
+        let row_zero_changed = (0..16)
+            .step_by(4)
+            .find(|&index| pair.correct_ciphertext[index] != pair.faulted_ciphertext[index])
+            .expect("validated fault pair has four changed bytes");
+        // The final ShiftRows leaves row zero in its MixColumns column.
+        // Independently replay the declared injection boundary, source row,
+        // and nonzero byte fault under the recovered master key.
+        let column = row_zero_changed / 4;
+        let matches = (0..4).any(|row| {
+            (1u16..=255).any(|difference| {
+                inject_fault_round_9(
+                    &cipher,
+                    &pair.plaintext,
+                    ((column + row) % 4) * 4 + row,
+                    difference as u8,
+                )
+                .1 == pair.faulted_ciphertext
+            })
+        });
+        if !matches {
+            return Err(format!(
+                "fault pair {pair_index} failed full AES round-9 fault replay"
+            ));
+        }
+        report.faulted_pairs_replayed += 1;
+    }
+    report.last_round_key = Some(last_round);
+    report.master_key = Some(master);
+    report.verified = true;
+    Ok(report)
 }
 
 // ── Visualization ────────────────────────────────────────────────────
@@ -507,6 +693,80 @@ mod tests {
         let (c2, f2) = inject_fault_round_8(&cipher, &pt, 0, 0x77);
         assert_eq!(count_active_ct_bytes(&c1, &f1), 4);
         assert_eq!(count_active_ct_bytes(&c2, &f2), 16);
+    }
+
+    #[test]
+    fn last_round_key_inverts_to_the_master_key() {
+        for master in [
+            [0u8; 16],
+            [
+                0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+                0x0e, 0x0f,
+            ],
+            [0xa5u8; 16],
+        ] {
+            let cipher = ReducedAes128::new(&master, 10, false);
+            let mut last_round = [0u8; 16];
+            for (column, word) in cipher.round_key(10).iter().enumerate() {
+                last_round[column * 4..column * 4 + 4].copy_from_slice(word);
+            }
+            assert_eq!(
+                invert_aes128_schedule_from_last_round_key(&last_round),
+                master
+            );
+        }
+    }
+
+    #[test]
+    fn round_nine_fault_pairs_recover_and_replay_aes128() {
+        let master: [u8; 16] = std::array::from_fn(|i| i as u8);
+        let cipher = ReducedAes128::new(&master, 10, false);
+        let mut pairs = Vec::new();
+        for column in 0..4 {
+            for (trial, fault) in [0x11, 0x37, 0x83, 0xe5].into_iter().enumerate() {
+                let plaintext = std::array::from_fn(|i| {
+                    (column as u8).wrapping_mul(53)
+                        ^ (trial as u8).wrapping_mul(29)
+                        ^ (i as u8).wrapping_mul(17)
+                });
+                let (correct_ciphertext, faulted_ciphertext) = inject_fault_round_9(
+                    &cipher,
+                    &plaintext,
+                    ((column + trial) % 4) * 4 + trial,
+                    fault,
+                );
+                pairs.push(DfaFaultPair {
+                    plaintext,
+                    correct_ciphertext,
+                    faulted_ciphertext,
+                });
+            }
+        }
+        let recovered = dfa_full_recovery(&pairs).unwrap();
+        assert_eq!(recovered.pairs_by_column, [4; 4]);
+        assert_eq!(recovered.candidates_by_column, [1; 4]);
+        assert_eq!(recovered.faulted_pairs_replayed, pairs.len());
+        assert_eq!(recovered.master_key, Some(master));
+        assert!(recovered.verified);
+
+        let partial = dfa_full_recovery(&pairs[..1]).unwrap();
+        assert_eq!(partial.pairs_used, 1);
+        assert!(partial.master_key.is_none());
+        assert!(!partial.verified);
+    }
+
+    #[test]
+    fn round_nine_fault_solver_rejects_wrong_diffusion_pattern() {
+        let mut faulted = [0u8; 16];
+        faulted[0] = 1;
+        let pair = DfaFaultPair {
+            plaintext: [0u8; 16],
+            correct_ciphertext: [0u8; 16],
+            faulted_ciphertext: faulted,
+        };
+        assert!(dfa_full_recovery(&[pair])
+            .unwrap_err()
+            .contains("exactly one byte in each row"));
     }
 
     /// **DFA visualisation renders** with the right section headers.

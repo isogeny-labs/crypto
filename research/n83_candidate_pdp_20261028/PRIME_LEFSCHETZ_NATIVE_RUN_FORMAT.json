@@ -1,0 +1,35 @@
+{
+ "schema":"n83.native-lefschetz-run-format/v1",
+ "encoding":"UTF-8 JSON; field elements are decimal strings; masks and counts are JSON integers",
+ "source_archive":{
+  "study/src/":"Exact Rust source and donor modules",
+  "study/inputs/KEY/input.json":"Original curve, field, m, ell27, target, factor-base manifest hash and planted witness where present",
+  "study/inputs/KEY/system.sing":"Exact original polynomial presentation audited natively",
+  "study/":"Native launcher, journal, format, argument, Cargo files and prior upper summary",
+  "prime_source_audit":"Native source auditor executable",
+  "prime_lefschetz_native":"Native arithmetic certificate/replay executable",
+  "test-instrument":"Exact native unit-test executable",
+  "manifest.sha256":"Hashes of staged source, inputs and executables; created before packaging metadata",
+  "Dockerfile":"Image recipe pinned to parent digest and source revision",
+  "build-info.json":"Source revision, both binary hashes, architecture and staged input count",
+  "frozen-protocol.json":"Frozen v2 protocol added after image construction to avoid a self-referential image hash; downloaded separately by the worker",
+  "archive_integrity":"Content-addressed archive hash covers every file including packaging metadata outside manifest.sha256"
+ },
+ "raw_output":{
+  "protocol-prime-lefschetz-native.json":"Frozen protocol with both binary identities, image digest and all42source/input/base hashes",
+  "inputs/KEY/":"Exact staged input.json and system.sing copies",
+  "source/":"Source files declared by frozen protocol",
+  "source-audit/KEY.json":"Native full presentation audit, field, weights and inverses, input/source/base identities",
+  "source-audit/summary.json":"42audit rows with degree_claim null",
+  "results/structure.json":"Block strings, Hilbert dimensions, degree4..16 slack; not an expanded basis",
+  "results/upper-witness.json":"8192squarefree mask/residue pairs for degree13H and annihilation counts",
+  "results/leading-mM.json":"Weighted quartic terms, expected and maximal monomials, disjoint-support checks",
+  "results/KEY.json":"Source-bound conditional FFD certificate with audit/structure/witness/leading hashes; new LFD null",
+  "results/summary.json":"42conditional rows only if producer completes; shared certificates, not42independent theorem proofs",
+  "*-status.json":"Actual per-phase exit status; unattempted phases are recorded in terminal as started=false,exit_code125",
+  "terminal.json":"Controller status, times, backend and all four phase statuses; success requires every phase exit0 and external custody/replay",
+  "manifest.sha256":"All raw payload hashes except the manifest itself",
+  "host.txt":"Kernel and CPU diagnostic identity; wall_valid=false, no performance claim"
+ },
+ "claim_boundary":"Native arithmetic plus exact source binding and the separate written Lefschetz/Koszul argument; independent scientific review/formalization pending. Failed or incomplete execution establishes no degree. No new LFD, regularity or elite-base improvement is inferred."
+}
