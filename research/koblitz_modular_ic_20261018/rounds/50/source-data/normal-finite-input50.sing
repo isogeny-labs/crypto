@@ -1,0 +1,57 @@
+ring integralCandidate50=2,(t,u),dp;short=0;ideal candidateIdeal50;candidateIdeal50[1]=t^32+(u^8+1)*t^24+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^20+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t^17+(u^64+u^54+u^53+u^50+u^49+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*t^16+(u^73+u^71+u^69+u^65+u^64+u^62+u^59+u^57+u^56+u^54+u^53+u^48+u^47+u^46+u^45+u^41+u^40+u^38+u^37+u^35)*t^12+(u^85+u^84+u^83+u^82+u^80+u^76+u^75+u^74+u^71+u^69+u^66+u^65+u^64+u^63+u^62+u^61+u^54+u^50+u^49+u^47+u^45+u^44+u^43+u^39+u^36+u^35)*t^9+(u^86+u^84+u^82+u^81+u^77+u^75+u^74+u^72+u^71+u^69+u^64+u^62+u^61+u^59+u^57+u^56+u^55+u^52+u^51+u^50+u^49+u^48+u^47+u^46+u^44+u^43+u^42+u^41+u^40+u^39+u^38+u^37+u^36+u^24)*t^8+(u^94+u^90+u^87+u^86+u^82+u^81+u^80+u^77+u^76+u^75+u^71+u^70+u^66+u^65+u^64+u^62+u^61+u^60+u^59+u^58)*t^5+(u^105+u^103+u^101+u^97+u^96+u^95+u^94+u^93+u^92+u^90+u^89+u^88+u^87+u^86+u^82+u^81+u^80+u^79+u^78+u^77+u^74+u^73+u^67+u^66+u^61+u^60+u^59+u^56+u^55+u^54+u^49+u^47)*t^4+(u^109+u^108+u^107+u^106+u^105+u^104+u^102+u^101+u^100+u^97+u^94+u^92+u^87+u^86+u^85+u^84+u^83+u^81+u^78+u^77+u^75+u^74+u^73+u^72+u^71+u^67)*t^2+(u^117+u^116+u^115+u^114+u^112+u^108+u^107+u^106+u^104+u^100+u^99+u^98+u^96+u^93+u^92+u^90+u^89+u^88+u^87+u^83+u^82+u^81+u^75+u^72+u^71+u^70+u^69+u^67+u^65+u^62+u^61+u^58+u^57+u^56)*t+(u^128+u^118+u^117+u^114+u^113+u^111+u^109+u^108+u^107+u^102+u^99+u^98+u^96+u^95+u^93+u^92+u^90+u^86+u^85+u^83+u^81+u^80+u^77+u^74+u^71+u^70+u^68+u^67+u^63+u^61+u^60+u^56+u^48);
+ring normalizationInput50=2,(x,p),wp(4,1);short=0;map actualModel50=integralCandidate50,x,p;ideal sourceIdeal50=actualModel50(candidateIdeal50);
+LIB "normal.lib";
+LIB "primdec.lib";
+option(redSB);short=0;
+if(lead(sourceIdeal50[1])!=x^32 || deg(sourceIdeal50[1])!=128){ERROR("NORMAL50_WEIGHTED_INPUT");quit;}
+print("NORMAL50_STAGE weighted_projection_degree=32 minimal_primes_begin=true");
+list primes50=minAssGTZ(sourceIdeal50);
+print("NORMAL50_COMPONENT_COUNT "+string(size(primes50)));
+link primeOut50="ASCII:w prime-components50.sing";open(primeOut50);
+write(primeOut50,"ring components50=2,(x,p),wp(4,1);list primes50;");
+int idx50;int gen50;ideal candidate50;int selected50=0;int matches50=0;
+for(idx50=1;idx50<=size(primes50);idx50++){
+ candidate50=primes50[idx50];
+ write(primeOut50,"ideal component50_"+string(idx50)+";");
+ for(gen50=1;gen50<=size(candidate50);gen50++){write(primeOut50,"component50_"+string(idx50)+"["+string(gen50)+"]="+string(candidate50[gen50])+";");}
+ ring probe50=(2,parameter50),(x,p),dp;
+ ideal probeIdeal50=imap(normalizationInput50,candidate50),p-parameter50;
+ int degree50=vdim(std(probeIdeal50));
+ print("NORMAL50_COMPONENT index="+string(idx50)+" generic_degree="+string(degree50));
+ if(degree50==32){setring normalizationInput50;matches50++;selected50=idx50;}else{setring normalizationInput50;}
+ kill probe50;
+}
+close(primeOut50);
+if(matches50!=1){ERROR("NORMAL50_UNIQUE_DEGREE32_COMPONENT");quit;}
+ideal selectedPrime50=primes50[selected50];ideal selectedStd50=std(selectedPrime50);
+if(size(reduce(sourceIdeal50,selectedStd50))!=0){ERROR("NORMAL50_SOURCE_CONTAINMENT");quit;}
+link selectedOut50="ASCII:w selected-prime50.sing";open(selectedOut50);
+write(selectedOut50,"ring selected50=2,(x,p),wp(4,1);ideal selectedPrime50;ideal originalIdeal50;");
+for(gen50=1;gen50<=size(selectedPrime50);gen50++){write(selectedOut50,"selectedPrime50["+string(gen50)+"]="+string(selectedPrime50[gen50])+";");}
+for(gen50=1;gen50<=size(sourceIdeal50);gen50++){write(selectedOut50,"originalIdeal50["+string(gen50)+"]="+string(sourceIdeal50[gen50])+";");}
+close(selectedOut50);
+print("NORMAL50_STAGE selected_prime_exported=true normalization_begin=true");
+list normalizedOutput50=normalP(selectedPrime50,"withRing");
+if(size(normalizedOutput50[1])!=1){ERROR("NORMAL50_COMPONENT_NOT_ONE");quit;}
+ideal module50=normalizedOutput50[2][1];
+if(reduce(module50[size(module50)],selectedStd50)==0){ERROR("NORMAL50_ZERO_DENOMINATOR");quit;}
+link moduleOut50="ASCII:w fractional-module50.sing";open(moduleOut50);
+write(moduleOut50,"ideal module50;");
+for(gen50=1;gen50<=size(module50);gen50++){write(moduleOut50,"module50["+string(gen50)+"]="+string(module50[gen50])+";");}
+write(moduleOut50,"int delta50="+string(normalizedOutput50[3][2])+";");close(moduleOut50);
+int sourceDelta50=normalizedOutput50[3][2];
+def normalRing50=normalizedOutput50[1][1];setring normalRing50;
+if(charstr(basering)!="2"){ERROR("NORMAL50_COEFFICIENT_DESCENT");quit;}
+link normalOut50="ASCII:w normalization50.sing";open(normalOut50);
+write(normalOut50,"ring normalized50=2,("+varstr(basering)+"),("+ordstr(basering)+");ideal norid;ideal normap;");
+int entry50;
+for(entry50=1;entry50<=size(norid);entry50++){write(normalOut50,"norid["+string(entry50)+"]="+string(norid[entry50])+";");}
+for(entry50=1;entry50<=size(normap);entry50++){write(normalOut50,"normap["+string(entry50)+"]="+string(normap[entry50])+";");}
+close(normalOut50);
+execute(read("normalization50.sing"));
+ideal reloadIdeal50=imap(normalRing50,norid);ideal reloadMap50=imap(normalRing50,normap);
+if(size(reloadIdeal50)!=size(norid) || size(reloadMap50)!=size(normap)){ERROR("NORMAL50_EXPORT_SIZE");quit;}
+for(entry50=1;entry50<=size(norid);entry50++){if(norid[entry50]!=reloadIdeal50[entry50]){ERROR("NORMAL50_EXPORT_IDEAL");quit;}}
+for(entry50=1;entry50<=size(normap);entry50++){if(normap[entry50]!=reloadMap50[entry50]){ERROR("NORMAL50_EXPORT_MAP");quit;}}
+print("NORMAL50_RESULT normalization_output_computed=true delta="+string(sourceDelta50)+" output_variables="+string(nvars(basering))+" serialization_checked=true independent_verification_required=true");
+print("NORMAL50_PRODUCER_PASS");quit;

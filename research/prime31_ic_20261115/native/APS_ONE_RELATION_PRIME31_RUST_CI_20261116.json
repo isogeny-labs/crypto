@@ -1,0 +1,75 @@
+{
+  "standing": "[pcc:unverified]",
+  "source_url": "https://github.com/isogeny-labs/crypto/actions/runs/43786504359",
+  "job_id": 133035251870,
+  "checked_source_commit": "90a0314f5be63d5ca56465a884091f4be0f114fd",
+  "status": "success",
+  "qualification": "GitHub Actions Rust development only; no independent scientific PCC; production benchmark unqualified",
+  "test_results": {
+    "reused_lib_tests": "40 passed",
+    "aps_example_tests": "2 passed",
+    "aps_example_run": "success"
+  },
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "public_target": [
+      1477799919,
+      824532935
+    ]
+  },
+  "aps_labelling": {
+    "list_count": 3,
+    "list_size": 1536,
+    "seed": "4150535f50523331",
+    "rounds_completed": 1,
+    "rejected_identity": 0,
+    "rejected_repeated_x": 0
+  },
+  "relation": {
+    "indices": [
+      437,
+      1247,
+      879
+    ],
+    "signs": [
+      -1,
+      1,
+      -1
+    ],
+    "alpha": 1144570523,
+    "beta": 2011873483,
+    "recovered_target_scalar": 1038579171,
+    "full_point_replay": true,
+    "mod_n_equation_replayed": true
+  },
+  "counters": {
+    "s3_pair_queries": 672768,
+    "field_square_roots": 672768,
+    "field_batch_inversions": 438,
+    "candidate_coordinate_matches": 1,
+    "signed_verified_relations": 1,
+    "ec_additions_after_algebraic_discovery": 57
+  },
+  "times_ns": {
+    "labelled_point_construction": 135786811,
+    "algebraic_discovery_and_verification": 191380563,
+    "cold_wall_until_verified_log": 327525503
+  },
+  "classification": "Published APS-style one-relation ECDLP; enumerative S3 pair-root evaluation remains generic meet-in-middle equivalent",
+  "limits": [
+    "one synthetic public target; one deterministic source-bound development run",
+    "no same-run matched generic join yet",
+    "no fully matched PKM/APS canonical external baseline",
+    "not a novel non-generic complexity gain",
+    "not independently PCC-audited"
+  ],
+  "code": "research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs"
+}

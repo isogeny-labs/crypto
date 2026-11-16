@@ -1,0 +1,511 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "smart-known-answer-20261110",
+  "version": 1,
+  "created": "2026-11-10",
+  "repository": "crypto",
+  "study_dir": "research/anomalous_curve_audit_20261110/smart-v1",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "design": "PROTOCOL.md",
+    "parent_proof": "../README.md"
+  },
+  "question": "Does the fixed finite-precision public-input program recover the certified scalar on the small and 160-bit inputs while rejecting the offcurve control, with all four fixed lifts retained?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "theorem",
+      "text": "Actual parent point order/knownanswer and predata generic finite-ring interpreter/Hensel/control facts are decided by Lean, not by this native run. Concrete target trace correctness requires subsequent Lean certification.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "exact_computation",
+      "text": "The three registered process records meet their fixed knownanswer/rejection and operation-count checks, retaining all four lift outcomes.",
+      "decided_by": [
+        "known-answers"
+      ]
+    },
+    {
+      "id": "C3",
+      "class": "out_of_scope",
+      "text": "Generic p-adic/group-scheme validity, whole curve point count, compiler/execution refinement, security cost, timing/statistics, other-machine independence and matched SafeCurves/rho are not established.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "small",
+      "role": "control_positive",
+      "description": "F5 knownanswer2",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "70aa9f2f5b2d86eb1d681559e0fd469e0bb4fdc2",
+        "build": [
+          [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "native/attack.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "/workspace/scratch/smart-known-answer"
+          ]
+        ],
+        "binary_sha256": "0b4c206e0adaca0cb943cbf725873060f53009df5616ff8bff28cefe7f893f93",
+        "threads": 1,
+        "flags": {
+          "precision": "p^2",
+          "coordinate_formulas": "EFD1998cmo",
+          "lifts": "i0..3, a+i*p and b+(2*i+1)*p"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "fixture": "inputs/small.txt",
+        "fixed_lifts": 4,
+        "known_answer_check": "expected.json"
+      }
+    },
+    {
+      "id": "offcurve",
+      "role": "control_negative",
+      "description": "F5 invalid Q(2,2)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "70aa9f2f5b2d86eb1d681559e0fd469e0bb4fdc2",
+        "build": [
+          [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "native/attack.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "/workspace/scratch/smart-known-answer"
+          ]
+        ],
+        "binary_sha256": "0b4c206e0adaca0cb943cbf725873060f53009df5616ff8bff28cefe7f893f93",
+        "threads": 1,
+        "flags": {
+          "precision": "p^2",
+          "coordinate_formulas": "EFD1998cmo",
+          "lifts": "i0..3, a+i*p and b+(2*i+1)*p"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "fixture": "inputs/offcurve.txt",
+        "fixed_lifts": 4,
+        "known_answer_check": "expected.json"
+      },
+      "same_instrument_as": "small"
+    },
+    {
+      "id": "large",
+      "role": "candidate",
+      "description": "Actual certified 160-bit point pair",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "70aa9f2f5b2d86eb1d681559e0fd469e0bb4fdc2",
+        "build": [
+          [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "native/attack.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "/workspace/scratch/smart-known-answer"
+          ]
+        ],
+        "binary_sha256": "0b4c206e0adaca0cb943cbf725873060f53009df5616ff8bff28cefe7f893f93",
+        "threads": 1,
+        "flags": {
+          "precision": "p^2",
+          "coordinate_formulas": "EFD1998cmo",
+          "lifts": "i0..3, a+i*p and b+(2*i+1)*p"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "fixture": "inputs/large.txt",
+        "fixed_lifts": 4,
+        "known_answer_check": "expected.json"
+      },
+      "same_instrument_as": "small"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact known answers; no sampling noise, variance or accepted timing claim. Repeated small preflights are in-sample instrument calibration, not A/A independence."
+    },
+    "positive": {
+      "present": true,
+      "arm": "small",
+      "expected_detection": "At least one nondegenerate lift; every nondegenerate result2, four outcomes retained, six steps per lift. Actual small point order/relation proved in Lean.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "offcurve",
+      "null_population": {
+        "description": "One exact invalid-input control, not a statistical null population.",
+        "generator": "Same small input with Qy changed from1 to2; all other public inputs unchanged. Actual equation failure proved in Lean.",
+        "n": 1,
+        "why_n": "Exact known rejection behavior, no statistical inference.",
+        "matched_on": [
+          "field5",
+          "curve a3 b2",
+          "G(1,1)",
+          "Qx2",
+          "binary",
+          "flags",
+          "thread1"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "fixture",
+        "levels": [
+          "small",
+          "offcurve",
+          "large"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "0b4c206e0adaca0cb943cbf725873060f53009df5616ff8bff28cefe7f893f93",
+        "how": "Same committed source, binary, GMP libraries, flags and one thread for all calls."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": {
+          "hostname": "762f5fc120c9",
+          "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+          "isolation": "none; shared local host"
+        },
+        "how": "No accepted timing metric; shared local host."
+      },
+      {
+        "name": "public_inputs",
+        "treatment": "crossed",
+        "value": "Three explicit fixed inputs",
+        "how": "Each arm is checked against its own fixed known answer/rejection, not a causal speed comparison."
+      },
+      {
+        "name": "lift_policy",
+        "treatment": "fixed",
+        "value": "All i0..3 retained; no adaptive restart",
+        "how": "Coefficient lifts a+i*p and b+(2*i+1)*p; zero coefficient recorded degenerate, never divided."
+      },
+      {
+        "name": "order_and_layout",
+        "treatment": "fixed",
+        "value": "small,offcurve,large; no warmups",
+        "how": "Exact knownanswer comparisons, no clock inference."
+      },
+      {
+        "name": "randomness",
+        "treatment": "fixed",
+        "value": "none",
+        "how": "No sampled instances/seeds; every lift formula and public input written before affected target data."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded known answers",
+        "how": "Frozen analyzer compares result strings/status/trace presence; it is not an arithmetic verifier."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "value": "durable per-process/per-lift traces",
+        "how": "Local zero paid; watchdog15each and no retry."
+      }
+    ],
+    "crosses_map": false,
+    "comparisons": [
+      {
+        "id": "known-answers",
+        "arms": [
+          "small",
+          "offcurve",
+          "large"
+        ],
+        "differs_in": [
+          "public_inputs"
+        ],
+        "design": "absolute",
+        "threshold": "Each process must meet its own registered knownanswer/rejection check, all lift rows included."
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact fixed knownanswer validation without timing or population inference; small then offcurve then large.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic i0..3 lift formulas; no RNG or sampled seed. Protocol hash guards the run, not a random seed."
+    },
+    "instance_sampling": {
+      "rule": "No sampling: one fixed input per arm, all written before target output. Case identity fixed; comparisons are absolute known answers only.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Knownanswer validation; expected scalar already certified in Lean. No fit, selection or subjective exclusions."
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Three exact execution cells, one per arm. No p-value or confidence interval; alpha is schema metadata only."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 5,
+      "threads": 1,
+      "estimated_total_seconds": 15,
+      "measured_on": "Final small binary preflight0.007s unisolated, negative rejection also checked. Large target unmeasured before freeze; public bit count gives210operators per point, four fixed lifts. Conservative estimate5s/call, total15s; watchdog15s/call, hard global45s. No performance inference."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "known_answer",
+        "name": "Registered known answer or rejection",
+        "unit": "integer or Boolean",
+        "kind": "exact",
+        "definition": "Small/large: all nondegenerate outputs equal fixed expected scalar and at least one is nondegenerate; offcurve: explicit rejection exit2. All four lifts retained.",
+        "source": "evidence/analysis.jsonl:ok",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "nondegenerate",
+        "name": "Nondegenerate lift count",
+        "unit": "integer or Boolean",
+        "kind": "exact",
+        "definition": "Count of nondegenerate outcomes among all four fixed lifts.",
+        "source": "evidence/analysis.jsonl:nondegenerate",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "degenerate",
+        "name": "Degenerate lift count",
+        "unit": "integer or Boolean",
+        "kind": "exact",
+        "definition": "Zero-G-coefficient lift count, no division.",
+        "source": "evidence/analysis.jsonl:degenerate",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "logical_steps",
+        "name": "Jacobian polynomial operator count",
+        "unit": "integer or Boolean",
+        "kind": "exact",
+        "definition": "Count from the program record, six per small lift/420 per large lift across both points. No GAE/time conversion.",
+        "source": "evidence/analysis.jsonl:steps",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "source/binary/input/library/analyzer/model hashes",
+      "argv/UTC start/end/exit/stdout/stderr",
+      "every tuple/lift/inverse/Hensel witness",
+      "all errors/degenerate outcomes",
+      "host/compiler/threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 15,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly one call per small/offcurve/large arm; each valid call computes all four fixed lifts without adaptive retries. Stop after three calls.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Watchdog15seconds each, hard global45seconds, zero paid compute; keep every failure/timeout.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing/malformed output, wrong result/rejection, absent trace, unexpected error or timeout makes the cell not_validated/discrepancy; never silently discard.",
+    "No postdata parser or implementation patch under this protocol. Preserve originals and use a labelled new version if needed.",
+    "Structural analyzer pass is not an arithmetic proof, independent replay or execution attestation."
+  ],
+  "decision_rule": {
+    "text": "Report fixture_pass only if all registered per-arm checks pass; otherwise discrepancy or not_validated, with all three rows and all lift outcomes retained.",
+    "comparison_ids": [
+      "known-answers"
+    ],
+    "threshold": "zero knownanswer/status/shape/count discrepancies",
+    "statistic": "exact equality to preregistered values",
+    "interval": "none; fixed exact known answers",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer discrepancy from known answer; no sampling inference",
+    "verdict_vocabulary": [
+      "fixture_pass",
+      "discrepancy",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.mjs",
+      "sha256": "d1ed3377796b96c65be40eebf5053574cd5d37ba58dfdfcc8a88d274436c1612"
+    },
+    "inputs": [
+      "expected.json",
+      "inputs/*.txt",
+      "evidence/runs/*"
+    ],
+    "outputs": [
+      "evidence/analysis.jsonl",
+      "export.json",
+      "report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "proof.svg"
+    ],
+    "report_dir": "."
+  },
+  "inadmissible": [
+    "Claiming security/timing improvement or a SafeCurves/rho comparison from these counts.",
+    "Suppressing a degenerate lift, crash, timeout or failed known answer.",
+    "Giving the program the expected scalar; it reads only the seven public input integers.",
+    "Calling the unblinded preflight controls out-of-sample confirmation or independent-host validation.",
+    "Promoting producer checks to Lean arithmetic correctness or signed execution."
+  ],
+  "literature": [
+    {
+      "ref": "Smart HPL97-128; parent point-sources.json primary hashes/read scopes",
+      "provenance": "retrieved",
+      "claim": "First-order p-adic transfer; generic formal-group bridge not asserted by this run."
+    },
+    {
+      "ref": "LMVV05 explicit author erratum; parent PCC-20261110-90623b",
+      "provenance": "retrieved",
+      "claim": "Corrected curve, fresh actual certified G/Q, old example correction already known."
+    },
+    {
+      "ref": "https://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian.html",
+      "provenance": "retrieved",
+      "claim": "Named add/double polynomials; finite-ring concrete executions checked separately, not a generic group-scheme refinement."
+    },
+    {
+      "ref": "lean/SmartArithmetic.lean and SmallControl.lean; Mathlib56a00585",
+      "provenance": "internal",
+      "claim": "Predata model, trace soundness, integer Hensel identity, actual small point/rejection and analytic operation count."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "00e7a4a76936914ded10c4bf2f40a1762e8eaec591af6d8abe5c316380684c56",
+    "commit": "70aa9f2f5b2d86eb1d681559e0fd469e0bb4fdc2",
+    "frozen_at": "2026-11-10T08:56:55Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "provenance_sha256": "f24fabc7b0a77d660ff41795ac3b3f00051285ef6b721c566b33c6cb700bda66",
+    "protocol_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "protocol_tool_commit": "005a7d7758844f97980b90c7ccd41b5cdcf9e048",
+    "predata_formal_model": [
+      {
+        "path": "lean/SmartArithmetic.lean",
+        "sha256": "b3370dc0e28c5ba4101435683b722734a59e5ecc36bf262469523ccae6fe5e1e"
+      },
+      {
+        "path": "lean/SmallControl.lean",
+        "sha256": "b92810587054270e88c8df9403211d9aa6fce696b7c07bf9ac50ddad49f57d3f"
+      }
+    ],
+    "source_commit": "70aa9f2f5b2d86eb1d681559e0fd469e0bb4fdc2",
+    "preflight_scope": "Small/offcurve in-sample calibration only; no large target finiteprecision output seen. Source guard requires frozen runner hash for >32bit inputs.",
+    "checkpoint_exception": "User-authorized zero-paid local bounded calls; per-case/per-lift durable artifacts.",
+    "original_item": 11
+  }
+}

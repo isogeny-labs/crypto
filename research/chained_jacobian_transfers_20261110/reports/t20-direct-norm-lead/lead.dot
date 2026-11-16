@@ -1,0 +1,24 @@
+digraph {
+ graph [rankdir=TB,bgcolor="white",nodesep="0.3",ranksep="0.45",pad="0.12"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=10,color="#456273",fillcolor="#edf4f4"];
+ edge [fontname="DejaVu Sans",fontsize=10,color="#407758"];
+ C [label="Jac(C20)/F101
+y²=18x⁶+75x⁴+45x²+40"];
+ T [label="Jac(T20)/F101
+y²=76x⁶+62x⁵+52x⁴+63x³+69x²+3x+25"];
+ A [label="A=E2×F0 / F101
+E2:y²=x³+59x+27; F0:y²=x³+44x+21
+rational component orders109 and113"];
+ C -> T [label="R20 · degree4
+existing proper correspondence"];
+ C -> A [label="N_C · degree4
+existing two degree2 covers"];
+ T -> A [label="M=N_C R20† · degree16
+proposed direct F101 evaluation",style=dashed,color="#9a6924"];
+ O [shape=note,fillcolor="#fff5df",label="Written inherited identities: MM†=M†M=[4]
+Runtime descent obligations remain OPEN
+2-torsion translation · sign · all poles/infinities
+Complete balanced inputs · no support-root calls
+Construction and complete costs remain charged"];
+ A -> O [style=invis];
+}

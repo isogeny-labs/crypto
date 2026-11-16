@@ -1,0 +1,241 @@
+/// Diagnostic adapter for existing native callbacks. Reuses Trace limits,
+/// sequence, flushing and poisoned-prefix semantics; performs no field work.
+/// This validates event coverage, not geometry, scalar correctness or ranks.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NativeProtocol { SignedCollector, KummerLabels, KummerDriver }
+
+pub struct NativeEvents<'a, 'w> {
+    trace: &'a mut Trace<'w>,
+    expected_header: serde_json::Value,
+    protocol: NativeProtocol,
+    started: bool,
+    terminal: bool,
+    failed: bool,
+    attempts: u64,
+    pending: Option<u64>,
+    recovered: Option<u64>,
+    nodes: u64,
+    driver_calls: u64,
+    driver_pending: Option<&'static str>,
+    driver_lift: Option<(serde_json::Value, serde_json::Value)>,
+    driver_input_labels: Option<serde_json::Value>,
+    driver_graph_pending: bool,
+    first: std::collections::BTreeMap<String, u64>,
+}
+impl<'a, 'w> NativeEvents<'a, 'w> {
+    pub fn new(trace: &'a mut Trace<'w>, protocol: NativeProtocol,
+        expected_header: serde_json::Value) -> Result<Self, Error> {
+        if trace.records_written() != 0 || !expected_header.is_object()
+            || expected_header["kind"] != "header" { return Err(Error::State); }
+        let schema = match protocol {
+            NativeProtocol::SignedCollector => "signed-collector-events/v1",
+            NativeProtocol::KummerLabels => "kummer-label-events/v1",
+            NativeProtocol::KummerDriver => "kummer-driver-events/v1",
+        };
+        if expected_header["schema"] != schema { return Err(Error::State); }
+        Ok(Self { trace, expected_header, protocol, started:false, terminal:false,
+            failed:false, attempts:0, pending:None, recovered:None, nodes:1, driver_calls:0, driver_pending:None, driver_lift:None, driver_input_labels:None, driver_graph_pending:false,
+            first:std::collections::BTreeMap::new() })
+    }
+    pub fn observe(&mut self, value: serde_json::Value) -> Result<(), Error> {
+        if let Some(error) = self.trace.failure() { return Err(error.clone()); }
+        if self.failed || self.terminal { return self.reject(); }
+        match self.accept(value) {
+            Ok(()) => Ok(()),
+            Err(error) => {
+                self.failed=true;
+                let first=self.trace.failure.get_or_insert(error).clone();
+                Err(first)
+            }
+        }
+    }
+    fn reject<T>(&mut self) -> Result<T, Error> {
+        self.failed=true;
+        let first=self.trace.failure.get_or_insert(Error::State).clone();
+        Err(first)
+    }
+    fn number(value:&serde_json::Value, field:&str) -> Result<u64, Error> {
+        value.get(field).and_then(|v|v.as_u64()).ok_or(Error::State)
+    }
+    fn scalar(value:&serde_json::Value, field:&str) -> Result<Option<u64>, Error> {
+        match value.get(field) {
+            Some(v) if v.is_null() => Ok(None),
+            Some(v) => v.as_u64().map(Some).ok_or(Error::State),
+            None => Err(Error::State),
+        }
+    }
+    fn accept(&mut self, value:serde_json::Value) -> Result<(), Error> {
+        let kind=value.get("kind").and_then(|x|x.as_str()).ok_or(Error::State)?;
+        if !self.started {
+            if value != self.expected_header { return Err(Error::State); }
+            self.trace.emit(Event::ObservedHeader { identity:self.trace.identity().clone(), native:value })?;
+            self.started=true; return Ok(());
+        }
+        if kind=="header" { return Err(Error::State); }
+        if self.protocol == NativeProtocol::KummerDriver {
+            return self.accept_driver(value);
+        }
+        if kind=="terminal" {
+            if self.pending.is_some() || Self::number(&value,"attempts")? != self.attempts
+                || Self::scalar(&value,"recovered")? != self.recovered { return Err(Error::State); }
+            self.trace.emit(Event::ObservedTerminal(value))?;
+            self.terminal=true; return Ok(());
+        }
+        match (self.protocol,kind) {
+            (NativeProtocol::SignedCollector,"candidate") |
+            (NativeProtocol::KummerLabels,"label_candidate") => {
+                let attempt=Self::number(&value,"attempt")?;
+                if self.pending.is_some() || self.recovered.is_some()
+                    || self.attempts.checked_add(1)!=Some(attempt) { return Err(Error::State); }
+                self.attempts=attempt; self.pending=Some(attempt);
+            }
+            (NativeProtocol::SignedCollector,"node") => {
+                if self.pending!=Some(Self::number(&value,"attempt")?)
+                    || Self::number(&value,"node")? != self.nodes { return Err(Error::State); }
+                self.nodes=self.nodes.checked_add(1).ok_or(Error::State)?;
+            }
+            (NativeProtocol::SignedCollector,"edge") => {
+                let attempt=Self::number(&value,"attempt")?;
+                if self.pending!=Some(attempt) || Self::number(&value,"node_count")?!=self.nodes {
+                    return Err(Error::State);
+                }
+                let nodes=value["nodes"].as_array().ok_or(Error::State)?;
+                let signs=value["signs"].as_array().ok_or(Error::State)?;
+                if nodes.len()!=2 || signs.len()!=2 || nodes.iter().any(|n|n.as_u64().is_none_or(|n|n>=self.nodes))
+                    || signs.iter().any(|s|!matches!(s.as_i64(),Some(-1)|Some(1))) { return Err(Error::State); }
+                if value.get("canonical").is_none() { return Err(Error::State); }
+                let key=serde_json::to_string(&value["canonical"]).map_err(|_|Error::State)?;
+                if self.first.insert(key,attempt).is_some() { return Err(Error::State); }
+                self.recovered=Self::scalar(&value,"recovered")?; self.pending=None;
+            }
+            (NativeProtocol::SignedCollector,"duplicate") => {
+                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
+                let key=serde_json::to_string(&value["canonical"]).map_err(|_|Error::State)?;
+                if self.first.get(&key).copied()!=Some(Self::number(&value,"first_attempt")?) {
+                    return Err(Error::State);
+                }
+                self.pending=None;
+            }
+            (NativeProtocol::SignedCollector,"identity") => {
+                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
+                self.recovered=Self::scalar(&value,"recovered")?;self.pending=None;
+            }
+            (NativeProtocol::SignedCollector,"nonsplit") => {
+                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
+                self.pending=None;
+            }
+            (NativeProtocol::SignedCollector,"choice") => {
+                let selected=Self::number(&value,"selected_attempt")?;
+                if self.pending.is_some() || self.recovered.is_some() || selected==0 || selected>self.attempts {
+                    return Err(Error::State);
+                }
+            }
+            (NativeProtocol::SignedCollector,"restart") => {
+                if self.pending.is_some() || self.recovered.is_some()
+                    || Self::number(&value,"after_attempt")?!=self.attempts { return Err(Error::State); }
+            }
+            (NativeProtocol::KummerLabels,"label_result") => {
+                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
+                let result=&value["result"];
+                if !matches!(result["status"].as_str(),Some("first"|"redundant"|"invariant_error"|
+                    "candidate_verified"|"candidate_rejected"|"noncanonical_label")) { return Err(Error::State); }
+                self.recovered=Self::scalar(result,"answer")?;
+                self.pending=None;
+            }
+            _ => return Err(Error::State),
+        }
+        self.trace.emit(Event::Observed(value))
+    }
+    fn driver_labels(&self, value: &serde_json::Value) -> Result<(), Error> {
+        let r=Self::number(&self.expected_header,"r")?;
+        let labels=value.as_array().ok_or(Error::State)?;
+        if r<3 || labels.len()!=2 || labels.iter().any(|v| v.as_u64().is_none_or(|x| x>=r)) {
+            return Err(Error::State);
+        }
+        Ok(())
+    }
+    fn accept_driver(&mut self, value: serde_json::Value) -> Result<(), Error> {
+        let kind=value["kind"].as_str().ok_or(Error::State)?;
+        if kind=="terminal" {
+            if self.pending.is_some() || self.driver_graph_pending || self.driver_lift.is_some()
+                || Self::number(&value,"attempts")?!=self.attempts
+                || Self::number(&value,"driver_calls")?!=self.driver_calls
+                || Self::scalar(&value,"recovered")?!=self.recovered { return Err(Error::State); }
+            self.trace.emit(Event::ObservedTerminal(value))?;
+            self.terminal=true;return Ok(());
+        }
+        match kind {
+            "driver_begin" => {
+                if self.pending.is_some() || self.driver_graph_pending || self.driver_lift.is_some() || self.recovered.is_some() {
+                    return Err(Error::State);
+                }
+                let operation=match value["operation"].as_str() {
+                    Some("advance")=>"advance",Some("lift")=>"lift",_=>return Err(Error::State),
+                };
+                let call=Self::number(&value,"call")?;
+                if self.driver_calls.checked_add(1)!=Some(call) { return Err(Error::State); }
+                self.driver_labels(&value["input"]["labels"])?;
+                self.driver_calls=call;self.pending=Some(call);self.driver_pending=Some(operation);
+                self.driver_input_labels=Some(value["input"]["labels"].clone());
+                self.driver_lift=None;
+            }
+            "driver_end" => {
+                if self.pending!=Some(Self::number(&value,"call")?)
+                    || self.driver_pending!=value["operation"].as_str() { return Err(Error::State); }
+                match self.driver_pending {
+                    Some("advance")=>{
+                        if Self::number(&value,"choice")? > 1 { return Err(Error::State); }
+                        for field in ["used_fallback","validation_failed"] {
+                            if !value[field].is_boolean() { return Err(Error::State); }
+                        }
+                        self.attempts=self.attempts.checked_add(1).ok_or(Error::State)?;
+                    }
+                    Some("lift")=>{
+                        self.driver_labels(&value["labels"])?;
+                        if self.driver_input_labels.as_ref()!=Some(&value["labels"])
+                            || !value["status"].is_string() || value["tested"].as_u64().is_none() {
+                            return Err(Error::State);
+                        }
+                        if !value["divisor"].is_null() {
+                            if !value["divisor"].is_object() { return Err(Error::State); }
+                            self.driver_lift=Some((value["divisor"].clone(),value["labels"].clone()));
+                        }
+                    }
+                    _=>return Err(Error::State),
+                }
+                self.pending=None;self.driver_pending=None;self.driver_input_labels=None;
+            }
+            "driver_relation"|"driver_duplicate" => {
+                if self.pending.is_some() || self.driver_graph_pending { return Err(Error::State); }
+                let (divisor,labels)=self.driver_lift.take().ok_or(Error::State)?;
+                if value["divisor"]!=divisor || value["labels"]!=labels
+                    || !value["canonical"].is_object() { return Err(Error::State); }
+                let key=serde_json::to_string(&value["canonical"]).map_err(|_|Error::State)?;
+                if kind=="driver_duplicate" {
+                    if !self.first.contains_key(&key) { return Err(Error::State); }
+                } else {
+                    if self.first.insert(key,self.driver_calls).is_some() { return Err(Error::State); }
+                    let nodes=value["nodes"].as_array().ok_or(Error::State)?;
+                    let signs=value["signs"].as_array().ok_or(Error::State)?;
+                    if nodes.len()!=2 || nodes.iter().any(|n| n.as_u64().is_none())
+                        || signs.len()!=2 || signs.iter().any(|x| !matches!(x.as_i64(),Some(-1)|Some(1))) {
+                        return Err(Error::State);
+                    }
+                    self.driver_graph_pending=true;
+                }
+            }
+            "driver_graph_result" => {
+                if !self.driver_graph_pending || self.pending.is_some() { return Err(Error::State); }
+                self.recovered=Self::scalar(&value,"recovered")?;self.driver_graph_pending=false;
+            }
+            "driver_gate"|"driver_restart" => {
+                if self.pending.is_some() || self.driver_graph_pending || self.driver_lift.is_some() || self.recovered.is_some()
+                    || !value["status"].is_string() { return Err(Error::State); }
+                self.driver_labels(&value["labels"])?;self.driver_lift=None;
+            }
+            _=>return Err(Error::State),
+        }
+        self.trace.emit(Event::Observed(value))
+    }
+
+}

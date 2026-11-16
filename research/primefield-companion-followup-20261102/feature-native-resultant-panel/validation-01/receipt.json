@@ -1,0 +1,89 @@
+{
+  "scope": "software validation and deterministic input construction; no panel execution",
+  "source_hashes": {
+    "feature-native-resultant-panel/main.rs": "65bb58dbdc72a2133ca4db118e50bd8c945607916162ca995360f57f54f31805",
+    "feature-native-resultant-panel/panel.rs": "c64418ce6fc3d30fa7b07e973acf1fadb2e6c996206d02ccc445eb9998d2de00",
+    "feature-native-resultant-panel/analyze.py": "2a28a9cb2eddb10d3fc94be7542f54a35abe89fb01d0ce76cc2c9027d0926dd7",
+    "feature-native-resultant-panel/test_analyze.py": "5a73a237984ced3f2746fc0105f7fbd75a110261b50af7c89667a5a6066cd91f",
+    "feature-native-resultant-panel/validate.py": "e5d535a93a3bed5385ffb9a7d72743daa781bf361cff4cf5553665da2fa290cc",
+    "feature-native-resultant-panel/inputs.tsv": "ade4adbda52cfc01290b5262eca1fa258e2407d42a527ce417e480764f478575",
+    "feature-native-resultant-panel/metrics.txt": "5de4571ed18f0142b807a198c20bb1f4945ea3cdd7f71f392bc121ff16cb4640",
+    "feature-native-resultant-accounting/meter.rs": "99443bf3affb9a19c6dc3c014b33923255c7fc8ff23c5eb31983fd24a83c46c8",
+    "feature-native-resultant-accounting/names.rs": "ca2f39c064827c488cbf0fc64043ad241148c61302b03636ec166613d881b810",
+    "feature-native-resultant-accounting/generated/scalar.rs": "978093fb1bdd5e847f6c094e241b6524486bff1e065ec609a57f4c8d346f54cb",
+    "feature-native-resultant-accounting/generated/euclid.rs": "81c327ea821163701f0a9fdd29a8a2c6db9e3ea78b509ecac194dd8d73c2b85b",
+    "feature-native-resultant-accounting/generated/half.rs": "96afe40aeab98356548528bce6074bcf9886f997e49082ab37193d0b5879fb20"
+  },
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "commands": [
+    {
+      "label": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-panel/main.rs",
+        "-o",
+        "/tmp/resultant-panel-check-kbo3f603/runner"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "9c84079f7cc714100b16d23c32ddeb3f2330cc17d7fc5ea2658b68b0c76a13de",
+      "exact_replay": null
+    },
+    {
+      "label": "native-test",
+      "argv": [
+        "/tmp/resultant-panel-check-kbo3f603/runner",
+        "--self-test"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "stdout_sha256": "7252fd48024c6f75e461d5b5016e586055f9d4ab49ac9aae9a7eaa4c381ff880",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exact_replay": null
+    },
+    {
+      "label": "inputs",
+      "argv": [
+        "/tmp/resultant-panel-check-kbo3f603/runner",
+        "--inputs"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "stdout_sha256": "ade4adbda52cfc01290b5262eca1fa258e2407d42a527ce417e480764f478575",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exact_replay": true
+    },
+    {
+      "label": "metrics",
+      "argv": [
+        "/tmp/resultant-panel-check-kbo3f603/runner",
+        "--metrics"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "stdout_sha256": "5de4571ed18f0142b807a198c20bb1f4945ea3cdd7f71f392bc121ff16cb4640",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exact_replay": true
+    },
+    {
+      "label": "analyzer-tests",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-panel/test_analyze.py"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5cf4ad7aaad2192e00021b754e3becd350a49dfd7151f98f924929ed54b4f977",
+      "exact_replay": null
+    }
+  ],
+  "binary_sha256": "569e91ad6ccd6eaf508c41d1604b41817e2967ad2d2cf1b15176345bc261eaee",
+  "passed": true
+}

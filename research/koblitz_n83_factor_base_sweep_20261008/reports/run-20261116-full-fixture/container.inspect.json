@@ -1,0 +1,271 @@
+[
+    {
+        "Id": "d0cbeecca273913099d6cde2a9a0743d969e524fc6fd49dc37176c562230e3ab",
+        "Created": "2026-11-16T02:49:24.190567436Z",
+        "Path": "sh",
+        "Args": [
+            "-ec",
+            "\n    repo=/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116\n    output=/Volumes/SSD990-2/tmp/n83-colima-output/full-fixture-lib-20261116-attempt-2\n    fixture=\"$repo/research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl\"\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 12884901888\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"400000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 512\n    test \"$(git -C \"$repo\" rev-parse HEAD)\" = \"$EXPECT_SOURCE\"\n    test -z \"$(git -C \"$repo\" status --porcelain)\"\n    test \"$(sha256sum \"$fixture\" | awk '{print $1}')\" = \"$EXPECT_FIXTURE_SHA\"\n    test \"$(wc -c < \"$fixture\" | tr -d \" \")\" = \"$EXPECT_FIXTURE_BYTES\"\n    test -f \"$repo/gpu/fes/fes_solve.cpp\"\n    test -f \"$repo/research/ic_planner_validation_20261020/sessions/r24/records.jsonl\"\n    mkdir \"$output\"\n    cd \"$repo\"\n    printf \"source=%s fixture_sha=%s target=%s memory.max=%s swap.max=%s cpu.max=%s pids.max=%s\\n\" \\\n      \"$EXPECT_SOURCE\" \"$EXPECT_FIXTURE_SHA\" \"$CARGO_TARGET_DIR\" \"$(cat /sys/fs/cgroup/memory.max)\" \\\n      \"$(cat /sys/fs/cgroup/memory.swap.max)\" \"$(cat /sys/fs/cgroup/cpu.max)\" \\\n      \"$(cat /sys/fs/cgroup/pids.max)\"\n    cargo test --release --lib --locked -j 1\n    test -z \"$(git status --porcelain)\"\n  "
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-16T02:49:24.225849745Z",
+            "FinishedAt": "2026-11-16T03:43:21.269141571Z"
+        },
+        "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+        "ResolvConfPath": "/var/lib/docker/containers/d0cbeecca273913099d6cde2a9a0743d969e524fc6fd49dc37176c562230e3ab/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/d0cbeecca273913099d6cde2a9a0743d969e524fc6fd49dc37176c562230e3ab/hostname",
+        "HostsPath": "/var/lib/docker/containers/d0cbeecca273913099d6cde2a9a0743d969e524fc6fd49dc37176c562230e3ab/hosts",
+        "LogPath": "/var/lib/docker/containers/d0cbeecca273913099d6cde2a9a0743d969e524fc6fd49dc37176c562230e3ab/d0cbeecca273913099d6cde2a9a0743d969e524fc6fd49dc37176c562230e3ab-json.log",
+        "Name": "/n83-full-fixture-lib-20261116-attempt-2",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "bridge",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 12884901888,
+            "NanoCpus": 4000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 12884901888,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 512,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                    "Target": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/crypto/.git",
+                    "Target": "/Volumes/SSD990/crypto/.git",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                    "Target": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-output",
+                    "Target": "/Volumes/SSD990-2/tmp/n83-colima-output"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/crypto/.git",
+                "Destination": "/Volumes/SSD990/crypto/.git",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                "Destination": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-output",
+                "Destination": "/Volumes/SSD990-2/tmp/n83-colima-output",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                "Destination": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "d0cbeecca273",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "EXPECT_FIXTURE_SHA=8970667e2f18587eeb08d033123dab029b94042ac5c07c870b08988f1ee5b738",
+                "GIT_CONFIG_KEY_0=safe.directory",
+                "GIT_CONFIG_VALUE_0=/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                "EXPECT_SOURCE=a702129de8e5bd72482d9790f3463028a467926f",
+                "EXPECT_FIXTURE_BYTES=2293097",
+                "CARGO_TARGET_DIR=/Volumes/SSD990-2/tmp/n83-colima-output/full-fixture-lib-20261116-attempt-2/cargo-target",
+                "CARGO_INCREMENTAL=0",
+                "GIT_OPTIONAL_LOCKS=0",
+                "GIT_CONFIG_COUNT=1",
+                "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "RUSTUP_HOME=/usr/local/rustup",
+                "CARGO_HOME=/usr/local/cargo",
+                "RUST_VERSION=1.99.1"
+            ],
+            "Cmd": [
+                "sh",
+                "-ec",
+                "\n    repo=/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116\n    output=/Volumes/SSD990-2/tmp/n83-colima-output/full-fixture-lib-20261116-attempt-2\n    fixture=\"$repo/research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl\"\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 12884901888\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"400000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 512\n    test \"$(git -C \"$repo\" rev-parse HEAD)\" = \"$EXPECT_SOURCE\"\n    test -z \"$(git -C \"$repo\" status --porcelain)\"\n    test \"$(sha256sum \"$fixture\" | awk '{print $1}')\" = \"$EXPECT_FIXTURE_SHA\"\n    test \"$(wc -c < \"$fixture\" | tr -d \" \")\" = \"$EXPECT_FIXTURE_BYTES\"\n    test -f \"$repo/gpu/fes/fes_solve.cpp\"\n    test -f \"$repo/research/ic_planner_validation_20261020/sessions/r24/records.jsonl\"\n    mkdir \"$output\"\n    cd \"$repo\"\n    printf \"source=%s fixture_sha=%s target=%s memory.max=%s swap.max=%s cpu.max=%s pids.max=%s\\n\" \\\n      \"$EXPECT_SOURCE\" \"$EXPECT_FIXTURE_SHA\" \"$CARGO_TARGET_DIR\" \"$(cat /sys/fs/cgroup/memory.max)\" \\\n      \"$(cat /sys/fs/cgroup/memory.swap.max)\" \"$(cat /sys/fs/cgroup/cpu.max)\" \\\n      \"$(cat /sys/fs/cgroup/pids.max)\"\n    cargo test --release --lib --locked -j 1\n    test -z \"$(git status --porcelain)\"\n  "
+            ],
+            "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "Labels": {
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "2af0ee2f72822f766ad8066218d1b13fe280f60d885b04f3a5d97d0b63545399",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "MacAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:08323aa37a9a6bdf87c250655aae3a1cfa3cbd09f3b30caf3561f0bfc6ad942d",
+            "size": 1449,
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux"
+            }
+        }
+    }
+]

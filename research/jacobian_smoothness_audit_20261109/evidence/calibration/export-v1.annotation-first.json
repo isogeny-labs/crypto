@@ -1,0 +1,196 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "AUDIT-MUMFORD-CALIBRATION-v1",
+  "created": "2026-11-09T22:24:02Z",
+  "protocol": {
+    "path": "../../native-census-v1/protocol-calibration.json",
+    "sha256": "f2572b4dd547db0c3177611d575be15fe3fd1abf2b2ab134db618c3fcd2913a6",
+    "protocol_id": "AUDIT-MUMFORD-CALIBRATION-20261109-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464",
+    "dirty": false
+  },
+  "backend": "manual",
+  "host": {
+    "path": "host.json",
+    "sha256": "9549bab63911038aa48e3f83fec6653831cff2317e45472c62b56c11b6fce4c9",
+    "class_id": "762f5fc120c9",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "f3-positive",
+      "role": "control_positive",
+      "binary_sha256": "851c5594fc67e56c1a414a4a1d1716f158c512902ead1aab4d267f4652328a0a",
+      "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464"
+    },
+    {
+      "id": "f5-all-smooth",
+      "role": "control_negative",
+      "binary_sha256": "851c5594fc67e56c1a414a4a1d1716f158c512902ead1aab4d267f4652328a0a",
+      "commit": "11100a8512bac3840bf1f85b1e7f0f523cd78464"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "mumford-calibration-v1-launcher",
+      "arm": "f3-positive",
+      "instance_id": "0",
+      "seed": 202611090301,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Frozen failure rule: launcher exits127before native arithmetic; no measured result."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "mumford-calibration-v1-unattempted",
+      "arm": "f5-all-smooth",
+      "instance_id": "0",
+      "seed": 202611090501,
+      "replicate": 0,
+      "warmup": false,
+      "status": "cancelled",
+      "outcome_class": "not_completed",
+      "attempts": 0,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Frozen failure stopping rule: second cell not launched after infrastructure failure."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 1,
+    "completed": 0,
+    "not_completed": 2,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": 2
+  },
+  "files": [
+    {
+      "path": "v1-rows.jsonl",
+      "sha256": "f22a8c8e05947b05f8db037468b12d0c01a8b3f04c0de042071855839bfd9b38",
+      "bytes": 333,
+      "kind": "raw"
+    },
+    {
+      "path": "../calibration-v1-launcher-failure.json",
+      "sha256": "c5a4577016d503f8a50b6a17ab1f315fd679b1674dac36a5366f1e96603373a6",
+      "bytes": 1495,
+      "kind": "receipt"
+    },
+    {
+      "path": "../calibration-v1-launcher.stderr.log",
+      "sha256": "6933a7e0df95783acf93ed90af942334f7d1619d9a6a1f897c79ed256537f3c9",
+      "bytes": 60,
+      "kind": "log"
+    },
+    {
+      "path": "../calibration-v1-launcher.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "log"
+    },
+    {
+      "path": "../calibration-v1-launcher.exit-status",
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe",
+      "bytes": 4,
+      "kind": "log"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../native-census-v1/src/main.rs",
+      "sha256": "0352a204e745e26e6d2fb3c100e665c0109880a33505c423578563301793ab65",
+      "bytes": 16978,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Producer-created export; PCC standing unsigned/unverified. Same-host C++ independently recomputes arithmetic; no separate machine. L0 clock diagnostic only."
+    },
+    {
+      "kind": "observation",
+      "text": "Canonical schema requires attempts>=1even for an unattempted cancelled cell. This honest attempts0export intentionally fails that schema; do not fabricate a native attempt. Exact custom v1launcher-failure receipt is authoritative flow."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

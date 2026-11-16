@@ -25,8 +25,8 @@ pub struct SolveStats {
     pub max_row_len: usize,
 }
 
-/// Which elimination to run.  Both make identical pivot choices and do
-/// identical arithmetic; they differ only in bookkeeping (slice S2).
+/// Reference and Fast make identical pivots and perform identical arithmetic.
+/// Hybrid changes the elimination order and uses a dense residual block.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum Solver {
     /// The S1 solver, kept as the exactness reference.
@@ -35,6 +35,8 @@ pub enum Solver {
     /// list for `k`, merge buffers reused.
     #[default]
     Fast,
+    /// Sparse elimination followed by a dense block (caller supplies hot columns).
+    Hybrid,
     /// S2b (PLAN.md §8): the step columns and `k` are a dense block per row;
     /// sparse columns are eliminated first, the residual block densely.
     /// Different pivot order; same `Option<k>` on every row set.
@@ -59,6 +61,7 @@ pub fn solve_for_last(
     match solver {
         Solver::Reference => solve_reference(rows, m, ell, stats),
         Solver::Fast => solve_fast(rows, m, ell, stats),
+        Solver::Hybrid => crate::hybrid::solve(rows, m, ell, &[], stats),
         Solver::Dense => solve_dense(rows, m, ell, dense_cols, stats),
     }
 }

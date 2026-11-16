@@ -1,0 +1,27 @@
+warning: unused import: `self`
+ --> continuation.rs:3:59
+  |
+3 | use super::{sparse::{Owner,Charge,Polynomial},scheduler::{self,search},check};
+  |                                                           ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0505]: cannot move out of `g` because it is borrowed
+  --> harness.rs:28:7
+   |
+26 |  let(map,model)=map(0,2,&[1,1],None,&[],0);let g=model.iter().enumerate().map(|(i,v)|if *v{vec![vec![],vec![i as u32]]}else{vec![vec![i as u32]]}).collect::<Vec<_>>();let mut o=Ledger::default();let mut s=continuation::Session::new(model.len() as u32,&g,li...
+   |                                                - binding `g` declared here                                                                                                                                                                                 -- borrow of `g` occurs here
+27 |  loop{match s.next().unwrap(){continuation::Outcome::CandidateRetained=>{let p=s.attempt.active.unwrap();let model=s.candidate().unwrap().to_vec();let record=records.len()as u64;let call=s.with_candidate_owner(|x,deadline,owner|signed_lift::verify_candidat...
+28 |  (map,g,s.into_attempt(),records)
+   |       ^ - borrow later used here
+   |       |
+   |       move out of `g` occurs here
+   |
+help: consider cloning the value if the performance cost is acceptable
+   |
+26 |  let(map,model)=map(0,2,&[1,1],None,&[],0);let g=model.iter().enumerate().map(|(i,v)|if *v{vec![vec![],vec![i as u32]]}else{vec![vec![i as u32]]}).collect::<Vec<_>>();let mut o=Ledger::default();let mut s=continuation::Session::new(model.len() as u32,&g.clone(),limits(),end(),&mut o);let mut records=Vec::new();
+   |                                                                                                                                                                                                                                                              ++++++++
+
+error: aborting due to 1 previous error; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0505`.
