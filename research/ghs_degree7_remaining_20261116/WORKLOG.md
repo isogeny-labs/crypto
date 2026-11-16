@@ -184,3 +184,29 @@ shape results and assess the fixed-carrier degree-seven bound.
 ### Errors
 
 None in the two counted runs.
+
+## 2026-11-15 23:23 America/Los_Angeles
+
+### What was done
+
+Committed the two-pole receipts and result at `143a03d63fe8`. Derived
+the final branch-only denominator identity `M C²=A³+A²B+bB³`, with
+`deg M=5` and `A=(Bh mod M)+M(λx²+μx+ν)`. Wrote and froze a three-pole
+protocol and source. Its 643,043,610 logical candidates per source model
+are represented by intersections of exact 243-bit sets for all `ν` values.
+
+### Decisions made
+
+The bitset representation is exact: at each evaluation point, translate the
+allowed affine values of `ν` by `λz²+μz`; intersect sixteen necessary
+conditions; then perform a full polynomial identity check on survivors.
+Commit source before counted execution.
+
+### Open threads
+
+Run and audit both source representatives. If zero, combine all denominator
+classes into a fixed-carrier degree-seven lower bound with stated scope.
+
+### Errors
+
+None in preparation.
