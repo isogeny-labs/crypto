@@ -52,3 +52,5 @@ earlierfullnormconstructionnotallread. Samehost/prover/proceduralbinding,
 no independent compiler/parser/physicalhost assurance. No holes/customaxioms/
 nativeproofeval/raisedlimits/newflags/waivers/frozenedit/cryptoPython/spend/
 uploads. [pcc:unverified]
+
+Publication: ready [PR #4369](https://github.com/isogeny-labs/crypto/pull/4369), existing ready follow-up stacked on #3739 after external merge #4355. Remote proof `1ac7842da62e31f1cd73ed9d0cd29b97f9ea1957` and local receipt `99acbc4274e9130dff28ce4d48a6fd62ff07f68a` share tree `1a0c41544ca0d79177ded1d32afc9c257cd7e0e7`. Anonymous fetch completed; fresh exact head/body/title/open/ready matched. Body has4484characters. All37pinsets3182entries/76scope links match;630nonemptyledgerprefix preserved through631. Current-head CI/review/signing pending. [pcc:unverified]
