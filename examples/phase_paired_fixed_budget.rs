@@ -5,19 +5,23 @@
 //! Protocol: research/phase_paired_native_20261026/PROTOCOL.md
 //! Independent replay: examples/phase_paired_replay.rs
 //!
-//! Subcommands (see `usage()`): `gate`, `run`, `freeze`. Tables and the chart are
-//! rendered by the replay example from verified receipts only.
+//! Subcommands (see `usage()`): `gate`, `run`, `freeze`; and, for the follow-up
+//! that changes only the solver (PROTOCOL_ADDENDUM_2.md), `cms-selftest`,
+//! `cms-check` and `cms-run`, which export each instance with
+//! `sat::to_dimacs_xor` and run a pinned CryptoMiniSat binary as a child process.
+//! Tables and the chart are rendered by the replay example from verified
+//! receipts only.
 //!
 //! The solver is `crypto_lib::cryptanalysis::sat::Solver` (single thread,
-//! native XOR rows, deterministic). It is not CryptoMiniSat; the contrast
-//! measured here is within one solver. The solver arms read the manifest only.
-//! They never open `witness_sealed.json`; only the checker (`gate --sealed`)
-//! and the replay do.
+//! native XOR rows, deterministic). It is not CryptoMiniSat (only the `cms-*`
+//! subcommands run that); the contrast measured by `run` is within one solver.
+//! The solver arms read the manifest only. They never open
+//! `witness_sealed.json`; only the checker (`gate --sealed`) and the replay do.
 
 use crypto_lib::binary_ecc::curve::{point_add, point_neg, BinaryCurve, BinaryPoint};
 use crypto_lib::binary_ecc::f2m::{F2mElement, IrreduciblePoly};
 use crypto_lib::cryptanalysis::koblitz_relation_solver::U64RankTracker;
-use crypto_lib::cryptanalysis::sat::{SolveResult, Solver};
+use crypto_lib::cryptanalysis::sat::{parse_dimacs_xor, to_dimacs_xor, SolveResult, Solver};
 use crypto_lib::hash::sha256::sha256;
 use num_bigint::BigUint;
 use serde_json::{json, Value};
@@ -2142,9 +2146,1263 @@ fn native_curve_and_space(
     }
 }
 
+// ---------------------------------------------------------------------------
+// CryptoMiniSat follow-up (PROTOCOL_ADDENDUM_2.md): the same instances, exported
+// with `sat::to_dimacs_xor`, solved by a pinned external binary run as a child
+// process. Nothing above this block is changed: the encoder, the instance, the
+// group check and the receipt writer are the ones the native study used.
+// ---------------------------------------------------------------------------
+
+const CMS_SCHEMA: &str = "phase_paired_cms/receipt/v1";
+const CMS_CONTROLS_SCHEMA: &str = "phase_paired_cms/controls/v1";
+/// The pinned build, fixed in PROTOCOL_ADDENDUM_2.md before any measurement.
+const CMS_TAG: &str = "release/v5.16.0";
+const CMS_COMMIT: &str = "2bf89cfb3e126e559d472388486327813f735f7e";
+const CADICAL_COMMIT: &str = "818c9562f114b315a9246ced943b66b60b38e8fb";
+const CADIBACK_COMMIT: &str = "445ddc2f2b5e54421af64e0652c2eb8444175322";
+const CMS_BINARY_SHA: &str = "8e1e539976b1fa8bff2b1e30df5c200c9a03ee343c634eadc0152e1b6cecd8f7";
+
+/// CryptoMiniSat's `--random` seed of repetition `rep`. CryptoMiniSat cannot
+/// take the native study's saved-phase scrambling, so the same per-repetition
+/// seed material (`phase_seed`) feeds its own seed instead; the arms of one
+/// repetition share it.
+fn cms_seed(rep: u64) -> u32 {
+    (phase_seed(rep) & 0x7fff_ffff) as u32
+}
+
+/// What the parser reads from CryptoMiniSat's standard output.
+#[derive(Debug, Default, PartialEq)]
+struct CmsOut {
+    /// The text after `s `: SATISFIABLE, UNSATISFIABLE or INDETERMINATE.
+    status: Option<String>,
+    /// Literals of the `v` lines, without the terminating 0.
+    model: Vec<i32>,
+    model_closed: bool,
+    /// Every `c conflicts : N` line, in order.
+    conflicts: Vec<u64>,
+    decisions: Option<u64>,
+    propagations: Option<u64>,
+    restarts: Option<u64>,
+    /// `c Total time (this thread)`, CryptoMiniSat's own clock.
+    total_time_s: Option<f64>,
+    /// A `v` line with a token that is not an integer.
+    malformed: bool,
+}
+
+/// The first token after the colon of a `c <label> : <value> ...` statistics line.
+fn stat_value<'a>(line: &'a str, label: &str) -> Option<&'a str> {
+    let rest = line.strip_prefix("c ")?;
+    let (l, r) = rest.split_once(':')?;
+    if l.trim() == label {
+        r.split_whitespace().next()
+    } else {
+        None
+    }
+}
+
+/// A statistics value as CryptoMiniSat prints it: an integer, or one rounded
+/// with a K, M or G suffix (propagations are). Rounded values are approximate;
+/// they feed only the exploratory columns, never a status or a budget.
+fn parse_scaled(tok: &str) -> Option<u64> {
+    let (num, mult) = match tok.chars().last()? {
+        'K' => (&tok[..tok.len() - 1], 1_000.0),
+        'M' => (&tok[..tok.len() - 1], 1_000_000.0),
+        'G' => (&tok[..tok.len() - 1], 1_000_000_000.0),
+        _ => (tok, 1.0),
+    };
+    num.parse::<f64>().ok().map(|v| (v * mult).round() as u64)
+}
+
+fn parse_cms_output(text: &str) -> CmsOut {
+    let mut o = CmsOut::default();
+    for line in text.lines() {
+        if let Some(s) = line.strip_prefix("s ") {
+            o.status = Some(s.trim().to_string());
+        } else if let Some(v) = line.strip_prefix("v ") {
+            for tok in v.split_whitespace() {
+                match tok.parse::<i32>() {
+                    Ok(0) => o.model_closed = true,
+                    Ok(l) => o.model.push(l),
+                    Err(_) => o.malformed = true,
+                }
+            }
+        } else if line.starts_with("c ") {
+            if let Some(x) = stat_value(line, "conflicts") {
+                if let Ok(n) = x.parse() {
+                    o.conflicts.push(n);
+                }
+            } else if let Some(x) = stat_value(line, "decisions") {
+                o.decisions = parse_scaled(x);
+            } else if let Some(x) = stat_value(line, "propagations") {
+                o.propagations = parse_scaled(x);
+            } else if let Some(x) = stat_value(line, "restarts") {
+                o.restarts = parse_scaled(x);
+            } else if let Some(x) = stat_value(line, "Total time (this thread)") {
+                o.total_time_s = x.parse().ok();
+            }
+        }
+    }
+    o
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CmsVerdict {
+    Sat,
+    Unsat,
+    Unknown,
+}
+
+/// The answer, from the status line and the exit code together (10, 20 and 0
+/// are CryptoMiniSat's conventions); any disagreement is an error.
+fn cms_verdict(o: &CmsOut, exit: Option<i32>) -> Result<CmsVerdict, String> {
+    match (o.status.as_deref(), exit) {
+        (Some("SATISFIABLE"), Some(10)) => Ok(CmsVerdict::Sat),
+        (Some("UNSATISFIABLE"), Some(20)) => Ok(CmsVerdict::Unsat),
+        (Some("INDETERMINATE"), Some(15)) => Ok(CmsVerdict::Unknown),
+        (s, e) => Err(format!("status line {s:?} with exit code {e:?}")),
+    }
+}
+
+/// The conflict count CryptoMiniSat reports (the last statistics line).
+fn cms_conflicts(o: &CmsOut) -> Result<u64, String> {
+    o.conflicts
+        .last()
+        .copied()
+        .ok_or_else(|| "no `c conflicts` line in the output".to_string())
+}
+
+/// The assignment of variables `1..=nv` from the `v` lines; every variable
+/// exactly once, terminated by 0.
+fn cms_model(o: &CmsOut, nv: u32) -> Result<Vec<bool>, String> {
+    if o.malformed || !o.model_closed {
+        return Err("model lines are malformed or not closed by 0".into());
+    }
+    let mut val: Vec<Option<bool>> = vec![None; nv as usize];
+    for &l in &o.model {
+        let v = l.unsigned_abs() as usize;
+        if v == 0 || v > nv as usize || val[v - 1].replace(l > 0).is_some() {
+            return Err(format!("model literal {l} is out of range or repeated"));
+        }
+    }
+    val.into_iter()
+        .enumerate()
+        .map(|(i, x)| x.ok_or_else(|| format!("variable {} missing from the model", i + 1)))
+        .collect()
+}
+
+/// A CNF + XOR instance read from extended DIMACS with CryptoMiniSat's parity
+/// convention (`x a b c 0` means a ^ b ^ c = 1; each negated literal flips the
+/// right-hand side). Parsed here, not by the crate, so that it is an
+/// independent reading of the file that was handed to the solver.
+struct Cnf {
+    nv: u32,
+    clauses: Vec<Vec<i32>>,
+    xors: Vec<(Vec<u32>, bool)>,
+}
+
+fn parse_cnf_xor(text: &str) -> Result<Cnf, String> {
+    let mut nv = None;
+    let (mut clauses, mut xors) = (Vec::new(), Vec::new());
+    for (n, line) in text.lines().enumerate() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('c') {
+            continue;
+        }
+        if let Some(h) = line.strip_prefix("p cnf ") {
+            let mut it = h.split_whitespace();
+            nv = Some(
+                it.next()
+                    .and_then(|v| v.parse::<u32>().ok())
+                    .ok_or_else(|| format!("line {}: bad header", n + 1))?,
+            );
+            continue;
+        }
+        let (is_xor, body) = match line.strip_prefix('x') {
+            Some(b) => (true, b),
+            None => (false, line),
+        };
+        let mut lits = Vec::new();
+        for t in body.split_whitespace() {
+            let l: i32 = t
+                .parse()
+                .map_err(|_| format!("line {}: bad literal", n + 1))?;
+            if l == 0 {
+                break;
+            }
+            lits.push(l);
+        }
+        if is_xor {
+            let neg = lits.iter().filter(|l| **l < 0).count();
+            let vars: Vec<u32> = lits.iter().map(|l| l.unsigned_abs()).collect();
+            let distinct: BTreeSet<u32> = vars.iter().copied().collect();
+            if distinct.len() != vars.len() {
+                return Err(format!("line {}: repeated variable in an XOR row", n + 1));
+            }
+            xors.push((vars, neg % 2 == 0));
+        } else {
+            clauses.push(lits);
+        }
+    }
+    Ok(Cnf {
+        nv: nv.ok_or("missing `p cnf` header")?,
+        clauses,
+        xors,
+    })
+}
+
+fn cnf_satisfied(c: &Cnf, m: &[bool]) -> bool {
+    let val = |l: i32| m[l.unsigned_abs() as usize - 1] == (l > 0);
+    c.clauses.iter().all(|cl| cl.iter().any(|l| val(*l)))
+        && c.xors
+            .iter()
+            .all(|(vs, rhs)| vs.iter().fold(false, |p, v| p ^ m[*v as usize - 1]) == *rhs)
+}
+
+/// Append a clause to an extended-DIMACS text and keep the header count right.
+fn append_clause(dimacs: &str, lits: &[i32]) -> String {
+    let (head, rest) = dimacs.split_once('\n').unwrap_or((dimacs, ""));
+    let mut p: Vec<&str> = head.split_whitespace().collect();
+    let count: usize = p.last().and_then(|v| v.parse().ok()).expect("p cnf V C");
+    let new = (count + 1).to_string();
+    *p.last_mut().unwrap() = &new;
+    let mut out = format!("{}\n{rest}", p.join(" "));
+    for l in lits {
+        out.push_str(&format!("{l} "));
+    }
+    out.push_str("0\n");
+    out
+}
+
+struct ChildRun {
+    exit_code: Option<i32>,
+    signal: Option<i32>,
+    user_ns: u64,
+    sys_ns: u64,
+    wall_ns: u64,
+    maxrss_kb: u64,
+    killed: bool,
+}
+
+/// Run `bin args` with stdout and stderr redirected to files and reap it with
+/// `wait4`, which returns the child's own resource usage (user + system CPU).
+/// The child is killed only if its wall time passes `kill_wall_s`, a backstop
+/// far above the solver's own CPU limit.
+fn run_child(
+    bin: &str,
+    args: &[String],
+    out_path: &std::path::Path,
+    err_path: &std::path::Path,
+    kill_wall_s: f64,
+) -> Result<ChildRun, String> {
+    let out = fs::File::create(out_path).map_err(|e| format!("{}: {e}", out_path.display()))?;
+    let err = fs::File::create(err_path).map_err(|e| format!("{}: {e}", err_path.display()))?;
+    let t0 = Instant::now();
+    let mut child = std::process::Command::new(bin)
+        .args(args)
+        .stdin(std::process::Stdio::null())
+        .stdout(out)
+        .stderr(err)
+        .spawn()
+        .map_err(|e| format!("spawn {bin}: {e}"))?;
+    let pid = child.id() as libc::pid_t;
+    let mut killed = false;
+    loop {
+        let mut status: libc::c_int = 0;
+        // SAFETY: a zeroed rusage is a valid out-parameter for wait4.
+        let mut ru: libc::rusage = unsafe { std::mem::zeroed() };
+        // SAFETY: `pid` is our own unreaped child.
+        let r = unsafe { libc::wait4(pid, &mut status, libc::WNOHANG, &mut ru) };
+        if r == pid {
+            let tv = |t: libc::timeval| t.tv_sec as u64 * 1_000_000_000 + t.tv_usec as u64 * 1_000;
+            return Ok(ChildRun {
+                exit_code: libc::WIFEXITED(status).then(|| libc::WEXITSTATUS(status)),
+                signal: libc::WIFSIGNALED(status).then(|| libc::WTERMSIG(status)),
+                user_ns: tv(ru.ru_utime),
+                sys_ns: tv(ru.ru_stime),
+                wall_ns: t0.elapsed().as_nanos() as u64,
+                maxrss_kb: ru.ru_maxrss as u64,
+                killed,
+            });
+        }
+        if r < 0 {
+            return Err(format!("wait4: {}", std::io::Error::last_os_error()));
+        }
+        if !killed && t0.elapsed().as_secs_f64() > kill_wall_s {
+            let _ = child.kill();
+            killed = true;
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+#[derive(Clone, Debug)]
+struct CmsConfig {
+    bin: String,
+    conflicts: u64,
+    /// CPU backstop passed as `--maxtime`; the primary budget is `conflicts`.
+    maxtime_s: f64,
+    scratch: std::path::PathBuf,
+    keep_dimacs: bool,
+}
+
+/// One child invocation and what was read from it.
+struct CmsCall {
+    run: ChildRun,
+    out: CmsOut,
+    stdout_sha: String,
+    tail_sha: String,
+    stdout_bytes: usize,
+}
+
+fn cms_args(max_conf: u64, max_time: f64, seed: u32, cnf: &std::path::Path) -> Vec<String> {
+    vec![
+        "--threads".into(),
+        "1".into(),
+        "--maxconfl".into(),
+        max_conf.to_string(),
+        "--maxtime".into(),
+        format!("{max_time:.3}"),
+        "--random".into(),
+        seed.to_string(),
+        "--verb".into(),
+        "1".into(),
+        cnf.display().to_string(),
+    ]
+}
+
+fn cms_call(
+    cfg: &CmsConfig,
+    cnf: &std::path::Path,
+    tag: &str,
+    max_conf: u64,
+    max_time: f64,
+    seed: u32,
+) -> Result<CmsCall, String> {
+    let (op, ep) = (
+        cfg.scratch.join(format!("{tag}.out")),
+        cfg.scratch.join(format!("{tag}.err")),
+    );
+    let run = run_child(
+        &cfg.bin,
+        &cms_args(max_conf, max_time, seed, cnf),
+        &op,
+        &ep,
+        max_time * 1.5 + 30.0,
+    )?;
+    let bytes = fs::read(&op).map_err(|e| e.to_string())?;
+    let text = String::from_utf8_lossy(&bytes).into_owned();
+    let tail = &bytes[bytes.len().saturating_sub(4096)..];
+    let call = CmsCall {
+        run,
+        out: parse_cms_output(&text),
+        stdout_sha: sha_hex(&bytes),
+        tail_sha: sha_hex(tail),
+        stdout_bytes: bytes.len(),
+    };
+    if !cfg.keep_dimacs {
+        let _ = fs::remove_file(&op);
+        let _ = fs::remove_file(&ep);
+    }
+    Ok(call)
+}
+
+/// Check the binary's hash and that its version banner names the pinned commits.
+fn cms_pinned(bin: &str) -> Result<(String, String), String> {
+    let bytes = fs::read(bin).map_err(|e| format!("read {bin}: {e}"))?;
+    let sha = sha_hex(&bytes);
+    if sha != CMS_BINARY_SHA {
+        return Err(format!(
+            "binary SHA-256 {sha} differs from the pinned {CMS_BINARY_SHA}"
+        ));
+    }
+    let banner = cmd_out(bin, &["--version"]);
+    for want in [CMS_COMMIT, CADICAL_COMMIT, CADIBACK_COMMIT] {
+        if !banner.contains(want) {
+            return Err(format!("version banner does not name commit {want}"));
+        }
+    }
+    Ok((sha, banner.lines().take(4).collect::<Vec<_>>().join(" | ")))
+}
+
+/// One attempt through the external solver: build and export the instance,
+/// run the child (again after a rejected tuple, within the remaining budget),
+/// group-check every model. Returns the receipt fields shared with the native
+/// attempts plus a `cms` block.
+fn run_cms_attempt(
+    inst: &Instance,
+    cfg: &CmsConfig,
+    tag: &str,
+    target: (u64, u64),
+    phases: bool,
+    form: Form,
+    seed: u32,
+) -> (AttemptOut, Value) {
+    let (w0, c0) = (Instant::now(), cpu_ns());
+    let (model, vars) = build_model(&inst.ec.gf, &inst.basis, target, phases, form);
+    let mut dimacs = to_dimacs_xor(&model.load(Priority::Core));
+    let (dimacs_sha, dimacs_bytes) = (sha_hex(dimacs.as_bytes()), dimacs.len());
+    let cnf_path = cfg.scratch.join(format!("{tag}.cnf"));
+    let wrote = fs::write(&cnf_path, &dimacs);
+    let (w1, c1) = (Instant::now(), cpu_ns());
+    let (mut child_cpu, mut child_wall, mut user, mut sys) = (0u64, 0u64, 0u64, 0u64);
+    let (mut vw, mut vc) = (0u64, 0u64);
+    let (mut conflicts, mut decisions, mut props, mut restarts) = (0u64, 0u64, 0u64, 0u64);
+    let (mut rejected, mut calls) = (0u64, 0u64);
+    let (mut found, mut summands) = (None, None);
+    let mut call_info: Vec<Value> = Vec::new();
+    let mut rss = 0u64;
+    let mut error: Option<String> = wrote
+        .err()
+        .map(|e| format!("write {}: {e}", cnf_path.display()));
+    let status: &'static str = 'attempt: loop {
+        if error.is_some() {
+            break 'attempt "error";
+        }
+        if conflicts >= cfg.conflicts {
+            break 'attempt "budget";
+        }
+        let left_t = cfg.maxtime_s - child_cpu as f64 / 1e9;
+        if left_t <= 0.0 {
+            break 'attempt "deadline";
+        }
+        calls += 1;
+        let call = match cms_call(
+            cfg,
+            &cnf_path,
+            &format!("{tag}.{calls}"),
+            cfg.conflicts - conflicts,
+            left_t,
+            seed,
+        ) {
+            Ok(c) => c,
+            Err(e) => {
+                error = Some(e);
+                break 'attempt "error";
+            }
+        };
+        let cpu = call.run.user_ns + call.run.sys_ns;
+        child_cpu += cpu;
+        user += call.run.user_ns;
+        sys += call.run.sys_ns;
+        child_wall += call.run.wall_ns;
+        rss = rss.max(call.run.maxrss_kb);
+        decisions += call.out.decisions.unwrap_or(0);
+        props += call.out.propagations.unwrap_or(0);
+        restarts += call.out.restarts.unwrap_or(0);
+        call_info.push(json!({
+            "exit_code": call.run.exit_code, "signal": call.run.signal,
+            "killed_at_wall_backstop": call.run.killed,
+            "status_line": call.out.status, "child_cpu_ns": cpu,
+            "child_wall_ns": call.run.wall_ns,
+            "cms_reported_conflicts": call.out.conflicts.last(),
+            "cms_reported_total_time_s": call.out.total_time_s,
+            "stdout_bytes": call.stdout_bytes, "stdout_sha256": call.stdout_sha,
+            "stdout_tail4096_sha256": call.tail_sha,
+        }));
+        if call.run.killed {
+            error = Some("child killed at the wall backstop".into());
+            break 'attempt "error";
+        }
+        let verdict = match cms_verdict(&call.out, call.run.exit_code) {
+            Ok(v) => v,
+            Err(e) => {
+                error = Some(e);
+                break 'attempt "error";
+            }
+        };
+        match cms_conflicts(&call.out) {
+            Ok(n) => conflicts += n,
+            Err(e) => {
+                error = Some(e);
+                break 'attempt "error";
+            }
+        }
+        match verdict {
+            CmsVerdict::Unsat => break 'attempt "unsat",
+            CmsVerdict::Unknown => {
+                break 'attempt if conflicts >= cfg.conflicts {
+                    "budget"
+                } else {
+                    "deadline"
+                }
+            }
+            CmsVerdict::Sat => {
+                let (a1, b1) = (Instant::now(), cpu_ns());
+                let sol = match cms_model(&call.out, model.nv) {
+                    Ok(s) => s,
+                    Err(e) => {
+                        error = Some(e);
+                        break 'attempt "error";
+                    }
+                };
+                // The model must satisfy the very file that was handed over.
+                match parse_cnf_xor(&dimacs) {
+                    Ok(c) if c.nv == model.nv && cnf_satisfied(&c, &sol) => {}
+                    _ => {
+                        error = Some("model does not satisfy the exported instance".into());
+                        break 'attempt "error";
+                    }
+                }
+                let (xs, detail) = decode(&inst.ec.gf, &inst.basis, &vars, &sol);
+                let ok = verify_xs(inst, &xs, target);
+                vw += a1.elapsed().as_nanos() as u64;
+                vc += cpu_ns() - b1;
+                if let Some(pts) = ok {
+                    found = Some(pts);
+                    summands = Some(detail);
+                    break 'attempt "verified";
+                }
+                rejected += 1;
+                // Block this (coordinates, phases) tuple and run again within
+                // the remaining budget, as the native attempts do.
+                let mut block: Vec<i32> = Vec::new();
+                let core = vars
+                    .c
+                    .iter()
+                    .flatten()
+                    .chain(vars.e.iter().flatten().flatten());
+                for v in core {
+                    block.push(if sol[*v as usize - 1] {
+                        -(*v as i32)
+                    } else {
+                        *v as i32
+                    });
+                }
+                dimacs = append_clause(&dimacs, &block);
+                if let Err(e) = fs::write(&cnf_path, &dimacs) {
+                    error = Some(e.to_string());
+                    break 'attempt "error";
+                }
+            }
+        }
+    };
+    let (wend, cend) = (Instant::now(), cpu_ns());
+    if !cfg.keep_dimacs {
+        let _ = fs::remove_file(&cnf_path);
+    }
+    let parent_cpu = cend - c0;
+    let out = AttemptOut {
+        status,
+        conflicts,
+        decisions,
+        propagations: props,
+        restarts,
+        learnt: 0,
+        xor_propagations: 0,
+        xor_conflicts: 0,
+        word_ops: 0,
+        rejected,
+        solver_calls: calls,
+        found,
+        summands,
+        size: model.size(),
+        build_wall_ns: (w1 - w0).as_nanos() as u64,
+        build_cpu_ns: c1 - c0,
+        solve_wall_ns: child_wall,
+        solve_cpu_ns: child_cpu,
+        verify_wall_ns: vw,
+        verify_cpu_ns: vc,
+        total_wall_ns: (wend - w0).as_nanos() as u64,
+        total_cpu_ns: parent_cpu + child_cpu,
+    };
+    let info = json!({
+        "cms_seed": seed, "dimacs_sha256": dimacs_sha, "dimacs_bytes": dimacs_bytes,
+        "child_user_ns": user, "child_sys_ns": sys, "child_cpu_ns": child_cpu,
+        "parent_cpu_ns": parent_cpu, "child_maxrss_kb": rss,
+        "calls": call_info, "error": error,
+    });
+    (out, info)
+}
+
+/// Receipt for one attempt through CryptoMiniSat: the native fields, the solver
+/// id and the `cms` block.
+fn cms_attempt_value(
+    item: &Value,
+    inst: &Instance,
+    out: &AttemptOut,
+    info: Value,
+    seq: u64,
+    seed: u32,
+) -> Value {
+    let mut v = attempt_value(item, inst, out, seq, seed as u64);
+    let o = v.as_object_mut().unwrap();
+    o.remove("phase_seed");
+    o.insert("solver".into(), json!("cryptominisat5"));
+    o.insert("cms".into(), info);
+    v
+}
+
+/// Stage rule (PROTOCOL_ADDENDUM_2.md): repetition 1 always starts; a later
+/// repetition runs in full if the remaining CPU allowance is at least `guard`
+/// times the dearest completed full repetition, with arm A only if it is at
+/// least `guard` times the dearest completed arm A, and not at all otherwise.
+fn rep_mode(
+    rep: u64,
+    remaining: f64,
+    guard: f64,
+    full_cost: Option<f64>,
+    a_cost: Option<f64>,
+) -> &'static str {
+    if rep == 1 {
+        return "full";
+    }
+    match (full_cost, a_cost) {
+        (Some(f), _) if remaining >= guard * f => "full",
+        (_, Some(a)) if remaining >= guard * a => "armA",
+        _ => "none",
+    }
+}
+
+fn cms_cpu_sum(recs: &[Value]) -> f64 {
+    recs.iter()
+        .map(|r| {
+            if r["status"] == "skipped" {
+                0.0
+            } else {
+                r["total_cpu_ns"]
+                    .as_u64()
+                    .or_else(|| r["cpu_ns"].as_u64())
+                    .unwrap_or(0) as f64
+                    / 1e9
+            }
+        })
+        .sum()
+}
+
+fn cms_config_from_args(a: &HashMap<String, String>) -> Result<CmsConfig, String> {
+    let bin = a
+        .get("cms")
+        .cloned()
+        .or_else(|| std::env::var("PHASE_PAIRED_CMS").ok())
+        .ok_or("--cms BINARY (or PHASE_PAIRED_CMS) is required")?;
+    let scratch = std::path::PathBuf::from(a.get("scratch").ok_or("--scratch DIR is required")?);
+    fs::create_dir_all(&scratch).map_err(|e| e.to_string())?;
+    Ok(CmsConfig {
+        bin,
+        conflicts: a
+            .get("conflict-budget")
+            .map(|v| v.parse().expect("conflict-budget"))
+            .unwrap_or(3_000_000),
+        maxtime_s: a
+            .get("maxtime")
+            .map(|v| v.parse().expect("maxtime"))
+            .unwrap_or(120.0),
+        scratch,
+        keep_dimacs: a.contains_key("keep-dimacs"),
+    })
+}
+
+fn cms_run_cmd(a: &HashMap<String, String>) -> i32 {
+    let inst = instance_from_args(a);
+    let cfg = match cms_config_from_args(a) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{e}");
+            return 64;
+        }
+    };
+    let (cms_sha, banner) = match cms_pinned(&cfg.bin) {
+        Ok(x) => x,
+        Err(e) => {
+            eprintln!("binary refused: {e}");
+            return 3;
+        }
+    };
+    let out_path = a.get("out").expect("--out receipts.jsonl").clone();
+    let forms: Vec<String> = a
+        .get("forms")
+        .cloned()
+        .unwrap_or_else(|| "subgroup_xor".into())
+        .split(',')
+        .map(String::from)
+        .collect();
+    for f in &forms {
+        assert!(formulation(f).is_some(), "unknown formulation {f}");
+    }
+    let reps: u64 = a.get("reps").map(|v| v.parse().unwrap()).unwrap_or(3);
+    let cpu_cap: f64 = a
+        .get("cpu-cap")
+        .map(|v| v.parse().unwrap())
+        .unwrap_or(3600.0);
+    let cpu_prior: f64 = a
+        .get("cpu-prior")
+        .map(|v| v.parse().unwrap())
+        .unwrap_or(0.0);
+    let guard: f64 = a
+        .get("stage-guard")
+        .map(|v| v.parse().unwrap())
+        .unwrap_or(1.1);
+    // The worst one attempt can cost: the CPU backstop plus a margin for parsing and overshoot.
+    let attempt_worst = cfg.maxtime_s * 1.05 + 3.0;
+    let controls: Vec<Value> = a.get("controls").map(|p| read_jsonl(p)).unwrap_or_default();
+    let controls_cpu = cms_cpu_sum(&controls);
+    let only: Option<Vec<String>> = a
+        .get("targets")
+        .map(|v| v.split(',').map(String::from).collect());
+    let prior = read_jsonl(&out_path);
+    let producer_sha = sha_hex(THIS_SOURCE);
+    let mut done = BTreeSet::new();
+    let mut seq = 0u64;
+    let mut modes: BTreeMap<u64, String> = BTreeMap::new();
+    if let Some(h) = prior.first() {
+        if !a.contains_key("resume") {
+            eprintln!("{out_path} exists; pass --resume to append");
+            return 3;
+        }
+        for (k, want) in [
+            ("manifest_sha256", json!(inst.manifest_sha)),
+            ("producer_sha256", json!(producer_sha)),
+            ("cms_binary_sha256", json!(cms_sha)),
+            ("conflict_budget", json!(cfg.conflicts)),
+            ("maxtime_cpu_s", json!(cfg.maxtime_s)),
+            ("forms", json!(forms)),
+            ("cpu_cap_s", json!(cpu_cap)),
+            ("cpu_prior_s", json!(cpu_prior)),
+        ] {
+            if h[k] != want {
+                eprintln!("resume refused: header {k} differs ({} vs {want})", h[k]);
+                return 3;
+            }
+        }
+        for r in &prior {
+            match r["type"].as_str() {
+                Some("attempt") => {
+                    seq += 1;
+                    if r["status"] != "skipped" {
+                        done.insert((
+                            r["rep"].as_u64().unwrap(),
+                            r["form"].as_str().unwrap().to_string(),
+                            r["target_id"].as_str().unwrap().to_string(),
+                            r["arm"].as_str().unwrap().to_string(),
+                        ));
+                    }
+                }
+                Some("stage") => {
+                    modes.insert(
+                        r["rep"].as_u64().unwrap(),
+                        r["mode"].as_str().unwrap().to_string(),
+                    );
+                }
+                _ => {}
+            }
+        }
+    }
+    let mut out = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&out_path)
+        .expect("open receipts");
+    let mut emit = |v: &Value| {
+        writeln!(out, "{}", serde_json::to_string(v).unwrap()).unwrap();
+        out.flush().unwrap();
+        out.sync_data().ok();
+    };
+    let meta = json!({
+        "created_unix": std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0),
+        "command": std::env::args().collect::<Vec<_>>().join(" "),
+        "cpu_model": cpu_model(),
+        "cpus": std::thread::available_parallelism().map(|n| n.get()).unwrap_or(0),
+        "loadavg_start": loadavg(),
+        "rustc": cmd_out("rustc", &["--version"]),
+        "kernel": cmd_out("uname", &["-sr"]),
+    });
+    if prior.is_empty() {
+        emit(&json!({
+            "type": "header", "schema": CMS_SCHEMA,
+            "manifest_sha256": inst.manifest_sha, "producer_sha256": producer_sha,
+            "forms": forms, "reps_planned": reps,
+            "conflict_budget": cfg.conflicts, "maxtime_cpu_s": cfg.maxtime_s,
+            "solver": "cryptominisat5 5.16.0, CLI child process, --threads 1, defaults otherwise",
+            "cms_tag": CMS_TAG, "cms_commit": CMS_COMMIT,
+            "cadical_commit": CADICAL_COMMIT, "cadiback_commit": CADIBACK_COMMIT,
+            "cms_binary_sha256": cms_sha, "cms_banner": banner,
+            "cms_args": "--threads 1 --maxconfl <budget left> --maxtime <cpu left> --random <cms_seed> --verb 1 <file.cnf>",
+            "cms_seeds": (1..=reps).map(cms_seed).collect::<Vec<_>>(),
+            "branch_priority": "not applicable (CryptoMiniSat chooses its own branching)",
+            "arms": {"A": "representatives only", "B": "one-hot Frobenius phases"},
+            "budget_clock": "conflicts (primary, CryptoMiniSat's own count); --maxtime is a CPU backstop",
+            "cpu_clock": "child user+system CPU from wait4, plus the parent's CLOCK_PROCESS_CPUTIME_ID for build, export and verification",
+            "schedule": "rep-major, formulation, target order; pair i runs A,B if (i+rep-1) even else B,A",
+            "cpu_cap_s": cpu_cap, "cpu_prior_s": cpu_prior, "controls_cpu_s": controls_cpu,
+            "stage_guard": guard,
+            "meta": meta,
+        }));
+    } else {
+        emit(&json!({"type": "resume", "reps_planned": reps, "meta": meta}));
+    }
+    let mut capped: Option<String> = None;
+    for item in schedule(&inst, &forms, reps) {
+        let key = (
+            item["rep"].as_u64().unwrap(),
+            item["form"].as_str().unwrap().to_string(),
+            item["target_id"].as_str().unwrap().to_string(),
+            item["arm"].as_str().unwrap().to_string(),
+        );
+        if done.contains(&key) {
+            continue;
+        }
+        let rep = key.0;
+        let all: Vec<Value> = read_jsonl(&out_path);
+        let spent = cpu_prior + controls_cpu + cms_cpu_sum(&all);
+        if item["pair"] == 0 && item["position"] == 0 && !modes.contains_key(&rep) {
+            // Per-repetition planning, from the receipts so far.
+            let cost = |r: u64, arm: Option<&str>| -> (f64, usize) {
+                let rows: Vec<&Value> = all
+                    .iter()
+                    .filter(|x| {
+                        x["type"] == "attempt"
+                            && x["status"] != "skipped"
+                            && x["rep"] == r
+                            && arm.is_none_or(|a| x["arm"] == a)
+                    })
+                    .collect();
+                (
+                    rows.iter()
+                        .map(|x| x["total_cpu_ns"].as_u64().unwrap_or(0) as f64 / 1e9)
+                        .sum(),
+                    rows.len(),
+                )
+            };
+            let n_targets = inst.targets.len();
+            let full: Vec<f64> = (1..rep)
+                .filter(|r| cost(*r, None).1 == 2 * n_targets)
+                .map(|r| cost(r, None).0)
+                .collect();
+            let a_only: Vec<f64> = (1..rep)
+                .filter(|r| cost(*r, Some("A")).1 == n_targets)
+                .map(|r| cost(r, Some("A")).0)
+                .collect();
+            let mx = |v: &[f64]| {
+                v.iter()
+                    .cloned()
+                    .fold(None::<f64>, |m, x| Some(m.map_or(x, |y| y.max(x))))
+            };
+            let (fc, ac) = (mx(&full), mx(&a_only));
+            let remaining = cpu_cap - spent;
+            let mode = if capped.is_some() {
+                "none"
+            } else {
+                rep_mode(rep, remaining, guard, fc, ac)
+            };
+            modes.insert(rep, mode.to_string());
+            emit(&json!({"type": "stage", "rep": rep, "mode": mode,
+                         "remaining_cpu_s": (remaining * 1000.0).round() / 1000.0,
+                         "dearest_full_rep_cpu_s": fc, "dearest_arm_a_cpu_s": ac,
+                         "guard": guard}));
+        }
+        let mode = modes.get(&rep).cloned().unwrap_or_else(|| "full".into());
+        if item["position"] == 0 && capped.is_none() {
+            let arms = if mode == "armA" { 1.0 } else { 2.0 };
+            if spent + arms * attempt_worst > cpu_cap {
+                capped = Some(format!(
+                    "cpu cap {cpu_cap} s: {spent:.1} s spent, a pair can cost {:.0} s",
+                    arms * attempt_worst
+                ));
+            }
+        }
+        let skip_reason = if let Some(c) = &capped {
+            Some(c.clone())
+        } else if mode == "none" {
+            Some("stage rule: the remaining allowance does not fit another repetition".to_string())
+        } else if mode == "armA" && item["arm"] == "B" {
+            Some("stage rule: arm A only in this repetition".to_string())
+        } else {
+            None
+        };
+        if let Some(reason) = skip_reason {
+            let mut rec = item.clone();
+            rec["type"] = json!("attempt");
+            rec["seq"] = json!(seq);
+            rec["status"] = json!("skipped");
+            rec["reason"] = json!(reason);
+            // Complete enough for the replay to check the slot against the manifest.
+            let tt = inst
+                .targets
+                .iter()
+                .find(|t| t.id == item["target_id"].as_str().unwrap())
+                .unwrap();
+            rec["target"] = json!([hx(tt.r.0), hx(tt.r.1)]);
+            rec["phases"] = json!(item["arm"] == "B");
+            rec["n"] = json!(inst.n);
+            seq += 1;
+            emit(&rec);
+            continue;
+        }
+        let t = inst
+            .targets
+            .iter()
+            .find(|t| t.id == item["target_id"].as_str().unwrap())
+            .unwrap();
+        if let Some(only) = &only {
+            if !only.contains(&t.id) {
+                continue;
+            }
+        }
+        if let Some(arms) = a.get("arms") {
+            if !arms.contains(item["arm"].as_str().unwrap()) {
+                continue;
+            }
+        }
+        let fin = formulation(item["form"].as_str().unwrap()).unwrap();
+        let seed = cms_seed(rep);
+        let tag = format!("r{rep}_{}_{}", item["arm"].as_str().unwrap(), t.id);
+        let (res, info) = run_cms_attempt(&inst, &cfg, &tag, t.r, item["arm"] == "B", fin, seed);
+        emit(&cms_attempt_value(&item, &inst, &res, info, seq, seed));
+        seq += 1;
+        // Progress lines carry no timing, as in the native run.
+        println!(
+            "rep {} {:14} pair {:2} {} {} {}",
+            item["rep"],
+            item["form"].as_str().unwrap(),
+            item["pair"],
+            item["arm"].as_str().unwrap(),
+            t.id,
+            res.status
+        );
+        if res.status == "error" {
+            eprintln!("instrument error on {tag}: the run stops (stop condition)");
+            emit(&json!({"type": "end", "capped": capped, "stopped": "error"}));
+            return 2;
+        }
+    }
+    let total = cms_cpu_sum(&read_jsonl(&out_path));
+    emit(&json!({"type": "end", "capped": capped,
+                 "total_attempt_cpu_s": (total * 1000.0).round() / 1000.0}));
+    0
+}
+
+// ---- controls: tiny known instances, export fidelity, positive control ----
+
+/// A random CNF + XOR instance on `n` variables, with its ground truth by
+/// brute force (no solver involved).
+fn tiny_instance(rng: &mut SplitMix, n: u32) -> (Vec<Vec<i32>>, Vec<(Vec<u32>, bool)>, bool) {
+    let mut clauses = Vec::new();
+    for _ in 0..(4 * n + rng.below(n as u64) as u32) {
+        let mut vs = BTreeSet::new();
+        while vs.len() < 3 {
+            vs.insert(1 + rng.below(n as u64) as i32);
+        }
+        clauses.push(
+            vs.into_iter()
+                .map(|v| if rng.below(2) == 1 { v } else { -v })
+                .collect(),
+        );
+    }
+    let mut xors = Vec::new();
+    for _ in 0..(2 + rng.below(3)) {
+        let k = 3 + rng.below(4) as usize;
+        let mut vs = BTreeSet::new();
+        while vs.len() < k {
+            vs.insert(1 + rng.below(n as u64) as u32);
+        }
+        xors.push((vs.into_iter().collect::<Vec<u32>>(), rng.below(2) == 1));
+    }
+    let c = Cnf {
+        nv: n,
+        clauses,
+        xors,
+    };
+    let sat = (0u32..(1 << n)).any(|m| {
+        let model: Vec<bool> = (0..n).map(|i| (m >> i) & 1 == 1).collect();
+        cnf_satisfied(&c, &model)
+    });
+    (c.clauses, c.xors, sat)
+}
+
+fn solver_from_lists(n: u32, clauses: &[Vec<i32>], xors: &[(Vec<u32>, bool)]) -> Solver {
+    let mut s = Solver::new(n);
+    for c in clauses {
+        s.add_clause(c.clone());
+    }
+    for (v, r) in xors {
+        s.add_xor(v, *r);
+    }
+    s
+}
+
+/// `cms-selftest`: the binary against brute force and the native solver on tiny
+/// instances, before any frozen target is touched.
+fn cms_selftest_cmd(a: &HashMap<String, String>) -> i32 {
+    let cfg = match cms_config_from_args(a) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{e}");
+            return 64;
+        }
+    };
+    let (cms_sha, banner) = match cms_pinned(&cfg.bin) {
+        Ok(x) => x,
+        Err(e) => {
+            eprintln!("binary refused: {e}");
+            return 3;
+        }
+    };
+    let out_path = a.get("out").expect("--out controls.jsonl").clone();
+    let count: usize = a.get("count").map(|v| v.parse().unwrap()).unwrap_or(100);
+    let mut out = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&out_path)
+        .expect("open controls");
+    let mut emit = |v: &Value| {
+        writeln!(out, "{}", serde_json::to_string(v).unwrap()).unwrap();
+        out.flush().unwrap();
+    };
+    emit(
+        &json!({"type": "header", "schema": CMS_CONTROLS_SCHEMA, "cms_binary_sha256": cms_sha,
+                 "cms_banner": banner, "producer_sha256": sha_hex(THIS_SOURCE)}),
+    );
+    let mut rng = SplitMix(0x434d_5353_4c46_5453);
+    let (mut agree, mut sat_n, mut unsat_n, mut bad, mut cpu_total) = (0, 0, 0, 0, 0u64);
+    for i in 0..count {
+        let n = 10 + rng.below(5) as u32;
+        let (clauses, xors, truth) = tiny_instance(&mut rng, n);
+        let text = to_dimacs_xor(&solver_from_lists(n, &clauses, &xors));
+        let native = {
+            let mut s = parse_dimacs_xor(&text).expect("crate parser");
+            s.solve() == SolveResult::Sat
+        };
+        let path = cfg.scratch.join(format!("selftest_{i}.cnf"));
+        fs::write(&path, &text).unwrap();
+        let call =
+            cms_call(&cfg, &path, &format!("selftest_{i}"), 100_000, 30.0, 1).expect("child");
+        let _ = fs::remove_file(&path);
+        let cpu = call.run.user_ns + call.run.sys_ns;
+        cpu_total += cpu;
+        let verdict = cms_verdict(&call.out, call.run.exit_code);
+        let (cms_sat, model_ok) = match verdict {
+            Ok(CmsVerdict::Sat) => {
+                let ok = cms_model(&call.out, n)
+                    .map(|m| {
+                        parse_cnf_xor(&text)
+                            .map(|c| cnf_satisfied(&c, &m))
+                            .unwrap_or(false)
+                    })
+                    .unwrap_or(false);
+                (Some(true), ok)
+            }
+            Ok(CmsVerdict::Unsat) => (Some(false), true),
+            _ => (None, false),
+        };
+        let pass = cms_sat == Some(truth) && native == truth && model_ok;
+        agree += pass as u32;
+        bad += !pass as u32;
+        if truth {
+            sat_n += 1
+        } else {
+            unsat_n += 1
+        }
+        emit(
+            &json!({"type": "selftest", "i": i, "vars": n, "truth_sat": truth,
+                     "native_sat": native, "cms_sat": cms_sat, "model_satisfies_file": model_ok,
+                     "pass": pass, "cpu_ns": cpu, "dimacs_sha256": sha_hex(text.as_bytes())}),
+        );
+    }
+    // The parity convention on hand-written files.
+    for (name, text, want) in [
+        ("parity_sat", "p cnf 3 3\nx 1 2 3 0\nx -1 2 0\n3 0\n", true),
+        ("odd_cycle_unsat", "p cnf 3 3\nx 1 2 0\nx 2 3 0\nx 1 3 0\n", false),
+        ("negation_flips_rhs_unsat", "p cnf 2 2\nx 1 2 0\nx -1 2 0\n", false),
+        ("pigeonhole_3_2_unsat", "p cnf 6 9\n1 2 0\n3 4 0\n5 6 0\n-1 -3 0\n-1 -5 0\n-3 -5 0\n-2 -4 0\n-2 -6 0\n-4 -6 0\n", false),
+    ] {
+        let path = cfg.scratch.join(format!("selftest_{name}.cnf"));
+        fs::write(&path, text).unwrap();
+        let call = cms_call(&cfg, &path, &format!("selftest_{name}"), 100_000, 30.0, 1)
+            .expect("child");
+        let _ = fs::remove_file(&path);
+        let cpu = call.run.user_ns + call.run.sys_ns;
+        cpu_total += cpu;
+        let got = match cms_verdict(&call.out, call.run.exit_code) {
+            Ok(CmsVerdict::Sat) => Some(true),
+            Ok(CmsVerdict::Unsat) => Some(false),
+            _ => None,
+        };
+        let model_ok = !want
+            || cms_model(&call.out, parse_cnf_xor(text).unwrap().nv)
+                .map(|m| cnf_satisfied(&parse_cnf_xor(text).unwrap(), &m))
+                .unwrap_or(false);
+        let pass = got == Some(want) && model_ok;
+        bad += !pass as u32;
+        emit(&json!({"type": "selftest", "name": name, "truth_sat": want, "cms_sat": got,
+                     "model_satisfies_file": model_ok, "pass": pass, "cpu_ns": cpu}));
+    }
+    println!(
+        "selftest: {} random instances ({sat_n} SAT, {unsat_n} UNSAT) agree with brute force, \
+         the native solver and the model check: {agree}; failures overall: {bad}; child CPU {:.3} s",
+        count,
+        cpu_total as f64 / 1e9
+    );
+    emit(
+        &json!({"type": "selftest_summary", "random": count, "sat": sat_n, "unsat": unsat_n,
+                 "failures": bad, "cpu_ns": 0, "child_cpu_ns": cpu_total}),
+    );
+    if bad == 0 && sat_n > 0 && unsat_n > 0 {
+        0
+    } else {
+        2
+    }
+}
+
+/// `cms-check`: export fidelity (the native solver on the DIMACS round trip
+/// follows the original search exactly) and the positive control through the
+/// real child-process path on cheap decomposable targets.
+fn cms_check_cmd(a: &HashMap<String, String>) -> i32 {
+    let inst = instance_from_args(a);
+    let cfg = match cms_config_from_args(a) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{e}");
+            return 64;
+        }
+    };
+    if let Err(e) = cms_pinned(&cfg.bin) {
+        eprintln!("binary refused: {e}");
+        return 3;
+    }
+    let out_path = a.get("out").expect("--out controls.jsonl").clone();
+    let fid_budget: u64 = a
+        .get("fidelity-budget")
+        .map(|v| v.parse().unwrap())
+        .unwrap_or(20_000);
+    let cases: Vec<(String, bool)> = a
+        .get("fidelity")
+        .cloned()
+        .unwrap_or_else(|| "b3:A,b3:B,a0:A,a0:B".into())
+        .split(',')
+        .map(|s| {
+            let (t, arm) = s.split_once(':').expect("target:arm");
+            (t.to_string(), arm == "B")
+        })
+        .collect();
+    let positive: Vec<(String, bool)> = a
+        .get("positive")
+        .cloned()
+        .unwrap_or_else(|| "b3:A,b3:B".into())
+        .split(',')
+        .map(|s| {
+            let (t, arm) = s.split_once(':').expect("target:arm");
+            (t.to_string(), arm == "B")
+        })
+        .collect();
+    let form = formulation("subgroup_xor").unwrap();
+    let mut out = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&out_path)
+        .expect("open controls");
+    let mut emit = |v: &Value| {
+        writeln!(out, "{}", serde_json::to_string(v).unwrap()).unwrap();
+        out.flush().unwrap();
+    };
+    let mut failures = 0;
+    for (tid, phases) in &cases {
+        let t = inst.targets.iter().find(|t| &t.id == tid).expect("target");
+        let seed = phase_seed(1);
+        let (model, _vars) = build_model(&inst.ec.gf, &inst.basis, t.r, *phases, form);
+        let original = model.load(Priority::Core);
+        let text = to_dimacs_xor(&original);
+        let reparsed = parse_dimacs_xor(&text).expect("round trip parse");
+        let fixed_point = to_dimacs_xor(&reparsed) == text;
+        let own = parse_cnf_xor(&text).expect("own parse");
+        let counts_match = reparsed.n_xors() == own.xors.len()
+            && own.nv == model.nv
+            && own.xors.len() == original.n_xors()
+            && own.clauses.len() == original.n_original_clauses();
+        // Same search from both: priority, phases, budget.
+        let run = |mut s: Solver| {
+            s.set_branch_priority(&model.core);
+            s.conflict_budget = fid_budget;
+            s.scramble_saved_phases(seed);
+            let c0 = cpu_ns();
+            let r = s.solve();
+            (
+                format!("{r:?}"),
+                s.conflicts(),
+                s.stats.decisions,
+                s.stats.propagations,
+                s.stats.restarts,
+                cpu_ns() - c0,
+            )
+        };
+        let (ra, rb) = (
+            run(model.load(Priority::None)),
+            run(parse_dimacs_xor(&text).expect("parse")),
+        );
+        let same = ra.0 == rb.0 && ra.1 == rb.1 && ra.2 == rb.2 && ra.3 == rb.3 && ra.4 == rb.4;
+        let pass = fixed_point && counts_match && same;
+        failures += !pass as u32;
+        emit(
+            &json!({"type": "fidelity", "target_id": tid, "arm": if *phases {"B"} else {"A"},
+                     "dimacs_sha256": sha_hex(text.as_bytes()), "dimacs_bytes": text.len(),
+                     "vars": model.nv, "clauses": own.clauses.len(), "xors": own.xors.len(),
+                     "reexport_is_identical": fixed_point, "counts_match": counts_match,
+                     "conflict_budget": fid_budget,
+                     "original": {"status": ra.0, "conflicts": ra.1, "decisions": ra.2, "propagations": ra.3, "restarts": ra.4},
+                     "round_trip": {"status": rb.0, "conflicts": rb.1, "decisions": rb.2, "propagations": rb.3, "restarts": rb.4},
+                     "identical_search": same, "pass": pass, "cpu_ns": ra.5 + rb.5}),
+        );
+        println!(
+            "fidelity {tid}:{} fixed_point={fixed_point} counts={counts_match} identical_search={same} ({} conflicts)",
+            if *phases { "B" } else { "A" },
+            ra.1
+        );
+    }
+    let mut first_conflicts: Option<(u64, u64)> = None;
+    for (n, (tid, phases)) in positive.iter().enumerate() {
+        let t = inst.targets.iter().find(|t| &t.id == tid).expect("target");
+        let item = json!({"rep": 0, "form": "subgroup_xor", "pair": 0, "position": 0,
+                          "arm": if *phases {"B"} else {"A"}, "target_id": t.id, "set": t.set});
+        let tag = format!("control_{}_{}", if *phases { "B" } else { "A" }, t.id);
+        let repeats = if n == 0 { 2 } else { 1 };
+        for rep in 0..repeats {
+            let (res, info) = run_cms_attempt(
+                &inst,
+                &cfg,
+                &format!("{tag}_{rep}"),
+                t.r,
+                *phases,
+                form,
+                cms_seed(0),
+            );
+            let mut v = cms_attempt_value(&item, &inst, &res, info, n as u64, cms_seed(0));
+            v["type"] = json!("positive_control");
+            v["cpu_ns"] = v["total_cpu_ns"].clone();
+            let ok = res.status == "verified" && res.found.is_some();
+            failures += !ok as u32;
+            if n == 0 {
+                match first_conflicts {
+                    None => first_conflicts = Some((res.conflicts, res.decisions)),
+                    Some(p) => {
+                        let det = p == (res.conflicts, res.decisions);
+                        v["same_seed_rerun_identical"] = json!(det);
+                        failures += !det as u32;
+                    }
+                }
+            }
+            println!(
+                "positive control {tag}: {} ({} conflicts)",
+                res.status, res.conflicts
+            );
+            emit(&v);
+        }
+    }
+    if failures == 0 {
+        0
+    } else {
+        2
+    }
+}
+
 fn usage() {
     eprintln!(
-        "usage: phase_paired_fixed_budget <gate|run|freeze> [--key value ...]\n\
+        "usage: phase_paired_fixed_budget <gate|run|freeze|cms-selftest|cms-check|cms-run> [--key value ...]\n\
+         cms-selftest --cms BIN --scratch DIR --out controls.jsonl [--count 60]\n\
+         cms-check    --cms BIN --scratch DIR --out controls.jsonl [--fidelity b3:A,b3:B,a0:A,a0:B] [--positive b3:A,b3:B]\n\
+         cms-run      --cms BIN --scratch DIR --out R.jsonl [--manifest P] [--reps 3] [--conflict-budget 3000000]\n\
+                      [--maxtime 120] [--cpu-cap 3600] [--cpu-prior S] [--controls controls.jsonl] [--resume]\n\
+         (the cms-* subcommands: PROTOCOL_ADDENDUM_2.md; the binary is hash-checked)\n\
+         usage: phase_paired_fixed_budget <gate|run|freeze> [--key value ...]\n\
          gate    [--manifest P] [--sealed witness_sealed.json] [--receipts R.jsonl --rep N]\n\
          run     --out R.jsonl [--manifest P] [--forms subgroup_xor,line_subgroup] [--reps 3]\n\
                  [--conflict-budget C] [--deadline-secs D] [--cpu-cap S] [--targets a0,b1] [--arms A] [--resume]\n\
@@ -2159,6 +3417,9 @@ fn main() {
         Some("gate") => gate_cmd(&arg_map(&args[1..])),
         Some("run") => run_cmd(&arg_map(&args[1..])),
         Some("freeze") => freeze_cmd(&arg_map(&args[1..])),
+        Some("cms-selftest") => cms_selftest_cmd(&arg_map(&args[1..])),
+        Some("cms-check") => cms_check_cmd(&arg_map(&args[1..])),
+        Some("cms-run") => cms_run_cmd(&arg_map(&args[1..])),
         _ => {
             usage();
             64
@@ -2549,5 +3810,232 @@ mod tests {
             4 * basis.len() + 4 * i.n as usize > MASK_BITS,
             "arm B exceeds the 64-bit variable mask"
         );
+    }
+
+    // ---- CryptoMiniSat follow-up (PROTOCOL_ADDENDUM_2.md) ----
+
+    const CANNED_SAT: &str = "c CryptoMiniSat version 5.16.0\n\
+        c restarts                 : 15          (2441.67   confls per restart)\n\
+        c decisions                : 37998       (0.00      % random)\n\
+        c decisions/conflicts      : 1.04\n\
+        c propagations             : 2133K       (2310K     props/s)\n\
+        c conflicts                : 36625       \n\
+        c Conflicts in UIP         : 7\n\
+        c restarts                 : 15          (2441.67   confls per restart)\n\
+        c conflicts                : 36625       \n\
+        c Total time (this thread) : 0.92        \n\
+        s SATISFIABLE\n\
+        v -1 2 -3 4\n\
+        v 5 0\n";
+    const CANNED_UNSAT: &str = "c conflicts                : 666390      \n\
+        c Total time (this thread) : 25.34       \n\
+        s UNSATISFIABLE\n";
+    const CANNED_UNKNOWN: &str =
+        "c Not finished running -- signal caught or some maximum reached\n\
+        c propagations             : 1M          (1886K     props/s)\n\
+        c conflicts                : 5002        \n\
+        s INDETERMINATE\n";
+
+    #[test]
+    fn cms_output_parser_reads_canned_outputs() {
+        let o = parse_cms_output(CANNED_SAT);
+        assert_eq!(o.status.as_deref(), Some("SATISFIABLE"));
+        assert_eq!(o.model, vec![-1, 2, -3, 4, 5]);
+        assert!(o.model_closed && !o.malformed);
+        assert_eq!(o.conflicts, vec![36625, 36625], "labels must match exactly");
+        assert_eq!(
+            (o.decisions, o.propagations, o.restarts),
+            (Some(37998), Some(2_133_000), Some(15))
+        );
+        assert_eq!(o.total_time_s, Some(0.92));
+        assert_eq!(cms_verdict(&o, Some(10)), Ok(CmsVerdict::Sat));
+        assert_eq!(cms_conflicts(&o), Ok(36625));
+        assert_eq!(cms_model(&o, 5), Ok(vec![false, true, false, true, true]));
+        let u = parse_cms_output(CANNED_UNSAT);
+        assert_eq!(cms_verdict(&u, Some(20)), Ok(CmsVerdict::Unsat));
+        assert_eq!(cms_conflicts(&u), Ok(666390));
+        let k = parse_cms_output(CANNED_UNKNOWN);
+        assert_eq!(cms_verdict(&k, Some(15)), Ok(CmsVerdict::Unknown));
+        assert_eq!(cms_conflicts(&k), Ok(5002));
+        assert_eq!(k.propagations, Some(1_000_000));
+    }
+
+    #[test]
+    fn cms_verdict_and_model_fail_closed() {
+        let sat = parse_cms_output(CANNED_SAT);
+        assert!(
+            cms_verdict(&sat, Some(20)).is_err(),
+            "SAT line with the UNSAT exit code"
+        );
+        assert!(cms_verdict(&sat, None).is_err(), "no exit code (a signal)");
+        assert!(cms_verdict(&parse_cms_output(CANNED_UNKNOWN), Some(0)).is_err());
+        assert!(cms_verdict(&parse_cms_output("c nothing\n"), Some(10)).is_err());
+        assert!(cms_conflicts(&parse_cms_output("s UNSATISFIABLE\n")).is_err());
+        assert!(cms_model(&sat, 6).is_err(), "variable 6 missing");
+        assert!(cms_model(&sat, 4).is_err(), "literal 5 out of range");
+        let repeated = parse_cms_output("s SATISFIABLE\nv 1 -1 0\n");
+        assert!(cms_model(&repeated, 1).is_err());
+        let unclosed = parse_cms_output("s SATISFIABLE\nv 1 2\n");
+        assert!(cms_model(&unclosed, 2).is_err());
+        let bad = parse_cms_output("s SATISFIABLE\nv 1 x 0\n");
+        assert!(bad.malformed && cms_model(&bad, 1).is_err());
+    }
+
+    #[test]
+    fn scaled_statistics_parse_with_suffixes() {
+        assert_eq!(parse_scaled("42"), Some(42));
+        assert_eq!(parse_scaled("222K"), Some(222_000));
+        assert_eq!(parse_scaled("1.5M"), Some(1_500_000));
+        assert_eq!(parse_scaled("2G"), Some(2_000_000_000));
+        assert_eq!(parse_scaled("x"), None);
+    }
+
+    #[test]
+    fn dimacs_xor_reader_follows_the_cryptominisat_parity_convention() {
+        let c = parse_cnf_xor("p cnf 3 3\nx 1 2 3 0\nx -1 2 0\nx -1 -3 0\n").unwrap();
+        assert_eq!(c.nv, 3);
+        assert_eq!(
+            c.xors,
+            vec![
+                (vec![1, 2, 3], true),
+                (vec![1, 2], false),
+                (vec![1, 3], true)
+            ]
+        );
+        assert!(
+            parse_cnf_xor("p cnf 2 1\nx 1 1 0\n").is_err(),
+            "repeated variable"
+        );
+        assert!(parse_cnf_xor("1 2 0\n").is_err(), "no header");
+        // x1^x2^x3 = 1, x1 = x2, x1 ^ x3 = 1: x = (0,0,1) works, (1,1,1) does not.
+        assert!(cnf_satisfied(&c, &[false, false, true]));
+        assert!(!cnf_satisfied(&c, &[true, true, true]));
+        // The empty clause is never satisfied.
+        let e = parse_cnf_xor("p cnf 1 1\n0\n").unwrap();
+        assert!(!cnf_satisfied(&e, &[true]));
+    }
+
+    #[test]
+    fn tiny_family_has_both_answers_and_the_native_solver_agrees_with_brute_force() {
+        let mut rng = SplitMix(0x434d_5353_4c46_5453);
+        let (mut sat, mut unsat) = (0, 0);
+        for _ in 0..40 {
+            let n = 10 + rng.below(5) as u32;
+            let (clauses, xors, truth) = tiny_instance(&mut rng, n);
+            let text = to_dimacs_xor(&solver_from_lists(n, &clauses, &xors));
+            let mut s = parse_dimacs_xor(&text).unwrap();
+            assert_eq!(
+                s.solve() == SolveResult::Sat,
+                truth,
+                "native on the round trip"
+            );
+            // My reader sees the same constraints the crate wrote.
+            let c = parse_cnf_xor(&text).unwrap();
+            assert_eq!(c.nv, n);
+            if truth {
+                sat += 1;
+            } else {
+                unsat += 1;
+            }
+        }
+        assert!(
+            sat >= 3 && unsat >= 3,
+            "family must exercise both answers ({sat}/{unsat})"
+        );
+    }
+
+    #[test]
+    fn append_clause_keeps_the_header_count() {
+        let t = append_clause("p cnf 3 2\n1 2 0\nx 1 3 0\n", &[-1, -2]);
+        assert!(t.starts_with("p cnf 3 3\n"));
+        assert!(t.ends_with("-1 -2 0\n"));
+        let c = parse_cnf_xor(&t).unwrap();
+        assert_eq!((c.clauses.len(), c.xors.len()), (2, 1));
+    }
+
+    #[test]
+    fn stage_rule_follows_the_preregistered_cases() {
+        // Repetition 1 always starts.
+        assert_eq!(rep_mode(1, 10.0, 1.1, None, None), "full");
+        // Fits in full with the guard; arm A only; none.
+        assert_eq!(rep_mode(2, 1100.0, 1.1, Some(1000.0), Some(400.0)), "full");
+        assert_eq!(rep_mode(2, 1099.0, 1.1, Some(1000.0), Some(400.0)), "armA");
+        assert_eq!(rep_mode(2, 441.0, 1.1, Some(1000.0), Some(400.0)), "armA");
+        assert_eq!(rep_mode(2, 439.0, 1.1, Some(1000.0), Some(400.0)), "none");
+        // No completed repetition to extrapolate from: do not start another.
+        assert_eq!(rep_mode(2, 3000.0, 1.1, None, None), "none");
+        assert_ne!(cms_seed(1), cms_seed(2));
+        assert!(cms_seed(1) != 0 && cms_seed(2) != 0 && cms_seed(3) != 0);
+    }
+
+    /// The export of real arm instances parses back to the same text, and the
+    /// native solver follows exactly the same search on the original and on the
+    /// round trip (same clauses, rows and order), for both arms.
+    #[test]
+    fn export_round_trip_is_faithful_for_both_arms() {
+        let i = inst();
+        let form = formulation("subgroup_xor").unwrap();
+        for phases in [false, true] {
+            let t = i.targets.iter().find(|t| t.id == "b3").unwrap();
+            let (model, _) = build_model(&i.ec.gf, &i.basis, t.r, phases, form);
+            let original = model.load(Priority::Core);
+            let text = to_dimacs_xor(&original);
+            let reparsed = parse_dimacs_xor(&text).unwrap();
+            assert_eq!(to_dimacs_xor(&reparsed), text, "re-export is a fixed point");
+            let c = parse_cnf_xor(&text).unwrap();
+            assert_eq!(c.nv, model.nv);
+            assert_eq!(c.xors.len(), original.n_xors());
+            assert_eq!(c.clauses.len(), original.n_original_clauses());
+            let run = |mut s: Solver| {
+                s.set_branch_priority(&model.core);
+                s.conflict_budget = 4_000;
+                s.scramble_saved_phases(phase_seed(1));
+                let r = format!("{:?}", s.solve());
+                (r, s.conflicts(), s.stats.decisions, s.stats.propagations)
+            };
+            assert_eq!(
+                run(model.load(Priority::None)),
+                run(parse_dimacs_xor(&text).unwrap()),
+                "phases = {phases}"
+            );
+        }
+    }
+
+    /// With PHASE_PAIRED_CMS naming the pinned binary, the child-process path
+    /// agrees with brute force on tiny instances (skipped otherwise).
+    #[test]
+    fn pinned_binary_agrees_with_brute_force_when_present() {
+        let Ok(bin) = std::env::var("PHASE_PAIRED_CMS") else {
+            return;
+        };
+        let scratch = std::env::temp_dir().join(format!("pp_cms_test_{}", std::process::id()));
+        fs::create_dir_all(&scratch).unwrap();
+        let cfg = CmsConfig {
+            bin,
+            conflicts: 100_000,
+            maxtime_s: 30.0,
+            scratch: scratch.clone(),
+            keep_dimacs: false,
+        };
+        assert!(
+            cms_pinned(&cfg.bin).is_ok(),
+            "binary must be the pinned build"
+        );
+        let mut rng = SplitMix(99);
+        for k in 0..12 {
+            let n = 10 + rng.below(4) as u32;
+            let (clauses, xors, truth) = tiny_instance(&mut rng, n);
+            let text = to_dimacs_xor(&solver_from_lists(n, &clauses, &xors));
+            let path = scratch.join(format!("t{k}.cnf"));
+            fs::write(&path, &text).unwrap();
+            let call = cms_call(&cfg, &path, &format!("t{k}"), 100_000, 30.0, 1).unwrap();
+            let v = cms_verdict(&call.out, call.run.exit_code).unwrap();
+            assert_eq!(v == CmsVerdict::Sat, truth, "instance {k}");
+            if truth {
+                let m = cms_model(&call.out, n).unwrap();
+                assert!(cnf_satisfied(&parse_cnf_xor(&text).unwrap(), &m));
+            }
+        }
+        let _ = fs::remove_dir_all(&scratch);
     }
 }
