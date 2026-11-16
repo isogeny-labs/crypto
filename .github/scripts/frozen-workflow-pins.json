@@ -1,6 +1,6 @@
 {
   "schema": "frozen-workflow-pins/v1",
-  "description": "Workflows whose exact bytes research evidence pins. Live workflows may change (runner, triggers, disk fixes); custody is checked in an isolated view that restores the pinned bytes from `revision` (.github/scripts/frozen-workflow-check.mjs). check: replay = run below by frozen-workflow-replays.yml; wrapper = the workflow itself runs frozen-workflow-check.mjs; record = no runtime check asserts the pin, so this file and the replay job's custody step document it.",
+  "description": "Workflows whose exact bytes research evidence pins. Live workflows may change (runner, triggers, disk fixes); custody is checked in an isolated view that restores the pinned bytes from `revision` (.github/scripts/frozen-workflow-check.mjs); a replay may carry its own `revision` when its manifest pins another version of its workflow. check: replay = run below by frozen-workflow-replays.yml; wrapper = the workflow itself runs frozen-workflow-check.mjs; record = no runtime check asserts the pin, so this file and the replay job's custody step document it.",
   "revision": "d30a63b89c3a6f79d55cd798ea6519e075636034",
   "workflows": {
     ".github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml": {
@@ -193,11 +193,11 @@
     },
     ".github/workflows/ecc2k130-symbolic-oaware-width-gate.yml": {
       "pinned_sha256": "7a55e6b8247bd0e1648376f480dc21630f89d02869dfb6b78ef711ec2f3e6e09",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN.json"
       ],
-      "note": "Its own preflight asserts the pin, and also fails on source drift a workflow view does not cover: src/binary_ecc/curve.rs changed on main after the 2026-09-25 freeze."
+      "note": "Replayed with a historical source view (input_view_manifest): eight src/ files the freeze pins changed on main after 2026-09-25. The study's checks only hash them or replay the frozen width decision against them; see research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN_VIEW.md."
     },
     ".github/workflows/endomorphism-search.yml": {
       "pinned_sha256": "1bee6995d9c8affdb6bb37149e8e37c3bc4d0c8e9451ea5e425941afff608fa6",
@@ -215,14 +215,14 @@
     },
     ".github/workflows/p192-geometry-collector-lean.yml": {
       "pinned_sha256": "07024051aa1820905e182564f48c90d3722af5821651db78d2ef4477ce38d39c",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/p192_extension_cover_20261012/reports/run-20261016T0432Z/RUN.json",
         "research/p192_extension_cover_20261012/reports/run-20261016T0512Z/RUN.json",
         "research/p192_extension_cover_20261012/reports/run-20261016T0747Z/RUN.json",
         "research/p192_extension_cover_20261012/reports/run-20261016T1850Z/RUN.json"
       ],
-      "note": "Not covered: reports/run-20261024-anchor-eight/ARTIFACTS.sha256 pins this workflow at b350582e757d1c1f979a222eca3801d6de045d290c270f2c216fb7ba5b335514, a second version this index (one revision) does not hold, and the cross-cubic-anchor-fan job checks it with sha256sum -c."
+      "note": "Replay p192_anchor_eight_20261024: reports/run-20261024-anchor-eight/ARTIFACTS.sha256 pins this workflow at b350582e757d1c1f979a222eca3801d6de045d290c270f2c216fb7ba5b335514, held by d0597e0ea3df9ce4003d27f182c06d9e19ee5c4b (the replay's own revision), and research/p192_extension_cover_20261012/REPORT.md at 0444d2bfb9316fed4f5682918434b3ae7318530b888dcc88965f7cd4f075341e, to which merge 097e2b2361 later added four figure-link lines; the input view .github/scripts/p192-anchor-eight-report-view-v1.json restores the pinned report from the same commit with the drift note research/p192_extension_cover_20261012/FROZEN_VIEW.md. The cross-cubic-anchor-fan job runs its sha256sum -c step through this replay. The run-20261024 and run-20261024-high-degree ARTIFACTS.sha256 manifests do not pin this workflow and pass on live bytes."
     }
   },
   "replays": [
@@ -673,6 +673,57 @@
         "python3",
         "-B",
         "research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "symbolic_oaware_width_gate_20260925",
+      "workflow": ".github/workflows/ecc2k130-symbolic-oaware-width-gate.yml",
+      "manifest": "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN.json",
+      "manifest_format": "pointer:/files/.github~1workflows~1ecc2k130-symbolic-oaware-width-gate.yml",
+      "input_view_manifest": ".github/scripts/symbolic-oaware-width-gate-source-view-v1.json",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/FROZEN.json",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/RESULT.md",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/run.py",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/PROTOCOL.md",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/export.py",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/verify.py",
+        "src/binary_ecc/curve.rs",
+        "src/binary_ecc/f2m.rs",
+        "src/cryptanalysis/binary_semaev.rs",
+        "src/cryptanalysis/coordinate_search.rs",
+        "src/cryptanalysis/pq_descent.rs",
+        "src/cryptanalysis/pq_descent_symbolic.rs",
+        "src/cryptanalysis/pq_groebner_f2.rs",
+        "src/cryptanalysis/sat.rs",
+        "src/cryptanalysis/semaev_decomp.rs",
+        "src/cryptanalysis/semaev_sat.rs"
+      ],
+      "command": [
+        "bash",
+        "-eo",
+        "pipefail",
+        "-c",
+        "python3 -m py_compile research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/{audit,verify,run,ci_replay}.py\npython3 research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/audit.py --preflight\npython3 research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/ci_replay.py\n"
+      ]
+    },
+    {
+      "id": "p192_anchor_eight_20261024",
+      "workflow": ".github/workflows/p192-geometry-collector-lean.yml",
+      "revision": "d0597e0ea3df9ce4003d27f182c06d9e19ee5c4b",
+      "manifest": "research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256",
+      "manifest_format": "sha256sum",
+      "input_view_manifest": ".github/scripts/p192-anchor-eight-report-view-v1.json",
+      "extra_workflows": [],
+      "roots": [
+        "research/p192_extension_cover_20261012/FROZEN_VIEW.md"
+      ],
+      "command": [
+        "sha256sum",
+        "-c",
+        "research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256"
       ]
     }
   ]

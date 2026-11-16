@@ -1,0 +1,25 @@
+{
+  "schema": "retained-exclusion-verifier-validation/v1",
+  "source": {
+    "sha256": "025b40e566a8255899c751e32662d47b08247cf959f2a944ea7189bd631ca2f0",
+    "bytes": 6085
+  },
+  "binary": {
+    "sha256": "0389abbcc4ab09d61e703ac389b571636027e91c66e05d27ecb35b71cb7de619",
+    "bytes": 8166456
+  },
+  "test_log": {
+    "sha256": "62eefabee46d08ed241ec9ff740d06ca0ff26648f609bbcf4f4d6ec7da931b03",
+    "bytes": 1628
+  },
+  "tests_passed": 22,
+  "tests_failed": 0,
+  "verifier_controls": 6,
+  "donor_controls": 16,
+  "production_compiled": false,
+  "authenticated_map_fixture": false,
+  "scientific_trials": 0,
+  "compile_command": "timeout 180 rustc +1.98 --edition=2021 --test harness.rs -o tests > compile.log 2>&1",
+  "test_command": "timeout 60 ./tests --test-threads=1 > tests.log 2>&1",
+  "observed_at": "2026-11-07T01:59:21.769811+00:00"
+}

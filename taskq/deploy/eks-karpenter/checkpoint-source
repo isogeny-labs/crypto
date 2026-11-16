@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# Trusted-main caller: archive a source revision and frozen inputs, upload a
+# private S3 checkpoint, and verify its readback. Does not execute an experiment.
+set -euo pipefail
+[[ $# == 5 ]] || { echo 'usage: checkpoint-source SOURCE SHA SPEC PROTOCOL NEW_OUTPUT' >&2; exit 2; }
+source_dir=$(realpath "$1")
+revision=$2
+spec=$3
+protocol=$4
+output=$5
+control=$(cd -- "$(dirname -- "$0")/../../.." && pwd)
+[[ $revision =~ ^[a-f0-9]{40}$ ]] || exit 2
+for relative in "$spec" "$protocol"; do
+  [[ $relative =~ ^[a-zA-Z0-9_./-]+\.json$ && $relative != /* && "/$relative/" != *'/../'* ]] || exit 2
+  [[ -f $source_dir/$relative ]] || exit 2
+  [[ $(realpath -- "$source_dir/$relative") == "$source_dir/"* ]] || exit 2
+done
+[[ $(git -C "$source_dir" rev-parse HEAD) == "$revision" ]] || exit 2
+git -C "$source_dir" diff --quiet HEAD || { echo 'source checkout is dirty' >&2; exit 2; }
+[[ -z $(git -C "$source_dir" ls-files --others --exclude-standard) ]] || { echo 'source checkout has untracked files' >&2; exit 2; }
+jq -e '.schema == "ecbench.spec/v1"' "$source_dir/$spec" >/dev/null
+jq -e '.schema == "experiment.protocol/v1" and .freeze.status == "frozen" and .freeze.filed_before_affected_data == true' "$source_dir/$protocol" >/dev/null
+[[ ! -e $output ]] || { echo 'checkpoint receipt directory already exists' >&2; exit 2; }
+mkdir -- "$output"
+output=$(realpath "$output")
+command -v aws >/dev/null
+command -v jq >/dev/null
+aws sts get-caller-identity --output json | jq -e '.Account == "104186811093"' > "$output/caller-account-check.txt"
+cd -- "$source_dir"
+for temporary in isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz .resume; do
+  [[ ! -e $temporary && ! -L $temporary ]] || { echo 'checkpoint staging path already exists' >&2; exit 2; }
+done
+cp -- "$spec" isolab-ecbench-spec.json
+cp -- "$protocol" isolab-experiment-protocol.json
+# Preserve native build sources and store pointers as data. No source-selected
+# command is executed with the uploader's credentials.
+git archive --format=tar.gz "$revision" -- Cargo.toml Cargo.lock src crates isogeny_algos \
+  scripts tools/artifacts tools/factor-base tools/volcano-cli taskq/deploy/eks-karpenter .github/workflows \
+  .artifacts docs/curves/registry.json docs/curves/standards/parameters.json \
+  docs/ic/boundary_targets.json docs/ic/calibration.json \
+  research/pencil_large_prime_20261029 research/five_leads_e2e_20261019/native \
+  > isolab-source-snapshot.tar.gz
+[[ $(stat -c %s isolab-source-snapshot.tar.gz) -le 134217728 ]] || { echo 'source checkpoint exceeds 128MiB; no upload/experiment' >&2; exit 1; }
+sha256sum isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz > "$output/payload.sha256"
+mkdir -p .resume
+cat > .resume/RESUME.md <<EOF
+# Resume: native hashed ECDLP ECBench
+
+## Goal
+Run the user's full native hashed-base algorithm through ECBench, retaining
+failures and comparing matched registered one-target rho/IC workloads.
+
+## Lead / hypothesis
+Measure source, selector, width and partial native backends. No achieved
+speedup, sub-rho result or challenge scalar is asserted by this checkpoint.
+
+## Spec
+Source $revision; trusted workflow revision ${GITHUB_SHA:-manual}; frozen spec $spec; protocol $protocol. Exact copies and
+the native build source snapshot are in this checkpoint's untracked payload.
+
+## State
+Checkpoint-only infrastructure step in GitHub run ${GITHUB_RUN_ID:-manual}
+attempt ${GITHUB_RUN_ATTEMPT:-1}. No scientific computation started here.
+The original earlier frozen native A/B study remains separate and open.
+
+## Next steps
+Verify this upload/readback, publish a digest-pinned image of $revision using
+isolab-experiment.yml publish_only, verify that publication receipt, then
+submit the frozen spec through the main-branch authenticated Iso Lab workflow.
+Require native L2, A/A and exact replay. Source archives include store pointers;
+restore data with the maintained artifact client when rebuilding.
+
+## Runs in flight
+Only this checkpoint workflow step; no EKS measurement job is submitted by
+checkpoint-source. Find later jobs by their original GitHub/CodeBuild IDs,
+never create a duplicate after an ambiguous submission.
+
+## Stop and success conditions
+No experiment unless checkpoint/readback and exact source/image admission
+pass. Fixed frozen sample design, one original 1800-second EKS deadline,
+zero measurement retries. Preserve failures/interruptions; a restored clock
+is invalid. Both challenge solves and independent general audit stay open.
+EOF
+export CHECKPOINT_MAX_FILE_MB=128 CHECKPOINT_MAX_TOTAL_MB=300
+export CHECKPOINT_PREFIX="checkpoints/isolab-ecbench/${GITHUB_RUN_ID:-manual}-${GITHUB_RUN_ATTEMPT:-1}"
+"$control/scripts/checkpoint.sh" push --force > "$output/upload.txt"
+"$control/scripts/checkpoint.sh" gate > "$output/gate.txt"
+read -r fingerprint stamp uri < .resume/.last-push
+[[ $uri == s3://setec-astronomy-artifacts/checkpoints/isolab-ecbench/*/ ]] || exit 1
+aws s3 cp --only-show-errors "${uri}checkpoint.tar.gz" "$output/checkpoint.tar.gz"
+mkdir "$output/readback"
+tar -xzf "$output/checkpoint.tar.gz" -C "$output/readback" -- ./meta.json ./RESUME.md ./untracked.tar.gz
+jq -e --arg sha "$revision" '.head == $sha' "$output/readback/meta.json" > "$output/source-check.txt"
+cmp .resume/RESUME.md "$output/readback/RESUME.md"
+mkdir "$output/readback/payload"
+tar -xzf "$output/readback/untracked.tar.gz" -C "$output/readback/payload" -- \
+  isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz
+(cd "$output/readback/payload" && sha256sum -c "$output/payload.sha256") > "$output/payload-readback.txt"
+archive_hash=$(sha256sum "$output/checkpoint.tar.gz" | cut -d' ' -f1)
+spec_hash=$(sha256sum isolab-ecbench-spec.json | cut -d' ' -f1)
+protocol_hash=$(sha256sum isolab-experiment-protocol.json | cut -d' ' -f1)
+jq -n --arg source "$revision" --arg control "${GITHUB_SHA:-}" --arg uri "$uri" --arg digest "$archive_hash" --arg spec "$spec_hash" --arg protocol "$protocol_hash" \
+  '{schema:"isolab.source-checkpoint/v1",source_revision:$source,workflow_revision:(if $control=="" then null else $control end),checkpoint_uri:$uri,archive_sha256:$digest,spec_sha256:$spec,protocol_sha256:$protocol,upload_readback_verified:true,experiment_submitted:false}' > "$output/checkpoint.json"
+printf 'Source checkpoint uploaded and independently read back; no experiment submitted.\n'

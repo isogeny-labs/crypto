@@ -352,6 +352,11 @@ Four further rules close the ways a frontier was made to overstate:
   page shows the **break-even price** per uncharged operation at which the two
   mean ops figures cross: the dominance flips there, inside the band or beyond
   it.
+  A weighted fit (`--weight w`) records the same `band` from fit version 2
+  on (it prices each size at the band weights, whatever weight the fit
+  charges), so this test also runs in a `+band(w=…)` domain; a version-1
+  weighted fit has no band, and a bound without one is not ranked above
+  w = 0.
 - **A leader is named only when it is separated.** The ops (and memory) leader
   is the method with the smallest *worst-bound* figure among the frontier
   entries, and it is named only when its intervals separate from every other

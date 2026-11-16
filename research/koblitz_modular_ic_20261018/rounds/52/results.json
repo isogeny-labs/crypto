@@ -1,0 +1,267 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 52,
+  "date": "2026-10-31",
+  "status_counts": {
+    "accepted": 12,
+    "rejected": 5
+  },
+  "construction_counts": {
+    "audited_unique_theorems": 9,
+    "normal_chart_rank": 32,
+    "source_index_length": 376,
+    "nu_adjoined_index_length": 180,
+    "nu_closure_extensions": 3,
+    "least_zero_exponent": 5,
+    "least_one_exponent": 9,
+    "local_filtration_levels": 14,
+    "small_good_packet_fibers": 488,
+    "small_patterns88": 312,
+    "small_patterns214": 0,
+    "small_smooth_base7": 224,
+    "small_smooth_base8": 264,
+    "small_odd_degree7_packet_factors": 0,
+    "large_good_packet_fibers": 3322,
+    "large_patterns88": 462,
+    "large_patterns214": 924,
+    "large_smooth_base10": 880,
+    "large_smooth_base11": 2453,
+    "large_odd_degree11_packet_factors": 2024,
+    "fresh_verified_packet_fibers": 3810,
+    "generic_norm_line_maps": 1,
+    "candidate_semigroup_gaps": 30,
+    "candidate_semigroup_conductor": 60
+  },
+  "runs": [
+    {
+      "attempt": "annihilator52-01",
+      "source_revision": "03cd91de29668eaba6b951674772be015031e685",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "ANNIHILATOR52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "ANNIHILATOR52_RESULT zero_exponent=5 one_exponent=9 full32_recovery_product=true both_local_minimality_remainders_retained=true changed_recovery_rejected=true"
+    },
+    {
+      "attempt": "closure-lean52-01",
+      "source_revision": "84bd3512612bf4eace7b5eca12b17ed64c9a8004",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "declarations": [],
+      "status": "rejected"
+    },
+    {
+      "attempt": "closure-lean52-02",
+      "source_revision": "c605aa80d2b9387dceecc3fe5ded86ae9335c986",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "declarations": [
+        "Closure52.mem_of_unit_smul_mem",
+        "Closure52.next_eq_iff_stable",
+        "Closure52.range_stable_of_intertwining",
+        "Closure52.ranges_eq_of_two_products",
+        "Closure52.stage_le_of_stable",
+        "Closure52.two_patterns_exclude_proper_degree"
+      ],
+      "status": "accepted"
+    },
+    {
+      "attempt": "closure52-01",
+      "source_revision": "11b2321448465960c6d38000db6d705762d616fd",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CLOSURE52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 162,
+      "first_errors": [
+        "   ? identifier parents50 not found in tablePidCertificate50",
+        "   ? error occurred in or before input.sing line 12: `intmat parents52=imap(tablePidCertificate50,parents50);`",
+        "   ? `parents52` is not defined",
+        "   ? error occurred in or before input.sing line 28: `j52++;`",
+        "   ? `parents52` is not defined",
+        "   ? error occurred in or before input.sing line 28: `j52++;`",
+        "   ? `parents52` is not defined",
+        "   ? error occurred in or before input.sing line 28: `j52++;`"
+      ],
+      "status": "rejected",
+      "native_result": "CLOSURE52_RESULT rank=32 initial_length=376 final_length=376 extensions=0 complete_field_columns=32 full_stability_product=true"
+    },
+    {
+      "attempt": "closure52-02",
+      "source_revision": "68e06c3e54007a3403b3b4f8c436a445d976b442",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CLOSURE52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "CLOSURE52_RESULT rank=32 initial_length=376 final_length=180 extensions=3 complete_field_columns=32 full_stability_product=true"
+    },
+    {
+      "attempt": "fibers23-52-01",
+      "source_revision": "e53eb365901a7c4370dafaf947e226a283092d30",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIBERS23_52_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "rejected",
+      "manual_stop": "SIGTERM sent to verified native PID for diagnosed nonadvancing continue loop; handler exit0,required marker absent"
+    },
+    {
+      "attempt": "fibers23-52-02",
+      "source_revision": "f85d402229455e9d9ae7ef738123643356cd3356",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIBERS23_52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "FIBERS23_52_RESULT good_packet_fibers=488 patterns88=312 patterns214=0 smooth_base7=224 smooth_base8=264 odd_degree7_packet_factors=0"
+    },
+    {
+      "attempt": "fibre-lean52-01",
+      "source_revision": "6ee198dd99f0f01d3f8e35512e441518754b1675",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "declarations": [
+        "FibreIrred52.common_degree_divisor_one",
+        "FibreIrred52.irreducible_of_two_patterns"
+      ],
+      "status": "accepted"
+    },
+    {
+      "attempt": "filtration52-01",
+      "source_revision": "2bd8f304177c1839ae7a833ef36db422525f12f5",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FILTRATION52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 361,
+      "first_errors": [
+        "   ? ++(`int`) failed",
+        "   ? error occurred in or before input.sing line 25: `exponentsZero52[i52]++;`",
+        "   ? ++(`int`) failed",
+        "   ? error occurred in or before input.sing line 25: `exponentsZero52[i52]++;`",
+        "   ? ++(`int`) failed",
+        "   ? error occurred in or before input.sing line 25: `exponentsZero52[i52]++;`",
+        "   ? ++(`int`) failed",
+        "   ? error occurred in or before input.sing line 25: `exponentsZero52[i52]++;`"
+      ],
+      "status": "rejected",
+      "native_result": "FILTRATION52_RESULT local_total_zero=60 local_total_one=120 local_filtration_levels=14 complete_module_products=28 full_recovery_and_minimality_reloaded=true"
+    },
+    {
+      "attempt": "filtration52-02",
+      "source_revision": "fb67dc2e798d676f5d43093f1bf20b6af394c86e",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FILTRATION52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "FILTRATION52_RESULT local_total_zero=60 local_total_one=120 local_filtration_levels=14 complete_module_products=28 full_recovery_and_minimality_reloaded=true"
+    },
+    {
+      "attempt": "fresh52-01",
+      "source_revision": "40d8bc48ea8c1718294856ebfce57c6af667d000",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FRESH52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "FRESH52_RESULT complete_specializations=3810 all_stored_factors_irreducible=true norm_and_three_sign_products=true least_scalar_minimality=true full_filtration_products=28"
+    },
+    {
+      "attempt": "largefibers23-52-01",
+      "source_revision": "d5cfb61db08b49aae3246447da8304bb47d4dc50",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "LARGEFIBERS23_52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "LARGEFIBERS23_52_RESULT good_packet_fibers=3322 patterns88=462 patterns214=924 smooth_base10=880 smooth_base11=2453 odd_degree11_packet_factors=2024"
+    },
+    {
+      "attempt": "normline52-01",
+      "source_revision": "c605aa80d2b9387dceecc3fe5ded86ae9335c986",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "NORMLINE52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "NORMLINE52_RESULT full_norm_image_line_product=true sign_equivariance_products=3 changed_intercept_rejected=true actual_QR_unit_and_Tate_normalization_still_pending=true"
+    },
+    {
+      "attempt": "rect-lean52-01",
+      "source_revision": "9c979a5964690ab135cd12d8c4a9c2260262d674",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "declarations": [
+        "RectBridge52.ranges_eq_of_two_rectangular_products"
+      ],
+      "status": "accepted"
+    },
+    {
+      "attempt": "reload52-01",
+      "source_revision": "92f9faa96c6dc25b3d0cc649b3a34c43b35729f4",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RELOAD52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 19,
+      "first_errors": [
+        "   ? `ideal` <> `ideal` failed",
+        "   ? error occurred in or before input.sing line 57: `is51));matrix fieldT52=fromPid52(T52);poly D52=fromPid52(commonDenominator51);`",
+        "   ? wrong type declaration. type 'help map;'",
+        "   ? `basis51` is not defined",
+        "   ? error occurred in or before input.sing line 57: `is51));matrix fieldT52=fromPid52(T52);poly D52=fromPid52(commonDenominator51);`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `fromPid52` is not defined",
+        "   ? error occurred in or before input.sing line 57: `is51));matrix fieldT52=fromPid52(T52);poly D52=fromPid52(commonDenominator51);`"
+      ],
+      "status": "rejected"
+    },
+    {
+      "attempt": "reload52-02",
+      "source_revision": "a809bcce0c8c98a992bc8cd59f59fcdf66994aaf",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RELOAD52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted"
+    },
+    {
+      "attempt": "semigroup52-01",
+      "source_revision": "d5cfb61db08b49aae3246447da8304bb47d4dc50",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "SEMIGROUP52_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "native_result": "SEMIGROUP52_RESULT gaps=30 conductor=60 zero_weighted_cusp_copies=2 one_weighted_cusp_copies=4 remaining_length=180 full32_local_types_match=true actual_completed_local_ring_identification_pending=true"
+    }
+  ],
+  "interpretation": "Exact native certificates; normalization,PID classification,DVR specialization and source-field identification premises are recorded separately in PROOF_MAP.md."
+}

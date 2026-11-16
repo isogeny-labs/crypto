@@ -1,0 +1,38 @@
+{
+  "fields": [
+    "P192",
+    "P224",
+    "P256",
+    "P384",
+    "P521",
+    "F65537"
+  ],
+  "input_by_field": {
+    "P192": "research/signed_prime_power_20261116_v78/P192_BATCH.json",
+    "P224": "research/signed_prime_power_20261116_v78/P224_BATCH.json",
+    "P256": "research/signed_prime_power_20261116_v78/P256_BATCH.json",
+    "P384": "research/signed_prime_power_20261116_v78/P384_BATCH.json",
+    "P521": "research/signed_prime_power_20261116_v78/P521_BATCH.json",
+    "F65537": "research/signed_prime_power_20261116_v78/F65537_BATCH.json"
+  },
+  "methods": [
+    "generic",
+    "adaptive"
+  ],
+  "cold_repetitions": 3,
+  "batch_size": 5,
+  "selection": "allfive NIST fields plus a direct-reference control; five fixed translations; report batch throughput,not single-cold latency",
+  "input_prefix": "",
+  "source_bits": 20,
+  "oracle_primes": [
+    3,
+    5,
+    7,
+    17,
+    31,
+    127
+  ],
+  "memory_mb": 4096,
+  "seconds": 90,
+  "cores": 1
+}

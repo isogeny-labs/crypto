@@ -52,6 +52,8 @@ are identical on every repetition (diff-verified, `raw/`).
 | ratio (median) | — | **3.26×** | — | 2.47× | 5.00× |
 | ratio (min, least-contended) | — | — | **1.87×** | — | — |
 
+The 3.26x is median-vs-median (76.38 / 23.40), not a paired estimate; the same-rep paired ratios are 2.06, 3.26 and 1.87 (n = 3, no A/A control). Clarified 2026-10-20; the cell was re-checked against `raw/s3-*.txt` and is unchanged.
+
 Wall-clock on a shared host without `isolated_bench`; treat these as stage /
 whole-process wall diagnostics. The identical-output check (including
 per-target probe counts) is the primary correctness gate and passes on all

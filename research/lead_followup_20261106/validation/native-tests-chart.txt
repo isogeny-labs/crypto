@@ -1,0 +1,37 @@
+   Compiling lead-followup-checks v0.1.0 (/workspace/crypto/research/lead_followup_20261106/native)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.23s
+     Running unittests ../../../examples/conjpair_resume/mod.rs (research/lead_followup_20261106/native/target/debug/deps/lead_followup_checks-7e2347e025cd3ac1)
+
+running 5 tests
+test tests::chart_seed_zero_preserves_the_legacy_stream ... ok
+test tests::identity_separates_field_degree_and_chart ... ok
+test tests::same_file_resume_preserves_bytes_and_appends ... ok
+test tests::separate_resume_copies_history_and_refuses_overwrite ... ok
+test tests::corrupt_or_duplicate_resume_is_never_truncated ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/chart_compare.rs (research/lead_followup_20261106/native/target/debug/deps/chart_compare-212551d28e60f631)
+
+running 3 tests
+test tests::chart_requires_a_nonsingular_canonical_matrix ... ok
+test tests::empty_match_is_unknown_when_solver_failed ... ok
+test tests::census_aa_and_completed_mismatches_are_refused ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/radix_compare.rs (research/lead_followup_20261106/native/target/debug/deps/radix_compare-0fb603c5c9de8b46)
+
+running 3 tests
+test tests::censored_costs_never_become_ratios ... ok
+test tests::pairs_by_input_not_row_order ... ok
+test tests::refuses_changed_targets_missing_cells_or_false_grading ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests lead_followup_checks
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
