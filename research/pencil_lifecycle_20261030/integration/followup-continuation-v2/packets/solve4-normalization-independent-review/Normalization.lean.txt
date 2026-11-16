@@ -1,0 +1,81 @@
+import EliminationWord
+set_option autoImplicit false
+namespace Solve4Normalize
+open Solve4Stage
+variable {K : Type*} [Field K]
+def scaleSuffix (col : Fin 4) (v : Row K) (u : K) : Row K :=
+ fun j => if col.val≤j.val then v j*u else v j
+theorem prefix_preserved (col : Fin 4) (v : Row K) (u : K)
+ (hz : ∀ j : Fin 5,j.val<col.val→v j=0) :
+ ∀ j : Fin 5,j.val<col.val→scaleSuffix col v u j=0 := by
+ intro j hj;simp [scaleSuffix,show ¬col.val≤j.val by omega,hz j hj]
+theorem scale_full (col : Fin 4) (v : Row K) (u : K)
+ (hz : ∀ j : Fin 5,j.val<col.val→v j=0) :
+ scaleSuffix col v u=fun j=>v j*u := by
+ funext j
+ by_cases h:col.val≤j.val
+ · simp [scaleSuffix,h]
+ · simp [scaleSuffix,h,hz j (by omega)]
+theorem scaled_residual (col : Fin 4) (v : Row K) (u : K) (x : Vector K)
+ (hz : ∀ j : Fin 5,j.val<col.val→v j=0) :
+ residual (scaleSuffix col v u) x=residual v x*u := by
+ rw [scale_full col v u hz]
+ simp only [residual];ring
+theorem equation_equiv (col : Fin 4) (v : Row K) (u : K) (x : Vector K)
+ (hz : ∀ j : Fin 5,j.val<col.val→v j=0) (hu:u≠0) :
+ residual (scaleSuffix col v u) x=0 ↔ residual v x=0 := by
+ rw [scaled_residual col v u x hz,mul_eq_zero];simp [hu]
+theorem inverse_pivot_one (col : Fin 4) (v : Row K) (h:v col.castSucc≠0) :
+ scaleSuffix col v (v col.castSucc)⁻¹ col.castSucc=1 := by
+ simp [scaleSuffix,h]
+theorem inverse_equation_equiv (col : Fin 4) (v : Row K) (x : Vector K)
+ (hz : ∀ j : Fin 5,j.val<col.val→v j=0) (h:v col.castSucc≠0) :
+ residual (scaleSuffix col v (v col.castSucc)⁻¹) x=0 ↔ residual v x=0 :=
+ equation_equiv col v _ x hz (inv_ne_zero h)
+
+def wordScale (p : UInt64) (col : Fin 4) (v : WRow) (u : UInt64) : WRow :=
+ fun j=>if col.val≤j.val then WordComparator.mul p (v j) u else v j
+theorem word_refines (p : UInt64) [Fact p.toNat.Prime] (col : Fin 4) (v : WRow) (u : UInt64)
+ (hb:p.toNat≤2^32) (hv:canonical p v) (hu:u.toNat<p.toNat) :
+ canonical p (wordScale p col v u) ∧
+ decode p (wordScale p col v u)=scaleSuffix col (decode p v) (u.toNat:ZMod p.toNat) := by
+ have hp:0<p.toNat:=(Fact.out:p.toNat.Prime).pos
+ constructor
+ · intro j
+   by_cases h:col.val≤j.val
+   · simpa [wordScale,h] using WordComparator.mul_canonical p (v j) u hp
+   · simpa [wordScale,h] using hv j
+ · funext j
+   by_cases h:col.val≤j.val
+   · simp only [decode,wordScale,scaleSuffix,if_pos h]
+     exact WordComparator.mul_decode p (v j) u hb (hv j) hu
+   · simp [decode,wordScale,scaleSuffix,h]
+theorem word_prefix (p : UInt64) (col : Fin 4) (v : WRow) (u : UInt64)
+ (hz:∀ j : Fin 5,j.val<col.val→v j=0) :
+ ∀ j : Fin 5,j.val<col.val→wordScale p col v u j=0 := by
+ intro j hj;simp [wordScale,show ¬col.val≤j.val by omega,hz j hj]
+-- inv is not implemented here: the exact decoded-inverse and canonical-unit
+-- obligations must be supplied for native inv(mat[col][col],p).
+theorem word_inverse_contract (p : UInt64) [Fact p.toNat.Prime] (col : Fin 4) (v : WRow) (u : UInt64)
+ (hb:p.toNat≤2^32) (hv:canonical p v) (hu:u.toNat<p.toNat)
+ (hz:∀ j : Fin 5,j.val<col.val→v j=0)
+ (hn:decode p v col.castSucc≠0)
+ (hinv:(u.toNat:ZMod p.toNat)=(decode p v col.castSucc)⁻¹) :
+ canonical p (wordScale p col v u) ∧
+ (∀ j : Fin 5,j.val<col.val→wordScale p col v u j=0) ∧
+ wordScale p col v u col.castSucc=1 ∧
+ (∀ x : Vector (ZMod p.toNat),residual (decode p (wordScale p col v u)) x=0 ↔ residual (decode p v) x=0) := by
+ have ref:=word_refines p col v u hb hv hu
+ have hzD:∀ j : Fin 5,j.val<col.val→decode p v j=0 := by
+  intro j hj;simp [decode,hz j hj]
+ refine ⟨ref.1,word_prefix p col v u hz,?_,?_⟩
+ · have he:=congrFun ref.2 col.castSucc
+   rw [hinv,inverse_pivot_one col (decode p v) hn] at he
+   have hp1:(1:UInt64).toNat<p.toNat := by
+    have ht:1<p.toNat:=(Fact.out:p.toNat.Prime).one_lt
+    simpa using ht
+   exact (WordComparator.canonical_eq p _ 1 (ref.1 col.castSucc) hp1).mpr (by simpa [decode] using he)
+ · intro x
+   rw [ref.2,hinv]
+   exact inverse_equation_equiv col (decode p v) x hzD hn
+end Solve4Normalize

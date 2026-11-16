@@ -1,0 +1,12 @@
+[package]
+name = "signed-native-restart-controls"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[dependencies]
+five-leads-study = { path = "../../../../five_leads_e2e_20261019/native" }
+signed-collector-stream-controls = { path = "../signed-stream" }
+signed-scheduler-check = { path = "../signed-scheduler" }
+signed-collector-replay = { path = "../signed-replay" }
+serde_json = "1"

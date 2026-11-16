@@ -56,3 +56,59 @@ Scope notes:
 Rebuild: `lake exe cache get && lake build`. Audit:
 `bash tools/lean/proof-gate.sh research/lift_dense_factor_base_20261027/lean`
 from the repository root.
+
+## Subgroup trap and the 2E trace condition (2026-11-07)
+
+File [`LiftDenseTrap.lean`](LiftDenseTrap.lean), added as a library root.
+It formalises statements T1 (with Amendment 1) and T2 of
+[`research/subgroup_trap_20261107`](../../subgroup_trap_20261107/README.md) and the
+mechanism behind its P3 prediction. Curve points are Mathlib's
+`WeierstrassCurve.Affine.Point`, and the group law is Mathlib's. Base change is
+`WeierstrassCurve.Affine.Point.map`, an additive hom
+`(W⁄F).Point →+ (W⁄K).Point` for `f : F →ₐ[S] K`, which exists at the pinned
+Mathlib. The binary curve y² + xy = x³ + ax² + b is `LiftDenseTrap.binCurve a b`,
+the Weierstrass curve with a₁ = 1, a₂ = a, a₃ = a₄ = 0 and a₆ = b (`binCurve_equation`).
+
+Proof gate (2026-11-07): `tools/lean/proof-gate.sh research/lift_dense_factor_base_20261027/lean`
+returns **PASS: 53 theorems, 0 trusted `native_decide`, 0 failing**. The 27 new
+`LiftDenseTrap` entries include the generated `binCurve.eq_1` and `twoE.eq_1`.
+Every theorem depends only on `propext`, `Classical.choice` and `Quot.sound`.
+Receipt: [`gate-receipt-trap/`](gate-receipt-trap/) (audit log, status, build tail,
+versions and source hashes). `lake build` is clean, with no warnings. There is no
+`sorry`, `admit`, custom axiom or `native_decide`.
+
+| study statement | Lean declaration | exact hypotheses | status |
+|:--|:--|:--|:--|
+| T1a, parity: [M:K] odd and y a root of a monic quadratic over K ⟹ y ∈ K | `LiftDenseTrap.mem_range_of_quadratic` (with `natDegree_minpoly_le_two`) | fields F, K with `Algebra F K`, `FiniteDimensional F K`, `Odd (finrank F K)`; `y² + b y + c = 0` with b, c ∈ F; conclusion `y ∈ (algebraMap F K).range`. No finiteness or characteristic hypothesis | **proved** |
+| T1a, binary form: y² + x y = c with x, c ∈ K | `LiftDenseTrap.mem_range_of_artin_schreier` | as above | **proved** |
+| T1, general: x ∈ K and (x, y) ∈ E(M) ⟹ y ∈ K₂ (degree ≤ 2 over K) | `LiftDenseTrap.finrank_adjoin_y_le_two` (with `quadratic_of_equation`) | any Weierstrass curve `W` with coefficients in R, tower R → F → K (scalar tower); `(W⁄K).Equation (algebraMap F K x₀) y`; conclusion `finrank F F⟮y⟯ ≤ 2` | **proved** |
+| T1, even case: y lies in the quadratic subfield K₂ ∩ M | `LiftDenseTrap.mem_of_finrank_adjoin_le_two` | K finite, `FiniteDimensional F K`, L an intermediate field with `finrank F L = 2`; `finrank F F⟮y⟯ ≤ 2` ⟹ `y ∈ L`. Counting argument: L and y are roots of X^{q²} − X, which has at most q² roots | **proved** |
+| T1b, closure: the image of W(K′) → W(M) is a subgroup; sums of image points stay in it | `LiftDenseTrap.sum_mem_range` | any `f : F →ₐ[S] K`, W with coefficients in R, scalar towers R → S → F and R → S → K; every integer combination `∑ nᵢ • Pᵢ` of points in `(Point.map f).range` is in it | **proved** |
+| T1b, no decomposition of a target outside the image | `LiftDenseTrap.no_decomposition` | as above, with `T ∉ (Point.map f).range` | **proved** |
+| T1 trap, [M:K] odd (K* = K): every point with x ∈ K comes from W(K) | `LiftDenseTrap.mem_range_of_x_mem` | W with coefficients in R ⊆ F; `FiniteDimensional F K`, `Odd (finrank F K)`; affine point of `W⁄K` with x ∈ range of `algebraMap F K`; conclusion: in the range of `Point.baseChange F K` | **proved** |
+| T1 trap, [M:K] odd: factor base ⊆ E(K), sums stay there, outside targets have no decomposition | `LiftDenseTrap.trap_sum_mem_range`, `LiftDenseTrap.trap_no_decomposition` | as above; each factor-base point is O or affine with x ∈ F; integer coefficients | **proved** |
+| T1 trap, [M:K] even (K* = K₂): every point with x ∈ K comes from W(K₂); no decomposition outside | `LiftDenseTrap.mem_range_of_x_mem_quadratic`, `LiftDenseTrap.trap_no_decomposition_quadratic` | `W : Affine F` (coefficients in F itself), K finite, `FiniteDimensional F K`, L intermediate with `finrank F L = 2`; image of `Point.map L.val` | **proved** |
+| Amendment 1 "trap iff [K:F₂] < N and 2[K:F₂] ≠ N" | — | — | **partly**: the "if" direction is confinement, which is proved above (FB ⊆ E(K*)). That E(K*) is a *proper* subgroup when K* ≠ M, and the "only if" direction, need point counts and are not formalised |
+| T2, easy direction, formula: (x, y) on the curve, x ≠ 0 ⟹ Tr(x² + b/x²) = Tr(a) | `LiftDenseTrap.trace_x_double` | M finite, `Algebra (ZMod 2) M`; no b ≠ 0 needed | **proved** |
+| T2, doubling: x(2Q) = x_Q² + b/x_Q² in Mathlib's group law | `LiftDenseTrap.double_x` | M of characteristic 2 (via `Algebra (ZMod 2) M`), Q = (x, y) nonsingular on `binCurve a b`, x ≠ 0; `Q + Q = some (x² + b/x²) y' _` | **proved** |
+| T2, easy direction: P = 2Q, P ≠ O ⟹ Tr(x_P) = Tr(a) | `LiftDenseTrap.trace_x_of_two_nsmul`, `LiftDenseTrap.not_two_nsmul_of_trace_ne` | M finite, `Algebra (ZMod 2) M`; any Q (the cases Q = O and x_Q = 0, where 2Q = O, are handled) | **proved** |
+| T2, converse (halving): Tr(x_P) = Tr(a) ⟹ P ∈ 2E | `LiftDenseTrap.exists_half` (with `exists_sq_eq`, `binCurve_nonsingular`) | M finite, `Algebra (ZMod 2) M`, b ≠ 0 (ordinary). Explicit half: s = √t with t² + x_P t = b, then ±(s, y₀) halves P | **proved** |
+| T2: P ≠ O lies in 2E(M) ⟺ Tr(x_P) = Tr(a); {O} ∪ {Tr(x) = Tr(a)} = 2E(M), a subgroup | `LiftDenseTrap.some_mem_twoE_iff`, `LiftDenseTrap.mem_twoE_iff` (2E = `twoE`, the range of `nsmulAddMonoidHom 2`) | M finite, `Algebra (ZMod 2) M`, b ≠ 0 | **proved** |
+| P3 mechanism: factor base with Tr(x) = Tr(a) (C1: Tr(x) = Tr(a) = 0) ⟹ every target with Tr(x_R) ≠ Tr(a) has zero decompositions | `LiftDenseTrap.p3_no_decomposition'` (and the conditional `p3_no_decomposition`, hypothesis FB ⊆ 2E) | M finite, `Algebra (ZMod 2) M`, b ≠ 0; each FB point is O or has Tr(x) = Tr(a); integer coefficients; affine target R | **proved** |
+| P3, "the 2E half carries 2× the prediction" | — | — | **open**: a counting statement (index [E : 2E] = 2 and the mass identity), not formalised |
+| Post hoc borderline share C(n, n/2) p^{n/2}(1−p)^{n/2} | — | — | **open**: heuristic, not a theorem here |
+
+Fidelity notes:
+- "Decomposition" is modelled as an integer combination ∑ nᵢ • Pᵢ over a
+  `Finset`, which covers the study's m-sums (all nᵢ = 1) and IC relations with
+  any coefficients. The theorems say nothing about the *number* of decompositions
+  of targets inside the subgroup.
+- The odd-degree trap allows the curve's coefficients in any R ⊆ F. The
+  even-degree trap takes `W : Affine F`, coefficients in F itself. This is the
+  study's setting with F = K = F₂(line, a, b).
+- In the study, K₂ ∩ M is K₂ when [M:K] is even and K when it is odd. Here the
+  odd case is `mem_range_of_x_mem` (no finiteness needed). The even case is
+  `mem_range_of_x_mem_quadratic` with the quadratic subfield L given as a
+  hypothesis; its existence inside M is standard and not restated.
+- `binCurve` is the a₁ = 1 normal form; b ≠ 0 is exactly ordinarity (j = 1/b).
+  The halving direction uses b ≠ 0. The easy direction does not.

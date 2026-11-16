@@ -1,0 +1,1 @@
+pub fn verify_fresh(bytes:&[u8],expected_hash:&str,owner:&[u8],pins:&FreshOwnerPins)->Result<Value,String>{ fresh_custody(bytes,expected_hash,owner,pins) }

@@ -1,0 +1,39 @@
+{
+  "schema": "n83.chain-exact-proof-map/v1",
+  "full_theorem_formalized": false,
+  "independent_review": "pending",
+  "lean_toolchain": "leanprover/lean4:v4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "dependencies": "Std only, no Mathlib dependency",
+  "lean": "ChainOverlap.lean",
+  "formalized": [
+    {
+      "declaration": "N83ChainOverlap.weighted_rank_budget",
+      "scope": "Conditional integer arithmetic from supplied scaled rank budget and n>=2ell; rank/window/polynomial premises not formalized"
+    },
+    {
+      "declaration": "N83ChainOverlap.shifted_defect_bound",
+      "scope": "q*n+2ell+2 <= (q+1)*n+ell from n>=ell+2"
+    }
+  ],
+  "native_checked": [
+    "Every cyclic selector window inverse both ways and Frobenius wrap",
+    "Every coefficient of all n cubic embeddings",
+    "All actual original top coefficients and complete source support",
+    "Original quadratic product relation coefficients",
+    "Original source lower projection",
+    "Theorem parameter inequalities",
+    "44 independent small mixed-degree Hilbert matrix controls",
+    "Exhaustive small subset rank density and support socle checks",
+    "Corrupt matrix and coefficient rejection"
+  ],
+  "written_bridges_not_formalized": [
+    "Characteristic-two coordinate changes preserve square ideal",
+    "Scalar extension preserves Hilbert dimensions",
+    "Window intersection counting gives rank density for all subsets",
+    "Intermediate support decomposition into selector quotient components",
+    "Pair block quotient socle is 2ell-rank",
+    "Exact sequence and annihilator give truncated-chain defect bound",
+    "All-support bound plus original-source projection establishes matching exact degree"
+  ]
+}

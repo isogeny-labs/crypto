@@ -1,0 +1,17 @@
+{
+ "schema":"n83.hilbert-layout/v2",
+ "inherits":"HILBERT_FORMAT.json",
+ "amendment":"HILBERT_AMENDMENT_V2.md",
+ "current_protocol":"protocol-hilbert-v2.json",
+ "current_instrument_source":"src/bin/hilbert_v2.rs",
+ "raw_run":"n83-prime-m2-hilbert-20261028-r2",
+ "prior_failed_run":"n83-prime-m2-hilbert-20261028-r1",
+ "integer_precision":"All dimensions are exact JSON integers bounded by2^54 in this batch; total_dimension exceeds2^53. Use an exact integer parser (Rust serde_json u64, Python int, or a lossless JavaScript parser). Field elements and modulus are decimal strings. Do not assume all integers fit JavaScript's safe integer range.",
+ "raw_snapshot_files":48,
+ "failed_raw_snapshot_files":34,
+ "source_check":"Complete original source bytes, including exactly the metadata-derived Boolean witness map and fixed check line for planted sources; natural sources have no witness suffix",
+ "archive_paths":{"completed":"hilbert-archives/runs.tar.xz","failed":"hilbert-archives/r1-failed.tar.xz"},
+ "export_paths":{"completed":"experiment-hilbert.export.json","failed":"experiment-hilbert-r1-failed.export.json"},
+ "failed_flow_semantics":"All six cells dispatched and input hashes checked; first complete-source checker failed, five later cells cancelled before certificate execution. Export completed=1 denotes terminated failed execution; accepted certificates=0.",
+ "replay":"Extract archive into a fresh directory. sha256sum -c manifest.sha256, then ./instrument replay . certificates; verify manifest again. Both native replay and archive hashes are producer checks, not independent scientific review."
+}

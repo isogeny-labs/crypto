@@ -1,0 +1,39 @@
+{
+  "schema": "research.independent-formal-review/v1",
+  "producer_manifest_sha256": "90acb6741d2dccb6d2acec7f8ee4d2de152de0e648a44e89cf81b669aaaf58fb",
+  "proof_sha256": "8149adbba29ebf617fb410ea2beb41052d168357e1ed58085980ce9909dd8ad2",
+  "verdict": "No blocking discrepancy at stated weighted field-value scope",
+  "checks": [
+    "literal dbl expression and nested parenthesization match retained Rust lines477-510",
+    "Taylor quotient with constant point residual and linear tangent residual valid",
+    "normalized tangent coefficients derived rather than assumed",
+    "nonzero weights and y plus characteristic not2 ensure nonzero output weights",
+    "self guard only: inverse first at zero y, doubling at nonzero y",
+    "producer module, controls, separate axiom readback replay exit0",
+    "reviewer all-coefficient nonzero fixture and missing-point negative control exit0"
+  ],
+  "boundaries": [
+    "monic quintic with absent degree4 coefficient",
+    "field-value correspondence only; no UInt64 or counters",
+    "self representation guard, no differently weighted converse",
+    "Mumford polynomial divisibility, no smoothness or class-sum theorem"
+  ],
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "reviewer_failure_preserved": "Negative-control attempts used unavailable eval APIs and then needed explicit coefficient simplification; corrected by taking constant coefficients of the witness identity, no producer change",
+  "receipts": {
+    "replay-module": 0,
+    "replay-controls": 0,
+    "replay-readback": 0,
+    "reviewer-controls1": 1,
+    "reviewer-controls2": 1,
+    "reviewer-controls3": 1,
+    "reviewer-controls4": 1,
+    "reviewer-controls5": 0
+  }
+}

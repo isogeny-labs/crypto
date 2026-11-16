@@ -1,0 +1,602 @@
+{
+ "idea_id": "MP-comm_alg-4",
+ "outcome": "refutes",
+ "scope": "toy F_2^13, 26 Boolean eqs, m=3 chain, N<=25; msolve step degree comparative",
+ "versions": {
+  "python": "3.9.10",
+  "msolve": "0.9.5"
+ },
+ "runtime": {
+  "wall_s": 769.5,
+  "cpu_user_s": 98.8,
+  "note": "wall dominated by 60s null timeouts"
+ },
+ "cells": {
+  "(3, 3, 3, 13)": {
+   "N": 22,
+   "minblock": 3,
+   "chain_D": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "chain_med": 4.0,
+   "null_D": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_med": null,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  "(3, 3, 3, 6)": {
+   "N": 15,
+   "minblock": 3,
+   "chain_D": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "chain_med": 3.0,
+   "null_D": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "null_med": 4.0,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    1000,
+    1001,
+    1002,
+    1003
+   ]
+  },
+  "(3, 3, 3, 5)": {
+   "N": 14,
+   "minblock": 3,
+   "chain_D": [
+    2,
+    3,
+    2,
+    3
+   ],
+   "chain_med": 2.5,
+   "null_D": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "null_med": 4.0,
+   "chain_xlD": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "null_xlD": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    2000,
+    2001,
+    2002,
+    2003
+   ]
+  },
+  "(3, 3, 3, 3)": {
+   "N": 12,
+   "minblock": 3,
+   "chain_D": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "chain_med": 2.0,
+   "null_D": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "null_med": 4.0,
+   "chain_xlD": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "null_xlD": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    3000,
+    3001,
+    3002,
+    3003
+   ]
+  },
+  "(3, 3, 3, 2)": {
+   "N": 11,
+   "minblock": 2,
+   "chain_D": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "chain_med": 2.0,
+   "null_D": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "null_med": 3.0,
+   "chain_xlD": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "null_xlD": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    4000,
+    4001,
+    4002,
+    4003
+   ]
+  },
+  "(4, 4, 4, 13)": {
+   "N": 25,
+   "minblock": 4,
+   "chain_D": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "chain_med": 4.0,
+   "null_D": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_med": null,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    false,
+    true,
+    true
+   ],
+   "seeds": [
+    5000,
+    5001,
+    5002,
+    5003
+   ]
+  },
+  "(4, 4, 4, 7)": {
+   "N": 19,
+   "minblock": 4,
+   "chain_D": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "chain_med": 3.0,
+   "null_D": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_med": null,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    6000,
+    6001,
+    6002,
+    6003
+   ]
+  },
+  "(4, 4, 4, 6)": {
+   "N": 18,
+   "minblock": 4,
+   "chain_D": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "chain_med": 3.0,
+   "null_D": [
+    null,
+    5,
+    5,
+    null
+   ],
+   "null_med": 5.0,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    7000,
+    7001,
+    7002,
+    7003
+   ]
+  },
+  "(4, 4, 4, 4)": {
+   "N": 16,
+   "minblock": 4,
+   "chain_D": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "chain_med": 3.0,
+   "null_D": [
+    5,
+    5,
+    5,
+    5
+   ],
+   "null_med": 5.0,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    8000,
+    8001,
+    8002,
+    8003
+   ]
+  },
+  "(4, 4, 4, 3)": {
+   "N": 15,
+   "minblock": 3,
+   "chain_D": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "chain_med": 2.0,
+   "null_D": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "null_med": 4.0,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    9000,
+    9001,
+    9002,
+    9003
+   ]
+  },
+  "(4, 4, 4, 2)": {
+   "N": 14,
+   "minblock": 2,
+   "chain_D": [
+    2,
+    2,
+    2,
+    2
+   ],
+   "chain_med": 2.0,
+   "null_D": [
+    4,
+    4,
+    4,
+    3
+   ],
+   "null_med": 4.0,
+   "chain_xlD": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "null_xlD": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    10000,
+    10001,
+    10002,
+    10003
+   ]
+  },
+  "(2, 4, 4, 4)": {
+   "N": 14,
+   "minblock": 2,
+   "chain_D": [
+    3,
+    3,
+    2,
+    3
+   ],
+   "chain_med": 3.0,
+   "null_D": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "null_med": 4.0,
+   "chain_xlD": [
+    5,
+    3,
+    3,
+    3
+   ],
+   "null_xlD": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    11000,
+    11001,
+    11002,
+    11003
+   ]
+  },
+  "(5, 5, 5, 3)": {
+   "N": 18,
+   "minblock": 3,
+   "chain_D": [
+    3,
+    3,
+    2,
+    3
+   ],
+   "chain_med": 3.0,
+   "null_D": [
+    null,
+    5,
+    5,
+    5
+   ],
+   "null_med": 5,
+   "chain_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "null_xlD": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "chain_unsat": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "seeds": [
+    12000,
+    12001,
+    12002,
+    12003
+   ]
+  }
+ },
+ "contrasts": {
+  "C2_l3": {
+   "N12": 2.0,
+   "N15": 3.0,
+   "N22": 4.0,
+   "verdict": "rises with N (count law)"
+  },
+  "C2_l4": {
+   "N16": 3.0,
+   "N19": 3.0,
+   "N25": 4.0,
+   "verdict": "rises with N at N25 (count law)"
+  },
+  "C1_N14": {
+   "(3,3,3,5)min3": 2.5,
+   "(4,4,4,2)min2": 2.0,
+   "(2,4,4,4)min2": 3.0,
+   "verdict": "mixed: min2 cells straddle min3 cell"
+  },
+  "C1_N18": {
+   "(4,4,4,6)min4": 3.0,
+   "(5,5,5,3)min3": 3.0,
+   "verdict": "tie (count law)"
+  },
+  "yseries_l3": {
+   "13": 4.0,
+   "6": 3.0,
+   "5": 2.5,
+   "3": 2.0,
+   "2": 2.0
+  },
+  "yseries_l4": {
+   "13": 4.0,
+   "7": 3.0,
+   "6": 3.0,
+   "4": 3.0,
+   "3": 2.0
+  }
+ },
+ "null_note": "chain D <= null D in every cell with null (Delta -1..-2); null also rises with N (3->4->5); null skipped N>=20 and timed out on 7/16 runs at N=18,19"
+}

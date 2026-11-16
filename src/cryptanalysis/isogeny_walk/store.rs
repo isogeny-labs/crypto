@@ -25,6 +25,7 @@
 //! The transport is the AWS CLI (`aws s3api`), run as a subprocess with the
 //! caller's credentials; no SDK is linked.
 
+use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
@@ -198,6 +199,69 @@ pub fn head(loc: &S3Loc, key: &str) -> Result<Option<Head>, String> {
         bytes,
         sha256: checksum_hex(encoded)?,
     }))
+}
+
+/// HEAD every object named by a completed run's marker. This checks stored
+/// byte counts and S3-reported hashes; [`fetch`] additionally checks the
+/// downloaded and decoded bytes.
+pub struct ObjectCheck {
+    pub checked: usize,
+    pub missing: Vec<String>,
+    pub mismatched: Vec<String>,
+}
+
+pub fn check_objects(
+    loc: &S3Loc,
+    run_rel: &str,
+    marker_head: &Head,
+    scratch: &Path,
+) -> Result<ObjectCheck, String> {
+    let marker_key = loc.key(&format!("{run_rel}/{COMPLETE_FILE}"));
+    let bytes = get(loc, &marker_key, scratch)?
+        .ok_or_else(|| format!("{marker_key}: marker vanished after HEAD"))?;
+    if bytes.len() as u64 != marker_head.bytes || sha256_hex_bytes(&bytes) != marker_head.sha256 {
+        return Err(format!("{marker_key}: marker differs from S3 HEAD"));
+    }
+    let marker: serde_json::Value = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    if marker["schema"].as_str() != Some(COMPLETE_SCHEMA)
+        || marker["run"].as_str() != Some(loc.uri(run_rel).as_str())
+    {
+        return Err(format!("{marker_key}: wrong schema or run identity"));
+    }
+    let objects = marker["objects"]
+        .as_array()
+        .ok_or("marker has no objects array")?;
+    let mut names = BTreeSet::new();
+    let mut missing = Vec::new();
+    let mut mismatched = Vec::new();
+    let object_prefix = loc.key(&format!("{run_rel}/attempts/"));
+    for object in objects {
+        let name = segment(object["name"].as_str().ok_or("object has no name")?)?;
+        if !names.insert(name) {
+            return Err(format!("{marker_key}: duplicate object name {name}"));
+        }
+        let key = object["key"].as_str().ok_or("object has no key")?;
+        if !key.starts_with(&object_prefix) {
+            return Err(format!("{key}: outside this run"));
+        }
+        let expected_bytes = object["bytes"].as_u64().ok_or("object has no bytes")?;
+        let expected_sha = object["sha256"].as_str().ok_or("object has no SHA-256")?;
+        if expected_sha.len() != 64 || !expected_sha.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(format!("{key}: invalid SHA-256 in marker"));
+        }
+        match head(loc, key)? {
+            None => missing.push(key.to_string()),
+            Some(found) if found.bytes != expected_bytes || found.sha256 != expected_sha => {
+                mismatched.push(key.to_string());
+            }
+            Some(_) => {}
+        }
+    }
+    Ok(ObjectCheck {
+        checked: objects.len(),
+        missing,
+        mismatched,
+    })
 }
 
 /// Upload an existing file without buffering it, conditional on the key not
@@ -465,14 +529,23 @@ fn sha256_hex_bytes(b: &[u8]) -> String {
     sha256(b).iter().map(|x| format!("{x:02x}")).collect()
 }
 
-/// Download the completed run at `run_rel` into `out`, checking every
-/// object's stored and uncompressed SHA-256.  Returns the marker.
+fn require_absent_output(out: &Path) -> Result<(), String> {
+    match std::fs::symlink_metadata(out) {
+        Ok(_) => Err(format!("refusing to overwrite {}", out.display())),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(format!("inspect {}: {e}", out.display())),
+    }
+}
+
+/// Download a completed run into a new directory, checking every stored and
+/// uncompressed SHA-256 before the directory becomes visible. Returns the marker.
 pub fn fetch(
     loc: &S3Loc,
     run_rel: &str,
     out: &Path,
     scratch: &Path,
 ) -> Result<serde_json::Value, String> {
+    require_absent_output(out)?;
     let marker_key = loc.key(&format!("{run_rel}/{COMPLETE_FILE}"));
     let text = get(loc, &marker_key, scratch)?
         .ok_or_else(|| format!("s3://{}/{marker_key}: no completed run", loc.bucket))?;
@@ -480,27 +553,51 @@ pub fn fetch(
     if marker["schema"].as_str() != Some(COMPLETE_SCHEMA) {
         return Err(format!("{marker_key}: not a {COMPLETE_SCHEMA} marker"));
     }
-    std::fs::create_dir_all(out).map_err(|e| e.to_string())?;
-    for o in marker["objects"].as_array().ok_or("objects")? {
-        let name = segment(o["name"].as_str().ok_or("name")?)?.to_string();
-        let key = o["key"].as_str().ok_or("key")?;
-        if !key.starts_with(&loc.key(&format!("{run_rel}/attempts/"))) {
-            return Err(format!("{key}: outside this run"));
+    let parent = out
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    let name = out.file_name().ok_or("output needs a directory name")?;
+    std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    let stage = parent.join(format!(
+        ".{}-fetch-{}",
+        name.to_string_lossy(),
+        attempt_id()
+    ));
+    std::fs::create_dir(&stage).map_err(|e| format!("create {}: {e}", stage.display()))?;
+    let result = (|| -> Result<(), String> {
+        let mut names = BTreeSet::new();
+        for o in marker["objects"].as_array().ok_or("objects")? {
+            let name = segment(o["name"].as_str().ok_or("name")?)?.to_string();
+            if !names.insert(name.clone()) {
+                return Err(format!("{marker_key}: duplicate object name {name}"));
+            }
+            let key = o["key"].as_str().ok_or("key")?;
+            if !key.starts_with(&loc.key(&format!("{run_rel}/attempts/"))) {
+                return Err(format!("{key}: outside this run"));
+            }
+            let stored = get(loc, key, scratch)?.ok_or_else(|| format!("{key}: missing"))?;
+            if Some(sha256_hex_bytes(&stored).as_str()) != o["sha256"].as_str() {
+                return Err(format!("{key}: stored SHA-256 differs from the marker"));
+            }
+            let content = match o["encoding"].as_str() {
+                Some("gzip") => gunzip(&stored)?,
+                Some("identity") => stored,
+                other => return Err(format!("{key}: unknown encoding {other:?}")),
+            };
+            if Some(sha256_hex_bytes(&content).as_str()) != o["content_sha256"].as_str() {
+                return Err(format!("{key}: content SHA-256 differs from the marker"));
+            }
+            std::fs::write(stage.join(&name), &content).map_err(|e| e.to_string())?;
         }
-        let stored = get(loc, key, scratch)?.ok_or_else(|| format!("{key}: missing"))?;
-        if Some(sha256_hex_bytes(&stored).as_str()) != o["sha256"].as_str() {
-            return Err(format!("{key}: stored SHA-256 differs from the marker"));
-        }
-        let content = match o["encoding"].as_str() {
-            Some("gzip") => gunzip(&stored)?,
-            Some("identity") => stored,
-            other => return Err(format!("{key}: unknown encoding {other:?}")),
-        };
-        if Some(sha256_hex_bytes(&content).as_str()) != o["content_sha256"].as_str() {
-            return Err(format!("{key}: content SHA-256 differs from the marker"));
-        }
-        std::fs::write(out.join(&name), &content).map_err(|e| e.to_string())?;
+        require_absent_output(out)?;
+        std::fs::rename(&stage, out).map_err(|e| format!("publish {}: {e}", out.display()))?;
+        Ok(())
+    })();
+    if result.is_err() {
+        let _ = std::fs::remove_dir_all(&stage);
     }
+    result?;
     Ok(marker)
 }
 

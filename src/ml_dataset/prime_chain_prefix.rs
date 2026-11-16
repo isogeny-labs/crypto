@@ -5,6 +5,7 @@ use std::io::BufRead;
 
 use serde_json::{json, Value};
 
+use super::algebraic_targets;
 use super::prefix_algebra::{self, Poly};
 
 const MAX_EVENT_BYTES: u64 = 8 * 1024 * 1024;
@@ -298,7 +299,7 @@ struct Child {
     system: Vec<Poly>,
 }
 
-fn graph(polynomials: &[Poly], n: usize) -> Value {
+pub(super) fn graph(polynomials: &[Poly], n: usize) -> Value {
     let monomials: Vec<_> = polynomials
         .iter()
         .flat_map(|f| f.iter().map(|(e, _)| e.clone()))
@@ -416,6 +417,7 @@ pub(super) fn replay(
     let mut verifier_work = VerifierWork::default();
     let mut stopped = false;
     let mut reason = None;
+    let mut algebraic = algebraic_targets::Channel::default();
     loop {
         let cut = bytes;
         let mut line = Vec::new();
@@ -570,6 +572,23 @@ pub(super) fn replay(
                     audit.work.coefficient_operations;
                 let verified = audit.certificate.is_some();
                 let audit_reason = audit.reason.clone();
+                if let Some(certificate) = &audit.certificate {
+                    algebraic.emit_node(
+                        algebraic_targets::Node {
+                            initial,
+                            active: &frame.active,
+                            bindings: &frame.bindings,
+                            sources: &frame.system,
+                            basis: &basis,
+                            proofs: &certificate.right_from_left,
+                            p,
+                            sequence: events,
+                            node_id: frame.id,
+                            equality_work: &audit.work,
+                        },
+                        &mut emit,
+                    )?;
+                }
                 emit(
                     None,
                     json!({"kind":"ideal_equality_audit","sequence":events,"node_id":frame.id,"certificate":audit}),
@@ -695,14 +714,16 @@ pub(super) fn replay(
             _ => return Err("unknown prime-chain event kind".into()),
         }
     }
-    Ok(replay_summary(
+    let mut summary = replay_summary(
         examples,
         certified_nodes,
         events,
         bytes,
         reason,
         &verifier_work,
-    ))
+    );
+    summary["algebraic_consequences"] = algebraic.summary();
+    Ok(summary)
 }
 
 #[cfg(test)]
@@ -746,9 +767,11 @@ mod tests {
             input,
             &json!({"verified_public_input":true}),
             std::io::Cursor::new(bytes),
-            |feature, _record| {
-                if let Some(feature) = feature {
-                    features.push(feature);
+            |feature, record| {
+                if record["kind"] == "observed_next_branch" {
+                    if let Some(feature) = feature {
+                        features.push(feature);
+                    }
                 }
                 Ok(())
             },
@@ -786,6 +809,76 @@ mod tests {
                 assert!(!rendered.contains(excluded));
             }
         }
+    }
+
+    #[test]
+    fn native_consequences_have_pre_native_context_and_separate_branch_counts() {
+        let (input, rows) = fixture(false);
+        let collect = |rows: &[Value]| {
+            let mut bytes = Vec::new();
+            for row in rows {
+                serde_json::to_writer(&mut bytes, row).unwrap();
+                bytes.push(b'\n');
+            }
+            let mut algebraic = Vec::new();
+            let mut branches = Vec::new();
+            let summary = replay(
+                &input,
+                &json!({"verified_public_input":true}),
+                std::io::Cursor::new(bytes),
+                |feature, record| {
+                    if record["kind"] == "polynomial_consequence" {
+                        algebraic.push((feature, record));
+                    } else if record["kind"] == "observed_next_branch" {
+                        branches.push(feature.unwrap());
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
+            (algebraic, branches, summary)
+        };
+        let (algebraic, branches, summary) = collect(&rows);
+        assert_eq!(branches.len(), 4);
+        assert_eq!(summary["verified_branch_examples"], 4);
+        assert_eq!(algebraic.len(), 10);
+        assert_eq!(
+            summary["algebraic_consequences"]["counts"]["admitted_nonzero_rows"],
+            10
+        );
+        for (feature, record) in &algebraic {
+            let feature = feature.as_ref().unwrap();
+            assert_eq!(feature["task"], "prime-polynomial-consequence/v1");
+            assert_eq!(record["admission_status"], "verified_nonzero");
+            assert_eq!(record["native_operation_witness"], false);
+            assert!(record["exact_first_fall_degree"].is_null());
+            assert!(record["exact_last_fall_degree"].is_null());
+            for forbidden in [
+                "certified_target",
+                "multiplier_proof",
+                "source_node_id",
+                "identity_audit",
+            ] {
+                assert!(feature.get(forbidden).is_none());
+            }
+        }
+        assert!(algebraic[..4].iter().all(|row| row.0 == algebraic[0].0));
+
+        // Scale an output basis row while leaving the pre-native system fixed.
+        // Both nodes certify the same ideal, but their output labels differ.
+        let mut changed = rows[..2].to_vec();
+        for term in changed[1]["event"]["report"]["basis"][0]
+            .as_array_mut()
+            .unwrap()
+        {
+            term[1] = json!((term[1].as_u64().unwrap() * 2) % 5);
+        }
+        let (changed_targets, _, _) = collect(&changed);
+        assert_eq!(changed_targets[0].0, algebraic[0].0);
+        assert_ne!(
+            changed_targets[0].1["certified_target"],
+            algebraic[0].1["certified_target"]
+        );
     }
     #[test]
     fn all_field_and_finite_iterators_replay_siblings_without_future_domains() {

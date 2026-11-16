@@ -1,0 +1,46 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "known-log claw positive control (planted, f2m15)",
+  "description": "Planted targets: the harness checks the recovered scalar against the planted k.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_explicit",
+        "n": 15,
+        "modulus": 32771,
+        "a": 1,
+        "b": 21067,
+        "group_order": 32638,
+        "r": 16319,
+        "gx": 31539,
+        "gy": 28502
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 2026111203
+  },
+  "arms": [
+    {
+      "name": "known-log",
+      "role": "candidate",
+      "method": {
+        "id": "ic.known_log_mitm2_v1",
+        "params": {
+          "size": "10",
+          "base_seed": "20261112",
+          "base_multiplier": "1",
+          "max_pair_work": "110",
+          "max_trials": "4080"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 2026111201,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

@@ -1,0 +1,28 @@
+m=16 curve=0 curve|lsb: logreg=0.4965, hgb=0.5009, mlp=0.4976
+m=16 curve=0 curve|msb: logreg=0.5013, hgb=0.5050, mlp=0.4978
+m=16 curve=0 PC-A|delta=0.02|lsb: logreg=0.5165, hgb=0.5114, mlp=0.4995
+m=16 curve=0 PC-A|delta=0.05|lsb: logreg=0.5555, hgb=0.5547, mlp=0.5217
+m=16 curve=0 PC-A|delta=0.1|lsb: logreg=0.6053, hgb=0.6053, mlp=0.5724
+m=16 curve=0 PC-A|delta=0.2|lsb: logreg=0.7021, hgb=0.7021, mlp=0.6973
+m=16 curve=0 PC-B|c=1|lsb: logreg=1.0000, hgb=1.0000, mlp=1.0000
+m=16 curve=0 PC-B|c=1|msb: logreg=1.0000, hgb=1.0000, mlp=1.0000
+m=16 curve=0 PC-B|c=2|lsb: logreg=0.4876, hgb=1.0000, mlp=1.0000
+m=16 curve=0 PC-B|c=3|lsb: logreg=0.6625, hgb=0.6625, mlp=0.9679
+m=16 curve=0 PC-B|c=5/3|lsb: logreg=0.5386, hgb=0.5977, mlp=0.9905
+m=16 curve=0 PC-B|c=rand0|lsb: logreg=0.4904, hgb=0.4709, mlp=0.9726
+m=16 curve=0 PC-B|c=rand0|msb: logreg=0.4868, hgb=0.4621, mlp=0.9592
+m=16 curve=0 PC-B|c=rand1|lsb: logreg=0.4876, hgb=0.5477, mlp=0.9819
+Traceback (most recent call last):
+  File "/opt/study/src/mllc_harness.py", line 164, in <module>
+    if __name__ == '__main__': main()
+                               ~~~~^^
+  File "/opt/study/src/mllc_harness.py", line 157, in main
+    r = run_size(m, cfg, a.models, null_R=null_R)
+  File "/opt/study/src/mllc_harness.py", line 106, in run_size
+    Nf, ksf, (Xf, labf) = fpstar_arm(m, seed, min(ntot, N-1), rng)
+                          ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/study/src/mllc_harness.py", line 72, in fpstar_arm
+    ks = rng.choice(N, size=n, replace=False) + 0
+         ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "numpy/random/_generator.pyx", line 925, in numpy.random._generator.Generator.choice
+ValueError: Cannot take a larger sample than population when replace is False

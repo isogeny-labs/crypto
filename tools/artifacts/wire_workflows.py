@@ -12,15 +12,20 @@ that hold moved files, and inserts after each `actions/checkout` step:
         if ! command -v aws ...; then (install the AWS CLI into $RUNNER_TEMP); fi
         python3 tools/artifacts/artifacts.py pull research/x experiments/y/results
 
-A sparse checkout also gets `tools/artifacts` and `.artifacts` (the store
-configuration) added to its patterns. The edit is textual (comments and
-layout survive) and idempotent; checkouts into a `path:` other than the
-workspace are reported, not edited.
+A sparse checkout also gets `tools/artifacts` added to its patterns. The edit
+is textual (comments and layout survive) and idempotent; checkouts into a
+`path:` other than the workspace are reported, not edited.
 
     python3 tools/artifacts/wire_workflows.py [--check] [WORKFLOW ...]
 
-`--check` edits nothing and exits 1 if any workflow lacks the step it needs,
-which is how CI keeps new workflows honest.
+`--check` edits nothing and exits 1 if any workflow lacks the step it needs
+or carries a stale one, which is how CI keeps new workflows honest.
+
+The pull list is derived from the workflow text outside the generated step:
+the step's own `pull` line is output, never a reference, so a directory the
+workflow stops naming is dropped on regeneration. Inputs a workflow's scripts
+discover at run time are declared with `# tools/artifacts pull: PATH ...`
+comment lines; hand edits to the generated line do not survive.
 """
 
 from __future__ import annotations
@@ -35,6 +40,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import artifacts  # noqa: E402
 
 STEP_NAME = "Pull store data this workflow reads (tools/artifacts)"
+# A workflow whose scripts find their inputs at run time (a gate that follows
+# VALIDATION.json to the session records it names) declares them, one or more
+# paths per comment line, since its text never names them:
+#     # tools/artifacts pull: research/x/sessions research/y/results
+DECLARE_RE = re.compile(r"^\s*#\s*tools/artifacts pull:(.*)$")
 PATH_RE = re.compile(r"(?<![A-Za-z0-9_./*-])((?:[A-Za-z0-9_+*-][A-Za-z0-9_.+*-]*/)+[A-Za-z0-9_.+*-]*)")
 
 
@@ -56,9 +66,39 @@ def moved_dirs(moved: set[str]) -> set[str]:
     }
 
 
+def strip_generated(text: str) -> str:
+    """The workflow without the pull steps this tool generated.
+
+    The generated `artifacts.py pull ...` line names every directory it pulls,
+    so scanning it would make each pulled directory a reference to itself and
+    keep it after the workflow stopped naming it.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^(\s*)- name: (.*)$", lines[i])
+        if not (m and m.group(2).strip() == STEP_NAME):
+            out.append(lines[i])
+            i += 1
+            continue
+        indent = len(m.group(1))
+        i += 1
+        while i < len(lines) and (not lines[i].strip() or len(lines[i]) - len(lines[i].lstrip()) > indent):
+            i += 1
+    return "\n".join(out)
+
+
 def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     """Paths the workflow names that are, or contain, moved files; minimal cover."""
     found = set()
+    text = strip_generated(text)
+    for line in text.split("\n"):
+        if m := DECLARE_RE.match(line):
+            # Declared, so kept while it still names moved data, and dropped
+            # (like any stale entry) once it does not.
+            found.update(p for p in (x.rstrip("/") for x in m.group(1).split())
+                         if p in moved or any(x.startswith(p + "/") for x in moved))
     # A sibling script may read data in the same artifact directory. Do not
     # infer that it reads every artifact in a broad ancestor such as
     # research/notes: many independent studies share that namespace.
@@ -121,7 +161,10 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
 
 
 def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
-    """Insert the pull step after each workspace checkout; returns (text, notes)."""
+    """Insert the pull step after each workspace checkout; returns (text, notes).
+
+    With no paths, an earlier generated step is removed and nothing is added.
+    """
     lines = text.split("\n")
     notes: list[str] = []
     out: list[str] = []
@@ -151,7 +194,8 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             out.extend(block)
             i = j
             continue
-        block = add_sparse_pattern(block, indent)
+        if paths:
+            block = add_sparse_pattern(block, indent)
         out.extend(block)
         k = next((k for k in range(j, len(lines)) if lines[k].strip()), len(lines))
         if k < len(lines) and STEP_NAME in lines[k]:
@@ -163,6 +207,9 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
                 j += 1
             while j > k + 1 and not lines[j - 1].strip():
                 j -= 1
+        if not paths:
+            i = j
+            continue
         step = step_lines(indent, paths)
         cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
                      if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
@@ -174,35 +221,6 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
 
 
 def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
-    """Make a sparse checkout also fetch what the pull step runs on: the tool
-    (tools/artifacts) and the store configuration (.artifacts/config.json)."""
-    for k, b in enumerate(block):
-        inline = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
-        if inline and "${{" in inline.group(2):
-            return block
-        if not inline and not re.match(rf"^{indent}    sparse-checkout: \|", b):
-            continue
-        cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
-        if inline:  # single-line form (`sparse-checkout: some/path`): rewrite as a block scalar
-            pad = indent + "      "
-            head, items, n = [inline.group(1) + "|"], [pad + inline.group(2).strip()], k + 1
-        else:
-            head, items, n = [b], [], k + 1
-            while n < len(block) and len(block[n]) - len(block[n].lstrip()) > len(indent) + 4:
-                items.append(block[n])
-                n += 1
-            pad = (items[0][: len(items[0]) - len(items[0].lstrip())]) if items else indent + "      "
-        have = [x.strip() for x in items]
-        if "/*" in have:
-            return block
-        add = []
-        if not any("tools/artifacts" in x or x in ("tools", "/tools/") for x in have):
-            add.append("tools/artifacts" if cone else "/tools/artifacts/")
-        if not any(x.strip("/") in (".artifacts", ".artifacts/config.json") for x in have):
-            add.append(".artifacts" if cone else "/.artifacts/")
-        if inline or add:
-            return block[:k] + head + items + [pad + x for x in add] + block[n:]
-        return block
     """Make a sparse checkout also fetch tools/artifacts and .artifacts (the
     store config the pull step reads; without it the remote is empty)."""
     cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
@@ -249,7 +267,7 @@ def main() -> int:
     for f in files:
         text = f.read_text()
         paths = needed(text, moved, dirs)
-        if not paths:
+        if not paths and STEP_NAME not in text:
             continue
         new, notes = wire(text, paths)
         for n in notes:
@@ -257,12 +275,15 @@ def main() -> int:
         if new != text:
             missing += 1
             if args.check:
-                print(f"{f.name}: needs `{STEP_NAME}` for {' '.join(paths)}")
+                if paths:
+                    print(f"{f.name}: needs `{STEP_NAME}` for {' '.join(paths)}")
+                else:
+                    print(f"{f.name}: stale `{STEP_NAME}`: the workflow names no moved data")
             else:
                 f.write_text(new)
-                print(f"{f.name}: pull {' '.join(paths)}")
+                print(f"{f.name}: pull {' '.join(paths)}" if paths else f"{f.name}: pull step removed")
     if args.check and missing:
-        print(f"\n{missing} workflow(s) read store data without pulling it; run "
+        print(f"\n{missing} workflow(s) lack the pull step they need or carry a stale one; run "
               f"python3 tools/artifacts/wire_workflows.py", file=sys.stderr)
         return 1
     return 0

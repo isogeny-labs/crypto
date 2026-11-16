@@ -1,0 +1,176 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "date": "2026-10-31",
+ "row": "E29 (GLV note §9.27/§9.31), the measured parts: kill test (8 curves), Stage R (8 curves x {order 6, order 24} x 16 walks x 2 arithmetics) and Stage A (p = 241, 337, 541; flat, cubic and twist24 arms, 48 walks each); evidence directory research/e29_twists_20261030. The handover n* is a model: recomputed in validator-report.json, not replayed",
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E29: fresh build from an export of the recorded binary commit in a fresh target directory, fresh runs, own comparison (validate_e29.rs compare)",
+ "recorded_binary": "0e4fccce1ad1baf7ace18a550483771f02315838 (experiments/34_twist24_stage_r/binary_commit.txt)",
+ "local_replay_note": "Replayed locally in the validator's 4-vCPU container, not on isolab-eks: the replay admits operation counts only; no wall time is compared or claimed (wall_ms listed, not compared).",
+ "build": {
+  "schema": "e2x-validator-build/v1",
+  "repository_head_at_start": "f23c53871 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152); working tree clean except .resume/ (gitignored)",
+  "source": "git archive <commit> of the build inputs only: Cargo.toml, Cargo.lock, src/, examples/, crates/, tools/, isogeny_algos/, benches/, research/pencil_large_prime_20261029, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, and the 58 include_str!/include_bytes! targets of the library present at the commit (under docs/, research/, tests/). Every exported file was checked equal to its blob at the commit (git hash-object): 789dc2ff6 tree 4,591 files, 0e4fccce1 tree 4,594 files, 0 mismatches each.",
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks. The replay admits operation counts only (no wall time is compared or claimed), so a local run suffices.",
+  "flags": "CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline",
+  "recorded_binary_commits": {
+   "all": "0e4fccce1ad1baf7ace18a550483771f02315838"
+  },
+  "builds": [
+   {
+    "commit": "0e4fccce1ad1baf7ace18a550483771f02315838",
+    "tree": "/dev/shm/val-tree-0e4 (re-exported after the restart, 2026-10-31T14:04Z; 4,594 files equal to their blobs)",
+    "target_dir": "/dev/shm/val-target-0e4: a fresh, empty target directory on tmpfs (the root filesystem has ~0.5 GB free); nothing reused from the producer's target/",
+    "command": "cd /dev/shm/val-tree-0e4 && CARGO_TARGET_DIR=/dev/shm/val-target-0e4 CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --offline --example e28_tau --example e29_twist --example e30_audit --example quartic_pipeline_gls",
+    "attempts": [
+     "2026-10-31T07:36:44Z attempt 1: shared target directory with the 789dc2ff6 build. VOID: cargo hashes the workspace's own path package by its relative path and judged the 789dc2ff6 library fresh by mtime (the exported files carry the commits' older mtimes), so the 0e4fccce1 examples failed to compile against it (unresolved E29/E30 imports). No binary of this attempt was used.",
+     "2026-10-31T07:37:25Z attempt 2: fresh target directory /dev/shm/val-target-0e4; lost when the container restarted (~14:00Z wiped /dev/shm) before its binaries were used.",
+     "2026-10-31 attempt 3: 2026-10-31T14:17:06Z Finished `release` profile [optimized] target(s) in 12m 20s (started 2026-10-31T14:04:35Z); fresh target dir /dev/shm/val-target-0e4"
+    ],
+    "binaries": [
+     {
+      "name": "e29_twist (0e4fccce1)",
+      "sha256": "399c764daacd25c7cc1fd52816b4b88fbb11cb7394b9ce2654e119eb84c2e024",
+      "bytes": 5330528
+     }
+    ]
+   }
+  ],
+  "run_command": "BIN=<e29_twist 0e4fccce1> research/e29_twists_20261030/replay/replay.sh",
+  "environment": "RAYON_NUM_THREADS=4 (the producer host's default on 4 vCPU)."
+ },
+ "build_record": {
+  "path": "replay/build.json",
+  "sha256": "57f0556234901029bbac8d1c56eefe4d13908fea74b569115b255f8b3c59839c"
+ },
+ "comparison": {
+  "path": "replay/replay_comparison.json",
+  "sha256": "eaf2fde42c06044205266bd782d6817d10d37ae2b2df25952e559d24498ed936",
+  "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form; integers compared exactly as i128), strings and booleans exactly; wall_ms is wall-clock and listed, not compared"
+ },
+ "runs_total": 6,
+ "runs_matched": 6,
+ "fields_compared": 26124,
+ "fields_identical": 26124,
+ "coverage": "full: every recorded run replayed (kill test, both Stage R runs, the three Stage A runs); no sampling",
+ "scalar_verification": "Every replayed walk record (512 in Stage R, 144 in Stage A) reports correct = true (the binary sets it only when the recovered logarithm equals the planted one and [d]G = Q is checked); every Stage A arm (9) is solved and correct and recovers the known scalar; the kill test reports a group of order 24 with psi_p on the curve on all 8 curves, which the validator's own arithmetic confirms on the canonical models (replay/twist_check.json).",
+ "runs": [
+  {
+   "run": "kill",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/kill.json",
+    "sha256": "0aca3733b0cd0c8ef9bc300a33ab61744e60593f035aa74fbb300b678ba3734c"
+   },
+   "replay_output": {
+    "path": "research/e29_twists_20261030/replay/kill.json",
+    "sha256": "0aca3733b0cd0c8ef9bc300a33ab61744e60593f035aa74fbb300b678ba3734c"
+   },
+   "fields_compared": 112,
+   "fields_identical": 112,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "curves": 8,
+    "group_order_24_and_psi_on_curve_all": true
+   }
+  },
+  {
+   "run": "stage_r_p241",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_r_p241.json",
+    "sha256": "6b67abb555a1035b20071c54b692c7752bcee1e1e083a2a3e922a1a8b366d0aa"
+   },
+   "replay_output": {
+    "path": "research/e29_twists_20261030/replay/stage_r_p241.json",
+    "sha256": "6b67abb555a1035b20071c54b692c7752bcee1e1e083a2a3e922a1a8b366d0aa"
+   },
+   "fields_compared": 729,
+   "fields_identical": 729,
+   "mismatches": [],
+   "matched": true
+  },
+  {
+   "run": "stage_r_rest",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_r_rest.json",
+    "sha256": "e3193c18b6ac2b2699a618815ca2cc1233f3739b6f915673dbac31469909fb87"
+   },
+   "replay_output": {
+    "path": "research/e29_twists_20261030/replay/stage_r_rest.json",
+    "sha256": "e3193c18b6ac2b2699a618815ca2cc1233f3739b6f915673dbac31469909fb87"
+   },
+   "fields_compared": 5103,
+   "fields_identical": 5103,
+   "mismatches": [],
+   "matched": true
+  },
+  {
+   "run": "stage_a_p241",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_a_p241.json",
+    "sha256": "54a852d0a6c1b40ba42fc48a2f756a41a9513c15e443d64c72853c5f404ebaf5"
+   },
+   "replay_output": {
+    "path": "research/e29_twists_20261030/replay/stage_a_p241.json",
+    "sha256": "6cb734a16d8e7e6c2e03cb39de3883f2ddc79a1959fef7a86ba6262e11dc2c46"
+   },
+   "fields_compared": 3905,
+   "fields_identical": 3905,
+   "mismatches": [],
+   "matched": true,
+   "timing_not_compared": [
+    {
+     "path": "$[0].report.wall_ms",
+     "committed": 49691.883760000004,
+     "replay": 48568.116962
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p337",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_a_p337.json",
+    "sha256": "6e5647ad16b3111e3594d93e6e710291c1d096f8fdd85504c8ceb54a9eda9044"
+   },
+   "replay_output": {
+    "path": "research/e29_twists_20261030/replay/stage_a_p337.json",
+    "sha256": "90fdd0f8c0246fcd2020471b10fd4c8274dd971bdbc52d2922dfe005fedcb8fd"
+   },
+   "fields_compared": 6724,
+   "fields_identical": 6724,
+   "mismatches": [],
+   "matched": true,
+   "timing_not_compared": [
+    {
+     "path": "$[0].report.wall_ms",
+     "committed": 94667.28591,
+     "replay": 84911.302482
+    }
+   ]
+  },
+  {
+   "run": "stage_a_p541",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_a_p541.json",
+    "sha256": "f5dec977a38497f4e86bde3d9184cd8d8a7ab45386aeea6ae13609409b8b0002"
+   },
+   "replay_output": {
+    "path": "research/e29_twists_20261030/replay/stage_a_p541.json",
+    "sha256": "d62718179eb87058110a36178e56cc25e50a6e53c0052df5e4b2542c4024a944"
+   },
+   "fields_compared": 9551,
+   "fields_identical": 9551,
+   "mismatches": [],
+   "matched": true,
+   "timing_not_compared": [
+    {
+     "path": "$[0].report.wall_ms",
+     "committed": 465424.984335,
+     "replay": 371161.627075
+    }
+   ]
+  }
+ ]
+}

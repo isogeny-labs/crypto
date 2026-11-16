@@ -1,0 +1,13 @@
+offset=0 trials=8 affine=(1, 5) fast=(0, 0) affine_ops=GroupOps { adds: 3, doubles: 1, scalar_mults: 0, field_ops: FieldOps { muls: 11, sqrs: 5, invs: 4 }, montgomery_reductions: 0 } fast_ops=GroupOps { adds: 0, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 0, sqrs: 0, invs: 0 }, montgomery_reductions: 0 }
+offset=-1 trials=8 affine=(1, 6) fast=(0, 1) affine_ops=GroupOps { adds: 3, doubles: 1, scalar_mults: 0, field_ops: FieldOps { muls: 11, sqrs: 5, invs: 4 }, montgomery_reductions: 0 } fast_ops=GroupOps { adds: 2, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 4, sqrs: 2, invs: 2 }, montgomery_reductions: 0 }
+offset=-2 trials=8 affine=(1, 7) fast=(0, 8) affine_ops=GroupOps { adds: 4, doubles: 1, scalar_mults: 0, field_ops: FieldOps { muls: 13, sqrs: 6, invs: 5 }, montgomery_reductions: 0 } fast_ops=GroupOps { adds: 8, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 16, sqrs: 8, invs: 8 }, montgomery_reductions: 0 }
+offset=-8 trials=16 affine=(1, 3) fast=(1, 3) affine_ops=GroupOps { adds: 3, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 6, sqrs: 3, invs: 3 }, montgomery_reductions: 0 } fast_ops=GroupOps { adds: 3, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 6, sqrs: 3, invs: 3 }, montgomery_reductions: 0 }
+offset=-4105 trials=4110 affine=(1, 4100) fast=(1, 4100) affine_ops=GroupOps { adds: 4100, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 8200, sqrs: 4100, invs: 4100 }, montgomery_reductions: 0 } fast_ops=GroupOps { adds: 4100, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 8200, sqrs: 4100, invs: 4100 }, montgomery_reductions: 0 }
+offset=-4103 trials=4100 affine=(1, 4098) fast=(1, 4098) affine_ops=GroupOps { adds: 4098, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 8196, sqrs: 4098, invs: 4098 }, montgomery_reductions: 0 } fast_ops=GroupOps { adds: 4098, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 8196, sqrs: 4098, invs: 4098 }, montgomery_reductions: 0 }
+offset=-4103 trials=4098 affine=(0, 4098) fast=(0, 4098) affine_ops=GroupOps { adds: 4098, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 8196, sqrs: 4098, invs: 4098 }, montgomery_reductions: 0 } fast_ops=GroupOps { adds: 4098, doubles: 0, scalar_mults: 0, field_ops: FieldOps { muls: 8196, sqrs: 4098, invs: 4098 }, montgomery_reductions: 0 }
+
+thread 'main' (851535) panicked at /tmp/curve25519-probe-regression-20261105/curve.rs:1172:2:
+assertion `left == right` failed
+  left: 3
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

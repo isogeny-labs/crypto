@@ -1,0 +1,2308 @@
+{
+ "schema": "e32-replay-comparison/v1",
+ "rule": "every leaf of every committed record against the replay output: numbers by their text (equal text, or equal value in the same integer/float form), strings, booleans and nulls exactly, arrays by length and position, objects by key in both directions; wall_ms, solve_ms (ic) and wall_s (walk) are wall-clock and listed, not compared",
+ "nonce": "fceafd16d7ec894272e376c481484aa6",
+ "selection": [
+  {
+   "p": 101,
+   "ic_seed": 3
+  },
+  {
+   "p": 149,
+   "ic_seed": 1
+  },
+  {
+   "p": 197,
+   "ic_seed": 1
+  },
+  {
+   "p": 269,
+   "ic_seed": 3
+  },
+  {
+   "p": 397,
+   "ic_seed": 3
+  },
+  {
+   "p": 557,
+   "ic_seed": 3
+  },
+  {
+   "p": 773,
+   "ic_seed": 1
+  },
+  {
+   "p": 1093,
+   "ic_seed": 3
+  },
+  {
+   "p": 1549,
+   "ic_seed": 1
+  },
+  {
+   "p": 2213,
+   "ic_seed": 2
+  },
+  {
+   "p": 3089,
+   "ic_seed": 2
+  }
+ ],
+ "recorded_runs": 66,
+ "required_runs": 44,
+ "required_matched": 44,
+ "required_missing": [],
+ "extension_runs_present": 22,
+ "extension_matched": 22,
+ "runs_present": 66,
+ "runs_matched": 66,
+ "fields_compared": 14619,
+ "fields_identical": 14619,
+ "scalars_verified": true,
+ "runs": [
+  {
+   "run": "ic_p101s1",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p101s1.json",
+    "sha256": "bb89cb8aa6fdd88cfa758c1ecc3ea269e911fd5a0e22dbe11af809bb87b99afe"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p101s1.json",
+    "sha256": "dc729f0b313a72449bca1d4bf3788417236bc9ba6a610d7e070fd275dd89a895"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 1538068,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 13833208042,
+    "macaulay_entries": 3832401664
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 108142.10372699893,
+     "replay": 126097.53059299882
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 42661.08903,
+     "replay": 55927.86076
+    }
+   ]
+  },
+  {
+   "run": "ic_p101s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p101s2.json",
+    "sha256": "c928d26c7383aa81b58972aebdfa449a26a464fb5ef1cc3fbc25cb1d12b16917"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p101s2.json",
+    "sha256": "7d92014f43521954d8ce6aa5af3daa28e50aa4ed5e1500d90d0333c15ad5d2a6"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 557533,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 4659726750,
+    "macaulay_entries": 1288514304
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 37628.97940199997,
+     "replay": 33383.12922299997
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 14908.526979,
+     "replay": 15693.738281
+    }
+   ]
+  },
+  {
+   "run": "ic_p101s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p101s3.json",
+    "sha256": "b906108689f0dc7ca633bd4e0a32ec6e7acfb751730f2c5d2826ca13979fe746"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p101s3.json",
+    "sha256": "bf3ae8527ebe61995abdebbb49e98810c04bb2679cca48399c97fb8e79fdb817"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 4444425,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 6349033521,
+    "macaulay_entries": 1741088832
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 52995.52835799997,
+     "replay": 44691.195715999966
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 20323.792393,
+     "replay": 20902.611989
+    }
+   ]
+  },
+  {
+   "run": "walk_p101s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p101s1.json",
+    "sha256": "e54484d038c76a63a911cf04fd1cc2eb6d0e1a0d0b552e8fe23d24ac8f8784e6"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p101s1.json",
+    "sha256": "b24690dea42bde8323d60059c4ec4ef4eb5a1392d91c950dfd15945fe76f04b0"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 351834.8125,
+    "mean_steps": 2007.1875
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.260031237,
+     "replay": 0.116423455
+    }
+   ]
+  },
+  {
+   "run": "walk_p101s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p101s2.json",
+    "sha256": "b4cdae0755544e3acc05a2fc1ef69a2cfd1b0b85e8150aa0de46098b6498f021"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p101s2.json",
+    "sha256": "91b6dd2f5d2bb5cee58221aa29456c27e081eb3e5061fc12d57aed956582846b"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 272685.75,
+    "mean_steps": 1192.4375
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.136460603,
+     "replay": 0.086024775
+    }
+   ]
+  },
+  {
+   "run": "walk_p101s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p101s3.json",
+    "sha256": "dedde4039f080c69dc86340b96f3fcf39d7b58887717f99018c1a0fe580f949d"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p101s3.json",
+    "sha256": "5146f645dd02f74e55fb0b8f9b2b3bcf03af1e400a3814492e4bf169accefcfa"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 307115.8125,
+    "mean_steps": 1549.125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.140752534,
+     "replay": 0.163254602
+    }
+   ]
+  },
+  {
+   "run": "ic_p149s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p149s1.json",
+    "sha256": "c4fd5dacf330fb081ecea07f74b621d93b88b06bcded9d6f87f333ae98f13de7"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p149s1.json",
+    "sha256": "2554a4a5dbddec68b498b2463468682df95550fe6ced7066d5245cccda7edb08"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 4914788,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 85999708286,
+    "macaulay_entries": 23709225792
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 667039.8190699981,
+     "replay": 751780.7127900016
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 257211.04825300002,
+     "replay": 321856.56249700004
+    }
+   ]
+  },
+  {
+   "run": "ic_p149s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p149s2.json",
+    "sha256": "1a04248d53c0ddf09104f2dad956311385ac7fb7ff6460a35f75f382827c5021"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p149s2.json",
+    "sha256": "2afd3a0753dcf0a38370b6531ac49781f39e2f5bb18a8402bd9fc44d00cab0ac"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 2874927,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 22353365025,
+    "macaulay_entries": 6146620032
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 144783.6029350007,
+     "replay": 157987.4638889993
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 57565.759859000005,
+     "replay": 74241.495506
+    }
+   ]
+  },
+  {
+   "run": "ic_p149s3",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p149s3.json",
+    "sha256": "36117fe9a41f1eafa945ba04dbf292949488507f68e56457b9eb3247e316335b"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p149s3.json",
+    "sha256": "c643575c74707ee513d37e3c6713e54dbf1d9b70db49e3dddf48a4babc936f41"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 22721433,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 3815583944,
+    "macaulay_entries": 1032893568
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 27161.74936400004,
+     "replay": 24704.361754999936
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 10762.008388,
+     "replay": 12015.453893
+    }
+   ]
+  },
+  {
+   "run": "walk_p149s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p149s1.json",
+    "sha256": "d6746c4616585388a3d55689c5e3565b14afbd21955155b8e7e8f9acbaea80eb"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p149s1.json",
+    "sha256": "1ceb990c104707fde4db338f68cb38e34dd657b3e57fb3ea62b6d4bfdf365be1"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 564610.5,
+    "mean_steps": 4056.625
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.345584141,
+     "replay": 0.165587355
+    }
+   ]
+  },
+  {
+   "run": "walk_p149s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p149s2.json",
+    "sha256": "7048fbde8ad53a9a572d933076840430330b172908c8d1cfb4c0485706dad5cc"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p149s2.json",
+    "sha256": "e6601af309ecabed93c71541c8b61255e35fcde4177d8c4909305f5193eb6ac2"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 554206.3125,
+    "mean_steps": 3965.0625
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.282027789,
+     "replay": 0.210689213
+    }
+   ]
+  },
+  {
+   "run": "walk_p149s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p149s3.json",
+    "sha256": "9ac4a289994b69cd11c87d1d0a150a2d041e1b23d5a37e41e84759303ef77d26"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p149s3.json",
+    "sha256": "c31609cfcafae8b7cf4a7c56191f1b90425a01d15b281fb67b52f8513bb1dd2b"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 461725.25,
+    "mean_steps": 2988.6875
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.233633237,
+     "replay": 0.168832404
+    }
+   ]
+  },
+  {
+   "run": "ic_p197s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p197s1.json",
+    "sha256": "306225075189147338f631a789040602ad100dbf35404eb85598368be63888c1"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p197s1.json",
+    "sha256": "1cd15995ad95138dfa2036c5961c0bfec492fb784f0513f7a378ea6d6c61eeef"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 79622603,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 24750444620,
+    "macaulay_entries": 6764870784
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 187244.33204600136,
+     "replay": 212238.81121699937
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 72399.224539,
+     "replay": 90944.685975
+    }
+   ]
+  },
+  {
+   "run": "ic_p197s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p197s2.json",
+    "sha256": "75972cc1a1fc7cb66908d96692ec199849ed223337deb617d7de960a9e97ced5"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p197s2.json",
+    "sha256": "460180cb5512c09c380d80d19547c729220a10aa68ea6192664307410c45fe31"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 7399960,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 10121590489,
+    "macaulay_entries": 2771075328
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 60818.85102300004,
+     "replay": 74625.013404
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 23972.534286,
+     "replay": 34210.060529
+    }
+   ]
+  },
+  {
+   "run": "ic_p197s3",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p197s3.json",
+    "sha256": "079e755b58ab753ed4a4987320e5310a2a3435d8377279e3d9e025c57c28d93f"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p197s3.json",
+    "sha256": "9ed07ad2c78aa4e149c719b8d4fd37fdd8975786c253f5077a866759ca1fb39c"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 8411066,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 8784981799,
+    "macaulay_entries": 2409703296
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 68722.53009799978,
+     "replay": 67946.437193
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 26128.405644000002,
+     "replay": 30204.890013
+    }
+   ]
+  },
+  {
+   "run": "walk_p197s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p197s1.json",
+    "sha256": "56bcf5fb13a75813990c9d5faa419348a4361a2d0eb99b3501441f603cb9d68d"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p197s1.json",
+    "sha256": "92f97e7dc79f668ab655c6a80d9308dd2710176819afaf52a5beacc869a0a171"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 709525.125,
+    "mean_steps": 5454
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.319398461,
+     "replay": 0.431182475
+    }
+   ]
+  },
+  {
+   "run": "walk_p197s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p197s2.json",
+    "sha256": "02c756a3d3b279c40945053ee57df5cf8a094c3c94ad7735343a9894eefe7ca1"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p197s2.json",
+    "sha256": "bade170a26664f9dd2976455b2e523852f697ddb0b4b922ba8b1b23429f0752b"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 677271.3125,
+    "mean_steps": 5119.1875
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.478092843,
+     "replay": 0.426818903
+    }
+   ]
+  },
+  {
+   "run": "walk_p197s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p197s3.json",
+    "sha256": "eaa9221de28f1a959d552991f252952fe486a343dc95f403d4378540c6fc7f6e"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p197s3.json",
+    "sha256": "89c69a9912c05ad7e035915f45ea5fe4066a86deb6f2a1f3733b10d8a3e8bec2"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 817464.5625,
+    "mean_steps": 6579.25
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.434278655,
+     "replay": 0.213913777
+    }
+   ]
+  },
+  {
+   "run": "ic_p269s1",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p269s1.json",
+    "sha256": "6b2c6721448f9eb8d35dc9e48ffc3ccadd75514bfd604050a660e14cbe1722fd"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p269s1.json",
+    "sha256": "8001fe5942f0ff853d404a0fec71af5cb32c22d52ec30ac71897d5e05b8f3bec"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 270725152,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 30691610728,
+    "macaulay_entries": 8405358528
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 235579.94501599984,
+     "replay": 218451.63127900058
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 90816.435721,
+     "replay": 102334.74730999999
+    }
+   ]
+  },
+  {
+   "run": "ic_p269s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p269s2.json",
+    "sha256": "daf851735dd5d7be5f30f970719db2077fd22f076d9549ccefb820f5a5809871"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p269s2.json",
+    "sha256": "7e6d9acf38bff580dca1c400189333d7b375f80ebbf18b86dda823c65d174f07"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 309622187,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 9773820165,
+    "macaulay_entries": 2681474880
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 61342.35534400018,
+     "replay": 73411.66289000025
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 24741.56203,
+     "replay": 34062.979763999996
+    }
+   ]
+  },
+  {
+   "run": "ic_p269s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p269s3.json",
+    "sha256": "39070eda603540e7c3e99e156c765b9e1fcb65d38ec24b99b417dce4848252f5"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p269s3.json",
+    "sha256": "be69720233f36670214c9a1c4d058e43f701d9cafd528783143fb91e87743abc"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 291579638,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 21251404052,
+    "macaulay_entries": 5809308288
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 135110.43484000105,
+     "replay": 172033.04546400017
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 52552.513011,
+     "replay": 75632.815222
+    }
+   ]
+  },
+  {
+   "run": "walk_p269s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p269s1.json",
+    "sha256": "6b21501410ab8764bc66fee18b7514b66267c4782b9885a743c06743e5a34955"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p269s1.json",
+    "sha256": "2352a38fd7de3370499bf2057d46764ad5099e5f092d7520612263b92ffe488b"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 1117087.875,
+    "mean_steps": 9565.4375
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.621672442,
+     "replay": 0.469762026
+    }
+   ]
+  },
+  {
+   "run": "walk_p269s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p269s2.json",
+    "sha256": "b6d0b9d1e91aabe0671376261f7cf75770b435ad3914a2eb68eb3c0824b9ace5"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p269s2.json",
+    "sha256": "b2ed474437cce57c51d0003cbad48230290d664859a2826bc87035d98090d92d"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 1107117.8125,
+    "mean_steps": 9478.4375
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.626407525,
+     "replay": 0.54845096
+    }
+   ]
+  },
+  {
+   "run": "walk_p269s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p269s3.json",
+    "sha256": "879af9e45b15db7081792a37309249179ae5d6220b33cf63765e4309f08c83c6"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p269s3.json",
+    "sha256": "fbb0d90c729a8ba1845bd44bb2e3ad216cf1464a28d5357c0daa4dc6641b614b"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 1213479.1875,
+    "mean_steps": 10580.8125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 0.500288138,
+     "replay": 0.417830028
+    }
+   ]
+  },
+  {
+   "run": "ic_p397s1",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p397s1.json",
+    "sha256": "9cc55d323dd20bc50d8ee051a90d64299264ba17346956b81f983f2abfad3063"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p397s1.json",
+    "sha256": "65df070e417d99e131b30a3c30c9dd2303065c306b583bddd6058df0990742e6"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 1275612762,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 16188662103,
+    "macaulay_entries": 4394191872
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 133226.93708900106,
+     "replay": 242228.37662299955
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 49017.970975,
+     "replay": 93042.87193099999
+    }
+   ]
+  },
+  {
+   "run": "ic_p397s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p397s2.json",
+    "sha256": "5eda827d0c4eedd5233ac43f8f2def52dfe7261ef5b011219c1b0cd0c9750864"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p397s2.json",
+    "sha256": "7fa0487a55955fb6345871be9f92adaadc7576bd57a7e5682eb9fa7fad1befc3"
+   },
+   "fields_compared": 606,
+   "fields_identical": 606,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 1421554453,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 22044076955,
+    "macaulay_entries": 5982337536
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 212140.14000399897,
+     "replay": 309903.3520209996
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 76556.85085,
+     "replay": 120691.914701
+    }
+   ]
+  },
+  {
+   "run": "ic_p397s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p397s3.json",
+    "sha256": "ebc07cce45e454f094cbaef5615ff72ab39e365a5db4e72d64aca3d52d2ba27e"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p397s3.json",
+    "sha256": "cbe4159850caf294ad6b1e2acb9ebd4d626607d228ffff04c3a4d5f4b72637b2"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 315298380,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 24496874737,
+    "macaulay_entries": 6645569280
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 236390.88463599922,
+     "replay": 360571.67978500325
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 84610.16294,
+     "replay": 137626.936217
+    }
+   ]
+  },
+  {
+   "run": "walk_p397s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p397s1.json",
+    "sha256": "d8f328dfc6aed216567a5556211d44a35b57c44442af71ee005a294867c75170"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p397s1.json",
+    "sha256": "09b466db9fb9189a41e6b440cc4263d8c272983aac7c7082441a2d31effcac32"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 2532750.875,
+    "mean_steps": 24193.5625
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 1.6419492500000001,
+     "replay": 1.329324827
+    }
+   ]
+  },
+  {
+   "run": "walk_p397s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p397s2.json",
+    "sha256": "aa670f471e49d6b036721757f6ae82922f1e2be566761b01059eba7e51c7a951"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p397s2.json",
+    "sha256": "5b7d9588b22a869bd01cc44960477a56f7ba940f73165920a2a66ce84116fa44"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 2268122.8125,
+    "mean_steps": 21438.8125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 1.211686813,
+     "replay": 0.912843862
+    }
+   ]
+  },
+  {
+   "run": "walk_p397s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p397s3.json",
+    "sha256": "756e19be66084513f756bff0b26a17db9bcdbd9d0a85d81d6f11ca285cd4b6a1"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p397s3.json",
+    "sha256": "0118bb6535e64901be342b92f240c2ffa27323746d40f7f74c62acbdf53a4624"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 2799809.1875,
+    "mean_steps": 26987.9375
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 1.626655975,
+     "replay": 1.233255866
+    }
+   ]
+  },
+  {
+   "run": "ic_p557s1",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p557s1.json",
+    "sha256": "e2aa4f0ac41c05a38d0812fafe5caff9ab18b7469eb3b3eaac55e60716616b10"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p557s1.json",
+    "sha256": "5a5d34e1628492a64b42e1129dedcbdcf6cbfe028444530996d11866cc802a3e"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 2865689438,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 35673748223,
+    "macaulay_entries": 9627016896
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 307993.1805939986,
+     "replay": 510849.58480200067
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 110051.641937,
+     "replay": 195940.422577
+    }
+   ]
+  },
+  {
+   "run": "ic_p557s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p557s2.json",
+    "sha256": "7391869fb69b034a19191c2c95caeedfff3571b6b2ab69e151fcd7c15955faa7"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p557s2.json",
+    "sha256": "f750ad0c3aac2765a3e57998907727b4541ac654293f9ea485974dbe6be75ecf"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 1861961401,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 28160491908,
+    "macaulay_entries": 7583968896
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 248689.5104049985,
+     "replay": 406246.9990529999
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 89295.48936899999,
+     "replay": 155582.084261
+    }
+   ]
+  },
+  {
+   "run": "ic_p557s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p557s3.json",
+    "sha256": "52850b726205ee137919b5dcc843efd7f4b465d6a5ab41924f21f2d0756ed3e9"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p557s3.json",
+    "sha256": "01354f35c7d8201456d46c49b505d8817d49b8d2b0a87e053efeb94fd85ecdc3"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 261503468,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 28707543916,
+    "macaulay_entries": 7729823808
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 252131.29484800063,
+     "replay": 433714.7572320054
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 90359.60332400001,
+     "replay": 163786.063847
+    }
+   ]
+  },
+  {
+   "run": "walk_p557s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p557s1.json",
+    "sha256": "9c34707eea3d55965c64a4470fb390b92fea7676b2b2610e8b14ff4af45066f0"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p557s1.json",
+    "sha256": "4d5f71863726dbd40697f7c237679aac4cf5b438ca4f8b1b721979bda883119c"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 4802106.1875,
+    "mean_steps": 47763.0625
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 2.3300582739999998,
+     "replay": 1.938081474
+    }
+   ]
+  },
+  {
+   "run": "walk_p557s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p557s2.json",
+    "sha256": "dbab67bda5f8351e4cdfba10f0c522b8749a3f1439622d9a1c1882581557e1f4"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p557s2.json",
+    "sha256": "88d27dcc7abbcdd55575517ca037e6b545948326581cf82cb34336ef20b3d3f7"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 5649112.125,
+    "mean_steps": 56590.8125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 3.199462579,
+     "replay": 2.592028226
+    }
+   ]
+  },
+  {
+   "run": "walk_p557s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p557s3.json",
+    "sha256": "fb21584b0340c6b2f1a4289a9c05b667545b5a569fb4170a39d4875a6d613fe4"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p557s3.json",
+    "sha256": "df62531417724e21141b0f12e30aba0bc8aff7345a90c37d83844f53fd1920c7"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 4444193.0625,
+    "mean_steps": 44004.5
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 2.084947236,
+     "replay": 1.533903557
+    }
+   ]
+  },
+  {
+   "run": "ic_p773s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p773s1.json",
+    "sha256": "f1c6cf2a8a36286b3bd3ad7f7fc85d5a326ca28966839b092ef85abd5f9ad828"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p773s1.json",
+    "sha256": "f0a5c2f768aafbdde3cb3090ffa5f14cfed287b95029afaac1abe0ee0c950019"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 14822397573,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 67185127421,
+    "macaulay_entries": 18034665600
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 660855.4560750007,
+     "replay": 1056247.882528992
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 234550.706069,
+     "replay": 392374.01947299996
+    }
+   ]
+  },
+  {
+   "run": "ic_p773s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p773s2.json",
+    "sha256": "8ea3c2662fe80e73feffa6d319e21734c208c0d29faf02f96fc986660f307be7"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p773s2.json",
+    "sha256": "27fefcdb820ea3206d0e549ce24b58748024139d3b72ae93bbe9a8b99e23e422"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 9484412546,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 106687498191,
+    "macaulay_entries": 28666071168
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 973561.2252709905,
+     "replay": 1550092.2613029962
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 346025.229614,
+     "replay": 593508.078496
+    }
+   ]
+  },
+  {
+   "run": "ic_p773s3",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p773s3.json",
+    "sha256": "4b896d99b292139acc6adf21262016e3ca95e0e9464c7f4ead1522003d48a6c6"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p773s3.json",
+    "sha256": "4cf28ccb09f2e5b5cd2a3f9d9cc1a3c5d2c15a3e7f545c879e4e8077dc9b9486"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 4494919666,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 57595494582,
+    "macaulay_entries": 15463338240
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 518438.5191480085,
+     "replay": 840195.7133510071
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 184803.84982499998,
+     "replay": 322523.68170699995
+    }
+   ]
+  },
+  {
+   "run": "walk_p773s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p773s1.json",
+    "sha256": "dced00fc6d43a08c3002d2e2dea288412b1b767269c1acbe4cc340578150cfd8"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p773s1.json",
+    "sha256": "d2064322a4ea7f8c0cd5fdb210dca303a78d8fc83e42722b4bc4e82e389212e8"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 8807026.4375,
+    "mean_steps": 89426.1875
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 5.090788205,
+     "replay": 4.858084489
+    }
+   ]
+  },
+  {
+   "run": "walk_p773s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p773s2.json",
+    "sha256": "1b149b6718f283c7507652e2509b04d78b4a051fb2458a13b006ea70f69f4be9"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p773s2.json",
+    "sha256": "fb55084e8c6100a8ef9f0236e478539a779ca528a0961105632e1b8f13d0faf3"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 9308311.5625,
+    "mean_steps": 94679.5
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 5.261751811,
+     "replay": 4.741341759
+    }
+   ]
+  },
+  {
+   "run": "walk_p773s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p773s3.json",
+    "sha256": "4d6b0530eb5f3767a8b70c132d2208b675899a251efd5c72c0c921aad4eee8a2"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p773s3.json",
+    "sha256": "b9eccc66c45d374b94a4ac08c40c2a6f3f616afa2b0ce8d6d3a97d653c609c53"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 8835541.625,
+    "mean_steps": 89760.0625
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 4.880760438,
+     "replay": 4.272053275
+    }
+   ]
+  },
+  {
+   "run": "ic_p1093s1",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p1093s1.json",
+    "sha256": "68ff8450d37a36e5d393e3a79e34dc2c791abdca941cb65f0a6fd58260266038"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p1093s1.json",
+    "sha256": "7180986b65beffc94edca9be4a9b3787403558433b78387865caf05b1f7dd1ff"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 34149132946,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 112899613521,
+    "macaulay_entries": 29865127488
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 1080242.3097469998,
+     "replay": 1624165.5685370064
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 381751.788644,
+     "replay": 619890.434601
+    }
+   ]
+  },
+  {
+   "run": "ic_p1093s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p1093s2.json",
+    "sha256": "47614c9bcacabd80c9aa9e8bf25a098ed90936f42ecb2a90f6d40e45c91ec048"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p1093s2.json",
+    "sha256": "fc026086a9fc01b50416be1b93f660096b8ffd33d48850e1b6d36645c4e64cfe"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 21259903030,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 72362948496,
+    "macaulay_entries": 19160139264
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 688357.4471049916,
+     "replay": 1084004.5131830038
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 244279.270746,
+     "replay": 412954.02814
+    }
+   ]
+  },
+  {
+   "run": "ic_p1093s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p1093s3.json",
+    "sha256": "547ea294676c021b362848c4e689f9e880be121a20e1d165f9db3912b3d3b18e"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p1093s3.json",
+    "sha256": "4bf299fec155b3496135fee568b7dbd545b429a836ecb89f70954f86f30e334c"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 73670974494,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 72983204297,
+    "macaulay_entries": 19314239616
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 812599.8299440092,
+     "replay": 1146764.6037459988
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 294064.682548,
+     "replay": 425846.04515799996
+    }
+   ]
+  },
+  {
+   "run": "walk_p1093s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p1093s1.json",
+    "sha256": "4973f0c9976125c36e371babc8494f233cb08dec9e1f6424a46e8854806aa541"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p1093s1.json",
+    "sha256": "eefb3267178fa52a6b66f13562abbbfedf3c0579a3b65d0d0b824416aa7142cd"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 22312348.25,
+    "mean_steps": 230375.3125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 14.858411525,
+     "replay": 13.705884988
+    }
+   ]
+  },
+  {
+   "run": "walk_p1093s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p1093s2.json",
+    "sha256": "7c6c054f696e86f901fd5346ff75175732b74d9e997227d0650cb65cfb9f0755"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p1093s2.json",
+    "sha256": "85a37dd3952d59721295682a649ee3a11586f013b11dba5ffefaee71f7f889d8"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 19720190.125,
+    "mean_steps": 203315.4375
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 11.737067002,
+     "replay": 9.517903163
+    }
+   ]
+  },
+  {
+   "run": "walk_p1093s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p1093s3.json",
+    "sha256": "3ce7bfec6caa21456b2b2af00ce59860ca159634830a4f5b6595efb1812abbb4"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p1093s3.json",
+    "sha256": "ee682ce1831d0f75a9f6dccd036f357b80abdf9d5a5536c3f125774118bf4670"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 16694589.5,
+    "mean_steps": 171697.25
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 9.596710026,
+     "replay": 7.541688376
+    }
+   ]
+  },
+  {
+   "run": "ic_p1549s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p1549s1.json",
+    "sha256": "349b2d038a36f0298e8f9c1a48d6c006eed0b851b6ab9f5c017ef659803ed9ca"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p1549s1.json",
+    "sha256": "9c7f985c8f5d00ca2bca170fa1b1c6bc9345ba86aaacaffd8c3c47cc5142bec4"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 12315842101,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 93879028038,
+    "macaulay_entries": 24790819200
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 1075786.3022890084,
+     "replay": 1436593.774261999
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 387329.846436,
+     "replay": 543289.232761
+    }
+   ]
+  },
+  {
+   "run": "ic_p1549s2",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p1549s2.json",
+    "sha256": "8722f22454aa9636e8f6ace623d120feed985185d601a01d5e3e2ba8a3c3f9e5"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p1549s2.json",
+    "sha256": "ae3c6a2675edc8a78b7a1d8c29d3278369b4b3520e310f8cba9ee427926f58a7"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 40240660139,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 132629964142,
+    "macaulay_entries": 35028063168
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 1706704.7946459828,
+     "replay": 1871060.478616024
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 618816.228184,
+     "replay": 721323.7637019999
+    }
+   ]
+  },
+  {
+   "run": "ic_p1549s3",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p1549s3.json",
+    "sha256": "5c18edb25d87f68c4871cec1afdaa2f1378c189e6bbe53218a270c534e78571b"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p1549s3.json",
+    "sha256": "38b1afb62e4a1b427102b1575ba6e0ae41414251da41db316bb12c6ce7b0c5a0"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 125079070748,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 84910979921,
+    "macaulay_entries": 22423756992
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 794712.9282410082,
+     "replay": 1201816.08998001
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 282521.385771,
+     "replay": 462668.283166
+    }
+   ]
+  },
+  {
+   "run": "walk_p1549s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p1549s1.json",
+    "sha256": "890a272cda1293a55dd0f9d7050fd54675417446606c6f57f0a2cba5b2f7f288"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p1549s1.json",
+    "sha256": "c44c318a39ce746de0a81cffe73adb8fb07f12760429a5c4a01a8ce8707c0f62"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 39642098.3125,
+    "mean_steps": 411291.3125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 24.837252897,
+     "replay": 19.41824647
+    }
+   ]
+  },
+  {
+   "run": "walk_p1549s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p1549s2.json",
+    "sha256": "0044bbb62439489a0d70721a89c9b95d7b60ed0734d58541cb8eb88aed90ec8a"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p1549s2.json",
+    "sha256": "8a1ac2f48f97d2f04508dcaf03dc6638c721e732964c8715ee12e34a24e13b8f"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 35683114,
+    "mean_steps": 369943.9375
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 26.635974289,
+     "replay": 22.478531587
+    }
+   ]
+  },
+  {
+   "run": "walk_p1549s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p1549s3.json",
+    "sha256": "fb159c0f9d025cf0ae4705922f0a8f9cabc7b9de64e073bb69a64f9388d1e820"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p1549s3.json",
+    "sha256": "d958d0eeaf24ba1f52d69fc33c27818a8e1ed3ad96dd8b0860858bcc380f46a7"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 40964592.5,
+    "mean_steps": 425158.625
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 28.6828254,
+     "replay": 22.874287307
+    }
+   ]
+  },
+  {
+   "run": "ic_p2213s1",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p2213s1.json",
+    "sha256": "937e8845ea4842225138e111ae864b044ef66db1f08d2d439dc56e8da13b01d5"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p2213s1.json",
+    "sha256": "1e30c9b3c3cb50eb198217f55077482cad1e26498342abfdccb6db09ce62becc"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 551154564982,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 128555555607,
+    "macaulay_entries": 33294240000
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 960443.0663849888,
+     "replay": 1772086.816262022
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 345187.339269,
+     "replay": 683006.47768
+    }
+   ]
+  },
+  {
+   "run": "ic_p2213s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p2213s2.json",
+    "sha256": "f0bcd015c583912979e91a879b08361734bc7962fd059f7a7a2c9b73985fcc60"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p2213s2.json",
+    "sha256": "da5b4129a52708bd47707a2e9658f846bbd555a906250993ca3ee55815a00409"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 1321661952886,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 151094139840,
+    "macaulay_entries": 39121736640
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 1164857.2751070145,
+     "replay": 2216966.395809059
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 417081.104734,
+     "replay": 842710.580141
+    }
+   ]
+  },
+  {
+   "run": "ic_p2213s3",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p2213s3.json",
+    "sha256": "54ab62eab0f8fbdd5d89f1b45adbb7a2775930e9270f75826d21687d15042f5d"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p2213s3.json",
+    "sha256": "eb9ddb4ea7d6a929a0d24d777a3dd4aa457c082ebb507d852a399ba744cc49c0"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 997281917140,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 103195449287,
+    "macaulay_entries": 26710168128
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 1101344.9540209826,
+     "replay": 1411730.1612189903
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 404123.803449,
+     "replay": 548904.432789
+    }
+   ]
+  },
+  {
+   "run": "walk_p2213s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p2213s1.json",
+    "sha256": "d944e4e8928add7169708ff2b272885596be0ca28b8aa0a68ce969644fd45918"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p2213s1.json",
+    "sha256": "85f4931e003f92493163f47656a4e992fcc4519c892aef645ebeb8e22c9ff4a0"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 79676897.125,
+    "mean_steps": 829360.3125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 56.232222878,
+     "replay": 42.124153045
+    }
+   ]
+  },
+  {
+   "run": "walk_p2213s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p2213s2.json",
+    "sha256": "9c7ba52b5d69cddb3cd7b925433260ba5e73817e962cf44fe816d4ea67b745a0"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p2213s2.json",
+    "sha256": "19b5db3e7bf576fa13eb50430a666592ec520b792ac0a196080a860a7229c7eb"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 73685247.375,
+    "mean_steps": 766822.3125
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 42.688213566,
+     "replay": 26.400661477
+    }
+   ]
+  },
+  {
+   "run": "walk_p2213s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p2213s3.json",
+    "sha256": "59b9ca3f603f8f66860de606f81a22c44797e9bd84ae8fa7bdbca2a032a01acf"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p2213s3.json",
+    "sha256": "77c6d7e7179c817bc3078cfb2d93e351da1eeca7408eade182c9d6e74afcb2f3"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 76944275,
+    "mean_steps": 800903.0625
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 55.00737851,
+     "replay": 37.255276587
+    }
+   ]
+  },
+  {
+   "run": "ic_p3089s1",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p3089s1.json",
+    "sha256": "a94922f54f667ef7b9fc0e7d8d8b75e94cf9548548b4855f56cf041ff1a1f109"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p3089s1.json",
+    "sha256": "6beb1cfbb5d362a945378d8bcb9838fecff169aae44b8ce77b05347f41c0f313"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 4753176148990,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 194565885707,
+    "macaulay_entries": 50588551104
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 1914913.6057740003,
+     "replay": 2732373.9297410515
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 673041.637738,
+     "replay": 1058952.189722
+    }
+   ]
+  },
+  {
+   "run": "ic_p3089s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p3089s2.json",
+    "sha256": "3228e9bc57f67ca3f5eccc313e37bb1366baa0b3df4b8262bd8f240cfba1762f"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p3089s2.json",
+    "sha256": "1310c1be696f4157a5ab130e8defc1ab559b09a53043605aaa0008bd5757365a"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 93802689116,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 178850626888,
+    "macaulay_entries": 46489098432
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 1624595.1345219885,
+     "replay": 2523041.195086981
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 571574.556486,
+     "replay": 970881.537155
+    }
+   ]
+  },
+  {
+   "run": "ic_p3089s3",
+   "sample": "extension (phase 2)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/ic_p3089s3.json",
+    "sha256": "26b80a2e0ace9bd77936f26991db43f137dbca08fe27837a0daee793e6daeecf"
+   },
+   "replay_output": {
+    "path": "replay/runs/ic_p3089s3.json",
+    "sha256": "8916f3bca3c30edafd1af3a6f5f727140204693de43455c775ecc20e5dfc14e7"
+   },
+   "fields_compared": 111,
+   "fields_identical": 111,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "ic_solved": true,
+    "ic_correct": true,
+    "ic_recovered": 2448607092683,
+    "equals_committed_walks_logarithm": true,
+    "total_muls": 234999559624,
+    "macaulay_entries": 61103297472
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.solve_ms",
+     "committed": 2321737.687489027,
+     "replay": 3176039.131820938
+    },
+    {
+     "path": "$.wall_ms",
+     "committed": 838371.755044,
+     "replay": 1234541.607421
+    }
+   ]
+  },
+  {
+   "run": "walk_p3089s1",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p3089s1.json",
+    "sha256": "7c0c689be832f65272ee532671727c137f6ce48d0f37b051a8608a96308ae9d3"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p3089s1.json",
+    "sha256": "fdcdbd8a417926bf9cf9232278c98d40f48469b934aa282c1a865f61520c379b"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 114333039.875,
+    "mean_steps": 1191287.375
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 67.596420083,
+     "replay": 61.517571944
+    }
+   ]
+  },
+  {
+   "run": "walk_p3089s2",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p3089s2.json",
+    "sha256": "f65d3d3f7195a79cdaa8a879cea18f2c3f7461039796869f0b983e0b22c0176b"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p3089s2.json",
+    "sha256": "acd4de376201b7ed0922ac1dca6190c7f9c42223c5c3fff9f024378f8132cf38"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 156438177,
+    "mean_steps": 1631224.6875
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 96.627206807,
+     "replay": 86.702613638
+    }
+   ]
+  },
+  {
+   "run": "walk_p3089s3",
+   "sample": "required (nonce selection or walk pool)",
+   "committed": {
+    "path": "../../experiments/36_handover_ladder/walk_p3089s3.json",
+    "sha256": "2e1937b1f77c0a7ba12004faffa76cd56dfe9ab9f72662331d408f8eb1adbc3f"
+   },
+   "replay_output": {
+    "path": "replay/runs/walk_p3089s3.json",
+    "sha256": "0b53c3bb5f1c39696d9bb94b5560d6f2ac43e598715e64b2d8287f3b2b83673e"
+   },
+   "fields_compared": 182,
+   "fields_identical": 182,
+   "fields_only_in_replay": 0,
+   "mismatches": [],
+   "matched": true,
+   "scalars": {
+    "walks": 16,
+    "all_correct": true,
+    "recover_the_committed_ic_logarithm": true,
+    "rho_iii_mean_fp_muls": 152375199.5,
+    "mean_steps": 1588676.75
+   },
+   "timing_not_compared": [
+    {
+     "path": "$.wall_s",
+     "committed": 76.568002309,
+     "replay": 77.707532232
+    }
+   ]
+  }
+ ]
+}

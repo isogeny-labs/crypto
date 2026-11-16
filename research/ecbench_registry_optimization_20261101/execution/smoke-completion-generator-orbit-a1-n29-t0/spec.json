@@ -1,0 +1,94 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Koblitz a=1 n=29 one-column generator-orbit engineering frontier, target block 1/2 — registry completion L0 diagnostic",
+  "description": "Full-price Frobenius references, lazy/layout table baselines and the fixed-setup generator-orbit candidate. This panel is never pooled with uniform-target scaling IC. This prospectively selected target block has four public targets, one warmup and six balanced measured rounds. Per-child censoring is fixed so the sum of child timeout ceilings is at most 2400s inside the 3,600-second EKS deadline; timeouts are retained and never retried.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 29
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202611019106,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-frob-full",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    },
+    {
+      "name": "rho-strong-full",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_full"
+      }
+    },
+    {
+      "name": "rho-frob-full-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    },
+    {
+      "name": "rho-strong-full-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_full"
+      }
+    },
+    {
+      "name": "ic-lazy-c1",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-lazy-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "ic-layout-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-layout-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "ic-gen-layout-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "mitm-frobenius-layout-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-generator"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611019206,
+    "isolation_required": "L0",
+    "timeout_seconds": 12
+  }
+}

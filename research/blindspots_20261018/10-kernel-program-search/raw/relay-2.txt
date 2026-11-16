@@ -1,0 +1,41 @@
+```
+card: CARD-BLINDSPOT-10-05-r2 (sha256 d03c552ab3360836a1425e522383161b25049faded7739933e28d10e955d4bdd)
+commit: 34c97e93048d09d29470a84e8a5161bec46b40ad
+receipt: research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-05-r2.json sha256 e8a6d9a42bcb94747a0f641e3929c1b4275532dd75b44c1bd995e0b2be3d0185
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-10/card-05-r2"] exit 0 (0.004 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-10/card-05-r2/b10", "examples/blindspots_10_kernel_search.rs"] exit 0 (6.249 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (make-state-dir): ["mkdir", "-p", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 4 (copy-card-04-archive): ["cp", "research/blindspots_20261018/10-kernel-program-search/raw/state/n31-b.jsonl", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-b.jsonl"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (search-n31-b-end): ["prlimit", "--as=4294967296", "target/blindspots-10/card-05-r2/b10", "search", "--n", "31", "--ell", "9", "--arm", "b", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state", "--budget", "256", "--max-new", "64"] exit 0 (87.305 s) succeeded
+  stdout sha256 bd5209aada446d7843dfa37df031882e2bcf8b59aa3b8b5fb24e9ea2516f44c3; last 20 lines:
+    eval 237 affine-rand-s2|lift1|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc0   q01=  6.8201e2 phi=0.906 dom=false 755ms
+    eval 238 coset4-s2|lift1|stop0|root0|q0|sqt1|pm0|ab2|bt1|gc0        q01=  9.8135e2 phi=0.875 dom=false 1003ms
+    eval 239 sub-rand1|lift1|stop0|root0|q1|sqt1|pm1|ab2|bt1|gc0        q01=  1.2092e3 phi=0.719 dom=false 896ms
+    eval 240 affine-aligned-s2|lift0|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc1 q01=  1.3932e3 phi=0.938 dom=false 3919ms
+    eval 241 coset4-s1|lift1|stop0|root1|q1|sqt1|pm0|ab2|bt1|gc0        q01=  1.4012e3 phi=0.844 dom=false 1196ms
+    eval 242 affine-aligned-s2|lift1|stop0|root1|q1|sqt1|pm0|ab1|bt1|gc0 q01=  5.7341e2 phi=1.000 dom=false 1058ms
+    eval 243 affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm0|ab0|bt2|gc0 q01=  4.7754e2 phi=1.000 dom=false 1361ms
+    eval 244 affine-aligned-s2|lift0|stop1|root0|q1|sqt1|pm0|ab2|bt0|gc0 q01=  1.2520e3 phi=0.938 dom=false 3186ms
+    eval 245 affine-aligned-s2|lift1|stop1|root1|q1|sqt0|pm0|ab2|bt0|gc0 q01=  4.9844e2 phi=0.938 dom=false 1213ms
+    eval 246 sub-rand2|lift1|stop0|root0|q2|sqt0|pm0|ab2|bt1|gc0        q01=  8.1773e2 phi=0.875 dom=false 799ms
+    eval 247 sub-rand1|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt0|gc0        q01=  9.1012e2 phi=0.719 dom=false 788ms
+    eval 248 affine-aligned-s2|lift1|stop1|root0|q0|sqt1|pm0|ab2|bt0|gc0 q01=  3.1884e2 phi=0.938 dom=false 783ms
+    eval 249 affine-aligned-s2|lift1|stop0|root0|q2|sqt0|pm0|ab4|bt0|gc0 q01=  4.5677e2 phi=0.250 dom=false 336ms
+    eval 250 affine-aligned-s2|lift1|stop0|root2|q1|sqt1|pm0|ab3|bt0|gc0 q01=  2.6925e3 phi=0.531 dom=false 4338ms
+    eval 251 sub-rand1|lift1|stop0|root0|q2|sqt0|pm0|ab2|bt1|gc0        q01=  9.9658e2 phi=0.719 dom=false 775ms
+    eval 252 affine-anti|lift1|stop0|root0|q2|sqt0|pm0|ab2|bt1|gc0      q01=       inf phi=0.000 dom=false 0ms
+    eval 253 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab0|bt0|gc0 q01=  3.8626e2 phi=1.000 dom=false 891ms
+    eval 254 affine-aligned-s2|lift1|stop0|root0|q2|sqt0|pm0|ab2|bt1|gc1 q01=  3.7832e2 phi=0.938 dom=false 795ms
+    eval 255 affine-aligned-s2|lift0|stop0|root0|q1|sqt0|pm0|ab1|bt1|gc0 q01=  1.4501e3 phi=1.000 dom=false 3474ms
+    best so far idx 94 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=3.1435e2 (256 of 256 evaluations done)
+  output research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-b.jsonl: 8d4e27e9d36d102cb0c94d0bcf8b5994b95f71f0cc9fdd85c8e2632729883e91
+command 6 (remove-bin): ["rm", "-f", "target/blindspots-10/card-05-r2/b10"] exit 0 (0.007 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 7 (remove-bin-dir): ["rmdir", "target/blindspots-10/card-05-r2"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```

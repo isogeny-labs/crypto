@@ -1,0 +1,10 @@
+--- 
++++ 
+@@ -878,6 +878,6 @@
+  let verify_before=j.f.counts();for ans in [&result["answer"],&edge["answer"]]{if let Some(k)=ans.as_u64(){assert_eq!(j.mul(g,k),q);terminal=true}}
+  json!({"status":"compared","native_evaluated":true,"a":a,"b":b,"divisor":d,"first_case_index":first_case,"label_reference_field":reference,"eligibility_field":eligibility,"key_reference_field":key_reference,"adapter":result,"graph":edge,"graph_state":graph.snapshot(),"post_terminal_diagnostic":diagnostic,"terminal_reference_field":j.f.counts()-verify_before})
+  }));
+- match outcome{Ok(z)=>println!("{}",json!({"identity":common,"result":z,"setup_checks_field":setup_counts,"constructor_field":constructor_counts,"setup_count_once_per_target":true})),Err(_)=>{partition_poisoned=true;println!("{}",json!({"identity":common,"status":"native_case_panic","native_evaluated":true}));}}
++ match outcome{Ok(z)=>println!("{}",json!({"identity":common,"result":z,"setup_checks_field":setup_counts,"constructor_field":constructor_counts,"setup_count_once_per_target":true,"setup_counter_scope":"nonadditive repeated metadata; aggregate unique physical archive_row only"})),Err(_)=>{partition_poisoned=true;println!("{}",json!({"identity":common,"status":"native_case_panic","native_evaluated":true}));}}
+  }
+ }

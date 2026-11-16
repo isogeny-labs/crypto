@@ -1,0 +1,33 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc | 32/32 | 7.440 | 7.906 | 12.101 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | ksum3f-n26 | 32/32 | 9.449 | 10.865 | 23.607 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | ksum3f-n36 | 32/32 | 8.756 | 9.416 | 15.359 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | ksum4f-n15 | 32/32 | 6.675 | 7.494 | 14.873 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | ksum4f-n22 | 32/32 | 12.635 | 12.873 | 15.016 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | ksum5-n16 | 32/32 | 16.072 | 16.239 | 17.738 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg | 32/32 | 0.993 | 1.085 | 1.921 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm27314-a41e3b62 | inc vs ksum3f-n26 | inc < ksum3f-n26 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs ksum3f-n36 | inc < ksum3f-n36 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs ksum4f-n15 | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | inc vs ksum4f-n22 | inc < ksum4f-n22 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs ksum5-n16 | inc < ksum5-n16 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n26 vs ksum3f-n36 | ksum3f-n36 < ksum3f-n26 |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n26 vs ksum4f-n15 | ksum4f-n15 < ksum3f-n26 |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n26 vs ksum4f-n22 | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n26 vs ksum5-n16 | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n26 vs rho-neg | rho-neg < ksum3f-n26 |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n36 vs ksum4f-n15 | ksum4f-n15 < ksum3f-n36 |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n36 vs ksum4f-n22 | unresolved inside the band |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n36 vs ksum5-n16 | ksum3f-n36 < ksum5-n16 |
+| icv1-fp28-tm27314-a41e3b62 | ksum3f-n36 vs rho-neg | rho-neg < ksum3f-n36 |
+| icv1-fp28-tm27314-a41e3b62 | ksum4f-n15 vs ksum4f-n22 | ksum4f-n15 < ksum4f-n22 |
+| icv1-fp28-tm27314-a41e3b62 | ksum4f-n15 vs ksum5-n16 | ksum4f-n15 < ksum5-n16 |
+| icv1-fp28-tm27314-a41e3b62 | ksum4f-n15 vs rho-neg | rho-neg < ksum4f-n15 |
+| icv1-fp28-tm27314-a41e3b62 | ksum4f-n22 vs ksum5-n16 | ksum4f-n22 < ksum5-n16 |
+| icv1-fp28-tm27314-a41e3b62 | ksum4f-n22 vs rho-neg | rho-neg < ksum4f-n22 |
+| icv1-fp28-tm27314-a41e3b62 | ksum5-n16 vs rho-neg | rho-neg < ksum5-n16 |

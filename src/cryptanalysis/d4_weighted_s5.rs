@@ -42,7 +42,7 @@ use serde::Serialize;
 use super::gaudry_cubic::{am, charpoly_mod_p, eigenvectors_mod_p, mm, rref_mod_p, sm, PolyRing};
 use super::gaudry_quartic::{
     charpoly_u16, echelon_by_lead, eigenvectors_u16, split_quartic, Curve4, Fp4, NormalForms4, Pt4,
-    QuarticSolve, E4,
+    QuarticSolve, ReplayOutcome, E4,
 };
 use super::gaudry_quartic_d4::{D4Instance, SymmetrisedD4};
 use super::residual_walk::{inv_mod, pow_mod};
@@ -182,8 +182,26 @@ pub fn columns_at(d: u16) -> usize {
     weighted_monomials_desc(d).len()
 }
 
+/// The shape of one weighted solve at one degree, recorded on a first
+/// system and replayed on later systems with the same leading monomials
+/// (F4Remake's idea, as [`super::gaudry_quartic::ShapeTrace`] for the
+/// unweighted solve): the triangularised leads, the built rows that reduced
+/// to zero, the pivot columns and the quotient dimension.  A replay does
+/// not build the zero rows and must reach the same pivots and dimension,
+/// or the full solve runs (charged as well).
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct WeightedTrace {
+    pub degree: u16,
+    pub leads: Vec<Option<[u8; 4]>>,
+    pub zero_ids: Vec<u32>,
+    pub pivot_cols: Vec<u32>,
+    pub dim: usize,
+}
+
 enum Inner {
     Solved(Vec<[u64; 4]>),
+    /// A replay did not reproduce the trace's shape.
+    Mismatch,
     Unsolved(String),
     /// A degenerate eigenspace needs a weight-2 unknown's multiplication
     /// matrix, which this degree cannot build.
@@ -320,6 +338,8 @@ fn solve_at(
     st: &mut QuarticSolve,
     row_selection: bool,
     debug: bool,
+    replay: Option<&WeightedTrace>,
+    record: Option<&mut WeightedTrace>,
 ) -> Inner {
     assert!(p < 1 << 15, "rows are u16 and products must fit u32");
     let t0 = Instant::now();
@@ -331,6 +351,13 @@ fn solve_at(
     let mut tri = 0u64;
     let (comps, leads) = triangularise(comps, p, &mut tri);
     st.triangularise_muls += tri;
+    if replay.is_some_and(|t| t.degree != d || t.leads != leads) {
+        return Inner::Mismatch;
+    }
+    let skip: std::collections::HashSet<u32> = replay
+        .map(|t| t.zero_ids.iter().copied().collect())
+        .unwrap_or_default();
+    let mut built = 0u32;
     let divides = |lm: &[u8; 4], m: &[u8; 4]| (0..4).all(|k| lm[k] <= m[k]);
     let mut rows: Vec<Vec<u16>> = Vec::new();
     for (i, comp) in comps.iter().enumerate() {
@@ -352,6 +379,10 @@ fn solve_at(
                     .take(i)
                     .any(|lm| lm.is_some_and(|lm| divides(&lm, &sh)))
             {
+                continue;
+            }
+            built += 1;
+            if skip.contains(&(built - 1)) {
                 continue;
             }
             let mut row = vec![0u16; cols.len()];
@@ -381,12 +412,30 @@ fn solve_at(
     st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
     st.zero_rows = ech.zero_rows;
     st.pivots = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
+    let pivot_cols: Vec<u32> = (0..cols.len() as u32)
+        .filter(|&c| ech.pivot_row[c as usize] != u32::MAX)
+        .collect();
+    if replay.is_some_and(|t| t.pivot_cols != pivot_cols) {
+        return Inner::Mismatch;
+    }
     let is_std: Vec<bool> = (0..cols.len())
         .map(|c| ech.pivot_row[c] == u32::MAX && wdeg(&cols[c]) < d)
         .collect();
     let standard: Vec<usize> = (0..cols.len()).filter(|&c| is_std[c]).collect();
     let dim = standard.len();
     st.dim = dim;
+    if replay.is_some_and(|t| t.dim != dim) {
+        return Inner::Mismatch;
+    }
+    if let Some(out) = record {
+        *out = WeightedTrace {
+            degree: d,
+            leads: leads.clone(),
+            zero_ids: ech.zero_ids.clone(),
+            pivot_cols,
+            dim,
+        };
+    }
     let mut std_index = vec![u32::MAX; cols.len()];
     for (i, &c) in standard.iter().enumerate() {
         std_index[c] = i as u32;
@@ -518,13 +567,64 @@ pub fn solve_weighted(
     row_selection: bool,
     debug: bool,
 ) -> (Option<Vec<[u64; 4]>>, u16) {
+    solve_weighted_traced(comps, d, p, rng, st, row_selection, debug, None, None)
+}
+
+/// [`solve_weighted`] with a shape trace at the base degree `d`: with
+/// `replay = Some(t)` the rows `t` records as reducing to zero are not
+/// built, and a replay that does not reach `t`'s leads, pivots and
+/// dimension runs the full solve instead (both charged in `st`; a fallback
+/// is never free).  With `record = Some(out)` the full solve's shape at `d`
+/// is written to `out`.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_weighted_traced(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    row_selection: bool,
+    debug: bool,
+    replay: Option<&WeightedTrace>,
+    mut record: Option<&mut WeightedTrace>,
+) -> (Option<Vec<[u64; 4]>>, u16) {
     let t0 = Instant::now();
     let mut deg = d;
     let res = loop {
         // Count the degenerate eigenspaces of the last attempt only.
         st.degenerate_eigenspaces = 0;
-        match solve_at(comps, deg, p, rng, st, row_selection, debug) {
+        // The trace is for the base degree; a rerun above it is a full solve.
+        let attempt = if deg == d && replay.is_some() {
+            match solve_at(comps, deg, p, rng, st, row_selection, debug, replay, None) {
+                Inner::Mismatch => {
+                    st.replay = ReplayOutcome::FellBack;
+                    None
+                }
+                other => {
+                    st.replay = ReplayOutcome::Replayed;
+                    Some(other)
+                }
+            }
+        } else {
+            None
+        };
+        let attempt = match attempt {
+            Some(a) => a,
+            None => solve_at(
+                comps,
+                deg,
+                p,
+                rng,
+                st,
+                row_selection,
+                debug,
+                None,
+                if deg == d { record.take() } else { None },
+            ),
+        };
+        match attempt {
             Inner::Solved(s) => break Some(s),
+            Inner::Mismatch => unreachable!("a full solve has no trace to mismatch"),
             Inner::Unsolved(why) => {
                 st.outcome = why;
                 break None;

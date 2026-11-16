@@ -1,0 +1,16 @@
+{
+  "schema": "ic_profile/factor-base-sweep/v1",
+  "created": "2026-10-30",
+  "question": "Among prime-abscissa sizes 32, 45, 56 and 64, which minimises whole-pipeline S at 20 bits with mitm:negation_folded=1?",
+  "answer": "45. It is a local optimum; every other size tested is worse.",
+  "spec": "taskq request ic-base-sweep-l2-20261030 (L2 shape required by the launcher)",
+  "binary": {
+    "ecbench_sha256": "ce9868bbe3066b481aed52c85a69272ada7cfb427edfb942ad42a7d23f39d538",
+    "source_revision": "9edcbe736982eb7a8f10f9705b060cf1d8d9acd3",
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:3accbd751fe38a780432c6b1eab980c146f22301601d1bf3838fde09ecca6173"
+  },
+  "records_uri": "s3://isolab-results-104186811093-us-east-2/runs/ic-base-sweep-l2-20261030/49333406-08cc-438a-919a-5004c6ca177d/session/records.jsonl",
+  "admission": "L2 refused (20-bit solves are ~187 us, under the 1 ms wall minimum); 240/240 verified; counts only",
+  "S_median": {"rho-neg": 1.077, "ic-n32": 11.226, "ic-n45": 9.929, "ic-n56": 10.099, "ic-n64": 10.794, "ic-n45-aa": 9.929},
+  "n": 40
+}

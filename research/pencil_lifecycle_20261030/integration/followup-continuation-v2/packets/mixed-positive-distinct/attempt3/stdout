@@ -1,0 +1,31 @@
+/var/tmp/pencil-mixed-positive-distinct-20261031-v1/PositiveDistinct.lean:115:8: error: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : DecidableEq K
+a0 a1 a2 a3 : K
+a : WeightedAdd11.Input K
+b : D2 K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a
+hb : validTwo (MixedGeneric.curve a0 a1 a2 a3) b
+hk : rawK a b = 0
+hc : a.y * rawW3 b ≠ -(rawY3 a b * a.w)
+hd : a.x * (b.z * b.z) ≠ (other a b).x
+hp : a.y * rawW3 b = rawY3 a b * a.w
+h2 : 2 ≠ 0
+hy : a.y ≠ 0
+hg : MixedGeneric.genericK (other a b) (doubled a0 a1 a2 a3 a) ≠ 0
+hz : (MixedGeneric.output (other a b) (doubled a0 a1 a2 a3 a) a3).z ≠ 0
+hw : (MixedGeneric.output (other a b) (doubled a0 a1 a2 a3 a) a3).w ≠ 0
+hv : validTwo (MixedGeneric.curve a0 a1 a2 a3) (MixedGeneric.output (other a b) (doubled a0 a1 a2 a3 a) a3)
+⊢ ¬rawY3 a b * a.w = -(rawY3 a b * a.w)
+/var/tmp/pencil-mixed-positive-distinct-20261031-v1/PositiveDistinct.lean:115:29: warning: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [classify, hk, hp]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

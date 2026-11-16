@@ -1,0 +1,116 @@
+{
+  "kind": "committed-saved-work-publication-admission/v1",
+  "date_utc": "2026-10-27T07:49:09.993Z",
+  "checked_commit": "c5f3cca9b7bae993703ca9e7e7d227497ae8e0ff",
+  "base": "8eef1252714097e0b8279c0bf55b82ed9e49943d",
+  "artifact_policy_status": 0,
+  "size_policy_status": 0,
+  "metrics_status": 0,
+  "committed_metrics": [
+    {
+      "metric": "nist.selection_period_work.verified_cells",
+      "value": 210,
+      "date": "2026-10-27",
+      "problem": "nist-candidate-selection",
+      "unit": "cells",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Saved ECPP work: independently checked count cells; no historical-rule claim",
+      "source": "research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json@c5f3cca9b7ba"
+    },
+    {
+      "metric": "nist.selection_period_ecpp.retained_rows",
+      "value": 21,
+      "date": "2026-10-26",
+      "problem": "nist-candidate-selection",
+      "unit": "orders",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Period ECPP trial: original cohort rows retained, including indeterminate",
+      "source": "research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json@fde041670aa1"
+    },
+    {
+      "metric": "nist.selection_exact_embedding.certified_rows",
+      "value": 21,
+      "date": "2026-10-26",
+      "problem": "nist-candidate-selection",
+      "unit": "curves",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "NIST all-21 census: exact embedding degrees with direct-power certificates",
+      "source": "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json@19f1f5468f2e"
+    },
+    {
+      "metric": "nist.selection_freelip.distinct_orders",
+      "value": 21,
+      "date": "2026-10-27",
+      "problem": "nist-candidate-selection",
+      "unit": "orders",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Recovered FreeLIP replay: distinct original orders, not repeated-call count",
+      "source": "research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json@0ffc59fa368c"
+    }
+  ],
+  "operational_log_hashes": {
+    "/workspace/nist-work-artifact-policy.log": {
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "bytes": 41
+    },
+    "/workspace/nist-work-size-policy.log": {
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+      "bytes": 65
+    },
+    "/workspace/nist-work-committed-metrics.jsonl": {
+      "sha256": "e24da2481128b2cbcdf00fd6a7174d9ced81196a1b8ce699ad7dc0e6e3676dfb",
+      "bytes": 29633
+    }
+  },
+  "bindings_at_checked_commit": {
+    "new_study": 119,
+    "parent": 71,
+    "earlier_freelip": 97,
+    "original_parent70_byte_preserved": true
+  },
+  "scope": "Repository checks and literal native metric export, not a security or historical-selector result",
+  "hosted_checks": "Must be read on actual final pushed head; local passes are not hosted CI",
+  "commands": {
+    "artifact_policy": [
+      "python3",
+      "tools/artifacts/artifacts.py",
+      "check",
+      "8eef1252714097e0b8279c0bf55b82ed9e49943d",
+      "c5f3cca9b7bae993703ca9e7e7d227497ae8e0ff"
+    ],
+    "size_policy": [
+      "scripts/check-large-files.sh",
+      "8eef1252714097e0b8279c0bf55b82ed9e49943d",
+      "c5f3cca9b7bae993703ca9e7e7d227497ae8e0ff"
+    ],
+    "metrics": [
+      "timeout",
+      "60s",
+      "python3",
+      "tools/progress_metrics.py",
+      "--ref",
+      "c5f3cca9b7bae993703ca9e7e7d227497ae8e0ff",
+      "--since",
+      "2026-10-26"
+    ]
+  },
+  "retained_outputs": {
+    "evidence/artifact-policy.txt": {
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "bytes": 41
+    },
+    "evidence/size-policy.txt": {
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+      "bytes": 65
+    },
+    "evidence/committed-metrics.txt": {
+      "sha256": "1fc1eed87046c095215fab41f1c1a67d95423162e725b4558d33a5bada2bbefe",
+      "bytes": 1466
+    }
+  },
+  "metric_output_scope": "committed-metrics.txt retains exactly the four NIST rows checked here; full exporter output29,633bytes retained at its external log path/hash"
+}

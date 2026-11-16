@@ -1,0 +1,36 @@
+{
+  "certificate_sha256": "59cf995240a349f8b53f471422b461a0f23cdea952b284cdb73f18dff2cec75c",
+  "closure_rank": null,
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/tmp/n83-candidate-fall/spike27/cases/koblitz-m5-planted/input",
+    "/tmp/n83-candidate-fall/spike27/cases/koblitz-m5-planted/result"
+  ],
+  "elapsed_seconds": 4.093,
+  "family": "koblitz",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "koblitz-m5-planted",
+  "input_sha256": "48b23a0428a119f12eb6176adf15b7c125ce2e0f7ef8585fdc58892575ea04b7",
+  "last_fall_degree": null,
+  "m": 5,
+  "replay": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"koblitz-m5-planted\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"koblitz-m5-planted\",\"status\":\"certified\"}\n",
+  "system_sha256": "5ca450fa0e25fd45b819121d118cc8b1a4c207167b2dc868e4fa276fdb2cb3f6",
+  "target_kind": "planted"
+}

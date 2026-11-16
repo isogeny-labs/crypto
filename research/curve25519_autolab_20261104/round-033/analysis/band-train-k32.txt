@@ -1,0 +1,110 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | inc | 32/32 | 1.983 | 2.164 | 3.794 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | rho-neg | 32/32 | 0.839 | 0.922 | 1.662 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkG-x06-n2 | 32/32 | 1.336 | 1.409 | 2.071 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkG-x07-n2 | 32/32 | 1.701 | 1.773 | 2.425 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkG-x08-n2 | 32/32 | 1.557 | 1.637 | 2.357 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkG-x09-n2 | 32/32 | 2.255 | 2.302 | 2.717 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkG-x10-n2 | 32/32 | 1.683 | 1.759 | 2.440 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkG-x12-n2 | 32/32 | 2.077 | 2.151 | 2.811 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkGg-x06-n2 | 32/32 | 1.375 | 1.421 | 1.842 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkGg-x07-n2 | 32/32 | 1.608 | 1.641 | 1.937 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkGg-x08-n2 | 32/32 | 1.566 | 1.613 | 2.036 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkGg-x09-n2 | 32/32 | 2.290 | 2.323 | 2.616 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkGg-x10-n2 | 32/32 | 1.718 | 1.766 | 2.193 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wwalkGg-x12-n2 | 32/32 | 1.876 | 1.899 | 2.103 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-tm109914-36f5bc82 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkG-x06-n2 | wwalkG-x06-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkG-x07-n2 | wwalkG-x07-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkG-x08-n2 | wwalkG-x08-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkG-x09-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkG-x10-n2 | wwalkG-x10-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkG-x12-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkGg-x06-n2 | wwalkGg-x06-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkGg-x07-n2 | wwalkGg-x07-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkGg-x08-n2 | wwalkGg-x08-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkGg-x09-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkGg-x10-n2 | wwalkGg-x10-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wwalkGg-x12-n2 | wwalkGg-x12-n2 < inc |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkG-x06-n2 | rho-neg < wwalkG-x06-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkG-x07-n2 | rho-neg < wwalkG-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkG-x08-n2 | rho-neg < wwalkG-x08-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkG-x09-n2 | rho-neg < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkG-x10-n2 | rho-neg < wwalkG-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkG-x12-n2 | rho-neg < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkGg-x06-n2 | rho-neg < wwalkGg-x06-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkGg-x07-n2 | rho-neg < wwalkGg-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkGg-x08-n2 | rho-neg < wwalkGg-x08-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkGg-x09-n2 | rho-neg < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkGg-x10-n2 | rho-neg < wwalkGg-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wwalkGg-x12-n2 | rho-neg < wwalkGg-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkG-x07-n2 | wwalkG-x06-n2 < wwalkG-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkG-x08-n2 | wwalkG-x06-n2 < wwalkG-x08-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkG-x09-n2 | wwalkG-x06-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkG-x10-n2 | wwalkG-x06-n2 < wwalkG-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkG-x12-n2 | wwalkG-x06-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkGg-x06-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkGg-x07-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkGg-x08-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkGg-x09-n2 | wwalkG-x06-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkGg-x10-n2 | wwalkG-x06-n2 < wwalkGg-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x06-n2 vs wwalkGg-x12-n2 | wwalkG-x06-n2 < wwalkGg-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkG-x08-n2 | wwalkG-x08-n2 < wwalkG-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkG-x09-n2 | wwalkG-x07-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkG-x10-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkG-x12-n2 | wwalkG-x07-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkGg-x06-n2 | wwalkGg-x06-n2 < wwalkG-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkGg-x07-n2 | wwalkGg-x07-n2 < wwalkG-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkGg-x08-n2 | wwalkGg-x08-n2 < wwalkG-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkGg-x09-n2 | wwalkG-x07-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkGg-x10-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x07-n2 vs wwalkGg-x12-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkG-x09-n2 | wwalkG-x08-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkG-x10-n2 | wwalkG-x08-n2 < wwalkG-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkG-x12-n2 | wwalkG-x08-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkGg-x06-n2 | wwalkGg-x06-n2 < wwalkG-x08-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkGg-x07-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkGg-x08-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkGg-x09-n2 | wwalkG-x08-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkGg-x10-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x08-n2 vs wwalkGg-x12-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkG-x10-n2 | wwalkG-x10-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkG-x12-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkGg-x06-n2 | wwalkGg-x06-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkGg-x07-n2 | wwalkGg-x07-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkGg-x08-n2 | wwalkGg-x08-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkGg-x09-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkGg-x10-n2 | wwalkGg-x10-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x09-n2 vs wwalkGg-x12-n2 | wwalkGg-x12-n2 < wwalkG-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x10-n2 vs wwalkG-x12-n2 | wwalkG-x10-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x10-n2 vs wwalkGg-x06-n2 | wwalkGg-x06-n2 < wwalkG-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x10-n2 vs wwalkGg-x07-n2 | wwalkGg-x07-n2 < wwalkG-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x10-n2 vs wwalkGg-x08-n2 | wwalkGg-x08-n2 < wwalkG-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x10-n2 vs wwalkGg-x09-n2 | wwalkG-x10-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x10-n2 vs wwalkGg-x10-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x10-n2 vs wwalkGg-x12-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x12-n2 vs wwalkGg-x06-n2 | wwalkGg-x06-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x12-n2 vs wwalkGg-x07-n2 | wwalkGg-x07-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x12-n2 vs wwalkGg-x08-n2 | wwalkGg-x08-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x12-n2 vs wwalkGg-x09-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x12-n2 vs wwalkGg-x10-n2 | wwalkGg-x10-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkG-x12-n2 vs wwalkGg-x12-n2 | wwalkGg-x12-n2 < wwalkG-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x06-n2 vs wwalkGg-x07-n2 | wwalkGg-x06-n2 < wwalkGg-x07-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x06-n2 vs wwalkGg-x08-n2 | wwalkGg-x06-n2 < wwalkGg-x08-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x06-n2 vs wwalkGg-x09-n2 | wwalkGg-x06-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x06-n2 vs wwalkGg-x10-n2 | wwalkGg-x06-n2 < wwalkGg-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x06-n2 vs wwalkGg-x12-n2 | wwalkGg-x06-n2 < wwalkGg-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x07-n2 vs wwalkGg-x08-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x07-n2 vs wwalkGg-x09-n2 | wwalkGg-x07-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x07-n2 vs wwalkGg-x10-n2 | wwalkGg-x07-n2 < wwalkGg-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x07-n2 vs wwalkGg-x12-n2 | wwalkGg-x07-n2 < wwalkGg-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x08-n2 vs wwalkGg-x09-n2 | wwalkGg-x08-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x08-n2 vs wwalkGg-x10-n2 | wwalkGg-x08-n2 < wwalkGg-x10-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x08-n2 vs wwalkGg-x12-n2 | wwalkGg-x08-n2 < wwalkGg-x12-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x09-n2 vs wwalkGg-x10-n2 | wwalkGg-x10-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x09-n2 vs wwalkGg-x12-n2 | wwalkGg-x12-n2 < wwalkGg-x09-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wwalkGg-x10-n2 vs wwalkGg-x12-n2 | unresolved inside the band |

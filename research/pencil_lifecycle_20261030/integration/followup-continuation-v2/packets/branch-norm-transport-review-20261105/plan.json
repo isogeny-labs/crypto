@@ -1,0 +1,39 @@
+{
+  "schema": "formal-preread-source-review-plan/v1",
+  "created_utc": "2026-11-05T19:01:22.134773+00:00",
+  "producer_candidate_read": false,
+  "prior_derivation_commit": "c1dedb6021d1ae08acba53b015652a5bd325be0a",
+  "prior_review_commit": "0dcdb2246243e8473a6e244852fb3525fb737a72",
+  "announced_claims": [
+    "branch evaluator equals rho composed with affine polynomial evaluation",
+    "actual curve polynomial maps to Y\u00b2",
+    "mapped norm product",
+    "support stalk valuation sum2",
+    "coefficientData/divisibility/separability specialization"
+  ],
+  "joints": [
+    "Actual Proj branch stalk codomain and scalar/x/y images commute with affine quotient-localization maps",
+    "Curve equation follows from actual quotient relation, not assumed evaluator equation",
+    "Polynomial norm assumption allowed as input but resulting stalknorm/order must be derived",
+    "C(b\u00b2) maps to B\u00b2 with coefficienthom and powers; correct difference of squares",
+    "Supportsum uses additive valuation and productnorm plus prior conjugateorder theorem",
+    "Source-specific wrapper derives exact polynomialnorm from existing coefficientData/divisibility theorem, simplebranch fromseparability; determinantnonzero and supportroot explicit"
+  ],
+  "attacks": [
+    "abstract evaluator unrelated to actualstalk",
+    "desired curve/norm/order smuggled intohypotheses",
+    "wrong scalar/sign",
+    "unproved supportsum represented asbasepolynomial multiplicity",
+    "missing nonzero/unit/simplebranch premise",
+    "circular import ofnewdesiredtheorem"
+  ],
+  "remaining_explicit": "Basepolynomial multiplicity transport remains unimplemented; no compiler or axiom audit authorized",
+  "method": "Inspect only after exact publication; source and primary API binding; no trials/compiler",
+  "knowledge": "KB unavailable; exact existing primary sources and prior independent derivation",
+  "deliverables": [
+    "JSON",
+    "PDF",
+    "SVG",
+    "manifest"
+  ]
+}

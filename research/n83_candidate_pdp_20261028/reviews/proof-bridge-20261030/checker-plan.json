@@ -1,0 +1,116 @@
+{
+  "review_plan": {
+    "claim_under_review": [
+      {
+        "id": "C-graded",
+        "claim": "For the exact prime chain with ell27, characteristic above27 and all nonzero selector weights, every homogeneous syzygy of weighted total degree at most16 is Koszul; matching source-bound upper witness is at17.",
+        "machine_status_before": "not_verified except eight arithmetic lemmas"
+      },
+      {
+        "id": "C-filtered",
+        "claim": "Conditional on full top-syzygy Koszul generation through16, the proposed bounded-representation reduction identifies V16 with bounded products; the source-bound nonzero pairing separates g16 from V16 while the saved derivation puts g in V17. No global LFD upper bound."
+      },
+      {
+        "id": "C-machine",
+        "claim": "Eight named Std-only Lean arithmetic lemmas check numerical prerequisites, not the polynomial-algebra or FFD/LFD theorem."
+      }
+    ],
+    "coordinator_prior": "Arithmetic replay is established; the universal graded-syzygy and filtered-space arguments remain independently unreviewed. Expect possible missing hypotheses or degree bookkeeping errors; retain inconclusive outcomes.",
+    "joints": [
+      {
+        "joint": "block SLP and primitive decomposition",
+        "assigned_to": "TASK-N83-GRADED",
+        "attack_plan": "Choose sectors at the maximal primitive degree and multi-block syzygies at degrees8-16; attempt to find a quotient relation hidden by truncation or a non-Koszul mixed square/quartic relation. Check off-by-one at degree17 and char<=ell failure.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "tensor sector degree and no truncation",
+        "assigned_to": "TASK-N83-GRADED",
+        "attack_plan": "Choose sectors at the maximal primitive degree and multi-block syzygies at degrees8-16; attempt to find a quotient relation hidden by truncation or a non-Koszul mixed square/quartic relation. Check off-by-one at degree17 and char<=ell failure.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "free chain regularity/Koszul generation",
+        "assigned_to": "TASK-N83-GRADED",
+        "attack_plan": "Choose sectors at the maximal primitive degree and multi-block syzygies at degrees8-16; attempt to find a quotient relation hidden by truncation or a non-Koszul mixed square/quartic relation. Check off-by-one at degree17 and char<=ell failure.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "selector-square lifting and finite-characteristic FFD conventions",
+        "assigned_to": "TASK-N83-GRADED",
+        "attack_plan": "Choose sectors at the maximal primitive degree and multi-block syzygies at degrees8-16; attempt to find a quotient relation hidden by truncation or a non-Koszul mixed square/quartic relation. Check off-by-one at degree17 and char<=ell failure.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "bounded representation descent",
+        "assigned_to": "TASK-N83-FILTERED",
+        "attack_plan": "Find a low-degree element created by repeated reduction/multiplication that is absent from one-shot bounded products; test removal of Koszul-generation hypothesis, zero pairing, zero polynomial, and cancellation in g. Check unrestricted U and end-of-chain indexing.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "closure under allowed multiplication",
+        "assigned_to": "TASK-N83-FILTERED",
+        "attack_plan": "Find a low-degree element created by repeated reduction/multiplication that is absent from one-shot bounded products; test removal of Koszul-generation hypothesis, zero pairing, zero polynomial, and cancellation in g. Check unrestricted U and end-of-chain indexing.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "coefficient functional annihilation and nonzero separation",
+        "assigned_to": "TASK-N83-FILTERED",
+        "attack_plan": "Find a low-degree element created by repeated reduction/multiplication that is absent from one-shot bounded products; test removal of Koszul-generation hypothesis, zero pairing, zero polynomial, and cancellation in g. Check unrestricted U and end-of-chain indexing.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "connection to exact source and rational-point scope",
+        "assigned_to": "TASK-N83-FILTERED",
+        "attack_plan": "Find a low-degree element created by repeated reduction/multiplication that is absent from one-shot bounded products; test removal of Koszul-generation hypothesis, zero pairing, zero polynomial, and cancellation in g. Check unrestricted U and end-of-chain indexing.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      },
+      {
+        "joint": "independent derivation from mathematical system definition",
+        "assigned_to": "TASK-N83-BLIND",
+        "attack_plan": "Derive a degree obstruction or explicit counterexample directly from the odd-width chain; do not inherit producer degree values or its method. If unresolved, identify precise missing theorem.",
+        "breaking_artifact": "Explicit algebraic counterexample or fully localized derivation error; otherwise list missing hypotheses."
+      }
+    ],
+    "blindness": {
+      "mutual": true,
+      "lifted_for": [],
+      "rationale": null
+    },
+    "proves_too_much": {
+      "objects": [
+        "Top-syzygy hypothesis removed: generators U^2 and U^2-U",
+        "Characteristic2 and odd-width squarezero algebra, where L^2=0",
+        "Zero scalar pairing treated as membership"
+      ],
+      "failure_signature": "The proof must reject its missing hypothesis or mark the functional inconclusive; it must not certify the same absence conclusion.",
+      "assigned_to": "TASK-N83-FILTERED"
+    },
+    "blind_rederivation": {
+      "required": true,
+      "quantity": "Uniform degree obstruction and explicit upper witness, and any valid filtered consequence for the given chain",
+      "parameters": "Exact mathematical statement in blind-statement.md; no predicted value or producer method",
+      "blind_from": [
+        "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded",
+        "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered",
+        "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/PRIME_LEFSCHETZ_ARGUMENT.md",
+        "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/PRIME_FILTERED_FUNCTIONAL_DESIGN.md",
+        "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence",
+        "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/reports",
+        "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/reviews/proof-bridge-20261030/review-plan.json",
+        "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/reviews/proof-bridge-20261030/checker-plan.json"
+      ],
+      "assigned_to": "TASK-N83-BLIND"
+    },
+    "procedure_deviations": []
+  },
+  "parent_archival_task": "T-995",
+  "reviewer_ids": "Local archival reviewer identities, not separate Conductor claims",
+  "immutable_snapshots": {
+    "graded": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded",
+    "filtered": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/filtered"
+  },
+  "blind_snapshot": "/home/ec2-user/n83-proof-bridge-blind-20261030",
+  "current_main_review_worktree": "/home/ec2-user/n83-proof-bridge-review-20261030",
+  "source_revision": "c64f02c176787dbf40d455f95b75bd2dd5bfe5bf"
+}

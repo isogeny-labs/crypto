@@ -114,6 +114,15 @@ unrecognized `resume` field to `isolab.eks.request/v1`; its validator deliberate
 rejects unknown fields. A requested resumable experiment must fail admission when
 its checkpoint/restore capability is missing, not silently run without recovery.
 
+A request with a `command` object runs a trusted native command instead of
+ecbench ([command mode](../../../../taskq/deploy/eks-karpenter/resume/CONTROLLER.md#command-mode),
+[example](../../../../taskq/deploy/eks-karpenter/resume/request.command.example.json)).
+It allows up to 50 restores, records any exit code, skips native replay and
+the fresh epoch, and uploads the outputs directory with `SHA256SUMS`; `wait`
+ends at `command_completed`. It has no live CRIU qualification yet. Payloads
+must hold no network connections and, with no AWS identity in the Pod, read
+inputs only from the image and write only to the outputs directory.
+
 ## Native implementation and current qualification
 
 The operator qualification now also covers real native ecbench: 36 computations

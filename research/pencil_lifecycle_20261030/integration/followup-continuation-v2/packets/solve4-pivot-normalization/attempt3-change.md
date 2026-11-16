@@ -1,0 +1,1 @@
+Attempt2 theorem module again passed; nonvacuity control could not synthesize Decidable for opaque canonical predicate. Explicitly unfold canonical before decide, matching the prior canonical control pattern. Failed readback sorryAx retained and rejected. Last allowed attempt3; no theorem source change or further retry authorized by this plan.

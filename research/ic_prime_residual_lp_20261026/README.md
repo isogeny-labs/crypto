@@ -141,3 +141,23 @@ size both arms would still be about 4× rho or more.
   (the example); `analysis/summary.json` (`scripts/summary.sh`, with
   `scripts/null.jq` and `scripts/slope.jq`). Figures come from
   `scripts/plots.py`, which only lays out the plot.
+
+## Note, 2026-11-01: byte counters are no longer priced as operations
+
+This README and its `analysis/band-*` files are frozen as measured. The band
+priced `residual_table_bytes_uncharged`, a byte count, at `w` GAE per byte; on
+the `res*` arms that was 83-99% of S at w = 1 (63-98% at w = 0.1). The owner
+decided (option B, 2026-11-01) that the band prices operations only
+(`band.rs` `NON_OPERATION_COUNTERS`); the counter stays listed.
+[`analysis/exbytes/`](analysis/exbytes/) holds the bands and the 24 weighted
+comparisons re-run under that rule (same arms, weights and bootstrap seeds;
+`sessions/` untouched). What changes:
+
+- `plan` and `rho` rows are identical; every `res*` row at w > 0 drops. At w = 1,
+  res4 / rho falls from 41-58x to 3.6-4.8x.
+- All 24 weighted comparisons of `res4`/`res8` against `plan` go from
+  "unresolved inside the band" to "res cheaper at every weight"
+  ([`CHANGES.md`](analysis/exbytes/CHANGES.md)). The w = 0 results are unchanged.
+- Any statement above that the residual collector loses to `plan` at w = 1 rests
+  on the byte price and does not hold under the rule now in force.
+Audit and rationale: [`research/ic_byte_counter_pricing_20261101`](../ic_byte_counter_pricing_20261101/README.md).

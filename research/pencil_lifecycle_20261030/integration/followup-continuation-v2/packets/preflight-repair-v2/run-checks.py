@@ -1,0 +1,2 @@
+import pathlib,subprocess,json,time,os
+p=pathlib.Path(__file__).parent;cmd=['timeout','-k','5s','120s','cargo','test','--offline','--lib','-j','1'];t=time.time();r=subprocess.run(cmd,cwd=p,env=dict(os.environ,CARGO_TARGET_DIR=str(p/'target')),capture_output=True,text=True);(p/'test.stdout').write_text(r.stdout);(p/'test.stderr').write_text(r.stderr);(p/'test.receipt.json').write_text(json.dumps(dict(command=cmd,exit_code=r.returncode,elapsed_seconds=time.time()-t),indent=2));print(r.returncode,r.stdout,r.stderr[-1500:])

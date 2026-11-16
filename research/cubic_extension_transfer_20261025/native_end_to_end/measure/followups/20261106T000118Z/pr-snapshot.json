@@ -1,0 +1,50 @@
+{
+  "schema": "cubic.pr_followup_observation/v1",
+  "source": "Producer-curated snapshot of GitHub connector and read-only REST observations; not independent execution evidence",
+  "observed_at": "2026-11-05T23:59:23Z",
+  "repository": "isogeny-labs/crypto",
+  "pr_number": 3505,
+  "pr_url": "https://github.com/isogeny-labs/crypto/pull/3505",
+  "head_sha": "fbe4aedf214598b84bc4ebf381126798a68768c6",
+  "base_sha": "ff30ef0ef2f065d198532f4524e1ec53bc7318ae",
+  "state": "open",
+  "merged": false,
+  "mergeable_state": "dirty",
+  "auto_merge": null,
+  "check_runs": [
+    {
+      "name": "review",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/42127869587/job/127596602865"
+    },
+    {
+      "name": "migrate",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/42127869565/job/127596602575"
+    }
+  ],
+  "required_check_names_absent": ["gate", "size", "artifacts"],
+  "commit_status_contexts": [],
+  "commit_status_rollup": "pending",
+  "submitted_reviews": [],
+  "review_threads": [],
+  "copilot_request": {
+    "comment_id": 6671877732,
+    "created_at": "2026-11-05T23:06:53Z",
+    "url": "https://github.com/isogeny-labs/crypto/pull/3505#issuecomment-6671877732",
+    "reply_observed": false,
+    "resolution_commit_observed": false
+  },
+  "metadata_repair": {
+    "before_description_prefix": "undefined\n\n",
+    "problem": "An earlier metadata update replaced the implementation and validation description with an unavailable cached value",
+    "action": "Restore the complete saved draft after checking its nonempty expected prefix, lint it, and require the GitHub update response to confirm the restored body",
+    "confirmed_by_update_response": true,
+    "head_changed_by_description_update": false
+  },
+  "full_library_validation_complete": false,
+  "scientific_benchmark_submitted": false,
+  "source_or_frozen_evidence_changed_by_this_repair": false
+}

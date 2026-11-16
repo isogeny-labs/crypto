@@ -1,0 +1,244 @@
+{
+  "card_id": "CARD-BLINDSPOT-04-09",
+  "card_path": "research/blindspots_20261018/04-presentation-search/card-09.yaml",
+  "card_sha256": "d8f17e2f81d234a7ef71481bfa5084cbc8f9baf61bde3780f129a724c22c4b7e",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-04/card-09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-04/card-09/b04",
+        "examples/blindspots_04_presentation_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.86,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 7.86,
+      "stderr_sha256": "4dc0b77782bbda8e469851e351f2200cb2fb287e66c887fe3570f9a0c9e520c1",
+      "stderr_tail": [
+        "138 |     low: u64,",
+        "    |     ^^^",
+        "    |",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: fields `rss_kb` and `seed_rows` are never read",
+        "    --> examples/blindspots_04_presentation_search.rs:2656:5",
+        "     |",
+        "2647 | struct DegreeResult {",
+        "     |        ------------ fields in this struct",
+        "...",
+        "2656 |     rss_kb: u64,",
+        "     |     ^^^^^^",
+        "2657 |     seed_rows: usize,",
+        "     |     ^^^^^^^^^",
+        "     |",
+        "     = note: `DegreeResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis",
+        "",
+        "warning: 2 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-09/b04",
+        "cell",
+        "--n",
+        "19",
+        "--l",
+        "4",
+        "--m",
+        "3",
+        "--arms",
+        "b",
+        "--dmax-b",
+        "3",
+        "--first",
+        "4",
+        "--random",
+        "4",
+        "--planted",
+        "0",
+        "--time-limit",
+        "300",
+        "--job-time",
+        "150"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 301.365,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "b-cell2-second",
+      "index": 3,
+      "outputs": {},
+      "seconds": 301.365,
+      "stderr_sha256": "181282eb8c9f038249eff07af869e7376371d85272da1ebc98bcf746f7d0f7e9",
+      "stderr_tail": [
+        "cell n=19 l=4 m=3 draw=0 curve d1=426861 d2=293889 a=381185 b=301406 basis=[1, 162855, 304598, 499631] setup 2.1s",
+        "cell done in 301.3s"
+      ],
+      "stdout_sha256": "3739199b2f07e8a859964a055de3ee66ee76626d3afc42d0d31cc9151c525b77",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":0,\"arm\":\"b\",\"kind\":\"random\",\"t\":4,\"nv0\":108,\"elim\":19,\"nv\":89,\"eqs\":114,\"ech_rows\":114,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":3,\"D_lb\":3,\"last_degree\":3,\"recovered_ok\":null,\"matrix_rows\":110706,\"matrix_cols\":117570,\"word_ops_last\":212971151272,\"word_ops_total\":212971217011,\"peak_basis_bytes\":725855568,\"secs\":153.005,\"rss_peak_kb\":947016,\"degrees\":[{\"d\":2,\"cols\":4006,\"rank\":114,\"target\":4006,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":114,\"products\":0,\"falls\":0,\"word_ops\":65739,\"peak_basis_bytes\":42328,\"rows_total\":114},{\"d\":3,\"cols\":117570,\"rank\":95074,\"target\":117570,\"out\":\"refuted\",\"secs\":152.974,\"seed_rows\":114,\"products\":110592,\"falls\":3727,\"word_ops\":212971151272,\"peak_basis_bytes\":725855568,\"rows_total\":110706}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":0,\"arm\":\"b\",\"kind\":\"random\",\"t\":5,\"nv0\":108,\"elim\":19,\"nv\":89,\"eqs\":114,\"ech_rows\":114,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":3,\"D_lb\":3,\"last_degree\":3,\"recovered_ok\":null,\"matrix_rows\":110706,\"matrix_cols\":117570,\"word_ops_last\":193429331090,\"word_ops_total\":193429396829,\"peak_basis_bytes\":705991976,\"secs\":132.553,\"rss_peak_kb\":947016,\"degrees\":[{\"d\":2,\"cols\":4006,\"rank\":114,\"target\":4006,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":114,\"products\":0,\"falls\":0,\"word_ops\":65739,\"peak_basis_bytes\":42328,\"rows_total\":114},{\"d\":3,\"cols\":117570,\"rank\":92790,\"target\":117570,\"out\":\"refuted\",\"secs\":132.524,\"seed_rows\":114,\"products\":110592,\"falls\":3942,\"word_ops\":193429331090,\"peak_basis_bytes\":705991976,\"rows_total\":110706}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":0,\"arm\":\"b\",\"kind\":\"random\",\"t\":6,\"nv0\":108,\"elim\":19,\"nv\":89,\"eqs\":114,\"ech_rows\":114,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"timelimit\",\"D\":null,\"D_lb\":3,\"last_degree\":3,\"recovered_ok\":null,\"matrix_rows\":41139,\"matrix_cols\":117570,\"word_ops_last\":25056348143,\"word_ops_total\":25056413882,\"peak_basis_bytes\":357711840,\"secs\":13.622,\"rss_peak_kb\":947016,\"degrees\":[{\"d\":2,\"cols\":4006,\"rank\":114,\"target\":4006,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":114,\"products\":0,\"falls\":0,\"word_ops\":65739,\"peak_basis_bytes\":42328,\"rows_total\":114},{\"d\":3,\"cols\":117570,\"rank\":37608,\"target\":null,\"out\":\"timelimit\",\"secs\":13.599,\"seed_rows\":114,\"products\":41025,\"falls\":1446,\"word_ops\":25056348143,\"peak_basis_bytes\":357711840,\"rows_total\":41139}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-09/b04",
+        "cell",
+        "--n",
+        "19",
+        "--l",
+        "4",
+        "--m",
+        "3",
+        "--arms",
+        "b",
+        "--dmax-b",
+        "2",
+        "--random",
+        "0",
+        "--planted",
+        "2",
+        "--time-limit",
+        "40",
+        "--job-time",
+        "30"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.11,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "b-cell2-planted",
+      "index": 4,
+      "outputs": {},
+      "seconds": 2.11,
+      "stderr_sha256": "6dcbd4d183180cc57271ffdac5cafcd22f42ad9e66e8bcec0c2e70b4632026a8",
+      "stderr_tail": [
+        "cell n=19 l=4 m=3 draw=0 curve d1=426861 d2=293889 a=381185 b=301406 basis=[1, 162855, 304598, 499631] setup 2.1s",
+        "cell done in 2.1s"
+      ],
+      "stdout_sha256": "aecc6caf8b6046e85bc3be3e926ac2c2728f58e162cf9d810f51baccfefb2963",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":0,\"arm\":\"b\",\"kind\":\"planted\",\"t\":0,\"nv0\":108,\"elim\":19,\"nv\":89,\"eqs\":114,\"ech_rows\":114,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":12,\"n_z\":6,\"n_truth_any\":6,\"n_truth_gen\":6,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":true,\"status\":\"not-reached\",\"D\":null,\"D_lb\":3,\"last_degree\":2,\"recovered_ok\":null,\"matrix_rows\":114,\"matrix_cols\":4006,\"word_ops_last\":65739,\"word_ops_total\":65739,\"peak_basis_bytes\":42328,\"secs\":0.016,\"rss_peak_kb\":10084,\"degrees\":[{\"d\":2,\"cols\":4006,\"rank\":114,\"target\":3994,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":114,\"products\":0,\"falls\":0,\"word_ops\":65739,\"peak_basis_bytes\":42328,\"rows_total\":114}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":0,\"arm\":\"b\",\"kind\":\"planted\",\"t\":1,\"nv0\":108,\"elim\":19,\"nv\":89,\"eqs\":114,\"ech_rows\":114,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":12,\"n_z\":6,\"n_truth_any\":6,\"n_truth_gen\":6,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":true,\"status\":\"not-reached\",\"D\":null,\"D_lb\":3,\"last_degree\":2,\"recovered_ok\":null,\"matrix_rows\":114,\"matrix_cols\":4006,\"word_ops_last\":65739,\"word_ops_total\":65739,\"peak_basis_bytes\":42328,\"secs\":0.012,\"rss_peak_kb\":10160,\"degrees\":[{\"d\":2,\"cols\":4006,\"rank\":114,\"target\":3994,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":114,\"products\":0,\"falls\":0,\"word_ops\":65739,\"peak_basis_bytes\":42328,\"rows_total\":114}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-04/card-09/b04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "0ef8b36300d5270ce1539341fcacc2cddad19cd4",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-09-b-cell2-planted.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-09-b-cell2-planted.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-09-b-cell2-second.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-09-b-cell2-second.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/draws.tsv",
+    "xamples/blindspots_06_signature_gb.rs"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-09-l-15-5-4-g12.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-09-l-15-5-4-g12.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-09.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

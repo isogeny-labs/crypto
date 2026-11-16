@@ -1,0 +1,19 @@
+{
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "research/n83_candidate_pdp_20261028/target/release/fall",
+    "replay",
+    "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-01/cases/spike35/koblitz-m2-planted/input",
+    "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-01/cases/spike35/koblitz-m2-planted/output/koblitz-m2-planted.json"
+  ],
+  "elapsed_seconds": 0.05,
+  "returncode": 0,
+  "stderr": "",
+  "stdout": "{\"input\":\"koblitz-m2-planted\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+  "verified": true
+}

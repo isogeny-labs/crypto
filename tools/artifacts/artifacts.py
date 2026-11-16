@@ -40,7 +40,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import threading
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -104,34 +103,6 @@ def repo_root() -> Path:
     return Path(p.stdout.strip())
 
 
-_AWS_BOOT_LOCK = threading.Lock()
-_AWS_BOOT: list[list[str]] = []
-
-
-def bootstrap_aws(cfg: "Config") -> list[str] | None:
-    """On a CI runner without the aws CLI (some self-hosted images), install
-    awscli once into the store cache with `pip --target` and return the argv
-    prefix that runs it. Elsewhere, and when ARTIFACTS_AWS names a CLI, None."""
-    if cfg.aws != "aws" or os.environ.get("ARTIFACTS_AWS"):
-        return None
-    if os.environ.get("GITHUB_ACTIONS") != "true" and os.environ.get("ARTIFACTS_BOOTSTRAP_AWS") != "1":
-        return None
-    with _AWS_BOOT_LOCK:
-        if not _AWS_BOOT:
-            target = cfg.cache / "awscli-py"
-            if not (target / "awscli").is_dir():
-                print("artifacts: `aws` not found; installing awscli into the store cache", file=sys.stderr)
-                p = subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
-                                    "--target", str(target), "awscli"], capture_output=True, text=True)
-                if p.returncode != 0:
-                    print(p.stderr[-2000:], file=sys.stderr)
-                    return None
-            code = (f"import sys; sys.path.insert(0, {str(target)!r}); "
-                    "from awscli.clidriver import main; sys.exit(main())")
-            _AWS_BOOT.append([sys.executable, "-c", code])
-        return _AWS_BOOT[0]
-
-
 @dataclass
 class Config:
     root: Path
@@ -192,13 +163,32 @@ def belongs_in_store(path: str, size: int, policy: dict) -> bool:
 # Manifests and the managed .gitignore block
 
 
+def staged_content(root: Path, relative: str, *, missing_ok: bool = False, output=None) -> bytes | None:
+    """Apply required filters, streaming payloads to output when supplied."""
+    spec = f":{relative}"
+    result = subprocess.run(["git", "-C", str(root), "cat-file", "--filters",
+                             f"--path={relative}", spec],
+                            stdout=subprocess.PIPE if output is None else output,
+                            stderr=subprocess.PIPE)
+    if result.returncode:
+        if missing_ok and "\n" not in spec:
+            request = spec.encode("utf-8", "surrogateescape")
+            probe = subprocess.run(["git", "-C", str(root), "cat-file", "--batch-check"],
+                                   input=request + b"\n", capture_output=True)
+            if (probe.returncode == 0 and not probe.stderr
+                    and probe.stdout == request + b" missing\n"):
+                return None
+        result.check_returncode()
+    return result.stdout
+
+
 def read_text_or_index(p: Path) -> str | None:
-    """A file's text, or its staged copy when a sparse checkout left it off disk."""
+    """A file's text, or filtered staged bytes when sparse checkout omitted it."""
     if p.exists():
         return p.read_text()
-    r = subprocess.run(["git", "-C", str(p.parent if p.parent.exists() else repo_root()), "show",
-                        f":{rel(repo_root(), p)}"], capture_output=True, text=True)
-    return r.stdout if r.returncode == 0 else None
+    root = repo_root()
+    data = staged_content(root, rel(root, p), missing_ok=True)
+    return None if data is None else data.decode("utf-8")
 
 
 def read_manifest(d: Path) -> dict[str, dict]:
@@ -349,10 +339,7 @@ class Remote:
         try:
             return subprocess.run(argv, capture_output=True, text=True)
         except FileNotFoundError:
-            boot = bootstrap_aws(self.cfg) if argv[0] == self.cfg.aws else None
-            if boot is None:
-                die(f"`{argv[0]}` not found; install the AWS CLI or set ARTIFACTS_AWS")
-            return subprocess.run([*boot, *argv[1:]], capture_output=True, text=True)
+            die(f"`{argv[0]}` not found; install the AWS CLI or set ARTIFACTS_AWS")
 
     def head(self, digest: str) -> int | None:
         """Size of the stored object, or None when absent."""
@@ -553,14 +540,15 @@ def cmd_push(cfg: Config, args) -> int:
         f, size = item
         path = cfg.root / f
         tmp = None
-        if not path.exists():
-            # Tracked but not on disk (a sparse checkout): read the committed blob.
-            (cfg.cache / "tmp").mkdir(parents=True, exist_ok=True)
-            fd, tmp = tempfile.mkstemp(dir=cfg.cache / "tmp")
-            with os.fdopen(fd, "wb") as out:
-                subprocess.run(["git", "-C", str(cfg.root), "cat-file", "blob", f":{f}"], stdout=out, check=True)
-            path = Path(tmp)
         try:
+            if not path.exists():
+                # The worktree path and staged path must offload the same bytes.
+                (cfg.cache / "tmp").mkdir(parents=True, exist_ok=True)
+                fd, tmp = tempfile.mkstemp(dir=cfg.cache / "tmp")
+                with os.fdopen(fd, "wb") as out:
+                    staged_content(cfg.root, f, output=out)
+                path = Path(tmp)
+            size = path.stat().st_size
             digest = sha256_file(path)
             sent = remote.put(digest, path, size)
             cache_insert(cfg, path, digest)

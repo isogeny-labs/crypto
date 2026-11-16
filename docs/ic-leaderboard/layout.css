@@ -29,6 +29,15 @@ body { padding-block: 24px 56px; }
 .organized .panel p { max-width: 100ch; }
 .organized .panel h2 { font-size: 25px; }
 .organized #board { gap: 14px; }
+.curve-search { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; }
+.curve-search label { font-family: var(--sans); font-size: 14px; font-weight: 600; }
+.curve-search input { flex: 1 1 260px; max-width: 420px; min-width: 0; padding: 9px 12px;
+  color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 5px; }
+.curve-search-count { color: var(--ink-2); font-size: 13px; }
+.curve-search-hint { flex-basis: 100%; color: var(--ink-2); font-size: 12px; }
+.curve-search-empty { flex-basis: 100%; margin: 0; }
+.curve-search-empty[hidden], .ranked-table tbody tr[hidden] { display: none; }
+.organized .ranked-table[hidden] { display: none; }
 .organized .table-context { font-size: 13px; line-height: 1.6; }
 .table-context > span { display: block; }
 .table-controls { display: flex; gap: 12px; justify-content: space-between; align-items: center;
@@ -40,6 +49,10 @@ body { padding-block: 24px 56px; }
 .organized .ranked-table td, .organized .ranked-table th { padding: 12px 16px; }
 .organized .ranked-table th { background: var(--sunk); }
 .organized .ranked-table td .slug { white-space: normal; overflow-wrap: anywhere; }
+.organized .ranked-table td:has(> .base-recipe) { min-width: 180px; }
+.base-recipe { display: block; margin-top: 5px; color: var(--ink-2); text-align: left;
+  font-size: 11px; font-weight: normal; line-height: 1.4; white-space: normal; }
+.ranked-table.all-columns .base-recipe { display: none; }
 .organized .ranked-table td:nth-child(2) { min-width: 240px; }
 .organized .ranked-table td:last-child { white-space: normal; min-width: 150px; max-width: 240px; }
 .organized .ratio { font-size: 18px; }

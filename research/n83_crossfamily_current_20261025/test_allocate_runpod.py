@@ -19,12 +19,14 @@ BUNDLE = {"source_head_sha": HEAD,
 
 class FakeProvider:
     def __init__(self, duplicate_machine=False, lose_second_response=False,
-                 wrong_gpu=False):
+                 wrong_gpu=False, profile="rtx4090", price_override=None):
         self.live = []
         self.terminated = []
         self.duplicate_machine = duplicate_machine
         self.lose_second_response = lose_second_response
         self.wrong_gpu = wrong_gpu
+        self.profile = profile
+        self.price_override = price_override
 
     def pods(self, _key):
         return list(self.live)
@@ -33,21 +35,24 @@ class FakeProvider:
         if "terminateAfter:" not in query or "stopAfter:" in query:
             raise ValueError("provider auto-termination deadline is missing")
         stratum = len(self.live)
-        name = f"n83-crossfamily-{HEAD[:12]}-s{stratum}"
+        label = "" if self.profile == "rtx4090" else f"-{self.profile}"
+        name = f"n83-crossfamily{label}-{HEAD[:12]}-s{stratum}"
         if name not in query:
             raise ValueError("unexpected Pod name")
-        if subject.GPU_TYPES[stratum] not in query:
+        gpu_types, price_cap = subject.HARDWARE_PROFILES[self.profile]
+        if gpu_types[stratum] not in query:
             raise ValueError("unexpected GPU type")
         pod = {
             "id": f"pod{stratum}", "name": name,
             "desiredStatus": "RUNNING",
-            "costPerHr": 0.34,
+            "costPerHr": (float(price_cap) if self.price_override is None else
+                          self.price_override),
             "createdAt": "2026-10-25T02:00:00Z",
             "machineId": "machine0" if self.duplicate_machine else f"machine{stratum}",
             "memoryInGb": 27, "vcpuCount": 4,
             "imageName": subject.IMAGE, "gpuCount": 1,
             "machine": {"gpuTypeId": "wrong" if self.wrong_gpu else
-                        subject.GPU_TYPES[stratum]},
+                        gpu_types[stratum]},
             "containerDiskInGb": 30, "volumeInGb": 0,
         }
         self.live.append(pod)
@@ -94,6 +99,39 @@ class AllocateTests(unittest.TestCase):
                 self.assertEqual(allocation["source_head_sha"], HEAD)
                 self.assertEqual(allocation["source_archive_sha256"],
                                  BUNDLE["source_archive_sha256"])
+
+    def test_ada2000_pair_uses_distinct_names_and_lower_cap(self):
+        provider = FakeProvider(profile="ada2000")
+        with tempfile.TemporaryDirectory() as temp, patch.object(
+                subject, "frozen_head", return_value=HEAD):
+            output = Path(temp) / "allocation"
+            result = subject.allocate(output, "fake", BUNDLE, provider.api,
+                                      provider.pods, provider.terminate,
+                                      guard=lambda _: SimpleNamespace(poll=lambda: None),
+                                      hardware_profile="ada2000")
+            self.assertEqual(result["status"], "PASS_TWO_BUDGETED_PODS")
+            plan = json.loads((output / "allocation_plan.json").read_text())
+            self.assertEqual(plan["hardware_profile"], "ada2000")
+            self.assertEqual(plan["gpu_types"], list(subject.ADA_TYPES))
+            self.assertEqual(plan["price_cap_per_hour_usd"], "0.25")
+            self.assertEqual(plan["total_reserved_cap_usd"], "3.10")
+            self.assertTrue(all("-ada2000-" in name for name in plan["names"]))
+            snapshot = json.loads((output / "provider_snapshot.json").read_text())
+            self.assertEqual(snapshot["projected_compute_and_container_disk_usd"],
+                             "3.06")
+            self.assertEqual(len({p["machine_id"] for p in snapshot["pods"]}), 2)
+
+    def test_ada2000_overpriced_pod_is_retired(self):
+        provider = FakeProvider(profile="ada2000", price_override=0.26)
+        with tempfile.TemporaryDirectory() as temp, patch.object(
+                subject, "frozen_head", return_value=HEAD):
+            with self.assertRaisesRegex(ValueError, "host or price cap"):
+                subject.allocate(Path(temp) / "allocation", "fake", BUNDLE,
+                                 provider.api, provider.pods, provider.terminate,
+                                 guard=lambda _: SimpleNamespace(poll=lambda: None),
+                                 hardware_profile="ada2000")
+            self.assertEqual(provider.terminated, ["pod0"])
+            self.assertEqual(provider.live, [])
 
     def test_unarmed_guard_prevents_paid_mutation(self):
         provider = FakeProvider()

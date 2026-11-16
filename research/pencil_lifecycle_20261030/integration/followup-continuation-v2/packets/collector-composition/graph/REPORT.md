@@ -1,0 +1,11 @@
+# Signed graph potential algebra
+
+Nine main declarations and nine controls passed with 18 separate axiom readbacks. Only propext and Quot.sound appear. Final algebra3, controls1 and readback1 all exited zero with unchanged bindings. Prior algebra1 and algebra2 failures are retained: simplification reduced the sign reflexivity goal to True; unavailable linear_combination required an explicit ring calculation; fixed-child evaluation required explicit unfolding. The first correction missed the unavailable tactic because of whitespace and algebra2 retains that failure.
+
+The source model represents a node as s*root+a+b*k. find composition is (s_p*s_q, a_p+s_p*a_q, b_p+s_p*b_q), proved equal to nested evaluation. Compression_sound substitutes the actual parent equation. Reversal preserves sign and negates signed offsets; it requires s*s=1 and is involutive under that premise.
+
+edge_reduction follows native subtraction order after resolving endpoint potentials. union_forward derives root_u=(-cu*cv)*root_v+cu*a+cu*b*k when cu*cu=1. union_backward uses reverse potential under both involutive signs and matches the source opposite-size branch's signed(-s, offset) expressions. fixed_child_transport proves native propagation of a known child anchor to parent.
+
+Source locations: three_leads.rs find1580-1596, edge1659-1712, Ring1491-1530. Source values are algebraic scalars in an arbitrary commutative ring; actual native u64, i8 and mutable array semantics are not asserted. Ring constructor primality does not itself prove no overflow for u64 addition: canonical addition needs 2r-2<2^64. Ring multiplication uses u128. Actual graph nodes still need a scalar coordinate interpretation, potentially supplied by a group homomorphism; this component does not manufacture that map.
+
+Controls over ZMod17 check negative and positive reversal, nested and compressed evaluation, both size-dependent union orientations, fixed-child propagation, an invalid sign square, and an incorrect offset sign. No scientific data were generated. Native forest shape, index bounds, recursive termination, counter headroom, same-root cycle branches and final inversion remain separate composition obligations. This is producer-checked evidence pending independent source-fidelity and proof review.

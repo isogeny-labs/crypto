@@ -140,6 +140,26 @@ enum Cmd {
         #[arg(long)]
         run: Option<String>,
     },
+    /// Check whether a walk, trait shard, or collected trait run has a completed S3 marker.
+    Exists {
+        /// s3://bucket/prefix the run was published under.
+        #[arg(long)]
+        from: String,
+        /// Run id (printed by `walk --store`, in STORE.json).
+        #[arg(long)]
+        run: String,
+        /// Check trait shard SHARD of OF instead of the walk.
+        #[arg(long)]
+        shard: Option<usize>,
+        #[arg(long)]
+        of: Option<usize>,
+        /// Check the collected traits of OF shards instead of the walk.
+        #[arg(long)]
+        collected: bool,
+        /// HEAD every referenced object and compare its size and SHA-256 with the marker.
+        #[arg(long)]
+        check_objects: bool,
+    },
     /// Download a stored walk, trait shard or collected traits, checking every hash.
     Fetch {
         /// s3://bucket/prefix the run was published under.
@@ -676,7 +696,11 @@ fn run(cli: Cli) -> Result<(), String> {
                 ]),
             ));
             let summary = V::Map(summary);
-            write(&out.join("walk.json"), &summary.json())?;
+            let summary_json = summary.json();
+            write(&out.join("walk.json"), &summary_json)?;
+            // Keep stdout machine-readable for direct callers and the crax
+            // JSON bridge; progress and publication diagnostics use stderr.
+            println!("{summary_json}");
             eprintln!(
                 "isogeny_walk: {} curves ({} expanded), {} verified edges, {} failures in {} ms; wrote {}",
                 w.nodes.len(),
@@ -1041,6 +1065,50 @@ fn run(cli: Cli) -> Result<(), String> {
             }
             Ok(())
         }
+        Cmd::Exists {
+            from,
+            run,
+            shard,
+            of,
+            collected,
+            check_objects,
+        } => {
+            let loc = S3Loc::parse(&from)?;
+            let rel = match (shard, of, collected) {
+                (Some(i), Some(n), false) => store::shard_rel(&run, i, n)?,
+                (None, Some(n), true) => store::collected_rel(&run, n)?,
+                (None, None, false) => store::walk_rel(&run)?,
+                _ => return Err("use --shard I --of N, or --collected --of N, or neither".into()),
+            };
+            let marker = loc.key(&format!("{rel}/{}", store::COMPLETE_FILE));
+            let result = store::head(&loc, &marker)?;
+            let mut report = serde_json::json!({
+                "schema": "isogeny-walk-exists/v1",
+                "marker": loc.uri(&format!("{rel}/{}", store::COMPLETE_FILE)),
+                "exists": result.is_some(),
+                "bytes": result.as_ref().map(|h| h.bytes),
+                "sha256": result.as_ref().map(|h| h.sha256.as_str()),
+            });
+            if check_objects {
+                report["object_check"] = if let Some(marker_head) = result.as_ref() {
+                    let scratch = std::env::temp_dir()
+                        .join(format!("isogeny-walk-object-check-{}", store::attempt_id()));
+                    let checked = store::check_objects(&loc, &rel, marker_head, &scratch);
+                    let _ = std::fs::remove_dir_all(&scratch);
+                    let checked = checked?;
+                    serde_json::json!({
+                        "status": if checked.missing.is_empty() && checked.mismatched.is_empty() { "pass" } else { "incomplete" },
+                        "checked": checked.checked,
+                        "missing": checked.missing,
+                        "mismatched": checked.mismatched,
+                    })
+                } else {
+                    serde_json::json!({"status": "no_marker", "checked": 0, "missing": [], "mismatched": []})
+                };
+            }
+            println!("{report}");
+            Ok(())
+        }
         Cmd::Fetch {
             from,
             run,
@@ -1056,7 +1124,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 (None, None, false) => store::walk_rel(&run)?,
                 _ => return Err("use --shard I --of N, or --collected --of N, or neither".into()),
             };
-            let sc = scratch(&out);
+            let sc = out.with_extension(format!("s3-scratch-{}", store::attempt_id()));
             let marker = store::fetch(&loc, &rel, &out, &sc);
             let _ = std::fs::remove_dir_all(&sc);
             let marker = marker?;

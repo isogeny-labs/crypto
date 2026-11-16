@@ -1,0 +1,75 @@
+{
+  "schema": "crypto.store-index-parallel-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T03:59:46.532956+00:00",
+  "source_commit": "e19302e68f38677b23608691863b0e9f379f3061",
+  "binary_sha256": {
+    "crypto": "10913120e06d367c696103fc8c801030fca96c4c65577796e6a9c114453e7254",
+    "crax": "ef3240cff338bccf7fefa2d61fc9340629c905a2e44afd281b9659d9d186749d"
+  },
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T035923Z-a24c6f94",
+  "objects": [
+    {
+      "name": "parallel/20261024T035923Z-a24c6f94/conflict.bin",
+      "sha256": "080d4a73d115c6e01be96cd7da04e27ae87b6441a049226378b47a862d3a728b",
+      "bytes": 73728,
+      "key": "ic/v1/acceptance/20261024T035923Z-a24c6f94/sha256/08/080d4a73d115c6e01be96cd7da04e27ae87b6441a049226378b47a862d3a728b"
+    },
+    {
+      "name": "parallel/20261024T035923Z-a24c6f94/item-0.bin",
+      "sha256": "0e79abb92a3266ccecc7b01ca06465ae8d37361040932bf7c2021d8a30a28e92",
+      "bytes": 73728,
+      "key": "ic/v1/acceptance/20261024T035923Z-a24c6f94/sha256/0e/0e79abb92a3266ccecc7b01ca06465ae8d37361040932bf7c2021d8a30a28e92"
+    },
+    {
+      "name": "parallel/20261024T035923Z-a24c6f94/item-1.bin",
+      "sha256": "fca2d0c4331351e109391becd19046873c0d4fe368a34925e6bf2f7b235c8238",
+      "bytes": 73728,
+      "key": "ic/v1/acceptance/20261024T035923Z-a24c6f94/sha256/fc/fca2d0c4331351e109391becd19046873c0d4fe368a34925e6bf2f7b235c8238"
+    },
+    {
+      "name": "parallel/20261024T035923Z-a24c6f94/item-2.bin",
+      "sha256": "3fd91a0606816c84b2cafb7e79aa30d2cfad4209fd7680a3f33562957c2a20a6",
+      "bytes": 73728,
+      "key": "ic/v1/acceptance/20261024T035923Z-a24c6f94/sha256/3f/3fd91a0606816c84b2cafb7e79aa30d2cfad4209fd7680a3f33562957c2a20a6"
+    },
+    {
+      "name": "parallel/20261024T035923Z-a24c6f94/item-3.bin",
+      "sha256": "a12c087738c7d1513730f2050106861ecb2bb4663d0720043dabaa4f07b8941d",
+      "bytes": 73728,
+      "key": "ic/v1/acceptance/20261024T035923Z-a24c6f94/sha256/a1/a12c087738c7d1513730f2050106861ecb2bb4663d0720043dabaa4f07b8941d"
+    }
+  ],
+  "checks": {
+    "parallel_distinct_name_pushes": 4,
+    "index_names_after_parallel_pushes": 4,
+    "parallel_same_name_exit_codes": [
+      0,
+      1
+    ],
+    "index_names_after_conflict": 5,
+    "same_name_loser_reported_conflict": true,
+    "remote_download_checked": 5,
+    "remote_download_problems": 0,
+    "remote_statuses": [
+      "bytes_ok",
+      "bytes_ok",
+      "bytes_ok",
+      "bytes_ok",
+      "bytes_ok"
+    ],
+    "crax_bridge_remote_checked": 5,
+    "fresh_cache_pull_sha256_equal": true,
+    "listed_objects_before_cleanup": 5,
+    "objects_deleted": 5,
+    "prefix_empty_after_cleanup": true,
+    "cleanup_errors": []
+  },
+  "limitations": {
+    "shared_local_index_path_required": true,
+    "separate_git_checkouts_not_reconciled": true,
+    "object_count_small": 5
+  }
+}

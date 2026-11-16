@@ -1,0 +1,17 @@
+curves joined: 50; family 12; Bonferroni alpha 4.17e-3
+outcome                        covariate      slope/mean      ci_lo      ci_hi         p  decision
+rho_ops_over_sqrt_n            z_691            +0.00635   -0.00650   +0.01919  3.252e-1      null
+rho_ops_over_sqrt_n            z_5000           +0.00927   -0.00461   +0.02315  1.854e-1      null
+rho_ops_over_sqrt_n            z_50000          +0.00392   -0.00995   +0.01780  5.721e-1      null
+rho_ops_over_sqrt_n            logL1_200000     -0.01415   -0.02741   -0.00090  3.690e-2      null
+rho_ops_over_sqrt_n            psi3_roots       -0.01251   -0.02592   +0.00090  6.676e-2      null
+rho_ops_over_sqrt_n            psi5_roots       +0.01258   -0.00092   +0.02607  6.707e-2      null
+m2_coverage_over_2N2_over_n    z_691            -0.00060   -0.00138   +0.00018  1.276e-1      null
+m2_coverage_over_2N2_over_n    z_5000           +0.00016   -0.00071   +0.00103  7.114e-1      null
+m2_coverage_over_2N2_over_n    z_50000          -0.00004   -0.00089   +0.00082  9.323e-1      null
+m2_coverage_over_2N2_over_n    logL1_200000     -0.00044   -0.00128   +0.00041  3.010e-1      null
+m2_coverage_over_2N2_over_n    psi3_roots       -0.00047   -0.00131   +0.00038  2.698e-1      null
+m2_coverage_over_2N2_over_n    psi5_roots       +0.00051   -0.00034   +0.00136  2.339e-1      null
+planted +2.0% on rho_ops_over_sqrt_n: recovered +0.0263 [+0.0135,+0.0392] p=1.49e-4 detected=true analytic power 0.605; MDE(80%) = 0.0237
+planted +2.0% on m2_coverage_over_2N2_over_n: recovered +0.0194 [+0.0186,+0.0202] p=1.85e-42 detected=true analytic power 1.000; MDE(80%) = 0.0014
+A/A: r(A,B)=-0.1780 [-0.4348,+0.1056]; slope B on A -0.0115 (per SD of A, frac of mean) p=0.259; mean B-A +8.790e-4 (t=+0.04); var ratios A 0.981 B 0.811

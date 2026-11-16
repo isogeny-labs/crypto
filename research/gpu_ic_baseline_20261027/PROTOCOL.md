@@ -36,6 +36,27 @@ and is **not** done by this document:
 
 Until 1 to 5 hold, `task_card.py lint` cannot pass and the card is not written.
 
+## 2a. Amendment 1 (owner, 2026-11-07): run on Modal, EKS GPU pool drafted for review
+
+The owner asked for both: draft the EKS GPU pool and also use Modal. Frozen before any run.
+
+- **Modal route.** `gpu/modal/modal_ic_job.py` runs `gpu/modal/ic_baseline_job.sh` on one Modal
+  RTX PRO 6000 (sm_120) in `nvidia/cuda:13.3.1-devel-ubuntu24.04`, the SKU and image the ecc2k130
+  work uses. Stage order is this protocol's gate order: host facts, host tests in the container,
+  builds, device selftests, ptxas and occupancy, then throughput only if every selftest passed.
+- **EKS pool.** A draft is in `taskq/deploy/eks-karpenter/gpu-draft/`. It is not applied. It does not
+  replace the Modal route here and is not a precondition for it.
+- **Admission on Modal differs from the CPU lab and is weaker.** Modal gives no exclusive-host
+  guarantee, no clock lock and no per-execution L2 attestation. Compensation: SM clock, power and
+  temperature sampled every 500 ms to `clocks.csv`; a round whose SM clock median is under 90% of
+  max is invalid and reported, not dropped; an A/A arm (a second build of the same source,
+  `semaev-l<first>-clmad-AA`) gives the noise floor. A result from this route is class
+  **engineering stage diagnostic, Modal-attested**, and cannot reach the leaderboard.
+- **Run sizes.** semaev `l` in {12, 14, 16} (the `l` = 17, 18 rungs wait for the selftest and
+  throughput numbers at 16), 5 interleaved rounds, order from sha256(token, round).
+- **Spend.** One GPU, 2 h function timeout, expected under 30 min. The run launches once. A failed
+  launch is diagnosed, not retried in a loop.
+
 ## 3. Arms (one build per arm, same commit, same host, interleaved)
 
 | id | binary | purpose |

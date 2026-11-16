@@ -1,0 +1,57 @@
+from pathlib import Path
+import json,hashlib,datetime,textwrap,html,subprocess
+D=Path(__file__).parent;root=Path('/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2');h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+packets=[('mixed-cancellation','/var/tmp/pencil-mixed-cancellation-20261031-v1','report.pdf'),('mixed-cancellation-review','/var/tmp/pencil-mixed-cancellation-independent-review-20261031','report.pdf'),('mixed-generic','/var/tmp/pencil-mixed-generic-20261031-v1','report.pdf'),('mixed-generic-review','/var/tmp/pencil-mixed-generic-independent-review-20261031','report.pdf'),('mixed-generic-word','/var/tmp/pencil-mixed-generic-word-20261031-v1','report.pdf'),('mixed-generic-word-review','/var/tmp/pencil-mixed-generic-word-independent-review-20261031','report.pdf'),('retained-duplicate-executed','/var/tmp/pencil-kummer-retained-duplicate-frozen-v2-20261031','results/report.pdf'),('retained420-independent-review','/var/tmp/pencil-retained420-independent-review-20261031-v1','review.pdf')]
+bindings=[]
+for label,pth,pdf in packets:
+ p=Path(pth)
+ for name in ['results/manifest.json' if label=='retained-duplicate-executed' else 'manifest.json',pdf]:
+  bindings.append({'label':label,'source_path':str(p/name),'link':'../packets/'+label+'/'+name,'sha256':h(p/name)})
+for link,source in [('../report-branch-completion/index.json',root/'report-branch-completion/index.json'),('../report-complete/index.json',root/'report-complete/index.json'),('../../four-lead-inventory/README.md',root.parent/'four-lead-inventory/README.md'),('../../five-followups/README.md',root.parent/'five-followups/README.md'),('../preflight-review/boxed-request-software-checks/maintained-clippy/receipt.json',root/'preflight-review/boxed-request-software-checks/maintained-clippy/receipt.json')]:
+ bindings.append({'label':'scope_or_software','source_path':str(source),'link':link,'sha256':h(source)})
+components=[{'id':'mixed-cancellation-field','result':'Input validity implies ordinate +/- alternatives, excludes mismatch branch; cancellation output has nonzero weights and normalized validity.','premises':'Field; shared support; both normalized input divisibilities; four nonzero weights. Repeated root/zero ordinate allowed.','evidence_labels':['mixed-cancellation','mixed-cancellation-review']},{'id':'mixed-cancellation-word','result':'Exact prelude/degree-one output decode and canonicality; guards agree; conditional word cancellation validity.','premises':'Prime 5<=p<2^31; 10 canonical coordinates; four nonzero weights; both normalized input validities.','evidence_labels':['mixed-cancellation','mixed-cancellation-review']},{'id':'mixed-generic-field','result':'Interpolation and explicit degree-two residual establish nonzero output weights and normalized validity under generic K!=0.','premises':'Field; monic quintic without X4; four nonzero weights; both input validities; K!=0.','evidence_labels':['mixed-generic','mixed-generic-review']},{'id':'mixed-generic-word','result':'Six canonical decoded payloads; zero guard and Option correspondence; outer/generic K equality; conditional output validity.','premises':'Prime 5<=p<2^31; 10 canonical coordinates plus curve[3]; validity adds nonzero weights, input validity and K!=0.','evidence_labels':['mixed-generic-word','mixed-generic-word-review']},{'id':'retained-duplicate-archive','result':'420 ordered archival cases:218 ineligible,174 first,28 redundant,0 informative;60 once-per-target setup entries agree.','premises':'60 selected p739 targets from180 records;7 designed cases each; original labels/targets/seeds; one admitted native attempt.','evidence_labels':['retained-duplicate-executed','retained420-independent-review']}]
+for c in components:c.update(independent_review='completed_at_stated_scope',cost_ratio=None,natural_yield=None,ranking=None)
+index={'schema':'research.component-overview/v1','captured_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'link_base':'followup-continuation-v2/report-mixed-archival','components':components,'evidence_bindings':bindings,'archival_counts':{'selected_targets':60,'cases':420,'ineligible':218,'first':174,'redundant':28,'informative':0,'graph_edges':174,'cycles':0,'terminal_answers':0,'duplicate_pattern':{'case':6,'first_case':3,'normalized_delta':[0,0],'count':28},'once_per_target_ledger_entries':60},'software_snapshot':{'maintained_boxed_clippy':{'exit_code':0,'sources_unchanged':True},'typed_retained':'pending root terminal review','full_lib':'pending root terminal review','cli':'pending root terminal review','canonical_integration':'pending final root configuration'},'preserved_scope':{'previous_overview':'../report-branch-completion/index.json','original_four_and_five_lead_completion_criteria':'unchanged; referenced inventories remain authoritative','full_target_cohort':1260,'separate_upper_gate_slots':18,'new_full_cohort_completed':False},'new_cost_ratio':None,'timing_ratio':None,'ranking':None}
+(D/'index.json').write_text(json.dumps(index,indent=2)+'\n')
+md='# Mixed addition and archival duplicate overview\n\n'
+for c in components:md+='## '+c['id']+'\n\n'+c['result']+'\n\nPremises: '+c['premises']+'\n\n'
+md+='Evidence links and full SHA256 bindings:\n\n'
+for b in bindings:md+='- ['+b['label']+' / '+Path(b['source_path']).name+']('+b['link']+') — `'+b['sha256']+'`\n'
+md+='\nAll cost ratios, natural-yield estimates and rankings are null. Earlier overview snapshots and full1260/separate18slot completion criteria are preserved. Boxed maintained Clippy exited0 with sources unchanged; typed/full/CLI and canonical integration remain pending in this snapshot.\n';(D/'INDEX.md').write_text(md)
+def page(title,sections,number):
+ y=36;body=[]
+ def line(t,size=13,fill='#1b3046'):
+  nonlocal y
+  body.append(f'<text x="34" y="{y}" font-family="DejaVu Sans" font-size="{size}" fill="{fill}">{html.escape(t)}</text>');y+=19
+ line(title,20);y+=12
+ for title,text in sections:
+  line(title,15);y+=3
+  for para in text.split('\n'):
+   for l in textwrap.wrap(para,101):line(l)
+   y+=6
+  y+=8
+ body.append(f'<text x="34" y="1090" font-family="DejaVu Sans" font-size="11">Component overview / page {number} / detailed provenance: index.json</text>')
+ assert y<1080,y
+ svg=f'<svg xmlns="http://www.w3.org/2000/svg" width="820" height="1120"><rect width="100%" height="100%" fill="white"/>'+''.join(body)+'</svg>'
+ dest=D/f'page-{number}.svg';dest.write_text(svg);subprocess.run(['rsvg-convert','-f','pdf','-o',str(D/f'page-{number}.pdf'),str(dest)],check=True)
+page('Reviewed mixed-degree addition components',[
+('Cancellation: field and word',components[0]['result']+' '+components[0]['premises']+'\n'+components[1]['result']+' '+components[1]['premises']),
+('Generic branch: field',components[2]['result']+' '+components[2]['premises']+' Repeated output support and zero interpolation slope are allowed. This establishes polynomial divisibility, not a divisor-class sum.'),
+('Generic branch: literal UInt64',components[3]['result']+' '+components[3]['premises']+' The actual generic formula uses explicit squares; no pow loop. Literal output w=1 is canonical. The other curve coefficients enter the validity statement as field values.'),
+('What the reviews checked','Separate module, control and axiom readbacks passed. Cancellation review covers both field and word modules; generic field and generic word have separate reviews. Only standard Lean axioms were read back. Original failed attempts and control corrections remain in their packets.'),
+('Source assumptions and remaining branches','Machine scope is Field n=1, tables=None and normal counter execution. Pure value bundles may define unused outputs beyond an early-return guard; no operation-count or side-effect equivalence is asserted. No compiler/linkage, class-sum, tripling, secondary positive-coincidence output or whole-walk theorem is claimed. Polynomial controls do not assert smooth curve preprocessing.'),
+('Publication and software snapshot','Canonical integration is pending final root configuration. Boxed maintained Clippy: exit0, sources unchanged. Typed retained-data tests, full library and CLI checks remain pending root terminal review in this snapshot. These software gates are separate from mathematical component review.')],1)
+page('Executed archival audit: fixed 420-case results',[
+('Coverage and dispositions','420 / 420 source identities in exact order; 60 targets, 7 cases each, selected by p=739 from a 180-record archive. Recomputed: 218 collector-ineligible; 202 eligible = 174 first occurrences + 28 redundant duplicates; 0 informative candidates. Native exit0. No missing, failed or post-terminal disposition.'),
+('The preserved pattern','All 28 duplicates are case6 versus case3 within the same target: designed -(G+Q) versus G+Q. Their canonically signed coefficient difference is (0,0). Across all60 targets the original case6 labels and divisors negate case3. Graph forwarding:174 edges,28 suppressions,0 cycles,0 terminal answers. These are coordinate-validation fixtures, not sampled collector paths.'),
+('Setup accounting: aggregate each target once','All60 ledger entries agree across their seven row copies.\nSetup checks:3904 Jacobian operations;438198 M;8436 S;14252 I;760038 field additions.\nConstructor:2640 Jacobian operations;299213 M;5631 S;9823 I;519770 field additions.\nReference, eligibility, adapter and graph phases remain separate; scalar and field counters are not conflated.'),
+('Independent review and exclusions','Reviewer independently recomputed coverage, split-root eligibility, signed normalization, duplicate classifications and the once-per-target ledger. Frozen source/control hashes matched. No native rerun: admission permitted one attempt. Native label checks verify D=aG+bQ and Q=kG against public known answers; controls include deliberately planted informative labels.\nHashing, comparisons, memory, primality arithmetic, dense reference arithmetic, internal expansion and complete runtime work are not fully priced. No comparative clock, natural-yield estimate, cost ratio or ranking is reported.'),
+('Scope retained','The original four-lead and five-followup criteria remain unchanged, including the full1,260-target requirement and separate18-slot upper gate. This snapshot adds component evidence and an archival correctness audit; previous aggregate snapshots are preserved. index.json binds exact producer and independent-review paths and hashes.')],2)
+subprocess.run(['pdfunite',str(D/'page-1.pdf'),str(D/'page-2.pdf'),str(D/'report.pdf')],check=True)
+# Editable count diagram; exact fixed archive only.
+svg='<svg xmlns="http://www.w3.org/2000/svg" width="820" height="340"><rect width="100%" height="100%" fill="white"/><g font-family="DejaVu Sans" fill="#1b3046"><text x="30" y="35" font-size="21">Fixed archive: 420 cases / 60 targets</text>'
+y=70
+for label,n,col in [('Collector-ineligible',218,'#8f9faf'),('First occurrence',174,'#497b96'),('Redundant duplicate',28,'#bd9451'),('Informative',0,'#a3b8a8')]:
+ svg+=f'<text x="30" y="{y+20}" font-size="15">{label}: {n}</text><rect x="240" y="{y}" width="{n*2}" height="30" fill="{col}"/>';y+=48
+svg+='<text x="30" y="295" font-size="14">All28 duplicates: case6 → case3; normalized delta=(0,0).</text><text x="30" y="320" font-size="14">Designed retained fixtures; no natural-yield or performance inference.</text></g></svg>'
+(D/'counts.svg').write_text(svg)

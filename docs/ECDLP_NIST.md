@@ -75,7 +75,7 @@ class-number-one discriminants `D ∈ {−11, −19, −43, −67, −163}` (tho
 ## Commands
 
 ```text
-ecdlp-nist list                                   # audit table of the fifteen curves
+ecdlp-nist list                                   # audit table of 15 NIST and 9 Certicom entries
 ecdlp-nist audit K-233 [--json]                   # one curve, every check
 ecdlp-nist solve P-256 --secret 0x1234567 --interval-bits 32
 ecdlp-nist solve B-571 --random-bits 24 --method kangaroo --threads 4
@@ -90,6 +90,48 @@ ecdlp-nist bench P-521                                       # additions per sec
 whole-group rho whose expected cost exceeds `2^40` additions is refused;
 `--force --max-iterations N` runs it to the budget and reports the budget
 exhausted.  Exit status is non-zero when no scalar was found.
+
+For curves with a large subgroup, `--random-bits b` supplies an interval of width
+`min(2^b, n - lo)` when no explicit interval width is given; the same is true
+when BSGS or kangaroo is requested explicitly. This makes the B-571 command
+above a bounded kangaroo solve. A small-order curve under automatic method
+selection keeps its whole-group branch unless an interval is requested.
+`--interval-lo` must have an explicit width or `--random-bits`. An explicit
+width must be positive and fit within `[lo,n)`; planted scalars must be below
+`n` and inside any declared interval. Random targets are sampled directly
+from the bounded range, without reduction modulo `n`. Invalid bounds exit
+with an error before target construction. A checked P-256 seeded solve, the
+same target supplied externally, and a bounded B-571 kangaroo solve are
+recorded in
+[`ecdlp_nist_interval_cli_20261022.json`](ic/fixtures/ecdlp_nist_interval_cli_20261022.json).
+The JSON `list`, `audit`, and `solve` commands include the exact field and equation:
+prime curves give `p`, `a`, and `b` in hex; binary curves give the field
+degree, irreducible-polynomial low terms, and `a` and `b` in hex. The output
+also retains the generator, subgroup order, cofactor, and full group order,
+so a target receipt can identify its concrete curve model.
+
+An external target can be supplied as a checked JSON artifact, including a
+`store:` reference that fetches missing bytes from the configured remote:
+
+```sh
+ecdlp-nist solve P-256 \
+  --point-file docs/ic/fixtures/ecdlp_nist_p256_target_20261022.json \
+  --interval-lo 32 --interval-bits 8 --json
+ecdlp-nist solve P-256 \
+  --point-file store:ecdlp-targets/public-p256/scalar38.json \
+  --interval-lo 32 --interval-bits 8 --json
+```
+
+The file is limited to 1 MiB. It may be a v1 envelope with `schema_version`,
+`curve`, and `target`, or a previous `ecdlp-nist solve --json` report. The
+`curve` object must exactly match the selected catalog curve's field,
+equation, generator, order, and cofactor; the target coordinates must be on
+that curve and in its subgroup. The solver includes the artifact's SHA-256
+and input reference in its result. The public P-256 artifact above identifies
+the same scalar-38 point used in the interval acceptance receipt. It passed
+live Setec S3 upload, HEAD, remote download verification, fresh-cache solve,
+byte comparison, pull, and exact-object cleanup; see
+[`ECDLP_TARGET_S3_ACCEPTANCE_20261022.json`](store/ECDLP_TARGET_S3_ACCEPTANCE_20261022.json).
 
 ## Measurements (this container, release build)
 

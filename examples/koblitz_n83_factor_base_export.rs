@@ -1298,6 +1298,39 @@ fn main() -> Result<()> {
                 &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-m4-l0-ordered-xcnf")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-l0-ordered-xcnf positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound ordered-first-pair D18 XCNF export only; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_ordered_xcnf_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-ordered-xcnf-fixture")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-l0-ordered-xcnf-fixture BASE_DIR FIXTURE_DIR FIXTURE NEW_OUTPUT_JSON (source-bound D18 public-fixture XCNF export only; 300-s internal cap)".into()); }
+            let fixture: u64=args[4].parse()?;
+            let receipt=primary_adapter::full_d18_m4_l0_ordered_xcnf_fixture_cli(
+                Path::new(&args[2]),Path::new(&args[3]),fixture,Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
+        Some("primary-k2048-m5-xcnf")=>{
+            if args.len()!=5 { return Err("primary-k2048-m5-xcnf positive|positive-unpinned|natural|positive-sorted-pinned|positive-sorted-unpinned|natural-sorted BASE_DIR NEW_OUTPUT_JSON (source-bound K2048 five-summand XCNF export only)".into()); }
+            let receipt=primary_adapter::k2048_m5_xcnf_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-k2048-m5-xcnf-fixture")=>{
+            if args.len()!=5 { return Err("primary-k2048-m5-xcnf-fixture BASE_DIR FIXTURE NEW_OUTPUT_JSON (source-bound K2048 public-fixture XCNF export only)".into()); }
+            let fixture: u64=args[3].parse()?;
+            let receipt=primary_adapter::k2048_m5_xcnf_fixture_cli(
+                Path::new(&args[2]),fixture,Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-k600-m6-xcnf")=>{
+            if args.len()!=5 { return Err("primary-k600-m6-xcnf positive-pinned|positive-unpinned|natural BASE_DIR NEW_OUTPUT_JSON (source-bound K600 full-base six-summand XCNF export only)".into()); }
+            let receipt=primary_adapter::k600_m6_xcnf_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4-l0-xcnf-witness")=>{
             if args.len()!=5 { return Err("primary-full-d18-m4-l0-xcnf-witness BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound constructed XCNF and native assignment; 300-s internal cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_l0_xcnf_witness_cli(
@@ -1421,7 +1454,7 @@ fn main() -> Result<()> {
             )?;
             println!("{summary}");
         },
-        Some("primary-chain-cold") | Some("primary-orbit-chain-cold") | Some("primary-ordered-orbit-chain-cold")=>{
+        Some("primary-chain-cold") | Some("primary-chain-cold-karatsuba") | Some("primary-chain-cold-shallow-karatsuba") | Some("primary-orbit-chain-cold") | Some("primary-orbit-chain-cold-shallow-karatsuba") | Some("primary-ordered-orbit-chain-cold") | Some("primary-ordered-orbit-chain-cold-shallow-karatsuba")=>{
             if args.len()!=16 { return Err("primary-[ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (requires verified hard cgroup memory and external wall caps)".into()); }
             let summary=primary_adapter::run_chain_cli(
                 Path::new(&args[2]),Path::new(&args[3]),args[4].parse()?,&args[5],args[6].parse()?,
@@ -1429,7 +1462,10 @@ fn main() -> Result<()> {
                     max_variables:args[9].parse()?, max_domain_clauses:args[10].parse()?,
                     max_models:args[11].parse()?, conflict_budget:args[12].parse()?,
                 },args[13].parse()?,args[14].parse()?,Path::new(&args[15]),
-                args[1]!="primary-chain-cold",args[1]=="primary-ordered-orbit-chain-cold",
+                args[1]=="primary-orbit-chain-cold" || args[1]=="primary-ordered-orbit-chain-cold" || args[1]=="primary-orbit-chain-cold-shallow-karatsuba" || args[1]=="primary-ordered-orbit-chain-cold-shallow-karatsuba",
+                args[1]=="primary-ordered-orbit-chain-cold" || args[1]=="primary-ordered-orbit-chain-cold-shallow-karatsuba",
+                args[1]=="primary-chain-cold-karatsuba",
+                args[1]=="primary-chain-cold-shallow-karatsuba" || args[1]=="primary-orbit-chain-cold-shallow-karatsuba" || args[1]=="primary-ordered-orbit-chain-cold-shallow-karatsuba",
             )?;
             println!("{summary}");
         },

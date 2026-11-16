@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="640" viewBox="0 0 980 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#222"/></marker>
+    <marker id="d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a2be2"/></marker>
+  </defs>
+  <rect width="980" height="640" fill="#ffffff"/>
+  <text x="490" y="34" text-anchor="middle" font-size="19" font-weight="bold">Reduction sequence for a lift E~/Z_p of ordinary E/F_p (p &gt; 2, good reduction)</text>
+  <text x="490" y="56" text-anchor="middle" font-size="13" fill="#444">Derived in C1 (torsion copy of E(F_p) in every lift). Maps shown with what they do to torsion.</text>
+
+  <rect x="20" y="112" width="50" height="44" rx="6" fill="#f2f2f2" stroke="#333"/>
+  <text x="45" y="139" text-anchor="middle" font-size="15">0</text>
+  <rect x="130" y="100" width="260" height="68" rx="6" fill="#e8f0fb" stroke="#1f4e9a" stroke-width="1.5"/>
+  <text x="260" y="126" text-anchor="middle" font-size="15">E~_1(Z_p)  formal group</text>
+  <text x="260" y="148" text-anchor="middle" font-size="12">kernel of reduction, ~= Z_p, torsion-free</text>
+  <rect x="470" y="100" width="260" height="68" rx="6" fill="#e8f0fb" stroke="#1f4e9a" stroke-width="1.5"/>
+  <text x="600" y="126" text-anchor="middle" font-size="15">E~(Z_p)</text>
+  <text x="600" y="148" text-anchor="middle" font-size="12">torsion ~= E(F_p) when p not dividing N</text>
+  <rect x="800" y="112" width="110" height="44" rx="6" fill="#e8f0fb" stroke="#1f4e9a" stroke-width="1.5"/>
+  <text x="855" y="139" text-anchor="middle" font-size="15">E(F_p)</text>
+  <text x="940" y="139" text-anchor="middle" font-size="15">0</text>
+
+  <g stroke="#222" stroke-width="1.6" fill="none" marker-end="url(#a)">
+    <line x1="72" y1="134" x2="126" y2="134"/>
+    <line x1="392" y1="134" x2="466" y2="134"/>
+    <line x1="732" y1="134" x2="796" y2="134"/>
+    <line x1="912" y1="134" x2="936" y2="134" stroke-width="0"/>
+  </g>
+  <g font-size="12" fill="#222" text-anchor="middle">
+    <text x="99" y="126">incl.</text>
+    <text x="429" y="126">iota</text>
+    <text x="764" y="104">pi</text>
+    <text x="764" y="184" font-size="11" fill="#444">onto (Hensel)</text>
+  </g>
+
+  <path d="M 855,162 C 840,230 700,230 650,172" fill="none" stroke="#8a2be2" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#d)"/>
+  <rect x="520" y="236" width="440" height="66" rx="6" fill="#f5eefc" stroke="#8a2be2"/>
+  <text x="740" y="257" text-anchor="middle" font-size="13" fill="#4b1d7a">section s: E(F_p) to E~(Z_p), pi o s = id</text>
+  <text x="740" y="276" text-anchor="middle" font-size="12" fill="#4b1d7a">unique if it exists (Hom(finite, Z_p) = 0)</text>
+  <text x="740" y="294" text-anchor="middle" font-size="12" fill="#4b1d7a">exists for every lift when p does not divide N</text>
+
+  <rect x="30" y="236" width="460" height="92" rx="6" fill="#fafafa" stroke="#999"/>
+  <text x="44" y="258" font-size="13" font-weight="bold">Why it splits when p does not divide N</text>
+  <text x="44" y="278" font-size="12">N is a unit in Z_p, so multiplication by N is an isomorphism;</text>
+  <text x="44" y="296" font-size="12">Ext^1(A, Z_p) is killed by |A| = N for finite A, hence zero.</text>
+  <text x="44" y="314" font-size="12">Torsion of E~(Z_p) maps onto the prime-to-p part of E(F_p).</text>
+
+  <text x="30" y="368" font-size="16" font-weight="bold">Which maps kill the torsion section s(E(F_p))</text>
+  <rect x="30" y="380" width="920" height="232" fill="#ffffff" stroke="#999"/>
+  <line x1="30" y1="410" x2="950" y2="410" stroke="#999"/>
+  <line x1="330" y1="380" x2="330" y2="612" stroke="#999"/>
+  <line x1="640" y1="380" x2="640" y2="612" stroke="#999"/>
+  <text x="40" y="402" font-size="13" font-weight="bold">Map (domain to target)</text>
+  <text x="340" y="402" font-size="13" font-weight="bold">Effect on torsion s(E(F_p))</text>
+  <text x="650" y="402" font-size="13" font-weight="bold">Status in the argument</text>
+  <g font-size="12">
+    <text x="40" y="434">formal log: E~_1(Z_p) to Q_p</text>
+    <text x="340" y="434">no torsion in E~_1, nothing to kill</text>
+    <text x="650" y="434">iso on E~_1 for p &gt; 2, not defined on torsion</text>
+    <text x="40" y="468">any hom E~(Z_p) to (Q_p, +)</text>
+    <text x="340" y="468">kills all of it (Q_p torsion-free)</text>
+    <text x="650" y="468">p-adic height, additive Coleman: zero on torsion</text>
+    <text x="40" y="502">X to log(N X~)/N (Smart-type)</text>
+    <text x="340" y="502">kills all of it: N s(Q) = O, so log = 0</text>
+    <text x="650" y="502">computable p-adic functional; zero on section</text>
+    <text x="40" y="536">Smart map at N = p (anomalous)</text>
+    <text x="340" y="536">no section; E(F_p) = Z/p, Z_p to Z_p to Z/p</text>
+    <text x="650" y="536">anomalous boundary case; not the only non-split case</text>
+    <text x="40" y="570">complex route: CM lift, K(E~[N])/K</text>
+    <text x="340" y="570">torsion field degree between N and about N^2</text>
+    <text x="650" y="570">needs a field of degree ~N, not free</text>
+    <text x="40" y="600">non-split when p divides N</text>
+    <text x="340" y="600">lift-dependent; not settled here</text>
+    <text x="650" y="600">"N = p is the only case" is wrong</text>
+  </g>
+</svg>

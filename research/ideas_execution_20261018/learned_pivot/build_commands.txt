@@ -1,0 +1,9 @@
+# From /workspace/crypto; full launch/reduction/fit argv are in run.sh and per-case .command.txt files.
+bash research/ideas_execution_20261018/learned_pivot/run.sh
+# The following aggregate calculation reads retained native result JSON only.
+g++ -O2 -std=c++17 -Wall -Wextra -Wpedantic research/ideas_execution_20261018/learned_pivot/src/summarize.cpp -o research/ideas_execution_20261018/learned_pivot/runs/frozen-v1/summarize
+research/ideas_execution_20261018/learned_pivot/runs/frozen-v1/summarize > research/ideas_execution_20261018/learned_pivot/summary.json
+# Rendering only; the first invocation reported an unwritable matplotlib config cache and used /tmp.
+python3 research/ideas_execution_20261018/learned_pivot/render_report.py
+# Preserve and verify original decompressed digests while compressing raw evidence.
+bash research/ideas_execution_20261018/learned_pivot/compress_evidence.sh

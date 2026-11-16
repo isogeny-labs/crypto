@@ -1,0 +1,175 @@
+{
+  "schema": "pencil-readonly-checkpoint-custody/v1",
+  "observed_utc": "2026-10-30T06:48:37Z",
+  "run_name": "pencil-p186379-20261030-c1",
+  "request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+  "generation": 9,
+  "archive": {
+    "archive_bytes": 183316480,
+    "archive_key": "recovery/runs/pencil-p186379-20261030-c1/generations/g9/checkpoint.tar",
+    "archive_sha256": "8f56e030d9489367073005097a89c49152d49030d506e2bc64edc66a01fd5384",
+    "archive_version": "04RcRDoAFvrYjkMK.u.6uEnkk8E07Cd0",
+    "committed_unix_seconds": 1793342786,
+    "encrypted": true,
+    "manifest_sha256": "b79d016f56d475c2fc12e416bb2309ca2d40419801729319baa5cba4af708d20",
+    "number": 9,
+    "readback_verified": true,
+    "request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+    "snapshot_id": "snap-09636fabb582decab",
+    "snapshot_name": "pencil-p186379-20261030-c1-g9",
+    "snapshot_ready": true,
+    "source_instance": "i-04d58c2b309fb6549",
+    "source_pod_uid": "3a7ab215-49d1-4982-8c78-5a0c71646842"
+  },
+  "bucket": "isolab-results-104186811093-us-east-2",
+  "private_directory": "/home/ec2-user/pencil-p186379-20261030-c1-private/g9",
+  "state": {
+    "path": "/home/ec2-user/pencil-p186379-20261030-c1-receipts/g9-observed-state.json",
+    "sha256": "cfa9916b910dbe3fe42105437a6fec77852f2591ed7fcbcae2d1988424950788"
+  },
+  "archive_size_verified": true,
+  "archive_sha256_verified": true,
+  "manifest_sha256_verified": true,
+  "selected_members_verified": [
+    {
+      "member": "compute/session/records.jsonl",
+      "sha256": "bdaed8329657b05bb7fa45140b4eb883c584e5fa8e7be88e158c0bbaf5baa451",
+      "bytes": 35778,
+      "expected": [
+        "bdaed8329657b05bb7fa45140b4eb883c584e5fa8e7be88e158c0bbaf5baa451",
+        35778
+      ],
+      "verified": true
+    },
+    {
+      "member": "compute/session/session.json",
+      "sha256": "e35272db888368e9c45f140a76b5bc9310e3da83966c8161ae814e86985b5518",
+      "bytes": 1764,
+      "expected": [
+        "e35272db888368e9c45f140a76b5bc9310e3da83966c8161ae814e86985b5518",
+        1764
+      ],
+      "verified": true
+    },
+    {
+      "member": "compute/session/spec.json",
+      "sha256": "8de495385bbfcfbe34366d7e2a97403914434f52e0410558a354e1b933a5c6d2",
+      "bytes": 1707,
+      "expected": [
+        "8de495385bbfcfbe34366d7e2a97403914434f52e0410558a354e1b933a5c6d2",
+        1707
+      ],
+      "verified": true
+    }
+  ],
+  "observation_summary": {
+    "observed_rows": 4,
+    "warmups": 3,
+    "measured": 1,
+    "by_status": [
+      {
+        "status": "timeout",
+        "count": 1
+      },
+      {
+        "status": "verified",
+        "count": 3
+      }
+    ],
+    "rows": [
+      {
+        "record_id": "ECR1hc433070a0dfa",
+        "session_id": "ECBS1hf8b5deac05ae",
+        "seq": 0,
+        "arm": "rho",
+        "round": 0,
+        "warmup": true,
+        "method": {
+          "id": "rho.three_leads_negation_v1",
+          "family": "rho",
+          "params": {
+            "trial_cap": "18668300"
+          },
+          "method_id": "ECM1h67454689882b",
+          "method_sha256": "67454689882b28d509ee64a8afc4882fab1b4f672670f2da66c0ad13756cb34f",
+          "entry": "three_leads::solve_rho"
+        },
+        "algorithm_seed": "3449432149853347341",
+        "outcome_status": "verified",
+        "error": null
+      },
+      {
+        "record_id": "ECR1h06a081858b58",
+        "session_id": "ECBS1hf8b5deac05ae",
+        "seq": 1,
+        "arm": "rho_AA",
+        "round": 0,
+        "warmup": true,
+        "method": {
+          "id": "rho.three_leads_negation_v1",
+          "family": "rho",
+          "params": {
+            "trial_cap": "18668300"
+          },
+          "method_id": "ECM1h67454689882b",
+          "method_sha256": "67454689882b28d509ee64a8afc4882fab1b4f672670f2da66c0ad13756cb34f",
+          "entry": "three_leads::solve_rho"
+        },
+        "algorithm_seed": "3449432149853347341",
+        "outcome_status": "verified",
+        "error": null
+      },
+      {
+        "record_id": "ECR1h438b9ba3dfc0",
+        "session_id": "ECBS1hf8b5deac05ae",
+        "seq": 2,
+        "arm": "pencil",
+        "round": 0,
+        "warmup": true,
+        "method": {
+          "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+          "family": "ic",
+          "params": {
+            "matrix_coefficient_cap": "25000000",
+            "small_denominator": "8"
+          },
+          "method_id": "ECM1h187cc5c6d747",
+          "method_sha256": "187cc5c6d747a3b25cfd9708e970b511886a46c49b5db9fd3b09ce5b8a7fc983",
+          "entry": "three_leads::pencil::solve"
+        },
+        "algorithm_seed": "3449432149853347341",
+        "outcome_status": "timeout",
+        "error": "watchdog expired"
+      },
+      {
+        "record_id": "ECR1ha36228f66009",
+        "session_id": "ECBS1hf8b5deac05ae",
+        "seq": 3,
+        "arm": "rho",
+        "round": 1,
+        "warmup": false,
+        "method": {
+          "id": "rho.three_leads_negation_v1",
+          "family": "rho",
+          "params": {
+            "trial_cap": "18668300"
+          },
+          "method_id": "ECM1h67454689882b",
+          "method_sha256": "67454689882b28d509ee64a8afc4882fab1b4f672670f2da66c0ad13756cb34f",
+          "entry": "three_leads::solve_rho"
+        },
+        "algorithm_seed": "6083824998165220716",
+        "outcome_status": "verified",
+        "error": null
+      }
+    ]
+  },
+  "checkpoint_restored": false,
+  "solver_replayed": false,
+  "independent_scientific_verification": false,
+  "scientific_comparison_performed": false,
+  "cloud_mutations": 0,
+  "private_archive_published": false,
+  "extraction_scope": "Only manifest and compute/session/{records.jsonl,session.json,spec.json}; no CRIU extraction",
+  "access_note": "Initial explicit MCP executable resolved a legacy recovery child via PATH and rejected memory before status retrieval. Successful read used reviewed package/bin PATH; future use direct reviewed recovery remote-status. No submission performed."
+}

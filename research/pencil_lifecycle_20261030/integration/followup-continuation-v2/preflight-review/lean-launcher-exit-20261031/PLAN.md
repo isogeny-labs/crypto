@@ -1,0 +1,7 @@
+# Standalone Lean launcher exit propagation
+
+Existing helper snapshots record native exit and before/after input bindings but print results without propagating a failing native status. This does not change final theorem receipts that explicitly have native exit0 and unchanged bindings. Preserve all historical helpers and results. Produce a new helper revision only.
+
+Native fixed instrument controls: (1) rejected false proposition 0=1 through the legacy helper reproduces wrapper0/native1; (2) same rejection through strict helper returns nonzero; (3) true identity through strict helper returns0 with unchanged inputs; (4) reusing an existing output directory fails without changing its files; (5) a deliberate instrument-only Lean #eval writes this packet's Marker.lean during compilation, native compiler exits0 but input binding changes and strict helper exits2. This #eval is a negative workflow control, not theorem evidence. Only the named fresh private marker may be modified. Preserve marker before/after and all receipts. No scientific workload or timing claim.
+
+The new helper propagates native failure and makes binding mismatch fail closed. Named-theorem axiom audit remains separate; this helper is not an independent semantic review or a substitute for the canonical formal gate. Verify actual native checks and process statuses, create PDF/SVG/JSON, and keep independent review pending.

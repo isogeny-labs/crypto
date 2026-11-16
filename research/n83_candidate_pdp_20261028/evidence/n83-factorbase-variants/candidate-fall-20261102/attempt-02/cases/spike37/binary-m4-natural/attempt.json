@@ -1,0 +1,50 @@
+{
+  "candidate_id": "spike37",
+  "certificate_sha256": "90a61b694bd0499878ad01c322bf7413d20246ed95f5f6385a7449a180ff8e77",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/binary-m4-natural/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/binary-m4-natural/output"
+  ],
+  "elapsed_seconds": 1.885,
+  "family": "binary",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "binary-m4-natural",
+  "input_row_sha256": "4e3e1bb12d3cff68466aadb6de36dce16da7f10ed415c9325a1cc9aad4e5d2e1",
+  "m": 4,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/binary-m4-natural/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike37/binary-m4-natural/output/binary-m4-natural.json"
+    ],
+    "elapsed_seconds": 0.556,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"binary-m4-natural\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_certificate_prefix": "s3://setec-astronomy-artifacts/runs/n83-ffd-lfd-factorbase-panel-20261102/v2/attempt-02/spike37/first-fall-attempt-01/certificates/binary-m4-natural.json",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"binary-m4-natural\",\"status\":\"certified\"}\n",
+  "system_bytes": 18679251,
+  "system_sha256": "439ed02bf063a4faebf165003f1664b69636a1f162f292acbc3cf56dccf7bc49",
+  "target_kind": "natural"
+}
