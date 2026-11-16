@@ -180,3 +180,12 @@ and 29, L2's recorded seeds differing from `run_linz.sh`). No smoke number enter
 The run script is `run.sh`; the binary's sha256 is recorded in `raw/BINARY.sha256` at run time.
 
 Amendments, if any, are appended below with a date.
+
+## Amendment 1 (2026-11-16, after the data; adds description, changes no frozen rule)
+
+- Table 4b and `amendment1_corners_i_over_g` in `results.json`: L4's I/G at four named price
+  corners (latency or throughput multiplication, W = 64 or 4096, field addition = 1 word op).
+  Added after seeing that the frozen range is unresolved on the m = 2 regime cells, to show which
+  factor moves the order. They decide nothing; the frozen §7b reading stands.
+- The analysis binary was rebuilt to add this table; the measurement binary
+  (`raw/BINARY.sha256`) is unchanged and no measurement was repeated.

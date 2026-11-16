@@ -394,6 +394,13 @@ pub fn run(args: &[String]) -> Result<(), String> {
             lo16.insert(key, lo);
             hi16.insert(key, hi);
         }
+        // Amendment 1 (descriptive, after the data): I/G at four named corners, add = 1 word op.
+        let corner = |mul: &str, sqr: &str, w: usize| -> BTreeMap<&str, f64> {
+            [("mul", rd(mul, w).unwrap().point), ("sqr", rd(sqr, w).unwrap().point), ("inv", rd("inv_lat", w).unwrap().point), ("add", n.div_ceil(64) as f64)].into_iter().collect()
+        };
+        let corners = [("lat_W64", corner("mul_lat", "sqr_lat", 64)), ("tp_W64", corner("mul_tp", "sqr_tp", 64)),
+            ("lat_W4096", corner("mul_lat", "sqr_lat", 4096)), ("tp_W4096", corner("mul_tp", "sqr_tp", 4096))];
+        let mut csum = [0.0f64; 4];
         let (mut l16lo, mut l16hi) = (0.0, 0.0);
         let (mut lsum_pt, mut lsum_lo, mut lsum_hi, mut k) = (0.0, 0.0, 0.0, 0usize);
         let mut budget = 0;
@@ -406,6 +413,9 @@ pub fn run(args: &[String]) -> Result<(), String> {
             lsum_pt += (iv / gcost(t, &p_point)).ln();
             lsum_lo += (iv / gcost(t, &hi_p)).ln();
             lsum_hi += (iv / gcost(t, &lo_p)).ln();
+            for (ci, (_, c)) in corners.iter().enumerate() {
+                csum[ci] += (iv / gcost(t, c)).ln();
+            }
             l16lo += (iv / gcost(t, &hi16)).ln();
             l16hi += (iv / gcost(t, &lo16)).ln();
             k += 1;
@@ -437,9 +447,16 @@ pub fn run(args: &[String]) -> Result<(), String> {
         l4rows.push(json!({"n": n, "l": l, "m": m, "targets": k, "budget_hits": budget,
             "prices_word_ops_point": p_point, "prices_word_ops_lo": lo_p, "prices_word_ops_hi": hi_p,
             "i_over_g_band_L4": band, "i_over_g_measured": {"point": ig_pt, "lo": ig_lo, "hi": ig_hi}, "reading": reading,
+            "amendment1_corners_i_over_g": corners.iter().enumerate().map(|(ci, (name, c))| json!({"corner": name, "prices": c, "i_over_g": (csum[ci] / k as f64).exp()})).collect::<Vec<_>>(),
             "secondary_w_ge_16": {"i_over_g_lo": (l16lo / k as f64).exp(), "i_over_g_hi": (l16hi / k as f64).exp(), "mul_lo": lo16["mul"], "mul_hi": hi16["mul"]}}));
     }
 
+    writeln!(md, "\n### Table 4b (Amendment 1, descriptive): I/G at named price corners (add = 1 word op)\n\n| cell | lat, W64 | tp, W64 | lat, W4096 | tp, W4096 |\n|--|--:|--:|--:|--:|").unwrap();
+    for r in &l4rows {
+        let c = r["amendment1_corners_i_over_g"].as_array().unwrap();
+        writeln!(md, "| {}:{}:{} | {:.3} | {:.3} | {:.3} | {:.3} |", r["n"], r["l"], r["m"],
+            c[0]["i_over_g"].as_f64().unwrap(), c[1]["i_over_g"].as_f64().unwrap(), c[2]["i_over_g"].as_f64().unwrap(), c[3]["i_over_g"].as_f64().unwrap()).unwrap();
+    }
     // ---- cross-check with the committed full_prices.json (another host).
     let mut xcheck = Vec::new();
     if let Some(fp) = full_prices {
