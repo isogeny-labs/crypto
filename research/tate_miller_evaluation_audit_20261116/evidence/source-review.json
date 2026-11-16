@@ -1,0 +1,175 @@
+{
+  "schema": "tate-miller-source-review/v1",
+  "recorded_at": "2026-11-16T22:30:41.077017+00:00",
+  "KB": {
+    "MCP_loaded": false,
+    "queries": [
+      {
+        "label": "status",
+        "argv": [
+          "scripts/research-kb",
+          "status"
+        ],
+        "exit": 127
+      },
+      {
+        "label": "mechanism",
+        "argv": [
+          "scripts/research-kb",
+          "search",
+          "Tate pairing Miller finite F19 cyclic18 quotient divisor evaluation",
+          "--top-k",
+          "8"
+        ],
+        "exit": 127
+      },
+      {
+        "label": "negative",
+        "argv": [
+          "scripts/research-kb",
+          "search",
+          "Tate pairing representative dependence disjoint support evaluation canonical counterexample",
+          "--top-k",
+          "8"
+        ],
+        "exit": 127
+      },
+      {
+        "label": "application",
+        "argv": [
+          "scripts/research-kb",
+          "search",
+          "Tate pairing quotient finite field roots unity final exponentiation actual curve",
+          "--top-k",
+          "8"
+        ],
+        "exit": 127
+      },
+      {
+        "label": "theorems",
+        "argv": [
+          "scripts/research-kb",
+          "theorems",
+          "Tate Miller divisorEvaluationOn actual rational E quotient"
+        ],
+        "exit": 127
+      }
+    ],
+    "ready": false,
+    "revision": null,
+    "last_refresh": null,
+    "fallback": "Bounded canonical actual source and primary author chapter; not an absence or novelty claim"
+  },
+  "conductor": {
+    "exit": 127,
+    "scope": "path:research/tate_f19_evaluation_audit_20261116",
+    "note": "Initial review reservation used tentative selector; final study path recorded explicitly in protocol",
+    "final_selector": "path:research/tate_miller_evaluation_audit_20261116",
+    "final_selector_exit": 127,
+    "final_selector_timing": "After code, before gate; initial tentative selector review was before protocol/code."
+  },
+  "primary": {
+    "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+    "bytes": 222784,
+    "sha256": "c06cf2df9b8003e19694a4ebfe298a1557d61169f87ec01542258438ceac015e",
+    "http": [
+      "200",
+      "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+      "222784"
+    ],
+    "text_lines": [
+      [
+        159,
+        371
+      ],
+      [
+        583,
+        622
+      ]
+    ],
+    "full_chapter_read": false,
+    "read_before_protocol_code": true,
+    "used": [
+      "26.2 proper divisor expression",
+      "26.3.2 representative conditions",
+      "26.3.4 normalization",
+      "26.3.5 addition/Miller",
+      "26.3.7 final exponent",
+      "26.3.10 right-domain guards",
+      "26.3.11 k>1/r>4 conditions"
+    ]
+  },
+  "author_errata": {
+    "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/crypto-book.html",
+    "bytes": 14963,
+    "sha256": "bdba99cb397a95b1bd6b37d2f672d23b487038dd7a3737de76c6ccee8edf825c",
+    "scope": "Bounded pairing/Tate/Miller/root wording search; not global absence"
+  },
+  "canonical_review": [
+    {
+      "path": "research/weil_rational_domain_audit_20261116/lean/RationalDomainTate.lean",
+      "bytes": 3459,
+      "sha256": "fddf5092af0edbf31368236336b342ffd91a8ca45143161de14bc80fc4e40f7b"
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115/lean/SourceNineteen.lean",
+      "bytes": 2871,
+      "sha256": "4d0ad49bf868675909f9ea815510b87be221ff5f1c4c3a7e2cea71f115ad46ba"
+    },
+    {
+      "path": "research/finite_point_evaluation_audit_20261115/lean/GeometricMiller.lean",
+      "bytes": 3786,
+      "sha256": "516ea587329e75fe95eb9dd5c903a4a58065726709acacaaa77e2074a9381d63"
+    },
+    {
+      "path": "research/finite_point_evaluation_audit_20261115/lean/DivisorEvaluation.lean",
+      "bytes": 5560,
+      "sha256": "c90deb637a9a759baf1e6a2001d68421f3e90a4ccbe2cb6efcd459346dc4846c"
+    },
+    {
+      "path": "research/finite_point_evaluation_audit_20261115/lean/EvaluationFormulas.lean",
+      "bytes": 4359,
+      "sha256": "09bc4b486a4ebdb43f0c38b7c2b8dd4c5ca4021f5347efc8ac9b5ef71d39783e"
+    },
+    {
+      "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliarySpecialCases.lean",
+      "bytes": 3983,
+      "sha256": "0d3c8df33de88c8e7c1ce5914eb6550721aa7ead0ae608302a9d267f9d117f02"
+    },
+    {
+      "path": "research/weil_auxiliary_ratio_audit_20261115/lean/AuxiliaryTangents.lean",
+      "bytes": 3810,
+      "sha256": "802888fe95d9dd70d0338ebade08adb6399c9edec9da9e6d2f0edc4e30577233"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/lean/MillerCurve.lean",
+      "bytes": 2458,
+      "sha256": "689300e3c8e6ecf23da0ed27b455193d8ca8c530d259b7e91ed8757b471325b9",
+      "access": "read-only tracked Git object; sparse disk absence not source absence"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/lean/MillerExpressions.lean",
+      "bytes": 2286,
+      "sha256": "b9fb8a504e1fdfa078809837286c3510e48e6dd9030fc9fd8f0f6d9f86e09422",
+      "access": "read-only tracked Git object; sparse disk absence not source absence"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/lean/TateQuotient.lean",
+      "bytes": 4328,
+      "sha256": "10e2963e7c2caf88e7ba0887d68258d9888c73a82721b569bad726fec05c26cd",
+      "access": "read-only tracked Git object; sparse disk absence not source absence"
+    }
+  ],
+  "prior_duplicates": [
+    "Known composite-root F3/n4 and F5/n6 already formalized; excluded before new experiment",
+    "Known rational-only zero-divisor nonconstant ratio already formalized; excluded before new experiment"
+  ],
+  "original_FR1994_read": false,
+  "actual_presentation_bridge": true,
+  "full_canonical_Tate_choice_descent_closed": false,
+  "novelty_claim": false,
+  "signed_standing": "unverified",
+  "paid_compute": 0,
+  "candidate_outcome": "Chosen F19 P6G/QG/S3G direct and proper shifted expressions agree at11, not a counterexample. Wrong manual expected slope values in04 and all failed states retained. Actual proper sourceValue proved noncube; no full canonical Tate independence/descent claim.",
+  "structural_audit": "Before source seal/producer/PCC, added explicit generic mapped-chosen local order zero and actual full geometric shifted-support disjointness. Earlier narrower gate25/binding174/unissued prepare retained; new gate/binding follow actual source changes."
+}
