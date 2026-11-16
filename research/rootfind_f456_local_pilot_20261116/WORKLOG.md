@@ -54,3 +54,23 @@
 ### Errors
 
 - None in the version 2 planner; the version 1 arm-order warning remains preserved in Amendment 1.
+
+## 2026-11-16, source-bound build and run admission
+
+### What was done
+
+- Preserved all three build attempts. The first failed under Homebrew Rust 1.93.1; the second was stopped at 300 seconds during active compilation; the third completed with Rust 1.99.1 at 14:52:53 UTC. `BUILD_STATUS.json` binds the exact source commit/tree, binary hash, command and all build log hashes. [pcc:unverified]
+- Replanned with that binary and compared the plan byte-for-byte with the cached preflight plan. The first two registered workloads still match the frozen L2 plan; `PLAN_CHECK-BOUND.json` binds the new binary. [pcc:unverified]
+- Rechecked Conductor's `.resume/RESUME.md` scope. T-6814 still holds it in `verifying`; no timed execution started.
+
+### Decisions made
+
+- Preserve the build and plan as runnable preparation. Do not use the stale resume to bypass the required current branch-specific S3 checkpoint. [pcc:unverified]
+
+### Open threads
+
+- Publish this preparation. When the resume path is released, write the new handoff, pass the checkpoint gate and execute/replay the one bounded local pilot. The L2 panel keeps its separate budget and isolation gates.
+
+### Errors
+
+- The first two build failures are infrastructure/toolchain outcomes, not scientific trials. The third build's missing `libLLVM.dylib` strip warning was nonfatal.
