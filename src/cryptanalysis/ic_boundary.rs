@@ -8577,6 +8577,16 @@ pub struct PairTable {
     pub filter_bit_sets: u64,
 }
 
+/// Native work omitted by the order-two first-row shortcut. The skipped
+/// witnesses are the negative twins of the retained first witnesses, not
+/// unexamined keys; the caller seeds their one homogeneous torsion row.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct BinaryTorsionBatchStats {
+    pub skipped_twin_collisions: u64,
+    pub inversion_lanes: u64,
+    pub inversion_batches: u64,
+}
+
 impl PairTable {
     /// The build's work beside its group operations, for `bitop/v1`
     /// (`ecbench::work`): one hash insert per attempt.
@@ -8683,7 +8693,7 @@ impl PairTable {
         g: &BinaryGroup<'_>,
         fb: &FactorBase<FastPoint>,
     ) -> Self {
-        Self::build_negation_folded_binary_batch_inner(g, fb, false).0
+        Self::build_negation_folded_binary_batch_inner(g, fb, false, false).0
     }
 
     /// Build the identical first-witness table while retaining every later
@@ -8694,14 +8704,59 @@ impl PairTable {
         g: &BinaryGroup<'_>,
         fb: &FactorBase<FastPoint>,
     ) -> (Self, Vec<[usize; 4]>) {
-        Self::build_negation_folded_binary_batch_inner(g, fb, true)
+        let (table, collisions, _) =
+            Self::build_negation_folded_binary_batch_inner(g, fb, true, false);
+        (table, collisions)
+    }
+
+    /// The batch table with its order-two row built from abscissa inverses.
+    /// On `b = 1`, `T = (0, 1)` and `x(T + P) = 1/x(P)`. The two signed points
+    /// above each later abscissa have the same sum key, so only the first is
+    /// inserted. Every later row retains the ordinary builder's order.
+    pub fn build_negation_folded_binary_batch_torsion_with_collisions(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> Result<(Self, Vec<[usize; 4]>, BinaryTorsionBatchStats), String> {
+        if g.0.b != 1 || fb.abscissa_list.first() != Some(&0) {
+            return Err("torsion batch requires b=1 and a zero first abscissa".into());
+        }
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        if groups[0].as_slice() != [0]
+            || fb.points.first() != Some(&FastPoint::affine(0, 1))
+            || fb.neg_index.first() != Some(&0)
+        {
+            return Err("torsion batch requires the first point to be T=(0,1)".into());
+        }
+        for group in groups.iter().skip(1) {
+            if group.len() != 2 {
+                return Err("torsion batch requires complete signed pairs".into());
+            }
+            let (j, nj) = (group[0], group[1]);
+            if fb.points[j].infinity
+                || fb.points[j].x == 0
+                || fb.points[j].x != fb.points[nj].x
+                || fb.neg_index.get(j) != Some(&nj)
+                || fb.neg_index.get(nj) != Some(&j)
+                || g.neg(fb.points[j]) != fb.points[nj]
+            {
+                return Err("torsion batch has an invalid signed pair".into());
+            }
+        }
+        Ok(Self::build_negation_folded_binary_batch_inner(
+            g, fb, true, true,
+        ))
     }
 
     fn build_negation_folded_binary_batch_inner(
         g: &BinaryGroup<'_>,
         fb: &FactorBase<FastPoint>,
         collect_collisions: bool,
-    ) -> (Self, Vec<[usize; 4]>) {
+        torsion_row: bool,
+    ) -> (Self, Vec<[usize; 4]>, BinaryTorsionBatchStats) {
         let start = Instant::now();
         let groups: Vec<&Vec<usize>> = fb
             .abscissa_list
@@ -8713,6 +8768,7 @@ impl PairTable {
         let mut ops = GroupOps::default();
         let mut attempts = 0u64;
         let mut collisions = Vec::new();
+        let mut torsion_stats = BinaryTorsionBatchStats::default();
         let mut scratch = BatchScratch::default();
         let mut indices = Vec::new();
         let mut addends = Vec::new();
@@ -8723,6 +8779,24 @@ impl PairTable {
             (Vec::new(), Vec::new(), Vec::new(), Vec::new());
         for ai in 0..a {
             let i = groups[ai][0];
+            if torsion_row && ai == 0 {
+                let mut inverses: Vec<u64> = groups
+                    .iter()
+                    .skip(1)
+                    .map(|group| fb.points[group[0]].x)
+                    .collect();
+                let mut inverse_scratch = Vec::new();
+                g.0.field.batch_inv(&mut inverses, &mut inverse_scratch);
+                for (group, &inverse) in groups.iter().skip(1).zip(&inverses) {
+                    map.entry(inverse + 1)
+                        .or_insert((i as u32, group[0] as u32));
+                    attempts += 1;
+                }
+                torsion_stats.skipped_twin_collisions = inverses.len() as u64;
+                torsion_stats.inversion_lanes = inverses.len() as u64;
+                torsion_stats.inversion_batches = u64::from(!inverses.is_empty());
+                continue;
+            }
             indices.clear();
             addends.clear();
             sums.clear();
@@ -8812,7 +8886,11 @@ impl PairTable {
             }
         }
         let table = Self {
-            kind: "negation_folded_binary_batch",
+            kind: if torsion_row {
+                "negation_folded_binary_batch_torsion"
+            } else {
+                "negation_folded_binary_batch"
+            },
             entries: map.len() as u64,
             map,
             parts: Vec::new(),
@@ -8825,7 +8903,7 @@ impl PairTable {
             index_lookups: a as u64,
             filter_bit_sets: 0,
         };
-        (table, collisions)
+        (table, collisions, torsion_stats)
     }
 
     /// The same negation-folded table and emission order as
@@ -18854,6 +18932,64 @@ mod tests {
                 }
             }
             assert_eq!(batch_ctr.lookups, scalar_ctr.lookups);
+        }
+    }
+
+    #[test]
+    fn binary_torsion_batch_preserves_every_first_witness() {
+        use crate::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+
+        for (n, dimension, skipped) in [(13, 5, 16), (19, 7, 69), (23, 8, 137)] {
+            let inst = koblitz_instance(0, n).unwrap();
+            let frob =
+                build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), dimension)
+                    .unwrap();
+            let fb = koblitz_factor_base(
+                &inst,
+                &frob,
+                ColumnFold::SignedFrobeniusOrbit,
+                format!("d={dimension}"),
+            )
+            .unwrap();
+            let group = BinaryGroup(&inst.fast);
+            let scalar = PairTable::build_negation_folded(&group, &fb);
+            let (batch, old_collisions) =
+                PairTable::build_negation_folded_binary_batch_with_collisions(&group, &fb);
+            let (torsion, collisions, stats) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            assert_eq!(scalar.map, batch.map, "scalar/batch at n={n}");
+            assert_eq!(torsion.map, batch.map, "every first witness at n={n}");
+            for &key in batch.map.keys() {
+                assert_eq!(torsion.get(key), batch.get(key), "probe key {key} at n={n}");
+            }
+            assert_eq!(stats.skipped_twin_collisions, skipped);
+            assert_eq!(stats.inversion_lanes, skipped);
+            assert_eq!(stats.inversion_batches, 1);
+            assert_eq!(old_collisions.len(), collisions.len() + skipped as usize);
+            assert_eq!(torsion.insert_attempts + skipped, batch.insert_attempts);
+            assert_eq!(
+                torsion.build_ops.adds + fb.points.len() as u64,
+                batch.build_ops.adds
+            );
+
+            let mut corrupt = fb.clone();
+            corrupt.neg_index[1] = 0;
+            assert!(
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                    &group, &corrupt,
+                )
+                .is_err()
+            );
+            let mut unsupported = inst.fast.clone();
+            unsupported.b = 2;
+            assert!(
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                    &BinaryGroup(&unsupported),
+                    &fb,
+                )
+                .is_err()
+            );
         }
     }
 

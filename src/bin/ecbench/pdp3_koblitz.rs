@@ -373,6 +373,8 @@ pub enum Pdp3Engine {
     RootfindNegfoldBatch,
     /// The batch table plus verified homogeneous rows from duplicate keys.
     RootfindNegfoldBatchHarvest,
+    /// Harvest non-torsion collisions and seed the order-two row directly.
+    RootfindNegfoldBatchHarvestTorsion,
     /// Windowed `m = 3` scan on the negation-folded [`PairTable`].
     RootfindWindowNegfold,
 }
@@ -390,12 +392,15 @@ impl Pdp3Engine {
             "rootfind-negfold" => Ok(Self::RootfindNegfold),
             "rootfind-negfold-batch" => Ok(Self::RootfindNegfoldBatch),
             "rootfind-negfold-batch-harvest" => Ok(Self::RootfindNegfoldBatchHarvest),
+            "rootfind-negfold-batch-harvest-torsion" => {
+                Ok(Self::RootfindNegfoldBatchHarvestTorsion)
+            }
             "rootfind-window-negfold" => Ok(Self::RootfindWindowNegfold),
             other => Err(format!(
                 "unknown engine `{other}`; try inherited-f4, f6-ic, f6-ic-pair, matrix-f4, \
                  matrix-f5, \
                  rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch, \
-                 rootfind-negfold-batch-harvest \
+                 rootfind-negfold-batch-harvest, rootfind-negfold-batch-harvest-torsion \
                  or rootfind-window-negfold"
             )),
         }
@@ -413,6 +418,7 @@ impl Pdp3Engine {
             Self::RootfindNegfold => "rootfind-negfold",
             Self::RootfindNegfoldBatch => "rootfind-negfold-batch",
             Self::RootfindNegfoldBatchHarvest => "rootfind-negfold-batch-harvest",
+            Self::RootfindNegfoldBatchHarvestTorsion => "rootfind-negfold-batch-harvest-torsion",
             Self::RootfindWindowNegfold => "rootfind-window-negfold",
         }
     }
@@ -432,6 +438,7 @@ impl Pdp3Engine {
                 | Self::RootfindNegfold
                 | Self::RootfindNegfoldBatch
                 | Self::RootfindNegfoldBatchHarvest
+                | Self::RootfindNegfoldBatchHarvestTorsion
                 | Self::RootfindWindowNegfold
         )
     }
@@ -443,6 +450,7 @@ impl Pdp3Engine {
             Self::RootfindNegfold
                 | Self::RootfindNegfoldBatch
                 | Self::RootfindNegfoldBatchHarvest
+                | Self::RootfindNegfoldBatchHarvestTorsion
                 | Self::RootfindWindowNegfold
         )
     }
@@ -466,6 +474,7 @@ impl Pdp3Engine {
             | Self::RootfindNegfold
             | Self::RootfindNegfoldBatch
             | Self::RootfindNegfoldBatchHarvest
+            | Self::RootfindNegfoldBatchHarvestTorsion
             | Self::RootfindWindowNegfold => None,
         }
     }
@@ -593,7 +602,8 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
 /// `pdp3-koblitz:m=3,engine=rootfind-window`,
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold`, or
 /// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch`, or
-/// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch-harvest`, or
+/// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch-harvest`,
+/// `pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch-harvest-torsion`, or
 /// `pdp3-koblitz:m=3,engine=rootfind-window-negfold`.
 pub struct Pdp3KoblitzOracle<'i> {
     name: &'static str,
@@ -620,8 +630,13 @@ pub struct Pdp3KoblitzOracle<'i> {
     /// Verified homogeneous rows harvested from duplicate batch-table keys.
     setup_rows: Vec<Vec<u64>>,
     collision_candidates: u64,
+    collision_verified: u64,
     collision_zero_rows: u64,
     collision_columns: usize,
+    torsion_skipped: u64,
+    torsion_inversion_lanes: u64,
+    torsion_inversion_batches: u64,
+    torsion_seed_rows: u64,
     /// Reused by the batched `m = 3` scan; all completed additions are charged.
     scan_scratch: BatchScratch,
     scan_addends: Vec<FastPoint>,
@@ -667,8 +682,13 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             pair_neg: None,
             setup_rows: Vec::new(),
             collision_candidates: 0,
+            collision_verified: 0,
             collision_zero_rows: 0,
             collision_columns: 0,
+            torsion_skipped: 0,
+            torsion_inversion_lanes: 0,
+            torsion_inversion_batches: 0,
+            torsion_seed_rows: 0,
             scan_scratch: BatchScratch::default(),
             scan_addends: Vec::new(),
             scan_sums: Vec::new(),
@@ -774,7 +794,9 @@ impl<'i> Pdp3KoblitzOracle<'i> {
         let g = ctx.group;
         if matches!(
             self.engine,
-            Pdp3Engine::RootfindNegfoldBatch | Pdp3Engine::RootfindNegfoldBatchHarvest
+            Pdp3Engine::RootfindNegfoldBatch
+                | Pdp3Engine::RootfindNegfoldBatchHarvest
+                | Pdp3Engine::RootfindNegfoldBatchHarvestTorsion
         ) && self.summands == 3
         {
             const SCAN_BLOCK: usize = 8;
@@ -1034,15 +1056,20 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         let engine = params.get("engine").ok_or(
             "missing parameter `engine`; try inherited-f4, f6-ic, matrix-f4, matrix-f5, \
              rootfind, rootfind-window, rootfind-negfold, rootfind-negfold-batch, \
-             rootfind-negfold-batch-harvest \
+             rootfind-negfold-batch-harvest, rootfind-negfold-batch-harvest-torsion \
              or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
         self.scan_pair_layout = None;
         self.setup_rows.clear();
         self.collision_candidates = 0;
+        self.collision_verified = 0;
         self.collision_zero_rows = 0;
         self.collision_columns = 0;
+        self.torsion_skipped = 0;
+        self.torsion_inversion_lanes = 0;
+        self.torsion_inversion_batches = 0;
+        self.torsion_seed_rows = 0;
         if self.engine == Pdp3Engine::F6IcPair {
             // Reuse within this pipeline solve, never across independent
             // records or replayed records in the auditor process.
@@ -1214,9 +1241,38 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                                 ctx.group, fb,
                             );
                         self.collision_candidates = collisions.len() as u64;
+                        self.collision_verified = collisions.len() as u64;
                         self.collision_columns = fb.columns;
                         let (rows, zero) =
                             verified_collision_rows(ctx.group, fb, ctx.r, &collisions, ops)?;
+                        self.setup_rows = rows;
+                        self.collision_zero_rows = zero;
+                        table
+                    }
+                    Pdp3Engine::RootfindNegfoldBatchHarvestTorsion => {
+                        if ctx.r % 2 == 0 || ctx.cofactor % 2 != 0 {
+                            return Err(
+                                "torsion harvest requires odd subgroup order and even cofactor"
+                                    .into(),
+                            );
+                        }
+                        let (table, collisions, stats) =
+                            PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                                ctx.group, fb,
+                            )?;
+                        self.collision_candidates =
+                            collisions.len() as u64 + stats.skipped_twin_collisions;
+                        self.collision_verified = collisions.len() as u64;
+                        self.collision_columns = fb.columns;
+                        self.torsion_skipped = stats.skipped_twin_collisions;
+                        self.torsion_inversion_lanes = stats.inversion_lanes;
+                        self.torsion_inversion_batches = stats.inversion_batches;
+                        let (mut rows, zero) =
+                            verified_collision_rows(ctx.group, fb, ctx.r, &collisions, ops)?;
+                        let mut seed = vec![0; fb.columns];
+                        seed[0] = 1;
+                        rows.push(seed);
+                        self.torsion_seed_rows = 1;
                         self.setup_rows = rows;
                         self.collision_zero_rows = zero;
                         table
@@ -1392,14 +1448,25 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             (None, None) => BTreeMap::new(),
         };
         c.insert("counted:table_insert_attempts".to_string(), 1);
-        if self.collision_candidates > 0 {
+        if self.collision_verified > 0 {
             c.insert(
                 "row_build_words".to_string(),
-                self.collision_candidates * (self.collision_columns as u64 + 4),
+                self.collision_verified * (self.collision_columns as u64 + 4)
+                    + self.torsion_seed_rows * self.collision_columns as u64,
             );
             c.insert(
                 "row_build_modr_adds".to_string(),
-                4 * self.collision_candidates,
+                4 * self.collision_verified,
+            );
+        }
+        if self.torsion_inversion_lanes > 0 {
+            c.insert(
+                "field_batch_inverse_lanes".into(),
+                self.torsion_inversion_lanes,
+            );
+            c.insert(
+                "field_batch_inverse_batches".into(),
+                self.torsion_inversion_batches,
             );
         }
         c
@@ -1423,13 +1490,27 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 table.build_ops.adds + table.build_ops.doubles,
             );
         }
-        if self.engine == Pdp3Engine::RootfindNegfoldBatchHarvest {
+        if matches!(
+            self.engine,
+            Pdp3Engine::RootfindNegfoldBatchHarvest
+                | Pdp3Engine::RootfindNegfoldBatchHarvestTorsion
+        ) {
             counts.insert("collision_candidates".into(), self.collision_candidates);
             counts.insert(
                 "collision_nonzero_rows".into(),
-                self.setup_rows.len() as u64,
+                self.setup_rows.len() as u64 - self.torsion_seed_rows,
             );
             counts.insert("collision_zero_rows".into(), self.collision_zero_rows);
+        }
+        if self.engine == Pdp3Engine::RootfindNegfoldBatchHarvestTorsion {
+            counts.insert("torsion_skipped_collisions".into(), self.torsion_skipped);
+            counts.insert("torsion_seed_rows".into(), self.torsion_seed_rows);
+            counts.insert("torsion_inverse_lanes".into(), self.torsion_inversion_lanes);
+            counts.insert(
+                "torsion_inverse_batches".into(),
+                self.torsion_inversion_batches,
+            );
+            counts.insert("collision_verified".into(), self.collision_verified);
         }
         if self.pair_table_points > 0 {
             counts.insert("pair_table_points".into(), self.pair_table_points as u64);
@@ -1522,9 +1603,11 @@ mod engine_names {
         use crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
 
         let mut checked_negative_index = false;
-        for (n, d, expected_candidates, expected_rank) in
-            [(13, 5, 27, 5), (19, 7, 99, 11), (23, 8, 201, 23)]
-        {
+        for (n, d, expected_candidates, expected_skipped, expected_rank) in [
+            (13, 5, 27, 16, 5),
+            (19, 7, 99, 69, 11),
+            (23, 8, 201, 137, 23),
+        ] {
             let inst = koblitz_instance(0, n).unwrap();
             let frob =
                 build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), d).unwrap();
@@ -1556,6 +1639,43 @@ mod engine_names {
                 assert_ne!(matrix.add_row(row, 0), RowStatus::Inconsistent);
             }
             assert_eq!(matrix.rank(), expected_rank);
+
+            let (torsion, retained, stats) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            assert_eq!(torsion.entries, harvested.entries);
+            assert_eq!(stats.skipped_twin_collisions, expected_skipped);
+            assert_eq!(
+                retained.len() + expected_skipped as usize,
+                expected_candidates
+            );
+            let old_retained: Vec<_> = collisions
+                .iter()
+                .copied()
+                .filter(|collision| {
+                    if collision[0] != 0 {
+                        return true;
+                    }
+                    assert_eq!(collision[2], 0);
+                    assert_eq!(fb.neg_index[collision[1]], collision[3]);
+                    assert_eq!(group.neg(fb.points[collision[1]]), fb.points[collision[3]]);
+                    false
+                })
+                .collect();
+            assert_eq!(retained, old_retained);
+            let (retained_rows, retained_zero) =
+                verified_collision_rows(&group, &fb, inst.r, &retained, &mut GroupOps::default())
+                    .unwrap();
+            assert_eq!(retained_zero, 0);
+            let mut seeded = IncrementalGauss::new(fb.columns + 1, inst.r);
+            let mut seed = vec![0; fb.columns + 1];
+            seed[0] = 1;
+            assert_ne!(seeded.add_row(seed, 0), RowStatus::Inconsistent);
+            for mut row in retained_rows {
+                row.push(0);
+                assert_ne!(seeded.add_row(row, 0), RowStatus::Inconsistent);
+            }
+            assert_eq!(seeded.rank(), expected_rank);
 
             let mut corrupt = collisions[0];
             let mut rejected = false;
@@ -1677,6 +1797,47 @@ mod engine_names {
             old.decomposition.setup.group_ops.adds + 3 * 27
         );
         assert!(new.decomposition.targets_tried <= old.decomposition.targets_tried);
+        spec.oracle_params
+            .set("engine", "rootfind-negfold-batch-harvest-torsion");
+        let mut torsion_oracle = Pdp3KoblitzOracle::new("pdp3-koblitz", 3, &inst);
+        let torsion = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut torsion_oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .unwrap();
+        assert!(torsion.verified);
+        assert_eq!(torsion.recovered, Some(planted));
+        assert_eq!(torsion.linear_algebra.cost.get("setup_seed_independent"), 5);
+        assert_eq!(torsion.decomposition.setup.get("collision_candidates"), 27);
+        assert_eq!(
+            torsion
+                .decomposition
+                .setup
+                .get("torsion_skipped_collisions"),
+            16
+        );
+        assert_eq!(torsion.decomposition.setup.get("collision_verified"), 11);
+        assert_eq!(torsion.decomposition.setup.get("torsion_seed_rows"), 1);
+        assert_eq!(
+            torsion.decomposition.setup.get("pair_table_entries"),
+            new.decomposition.setup.get("pair_table_entries")
+        );
+        eprintln!(
+            "torsion trials={} target_rows={} rank={} setup_adds={} total_gae={} seed_rank={} collision_verified={} skipped={}",
+            torsion.decomposition.targets_tried,
+            torsion.decomposition.relations_found,
+            torsion.linear_algebra.rank,
+            torsion.decomposition.setup.group_ops.adds,
+            torsion.total_gae,
+            torsion.linear_algebra.cost.get("setup_seed_independent"),
+            torsion.decomposition.setup.get("collision_verified"),
+            torsion.decomposition.setup.get("torsion_skipped_collisions"),
+        );
         eprintln!(
             "old trials={} target_rows={} rank={} setup_adds={} total_gae={}; harvest trials={} target_rows={} rank={} setup_adds={} total_gae={} seed_rank={}",
             old.decomposition.targets_tried,
