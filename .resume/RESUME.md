@@ -2576,3 +2576,20 @@ pcc/claims/PCC-20261116-80b1fb.json: one-page37628-byte report rendered and insp
 # 2026-11-16 04:54 UTC Root CI/merge checkpoint
 
 PR4396 genuine merge40839ddeaf174801500bff4fdacc746ccf016d0c; expected dfeb head. Actual all8 started checks success and main-only sign skipped; size/artifacts legitimately main-only. Original full PCC CI43800448798/job133079183510, entire193910-byte archive/all10 members/full1077822-byte job log retained by63ba17. Actual merge confirmation757c7f. Scoped PCC data-address problem resolved; global main-ledger/scientificNEW28 remain open. Continue Consumer1587 independent raw reconstruction/streaming certificates and8 direct graph theorem bindings be98f8; full historical population remains EKS-only and unexecuted. This metadata must publish through a fresh owned successor, never resurrect the merged/deleted branch. [pcc:unverified]
+
+---
+
+2026-11-16T07:28:38.916568+00:00
+# Resume from genuine merged Root tree on a fresh checkpoint branch
+
+## What was done
+pcc/claims/PCC-20261116-2f55ff.json: actual normal switch from3dff to genuine merged5ae1 on fresh owned runtime-progress branch0; entire committed trees equal, all42 selected current owned files/index retained byte-exact. Persistent GitHub queue/readyPR refreshd853c5 now records actual5e80CI8db45c and exhausted-budget e42949 plus runtime1169c2; entire prior/current API replies retained. [pcc:unverified]
+
+## Decisions made
+Publish finished Root currentCI/genuine migration8483-keyFF/merge/storage/queue evidence continuously; extend exact original artifact hydration inputs for the two new whole over-policy metadata objects before the real bot. Keep original verifiers/keyring/policy and immutable older workflow snapshots. [pcc:unverified]
+
+## Open threads
+Consumer driver source0405429a normally published with4d830d; offline metadata/input byte checks efa891 and first-whitespace failurea69dba retained. Actual new compiler-only CI expected after spaced observation around08:15UTC. Full60 historical computation/OCI/ABI/known admission/genuine scientificNEW28 and main ledger remain open. [pcc:unverified]
+
+## Errors
+Original budget daily/monthly exhaustion and pool timeout stop paid work, not all source/proof/custody work. Driver source review/function/footer corrections and GNU-time metadata failure remain whole. Root new branch changes no source tree or raw bytes. [pcc:unverified]
