@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "twist-two-base-degree-two-full-source-20261116",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-16",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_field_cost_20261116/projective/two-base",
@@ -6665,6 +6665,46 @@
       "parameters": {
         "expected_exit": 0
       }
+    },
+    {
+      "id": "quadratic-selftest",
+      "role": "control_positive",
+      "description": "Coefficient-only split/repeated/zero quadratic extraction finiteengineering check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "dispatch": "thin shell, native research/proof/identity/replay/analysis only",
+          "clock_valid": "false",
+          "counter": "fresh actual Ir plus native SELF/body and originalpoint checks"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "quadratic-selftest-audit",
+      "role": "control_positive",
+      "description": "Coefficient-only split/repeated/zero quadratic extraction finiteengineering check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "dispatch": "thin shell, native research/proof/identity/replay/analysis only",
+          "clock_valid": "false",
+          "counter": "fresh actual Ir plus native SELF/body and originalpoint checks"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
     }
   ],
   "controls": {
@@ -6782,6 +6822,8 @@
           "source-cap2-cpp",
           "source-cap2-rust",
           "source-cap2-agree",
+          "quadratic-selftest",
+          "quadratic-selftest-audit",
           "semantic-C",
           "semantic-A",
           "semantic-B",
@@ -7093,7 +7135,7 @@
           "payload_truth"
         ],
         "design": "absolute",
-        "threshold": "All332expectedstages/postmanifest; all6090primary30target intervals/182700coldcalls, complete sourcefrontiers. Candidateupper+max(1000,AA)<nonempty sourcelower. Keep all loss/identity/block/failed; no free posthocselector."
+        "threshold": "All334expectedstages/postmanifest; all6090primary30target intervals/182700coldcalls, complete sourcefrontiers. Candidateupper+max(1000,AA)<nonempty sourcelower. Keep all loss/identity/block/failed; no free posthocselector."
       },
       {
         "id": "counter-repeat",
@@ -7267,7 +7309,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "First unexpected stage or hard19:45UTCdeadline; full332stage scope or incomplete, never favorable subset",
+      "rule": "First unexpected stage or hard19:45UTCdeadline; full334stage scope or incomplete, never favorable subset",
       "kind": "fixed_n",
       "preregistered": true
     }
@@ -7277,7 +7319,7 @@
     "comparison_ids": [
       "full-panel"
     ],
-    "threshold": "All332expectedstages/postmanifest; all6090primary30target intervals/182700coldcalls, complete sourcefrontiers. Candidateupper+max(1000,AA)<nonempty sourcelower. Keep all loss/identity/block/failed; no free posthocselector.",
+    "threshold": "All334expectedstages/postmanifest; all6090primary30target intervals/182700coldcalls, complete sourcefrontiers. Candidateupper+max(1000,AA)<nonempty sourcelower. Keep all loss/identity/block/failed; no free posthocselector.",
     "statistic": "Exact raw/selfcost/result bindings and fixed calibration predicates",
     "interval": "none; finite deterministic enumeration",
     "multiple_comparison_correction": "none",
@@ -7353,25 +7395,26 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "52f4ee289bd72bb629f7f9e07efcddde5400d2a017040b46a03d7fb1bc398c94",
-    "commit": "bf57c33e8562d87badde36c2ed04589f51bcce8e",
-    "frozen_at": "2026-11-16T18:48:42Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "commit": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "filed_before_affected_data": false
   },
   "extensions": {
-    "pins_sha256": "6235522dff35a9cad3f165551cd9f0ff3d6db3cf8201d90988c61c20f4a6dbd1",
+    "pins_sha256": "42785267a1f3b4fe65f2ee84738640de3f37ac229924b11291d90de3d0ab40a1",
     "start_at": "2026-11-16T18:45:00Z",
     "deadline": "2026-11-16T19:45:00Z",
     "source_checkpoint": "Samebranch GitHub source/protocol beforeaffectedlaunch, sourceonlyapproval; no asset/credential/paidresourcepermission",
     "degree": "Univariate ORIGINALmembership/witness2 vs3; scalarfieldprimitives charged but notpolynomialdegree bounded; IDCtotaldegree4includescoeffvariables; originalcurvepullback/regularityunknown",
-    "population": "ALL B3two methods455×3 plus B2method105×3, BOTHstreams/freshcalls; independentB2math315profiles/9450recoveries/9765diagnostics eachC/A/B; SAME30nonidentitypointsrepeat",
+    "population": "ALL B3two methods455\u00d73 plus B2method105\u00d73, BOTHstreams/freshcalls; independentB2math315profiles/9450recoveries/9765diagnostics eachC/A/B; SAME30nonidentitypointsrepeat",
     "falsepayloads": "16math+7cost+2qualifier,2falseproofs,3forgedIDC and falseissuer; genuine rehashed/no receipt",
     "baseline_math": "Exactfirst-row0a181f004 andsetup-rank86449333f receipts; nativecounterfreshbothmethods, no imported timing",
     "identity": "Officialunchangedcanonicalnative module snapshots; evaluatedMersennefield64points andpinnedLeanpointer distinctfromactualkernelruns/signedverdict",
     "resource_agreement": "Typedexecution/runnerliteral/README/extension start+deadline checkedBEFOREdata; no stalefields",
     "analysis_agreement": "Typedactualscript/PINS/runner agree beforedata; syntheticmetadatafixture NOTnativeoutcomes",
     "scope": "SamePR4372open/autooff, automationpaused,no duplicatewriter/subagents; localonly",
-    "coordination": "KBnotloaded/wrapper127/Conductor127, no lease/replacement; actualrepo/primaryfallback"
+    "coordination": "KBnotloaded/wrapper127/Conductor127, no lease/replacement; actualrepo/primaryfallback",
+    "pre_data_amendment": "Before ANY newbuild/proof/data, addcoefficient-only split/repeated/zero quadratic extraction check; full334stages,same19:45deadline; firstunexecutedprotocol preserved inGit71727b16a"
   }
 }

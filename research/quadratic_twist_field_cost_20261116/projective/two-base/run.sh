@@ -58,6 +58,8 @@ elif [[ $mode = execute ]];then
  run source-cap2-rust 0 "$out/source-cap2-probe"
  run source-cap2-agree 0 cmp "$out/source-cap2-cpp.log" "$out/source-cap2-rust.log"
 
+ run quadratic-selftest 0 "$out/semantic" selftest "$head"
+ run quadratic-selftest-audit 0 bash -o pipefail -c '"$1" selftest "$2" < "$3"' _ "$out/math-audit" "$head" "$out/quadratic-selftest.log"
  for tag in C A B;do
   if [[ $tag = C ]];then run "semantic-$tag" 0 bash -o pipefail -c '"$1" produce C "$2" | xz -T1 -3 > "$3"' _ "$out/semantic" "$head" "$out/C.xz"
   else run "semantic-$tag" 0 bash -c '"$1" produce "$3" "$2" > "$4"' _ "$out/semantic" "$head" "$tag" "$out/$tag.digest";fi

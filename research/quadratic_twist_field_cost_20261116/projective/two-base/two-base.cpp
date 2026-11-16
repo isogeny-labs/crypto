@@ -184,7 +184,13 @@ void patch(const std::string&mode){
 void apply_patch_file(const fs::path&delta,const fs::path&hashout){
  std::string raw{std::istreambuf_iterator<char>(std::cin),{}};auto text=read(delta);auto end=text.find('\n');std::istringstream in(text.substr(0,end));std::string name,oldhash,newhash;size_t offset,len,n;in>>name>>offset>>len>>n>>oldhash>>newhash;need(name=="PATCH"&&offset+len<=raw.size(),"patch scope");std::string replacement=text.substr(end+1);need(replacement.size()==n&&digest(replacement)==newhash&&digest(raw.substr(offset,len))==oldhash,"exact altered payload binding");raw.replace(offset,len,replacement);write(hashout,digest(raw)+"\n");std::cout<<raw;need(bool(std::cout),"false stream emission");
 }
+void selftest(const std::string&head){
+ std::cout<<"TWO-QUADRATIC-SELFTEST "<<head<<'\n';
+ for(int domain=0;domain<2;domain++){ROUTE=3;BASE_POLY=false;std::vector<F>alphabet;if(domain==0){for(int a=0;a<61;a++)alphabet.push_back(F(a));}else{alphabet.push_back(F());F z=fast_tate(P{F(0),F(10),false},chi(P{F(37),F(14),false}));F at(1);for(int j=0;j<31;j++){alphabet.push_back(at);at=at*z;}}std::sort(alphabet.begin(),alphabet.end());need(std::set<F>(alphabet.begin(),alphabet.end()).size()==alphabet.size(),"distinct actual extraction alphabet");BaseScope mode(domain==0);int cases=0;
+ for(size_t i=0;i<alphabet.size();i++)for(size_t j=i;j<alphabet.size();j++){peak=0;Poly f=product(Poly{-alphabet[i],F(1)},Poly{-alphabet[j],F(1)},2);auto roots=cover_roots(f);std::vector<F>expected{alphabet[i],alphabet[j]};expected.erase(std::unique(expected.begin(),expected.end()),expected.end());need(roots==expected,"quadratic split/repeated/zero coefficient-only extraction");std::cout<<"S "<<domain<<' '<<i<<' '<<j<<' '<<poly(f)<<' '<<roots.size();for(F x:roots)std::cout<<' '<<encode(x);std::cout<<'\n';cases++;}std::cout<<"DOMAIN "<<domain<<' '<<cases<<'\n';}std::cout<<"SELFTEST-DONE\n";
+}
 int main(int argc,char**argv){try{
+ if(argc==3&&std::string(argv[1])=="selftest"){selftest(argv[2]);return 0;}
  if(argc==4&&std::string(argv[1])=="produce"){stream_produce(argv[2],argv[3]);return 0;}
  if(argc==3&&std::string(argv[1])=="corrupt"){patch(argv[2]);return 0;}
  if(argc==4&&std::string(argv[1])=="apply"){apply_patch_file(argv[2],argv[3]);return 0;}
