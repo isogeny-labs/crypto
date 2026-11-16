@@ -97,3 +97,34 @@ For the **domain-comparable B31 rows**, the partial observed reducer-block entry
 On **only the two equivalent B31-restricted ideals**, run both methods at paired dense/NNZ caps **30,000** and **60,000**, preserving the same pinned ordinary curve, point set, exact membership constraints, degree cap 12, per-call 5s cooperative limit and original F4 engine. Record every capped/timeout/basis-only result, wall time, matrix size, steps, field multiply-adds, and emitted complete solution counts (which remain unavailable without root extraction). Do not silently change resource limits between arms or assert a solver speedup from two censored stages. If both still hit oversize or cost balloons, close this presentation as a negative F4-engine lead rather than raising caps indefinitely.
 
 This is a bounded development diagnostic on the ordinary p=2³¹−1 prime-order curve; no authenticated paid EKS benchmark, PCC signature, full m8 natural relation or PKM/APS completion is being claimed.
+
+
+## Executed paired exact-B31 cap ladder — still no complete F4 output
+
+At source [19efc09da705](https://github.com/isogeny-labs/crypto/commit/19efc09da705d6412cb8e3919f1f54dd192696ae), [Actions 43781444534](https://github.com/isogeny-labs/crypto/actions/runs/43781444534) job 133019318139 completed all Rust tests and both 15k and 30k/60k paired panels. Exact measured output: [ORIENTED_PAIR_F4_CAP_LADDER_CI_20261116.json](ORIENTED_PAIR_F4_CAP_LADDER_CI_20261116.json), producer-only [pcc:unverified].
+
+| Exact-B31 cap | Original S3 reached degree | Original max B' | Oriented degree | Oriented max B' | Both complete? |
+|---:|---:|---:|---:|---:|---|
+| 30,000 | 6 | 32,599 | 5 | 37,664 | No; both oversize |
+| 60,000 | 6 | **280,334** | 5 | **70,526** | No; both oversize |
+
+The oriented model remains below the original model's first 60k-admitted large step, with a ~4.0× smaller *next rejected* B' block (70,526 versus 280,334) at the tested 60k cap. The corresponding partial multiply-adds were 246,250 versus 666,277. Crucially, **neither model completed**, and the degree and accepted-step histories differ. This is a structural *matrix-growth observation*, not a 4× reduction in complete relation-oracle time or an achieved lower ECDLP cost. Raising the fixed pair's cap alone is not the next action.
+
+## A single target-conditioned m8 transfer diagnostic, preregistered before execution
+
+A potentially useful property of the oriented lift is a **free-variable budget preserving substitution** into the *actual target-dependent* balanced m8 ideal. The original has three free partial-sum abscissae u,v,w. Replace the last fixed S3(x6,x7,w) by one ordinate y and one slope t, with
+
+    y² = x6³+a*x6+b,
+    2*y*t +(x7-x6)*t² = x6²+x6*x7+x7²+a,
+    w = t² - x6 - x7.
+
+The full target equation is then S4(u,v,t²-x6-x7,xR)=0, along with S4(x0,x1,x2,u)=S4(x3,x4,x5,v)=0. Thus there are **four** native F4 free variables u,v,y,t, within the actual MAX_FREE=4 engine limit, rather than adding variables to an unmodified w. The target S4 may grow to high degree/term count on substitution; this **must** be measured as a possible regression. The affine inverse-pair/identity exception is still separate.
+
+The controlled m8 experiment is a **bounded development falsifier**, not a claim of full algebraic recovery:
+
+1. Freeze the same 16 existing natural public masks from M8_NATURAL_F4_PANEL_20261115.json; the solver sees only full public coordinates to build the target polynomial, never the known mixed-walk coefficients or test-only split labels.
+2. Build the *original* 8-tower+3-free four-polynomial ideal and the *oriented* 8-tower+4-free five-polynomial ideal using the same existing Rust S3/S4 resultant builder and F4 engine, with 12 degree, 15k dense/NNZ and five-second per-call budgets. Compare original normal-form term counts against [526,526,16] from the existing Rust source; assert semantic vanishing on a fixed planted 8-point control without using it to choose a solution.
+3. Report every public target's F4 complete/oversize/timeout, partial matrix sizes, input construction time, steps, multiply-adds and root-extraction status. Do not call an incomplete basis a negative; no generic sum table or scalar input is allowed.
+4. Stop this presentation if the full target-conditioned oriented system also stops uniformly with no completed roots. Further cap increases and any performance claims require a distinct admitted study with actual target roots, row rank and PKM/APS index-calculus comparisons.
+
+The previous fixed-pair cap ladder has **not** established a successful oracle; this target-dependent experiment tests whether the two partial S4 constraints change that conclusion before abandoning the oriented mechanism.
