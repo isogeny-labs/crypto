@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2225Z-ic-gpu-rootfind-setup",
+  "latest_record": "20261116T0058Z-ic-gpu-ipc-split-a100",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 10,
     "invalid": 4,
-    "measured": 201,
+    "measured": 202,
     "open": 0
   },
   "repo": "crypto",
@@ -14805,6 +14805,468 @@
       ],
       "problem": "kernel:fes_f2_gpu_call_prep",
       "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "counted_answers_differ_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "counted_answers_differ_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.00014156,
+      "latest": 0.00014156,
+      "latest_derived": {},
+      "metric": "kernel_gpu_b_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00014147999999999998,
+            0.00014165
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.00014156
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 6.899333333333333e-05,
+      "latest": 6.899333333333333e-05,
+      "latest_derived": {},
+      "metric": "kernel_gpu_b_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            6.882e-05,
+            6.921e-05
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 6.899333333333333e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.36e-05,
+      "latest": 1.36e-05,
+      "latest_derived": {},
+      "metric": "pipe_floor_c_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.34e-05,
+            1.3700000000000001e-05
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 1.36e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.35e-05,
+      "latest": 1.35e-05,
+      "latest_derived": {},
+      "metric": "pipe_floor_c_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.34e-05,
+            1.3599999999999999e-05
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 1.35e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0003166333333333333,
+      "latest": 0.0003166333333333333,
+      "latest_derived": {},
+      "metric": "round_trip_a_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0003153,
+            0.0003187
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.0003166333333333333
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00024606666666666667,
+      "latest": 0.00024606666666666667,
+      "latest_derived": {},
+      "metric": "round_trip_a_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0002442,
+            0.00024890000000000003
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.00024606666666666667
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00026153333333333337,
+      "latest": 0.00026153333333333337,
+      "latest_derived": {},
+      "metric": "round_trip_b_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0002467,
+            0.00028670000000000003
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.00026153333333333337
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00019193333333333333,
+      "latest": 0.00019193333333333333,
+      "latest_derived": {},
+      "metric": "round_trip_b_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00018559999999999998,
+            0.0001967
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.00019193333333333333
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0006309516642429426,
+      "latest": 0.0006309516642429426,
+      "latest_derived": {},
+      "metric": "solver_call_a_pre4062_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0006299394067579127,
+            0.0006324092001710864
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.0006309516642429426
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0005009086119985801,
+      "latest": 0.0005009086119985801,
+      "latest_derived": {},
+      "metric": "solver_call_a_pre4062_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0004991113333333333,
+            0.0005036781075612353
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.0005009086119985801
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0002753493986313088,
+      "latest": 0.0002753493986313088,
+      "latest_derived": {},
+      "metric": "solver_call_b_main_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00026077928143712577,
+            0.00030012342514970056
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.0002753493986313088
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00020281910046148388,
+      "latest": 0.00020281910046148388,
+      "latest_derived": {},
+      "metric": "solver_call_b_main_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0001969117097976571,
+            0.0002070295969116081
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.00020281910046148388
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 7.941333333333335e-05,
+      "latest": 7.941333333333335e-05,
+      "latest_derived": {},
+      "metric": "unlocated_b_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            7.941333333333335e-05,
+            7.941333333333335e-05
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 7.941333333333335e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 8.509333333333331e-05,
+      "latest": 8.509333333333331e-05,
+      "latest_derived": {},
+      "metric": "unlocated_b_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            8.509333333333331e-05,
+            8.509333333333331e-05
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 8.509333333333331e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.00016852000000000002,
+      "latest": 0.00016852000000000002,
+      "latest_derived": {},
+      "metric": "worker_busy_b_char2_n25",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.00016790999999999998,
+            0.00016899000000000002
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 0.00016852000000000002
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 9.333999999999998e-05,
+      "latest": 9.333999999999998e-05,
+      "latest_derived": {},
+      "metric": "worker_busy_b_koblitz_n23",
+      "points": [
+        {
+          "commit": "1939c2ffb8da",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 3,
+          "record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            9.203e-05,
+            9.415000000000001e-05
+          ],
+          "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+          "value": 9.333999999999998e-05
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_split_a100",
+      "unit": "wall_s"
     },
     {
       "better": "higher",
