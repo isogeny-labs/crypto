@@ -1,0 +1,22 @@
+✔ [9058/9060] Built OrientationContent (3.8s)
+✖ [9059/9060] Building OrientationProduct (2.9s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean/OrientationProduct.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean/OrientationProduct.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/ir/OrientationProduct.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/ir/OrientationProduct.setup.json --json
+error: OrientationProduct.lean:48:39: Ambiguous term
+  prod_comp
+Possible interpretations:
+  Finset.prod_comp : ∀ (f : ?m.66 → ?m.67) (g : ?m.65 → ?m.66),
+    ∏ a ∈ ?m.68, f (g a) = ∏ b ∈ image g ?m.68, f b ^ #({a ∈ ?m.68 | g a = b})
+  
+  Polynomial.prod_comp : ∀ (s : Finset ?m.67) (p : ?m.67 → ?m.65[X]) (q : ?m.65[X]),
+    (∏ j ∈ s, p j).comp q = ∏ j ∈ s, (p j).comp q
+error: OrientationProduct.lean:48:2: Type mismatch: After simplification, term
+  hp
+ has type
+  Content (∑ i_1 ∈ mask u x y, ↑(m i_1) * beta i (chartOrder u x y) i_1)
+    (∏ i ∈ mask u x y, (factor (delta x y) i).comp (C ↑t + C (2 ^ (a + 1)) * X) ^ m i)
+but is expected to have type
+  Content (∑ j ∈ mask u x y, ↑(m j) * beta i (chartOrder u x y) j)
+    ((∏ j ∈ mask u x y, factor (delta x y) j ^ m j).comp (C ↑t + C (2 ^ (a + 1)) * X))
+Some required targets logged failures:
+- OrientationProduct
+error: build failed

@@ -1,0 +1,15 @@
+{
+  "schema": "cover.two-lp-dlp.post-call-coverage/v1",
+  "source_revision": "af48df0d30dccce461370cc8e787a45c2640134d",
+  "recorded_rref_products": 7711970,
+  "raw_counter_path": "two-lp.raw.json/work/solver_modular_muls",
+  "missing_product_hook": true,
+  "missing_subtraction_hook": true,
+  "separately_emitted_subtraction_count": null,
+  "inversion_hook": "already present; must not be charged twice",
+  "source_basis": "residual_walk.rs local mul_mod/sub_mod and FixedFactor::mul do not call modular hooks; RelationSystem::insert_by uses these",
+  "complete_cost": false,
+  "total_bitops": null,
+  "comparison_eligible": false,
+  "scope": "post-call source audit; original raw/qualifier/summary unchanged"
+}

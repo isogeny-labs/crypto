@@ -1,0 +1,28 @@
+{
+  "command": [
+    "/home/ec2-user/.cargo/bin/rustc",
+    "--edition=2021",
+    "-O",
+    "-C",
+    "overflow-checks=yes",
+    "--emit=link,dep-info",
+    "--cfg",
+    "quotient_trace",
+    "--cfg",
+    "trace_tests",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-quotient-trace/trace-tests.rs",
+    "-o",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-quotient-trace/validation-02/synthetic"
+  ],
+  "compile_exit": 0,
+  "executed": true,
+  "input_hashes": {
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-quotient-trace/trace-tests.rs": "1b47ae36bfef305d43c02023a482e628a18f6b40275c00571710fcf244c3fb50",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-quotient-trace/polynomial.rs": "afb7ee7879123bcb7493850b787758bc433517761ec97e7243b2acceba9bf0d7",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-quotient-trace/trace-meter.rs": "fc8658b0a9975d11914c9c29acd27d9fbf7abe34f59f02408fd9797ed36303d7",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-quotient-trace/../feature-native-weighted-quotient/polynomial.rs": "6b3f25f44847c0e9e690fa9db389bbc11b35450f5cbc7fec26ac6595eddff626"
+  },
+  "binary_sha256": "0cefb6f28d009be5c4b8071b6b7b8dbf54afc8f2b78da6b0896c5b2b1ee06067",
+  "check_exit": 0,
+  "stdout_sha256": "1f344ec23fac4cdf1678632630443dd3c039b05b888e05c1a6a447d4f1b153eb"
+}

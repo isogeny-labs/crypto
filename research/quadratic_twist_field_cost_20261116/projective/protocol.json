@@ -1,0 +1,862 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-projective-cold-engineering-20261116",
+  "version": 3,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116/projective",
+  "authors": [
+    "producer"
+  ],
+  "question": "Full finite engineering census of division-free base-field torus membership and original-source cold scalar recovery; no timed or original solving-degree claim.",
+  "claims": [
+    {
+      "id": "exact-coverage",
+      "text": "Actual native coverage, witness/rank/public-log/source-scalar reconstruction on every declared cell; no signed standing from producer output",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Runtime, total cost, intrinsic regularity and original-input pullback witness degree are outside this engineering census",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "cpp-build",
+      "role": "reference",
+      "description": "Exact native engineering stage cpp-build; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "rust-build",
+      "role": "reference",
+      "description": "Exact native engineering stage rust-build; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "produce-C",
+      "role": "candidate",
+      "description": "Exact native engineering stage produce-C; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "produce-A",
+      "role": "candidate",
+      "description": "Exact native engineering stage produce-A; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "produce-B",
+      "role": "candidate",
+      "description": "Exact native engineering stage produce-B; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "independent-audit",
+      "role": "control_positive",
+      "description": "Exact native engineering stage independent-audit; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-map",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-map; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-missing-policy",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-missing-policy; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-target",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-target; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-scalar; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-log",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-log; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-cost",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-cost; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-degree",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-degree; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-witness",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-witness; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-root; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-source; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-columns",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-columns; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    },
+    {
+      "id": "reject-missing-failure",
+      "role": "control_negative",
+      "description": "Exact native engineering stage reject-missing-failure; all declarations/controls retained, no timing verdict",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "source_checkpoint": "before affected launch"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "missing_failure_exception": "only explicit-null sentinel when no capped diagnostic exists"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "independent-audit",
+      "expected_detection": "Every actual identity/doubled-base/ordered-pair query in full census has no missing or extra certificate-admitted row; original-source scalars independently reconstructed",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-witness",
+      "null_population": {
+        "description": "Twelve genuinely changed and rehashed false native payload categories; not a random statistical null",
+        "generator": "Frozen run.py.txt metadata mutator; independent native arithmetic replay rejects false data",
+        "n": 12,
+        "why_n": "Exact semantic/source/cost/coverage integrity categories, no statistical generalization",
+        "matched_on": [
+          "unaltered native sources",
+          "all unmodified dataset bytes",
+          "actual fixture/domain",
+          "independent auditor",
+          "resource budget"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "encoding",
+        "levels": [
+          "quadratic-field terminal-progress",
+          "homogeneous base-field",
+          "quadratic-field conjugation control"
+        ]
+      },
+      {
+        "name": "payload_truth",
+        "levels": [
+          "original data",
+          "single false payload category"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "All native producer/auditor/runner/contract source bytes in PINS.json",
+        "how": "GitHub checkpoint/frozen protocol before affected native launch"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "C",
+          "A",
+          "B"
+        ],
+        "how": "All fresh full native executions, no answer lookup; deterministic equality not clock noise"
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "ALL455policies*3roles*2caps*31queries and all30separate original targets",
+        "how": "Native independently reconstructs full actual ordered population"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Existing LOCAL runtime only; max2workers",
+        "how": "No clock interpretation or total-cost inference"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "cpp-build",
+          "rust-build",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "reject-map",
+          "reject-missing-policy",
+          "reject-target",
+          "reject-scalar",
+          "reject-log",
+          "reject-cost",
+          "reject-degree",
+          "reject-witness",
+          "reject-root",
+          "reject-source",
+          "reject-columns",
+          "reject-missing-failure"
+        ],
+        "how": "Dependency-ordered deterministic exact census; no timing verdict"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "cpp-build",
+          "rust-build",
+          "produce-C",
+          "produce-A",
+          "produce-B",
+          "independent-audit",
+          "reject-map",
+          "reject-missing-policy",
+          "reject-target",
+          "reject-scalar",
+          "reject-log",
+          "reject-cost",
+          "reject-degree",
+          "reject-witness",
+          "reject-root",
+          "reject-source",
+          "reject-columns",
+          "reject-missing-failure"
+        ],
+        "differs_in": [
+          "payload_truth"
+        ],
+        "design": "absolute",
+        "threshold": "All declared full native execution/reconstruction stages finish0; every genuinely changed false payload rejects101/no receipt; only missing-failure may be explicit null under written rule"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "produce-A",
+          "produce-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "domain": "Actual F61/r31 cyclic source points and actual twist-assisted reduced Tate images",
+        "check": "Independent full group/image homomorphism, point/domain checks, legitimate admitted public logs and original scalar check; no generic twist map claim"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact full finite declared population, no p-value or timed effect claim"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 120,
+      "per_sample_seconds": 60,
+      "threads": 2,
+      "estimated_total_seconds": 1200,
+      "measured_on": "Conservative estimate from prior full integrated native study; new source not run before freeze, hard600s stage/3600s total stop"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "profiles",
+        "name": "profiles",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "2730complete policy/role/cap profiles per fresh execution",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "target_workloads",
+        "name": "target_workloads",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "81900separate configuration-target attempts per fresh execution, not distinct challenges",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "map_calls",
+        "name": "map_calls",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Actual cold mapping requests from producer counts and independent reconstruction",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "algebraic_recoveries",
+        "name": "algebraic_recoveries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Original source target scalar recovered using admitted public logs and a certified query",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "blocked_setups",
+        "name": "blocked_setups",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Rank-deficient admitted public setup, never patched by a scalar oracle",
+        "source": "audit.json and all source-bound native profile data",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "audited_theorems",
+      "failing_axioms",
+      "trusted_native"
+    ],
+    "record": [
+      "actual published source head",
+      "exact true/false sources",
+      "compiler release/binary SHA",
+      "Mathlib/dependency identities and cache inventory",
+      "gate/auditor/trust-file SHA",
+      "all commands/exits/build/audit/status logs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "placement": {
+      "outer_seconds": 3600,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All18native/build/control stages or first unexpected failure;600s per stage, absolute05:25UTC. Every incomplete population/failure retained; no favorable subset or oracle fallback.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "All full actual native cases reconstructed with exact point/row/witness/public-log/original-source scalar checks; false data rejected. No speed/regularity/original pullback degree inference.",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "All declared full native execution/reconstruction stages finish0; every genuinely changed false payload rejects101/no receipt; only missing-failure may be explicit null under written rule",
+    "statistic": "Exact full-population profile/witness/row/scalar consistency",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Descriptive named-chart cap/rank/recovery profiles; original-input witness pullback degree unknown/null",
+    "verdict_vocabulary": [
+      "finite_native_consistent_unsigned",
+      "failed",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quadratic_twist_field_cost_20261116/projective/audit.rs",
+      "sha256": "579b600d7555b7783a9c653286a39593c3d0d694da912a14a30de37f0f4de5d1"
+    },
+    "inputs": [
+      "All2730full profiles/81900separate targets per fresh C/A/B stream",
+      "Exact compressed complete witness traces and independent arithmetic",
+      "All source/protocol/binary/control hashes"
+    ],
+    "outputs": [
+      "Independent full reconstructed profiles/scalars and all raw failures",
+      "No clock or total-cost comparison"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Coordinate/exception-domain diagram only if proofs complete; no quantitative solver graph without data"
+    ],
+    "report_dir": "reports/kernel-20261115"
+  },
+  "inadmissible": [
+    "Change full population/caps/criteria after data",
+    "Feed reference point enumeration into candidate stopping",
+    "Use target scalar labels or unadmitted public logs in recovery",
+    "Turn cap-unknown into a certified root",
+    "Claim named chart degree is original witness degree or intrinsic regularity",
+    "Infer speed from unisolated clocks or incomplete cost vectors",
+    "Discard ties/losses/blocked setups/failed queries",
+    "Upload denied findings/assets or use paid resources/credential fallback"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.math.uci.edu/~asilverb/bibliography/ceilidh.pdf",
+      "provenance": "retrieved",
+      "claim": "Indexed primary section5.2 equations inspected; fullPDF inaccessible403/502/503, reciprocal chart is established not novel"
+    },
+    {
+      "ref": "https://hackmd.io/@yelhousni/emulated-pairing",
+      "provenance": "retrieved",
+      "claim": "Primary author torus compression/operations and exceptional±1 section read; SNARK inverse cost not native CPU price"
+    },
+    {
+      "ref": "https://doi.org/10.1007/11535218_5",
+      "provenance": "retrieved",
+      "claim": "Primary institutional record confirms established rational-torus IC; no extension-field/prime-field security inference"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "include-existing-json-header",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "First C++ build failed before data: existing JSON header include path omitted. Algorithm/population unchanged.",
+      "changes": [
+        "Add existing -I/workspace/twist-native-tooling/include to frozen build command",
+        "Pin immutable existing public JSON header bytes",
+        "Add exact repository identity guard"
+      ]
+    },
+    {
+      "id": "independent-actual-row-coverage",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "Static source review while v2 original data ran found that replay checked admitted row soundness and polynomial reconstruction but did not separately enumerate all actual signed source pairs after certification. This corrects the instrument to the already-written coverage criterion; v2 outcomes remain retained and are not called fully coverage-accepted. This amendment is after original v2 data and before new corrected-instrument data, not blinded confirmation.",
+      "changes": [
+        "Independent auditor enumerates actual signed source sums only AFTER each candidate certificate/extraction and requires exact ordered row equality; never feeds stopping",
+        "Auditor explicitly verifies59 is nonsquare in the actual curve field",
+        "Producer bytes, population, cap/admission/recovery criteria and all controls remain unchanged",
+        "Run a fresh full C/A/B corrected-instrument replication with new output directories"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "6227f5684f740148fd93b1e012a6d0fa789ba62593e79fac28da849491e2fc79",
+    "commit": "02e6da9b6a4c0a618e995010843cae77b1c4c8f8",
+    "frozen_at": "2026-11-16T04:32:51Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "window": "04:25-05:25UTC2026-11-16",
+    "fixture": {
+      "p": 61,
+      "d": 59,
+      "r": 31,
+      "source": [
+        21,
+        39,
+        0,
+        10
+      ],
+      "twist": [
+        23,
+        54,
+        37,
+        14
+      ]
+    },
+    "roles": [
+      3,
+      4,
+      5
+    ],
+    "policies": 455,
+    "caps": [
+      3,
+      4
+    ],
+    "query_points": 31,
+    "configuration_target_attempts_per_stream": 81900,
+    "profiles_per_stream": 2730,
+    "no_new_data_before_freeze": true,
+    "original_input_pullback_witness_degree": null,
+    "field_cost_price": null,
+    "canonical_current_guide": "encrypted/unreadable; historical guide+rules explicitly pinned/read; current checker/schema retained",
+    "checkpoint_transport": "Authorized samebranch public-algebra source/protocol GitHub checkpoint only; no denied-result narrative export",
+    "no_timing_claim": true,
+    "source_files_sha256": {
+      "run.py.txt": "ef13746ee85159465a44a932493fbab2dcd583e004f53b16c48b36b2996cfd52",
+      "PROTOCOL.md": "70e2b15b398cea115a97952aad8fc383ac76208fcc247dfc550952e753abc5a0",
+      "projective.cpp": "b84d80ad1391ceeec531565c27cd86bcc14e9ba84d0eff9fbe3a57df5342737b",
+      "Cargo.toml": "e7f6ab76aae54a6bc7c6e5dcdda0c19837ac91a8a6b71ad7d7836daa1125f629",
+      "audit.rs": "579b600d7555b7783a9c653286a39593c3d0d694da912a14a30de37f0f4de5d1",
+      "Cargo.lock": "d5ee0088905c734a18f56c3c6e4f21c762473f90feb30f9aaae82b39daff3e1a"
+    },
+    "external_files": {
+      "/workspace/twist-native-tooling/include/nlohmann/json.hpp": "9bea4c8066ef4a1c206b2be5a36302f8926f7fdc6087af5d20b417d0cf103ea6"
+    }
+  }
+}

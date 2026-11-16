@@ -1,0 +1,14 @@
+{
+  "action": "grep -rn '#\\[path' for that file outside src/ (tools/backend-leaderboard, research/*/measure) and build those crates too; keep shared files free of new dependencies",
+  "created": "2026-11-16T08:54:02Z",
+  "evidence": [
+    "PR #4406 check 'current' run 43832730815"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-extend"
+  ],
+  "trigger": "Changing a file under src/cryptanalysis/ecbench/ (canonical.rs, band.rs, stats.rs, methods.rs, callgrind.rs) to use a new crate or method",
+  "why": ""
+}

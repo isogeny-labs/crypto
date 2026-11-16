@@ -1,0 +1,11 @@
+p=1009;a=5;b=7;d=2; while(kronecker(d,p)!=-1,d++);
+T=ffgen(Mod(1,p)*(w^2-d),'T);
+Ek=ellinit([a,b]*T^0,T);
+R=random(Ek); print(R); xR=R[1]; L=liftall(xR); print(L);
+S3(x1,x2,x3)=(x1-x2)^2*x3^2-2*((x1+x2)*(x1*x2+a)+2*b)*x3+(x1*x2-a)^2-4*b*(x1+x2);
+tt=varlower("tt");
+u=polcoef(L,0,'T);v=polcoef(L,1,'T);print(u," ",v);
+S=S3(x1,x2,u+v*tt); print(variables(S));
+S=substpol(S,tt^2,d); U=Mod(1,p)*polcoef(S,0,tt); V=Mod(1,p)*polcoef(S,1,tt);
+print(variables(U)," ",poldegree(U,x1)," ",poldegree(U,x2));
+r=polresultant(U,V,x2); print(variables(r)," ",poldegree(r)," ", type(r));
