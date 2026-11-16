@@ -6,6 +6,7 @@ import subprocess, os, sys, json, time, hashlib, gzip, shlex
 repo=Path.cwd();base=repo/'research/quadratic_twist_field_cost_20261116/projective'
 out=Path(os.environ['PROJECTIVE_OUTPUT']).resolve();assert not out.exists() and not out.is_relative_to(repo)
 assert subprocess.check_output(['git','branch','--show-current'],text=True).strip()=='codex/twist-field-cost'
+assert subprocess.check_output(['git','remote','get-url','origin'],text=True).strip()=='https://github.com/isogeny-labs/crypto.git'
 assert not subprocess.check_output(['git','status','--porcelain'],text=True).strip()
 head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 ref=json.loads(Path(os.environ['PROJECTIVE_REF']).read_text())
@@ -13,6 +14,7 @@ assert ref['head']==head and ref['state']=='open' and ref['auto_merge'] is None 
 assert 0<=time.time()-ref['observed_epoch']<=60
 pins=json.loads((base/'PINS.json').read_text())
 for name,h in pins['files'].items():assert hashlib.sha256((base/name).read_bytes()).hexdigest()==h,name
+for name,h in pins.get('external_files',{}).items():assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==h,name
 protocol=json.loads((base/'protocol.json').read_text());assert protocol['freeze']['status']=='frozen'
 subprocess.run([sys.executable,'/workspace/canonical-protocol-20261115/tools/experiment_protocol.py','validate',str(base/'protocol.json')],check=True)
 out.mkdir(mode=0o700);(out/'source-ref.json').write_text(json.dumps(ref,indent=2)+'\n')
@@ -29,7 +31,7 @@ def run(name,args,expected=0,env=None):
     stages.append({'name':name,'exit':completed.returncode,'expected_exit':expected})
     (out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n')
     assert completed.returncode==expected,(name,completed.returncode)
-run('cpp-build',['g++','-std=c++20','-O2','-Wall','-Wextra',base/'projective.cpp','-lcrypto','-lz','-o',out/'producer'])
+run('cpp-build',['g++','-std=c++20','-O2','-Wall','-Wextra','-I/workspace/twist-native-tooling/include',base/'projective.cpp','-lcrypto','-lz','-o',out/'producer'])
 env=os.environ.copy();env.update(CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup',CARGO_BUILD_JOBS='2',CARGO_TARGET_DIR=str(out/'target'),PATH='/workspace/twist-native-tooling/cargo/bin:'+env['PATH'])
 run('rust-build',['cargo','build','--release','--locked','--offline','--manifest-path',base/'Cargo.toml'],env=env)
 audit=out/'target/release/twist_projective_audit'
