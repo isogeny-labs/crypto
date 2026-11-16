@@ -1,0 +1,22 @@
+[
+  {
+    "name": "QuarticFibre.cleared_fibre_factorization",
+    "claim_path": "pcc/claims/PCC-20261112-d4010b.json",
+    "statement": "theorem cleared_fibre_factorization {K : Type} [CommRing K] (f m n q a b x y : K) (hcover : f*m^2=n^3+a*n*q^4+b*q^6) (hpoint : y^2=x^3+a*x+b) : f*m^2-y^2*q^6 = (n-x*q^2)*(n^2+n*x*q^2+x^2*q^4+a*q^4)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/QuarticFibre.lean",
+      "theorem": "QuarticFibre.cleared_fibre_factorization",
+      "decl_sha256": "0640025a173d9a44b980531468decd4b8ae604e522a37a8e0009d3a8ddd9c9ff"
+    }
+  },
+  {
+    "name": "QuarticFibre.ordinate_denominator_inverse",
+    "claim_path": "pcc/claims/PCC-20261112-4286c9.json",
+    "statement": "theorem ordinate_denominator_inverse {K : Type} [CommRing K] (f m y q yi qi : K) (hfibre : f*m^2=y^2*q^6) (hy : y*yi=1) (hq : q*qi=1) : m*(f*m*yi^2*qi^6)=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/QuarticFibre.lean",
+      "theorem": "QuarticFibre.ordinate_denominator_inverse",
+      "decl_sha256": "af8fa2ffcff63a0cdca685d33ee808c3709fe4cae8c2481e71c4223a6aba4e15"
+    }
+  }
+]

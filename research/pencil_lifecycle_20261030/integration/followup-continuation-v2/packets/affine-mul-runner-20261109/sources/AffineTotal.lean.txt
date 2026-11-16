@@ -1,0 +1,40 @@
+import AffineRelation
+set_option autoImplicit false
+namespace AffineDispatch
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput FastPrelude FastCalls
+
+theorem fallback_execution (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b : Stored)
+ (hp : 1<p.toNat) (hbound : p.toNat<2^31) (hf : Canon p f) (hfd : (wordsPoly p f).natDegree=5)
+ (ha : WellFormed p (wordsPoly p f) a) (hb : WellFormed p (wordsPoly p f) b)
+ (ht : IsFallback (classify p a b)) :
+ ∃ out, Runs p f a b (classify p a b) out ∧ WellFormed p (wordsPoly p f) out := by
+ obtain ⟨hac,havc,han,havn,hae,hal,havl,had,haval⟩:=stored_inputs p _ a hp ha
+ obtain ⟨hbc,hbvc,hbn,hbvn,hbe,hbl,hbvl,hbd,hbval⟩:=stored_inputs p _ b hp hb
+ obtain ⟨ch,u,w,r,v0,au,bv,hdiv,hr,hv0,hrun,huc,hvc,hun,hvn,_,_,_,_,hval⟩ :=
+  ReductionWord.fallback_reduced_strict p (up a) (up b) (vp a) (vp b) f hp hbound
+   hac hbc havc hbvc hf han hbn haval.1.ne_zero hbval.1.ne_zero
+   (by rw [had];exact ha.1) (by rw [hbd];exact hb.1) hfd
+   (by simpa [pow_two] using ha.2.2.2.2.2) (by simpa [pow_two] using hb.2.2.2.2.2)
+ obtain ⟨hc,hw⟩:=construct_wellformed p _ au bv hp huc hvc hun hvn hval
+ exact ⟨raw au bv,Runs.fallback (classify p a b) rfl ht ch u w r v0 au bv (raw au bv) hdiv hr hv0 hrun hc,hw⟩
+
+theorem total_preserving_execution (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a b : Stored)
+ (hp : 2<p.toNat) (hbound : p.toNat<2^31) (hf : Canon p f) (hfd : (wordsPoly p f).natDegree=5)
+ (ha : WellFormed p (wordsPoly p f) a) (hb : WellFormed p (wordsPoly p f) b) :
+ ∃ out, Runs p f a b (classify p a b) out ∧ WellFormed p (wordsPoly p f) out := by
+ by_cases ha0 : a.degree=0
+ · refine ⟨b,?_,hb⟩
+   simpa [classify,ha0] using (Runs.left (p:=p) (f:=f) (b:=b) ha0)
+ by_cases hb0 : b.degree=0
+ · refine ⟨a,?_,ha⟩
+   simpa [classify,ha0,hb0] using (Runs.right (p:=p) (f:=f) ha0 hb0)
+ rcases nonidentity_partition p a b ha0 hb0 with hfast | hfallback
+ · obtain ⟨hda,hdb,hn,hs⟩:=(classify_fast_iff p a b).mp hfast
+   obtain ⟨q,r,hq,hr,huc,hun,hrc,hrn,_,hl,_,hval⟩:=
+    stored_fast_calls p f a b hp hbound hf hfd ha hb hda hdb hn hs
+   obtain ⟨hc,hw⟩:=construct_wellformed p _ _ r (by omega) huc hrc hun hrn hval
+   refine ⟨raw (scaled p (extract a b) q) r,?_,hw⟩
+   rw [hfast]
+   exact Runs.fast hfast q r _ hq hr hl hc
+ · exact fallback_execution p f a b (by omega) hbound hf hfd ha hb hfallback
+end AffineDispatch

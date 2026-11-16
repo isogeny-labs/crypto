@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=11];
+ native [label="Frozen native calls: common logging\nOld[0,2,0] -> new[2,3,4]; live basis3"];
+ snapshot [label="Lean operational table-copy model\nThree function updates; actual logged indices"];
+ matrix [label="Every coefficient type/content\nNew matrix lookup returns old basis value",fillcolor="#d8eee4"];
+ wrong [label="New3/4 absent from live basis\nNew2 in range can denote different coefficient\nUniversal wrong-table invariant is false",fillcolor="#fbe3df"];
+ paired [label="Native ordinary: baseline134, corrected exactPASS\nBoth saturation calls timeout5s",fillcolor="#fff1d5"];
+ scope [label="No C trace-authenticity / pointer refinement proof\nLive prefix differs from allocated capacity\nCurrent upstream already uses matrix lookup",fillcolor="#fff1d5"];
+ native -> snapshot [style=dashed,label="recorded values"];
+ snapshot -> matrix; snapshot -> wrong;
+ native -> paired; matrix -> scope; wrong -> scope; paired -> scope;
+}

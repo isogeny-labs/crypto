@@ -1,0 +1,11 @@
+name = "local_translation_audit"
+version = "0.1.0"
+defaultTargets = ["LocalTranslationAudit"]
+
+[[require]]
+name = "elliptic_translation_audit"
+path = "../../elliptic_translation_audit_20261115/lean"
+
+[[lean_lib]]
+name = "LocalTranslationAudit"
+roots = ["LocalTranslationCertificate", "TranslationEvaluation", "TranslationExpansion", "TranslationInfinity", "TranslationIntegral", "TranslationLocal", "TranslationSign", "TranslationTransport", "TranslationValuation"]

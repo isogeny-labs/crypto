@@ -1,0 +1,14 @@
+digraph Target {
+ graph [rankdir=TB,bgcolor="white",fontname="Helvetica",ranksep=0.22];
+ node [shape=box,style="rounded,filled",fillcolor="#EDF4FF",fontname="Helvetica",fontsize=11];
+ edge [color="#4D607D"];
+ public [label="PUBLIC COMPILATION\np,h,a,q,k,A; arity; target Q; distinct mode\nNo planted labels, signs, scalar or witness"];
+ members [label="SIX MEMBER/IMAGE MODULES\nBoth Fp2 coordinates; bounded selectors\nPairwise raw-parameter norm inverse guards"];
+ sum [label="COMPLETE EXTENDED EDWARDS SUM\nEqual / inverse / identity intermediates retained\nInverse Z and both target coordinates\n1059 variables / 1089 equations / 3323 terms; degree 2"];
+ root [fillcolor="#FFF3D9",label="ROOT DISCOVERY: OPEN\nKnown-witness checking is not a solver\nYield and complete work remain unpriced"];
+ decode [label="CHECKED-ROOT ADAPTER\nStandard BSGS; actual baby table 14600 entries\nCanonical sign; keep raw image aliases distinct\nIndependent signed-row replay against Q"];
+ finite [label="FIXED NATIVE CONTROLS\n24024 toy pair/target assignments; 1848 accepted\n144 equal-image + 144 inverse-image pairs\n18 actual raw labels; 1059 mutations rejected\nProducer-local; unsigned / unverified"];
+ public -> members; members -> sum; sum -> root;
+ root -> decode [style=dashed,label="requires a returned root"];
+ sum -> finite; decode -> finite;
+}

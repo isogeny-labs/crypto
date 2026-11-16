@@ -1,0 +1,9 @@
+# Production compiled quotient arithmetic correctness
+
+Remove only unconditional product/colon reference comparisons from the preceding verified compiled-map implementation. Keep original unused reference methods for audit, but no production call may invoke them. Preserve full group-law dimensions/nullspace normalization, in-run tensor construction and1millionentrycap, section no-base shortcut and exceptional fallback. Counts now denote production calls, not reference comparisons.
+
+Correctness executable runs both direct original-input recoveries, all primary/adjacent/sign/corruption and both-chart controls, plus explicit degree2fixedbase control. Require both branches and nonzero product/colon counters; finalclasses must equal preceding independent direct replay under separate post-run comparison. No prior class/scalar is reconstruction input. Production entrypoint omits extra fixedbase control and its branch assertion, with identical evaluator/group code.
+
+Phase RAII probes are disabled unless HEC_PHASE_LOG is explicitly present; unset it for this correctness gate. When enabled later they report nested model construction, complete per-input replay and per-candidate spans, with panic completion status. Nested phases must not be added as disjoint times. No timing execution until a new benchmark record, stable same-host controls, complete hashes and source checkpoint. This gate measures no time and establishes no performance gain.
+
+Freeze all source/lock/arithmetic/input/binary hashes; commit/checkpoint/gate before once-only correctness execution. Preserve mismatch/cap/failure without fallback. Earlier1.621xand drift-affected0.930records unchanged; no cold end-to-end/genus2/4/10xclaim. A later comparison must charge tensor construction and dual maps and report host stability before making speed claims.

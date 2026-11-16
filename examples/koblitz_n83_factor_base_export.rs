@@ -6,6 +6,8 @@ use crypto_lib::cryptanalysis::koblitz_fast_arith::{FastBinaryCurve128, FastPoin
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     frobenius_eigenvalue, koblitz_point_count, ChainS3Limits,
 };
+use crypto_lib::hash::sha256::sha256;
+use crypto_lib::store::{backend::RemoteSpec, hash_file, PushMeta, Store};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -16,6 +18,10 @@ use std::fs::{self, OpenOptions};
 use std::io::{Read, Write};
 use std::path::Path;
 use std::process::Command;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 use std::time::{Duration, Instant};
 
 // Archived research snapshots, compiled here unchanged. research/ is not
@@ -27,6 +33,9 @@ mod compact_cold;
 #[path = "../research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs"]
 #[allow(dead_code, unused_imports, clippy::all)]
 mod primary_adapter;
+#[path = "n83_factor_base_sweep_v5.rs"]
+#[allow(dead_code)]
+mod v5_design;
 
 const STUDY: &str = "koblitz_n83_factor_base_sweep_20261008";
 const PREFIX: &str = "s3://crypto-autoresearcher/factor-bases/icv1/etc";
@@ -54,8 +63,72 @@ const SYMMETRIES: [&str; 5] = [
 ];
 const LA: [&str; 3] = ["dense_u64", "sparse_u64", "modular_biguint"];
 const RADICES: [usize; 8] = [5, 4, 5, 8, 2, 3, 3, 3];
+const V5_RETAINED_K600_ORDINAL: u64 = 26_960_859_236;
+const V5_RETAINED_K600_SHA256: &str =
+    "3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf";
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+/// Bind one declared v5 cell to the already retained, exact K600 store object.
+/// This only checks a runnable adapter; it is not a runtime measurement.
+fn retained_v5_k600_binding(ordinal: u64, base_dir: &Path) -> Result<Value> {
+    if ordinal != V5_RETAINED_K600_ORDINAL {
+        return Err("no retained v5 adapter for this ordinal".into());
+    }
+    let source_root = std::env::var_os("ICV1_FROZEN_SOURCE_DIR")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")));
+    let v5_source = source_root.join("examples/n83_factor_base_sweep_v5.rs");
+    if fs::read(v5_source)?.as_slice() != include_bytes!("n83_factor_base_sweep_v5.rs").as_slice() {
+        return Err("v5 adapter source differs from the compiled source".into());
+    }
+    let case = v5_design::verified_case(&source_root, ordinal)?;
+    if case["region"] != "v5_single_base"
+        || case["source"]["base_index"] != 92
+        || case["source"]["base"]
+            != json!({"a":0,"closure":"signed_frobenius","family":"public_x_hash",
+                "parameter":600,"parameter_unit":"orbit_columns","seed":2026100801u64})
+        || case["symmetry_mask"] != 18
+        || case["solver"]
+            != json!({"summands":6,"split_bits":0,
+                "symmetry":["signed_frobenius","ordered_first_pair"],
+                "backend":"sat_cdcl","enumeration":"binary",
+                "max_large_primes":0,"threads":1,"linear_algebra":"modular_biguint"})
+    {
+        return Err("v5 retained K600 case no longer matches the executable strategy".into());
+    }
+    let manifest: Value = serde_json::from_slice(&fs::read(base_dir.join("manifest.json"))?)?;
+    if manifest["schema"] != "n83.factor-base-panel/v3-artifact-store"
+        || manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || manifest["remote"] != "s3://setec-astronomy-artifacts/store"
+        || manifest["base"]["a"] != 0
+        || manifest["base"]["closure"] != "signed_frobenius"
+        || manifest["base"]["columns"] != 600
+        || manifest["base"]["policy"] != "public_x_hash"
+        || manifest["base"]["seed"] != 2026100801u64
+        || manifest["base"]["compressed_sha256"] != V5_RETAINED_K600_SHA256
+        || manifest["base"]["bytes"] != 3_025_798u64
+    {
+        return Err("retained K600 store manifest differs from the v5 binding".into());
+    }
+    Ok(json!({
+        "schema":"n83.v5-retained-adapter-binding/v1",
+        "status":"PASS_EXACT_ADAPTER_BINDING",
+        "ordinal":ordinal,
+        "base_sha256":V5_RETAINED_K600_SHA256,
+        "strategy":"ordered-orbit-chain-s3",
+        "case":case,
+        "executed_complete_pipeline":false,
+        "selected_best_total_runtime":Value::Null
+    }))
+}
+
+fn require_v5_one_thread(value: Option<&str>) -> Result<()> {
+    if value != Some("1") {
+        return Err("V5 one-thread cell requires RAYON_NUM_THREADS=1".into());
+    }
+    Ok(())
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 struct BaseSpec {
@@ -700,6 +773,398 @@ fn construct_v2_one(
     Ok(())
 }
 
+/// Construct one primary base, replay every point and label using the generic
+/// curve path, publish it under an immutable SHA-256 name, and force a fresh
+/// remote download before issuing the successor custody receipt.
+fn construct_store_v3_one(
+    root: &Path,
+    policy: &str,
+    columns: usize,
+    seed: u64,
+    budget_seconds: u64,
+    source_commit: &str,
+    remote: &str,
+    store: &mut Store,
+) -> Result<Value> {
+    if ![
+        "public_x_sequential",
+        "public_x_hash",
+        "public_x_gray_prefix",
+    ]
+    .contains(&policy)
+        || columns == 0
+        || budget_seconds == 0
+        || budget_seconds > 7200
+        || source_commit.len() != 40
+        || !source_commit.bytes().all(|byte| byte.is_ascii_hexdigit())
+        || store.cfg.remote.as_ref() != Some(&RemoteSpec::parse(remote)?)
+    {
+        return Err("v3 primary construction inputs or store remote invalid".into());
+    }
+    fs::create_dir(root)?;
+    fs::create_dir(root.join("objects"))?;
+    let total_start = Instant::now();
+    write_new_json(
+        &root.join("attempt.json"),
+        &json!({"schema":"n83.factor-base-attempt/v3-artifact-store",
+            "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+            "policy":policy,"columns":columns,"seed":seed,
+            "construction_budget_seconds":budget_seconds,"source_commit":source_commit,
+            "remote":remote,"selected_best_total_runtime":Value::Null}),
+    )?;
+    let deadline = total_start + Duration::from_secs(budget_seconds);
+    let construction_finished = Arc::new(AtomicBool::new(false));
+    let watchdog_finished = Arc::clone(&construction_finished);
+    let cap_path = root.join("construction-cap.json");
+    std::thread::spawn(move || {
+        std::thread::sleep(deadline.saturating_duration_since(Instant::now()));
+        if !watchdog_finished.load(Ordering::Acquire) {
+            let _ = write_new_json(
+                &cap_path,
+                &json!({"schema":"n83.factor-base-construction-cap/v3-artifact-store",
+                    "status":"UNKNOWN_budget","construction_budget_seconds":budget_seconds,
+                    "elapsed_process_wall_ms":total_start.elapsed().as_secs_f64()*1000.0,
+                    "selected_best_total_runtime":Value::Null}),
+            );
+            std::process::exit(124);
+        }
+    });
+    let partial = root.join("objects/.partial.jsonl.gz");
+    let file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&partial)?;
+    let mut writer = HashingWriter {
+        inner: GzEncoder::new(file, Compression::default()),
+        hasher: blake3::Hasher::new(),
+    };
+    let mut row = match construct_into(0, policy, columns, seed, deadline, &mut writer) {
+        Ok(row) => row,
+        Err(error) => {
+            construction_finished.store(true, Ordering::Release);
+            return Err(error);
+        }
+    };
+    let plain_blake3 = writer.hasher.finalize().to_hex().to_string();
+    let finished = writer.inner.finish();
+    construction_finished.store(true, Ordering::Release);
+    finished?.sync_all()?;
+    let construction_ms = total_start.elapsed().as_secs_f64() * 1000.0;
+    let compressed = fs::read(&partial)?;
+    let compressed_sha256 = hex::encode(sha256(&compressed));
+    let compressed_blake3 = blake3::hash(&compressed).to_hex().to_string();
+    let mut plain = Vec::new();
+    GzDecoder::new(&compressed[..]).read_to_end(&mut plain)?;
+    if blake3::hash(&plain).to_hex().as_str() != plain_blake3 {
+        return Err("v3 construction stream hash mismatch".into());
+    }
+    let object = root
+        .join("objects")
+        .join(format!("{compressed_sha256}.jsonl.gz"));
+    fs::rename(&partial, &object)?;
+    let store_name =
+        format!("factor-bases/icv1-f2m83-tm6151469093347-debefd74/{compressed_sha256}.jsonl.gz");
+    row["closure"] = json!("signed_frobenius");
+    row["store_name"] = json!(store_name);
+    row["compressed_sha256"] = json!(compressed_sha256);
+    row["compressed_blake3"] = json!(compressed_blake3);
+    row["plain_blake3"] = json!(plain_blake3);
+    row["bytes"] = json!(compressed.len());
+    row["plain_bytes"] = json!(plain.len());
+    let replay_start = Instant::now();
+    let (points_checked, representatives_checked) =
+        primary_adapter::replay_constructed_primary(&row, &plain)?;
+    let replay_ms = replay_start.elapsed().as_secs_f64() * 1000.0;
+    drop(plain);
+    drop(compressed);
+    write_new_json(
+        &root.join("manifest.json"),
+        &json!({"schema":"n83.factor-base-panel/v3-artifact-store",
+            "status":"completed_factor_base_object","study":STUDY,
+            "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+            "source_commit":source_commit,"remote":remote,"base":row,
+            "selected_best_total_runtime":Value::Null,
+            "measurement_scope":"factor-base construction and custody only; no relation, rank, individual log or total runtime"}),
+    )?;
+    let manifest_sha256 = hex::encode(sha256(&fs::read(root.join("manifest.json"))?));
+    write_new_json(
+        &root.join("replay.json"),
+        &json!({"schema":"n83.factor-base-replay/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"store_name":store_name,
+            "point_set_blake3":row["point_set_blake3"],
+            "points_checked":points_checked,"representatives_checked":representatives_checked,
+            "generic_replay_wall_ms_informational_L0":replay_ms}),
+    )?;
+    let publish_start = Instant::now();
+    let pushed = store.push(
+        &store_name,
+        &object,
+        PushMeta {
+            description: format!("N83 primary signed-Frobenius {policy} K{columns}"),
+            tags: vec!["n83".into(), "factor-base".into(), "icv1".into()],
+            provenance: format!("{source_commit} {manifest_sha256}"),
+            no_cache: true,
+            ..Default::default()
+        },
+    )?;
+    let publish_ms = publish_start.elapsed().as_secs_f64() * 1000.0;
+    if pushed.sha256 != compressed_sha256 || pushed.bytes != row["bytes"].as_u64().unwrap_or(0) {
+        return Err("v3 store push disagrees with constructed object".into());
+    }
+    let mut fresh_cfg = store.cfg.clone();
+    fresh_cfg.cache_dir = root.join(".fresh-cache");
+    let fresh_store = Store::open(fresh_cfg)?;
+    let pull_start = Instant::now();
+    let pulled = fresh_store.ensure(&store_name)?;
+    let pull_ms = pull_start.elapsed().as_secs_f64() * 1000.0;
+    let (fresh_sha256, fresh_bytes) = hash_file(&pulled.path)?;
+    if !pulled.fetched || fresh_sha256 != pushed.sha256 || fresh_bytes != pushed.bytes {
+        return Err("v3 fresh remote pull did not match the pushed object".into());
+    }
+    write_new_json(
+        &root.join("storage.json"),
+        &json!({"schema":"n83.factor-base-storage/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"remote":remote,"store_name":store_name,
+            "sha256":pushed.sha256,"bytes":pushed.bytes,"uploaded":pushed.uploaded,
+            "fresh_download_sha256":fresh_sha256,"fresh_download_bytes":fresh_bytes,
+            "construction_wall_ms_informational_L0":construction_ms,
+            "publish_wall_ms_informational_L0":publish_ms,
+            "fresh_pull_wall_ms_informational_L0":pull_ms,
+            "elapsed_process_wall_ms_informational_L0":total_start.elapsed().as_secs_f64()*1000.0,
+            "selected_best_total_runtime":Value::Null}),
+    )?;
+    let import = primary_adapter::verify_store_v3(root, &fresh_store)?;
+    write_new_json(&root.join("import.json"), &import)?;
+    Ok(import)
+}
+
+/// Adopt an already archived v3 object from a different remote without a PUT.
+/// The source manifest and artifact pointer are pinned by caller-supplied
+/// SHA-256 values. A fresh remote download and generic curve replay create
+/// new receipts; the earlier local-store receipt is never relabelled as S3.
+#[allow(clippy::too_many_arguments)]
+fn adopt_store_v3_readonly(
+    source_root: &Path,
+    artifact_pointer: &Path,
+    expected_source_manifest_sha256: &str,
+    expected_pointer_sha256: &str,
+    remote: &str,
+    budget_seconds: u64,
+    adopter_source_commit: &str,
+    root: &Path,
+    store: &Store,
+) -> Result<Value> {
+    if budget_seconds == 0
+        || budget_seconds > 300
+        || [expected_source_manifest_sha256, expected_pointer_sha256]
+            .iter()
+            .any(|digest| digest.len() != 64 || !digest.bytes().all(|b| b.is_ascii_hexdigit()))
+        || adopter_source_commit.len() != 40
+        || !adopter_source_commit.bytes().all(|b| b.is_ascii_hexdigit())
+        || store.cfg.remote.as_ref() != Some(&RemoteSpec::parse(remote)?)
+        || root.exists()
+    {
+        return Err("read-only v3 adoption input, source, remote or output invalid".into());
+    }
+    let source_manifest_bytes = fs::read(source_root.join("manifest.json"))?;
+    let source_manifest_sha256 = hex::encode(sha256(&source_manifest_bytes));
+    if source_manifest_sha256 != expected_source_manifest_sha256 {
+        return Err("source v3 manifest differs from frozen SHA-256".into());
+    }
+    let source_manifest: Value = serde_json::from_slice(&source_manifest_bytes)?;
+    let source_replay: Value = serde_json::from_slice(&fs::read(source_root.join("replay.json"))?)?;
+    let source_storage: Value =
+        serde_json::from_slice(&fs::read(source_root.join("storage.json"))?)?;
+    let row = &source_manifest["base"];
+    let store_name = row["store_name"]
+        .as_str()
+        .ok_or("source store name missing")?;
+    let digest = row["compressed_sha256"]
+        .as_str()
+        .ok_or("source compressed digest missing")?;
+    let bytes = row["bytes"]
+        .as_u64()
+        .ok_or("source compressed size missing")?;
+    let plain_bytes = row["plain_bytes"]
+        .as_u64()
+        .ok_or("source plain size missing")?;
+    let columns = row["columns"].as_u64().ok_or("source columns missing")?;
+    let points = row["points"].as_u64().ok_or("source point count missing")?;
+    if source_manifest["schema"] != "n83.factor-base-panel/v3-artifact-store"
+        || source_manifest["status"] != "completed_factor_base_object"
+        || source_manifest["study"] != STUDY
+        || source_manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || source_manifest["source_commit"]
+            .as_str()
+            .is_none_or(|value| value.len() != 40 || !value.bytes().all(|b| b.is_ascii_hexdigit()))
+        || row["a"] != 0
+        || row["closure"] != "signed_frobenius"
+        || ![
+            "public_x_sequential",
+            "public_x_hash",
+            "public_x_gray_prefix",
+        ]
+        .iter()
+        .any(|policy| row["policy"] == *policy)
+        || columns == 0
+        || points
+            != columns
+                .checked_mul(166)
+                .ok_or("source point count overflow")?
+        || bytes == 0
+        || plain_bytes == 0
+        || !store_name.starts_with("factor-bases/icv1-f2m83-tm6151469093347-debefd74/")
+        || store_name
+            != format!("factor-bases/icv1-f2m83-tm6151469093347-debefd74/{digest}.jsonl.gz")
+        || source_replay["schema"] != "n83.factor-base-replay/v3-artifact-store"
+        || source_replay["status"] != "PASS"
+        || source_replay["manifest_sha256"] != source_manifest_sha256
+        || source_replay["store_name"] != store_name
+        || source_replay["point_set_blake3"] != row["point_set_blake3"]
+        || source_replay["points_checked"].as_u64() != Some(points)
+        || source_replay["representatives_checked"].as_u64() != Some(columns)
+        || source_storage["schema"] != "n83.factor-base-storage/v3-artifact-store"
+        || source_storage["status"] != "PASS"
+        || source_storage["manifest_sha256"] != source_manifest_sha256
+        || source_storage["remote"] != source_manifest["remote"]
+        || source_storage["store_name"] != store_name
+        || source_storage["sha256"] != digest
+        || source_storage["bytes"].as_u64() != Some(bytes)
+        || source_storage["fresh_download_sha256"] != digest
+        || source_storage["fresh_download_bytes"].as_u64() != Some(bytes)
+    {
+        return Err("source v3 manifest, replay or storage differs from custody contract".into());
+    }
+    let pointer_bytes = fs::read(artifact_pointer)?;
+    let pointer_sha256 = hex::encode(sha256(&pointer_bytes));
+    if pointer_sha256 != expected_pointer_sha256 {
+        return Err("archive artifact pointer differs from frozen SHA-256".into());
+    }
+    let pointer: Value = serde_json::from_slice(&pointer_bytes)?;
+    let object_name = format!("{digest}.jsonl.gz");
+    if pointer["schema"] != "artifacts.manifest/v1"
+        || pointer["files"]
+            .as_object()
+            .is_none_or(|files| files.len() != 1)
+        || pointer["files"][&object_name]["sha256"] != digest
+        || pointer["files"][&object_name]["bytes"].as_u64() != Some(bytes)
+    {
+        return Err("archive artifact pointer differs from source object".into());
+    }
+    let (indexed_name, indexed_digest, indexed_bytes) = store.lookup(store_name)?;
+    if indexed_name.as_deref() != Some(store_name)
+        || indexed_digest != digest
+        || indexed_bytes != Some(bytes)
+    {
+        return Err("read-only adoption index differs from source object".into());
+    }
+    fs::create_dir(root)?;
+    let total_start = Instant::now();
+    write_new_json(
+        &root.join("attempt.json"),
+        &json!({"schema":"n83.factor-base-adoption-attempt/v1",
+            "status":"STARTED","source_manifest_sha256":source_manifest_sha256,
+            "artifact_pointer_sha256":pointer_sha256,"adopter_source_commit":adopter_source_commit,
+            "remote":remote,"store_name":store_name,"sha256":digest,"bytes":bytes,
+            "budget_seconds":budget_seconds,"selected_best_total_runtime":Value::Null}),
+    )?;
+    let finished = Arc::new(AtomicBool::new(false));
+    struct FinishOnDrop(Arc<AtomicBool>);
+    impl Drop for FinishOnDrop {
+        fn drop(&mut self) {
+            self.0.store(true, Ordering::Release);
+        }
+    }
+    let _finish_on_drop = FinishOnDrop(Arc::clone(&finished));
+    let watchdog_finished = Arc::clone(&finished);
+    let cap_path = root.join("cap.json");
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_secs(budget_seconds));
+        if !watchdog_finished.load(Ordering::Acquire) {
+            let _ = write_new_json(
+                &cap_path,
+                &json!({"schema":"n83.factor-base-adoption-cap/v1",
+                    "status":"UNKNOWN_budget","budget_seconds":budget_seconds,
+                    "elapsed_process_wall_ms":total_start.elapsed().as_secs_f64()*1000.0,
+                    "selected_best_total_runtime":Value::Null}),
+            );
+            std::process::exit(124);
+        }
+    });
+    let mut fresh_cfg = store.cfg.clone();
+    fresh_cfg.cache_dir = root.join(".fresh-cache");
+    let fresh_store = Store::open(fresh_cfg)?;
+    let pull_start = Instant::now();
+    let pulled = fresh_store.ensure(store_name)?;
+    let pull_ms = pull_start.elapsed().as_secs_f64() * 1000.0;
+    let (fresh_sha256, fresh_bytes) = hash_file(&pulled.path)?;
+    if !pulled.fetched || fresh_sha256 != digest || fresh_bytes != bytes {
+        return Err("read-only adoption did not freshly fetch the pinned object".into());
+    }
+    let compressed = fs::read(&pulled.path)?;
+    if compressed.len() as u64 != bytes
+        || blake3::hash(&compressed).to_hex().as_str()
+            != row["compressed_blake3"]
+                .as_str()
+                .ok_or("compressed BLAKE3 missing")?
+    {
+        return Err("read-only adoption compressed object differs".into());
+    }
+    let mut plain = Vec::new();
+    GzDecoder::new(&compressed[..])
+        .take(plain_bytes.checked_add(1).ok_or("plain size overflow")?)
+        .read_to_end(&mut plain)?;
+    if plain.len() as u64 != plain_bytes
+        || blake3::hash(&plain).to_hex().as_str()
+            != row["plain_blake3"].as_str().ok_or("plain BLAKE3 missing")?
+    {
+        return Err("read-only adoption plain object differs".into());
+    }
+    let replay_start = Instant::now();
+    let (points_checked, representatives_checked) =
+        primary_adapter::replay_constructed_primary(row, &plain)?;
+    let replay_ms = replay_start.elapsed().as_secs_f64() * 1000.0;
+    write_new_json(
+        &root.join("manifest.json"),
+        &json!({"schema":"n83.factor-base-panel/v3-artifact-store",
+            "status":"completed_factor_base_object","study":STUDY,
+            "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+            "source_commit":source_manifest["source_commit"],
+            "remote":remote,"base":row,
+            "custody_mode":"read_only_adoption",
+            "source_manifest_sha256":source_manifest_sha256,
+            "artifact_pointer_sha256":pointer_sha256,
+            "adopter_source_commit":adopter_source_commit,
+            "selected_best_total_runtime":Value::Null,
+            "measurement_scope":"read-only artifact custody and generic replay; no relation, rank, individual log or total runtime"}),
+    )?;
+    let manifest_sha256 = hex::encode(sha256(&fs::read(root.join("manifest.json"))?));
+    write_new_json(
+        &root.join("replay.json"),
+        &json!({"schema":"n83.factor-base-replay/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"store_name":store_name,
+            "point_set_blake3":row["point_set_blake3"],
+            "points_checked":points_checked,"representatives_checked":representatives_checked,
+            "generic_replay_wall_ms_informational_L0":replay_ms}),
+    )?;
+    write_new_json(
+        &root.join("storage.json"),
+        &json!({"schema":"n83.factor-base-storage/v3-artifact-store","status":"PASS",
+            "manifest_sha256":manifest_sha256,"remote":remote,"store_name":store_name,
+            "sha256":digest,"bytes":bytes,"uploaded":false,
+            "custody_mode":"read_only_adoption",
+            "source_manifest_sha256":source_manifest_sha256,
+            "artifact_pointer_sha256":pointer_sha256,
+            "fresh_download_sha256":fresh_sha256,"fresh_download_bytes":fresh_bytes,
+            "fresh_pull_wall_ms_informational_L0":pull_ms,
+            "elapsed_process_wall_ms_informational_L0":total_start.elapsed().as_secs_f64()*1000.0,
+            "selected_best_total_runtime":Value::Null}),
+    )?;
+    let import = primary_adapter::verify_store_v3(root, &fresh_store)?;
+    write_new_json(&root.join("import.json"), &import)?;
+    Ok(import)
+}
+
 fn replay_v2_one_bounded(root: &Path, budget_seconds: u64) -> Result<()> {
     if budget_seconds == 0 || budget_seconds > 7200 {
         return Err("v2 replay wall cap must be 1..7200 seconds".into());
@@ -1213,6 +1678,35 @@ fn main() -> Result<()> {
             if args.len()!=4 { return Err("v2-replay-one PANEL_DIR BUDGET_SECONDS".into()); }
             replay_v2_one_bounded(Path::new(&args[2]),args[3].parse()?)?;
         },
+        Some("primary-store-v3-construct-publish")=>{
+            if args.len()!=8 { return Err("primary-store-v3-construct-publish NEW_DIRECTORY POLICY K SEED CONSTRUCTION_BUDGET_SECONDS EXACT_REMOTE (requires a clean source checkout; publishes a new primary base and verifies a fresh pull)".into()); }
+            let (source_commit, _mode)=primary_adapter::frozen_primary_probe_source()?;
+            let mut store=Store::open_default()?;
+            let root=Path::new(&args[2]);
+            let result=construct_store_v3_one(root,&args[3],args[4].parse()?,args[5].parse()?,args[6].parse()?,&source_commit,&args[7],&mut store);
+            if let Err(error)=&result {
+                if root.is_dir() {
+                    let _=write_new_json(&root.join("failure.json"),&json!({"schema":"n83.factor-base-attempt-failure/v3-artifact-store","status":"FAILED","error":error.to_string(),"selected_best_total_runtime":Value::Null}));
+                }
+            }
+            println!("{}",result?);
+        },
+        Some("primary-store-v3-adopt-readonly")=>{
+            if args.len()!=9 { return Err("primary-store-v3-adopt-readonly SOURCE_BASE_DIR ARTIFACT_POINTER EXPECTED_SOURCE_MANIFEST_SHA256 EXPECTED_POINTER_SHA256 EXACT_REMOTE BUDGET_SECONDS NEW_DIRECTORY (fresh read-only remote fetch and generic replay; no PUT)".into()); }
+            let (adopter_source_commit, _mode)=primary_adapter::frozen_primary_probe_source()?;
+            let store=Store::open_default()?;
+            let root=Path::new(&args[8]);
+            let result=adopt_store_v3_readonly(
+                Path::new(&args[2]),Path::new(&args[3]),&args[4],&args[5],
+                &args[6],args[7].parse()?,&adopter_source_commit,root,&store,
+            );
+            if let Err(error)=&result {
+                if root.is_dir() && !root.join("cap.json").exists() {
+                    let _=write_new_json(&root.join("failure.json"),&json!({"schema":"n83.factor-base-adoption-failure/v1","status":"FAILED","error":error.to_string(),"selected_best_total_runtime":Value::Null}));
+                }
+            }
+            println!("{}",result?);
+        },
         Some("replay")=>replay(Path::new(args.get(2).ok_or("replay directory")?))?,
         Some("probes")=>probes(Path::new(args.get(2).ok_or("probes directory budget_seconds")?),args.get(3).ok_or("budget")?.parse()?)?,
         Some("upload")=>upload(Path::new(args.get(2).ok_or("upload directory")?))?,
@@ -1329,6 +1823,19 @@ fn main() -> Result<()> {
             let receipt=primary_adapter::k600_m6_xcnf_cli(
                 &args[2],Path::new(&args[3]),Path::new(&args[4]),
             )?;
+            println!("{receipt}");
+        },
+        Some("primary-k600-m6-replay")=>{
+            if args.len()!=10 { return Err("primary-k600-m6-replay BASE_DIR EXPORT_JSON XCNF SOLVER_RECEIPT SOLVER_STDOUT SOURCE_COMMIT EXPORT_BINARY_SHA NEW_OUTPUT_JSON".into()); }
+            let receipt=primary_adapter::k600_m6_replay_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+                Path::new(&args[5]),Path::new(&args[6]),&args[7],&args[8],Path::new(&args[9]),
+            )?;
+            println!("{receipt}");
+        },
+        Some("primary-store-v3-check")=>{
+            if args.len()!=4 { return Err("primary-store-v3-check BASE_DIR NEW_OUTPUT_JSON (verify a successor content-addressed primary base against its replay and fresh-download receipts)".into()); }
+            let receipt=primary_adapter::check_store_v3_cli(Path::new(&args[2]),Path::new(&args[3]))?;
             println!("{receipt}");
         },
         Some("primary-full-d18-m4-l0-xcnf-witness")=>{
@@ -1454,6 +1961,53 @@ fn main() -> Result<()> {
             )?;
             println!("{summary}");
         },
+        Some("primary-store-v3-trial")=>{
+            if args.len()!=9 { return Err("primary-store-v3-trial BASE_DIR FIXTURE_DIR K M MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR (verified v3 artifact-store input; enumerate strategy; full-cost result remains unset)".into()); }
+            let summary=primary_adapter::run_store_trial_cli(
+                Path::new(&args[2]),Path::new(&args[3]),args[4].parse()?,args[5].parse()?,
+                args[6].parse()?,args[7].parse()?,Path::new(&args[8]),
+            )?;
+            println!("{summary}");
+        },
+        Some("primary-v5-retained-binding-check")=>{
+            if args.len()!=4 { return Err("primary-v5-retained-binding-check ORDINAL BASE_DIR".into()); }
+            println!("{}",retained_v5_k600_binding(args[2].parse()?,Path::new(&args[3]))?);
+        },
+        Some("primary-v5-retained-chain-cold")=>{
+            if args.len()!=13 { return Err("primary-v5-retained-chain-cold ORDINAL BASE_DIR FIXTURE_DIR MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (exact retained K600; hard cgroup and external wall caps required)".into()); }
+            require_v5_one_thread(std::env::var("RAYON_NUM_THREADS").ok().as_deref())?;
+            let ordinal=args[2].parse()?;
+            let base_dir=Path::new(&args[3]);
+            let binding=retained_v5_k600_binding(ordinal,base_dir)?;
+            let max_trials=args[5].parse()?;
+            let limits=ChainS3Limits {
+                max_variables:args[6].parse()?,max_domain_clauses:args[7].parse()?,
+                max_models:args[8].parse()?,conflict_budget:args[9].parse()?,
+            };
+            let budget_seconds=args[10].parse()?;
+            let memory_mib=args[11].parse()?;
+            let run_dir=Path::new(&args[12]);
+            let sidecar=run_dir.with_extension("v5-binding.json");
+            if run_dir.exists() || sidecar.exists() { return Err("v5 output path already exists".into()); }
+            write_new_json(&sidecar,&binding)?;
+            let summary=primary_adapter::run_store_chain_cli(
+                base_dir,Path::new(&args[4]),600,6,max_trials,limits,
+                budget_seconds,memory_mib,run_dir,true,true,
+            )?;
+            println!("{summary}");
+        },
+        Some("primary-store-v3-chain-cold") | Some("primary-store-v3-orbit-chain-cold") | Some("primary-store-v3-ordered-orbit-chain-cold")=>{
+            if args.len()!=14 { return Err("primary-store-v3-[ordered-orbit-|orbit-]chain-cold BASE_DIR FIXTURE_DIR K M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (verified v3 artifact-store input; requires hard cgroup memory and external wall caps)".into()); }
+            let summary=primary_adapter::run_store_chain_cli(
+                Path::new(&args[2]),Path::new(&args[3]),args[4].parse()?,args[5].parse()?,
+                args[6].parse()?,ChainS3Limits {
+                    max_variables:args[7].parse()?, max_domain_clauses:args[8].parse()?,
+                    max_models:args[9].parse()?, conflict_budget:args[10].parse()?,
+                },args[11].parse()?,args[12].parse()?,Path::new(&args[13]),
+                args[1]!="primary-store-v3-chain-cold",args[1]=="primary-store-v3-ordered-orbit-chain-cold",
+            )?;
+            println!("{summary}");
+        },
         Some("primary-chain-cold") | Some("primary-chain-cold-karatsuba") | Some("primary-chain-cold-shallow-karatsuba") | Some("primary-orbit-chain-cold") | Some("primary-orbit-chain-cold-shallow-karatsuba") | Some("primary-ordered-orbit-chain-cold") | Some("primary-ordered-orbit-chain-cold-shallow-karatsuba")=>{
             if args.len()!=16 { return Err("primary-[ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR (requires verified hard cgroup memory and external wall caps)".into()); }
             let summary=primary_adapter::run_chain_cli(
@@ -1469,7 +2023,7 @@ fn main() -> Result<()> {
             )?;
             println!("{summary}");
         },
-        _=>return Err("usage: plan output.json | case ordinal | pilot NEW_DIRECTORY budget_seconds | v2-construct-one NEW_DIRECTORY A POLICY K SEED BUDGET_SECONDS | v2-replay-one PANEL_DIR BUDGET_SECONDS | replay directory | probes directory budget_seconds | upload directory | cold PANEL_DIR K MAX_SECONDS [unordered] | primary-adapter-check PANEL_DIR K NEW_OUTPUT_JSON | primary-sat-build PANEL_DIR K MEMORY_MIB NEW_OUTPUT_JSON | primary-s3-probe PANEL_DIR K POLICY SEED ordered|unordered MAX_STATES MEMORY_MIB NEW_OUTPUT_JSON | primary-[orbit-|ordered-orbit-]chain-build PANEL_DIR K POLICY SEED M IDENTITY_MASK MAX_VARIABLES MAX_DOMAIN_CLAUSES MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-planted PANEL_DIR pinned|unpinned MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-witness PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-root-phase PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-search-progress PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-positive PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-phase-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-cold PANEL_DIR K M STRATEGY MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR | primary-[orbit-|ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR".into()),
+        _=>return Err("usage: plan output.json | case ordinal | pilot NEW_DIRECTORY budget_seconds | v2-construct-one NEW_DIRECTORY A POLICY K SEED BUDGET_SECONDS | v2-replay-one PANEL_DIR BUDGET_SECONDS | replay directory | probes directory budget_seconds | upload directory | cold PANEL_DIR K MAX_SECONDS [unordered] | primary-adapter-check PANEL_DIR K NEW_OUTPUT_JSON | primary-sat-build PANEL_DIR K MEMORY_MIB NEW_OUTPUT_JSON | primary-s3-probe PANEL_DIR K POLICY SEED ordered|unordered MAX_STATES MEMORY_MIB NEW_OUTPUT_JSON | primary-[orbit-|ordered-orbit-]chain-build PANEL_DIR K POLICY SEED M IDENTITY_MASK MAX_VARIABLES MAX_DOMAIN_CLAUSES MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-planted PANEL_DIR pinned|unpinned MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-witness PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-root-phase PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-search-progress PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-positive PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-selector-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-orbit-chain-phase-only PANEL_DIR MEMORY_MIB NEW_OUTPUT_JSON | primary-cold PANEL_DIR K M STRATEGY MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR | primary-store-v3-trial BASE_DIR FIXTURE_DIR K M MAX_TRIALS BUDGET_SECONDS NEW_RUN_DIR | primary-store-v3-[orbit-|ordered-orbit-]chain-cold BASE_DIR FIXTURE_DIR K M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR | primary-[orbit-|ordered-orbit-]chain-cold PANEL_DIR FIXTURE_DIR K POLICY SEED M MAX_TRIALS MAX_VARIABLES MAX_DOMAIN_CLAUSES MAX_MODELS CONFLICT_BUDGET BUDGET_SECONDS MEMORY_MIB NEW_RUN_DIR".into()),
     }
     Ok(())
 }
@@ -1477,6 +2031,19 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn retained_v5_cell_binds_only_the_exact_k600_object() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let base = root.join("research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-s3-adoption-20261115/attempt-1");
+        let receipt = retained_v5_k600_binding(V5_RETAINED_K600_ORDINAL, &base).unwrap();
+        assert_eq!(receipt["status"], "PASS_EXACT_ADAPTER_BINDING");
+        assert_eq!(receipt["case"]["symmetry_mask"], 18);
+        assert_eq!(receipt["case"]["solver"]["backend"], "sat_cdcl");
+        assert!(retained_v5_k600_binding(V5_RETAINED_K600_ORDINAL + 1, &base).is_err());
+        assert!(require_v5_one_thread(Some("1")).is_ok());
+        assert!(require_v5_one_thread(None).is_err());
+        assert!(require_v5_one_thread(Some("4")).is_err());
+    }
     #[test]
     fn v2_object_gate_matches_the_frozen_size_receipt() {
         let design: Value = serde_json::from_slice(include_bytes!(
@@ -1712,5 +2279,229 @@ mod tests {
         fs::write(dir.join(object), b"corrupt").unwrap();
         assert!(load_object(&dir, &row).is_err());
         fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn primary_store_v3_producer_replays_pushes_and_fresh_pulls() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!("n83-v3-producer-{nonce}"));
+        let remote = root.join("remote");
+        fs::create_dir_all(&remote).unwrap();
+        let remote_uri = format!("file://{}", remote.display());
+        let cfg = crypto_lib::store::Config {
+            index_path: root.join("index.json"),
+            cache_dir: root.join("normal-cache"),
+            remote: Some(RemoteSpec::Dir(remote)),
+            endpoint: None,
+            aws: "aws".into(),
+        };
+        let mut store = Store::open(cfg.clone()).unwrap();
+        let bundle = root.join("bundle");
+        let receipt = construct_store_v3_one(
+            &bundle,
+            "public_x_hash",
+            2,
+            SEEDS[0],
+            60,
+            &"a".repeat(40),
+            &remote_uri,
+            &mut store,
+        )
+        .unwrap();
+        assert_eq!(receipt["status"], "PASS");
+        assert_eq!(receipt["points_checked"], 332);
+        assert_eq!(receipt["orbit_columns_checked"], 2);
+        assert_eq!(
+            serde_json::from_slice::<Value>(&fs::read(bundle.join("storage.json")).unwrap())
+                .unwrap()["uploaded"],
+            true
+        );
+        let fresh = Store::open(cfg).unwrap();
+        assert_eq!(
+            primary_adapter::verify_store_v3(&bundle, &fresh).unwrap()["status"],
+            "PASS"
+        );
+        assert!(construct_store_v3_one(
+            &bundle,
+            "public_x_hash",
+            2,
+            SEEDS[0],
+            60,
+            &"a".repeat(40),
+            &remote_uri,
+            &mut store,
+        )
+        .is_err());
+        let mut storage: Value =
+            serde_json::from_slice(&fs::read(bundle.join("storage.json")).unwrap()).unwrap();
+        storage["fresh_download_sha256"] = json!("0");
+        fs::write(
+            bundle.join("storage.json"),
+            serde_json::to_vec(&storage).unwrap(),
+        )
+        .unwrap();
+        assert!(primary_adapter::verify_store_v3(&bundle, &fresh).is_err());
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn read_only_adoption_replays_a_remote_copy_and_rejects_changed_bindings() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!("n83-v3-adoption-{nonce}"));
+        let source_remote = root.join("source-remote");
+        let archive_remote = root.join("archive-remote");
+        fs::create_dir_all(&source_remote).unwrap();
+        fs::create_dir_all(&archive_remote).unwrap();
+        let source_uri = format!("file://{}", source_remote.display());
+        let source_cfg = crypto_lib::store::Config {
+            index_path: root.join("source-index.json"),
+            cache_dir: root.join("source-cache"),
+            remote: Some(RemoteSpec::Dir(source_remote)),
+            endpoint: None,
+            aws: "aws".into(),
+        };
+        let mut source_store = Store::open(source_cfg).unwrap();
+        let source_bundle = root.join("source-bundle");
+        construct_store_v3_one(
+            &source_bundle,
+            "public_x_hash",
+            2,
+            SEEDS[0],
+            60,
+            &"a".repeat(40),
+            &source_uri,
+            &mut source_store,
+        )
+        .unwrap();
+        let source_manifest = fs::read(source_bundle.join("manifest.json")).unwrap();
+        let source_manifest_hash = hex::encode(sha256(&source_manifest));
+        let source_value: Value = serde_json::from_slice(&source_manifest).unwrap();
+        let name = source_value["base"]["store_name"].as_str().unwrap();
+        let digest = source_value["base"]["compressed_sha256"].as_str().unwrap();
+        let bytes = source_value["base"]["bytes"].as_u64().unwrap();
+        let key = format!("sha256/{}/{digest}", &digest[..2]);
+        let object = archive_remote.join(&key);
+        fs::create_dir_all(object.parent().unwrap()).unwrap();
+        fs::copy(
+            source_bundle
+                .join("objects")
+                .join(format!("{digest}.jsonl.gz")),
+            &object,
+        )
+        .unwrap();
+        let pointer_path = root.join("artifact-pointer.json");
+        write_new_json(
+            &pointer_path,
+            &json!({"schema":"artifacts.manifest/v1","files":{
+                format!("{digest}.jsonl.gz"):{"sha256":digest,"bytes":bytes}
+            }}),
+        )
+        .unwrap();
+        let pointer_hash = hex::encode(sha256(&fs::read(&pointer_path).unwrap()));
+        fs::copy(
+            root.join("source-index.json"),
+            root.join("archive-index.json"),
+        )
+        .unwrap();
+        let archive_uri = format!("file://{}", archive_remote.display());
+        let archive_cfg = crypto_lib::store::Config {
+            index_path: root.join("archive-index.json"),
+            cache_dir: root.join("archive-normal-cache"),
+            remote: Some(RemoteSpec::Dir(archive_remote)),
+            endpoint: None,
+            aws: "aws".into(),
+        };
+        let archive_store = Store::open(archive_cfg.clone()).unwrap();
+        for (label, source_hash, artifact_hash, selected_remote) in [
+            (
+                "wrong-source",
+                "0".repeat(64),
+                pointer_hash.clone(),
+                archive_uri.clone(),
+            ),
+            (
+                "wrong-pointer",
+                source_manifest_hash.clone(),
+                "0".repeat(64),
+                archive_uri.clone(),
+            ),
+            (
+                "wrong-remote",
+                source_manifest_hash.clone(),
+                pointer_hash.clone(),
+                source_uri.clone(),
+            ),
+        ] {
+            let output = root.join(label);
+            assert!(adopt_store_v3_readonly(
+                &source_bundle,
+                &pointer_path,
+                &source_hash,
+                &artifact_hash,
+                &selected_remote,
+                60,
+                &"b".repeat(40),
+                &output,
+                &archive_store,
+            )
+            .is_err());
+            assert!(!output.exists());
+        }
+        let mut wrong_index: Value =
+            serde_json::from_slice(&fs::read(root.join("archive-index.json")).unwrap()).unwrap();
+        wrong_index["entries"][name]["sha256"] = json!("0".repeat(64));
+        let wrong_index_path = root.join("wrong-index.json");
+        fs::write(&wrong_index_path, serde_json::to_vec(&wrong_index).unwrap()).unwrap();
+        let mut wrong_cfg = archive_cfg.clone();
+        wrong_cfg.index_path = wrong_index_path;
+        let wrong_store = Store::open(wrong_cfg).unwrap();
+        let wrong_output = root.join("wrong-index-output");
+        assert!(adopt_store_v3_readonly(
+            &source_bundle,
+            &pointer_path,
+            &source_manifest_hash,
+            &pointer_hash,
+            &archive_uri,
+            60,
+            &"b".repeat(40),
+            &wrong_output,
+            &wrong_store,
+        )
+        .is_err());
+        assert!(!wrong_output.exists());
+        let adopted = root.join("adopted");
+        let result = adopt_store_v3_readonly(
+            &source_bundle,
+            &pointer_path,
+            &source_manifest_hash,
+            &pointer_hash,
+            &archive_uri,
+            60,
+            &"b".repeat(40),
+            &adopted,
+            &archive_store,
+        )
+        .unwrap();
+        assert_eq!(result["status"], "PASS");
+        assert_eq!(result["points_checked"], 332);
+        assert_eq!(result["orbit_columns_checked"], 2);
+        let storage: Value =
+            serde_json::from_slice(&fs::read(adopted.join("storage.json")).unwrap()).unwrap();
+        assert_eq!(storage["uploaded"], false);
+        assert_eq!(storage["custody_mode"], "read_only_adoption");
+        assert_eq!(storage["fresh_download_sha256"], digest);
+        let second_reader = Store::open(archive_cfg).unwrap();
+        assert_eq!(
+            primary_adapter::verify_store_v3(&adopted, &second_reader).unwrap()["status"],
+            "PASS"
+        );
+        assert!(object.is_file());
+        fs::remove_dir_all(root).unwrap();
     }
 }

@@ -1,0 +1,11 @@
+name = "finite_char_two_trace_audit"
+version = "0.1.0"
+defaultTargets = ["FiniteCharTwoTraceAudit"]
+
+[[require]]
+name = "small_prime_trace_geometry_audit"
+path = "../../small_prime_trace_geometry_audit_20261114/lean"
+
+[[lean_lib]]
+name = "FiniteCharTwoTraceAudit"
+roots = ["FiniteTwoTorsion", "TraceParity", "ImperfectControl", "FiniteCharTwoCertificate"]

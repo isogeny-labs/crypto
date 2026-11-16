@@ -1,0 +1,50 @@
+{
+  "schema": "pencil.final-admission-static-review/v1",
+  "reviewed_utc": "2026-11-11T02:46:28Z",
+  "reviewer": "ci_audit",
+  "reviewer_authorship_disclosure": "reviewer implemented the v7 mode-preservation source; the source itself was independently reviewed in the separately pinned combined-v7 source review",
+  "scope": "corrected final admission bindings only; no compiler, test, resolver, or scientific payload",
+  "candidate": {
+    "path": "admission-candidate.json",
+    "sha256": "7e5633e51e48ef1128b5c87debb8b532ed509eb78253a8eff5699e6f2756df74"
+  },
+  "source": {
+    "published_revision": "609858b7111e4a3f99a2e2639759501b065e3ba1",
+    "manifest_sha256": "81099aee131bbdf3f61117a6f4a20b29751ba0de6f795f980256488af93fc59e",
+    "independent_review_sha256": "eb0d11e8c4aa4fbd19e9f3079b05589bdcce0c89e9fddf58ee8712ac4739a64d"
+  },
+  "correction": {
+    "rejected_candidate_sha256": "9470dc34c22822058f10e4a194d954f1428d49bc33b3e18922714a74d9ea7873",
+    "rejection": "prior_v4_terminal_confirmed remained false from the source draft",
+    "corrected_field": "prior_v4_terminal_confirmed",
+    "corrected_value": true,
+    "supporting_receipt_sha256": "e5b64e1cf01d428a3a140b66179ab0fc862080c26a0a353c6dfa949412c6c45a",
+    "validation_sha256": "d0fb48c0523f8ec22ef25ac1103aaacaef06276c591b22e0d7e9e9bacd8dd7a9"
+  },
+  "checks": {
+    "native_loader": "passed after correction, coordinator-observed",
+    "nested_path_sha_size_pins": 13,
+    "runtime_packet_sha_pins": 26,
+    "mode_inventory_sha256": "c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241",
+    "cache_files": 2165,
+    "cache_executable_files": 82,
+    "special_permission_bits": 0,
+    "prior_v6_terminal_and_cleanup_bound": true,
+    "active_pencil_units": 0,
+    "prospective_workspace_absent": true,
+    "prospective_durable_absent": true,
+    "prospective_unit_absent": true,
+    "lease_task": "T-2170",
+    "lease_fencing_epoch": 1
+  },
+  "campaign": {
+    "ceiling_seconds": 129600,
+    "charged_seconds": 15780,
+    "reserved_seconds": 2400,
+    "unreserved_seconds": 111420,
+    "attempts": 1,
+    "automatic_retry": false
+  },
+  "verdict": "ready_for_coordinator_publication_and_one_exact_invocation",
+  "execution_performed": false
+}

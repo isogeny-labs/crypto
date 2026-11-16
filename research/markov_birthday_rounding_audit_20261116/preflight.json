@@ -1,0 +1,161 @@
+{
+  "schema": "markov-birthday-preflight/v1",
+  "build_snapshots": 9,
+  "failed_states": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08"
+  ],
+  "successful_states": [
+    "09"
+  ],
+  "gate": {
+    "declarations": 60,
+    "failing": 0,
+    "trusted_native": 0,
+    "new_modules": 9,
+    "new_concrete_modules": 8,
+    "official_import_bridge_modules": 1,
+    "count_includes_generated_equation_declarations": true,
+    "new_source_warnings": 0,
+    "inherited_advisories": {
+      "markov-birthday-builds/09/build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "markov-birthday-gate01/research_markov_birthday_rounding_audit_20261116_lean/build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "markov-birthday-gate01/research_markov_birthday_rounding_audit_20261116_lean/source-build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ]
+    },
+    "auditor_advisories": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ],
+    "archive": {
+      "path": "research/markov_birthday_rounding_audit_20261116/evidence/gate.tar.gz",
+      "bytes": 2446,
+      "sha256": "94f7afe313ad73c8060fd44882522a38e17a0879a9cceb05ebb9f2d1081b8cfa"
+    },
+    "inventory": [
+      {
+        "member": "audit.log",
+        "bytes": 6032,
+        "sha256": "fe4fbbf4677c7c835f145b312fda28aa45a7a1a1aad4373391c4eab04536cc86"
+      },
+      {
+        "member": "build.log",
+        "bytes": 8157,
+        "sha256": "1e78fc238f9c3e065564b1709473f6b2f2f87d00a0d79d1d52970d198858a9c0"
+      },
+      {
+        "member": "cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "source-build.log",
+        "bytes": 8157,
+        "sha256": "9d6806b54e73762f2b90e0cacc5c0ba64356f1ae040687e1be1e4cfed62704f0"
+      },
+      {
+        "member": "status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ]
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "logical_archive_name": "attempts.tar.xz",
+    "compressed_bytes": 171640,
+    "logical_sha256": "54dcc1fe7fc169ee90b1db1fff599a06d09f920f40b1b93ac2cefb756cb51d9a",
+    "physical_files": [
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.tar.xz.part01",
+        "bytes": 64000,
+        "sha256": "da6b5e847be634b5ba2e32e0afb1375ad5a9a5b92764903594c55663c5b79742"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.tar.xz.part02",
+        "bytes": 64000,
+        "sha256": "9ec1cf2ac426a16cf876fad11faed819e736d4e9e7c9ee5b179fcb5fc8b86e2d"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/evidence/attempts.tar.xz.part03",
+        "bytes": 43640,
+        "sha256": "9420dea052a643691344a40fde267fd5677250987695ecf48a2b27a685644021"
+      }
+    ],
+    "files": 315,
+    "unique_objects": 144,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json",
+    "multipart": true,
+    "parts": 3,
+    "physical_part_limit": 65536,
+    "copyright_or_regenerable_PNG_included": false
+  },
+  "dependency_plans": 1,
+  "old_formal_files": 22,
+  "static_hash_dependency_pins": 36,
+  "published_preservation_entries": 6074,
+  "all_checked_entries": 6110,
+  "frozen_plans": 47,
+  "copied_modules": 0,
+  "hydrated_modules": 0,
+  "manifest_packages": 13,
+  "all6110pins_checked_every_state_and_gate": true,
+  "exact_source_roots_from01": true,
+  "all_failed_states_retained": true,
+  "known_source_methods_credited": true,
+  "actual_uniform_reset_PMF_and_matrix": true,
+  "actual_doubly_stochastic_and_stationary": true,
+  "actual_positive_reachability_and_period_one": true,
+  "actual_chronological_word_product_PMF": true,
+  "actual_Green_includes_identity": true,
+  "actual_Green_maxima_at_one": true,
+  "actual_T1_m_M_equal_one_mixing": true,
+  "actual_static_hash_first_repeat_and_iid_bridge": true,
+  "actual_first_step_collision_probability": true,
+  "literal_KMPT2010_finite_all_c_counter": true,
+  "upward_rounding_displayed_time_does_not_repair_witness": true,
+  "actual_uniform_selfavoiding_embedding_bijection": true,
+  "actual_exact_uniform_birthday_probability": true,
+  "actual_uniform_exponential_survival_bound": true,
+  "actual_integer_quadratic_time_condition": true,
+  "actual_uniform_ceiling_time_bound": true,
+  "actual_same_instance_two_step_control": true,
+  "actual_zero_and_singleton_controls": true,
+  "transparent_proposition_bundles_in_pinned_certificate": true,
+  "expanded_individual_law_headers_in_proof_map": true,
+  "general_Markov_second_moment_and_block_ceiling_repair": false,
+  "asymptotic_Pollard_square_root_order_refuted": false,
+  "qualified_large_partition_adding_constant_refuted": false,
+  "practical_hash_or_scalar_recovery_runtime": false,
+  "full14complete": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}
