@@ -93,3 +93,15 @@ jobs:
               cmp "$weber_root_replay/root-idc/beta-$root-$part.json" "$study/receipts/round-04/root-certificates-03/beta-$root-$part.json"
             done
           done
+      - name: Reproduce the bounded Eisenstein metric trial
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-05/v5/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o /tmp/weber-metric
+          timeout 60s /tmp/weber-metric qualify "$study/receipts/round-04/models/u3-v3.model" -1 > /tmp/weber-metric-u3.jsonl
+          cmp /tmp/weber-metric-u3.jsonl "$study/receipts/round-05/qualify-05-u3-all.jsonl"
+          for point in 0 1 2 3; do
+            timeout 60s /tmp/weber-metric qualify "$study/receipts/round-04/models/u5-v3.model" "$point" > "/tmp/weber-metric-u5-$point.jsonl"
+            cmp "/tmp/weber-metric-u5-$point.jsonl" "$study/receipts/round-05/qualify-05-u5-public-$point.jsonl"
+          done

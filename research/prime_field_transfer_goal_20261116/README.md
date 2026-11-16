@@ -203,3 +203,6 @@ Existing performance panels and the earlier example diagrams are unchanged:
 this round reports correctness and encoding obstructions, with no measured
 speedup or new benchmark/leaderboard row.
 [pcc:unverified]
+
+
+Round05 follow-up: the [coefficient-metric trial](round-05/RESULT.md) has unchanged fixed-bin coverage; its inspected [one-page report](reports/round-05.pdf) preserves the null result and feasible real-matrix Lean certificate. The round04 source-selected examples above remain the current coverage result. PCC-20261116-fc5aeb is unsigned. [pcc:unverified]
