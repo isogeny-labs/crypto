@@ -94,7 +94,7 @@ struct Term {
 fn equations(path: &str) -> Vec<Vec<Term>> {
     let s = fs::read_to_string(path).unwrap();
     let mut ls = s.lines();
-    assert_eq!(ls.next().unwrap(), "w,x1,y1,x2,y2,x3,y3,t");
+    assert_eq!(ls.next().unwrap(), "w,u0,u1,u2,v0,v1,v2,t");
     assert_eq!(ls.next().unwrap(), "631");
     let names = ["w", "u0", "u1", "u2", "v0", "v1", "v2", "t"];
     ls.collect::<Vec<_>>()
