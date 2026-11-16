@@ -1,0 +1,12 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 0, 0, 0, z^3]);
+assert #E eq 120;
+assert WeilDescentGenus(E, GF(2), z) eq 7;
+C, h := WeilDescent(E, GF(2), z);
+assert Genus(C) eq 7;
+print "curve_type", Type(C);
+print "curve_genus", Genus(C);
+print "curve", C;
+print "hyperelliptic_over_base", IsHyperelliptic(C : Eqn := false);
+print "geometrically_hyperelliptic", IsGeometricallyHyperelliptic(C : Map := false);

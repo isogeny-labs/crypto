@@ -1,0 +1,3 @@
+# Exact earlier W0 target geometry
+
+Frozen before the second Magma call. The first geometry probe regenerated `WeilDescent(E_+,F2,z)` and obtained a plane equation that differs from the earlier saved W0 map receipt, although both have genus seven. To test the **specific prior map target**, reconstruct its printed homogeneous equation exactly in `check_previous_target.magma`, assert genus seven, and call Magma's geometric hyperellipticity predicate. A false result blocks obtaining a curve twist of that specific target by a hyperelliptic involution. It does not prove that every conceivable genus-seven W0 cover target is nonhyperelliptic.

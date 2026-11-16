@@ -1,0 +1,3 @@
+# Odd coprime base-change prime-subgroup screen
+
+Frozen before execution on 16 November 2026. For the trace -9 source in `PRIME23_PROTOCOL.md`, compute `t_0=2`, `t_1=-9`, `t_s=-9t_(s-1)-128t_(s-2)` and `N_s=2^(7s)+1-t_s` at `s∈{1,3,5,9,11,13,15}`. Factor each `N_s`, prove primality of its largest factor `r_s`, and check `gcd(r_s, 2·7·(t_s²−4·2^(7s)))=1`. This is the squarefree-Frobenius criterion for existence of an isogeny of degree prime to `r_s` **for each base-changed isogeny class separately**. The base-change carrier and simplicity theorem already lives in `../ghs_n7_base_change_20261115/THEOREM.md`. The outputs are group-order and subgroup-preservation inputs, not measured attack costs or evaluable isogenies.

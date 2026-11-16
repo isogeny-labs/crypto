@@ -1,0 +1,6 @@
+P<X,Y,Z> := ProjectiveSpace(GF(2),2);
+C := Curve(P, X^12 + X^10*Z^2 + X^7*Y*Z^4 + X^4*Y^4*Z^4 + Y^8*Z^4 + X^7*Z^5 + X^6*Z^6);
+assert Genus(C) eq 7;
+print "curve_genus", Genus(C);
+print "hyperelliptic_over_base", IsHyperelliptic(C : Eqn := false);
+print "geometrically_hyperelliptic", IsGeometricallyHyperelliptic(C : Map := false);

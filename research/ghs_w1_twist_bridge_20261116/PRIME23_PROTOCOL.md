@@ -1,0 +1,7 @@
+# Prime-to-23 transfer existence gate
+
+Frozen before the verification run on 16 November 2026. For the exact W1 source `E_-: y²+xy=x³+x²+z³` over `F2[z]/(z⁷+z+1)` and hyperelliptic carrier `Y_-: y²+v(x)y=u_-(x)` over F2, with `v=0x8f,u_-=0xc07a`, independently recount source order and carrier points for extensions of degrees 1–7. The expected Jacobian/Weil-restriction Frobenius polynomial is `P(X)=X^14+9X^7+128` and expected rational group order is `P(1)=138=6·23`.
+
+Check exact irreducibility of `P` over F13, its integer discriminant `−2^42·7^14·431^7`, and squarefreeness modulo 23. These finite facts support the following paper-level implication of [Tate's integral homomorphism theorem](https://pazuki.perso.math.cnrs.fr/index_fichiers/Tate66.pdf): because the two 23-adic Tate modules have the same multiplicity-one etale Frobenius algebra, they are isomorphic over Z23 as Frobenius modules; an F2-isogeny from `Res(E_-)` to `J(Y_-)` can be chosen with degree prime to 23. This would preserve the exact order-23 source subgroup. It does not construct the isogeny or evaluate an image.
+
+Check the same finite arithmetic in Lean where practical. The geometry (the carrier zeta function, Tate module freeness, and application of Tate's theorem) remains outside the Lean statement. A positive result is an abstract subgroup-preserving isogeny theorem, not a completed transfer attack. The direct twist of the earlier W0 curve is a separate gate and has already failed its geometric hyperellipticity check.
