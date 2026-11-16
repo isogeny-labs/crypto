@@ -86,6 +86,6 @@ Sources checked (KB): **KB unavailable** (no `kb_status` / `search_knowledge` MC
 
 ## Check-in and validation
 
-New: [Rust native exact-support oracle](examples/prime31_s9_support_ceiling.rs), pinned toolchain [CI workflow](../../../../.github/workflows/prime31-s9-support-ceiling.yml), this report, shared session-log entry. The Rust example reuses existing crate arithmetic, independently enumerates all net signatures on the actual curve, and has exact B4/B8 golden-result tests plus brute signed-word equivalence for smaller B. It does **not** replace, implement, or accelerate the current full APS ECDLP solver.
+New: [Rust native exact-support oracle](examples/prime31_s9_support_ceiling.rs), pinned toolchain [CI workflow](../../../.github/workflows/prime31-s9-support-ceiling.yml), this report, shared session-log entry. The Rust example reuses existing crate arithmetic, independently enumerates all net signatures on the actual curve, and has exact B4/B8 golden-result tests plus brute signed-word equivalence for smaller B. It does **not** replace, implement, or accelerate the current full APS ECDLP solver.
 
 **Still missing:** observed green Rust Actions run, independent signed PCC, fresh optimized WZ rho comparison, and genuine nonenumerative S9 rational-root extractor with complete B31 unknown-target ECDLP timings. No leaderboard or fastest claim is warranted.
