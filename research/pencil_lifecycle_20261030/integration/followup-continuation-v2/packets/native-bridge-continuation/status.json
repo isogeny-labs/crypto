@@ -1,0 +1,40 @@
+{
+  "schema": "research.parallel-native-bridge-packet/v1",
+  "task": "T-1219",
+  "components": {
+    "czero_output": {
+      "main": 12,
+      "producer_controls": 10,
+      "producer_readbacks": 22,
+      "independent_review": {
+        "reviewer_declarations": 5,
+        "readbacks": 27,
+        "scope": "normalized output and unit-input-weight ordinate identity"
+      }
+    },
+    "graph_ring": {
+      "main": 7,
+      "producer_controls": 10,
+      "reviewer_controls": 9,
+      "review_readbacks": 26
+    },
+    "comparator": {
+      "main": 6,
+      "producer_controls": 8,
+      "reviewer_controls": 6,
+      "review_readbacks": 20
+    },
+    "accounting_v2": {
+      "producer_negative_controls": 5,
+      "independent_negative_controls": 2,
+      "positive_output_identical": true,
+      "provenance_scope": "recorded chain, required identities and index labels",
+      "receipt_authenticity": false
+    }
+  },
+  "scientific_execution": false,
+  "full_cohort_obligation": 1260,
+  "complete_cost_ratio": null,
+  "natural_yield": null,
+  "full_review_workflow_complete": false
+}

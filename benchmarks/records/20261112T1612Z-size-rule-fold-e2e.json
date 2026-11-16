@@ -1,0 +1,115 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-12T16:18:26+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/size_rule_fold_20261112/run_e2e.sh",
+        "research/size_rule_fold_20261112/results"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T16:12:23+00:00",
+      "wall_s": 299.652
+    }
+  ],
+  "commit": "a62f4c7cc6695088996b04add8621a8caaf56e36",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T16:12:18+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-size-rule-fold"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T1612Z-size-rule-fold-e2e",
+  "metrics": [
+    {
+      "baseline": 137.95,
+      "better": "lower",
+      "n": 3,
+      "name": "s_size_rule_koblitz13",
+      "note": "degree-13 Koblitz, binary-subspace dimension 7, descent-algebraic m=2 with fes-then-inherited (ran fes-f2, pinned word XORs); baseline = same oracle with inherited-f4 (117.8-167.6); S/rho 35.3 vs 47.8",
+      "reference": 2.89,
+      "reference_kind": "matched_rho",
+      "spread": [
+        83.71,
+        116.31
+      ],
+      "unit": "S",
+      "value": 101.91
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "size_rule_minus_inherited_s_other_instances",
+      "note": "fes-then-inherited S equals inherited-f4 S on the five instances with 16 or more unknowns, where the rule ran inherited-f4",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "S",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "fold_minus_legacy_s_max_abs",
+      "note": "folded inherited-f4 S equals inherited-f4-legacy S on all six instances",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "S",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "verified_configurations",
+      "note": "6 instances x (pair table, inherited-f4, inherited-f4-legacy, fes-then-inherited), every repeat; matched rho runs verified too",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 24.0
+    }
+  ],
+  "problem": "study:size_rule_fold_20261112:e2e-ladder",
+  "raw": [
+    {
+      "bytes": 89581,
+      "path": "research/size_rule_fold_20261112/results.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3a/3a76fcbbbc76ba86aafb37c6642e8cf7af97966c6019e8550723cb558eb4dfd6",
+      "sha256": "3a76fcbbbc76ba86aafb37c6642e8cf7af97966c6019e8550723cb558eb4dfd6",
+      "uploaded": false
+    },
+    {
+      "bytes": 19340,
+      "path": "research/size_rule_fold_20261112/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5f/5ff95d5046c407421df40aec99dd5cf3329db7a1002b9b5dedf0274e7bbbda5d",
+      "sha256": "5ff95d5046c407421df40aec99dd5cf3329db7a1002b9b5dedf0274e7bbbda5d",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/size_rule_fold_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/size_rule_fold_20261112/results.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "size-rule-fold-e2e",
+  "status": "measured",
+  "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 (next kernels folded in), inherited-f4-legacy and fes-then-inherited, 3 repeats: all 24 configurations verified; size rule best algebraic row everywhere (degree 13: S 101.9 vs inherited-f4 138.0, 0.74x, 35.3x rho vs 47.8x; equal to inherited-f4 elsewhere); folded and legacy inherited-f4 S identical. Local container; unverified.",
+  "validation": null
+}

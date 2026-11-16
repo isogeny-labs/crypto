@@ -1,0 +1,30 @@
+# delphi-loop candidate targets per task family, cheapest first.
+# The incumbent is what the lane used before routing (task_card.DIRECTOR_MODEL);
+# with policy `exploit` a cheaper target replaces it only once its acceptance
+# lower bound clears `threshold` on at least `min_n` episodes. The escalation
+# chain is every target after the choice, so stronger models come last.
+# `free: true` marks targets standalone delphi runs at no cost (DELPHI_FREE).
+# `openrouter:openrouter/free` is OpenRouter's router over its $0 model ids (20
+# requests/min and 50/day per account, 1000/day with $10 of credit); DELPHI_FREE
+# is what selects it, because only free targets are candidates then.
+prior: [1, 1]        # Beta prior on the ingest acceptance rate
+z: 1.2816            # one-sided 90% lower bound
+threshold: 0.8
+min_n: 5
+families:
+  card-compile:
+    incumbent: anthropic:claude-sonnet-5-5@high
+    targets:
+      - target: openrouter:openrouter/free
+        free: true
+      - target: anthropic:claude-haiku-5-5@high
+      - target: anthropic:claude-sonnet-5-5@high
+      - target: anthropic:claude-opus-5-5@high
+  assess:
+    incumbent: anthropic:claude-sonnet-5-5@high
+    targets:
+      - target: openrouter:openrouter/free
+        free: true
+      - target: anthropic:claude-haiku-5-5@high
+      - target: anthropic:claude-sonnet-5-5@high
+      - target: anthropic:claude-opus-5-5@high

@@ -2,12 +2,22 @@
 //!
 //! The tiny-field oracle deliberately uses neither the tensor implementation
 //! nor its curve arithmetic. Expected answers go only into the separate manifest.
+//!
+//! `run` executes two prebuilt arm binaries over a prepared panel with a seeded
+//! interleaved Latin schedule (see `panel_driver.rs`); `analyze` recomputes the
+//! paired analysis from retained rows.
 
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
 use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::Path;
+
+#[macro_use]
+#[path = "../serialization.rs"]
+mod serialization;
+#[path = "../panel_driver.rs"]
+mod driver;
 
 type Point = Option<(u64, u64)>;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -214,17 +224,25 @@ fn prepare(output: &Path) -> Result<()> {
 }
 
 fn run() -> Result<()> {
-    let mut args = std::env::args_os().skip(1);
-    let command = args.next();
-    let output = args.next();
-    if command.as_deref() != Some(std::ffi::OsStr::new("prepare"))
-        || output.is_none()
-        || args.next().is_some()
-    {
-        return Err("usage: hashed-ecdl-panel prepare NEW_DIRECTORY".into());
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    match args.first().map(String::as_str) {
+        Some("prepare") if args.len() == 2 => {
+            prepare(Path::new(&args[1]))?;
+            println!(
+                "Prepared 60 development and 24 holdout problems; no solver or benchmark ran."
+            );
+        }
+        Some("run") => driver::cli_run(&args[1..])?,
+        Some("analyze") => driver::cli_analyze(&args[1..])?,
+        Some("hash") if args.len() == 2 => print!("{}", driver::hash_list(Path::new(&args[1]))?),
+        _ => {
+            return Err(format!(
+                "usage: hashed-ecdl-panel prepare NEW_DIRECTORY\n{}",
+                driver::USAGE
+            )
+            .into())
+        }
     }
-    prepare(Path::new(&output.unwrap()))?;
-    println!("Prepared 60 development and 24 holdout problems; no solver or benchmark ran.");
     Ok(())
 }
 

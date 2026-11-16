@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "kubectl",
+    "--kubeconfig",
+    "/home/ec2-user/ops/eks-isolab/kubeconfig",
+    "--context",
+    "i-01f85a6c905181498@isolab.us-east-2.eksctl.io",
+    "--request-timeout=30s",
+    "get",
+    "resourcequota",
+    "jobs",
+    "-n",
+    "isolab",
+    "-o",
+    "json"
+  ],
+  "started_utc": "2026-11-05T16:19:23.930934+00:00",
+  "finished_utc": "2026-11-05T16:19:26.136583+00:00",
+  "elapsed_seconds": 2.2056463199987775,
+  "exit_code": 1,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "af1e542a0919b716216e9e114e6cecde46b2017a011c44458ee1770f408c4601"
+}

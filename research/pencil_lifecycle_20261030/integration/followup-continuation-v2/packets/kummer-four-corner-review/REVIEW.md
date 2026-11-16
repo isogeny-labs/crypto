@@ -1,0 +1,18 @@
+# Independent four-corner and Delta-zero recovery review
+
+Plan frozen before source/report/result access. All producer pre-execution inputs copied and hash-verified into private snapshot. Fresh offline native replay exited0 and its parsed result equals producer output exactly. Recomputed252 transitions,1008 corner matches,252 exact signed recoveries:243 generic,8 degree-one,1 Delta fallback. Original pinned252-transition/251-recovery packet and native exit101 were independently inspected and remain distinct.
+
+## Four-corner construction
+Independently derived grid [R,R+T,R+G,R+G+T] update agrees with source grid_step. Four repaired calls compute [2R],[2R+T],[2R+G],[2R+G+T]. Choice0 retains order, choice1 returns [B,A,D,C]; 2T=0 establishes the swapped neighbours. Labels refer to R=aT+bQ moduloN=2r; rQ=0 and2T=0 justify reduction. N<=2^63 and canonical labels keep2a+c and2b within UInt64. This is a torsion-step family, not the original generic G-step walk.
+
+Unlike the earlier supplied-neighbour fixture, this entrypoint calls grid_fixture_check only. Recovery receives next[0] and next[2] with signed anchorG before constructing the signed expected reference. The old fixture_check function containing external_plus from expected remains dead code in this executable's path. Initial signed construction uses public fixture points and is separately counted. The supplied-neighbour dependency is closed for this tested construction; collector relation-label semantics remain a separate task.
+
+## Delta construction
+From u=X²+a1X+a0 and v=b0+b1X, v² mod u=(b0²-a0b1²,2b0b1-a1b1²). The existing fourth-coordinate formula gives the code's B=b1² including the f6 contribution. The power recurrence(-a0*c1,c0-a1*c1) correctly computes successive X powers modulo u. For nonzero b1, b0=(r1+a1B)/(2b1). For zero b1, sqrt(r0) supplies possible b0 and j.valid rejects r1!=0. Candidate deduplication and j.valid/project-back/anchor-plus checks select exactly one match; zero or multiple matches reject. Source generates at most four candidate entries before deduplication. Expected point/labels are not recovery arguments. Valid smooth model, odd prime, canonical data and correct arithmetic/projection remain caller assumptions.
+
+With exact quotient-by-sign semantics, a non-two-torsion signed anchor disambiguates D from -D unless they already coincide: equality of their anchored quotient neighbours would force2D=0 or2G=0. This is an algebraic justification, not a new universal proof of the implementation's coordinate maps. Zero-input, zero-neighbour and inconsistent-neighbour controls passed for the retained Delta fixture. Delta nonsquare and ambiguous branches are explicit but not exercised in this packet. Existing D_zero recovery remains unchanged and can perform broader enumeration.
+
+## Required wording correction
+The producer REPORT says no field enumeration occurs. The new Mumford-candidate loop is bounded, but existing Field.sqrt on the n=1 route performs a sequential nonresidue search `(2..q).find(...)` at native/src/three_leads.rs:434. Therefore the precise supported statement is no exhaustive field/group/scalar candidate enumeration added by Delta reconstruction; square-root search and its costs remain. This correction has been requested additively without modifying the frozen packet.
+
+Native phase counters are diagnostic observations, not complete cost or timing evidence. Reference and negative-control work have separate scope; no rho comparison, full cohort or policy ranking is supported. No candidate repair, scientific execution or cloud action was performed by this review.

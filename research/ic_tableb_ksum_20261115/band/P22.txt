@@ -1,0 +1,43 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | bsgs-neg | 432/432 | 0.986 | 1.084 | 1.965 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | inc-hi | 432/432 | 11.830 | 13.451 | 28.040 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | inc-lo | 432/432 | 12.920 | 15.150 | 35.216 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | inc-tb | 432/432 | 11.147 | 12.892 | 28.597 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | ksum4 | 432/432 | 6.284 | 7.090 | 14.341 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | ksum5 | 432/432 | 6.649 | 7.391 | 14.065 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | rho-neg | 432/432 | 1.172 | 1.280 | 2.249 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | rho-neg-aa | 432/432 | 1.172 | 1.280 | 2.249 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp22-tm1267-a5acaf6d | bsgs-neg vs inc-hi | bsgs-neg < inc-hi |
+| icv1-fp22-tm1267-a5acaf6d | bsgs-neg vs inc-lo | bsgs-neg < inc-lo |
+| icv1-fp22-tm1267-a5acaf6d | bsgs-neg vs inc-tb | bsgs-neg < inc-tb |
+| icv1-fp22-tm1267-a5acaf6d | bsgs-neg vs ksum4 | bsgs-neg < ksum4 |
+| icv1-fp22-tm1267-a5acaf6d | bsgs-neg vs ksum5 | bsgs-neg < ksum5 |
+| icv1-fp22-tm1267-a5acaf6d | bsgs-neg vs rho-neg | bsgs-neg < rho-neg |
+| icv1-fp22-tm1267-a5acaf6d | bsgs-neg vs rho-neg-aa | bsgs-neg < rho-neg-aa |
+| icv1-fp22-tm1267-a5acaf6d | inc-hi vs inc-lo | inc-hi < inc-lo |
+| icv1-fp22-tm1267-a5acaf6d | inc-hi vs inc-tb | unresolved inside the band |
+| icv1-fp22-tm1267-a5acaf6d | inc-hi vs ksum4 | ksum4 < inc-hi |
+| icv1-fp22-tm1267-a5acaf6d | inc-hi vs ksum5 | ksum5 < inc-hi |
+| icv1-fp22-tm1267-a5acaf6d | inc-hi vs rho-neg | rho-neg < inc-hi |
+| icv1-fp22-tm1267-a5acaf6d | inc-hi vs rho-neg-aa | rho-neg-aa < inc-hi |
+| icv1-fp22-tm1267-a5acaf6d | inc-lo vs inc-tb | inc-tb < inc-lo |
+| icv1-fp22-tm1267-a5acaf6d | inc-lo vs ksum4 | ksum4 < inc-lo |
+| icv1-fp22-tm1267-a5acaf6d | inc-lo vs ksum5 | ksum5 < inc-lo |
+| icv1-fp22-tm1267-a5acaf6d | inc-lo vs rho-neg | rho-neg < inc-lo |
+| icv1-fp22-tm1267-a5acaf6d | inc-lo vs rho-neg-aa | rho-neg-aa < inc-lo |
+| icv1-fp22-tm1267-a5acaf6d | inc-tb vs ksum4 | ksum4 < inc-tb |
+| icv1-fp22-tm1267-a5acaf6d | inc-tb vs ksum5 | ksum5 < inc-tb |
+| icv1-fp22-tm1267-a5acaf6d | inc-tb vs rho-neg | rho-neg < inc-tb |
+| icv1-fp22-tm1267-a5acaf6d | inc-tb vs rho-neg-aa | rho-neg-aa < inc-tb |
+| icv1-fp22-tm1267-a5acaf6d | ksum4 vs ksum5 | unresolved inside the band |
+| icv1-fp22-tm1267-a5acaf6d | ksum4 vs rho-neg | rho-neg < ksum4 |
+| icv1-fp22-tm1267-a5acaf6d | ksum4 vs rho-neg-aa | rho-neg-aa < ksum4 |
+| icv1-fp22-tm1267-a5acaf6d | ksum5 vs rho-neg | rho-neg < ksum5 |
+| icv1-fp22-tm1267-a5acaf6d | ksum5 vs rho-neg-aa | rho-neg-aa < ksum5 |
+| icv1-fp22-tm1267-a5acaf6d | rho-neg vs rho-neg-aa | unresolved inside the band |

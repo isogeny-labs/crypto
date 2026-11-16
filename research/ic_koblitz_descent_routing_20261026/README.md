@@ -104,3 +104,15 @@ protocol's rule.
 - **Derived:** `analysis/band-*.{txt,json}` (`ecbench band`) and
   `sessions/*/comparisons/` (`ecbench compare --save`). The figure comes from
   `scripts/plots.py`, which only lays out the plot.
+
+## Note, 2026-11-01: byte counters are no longer priced as operations
+
+This README and its `analysis/band-*` files are frozen as measured. The band
+priced `factor_base_vec_bytes_floor_uncharged`, a byte count, at `w` GAE per
+byte. The owner decided (option B, 2026-11-01) that the band prices operations
+only (`band.rs` `NON_OPERATION_COUNTERS`); the counter stays listed.
+[`analysis/exbytes/`](analysis/exbytes/) holds the bands re-run under that rule
+(`sessions/` untouched): three arm rows change at w > 0, by at most 12%, and no
+band-rank verdict changes. No weighted comparison was committed, so none was
+re-run. Audit and rationale:
+[`research/ic_byte_counter_pricing_20261101`](../ic_byte_counter_pricing_20261101/README.md).

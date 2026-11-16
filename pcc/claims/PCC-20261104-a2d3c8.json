@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-04T15:52:29Z",
+ "id": "PCC-20261104-a2d3c8",
+ "kind": "theorem",
+ "producer": {
+  "commit": "b4adcd260163cce51b39f50e29f93065cb3f261d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "73d3c098eaeee26bb999f59e9e8f6b38b35afc453be8ba6ddb39d873b3e2f319",
+   "kind": "lean",
+   "project": "research/prime_pole_anchor_20261030/repeated/lean",
+   "theorem": "AnchorBudget.fibonacci_bound"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Abstract suffix budget only; rational valuation bridge and ECDLP complexity are excluded.",
+ "statement": "For every natural g and list ms satisfying AnchorBudget.Feasible g ms, F_(2*length ms)*g <= sum ms and F_(2*length ms+1)*g <= penalty ms+g."
+}

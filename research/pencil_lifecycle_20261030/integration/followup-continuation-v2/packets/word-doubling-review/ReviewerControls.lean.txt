@@ -1,0 +1,10 @@
+import WordDoubling
+open PencilWordRefinement
+example : (5*(2147483646:UInt64))%2147483647 = ((5%2147483647)*2147483646)%2147483647 := by
+ apply literal5_mul_reduce <;> decide
+example : wordGuard 7 ⟨1,1,1,0⟩ ⟨1,1,1,0⟩ = .inverse := by decide
+example : (dblWordPayload 7 1 2 3 4 ⟨1,2,3,4⟩).canonical 7 := by
+ dsimp [WeightedWord.canonical,dblWordPayload,wordNeg,wordAdd,wordSub]
+ decide
+example : (dblWordPayload 5 0 0 0 0 ⟨1,1,1,1⟩).s = 0 := by decide
+example : (dblWordPayload 7 0 0 0 0 ⟨1,1,1,1⟩).s = 5 := by decide

@@ -194,7 +194,66 @@ def fig_l4():
     fig.savefig("l4_bounds.png", dpi=110)
 
 
+def fig_c1():
+    """C1 (Amendment 7): runs/c1pe/ records, d3-checkpoints.tsv, and the dense OOM logs in runs/c1/."""
+    from datetime import datetime
+    recs = {r["draw"]: r for r in load("c1pe/pe5-m3-19-7.d*.jsonl")}
+    if not recs:
+        return
+    cols = next(iter(recs.values()))["columns"]
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.4, 3.2), facecolor=SURF,
+                               gridspec_kw={"width_ratios": [1, 1.35]})
+    style(a); style(b)
+    dense = []
+    for k in sorted(recs):
+        with open(os.path.join(RUNS, "c1", f"deg5-m3-19-7.d{k}.log")) as f:
+            kb = [int(l.split(":")[1]) for l in f if "Maximum resident set size" in l]
+        dense.append(kb[0] / 1e6 if kb else float("nan"))
+    labels = [f"draw {k}" for k in sorted(recs)]
+    x = range(len(labels))
+    a.bar([i - 0.2 for i in x], dense, width=0.4, color=ORANGE,
+          label="dense dreg_closure: OOM abort (471 GB cap)")
+    a.bar([i + 0.2 for i in x], [recs[k]["vm_hwm_kb"] / 1e6 for k in sorted(recs)], width=0.4,
+          color=BLUE, label="pe_closure: refuted at 5")
+    a.axhline(73, color=INK2, lw=0.8, ls="--")
+    a.text(1.45, 78, "73 GB bound", fontsize=7, color=INK2, ha="right")
+    a.set_xticks(list(x)); a.set_xticklabels(labels)
+    a.set_ylabel("peak resident memory (GB)")
+    a.legend(frameon=False, fontsize=7, loc="upper right")
+    a.set_ylim(0, 560)
+    a.set_title("C1 memory, m=3 (19,7), D=5", loc="left", fontsize=10, color=INK)
+    t0 = datetime.fromisoformat("2026-11-04T04:43:09+00:00")
+    pts = [(0.0, 0)]
+    with open(os.path.join(RUNS, "c1pe", "d3-checkpoints.tsv")) as f:
+        next(f)
+        for l in f:
+            t, _, rows = l.split("\t")[:3]
+            pts.append(((datetime.fromisoformat(t.replace("Z", "+00:00")) - t0).total_seconds() / 3600,
+                        int(rows)))
+    r3 = recs.get(3)
+    if r3:
+        pts.append((r3["secs"] / 3600, r3["peak_basis_rows"]))
+    b.plot([p[0] for p in pts], [p[1] / 1e3 for p in pts], color=BLUE, marker="o", ms=3, lw=1.2,
+           label="draw 3 basis rows (checkpoints, ≈ bytes / 95,016)")
+    b.axhline(cols / 1e3, color=INK2, lw=0.8, ls="--")
+    b.text(0.2, cols / 1e3 + 15, f"columns = {cols:,}", fontsize=7, color=INK2)
+    if r3:
+        b.scatter([r3["secs"] / 3600], [r3["peak_basis_rows"] / 1e3], color=AQUA, zorder=3, s=30,
+                  label=f"1 ∈ W at {r3['peak_basis_rows']:,} rows ({r3['peak_basis_rows'] / cols:.2f})")
+    b.set_xlabel("hours since draw 3 start")
+    b.set_ylabel("basis rows (thousands)")
+    b.set_ylim(0, 850)
+    b.legend(frameon=False, fontsize=7, loc="lower right")
+    b.set_title("Basis growth to refutation", loc="left", fontsize=10, color=INK)
+    fig.text(0.01, 0.01, "Recorded: runs/c1pe/pe5-m3-19-7.d{0,3}.jsonl, runs/c1pe/d3-checkpoints.tsv, "
+             "runs/c1/deg5-m3-19-7.d{0,3}.log (dense, Amendment 6).", fontsize=7, color=INK2)
+    fig.tight_layout(rect=(0, 0.05, 1, 1))
+    fig.savefig("c1_degree5.svg")
+    fig.savefig("c1_degree5.png", dpi=110)
+
+
 if __name__ == "__main__":
+    fig_c1()
     fig_l3()
     fig_l4()
     if glob.glob(os.path.join(RUNS, "g1-*.jsonl")):

@@ -1,0 +1,62 @@
+{
+  "item": 8,
+  "title": "Learned WDSat / XOR-CDCL branching",
+  "original_requirement": "Run learned branching and learned cubing/cube-and-conquer on Semaev CNFs using WDSat m3 oracle up to n41.",
+  "acceptance_criteria": [
+    "Static vertex-cover/standard heuristic/random cube/deterministic cube controls before learned policy.",
+    "Unseen curves, systems and sizes; charge training/inference/cube communication; report solved fraction and tail cost including censored runs.",
+    "Independently check every SAT assignment and every claimed UNSAT/cube-coverage certificate."
+  ],
+  "source_bindings": [
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/solve.py"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/symmodel.py"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/README.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/koblitz_sat_ablation.rs"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "cryptanalysis",
+      "argv": [
+        "python3",
+        "experiments/pdp-scaling/solve.py",
+        "--engine",
+        "wdsat",
+        "--n",
+        "41",
+        "--m",
+        "3",
+        "--l",
+        "6",
+        "--seed",
+        "1",
+        "--timeout",
+        "1800"
+      ],
+      "purpose": "Existing upstream WDSat comparator; requires WDSAT_SRC.",
+      "kind": "scientific_diagnostic"
+    }
+  ],
+  "remaining_gaps": [
+    "WDSAT_SRC checkout/build and learned solver integration need binding.",
+    "Direct S4 descent has degree6; upstream WDSat ANF reader known wrong atdegree>=4, so use its m3 symmetric degree<=3 model only.",
+    "No trained policy, learning backend or prospective heldout corpus is provided by inspected wrapper; torch not installed."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Learned branching for WDSat and XOR-CDCL on Semaev CNFs. Zero hits for NeuroSAT-style work. WDSat is your best m = 3 oracle up to n = 41 and runs a static vertex-cover order. Cube-and-conquer with learned cubing was declined without a run."
+}

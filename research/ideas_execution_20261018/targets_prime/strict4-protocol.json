@@ -1,0 +1,11 @@
+{
+  "schema": "ideas.targets-prime.strict4/v1",
+  "frozen_before_execution": true,
+  "relationship": "Additional arm, preserving the original ordered four-point results. Excludes padding an effective two-point decomposition with a cancelling pair.",
+  "primes": [251,509,1021,2039,4093], "seeds": [1,2,3],
+  "factor_base_and_natural_targets": "Identical deterministic curve/base/natural-target fixtures to protocol.json; 32 natural targets per curve.",
+  "acceptance": "All four returned abscissae must be distinct. MITM searches every stored candidate pair; independent reference enumerates unordered quadruples with all four distinct abscissae. Exact point sum must match.",
+  "positive_control": "One sum of four first available distinct-abscissa base points per eligible curve. Ineligible bases are recorded rather than replaced.",
+  "budget": {"maximum_memory_mib":512,"maximum_cpu_seconds":300},
+  "claim_ceiling": "Toy constrained decomposition cells, operation counters in separate units; no lattice method or security conclusion."
+}

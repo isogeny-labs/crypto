@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <rect width="900" height="330" fill="#ffffff"/>
+  <!-- Panel A -->
+  <text x="20" y="28" font-weight="bold">A. Doubling vs small high bits</text>
+  <rect x="20" y="40" width="260" height="200" fill="none" stroke="#333"/>
+  <ellipse cx="150" cy="140" rx="110" ry="60" fill="#e8f0fb" stroke="#2b6cb0"/>
+  <text x="150" y="132" text-anchor="middle">B_k: top k bits zero</text>
+  <text x="150" y="150" text-anchor="middle">density 2^-k</text>
+  <line x1="150" y1="210" x2="150" y2="235" stroke="#c53030" marker-end="url(#x)"/>
+  <text x="150" y="232" text-anchor="middle" fill="#c53030" dy="-2"></text>
+  <text x="150" y="258" text-anchor="middle">x(2P) = ((x^2-a)^2-8bx)/(4y^2)</text>
+  <text x="150" y="276" text-anchor="middle" fill="#c53030">not a bit shift: no reason to stay in B_k</text>
+  <!-- Panel B -->
+  <text x="320" y="28" font-weight="bold">B. x -&gt; 2x is not a curve map</text>
+  <rect x="320" y="40" width="260" height="200" fill="none" stroke="#333"/>
+  <rect x="340" y="70" width="220" height="60" fill="#e8f0fb" stroke="#2b6cb0"/>
+  <text x="450" y="95" text-anchor="middle">x(E) about half of F_p</text>
+  <text x="450" y="115" text-anchor="middle">x³+ax+b square</text>
+  <text x="450" y="170" text-anchor="middle">x -&gt; 2x sends many x into F_p</text>
+  <text x="450" y="188" text-anchor="middle">that are not x-coordinates</text>
+  <text x="450" y="222" text-anchor="middle" fill="#c53030">no point (2x, y) for those x</text>
+  <!-- Panel C -->
+  <text x="620" y="28" font-weight="bold">C. Digit-pattern base under the group law</text>
+  <rect x="620" y="40" width="260" height="200" fill="none" stroke="#333"/>
+  <text x="750" y="80" text-anchor="middle">prime order n, subset S</text>
+  <text x="750" y="100" text-anchor="middle">closed under +, S nonempty</text>
+  <text x="750" y="120" text-anchor="middle">=&gt; -P = (n-1)P in S, S is a subgroup</text>
+  <text x="750" y="140" text-anchor="middle">=&gt; S = {O} or the whole group</text>
+  <text x="750" y="170" text-anchor="middle">negation preserves x, so x-bases</text>
+  <text x="750" y="188" text-anchor="middle">are negation-closed (factor 2 only)</text>
+  <text x="750" y="222" text-anchor="middle" fill="#c53030">no proper digit-pattern base closed</text>
+  <defs>
+    <marker id="x" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#c53030"/></marker>
+  </defs>
+  <text x="20" y="310">Diagram of derivations only. No counted measurement in this directory.</text>
+</svg>

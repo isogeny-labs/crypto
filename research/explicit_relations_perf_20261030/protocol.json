@@ -1,0 +1,478 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXPLICIT-RELATIONS-NORMALIZE-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/explicit_relations_perf_20261030",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "implementation_pr": "https://github.com/isogeny-labs/crypto/pull/2889"
+  },
+  "question": "Does product-tree batch inversion preserve exact outputs while reducing source-level field multiplications, and what do matched GPU stage diagnostics show?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Native product-tree normalization preserves canonical outputs, deterministic relation witnesses and independent CPU replay on all fixed fixtures.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Native tree uses fewer source-level normalization multiplications than the previous dual scan on these fixed block sizes, excluding the shared inversion and affine conversion.",
+      "class": "comparative",
+      "decided_by": [
+        "C-native"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Certified latency speedup, fastest-tool status, full ECDLP performance and asymptotic improvements are not established by this L0 diagnostic panel.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "u",
+      "role": "baseline",
+      "description": "Old dual inclusive scan",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "normalizer": "ER_NORMALIZE_SCAN_REFERENCE"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "normalizer": "ER_NORMALIZE_SCAN_REFERENCE"
+      }
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "description": "Product-tree inversion",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "normalizer": "default"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "normalizer": "default"
+      }
+    },
+    {
+      "id": "w",
+      "role": "reference",
+      "description": "NVIDIA CUB BlockScan exclusive products",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "normalizer": "ER_NORMALIZE_CUB_REFERENCE"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "normalizer": "ER_NORMALIZE_CUB_REFERENCE"
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Second invocation of the identical u binary",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "normalizer": "ER_NORMALIZE_SCAN_REFERENCE"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "normalizer": "ER_NORMALIZE_SCAN_REFERENCE"
+      },
+      "same_instrument_as": "u"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Two planted reachable targets per execution exercise the same GPU path and independent host witness verification; each must be detected."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Two fixed negative targets per execution are exhaustively checked by the independent host backend; no random-population claim is made."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "normalizer",
+        "levels": [
+          "dual_scan",
+          "product_tree",
+          "cub_scan"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "one frozen commit, nvcc13.2.51 -O3 -std=c++17 -arch=sm_120",
+        "how": "Only the normalizer compile definition differs; record each binary hash."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "p=2^61-1,a=0,b=7; base sizes16,64,256; 4slots; normalization counts257,65537,262145; seeds111,222,333",
+        "how": "Native deterministic generator independent of arm; CPU reference checks every witness and negative target."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Same full RTX PRO6000 and pod for all rows. Record device identity, GPU state, CPU affinity and CPUinfo; shared host earns only L0."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh process each cell samples ASLR; allocations, launch geometry, row/chunk caps fixed."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Four-arm Latin rotation with alternating reversal per round and instance."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen Rust analysis consumes neutral u/v/w/x labels and validates complete cells/digests; labels are decoded only in report."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-native",
+        "arms": [
+          "u",
+          "v"
+        ],
+        "differs_in": [
+          "normalizer"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-external",
+        "arms": [
+          "w",
+          "v"
+        ],
+        "differs_in": [
+          "normalizer"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "u",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "seed=111*(instance_index+1), all arms/rounds share deterministic inputs; SplitMix64 constructs projective scales."
+    },
+    "instance_sampling": {
+      "rule": "Fixed public software fixtures, not random scientific population: three increasing base sizes and partial-block normalization sizes.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "Standalone frozen analyzer receives only rows.csv with neutral u/v/w/x arm labels, no protocol or identity key. Numerical signatures may reveal implementations.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 3,
+    "replicates": 9,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact source-level counts and deterministic equality need no sampling power. Nine repeats characterize descriptive ranges only; no timed significance test or equivalence claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Conservative unmeasured allocation estimate, not timing evidence. Round0 is the declared per-arm/size preflight and warmup; preserve all costs. No preflight numbers existed at freeze."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "normalization_muls",
+        "name": "Normalization multiplication count",
+        "unit": "field multiplications",
+        "kind": "exact",
+        "definition": "Per invocation: padded blocks times4608 for dualscan or765 for tree. Excludes identical inversion/affine work; not total GAE or machine instructions. CUB count is omitted because implementation-dependent.",
+        "source": "rows.csv normalization_muls",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "normalize_ms",
+        "name": "Normalization kernel diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "CUDA event interval over8 launches divided by8, after one untimed kernel launch; readback and verification excluded.",
+        "source": "rows.csv normalize_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      },
+      {
+        "id": "prepare_ms",
+        "name": "Prepare diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Host synchronized prepare including allocations, table build, sort and device sync.",
+        "source": "rows.csv prepare_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      },
+      {
+        "id": "query_ms",
+        "name": "Four-query diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Four device.find calls including transfers, synchronization and native witness verification; independent comparison checker outside interval.",
+        "source": "rows.csv query_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      },
+      {
+        "id": "cold_ms",
+        "name": "Cold pipeline diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Fresh-process fixture construction, plan validation, GPU context initialization, prepare and four queries. Independent host cross-check excluded; no context reuse.",
+        "source": "rows.csv cold_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "normalization_muls",
+      "digest",
+      "norm_digest"
+    ],
+    "record": [
+      "GPU UUID and driver",
+      "CUDA compiler and binary hashes",
+      "CPUinfo and process affinity",
+      "GPU state before and after",
+      "all row stages and digests"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "runpod",
+    "queue": "Secure Cloud full RTX PRO 6000",
+    "placement": {
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "count": 1,
+      "container_disk_gb": 40
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 2400,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "4arms x3instances x(1warmup+9rounds)=120 rows; no extra repeats after viewing results.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any incorrect output, failed sanitizer or missing cell invalidates the run; retain failures. Worker2400s/controller2700s deadline; delete pod and retain partial data.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any output mismatch, nonzero sanitizer result, missing measured cell or source mismatch invalidates the panel."
+  ],
+  "decision_rule": {
+    "text": "C1 requires all correctness checks and identical cross-arm digests. C2 requires the exact native count765 perblock versus4608, with equality passing. Timing is L0 descriptive telemetry and cannot decide a speedup or fastest-tool claim.",
+    "comparison_ids": [
+      "C-native"
+    ],
+    "threshold": "all equality checks pass; candidate normalization_muls < baseline for every fixture",
+    "statistic": "exact algorithmic multiplication count; descriptive latency median/min/max",
+    "interval": "exact counts; diagnostic full observed range, no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "native multiplication count difference and ratio, excluding inversion/affine work",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.rs",
+      "sha256": "9a51c724a9c7f0872e247176bdba6f69384fa721707462ca375aaa7d1c933bba"
+    },
+    "inputs": [
+      "rows.csv"
+    ],
+    "outputs": [
+      "summary.csv",
+      "latency.svg",
+      "analysis.log"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-arm four-query diagnostic latency with full ranges"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Treating L0 clocks as certified speedups",
+    "Omitting prepare/context costs from a full-pipeline claim",
+    "Changing fixtures or repeat count after reading observations",
+    "Calling normalization counts total field work or GAE",
+    "Claiming CUB field counts without instrumentation"
+  ],
+  "literature": [
+    {
+      "ref": "https://developer.nvidia.com/gpugems/gpugems3/part-vi-gpu-computing/chapter-39-parallel-prefix-sum-scan-cuda",
+      "provenance": "retrieved",
+      "claim": "Work-efficient up/down tree traversal replaces redundant inclusive scans; shared-memory access can still dominate.",
+      "verified_by": "Primary chapter read before implementation,2026-10-30 UTC"
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/asynchronous-execution.html",
+      "provenance": "retrieved",
+      "claim": "CUDA launches are asynchronous; use event timing and explicit synchronization, report scope.",
+      "verified_by": "Primary CUDA documentation read before implementation,2026-10-30 UTC"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "3e379eac61e5b75a077ad8bba29dd68e6f5319c1356ecdf4b337b1f35bab3fd6",
+    "commit": "b99e3f2000f19d629423f346c93c9631ff6bcf75",
+    "frozen_at": "2026-10-30T00:19:16Z",
+    "filed_before_affected_data": true
+  }
+}

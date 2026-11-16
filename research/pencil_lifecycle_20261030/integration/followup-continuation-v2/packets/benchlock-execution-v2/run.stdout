@@ -1,0 +1,26 @@
+parent_pid=2349196
+probe acquired=false errno=11
+probe acquired=true errno=0
+C1 PASS
+C2 fd_cloexec=true
+child_ready pid=2349197 destructor_body=false
+probe acquired=false errno=11
+child_reaped status=0
+probe acquired=true errno=0
+C2 PASS
+child_ready pid=2349198 destructor_body=false
+probe acquired=true errno=0
+child_reaped status=0
+C3 PASS
+child_ready pid=2349199 destructor_body=true
+probe acquired=false errno=11
+probe acquired=true errno=0
+child_reaped status=0
+C4 PASS
+child_ready pid=2349200 destructor_body=false
+probe acquired=true errno=0
+child_reaped status=0
+C6 PASS
+probe acquired=true errno=0
+C5 PASS
+ALL_SIX_CONTROLS_PASS

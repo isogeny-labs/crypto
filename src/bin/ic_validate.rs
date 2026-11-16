@@ -1598,6 +1598,17 @@ const ROWS: &[Row] = &[
         ],
     },
     Row {
+        key: "v9",
+        dir: "rule/v9",
+        mode: "rule",
+        arm: "",
+        also: &[("v9c", "rule/v9c")],
+        evidence: &[
+            "research/ic_tool_program/rule/v9",
+            "benchmarks/20261111-ic-rule-v9",
+        ],
+    },
+    Row {
         key: "A14",
         dir: "explorations/A14-prefetch-size-gate-20261017",
         mode: "exploration",
@@ -1728,6 +1739,8 @@ fn rho_reference(key: &str, b: &Band) -> Value {
     }
     let protocol = if key == "v8" {
         "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: rule v8's matched rho, the signed-Frobenius r-adding walk (negation and Frobenius classes) with its canonicalisation batched 16 lanes at a time, its set-up plus its walk, as measured; rule v8c, the same binary with rho as at rule v7, is its control"
+    } else if key == "v9" {
+        "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: rule v8's matched rho (the signed-Frobenius r-adding walk, negation and Frobenius classes, its canonicalisation batched 16 lanes at a time), its set-up plus its walk, as measured, in main's binary; rule v9c, rule v8's binary in the same session with the same rho, is its control"
     } else {
         "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: the signed-Frobenius r-adding walk (negation and Frobenius classes), its set-up plus its walk, as measured"
     };

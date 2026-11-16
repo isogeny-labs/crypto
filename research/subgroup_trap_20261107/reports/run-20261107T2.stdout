@@ -1,0 +1,35 @@
+identity (regenerated targets reproduce every frozen count): rows 72, mismatching rows 0
+
+P1 (A0 subfield trap):
+  k=5 std        deg_K=5 trapped=true fb=62 in_E(F_Q2)=62 in_H=62 | targets T=20000 in_E(F_Q2)=16 in_H=9 nonzero_outside_H=0 nonzero_outside_E(F_Q2)=0 => ok
+  k=5 tw_a(u=1)  deg_K=5 trapped=true fb=62 in_E(F_Q2)=62 in_H=62 | targets T=20000 in_E(F_Q2)=16 in_H=9 nonzero_outside_H=0 nonzero_outside_E(F_Q2)=0 => ok
+  k=5 tw_b(u=6)  deg_K=10 trapped=false fb=62 in_E(F_Q2)=42 in_H=20 | targets T=20000 in_E(F_Q2)=16 in_H=9 nonzero_outside_H=2604 nonzero_outside_E(F_Q2)=2597 => ok
+  k=7 std        deg_K=7 trapped=true fb=254 in_E(F_Q2)=254 in_H=254 | targets T=8000 in_E(F_Q2)=0 in_H=0 nonzero_outside_H=0 nonzero_outside_E(F_Q2)=0 => ok
+  k=7 tw_a(u=1)  deg_K=7 trapped=true fb=254 in_E(F_Q2)=254 in_H=254 | targets T=8000 in_E(F_Q2)=0 in_H=0 nonzero_outside_H=0 nonzero_outside_E(F_Q2)=0 => ok
+  k=7 tw_b(u=6)  deg_K=14 trapped=false fb=254 in_E(F_Q2)=114 in_H=56 | targets T=8000 in_E(F_Q2)=0 in_H=0 nonzero_outside_H=1148 nonzero_outside_E(F_Q2)=1148 => ok
+  k=9 std        deg_K=9 trapped=true fb=1022 in_E(F_Q2)=1022 in_H=1022 | targets T=1500 in_E(F_Q2)=0 in_H=0 nonzero_outside_H=0 nonzero_outside_E(F_Q2)=0 => ok
+  k=9 tw_a(u=1)  deg_K=9 trapped=true fb=1022 in_E(F_Q2)=1022 in_H=1022 | targets T=1500 in_E(F_Q2)=0 in_H=0 nonzero_outside_H=0 nonzero_outside_E(F_Q2)=0 => ok
+  k=9 tw_b(u=6)  deg_K=18 trapped=false fb=1022 in_E(F_Q2)=506 in_H=252 | targets T=1500 in_E(F_Q2)=0 in_H=0 nonzero_outside_H=192 nonzero_outside_E(F_Q2)=192 => ok
+P1 => PASS
+
+P2 (A0 std, exact mass over E(F_Q2)):
+  k=5 #E(F_Q2)=968 |H|=484 m=62 sum N = 14776336 (m^4 = 14776336) support=484 outside H=0 mean on H=30529.620 = m^4/|H|=30529.620 min/max on H 25024/88088 => ok
+  k=7 #E(F_Q2)=16472 |H|=8236 m=254 sum N = 4162314256 (m^4 = 4162314256) support=8236 outside H=0 mean on H=505380.556 = m^4/|H|=505380.556 min/max on H 442240/4352888 => ok
+P2 => PASS
+
+P3 (zero count whenever Tr(x_R) != Tr(a)):
+  rows 72, (row, target) pairs with Tr(x_R) != Tr(a): 309870, nonzero among them: 0
+  reported: fraction with Tr(x_R) = Tr(a) in [0.440, 0.530]; mean on that half / pred_excl (non-A0 rows) median 2.007, range [1.603, 2.425]
+P3 => PASS
+
+P4 (no applicable line trapped):
+  oakley3_gf2_155 N=155 d=31 Tr(a)=0 deg a=1 deg b=155 lines 3 trapped 0; F_2^16 lines can trap: n/a
+  oakley4_gf2_185 N=185 d=37 Tr(a)=0 deg a=1 deg b=185 lines 3 trapped 0; F_2^16 lines can trap: n/a
+  c2pnb176v1 N=176 d=44 Tr(a)=1 deg a=16 deg b=16 lines 3 trapped 0; F_2^16 lines can trap: false
+  c2pnb208w1 N=208 d=52 Tr(a)=0 deg a=1 deg b=16 lines 3 trapped 0; F_2^16 lines can trap: false
+  c2pnb272w1 N=272 d=68 Tr(a)=1 deg a=16 deg b=16 lines 3 trapped 0; F_2^16 lines can trap: false
+  c2pnb304w1 N=304 d=76 Tr(a)=1 deg a=16 deg b=16 lines 3 trapped 0; F_2^16 lines can trap: false
+  c2pnb368w1 N=368 d=92 Tr(a)=0 deg a=16 deg b=16 lines 3 trapped 0; F_2^16 lines can trap: false
+  C1 A1 A2 B1-B3 (all k, all arms): 54 rows, trapped 0
+P4 => PASS
+rc=0

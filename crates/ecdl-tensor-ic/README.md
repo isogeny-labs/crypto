@@ -21,7 +21,7 @@ does not share code with it.
 | 1. Factor-base selection | `relation.rs` `new_factor_bases`, `new_affine_factor_bases`, `new_windowed_factor_bases` | m random hashed membership predicates, each with \|F_i\| ≈ (2r)^(1/m). There is no notion of smoothness. The default hash is keyed SHA-256. The gadget path uses a random affine hash, A ∈ F_i iff (α_i x + β_i y + γ_i) mod p < U_i, because that is cheap to check with low-degree gadgets. A coordinate window can be added: A ∈ F_i iff x(A) < p>>k as well (see below). |
 | 2. Relation finding | `relation.rs` `relation_network`, `tensor.rs` | `[u]P+[v]Q = A_1+…+A_m` is encoded as a Boolean tensor network with (2m−1)(2b+1) edges. |
 | Counting → search | `tensor.rs` `find_witness` | Self-reduction fixes one bit at a time, so any **counting** solver works. |
-| 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by Gaussian elimination |
+| 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by sparse Gaussian elimination (`left_kernel_vector_sparse`, used by the solver); `left_kernel_vector` is the dense reference |
 | 4. Extraction | `solver.rs` | ξ = −U/V, always checked against `[ξ]P == Q`; an unverified answer is never returned. |
 
 Relation search has two elimination orders. The default contracts the
@@ -94,6 +94,47 @@ evaluates a hash per group point; k = 8 takes 12 ms and holds the same |F_i|.
 
 The modulus there is p = 2^(b−1)+1, which is not prime; only the structure is
 measured, and networks are built but never evaluated.
+
+## Fixed-cofactor curves (Rust only)
+
+`cofactor.rs` adds the paper's fixed-cofactor setting, following the design
+in `research/ecdl_tensor_ic_cofactor_20261106/DESIGN.md` and the transcription
+of Bochum v0.2 §3 in `crates/hashed-ecdl-tensor`.
+
+- **Setting.** #E = c·r with r prime and r > c. `Curve` keeps its meaning:
+  `order` is r, and `g` lies in the order-r subgroup G = [c]E.
+  `CofactorCurve` carries c beside it, and `random_cofactor_curve` finds
+  toy curves by naive counting.
+- **Factor bases** are drawn as for order r, then restricted to G
+  (`cofactor_factor_bases`). The hash is evaluated on A_i, the subgroup
+  point.
+- **Whole-point network** (`cofactor_relation_network`). Each slot takes a
+  free S_i ∈ E (a support over the preimages of F_i, enumerated once per
+  factor-base draw into `FactorBases::preimages`) and a projection vertex
+  emits A_i = [c]S_i only when A_i is a member of F_i. Since every point of
+  G has exactly c preimages, the count is exactly c^m times the subgroup
+  network's.
+- **Gadget network** (`gadget_cofactor_relation_network`). A
+  `Builder::scalar_mul_const` gadget (double-and-add with complete
+  additions) computes A_i = [c]S_i, forces A_i ≠ O and checks membership.
+  Its count equals the whole-point cofactor count. `cofactor_shape` gives
+  its per-slot shape. For c = 2, 4, 8 at b = 64…1024, edges/b fall with b
+  (e.g. c = 4: 574, 521, 489) and max degree / b^(3/4) stays below 25.
+- **Solver.** `Solver::cofactor` (default 1, so prime-order behaviour is
+  unchanged) switches all of this on. It refuses a target outside G and
+  coordinate windows. Meet-in-the-middle search runs on the A_i directly.
+- **CLI.** `ic tensor demo --cofactor C`.
+- **Tests.** `tests/cofactor_test.rs` (9 tests):
+  - the curve order, and exactly c preimages per point of G;
+  - the whole-point identity count = c^m × subgroup count, for m = 2 and 3,
+    with c = 2 and 4;
+  - an exhaustive [k]S gadget check;
+  - gadget count = whole-point count;
+  - solves for c = 2 and 4 (whole-point, meet-in-the-middle, gadgets);
+  - rejected inputs, and the bounded shape;
+  - cached preimages give the same count as sources over all of E.
+
+None of this changes the cost class: every counter is still exponential.
 
 ## Run
 

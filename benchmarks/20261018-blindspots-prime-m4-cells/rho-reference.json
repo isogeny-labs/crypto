@@ -1,0 +1,50 @@
+{
+  "schema": "validation-gate/v1 rho_reference (DRAFT; not VALIDATION.json)",
+  "draft": true,
+  "scope": "arm (a) full index calculus vs the matched rho, the four design cells (16, 20, 24, 28 bits); gae_band at the largest measured cell, 28 bits, bx = 63. Arm (b) full-IC rows are not covered: they ran in separate builds (cards 09-12), so same_binary_or_process would be false for them.",
+  "kind": "no_symmetry_used",
+  "kind_note": "Deliberately outside the gate's enum, and the gate will refuse it. The measured reference is plain Pollard rho: a 16-jump r-adding walk over points, partition by a hash of x, step P -> P + T_j. P and -P diverge after one step, so the negation map is not used. The x-keyed distinguished-point table only detects +-matches between stored DPs. 'negation' would misdescribe that walk. 'no_symmetry_available' would be false: a, b != 0 at every cell, so j != 0, 1728 and Aut(E) = {+-1}. Frobenius is trivial on E(F_p).",
+  "strongest_available_kind": "negation",
+  "protocol": "PROTOCOL.md 'Unit, accounting, pricing', Matched rho: Pollard rho with a 16-jump r-adding walk (jump scalars with four random bits set, built from the doubling chains of G and Q, counted), van Oorschot-Wiener distinguished points theta = floor(log2 p / 4) with log2 p the cell label (4, 5, 6, 7 bits), one thread, 16 independent logarithms per cell, each logarithm verified by a counted scalar multiplication, jump-table setup counted (included in gae) and reported apart (setup_gadd).",
+  "unit": "GAE: one counted affine group addition (doubling and P + (-P) included) = 1. Plus w x native operations (lookup, insert, legendre, sqrt, rowop, madd, dptest, build), w in {0, 0.1, 1}. The same counters and the same native set are used for both arms (recomputed: rho native = lookup + insert + dptest; arm (a) native = lookup + insert + legendre + sqrt + rowop).",
+  "binary_or_process": "target/blindspots-14/card-01/b14: one rustc build (--edition 2021 -C opt-level=3 -C codegen-units=1 -C target-cpu=native) of examples/blindspots_14_prime_m4.rs, sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376, at commit 397d5ade00dc143660ab068d2d12d3808e93510e with dirty_before empty. Card CARD-BLINDSPOT-14-01 (card sha256 64adb85f6ef39ef8030e7f3289df6f86954c9881800a5d041abfac7c6aa20eaa; receipt raw/receipt-card-01.json sha256 10e7382158368b1a548227e4a823633f3a5ceb4aa46afc0a3b4e32b57a50e243). Command indices: build 2; rho-b16..b28 6-9; fullic-a-b16..b28 19-22; remove-bin 28. Same binary file, separate processes; the binary itself has no recorded sha256.",
+  "matches_protocol": true,
+  "strongest_available": false,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "evidence": {
+    "matches_protocol": "rho-b{16,20,24,28}.jsonl: 16 runs each (run 0..15), ok 16/16, gae == counts.gadd, which includes setup_gadd (counts snapshotted before make_jumps); instrument rho_run: J = 16, four distinct bits per alpha and beta, theta = (bits/4).max(2), verification by cv.mul(cand, g) inside the counted window; cmd_rho draws a distinct d and walk seed per run.",
+    "strongest_available": "false: negation is available (Aut(E) = {+-1}) and the walk does not use it; see kind_note.",
+    "same_unit": "both arms are counted by the same instrument counters; native totals recompute from the same eight counters.",
+    "same_binary_or_process": "receipt-card-01.json command list (see binary_or_process); holds for arm (a) only."
+  },
+  "gae_band": {
+    "0": {
+      "ic": 568572.875,
+      "rho": 18912.8125
+    },
+    "0.1": {
+      "ic": 627636.11875,
+      "rho": 20775.33125
+    },
+    "1": {
+      "ic": 1159205.3125,
+      "rho": 37538.0
+    }
+  },
+  "gae_band_cell": {
+    "bits": 28,
+    "p": 248685287,
+    "bx": 63,
+    "runs_ic": 16,
+    "runs_rho": 16,
+    "ic_over_rho": {
+      "0": 30.062840997339766,
+      "0.1": 30.21064315159837,
+      "1": 30.880849072939423
+    },
+    "definition": "ic = mean(gae_total) + w * mean(native_total) over 16 full-IC runs; rho = mean(gae) + w * mean(native) over 16 rho runs"
+  },
+  "order_holds_across_band": true,
+  "order_note": "rho is cheaper than arm (a) full IC at w = 0, 0.1 and 1 at every design cell (ratios 6.45 to 30.88). A negation-map rho could only lower rho's cost, so the order would still hold."
+}

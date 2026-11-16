@@ -1,0 +1,5488 @@
+{
+  "baseline_solver_ms": {
+    "max": 216393.80451,
+    "median": 182074.425421,
+    "min": 177459.286074,
+    "n": 7
+  },
+  "candidate_solver_ms": {
+    "max": 17862.255509000002,
+    "median": 17767.144183,
+    "min": 17731.849428,
+    "n": 7
+  },
+  "class": "engineering",
+  "complete_comparison_coverage": true,
+  "external_algorithm_cpu_ms": {
+    "max": 2840.0,
+    "median": 2830.0,
+    "min": 2810.0,
+    "n": 7
+  },
+  "external_process_ms": {
+    "max": 2982.035582,
+    "median": 2973.960454,
+    "min": 2960.83891,
+    "n": 7
+  },
+  "identical_search_and_selector_signature": true,
+  "manifest": "/home/ec2-user/scratch/n83-xor-opt-20261019/manifest-final.json",
+  "natural_yield_winner": null,
+  "pairs": [
+    {
+      "candidate_wall_over_external_algorithm_cpu": 6.286299533568904,
+      "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+      "round": 1,
+      "solver_a_over_b": 12.163633226193763,
+      "word_updates_a_over_b": 394.7043552222553
+    },
+    {
+      "candidate_wall_over_external_algorithm_cpu": 6.2741164696113065,
+      "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+      "round": 2,
+      "solver_a_over_b": 9.994468833016759,
+      "word_updates_a_over_b": 394.7043552222553
+    },
+    {
+      "candidate_wall_over_external_algorithm_cpu": 6.349290320284697,
+      "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+      "round": 3,
+      "solver_a_over_b": 9.958668288301093,
+      "word_updates_a_over_b": 394.7043552222553
+    },
+    {
+      "candidate_wall_over_external_algorithm_cpu": 6.278142820848057,
+      "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+      "round": 4,
+      "solver_a_over_b": 10.169526703108648,
+      "word_updates_a_over_b": 394.7043552222553
+    },
+    {
+      "candidate_wall_over_external_algorithm_cpu": 6.2895265876760575,
+      "external_timer_note": "native solve wall / CMS solve-simplify reported CPU; different timer kinds",
+      "round": 5,
+      "solver_a_over_b": 10.19324940958664,
+      "word_updates_a_over_b": 394.7043552222553
+    }
+  ],
+  "rows": [
+    {
+      "actual_word_updates": 5551462287,
+      "arm": "A",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-a1",
+      "external_process_ms": null,
+      "id": "aa-a1",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 70,
+          "failed_user_threads": 0,
+          "moved_count": 403
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              5.04,
+              5.02,
+              4.03
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 21584441,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 15886,
+                "idle": 107255,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15457,
+                "idle": 107508,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428198440
+          },
+          "before": {
+            "loadavg": [
+              5.21,
+              5.06,
+              4.04
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 21583409,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 15886,
+                "idle": 107055,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15457,
+                "idle": 107308,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428196440
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 184857.12651399997,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 183941.363293,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 35307,
+        "ns_propagate_clauses": 75822881,
+        "ns_propagate_xors": 183771236268,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507
+      }
+    },
+    {
+      "actual_word_updates": 5551462287,
+      "arm": "A",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-a2",
+      "external_process_ms": null,
+      "id": "aa-a2",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 61,
+          "failed_user_threads": 0,
+          "moved_count": 387
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              7.57,
+              6.2,
+              4.7
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 21641315,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 34340,
+                "idle": 107513,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15471,
+                "idle": 126193,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428385584
+          },
+          "before": {
+            "loadavg": [
+              7.57,
+              6.2,
+              4.7
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 21633584,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 34340,
+                "idle": 107313,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15471,
+                "idle": 125993,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428383582
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 205977.809068,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 204881.214006,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 35307,
+        "ns_propagate_clauses": 92373715,
+        "ns_propagate_xors": 204684937511,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507
+      }
+    },
+    {
+      "actual_word_updates": 14064862,
+      "arm": "B",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-b1",
+      "external_process_ms": null,
+      "id": "aa-b1",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 64,
+          "failed_user_threads": 0,
+          "moved_count": 385
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              10.2,
+              13.32,
+              8.35
+            ],
+            "psi_cpu_some_avg10": 0.05,
+            "psi_cpu_some_total_us": 54946028,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 54867,
+                "idle": 107804,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15551,
+                "idle": 146897,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428593762
+          },
+          "before": {
+            "loadavg": [
+              10.91,
+              13.51,
+              8.38
+            ],
+            "psi_cpu_some_avg10": 0.07,
+            "psi_cpu_some_total_us": 54945789,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 54867,
+                "idle": 107604,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15551,
+                "idle": 146697,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428591762
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 18472.824773,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 17731.849428,
+      "source_commit": "dc7f38c4961b76042271a54dcbd5d338b0f94e1b",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": {
+        "decisions": 35307,
+        "engine": "indexed_words",
+        "ns_propagate_clauses": 71497883,
+        "ns_propagate_xors": 17563926773,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507,
+        "xor_support_visits": 15997241,
+        "xor_word_updates": 14064862
+      }
+    },
+    {
+      "actual_word_updates": 14064862,
+      "arm": "B",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-b2",
+      "external_process_ms": null,
+      "id": "aa-b2",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 65,
+          "failed_user_threads": 0,
+          "moved_count": 386
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              8.25,
+              12.67,
+              8.24
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 54962021,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 56680,
+                "idle": 108061,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15552,
+                "idle": 148962,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428614452
+          },
+          "before": {
+            "loadavg": [
+              8.62,
+              12.82,
+              8.26
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 54961812,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 56680,
+                "idle": 107861,
+                "steal": 0
+              },
+              "31": {
+                "busy": 15552,
+                "idle": 148762,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792428612452
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 18589.229665000003,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 17759.98874,
+      "source_commit": "dc7f38c4961b76042271a54dcbd5d338b0f94e1b",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": {
+        "decisions": 35307,
+        "engine": "indexed_words",
+        "ns_propagate_clauses": 68061614,
+        "ns_propagate_xors": 17596360033,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507,
+        "xor_support_visits": 15997241,
+        "xor_word_updates": 14064862
+      }
+    },
+    {
+      "arm": "E",
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-e1",
+      "id": "aa-e1",
+      "planned_status": "UNKNOWN_FAILED_AUDIT",
+      "status": "FAILED_NO_AUDIT"
+    },
+    {
+      "arm": "E",
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-e2",
+      "id": "aa-e2",
+      "planned_status": "NOT_ATTEMPTED_SUPERSEDED",
+      "status": "NOT_ATTEMPTED"
+    },
+    {
+      "arm": "E",
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-e1-v3",
+      "id": "aa-e1-v3",
+      "planned_status": "PREFLIGHT_REFUSED",
+      "status": "PREFLIGHT_REFUSED_NO_WORKER"
+    },
+    {
+      "arm": "E",
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-e2-v3",
+      "id": "aa-e2-v3",
+      "planned_status": "NOT_ATTEMPTED_SUPERSEDED",
+      "status": "NOT_ATTEMPTED"
+    },
+    {
+      "arm": "E",
+      "columns": 0,
+      "conflict_cap": 1000000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-e1-v4",
+      "external_algorithm_cpu_ms": 2820.0,
+      "external_parsing_cpu_ms": 90.0,
+      "external_process_ms": 2960.83891,
+      "id": "aa-e1-v4",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 71,
+          "failed_user_threads": 0,
+          "moved_count": 389
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              23.7,
+              12.93,
+              9.02
+            ],
+            "psi_cpu_some_avg10": 2.04,
+            "psi_cpu_some_total_us": 74848790,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 68461,
+                "idle": 176030,
+                "steal": 0
+              },
+              "31": {
+                "busy": 28020,
+                "idle": 216199,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429413057
+          },
+          "before": {
+            "loadavg": [
+              23.7,
+              12.93,
+              9.02
+            ],
+            "psi_cpu_some_avg10": 2.49,
+            "psi_cpu_some_total_us": 74848488,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 68461,
+                "idle": 175830,
+                "steal": 0
+              },
+              "31": {
+                "busy": 28020,
+                "idle": 215999,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429411057
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                23.7,
+                12.93,
+                9.02
+              ],
+              "psi_cpu_some_avg10": 2.04,
+              "psi_cpu_some_total_us": 74848790,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 68461,
+                  "idle": 176030,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 28020,
+                  "idle": 216199,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429413057
+            },
+            "before": {
+              "loadavg": [
+                23.7,
+                12.93,
+                9.02
+              ],
+              "psi_cpu_some_avg10": 2.49,
+              "psi_cpu_some_total_us": 74848488,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 68461,
+                  "idle": 175830,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 28020,
+                  "idle": 215999,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429411057
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 3848.25772,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": null,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": null
+    },
+    {
+      "arm": "E",
+      "columns": 0,
+      "conflict_cap": 1000000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/aa-e2-v4",
+      "external_algorithm_cpu_ms": 2810.0,
+      "external_parsing_cpu_ms": 70.0,
+      "external_process_ms": 2973.960454,
+      "id": "aa-e2-v4",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 72,
+          "failed_user_threads": 0,
+          "moved_count": 390
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              22.12,
+              12.78,
+              8.99
+            ],
+            "psi_cpu_some_avg10": 1.12,
+            "psi_cpu_some_total_us": 74860068,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 68803,
+                "idle": 176297,
+                "steal": 0
+              },
+              "31": {
+                "busy": 28021,
+                "idle": 216806,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429419148
+          },
+          "before": {
+            "loadavg": [
+              22.12,
+              12.78,
+              8.99
+            ],
+            "psi_cpu_some_avg10": 1.36,
+            "psi_cpu_some_total_us": 74859904,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 68803,
+                "idle": 176098,
+                "steal": 0
+              },
+              "31": {
+                "busy": 28021,
+                "idle": 216606,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429417148
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                22.12,
+                12.78,
+                8.99
+              ],
+              "psi_cpu_some_avg10": 1.12,
+              "psi_cpu_some_total_us": 74860068,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 68803,
+                  "idle": 176297,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 28021,
+                  "idle": 216806,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429419148
+            },
+            "before": {
+              "loadavg": [
+                22.12,
+                12.78,
+                8.99
+              ],
+              "psi_cpu_some_avg10": 1.36,
+              "psi_cpu_some_total_us": 74859904,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 68803,
+                  "idle": 176098,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 28021,
+                  "idle": 216606,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429417148
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 3857.202571,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": null,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": null
+    },
+    {
+      "actual_word_updates": 5551462287,
+      "arm": "A",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r1-a",
+      "external_process_ms": null,
+      "id": "r1-a",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 73,
+          "failed_user_threads": 0,
+          "moved_count": 376
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              3.5,
+              6.75,
+              7.47
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75144616,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 74328,
+                "idle": 204172,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30271,
+                "idle": 247931,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429753236
+          },
+          "before": {
+            "loadavg": [
+              3.5,
+              6.75,
+              7.47
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75144540,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 74328,
+                "idle": 203972,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30271,
+                "idle": 247731,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429751236
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                3.5,
+                6.75,
+                7.47
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75144616,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 74328,
+                  "idle": 204172,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30271,
+                  "idle": 247931,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429753236
+            },
+            "before": {
+              "loadavg": [
+                3.5,
+                6.75,
+                7.47
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75144540,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 74328,
+                  "idle": 203972,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30271,
+                  "idle": 247731,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429751236
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 217304.902778,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 216393.80451,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 35307,
+        "ns_propagate_clauses": 91538132,
+        "ns_propagate_xors": 216204999134,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507
+      }
+    },
+    {
+      "actual_word_updates": 14064862,
+      "arm": "B",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r1-b",
+      "external_process_ms": null,
+      "id": "r1-b",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 65,
+          "failed_user_threads": 0,
+          "moved_count": 364
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              3.85,
+              6.3,
+              7.23
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75260097,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 96005,
+                "idle": 204445,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30297,
+                "idle": 269802,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429972718
+          },
+          "before": {
+            "loadavg": [
+              4.19,
+              6.4,
+              7.27
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75248568,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 96005,
+                "idle": 204245,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30297,
+                "idle": 269602,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429970717
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                3.85,
+                6.3,
+                7.23
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75260097,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 96005,
+                  "idle": 204445,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30297,
+                  "idle": 269802,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429972718
+            },
+            "before": {
+              "loadavg": [
+                4.19,
+                6.4,
+                7.27
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75248568,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 96005,
+                  "idle": 204245,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30297,
+                  "idle": 269602,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429970717
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 19363.37417,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 17790.22768,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": {
+        "decisions": 35307,
+        "engine": "indexed_words",
+        "ns_propagate_clauses": 65920266,
+        "ns_propagate_xors": 17629735096,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507,
+        "xor_support_visits": 15997241,
+        "xor_word_updates": 14064862
+      }
+    },
+    {
+      "arm": "E",
+      "columns": 0,
+      "conflict_cap": 1000000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r1-e",
+      "external_algorithm_cpu_ms": 2830.0,
+      "external_parsing_cpu_ms": 90.0,
+      "external_process_ms": 2978.070151,
+      "id": "r1-e",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 65,
+          "failed_user_threads": 0,
+          "moved_count": 364
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              3.54,
+              6.07,
+              7.13
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75278946,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 97824,
+                "idle": 204782,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30297,
+                "idle": 271958,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429994281
+          },
+          "before": {
+            "loadavg": [
+              3.54,
+              6.07,
+              7.13
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75278829,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 97824,
+                "idle": 204582,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30297,
+                "idle": 271758,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792429992281
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                3.54,
+                6.07,
+                7.13
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75278946,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 97824,
+                  "idle": 204782,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30297,
+                  "idle": 271958,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429994281
+            },
+            "before": {
+              "loadavg": [
+                3.54,
+                6.07,
+                7.13
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75278829,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 97824,
+                  "idle": 204582,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30297,
+                  "idle": 271758,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792429992281
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 3874.171761,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": null,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": null
+    },
+    {
+      "actual_word_updates": 14064862,
+      "arm": "B",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r2-b",
+      "external_process_ms": null,
+      "id": "r2-b",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 65,
+          "failed_user_threads": 0,
+          "moved_count": 360
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              2.44,
+              5.47,
+              6.89
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75325071,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 98203,
+                "idle": 208178,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30312,
+                "idle": 275718,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430032060
+          },
+          "before": {
+            "loadavg": [
+              2.47,
+              5.53,
+              6.92
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75322736,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 98203,
+                "idle": 207978,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30312,
+                "idle": 275518,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430030060
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                2.44,
+                5.47,
+                6.89
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75325071,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 98203,
+                  "idle": 208178,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30312,
+                  "idle": 275718,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430032060
+            },
+            "before": {
+              "loadavg": [
+                2.47,
+                5.53,
+                6.92
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75322736,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 98203,
+                  "idle": 207978,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30312,
+                  "idle": 275518,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430030060
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 18714.436316,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 17755.749609,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": {
+        "decisions": 35307,
+        "engine": "indexed_words",
+        "ns_propagate_clauses": 63858673,
+        "ns_propagate_xors": 17598676113,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507,
+        "xor_support_visits": 15997241,
+        "xor_word_updates": 14064862
+      }
+    },
+    {
+      "actual_word_updates": 5551462287,
+      "arm": "A",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r2-a",
+      "external_process_ms": null,
+      "id": "r2-a",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 64,
+          "failed_user_threads": 0,
+          "moved_count": 383
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              2.77,
+              5.35,
+              6.82
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75359322,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 100017,
+                "idle": 208455,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30322,
+                "idle": 277797,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430052969
+          },
+          "before": {
+            "loadavg": [
+              2.41,
+              5.32,
+              6.81
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75349196,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 100017,
+                "idle": 208255,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30313,
+                "idle": 277608,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430050968
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.09
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                2.77,
+                5.35,
+                6.82
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75359322,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 100017,
+                  "idle": 208455,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30322,
+                  "idle": 277797,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430052969
+            },
+            "before": {
+              "loadavg": [
+                2.41,
+                5.32,
+                6.81
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75349196,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 100017,
+                  "idle": 208255,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30313,
+                  "idle": 277608,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430050968
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.09
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 178252.95574399998,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 177459.286074,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 35307,
+        "ns_propagate_clauses": 70143918,
+        "ns_propagate_xors": 177295967650,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507
+      }
+    },
+    {
+      "arm": "E",
+      "columns": 0,
+      "conflict_cap": 1000000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r2-e",
+      "external_algorithm_cpu_ms": 2830.0,
+      "external_parsing_cpu_ms": 90.0,
+      "external_process_ms": 2975.526142,
+      "id": "r2-e",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 62,
+          "failed_user_threads": 0,
+          "moved_count": 405
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              2.98,
+              4.28,
+              6.14
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75479793,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 117802,
+                "idle": 208715,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30338,
+                "idle": 295786,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430233418
+          },
+          "before": {
+            "loadavg": [
+              2.89,
+              4.28,
+              6.15
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75478799,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 117802,
+                "idle": 208515,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30338,
+                "idle": 295586,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430231418
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                2.98,
+                4.28,
+                6.14
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75479793,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 117802,
+                  "idle": 208715,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30338,
+                  "idle": 295786,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430233418
+            },
+            "before": {
+              "loadavg": [
+                2.89,
+                4.28,
+                6.15
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75478799,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 117802,
+                  "idle": 208515,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30338,
+                  "idle": 295586,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430231418
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 3871.15636,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": null,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": null
+    },
+    {
+      "actual_word_updates": 5551462287,
+      "arm": "A",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r3-a",
+      "external_process_ms": null,
+      "id": "r3-a",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 59,
+          "failed_user_threads": 0,
+          "moved_count": 388
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              1.43,
+              2.98,
+              5.31
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75615126,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 118242,
+                "idle": 225980,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30503,
+                "idle": 313310,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430410728
+          },
+          "before": {
+            "loadavg": [
+              1.43,
+              2.98,
+              5.31
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75611588,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 118242,
+                "idle": 225780,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30502,
+                "idle": 313111,
+                "steal": 2
+              }
+            },
+            "unix_ms": 1792430408728
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.01
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                1.43,
+                2.98,
+                5.31
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75615126,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 118242,
+                  "idle": 225980,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30503,
+                  "idle": 313310,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430410728
+            },
+            "before": {
+              "loadavg": [
+                1.43,
+                2.98,
+                5.31
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75611588,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 118242,
+                  "idle": 225780,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30502,
+                  "idle": 313111,
+                  "steal": 2
+                }
+              },
+              "unix_ms": 1792430408728
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.01
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 178461.06489900002,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 177677.638026,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 35307,
+        "ns_propagate_clauses": 72478486,
+        "ns_propagate_xors": 177513546045,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507
+      }
+    },
+    {
+      "actual_word_updates": 14064862,
+      "arm": "B",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r3-b",
+      "external_process_ms": null,
+      "id": "r3-b",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 59,
+          "failed_user_threads": 0,
+          "moved_count": 404
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              2.9,
+              2.95,
+              4.88
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75699351,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 136048,
+                "idle": 226239,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30511,
+                "idle": 331350,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430591390
+          },
+          "before": {
+            "loadavg": [
+              2.9,
+              2.95,
+              4.88
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75698512,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 136048,
+                "idle": 226039,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30511,
+                "idle": 331150,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430589390
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                2.9,
+                2.95,
+                4.88
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75699351,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 136048,
+                  "idle": 226239,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30511,
+                  "idle": 331350,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430591390
+            },
+            "before": {
+              "loadavg": [
+                2.9,
+                2.95,
+                4.88
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75698512,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 136048,
+                  "idle": 226039,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30511,
+                  "idle": 331150,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430589390
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 18768.882519000003,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 17841.5058,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": {
+        "decisions": 35307,
+        "engine": "indexed_words",
+        "ns_propagate_clauses": 65279942,
+        "ns_propagate_xors": 17681812533,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507,
+        "xor_support_visits": 15997241,
+        "xor_word_updates": 14064862
+      }
+    },
+    {
+      "arm": "E",
+      "columns": 0,
+      "conflict_cap": 1000000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r3-e",
+      "external_algorithm_cpu_ms": 2810.0,
+      "external_parsing_cpu_ms": 70.0,
+      "external_process_ms": 2982.035582,
+      "id": "r3-e",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 62,
+          "failed_user_threads": 0,
+          "moved_count": 421
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              2.66,
+              2.89,
+              4.81
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75721564,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 137875,
+                "idle": 226511,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30514,
+                "idle": 333442,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430612355
+          },
+          "before": {
+            "loadavg": [
+              2.72,
+              2.9,
+              4.82
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75714933,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 137872,
+                "idle": 226313,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30514,
+                "idle": 333242,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430610355
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.03,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                2.66,
+                2.89,
+                4.81
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75721564,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 137875,
+                  "idle": 226511,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30514,
+                  "idle": 333442,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430612355
+            },
+            "before": {
+              "loadavg": [
+                2.72,
+                2.9,
+                4.82
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75714933,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 137872,
+                  "idle": 226313,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30514,
+                  "idle": 333242,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430610355
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.03,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 3881.76101,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": null,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": null
+    },
+    {
+      "actual_word_updates": 14064862,
+      "arm": "B",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r4-b",
+      "external_process_ms": null,
+      "id": "r4-b",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 62,
+          "failed_user_threads": 0,
+          "moved_count": 420
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              2.46,
+              2.82,
+              4.72
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75770983,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 138230,
+                "idle": 229542,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30604,
+                "idle": 336734,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430646203
+          },
+          "before": {
+            "loadavg": [
+              2.46,
+              2.82,
+              4.72
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75769628,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 138230,
+                "idle": 229342,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30604,
+                "idle": 336534,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430644203
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                2.46,
+                2.82,
+                4.72
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75770983,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 138230,
+                  "idle": 229542,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30604,
+                  "idle": 336734,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430646203
+            },
+            "before": {
+              "loadavg": [
+                2.46,
+                2.82,
+                4.72
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75769628,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 138230,
+                  "idle": 229342,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30604,
+                  "idle": 336534,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430644203
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 18628.195048,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 17767.144183,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": {
+        "decisions": 35307,
+        "engine": "indexed_words",
+        "ns_propagate_clauses": 64655531,
+        "ns_propagate_xors": 17608454720,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507,
+        "xor_support_visits": 15997241,
+        "xor_word_updates": 14064862
+      }
+    },
+    {
+      "actual_word_updates": 5551462287,
+      "arm": "A",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r4-a",
+      "external_process_ms": null,
+      "id": "r4-a",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 62,
+          "failed_user_threads": 0,
+          "moved_count": 418
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              2.61,
+              2.83,
+              4.68
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75790678,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 140044,
+                "idle": 229809,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30606,
+                "idle": 338812,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430667013
+          },
+          "before": {
+            "loadavg": [
+              2.61,
+              2.83,
+              4.68
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75788977,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 140044,
+                "idle": 229609,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30606,
+                "idle": 338612,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430665013
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                2.61,
+                2.83,
+                4.68
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75790678,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 140044,
+                  "idle": 229809,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30606,
+                  "idle": 338812,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430667013
+            },
+            "before": {
+              "loadavg": [
+                2.61,
+                2.83,
+                4.68
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75788977,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 140044,
+                  "idle": 229609,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30606,
+                  "idle": 338612,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430665013
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 181378.86235,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 180683.447207,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 35307,
+        "ns_propagate_clauses": 75250840,
+        "ns_propagate_xors": 180514392162,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507
+      }
+    },
+    {
+      "arm": "E",
+      "columns": 0,
+      "conflict_cap": 1000000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r4-e",
+      "external_algorithm_cpu_ms": 2830.0,
+      "external_parsing_cpu_ms": 70.0,
+      "external_process_ms": 2963.841383,
+      "id": "r4-e",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 70,
+          "failed_user_threads": 0,
+          "moved_count": 413
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              4.96,
+              3.55,
+              4.6
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75917239,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 158159,
+                "idle": 230052,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30725,
+                "idle": 357028,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430850602
+          },
+          "before": {
+            "loadavg": [
+              4.96,
+              3.55,
+              4.6
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75916843,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 158159,
+                "idle": 229852,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30725,
+                "idle": 356828,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430848602
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                4.96,
+                3.55,
+                4.6
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75917239,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 158159,
+                  "idle": 230052,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30725,
+                  "idle": 357028,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430850602
+            },
+            "before": {
+              "loadavg": [
+                4.96,
+                3.55,
+                4.6
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75916843,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 158159,
+                  "idle": 229852,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30725,
+                  "idle": 356828,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430848602
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 3945.431833,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": null,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": null
+    },
+    {
+      "actual_word_updates": 5551462287,
+      "arm": "A",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r5-a",
+      "external_process_ms": null,
+      "id": "r5-a",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 70,
+          "failed_user_threads": 0,
+          "moved_count": 412
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              4.53,
+              3.59,
+              4.58
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75941356,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 159535,
+                "idle": 231493,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30787,
+                "idle": 359786,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430878831
+          },
+          "before": {
+            "loadavg": [
+              4.67,
+              3.6,
+              4.59
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 75937859,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 159535,
+                "idle": 231293,
+                "steal": 0
+              },
+              "31": {
+                "busy": 30787,
+                "idle": 359587,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792430876831
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                4.53,
+                3.59,
+                4.58
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75941356,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 159535,
+                  "idle": 231493,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30787,
+                  "idle": 359786,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430878831
+            },
+            "before": {
+              "loadavg": [
+                4.67,
+                3.6,
+                4.59
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 75937859,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 159535,
+                  "idle": 231293,
+                  "steal": 0
+                },
+                "31": {
+                  "busy": 30787,
+                  "idle": 359587,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792430876831
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 182952.24735,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 182074.425421,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 35307,
+        "ns_propagate_clauses": 77206610,
+        "ns_propagate_xors": 181901068422,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507
+      }
+    },
+    {
+      "actual_word_updates": 14064862,
+      "arm": "B",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r5-b",
+      "external_process_ms": null,
+      "id": "r5-b",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 71,
+          "failed_user_threads": 0,
+          "moved_count": 410
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              5.15,
+              4.35,
+              4.69
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76028870,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 177780,
+                "idle": 231764,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30806,
+                "idle": 378245,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431063988
+          },
+          "before": {
+            "loadavg": [
+              5.34,
+              4.37,
+              4.7
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76028666,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 177780,
+                "idle": 231564,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30806,
+                "idle": 378047,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431061987
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                5.15,
+                4.35,
+                4.69
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76028870,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 177780,
+                  "idle": 231764,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30806,
+                  "idle": 378245,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431063988
+            },
+            "before": {
+              "loadavg": [
+                5.34,
+                4.37,
+                4.7
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76028666,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 177780,
+                  "idle": 231564,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30806,
+                  "idle": 378047,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431061987
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 18673.070395,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": 17862.255509000002,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": {
+        "decisions": 35307,
+        "engine": "indexed_words",
+        "ns_propagate_clauses": 68998714,
+        "ns_propagate_xors": 17697739964,
+        "original_nonzero_words": 108026,
+        "restarts": 5,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 36757,
+        "xor_reason_lits": 5153715,
+        "xor_repivots": 94879418,
+        "xor_row_ops": 3493683,
+        "xor_row_scans": 87094507,
+        "xor_support_visits": 15997241,
+        "xor_word_updates": 14064862
+      }
+    },
+    {
+      "arm": "E",
+      "columns": 0,
+      "conflict_cap": 1000000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/r5-e",
+      "external_algorithm_cpu_ms": 2840.0,
+      "external_parsing_cpu_ms": 80.0,
+      "external_process_ms": 2971.6345610000003,
+      "id": "r5-e",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 69,
+          "failed_user_threads": 0,
+          "moved_count": 411
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              4.97,
+              4.36,
+              4.69
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76039815,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 179606,
+                "idle": 232025,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30811,
+                "idle": 380326,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431084860
+          },
+          "before": {
+            "loadavg": [
+              5.05,
+              4.37,
+              4.69
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76039608,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 179606,
+                "idle": 231825,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30811,
+                "idle": 380128,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431082860
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                4.97,
+                4.36,
+                4.69
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76039815,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 179606,
+                  "idle": 232025,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30811,
+                  "idle": 380326,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431084860
+            },
+            "before": {
+              "loadavg": [
+                5.05,
+                4.37,
+                4.69
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76039608,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 179606,
+                  "idle": 231825,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30811,
+                  "idle": 380128,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431082860
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "outer_wall_ms": 3872.681375,
+      "selector_assignments": [
+        {
+          "domain_size": 1182,
+          "index": 401,
+          "phase": 0,
+          "phase_first_wire": 87190,
+          "representative": "3190528981678629953846779",
+          "selector_first_wire": 84744
+        },
+        {
+          "domain_size": 1182,
+          "index": 780,
+          "phase": 0,
+          "phase_first_wire": 90805,
+          "representative": "6322576162995772655031682",
+          "selector_first_wire": 88359
+        },
+        {
+          "domain_size": 1182,
+          "index": 1059,
+          "phase": 0,
+          "phase_first_wire": 94420,
+          "representative": "8674926856113960796960747",
+          "selector_first_wire": 91974
+        },
+        {
+          "domain_size": 866,
+          "index": 193,
+          "phase": 0,
+          "phase_first_wire": 97403,
+          "representative": "2356799046069879186945790",
+          "selector_first_wire": 95589
+        },
+        {
+          "domain_size": 866,
+          "index": 62,
+          "phase": 0,
+          "phase_first_wire": 100386,
+          "representative": "668067089966811331796550",
+          "selector_first_wire": 98572
+        }
+      ],
+      "solver_ms": null,
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+      "terminal_counters": null,
+      "wall_cap_seconds": 360,
+      "worker_blake3": "f0a937671e214aa135717dca8d0b141fea571189f5bfd748b77f5e16014d03ce",
+      "xor_profile": null
+    },
+    {
+      "arm": "K2048",
+      "columns": 2048,
+      "conflict_cap": 1000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k2048",
+      "id": "k2048",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 69,
+          "failed_user_threads": 0,
+          "moved_count": 437
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              4.19,
+              4.23,
+              4.63
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76073219,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180020,
+                "idle": 234491,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30847,
+                "idle": 383180,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431113741
+          },
+          "before": {
+            "loadavg": [
+              4.29,
+              4.25,
+              4.64
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76071252,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180020,
+                "idle": 234291,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30847,
+                "idle": 382980,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431111741
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                4.19,
+                4.23,
+                4.63
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76073219,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180020,
+                  "idle": 234491,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30847,
+                  "idle": 383180,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431113741
+            },
+            "before": {
+              "loadavg": [
+                4.29,
+                4.25,
+                4.64
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76071252,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180020,
+                  "idle": 234291,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30847,
+                  "idle": 382980,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431111741
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 4861.868809,
+      "outer_wall_ms": 10319.216837999998,
+      "phases": [
+        {
+          "data": {
+            "points": 339968,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003923,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 892470,
+            "representatives": 2048
+          },
+          "elapsed_ms": 130.877458,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 205.568327,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 205.586097,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 219.019595,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 1140557,
+            "domain_clauses": 892470,
+            "identity_mask": 0,
+            "variables": 111478
+          },
+          "elapsed_ms": 292.511026,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 1000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 292.537459,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 1000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 5154.406268,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 1000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 600,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K4096",
+      "columns": 4096,
+      "conflict_cap": 1000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k4096",
+      "id": "k4096",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 69,
+          "failed_user_threads": 0,
+          "moved_count": 406
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              4.01,
+              4.19,
+              4.62
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76090739,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180991,
+                "idle": 234777,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30849,
+                "idle": 384432,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431126314
+          },
+          "before": {
+            "loadavg": [
+              4.01,
+              4.19,
+              4.62
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76084766,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180991,
+                "idle": 234577,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30849,
+                "idle": 384234,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431124314
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                4.01,
+                4.19,
+                4.62
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76090739,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180991,
+                  "idle": 234777,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30849,
+                  "idle": 384432,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431126314
+            },
+            "before": {
+              "loadavg": [
+                4.01,
+                4.19,
+                4.62
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76084766,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180991,
+                  "idle": 234577,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30849,
+                  "idle": 384234,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431124314
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 7814.6744149999995,
+      "outer_wall_ms": 18151.190391,
+      "phases": [
+        {
+          "data": {
+            "points": 679936,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003741,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 1773110,
+            "representatives": 4096
+          },
+          "elapsed_ms": 297.355228,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 455.947466,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 455.9672,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 469.118505,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 2021197,
+            "domain_clauses": 1773110,
+            "identity_mask": 0,
+            "variables": 131958
+          },
+          "elapsed_ms": 580.0843970000001,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 1000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 580.112288,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 1000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 8394.786703,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 1000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 600,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "PROFILE",
+      "columns": 0,
+      "conflict_cap": 5000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-profile/witness",
+      "id": "profile-censored",
+      "outer_wall_ms": 180277.071466,
+      "source_commit": "d2020ca503922151ce41278449f5d3138da08385",
+      "status": "UNKNOWN_CONTROL_WALL_CAP",
+      "terminal_counters": null,
+      "wall_cap_seconds": 180,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db"
+    },
+    {
+      "arm": "PROFILE",
+      "columns": 0,
+      "conflict_cap": 1,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-early/witness",
+      "external_process_ms": null,
+      "id": "profile-one-conflict",
+      "outer_wall_ms": 1881.758214,
+      "selector_assignments": [],
+      "solver_ms": 977.691845,
+      "source_commit": "4122fddca6f45121910b418419118f284b682379",
+      "status": "UNKNOWN_CONTROL_CONFLICT_CAP",
+      "terminal_counters": null,
+      "wall_cap_seconds": 90,
+      "worker_blake3": "ab77b70af380f64281b2463eb99da9b27c2974236163d043c3a5a7c92761b3db",
+      "xor_profile": {
+        "decisions": 161,
+        "ns_propagate_clauses": 5932661,
+        "ns_propagate_xors": 971224218,
+        "original_nonzero_words": 108026,
+        "restarts": 0,
+        "rows": 4980,
+        "scope": "existing_solver_counters_and_original_row_word_census",
+        "words_per_dense_row": 1589,
+        "xor_passes": 175,
+        "xor_reason_lits": 596633,
+        "xor_repivots": 372824,
+        "xor_row_ops": 113913,
+        "xor_row_scans": 501164
+      }
+    },
+    {
+      "arm": "K2048",
+      "columns": 2048,
+      "conflict_cap": 10000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k2048-10k-v5",
+      "id": "k2048-10k-v5",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 64,
+          "failed_user_threads": 0,
+          "moved_count": 480
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              17.4,
+              12.92,
+              8.03
+            ],
+            "psi_cpu_some_avg10": 0.02,
+            "psi_cpu_some_total_us": 95784149,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 190063,
+                "idle": 242755,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38396,
+                "idle": 393910,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431297021
+          },
+          "before": {
+            "loadavg": [
+              17.4,
+              12.92,
+              8.03
+            ],
+            "psi_cpu_some_avg10": 0.03,
+            "psi_cpu_some_total_us": 95783287,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 190063,
+                "idle": 242556,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38396,
+                "idle": 393710,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431295021
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                17.4,
+                12.92,
+                8.03
+              ],
+              "psi_cpu_some_avg10": 0.02,
+              "psi_cpu_some_total_us": 95784149,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 190063,
+                  "idle": 242755,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38396,
+                  "idle": 393910,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431297021
+            },
+            "before": {
+              "loadavg": [
+                17.4,
+                12.92,
+                8.03
+              ],
+              "psi_cpu_some_avg10": 0.03,
+              "psi_cpu_some_total_us": 95783287,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 190063,
+                  "idle": 242556,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38396,
+                  "idle": 393710,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431295021
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 42413.639201,
+      "outer_wall_ms": 47750.513728,
+      "phases": [
+        {
+          "data": {
+            "points": 339968,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003865,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 892470,
+            "representatives": 2048
+          },
+          "elapsed_ms": 131.29394399999998,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 205.777131,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 205.795844,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 219.338566,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 1140557,
+            "domain_clauses": 892470,
+            "identity_mask": 0,
+            "variables": 111478
+          },
+          "elapsed_ms": 293.139907,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 10000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 293.168853,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 10000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 42706.808054,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "2ccbc3da6b49c470b67f3cf67717d81a8a017986",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 10000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 300,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K4096",
+      "columns": 4096,
+      "conflict_cap": 10000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k4096-10k-v5",
+      "id": "k4096-10k-v5",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 64,
+          "failed_user_threads": 0,
+          "moved_count": 468
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              12.9,
+              12.44,
+              8.13
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 95803012,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 194795,
+                "idle": 243026,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38403,
+                "idle": 398894,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431347056
+          },
+          "before": {
+            "loadavg": [
+              12.9,
+              12.44,
+              8.13
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 95801713,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 194794,
+                "idle": 242827,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38403,
+                "idle": 398694,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431345056
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.01,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                12.9,
+                12.44,
+                8.13
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 95803012,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 194795,
+                  "idle": 243026,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38403,
+                  "idle": 398894,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431347056
+            },
+            "before": {
+              "loadavg": [
+                12.9,
+                12.44,
+                8.13
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 95801713,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 194794,
+                  "idle": 242827,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38403,
+                  "idle": 398694,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431345056
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.01,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 50433.062636,
+      "outer_wall_ms": 60818.306138,
+      "phases": [
+        {
+          "data": {
+            "points": 679936,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003445,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 1773110,
+            "representatives": 4096
+          },
+          "elapsed_ms": 304.331362,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 467.405979,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 467.423477,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 480.138884,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 2021197,
+            "domain_clauses": 1773110,
+            "identity_mask": 0,
+            "variables": 131958
+          },
+          "elapsed_ms": 592.735529,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 10000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 592.76126,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 10000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 51025.823896,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "2ccbc3da6b49c470b67f3cf67717d81a8a017986",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 10000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 300,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    }
+  ],
+  "schema": "n83.native-xor-summary/v2",
+  "scope": "known-witness SAT component and separately bounded natural trials",
+  "signature": {
+    "conflicts": 787,
+    "decisions": 35307,
+    "passes": 36757,
+    "reason_lits": 5153715,
+    "repivots": 94879418,
+    "restarts": 5,
+    "row_ops": 3493683,
+    "row_scans": 87094507,
+    "selectors": [
+      {
+        "domain_size": 1182,
+        "index": 401,
+        "phase": 0,
+        "phase_first_wire": 87190,
+        "representative": "3190528981678629953846779",
+        "selector_first_wire": 84744
+      },
+      {
+        "domain_size": 1182,
+        "index": 780,
+        "phase": 0,
+        "phase_first_wire": 90805,
+        "representative": "6322576162995772655031682",
+        "selector_first_wire": 88359
+      },
+      {
+        "domain_size": 1182,
+        "index": 1059,
+        "phase": 0,
+        "phase_first_wire": 94420,
+        "representative": "8674926856113960796960747",
+        "selector_first_wire": 91974
+      },
+      {
+        "domain_size": 866,
+        "index": 193,
+        "phase": 0,
+        "phase_first_wire": 97403,
+        "representative": "2356799046069879186945790",
+        "selector_first_wire": 95589
+      },
+      {
+        "domain_size": 866,
+        "index": 62,
+        "phase": 0,
+        "phase_first_wire": 100386,
+        "representative": "668067089966811331796550",
+        "selector_first_wire": 98572
+      }
+    ]
+  },
+  "timing_scope": "descriptive recorded conditions; no automatic L2 or full-cold timing admission; missing worker context-switch/fault accounting",
+  "total_index_calculus_runtime_ms": null
+}

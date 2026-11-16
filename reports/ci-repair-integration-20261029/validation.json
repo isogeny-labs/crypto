@@ -1,0 +1,80 @@
+{
+  "source_commit": "e4d715fdb79582e34c2d105107a87e0a7d35c467",
+  "parents": [
+    {
+      "ref": "origin/main",
+      "source": "34af29516e0f89ad9aabce3f2915ebe0a4e72133",
+      "head": "886d4ce9bc501f7f0e31181c504a4c5d4ac164bf"
+    },
+    {
+      "ref": "origin/ci-bundle-native",
+      "source": "7573dad81a1a119f6351d76b76e1d6df56652db3",
+      "head": "22f7696e1cddd5f3332e70e623cd8f2b3479a7ef"
+    },
+    {
+      "ref": "origin/ci-bundle-dashboard",
+      "source": "f8853110f0cc9972db55d7d0840b447e8b836435",
+      "head": "e4d715fdb79582e34c2d105107a87e0a7d35c467"
+    }
+  ],
+  "library_summary": "5143 passed; 0 failed; 123 ignored; 1398.91s",
+  "library_command_status_recheck": {
+    "source_commit": "e4d715fdb79582e34c2d105107a87e0a7d35c467",
+    "cargo_exit_code": 0,
+    "tests_passed": 5143,
+    "failed": 0,
+    "ignored": 123,
+    "seconds": 1142.9
+  },
+  "library_source_tree": "2e212a235e89a74a80b61ff334a83fad03bf5575",
+  "backlog_lab": {
+    "cargo_exit": 0,
+    "tests_passed": 15,
+    "ignored": 0,
+    "actual_cards": 54,
+    "protocol_only_directories": 2,
+    "cairn_rev": "b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54",
+    "inventory": "Git-indexed backlog/XP-*/card.json descriptors; missing tracked descriptors and empty inventory fail"
+  },
+  "ic_controls": {
+    "path_tests": 16,
+    "parser_tests": 8,
+    "browser_tests": 4,
+    "input_files_covered": 961,
+    "all_four_views_current": true,
+    "actual_prime_base_validation_errors": []
+  },
+  "dashboard": {
+    "source_pin_negative_control": "passed in parent f8853110f0cc9972db55d7d0840b447e8b836435",
+    "integrated_browser_result": {
+      "status": "PASS_IC_DASHBOARD_BROWSER",
+      "chrome": "/usr/bin/chromium",
+      "checks": [
+        "desktop: visible graphs, correct readiness, quiet evidence, search, retained fragment links",
+        "mobile 390: no page overflow; whole comparison graph fits; readiness scrolls within its panel",
+        "mobile 320: no page overflow; whole comparison graph fits; readiness scrolls within its panel",
+        "dark theme rendered",
+        "JavaScript disabled: static measurements, graphs, diagrams and native details remain available"
+      ],
+      "script_errors": [],
+      "external_requests": [],
+      "viewport_widths": [
+        1280,
+        390,
+        320
+      ],
+      "transport": "local HTTP preview",
+      "page_sha256": "7e96c0d94d043b7736e247eefcb2b9784cc30ccd8a9a57dbce5230f194ab8074"
+    }
+  },
+  "workflow_lint": "all five workflows pass",
+  "lean_manual_fallback": {
+    "source_queue": "40826245951:28 successful jobs,92 queued on crypto-eks-linux",
+    "all_existing_job_steps_preserved": true,
+    "all_120_targets_retained": true,
+    "default": "configured",
+    "manual_choice": "github-hosted",
+    "hosted_full_audit": "pending",
+    "concurrency": "Hosted manual audits use a separate -hosted group; configured event/ref groups stay byte-identical, so a backed-up configured run cannot block the fallback."
+  }
+}

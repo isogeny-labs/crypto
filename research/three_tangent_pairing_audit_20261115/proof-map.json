@@ -1,0 +1,189 @@
+{
+  "main": "ThreeTangentPairingAudit.actual_three_tangent_pairing_certificate",
+  "binding": "0315aa3c3afc383f33716cf70c3ccd8fc73b92aaec58f2b5a1d71baaf12990e5",
+  "custom_imports": {
+    "ActualCriterion": "research/bk_frobenius_bridge_audit_20261114/lean/ActualCriterion.lean",
+    "ActualFrobenius": "research/bk_frobenius_bridge_audit_20261114/lean/ActualFrobenius.lean",
+    "ActualMatrix": "research/bk_frobenius_bridge_audit_20261114/lean/ActualMatrix.lean",
+    "GenericFrobenius": "research/bk_linear_audit_20261113/lean/GenericFrobenius.lean",
+    "RationalTorsion": "research/bk_linear_audit_20261113/lean/RationalTorsion.lean",
+    "GeneralThreeBKCertificate": "research/bk_three_normalization_audit_20261114/lean/GeneralThreeBKCertificate.lean",
+    "ShiftCoordinates": "research/bk_three_normalization_audit_20261114/lean/ShiftCoordinates.lean",
+    "ShiftDescent": "research/bk_three_normalization_audit_20261114/lean/ShiftDescent.lean",
+    "ShiftPointGroup": "research/bk_three_normalization_audit_20261114/lean/ShiftPointGroup.lean",
+    "ThreeCountBridge": "research/bk_three_normalization_audit_20261114/lean/ThreeCountBridge.lean",
+    "ThreeNormalForm": "research/bk_three_normalization_audit_20261114/lean/ThreeNormalForm.lean",
+    "S3Completion": "research/theorem_audit_20261108/lean/S3Completion.lean",
+    "S3Roots": "research/theorem_audit_20261108/lean/S3Roots.lean",
+    "StructuralAudit": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+    "FrobeniusFiniteExtension": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+    "FrobeniusPointDescent": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+    "RationalCounterexample": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+    "TorsionBoundaries": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+    "ThreeCharacterControls": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterControls.lean",
+    "ThreeCharacterFrobenius": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterFrobenius.lean",
+    "ThreeCharacterModule": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterModule.lean",
+    "ThreeCharacterPoint": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterPoint.lean",
+    "ThreeCharacterScalar": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterScalar.lean",
+    "CharacteristicThree": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+    "DivisionQuartic": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+    "GeneralBasis": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+    "GeneralCardinality": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+    "GeneralRoots": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+    "GeneralTriplePoint": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+    "GeometricCardinality": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+    "QuarticRoots": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+    "TernaryBasis": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+    "TriplePoint": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+    "TangentCertificate": "research/three_tangent_pairing_audit_20261115/lean/TangentCertificate.lean",
+    "TangentCharacter": "research/three_tangent_pairing_audit_20261115/lean/TangentCharacter.lean",
+    "TangentControls": "research/three_tangent_pairing_audit_20261115/lean/TangentControls.lean",
+    "TangentCoordinates": "research/three_tangent_pairing_audit_20261115/lean/TangentCoordinates.lean",
+    "TangentCovariance": "research/three_tangent_pairing_audit_20261115/lean/TangentCovariance.lean",
+    "TangentFrobenius": "research/three_tangent_pairing_audit_20261115/lean/TangentFrobenius.lean",
+    "TangentNecessity": "research/three_tangent_pairing_audit_20261115/lean/TangentNecessity.lean",
+    "TangentPerfect": "research/three_tangent_pairing_audit_20261115/lean/TangentPerfect.lean",
+    "TangentPoint": "research/three_tangent_pairing_audit_20261115/lean/TangentPoint.lean",
+    "TangentScalar": "research/three_tangent_pairing_audit_20261115/lean/TangentScalar.lean"
+  },
+  "claims": [
+    {
+      "declaration": "ThreeTangentPairingAudit.shifted_tangentValue",
+      "conclusion": "Actual tangent y-coefficient1 coordinate transport."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.model_tangent_ratio",
+      "conclusion": "Actual normalized tangent ratio equals credited character."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.normalized_pair_character",
+      "conclusion": "Actual pairing at arbitrary nonzeroP equals actual normalized character."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_add_right",
+      "conclusion": "Actual fullsecondbilinearity."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_add_left",
+      "conclusion": "Actual fullfirstbilinearity."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_cube",
+      "conclusion": "Actualcube3=1."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_left_nondegenerate",
+      "conclusion": "Actual leftradical zero."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_right_nondegenerate",
+      "conclusion": "Actual rightradical zero."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_algmap",
+      "conclusion": "Actual coefficient point-map covariance."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_frobenius",
+      "conclusion": "Actual Frobenius q-power covariance."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_coordinates",
+      "conclusion": "Actual pairing determinant coordinate identity."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.actual_general_three_determinant",
+      "conclusion": "Actualall-model finitebase Frobeniusdetqmod3 withnofixedpoint/countpremise."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.full_three_torsion_forces_cyclotomic",
+      "conclusion": "Chosenfinitefieldcontainment forces3|q^k−1 withnocountpremise."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.tangentPair_outside_domain",
+      "conclusion": "Actual outside-x tangent domainnonzero."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.characteristic_three_degenerate",
+      "conclusion": "Actual nonsingular char3/nonzero3point allpairings1."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.actual_cyclic_line_degenerate",
+      "conclusion": "Actual nontrivial cyclicSubmodulespan restrictiondegenerate."
+    },
+    {
+      "declaration": "ThreeTangentPairingAudit.binary_pairing_positive",
+      "conclusion": "Creditedactualchar2curve hasnewnontrivialcube-rootpairvalue."
+    }
+  ],
+  "prior_reused_claims": [
+    {
+      "path": "research/three_torsion_rank_audit_20261114",
+      "role": "Actual all-model geometric3kernel/module/rank2/basis; literaldivision/nonsingularity/denominator; creditedactualbinarycurve."
+    },
+    {
+      "path": "research/three_torsion_character_audit_20261114",
+      "role": "Actual normalizedfamily cubic character/primitivecube/nonzero/kernel/translation/negation/basiscoordinates/normalfamilydetq; knownordinarychar3kernel3 and explicitcoordinates."
+    },
+    {
+      "path": "research/bk_three_normalization_audit_20261114",
+      "role": "Actual point/group coordinate changes, normal coefficients, torsion/group/field transports and qualifiedgeneralmodelBK3; frozenlocaldependency33custom54formalconfigs65pins0copies."
+    },
+    {
+      "path": "research/bk_frobenius_bridge_audit_20261114",
+      "role": "Actual Frobenius/basis matrix/descent/conditionaldetcriterion/extensionforcesdetpower; reused."
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115",
+      "role": "Generalallrmodule/fixedfield bridge and originalF19knownsourcecontrol credited separately; not imported or recomputed."
+    },
+    {
+      "path": "research/miller_level_compatibility_audit_20261115",
+      "role": "Prior actual Miller geometry/evaluation/levels; canonicalWeilcomparison stillseparate, no inheritance of unprovedcomparison."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 43,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_tangent_pairing_both_bilinear_both_radicals": true,
+    "actual_tangent_domain_nonzero": true,
+    "actual_fieldmap_Frobenius_covariance": true,
+    "generic_allmodel_determinant_at_three": true,
+    "determinant_no_rationalfixedpoint_or_countpremise": true,
+    "chosen_field_necessity_no_pointcount": true,
+    "actual_charthree_degenerate": true,
+    "actual_cyclic_line_degenerate": true,
+    "actual_binary_positive": true,
+    "canonical_Weil_comparison": false,
+    "general_prime_ge5_rankdet": false,
+    "qualified_source_refuted": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}
