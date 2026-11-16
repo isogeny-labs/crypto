@@ -336,13 +336,76 @@ fn execute(compare:bool,round_limit:usize,q:(u64,u64))
         "attempts":attempts
     }))
 }
+
+fn heldout_twelve()->Result<serde_json::Value,String>{
+    // Caller-side fixture generation; the scalar is never passed to execute().
+    // These known answers are verified only after the complete algebraic solve.
+    let mut rng=0x484f_4c44_4f55_5453_u64;
+    let mut used=HashSet::new();
+    let mut results=Vec::with_capacity(12);
+    let mut successes=0usize;
+    let mut total_cold_ns=0u128;
+    let mut total_s3_pairs=0u64;
+    for case in 0..12usize {
+        let k=loop {
+            let candidate=prng(&mut rng)%N;
+            if candidate>1 && used.insert(candidate){break candidate;}
+        };
+        let mut verifier=Arithmetic::default();
+        let q=verifier.scalar(PRIME31,k,Some(PRIME31.g))
+            .ok_or("holdout public Q was identity")?;
+        let result=execute(false,ROUNDS,q)?;
+        let solved=result["complete_target_scalar_recovered"].as_bool()==Some(true);
+        let last=result["attempts"].as_array()
+            .and_then(|a|a.last()).ok_or("missing holdout transcript")?;
+        let found=last.pointer("/solution/log").and_then(|v|v.as_u64());
+        if solved && found!=Some(k) {
+            return Err(format!("holdout case {case} returned wrong target scalar"));
+        }
+        let ns=result["cold_rust_wall_ns"].as_u64().ok_or("missing cold wall")?;
+        let pairs=result["attempts"].as_array().ok_or("missing attempts")?
+            .iter().map(|v|v["algebraic_visited_pairs"].as_u64().unwrap_or(0))
+            .sum::<u64>();
+        total_cold_ns+=u128::from(ns);
+        total_s3_pairs+=pairs;
+        if solved {successes+=1;}
+        results.push(json!({
+            "case":case,"public_target":q,
+            "known_answer_verifier_only":k,
+            "recovered_log":found,
+            "success":solved,
+            "attempts":result["attempts"].as_array().map(|a|a.len()),
+            "cold_wall_ns":ns,"s3_pairs":pairs
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "classification":"published APS-style S3 pair enumeration; generic MITM equivalent",
+        "fixture":"12 deterministic independent nontrivial public Q=[k]G; k not passed to execute",
+        "curve_prime":P,"group_order":N,
+        "cases":12,"successes":successes,
+        "total_cold_wall_ns":total_cold_ns.to_string(),
+        "total_s3_pair_roots":total_s3_pairs,
+        "cases_detail":results,
+        "scientific_limit":"source-specific developer CI, no independent PCC or non-generic cost claim"
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--holdouts" {
+        let v=heldout_twelve()?;
+        println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
+        if v["successes"].as_u64()!=Some(12) {
+            return Err("some held-out prime31 targets did not solve within three bounded rounds".into());
+        }
+        return Ok(());
+    }
     let compare=match args.as_slice() {
         [] => false,
         [a] if a=="--one" => false,
         [a] if a=="--compare" => true,
-        _ => return Err("usage: prime31_aps_one_relation --one|--compare".into())
+        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts".into())
     };
     let v=execute(compare,ROUNDS,PUBLIC_Q)?;
     println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
