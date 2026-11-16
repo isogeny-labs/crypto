@@ -1,5 +1,29 @@
 # Curve25519 torus/S4: native Rust qualification
 
+## Unknown indices inside the original actual six-member system
+
+The [indexed-circuit report](reports/indexed-circuit-v1/REPORT.md) and
+[inspected PDF](reports/indexed-circuit-v1/report.pdf) describe an isolated
+[Rust compiler](../../tools/torus-indexed-circuit/README.md). It appends
+unknown t bits and range/borrow/product gates to the ORIGINAL actual
+a60824497/q213156431/k20633 six-member system, retaining all1059 old
+variables and1089 old equations. The1989-variable/2223-equation quadratic
+system extends the same known witness and rejects1989 mutations; it invokes
+no solver. Native b3227f remains unsigned. [pcc:unverified]
+
+All24024 original toy target decisions agree, including the original raw
+aliases and identity exclusions. Four fixed member domains check canonical
+index extensions; exact t<q guards reject labels that otherwise alias the
+same parameter. Three existing-law Lean endpoints77b508 give conditional
+algebraic index existence/uniqueness, with native/compiler soundness still
+open. [pcc:unverified]
+
+The [next gate](indexed-circuit-v1/NEXT.md) is complete accounting and
+dependency propagation on identical public original/augmented systems.
+Known-label extension is not discovery evidence; input-role metadata and
+extra constraints alone supply no cost advantage. Original source, criteria,
+raw evidence and earlier direct Lean bindings remain unchanged.
+
 ## Bounded sparse solver and next representation comparison
 
 The [new solver report](reports/direct-elimination-v1/REPORT.md) and
