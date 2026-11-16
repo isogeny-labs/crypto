@@ -1,5 +1,15 @@
 # Vieta Rust port: continuation receipt
 
+## Current follow-up — 16 November, 03:14 UTC
+
+PR4358 had no Copilot response after four hours; generic autofix lacked its API
+key. The documented timeout fallback is merging main222394077d locally, with
+exact main ledger prefix, two unchanged appended local bodies and complete
+journal block multisets. See results-merge-20261116T0311Z.json in the scale
+directory and today's session log. Sources/protocols/claims/data are unchanged.
+Next: finish focused checks, publish merge, inspect new-head merge gates and
+required reviews, then bounded follow-up if pending. No benchmarks are needed.
+
 ## Current state — 22:15 UTC
 
 PR 4340 merged (merge 5181b305c62eb8032b7f0ea5e0b81a6d6a14eb31).

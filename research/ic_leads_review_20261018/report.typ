@@ -3,6 +3,9 @@
 #show table: set text(size: 7.5pt)
 #set table(stroke: 0.4pt + gray, inset: 4pt)
 #show table: it => { show raw.where(block: false): r => text(font: "DejaVu Sans Mono", size: 6.3pt, r.text.replace("_", "_\u{200b}").replace("/", "/\u{200b}")); it }
+#block(fill: luma(235), inset: 6pt, width: 100%)[#text(size: 8pt)[Correction 2026-10-20 (validation sweep A, verdict: contradicted). The 120/168 replay-all result (48 inherited-F4 rows differing) quoted below is the 2026-10-13 receipt, kept as history. Replay of the same session on current main is 72/168 identical with 96 mismatches across all four IC arms (ic-f4-m2, ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3), an open regression (sweep D, PR \#2290). Root-finder rows are not claimed to pass. See research/ecbench\_frontier\_20261013/README.md.]]
+
+
 = Index-calculus leads: status review and missed opportunities
 (2026-10-18)
 <index-calculus-leads-status-review-and-missed-opportunities-2026-10-18>

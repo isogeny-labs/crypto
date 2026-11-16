@@ -1,0 +1,9 @@
+# Executed actual cold algebraic original-source recovery
+
+Source checkpointf98fc57c1 precedes23:30:28–23:30:34UTC builds/data. ONE geometric size3 base, caps0..8, EACH30 nonidentity actual source points =270 separate cold workloads. Every target builds its own3public base pairing values and fresh public setup rank/logs from ONLY admitted relations at publicmP; incomplete setup stays failed. Actual unknown Q-point input only; fresh shifted queries recover/check original[k]P=Q. [pcc:unverified]
+
+Independent Rust field/group/linear-Miller/polynomial/Euclidean/relation-field Gaussian/log/scalar replay agrees with C++ binary Miller.150 algebraic original recoveries,120 blocked setups,0 identity-shift recoveries. Both fresh streams/receipts equal; all30 build/data/control stages finish, all12 actually changed false payloads reject101/no receipt. No native failure; unused helper warnings retained. Actual expanded finite-field witness peak6, matrix degree null. This is one-policy engineering, not a full frontier or speed gain. Algorithmic phase-event counts are not calibrated total cost. [pcc:unverified]
+
+All81 raw files in143476byte local archive SHA256562b19942a24752d6aaaf6ad30fb21e3fa4b5f993c53b1b992c559edd06875b5 actually restore/hash/repack; all false payloads retained. Local one-page native-count graph/PDF rendered and inspected. No raw/PDF/archive upload, paid resources, new Lean/IDC/signed PCC. [pcc:unverified]
+
+Next within the same23:29–00:29 scientific window: FULL455 source policies,9caps,30cold targets, exact source/policy membership and all failed setups. Preserve fresh execution; deduplicate only emitted identical bytes, not computation. Freeze new full coverage/source/binaries/analysis/counter/control/resource protocol before data. A fair source baseline gets the same pairing-field alternative. [pcc:unverified]
