@@ -76,6 +76,9 @@ jobs:
       - name: Complete optimized Rust APS walk-Mersenne single prime31 public log
         timeout-minutes: 2
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --walk-mersenne-one
+      - name: Preregistered 24 fresh prime31 unequal APS cold solvers with repeat A/A
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --unequal-confirm
       - name: Twelve held-out complete prime31 Rust APS logarithms
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --holdouts
