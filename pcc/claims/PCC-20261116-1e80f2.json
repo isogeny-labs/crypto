@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:39:25Z",
+ "id": "PCC-20261116-1e80f2",
+ "kind": "execution",
+ "producer": {
+  "commit": "f68145a347f46f032d1f866ba6bda56e5271e190",
+  "model": "GPT-6",
+  "session": "selected-root-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/core-clippy-01.log",
+    "sha256": "ee27e65c6b383dbe3565cbe1cc33727dd42a25d565d798c533951183609c6065"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/counter-clippy-01.log",
+    "sha256": "f989acdb6a550ffa53e70b8d172016e726de57828adb064991cf01e47091e141"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/native-clippy-01.log",
+    "sha256": "797fc8eaeee55ffdf0ab107aef5c62af6bc73eb3a74c5d6390d71048f75e680f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Strict release clippy completed successfully for shared normal/counter targets and the actual-root qualification package all targets. These are development static checks, not a full-root unit-suite or runtime result."
+}

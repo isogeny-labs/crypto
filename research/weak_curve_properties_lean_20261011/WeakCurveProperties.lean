@@ -1,7 +1,0 @@
-import WeakCurveProperties.Algebra
-import WeakCurveProperties.Conductor
-import WeakCurveProperties.Torsion
-import WeakCurveProperties.CyclicTwists
-import WeakCurveProperties.WeierstrassTwists
-import WeakCurveProperties.FiniteFields
-import WeakCurveProperties.Application
