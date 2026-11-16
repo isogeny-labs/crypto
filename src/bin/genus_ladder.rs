@@ -438,6 +438,7 @@ fn main() -> ExitCode {
                             // Per-step work the walk does not emit, in closed
                             // form: one partition hash and two coefficient
                             // additions modulo r per step (symmetric pricing).
+                            rec["compares_uncharged"] = json!(o.compares);
                             rec["hash_uncharged"] = json!(o.steps);
                             rec["coef_adds_uncharged"] = json!(2 * o.steps);
                             rec["wall_ns"] = json!(o.wall_ns);

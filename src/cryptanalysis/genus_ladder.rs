@@ -1979,6 +1979,9 @@ pub struct RhoOut {
     pub cantor_inv: u64,
     /// Canonicalisations (the walk's per-step native work).
     pub native: u64,
+    /// The walk's other counted native work (`RhoResult::work_native`: the
+    /// short-cycle window's and Brent's compares), summed.  Not in `native`.
+    pub compares: u64,
     pub steps: u64,
     pub wall_ns: u64,
 }
@@ -2030,6 +2033,7 @@ pub fn run_rho_walk(inst: &Instance, seed: u64, walk: RhoWalk) -> RhoOut {
             .copied()
             .unwrap_or(0)
             .max(rr.steps),
+        compares: rr.work_native.values().sum(),
         steps: rr.steps,
         wall_ns: rr.wall_ns,
     }
