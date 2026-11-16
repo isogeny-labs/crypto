@@ -1,0 +1,89 @@
+### freeze commit 4feb188f47 (2026-11-16 01:22:10 +0000) file research/ic_positive_control_lucas_20261116/frozen.sha256
+  OK research/ic_positive_control_lucas_20261116/PROTOCOL.md
+  OK src/cryptanalysis/chained_transfer/ic_control.rs
+  OK src/bin/ic_positive_control.rs
+### freeze commit caae5eca9f (2026-11-16 06:36:03 +0000) file research/ic_positive_control_la_20261116/frozen.sha256
+  OK research/ic_positive_control_la_20261116/PROTOCOL.md
+  OK src/cryptanalysis/chained_transfer/ic_control.rs
+  OK src/bin/ic_positive_control.rs
+### freeze commit 551590e3b7 (2026-11-16 07:51:52 +0000) file research/ic_positive_control_unit_t_20261116/frozen.sha256
+  OK research/ic_positive_control_unit_t_20261116/PROTOCOL.md
+  OK src/cryptanalysis/chained_transfer/ic_control.rs
+  OK src/bin/ic_positive_control.rs
+### freeze commit 81ddcdc450 (2026-11-16 10:01:01 +0000) file research/ic_positive_control_capped_20261116/frozen.sha256
+  OK research/ic_positive_control_capped_20261116/PROTOCOL.md
+  OK src/cryptanalysis/chained_transfer/ic_control.rs
+  OK src/bin/ic_positive_control.rs
+### binary.sha256 files and the commit that added each
+ic_positive_control_la_20261116: added in cc2d4d50c6 2026-11-16 06:38:32 +0000 :: d611851a573db35787f690eeb126b185151d2fb37b9e765d549134b13602c4aa  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/bin/ic_positive_control.caae5ec
+ic_positive_control_unit_t_20261116: added in 551590e3b7 2026-11-16 07:51:52 +0000 :: cd574bde2bac86e52072f344943b5e90b0e96b4df69e31c0c14697d28e55e364  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/bin/ic_positive_control.unitt
+ic_positive_control_capped_20261116: added in 81ddcdc450 2026-11-16 10:01:01 +0000 :: 6a97ea07313f6a057a7d12e8f2458f92a464817b12fec389c99f4ceede3b59a2  /tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/bin/ic_positive_control.capped
+### instrument blob hashes per commit
+4feb188f47 2026-11-16 01:22:10 +0000 ic_control=b41bc798cab0 bin=d74c9aefc3b0 Positive control: Cardano-Lucas split oracle port, frozen protocol
+82b3d37a39 2026-11-16 01:24:26 +0000 ic_control=b41bc798cab0 bin=d74c9aefc3b0 Positive control Lucas port: analysis script, resume note, open bench 
+ba0c9c1233 2026-11-16 01:34:02 +0000 ic_control=b41bc798cab0 bin=d74c9aefc3b0 Positive control Lucas port: results, report, bench record, session lo
+caae5eca9f 2026-11-16 06:36:03 +0000 ic_control=f1e6b6cac88c bin=eda42040ca3f Positive control LA: coordinate Wiedemann (LaMode), tests, frozen prot
+cc2d4d50c6 2026-11-16 06:38:32 +0000 ic_control=6f35213beafd bin=81f71c402aae Positive control LA: training sweep scripts, frozen binary hash; unit-
+2bc7249bac 2026-11-16 06:51:46 +0000 ic_control=6f35213beafd bin=81f71c402aae Positive control LA: training result cc* = 2.0 (S* = S); test script
+fbd22482c7 2026-11-16 07:13:56 +0000 ic_control=6f35213beafd bin=81f71c402aae Positive control LA: results, report, closed bench record
+be5e426df1 2026-11-16 07:17:40 +0000 ic_control=1b99e0a25bdd bin=b5b41e9fff84 Merge remote-tracking branch 'origin/claude/hyperelliptic-index-calcul
+551590e3b7 2026-11-16 07:51:52 +0000 ic_control=1b99e0a25bdd bin=b5b41e9fff84 Positive control unit-T + fast fallback: frozen protocol, binary hash,
+3eaf62ab17 2026-11-16 09:40:58 +0000 ic_control=1b99e0a25bdd bin=b5b41e9fff84 Positive control unit-T study: results, report, closed record, session
+fcc5fc5e87 2026-11-16 09:42:13 +0000 ic_control=79c5a3f8faa3 bin=43ddd2127db4 Merge remote-tracking branch 'origin/claude/hyperelliptic-index-calcul
+81ddcdc450 2026-11-16 10:01:01 +0000 ic_control=79c5a3f8faa3 bin=43ddd2127db4 Positive control capped unit-T (arm W): frozen protocol, binary hash, 
+87afac5ff2 2026-11-16 11:36:59 +0000 ic_control=79c5a3f8faa3 bin=43ddd2127db4 Positive control arm W: W phase complete (all certified); S/R reproduc
+5576b7fac8 2026-11-16 11:38:04 +0000 ic_control=79c5a3f8faa3 bin=43ddd2127db4 Positive control arm W: results, report, closed record, session log
+79c91dd913 2026-11-16 11:38:48 +0000 ic_control=79c5a3f8faa3 bin=43ddd2127db4 Move PR data files to the artifact store
+### study commit logs
+== ic_positive_control_lucas_20261116
+b6f86cc6df 2026-11-16 01:35:17 +0000 Move PR data files to the artifact store
+ba0c9c1233 2026-11-16 01:34:02 +0000 Positive control Lucas port: results, report, bench record, session log
+0867916552 2026-11-16 01:31:50 +0000 Positive control Lucas port: run log progress (p=65537 started)
+4cd50e6e6e 2026-11-16 01:29:25 +0000 Positive control Lucas port: run log progress (p=32771 started)
+effac24c61 2026-11-16 01:25:05 +0000 Positive control Lucas port: partial run log (run in progress)
+82b3d37a39 2026-11-16 01:24:26 +0000 Positive control Lucas port: analysis script, resume note, open bench record
+4feb188f47 2026-11-16 01:22:10 +0000 Positive control: Cardano-Lucas split oracle port, frozen protocol
+== ic_positive_control_la_20261116
+1b8d16a249 2026-11-16 07:15:24 +0000 Move PR data files to the artifact store
+fbd22482c7 2026-11-16 07:13:56 +0000 Positive control LA: results, report, closed bench record
+6cf294f8ea 2026-11-16 06:52:09 +0000 Positive control LA: test run in progress (log)
+2bc7249bac 2026-11-16 06:51:46 +0000 Positive control LA: training result cc* = 2.0 (S* = S); test script
+e2c7ab314d 2026-11-16 06:48:34 +0000 Positive control LA: training cc=1.4 done (sweep in progress)
+5e6af4f101 2026-11-16 06:44:04 +0000 Positive control LA: training cc=1.0 done (sweep in progress)
+22cd51d6cc 2026-11-16 06:39:23 +0000 Positive control LA: training cc=0.7 done (sweep in progress)
+cc2d4d50c6 2026-11-16 06:38:32 +0000 Positive control LA: training sweep scripts, frozen binary hash; unit-T walk (WIP, tests running)
+caae5eca9f 2026-11-16 06:36:03 +0000 Positive control LA: coordinate Wiedemann (LaMode), tests, frozen protocol
+== ic_positive_control_unit_t_20261116
+7228877dc2 2026-11-16 09:41:37 +0000 Move PR data files to the artifact store
+3eaf62ab17 2026-11-16 09:40:58 +0000 Positive control unit-T study: results, report, closed record, session log
+23acb89fa6 2026-11-16 08:06:47 +0000 Positive control unit-T: run log progress
+a7663fd2a0 2026-11-16 08:01:11 +0000 Positive control unit-T: run log progress
+981917a1b2 2026-11-16 07:55:34 +0000 Positive control unit-T: run log progress
+24dae23381 2026-11-16 07:53:03 +0000 Positive control unit-T: run in progress (log)
+7d135a6a18 2026-11-16 07:52:46 +0000 Positive control unit-T: analysis script (frozen rules)
+551590e3b7 2026-11-16 07:51:52 +0000 Positive control unit-T + fast fallback: frozen protocol, binary hash, test script, open record
+== ic_positive_control_capped_20261116
+79c91dd913 2026-11-16 11:38:48 +0000 Move PR data files to the artifact store
+5576b7fac8 2026-11-16 11:38:04 +0000 Positive control arm W: results, report, closed record, session log
+87afac5ff2 2026-11-16 11:36:59 +0000 Positive control arm W: W phase complete (all certified); S/R reproduction running
+32a2ba0a83 2026-11-16 10:10:21 +0000 Positive control arm W: run log progress
+2bafc280db 2026-11-16 10:04:45 +0000 Positive control arm W: run log progress
+13a30673b7 2026-11-16 10:02:08 +0000 Positive control arm W: run in progress (log)
+4a95132450 2026-11-16 10:01:52 +0000 Positive control arm W: analysis script (frozen rules)
+81ddcdc450 2026-11-16 10:01:01 +0000 Positive control capped unit-T (arm W): frozen protocol, binary hash, test script, open record
+### run start = mtime - wall_s
+<stdin>:8: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+<stdin>:9: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+research/ic_positive_control_lucas_20261116/run.json end 2026-11-16T01:32:25 wall_s 583.1 start 2026-11-16T01:22:42
+research/ic_positive_control_la_20261116/train_cc0.7.json end 2026-11-16T06:39:09 wall_s 169.3 start 2026-11-16T06:36:20
+research/ic_positive_control_la_20261116/train_cc1.0.json end 2026-11-16T06:43:45 wall_s 276.1 start 2026-11-16T06:39:09
+research/ic_positive_control_la_20261116/train_cc1.4.json end 2026-11-16T06:48:16 wall_s 271.1 start 2026-11-16T06:43:45
+research/ic_positive_control_la_20261116/train_cc2.0.json end 2026-11-16T06:51:31 wall_s 194.3 start 2026-11-16T06:48:16
+research/ic_positive_control_la_20261116/run.json end 2026-11-16T07:08:40 wall_s 1007.4 start 2026-11-16T06:51:53
+research/ic_positive_control_unit_t_20261116/run.json end 2026-11-16T09:29:30 wall_s 5845.3 start 2026-11-16T07:52:04
+research/ic_positive_control_capped_20261116/run_w.json end 2026-11-16T11:36:30 wall_s 5724.1 start 2026-11-16T10:01:06
+research/ic_positive_control_capped_20261116/run_sr.json end 2026-11-16T11:37:01 wall_s 31.5 start 2026-11-16T11:36:30
+### producer binaries (sha256 at validator dispatch 14:52 UTC)
+d611851a573db35787f690eeb126b185151d2fb37b9e765d549134b13602c4aa  bin/ic_positive_control.caae5ec
+6a97ea07313f6a057a7d12e8f2458f92a464817b12fec389c99f4ceede3b59a2  bin/ic_positive_control.capped
+cd574bde2bac86e52072f344943b5e90b0e96b4df69e31c0c14697d28e55e364  bin/ic_positive_control.unitt

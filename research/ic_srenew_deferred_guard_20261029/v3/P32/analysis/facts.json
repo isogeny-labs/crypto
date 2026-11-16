@@ -1,0 +1,1184 @@
+{
+  "audit": {
+    "checks": {
+      "arms": true,
+      "env_class": true,
+      "executions": true,
+      "host_hash": true,
+      "plan_hash": true,
+      "record_count": true,
+      "records": true,
+      "records_hash": true,
+      "replays": true,
+      "session_complete": true,
+      "spec_id": true,
+      "workloads": true
+    },
+    "ok": true,
+    "problems": [],
+    "records": 2688,
+    "records_bound": true,
+    "regraded": true,
+    "replay_detail_counts": {
+      "identical": 2304
+    },
+    "replays_reproduced_true": 2304,
+    "replays_total": 2304,
+    "schema": "ecbench.audit/v1",
+    "session_id": "ECBS1h999ec5ed79e4",
+    "session_status": "complete",
+    "verified_records": 2688
+  },
+  "audit_path": "audit.json",
+  "binary_sha256_file": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c  /usr/local/bin/ecbench",
+  "binary_sha256_file_first_field_equals_build_info_ecbench_sha256": true,
+  "binary_used": "/dev/shm/isolab-build/ecbench",
+  "binary_used_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+  "binary_used_sha256_equals_build_info_ecbench_sha256": true,
+  "binary_used_source": "dev-shm-build",
+  "build_info": {
+    "architecture": "linux/amd64",
+    "built_at": "2026-10-29T07:29:58Z",
+    "default_features": false,
+    "ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+    "rustflags": "-C target-cpu=x86-64",
+    "source_repository": "https://github.com/aburan28/crypto",
+    "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "target": "x86_64-unknown-linux-musl"
+  },
+  "build_info_path": "build-info.json",
+  "job_exit": {
+    "exit_code": 42,
+    "job_name": "ic-dg3-p32-20261029",
+    "node_name": "ip-10-84-76-91.us-east-2.compute.internal",
+    "pod_uid": "bd38514c-48dc-49a0-82e0-9986502d8196"
+  },
+  "job_exit_path": "job-exit.json",
+  "l2_gate": {
+    "accepted": false,
+    "below_l2": [
+      {
+        "arm": "rho-neg",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.1650390625,
+              0.826171875,
+              0.73193359375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33532607,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 85419,
+                "idle": 102687,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261410785
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.1650390625,
+              0.826171875,
+              0.73193359375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33532606,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 85417,
+                "idle": 102687,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261410758
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 917.2 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": -1,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2024
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 936
+      },
+      {
+        "arm": "rho-neg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.1650390625,
+              0.826171875,
+              0.73193359375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33532618,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 85558,
+                "idle": 102691,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261412204
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.1650390625,
+              0.826171875,
+              0.73193359375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33532617,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 85555,
+                "idle": 102691,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261412175
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 879.8 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 943
+      },
+      {
+        "arm": "rho-neg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0498046875,
+              0.865234375,
+              0.75244140625
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33623115,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 92464,
+                "idle": 102887,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261483144
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0498046875,
+              0.865234375,
+              0.75244140625
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33623114,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 92461,
+                "idle": 102887,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261483116
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 547.5 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 1288
+      },
+      {
+        "arm": "rho-neg",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.04541015625,
+              0.86767578125,
+              0.75390625
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33629892,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 92632,
+                "idle": 102891,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261484873
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.04541015625,
+              0.86767578125,
+              0.75390625
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33629891,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 92629,
+                "idle": 102891,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261484845
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 559.5 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2024
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 1295
+      },
+      {
+        "arm": "rho-neg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.92822265625,
+              0.80078125
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33834939,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 108496,
+                "idle": 103330,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261647782
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.92822265625,
+              0.80078125
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33834938,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 108493,
+                "idle": 103330,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261647755
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 590.9 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2072
+      },
+      {
+        "arm": "rho-neg",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.9296875,
+              0.80224609375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33835355,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 108662,
+                "idle": 103334,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261649471
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.9296875,
+              0.80224609375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33835354,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 108659,
+                "idle": 103334,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261649442
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 594.7 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2022
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2079
+      },
+      {
+        "arm": "rho-neg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.9296875,
+              0.80224609375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837375,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 108976,
+                "idle": 103343,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261652717
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.9296875,
+              0.80224609375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837373,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 108974,
+                "idle": 103343,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261652689
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 678.5 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": -1,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2096
+      },
+      {
+        "arm": "rho-neg",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.93115234375,
+              0.8037109375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837392,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 109142,
+                "idle": 103347,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261654438
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.93115234375,
+              0.8037109375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837390,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 109140,
+                "idle": 103347,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261654410
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 679.3 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": -1,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2103
+      },
+      {
+        "arm": "rho-neg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.93115234375,
+              0.8037109375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837406,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 109309,
+                "idle": 103352,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261656142
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.93115234375,
+              0.8037109375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837405,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 109306,
+                "idle": 103352,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261656113
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 865.5 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2112
+      },
+      {
+        "arm": "rho-neg",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.93115234375,
+              0.8037109375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837873,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 109457,
+                "idle": 103356,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261657663
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.0,
+              0.93115234375,
+              0.8037109375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33837872,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 109454,
+                "idle": 103356,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261657634
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 865.2 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2022
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2119
+      },
+      {
+        "arm": "rho-neg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.3681640625,
+              1.01513671875,
+              0.8330078125
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33842838,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 110116,
+                "idle": 103374,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261664426
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.3681640625,
+              1.01513671875,
+              0.8330078125
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33842836,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 110114,
+                "idle": 103374,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261664398
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 807.2 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": -1,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2152
+      },
+      {
+        "arm": "rho-neg",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.3681640625,
+              1.01513671875,
+              0.8330078125
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33844421,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 110283,
+                "idle": 103378,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261666152
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.3681640625,
+              1.01513671875,
+              0.8330078125
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33844418,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 110280,
+                "idle": 103378,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261666122
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 806.0 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": 0,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2159
+      },
+      {
+        "arm": "rho-neg",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.18359375,
+              1.02490234375,
+              0.85302734375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33943351,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 117550,
+                "idle": 103579,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261740795
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.18359375,
+              1.02490234375,
+              0.85302734375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33943349,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 117548,
+                "idle": 103579,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261740767
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 926.0 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": -1,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2022
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2512
+      },
+      {
+        "arm": "rho-neg-aa",
+        "isolation": {
+          "after": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.18359375,
+              1.02490234375,
+              0.85302734375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33943365,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 117716,
+                "idle": 103583,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261742517
+          },
+          "before": {
+            "intruders": {
+              "kernel_threads": 0,
+              "user_threads": 0
+            },
+            "loadavg": [
+              1.18359375,
+              1.02490234375,
+              0.85302734375
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 33943364,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "4": {
+                "busy": 117714,
+                "idle": 103583,
+                "steal": 6
+              }
+            },
+            "unix_ms": 1793261742489
+          },
+          "blockers": [
+            "L2: solve too short to admit wall time: solve 933.1 \u00b5s is under the 1.0 ms minimum",
+            "L3: governor is None, not performance",
+            "L3: turbo/boost is not known to be off",
+            "L3: not known to be bare metal"
+          ],
+          "foreign_busy_ticks": -1,
+          "idle_sibling_busy_ticks": 0,
+          "level": "L1",
+          "node": 0,
+          "placement": {
+            "affinity": [
+              4
+            ],
+            "anon_pages_by_node": {
+              "0": 2023
+            },
+            "cpu_at_end": 4,
+            "cpu_at_start": 4,
+            "mempolicy": null,
+            "mems_allowed": "0"
+          },
+          "reserved": [
+            4
+          ],
+          "run_cpu": 4,
+          "steal_ticks": 0
+        },
+        "seq": 2519
+      }
+    ],
+    "executions": 2688,
+    "grades": [
+      {
+        "count": 14,
+        "level": "L1"
+      },
+      {
+        "count": 2674,
+        "level": "L2"
+      }
+    ],
+    "invalid_outcomes": [],
+    "required": "L2"
+  },
+  "l2_gate_path": "l2-gate.json",
+  "session_spec_equals_input_spec": true
+}

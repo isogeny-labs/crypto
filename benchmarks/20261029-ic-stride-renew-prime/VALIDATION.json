@@ -1,0 +1,171 @@
+{
+  "schema": "validation-gate/v1",
+  "rows": [
+    "icv1-fp20-tm1549-7ec9131a",
+    "icv1-fp20-tm327-45c21191",
+    "icv1-fp28-t20713-32971d39",
+    "icv1-fp28-tm21435-0b5ad955"
+  ],
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "4927a26e296042b475ceaf6ffffc042bf8621d143f408f17c7b5d4b049e339a5"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "727b79f33e377923b545406a7cc31ecb8c4f46ec886b33e6988c350bf3bc9edb"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "PROTOCOL.md section 2 arm rho-neg: rho.negation in the same session per size (P20 ECBS session of job ic-srenew-p20-20261029, P28 of ic-srenew-p28-20261029), same 48 targets, rounds and algorithm seeds as srenew and walk",
+    "unit": "ecbench.gae / sqrt(r) (S), unpriced native operations priced at w GAE each (AGENTS.md section 5a); rho canonicalisations priced the same way",
+    "binary_or_process": "ecbench sha256 583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9 (isolab-eks image, source cb2ec6873f30), one session per size; replayed by bf5eec6d",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "strongest_available_basis": "All four curves are prime-order curves over prime fields with j not 0 or 1728 (validator check against the ICV1 strings), so Aut(E) = {+-1}: negation is the only automorphism fold and no Frobenius fold exists.",
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band_row": "icv1-fp20-tm327-45c21191: ic = srenew mean S over its 144 measured runs, rho = rho-neg mean S over the same 144 (target, round) pairs; every row in gae_band_by_row",
+    "gae_band": {
+      "0": {
+        "ic": 8.678134121323644,
+        "rho": 1.3099889240544926
+      },
+      "0.1": {
+        "ic": 9.903122288029808,
+        "rho": 1.4210702364195145
+      },
+      "1": {
+        "ic": 20.928015788385263,
+        "rho": 2.420802047704712
+      }
+    },
+    "gae_band_by_row": {
+      "icv1-fp20-tm1549-7ec9131a": {
+        "0": {
+          "ic": 8.837694927798593,
+          "rho": 1.3168405036929656
+        },
+        "0.1": {
+          "ic": 10.152317852028446,
+          "rho": 1.430581570788923
+        },
+        "1": {
+          "ic": 21.983924170097133,
+          "rho": 2.4542511746525393
+        }
+      },
+      "icv1-fp20-tm327-45c21191": {
+        "0": {
+          "ic": 8.678134121323644,
+          "rho": 1.3099889240544926
+        },
+        "0.1": {
+          "ic": 9.903122288029808,
+          "rho": 1.4210702364195145
+        },
+        "1": {
+          "ic": 20.928015788385263,
+          "rho": 2.420802047704712
+        }
+      },
+      "icv1-fp28-t20713-32971d39": {
+        "0": {
+          "ic": 21.029463342393925,
+          "rho": 0.9331982462765427
+        },
+        "0.1": {
+          "ic": 22.627850081798883,
+          "rho": 1.0234954202019884
+        },
+        "1": {
+          "ic": 37.01333073644352,
+          "rho": 1.8361699855309999
+        }
+      },
+      "icv1-fp28-tm21435-0b5ad955": {
+        "0": {
+          "ic": 21.174522425370366,
+          "rho": 0.9636529828796344
+        },
+        "0.1": {
+          "ic": 22.665411190935156,
+          "rho": 1.0568448094712444
+        },
+        "1": {
+          "ic": 36.083410081018265,
+          "rho": 1.895571248795732
+        }
+      }
+    },
+    "gae_band_baseline_by_row": {
+      "icv1-fp20-tm1549-7ec9131a": {
+        "0": {
+          "ic": 10.481611540003103,
+          "rho": 1.3168405036929656
+        },
+        "0.1": {
+          "ic": 11.810065295254153,
+          "rho": 1.430581570788923
+        },
+        "1": {
+          "ic": 23.766149092513604,
+          "rho": 2.4542511746525393
+        }
+      },
+      "icv1-fp20-tm327-45c21191": {
+        "0": {
+          "ic": 10.328990698196,
+          "rho": 1.3099889240544926
+        },
+        "0.1": {
+          "ic": 11.555886271460784,
+          "rho": 1.4210702364195145
+        },
+        "1": {
+          "ic": 22.597946430843834,
+          "rho": 2.420802047704712
+        }
+      },
+      "icv1-fp28-t20713-32971d39": {
+        "0": {
+          "ic": 21.46312647668946,
+          "rho": 0.9331982462765427
+        },
+        "0.1": {
+          "ic": 23.116971230400413,
+          "rho": 1.0234954202019884
+        },
+        "1": {
+          "ic": 38.001574013799,
+          "rho": 1.8361699855309999
+        }
+      },
+      "icv1-fp28-tm21435-0b5ad955": {
+        "0": {
+          "ic": 21.754097933557734,
+          "rho": 0.9636529828796344
+        },
+        "0.1": {
+          "ic": 23.32857775860131,
+          "rho": 1.0568448094712444
+        },
+        "1": {
+          "ic": 37.49889618399346,
+          "rho": 1.895571248795732
+        }
+      }
+    },
+    "order_holds_across_band": true
+  },
+  "verdict": "passed",
+  "caveats": [
+    "P28 passes with caveats (VAL-20261029-4aed57): about one third of its 2.3% gain is the scalar-multiplication saving; the other two thirds come from srenew needing 4.4% fewer relations (203.3 vs 212.7, CI [0.916, 0.996]) and 4.3% fewer trials, which the protocol did not predict and for which no mechanism is stated; it sits about two standard errors from zero. The w = 1 upper bound is 0.9955 (0.9945 to 0.9965 across 11 validator bootstrap seeds).",
+    "Four sizes were each decided at 95% with no multiplicity correction, as frozen. P24 and P32 are null and not covered by this file.",
+    "Two fresh curves per size, 24 targets x 6 rounds; the intervals cover target-to-target variation over two curves, not a population of curves. No exponent claim.",
+    "The measuring binary (583e62f0, EKS, AMD) and the replay binary (bf5eec6d, local Intel container) differ; replay is cross-binary and cross-host, 1440/1440 identical per session. Neither is an independent implementation; the validator stdlib recompute and [d]G = Q checks on 2,880 records are the implementation-independent checks.",
+    "Counted unit only; wall times are L2 records but not analysed. The image binary does not emit the bitop/v1 work fields."
+  ],
+  "promotion_blockers": [],
+  "promotion_note": "No evidence blocker known to the validator remains for the four rows. Promotion itself is the Coordinator decision; this file records evidence admissibility, not authorization.",
+  "evidence_note": "replay-certificate.json is a copy of research/ic_stride_renew_prime_20261029/validation/replay-certificate.json; validator-report.json is a copy of that directory's validator-report.json with raw_data paths rebased to this directory (../../research/ic_stride_renew_prime_20261029/...); raw data is under research/ic_stride_renew_prime_20261029/P20 and P28"
+}

@@ -1,0 +1,116 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "ic-dgw-p24-20261029",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 3600,
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "XP-20261029-dg-wall P24 wall session: wall time per operation, deferred guard against the eager guard at N 162",
+      "description": "Frozen protocol (backlog/XP-20261029-dg-wall/PROTOCOL.md and APPROVAL.md): ns per GAE of ic.pipeline targets stride-renew-deferred-guard against stride-renew at the same factor base prime-abscissa:size=162 and oracle mitm:negation_folded=1 (identical charged work), A/A-corrected by srenew-aa, on two fresh 24-bit prime-order curves; walk (structural reference role for native A/A admission) and dg-small (N 130) are descriptive. No rho arm: the matched rho is in spec-P24-rho.json. Public synthetic curves and targets; no security claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 24,
+            "seed": 202610297243
+          },
+          {
+            "kind": "prime_search",
+            "bits": 24,
+            "seed": 202610297244
+          }
+        ],
+        "targets_per_curve": 24,
+        "target_seed": 202610297246,
+        "target_kind": "public"
+      },
+      "arms": [
+        {
+          "name": "walk",
+          "role": "reference",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "4243777",
+              "targets": "walk"
+            }
+          }
+        },
+        {
+          "name": "srenew",
+          "role": "baseline",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "4243777",
+              "targets": "stride-renew"
+            }
+          }
+        },
+        {
+          "name": "dg",
+          "role": "candidate",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "4243777",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        },
+        {
+          "name": "srenew-aa",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "4243777",
+              "targets": "stride-renew"
+            }
+          }
+        },
+        {
+          "name": "dg-small",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=130",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "4243777",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 6,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 202610297248,
+        "isolation_required": "L2",
+        "timeout_seconds": 1800
+      }
+    },
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:cf0dcc8ba2f6e399f3c16aec8dda0eaccb65dd0f8b75a2f90daf2b543ffb620c",
+      "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+      "ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c"
+    }
+  },
+  "provenance": {
+    "harness": "claude-code-local",
+    "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "workflow_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "run_url": "https://github.com/isogeny-labs/crypto/blob/6e4804417baa031f6a1aee9b9b54c67c90c4dafe/backlog/XP-20261029-dg-wall/PROTOCOL.md"
+  }
+}

@@ -1,0 +1,29 @@
+[2026-11-16T23:25:52Z] CMD: mkdir -p raw
+  exit=0
+[2026-11-16T23:25:52Z] CMD: (cd l06 && cargo build --release 2>&1) | tee raw/build.log
+  exit=0
+  sha256 a106b74d24cbf47aa248f7a1ec5f6b44f6dc0fdb7806de62cfe0fc776e1a3b11  raw/build.log
+[2026-11-16T23:25:52Z] CMD: (cd l06 && cargo test --release 2>&1) | tee raw/test.log
+  exit=0
+  sha256 2511ee7cfa1186a82b41df3e18eab2797b692a6ac1d21bd8d864c770b7eda1b5  raw/test.log
+[2026-11-16T23:25:52Z] CMD: ./l06/target/release/l06 lagr2 --out raw/l2_lagrangians.json
+  exit=0
+  sha256 354eedca32f4acd86d0f5dc3b917804e16c87541488ac9d8520f373e78f431ed  raw/l2_lagrangians.json
+[2026-11-16T23:25:58Z] CMD: ./l06/target/release/l06 gsp --samples 200000 --out raw/gsp_reference.json 2> raw/gsp.log
+  exit=0
+  sha256 054f7c007c654a8eeeee51157ebeb4ffe3a7bb3d00449d4351a1087d3be66c56  raw/gsp_reference.json
+  sha256 92e933653ce02fcb7514d4e098d1f2c5c51df5f937ded47c42e0fe2dc58a9fd4  raw/gsp.log
+[2026-11-16T23:26:51Z] CMD: ./l06/target/release/l06 gate-enum --p 101 --count 200 --out raw/gate_enum_p101.jsonl 2> raw/gate_enum_p101.log
+  exit=0
+  sha256 de6739126580b3348b0c02fc79d506b3cc846741e5d2d4c466bc7ef8fe604920  raw/gate_enum_p101.jsonl
+[2026-11-16T23:27:17Z] CMD: ./l06/target/release/l06 gate-enum --p 257 --count 40 --out raw/gate_enum_p257.jsonl 2> raw/gate_enum_p257.log
+  exit=0
+  sha256 1582a2f3501c071449b816144fca61971621491ed732f1658a7bf4bd6416577a  raw/gate_enum_p257.jsonl
+[2026-11-16T23:30:21Z] CMD: timeout 600 ./l06/target/release/l06 census --p 257 --u-count 3000 --prime-target 120 --draw-cap 40000 --out raw/census_p257.jsonl 2> raw/census_p257.log
+  exit=0
+  sha256 d99b7c2dad6304bc1ec331ecec2bdff1cf91240451ea462a4fe4336cd4d7128a  raw/census_p257.jsonl
+  sha256 16d4166a1d84f655507d2136bb0cb52d695e0ae257d02bbb653fe62e424422aa  raw/census_p257.log
+[2026-11-16T23:30:44Z] CMD: timeout 600 ./l06/target/release/l06 census --p 521 --u-count 3000 --prime-target 120 --draw-cap 40000 --out raw/census_p521.jsonl 2> raw/census_p521.log
+  exit=0
+  sha256 3b5932b1305ef0c194eaec903692a70dca6b4f94940ebb08d744cda76314fc3a  raw/census_p521.jsonl
+  sha256 6eb0aa7f2f6f61b283b71f801b161633f8e3b57a6b33dc25ab05b32c3fc7af8c  raw/census_p521.log
