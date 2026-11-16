@@ -1,18 +1,15 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
 pub mod budget;
-// Legacy allocation/receipt compatibility only; live dataset S3 uses budget + s3_budget.
 pub mod capture;
+mod cost_labels;
 pub mod curves;
+pub mod custody;
 mod execution;
 pub mod export;
-pub mod factor_bases;
-pub mod legacy_budget;
-pub mod live;
 pub mod relations;
 pub mod report;
 pub mod restore;
 pub mod s3_budget;
-pub mod snapshot;
 pub mod solvers;
 mod startup_gate;
 pub mod storage;
@@ -28,12 +25,22 @@ use s3_budget::S3BudgetContext;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
+#[cfg(target_os = "linux")]
+use std::ffi::OsString;
 use std::fs::{self, File, OpenOptions};
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, ExitStatus, Stdio};
+#[cfg(not(target_os = "linux"))]
+use std::process::Child;
+#[cfg(not(target_os = "linux"))]
+use std::process::Command;
+use std::process::{ExitStatus, Stdio};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use types::{Artifact, CaseConfig, FactorBasePolicy};
+#[cfg(target_os = "linux")]
+use telemetry::pmu_containment;
+#[cfg(target_os = "linux")]
+use telemetry::whole_worker::{Collector, GatedWorker};
+use types::{Artifact, CaseConfig};
 
 #[derive(Args)]
 pub struct DatasetArgs {
@@ -43,6 +50,8 @@ pub struct DatasetArgs {
 
 #[derive(Subcommand)]
 pub enum DatasetCommand {
+    /// Create, verify, or locally restore a restricted full-run custody bundle.
+    Custody(custody::CustodyArgs),
     /// Validate a delivered launch grant and start the frozen bounded worker.
     Start {
         #[arg(long)]
@@ -71,6 +80,11 @@ pub enum DatasetCommand {
     },
     /// Count recorded outcomes without rerunning any solver.
     Status {
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Replay a local run and report fail-closed instruction-to-solve labels.
+    CostLabels {
         #[arg(long)]
         out: PathBuf,
     },
@@ -109,20 +123,6 @@ pub enum DatasetCommand {
         remote: Option<String>,
         #[command(flatten)]
         budget: BudgetArgs,
-    },
-    /// Download retained partial artifacts without resuming or replaying a solver.
-    RestorePartial(live::RestorePartialArgs),
-    /// Initialize legacy offline allocation/receipt compatibility; not live S3 authority.
-    BudgetInit {
-        #[arg(long)]
-        policy: PathBuf,
-    },
-    /// Create a legacy offline allocation receipt; live workers require a current owner grant.
-    BudgetAllocate(live::AllocateArgs),
-    #[command(hide = true)]
-    SnapshotWorker {
-        #[arg(long)]
-        request: PathBuf,
     },
     /// Preserve an interrupted attempt after proving no matching worker remains.
     Reconcile {
@@ -268,13 +268,13 @@ pub struct PlanArgs {
     pub seed: u64,
     #[arg(long, default_value_t = 8)]
     pub factor_base_size: usize,
-    /// JSON array of explicit factor-base recipes; selects plan/v2. Omit for exact legacy plan/v1.
-    #[arg(long)]
-    pub factor_base_policies: Option<PathBuf>,
     #[arg(long, default_value_t = 3)]
     pub degree_bound: u32,
     #[arg(long, default_value_t = 100000)]
     pub work_limit: u64,
+    /// Restricted construction population. Planted targets retain their draw log and logs only in the witness.
+    #[arg(long, default_value = "natural", value_parser = ["natural", "planted-pdp-v1"])]
+    pub population: String,
     /// SHA-256 of the committed experiment.protocol/v1 file. Required to generate.
     #[arg(long)]
     pub protocol_sha256: Option<String>,
@@ -310,12 +310,6 @@ pub struct GenerateArgs {
     pub remote: Option<String>,
     #[command(flatten)]
     pub budget: BudgetArgs,
-    /// Publish acknowledged partial artifacts at this interval when --publish is set.
-    #[arg(long, default_value_t = 30)]
-    pub snapshot_seconds: u64,
-    /// Bound each snapshot helper; the solver deadline remains independently enforced.
-    #[arg(long, default_value_t = 120)]
-    pub snapshot_timeout_seconds: u64,
     /// Finite Resources reservation charged once per cell, with requests spent inside it.
     #[arg(long)]
     pub budget_cell_envelope: Option<PathBuf>,
@@ -339,28 +333,15 @@ pub struct DatasetPlan {
     pub twists: bool,
     pub protocol_sha256: Option<String>,
     pub split_rule: String,
-    /// Empty and absent for frozen plan/v1. Explicit nonempty policy axis for plan/v2.
-    #[serde(
-        default,
-        deserialize_with = "nonempty_policy_axis",
-        skip_serializing_if = "Vec::is_empty"
-    )]
-    pub factor_base_policies: Vec<FactorBasePolicy>,
 }
 
-fn nonempty_policy_axis<'de, D: serde::Deserializer<'de>>(
-    deserializer: D,
-) -> Result<Vec<FactorBasePolicy>, D::Error> {
-    let policies = Vec::<FactorBasePolicy>::deserialize(deserializer)?;
-    if policies.is_empty() || policies.len() > 32 {
-        return Err(serde::de::Error::custom(
-            "a present policy axis must contain 1..32 recipes",
-        ));
-    }
-    Ok(policies)
-}
+const NATURAL_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/v1";
+const PLANTED_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/planted-pdp-v1";
 
 impl DatasetPlan {
+    fn planted(&self) -> bool {
+        self.schema == PLANTED_PLAN_SCHEMA
+    }
     /// Existing run/grant identity: compact serialization of this typed plan
     /// in struct field order, not generic canonical JSON or the saved file bytes.
     fn binding_sha256(&self) -> Result<String, String> {
@@ -370,17 +351,12 @@ impl DatasetPlan {
     }
 
     pub fn validate(&self) -> Result<(), String> {
-        let policy_plan = match self.schema.as_str() {
-            "crypto.ml-dataset.plan/v1" if self.factor_base_policies.is_empty() => false,
-            "crypto.ml-dataset.plan/v2" if !self.factor_base_policies.is_empty() => true,
-            _ => {
-                return Err(
-                    "expected plan/v1 without policies or plan/v2 with explicit policies".into(),
-                )
-            }
-        };
-        if !self.twists {
-            return Err("expected paired twists".into());
+        if !matches!(
+            self.schema.as_str(),
+            NATURAL_PLAN_SCHEMA | PLANTED_PLAN_SCHEMA
+        ) || !self.twists
+        {
+            return Err("expected natural or planted PDP plan with paired twists".into());
         }
         if self.field_sizes.is_empty()
             || self.field_sizes.iter().any(|n| !(3..=61).contains(n))
@@ -416,6 +392,25 @@ impl DatasetPlan {
                 return Err("empty, duplicate or unknown family/solver axis".into());
             }
         }
+        if self.planted() {
+            if self
+                .solvers
+                .iter()
+                .any(|solver| solver == "double-large-prime")
+            {
+                return Err(
+                    "planted PDP double-large-prime requires restricted factor-base replay".into(),
+                );
+            }
+            if self.families.iter().any(|family| family == "prime")
+                && self.field_sizes.iter().any(|n| *n >= 33)
+                && self.solvers.iter().any(|solver| solver == "f4")
+            {
+                return Err(
+                    "planted PDP wide-prime F4 requires restricted factor-base replay".into(),
+                );
+            }
+        }
         if self.field_sizes.iter().collect::<BTreeSet<_>>().len() != self.field_sizes.len()
             || self.arities.iter().collect::<BTreeSet<_>>().len() != self.arities.len()
             || self.curve_seeds == 0
@@ -431,20 +426,6 @@ impl DatasetPlan {
         }
         if self.split_rule != "curve-twist-component-sha256-v1" {
             return Err("unknown split rule".into());
-        }
-        if policy_plan {
-            if self.factor_base_policies.len() > 32 {
-                return Err("at most 32 factor-base policies are supported per plan".into());
-            }
-            let mut recipes = BTreeSet::new();
-            for policy in &self.factor_base_policies {
-                for &n in &self.field_sizes {
-                    policy.validate(n)?;
-                }
-                if !recipes.insert(serde_json::to_vec(policy).map_err(|e| e.to_string())?) {
-                    return Err("duplicate factor-base policy recipe".into());
-                }
-            }
         }
         if let Some(hash) = &self.protocol_sha256 {
             crate::store::index::validate_sha256(hash)?;
@@ -463,7 +444,6 @@ impl DatasetPlan {
             self.generators,
             self.keys,
             2,
-            self.factor_base_policies.len().max(1) as u64,
         ]
         .into_iter()
         .try_fold(1u64, |a, b| {
@@ -482,14 +462,6 @@ impl DatasetPlan {
             d
         };
         let solver = self.solvers[digit(self.solvers.len() as u64) as usize].clone();
-        let factor_base_policy = if self.factor_base_policies.is_empty() {
-            None
-        } else {
-            Some(
-                self.factor_base_policies[digit(self.factor_base_policies.len() as u64) as usize]
-                    .clone(),
-            )
-        };
         let twist = digit(2) == 1;
         let m = self.arities[digit(self.arities.len() as u64) as usize];
         let key_index = digit(self.keys);
@@ -507,7 +479,6 @@ impl DatasetPlan {
             key_index,
             seed: self.seed,
             factor_base_size: self.factor_base_size,
-            factor_base_policy,
             degree_bound: self.degree_bound,
             work_limit: self.work_limit,
             solver,
@@ -585,7 +556,7 @@ fn budget_inputs(
             state,
         ))),
         _ => Err(
-            "provide all of --budget-policy, --budget-grant, --budget-owner and --budget-state; budget-policy, budget-grant, budget-owner and budget-state must be supplied together"
+            "budget-policy, budget-grant, budget-owner and budget-state must be supplied together"
                 .into(),
         ),
     }
@@ -1008,6 +979,7 @@ fn fetch_budget_object(
 
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
+        DatasetCommand::Custody(a) => println!("{}", custody::run(a)?),
         DatasetCommand::Start { resume } => {
             let outcome = startup_gate::start(*resume).map_err(|e| e.to_string())?;
             println!(
@@ -1017,20 +989,11 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         }
         DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
         DatasetCommand::Plan(a) => {
-            let factor_base_policies: Vec<FactorBasePolicy> = a
-                .factor_base_policies
-                .as_ref()
-                .map(|path| read_json(path))
-                .transpose()?
-                .unwrap_or_default();
-            if a.factor_base_policies.is_some() && factor_base_policies.is_empty() {
-                return Err("explicit factor-base policy array must not be empty".into());
-            }
             let plan = DatasetPlan {
-                schema: if factor_base_policies.is_empty() {
-                    "crypto.ml-dataset.plan/v1"
-                } else {
-                    "crypto.ml-dataset.plan/v2"
+                schema: match a.population.as_str() {
+                    "natural" => NATURAL_PLAN_SCHEMA,
+                    "planted-pdp-v1" => PLANTED_PLAN_SCHEMA,
+                    _ => return Err("unknown dataset population".into()),
                 }
                 .into(),
                 field_sizes: numbers(&a.n)?,
@@ -1047,7 +1010,6 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 twists: true,
                 protocol_sha256: a.protocol_sha256.clone(),
                 split_rule: "curve-twist-component-sha256-v1".into(),
-                factor_base_policies,
             };
             plan.validate()?;
             let parent = a
@@ -1065,7 +1027,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             println!(
                 "{}",
                 json!({"plan":a.out,"sha256":artifact.sha256,"plan_sha256":plan.binding_sha256()?,"planned_cells":plan.cell_count()?,
-                "generated_cells":0,"twists_included":true})
+                "generated_cells":0,"twists_included":true,"population":a.population})
             );
         }
         DatasetCommand::Generate(a) => generate(a)?,
@@ -1100,6 +1062,9 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         }
         DatasetCommand::Status { out } => {
             println!("{}", verify_run(out, false)?);
+        }
+        DatasetCommand::CostLabels { out } => {
+            println!("{}", cost_labels::report_run(out)?);
         }
         DatasetCommand::Report { out, destination } => {
             println!("{}", report::report_run(out, destination)?);
@@ -1152,10 +1117,6 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             let finalized = finalize_budget(out, context.as_ref(), None, false);
             println!("{}", combine_finalization(result, finalized)?);
         }
-        DatasetCommand::RestorePartial(args) => println!("{}", live::restore_partial(args)?),
-        DatasetCommand::BudgetInit { policy } => println!("{}", legacy_budget::initialize(policy)?),
-        DatasetCommand::BudgetAllocate(args) => println!("{}", live::allocate(args)?),
-        DatasetCommand::SnapshotWorker { request } => live::snapshot_worker(request)?,
         DatasetCommand::Reconcile { out, cell, reason } => reconcile(out, *cell, reason)?,
     }
     Ok(())
@@ -1250,39 +1211,70 @@ fn sync_dir(path: &Path) -> Result<(), String> {
 }
 
 struct SupervisedChild {
+    #[cfg(not(target_os = "linux"))]
     child: Child,
+    #[cfg(target_os = "linux")]
+    child: GatedWorker,
+    #[cfg(not(target_os = "linux"))]
     finished: bool,
 }
 impl SupervisedChild {
+    fn pid(&self) -> u32 {
+        #[cfg(target_os = "linux")]
+        {
+            self.child.pid()
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            self.child.id()
+        }
+    }
     fn kill_group(&mut self) {
         #[cfg(unix)]
         unsafe {
-            libc::kill(-(self.child.id() as i32), libc::SIGKILL);
+            libc::kill(-(self.pid() as i32), libc::SIGKILL);
         }
+        #[cfg(not(target_os = "linux"))]
         let _ = self.child.kill();
     }
     fn stop(&mut self) -> Result<ExitStatus, String> {
-        self.kill_group();
-        let exit = self.child.wait().map_err(|e| e.to_string())?;
-        self.finished = true;
-        Ok(exit)
+        #[cfg(target_os = "linux")]
+        {
+            self.child.stop().map_err(|e| e.to_string())
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            self.kill_group();
+            let exit = self.child.wait().map_err(|e| e.to_string())?;
+            self.finished = true;
+            Ok(exit)
+        }
     }
     fn poll(&mut self) -> Result<Option<ExitStatus>, String> {
+        #[cfg(target_os = "linux")]
+        let exit = self.child.try_wait().map_err(|e| e.to_string())?;
+        #[cfg(not(target_os = "linux"))]
         let exit = self.child.try_wait().map_err(|e| e.to_string())?;
         if exit.is_some() {
             // A backend may have spawned children. Its process group must not
             // survive the supervised invocation even after the worker exits.
             self.kill_group();
-            self.finished = true;
+            #[cfg(not(target_os = "linux"))]
+            {
+                self.finished = true;
+            }
         }
         Ok(exit)
     }
 }
 impl Drop for SupervisedChild {
     fn drop(&mut self) {
-        if !self.finished {
-            self.kill_group();
-            let _ = self.child.wait();
+        #[cfg(not(target_os = "linux"))]
+        {
+            if !self.finished {
+                self.kill_group();
+                let _ = self.child.wait();
+            }
         }
     }
 }
@@ -1356,6 +1348,7 @@ fn verify_capture_context(dir: &Path, artifacts: &[Artifact]) -> Result<(), Stri
 
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
+    let (plan, _, _) = bound_run(&out)?;
     let mut registry = Vec::<Artifact>::new();
     let capture_context = admit_capture_context(&out)?;
     let execution_context = execution::admit(&out)?;
@@ -1370,13 +1363,21 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let mut factor_base_verified = false;
     let result = (|| {
         let case = telemetry::measured(&out, &mut registry, "curve-construction", || {
-            curves::generate(config)
+            if plan.planted() {
+                curves::generate_planted(config)
+            } else {
+                curves::generate(config)
+            }
         })?;
         telemetry::measured(&out, &mut registry, "known-answer-replay", || {
             curves::verify(&case.public_instance, &case.private_witness)
         })?;
         telemetry::measured(&out, &mut registry, "factor-base-replay", || {
-            curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)
+            if plan.planted() {
+                curves::verify_planted(config, &case)
+            } else {
+                curves::verify_factor_base(&case.public_instance, &case.factor_base)
+            }
         })?;
         registry.push(storage::write_json(
             &out,
@@ -1433,6 +1434,7 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 "protocol.json",
                 "attempt.json",
                 "worker-process.json",
+                "whole-worker-counter.json",
                 "host.json",
                 "worker-artifacts.json",
                 "measurement-policy.json",
@@ -1520,6 +1522,7 @@ fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
                 "run.json" => ("restricted-run-binding", "json"),
                 "protocol.json" => ("restricted-frozen-protocol", "json"),
                 "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
+                "whole-worker-counter.json" => ("restricted-whole-worker-counter/v1", "json"),
                 "host.json" => ("host-measurement-context", "json"),
                 "worker-artifacts.json" => ("artifact-registry", "json"),
                 "capture-binding.json" => ("partial-capture-binding", "json"),
@@ -1580,7 +1583,6 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         || a.seconds_per_case == 0
         || a.memory_mib < 128
         || a.trace_mib == 0
-        || (a.publish && (a.snapshot_seconds == 0 || a.snapshot_timeout_seconds == 0))
     {
         return Err("invalid cell, shard, time, memory or trace limit".into());
     }
@@ -1626,7 +1628,6 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     }
     let _lease = Lease::acquire(&a.out)?;
     let out = checked_directory(&a.out, false)?;
-    let budget_policy_sha256 = session.as_ref().map(|s| s.policy().sha256()).transpose()?;
     assert_no_workers(&out)?;
     let plan_sha = plan.binding_sha256()?;
     if let Some(session) = &session {
@@ -1640,22 +1641,11 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         })?;
     }
     let context = budget_transport(session)?;
-    let mut binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
+    let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
         "source_commit":source,"binary_sha256":binary_sha,"shard_index":a.shard_index,
         "shard_count":a.shard_count,"seconds_per_case":a.seconds_per_case,"memory_mib":a.memory_mib,
         "trace_mib":a.trace_mib,"execution_context_required":cfg!(target_os = "linux"),"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
-    if a.publish {
-        binding["partial_capture"] = json!({
-            "schema":"crypto.ml-dataset.capture-policy/v1",
-            "interval_seconds":a.snapshot_seconds,
-            "helper_timeout_seconds":a.snapshot_timeout_seconds,
-            "limits":live::capture_limits(a.trace_mib)?,
-            "snapshot_limits":snapshot::SnapshotLimits::default(),
-            "solver_state_restorable":false,
-            "budget_policy_sha256":budget_policy_sha256,
-        });
-    }
     let result = (|| {
         storage::write_json(&out, "run.json", "run-binding", &binding)?;
         storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
@@ -1729,16 +1719,6 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 "partial-capture-limits",
                 &capture::capture_limits(a.trace_mib)?,
             )?;
-            // Freeze context and acknowledge its partial snapshot before starting
-            // the solver clock. Helpers inherit the same owner's current ledger.
-            let mut live_capture = if a.publish {
-                let mut capture =
-                    live::LiveSupervisor::new_with_budget(&out, &dir, a, context.as_ref())?;
-                capture.flush(snapshot::AttemptStatus::Running, None, None)?;
-                Some(capture)
-            } else {
-                None
-            };
             let stdout = OpenOptions::new()
                 .write(true)
                 .create_new(true)
@@ -1749,75 +1729,118 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 .create_new(true)
                 .open(dir.join("stderr.log"))
                 .map_err(|e| e.to_string())?;
-            let mut command = Command::new(&exe);
-            command
-                .args(["dataset", "worker", "--config"])
-                .arg(dir.join("config.json"))
-                .arg("--out")
-                .arg(&dir)
-                .env("RAYON_NUM_THREADS", "1")
-                .stdout(Stdio::from(stdout))
-                .stderr(Stdio::from(stderr));
             let memory = a
                 .memory_mib
                 .checked_mul(1024 * 1024)
                 .ok_or("memory limit overflow")?;
-            #[cfg(target_os = "linux")]
-            {
-                use std::os::unix::process::CommandExt;
-                let parent = std::process::id();
-                // Limit the child only. Kill it if its supervising process vanishes.
-                unsafe {
-                    command.pre_exec(move || {
-                        if libc::setpgid(0, 0) != 0 {
-                            return Err(std::io::Error::last_os_error());
-                        }
-                        if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
-                            return Err(std::io::Error::last_os_error());
-                        }
-                        if libc::getppid() as u32 != parent {
-                            return Err(std::io::Error::other("supervisor exited"));
-                        }
-                        let limit = libc::rlimit {
-                            rlim_cur: memory,
-                            rlim_max: memory,
-                        };
-                        if libc::setrlimit(libc::RLIMIT_AS, &limit) != 0 {
-                            return Err(std::io::Error::last_os_error());
-                        }
-                        Ok(())
-                    });
-                }
-            }
-            #[cfg(all(unix, not(target_os = "linux")))]
-            {
-                use std::os::unix::process::CommandExt;
-                command.process_group(0);
-            }
             let launch_context = if cfg!(target_os = "linux") {
                 Some(execution::create(&dir)?)
             } else {
                 None
             };
             let start = Instant::now();
+            #[cfg(target_os = "linux")]
             let mut child = SupervisedChild {
-                child: command.spawn().map_err(|e| e.to_string())?,
-                finished: false,
+                child: {
+                    use std::os::unix::process::CommandExt;
+                    let parent = std::process::id();
+                    let args = [
+                        OsString::from("dataset"),
+                        OsString::from("worker"),
+                        OsString::from("--config"),
+                        dir.join("config.json").into_os_string(),
+                        OsString::from("--out"),
+                        dir.clone().into_os_string(),
+                    ];
+                    GatedWorker::spawn_configured(exe.as_os_str(), &args, |command| {
+                        command
+                            .env("RAYON_NUM_THREADS", "1")
+                            .stdout(Stdio::from(stdout))
+                            .stderr(Stdio::from(stderr));
+                        // These settings apply to the blocked gate and survive
+                        // its final exec into the dataset worker.
+                        unsafe {
+                            command.pre_exec(move || {
+                                if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
+                                    return Err(std::io::Error::last_os_error());
+                                }
+                                if libc::getppid() as u32 != parent {
+                                    return Err(std::io::Error::other("supervisor exited"));
+                                }
+                                let limit = libc::rlimit {
+                                    rlim_cur: memory,
+                                    rlim_max: memory,
+                                };
+                                if libc::setrlimit(libc::RLIMIT_AS, &limit) != 0 {
+                                    return Err(std::io::Error::last_os_error());
+                                }
+                                Ok(())
+                            });
+                        }
+                    })
+                    .map_err(|e| e.to_string())?
+                },
+            };
+            #[cfg(not(target_os = "linux"))]
+            let mut child = {
+                let mut command = Command::new(&exe);
+                command
+                    .args(["dataset", "worker", "--config"])
+                    .arg(dir.join("config.json"))
+                    .arg("--out")
+                    .arg(&dir)
+                    .env("RAYON_NUM_THREADS", "1")
+                    .stdout(Stdio::from(stdout))
+                    .stderr(Stdio::from(stderr));
+                #[cfg(unix)]
+                {
+                    use std::os::unix::process::CommandExt;
+                    command.process_group(0);
+                }
+                SupervisedChild {
+                    child: command.spawn().map_err(|e| e.to_string())?,
+                    finished: false,
+                }
             };
             storage::write_json(
                 &dir,
                 "worker-process.json",
                 "process-provenance",
                 &json!({
-            "worker_pid":child.child.id(),"supervisor_pid":std::process::id(),
-            "output":dir,"process_group":child.child.id()}),
+            "worker_pid":child.pid(),"supervisor_pid":std::process::id(),
+            "output":dir,"process_group":child.pid()}),
             )?;
+            #[cfg(target_os = "linux")]
+            let (collector, attach_status, attach_error) = match Collector::attach(child.pid()) {
+                Ok(collector) => (Some(collector), "observed", None),
+                Err(error) => {
+                    let unavailable = matches!(
+                        error.raw_os_error(),
+                        Some(libc::EPERM | libc::EACCES | libc::ENOSYS | libc::EOPNOTSUPP)
+                    );
+                    (
+                        None,
+                        if unavailable {
+                            "perf_unavailable"
+                        } else {
+                            "attach_failed"
+                        },
+                        Some(error.to_string()),
+                    )
+                }
+            };
+            #[cfg(target_os = "linux")]
+            let cgroup_start = pmu_containment::Start::capture(child.pid());
+            #[cfg(target_os = "linux")]
+            child.child.release().map_err(|error| {
+                let _ = child.stop();
+                format!("worker gate release failed: {error}")
+            })?;
             let mut stop_reason = None;
-            let mut publication_failure = None;
             let exit = loop {
                 let polled = child.poll()?;
-                // Preserve main's conservative original-deadline censoring even
-                // when a successful exit is first observed after that deadline.
+                // A successful exit observed at/after the original deadline is
+                // conservatively censored, even if it occurred between polls.
                 let expired = if let Some(launch) = &launch_context {
                     execution::deadline_expired(
                         launch.deadline_monotonic_ns,
@@ -1832,18 +1855,6 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 if let Some(status) = polled {
                     break status;
                 }
-                if let Some(capture) = live_capture.as_mut() {
-                    if let Err(error) = capture.poll() {
-                        publication_failure = Some(error);
-                        break child.stop()?;
-                    }
-                    if capture.capture_stopped()? {
-                        stop_reason = Some("capture_budget_exhausted");
-                    }
-                    if capture.capacity_exhausted() {
-                        stop_reason = Some("snapshot_chain_limit");
-                    }
-                }
                 let bytes = tree_bytes_while_running(&dir)?;
                 if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
                     stop_reason = Some("trace_budget_exhausted");
@@ -1853,66 +1864,85 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 }
                 std::thread::sleep(Duration::from_millis(100));
             };
-            let worker_elapsed = start.elapsed();
+            #[cfg(target_os = "linux")]
+            let counter_status = {
+                let cgroup_diagnostic = match cgroup_start {
+                    Ok(start) => start.finish(),
+                    Err(error) => pmu_containment::unavailable(child.pid(), error),
+                };
+                let (status, observation, error, event_id, attr_size, attr_flags) =
+                    if let Some(collector) = collector.as_ref() {
+                        match collector.read() {
+                            Ok(o) => (
+                                if o.time_enabled_ns == 0 {
+                                    "not_running"
+                                } else if o.time_running_ns != o.time_enabled_ns {
+                                    "multiplexed"
+                                } else {
+                                    "observed"
+                                },
+                                Some(o),
+                                None,
+                                Some(collector.event_id),
+                                Some(collector.attr_size),
+                                Some(collector.attr_flags),
+                            ),
+                            Err(e) => (
+                                "read_failed",
+                                None,
+                                Some(e.to_string()),
+                                Some(collector.event_id),
+                                Some(collector.attr_size),
+                                Some(collector.attr_flags),
+                            ),
+                        }
+                    } else {
+                        (attach_status, None, attach_error, None, None, None)
+                    };
+                storage::write_json(
+                    &dir,
+                    "whole-worker-counter.json",
+                    "restricted-whole-worker-counter/v1",
+                    &json!({
+                        "schema":"crypto.ml-dataset.whole-worker-counter/v1",
+                        "attempt_binding":capture_binding,
+                        "gate_pid":child.pid(),"process_group":child.pid(),
+                        "event_id":event_id,"attr_size":attr_size,"attr_flags":attr_flags,
+                        "observation":observation.map(|o| json!({
+                            "raw_instructions":o.raw_instructions,
+                            "time_enabled_ns":o.time_enabled_ns,
+                            "time_running_ns":o.time_running_ns,
+                            "event_id":o.event_id,
+                        })),
+                        "status":status,"error":error,
+                        "worker_exit_success":exit.success(),"worker_exit_code":exit.code(),
+                        "cgroup_diagnostic":cgroup_diagnostic,
+                        "descendants_terminated_and_accounted":false,
+                        "platform_admitted":false,"eligible_instructions":null,
+                    }),
+                )?;
+                status
+            };
             let final_bytes = tree_bytes_while_running(&dir)?;
             if final_bytes > a.trace_mib.saturating_mul(1024 * 1024) {
                 stop_reason = Some("trace_budget_exhausted");
-            }
-            if let Some(error) = publication_failure {
-                storage::write_json(
-                    &dir,
-                    "publication-failure.json",
-                    "local-publication-failure",
-                    &json!({
-                        "schema":"crypto.ml-dataset.publication-failure/v1", "reason":error,
-                        "worker_exit_code":exit.code(), "worker_elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
-                        "remote_terminal_observation_verified":false,
-                        "local_artifacts_retained":true,"wave_stopped":true,
-                    }),
-                )?;
-                return Err(format!(
-                "partial publication failed; worker stopped and local artifacts retained: {error}"
-            ));
-            }
-            if let Some(capture) = live_capture.as_mut() {
-                if capture.capture_stopped()? {
-                    stop_reason = Some("capture_budget_exhausted");
-                }
-                let status = if stop_reason.is_some() || !exit.success() {
-                    snapshot::AttemptStatus::Interrupted
-                } else {
-                    snapshot::AttemptStatus::Exited
-                };
-                if let Err(error) = capture.flush(status, exit.code(), stop_reason) {
-                    storage::write_json(
-                        &dir,
-                        "publication-failure.json",
-                        "local-publication-failure",
-                        &json!({
-                            "schema":"crypto.ml-dataset.publication-failure/v1","reason":error,
-                            "worker_exit_code":exit.code(),"remote_terminal_observation_verified":false,
-                            "local_artifacts_retained":true,"wave_stopped":true,
-                        }),
-                    )?;
-                    return Err(error);
-                }
             }
             let mut outcome: Value = if dir.join("result.json").exists() {
                 read_json(&dir.join("result.json"))?
             } else {
                 json!({"status":"worker_failed","solver_completed":false})
             };
-            if let Some(reason) = stop_reason {
-                outcome = json!({"status":reason,"solver_completed":false});
-            }
-            if !exit.success() && stop_reason.is_none() {
-                outcome = json!({"status":"worker_failed","exit_code":exit.code(),"solver_completed":false});
-            }
             outcome =
                 execution::terminal_outcome(outcome, stop_reason, exit.success(), exit.code());
-            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
+            #[cfg(target_os = "linux")]
+            let instruction_counter_status =
+                format!("whole_worker_raw_{counter_status}; solve_cost_unadmitted");
+            #[cfg(not(target_os = "linux"))]
+            let instruction_counter_status =
+                "whole_worker_not_counted; see phase telemetry for available hardware counts";
+            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
-            "instruction_counter_status":"whole_worker_not_counted; see phase telemetry for available hardware counts","memory_limit_bytes":memory,
+            "instruction_counter_status":instruction_counter_status,"memory_limit_bytes":memory,
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
             "output_budget_scope":"all_cell_files_before_manifest_seal",
             "checkpoint_mid_call":false,"interrupted_trace_loss_possible":true});
@@ -1944,14 +1974,6 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_output_bytes_before_seal":final_bytes,"sealed_manifest_bytes":manifest_bytes,
             "publication_metadata_bytes":publication_bytes})
             );
-            if matches!(
-                stop_reason,
-                Some("capture_budget_exhausted" | "snapshot_chain_limit")
-            ) {
-                return Err(
-                    "capture stopped; retained the acknowledged prefix and stopped the wave".into(),
-                );
-            }
         }
         println!("{}", verify_run(&out, true)?);
         Ok(())
@@ -2500,7 +2522,17 @@ fn cell_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
 /// Keep the exported outcome labels no stronger than the certificate's terminal
 /// state. This also runs during hash-only verification as a consistency check;
 /// mathematical replay remains the separate `replay` gate below.
-fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(), String> {
+fn verify_prime_root_outcome(outcome: &Value, certificate: &Value, m: usize) -> Result<(), String> {
+    let chain = (3..=15).contains(&m);
+    if chain {
+        if certificate["strategy"] != "prime-affine-s3-chain-prefix-root/v1"
+            || certificate["m"] != m
+        {
+            return Err("prime-root chain certificate strategy or arity differs".into());
+        }
+    } else if m != 2 || !certificate["strategy"].is_null() || !certificate["m"].is_null() {
+        return Err("prime-root m=2 certificate contains chain metadata".into());
+    }
     verify_root_outcome(outcome, certificate, solvers::PRIME_ROOT_CERTIFICATE_SCOPE)?;
     let queries = certificate["queries"]
         .as_array()
@@ -2657,13 +2689,44 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
     if (found && censored) || (censored && all_queries) || (!found && !censored && !all_queries) {
         return Err("inconsistent prime-root aggregate termination".into());
     }
+    let chain = scope == solvers::PRIME_ROOT_CERTIFICATE_SCOPE
+        && certificate["strategy"] == "prime-affine-s3-chain-prefix-root/v1";
+    let infinity_prefix = certificate["infinity_prefix_encountered"].as_bool();
+    if chain && infinity_prefix.is_none() {
+        return Err("prime-root chain certificate lacks affine-infinity result".into());
+    }
+    if !chain
+        && (!certificate["infinity_prefix_encountered"].is_null()
+            || !outcome["root_termination_cause"].is_null())
+    {
+        return Err("non-chain root certificate contains chain termination metadata".into());
+    }
+    if infinity_prefix == Some(true) && (!censored || found) {
+        return Err("inconsistent affine-infinity termination".into());
+    }
     let expected_status = if found {
         "verified"
+    } else if infinity_prefix == Some(true) {
+        "partial"
     } else if censored {
         "budget_exhausted"
     } else {
         "partial"
     };
+    if let Some(infinity_prefix) = infinity_prefix {
+        let cause = if found {
+            "found_pdp"
+        } else if infinity_prefix {
+            "affine_infinity_prefix"
+        } else if censored {
+            "work_or_trace_cap"
+        } else {
+            "affine_prefixes_exhausted"
+        };
+        if outcome["root_termination_cause"] != cause {
+            return Err("prime-root termination cause differs from certificate".into());
+        }
+    }
     if outcome["root_execution_trace_complete_verified"] != false
         || outcome["root_total_operation_count_verified"] != false
         || outcome["trace_complete"] != false
@@ -2685,83 +2748,108 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
     Ok(())
 }
 
-/// New generic v2 claims require the exact independently replayable transcript
-/// and one bound payload per native batch. V1 behavior remains in its replayer.
-fn verify_generic_filter_artifacts(
+fn verify_whole_worker_counter(
     dir: &Path,
-    manifest: &CellManifest,
-    complete_factor_base: bool,
+    artifacts: &[Artifact],
+    outcome: &Value,
 ) -> Result<(), String> {
-    let transcripts: Vec<_> = manifest
-        .artifacts
+    let counter = artifacts
         .iter()
-        .filter(|a| {
-            a.role == "large-prime-elimination-transcript"
-                || a.path == "generic-large-prime-transcript.json"
-        })
-        .collect();
-    let payloads: Vec<_> = manifest
-        .artifacts
-        .iter()
-        .filter(|a| {
-            a.role == relations::FILTER_CERTIFICATE_ROLE
-                || a.path.starts_with("generic-large-prime-filter-batch-")
-        })
-        .collect();
-    let mut v2 = None;
-    for artifact in &transcripts {
-        let value: Value = read_json(&dir.join(&artifact.path))?;
-        if value["schema"] == relations::GENERIC_V2_SCHEMA {
-            if v2.is_some()
-                || transcripts.len() != 1
-                || artifact.path != "generic-large-prime-transcript.json"
-                || artifact.role != "large-prime-elimination-transcript"
-                || artifact.encoding != "json"
-            {
-                return Err("generic v2 transcript role/path/uniqueness differs".into());
-            }
-            v2 = Some(value);
+        .find(|a| a.path == "whole-worker-counter.json");
+    let Some(artifact) = counter else {
+        if outcome["supervisor"]["instruction_counter_status"]
+            .as_str()
+            .is_some_and(|s| s.starts_with("whole_worker_raw_"))
+        {
+            return Err("whole-worker counter status lacks its restricted artifact".into());
         }
-    }
-    let claimed = manifest.outcome.get("filter_trace_policy").is_some()
-        || manifest.outcome.get("filter_trace_censored").is_some()
-        || manifest
-            .outcome
-            .get("recorded_row_transitions_verified")
-            .is_some();
-    let Some(transcript) = v2 else {
-        return if claimed || !payloads.is_empty() {
-            Err("generic filter trace claims/payloads lack their v2 transcript".into())
-        } else {
-            Ok(())
-        };
+        return Ok(()); // Historical cells predate the staged collector.
     };
-    if !complete_factor_base || manifest.config.solver != "double-large-prime" {
-        return Err("generic v2 filter transcript lacks public relation domain".into());
+    if artifact.role != "restricted-whole-worker-counter/v1" || artifact.encoding != "json" {
+        return Err("whole-worker counter has the wrong reserved role".into());
     }
-    let public: Value = read_json(&dir.join("public.json"))?;
-    let base: Value = read_json(&dir.join("factor-base.json"))?;
-    relations::verify_generic_v2_labels(
-        &public,
-        &base,
-        &manifest.config,
-        &transcript,
-        &manifest.outcome,
-    )?;
-    let expected = relations::generic_v2_filter_payloads(&transcript)?;
-    if payloads.len() != expected.len() {
-        return Err("generic v2 native batch payload count differs".into());
+    let counter: Value = read_json(&dir.join("whole-worker-counter.json"))?;
+    let process: Value = read_json(&dir.join("worker-process.json"))?;
+    let binding = serde_json::to_value(capture::AttemptBinding::from_cell_files(dir)?)
+        .map_err(|e| e.to_string())?;
+    let pid = process["worker_pid"]
+        .as_u64()
+        .filter(|n| *n > 0)
+        .ok_or("worker process lacks positive PID")?;
+    let status = counter["status"].as_str().ok_or("counter lacks status")?;
+    let event_id = counter["event_id"].as_u64();
+    #[cfg(target_os = "linux")]
+    if let Some(diagnostic) = counter.get("cgroup_diagnostic") {
+        pmu_containment::verify_diagnostic(diagnostic, pid)?;
     }
-    for payload in expected {
-        let matches: Vec<_> = payloads.iter().filter(|a| a.path == payload.path).collect();
-        if matches.len() != 1 || matches[0].role != payload.role || matches[0].encoding != "json" {
-            return Err("generic v2 native batch payload role/path differs".into());
+    let observation = &counter["observation"];
+    let valid_status = match status {
+        "perf_unavailable" | "attach_failed" => {
+            counter["event_id"].is_null()
+                && counter["attr_size"].is_null()
+                && counter["attr_flags"].is_null()
+                && observation.is_null()
+                && counter["error"].as_str().is_some_and(|s| !s.is_empty())
         }
-        let actual: Value = read_json(&dir.join(&payload.path))?;
-        let wanted: Value = serde_json::from_slice(&payload.bytes).map_err(|e| e.to_string())?;
-        if actual != wanted {
-            return Err("generic v2 native batch payload differs from transcript".into());
+        "read_failed" => {
+            event_id.is_some_and(|id| id > 0)
+                && observation.is_null()
+                && counter["error"].as_str().is_some_and(|s| !s.is_empty())
         }
+        "observed" | "multiplexed" | "not_running" => {
+            event_id.is_some_and(|id| id > 0)
+                && observation["event_id"].as_u64() == event_id
+                && observation["raw_instructions"].as_u64().is_some()
+                && observation["time_enabled_ns"].as_u64().is_some()
+                && observation["time_running_ns"].as_u64().is_some()
+                && counter["error"].is_null()
+                && match status {
+                    "observed" => {
+                        observation["time_enabled_ns"]
+                            .as_u64()
+                            .is_some_and(|n| n > 0)
+                            && observation["time_running_ns"] == observation["time_enabled_ns"]
+                    }
+                    "not_running" => observation["time_enabled_ns"] == 0,
+                    "multiplexed" => {
+                        observation["time_enabled_ns"]
+                            .as_u64()
+                            .is_some_and(|n| n > 0)
+                            && observation["time_running_ns"] != observation["time_enabled_ns"]
+                    }
+                    _ => false,
+                }
+        }
+        _ => false,
+    };
+    // v1 collector fixes the Linux perf_event_attr to 112 bytes with
+    // disabled|inherit|exclude_kernel|exclude_hv|enable_on_exec (0x1063).
+    let valid_attr = matches!(status, "perf_unavailable" | "attach_failed")
+        || (counter["attr_size"] == 112 && counter["attr_flags"] == 0x1063);
+    if counter["schema"] != "crypto.ml-dataset.whole-worker-counter/v1"
+        || counter["attempt_binding"] != binding
+        || counter["gate_pid"].as_u64() != Some(pid)
+        || counter["process_group"].as_u64() != Some(pid)
+        || process["process_group"].as_u64() != Some(pid)
+        || !counter["worker_exit_success"].is_boolean()
+        || counter["worker_exit_success"]
+            != outcome["supervisor"]["exit_code"]
+                .as_i64()
+                .map(|n| n == 0)
+                .unwrap_or(false)
+        || counter["worker_exit_code"] != outcome["supervisor"]["exit_code"]
+        || counter["descendants_terminated_and_accounted"] != false
+        || counter["platform_admitted"] != false
+        || !counter["eligible_instructions"].is_null()
+        || !outcome["supervisor"]["retired_instructions"].is_null()
+        || outcome["supervisor"]["instruction_counter_status"]
+            != format!("whole_worker_raw_{status}; solve_cost_unadmitted")
+        || !valid_status
+        || !valid_attr
+    {
+        return Err(
+            "whole-worker counter differs from original attempt or unadmitted scope".into(),
+        );
     }
     Ok(())
 }
@@ -2780,12 +2868,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
     verify_capture_context(dir, &manifest.artifacts)?;
     execution::verify(dir, &manifest.artifacts)?;
-    let wide_prime_replay = solvers::verify_prime_f4_wide(
-        dir,
-        &manifest.config,
-        &manifest.outcome,
-        &manifest.artifacts,
-    )?;
+    verify_whole_worker_counter(dir, &manifest.artifacts, &manifest.outcome)?;
     for required in [
         "config.json",
         "run.json",
@@ -2807,10 +2890,16 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("cell provenance differs from frozen plan".into());
     }
+    // Bind the original cell before admitting any specialized replay claim.
+    let wide_prime_replay = solvers::verify_prime_f4_wide(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
     let has = |path: &str| manifest.artifacts.iter().any(|a| a.path == path);
     let complete_known_answer = has("public.json") && has("witness.json");
     let complete_factor_base = has("public.json") && has("factor-base.json");
-    verify_generic_filter_artifacts(dir, &manifest, complete_factor_base)?;
     // Reserved native artifacts cannot evade replay by losing their role and
     // outcome fields together. Legacy root-polynomials.json is not a native
     // root-set certificate and remains compatible with its historical scope.
@@ -2867,7 +2956,11 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                 manifest.config.family.as_str(),
                 "prime" | "binary" | "koblitz"
             )
-            || manifest.config.m != 2
+            || (if binary_root {
+                manifest.config.m != 2
+            } else {
+                !(2..=15).contains(&manifest.config.m)
+            })
             || root_certificates.len() != 1
             || root_certificates[0].role != expected_root_role
             || root_certificates[0].encoding != "json")
@@ -2878,7 +2971,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             "prime-root"
         };
         return Err(format!(
-            "{kind} certificate lacks its unique public family/root/m2 domain"
+            "{kind} certificate lacks its unique public family/root/arity domain"
         ));
     }
     let root_certificate: Option<Value> = root_certificates
@@ -2889,14 +2982,17 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         if binary_root {
             verify_binary_root_outcome(&manifest.outcome, certificate)?;
         } else {
-            verify_prime_root_outcome(&manifest.outcome, certificate)?;
+            verify_prime_root_outcome(&manifest.outcome, certificate, manifest.config.m)?;
         }
         verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, binary_root, false)?;
     }
     let censored_m3_prefix = wide_prime_replay == solvers::WidePrimeReplay::CensoredM3Prefix;
+    let verified_dynamic = wide_prime_replay == solvers::WidePrimeReplay::VerifiedDynamic;
     let prime_chain_declared = !censored_m3_prefix
+        && !verified_dynamic
         && manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
     let prime_chain_input_expected = !censored_m3_prefix
+        && !verified_dynamic
         && manifest.config.family == "prime"
         && manifest.config.solver == "f4"
         && (3..=15).contains(&manifest.config.m)
@@ -2928,6 +3024,13 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     if manifest.outcome["factor_base_verified"] == true && !complete_factor_base {
         return Err("factor-base label lacks required artifacts".into());
     }
+    if plan.planted()
+        && (manifest.outcome["known_answer_verified"] == true
+            || manifest.outcome["factor_base_verified"] == true)
+        && !(complete_known_answer && complete_factor_base)
+    {
+        return Err("planted label lacks restricted construction replay inputs".into());
+    }
     if manifest.outcome["scalar_recovered_without_witness"] == true
         && !manifest
             .artifacts
@@ -2944,7 +3047,16 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("PDP label lacks its group replay certificate".into());
     }
-    if replay && complete_known_answer {
+    if replay && plan.planted() && complete_known_answer && complete_factor_base {
+        curves::verify_planted(
+            &manifest.config,
+            &types::CaseData {
+                public_instance: read_json(&dir.join("public.json"))?,
+                private_witness: read_json(&dir.join("witness.json"))?,
+                factor_base: read_json(&dir.join("factor-base.json"))?,
+            },
+        )?;
+    } else if replay && complete_known_answer && !plan.planted() {
         curves::verify(
             &read_json(&dir.join("public.json"))?,
             &read_json(&dir.join("witness.json"))?,
@@ -2953,9 +3065,9 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     if replay && complete_factor_base {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
-        curves::verify_factor_base_config(&manifest.config, &public, &base).map_err(|error| {
-            format!("factor base differs from frozen cell configuration: {error}")
-        })?;
+        if !plan.planted() {
+            curves::verify_factor_base(&public, &base)?;
+        }
         if has("prime-f4-input.json") && !censored_m3_prefix {
             let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
             // The m=2 reference uses the same filename with a legacy schema.
@@ -3021,14 +3133,12 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             }
             if artifact.role == "large-prime-elimination-transcript" {
                 let transcript: Value = read_json(&dir.join(&artifact.path))?;
-                let requested_work = if transcript["schema"]
-                    == "ml-ecdlp-generic-large-prime-transcript/v1"
-                    || transcript["schema"] == relations::GENERIC_V2_SCHEMA
-                {
-                    transcript["requested_work"].as_u64()
-                } else {
-                    transcript["requested_work_limit"].as_u64()
-                };
+                let requested_work =
+                    if transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1" {
+                        transcript["requested_work"].as_u64()
+                    } else {
+                        transcript["requested_work_limit"].as_u64()
+                    };
                 if requested_work != Some(manifest.config.work_limit) {
                     return Err("relation transcript work limit differs from frozen cell".into());
                 }
@@ -3931,7 +4041,6 @@ mod tests {
             twists: true,
             protocol_sha256: None,
             split_rule: "curve-twist-component-sha256-v1".into(),
-            factor_base_policies: Vec::new(),
         }
     }
     #[cfg(target_os = "linux")]
@@ -4032,110 +4141,6 @@ mod tests {
         assert_eq!(a, b);
     }
 
-    #[test]
-    fn frozen_720_cell_pilot_keeps_bytes_and_legacy_mapping() {
-        let bytes = include_bytes!("../../research/ml_dataset_20261028/pilot-plan.json");
-        assert_eq!(
-            digest(bytes),
-            "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a"
-        );
-        let plan: DatasetPlan = serde_json::from_slice(bytes).unwrap();
-        plan.validate().unwrap();
-        assert_eq!(plan.cell_count().unwrap(), 720);
-        assert_eq!(
-            digest(&serde_json::to_vec(&plan).unwrap()),
-            "c905e878e3dcb29e407e743874d18b6b7091c097984f829820f26673ccd47f21"
-        );
-        let mut with_empty_axis = serde_json::to_value(&plan).unwrap();
-        with_empty_axis["factor_base_policies"] = json!([]);
-        assert!(serde_json::from_value::<DatasetPlan>(with_empty_axis).is_err());
-        let solvers = [
-            "bsgs",
-            "enumerate",
-            "root",
-            "sat",
-            "f4",
-            "f5",
-            "f6",
-            "weil",
-            "pkm",
-            "double-large-prime",
-        ];
-        for i in 0..720 {
-            let c = plan.cell(i).unwrap();
-            assert_eq!(c.solver, solvers[(i % 10) as usize]);
-            assert_eq!(c.twist, (i / 10) % 2 == 1);
-            assert_eq!(c.m, [2, 4, 15][((i / 20) % 3) as usize]);
-            assert_eq!(c.key_index, (i / 60) % 2);
-            assert_eq!(c.generator_index, (i / 120) % 2);
-            assert_eq!(c.curve_seed, 0);
-            assert_eq!(c.family, ["koblitz", "binary", "prime"][(i / 240) as usize]);
-            assert!(c.factor_base_policy.is_none());
-            assert!(!serde_json::to_string(&c)
-                .unwrap()
-                .contains("factor_base_policy"));
-        }
-        assert_eq!(
-            serde_json::to_string(&plan.cell(0).unwrap()).unwrap(),
-            r#"{"family":"koblitz","n":23,"m":2,"twist":false,"curve_seed":0,"generator_index":0,"key_index":0,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"bsgs"}"#
-        );
-        assert_eq!(
-            serde_json::to_string(&plan.cell(719).unwrap()).unwrap(),
-            r#"{"family":"prime","n":23,"m":15,"twist":true,"curve_seed":0,"generator_index":1,"key_index":1,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"double-large-prime"}"#
-        );
-    }
-
-    #[test]
-    fn policy_axis_preserves_every_matched_problem_and_rejects_ambiguous_versions() {
-        let legacy = plan();
-        let mut explicit = legacy.clone();
-        explicit.schema = "crypto.ml-dataset.plan/v2".into();
-        assert!(explicit.validate().is_err());
-        explicit.factor_base_policies = vec![
-            FactorBasePolicy::Legacy {},
-            FactorBasePolicy::SampledXProjectedControl {
-                candidate_limit: 256,
-            },
-            FactorBasePolicy::BinarySubspaceIntersection {
-                basis: vec![1, 2, 4],
-                candidate_limit: 8,
-            },
-        ];
-        explicit.validate().unwrap();
-        assert_eq!(
-            explicit.cell_count().unwrap(),
-            3 * legacy.cell_count().unwrap()
-        );
-        let solvers = legacy.solvers.len() as u64;
-        for index in 0..legacy.cell_count().unwrap() {
-            for policy_index in 0..3 {
-                let new_index =
-                    (index / solvers) * (solvers * 3) + policy_index * solvers + index % solvers;
-                let mut cell = explicit.cell(new_index).unwrap();
-                assert_eq!(
-                    cell.factor_base_policy.take().unwrap(),
-                    explicit.factor_base_policies[policy_index as usize]
-                );
-                assert_eq!(
-                    serde_json::to_vec(&cell).unwrap(),
-                    serde_json::to_vec(&legacy.cell(index).unwrap()).unwrap()
-                );
-            }
-        }
-        explicit.schema = legacy.schema.clone();
-        assert!(explicit.validate().is_err());
-        explicit.schema = "crypto.ml-dataset.plan/v2".into();
-        explicit
-            .factor_base_policies
-            .push(FactorBasePolicy::Legacy {});
-        assert!(explicit.validate().is_err());
-        explicit.factor_base_policies = vec![FactorBasePolicy::BinarySubspaceIntersection {
-            basis: vec![1, 2, 3],
-            candidate_limit: 8,
-        }];
-        assert!(explicit.validate().is_err());
-    }
-
     struct TempRun(PathBuf);
     impl TempRun {
         fn new() -> Self {
@@ -4170,18 +4175,9 @@ mod tests {
             (p, binding, protocol)
         }
         fn failed_cell(&self, p: &DatasetPlan, binding: &Value, protocol: &[u8]) -> PathBuf {
-            self.failed_cell_at(p, binding, protocol, 1)
-        }
-        fn failed_cell_at(
-            &self,
-            p: &DatasetPlan,
-            binding: &Value,
-            protocol: &[u8],
-            index: u64,
-        ) -> PathBuf {
-            let dir = self.0.join(format!("cells/{index:012}"));
+            let dir = self.0.join("cells/000000000001");
             fs::create_dir_all(&dir).unwrap();
-            let config = p.cell(index).unwrap();
+            let config = p.cell(1).unwrap();
             let mut artifacts = vec![
                 storage::write_json(&dir, "plan.json", "plan", p).unwrap(),
                 storage::write_json(&dir, "run.json", "run", binding).unwrap(),
@@ -4195,7 +4191,7 @@ mod tests {
                 artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
             }
             storage::write_json(&dir,"manifest.json","manifest",&CellManifest {
-                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:index,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
+                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:1,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
                 config,outcome:json!({"status":"worker_failed","known_answer_verified":false,"solver_completed":false}),artifacts,
             }).unwrap();
             dir
@@ -4205,6 +4201,87 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+
+    #[test]
+    fn planted_plan_binds_population_without_changing_natural_plan_bytes() {
+        let natural = plan();
+        assert_eq!(natural.schema, NATURAL_PLAN_SCHEMA);
+        natural.validate().unwrap();
+        let natural_bytes = serde_json::to_vec(&natural).unwrap();
+        assert!(std::str::from_utf8(&natural_bytes)
+            .unwrap()
+            .contains("plan/v1"));
+        let mut planted = natural.clone();
+        planted.schema = PLANTED_PLAN_SCHEMA.into();
+        planted.validate().unwrap();
+        assert_eq!(planted.cell(0).unwrap(), natural.cell(0).unwrap());
+        assert_ne!(
+            planted.binding_sha256().unwrap(),
+            natural.binding_sha256().unwrap()
+        );
+    }
+
+    #[test]
+    fn planted_plan_rejects_natural_only_factor_base_replay_paths() {
+        let mut planted = plan();
+        planted.schema = PLANTED_PLAN_SCHEMA.into();
+        planted.solvers = vec!["double-large-prime".into()];
+        assert!(planted
+            .validate()
+            .unwrap_err()
+            .contains("restricted factor-base replay"));
+
+        planted.solvers = vec!["f4".into()];
+        planted.families = vec!["prime".into()];
+        planted.field_sizes = vec![47];
+        assert!(planted.validate().unwrap_err().contains("wide-prime F4"));
+
+        planted.field_sizes = vec![23];
+        planted.validate().unwrap();
+        planted.schema = NATURAL_PLAN_SCHEMA.into();
+        planted.field_sizes = vec![47];
+        planted.validate().unwrap();
+    }
+
+    #[test]
+    fn planted_worker_keeps_construction_private_and_replays_it() {
+        let fixture = TempRun::new();
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.schema = PLANTED_PLAN_SCHEMA.into();
+        plan.factor_base_size = 4;
+        plan.solvers = vec!["enumerate".into()];
+        plan.work_limit = 20_000;
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        let dir = fixture.0.join("cells/000000000000");
+        fs::create_dir_all(&dir).unwrap();
+        let config = plan.cell(0).unwrap();
+        // `bound` wrote the original natural plan. This test constructs a
+        // different planted run, so replace only its test-local root binding.
+        fs::remove_file(fixture.0.join("plan.json")).unwrap();
+        fs::remove_file(fixture.0.join("run.json")).unwrap();
+        for root in [&fixture.0, &dir] {
+            storage::write_json(root, "plan.json", "plan", &plan).unwrap();
+            storage::write_json(root, "run.json", "run", &binding).unwrap();
+            storage::write_bytes(root, "protocol.json", "protocol", "json", &protocol).unwrap();
+        }
+        storage::write_json(&dir, "config.json", "config", &config).unwrap();
+        worker(&config, &dir).unwrap();
+        let public: Value = read_json(&dir.join("public.json")).unwrap();
+        let witness: Value = read_json(&dir.join("witness.json")).unwrap();
+        let base: Value = read_json(&dir.join("factor-base.json")).unwrap();
+        assert!(public.get("population").is_none());
+        assert!(public.get("construction_trace").is_none());
+        assert_eq!(base["rule"], "planted-known-log-subgroup/v1");
+        let case = types::CaseData {
+            public_instance: public,
+            private_witness: witness.clone(),
+            factor_base: base,
+        };
+        curves::verify_planted(&config, &case).unwrap();
+        let mut wrong = case;
+        wrong.private_witness["planted_construction"]["base_logs"][0] = json!("0");
+        assert!(curves::verify_planted(&config, &wrong).is_err());
     }
 
     #[test]
@@ -4239,24 +4316,58 @@ mod tests {
 
     #[test]
     fn prime_root_outcome_contract_covers_found_exhausted_and_censored() {
-        for (found, censored, all_queries, status, completed) in [
-            (true, false, false, "verified", true),
-            (true, false, true, "verified", true),
-            (false, false, true, "partial", true),
-            (false, true, false, "budget_exhausted", false),
+        for (found, censored, all_queries, infinity, status, cause, completed) in [
+            (true, false, false, false, "verified", "found_pdp", true),
+            (true, false, true, false, "verified", "found_pdp", true),
+            (
+                false,
+                false,
+                true,
+                false,
+                "partial",
+                "affine_prefixes_exhausted",
+                true,
+            ),
+            (
+                false,
+                true,
+                false,
+                false,
+                "budget_exhausted",
+                "work_or_trace_cap",
+                false,
+            ),
+            (
+                false,
+                true,
+                false,
+                true,
+                "partial",
+                "affine_infinity_prefix",
+                false,
+            ),
         ] {
-            let certificate = json!({"found_pdp":found,"censored":censored,
+            let certificate = json!({"strategy":"prime-affine-s3-chain-prefix-root/v1","m":3,
+                "found_pdp":found,"censored":censored,
                 "queries":[],"charged_work":0,
+                "infinity_prefix_encountered":infinity,
                 "root_queries_completed":all_queries,"execution_trace_complete_verified":false,
                 "total_operation_count_verified":false});
             let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
                 "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
                 "trace_complete":false,"scalar_recovered_without_witness":false,
                 "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
-                "pdp_witness_verified":found,"solver_completed":completed,"status":status,"counters":{
+                "pdp_witness_verified":found,"solver_completed":completed,"status":status,
+                "root_termination_cause":cause,"counters":{
                     "aggregate_root_field_and_group_work":0,"root_solver_calls":0,
                     "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
-            verify_prime_root_outcome(&outcome, &certificate).unwrap();
+            verify_prime_root_outcome(&outcome, &certificate, 3).unwrap();
+            let mut missing_infinity = certificate.clone();
+            missing_infinity
+                .as_object_mut()
+                .unwrap()
+                .remove("infinity_prefix_encountered");
+            assert!(verify_prime_root_outcome(&outcome, &missing_infinity, 3).is_err());
             for field in [
                 "root_execution_trace_complete_verified",
                 "root_total_operation_count_verified",
@@ -4268,7 +4379,7 @@ mod tests {
                 let mut bad = outcome.clone();
                 bad[field] = json!(true);
                 assert!(
-                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    verify_prime_root_outcome(&bad, &certificate, 3).is_err(),
                     "{field}"
                 );
             }
@@ -4276,6 +4387,7 @@ mod tests {
                 ("pdp_witness_verified", json!(!found)),
                 ("solver_completed", json!(!completed)),
                 ("status", json!("unsupported")),
+                ("root_termination_cause", json!("work_or_trace_cap_typo")),
                 (
                     "root_certificate_scope",
                     json!("full execution trace verified"),
@@ -4284,11 +4396,35 @@ mod tests {
                 let mut bad = outcome.clone();
                 bad[field] = value;
                 assert!(
-                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    verify_prime_root_outcome(&bad, &certificate, 3).is_err(),
                     "{field}"
                 );
             }
         }
+    }
+
+    #[test]
+    fn prime_root_m2_rejects_injected_affine_infinity_label() {
+        let certificate = json!({"found_pdp":false,"censored":true,
+            "queries":[],"charged_work":0,"root_queries_completed":false,
+            "execution_trace_complete_verified":false,"total_operation_count_verified":false});
+        let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
+            "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
+            "trace_complete":false,"scalar_recovered_without_witness":false,
+            "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
+            "pdp_witness_verified":false,"solver_completed":false,"status":"budget_exhausted",
+            "counters":{"aggregate_root_field_and_group_work":0,"root_solver_calls":0,
+                "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
+        verify_prime_root_outcome(&outcome, &certificate, 2).unwrap();
+        let mut injected_certificate = certificate.clone();
+        let mut injected_outcome = outcome.clone();
+        injected_certificate["infinity_prefix_encountered"] = json!(true);
+        injected_outcome["status"] = json!("partial");
+        injected_outcome["root_termination_cause"] = json!("affine_infinity_prefix");
+        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
+        injected_certificate["strategy"] = json!("prime-affine-s3-chain-prefix-root/v1");
+        injected_certificate["m"] = json!(3);
+        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
     }
 
     #[test]
@@ -6529,137 +6665,6 @@ mod tests {
     }
 
     #[test]
-    fn sealed_root_censoring_cannot_be_promoted_by_manifest_tampering() {
-        for family in ["prime", "binary", "koblitz"] {
-            let fixture = TempRun::new();
-            let (mut plan, mut binding, protocol) = fixture.bound();
-            // This chooses the same public n=11, seed=7, generator/key=1 fixture
-            // already used by the curve and root adapter tests; no experimental
-            // campaign cell is generated. Work=1 stops before S3 setup.
-            plan.field_sizes = vec![11];
-            plan.families = vec![family.into()];
-            plan.solvers = vec!["root".into()];
-            plan.curve_seeds = 8;
-            plan.generators = 2;
-            plan.keys = 2;
-            plan.seed = 42;
-            plan.factor_base_size = 8;
-            plan.work_limit = 1;
-            plan.validate().unwrap();
-            binding["plan_sha256"] = json!(digest(&serde_json::to_vec(&plan).unwrap()));
-            fs::write(
-                fixture.0.join("plan.json"),
-                serde_json::to_vec(&plan).unwrap(),
-            )
-            .unwrap();
-            fs::write(
-                fixture.0.join("run.json"),
-                serde_json::to_vec(&binding).unwrap(),
-            )
-            .unwrap();
-            let dir = fixture.failed_cell_at(&plan, &binding, &protocol, 63);
-            let mut manifest: CellManifest = read_json(&dir.join("manifest.json")).unwrap();
-            assert_eq!(manifest.config.curve_seed, 7);
-            assert_eq!(manifest.config.generator_index, 1);
-            assert_eq!(manifest.config.key_index, 1);
-            let case = curves::generate(&manifest.config).unwrap();
-            let solved = solvers::solve(&manifest.config, &case).unwrap();
-            assert_eq!(solved.outcome["status"], "budget_exhausted");
-            manifest.artifacts.push(
-                storage::write_json(
-                    &dir,
-                    "public.json",
-                    "public-instance",
-                    &case.public_instance,
-                )
-                .unwrap(),
-            );
-            manifest.artifacts.push(
-                storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
-                    .unwrap(),
-            );
-            for artifact in solved.artifacts {
-                manifest.artifacts.push(
-                    storage::write_bytes(
-                        &dir,
-                        &artifact.path,
-                        &artifact.role,
-                        &artifact.encoding,
-                        &artifact.bytes,
-                    )
-                    .unwrap(),
-                );
-            }
-            manifest.outcome = solved.outcome;
-            manifest.outcome["known_answer_verified"] = json!(false);
-            manifest.outcome["factor_base_verified"] = json!(true);
-            let original = manifest.outcome.clone();
-            let save_manifest = |manifest: &CellManifest| {
-                fs::write(
-                    dir.join("manifest.json"),
-                    serde_json::to_vec(manifest).unwrap(),
-                )
-                .unwrap();
-            };
-            save_manifest(&manifest);
-            verify_cell(&dir, false).unwrap();
-            verify_cell(&dir, true).unwrap();
-            for (field, value) in [
-                ("root_execution_trace_complete_verified", json!(true)),
-                ("root_total_operation_count_verified", json!(true)),
-                ("trace_complete", json!(true)),
-                ("solver_completed", json!(true)),
-                ("pdp_witness_verified", json!(true)),
-                (
-                    "root_certificate_scope",
-                    json!("full execution trace verified"),
-                ),
-                ("status", json!("verified")),
-                ("status", json!("partial")),
-            ] {
-                manifest.outcome = original.clone();
-                manifest.outcome[field] = value;
-                save_manifest(&manifest);
-                for replay in [false, true] {
-                    assert!(
-                        verify_cell(&dir, replay)
-                            .unwrap_err()
-                            .contains("prime-root outcome labels"),
-                        "{field}/{replay}"
-                    );
-                }
-            }
-            assert!(export::export(&fixture.0, &fixture.0.join("export"))
-                .unwrap_err()
-                .contains("prime-root outcome labels"));
-            manifest.outcome = original;
-            save_manifest(&manifest);
-            verify_cell(&dir, true).unwrap();
-            let output = fixture.0.join("valid-export");
-            export::export(&fixture.0, &output).unwrap();
-            let targets: Vec<Value> = fs::read_to_string(output.join("restricted/targets.jsonl"))
-                .unwrap()
-                .lines()
-                .map(|line| serde_json::from_str(line).unwrap())
-                .collect();
-            assert_eq!(targets.len(), 1);
-            let role = if family == "prime" {
-                "prime-root-certificates/v1"
-            } else {
-                "binary-root-certificates/v1"
-            };
-            assert!(targets[0]["solution_certificates"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .any(|a| a["role"] == role));
-            let features = fs::read_to_string(output.join("features.jsonl")).unwrap();
-            assert!(!features.contains("root_certificate"));
-            assert!(!features.contains("acknowledged_native"));
-        }
-    }
-
-    #[test]
     fn resume_rejects_valid_same_plan_cell_from_another_run_binding() {
         let fixture = TempRun::new();
         let (plan, binding, protocol) = fixture.bound();
@@ -6842,6 +6847,98 @@ mod tests {
     }
 
     #[test]
+    fn whole_worker_counter_replay_rejects_mutated_identity_and_admission() {
+        let f = TempRun::new();
+        let (p, binding, protocol) = f.bound();
+        let dir = f.failed_cell(&p, &binding, &protocol);
+        let attempt = json!({"schema":"crypto.ml-dataset.attempt/v1",
+            "cell_index":1,"plan_sha256":binding["plan_sha256"]});
+        fs::write(
+            dir.join("attempt.json"),
+            serde_json::to_vec(&attempt).unwrap(),
+        )
+        .unwrap();
+        let process = json!({"worker_pid":4242,"process_group":4242});
+        fs::write(
+            dir.join("worker-process.json"),
+            serde_json::to_vec(&process).unwrap(),
+        )
+        .unwrap();
+        let attempt_binding = capture::AttemptBinding::from_cell_files(&dir).unwrap();
+        let baseline = json!({
+            "schema":"crypto.ml-dataset.whole-worker-counter/v1",
+            "attempt_binding":attempt_binding,"gate_pid":4242,"process_group":4242,
+            "event_id":17,"attr_size":112,"attr_flags":0x1063,
+            "observation":{"raw_instructions":900,"time_enabled_ns":100,
+                "time_running_ns":100,"event_id":17},
+            "status":"observed","error":null,
+            "worker_exit_success":true,"worker_exit_code":0,
+            "descendants_terminated_and_accounted":false,
+            "platform_admitted":false,"eligible_instructions":null,
+        });
+        let artifact = Artifact {
+            path: "whole-worker-counter.json".into(),
+            role: "restricted-whole-worker-counter/v1".into(),
+            encoding: "json".into(),
+            sha256: "0".repeat(64),
+            bytes: 0,
+        };
+        let outcome = json!({"supervisor":{"exit_code":0,"retired_instructions":null,
+            "instruction_counter_status":"whole_worker_raw_observed; solve_cost_unadmitted"}});
+        let check = |record: &Value| {
+            fs::write(
+                dir.join("whole-worker-counter.json"),
+                serde_json::to_vec(record).unwrap(),
+            )
+            .unwrap();
+            verify_whole_worker_counter(&dir, std::slice::from_ref(&artifact), &outcome)
+        };
+        check(&baseline).unwrap();
+        #[cfg(target_os = "linux")]
+        {
+            let mut with_diagnostic = baseline.clone();
+            with_diagnostic["cgroup_diagnostic"] = json!({
+                "status":"empty_observed_no_migration_proof","worker_pid":4242,
+                "relative_path":"/worker","cgroup_inode":17,
+                "shared_with_supervisor":false,"populated_after_exit":false,
+                "direct_members_after_exit":0,"no_migration_proven":false,
+            });
+            check(&with_diagnostic).unwrap();
+            with_diagnostic["cgroup_diagnostic"]["no_migration_proven"] = json!(true);
+            assert!(check(&with_diagnostic).is_err());
+        }
+        for (path, value) in [
+            ("gate_pid", json!(4243)),
+            ("event_id", json!(18)),
+            ("attr_size", json!(120)),
+            ("attr_flags", json!(0)),
+            ("attempt_binding", json!({})),
+            ("eligible_instructions", json!(900)),
+            ("descendants_terminated_and_accounted", json!(true)),
+            ("platform_admitted", json!(true)),
+        ] {
+            let mut changed = baseline.clone();
+            changed[path] = value;
+            assert!(check(&changed).is_err(), "accepted counter mutation {path}");
+        }
+        let mut unavailable = baseline;
+        unavailable["status"] = json!("perf_unavailable");
+        unavailable["event_id"] = Value::Null;
+        unavailable["attr_size"] = Value::Null;
+        unavailable["attr_flags"] = Value::Null;
+        unavailable["observation"] = Value::Null;
+        unavailable["error"] = json!("perf_event_open denied");
+        let unavailable_outcome = json!({"supervisor":{"exit_code":0,"retired_instructions":null,
+            "instruction_counter_status":"whole_worker_raw_perf_unavailable; solve_cost_unadmitted"}});
+        fs::write(
+            dir.join("whole-worker-counter.json"),
+            serde_json::to_vec(&unavailable).unwrap(),
+        )
+        .unwrap();
+        verify_whole_worker_counter(&dir, &[artifact], &unavailable_outcome).unwrap();
+    }
+
+    #[test]
     fn lease_is_exclusive_and_released_on_drop() {
         let f = TempRun::new();
         let lease = Lease::acquire(&f.0).unwrap();
@@ -6864,21 +6961,14 @@ mod tests {
         assert_eq!(fs::read(f.0.join("original")).unwrap(), b"unchanged");
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     #[test]
     fn supervisor_guard_reaps_child_on_error_path() {
-        use std::os::unix::process::CommandExt;
-        let child = Command::new("sleep")
-            .arg("30")
-            .process_group(0)
-            .spawn()
-            .unwrap();
-        let pid = child.id();
+        let mut child = GatedWorker::spawn("/bin/sleep", &["30"]).unwrap();
+        let pid = child.pid();
+        child.release().unwrap();
         let start = Instant::now();
-        drop(SupervisedChild {
-            child,
-            finished: false,
-        });
+        drop(SupervisedChild { child });
         assert!(start.elapsed() < Duration::from_secs(3));
         let mut status = 0;
         assert_eq!(
@@ -6894,24 +6984,17 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn reconciliation_refuses_surviving_external_process_group() {
-        use std::os::unix::process::CommandExt;
         let f = TempRun::new();
         let dir = f.0.join("cells/000000000000");
         fs::create_dir_all(&dir).unwrap();
-        let child = Command::new("sleep")
-            .arg("30")
-            .process_group(0)
-            .spawn()
-            .unwrap();
-        let guard = SupervisedChild {
-            child,
-            finished: false,
-        };
+        let mut child = GatedWorker::spawn("/bin/sleep", &["30"]).unwrap();
+        child.release().unwrap();
+        let guard = SupervisedChild { child };
         storage::write_json(
             &dir,
             "worker-process.json",
             "identity",
-            &json!({"process_group":guard.child.id()}),
+            &json!({"process_group":guard.pid()}),
         )
         .unwrap();
         assert!(assert_no_workers(&f.0)

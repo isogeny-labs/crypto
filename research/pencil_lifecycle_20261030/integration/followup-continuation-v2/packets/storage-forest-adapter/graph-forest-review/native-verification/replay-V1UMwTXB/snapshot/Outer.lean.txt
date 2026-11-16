@@ -1,0 +1,45 @@
+import Canon
+set_option autoImplicit false
+namespace MonicRemainder
+open Polynomial ScaleTrim
+
+def loop (p : UInt64) (b : List UInt64) (fuel : Nat) (r : List UInt64) : Option (List UInt64) :=
+ if hr : r=[] then some r else
+ if hl : b.length≤r.length then
+  match fuel with
+  | 0=>none
+  | k+1=>loop p b k (selected p b r hr hl)
+ else some r
+termination_by structural fuel
+
+theorem loop_correct (p : UInt64) [Fact p.toNat.Prime] (b : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b)
+ (fuel : Nat) (r out : List UInt64) (hrs : Canon p r) (ho : loop p b fuel r=some out) :
+ Canon p out ∧ (wordsPoly p b∣wordsPoly p out ↔ wordsPoly p b∣wordsPoly p r) := by
+ induction fuel generalizing r out with
+ | zero =>
+   rw [loop] at ho
+   split_ifs at ho with hr hl
+   · have he:=Option.some.inj ho; subst out; exact ⟨hrs,Iff.rfl⟩
+   · have he:=Option.some.inj ho; subst out; exact ⟨hrs,Iff.rfl⟩
+ | succ fuel ih =>
+   rw [loop] at ho
+   split_ifs at ho with hr hl
+   · have he:=Option.some.inj ho; subst out; exact ⟨hrs,Iff.rfl⟩
+   · have hs:=selected_correct p b r hr hl hp hb hbs hrs
+     have ht:=ih _ out hs.1 ho
+     refine ⟨ht.1,ht.2.trans ?_⟩
+     rw [hs.2]
+     exact dvd_sub_left (dvd_mul_left _ _)
+   · have he:=Option.some.inj ho; subst out; exact ⟨hrs,Iff.rfl⟩
+
+def premModel (p : UInt64) (b a : List UInt64) (fuel : Nat) : Option (List UInt64) :=
+ loop p b fuel (trimFuel a.length a)
+
+theorem success_sound (p : UInt64) [Fact p.toNat.Prime] (b a : List UInt64) (fuel : Nat)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b) (ha : Canon p a)
+ (ho : premModel p b a fuel=some []) : wordsPoly p b∣wordsPoly p a := by
+ have h:=loop_correct p b hp hb hbs fuel (trimFuel a.length a) [] (trim_good p _ a ha) ho
+ have hd : wordsPoly p b∣wordsPoly p (trimFuel a.length a) := h.2.mp (by simp [wordsPoly,listPoly])
+ simpa only [trim_preserves] using hd
+end MonicRemainder

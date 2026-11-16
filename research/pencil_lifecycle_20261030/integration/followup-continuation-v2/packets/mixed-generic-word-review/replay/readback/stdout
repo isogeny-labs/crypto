@@ -1,0 +1,19 @@
+'PencilWordRefinement.generic_word_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.generic_guard_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.generic_dispatch_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.generic_outer_guard' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PencilWordRefinement.generic_word_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]
+PencilWordRefinement.generic_word_preserves (p : UInt64) [Fact (Nat.Prime p.toNat)] (a0 a1 a2 : ZMod p.toNat)
+  (a3 : UInt64) (a : PencilWordRefinement.WordD1) (b : PencilWordRefinement.WeightedWord) (hfive : 5 ≤ p.toNat)
+  (hbound : p.toNat < 2 ^ 31) (ha : PencilWordRefinement.WordD1.canonical p a)
+  (hb : PencilWordRefinement.WeightedWord.canonical p b) (h3 : a3.toNat < p.toNat) (haz : a.z ≠ 0) (haw : a.w ≠ 0)
+  (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+  (hva : PencilWordRefinement.WordD1.normalizedValid p (MixedGeneric.curve a0 a1 a2 ↑a3.toNat) a)
+  (hvb : PencilWordRefinement.WeightedWord.normalizedValid p (MixedGeneric.curve a0 a1 a2 ↑a3.toNat) b)
+  (hk :
+    MixedGeneric.genericK (PencilWordRefinement.WordD1.decode p a) (PencilWordRefinement.WeightedWord.decodeTwo p b) ≠
+      0) :
+  have c := (PencilWordRefinement.genericWords p a b a3).payload;
+  PencilWordRefinement.genericWordDispatch p a b a3 = some c ∧
+    PencilWordRefinement.WeightedWord.canonical p c ∧
+      c.z ≠ 0 ∧ c.w ≠ 0 ∧ PencilWordRefinement.WeightedWord.normalizedValid p (MixedGeneric.curve a0 a1 a2 ↑a3.toNat) c

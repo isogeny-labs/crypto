@@ -1,4 +1,4 @@
-# Exact full right-sum cache — GPU validation pending
+# Exact full right-sum cache — validated through 62 bits
 
 `make cuda-right-cache ARCH=sm_120` adds an optional full affine right-sum cache
 to the persistent query with dense CUB left tables. Each cached sum is exactly
@@ -17,7 +17,8 @@ Admission preserves the existing free-minus-free/4 threshold. The peak bound
 is max(sort-phase bytes, retained table/index/points/results plus full-cache
 bytes). The sort scratch has been synchronized and freed before the full
 cache is allocated. Existing prefix/partial reservations remain charged;
-full and partial cache macros cannot be enabled together. An overflow-safe
+the optional combined variant can enable both cache macros. The full cache
+takes precedence; charged partial tables serve as its fallback. An overflow-safe
 capacity test selects the full cache only when it fits both the memory
 budget and an explicit byte cap. Otherwise the same exact persistent search
 runs uncached. Unexpected CUDA allocation errors remain errors, not hidden
@@ -27,19 +28,25 @@ Tests cover exact coordinate/infinity round trips and capacity/overflow edges.
 The forced two-block persistent query fixture compares a full cache against
 a zero-byte-cap fallback and the CPU oracle, including a minimum at tuple1088,
 complete misses, partial tails, repeated calls, empty reprepare and rebuilding.
-The full service and query sanitizer suites must pass before new measurements.
-Host fixture/syntax checks pass; CUDA validation has not yet run.
+The full service and query sanitizer suites passed before the v13 panel.
+Every prescribed cell recovered and passed fresh CPU certificate replay;
+matched52-bit certificates were identical. Both61-bit and both62-bit cells
+actually used full right caches. The62-bit cache sizes were2,276,312,640 and
+2,759,268,600 rows; admission estimates60,880,922,152 and68,978,885,440bytes
+include the phase peak and are not measured peak VRAM. See the
+[v13 report](../../research/explicit_relations_e2e_20261030/reports/run-20261030T1757Z/report.pdf).
 
-The separately frozen v13 panel uses b=chunked dense CUB, u=persistent dense
-CUB, v=persistent plus full right cache, x=identical v. At52bits it requires
+The completed frozen v13 panel used b=chunked dense CUB, u=persistent dense
+CUB, v=persistent plus full right cache, x=identical v. At52bits it required
 full caching for every successful v/x control and zero cache rows for b/u.
-It then probes both fixed61/62-bit targets with v, explicitly retaining any
+It then probed both fixed61/62-bit targets with v, explicitly retaining any
 fallback, refusal or timeout. V12 was never executed and remains preserved.
-The active v11 is unaffected and no second taskGPU may launch concurrently.
+V16 next tests filtering with this cache policy held fixed at52bits; larger
+cache fallback remains explicit in TABLE records.
 
 Literature: NVIDIA CUDA Best Practices Guide, memory optimizations and device
 memory accesses, read2026-10-30 before implementation:
 https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#memory-optimizations
 See PERSISTENT-QUERY.md for grid/atomic correctness and DENSE-ROWS.md for CUB
-scratch sizing. This is conventional reuse of invariant group sums, not a new
-ECDLP method, certified speedup, full operation ledger or GPU tensor backend.
+scratch sizing. The cache reuses invariant group sums; construction and memory costs remain
+charged in every cold solve.

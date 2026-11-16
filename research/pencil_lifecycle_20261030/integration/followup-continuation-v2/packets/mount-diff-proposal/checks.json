@@ -1,0 +1,162 @@
+{
+  "schema": "software.fixed-parser-checks/v1",
+  "cases": [
+    {
+      "case": "ordering-0",
+      "accepted": true,
+      "input_sha256": "0f6371185b0230f9ffdaee67123ce88b48e6b3844b3aeecdf36302254936853d"
+    },
+    {
+      "case": "ordering-1",
+      "accepted": true,
+      "input_sha256": "fb1e10af914b4e11b49e0f0c8c53fd77416f3ce2f6a9a36cfaebb215acba5729"
+    },
+    {
+      "case": "ordering-2",
+      "accepted": true,
+      "input_sha256": "f988e2403c2ef391145578e2a11ecc7969d3adaff0bd50206c053938389ee25b"
+    },
+    {
+      "case": "ordering-3",
+      "accepted": true,
+      "input_sha256": "eeaa86874a70f0aef36885ecbb0016b9936edf760b21060fff0b3dbaf3aa6e8f"
+    },
+    {
+      "case": "ordering-4",
+      "accepted": true,
+      "input_sha256": "405bf7de821c0b1185c5686204cfa3a9a678b45d6e1d3a0382dfa546a06f3438"
+    },
+    {
+      "case": "ordering-5",
+      "accepted": true,
+      "input_sha256": "7dc8614e14303fc9c1ef98b2da635b19ecd26c6119746a19dd4914e0ca2ce140"
+    },
+    {
+      "case": "empty",
+      "accepted": false,
+      "input_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "missing",
+      "accepted": false,
+      "input_sha256": "c8798b3c52921efbee0af3dbb7c918795523d4cf090c9d7b470b5c31c29736a3"
+    },
+    {
+      "case": "duplicate",
+      "accepted": false,
+      "input_sha256": "821410a21910df541973aecda501daa8d6af0d21148e6851b3ce570e05de858a"
+    },
+    {
+      "case": "extra-child",
+      "accepted": false,
+      "input_sha256": "39650dedec3369d299edcc0d273ea7cd7162436287e7033eaed20da9a313685e"
+    },
+    {
+      "case": "prefix",
+      "accepted": false,
+      "input_sha256": "beef5604c4197486395794a0b1fdad7095357b2d66a5ecd3fc08b811ce51b57e"
+    },
+    {
+      "case": "suffix",
+      "accepted": false,
+      "input_sha256": "1da5cec15d5a8a58fd6c2b02a50649de30a9f42a3abc9e995944419ce1d245c3"
+    },
+    {
+      "case": "dot",
+      "accepted": false,
+      "input_sha256": "dd3bd0b6a93a4b7120768430abeec692a90ded5f60592c12d8acc1ccd8daf71b"
+    },
+    {
+      "case": "double-space",
+      "accepted": false,
+      "input_sha256": "916711828e87e06f7363733cf77c38d627935db02476dda5de5b63c1e99e5660"
+    },
+    {
+      "case": "tab",
+      "accepted": false,
+      "input_sha256": "47b0baf157b061060b2b0d1488cd30f706b4e23450a44508d7fde37034589966"
+    },
+    {
+      "case": "crlf",
+      "accepted": false,
+      "input_sha256": "ac108427c891133385d367e4f24b48e3d7fd019a30cdbc2bc02034b5bf0c8d03"
+    },
+    {
+      "case": "no-final-newline",
+      "accepted": false,
+      "input_sha256": "8fb7844c633ab891cd2a13fb452db34a53ba7c5a7865011cf94ab826ede2b260"
+    },
+    {
+      "case": "extra-final-newline",
+      "accepted": false,
+      "input_sha256": "1d37c25bfb0d85c7bef37e9ddedd3179a3335280af30fdf0754e9def3a6fb945"
+    },
+    {
+      "case": "non-ascii",
+      "accepted": false,
+      "input_sha256": "7b460a7486cd460f032cf78649d6bd055a000472025b6137e5ec17f3f7280231"
+    },
+    {
+      "case": "oversized",
+      "accepted": false,
+      "input_sha256": "98ab1e880eedc1532c9e285109a4b031075817da0c07986d8953a6da320c53d2"
+    },
+    {
+      "case": "NUL",
+      "accepted": false,
+      "input_sha256": "9c52d00e1cdd79e69f79092caa5c9b5e63fde67979ed39a314bc2d747c010168"
+    },
+    {
+      "case": "C-0",
+      "accepted": false,
+      "input_sha256": "ffedb2401dbac46dde8078cdc47a5837bed52664cf1fc0bf441ab89ff24e56df"
+    },
+    {
+      "case": "C-1",
+      "accepted": false,
+      "input_sha256": "54f7d0f9e7b36deb9d7c285abe09ef8bd54ab67851156a63c1d363722acdd65c"
+    },
+    {
+      "case": "C-2",
+      "accepted": false,
+      "input_sha256": "87d5ec78914385cadf969c171f83f8e601977f2bafa3f0c49caa2f0b4472551e"
+    },
+    {
+      "case": "D-0",
+      "accepted": false,
+      "input_sha256": "bd4abb92dcd3d04ccefbfdfe86d2a50fc1dea879965540e5b79dd17f353963cf"
+    },
+    {
+      "case": "D-1",
+      "accepted": false,
+      "input_sha256": "4b089b3b6fe3f67ab72a707b7b9df1c116aa490abb2f1a06a1b104258e3631ed"
+    },
+    {
+      "case": "D-2",
+      "accepted": false,
+      "input_sha256": "84714ee146bcb68bcc17adbac079232ed8006d54e19cb12feb1f219d1338df69"
+    }
+  ],
+  "actual_diff_sha256": "0f6371185b0230f9ffdaee67123ce88b48e6b3844b3aeecdf36302254936853d",
+  "actual_diff_parse": {
+    "schema": "software.exact-mount-diff/v1",
+    "changes": [
+      {
+        "kind": "added",
+        "path": "/fixtures"
+      },
+      {
+        "kind": "added",
+        "path": "/qualification"
+      },
+      {
+        "kind": "added",
+        "path": "/qualification/exec-gate"
+      }
+    ],
+    "writer_attribution": null,
+    "no_writes_claim": false
+  },
+  "all_expected_outcomes": true,
+  "runtime_execution": false
+}

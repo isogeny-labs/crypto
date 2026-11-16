@@ -1,0 +1,65 @@
+import CrossScaling
+import WeightedAdd11
+set_option autoImplicit false
+namespace PencilWordRefinement
+
+def wordPowLoop : Nat → UInt64 → UInt64 → UInt64 → UInt64 → UInt64
+ | 0, _, _, _, r => r
+ | n+1,p,a,e,r =>
+   if e > 0 then
+     let r := if e &&& 1 != 0 then (r*a)%p else r
+     let e := e >>> 1
+     let a := if e > 0 then (a*a)%p else a
+     wordPowLoop n p a e r
+   else r
+
+def wordPow5 (p a : UInt64) : UInt64 := wordPowLoop 3 p a 5 1
+
+theorem pow5_unroll (p a : UInt64) : wordPow5 p a =
+    (let r := ((1:UInt64)*a)%p
+     let a2 := (a*a)%p
+     let a4 := (a2*a2)%p
+     (r*a4)%p) := by rfl
+
+def pow5Expr (a : UInt64) : MulExpr :=
+  .mul (.mul (.leaf 1) (.leaf a))
+    (.mul (.mul (.leaf a) (.leaf a)) (.mul (.leaf a) (.leaf a)))
+
+theorem pow5_composition (p a : UInt64) (hfive : 5 ≤ p.toNat) (hb : p.toNat < 2^31)
+    (ha : a.toNat < p.toNat) :
+    (wordPow5 p a).toNat < p.toNat ∧
+    ((wordPow5 p a).toNat : ZMod p.toNat) = (a.toNat : ZMod p.toNat)^5 := by
+  have hp : 0 < p.toNat := by omega
+  have hg : (pow5Expr a).good p := by simp [pow5Expr,MulExpr.good,ha]; omega
+  have hc := MulExpr.composition p hp hb (pow5Expr a) hg
+  refine ⟨hc.1,?_⟩
+  change (((pow5Expr a).word p).toNat : ZMod p.toNat) = _
+  rw [hc.2]
+  simp [pow5Expr,MulExpr.field]
+  ring
+
+def wordAdd (p a b : UInt64) : UInt64 := (a+b)%p
+
+theorem wordAdd_composition (p a b : UInt64) (hp : 0 < p.toNat) (hb : p.toNat < 2^31)
+    (ha : a.toNat < p.toNat) (hc : b.toNat < p.toNat) :
+    (wordAdd p a b).toNat < p.toNat ∧
+    ((wordAdd p a b).toNat : ZMod p.toNat) = (a.toNat : ZMod p.toNat)+(b.toNat : ZMod p.toNat) := by
+  have hsum : a.toNat+b.toNat < 2^64 := by omega
+  constructor
+  · rw [wordAdd, UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+  · simp only [wordAdd, UInt64.toNat_mod, UInt64.toNat_add, Nat.mod_eq_of_lt hsum,
+      ZMod.natCast_mod, Nat.cast_add]
+
+theorem wordNeg_composition (p a : UInt64) (hp : 0 < p.toNat) (ha : a.toNat < p.toNat) :
+    (wordNeg p a).toNat < p.toNat ∧
+    ((wordNeg p a).toNat : ZMod p.toNat) = -(a.toNat : ZMod p.toNat) := by
+  rw [wordNeg_value p a hp]
+  exact ⟨Nat.mod_lt _ hp,neg_decode _ _ ha⟩
+
+theorem wordSub_composition (p a b : UInt64) (hp : 0 < p.toNat) (hb : p.toNat < 2^31)
+    (ha : a.toNat < p.toNat) (hc : b.toNat < p.toNat) :
+    (wordSub p a b).toNat < p.toNat ∧
+    ((wordSub p a b).toNat : ZMod p.toNat) = (a.toNat : ZMod p.toNat)-(b.toNat : ZMod p.toNat) := by
+  rw [wordSub_value p a b hp hb ha]
+  exact ⟨Nat.mod_lt _ hp,sub_decode _ _ _ hc⟩
+end PencilWordRefinement

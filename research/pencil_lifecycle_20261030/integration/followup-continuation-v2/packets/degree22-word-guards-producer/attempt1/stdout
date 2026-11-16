@@ -1,0 +1,37 @@
+/var/tmp/pencil-degree22-word-guards-20261031-v1/WordGuard22.lean:27:49: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-degree22-word-guards-20261031-v1/WordGuard22.lean:53:5: error: Tactic `contradiction` failed
+
+case pos
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hbound : p.toNat < 2 ^ 31
+a b : WeightedWord
+ha : WeightedWord.canonical p a
+hb : WeightedWord.canonical p b
+hB : guardBWord p a = 0
+hp : 0 < p.toNat
+left✝ : (guardBWord p a).toNat < p.toNat
+dec : ↑(guardBWord p a).toNat = Degree22Guards.doubleB ↑a.q.toNat ↑a.r.toNat ↑a.s.toNat ↑a.t.toNat
+hzero : Degree22Guards.doubleB ↑a.q.toNat ↑a.r.toNat ↑a.s.toNat ↑a.t.toNat = 0
+hodd : 2 ≠ 0
+hsupport :
+  ↑a.q.toNat * ↑b.z.toNat ^ 2 = ↑b.q.toNat * ↑a.z.toNat ^ 2 ∧ ↑a.r.toNat * ↑b.z.toNat ^ 4 = ↑b.r.toNat * ↑a.z.toNat ^ 4
+hbranch :
+  some
+      (ProjectiveLawRuntime.classifySameU22 (↑a.s.toNat * ↑b.z.toNat ^ 3 * ↑b.w.toNat)
+        (↑a.t.toNat * ↑b.z.toNat ^ 5 * ↑b.w.toNat) (↑b.s.toNat * ↑a.z.toNat ^ 3 * ↑a.w.toNat)
+        (↑b.t.toNat * ↑a.z.toNat ^ 5 * ↑a.w.toNat)) =
+    some ProjectiveLawRuntime.Branch22Prelude.sameUDouble
+hi :
+  ¬(↑a.s.toNat * ↑b.z.toNat ^ 3 * ↑b.w.toNat = -(↑b.s.toNat * ↑a.z.toNat ^ 3 * ↑a.w.toNat) ∧
+      ↑a.t.toNat * ↑b.z.toNat ^ 5 * ↑b.w.toNat = -(↑b.t.toNat * ↑a.z.toNat ^ 5 * ↑a.w.toNat))
+he :
+  ↑a.s.toNat * ↑b.z.toNat ^ 3 * ↑b.w.toNat = ↑b.s.toNat * ↑a.z.toNat ^ 3 * ↑a.w.toNat ∧
+    ↑a.t.toNat * ↑b.z.toNat ^ 5 * ↑b.w.toNat = ↑b.t.toNat * ↑a.z.toNat ^ 5 * ↑a.w.toNat
+hc : ProjectiveLawRuntime.Branch22Prelude.sameUDouble = ProjectiveLawRuntime.Branch22Prelude.sameUDouble
+⊢ a.s ≠ 0
+/var/tmp/pencil-degree22-word-guards-20261031-v1/WordGuard22.lean:54:3: error: No goals to be solved
+/var/tmp/pencil-degree22-word-guards-20261031-v1/WordGuard22.lean:64:1: error: No goals to be solved

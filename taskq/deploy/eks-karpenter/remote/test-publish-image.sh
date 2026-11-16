@@ -13,10 +13,17 @@ cat > "$tmp/bundle/ecbench" <<'EOF'
 touch "$TEST_EXECUTED"
 EOF
 chmod +x "$tmp/bundle/ecbench"
+cat > "$tmp/bundle/isolab-fresh-owner" <<'EOF'
+#!/bin/sh
+touch "$TEST_EXECUTED"
+exit 23
+EOF
+chmod +x "$tmp/bundle/isolab-fresh-owner"
+owner_binary=$(sha256sum "$tmp/bundle/isolab-fresh-owner" | cut -d' ' -f1)
 revision=$(printf 'a%.0s' {1..40})
 binary=$(sha256sum "$tmp/bundle/ecbench" | cut -d' ' -f1)
-jq -n --arg revision "$revision" --arg binary "$binary" \
-  '{source_revision:$revision,ecbench_sha256:$binary,source_repository:"https://github.com/aburan28/crypto",
+jq -n --arg revision "$revision" --arg binary "$binary" --arg owner_binary "$owner_binary" \
+  '{source_revision:$revision,ecbench_sha256:$binary,fresh_owner_sha256:$owner_binary,source_repository:"https://github.com/aburan28/crypto",
     architecture:"linux/amd64",target:"x86_64-unknown-linux-musl",default_features:false}' > "$tmp/bundle/build-info.json"
 cat > "$tmp/bin/aws" <<'EOF'
 #!/usr/bin/env bash
@@ -42,6 +49,14 @@ export PATH="$tmp/bin:$PATH"
 jq -e --arg revision "$revision" --arg binary "$binary" --arg repository "$ISOLAB_IMAGE_REPOSITORY" \
   '.source_revision==$revision and .ecbench_sha256==$binary
     and .image_uri==($repository+"@sha256:"+("0"*64))' "$tmp/image.json" >/dev/null
+jq -e --arg owner "$owner_binary" \
+  '.schema=="isolab.fresh-owner-image/v1" and .fresh_owner_sha256==$owner' "$tmp/image.json.fresh-owner.json" >/dev/null
+cp "$tmp/bundle/isolab-fresh-owner" "$tmp/owner-original"
+printf changed >> "$tmp/bundle/isolab-fresh-owner"
+: > "$TEST_PUBLISH_LOG"
+if "$here/../publish-image" "$tmp/bundle" "$revision" "$tmp/image.json" >/dev/null 2>&1; then exit 1; fi
+[[ ! -s "$TEST_PUBLISH_LOG" && ! -e "$TEST_EXECUTED" ]]
+cp "$tmp/owner-original" "$tmp/bundle/isolab-fresh-owner"
 : > "$TEST_PUBLISH_LOG"
 if "$here/../publish-image" "$tmp/bundle" "$(printf 'c%.0s' {1..40})" "$tmp/image.json" >/dev/null 2>&1; then exit 1; fi
 [[ ! -s "$TEST_PUBLISH_LOG" ]]

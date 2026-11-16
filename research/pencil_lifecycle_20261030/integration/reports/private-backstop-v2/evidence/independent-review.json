@@ -1,0 +1,220 @@
+{
+  "claim_boundary": {
+    "not_supported": [
+      "production image packaging or caller provenance",
+      "Kubernetes/Pod PID-namespace admission",
+      "CRIU recovery interaction",
+      "physical worker or infrastructure deallocation",
+      "clock or timing qualification",
+      "general behavior outside this one local mechanism observation",
+      "scientific execution or performance"
+    ],
+    "supported": "In this one inspected Docker-private PID namespace, the exact read-back fixture installed the unchanged deadline backstop, a detached child was reaped with SIGKILL 9, PID1 exited125, OOMKilled was false, and exact-owner cleanup returned0.",
+    "verdict": "The retained files support the bounded local shutdown-mechanism observation. BS-1 through BS-3 are additive evidence/provenance gaps; BS-4 is reconciled and does not require a rebuild or repeat."
+  },
+  "created_utc": "2026-10-30T22:21:28.820012Z",
+  "evidence_findings": [
+    {
+      "effect": "The mechanism result is supported by the raw container evidence, but exact attribution to v4 is a root/operator assertion rather than a self-contained receipt.",
+      "evidence": "The output set is consistent with run-reviewed-container-v4.sh and the successful path is source-identical to v3 except for ambiguous-create handling. No retained command line or receipt hashes v4 plus image ID, binary hash and output directory as the actual invocation.",
+      "follow_up": "Add an additive, explicitly operator-authored invocation binding that names v4 SHA256 8dc2b499..., exact immutable image ID, fixture SHA256 and observation directory. Do not rewrite the observation or claim it is contemporaneous machine evidence.",
+      "id": "BS-1",
+      "severity": "documentation_gap",
+      "title": "The retained observation does not contain a command receipt binding the invoked orchestration script and arguments"
+    },
+    {
+      "effect": "Exact artifact/source identity and static ELF properties are reviewable; reproducible build-command provenance is not established by this packet.",
+      "evidence": "build.receipt.json contains start/end/exit and two false execution flags. BUILD_SHA256SUMS binds exact source, lock, Dockerfile and output binary, and build.stderr shows a successful release build, but neither record states the cargo command, Rust version, target, --locked/--offline flags, jobs, or timeout.",
+      "follow_up": "If build reproducibility is claimed, add a truthful additive build-command/toolchain receipt sourced from retained command evidence. No rebuild is necessary to preserve the mechanism observation.",
+      "id": "BS-2",
+      "severity": "documentation_gap",
+      "title": "Build receipt is minimal and does not bind the exact command or toolchain"
+    },
+    {
+      "effect": "The packet proves the exact rm command succeeded according to Docker. The stronger current-state statement depends on the owner-reported live read until that already-observed output is retained.",
+      "evidence": "cleanup identity, pre-cleanup and terminal inspect all bind the exact stopped container; docker rm returned exit0 and echoed the exact container ID. The task owner separately reports a later live read with no running or stopped labelled container, but no post-removal ps/inspect output is present here.",
+      "follow_up": "Bind the already-observed live read in an additive receipt if publication needs the stronger statement. Do not repeat the container observation.",
+      "id": "BS-3",
+      "severity": "documentation_gap",
+      "title": "Successful removal is retained, but the later live no-labelled-container readback is not in this directory"
+    },
+    {
+      "effect": "This is a custody/permissions issue in receipt capture, not an image-build or mechanism failure.",
+      "evidence": "image-id-v1.txt is root:root mode0600. Read-only sudo reconciliation yielded sha256:fdee14f..., equal to the build log and image inspect ID. No image rebuild occurred.",
+      "follow_up": "Retain the permission failure and reconciled content as separate facts; do not erase it or rebuild.",
+      "id": "BS-4",
+      "severity": "reconciled_nonfailure",
+      "title": "Ordinary iidfile read failed because the successful build created a root-owned mode-0600 file"
+    }
+  ],
+  "observation_summary": {
+    "bytes": 1318,
+    "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/OBSERVATION.json",
+    "review": "Fields match retained source, fixture, image/container IDs, timestamps, exit125, OOM false, orchestration/cleanup0 and child-signal9 evidence. It correctly sets scientific_execution=false and production_runtime_qualified=false and does not claim the absent post-removal live read.",
+    "sha256": "86888a6ec63b586795b00743fc5e86f636754376b16900adc9335329a5e905d7"
+  },
+  "observed_result": {
+    "cleanup_remove_exit": 0,
+    "cleanup_remove_output_container_id": "5e9d5d0cef0a4ceeb08e50cb88eb99f1318ab2a3ddd15fbe1f5d9231db58d2a9",
+    "container_exit_code": 125,
+    "detached_child_code": null,
+    "detached_child_pid": 7,
+    "detached_child_reap_elapsed_ns": 2196991669,
+    "detached_child_signal": 9,
+    "exact_identity_preserved_created_result_cleanup": true,
+    "finished_at": "2026-10-30T22:19:21.103898781Z",
+    "fixture_log_lines": [
+      "fixture_admitted pid=1 euid=0 child_pid=7 cutoff_utc=1793398761 monotonic_anchor=captured",
+      "watchdog_installed main_thread_blocking",
+      "detached_child_reaped signal=Some(9) code=None elapsed_ns=2196991669"
+    ],
+    "mechanism_result": "PASS: exact fixture, private container, detached child SIGKILL observed, PID1 exit125.",
+    "oom_killed": false,
+    "orchestration_exit": 0,
+    "pid1_exit_125_observed": true,
+    "running": false,
+    "started_at": "2026-10-30T22:19:18.805569819Z",
+    "wait_command_exit": 0,
+    "watchdog_installed_marker": true
+  },
+  "orchestration": {
+    "container_id": "5e9d5d0cef0a4ceeb08e50cb88eb99f1318ab2a3ddd15fbe1f5d9231db58d2a9",
+    "container_name": "/isolab-private-backstop-bd8f541b-ae75-4b5f-8b83-215eb2f6ad3b",
+    "image_id": "sha256:fdee14f586902162cc587d180fa734a9f21e395719e357ac75720345bfeef8df",
+    "image_readback": {
+      "bytes": 684016,
+      "equals_built_fixture": true,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/container-observation-v1/fixture-readback",
+      "program_headers_equal_preimage_check": true,
+      "sha256": "7aa53cc278569ca13f1f0d9a860a65de7004b77c854db27f3f56ed819a8dd7f9"
+    },
+    "observation_directory": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/container-observation-v1",
+    "owner_label": "bd8f541b-ae75-4b5f-8b83-215eb2f6ad3b",
+    "prestart": {
+      "binds": null,
+      "cap_add": null,
+      "cap_drop": [
+        "ALL"
+      ],
+      "device_requests": null,
+      "devices": [],
+      "entrypoint": [
+        "/fixture"
+      ],
+      "init": null,
+      "ipc_mode": "private",
+      "isolation_predicates_match_reviewed_script": true,
+      "memory_bytes": 67108864,
+      "memory_swap_bytes": 67108864,
+      "mounts": [],
+      "nano_cpus": 250000000,
+      "network_mode": "none",
+      "pid": 0,
+      "pid_mode": "",
+      "pids_limit": 16,
+      "privileged": false,
+      "qualification_marker_present": true,
+      "read_only_rootfs": true,
+      "restart_policy": {
+        "MaximumRetryCount": 0,
+        "Name": "no"
+      },
+      "running": false,
+      "security_opt": [
+        "no-new-privileges"
+      ],
+      "status": "created",
+      "user": "0:0",
+      "uts_mode": "",
+      "volumes_from": null
+    },
+    "reviewed_script": {
+      "bytes": 8246,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/run-reviewed-container-v4.sh",
+      "sha256": "8dc2b499f81b6014cd9ec53715a89c4b41abd519064d34e3ef07b8c856561d73"
+    }
+  },
+  "reviewer": "/root/ci_audit",
+  "schema": "pencil-private-backstop-mechanism-independent-review/v1",
+  "scope": "Read-only review of one retained local private-container shutdown observation. No Docker command, container execution, build, fixture execution, cloud action, source change, or scientific workload was performed by this review. One sudo read of the already-created root-owned iid file was used to reconcile its retained content after ordinary user access was denied.",
+  "source_and_build": {
+    "build_manifest": {
+      "bytes": 446,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/BUILD_SHA256SUMS",
+      "sha256": "4b8f3c369c43ad7e9b90f0e20a86dc37e18d0f32c4f288c381f0ce18c3ab3bf2"
+    },
+    "build_receipt": {
+      "bytes": 169,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/build.receipt.json",
+      "sha256": "a1ef7e9f458df57fd34942717900a5a78ec32be67950c4f775e80d1fb5a4559a"
+    },
+    "build_stderr": {
+      "bytes": 391,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/build.stderr",
+      "sha256": "b6bef5f747debbdd8933f2521eda2d04bc723a49f8fbc80902a3e96dbee4a220"
+    },
+    "canonical_controller_deadline": {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/taskq/deploy/eks-karpenter/resume/controller/src/deadline.rs",
+      "sha256": "b7eaf3b0249a7bb630c9a486eb613c48e3ec779c486796c9634c2fdfc61644cb"
+    },
+    "cargo_lock": {
+      "bytes": 2853,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/Cargo.lock",
+      "sha256": "c5c0b2a46235d161bccb0e37b9a0b2f4e4d1e857839857e7d4e548a6328980ef"
+    },
+    "copied_deadline": {
+      "bytes": 12318,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/src/deadline.rs",
+      "sha256": "b7eaf3b0249a7bb630c9a486eb613c48e3ec779c486796c9634c2fdfc61644cb"
+    },
+    "dockerfile": {
+      "bytes": 81,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/Dockerfile",
+      "sha256": "8c2ee38df83c07f27833c6662fad889993fd45e284869caa04be5286e7600210"
+    },
+    "elf_evidence": {
+      "dynamic_section": {
+        "bytes": 1094,
+        "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/fixture-dynamic-section.txt",
+        "sha256": "3cde7faece80be3c3cd9e3a807d37eaea2b60808ffef3a6f252707bbc22b957d"
+      },
+      "interp_segment_present": false,
+      "needed_entries_present": false,
+      "program_headers": {
+        "bytes": 2178,
+        "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/fixture-program-headers.txt",
+        "sha256": "705b6bb9f34cf891efed48833538fe1e83d5beaffc6787494f83eab3a67dbc69"
+      }
+    },
+    "fixture_binary": {
+      "build_manifest_check": "passed for Cargo.lock, main.rs, deadline.rs, fixture binary and Dockerfile",
+      "bytes": 684016,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/target/x86_64-unknown-linux-musl/release/private-backstop-fixture",
+      "sha256": "7aa53cc278569ca13f1f0d9a860a65de7004b77c854db27f3f56ed819a8dd7f9"
+    },
+    "fixture_source": {
+      "bytes": 2380,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/src/main.rs",
+      "sha256": "5fb2879f29c5bf75d06be9e5be3b27bb66f34b3cd0379e5eabaf16f3fa84c5bc"
+    },
+    "ids_equal": true,
+    "image_build_log": {
+      "bytes": 549,
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/image-build-v1.stderr",
+      "sha256": "ce9c721d090a1c54f325733f200b8318b36bc6634f3188d06196ab171b65458f"
+    },
+    "image_build_log_id": "sha256:fdee14f586902162cc587d180fa734a9f21e395719e357ac75720345bfeef8df",
+    "image_id_file": {
+      "bytes": 71,
+      "content": "sha256:fdee14f586902162cc587d180fa734a9f21e395719e357ac75720345bfeef8df",
+      "mode": "0600",
+      "ordinary_user_read": "permission denied",
+      "owner": "root:root",
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/private-backstop-qualification-plan-v1/image-id-v1.txt",
+      "rebuild_performed": false,
+      "reconciled_read_only_with_sudo": true,
+      "sha256": "aad2d3d2f8b601ef55a2e44f14524fd242e1a8466beff5e3865f4a829176d5de"
+    },
+    "image_inspect_id": "sha256:fdee14f586902162cc587d180fa734a9f21e395719e357ac75720345bfeef8df"
+  }
+}

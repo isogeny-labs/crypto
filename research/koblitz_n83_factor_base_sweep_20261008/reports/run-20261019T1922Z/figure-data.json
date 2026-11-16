@@ -1,0 +1,1995 @@
+{
+  "baseline_solver_ms": null,
+  "candidate_solver_ms": null,
+  "class": "engineering",
+  "complete_comparison_coverage": false,
+  "external_algorithm_cpu_ms": null,
+  "external_process_ms": null,
+  "identical_search_and_selector_signature": false,
+  "manifest": "/home/ec2-user/scratch/n83-natural-200k-20261019/manifest-completed.json",
+  "natural_yield_winner": null,
+  "pairs": [],
+  "rows": [
+    {
+      "arm": "K2048",
+      "columns": 2048,
+      "conflict_cap": 1000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k2048",
+      "id": "k2048",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 69,
+          "failed_user_threads": 0,
+          "moved_count": 437
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              4.19,
+              4.23,
+              4.63
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76073219,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180020,
+                "idle": 234491,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30847,
+                "idle": 383180,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431113741
+          },
+          "before": {
+            "loadavg": [
+              4.29,
+              4.25,
+              4.64
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76071252,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180020,
+                "idle": 234291,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30847,
+                "idle": 382980,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431111741
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                4.19,
+                4.23,
+                4.63
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76073219,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180020,
+                  "idle": 234491,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30847,
+                  "idle": 383180,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431113741
+            },
+            "before": {
+              "loadavg": [
+                4.29,
+                4.25,
+                4.64
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76071252,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180020,
+                  "idle": 234291,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30847,
+                  "idle": 382980,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431111741
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 4861.868809,
+      "outer_wall_ms": 10319.216837999998,
+      "phases": [
+        {
+          "data": {
+            "points": 339968,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003923,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 892470,
+            "representatives": 2048
+          },
+          "elapsed_ms": 130.877458,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 205.568327,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 205.586097,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 219.019595,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 1140557,
+            "domain_clauses": 892470,
+            "identity_mask": 0,
+            "variables": 111478
+          },
+          "elapsed_ms": 292.511026,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 1000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 292.537459,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 1000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 5154.406268,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 1000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 600,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K4096",
+      "columns": 4096,
+      "conflict_cap": 1000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k4096",
+      "id": "k4096",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 69,
+          "failed_user_threads": 0,
+          "moved_count": 406
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              4.01,
+              4.19,
+              4.62
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76090739,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180991,
+                "idle": 234777,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30849,
+                "idle": 384432,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431126314
+          },
+          "before": {
+            "loadavg": [
+              4.01,
+              4.19,
+              4.62
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 76084766,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 180991,
+                "idle": 234577,
+                "steal": 1
+              },
+              "31": {
+                "busy": 30849,
+                "idle": 384234,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431124314
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                4.01,
+                4.19,
+                4.62
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76090739,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180991,
+                  "idle": 234777,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30849,
+                  "idle": 384432,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431126314
+            },
+            "before": {
+              "loadavg": [
+                4.01,
+                4.19,
+                4.62
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 76084766,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 180991,
+                  "idle": 234577,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 30849,
+                  "idle": 384234,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431124314
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 7814.6744149999995,
+      "outer_wall_ms": 18151.190391,
+      "phases": [
+        {
+          "data": {
+            "points": 679936,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003741,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 1773110,
+            "representatives": 4096
+          },
+          "elapsed_ms": 297.355228,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 455.947466,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 455.9672,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 469.118505,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 2021197,
+            "domain_clauses": 1773110,
+            "identity_mask": 0,
+            "variables": 131958
+          },
+          "elapsed_ms": 580.0843970000001,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 1000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 580.112288,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 1000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 8394.786703,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "40d554ab57d9a0d51333f7b288be18f0a4595603",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 1000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 600,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K2048",
+      "columns": 2048,
+      "conflict_cap": 10000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k2048-10k-v5",
+      "id": "k2048-10k-v5",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 64,
+          "failed_user_threads": 0,
+          "moved_count": 480
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              17.4,
+              12.92,
+              8.03
+            ],
+            "psi_cpu_some_avg10": 0.02,
+            "psi_cpu_some_total_us": 95784149,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 190063,
+                "idle": 242755,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38396,
+                "idle": 393910,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431297021
+          },
+          "before": {
+            "loadavg": [
+              17.4,
+              12.92,
+              8.03
+            ],
+            "psi_cpu_some_avg10": 0.03,
+            "psi_cpu_some_total_us": 95783287,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 190063,
+                "idle": 242556,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38396,
+                "idle": 393710,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431295021
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                17.4,
+                12.92,
+                8.03
+              ],
+              "psi_cpu_some_avg10": 0.02,
+              "psi_cpu_some_total_us": 95784149,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 190063,
+                  "idle": 242755,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38396,
+                  "idle": 393910,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431297021
+            },
+            "before": {
+              "loadavg": [
+                17.4,
+                12.92,
+                8.03
+              ],
+              "psi_cpu_some_avg10": 0.03,
+              "psi_cpu_some_total_us": 95783287,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 190063,
+                  "idle": 242556,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38396,
+                  "idle": 393710,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431295021
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 42413.639201,
+      "outer_wall_ms": 47750.513728,
+      "phases": [
+        {
+          "data": {
+            "points": 339968,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003865,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 892470,
+            "representatives": 2048
+          },
+          "elapsed_ms": 131.29394399999998,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 205.777131,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 205.795844,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 219.338566,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 1140557,
+            "domain_clauses": 892470,
+            "identity_mask": 0,
+            "variables": 111478
+          },
+          "elapsed_ms": 293.139907,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 10000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 293.168853,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 10000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 42706.808054,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "2ccbc3da6b49c470b67f3cf67717d81a8a017986",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 10000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 300,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K4096",
+      "columns": 4096,
+      "conflict_cap": 10000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/xor-indexed/k4096-10k-v5",
+      "id": "k4096-10k-v5",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 64,
+          "failed_user_threads": 0,
+          "moved_count": 468
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              12.9,
+              12.44,
+              8.13
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 95803012,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 194795,
+                "idle": 243026,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38403,
+                "idle": 398894,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431347056
+          },
+          "before": {
+            "loadavg": [
+              12.9,
+              12.44,
+              8.13
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 95801713,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 0,
+            "reserved_ticks": {
+              "15": {
+                "busy": 194794,
+                "idle": 242827,
+                "steal": 1
+              },
+              "31": {
+                "busy": 38403,
+                "idle": 398694,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792431345056
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.01,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                12.9,
+                12.44,
+                8.13
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 95803012,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 194795,
+                  "idle": 243026,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38403,
+                  "idle": 398894,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431347056
+            },
+            "before": {
+              "loadavg": [
+                12.9,
+                12.44,
+                8.13
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 95801713,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 0,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 194794,
+                  "idle": 242827,
+                  "steal": 1
+                },
+                "31": {
+                  "busy": 38403,
+                  "idle": 398694,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792431345056
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.01,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 50433.062636,
+      "outer_wall_ms": 60818.306138,
+      "phases": [
+        {
+          "data": {
+            "points": 679936,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003445,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 1773110,
+            "representatives": 4096
+          },
+          "elapsed_ms": 304.331362,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 467.405979,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 467.423477,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 480.138884,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 2021197,
+            "domain_clauses": 1773110,
+            "identity_mask": 0,
+            "variables": 131958
+          },
+          "elapsed_ms": 592.735529,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 10000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 592.76126,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 10000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 51025.823896,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "2ccbc3da6b49c470b67f3cf67717d81a8a017986",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 10000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 300,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K2048",
+      "columns": 2048,
+      "conflict_cap": 100000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-100k-20261019/exec/k2048-v6c",
+      "id": "k2048-100k",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 63,
+          "failed_user_threads": 0,
+          "moved_count": 459
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              21.65,
+              12.85,
+              8.12
+            ],
+            "psi_cpu_some_avg10": 0.19,
+            "psi_cpu_some_total_us": 237005255,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1135143,
+            "reserved_ticks": {
+              "15": {
+                "busy": 275941,
+                "idle": 540419,
+                "steal": 2
+              },
+              "31": {
+                "busy": 103335,
+                "idle": 712364,
+                "steal": 4
+              }
+            },
+            "unix_ms": 1792435139422
+          },
+          "before": {
+            "loadavg": [
+              21.65,
+              12.85,
+              8.12
+            ],
+            "psi_cpu_some_avg10": 0.23,
+            "psi_cpu_some_total_us": 237004416,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1135143,
+            "reserved_ticks": {
+              "15": {
+                "busy": 275941,
+                "idle": 540219,
+                "steal": 2
+              },
+              "31": {
+                "busy": 103334,
+                "idle": 712167,
+                "steal": 4
+              }
+            },
+            "unix_ms": 1792435137421
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.0,
+            "31": 0.01
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                21.65,
+                12.85,
+                8.12
+              ],
+              "psi_cpu_some_avg10": 0.19,
+              "psi_cpu_some_total_us": 237005255,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1135143,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 275941,
+                  "idle": 540419,
+                  "steal": 2
+                },
+                "31": {
+                  "busy": 103335,
+                  "idle": 712364,
+                  "steal": 4
+                }
+              },
+              "unix_ms": 1792435139422
+            },
+            "before": {
+              "loadavg": [
+                21.65,
+                12.85,
+                8.12
+              ],
+              "psi_cpu_some_avg10": 0.23,
+              "psi_cpu_some_total_us": 237004416,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1135143,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 275941,
+                  "idle": 540219,
+                  "steal": 2
+                },
+                "31": {
+                  "busy": 103334,
+                  "idle": 712167,
+                  "steal": 4
+                }
+              },
+              "unix_ms": 1792435137421
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.0,
+              "31": 0.01
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 383937.390858,
+      "outer_wall_ms": 393756.25381,
+      "phases": [
+        {
+          "data": {
+            "points": 339968,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003264,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 892470,
+            "representatives": 2048
+          },
+          "elapsed_ms": 133.491677,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 210.711853,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 210.733599,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 224.495702,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 1140557,
+            "domain_clauses": 892470,
+            "identity_mask": 0,
+            "variables": 111478
+          },
+          "elapsed_ms": 300.279738,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 100000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 300.310627,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 100000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 384237.701485,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "660f0f4b1055fbc6d67bca25c4a0934eb9cf94cf",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 100000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 900,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K4096",
+      "columns": 4096,
+      "conflict_cap": 100000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-100k-20261019/exec/k4096-v6c",
+      "id": "k4096-100k",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 62,
+          "failed_user_threads": 0,
+          "moved_count": 467
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            15,
+            31
+          ],
+          "request": "auto",
+          "reserved": [
+            15,
+            31
+          ],
+          "run_cpu": 15,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              12.97,
+              11.82,
+              9.29
+            ],
+            "psi_cpu_some_avg10": 1.73,
+            "psi_cpu_some_total_us": 239996718,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1163943,
+            "reserved_ticks": {
+              "15": {
+                "busy": 315189,
+                "idle": 544438,
+                "steal": 2
+              },
+              "31": {
+                "busy": 104076,
+                "idle": 754799,
+                "steal": 4
+              }
+            },
+            "unix_ms": 1792435572189
+          },
+          "before": {
+            "loadavg": [
+              13.31,
+              11.87,
+              9.29
+            ],
+            "psi_cpu_some_avg10": 1.23,
+            "psi_cpu_some_total_us": 239865291,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1163943,
+            "reserved_ticks": {
+              "15": {
+                "busy": 315188,
+                "idle": 544238,
+                "steal": 2
+              },
+              "31": {
+                "busy": 104076,
+                "idle": 754599,
+                "steal": 4
+              }
+            },
+            "unix_ms": 1792435570188
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "15": 0.01,
+            "31": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                12.97,
+                11.82,
+                9.29
+              ],
+              "psi_cpu_some_avg10": 1.73,
+              "psi_cpu_some_total_us": 239996718,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1163943,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 315189,
+                  "idle": 544438,
+                  "steal": 2
+                },
+                "31": {
+                  "busy": 104076,
+                  "idle": 754799,
+                  "steal": 4
+                }
+              },
+              "unix_ms": 1792435572189
+            },
+            "before": {
+              "loadavg": [
+                13.31,
+                11.87,
+                9.29
+              ],
+              "psi_cpu_some_avg10": 1.23,
+              "psi_cpu_some_total_us": 239865291,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1163943,
+              "reserved_ticks": {
+                "15": {
+                  "busy": 315188,
+                  "idle": 544238,
+                  "steal": 2
+                },
+                "31": {
+                  "busy": 104076,
+                  "idle": 754599,
+                  "steal": 4
+                }
+              },
+              "unix_ms": 1792435570188
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "15": 0.01,
+              "31": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 395987.838978,
+      "outer_wall_ms": 407619.165871,
+      "phases": [
+        {
+          "data": {
+            "points": 679936,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003689,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 1773110,
+            "representatives": 4096
+          },
+          "elapsed_ms": 301.40187299999997,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 469.061245,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 469.081933,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 482.202482,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 2021197,
+            "domain_clauses": 1773110,
+            "identity_mask": 0,
+            "variables": 131958
+          },
+          "elapsed_ms": 590.044152,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 100000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 590.074419,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 100000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 396577.913397,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "660f0f4b1055fbc6d67bca25c4a0934eb9cf94cf",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 100000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 900,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K2048",
+      "columns": 2048,
+      "conflict_cap": 200000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k2048-v8b",
+      "id": "k2048-200k",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 64,
+          "failed_user_threads": 0,
+          "moved_count": 494
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            14,
+            30
+          ],
+          "request": {
+            "explicit": [
+              14,
+              30
+            ]
+          },
+          "reserved": [
+            14,
+            30
+          ],
+          "run_cpu": 14,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              9.07,
+              14.8,
+              13.47
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 319513398,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1712905,
+            "reserved_ticks": {
+              "14": {
+                "busy": 236456,
+                "idle": 903773,
+                "steal": 3
+              },
+              "30": {
+                "busy": 226317,
+                "idle": 914269,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792438390852
+          },
+          "before": {
+            "loadavg": [
+              9.07,
+              14.8,
+              13.47
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 319513291,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1712896,
+            "reserved_ticks": {
+              "14": {
+                "busy": 236456,
+                "idle": 903573,
+                "steal": 3
+              },
+              "30": {
+                "busy": 226317,
+                "idle": 914069,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792438388852
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "14": 0.0,
+            "30": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                9.07,
+                14.8,
+                13.47
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 319513398,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1712905,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 236456,
+                  "idle": 903773,
+                  "steal": 3
+                },
+                "30": {
+                  "busy": 226317,
+                  "idle": 914269,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792438390852
+            },
+            "before": {
+              "loadavg": [
+                9.07,
+                14.8,
+                13.47
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 319513291,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1712896,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 236456,
+                  "idle": 903573,
+                  "steal": 3
+                },
+                "30": {
+                  "busy": 226317,
+                  "idle": 914069,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792438388852
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "14": 0.0,
+              "30": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 759947.84721,
+      "outer_wall_ms": 765409.242176,
+      "phases": [
+        {
+          "data": {
+            "points": 339968,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.004293,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 892470,
+            "representatives": 2048
+          },
+          "elapsed_ms": 133.105779,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 210.546806,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 210.564541,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 224.141436,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 1140557,
+            "domain_clauses": 892470,
+            "identity_mask": 0,
+            "variables": 111478
+          },
+          "elapsed_ms": 298.206749,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 200000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 298.234789,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 200000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 760246.081999,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "7f075624590914cf7598eff7c793ef275ef5b976",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 200000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 1200,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K4096",
+      "columns": 4096,
+      "conflict_cap": 200000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k4096-v8",
+      "id": "k4096-200k",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 60,
+          "failed_user_threads": 0,
+          "moved_count": 476
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            14,
+            30
+          ],
+          "request": {
+            "explicit": [
+              14,
+              30
+            ]
+          },
+          "reserved": [
+            14,
+            30
+          ],
+          "run_cpu": 14,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              7.4,
+              10.67,
+              13.63
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 362955162,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1743464,
+            "reserved_ticks": {
+              "14": {
+                "busy": 312990,
+                "idle": 909425,
+                "steal": 3
+              },
+              "30": {
+                "busy": 226574,
+                "idle": 995934,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792439213032
+          },
+          "before": {
+            "loadavg": [
+              7.4,
+              10.67,
+              13.63
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 362955113,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 1743464,
+            "reserved_ticks": {
+              "14": {
+                "busy": 312990,
+                "idle": 909225,
+                "steal": 3
+              },
+              "30": {
+                "busy": 226574,
+                "idle": 995734,
+                "steal": 3
+              }
+            },
+            "unix_ms": 1792439211032
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "14": 0.0,
+            "30": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                7.4,
+                10.67,
+                13.63
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 362955162,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1743464,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 312990,
+                  "idle": 909425,
+                  "steal": 3
+                },
+                "30": {
+                  "busy": 226574,
+                  "idle": 995934,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792439213032
+            },
+            "before": {
+              "loadavg": [
+                7.4,
+                10.67,
+                13.63
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 362955113,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 1743464,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 312990,
+                  "idle": 909225,
+                  "steal": 3
+                },
+                "30": {
+                  "busy": 226574,
+                  "idle": 995734,
+                  "steal": 3
+                }
+              },
+              "unix_ms": 1792439211032
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "14": 0.0,
+              "30": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "natural_solver_ms": 786700.6455450001,
+      "outer_wall_ms": 797133.398274,
+      "phases": [
+        {
+          "data": {
+            "points": 679936,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.0039310000000000005,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 1773110,
+            "representatives": 4096
+          },
+          "elapsed_ms": 302.003797,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 461.4310119999999,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 461.4493619999999,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 474.147912,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 2021197,
+            "domain_clauses": 1773110,
+            "identity_mask": 0,
+            "variables": 131958
+          },
+          "elapsed_ms": 586.09595,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 200000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 586.124952,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 200000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 787286.7704970001,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "7f075624590914cf7598eff7c793ef275ef5b976",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 200000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 1200,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K2048",
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k2048",
+      "id": "k2048-v7-preflight",
+      "planned_status": null,
+      "status": "PREFLIGHT_REFUSED_NO_WORKER"
+    },
+    {
+      "arm": "K2048",
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k2048-v8",
+      "id": "k2048-v8-launch-failure",
+      "planned_status": null,
+      "status": "LAUNCH_FAILED_NO_AUDIT"
+    }
+  ],
+  "schema": "n83.native-xor-summary/v2",
+  "scope": "known-witness SAT component and separately bounded natural trials",
+  "signature": null,
+  "timing_scope": "descriptive recorded conditions; no automatic L2 or full-cold timing admission; missing worker context-switch/fault accounting",
+  "total_index_calculus_runtime_ms": null
+}

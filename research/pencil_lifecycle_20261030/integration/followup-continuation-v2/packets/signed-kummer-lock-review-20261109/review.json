@@ -1,0 +1,97 @@
+{
+  "schema": "source-review/v1",
+  "status": "no_remaining_blocking_source_finding",
+  "producer_manifest_sha256": "729ecb2b19b1100db21ce8865465b4b7abb6197be07331468c2796339ee28002",
+  "execution_performed": false,
+  "closure": {
+    "files": 49,
+    "missing_explicit_manifest_paths": [],
+    "all_hashes_and_sizes_verified": true,
+    "package_metadata_references": [],
+    "environment_macro_uses": [
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/eager.rs",
+        "line": "env!(\"CARGO_MANIFEST_DIR\"),"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/eager.rs",
+        "line": "env!(\"CARGO_MANIFEST_DIR\"),"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/eager.rs",
+        "line": "std::env::set_current_dir(std::path::Path::new(env!(\"CARGO_MANIFEST_DIR\")).join(\"../..\"))"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned.rs",
+        "line": "env!(\"CARGO_MANIFEST_DIR\"),"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned.rs",
+        "line": "env!(\"CARGO_MANIFEST_DIR\"),"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned.rs",
+        "line": "std::env::set_current_dir(std::path::Path::new(env!(\"CARGO_MANIFEST_DIR\")).join(\"../..\"))"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned-original.rs",
+        "line": "env!(\"CARGO_MANIFEST_DIR\"),"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned-original.rs",
+        "line": "env!(\"CARGO_MANIFEST_DIR\"),"
+      },
+      {
+        "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/pruned-original.rs",
+        "line": "std::env::set_current_dir(std::path::Path::new(env!(\"CARGO_MANIFEST_DIR\")).join(\"../..\"))"
+      }
+    ]
+  },
+  "amendment": {
+    "scope": "two manifest-only package identity edits",
+    "rust_dependency_key": "five-leads-study",
+    "new_package": "kummer-five-leads-study",
+    "rust_source_unchanged": true,
+    "binary_or_runtime_equivalence_established": false
+  },
+  "containment": {
+    "worker_seconds": 45,
+    "native_runtime_seconds": 50,
+    "native_stop_seconds": 5,
+    "caller_timeout_seconds": 59,
+    "caller_kill_seconds": 1,
+    "reserved_seconds": 60,
+    "cpu": 1,
+    "memory_bytes": 2147483648,
+    "swap_bytes": 0,
+    "tasks": 64,
+    "per_file_bytes": 16777216,
+    "writable": "fresh owned workspace only",
+    "compiler_proxy": "only exact -vV permitted; all other arguments rejected",
+    "network": "PrivateNetwork plus Cargo offline"
+  },
+  "resolved_findings": [
+    "Broad writable donor path narrowed",
+    "Inclusive native/caller60s bound",
+    "Finite file cap",
+    "Concrete native owner and terminal capture",
+    "Fast-exit identity retained with RemainAfterExit",
+    "Success requires native exit0/success and empty owned cgroup",
+    "Owned post-stop disappearance distinguished from scientific success"
+  ],
+  "pending": [
+    "Exact release and publication readback; active root terminal and cleanup; separate60second reservation",
+    "Actual offline dependency resolution unexecuted",
+    "Lock bytes must be published before combined build",
+    "Combined build wrapper and acceptance remain separate review"
+  ],
+  "files": {
+    "generate_lock.py": "ae17b73dd2b3cb3b8c18b0c50fa33add57d26cdceeba01571bdebcf497bd802e",
+    "launch.py": "c1623b8ab38a97f096a8dee20ae6aaedc67dd1bf6bb8e96e2b4b1ec340ad7c77",
+    "rustc-query.py": "3a358ba4a695e85b093472b3cc6b7baf3c2c48edc5b87a1ce565d89390e8747e",
+    "commands.json": "d9090471473bb0e2714113697cbf9ea2f381c17d1e93651186dc40f2af92f51c",
+    "lock-inputs.json": "b1aff1db9f2433ee4b67c7b6c884bf95fa21b562f7eee1d88680c254cba4abe5",
+    "driver-Cargo.toml": "a23852199afe78c85654727350901ba65b0207bfd511f297a13e53358b02fa12",
+    "native-Cargo.toml": "55443ed606286f12d6ccdd1cbd898bf306348e4b62f4c6f26d710f57402ba9f2"
+  }
+}

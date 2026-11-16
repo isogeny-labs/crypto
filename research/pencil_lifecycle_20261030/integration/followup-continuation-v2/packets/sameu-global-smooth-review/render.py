@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,hashlib,datetime,html
+import subprocess,textwrap
+D=Path(__file__).parent; P=Path('/var/tmp/pencil-sameu-global-smooth-20261031-v1')
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+checks=json.loads((D/'hash-check.json').read_text());assert len(checks)==231
+for c in checks: assert h(Path(c['path']))==c['sha256'],c['path']
+assert h(P/'manifest.json')=='e1b420f0327113a29b62442cd9f25ada7454de75c647af1a017921264e85b479'
+exits={n:json.loads((D/'replay'/n/'receipt.json').read_text())['exit_code'] for n in ['module','controls','readback','reviewer1','reviewer2']}
+assert exits=={'module':0,'controls':0,'readback':0,'reviewer1':1,'reviewer2':0}
+paras=[('Result','Five global-to-local polynomial lemmas passed fresh compilation and axiom readback. Producer controls and additional reviewer characteristic-two and common-root controls passed. No blocking discrepancy was identified at this scope.'),('Exact premise and derivation','IsCoprime f f.derivative means an explicit polynomial Bezout identity A*f+B*f\' = 1. Evaluating at a putative common zero gives 0=1. For the retained monic quintic, evaluation and formal derivative evaluation equal the previously defined value and derivative expressions. Applying this exclusion to the reviewed same-support extraction proves its normalized ordinate is nonzero from the original two divisibility premises, nonzero slope difference and noninverse condition.'),('Characteristic boundaries','The proof works over an arbitrary field and never divides by 5. Producer F5 controls cover X^5-X with derivative -1 and the rejected X^5 example. Reviewer F2 control supplies f=X^5+X+1 and the certificate f-X*f\'=1; a rational X^2 common-zero control rejects coprimality. These are polynomial assertions. They do not identify geometric smoothness of y^2=f in characteristic two. The downstream weighted doubling composition still needs its separate characteristic-not-two and nonzero-weight premises.'),('Custody and independent checks','231 recorded source, producer and dependency-cache bindings were rechecked. The copied theorem module, five producer controls and five-declaration axiom readback all exited 0. Only propext, Classical.choice and Quot.sound appeared. Additional reviewer controls exited 0 after a retained numeral-normalization failure. The retained dependency objects were hash checked, not rebuilt transitively.'),('Failures retained','Producer missing-import, namespace and numeral-control failures remain in its sealed packet; its second main attempt recorded process exit -9. Reviewer attempt 1 failed to reduce the coefficient 4 in F2; attempt 2 added that explicit reduction and passed. Successful reviewer output retains unused-simp/tactic warnings.'),('Review authorship and exclusions','The reviewer authored imported extraction and doubling components and had reviewed the local bridge; this review is independent of the new global-bridge construction. No Squarefree/Separable equivalence, global certificate-finding algorithm, UInt64 execution, class-sum, compiler, operation-count or scientific timing result is asserted. No scientific trial was run. Full-cohort cost ratio is null.')]
+s={'schema':'mathematical_component_review/v1','status':'validated_scoped','utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'producer_path':str(P),'producer_manifest_sha256':h(P/'manifest.json'),'source_sha256':h(P/'GlobalSmooth.lean'),'bindings_checked':231,'native_exits':exits,'axioms':['propext','Classical.choice','Quot.sound'],'claims_reviewed':json.loads((P/'status.json').read_text())['claims'],'dependency_authorship_disclosed':True,'scientific_trials':0,'whole_cost_ratio':None,'scope':[v for k,v in paras]}
+(D/'review.json').write_text(json.dumps(s,indent=2)+'\n');(D/'REVIEW.md').write_text('# Global coprimality bridge: independent review\n\n'+'\n\n'.join('## '+k+'\n\n'+v for k,v in paras)+'\n')
+lines=['Global coprimality bridge - independent review','31 October 2026','']
+for k,v in paras:lines += [k]+textwrap.wrap(v,112)+['']
+rs='<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="'+str(75+len(lines)*20)+'"><rect width="100%" height="100%" fill="white"/>'
+for i,line in enumerate(lines):rs+=f'<text x="35" y="{40+i*20}" font-family="sans-serif" font-size="15">{html.escape(line)}</text>'
+rs+='</svg>';(D/'report.svg').write_text(rs)
+subprocess.run(['rsvg-convert','-f','pdf','-o',str(D/'report.pdf'),str(D/'report.svg')],check=True)
+labels=['IsCoprime f, f derivative','Evaluate Bezout identity','Exclude common root at extracted x','Original divisibilities + noninverse + slope nonzero','Extracted ordinate nonzero']
+svg='<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="470" viewBox="0 0 1000 470"><rect width="1000" height="470" fill="white"/><text x="30" y="35" font-size="22">Global-to-local polynomial dependency</text>'
+for i,t in enumerate(labels):
+ y=65+i*65;svg+=f'<rect x="30" y="{y}" width="930" height="45" rx="7" fill="#e8f1f7" stroke="#38607a"/><text x="45" y="{y+29}" font-family="sans-serif" font-size="17">{html.escape(t)}</text>'
+ if i<4:svg+=f'<path d="M490 {y+45} v20" stroke="#38607a"/>'
+svg+='<text x="30" y="435" font-size="15">Arbitrary field; downstream doubling retains its own nonzero-weight and characteristic premises.</text></svg>'
+(D/'diagram.svg').write_text(svg)
+files={str(p.relative_to(D)):h(p) for p in D.rglob('*') if p.is_file() and p.name!='manifest.json' and p.suffix not in ['.olean','.ilean']}
+(D/'manifest.json').write_text(json.dumps({'schema':'artifact_manifest/v1','files':files},indent=2)+'\n');print(h(D/'manifest.json'))

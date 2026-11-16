@@ -297,6 +297,24 @@ int main() {
       if (c.lift(x, 0, q))
         ps.push_back(q);
     }
+    // Exercise every enlarged slot boundary with exact CPU witnesses, tails,
+    // empty reprepare and the same device storage used by each build variant.
+    for (unsigned slots : {9u, 10u, MAX_SLOTS}) {
+      std::vector<std::vector<Point>> bases(slots, {ps[0], ps[1]});
+      Plan p = plan(c, bases, 4096);
+      require(p.slots == slots && p.offsets[slots] == 2 * slots);
+      DeviceBackend device(c, 4096, 17);
+      HostBackend host(c, 4096, 17);
+      device.prepare(p); host.prepare(p);
+      for (Point target : {Point{}, ps[0], ps[1], ps.back()}) {
+        auto got = device.find(target, 8192), expected = host.find(target, 8192);
+        require(got.found == expected.found && got.indices == expected.indices);
+        if (got.found) require(got.indices.size() == slots);
+      }
+      bases.back().clear();
+      device.prepare(plan(c, bases, 4096));
+      require(!device.find(Point{}, 0).found);
+    }
     // Exercise automatic index admission and rebuilding through the public
     // backend, including a table with >=4096 rows and a partial query block.
     Curve wide = curve(65521, 0, 7);
@@ -306,6 +324,39 @@ int main() {
       if (wide.lift(x, 0, q))
         base.push_back(q);
     }
+#if defined(ER_QUERY_CACHED) && defined(ER_RIGHT_FULL_CACHE)
+    // Three right slots and >=4096 combinations activate partial reuse.
+    // Force full-cache refusal independently of the available GPU memory.
+    {
+      std::vector<std::vector<Point>> bases(4);
+      bases[0] = {base.front()};
+      for (unsigned j = 1; j < 4; ++j)
+        bases[j].assign(base.begin() + j, base.begin() + j + 17);
+      Plan p = plan(wide, bases, 8192);
+      p.split = 1; p.left = 1; p.right = 17 * 17 * 17;
+      DeviceBackend cached(wide, 8192, 512), fallback(wide, 8192, 512, 0);
+      HostBackend host(wide, 8192, 512);
+      cached.prepare(p); fallback.prepare(p); host.prepare(p);
+      require(cached.cached_right_rows() == p.right);
+      require(fallback.cached_right_rows() == 0);
+      require(fallback.cached_partial_rows() == 17 + 17 * 17);
+      require(cached.cached_partial_rows() == 17 + 17 * 17);
+      for (Point target : {base.front(), Point{}, base.back(),
+                           wide.affine(tuple_sum(wide, p.view(p.points.data()),
+                                                 0, p.slots, p.right - 1))}) {
+        auto expected = host.find(target, p.left + p.right);
+        for (auto *device : {&cached, &fallback}) {
+          auto got = device->find(target, p.left + p.right);
+          require(got.found == expected.found && got.indices == expected.indices);
+        }
+      }
+      fallback.prepare(Plan{});
+      require(!fallback.find(Point{}, 0).found);
+      fallback.prepare(p);
+      require(fallback.find(base.back(), p.left + p.right).indices ==
+              host.find(base.back(), p.left + p.right).indices);
+    }
+#endif
 #ifdef ER_QUERY_PERSISTENT
     // Force multiple grid strides, a partial final tile, late minima, complete
     // misses and reset ordering. The check target caps the grid at two blocks.

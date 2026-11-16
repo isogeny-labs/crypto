@@ -1,0 +1,23 @@
+digraph ProjectedQuery {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.4", fontname="DejaVu Sans", fontsize=16, labelloc="t", label="Projected queries and the remaining cold pipeline"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf5ff", color="#365779", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.10"];
+  edge [color="#526779", arrowsize=0.7, fontname="DejaVu Sans", fontsize=9];
+
+  assumptions [label="Required domain certificate\n#E = h*r; prime r; gcd(h,r)=1\nG has exact order r", fillcolor="#fff4d8", color="#a57c20"];
+  kernel [label="Checked ordered kernel census\nK = ker[h]\nNative constructors\nCyclic h <= 4096; supplied K <= 65536"];
+  query [label="Given T=[d]G, k mod r, U in K\nR = T + [k]G + U\nUniform only if k and U are uniform"];
+  oracle [label="Find a full-curve relation\nsum eps_i*P_i = R\nRelation oracle remains open", style="rounded,dashed,filled", fillcolor="#f4f4f4", color="#777777"];
+  logs [label="Supply projected base logs L_i\n[L_i]G = [h]P_i\nCold log collection / LA remains open", style="rounded,dashed,filled", fillcolor="#f4f4f4", color="#777777"];
+  check [label="Native verification\nCheck every log and signed relation\nS = sum eps_i*L_i mod r"];
+  recover [label="Scalar recovery and public check\nd = h^(-1)*S - k mod r\nVerify [d]G = T"];
+  assumptions -> kernel;
+  kernel -> query;
+  query -> oracle;
+  oracle -> check;
+  logs -> check;
+  check -> recover;
+  note [shape=note, label="Conditional algebra + source checks only\nThe helper supplies no random sampler, relation oracle,\nfactor-base logarithms or complete IC price.\nNo new curve experiment or speed result.", fillcolor="#ffffff", color="#8793a0"];
+  {rank=same; oracle; logs;}
+  recover -> note [style=invis];
+  {rank=sink; note;}
+}

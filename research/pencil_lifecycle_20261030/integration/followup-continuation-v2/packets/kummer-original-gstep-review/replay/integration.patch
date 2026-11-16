@@ -1,0 +1,93 @@
+--- a/eager.rs
++++ b/pruned-boundary-delta.rs
+@@ -48,12 +48,19 @@
+         p: u64,
+     ) -> StepResult {
+         let choice = branch(k, p);
+-        let (kd, r0) = xadd_repaired(k, k, k0, t, acts, p);
+-        let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
+-        let (kpp, r2) = xadd_repaired(kp, kp, k0, t, acts, p);
+-        let pair = if choice == 0 { kd.zip(km) } else { km.zip(kpp) };
+-        (pair, choice, [r0, r1, r2], [true,true,true], [choice==0,true,choice!=0])
+-    }
++        // Proposed arm: only the selected double is evaluated.
++        // None in the unused repair slot means not evaluated, not repair failure.
++        if choice == 0 {
++            let (kd, r0) = xadd_repaired(k, k, k0, t, acts, p);
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            (kd.zip(km), choice, [r0, r1, None], [true,true,false], [true,true,false])
++        } else {
++            let (km, r1) = xadd_repaired(k, kp, kg, t, acts, p);
++            let (kpp, r2) = xadd_repaired(kp, kp, k0, t, acts, p);
++            (km.zip(kpp), choice, [None, r1, r2], [false,true,true], [false,true,true])
++        }
++    }
++
+     pub fn repair_probe(x:[u64;4],y:[u64;4],diff:[u64;4],t:[u64;4],acts:&[(u64,[[u64;4];4])],p:u64)->(Option<[u64;4]>,Option<[u64;4]>,Option<u64>){
+        let plain=xadd(x,y,diff,t,p);let(repaired,root)=xadd_repaired(x,y,diff,t,acts,p);(plain,repaired,root)
+     }
+@@ -129,7 +136,7 @@
+ mod signed {
+     include!(concat!(
+         env!("CARGO_MANIFEST_DIR"),
+-        "/src/recover_impl_uncached.rs"
++        "/src/recover_boundary_impl.rs"
+     ));
+     pub fn curve_coeff(t: &Value, p: u64) -> Vec<u64> {
+         curve(t, p)
+@@ -138,6 +145,41 @@
+         general(k, t, p)
+     }
+     #[allow(clippy::too_many_arguments)] // The unchanged N11 Recover wrapper.
++
++
++    pub fn delta_lift(anchor:Divisor,kq:[u64;4],kplus:[u64;4],t:&Value,j:&Jacobian,p:u64)->(Option<Divisor>,&'static str,usize){
++      if kq==[0;4]||kplus==[0;4]{return(None,"delta_zero_vector",0);}
++      let Some(q)=general(kq,t,p)else{return(None,"delta_nonordinary_chart",0);};let f=curve(t,p);
++      let(a0,a1)=(q[2],s(0,q[1],p));let z=s(m(a1,a1,p),a0,p);let b1sq=a(s(s(q[3],m(z,s(m(f[5],a1,p),m(f[6],z,p),p),p),p),m(a1,s(f[3],m(f[4],a1,p),p),p),p),f[2],p);
++      let Some(root)=j.f.sqrt(b1sq)else{return(None,"delta_nonsquare",0);};
++      let mut power=[1,0];let mut rem=[0,0];for &coeff in &f{rem[0]=a(rem[0],m(coeff,power[0],p),p);rem[1]=a(rem[1],m(coeff,power[1],p),p);power=[s(0,m(a0,power[1],p),p),s(power[0],m(a1,power[1],p),p)];}
++      let mut candidates=Vec::new();for b1 in[root,j.f.neg(root)]{let b0s=if b1!=0{vec![m(a(rem[1],m(a1,b1sq,p),p),inv(m(2,b1,p),p),p)]}else{match j.f.sqrt(rem[0]){Some(b0)=>vec![b0,j.f.neg(b0)],None=>vec![]}};
++        for b0 in b0s{let d=Divisor{degree:2,u:[a0,a1,1],v:[b0,b1]};if !candidates.contains(&d){candidates.push(d);}}}
++      let tested=candidates.len();assert!(tested<=4);let mut matches=Vec::new();
++      for d in candidates{if !j.valid(d){continue;}let Some(kd)=super::walk::project_any(d,j,t,&[],p)else{continue;};if !super::walk::same_k(kd,kq,p){continue;}let sum=j.add(anchor,d);let Some(ks)=super::walk::project_any(sum,j,t,&[],p)else{continue;};if super::walk::same_k(ks,kplus,p){matches.push(d);}}
++      match matches.len(){1=>(Some(matches[0]),"delta_unique_signed_lift",tested),0=>(None,"delta_no_signed_lift",tested),_=>(None,"delta_ambiguous_signed_lift",tested)}
++    }
++    pub fn boundary_lift(anchor:Divisor,kq:[u64;4],kplus:[u64;4],t:&Value,j:&Jacobian,p:u64)->(Option<Divisor>,&'static str,usize){
++      if kq==[0;4]||kplus==[0;4]{return(None,"zero_projective_vector",0);}
++      let Some(q)=general_homogeneous(kq,t,p)else{return(None,"singular_coordinate_map",0);};
++      if q[0]!=0{return(None,"not_boundary_chart",0);}
++      if q[1]==0{
++        if q[2]!=0||q[3]==0{return(None,"invalid_boundary_chart",0);}
++        let Some(ka)=super::walk::project_any(anchor,j,t,&[],p)else{return(None,"anchor_projection_failure",0);};
++        return if super::walk::same_k(ka,kplus,p){(Some(Divisor::O),"identity_recovered",1)}else{(None,"identity_neighbour_mismatch",1)};
++      }
++      if m(q[1],q[3],p)!=m(q[2],q[2],p){return(None,"invalid_degree1_conic",0);}
++      let x=m(q[2],inv(q[1],p),p);let value=j.polynomial.iter().rev().fold(0,|z,&c|j.f.add(j.f.mul(z,x),c));
++      let Some(y)=j.f.sqrt(value)else{return(None,"degree1_nonsquare",0);};
++      let mut matches=Vec::new();let mut tested=0;
++      for yy in [y,j.f.neg(y)]{
++        let candidate=Divisor{degree:1,u:[j.f.neg(x),1,0],v:[yy,0]};if matches.contains(&candidate){continue;}tested+=1;
++        if !j.valid(candidate){continue;}let Some(kc)=super::walk::project_any(candidate,j,t,&[],p)else{continue;};
++        if !super::walk::same_k(kc,kq,p){continue;}let sum=j.add(anchor,candidate);let Some(ks)=super::walk::project_any(sum,j,t,&[],p)else{continue;};
++        if super::walk::same_k(ks,kplus,p){matches.push(candidate);}
++      }
++      match matches.len(){1=>(Some(matches[0]),"degree1_unique_signed_lift",tested),0=>(None,"degree1_no_signed_lift",tested),_=>(None,"degree1_ambiguous_signed_lift",tested)}
++    }
+     pub fn lift(
+         anchor: Divisor,
+         kq: [u64; 4],
+@@ -167,9 +209,12 @@
+                     status = "enumerated_exception_lift";
+                 }
+             }
++            if out.is_none() && status == "Delta_zero" {
++                return delta_lift(anchor,kq,kplus,t,j,p);
++            }
+             (out, status, tested)
+         } else {
+-            (None, "general_conversion_inapplicable", 0)
++            boundary_lift(anchor,kq,kplus,t,j,p)
+         }
+     }
+ }

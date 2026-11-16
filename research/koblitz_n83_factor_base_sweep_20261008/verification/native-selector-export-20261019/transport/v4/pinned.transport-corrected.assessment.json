@@ -1,0 +1,56 @@
+{
+  "card_id": "CARD-n83-sat-boundary-20261019-pinned",
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "interpretation": "not_assessed",
+  "corrected_native_card_check": {
+    "exit_code": 0,
+    "relay_verbatim": true,
+    "record_digests_verified": true,
+    "status": "completed"
+  },
+  "original_failure": {
+    "assessment": "/home/ec2-user/scratch/n83-sat-boundary-20261019/pinned.assessment.json",
+    "assessment_sha256": "16556e7d43e52c58e9d44cb1eed5df997e583793c25a0381d0bb20966e3a8b50",
+    "native_check_exit_code": 1,
+    "native_check_error": "relay differs from native receipt rendering",
+    "cause": "Receipt JSON floating-point reserialization changed 1.1790702610000001 to1.179070261; original relay and receipt bytes match. Original failed check and impeded assessment remain unchanged."
+  },
+  "checker_provenance": {
+    "binary": "/home/ec2-user/scratch/n83-sat-boundary-20261019/transport-fix-target/release/n83-sweep-runner",
+    "binary_sha256": "89cc67b25466a83baee13459059317890daef26667ce5b35c278a6adff3eca5d",
+    "source": "/home/ec2-user/scratch/n83-sat-boundary-20261019/transport-fix-src",
+    "changed_source": "src/card.rs",
+    "changed_source_sha256": "21753591b153b43c3d449f97e861823ea95c0226b6b5e91e08ea0114ddb52fd2",
+    "reviewed_change": "report reads original receipt text, parses only to validate card_id, then returns original text without its terminal newline. Read-only diff confirms this sole card.rs change.",
+    "test_log": "/home/ec2-user/scratch/n83-sat-boundary-20261019/validation/transport-fix-tests.log",
+    "test_log_sha256": "e55c101acf1153fcd96af88ec74a8ee5dbad35cdf3c83398375d24dea64daee0",
+    "observed_test_log": "8 unit plus7 integration passed, including card_report_preserves_original_float_bytes; tests not rerun by director."
+  },
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-sat-boundary-20261019/cards/pinned.json",
+    "relay": "/home/ec2-user/scratch/n83-sat-boundary-20261019/pinned-relay.txt",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/pinned.receipt.json",
+    "relay_and_receipt_sha256": "5ff7ce692be82354cc22e30830c1f78a02813324ca1318a476bd43846cba9264",
+    "exact_byte_identity_verified": true,
+    "stream_sha256s_matched": 2,
+    "declared_output_sha256s_matched": 9
+  },
+  "scope": {
+    "frozen_head": "5e9ee5d4b1aa6ca22368213e5bc05b343e00bfb4",
+    "tracked_checkout_clean": true,
+    "experiment_bound_files_unchanged": true,
+    "experiment_rerun": false,
+    "source_or_spec_changes": false
+  },
+  "reasons": [
+    "Corrected native card-check passed on original card and actual saved relay under frozen native_path.",
+    "Exact byte comparison confirms original relay equals original on-disk receipt.",
+    "All stream and declared output digests match; frozen experiment file binds and HEAD remain valid.",
+    "Receipt records exact frozen argv completed once with exit0 and no timeout; clean before/after status and declared scope hold.",
+    "Transport-only correction resolves the prior verifier impediment; it does not rewrite any experimental evidence or interpret scientific observations."
+  ]
+}
