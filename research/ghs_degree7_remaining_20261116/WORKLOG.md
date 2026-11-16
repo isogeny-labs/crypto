@@ -543,3 +543,29 @@ Commit receipts, freeze linear-square degree-eight screen, run and audit.
 ### Errors
 
 None in the four counted runs.
+
+## 2026-11-15 23:39 America/Los_Angeles
+
+### What was done
+
+Committed degree-eight two-pole receipts and bounded result at
+`a68e87a2beda`. Wrote a frozen protocol and source for five nonbranch
+linear-square denominator shapes. The source solves the coefficient equation
+in `c` for no quadratic branch pole and filters 11,859,210 logical
+`(c,λ)` candidates per one-pole shape with direct square-class controls.
+No counted run had begun at this entry.
+
+### Decisions made
+
+The even exponent on the nonbranch linear factor keeps evaluation square
+classes independent of `c`, except when the point equals `c` and the
+condition is automatic. This permits a source-bound complete search of
+these five shapes on the four representative cells.
+
+### Open threads
+
+Commit and run, inspect any hits, then assess remaining degree-eight classes.
+
+### Errors
+
+None in preparation.
