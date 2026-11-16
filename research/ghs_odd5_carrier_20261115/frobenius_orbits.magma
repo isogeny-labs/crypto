@@ -1,0 +1,15 @@
+// Independent F243 power-basis replay of the two trace-+26 Frobenius orbits.
+F := GF(3);
+R<z> := PolynomialRing(F);
+K<a> := ext<F | z^5+2*z+1>;
+function Mask(v)
+    c := Eltseq(v);
+    return &+[ Integers()!c[i]*3^(i-1) : i in [1..#c] ];
+end function;
+first := [ Mask(a^(3^j)) : j in [0..4] ];
+second := [ Mask((a+a^3)^(3^j)) : j in [0..4] ];
+assert first eq [3,27,167,182,230];
+assert second eq [30,194,103,139,233];
+assert #Seqset(first cat second) eq 10;
+print "PASS trace26 first orbit",first;
+print "PASS trace26 positive-cover orbit",second;
