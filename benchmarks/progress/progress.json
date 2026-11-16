@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0332Z-larger-star-capacity-screen-20261116",
+  "latest_record": "20261116T0445Z-proof-replay-pipeline-screen-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 197,
+    "measured": 198,
     "open": 1
   },
   "repo": "crypto",
@@ -13763,6 +13763,52 @@
       ],
       "problem": "kernel:c25519_family_bsgs_vs_rho",
       "unit": "S"
+    },
+    {
+      "better": "higher",
+      "first": 48.0,
+      "latest": 48.0,
+      "latest_derived": {},
+      "metric": "complete_outputs",
+      "points": [
+        {
+          "commit": "c699fda4e2e8",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0445Z-proof-replay-pipeline-screen-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All54 planned outcomes retained:48 matching complete outputs,6 required Std imports failed (4 explicit total-cofactor budget;2 terminated at16MiB files, no signal recorded). No complete-roster ratio or selected family; no15x gain. Corrected cause attribution883af8, raw failed outputs retained. Unsigned L0 one-call screen. [pcc:unverified]",
+          "value": 48.0
+        }
+      ],
+      "problem": "kernel:certified_basis_pipeline",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "failed_attempts",
+      "points": [
+        {
+          "commit": "c699fda4e2e8",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0445Z-proof-replay-pipeline-screen-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All54 planned outcomes retained:48 matching complete outputs,6 required Std imports failed (4 explicit total-cofactor budget;2 terminated at16MiB files, no signal recorded). No complete-roster ratio or selected family; no15x gain. Corrected cause attribution883af8, raw failed outputs retained. Unsigned L0 one-call screen. [pcc:unverified]",
+          "value": 6.0
+        }
+      ],
+      "problem": "kernel:certified_basis_pipeline",
+      "unit": "count"
     },
     {
       "better": "lower",
