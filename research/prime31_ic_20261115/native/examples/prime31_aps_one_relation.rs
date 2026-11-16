@@ -75,15 +75,15 @@ fn prng(state:&mut u64)->u64 {
     z=(z^(z>>27)).wrapping_mul(0x94d0_49bb_1331_11eb);
     z^(z>>31)
 }
-fn source(q:(u64,u64),seed:u64,ar:&mut Arithmetic)
+fn source_sized(q:(u64,u64),seed:u64,ar:&mut Arithmetic,count:usize)
     ->Result<([Vec<Labelled>;3],u64,u64),String> {
     let mut rng=seed;
-    let mut out:[Vec<Labelled>;3]=std::array::from_fn(|_|Vec::with_capacity(T));
-    let mut xs=HashSet::with_capacity(3*T);
+    let mut out:[Vec<Labelled>;3]=std::array::from_fn(|_|Vec::with_capacity(count));
+    let mut xs=HashSet::with_capacity(3*count);
     let mut identity=0_u64;
     let mut duplicated=0_u64;
     for part in &mut out {
-        while part.len()<T {
+        while part.len()<count {
             let a=prng(&mut rng)%N;
             let b=prng(&mut rng)%N;
             if a==0&&b==0 {continue;}
@@ -163,10 +163,10 @@ fn algebraic(
     let lookup=reverse_index(&parts[2]);
     let mut stats=Stats::default();
     for (i,p) in parts[0].iter().enumerate() {
-        let mut coefficients=Vec::with_capacity(T);
-        let mut sqrts=Vec::with_capacity(T);
-        let mut prefixes=Vec::with_capacity(T+1);
-        let mut denominators=Vec::with_capacity(T);
+        let mut coefficients=Vec::with_capacity(parts[1].len());
+        let mut sqrts=Vec::with_capacity(parts[1].len());
+        let mut prefixes=Vec::with_capacity(parts[1].len()+1);
+        let mut denominators=Vec::with_capacity(parts[1].len());
         prefixes.push(1u64);
         for other in &parts[1] {
             let f=s3_coeff(p.pt.0,other.pt.0);
@@ -251,8 +251,11 @@ fn json_solution(s:&Option<Solution>)->serde_json::Value {
              "identity_equation":"alpha + beta * log = 0 (mod n)"})
     } else {json!({"status":"no_relation_in_bounded_sample"})}
 }
-fn execute(compare:bool,round_limit:usize,q:(u64,u64))
+fn execute_sized(compare:bool,round_limit:usize,q:(u64,u64),count:usize)
     ->Result<serde_json::Value,String> {
+    if count<2 || count>8_192 || round_limit==0 || round_limit>64 {
+        return Err("inadmissible labelled-list count or trial cap".into());
+    }
     let cold=Instant::now();
     let mut arithmetic=Arithmetic::default();
     check_curve(PRIME31,&mut arithmetic)?;
@@ -263,7 +266,7 @@ fn execute(compare:bool,round_limit:usize,q:(u64,u64))
     for round in 0..round_limit {
         let seed=SEED.wrapping_add((round as u64).wrapping_mul(0xd1b5_4a32_d192_ed03));
         let source_start=Instant::now();
-        let (parts,identities,duplicate_x)=source(q,seed,&mut arithmetic)?;
+        let (parts,identities,duplicate_x)=source_sized(q,seed,&mut arithmetic,count)?;
         let source_ns=source_start.elapsed().as_nanos();
         let alg_start=Instant::now();
         let additions_before=arithmetic.counts.group_additions;
@@ -298,7 +301,7 @@ fn execute(compare:bool,round_limit:usize,q:(u64,u64))
         let success=solution.is_some();
         attempts.push(json!({
             "round":round,"public_seed":format!("{seed:016x}"),
-            "points_per_partition":T,"precompute_labels_ns":source_ns,
+            "points_per_partition":count,"precompute_labels_ns":source_ns,
             "rejected_identity":identities,"rejected_global_duplicate_x":duplicate_x,
             "algebraic_S3_pair_roots_ns":alg_ns,"algebraic_visited_pairs":stats.pair_s3,
             "algebraic_field_square_roots":stats.s3_sqrt,
@@ -317,6 +320,7 @@ fn execute(compare:bool,round_limit:usize,q:(u64,u64))
                 "method":"published APS 2018 dynamic labelled one-relation S3, m=3",
                 "classification":"index-calculus methodology, generic pair-MITM equivalent, not a novel non-generic attack",
                 "p":P,"n":N,"curve_a":PRIME31.a,"curve_b":PRIME31.b,
+                "points_per_partition":count,"round_limit":round_limit,
                 "cofactor":1,"generator":PRIME31.g,"public_target":q,
                 "complete_target_scalar_recovered":true,
                 "no_known_target_log_in_solver":true,
@@ -330,19 +334,167 @@ fn execute(compare:bool,round_limit:usize,q:(u64,u64))
         "standing":"[pcc:unverified]",
         "method":"published APS 2018 one relation",
         "p":P,"n":N,"public_target":q,
+        "points_per_partition":count,"round_limit":round_limit,
         "complete_target_scalar_recovered":false,
         "status":"bounded_exhaustion_not_a_negative_algebraic_ideal_certificate",
         "cold_rust_wall_ns":cold.elapsed().as_nanos(),
         "attempts":attempts
     }))
 }
+
+fn execute(compare:bool,round_limit:usize,q:(u64,u64))
+    ->Result<serde_json::Value,String>{
+    execute_sized(compare,round_limit,q,T)
+}
+
+// Development-only partition-size experiment against the same published
+// APS one-relation control. Each arm rebuilds its labelled public points,
+// charges every unsuccessful round, and verifies target scalars only outside
+// execute_sized. Varying T is an engineering search over generic-MITM-equivalent
+// arithmetic, never a non-generic complexity claim.
+fn partition_size_sweep()->Result<serde_json::Value,String>{
+    const SIZES:[(usize,usize);5]=[(768,12),(1024,8),(1536,3),(2048,3),(3072,2)];
+    let mut rng=0x484f_4c44_4f55_5453_u64;
+    let mut known=HashSet::new();
+    let mut targets=Vec::new();
+    let mut point_ar=Arithmetic::default();
+    for _ in 0..12 {
+        let k=loop {
+            let candidate=prng(&mut rng)%N;
+            if candidate>1 && known.insert(candidate) {break candidate;}
+        };
+        let q=point_ar.scalar(PRIME31,k,Some(PRIME31.g))
+            .ok_or("size sweep target was identity")?;
+        targets.push((q,k));
+    }
+    let mut configurations=Vec::new();
+    for (count,round_limit) in SIZES {
+        let mut cases=Vec::new();
+        let mut successes=0usize;
+        let mut total_ns=0u128;
+        let mut total_pairs=0u64;
+        let mut total_rounds=0usize;
+        for (idx,&(q,k)) in targets.iter().enumerate() {
+            let v=execute_sized(false,round_limit,q,count)?;
+            let solved=v["complete_target_scalar_recovered"].as_bool()==Some(true);
+            let attempts=v["attempts"].as_array().ok_or("no sweep attempts")?;
+            let last=attempts.last().ok_or("empty sweep attempts")?;
+            let found=last.pointer("/solution/log").and_then(|x|x.as_u64());
+            if solved && (found!=Some(k)
+                || point_ar.scalar(PRIME31,found.unwrap(),Some(PRIME31.g))!=Some(q)) {
+                return Err(format!("sweep scalar replay failed for T={count}, case={idx}"));
+            }
+            let cost=v["cold_rust_wall_ns"].as_u64().ok_or("missing sweep wall")?;
+            let pairs=attempts.iter().map(|row|
+                row["algebraic_visited_pairs"].as_u64().unwrap_or(0)
+            ).sum::<u64>();
+            if solved{successes+=1;}
+            total_ns+=u128::from(cost);
+            total_pairs+=pairs;
+            total_rounds+=attempts.len();
+            cases.push(json!({
+                "case":idx,"public_target":q,
+                "expected_known_answer_verifier_only":k,
+                "recovered_log":found,"solved":solved,
+                "rounds":attempts.len(),"cold_wall_ns":cost,
+                "visited_pair_quadratics":pairs,
+                "unresolved_within_cap":!solved
+            }));
+        }
+        configurations.push(json!({
+            "points_per_partition":count,"max_rounds":round_limit,
+            "solved":successes,"cases":targets.len(),
+            "total_cold_wall_ns":total_ns.to_string(),
+            "total_pair_quadratics":total_pairs,"total_rounds":total_rounds,
+            "individual":cases
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "classification":"published APS-style index calculus; pair-root enumeration generic MITM-equivalent",
+        "curve_prime":P,"group_order":N,
+        "sweep":"12 identical independently generated caller-side held-out public Q per arm; fixed seed, varied T and bounded retries",
+        "no_known_scalar_supplied_to_algebraic_solver":true,
+        "reports_failures_and_misses":true,
+        "calibration":"one sequential Rust release CI development sweep; not an isolated A/A comparison",
+        "arms":configurations
+    }))
+}
+
+fn heldout_twelve()->Result<serde_json::Value,String>{
+    // Caller-side fixture generation; the scalar is never passed to execute().
+    // These known answers are verified only after the complete algebraic solve.
+    let mut rng=0x484f_4c44_4f55_5453_u64;
+    let mut used=HashSet::new();
+    let mut results=Vec::with_capacity(12);
+    let mut successes=0usize;
+    let mut total_cold_ns=0u128;
+    let mut total_s3_pairs=0u64;
+    for case in 0..12usize {
+        let k=loop {
+            let candidate=prng(&mut rng)%N;
+            if candidate>1 && used.insert(candidate){break candidate;}
+        };
+        let mut verifier=Arithmetic::default();
+        let q=verifier.scalar(PRIME31,k,Some(PRIME31.g))
+            .ok_or("holdout public Q was identity")?;
+        let result=execute(false,ROUNDS,q)?;
+        let solved=result["complete_target_scalar_recovered"].as_bool()==Some(true);
+        let last=result["attempts"].as_array()
+            .and_then(|a|a.last()).ok_or("missing holdout transcript")?;
+        let found=last.pointer("/solution/log").and_then(|v|v.as_u64());
+        if solved && found!=Some(k) {
+            return Err(format!("holdout case {case} returned wrong target scalar"));
+        }
+        let ns=result["cold_rust_wall_ns"].as_u64().ok_or("missing cold wall")?;
+        let pairs=result["attempts"].as_array().ok_or("missing attempts")?
+            .iter().map(|v|v["algebraic_visited_pairs"].as_u64().unwrap_or(0))
+            .sum::<u64>();
+        total_cold_ns+=u128::from(ns);
+        total_s3_pairs+=pairs;
+        if solved {successes+=1;}
+        results.push(json!({
+            "case":case,"public_target":q,
+            "known_answer_verifier_only":k,
+            "recovered_log":found,
+            "success":solved,
+            "attempts":result["attempts"].as_array().map(|a|a.len()),
+            "cold_wall_ns":ns,"s3_pairs":pairs
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "classification":"published APS-style S3 pair enumeration; generic MITM equivalent",
+        "fixture":"12 deterministic independent nontrivial public Q=[k]G; k not passed to execute",
+        "curve_prime":P,"group_order":N,
+        "cases":12,"successes":successes,
+        "total_cold_wall_ns":total_cold_ns.to_string(),
+        "total_s3_pair_roots":total_s3_pairs,
+        "cases_detail":results,
+        "scientific_limit":"source-specific developer CI, no independent PCC or non-generic cost claim"
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--size-sweep" {
+        let result=partition_size_sweep()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
+    if args.len()==1 && args[0]=="--holdouts" {
+        let v=heldout_twelve()?;
+        println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
+        if v["successes"].as_u64()!=Some(12) {
+            return Err("some held-out prime31 targets did not solve within three bounded rounds".into());
+        }
+        return Ok(());
+    }
     let compare=match args.as_slice() {
         [] => false,
         [a] if a=="--one" => false,
         [a] if a=="--compare" => true,
-        _ => return Err("usage: prime31_aps_one_relation --one|--compare".into())
+        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep".into())
     };
     let v=execute(compare,ROUNDS,PUBLIC_Q)?;
     println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
@@ -375,6 +527,19 @@ mod tests {
         expected.sort_unstable();
         assert_eq!(xs,expected);
         assert!(xs.iter().all(|&x|s3_eval(f,x)==0));
+    }
+    #[test]
+    fn varied_rust_partition_sizes_preserve_public_base_invariants(){
+        let mut ar=Arithmetic::default();
+        let (parts,identities,duplicates)=source_sized(PUBLIC_Q,SEED,&mut ar,128).unwrap();
+        assert_eq!(parts.iter().map(Vec::len).sum::<usize>(),384);
+        assert_eq!(parts.iter().flat_map(|v|v.iter().map(|pt|pt.pt.0))
+            .collect::<HashSet<_>>().len(),384);
+        assert_eq!(identities,0);
+        assert!(duplicates<10);
+        let trial=execute_sized(false,1,PUBLIC_Q,128).unwrap();
+        assert_eq!(trial["points_per_partition"].as_u64(),Some(128));
+        assert!(trial["attempts"].as_array().is_some());
     }
     #[test]
     fn one_relation_congruence() {

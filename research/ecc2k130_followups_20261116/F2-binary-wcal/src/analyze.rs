@@ -152,6 +152,14 @@ pub fn run(args: &[String]) -> Result<(), String> {
             by_n_small_ga.insert(*n, ga_ns);
         }
         let mut row = serde_json::Map::new();
+        for w in WORDS {
+            let op = format!("xor_w{w}");
+            if !price_ops.contains(&op.as_str()) {
+                let r = reading(ps, &op, "ga", &mut rng);
+                readings.insert((*n, imp.clone(), op.clone(), "ga".into()), r);
+                row.insert(op, rjson(&r));
+            }
+        }
         for op in price_ops.iter() {
             let r = reading(ps, op, "ga", &mut rng);
             readings.insert((*n, imp.clone(), op.to_string(), "ga".into()), r);
@@ -196,6 +204,17 @@ pub fn run(args: &[String]) -> Result<(), String> {
             "ga_ns": {"median": ga_ns, "min": ga_min, "max": ga_max}}));
         prices.push(json!({"n": n, "impl": imp, "label": ps[0].label, "processes": ps.len(),
             "ga_ns_median": ga_ns, "gae": Value::Object(row), "word_xor_units": Value::Object(wordunits), "ns": Value::Object(ns)}));
+    }
+    // Labelled extrapolation (PROTOCOL §4 limits): n = 131 w3 prices rescaled by GA_w3 / GA_wide at n = 83.
+    let mut bridged = Vec::new();
+    if let (Some(w3_83), Some(wide_83), Some(w3_131)) = (groups.get(&(83, "w3".to_string())), groups.get(&(83, "wide".to_string())), groups.get(&(131, "w3".to_string()))) {
+        let k = ns_median(w3_83, "ga").0 / ns_median(wide_83, "ga").0;
+        for op in price_ops.iter() {
+            let r = readings[&(131, "w3".to_string(), op.to_string(), "ga".to_string())];
+            bridged.push(json!({"op": op, "price_w3_unit": rjson(&r), "scale_ga_w3_over_ga_wide_at_83": k,
+                "extrapolated_price_ecbench_quality_ga": {"point": r.point * k, "ci95_union": [r.lo * k, r.hi * k]}}));
+        }
+        writeln!(md, "\nExtrapolation (labelled): GA_w3/GA_wide at n = 83 = {k:.2}; n = 131 prices × {k:.2} estimate the price against an ecbench-quality addition.").unwrap();
     }
     // Drift control: ns per word at W = 64 does not touch the field.
     let xs: Vec<f64> = xor64_ns_all.iter().map(|x| x.3).collect();
@@ -309,7 +328,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
     // ---- L4 re-read (PROTOCOL §7b): I native word XORs vs G field ops priced in word XORs.
     let mut l4rows = Vec::new();
     writeln!(md, "\n## Table 4: L4 G (gcd with L_V) vs I (inherited-f4) at measured field-op prices in word XORs\n").unwrap();
-    writeln!(md, "| cell n:l:m | targets | mul price in word ops (point; range over lat/tp, W 4–4096, 95% union) | I/G at P1 / P4 / P2n (L4) | I/G measured point | I/G measured range | reading |\n|--|--:|--|--|--:|--|--|").unwrap();
+    writeln!(md, "| cell n:l:m | targets | mul price in word ops (point; range over lat/tp, W 4–4096, 95% union) | I/G at P1 / P4 / P2n (L4) | I/G measured point | I/G measured range | reading | secondary range, W ≥ 16 |\n|--|--:|--|--|--:|--|--|--|").unwrap();
     let l4res: Value = serde_json::from_str(&std::fs::read_to_string(Path::new(&l4).join("results.json")).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
     let mut gfiles: Vec<_> = std::fs::read_dir(Path::new(&l4).join("raw")).map_err(|e| e.to_string())?
         .filter_map(|e| e.ok().map(|e| e.path()))
@@ -334,6 +353,17 @@ pub fn run(args: &[String]) -> Result<(), String> {
         let mut lo_p: BTreeMap<&str, f64> = BTreeMap::new();
         let mut hi_p: BTreeMap<&str, f64> = BTreeMap::new();
         for (key, ops) in [("mul", ["mul_lat", "mul_tp"]), ("sqr", ["sqr_lat", "sqr_tp"]), ("inv", ["inv_lat", "inv_lat"]), ("add", ["fadd", "fadd"])] {
+            if key == "add" {
+                // PROTOCOL §4 limits: low end 1 word op per word of the field (by construction),
+                // high end the measured black_box-latency fadd.
+                let mut hi = 0.0f64;
+                for w in WORDS.iter().filter(|&&w| w >= 4) {
+                    hi = hi.max(rd("fadd", *w).unwrap().hi);
+                }
+                lo_p.insert(key, n.div_ceil(64) as f64);
+                hi_p.insert(key, hi);
+                continue;
+            }
             let (mut lo, mut hi) = (f64::INFINITY, 0.0f64);
             for op in ops {
                 for w in WORDS.iter().filter(|&&w| w >= 4) {
@@ -345,10 +375,33 @@ pub fn run(args: &[String]) -> Result<(), String> {
             lo_p.insert(key, lo);
             hi_p.insert(key, hi);
         }
-        let p_point: BTreeMap<&str, f64> = [("mul", pt("mul_lat")), ("sqr", pt("sqr_lat")), ("inv", pt("inv_lat")), ("add", pt("fadd"))].into_iter().collect();
+        let p_point: BTreeMap<&str, f64> = [("mul", pt("mul_lat")), ("sqr", pt("sqr_lat")), ("inv", pt("inv_lat")), ("add", n.div_ceil(64) as f64)].into_iter().collect();
         let gcost = |g: &Value, p: &BTreeMap<&str, f64>| -> f64 {
             ["mul", "sqr", "inv", "add"].iter().map(|k| g["g"][*k].as_f64().unwrap() * p[k]).sum()
         };
+        // Secondary (descriptive): the same range over W >= 16 only.
+        let mut lo16 = lo_p.clone();
+        let mut hi16 = hi_p.clone();
+        for (key, ops) in [("mul", ["mul_lat", "mul_tp"]), ("sqr", ["sqr_lat", "sqr_tp"]), ("inv", ["inv_lat", "inv_lat"])] {
+            let (mut lo, mut hi) = (f64::INFINITY, 0.0f64);
+            for op in ops {
+                for w in WORDS.iter().filter(|&&w| w >= 16) {
+                    let r = rd(op, *w).unwrap();
+                    lo = lo.min(r.lo);
+                    hi = hi.max(r.hi);
+                }
+            }
+            lo16.insert(key, lo);
+            hi16.insert(key, hi);
+        }
+        // Amendment 1 (descriptive, after the data): I/G at four named corners, add = 1 word op.
+        let corner = |mul: &str, sqr: &str, w: usize| -> BTreeMap<&str, f64> {
+            [("mul", rd(mul, w).unwrap().point), ("sqr", rd(sqr, w).unwrap().point), ("inv", rd("inv_lat", w).unwrap().point), ("add", n.div_ceil(64) as f64)].into_iter().collect()
+        };
+        let corners = [("lat_W64", corner("mul_lat", "sqr_lat", 64)), ("tp_W64", corner("mul_tp", "sqr_tp", 64)),
+            ("lat_W4096", corner("mul_lat", "sqr_lat", 4096)), ("tp_W4096", corner("mul_tp", "sqr_tp", 4096))];
+        let mut csum = [0.0f64; 4];
+        let (mut l16lo, mut l16hi) = (0.0, 0.0);
         let (mut lsum_pt, mut lsum_lo, mut lsum_hi, mut k) = (0.0, 0.0, 0.0, 0usize);
         let mut budget = 0;
         for t in ts {
@@ -360,6 +413,11 @@ pub fn run(args: &[String]) -> Result<(), String> {
             lsum_pt += (iv / gcost(t, &p_point)).ln();
             lsum_lo += (iv / gcost(t, &hi_p)).ln();
             lsum_hi += (iv / gcost(t, &lo_p)).ln();
+            for (ci, (_, c)) in corners.iter().enumerate() {
+                csum[ci] += (iv / gcost(t, c)).ln();
+            }
+            l16lo += (iv / gcost(t, &hi16)).ln();
+            l16hi += (iv / gcost(t, &lo16)).ln();
             k += 1;
         }
         if k == 0 {
@@ -382,14 +440,23 @@ pub fn run(args: &[String]) -> Result<(), String> {
         } else {
             "unresolved inside the measured range".to_string()
         };
-        writeln!(md, "| {n}:{l}:{m} | {k} | {:.1} ({:.1}–{:.1}) | {} | {:.3} | [{:.3}, {:.3}] | {reading} |",
+        writeln!(md, "| {n}:{l}:{m} | {k} | {:.1} ({:.1}–{:.1}) | {} | {:.3} | [{:.3}, {:.3}] | {reading} | [{:.3}, {:.3}] |",
             p_point["mul"], lo_p["mul"], hi_p["mul"],
-            band.map(|b| format!("{:.3} / {:.3} / {:.3}", b[0], b[1], b[2])).unwrap_or("-".into()), ig_pt, ig_lo, ig_hi).unwrap();
+            band.map(|b| format!("{:.3} / {:.3} / {:.3}", b[0], b[1], b[2])).unwrap_or("-".into()), ig_pt, ig_lo, ig_hi,
+            (l16lo / k as f64).exp(), (l16hi / k as f64).exp()).unwrap();
         l4rows.push(json!({"n": n, "l": l, "m": m, "targets": k, "budget_hits": budget,
             "prices_word_ops_point": p_point, "prices_word_ops_lo": lo_p, "prices_word_ops_hi": hi_p,
-            "i_over_g_band_L4": band, "i_over_g_measured": {"point": ig_pt, "lo": ig_lo, "hi": ig_hi}, "reading": reading}));
+            "i_over_g_band_L4": band, "i_over_g_measured": {"point": ig_pt, "lo": ig_lo, "hi": ig_hi}, "reading": reading,
+            "amendment1_corners_i_over_g": corners.iter().enumerate().map(|(ci, (name, c))| json!({"corner": name, "prices": c, "i_over_g": (csum[ci] / k as f64).exp()})).collect::<Vec<_>>(),
+            "secondary_w_ge_16": {"i_over_g_lo": (l16lo / k as f64).exp(), "i_over_g_hi": (l16hi / k as f64).exp(), "mul_lo": lo16["mul"], "mul_hi": hi16["mul"]}}));
     }
 
+    writeln!(md, "\n### Table 4b (Amendment 1, descriptive): I/G at named price corners (add = 1 word op)\n\n| cell | lat, W64 | tp, W64 | lat, W4096 | tp, W4096 |\n|--|--:|--:|--:|--:|").unwrap();
+    for r in &l4rows {
+        let c = r["amendment1_corners_i_over_g"].as_array().unwrap();
+        writeln!(md, "| {}:{}:{} | {:.3} | {:.3} | {:.3} | {:.3} |", r["n"], r["l"], r["m"],
+            c[0]["i_over_g"].as_f64().unwrap(), c[1]["i_over_g"].as_f64().unwrap(), c[2]["i_over_g"].as_f64().unwrap(), c[3]["i_over_g"].as_f64().unwrap()).unwrap();
+    }
     // ---- cross-check with the committed full_prices.json (another host).
     let mut xcheck = Vec::new();
     if let Some(fp) = full_prices {
@@ -413,7 +480,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
         "prices": prices, "controls": controls,
         "drift_control": {"xor_w64_ns_median_per_process": xor64_ns_all.iter().map(|x| json!({"n": x.0, "impl": x.1, "rep": x.2, "ns": x.3})).collect::<Vec<_>>(),
             "max_over_min": drift, "pass": drift_pass},
-        "linz_allin": linz, "l2_reread": l2rows, "l4_reread": l4rows, "full_prices_crosscheck": xcheck,
+        "bridged_131": bridged, "linz_allin": linz, "l2_reread": l2rows, "l4_reread": l4rows, "full_prices_crosscheck": xcheck,
     });
     std::fs::create_dir_all(&out).map_err(|e| e.to_string())?;
     std::fs::write(Path::new(&out).join("results.json"), serde_json::to_string_pretty(&results).unwrap()).map_err(|e| e.to_string())?;
