@@ -78,6 +78,15 @@ Observed LA primitive bitops fall903928056050to661359105264, including6171
 known gate events; other phases match. Native bookkeeping remains incomplete,
 with no full-cost ratio or parity assertion. [pcc:unverified]
 
+The [production basis-reuse comparison](runpod-production-quotient-20261116-39/report.pdf)
+integrates the checked kernel into the optional Rust pipeline and runs a
+fresh matched p1009seed367 fixture. All three workers recover216251322113766629.
+Graph LA observed bitops764235601774→386190905796, with exact conservation
+of every other paired phase and identical sources/descents/projection.
+Whole incomplete subtotals6787702462546IC/7919959237308graph/7541914541330reuse
+remain unrankable.317source/portable hashes pass; the owned CPU is collected
+and deleted. PCC-20261116-c04e84 remains unverified. [pcc:unverified]
+
 The [homogeneous-basis reuse replay](runpod-homogeneous-quotient-20261116-38/report.pdf)
 checks all six saved37graph matrices. Both modes pay the homogeneous
 checkpoint; reuse substitutes its checked one-dimensional kernel before a

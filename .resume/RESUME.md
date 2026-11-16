@@ -1,3 +1,85 @@
+# Current checkpoint:39COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE/RustgraphIC+cheapextension-fieldrelationfinder towardrho parity.
+UserRustscience/ALLfuturemeasurementsRunpod. No subagents/stopgoal.
+ALLownedpaidpods32–39DELETED; no compiler/scientificjobactive. Privateauthpointer
+/tmp/ic-runpod-auth-location persists;NEVERprintkey/header/token/envresponses/
+copyAPIkeytopod. No needaskcredentials/profile. <=60seccommentary/concreteactions.
+
+39sourceb2cf8aaf10aa667e20d4d512a92a6a9d24c4524d before solePOST20220:05:50Z.
+p1009seed367/L263807419864521289,all3actualscalar216251322113766629/copiedqualifier0.
+ObservedINCOMPLETEwhole6787702462546IC/7919959237308graph/7541914541330reuse;
+LA320975823394IC/764235601774graph/386190905796reuse. ALLnon-LApairedgraphphases
+identical. Exactsource/descent/endpoint/checkpointmatrix/rank/finalprojection
+identity;independentcert/target/gate/kernel/projectedrows/scopedcounts/conservation
+PASS. fullbase492/small418/sources514/descents2/residuals3427;hom/fullrank417/419,
+quotientrank2,affinerows419→124. Removedoldsolver/conversion9159251M/8983271A/
+419Inv/189285words;added1121M/1532A/2Inv/1016069words. No old38/37composition.
+Nativegapsremainunrankable/nullfullcost/band/ratios/no parityclaim. Onecoldround
+0warm/retry/excluded,143.652swholepracticality. PCCc04e84UNVERIFIED;
+lessonsO-58f8fa379af1/T-0d6c39488ba6/O-65676b6db774. SourcePCC7d680eunverified.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-production-quotient-20261116-39/
+returned/task/run:546374Bbaselinegraph/560194Breuse/1135238BexportLOCALhashbound;
+31888Bsummary/7403BICraw/smallmetadataGit.317committedsourcepostcallreconstruction/
+portablepre/preworker/post/qualifiedhashPASS;privatepatternscanPASS. Own39
+kt5m0imke1z53cCPU4/8/.12h/pinnedimage/actualCPU24 DELETE204+GET40420:09:48Z
+AFTERcollection;privateguardmarker1800sguardinert. FinalONEPAGEPDFVIEWEDunclipped/
+exactPDF/SVG/150dpiPNG/nativefigurecopieshashPASS. Packetresearch/.../
+runpod-production-quotient-20261116-39;benchmarks/20261116-runpod-production-quotient.
+No raw/qualifier/summaryrewrites. Compactpresentationseparateschema;originalsummary
+alsoGitfits. CurrentstudyREADMEchangedPOSTCALLforreportlink,old317manifestbinds
+originalb2blobs,notcurrentREADME. Don'trerun/reprice39.
+
+NEXTcommit/pushfinished39packet/PCC/lesson/journal/resume/studyREADME,PRactual39
+AFTERproselint0. RegularPR4288/automerge/requiredCIreviewunconfirmed/no manualmerge.
+Latest aebCIEMPTY19:22;newpublicationpermitsread. CachedlatestPRbodytoolstoremay
+havebeenresetbyenvironmentstartup; /tmp/ic-quotient38-pr-body.txt contains38body,
+orfetchcurrentGitHubmetadata. Sourceb2newproductionflagnotyetinPRbody.
+
+NEXTTECHNICAL relationfinderlead: currentverified_relation removesFp-smallroots,
+requiresremainingquadraticFp-split,allfullsupportinoriginalFpbase. Proposedretain
+irreduciblequadraticMumfordD=(U,V)overFp²asonecanonical±remainder-classvertex;
+repeatdescriptorscancel,possiblyextendaccepteduniverse. NOTSELECTED40yet.
+LEAD_EXTENSION_QUADRATIC_REMAINDERS.md+extension-remainder-lead-review/layout-v2/
+report.pdf(VIEWED)listcompetinghypotheses/proofcontrols. Initialclippedlayout/
+PCC8e1cabpinnedsource/manifestretainedexact;don'teditpinnedLEADnoteorinitialfigfiles.
+ActualsourcelineconventionsA=a0+t*s*a1,C=sqrt(s)B,y=-A/C,F=A²−C²H;forcoprime
+quadraticU|F,V=-A/CmodU,mustcheckV²=HmodU,norm/poles/squarefreeness/point signs/
+principal-divisoridentity/independentJacobianreplay/canonicalorientation/witnesses.
+Remainderclassesmaybecomposite,don'tcallthemprimewithoutqualification.
+KBexact/negativeunavailablevalidation/extension-remainder-kb-*.log. m8finite
+Bspaceceil(p/2),m9p²; no m8protocol. Don'tassumeendomorphism/j0/tracezeroalpha.
+
+PossibleIMPLEMENTATION ROUTE toavoidanotherRootrebuildbeforecomponentviability:
+newstandaloneRustEXAMPLEusingexistingPUBLIC library APIs (TwoLargePrimeSieve::new/
+setup/base/sieve_line, Ctx/Fq/FpRing/Line,line_poly,prime_hyperelliptic ops Div/Hyp),
+newremainderhelperinexample/research; existingRootRlibfromb2cachecanlinkwithout
+librarysourcechange. Needinspectactualpublicpoly/fieldAPIs/build.rs beforedeciding.
+ComparefixedmatchedBcohort fullFpfullsmoothversusverifiedquadraticremainders,
+recordpartialdescriptors/collisionrank/certificates/algebraiccost,allfailures.
+Firstnativehand+Jacobiancontrols/protocolsourcepublishedBEFOREnewRunpoddata.
+No40code/protocol/callyet. Afterviabilityintegratepipeline;candidatewall/costunknown.
+Focusoneconcretecode/datastep;don'tspend10minspeculatingIR/Lean/endomorphisms.
+
+PRODUCTION39codefullyintegrated/sourceb2: sharedhelper
+src/cryptanalysis/jv_homogeneous_quotient.rs (nativepathwrapper),readonlypivotgetter
+actualRREF,constructcheckedkernelatreadycheckpoint,chargeinitial/projectionevents,
+2colCountedRelationSystem. OptionalAPI+--reuse-homogeneous-basisrequiresstructuralgate/
+rankstride;oldentrypoint/defaults retained. Serializeexplicitrank/productscope;
+actualquotientrank2,independentfullrank419. All34libtestsPASS/2oldignored,3example,
+54nativequalifier/strictClippy/build/actualwrappertransport+firstfailure/capturePASS.
+Workspace-startupinterruptedinitiallocaltestcompile;samefrozen7sourceresumptionPASS.
+No activecompilers;DON'Trebuildunchangedcode. Runtimeoutertoolcouldreport1despite
+explicitcapturedcargo0;useactualexitfiles+logs. No globalparent-suitePASSclaimed.
+
+RECENTADMIN: packagingguardinitiallyrefusedstaleorigintrackingrefafterpush;explicit
+fetchmadeb2matchandpassedbeforefirstscience. prepare...requirespublishedHEADmatching
+originref,soALWAYSexplicitfeaturefetchAFTERpushifremote.fetchonlymainconfigured.
+Combinedpostcallexportrejectedforoptionalrm-fscratchcleanup;rerunwithoutdeletion
+completedexport. Invalidouter-envelopejqtempscratchannotatednotusedasdata. Avoid
+rm-fstylecommands(rejectedbyruntime);preserveoruseapprovedsaferfilehandling.
+
 # Current checkpoint:39SOURCE READY; ownedRunpodCPUready/NOTDISPATCHED
 
 GoalACTIVE/Rust graphIC+cheapextension-field relationfinder towardrho parity.
