@@ -1,3 +1,37 @@
+# Current checkpoint: accounting source ready,24NOTRUN (16 November10:00Z)
+
+All native checks PASS:12 generic/MSTfilter (768map-oracle merges + exact
+3mul/2add/1inv/23word kernel),17sieve/graph(twoignored),1executed public-worker
+test (old+countedRho recoveractualscalar/foreign0/other0). Library/example/analyzer
+strictClippy, actualproduction/analyzerbuilds PASS;22analyzertests incl7bitopvectors.
+Newanalyzerreplays21PASS+23negative summaries BYTEEXACT. Initialincludedbitop
+enum-naminglint retained/resolvedonlyonincludedmodule; noassertionweakening.
+
+Rustmodulargraphhooks+sortedAXPY integrated. --bitops optin usesclaimedRayon1,
+oldformatwithoutflag; additivework_native observedprimitives/phases/subtotals,
+completeFALSE,totalNULL,explicitgaps. Rhoexplicitrho_tally+outerreplayONLY avoids
+snapshotdoublecount. Analyzerrepricesfixedunit/checkssums/zeroOTHER+foreign,
+rejectstampering/promotedcompleteness; evenPASS cannotauthorizecomparison.
+
+Amendment19/cover-accounting-validation-plan.json prospective24: p1009fresh269,
+oneICthenoriginalPivotgraph/1validation0warm/noRho/AA/ratios/CI;900worker1900whole,
+CPU0/8GiB/noretry/incidence+sharedboth. 88filesvalidation/cover-accounting-source.sha256
+PASS; distinctbuildmanifest. MUSTpublishcleansource/spec BEFOREsolewrappercall to
+/workspace/ic-local-runs/local-cover-accounting-validation-20261116-24.
+No24data/job yet. AfterexitORIGINALcopiedanalyzer/rawflow/hash/report/publish.
+
+COUNTING_COVERAGE.md namesmissinggraphmaps/normalization/replaybookkeeping,
+descentinline2scalaradds/residual+4initialRNGdraws, native/RNGcoverage and strongest
+Rho pricing. These are nextwork, NOTexternalblocker. Primarytotalunknown, noprimary
+parityassertion. Valgrind/perfnotinstalled; officialValgrind3.28.0source downloaded
+/workspace/ic-local-tools/valgrind-3.28.0.tar.bz2 SHA2569f7a18d128f05d3a80fea53e6953f34aad7200a425ceaee46099a8a798a7dd9c;
+publishedSHA1matches, manualread. No install/audit run yet. DoNOTcompileinstall
+during24. GoalACTIVE/localworks/no stopgoal/no subagents.
+
+PR4288same/regular/automerge, no manualmerge. CI09:45on22327listsEMPTY/appreview+
+migratesuccess;requiredgatesreviewunconfirmed.NEXT>=10:35absentnewsourceevent.
+Stage22censor/23MSTrefusalunchanged/published. AllclaimsPCCunverified.
+
 # Current checkpoint:23published; nextaccountinglead (16 November ~09:10Z)
 
 STAGE23FINISHED/FAILEDPROJECTIONCRITERION, actualrecoveriesBOTHCORRECT.

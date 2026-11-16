@@ -3,6 +3,7 @@
 //! inside each IC worker. The planted answer is never supplied to workers.
 use clap::Parser;
 use crypto_lib::cryptanalysis::{
+    jv_bitops::{self as bitops, JvTally, Phase},
     jv_cover::{self as cover, EllE, Fq3, PtE6, E2, E6},
     jv_rho_strong::{self as rho, CurveInstance, StrongOpts},
     jv_sieve::{self as sieve, SieveGraphOptions},
@@ -46,6 +47,9 @@ struct Args {
     incidence_shared: bool,
     #[arg(long)]
     mst_graph: bool,
+    /// Emit incomplete operation-accounting diagnostics; never a ranked total.
+    #[arg(long)]
+    bitops: bool,
     #[arg(long, default_value_t = 0)]
     worker_timeout_seconds: u64,
 }
@@ -112,6 +116,38 @@ fn solve_worker(
     keep: usize,
     mst: bool,
 ) -> Result<Value, String> {
+    solve_worker_inner(curve, method, seed, keep, mst, false)
+}
+
+fn solve_worker_counted(
+    curve: &PublicCurve,
+    method: &str,
+    seed: u64,
+    keep: usize,
+    mst: bool,
+) -> Result<Value, String> {
+    // Nested parallel iterators must execute on the tally owner's thread.
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .map_err(|e| e.to_string())?;
+    pool.install(|| {
+        bitops::claim();
+        bitops::set_moduli(curve.p, curve.l);
+        bitops::enable(true);
+        let _instance = bitops::enter(Phase::Instance);
+        solve_worker_inner(curve, method, seed, keep, mst, true)
+    })
+}
+
+fn solve_worker_inner(
+    curve: &PublicCurve,
+    method: &str,
+    seed: u64,
+    keep: usize,
+    mst: bool,
+    accounting: bool,
+) -> Result<Value, String> {
     if !is_prime_u64(curve.p)
         || !is_prime_u64(curve.l)
         || !(5..=1823).contains(&curve.p)
@@ -140,7 +176,12 @@ fn solve_worker(
     if !ec.mul(&g, curve.l).inf {
         return Err("public generator has wrong order".into());
     }
-    let (scalar, work, native_verified, capped) = if method == "rho" {
+    // Public-domain validation above is excluded. Everything from the public
+    // curve to the recovered scalar and its replay below is cold attack work.
+    let before = bitops::snapshot();
+    let other_before = bitops::snapshot_other();
+    let _attack = bitops::enter(Phase::Model);
+    let (scalar, work, native_verified, capped, rho_work) = if method == "rho" {
         let instance = CurveInstance {
             p: curve.p,
             l: curve.l,
@@ -154,11 +195,21 @@ fn solve_worker(
             rho::strong_rho_counted_with_scalar(&instance, seed, 0, rho_options(curve.l));
         let verified = counted.verified;
         let capped = counted.run.capped;
+        let tally = if accounting {
+            let _harness = bitops::enter(Phase::Harness);
+            Some(rho::rho_tally(
+                &counted,
+                &rho::measure_fq3_prims(curve.p, curve.l),
+            ))
+        } else {
+            None
+        };
         (
             scalar,
             serde_json::to_value(counted).map_err(|e| e.to_string())?,
             verified,
             capped,
+            tally,
         )
     } else {
         // Zero is an answer placeholder, not the challenge's actual logarithm.
@@ -200,19 +251,91 @@ fn solve_worker(
             serde_json::to_value(report).map_err(|e| e.to_string())?,
             verified,
             capped,
+            None,
         )
     };
-    let verified =
-        native_verified && scalar.is_some_and(|d| d > 0 && d < curve.l && ec.mul(&g, d) == q);
+    let replay_before = bitops::snapshot();
+    let verified = {
+        let _verification = bitops::enter(Phase::Verification);
+        native_verified && scalar.is_some_and(|d| d > 0 && d < curve.l && ec.mul(&g, d) == q)
+    };
+    let replay = bitops::snapshot().since(&replay_before);
     let elapsed = started.elapsed().as_nanos();
     let mut semantic_work = work.clone();
     without_times(&mut semantic_work);
-    Ok(
-        json!({"method":method,"solver_answer_placeholder":0,"recovered_scalar":scalar,
+    let mut result = json!({"method":method,"solver_answer_placeholder":0,"recovered_scalar":scalar,
         "graph_strategy":if mst {"mst"}else{"pivot"},
         "verified":verified,"capped":capped,"inner_wall_ns":elapsed,"work":work,
-        "signature":{"scalar":scalar,"verified":verified,"capped":capped,"work":semantic_work}}),
-    )
+        "signature":{"scalar":scalar,"verified":verified,"capped":capped,"work":semantic_work}});
+    if accounting {
+        let (tally, phases, pricing) = if let Some(mut t) = rho_work {
+            // Native rho calls some hooks internally. Its explicit tally is
+            // the sole source for that run; only the outer replay is added.
+            t.phase_mut(Phase::RhoVerification).add(&replay.total());
+            (
+                t,
+                &Phase::RHO[..],
+                "existing generic Fq3 harness primitive prices",
+            )
+        } else {
+            (
+                bitops::snapshot().since(&before),
+                &Phase::IC[..],
+                "executed modular hooks and observed native events",
+            )
+        };
+        let native = accounting_json(&tally, phases, curve, method, pricing);
+        let other_after = bitops::snapshot_other();
+        result["work_native"] = native;
+        result["work_native"]["other_modulus_ops"] = json!(Phase::IC
+            .iter()
+            .map(|&p| other_after[p as usize] - other_before[p as usize])
+            .sum::<u64>());
+        result["signature"]["work_native"] = result["work_native"].clone();
+    }
+    Ok(result)
+}
+
+fn accounting_json(
+    tally: &JvTally,
+    phases: &[Phase],
+    curve: &PublicCurve,
+    method: &str,
+    pricing: &str,
+) -> Value {
+    let widths = bitops::widths(curve.p, curve.l);
+    let phase_rows: Vec<_> = phases
+        .iter()
+        .map(|&phase| {
+            let t = tally.phase(phase);
+            json!({"phase":phase.name(), "primitives":bitops::prims_json(t),
+        "diagnostic_priced_bitops":t.bitops(&widths).expect("known primitives").to_string()})
+        })
+        .collect();
+    let total = tally.sum(phases);
+    let gaps = if method == "rho" {
+        vec![
+            "native_extension_formula_vs_generic_harness_pricing",
+            "tuned_reference_bitop_pricing",
+            "rho_setup_and_native_bookkeeping_audit",
+            "rng_internal_work",
+        ]
+    } else {
+        vec![
+            "graph_maps_sets_normalization_scheduling_and_replay_bookkeeping",
+            "cover_scalar_rng_and_native_bookkeeping_audit",
+            "rng_internal_work",
+        ]
+    };
+    json!({"schema":"cover.graph.accounting-diagnostic/v1", "unit":"bitop/v1",
+        "complete":false, "total_bitops":Value::Null, "comparison_eligible":false,
+        "pricing":pricing, "phases":phase_rows, "observed_primitives":bitops::prims_json(&total),
+        "diagnostic_priced_bitops":total.bitops(&widths).expect("known primitives").to_string(),
+        "widths":{"field_bits":widths.element_bits(),"r_bits":widths.r_bits},
+        "known_uncounted":gaps.into_iter().map(|name| json!({"name":name,"count":Value::Null,"status":"coverage_or_emission_pending"})).collect::<Vec<_>>(),
+        "foreign_hook_calls":bitops::foreign(),
+        "operand_rechecks":"included where inseparable from existing hooks",
+        "excluded":"public domain validation; instance construction; control, allocation and memory under bitop/v1"})
 }
 
 fn write_row(out: &mut BufWriter<File>, row: &Value) -> Result<(), Box<dyn std::error::Error>> {
@@ -228,7 +351,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let curve = serde_json::from_reader(File::open(
             args.fixture.as_ref().ok_or("worker fixture required")?,
         )?)?;
-        let result = solve_worker(
+        let solve = if args.bitops {
+            solve_worker_counted
+        } else {
+            solve_worker
+        };
+        let result = solve(
             &curve,
             method,
             args.walk_seed,
@@ -308,6 +436,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "capacity_model_m9":sieve::relations_estimate(p,9),
             "graph_strategy":if args.mst_graph {"mst"}else{"pivot"},
             "sieve_recipe":if args.validation_only || args.incidence_shared {"incidence_shared"}else{"historical_default"}});
+            let mut base = base;
+            if args.bitops {
+                base["operation_accounting"] = json!("incomplete_bitop_diagnostic");
+            }
             let mut fixture = base.clone();
             fixture["record_type"] = json!("fixture");
             fixture["expected_scalar"] = json!(spec.d);
@@ -366,6 +498,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             ]);
                         if args.mst_graph {
                             command.arg("--mst-graph");
+                        }
+                        if args.bitops {
+                            command.arg("--bitops");
                         }
                         for (key, _) in std::env::vars_os()
                             .filter(|(key, _)| key.to_string_lossy().starts_with("JV_"))
@@ -433,5 +568,24 @@ mod tests {
         assert_eq!(got["recovered_scalar"], spec.d);
         assert_eq!(got["verified"], true);
         assert_eq!(got["work"]["run"]["correct"], false); // no planted answer supplied
+        assert!(got.get("work_native").is_none());
+        let diagnostic = solve_worker_counted(&curve, "rho", 3, 75, false).unwrap();
+        assert_eq!(diagnostic["recovered_scalar"], spec.d);
+        assert_eq!(diagnostic["verified"], true);
+        let accounting = &diagnostic["work_native"];
+        assert_eq!(accounting["complete"], false);
+        assert_eq!(accounting["comparison_eligible"], false);
+        assert!(accounting["total_bitops"].is_null());
+        assert_eq!(accounting["foreign_hook_calls"], 0);
+        assert_eq!(accounting["other_modulus_ops"], 0);
+        assert!(
+            accounting["diagnostic_priced_bitops"]
+                .as_str()
+                .unwrap()
+                .parse::<u128>()
+                .unwrap()
+                > 0
+        );
+        assert_eq!(diagnostic["signature"]["work_native"], *accounting);
     }
 }

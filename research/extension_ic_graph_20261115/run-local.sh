@@ -70,6 +70,8 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
   src/cryptanalysis/jv_rho_strong.rs src/cryptanalysis/jv_isogeny_walk.rs \
   src/cryptanalysis/large_prime_filter.rs \
   src/cryptanalysis/large_prime_filter_mst.rs \
+  src/cryptanalysis/bitops.rs src/prime_hyperelliptic/ops.rs docs/units/BITOPS.md \
+  docs/units/bitop-v1.vectors.json docs/units/bitop-v2.vectors.json \
   research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \
   research/pencil_large_prime_20261029/src/sparse.rs research/extension_ic_graph_20261115 \
@@ -90,6 +92,9 @@ argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" \
 if [[ "$driver_kind" == cover-sieve-graph || "$driver_kind" == cover-sieve-validation ]]; then
   keep_percent=$(jq -er .retained_percent "$run_dir/runtime-plan.json")
   argv+=(--retained-percent "$keep_percent")
+  if [[ $(jq -r '.operation_accounting // false' "$run_dir/runtime-plan.json") == true ]]; then
+    argv+=(--bitops)
+  fi
   if [[ $(jq -r '.graph_strategy // "pivot"' "$run_dir/runtime-plan.json") == mst ]]; then
     argv+=(--mst-graph)
   fi

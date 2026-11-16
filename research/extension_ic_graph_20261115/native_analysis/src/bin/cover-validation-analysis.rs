@@ -1,4 +1,6 @@
 //! Endpoint validation only. No A/A, ratios, confidence intervals or parity claim.
+#[path = "../cover_accounting.rs"]
+mod accounting;
 #[allow(dead_code)]
 #[path = "cover-graph-analysis.rs"]
 mod common;
@@ -18,6 +20,7 @@ fn key(v: &Value) -> Result<Key, String> {
     ))
 }
 fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, String> {
+    let counted = plan["operation_accounting"] == true;
     let source = plan["source_revision"]
         .as_str()
         .filter(|s| s.len() == 40 && s.bytes().all(|c| c.is_ascii_hexdigit()))
@@ -31,6 +34,9 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
         || plan["worker_timeout_seconds"] != 900
         || plan["retained_percent"] != 75
         || plan["allow_comparative_claims"] != false
+        || plan
+            .get("operation_accounting")
+            .is_some_and(|v| !v.is_boolean())
     {
         return Err("invalid frozen validation plan".into());
     }
@@ -70,6 +76,8 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
             || row["validation_only"] != true
             || row["worker_timeout_seconds"] != 900
             || row["sieve_recipe"] != "incidence_shared"
+            || (counted && row["operation_accounting"] != "incomplete_bitop_diagnostic")
+            || (!counted && row.get("operation_accounting").is_some())
         {
             problems.insert("schema/source/validation mode/recipe mismatch".into());
         }
@@ -153,6 +161,10 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
             let method = if arm == "ic_a" { "ic" } else { "graph" };
             let mut semantic = work.clone();
             clean(&mut semantic);
+            let mut signature = json!({"scalar":w["recovered_scalar"],"verified":true,"capped":false,"work":semantic});
+            if counted {
+                signature["work_native"] = w["work_native"].clone();
+            }
             valid = r["valid"] == true
                 && (plan.get("graph_strategy").is_none()
                     || w["graph_strategy"] == plan["graph_strategy"])
@@ -170,8 +182,12 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
                 && r["cold_process_wall_ns"].as_u64().is_some_and(|v| v > 0)
                 && w["inner_wall_ns"].as_u64().is_some_and(|v| v > 0)
                 && r["cold_process_wall_ns"].as_u64() >= w["inner_wall_ns"].as_u64()
-                && w["signature"]
-                    == json!({"scalar":w["recovered_scalar"],"verified":true,"capped":false,"work":semantic});
+                && w["signature"] == signature
+                && if counted {
+                    accounting::valid(&w["work_native"], &f["family"])
+                } else {
+                    w.get("work_native").is_none()
+                };
             if method == "graph" {
                 let g = &work["graph_filter"];
                 valid &= valid_graph(g);
@@ -186,15 +202,22 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
             }
         }
         outcomes.push(json!({"p":p,"seed":seed,"arm":arm,"completed":row.is_some(),"endpoint_valid":valid,"nontrivial_graph_without_fallback":exercised,"child_exit":row.map(|r|r["child_exit"].clone()),"recorded_outer_wall_ns":row.map(|r|r["cold_process_wall_ns"].clone()),"recovered_scalar":row.map(|r|r["worker"]["recovered_scalar"].clone()),"work":row.map(|r|r["worker"]["work"].clone()),"progress_path":row.map(|r|r["progress_path"].clone())}));
+        if counted {
+            outcomes.last_mut().expect("just pushed")["work_native"] =
+                row.map_or(Value::Null, |r| r["worker"]["work_native"].clone());
+        }
     }
     let valid = problems.is_empty()
         && executions.len() == schedule.len()
         && starts.len() == schedule.len()
         && plan["observed_process_exit"] == 0
         && outcomes.iter().all(|r| r["endpoint_valid"] == true);
-    Ok(
-        json!({"schema":"cover.sieve.validation-summary/v1","source_revision":source,"observed_process_exit":plan["observed_process_exit"],"planned_executions":schedule.len(),"attempted_executions":starts.len(),"completed_executions":executions.len(),"raw_executions":raw_count,"in_flight_without_completion":pending,"unattempted_executions":schedule.len().saturating_sub(starts.len()),"global_problems":problems,"full_recovery_validation_passed":valid,"allows_new_frozen_comparison":valid,"comparative_eligibility":false,"rho_parity":false,"scope":"two public-input endpoint checks; no AA or comparative timing inference; all recorded wall is spent-work diagnostic","outcomes":outcomes}),
-    )
+    let mut result = json!({"schema":"cover.sieve.validation-summary/v1","source_revision":source,"observed_process_exit":plan["observed_process_exit"],"planned_executions":schedule.len(),"attempted_executions":starts.len(),"completed_executions":executions.len(),"raw_executions":raw_count,"in_flight_without_completion":pending,"unattempted_executions":schedule.len().saturating_sub(starts.len()),"global_problems":problems,"full_recovery_validation_passed":valid,"allows_new_frozen_comparison":valid,"comparative_eligibility":false,"rho_parity":false,"scope":"two public-input endpoint checks; no AA or comparative timing inference; all recorded wall is spent-work diagnostic","outcomes":outcomes});
+    if counted {
+        result["accounting_diagnostic_only"] = json!(true);
+        result["allows_new_frozen_comparison"] = json!(false);
+    }
+    Ok(result)
 }
 fn main() -> Result<(), Box<dyn Error>> {
     let a: Vec<_> = std::env::args().collect();
@@ -264,6 +287,107 @@ mod tests {
         }
         (p, rows)
     }
+    #[test]
+    fn accounting_diagnostic_reprices_and_never_allows_comparison() {
+        let (mut p, mut rows) = fixture();
+        p["operation_accounting"] = json!(true);
+        let names = [
+            "field_add",
+            "field_mul",
+            "field_sqr",
+            "field_inv",
+            "field_sqrt",
+            "legendre",
+            "modr_add",
+            "modr_mul",
+            "modr_inv",
+            "word_op",
+            "hash_probe",
+            "rng_words",
+        ];
+        let phases = [
+            "unattributed",
+            "walk",
+            "transport",
+            "model",
+            "factor_base",
+            "relations",
+            "descent",
+            "linear_algebra",
+            "verification",
+        ];
+        for row in &mut rows {
+            row["operation_accounting"] = json!("incomplete_bitop_diagnostic");
+            if row["record_type"] != "execution" {
+                continue;
+            }
+            let mut zero = serde_json::Map::new();
+            for name in names {
+                zero.insert(name.into(), json!(0));
+            }
+            let mut one = zero.clone();
+            one.insert("word_op".into(), json!(1));
+            let mut phase_rows: Vec<_> = phases
+                .into_iter()
+                .map(|name| json!({"phase":name,"primitives":zero,"diagnostic_priced_bitops":"0"}))
+                .collect();
+            phase_rows[0]["primitives"] = json!(one);
+            phase_rows[0]["diagnostic_priced_bitops"] = json!("64");
+            let native = json!({"schema":"cover.graph.accounting-diagnostic/v1","unit":"bitop/v1","complete":false,"total_bitops":null,"comparison_eligible":false,"pricing":"executed modular hooks and observed native events","foreign_hook_calls":0,"other_modulus_ops":0,"widths":{"field_bits":10,"r_bits":61},"known_uncounted":[{"name":"pending","count":null,"status":"coverage_or_emission_pending"}],"phases":phase_rows,"observed_primitives":one,"diagnostic_priced_bitops":"64"});
+            row["worker"]["work_native"] = native.clone();
+            row["worker"]["signature"]["work_native"] = native;
+        }
+        let s = analyze(&p, rows.clone(), 0).unwrap();
+        assert_eq!(s["full_recovery_validation_passed"], true);
+        assert_eq!(s["allows_new_frozen_comparison"], false);
+        assert_eq!(s["comparative_eligibility"], false);
+        for (field, bad) in [
+            ("complete", json!(true)),
+            ("total_bitops", json!(0)),
+            ("foreign_hook_calls", json!(1)),
+            ("other_modulus_ops", json!(1)),
+            ("diagnostic_priced_bitops", json!("63")),
+            ("known_uncounted", json!([])),
+        ] {
+            let mut damaged = rows.clone();
+            let r = damaged
+                .iter_mut()
+                .find(|r| r["record_type"] == "execution")
+                .unwrap();
+            r["worker"]["work_native"][field] = bad;
+            r["worker"]["signature"]["work_native"] = r["worker"]["work_native"].clone();
+            assert_eq!(
+                analyze(&p, damaged, 0).unwrap()["full_recovery_validation_passed"],
+                false,
+                "{field}"
+            );
+        }
+        for damage in 0..4 {
+            let mut damaged = rows.clone();
+            let r = damaged
+                .iter_mut()
+                .find(|r| r["record_type"] == "execution")
+                .unwrap();
+            let v = &mut r["worker"]["work_native"];
+            match damage {
+                0 => v["phases"][0]["primitives"]["word_op"] = json!(2),
+                1 => v["observed_primitives"]["rng_words"] = json!(2),
+                2 => v["phases"][0]["phase"] = json!("verification"),
+                _ => v["observed_primitives"]["unknown"] = json!(1),
+            }
+            r["worker"]["signature"]["work_native"] = r["worker"]["work_native"].clone();
+            assert_eq!(
+                analyze(&p, damaged, 0).unwrap()["full_recovery_validation_passed"],
+                false
+            );
+        }
+        p.as_object_mut().unwrap().remove("operation_accounting");
+        assert_eq!(
+            analyze(&p, rows, 0).unwrap()["full_recovery_validation_passed"],
+            false
+        );
+    }
+
     #[test]
     fn endpoints_are_validation_not_comparative_evidence() {
         let (p, r) = fixture();
