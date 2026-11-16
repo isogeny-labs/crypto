@@ -18,3 +18,6 @@ pub mod trace_zero_linearized;
 pub mod trace_zero_word_field;
 #[path = "../../../../../src/cryptanalysis/trace_zero_subspace_relations.rs"]
 pub mod trace_zero_subspace_relations;
+
+#[path = "../../../../trace_zero_kernel_20261116/compact_word_snapshot.rs"]
+pub mod trace_zero_compact_word_snapshot;

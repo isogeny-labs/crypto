@@ -71,7 +71,16 @@ impl ProductProjection {
         }
         a
     }
+    #[cfg(test)]
     fn new(xs: &[F2mElement], ws: &[F2mElement], c: &BinaryCurve) -> Self {
+        Self::new_with_field(xs, ws, c, &WordField::new(c))
+    }
+    fn new_with_field(
+        xs: &[F2mElement],
+        ws: &[F2mElement],
+        c: &BinaryCurve,
+        field: &WordField,
+    ) -> Self {
         assert!(xs.len() < 63 && c.m <= 192);
         let pivots: Vec<_> = ws
             .iter()
@@ -102,14 +111,15 @@ impl ProductProjection {
             .collect();
         let mut equations = vec![vec![[0; 3]; xs.len() + 1]; coordinates.len()];
         for (i, h) in halves.iter().enumerate() {
+            let mut multiple = words(h);
             for bit in 0..c.m as usize {
-                let unit = F2mElement::from_bit_positions(&[bit as u32], c.m);
-                let image = Self::reduce_with(&pivots, words(&unit.mul(h, &c.irreducible)));
+                let image = Self::reduce_with(&pivots, multiple);
                 for (j, &coord) in coordinates.iter().enumerate() {
                     if image[coord / 64] & (1u64 << (coord % 64)) != 0 {
                         equations[j][i][bit / 64] |= 1u64 << (bit % 64);
                     }
                 }
+                multiple = field.times_x(multiple);
             }
         }
         for (row, mask) in equations.iter_mut().zip(&rhs) {
@@ -801,8 +811,9 @@ pub fn decompose_trace_zero_linearized(
     let xs_squared: Vec<_> = xs.iter().map(|x| x.square(&c.irreducible)).collect();
     let ws_squared: Vec<_> = ws.iter().map(|w| w.square(&c.irreducible)).collect();
     // Small bases keep scalar admission/search costs. Larger bases amortize
-    // each inversion over at most 32 consecutive residuals, in original order.
-    let batch_size = if base.len() >= 64 { 32 } else { 1 };
+    // each inversion over at most 256 consecutive residuals, in original order.
+    // Unused tail residuals are computed and charged even for an early answer.
+    let batch_size = if base.len() >= 64 { 256 } else { 1 };
     let mut residuals = Vec::new();
     let mut residual_start = 0;
     let use_projection =
@@ -847,7 +858,14 @@ pub fn decompose_trace_zero_linearized(
             };
             out.systems += 1;
             let projected = if r > 0 && use_projection {
-                let p = projection.get_or_insert_with(|| ProductProjection::new(&xs, &ws, c));
+                let p = projection.get_or_insert_with(|| {
+                    ProductProjection::new_with_field(
+                        &xs,
+                        &ws,
+                        c,
+                        compact.as_ref().expect("projected compact workspace"),
+                    )
+                });
                 out.projected_columns = xs.len() + 1;
                 out.projected_systems += 1;
                 let (answer, rows) = p.solve_compact(

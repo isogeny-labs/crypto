@@ -44,6 +44,8 @@ pub struct WordField {
     trace_mask: Element,
     half: Vec<Element>,
     nbytes: usize,
+    reduction: u8,
+    tail: Element,
 }
 impl WordField {
     pub fn new(c: &BinaryCurve) -> Self {
@@ -61,6 +63,18 @@ impl WordField {
             halves.push(element(&e.half_trace(&c.irreducible).unwrap()));
         }
         let nbytes = n.div_ceil(8);
+        let mut tail = [0; 3];
+        for &t in &c.irreducible.low_terms {
+            tail[t as usize / 64] |= 1u64 << (t % 64);
+        }
+        // Select only by the complete modulus, never by degree alone.
+        let reduction = if c.m == 131 && tail == [0x2007, 0, 0] {
+            131
+        } else if c.m == 83 && tail == [(1u64 << 45) | 7, 0, 0] {
+            83
+        } else {
+            0
+        };
         let mut half = vec![[0; 3]; nbytes * 256];
         for byte in 0..nbytes {
             for value in 1..256usize {
@@ -81,6 +95,8 @@ impl WordField {
             trace_mask,
             half,
             nbytes,
+            reduction,
+            tail,
         }
     }
     #[inline]
@@ -93,8 +109,7 @@ impl WordField {
         operation_tally::tick(self.m, "mul");
         let mut out = [0u64; 7];
         mul_words_into(&a[..self.nw], &b[..self.nw], &mut out);
-        reduce_words(&mut out[..2 * self.nw + 1], &self.irr);
-        [out[0], out[1], out[2]]
+        self.reduce(out)
     }
     #[inline]
     pub fn square(&self, a: Element) -> Element {
@@ -104,8 +119,65 @@ impl WordField {
             out[2 * i] = spread32(w);
             out[2 * i + 1] = spread32(w >> 32);
         }
-        reduce_words(&mut out[..2 * self.nw + 1], &self.irr);
-        [out[0], out[1], out[2]]
+        self.reduce(out)
+    }
+    #[inline]
+    fn reduce(&self, mut p: [u64; 7]) -> Element {
+        match self.reduction {
+            83 => {
+                // deg(product)<=164. Three whole-high-part folds suffice:
+                // top degrees <=81,43,5 and tail degree45.
+                let mut lo = p[0] as u128 | ((p[1] as u128) << 64);
+                let hi = p[2] as u128 | ((p[3] as u128) << 64);
+                let mask = (1u128 << 83) - 1;
+                let mut top = (lo >> 83) | (hi << 45);
+                for _ in 0..3 {
+                    lo = (lo & mask) ^ top ^ (top << 1) ^ (top << 2) ^ (top << 45);
+                    top = lo >> 83;
+                }
+                debug_assert_eq!(top, 0);
+                [lo as u64, (lo >> 64) as u64, 0]
+            }
+            131 => {
+                // product = low + z^131*s, deg(s)<=129. Fold s*(1+z+z²+z^13),
+                // then its <=12-bit overflow once more; the latter ends below z^26.
+                let s0 = (p[2] >> 3) | (p[3] << 61);
+                let s1 = (p[3] >> 3) | (p[4] << 61);
+                let s2 = (p[4] >> 3) | (p[5] << 61);
+                let lo = s0 ^ (s0 << 1) ^ (s0 << 2) ^ (s0 << 13);
+                let mid =
+                    s1 ^ (s1 << 1) ^ (s1 << 2) ^ (s1 << 13) ^ (s0 >> 63) ^ (s0 >> 62) ^ (s0 >> 51);
+                let high =
+                    s2 ^ (s2 << 1) ^ (s2 << 2) ^ (s2 << 13) ^ (s1 >> 63) ^ (s1 >> 62) ^ (s1 >> 51);
+                let last = (p[2] & 7) ^ high;
+                let top = last >> 3;
+                [
+                    p[0] ^ lo ^ top ^ (top << 1) ^ (top << 2) ^ (top << 13),
+                    p[1] ^ mid,
+                    last & 7,
+                ]
+            }
+            _ => {
+                reduce_words(&mut p[..2 * self.nw + 1], &self.irr);
+                [p[0], p[1], p[2]]
+            }
+        }
+    }
+    /// Multiply by the polynomial-basis generator, including exact reduction.
+    #[inline]
+    pub fn times_x(&self, a: Element) -> Element {
+        operation_tally::tick(self.m, "mul");
+        let high = (a[(self.m as usize - 1) / 64] >> ((self.m - 1) % 64)) & 1;
+        let mut out = [
+            a[0] << 1,
+            (a[1] << 1) | (a[0] >> 63),
+            (a[2] << 1) | (a[1] >> 63),
+        ];
+        out[self.nw - 1] &= (1u64 << (self.m % 64)) - 1;
+        for (x, t) in out.iter_mut().zip(self.tail) {
+            *x ^= t & 0u64.wrapping_sub(high);
+        }
+        out
     }
     pub fn inv(&self, a: Element) -> Option<Element> {
         operation_tally::tick(self.m, "inverse_informational");
