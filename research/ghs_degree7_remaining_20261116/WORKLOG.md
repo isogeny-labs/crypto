@@ -467,3 +467,28 @@ Commit source, run four carrier/source cells, inspect every hit and cost gate.
 ### Errors
 
 None in preparation.
+
+## 2026-11-15 23:31 America/Los_Angeles
+
+### What was done
+
+Committed sparse degree-eight protocol/source at `30fa591b826f` and ran
+all four carrier/source cells. All eight shape counters had their expected
+assignment and logical-candidate counts; point-filter controls passed;
+zero full identities. CPU seconds were 1.734, 1.731, 1.744, 1.760 for
+carrier/source pairs (32280,68), (32280,84), (35349,68), (35349,84).
+Wrote the bounded result note.
+
+### Decisions made
+
+The sparse arm is closed only for its eight branch-supported shapes. Extend
+to `B=LQiQj` and `B=L³QiQj`, using the exact bitset method to enumerate
+the three numerator coefficients without expanding every `ν` value.
+
+### Open threads
+
+Commit sparse receipts; freeze and run two-quadratic-pole degree-eight arm.
+
+### Errors
+
+None in these four runs.
