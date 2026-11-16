@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1532Z-ic-gpu-wake-probe-a100",
+  "latest_record": "20261116T1612Z-ic-gpu-worker-prewarm-host",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 208,
+    "measured": 209,
     "open": 0
   },
   "repo": "crypto",
@@ -15575,6 +15575,159 @@
         }
       ],
       "problem": "kernel:fes_f2_gpu_wake_probe_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "counted_runs_differing",
+      "points": [
+        {
+          "commit": "9f446ddc6053",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 24,
+          "record": "20261116T1612Z-ic-gpu-worker-prewarm-host",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Host A/B of starting the fes-f2-gpu serve worker early in ic bench (one release binary, ICX_FES_PREWARM on against 0, and 0 again as the noise floor, 4 interleaved runs per arm; the worker sleeps 150 ms before it starts, standing in for a CUDA context): the first fes-f2-gpu row's wall 0.3352 to 0.1624 s (off again 0.3345), the second row (worker already running) within noise, counted fields identical in 24 of 24 compared rows. No GPU measurement: the real CUDA initialisation (about 150 ms on an A100) and contention with the rho reference are untested. [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_worker_prewarm_host",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.33452036399999996,
+      "latest": 0.33452036399999996,
+      "latest_derived": {},
+      "metric": "first_gpu_row_wall_off_again",
+      "points": [
+        {
+          "commit": "9f446ddc6053",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T1612Z-ic-gpu-worker-prewarm-host",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.313748829,
+            0.369980954
+          ],
+          "summary": "Host A/B of starting the fes-f2-gpu serve worker early in ic bench (one release binary, ICX_FES_PREWARM on against 0, and 0 again as the noise floor, 4 interleaved runs per arm; the worker sleeps 150 ms before it starts, standing in for a CUDA context): the first fes-f2-gpu row's wall 0.3352 to 0.1624 s (off again 0.3345), the second row (worker already running) within noise, counted fields identical in 24 of 24 compared rows. No GPU measurement: the real CUDA initialisation (about 150 ms on an A100) and contention with the rho reference are untested. [pcc:unverified]",
+          "value": 0.33452036399999996
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_worker_prewarm_host",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.33521143600000003,
+      "latest": 0.33521143600000003,
+      "latest_derived": {},
+      "metric": "first_gpu_row_wall_off",
+      "points": [
+        {
+          "commit": "9f446ddc6053",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T1612Z-ic-gpu-worker-prewarm-host",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.309180024,
+            0.375532517
+          ],
+          "summary": "Host A/B of starting the fes-f2-gpu serve worker early in ic bench (one release binary, ICX_FES_PREWARM on against 0, and 0 again as the noise floor, 4 interleaved runs per arm; the worker sleeps 150 ms before it starts, standing in for a CUDA context): the first fes-f2-gpu row's wall 0.3352 to 0.1624 s (off again 0.3345), the second row (worker already running) within noise, counted fields identical in 24 of 24 compared rows. No GPU measurement: the real CUDA initialisation (about 150 ms on an A100) and contention with the rho reference are untested. [pcc:unverified]",
+          "value": 0.33521143600000003
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_worker_prewarm_host",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.16241390875,
+      "latest": 0.16241390875,
+      "latest_derived": {},
+      "metric": "first_gpu_row_wall_on",
+      "points": [
+        {
+          "commit": "9f446ddc6053",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T1612Z-ic-gpu-worker-prewarm-host",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.147593779,
+            0.17884072
+          ],
+          "summary": "Host A/B of starting the fes-f2-gpu serve worker early in ic bench (one release binary, ICX_FES_PREWARM on against 0, and 0 again as the noise floor, 4 interleaved runs per arm; the worker sleeps 150 ms before it starts, standing in for a CUDA context): the first fes-f2-gpu row's wall 0.3352 to 0.1624 s (off again 0.3345), the second row (worker already running) within noise, counted fields identical in 24 of 24 compared rows. No GPU measurement: the real CUDA initialisation (about 150 ms on an A100) and contention with the rho reference are untested. [pcc:unverified]",
+          "value": 0.16241390875
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_worker_prewarm_host",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.86075,
+      "latest": 0.86075,
+      "latest_derived": {},
+      "metric": "whole_run_wall_off",
+      "points": [
+        {
+          "commit": "9f446ddc6053",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T1612Z-ic-gpu-worker-prewarm-host",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.781,
+            0.92
+          ],
+          "summary": "Host A/B of starting the fes-f2-gpu serve worker early in ic bench (one release binary, ICX_FES_PREWARM on against 0, and 0 again as the noise floor, 4 interleaved runs per arm; the worker sleeps 150 ms before it starts, standing in for a CUDA context): the first fes-f2-gpu row's wall 0.3352 to 0.1624 s (off again 0.3345), the second row (worker already running) within noise, counted fields identical in 24 of 24 compared rows. No GPU measurement: the real CUDA initialisation (about 150 ms on an A100) and contention with the rho reference are untested. [pcc:unverified]",
+          "value": 0.86075
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_worker_prewarm_host",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.68375,
+      "latest": 0.68375,
+      "latest_derived": {},
+      "metric": "whole_run_wall_on",
+      "points": [
+        {
+          "commit": "9f446ddc6053",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 4,
+          "record": "20261116T1612Z-ic-gpu-worker-prewarm-host",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.622,
+            0.863
+          ],
+          "summary": "Host A/B of starting the fes-f2-gpu serve worker early in ic bench (one release binary, ICX_FES_PREWARM on against 0, and 0 again as the noise floor, 4 interleaved runs per arm; the worker sleeps 150 ms before it starts, standing in for a CUDA context): the first fes-f2-gpu row's wall 0.3352 to 0.1624 s (off again 0.3345), the second row (worker already running) within noise, counted fields identical in 24 of 24 compared rows. No GPU measurement: the real CUDA initialisation (about 150 ms on an A100) and contention with the rho reference are untested. [pcc:unverified]",
+          "value": 0.68375
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_worker_prewarm_host",
       "unit": "wall_s"
     },
     {
