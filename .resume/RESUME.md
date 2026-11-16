@@ -1,3 +1,154 @@
+# Integrate genuine metadata bot and publish unchanged-verifier evidence preparation
+
+## What was done
+pcc/claims/PCC-20261116-2bdca5.json: ordinary merge of genuinebot532 into893 prepared, with exact canonical metadata and whole ignored archive. All343 science and original verifier/core tests/artifact tools/policy unchanged; scoped source gates0 and broad benchmark1 exactly historical. The separate real isolated-source FF/custody result remains0e8d86. [pcc:unverified]
+
+## Decisions made
+Commit both real parents and owned metadata, then normal publish and new source tag. Fresh required CI must actually validate the data-address restoration/hydration; keep claims unsigned and every old failure. No PR or main merge bypass. [pcc:unverified]
+
+## Open threads
+Actual RootPCC final-head CI and named address problem; Consumer66d2 unit/proof CI; strict historical LP ingestion/CI03, scientificNEW28, EKS admission and original main-ledger/reference/global bridges. [pcc:unverified]
+
+## Errors
+No new source acceptance error so far. The previous cold-CI failure and first metadata-test wording failure are retained. Broad benchrec remains1; overall CI has not yet been observed with this source. [pcc:unverified]
+
+---
+# Preserve ignored-payload staging rejection after genuine bot merge
+
+## What was done
+pcc/claims/PCC-20261116-73cc72.json: real bot fetch/merge and preceding source checks pass; Git refuses re-adding the already deleted, fully restored ignored archive. Whole failed source/logs/caller/index retained; no commit/push. [pcc:unverified]
+
+## Decisions made
+Keep the genuine staged deletion and complete ignored file, excluding only that path from add input in governor02. Never force-add it or manufacture metadata. Reuse the existing pending real merge without re-running it. [pcc:unverified]
+
+## Open threads
+Commit genuine metadata integration/PCC preparation, actual required CI; Consumer66d2 failed development CI first observed, collect whole logs/artifacts and fix its actual cause; historical ingestion/CI03/NEW28. [pcc:unverified]
+
+## Errors
+The staging helper treated an already staged deleted path as an add candidate after restoring its ignored bytes. Git's refusal preserved the intended canonical state. [pcc:unverified]
+
+---
+# Freeze authentic evidence-address restoration before fresh PCC CI
+
+## What was done
+pcc/claims/PCC-20261116-b55dd4.json: all eight metadata address controls, original62 canaries and original PCC tests pass. Exact known244-byte receipt is bound to the unchanged frozen claim; original verifier/core tests/receipt bytes remain exact. Actionlint/wiring0 for explicit data staging; whole first diagnostic failure remains35c9d7. [pcc:unverified]
+
+## Decisions made
+Publish the concrete data-only compatibility helper/manifest/protocol and workflow preparation, retaining every original check and signing restriction. Correct data remains unsigned not_covered. Only a fresh CI namespace may acquire the historical symlink; the real shared scratch file remains unchanged. [pcc:unverified]
+
+## Open threads
+Genuinebot532 integration/source checkpoint, actual final-head required PCC CI and named problem; Consumer66d2 development CI about01:00UTC; strict historical ingestion/CI03/fullNEW28/EKS admission. [pcc:unverified]
+
+## Errors
+The first diagnostic wording failure is retained; no rejection was weakened. Global CI is not yet observed with the preparation, and no PR merge is inferred. [pcc:unverified]
+
+---
+# Test authentic legacy evidence address compatibility
+
+## What was done
+pcc/claims/PCC-20261116-35c9d7.json: original verifier accepts an authentic in-repository alias only as unsigned not_covered and still rejects escapes and changed bytes. Seven metadata tests pass; one diagnostic wording assertion fails after its required rejection already succeeds. Full first source/logs retained; all original canaries0. [pcc:unverified]
+
+## Decisions made
+Match the original changed-byte diagnostic, keep every rejection, then stage the known legacy receipt address only in a fresh CI namespace. Do not modify the real historical scratch file, frozen claim, verifier, keyring or ledger records. [pcc:unverified]
+
+## Open threads
+Exact frozen receipt-address manifest and cold-object hydration, actual final-head PCC CI; genuinebot metadata integration/checkpoint; Consumer matrix publication/CI and historical ingestion/CI03. [pcc:unverified]
+
+## Errors
+The new test expected a diagnostic substring that the original checker does not use. The original checker already returned fail as required. [pcc:unverified]
+
+---
+# Close original metadata transport02 with real published bot and terminal custody
+
+## What was done
+pcc/claims/PCC-20261116-0e8d86.json: actual original replay-before-bot532c2d32/sourcec019 and new run tag; full1111167B artifact/all34 members retained. Isolated source clone normalFF0, whole archive restored only after genuine ignore, original artifact/local verification/full-manifest wiring/ledger0, all952 held keys/full ledger/payload unchanged and all343 ongoing science unchanged. Original metadata hold02 is closed successfully at this narrow scope. [pcc:unverified]
+
+## Decisions made
+Preserve the real bot/tag and all raw. An integration into the ongoing metadata branch is an ordinary merge, distinct from the actual isolated-source FF. Global PCC CI still fails on the old absolute-path claim3e6bc7 and two cold store-backed subjects of67abc8; retain the whole log and name those separate blockers. No old claim or ledger is rewritten, and no PR merges while required checks fail. [pcc:unverified]
+
+## Open threads
+Integrate genuine three-path metadata bot/checkpoint; frozen PCC compatibility/cold hydration; Consumer66d2 synthetic engine/development CI and next strict historical ingestion/CI03; scientificNEW28 and original main-ledger/reference/global/cost bridges. [pcc:unverified]
+
+## Errors
+Earlier attempt01 remains failede3c377. Root4366 canary and base-prefix steps pass but verify-all fails on existing3e6bc7 path escape and67abc8 missing hydrated objects. Metadata transport success does not make those gates green. [pcc:unverified]
+
+---
+# Ready transport02 PR4366 and resume Consumer development
+
+## What was done
+pcc/claims/PCC-20261115-3422cc.json: ready PR4366 opened at23:18:27Z on exact893 source/c019 base. Full public metadata retained. [pcc:unverified]
+
+## Decisions made
+Check its actual run after the ordinary50-minute cadence, about00:08UTC. Continue Consumer generic proofs/matrix implementation in the meantime. No manual unchanged retry or merge bypass. [pcc:unverified]
+
+## Open threads
+Root02 full bot/new tag/FF/terminal custody, Consumer foundation and graph certificates, CI03 materialization, full NEW28 and original ledger/base benchmark gaps. [pcc:unverified]
+
+## Errors
+No new PR creation error. Transport02 outcome remains unknown. [pcc:unverified]
+
+---
+# Publish immutable transport02 source checkpoint
+
+## What was done
+pcc/claims/PCC-20261115-cf27ac.json: source893d05f5145b published by normal atomic creation of new feature, c019 base and source tag; exact readback0. Full publication receipts retained. [pcc:unverified]
+
+## Decisions made
+Open a ready PR for the concrete original-tool workflow; collect its actual full partial/success artifact, then validate the genuine bot in the held source clone. [pcc:unverified]
+
+## Open threads
+Actual transport02 and terminal guards; Consumer LP foundation/graph units/CI03; NEW28 and existing merge gates. [pcc:unverified]
+
+## Errors
+No new publication failure. Prior01 and broad historical benchrec remain explicit negatives; no02 success claim yet. [pcc:unverified]
+
+---
+# Freeze original artifact transport02 and immutable source clone
+
+## What was done
+pcc/claims/PCC-20261115-553a04.json: new thin workflow/protocol positive static gates0; historical broadbenchrec1 unchanged; exact original c019 clone holds952 files, full source ledger, all343 science inputs and whole payload/external copy. e3c377 retains attempt01 full failed publication and closed hold. [pcc:unverified]
+
+## Decisions made
+Publish concrete02 source on new codex feature/checkpoint base and genuinely new source tag. Actual original migration must replay whole bytes before its real direct-parent three-path bot, publish a new run tag, and complete normal FF plus terminal guards in the isolated source clone. Never force moved shared branches, rechain frozen ledgers or manufacture canonical metadata. [pcc:unverified]
+
+## Open threads
+Ready PR and actual transport02; full scientific NEW28; Consumer LP proof/native development and fresh CI03 materialization; original shared-ledger prefix conflicts. [pcc:unverified]
+
+## Errors
+Prior normal branch publication was rejected after successful whole-object replay. It remains failed;02 addresses publication with a new tag and exports the real bot bundle on every outcome. No02 success yet. [pcc:unverified]
+
+---
+# Preserve unchanged historical broad benchmark gate obstruction
+
+## What was done
+pcc/claims/PCC-20261115-991873.json: source governor stopped at benchrec1 after ledger/actionlint/wiring0. The complete189-problem/106-record output is byte-identical to the preserved historical negative; all benchmark inputs and tool unchanged. No commit/push occurred. [pcc:unverified]
+
+## Decisions made
+Record the existing gate as1 in the next governor, retaining complete output and pending merge requirement. Continue independent metadata transport and Consumer research; no benchmark record or policy is edited. [pcc:unverified]
+
+## Open threads
+Transport02 source publication and actual run, full scientific NEW28, Consumer LP foundation/CI03, original ledger and global baseline gates. [pcc:unverified]
+
+## Errors
+I repeated a known broad negative without checking the old restoration entry first. Its output matches exactly; no new benchmark computation or result is claimed. [pcc:unverified]
+
+---
+# Original metadata transport replays full object, then loses mutable branch publication race
+
+## What was done
+pcc/claims/PCC-20261115-e3c377.json: original43763536307/job132963431408 uploads/replays1entireobject, createsrunner-local50d79441e5, then normalpush1/non-fast-forward. Completejob/API/sourcehold retained. Observedbotprefixnotpublished(422). All406heldfiles/fullsourceledger/HEAD/status/wholearchive/externalcopy unchanged at failureterminalguard; attemptclosedfailed withno canonicalpublication/FF/acceptance claim. [pcc:unverified]
+
+## Decisions made
+Preserve sourcec019 andallrawbytes; release failedmetadatahold onlyfornewbookkeeping. Authorseparatelyprospective transport02 usingoriginalimmutabletool/policy, exactwholearchive/replay/directparent/3pathguards, fullbotbundle/manifest/log exports onfailure, andnewuniqueimmutabletagpublication. Thisaddresses observedexternalbranchmovement withoutforcedupdates/ledgerrechain orfakecanonicalentries. [pcc:unverified]
+
+## Open threads
+Concrete02workflow/staticchecks/sourcepublication/actualoriginaltooltransport; scientificNEW28; Consumer1578freshCI02atsource826 queuedlastobserved, cheapercompleteLPpresentationreview/protocolbeforecode andoriginalledgermergegates. [pcc:unverified]
+
+## Errors
+Originalmigrationjoboverall1 despiteS3whole-replay success; do nottreatpartialinfrastructuresuccess asterminalcustody. Bothpreservedheadandstablebasebranchesmovedexternallywhilejobran. No unchangedretryagainstthe sameadvancedbranch andno forcepush. [pcc:unverified]
+
+---
+
 # Preserve metadata transport parser failure; separate original output channels
 
 ## What was done
