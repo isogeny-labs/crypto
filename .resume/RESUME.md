@@ -1,3 +1,33 @@
+# Current checkpoint:37SOURCE READY; owned Runpod CPU provisioned/not dispatched
+
+GoalACTIVE/Rust graphIC+cheap extension-field relation finding towardrho parity.
+UserRunpod-only measurements/Rust scientific code. No subagents/stopgoal.
+36publishedc443226ef/PRupdatedafterlint0. Allold32–36ownedpodsdeleted.
+NEWOWN37nyebuop20aauuv CPU4vCPU8GiBcpu3c0.12USDh created18:52:12Z,
+2700s localDELETEguardian+GraphQLfallback active. No37scientificdispatch yet.
+Privateauthpointer/tmp/ic-runpod-auth-location->pod37.id/task37-header/token.
+NEVERprintcredentials/headers/tokens/envresponses/copyAPIkeytoPod.
+
+37Amendment32/balance-plan.json p1009seed359,IC+sixgraph75/85/95percent crossed
+strides32/128,allgraphstructural-gated,fullp²budget/8192residuals/32descents.
+Onecoldround0warm/retry,300worker2300whole2700runner8GiBfirstallowedCPU.
+Everyarmattempted/failures/capsretained. Newnativequalifier25tests/strictClippy/
+buildPASS; graphprefixBFS+denseLPrank/charge/schedule, allsuccessfulaffine/rank/
+actualtargetproofs,common descentandsamefractionoriginalsourceprefixes.
+Transportactual7paths+deliberatefirstarmfailurecontinuationcontrolsPASS;
+Rustcaptureauth/oncecontrol+warnings-deniedcompilePASS.297source/binaryhashPASS.
+Productiondriverbytesandc79production sourceunchanged;noRootrebuildneeded.
+PCC-20261116-cca062UNVERIFIED. Incompletecosts/nulltotals/bands/ratiospersist.
+
+NEXTcommit/pushcleansource/spec/manifestsbeforeprepare-balance-runpod.sh NEWSTAGE.
+EnsureCPUhealthand>=2410sremaining,upload/POSTONCE. Collectexactarchive/portable
+pre/preworker/post/qualified/sourcehashesTHENimmediatelydeleteownpod+confirm
+absence/markprivatepod-ID.deleted. DoNOTredispatchuncertainPOST. Failurelogs
+mustnotpreventcleanup. Finalrenderbalance-render/balance-report.typ/PDFVIEWall
+pages/exactbenchmarkcopies/hash/PCC/lesson/journal/PR. Keepgoalactive.
+No37resultyet;doNOTcompose34–36costs. Currentc443workflow/statusEMPTY18:45,
+requiredCIreviewunconfirmed/no manualmerge. <=60seccommentary/concreteactions.
+
 # Current checkpoint:36COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
 
 GoalACTIVE/RustgraphIC+cheapalgebraicrelationfinderresearchtowardrho parity.

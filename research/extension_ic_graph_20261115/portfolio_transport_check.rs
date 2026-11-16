@@ -29,16 +29,26 @@ fn main() -> Result<(), Box<dyn Error>> {
             writeln!(out, "{{\"transport_control_only\":true}}")?;
         }
         println!("transport-control stdout");
+        if env::var_os("IC_TRANSPORT_FAIL_FIRST").is_some()
+            && Path::new(&args[i + 1])
+                .file_name()
+                .is_some_and(|s| s == "ic.raw.json")
+        {
+            return Err("deliberate transport-only first-arm failure".into());
+        }
         return Ok(());
     }
     if !(2..=3).contains(&args.len()) {
         return Err(
-            "usage: portfolio-transport-check WRAPPER [--expect-failure|--structural]".into(),
+            "usage: portfolio-transport-check WRAPPER [--expect-failure|--structural|--balance]"
+                .into(),
         );
     }
     let negative = args.get(2).is_some_and(|s| s == "--expect-failure");
     let structural = args.get(2).is_some_and(|s| s == "--structural");
-    if args.len() == 3 && !negative && !structural {
+    let failure = args.get(2).is_some_and(|s| s == "--balance-failure");
+    let balance = args.get(2).is_some_and(|s| s == "--balance") || failure;
+    if args.len() == 3 && !negative && !structural && !balance {
         return Err("unknown control option".into());
     }
     let wrapper = fs::canonicalize(Path::new(&args[1]))?;
@@ -56,7 +66,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         .ok_or("CPU affinity")?
         .trim();
     let cpu = allowed.split([',', '-']).next().ok_or("CPU")?;
-    let modes: &[&str] = if structural {
+    let modes: &[&str] = if balance {
+        &[
+            "ic", "s75-r32", "s75-r128", "s85-r32", "s85-r128", "s95-r32", "s95-r128",
+        ]
+    } else if structural {
         &["rank-stop", "structural-gate"]
     } else {
         &MODES
@@ -68,11 +82,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         .join(",");
     let plan=format!("{{\"pinned_cpu\":\"{cpu}\",\"source_revision\":\"{}\",\"memory_gib\":8,\"p\":1009,\"seed\":347,\"fixture_timeout_seconds\":10,\"worker_timeout_seconds\":10,\"small_percent\":75,\"b_count\":1018081,\"collection_rank_stride\":128,\"max_descent_residuals\":8192,\"max_accepted_descents\":32,\"mode_order\":[{modes_json}]}}","a".repeat(40));
     fs::write(run.join("runtime-plan.json"), plan)?;
-    let status = Command::new("bash")
-        .arg(wrapper)
-        .arg("--execute")
-        .arg(&run)
-        .status()?;
+    let mut command = Command::new("bash");
+    command.arg(wrapper).arg("--execute").arg(&run);
+    if failure {
+        command.env("IC_TRANSPORT_FAIL_FIRST", "1");
+    }
+    let status = command.status()?;
     if status.success() == negative {
         return Err(format!(
             "unexpected wrapper status; controls retained at {}",
@@ -92,12 +107,15 @@ fn main() -> Result<(), Box<dyn Error>> {
                 return Err("negative control failed for a different reason".into());
             }
         } else if raw != "{\"transport_control_only\":true}\n"
-            || exit.trim() != "0"
+            || exit.trim() != if failure && *mode == "ic" { "1" } else { "0" }
             || fs::read_to_string(run.join(format!("{mode}.summary.jsonl")))?
                 != "transport-control stdout\n"
         {
             return Err("raw/stdout separation or contents failed".into());
         }
+    }
+    if fs::read_to_string(run.join("flow.jsonl"))?.lines().count() != 2 + 2 * modes.len() {
+        return Err("missing transport flow record".into());
     }
     fs::remove_dir_all(run)?;
     println!(
@@ -106,6 +124,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             "old-wrapper rejection"
         } else if structural {
             "new-wrapper two-arm capture"
+        } else if balance {
+            "new-wrapper seven-arm capture"
         } else {
             "new-wrapper six-arm capture"
         }

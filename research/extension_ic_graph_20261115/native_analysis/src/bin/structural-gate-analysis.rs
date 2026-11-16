@@ -1,7 +1,7 @@
 //! Independent graph connectivity and matrix-rank replay for optional checkpoint skips.
 #[allow(dead_code)]
 #[path = "rank-stop-analysis.rs"]
-mod graph;
+pub(crate) mod graph;
 use graph::full::{
     self,
     shared::{canonical, n, prime, Terms},
@@ -17,7 +17,7 @@ use std::{
 
 // This checker uses graph traversal and independent dense elimination rather
 // than the production union-find helper or its counters.
-fn structural_state(inputs: &[Value], p: u64, l: u64) -> Result<Value, String> {
+pub(crate) fn structural_state(inputs: &[Value], p: u64, l: u64) -> Result<Value, String> {
     let mut adjacent = BTreeMap::<u64, BTreeSet<u64>>::new();
     let mut anchors = BTreeSet::new();
     let mut supports = Vec::new();
