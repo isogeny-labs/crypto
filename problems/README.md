@@ -11,12 +11,9 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [PR2036 CodeQL configuration and runners](pr2036-codeql-configuration.md) | open | current-head CI acceptance | enabled repository code scanning and complete current-head query/handoff checks on healthy runners |
-| [N83 resume evidence and historical accounting](n83-resume-evidence-and-execution-access.md) | open | missing historical charged intervals and interrupted-run custody; S3 restored | reconcile prior intervals; retain fresh native1M replay/profile and storage evidence |
-| [Native N83 800K memory limit](n83-native-800k-memory-limit.md) | investigating | both arena candidates pass1M with complete retained counters/storage/memory and observed reclamation; historical4GiB attribution/minimum memory open | exact1.5M/9000 continuation after validated guard; retain old OOMs, refusals and rejected/interrupted custody |
-| [Native N83 K4096 terminal observability](n83-native-k4096-terminal-observability.md) | resolved (bounded diagnostic) | matched 1,000-conflict terminal observability only | native phase/query controls and independently replayed K2048/K4096 terminals pass; full cold selection remains open |
-| [Native N83 Docker inspection audit gap](n83-native-docker-inspection-audit-gap.md) | resolved (bounded reacquisition) | initial K4096 400K final Docker state missing | failed attempt preserved; separately frozen repeat passes native/fresh S3 replay,172payload hashes and repack; root cause unknown |
-| [N83 free-selector known-witness search](n83-free-selector-known-witness-search.md) | resolved for the exact control | original N83 fixed-coordinate control with free orbit selectors | verified SAT787conflicts /167.34s within180s; actual model selectors and group replay; XOR propagation cost measured, natural yield/cold winner still open |
+| [Current-main research regression gates](current-main-research-regressions.md) | open; library/lint repairs validated | merging the Rust/IC changes with passing final-head CI/review | local release library, 53 consumers, full maintained Clippy and workspace types pass; shared frozen-lock, checkout, registry, leaderboard and backlog gates remain |
+| [Secret-key Rust API timing coverage](rust-secret-api-timing-coverage.md) | open | an end-to-end side-channel resistance claim for the whole crate | complete secret-data-flow coverage, fixed-width API boundaries and independent target-specific timing/code review |
+| [IC live-trace baseline compilation](ic-live-trace-main-compile.md) | superseded; build wiring repaired | the original build obstruction is removed; integrated validation remains blocked by the [successor](current-main-research-regressions.md) | all binaries now type-check; the successor tracks the remaining full-library/lint gates |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
 | [Correlated packets with one common deformation](correlated-packet-common-kernel.md) | open | the selected two-axis contraction improvement for a new prime-field route | construct one low-degree kernel with compatible levelwise factorizations, charged mode density and complete recursive proof |
 | [Exact compact scalar-predicate splitting](prime-scalar-exact-splitting.md) | open | an essentially new compact scalar-verification route to sub-exponential prime-field ECDLP | constructible exact splitting/weighted extension with complete network, recursive, cost and formal proof bounds |
@@ -152,6 +149,26 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
+
+
+
+
+| [PR2036 CodeQL configuration and runners](pr2036-codeql-configuration.md) | open | current-head CI acceptance | enabled repository code scanning and complete current-head query/handoff checks on healthy runners |
+| [N83 resume evidence and historical accounting](n83-resume-evidence-and-execution-access.md) | open | missing historical charged intervals and interrupted-run custody; S3 restored | reconcile prior intervals; retain fresh native1M replay/profile and storage evidence |
+| [Native N83 800K memory limit](n83-native-800k-memory-limit.md) | investigating | both arena candidates pass1M with complete retained counters/storage/memory and observed reclamation; historical4GiB attribution/minimum memory open | exact1.5M/9000 continuation after validated guard; retain old OOMs, refusals and rejected/interrupted custody |
+| [Native N83 K4096 terminal observability](n83-native-k4096-terminal-observability.md) | resolved (bounded diagnostic) | matched 1,000-conflict terminal observability only | native phase/query controls and independently replayed K2048/K4096 terminals pass; full cold selection remains open |
+| [Native N83 Docker inspection audit gap](n83-native-docker-inspection-audit-gap.md) | resolved (bounded reacquisition) | initial K4096 400K final Docker state missing | failed attempt preserved; separately frozen repeat passes native/fresh S3 replay,172payload hashes and repack; root cause unknown |
+| [N83 free-selector known-witness search](n83-free-selector-known-witness-search.md) | resolved for the exact control | original N83 fixed-coordinate control with free orbit selectors | verified SAT787conflicts /167.34s within180s; actual model selectors and group replay; XOR propagation cost measured, natural yield/cold winner still open |
+
+
+
+
+
+
+
+
+
+
 
 
 
