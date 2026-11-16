@@ -4,7 +4,7 @@ set -euo pipefail
 mode=${1:?build or execute};out=${2:?fresh output};ref=${3:?connected reference}
 cd "$(git rev-parse --show-toplevel)";scope=research/quadratic_twist_field_cost_20261116/projective/norm-linear
 [[ $(git branch --show-current) = codex/twist-field-cost && $(git remote get-url origin) = https://github.com/isogeny-labs/crypto.git && -z $(git status --porcelain) ]]
-[[ $out = /workspace/twist-norm-linear-run01-20261116 ]]
+[[ $out = /workspace/twist-norm-linear-run02-20261116 ]]
 run(){ local name=$1 expected=$2 remaining cap code=0;shift 2;remaining=$(($(date -u -d '2026-11-16T16:55:00Z' +%s)-$(date -u +%s)));[[ $remaining -gt 0 ]];cap=$remaining;[[ $cap -le 600 ]]||cap=600
  printf '%q ' "$@" > "$out/$name.command";printf '\n' >> "$out/$name.command";date -u +%FT%TZ > "$out/$name.started-at"
  timeout --signal=TERM --kill-after=10 "$cap" "$@" > "$out/$name.log" 2>&1 || code=$?
