@@ -347,3 +347,10 @@ all eight completed graph arms project516rows to387 with every output replayed
 and no fallback. The frozen comparison remains ineligible with null intervals;
 partial descriptive ratios are retained in the report and full Rustsummary,
 without a gain or parity verdict. [pcc:unverified]
+
+The [MST-filter validation](local-cover-mst-validation-20261116-23/report.pdf)
+recovers both scalars, but its forced75percent-retention candidate fails the
+work-proxy guard:509rows/4577nonzeros become382rows/10904nonzeros. No candidate
+row is admitted or replayed; the original-solve fallback recovers correctly.
+The frozen projection criterion fails, so no timing follow-up follows from
+this validation. [pcc:unverified]

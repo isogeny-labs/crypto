@@ -1,3 +1,26 @@
+# Current checkpoint: STAGE23RUNNING (16 November ~08:55Z)
+
+Source/spec a457ec75b8657c211da69b4dc658c4e698a5888a PUBLISHED before solecall.
+Run /workspace/ic-local-runs/local-cover-mst-validation-20261116-23, session65029.
+76manifestPASS/sourceclean/noLIVEcompiler. p1009seed263 oneICthenoneMSTgraph,
+0warm/noAA/rho/ratio/CI;900worker/1900whole/CPU0/8GiB/no retry. Bothsameincidence/shared.
+Originaldriver/analyzer/sourcecheckpoint/host captured. DO NOTcompile/changecode/
+parameters/launchnewtrial orrestartwrapper. Checkexitfile+actualprocessifsessionlost.
+AfteractualexitORIGINALcopiedanalyzer/prepost/fullflow/report/publish. Requireboth
+actualscalar+groupreplay ANDnontrivialMSTprojectionnofallback; a refusalcanstill
+recoverviaoldsolvebutfailsprojectioncriterion. No23resultyet.
+
+NativeSOURCECHECKSPASS10filter17sieve(2ignored)19cover(1ignored)1example,
+actualproduction/analyzerbuilds+strictClippy. Analysis46executions36distinct10dup,
+20/21/22summariesbyteexact. MSTnew637linemodule/targetprotection+replay/proxyguard,
+APIadditive andexplicitCLI/source/strategybinding. No speedclaimfromproxy.
+22censorfullpacketpublished1abc/aaeartifact restoredchecked, currentPRbodyactual
+MST23running+22censor. Primarycountedcostgapremains:genericgraphhelpersbypass
+jv_bitops; existingcountedharness/sourcebookreviewedinlatestjournal. Nextlead
+accountingpointerONLY, no code/protocolselected there. GoalACTIVE/localworks.
+CIcurrenta457read08:55: appsreview/migratesuccess,requiredgate/size/artifacts/review
+unconfirmed. NEXT>=09:45absentevent. No stopgoal/subagents/ledgeredits.
+
 # Current checkpoint: MST SOURCE CHECKS PASS,23NOTRUN
 
 Actualnativeproductionbuild+publicworkerexampletestPASS.10filter/17sieve+graph
