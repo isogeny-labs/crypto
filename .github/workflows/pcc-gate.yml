@@ -45,10 +45,19 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/chained_jacobian_transfers_20261110/evidence/genus3-artifact-publication-01/whole-raw.tar.xz research/chained_jacobian_transfers_20261110/evidence/genus3-root-regression-01/members.json.xz
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/chained_jacobian_transfers_20261110/evidence/genus3-artifact-publication-01/whole-raw.tar.xz research/chained_jacobian_transfers_20261110/evidence/genus3-root-regression-01/members.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/complete-current-guard.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/whole-failed-staged-index.xz
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Restore the exact historical unsigned data address
+        run: |
+          set -euo pipefail
+          if [ ! -d /workspace/scratch ]; then
+            sudo install -d -m 0755 -o "$(id -u)" -g "$(id -g)" /workspace/scratch
+          fi
+          python3 tools/pcc/prepare_legacy_evidence_aliases.py \
+            --manifest research/chained_jacobian_transfers_20261110/PCC_LEGACY_EVIDENCE_ADDRESSES_01.json \
+            --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
       - name: Fetch the base tip
         if: github.event_name == 'pull_request'
         env:
@@ -85,7 +94,15 @@ jobs:
           # shellcheck disable=SC2086
           python3 tools/pcc/pcc.py lint-prose $files
       - name: pcc tests
-        run: python3 tools/pcc/test_pcc.py
+        run: |
+          python3 tools/pcc/test_pcc.py
+          python3 -m unittest tools/pcc/test_legacy_evidence_aliases.py -v
+      - name: Remove only the legacy address created by this job
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pcc-legacy-addresses.json" ]; then
+            python3 tools/pcc/prepare_legacy_evidence_aliases.py --cleanup --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
+          fi
 
   sign:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -119,10 +136,19 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/chained_jacobian_transfers_20261110/evidence/genus3-artifact-publication-01/whole-raw.tar.xz research/chained_jacobian_transfers_20261110/evidence/genus3-root-regression-01/members.json.xz
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/chained_jacobian_transfers_20261110/evidence/genus3-artifact-publication-01/whole-raw.tar.xz research/chained_jacobian_transfers_20261110/evidence/genus3-root-regression-01/members.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/complete-current-guard.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/whole-failed-staged-index.xz
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Restore the exact historical unsigned data address
+        run: |
+          set -euo pipefail
+          if [ ! -d /workspace/scratch ]; then
+            sudo install -d -m 0755 -o "$(id -u)" -g "$(id -g)" /workspace/scratch
+          fi
+          python3 tools/pcc/prepare_legacy_evidence_aliases.py \
+            --manifest research/chained_jacobian_transfers_20261110/PCC_LEGACY_EVIDENCE_ADDRESSES_01.json \
+            --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
       - name: Sign verdicts for claims that do not stand
         env:
           PCC_SIGNING_KEY: ${{ secrets.PCC_SIGNING_KEY }}
@@ -148,4 +174,11 @@ jobs:
             git add pcc/ledger.jsonl
             git commit -m "pcc: signed verdicts for ${GITHUB_SHA}"
             git push origin HEAD:main
+          fi
+
+      - name: Remove only the legacy address created by this signing job
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pcc-legacy-addresses.json" ]; then
+            python3 tools/pcc/prepare_legacy_evidence_aliases.py --cleanup --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
           fi

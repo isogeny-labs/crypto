@@ -2081,3 +2081,39 @@ Ready PR and actual transport02; full scientific NEW28; Consumer LP proof/native
 Prior normal branch publication was rejected after successful whole-object replay. It remains failed;02 addresses publication with a new tag and exports the real bot bundle on every outcome. No02 success yet. [pcc:unverified]
 
 ---
+
+2026-11-16T00:29:30.615952+00:00
+
+# Close original metadata transport02 with real published bot and terminal custody
+
+## What was done
+pcc/claims/PCC-20261116-0e8d86.json: actual original replay-before-bot532c2d32/sourcec019 and new run tag; full1111167B artifact/all34 members retained. Isolated source clone normalFF0, whole archive restored only after genuine ignore, original artifact/local verification/full-manifest wiring/ledger0, all952 held keys/full ledger/payload unchanged and all343 ongoing science unchanged. Original metadata hold02 is closed successfully at this narrow scope. [pcc:unverified]
+
+## Decisions made
+Preserve the real bot/tag and all raw. An integration into the ongoing metadata branch is an ordinary merge, distinct from the actual isolated-source FF. Global PCC CI still fails on the old absolute-path claim3e6bc7 and two cold store-backed subjects of67abc8; retain the whole log and name those separate blockers. No old claim or ledger is rewritten, and no PR merges while required checks fail. [pcc:unverified]
+
+## Open threads
+Integrate genuine three-path metadata bot/checkpoint; frozen PCC compatibility/cold hydration; Consumer66d2 synthetic engine/development CI and next strict historical ingestion/CI03; scientificNEW28 and original main-ledger/reference/global/cost bridges. [pcc:unverified]
+
+## Errors
+Earlier attempt01 remains failede3c377. Root4366 canary and base-prefix steps pass but verify-all fails on existing3e6bc7 path escape and67abc8 missing hydrated objects. Metadata transport success does not make those gates green. [pcc:unverified]
+
+---
+
+2026-11-16T01:07:30.997031+00:00
+
+# Integrate genuine metadata bot and publish unchanged-verifier evidence preparation
+
+## What was done
+pcc/claims/PCC-20261116-2bdca5.json: ordinary merge of genuinebot532 into893 prepared, with exact canonical metadata and whole ignored archive. All343 science and original verifier/core tests/artifact tools/policy unchanged; scoped source gates0 and broad benchmark1 exactly historical. The separate real isolated-source FF/custody result remains0e8d86. [pcc:unverified]
+
+## Decisions made
+Commit both real parents and owned metadata, then normal publish and new source tag. Fresh required CI must actually validate the data-address restoration/hydration; keep claims unsigned and every old failure. No PR or main merge bypass. [pcc:unverified]
+
+## Open threads
+Actual RootPCC final-head CI and named address problem; Consumer66d2 unit/proof CI; strict historical LP ingestion/CI03, scientificNEW28, EKS admission and original main-ledger/reference/global bridges. [pcc:unverified]
+
+## Errors
+No new source acceptance error so far. The previous cold-CI failure and first metadata-test wording failure are retained. Broad benchrec remains1; overall CI has not yet been observed with this source. [pcc:unverified]
+
+---
