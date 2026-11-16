@@ -1,0 +1,551 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actual_geometric_denominator_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.bivariate_coefficient_modular' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_denominator_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.actual_geometric_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.rowNumeratorRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.approximationRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_absolute_right_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.chartRootRep_den_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_right_modular_with_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.finiteExtract_intCast' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_finite_right_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.boxEval_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.modular_box_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.multiplicationProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.rowNumeratorCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.approximationCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.boundedRightEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.matches_prod' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.Matches.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.scalarDiagonal_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.packedApprox_matches' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.packedEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCost.packedApprox_nodes_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCost.actualApprox_scalarProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationStoredBox.evaluate_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationStoredBox.entry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.materializeLogged_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.multiplyLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.multiplyLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.evaluateLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.evaluateLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.coefficientLogged_multiply_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationConvolutionTrace.coefficientLogged_cast_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.budget_product' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.Budget.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_approximation_budget' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_approximation_literals' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_inputVolume_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_right_work_precision' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPayloadTrace.evaluateWithInputs_erasure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPayloadTrace.evaluateWithInputs_inputs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPayloadTrace.actual_recorded_volume' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBinaryInput.signed_correct' depends on axioms: [propext, Quot.sound]
+'OrientationBinaryInput.signed_adds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBinaryInput.bounded_signed_reads' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBooleanAdder.fullAdder_identity' does not depend on any axioms
+'OrientationBooleanAdder.ripple_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBooleanAdder.ripple_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBooleanAdder.ripple_residue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.encode_quotient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.ofNatWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.addWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.addWord_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSignedWord.invertWord_value' depends on axioms: [propext, Quot.sound]
+'OrientationSignedWord.negateWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSignedWord.ofIntWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSignedWord.ofIntWord_events_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordMultiply.shiftWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordMultiply.multiplyWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordMultiply.multiplyWord_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordConvolution.dotWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordConvolution.wordConvolution_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordConvolution.wordConvolution_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordArray.materializeGated_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordArray.multiplyWords_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordArray.multiplyWords_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEvaluator.evaluateWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEvaluator.coefficientWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordGateCost.evaluateWord_events_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordGateCost.actualApprox_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordGateCost.coefficientWord_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEntry.rightNumeratorWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEntry.rightNumeratorWord_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEntry.entryWord_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordQuotient.quotientWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordQuotient.quotientWord_skipped_length' depends on axioms: [propext, Quot.sound]
+'OrientationWordQuotient.finiteExtract_from_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNewtonKernel.newtonR_error' depends on axioms: [propext, Quot.sound]
+'OrientationNewtonKernel.newtonR_actual_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNewtonKernel.even_zero_control' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordInverse.stepWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordInverse.inverseWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordInverse.inverseWord_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.extractWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.completeEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.completeEntry_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.completeEntry_skipped_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCreationWord.liftWord_canonical' depends on axioms: [propext, Quot.sound]
+'OrientationCreationWord.liftWord_trans_val' depends on axioms: [propext, Quot.sound]
+'OrientationCreationWord.frozenEntry_later' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.nilpotent_power' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.eval_nilpotent_finite' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.actualEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.extension_nontrivial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.wordEntrySum_representative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.normalCoordinate_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.padded_normalCoordinate_val' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.actual_coordinate_reuse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.zero_right_diagonal_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.activeZero_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.zero_right_all_k_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.activeZeroAt_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityControl.symmetric_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityControl.odd_geometric_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_denominator_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_denominator_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_geometric_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_odd_right_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOffDiagonalControl.offdiag_right_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOffDiagonalControl.odd_joint_witness' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationEvenControl.actual_even_right_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationEvenControl.actual_even_right_first_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityContent.ParityContent.mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityContent.parity_geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityContent.scaled_odd_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationHalfSlopes.neg_den_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationHalfSlopes.half_slope_sum_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationHalfSlopes.chart_slope_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationUniformOddContent.scaled_denominator_parity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationUniformOddContent.actual_odd_right_content_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOddRescaling.rescaled_right_integral' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOddRescaling.rescaled_left_weight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOddRescaling.rescaled_product' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOddRescaling.rescaled_precision' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSingleAdmission.schedule_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSingleAdmission.no_all_node_nonnegative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSingleAdmission.zero_anchor_all_nonnegative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSharedFirstMoment.denominator_matching' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSharedFirstMoment.denominator_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSharedFirstMoment.right_matching_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSharedFirstMoment.adjacent_highest_difference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSharedFirstMoment.no_all_matching_content_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSharedFirstMoment.no_all_matching_content_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonuniform.node_half_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonuniform.actual_node_half_divisor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonuniformLift.scaled_denominator_model' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonuniformLift.denominatorLift_map' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonuniformLift.approximationLift_map' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonuniformLift.actual_nonuniform_odd_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonuniformLift.actual_all_node_graded_odd_content' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationRetainedNonuniform.node_half_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedNonuniform.actual_node_half_divisor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedNonuniformLift.scaled_denominator_model' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedNonuniformLift.denominatorLift_map' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedNonuniformLift.approximationLift_map' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedNonuniformLift.actual_nonuniform_odd_content' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationRetainedNonuniformLift.actual_all_node_graded_odd_content' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationRetainedNonuniformLift.negative_approximationLift_eq' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationRetainedRescaling.same_product' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedRescaling.same_precision' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedRescaling.left_weight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRetainedRescaling.right_integral' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConstructedProfile.profile_schedule' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConstructedProfile.four_profile_schedule' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConstructedProfile.actual_weight_nonnegative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConstructedProfile.four_profile_terminal_mass' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConstructedProfile.constructed_integral_factorization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+../modular-evidence/draft-116.lean.txt:5673:73: error: unknown namespace `OrientationDegree`
+../modular-evidence/draft-116.lean.txt:5683:49: error: Function expected at
+  extra
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  (scaledDen D g)
+
+Hint: The identifier `extra` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5683:71: error: Function expected at
+  extra
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  D
+
+Hint: The identifier `extra` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5688:38: error: Function expected at
+  oddPart
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  (scaledDen D g)
+
+Hint: The identifier `oddPart` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5688:62: error: Function expected at
+  oddPart
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  D
+
+Hint: The identifier `oddPart` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5696:6: error: Function expected at
+  extra
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  (scaledDen D g)
+
+Hint: The identifier `extra` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5698:12: error(lean.unknownIdentifier): Unknown identifier `extra_le_bound`
+../modular-evidence/draft-116.lean.txt:5696:39: error: unsolved goals
+x✝ : Sort u_1
+extra : x✝
+p D B g : ℕ
+hD : 0 < D
+hB : D ≤ 2 ^ B
+⊢ p + (sorry + g) ≤ p + B + g
+../modular-evidence/draft-116.lean.txt:5704:31: error: Application type mismatch: The argument
+  ?m.46
+has type
+  2 ≠ 0
+of sort `Prop` but is expected to have type
+  ℕ
+of sort `Type` in the application
+  pow_ne_zero ?m.46
+../modular-evidence/draft-116.lean.txt:5704:2: error: `simp` made no progress
+../modular-evidence/draft-116.lean.txt:5712:10: error: Function expected at
+  MomentLabels
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `MomentLabels` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5712:33: error: Function expected at
+  Ports
+but this term has type
+  ?m.2
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `Ports` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5713:2: error(lean.unknownIdentifier): Unknown identifier `C`
+../modular-evidence/draft-116.lean.txt:5713:28: error(lean.unknownIdentifier): Unknown identifier `trimmedRight`
+../modular-evidence/draft-116.lean.txt:5716:44: error: type expected, got
+  (Rep.{?u.18, ?u.17, ?u.16}
+  ?m.6 : (G : Type ?u.16) → [Semiring ?m.6] → [Monoid G] → Type (max (max ?u.17 ?u.16) (?u.18 + 1)))
+../modular-evidence/draft-116.lean.txt:5721:10: error: Function expected at
+  MomentLabels
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `MomentLabels` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5721:33: error: Function expected at
+  Ports
+but this term has type
+  ?m.2
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `Ports` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5722:5: error: Function expected at
+  representation
+but this term has type
+  ?m.3
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `representation` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5723:17: error: Function expected at
+  trimmedRightRep
+but this term has type
+  ?m.4
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `trimmedRightRep` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5723:56: error: Function expected at
+  gain
+but this term has type
+  ?m.5
+
+Note: Expected a function because this term is being applied to the argument
+  q
+
+Hint: The identifier `gain` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5724:13: error: Invalid argument: Variable `representation` is not a proposition or let-declaration
+../modular-evidence/draft-116.lean.txt:5724:28: error(lean.unknownIdentifier): Unknown constant `Rep.cast`
+../modular-evidence/draft-116.lean.txt:5724:37: error(lean.unknownIdentifier): Unknown constant `Rep.mul`
+../modular-evidence/draft-116.lean.txt:5724:45: error(lean.unknownIdentifier): Unknown constant `Rep.rational`
+../modular-evidence/draft-116.lean.txt:5724:58: warning: This simp argument is unused:
+  inverse_power_den
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [representation, Rep.cast, Rep.mul, Rep.rational, scaledDen]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-116.lean.txt:5728:10: error: Function expected at
+  MomentLabels
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `MomentLabels` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5728:33: error: Function expected at
+  Ports
+but this term has type
+  ?m.2
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `Ports` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5729:5: error: Function expected at
+  representation
+but this term has type
+  ?m.3
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `representation` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5729:45: error: Function expected at
+  trimmedRightRep
+but this term has type
+  ?m.4
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `trimmedRightRep` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5730:13: error: Invalid argument: Variable `representation` is not a proposition or let-declaration
+../modular-evidence/draft-116.lean.txt:5730:28: error(lean.unknownIdentifier): Unknown constant `Rep.cast`
+../modular-evidence/draft-116.lean.txt:5730:37: error(lean.unknownIdentifier): Unknown constant `Rep.mul`
+../modular-evidence/draft-116.lean.txt:5730:45: error(lean.unknownIdentifier): Unknown constant `Rep.rational`
+../modular-evidence/draft-116.lean.txt:5730:58: warning: This simp argument is unused:
+  inverse_power_num
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [representation, Rep.cast, Rep.mul, Rep.rational, map_one, one_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-116.lean.txt:5730:76: warning: This simp argument is unused:
+  map_one
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [representation, Rep.cast, Rep.mul, Rep.rational, inverse_power_num, one_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-116.lean.txt:5730:84: warning: This simp argument is unused:
+  one_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [representation, Rep.cast, Rep.mul, Rep.rational, inverse_power_num, map_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-116.lean.txt:5733:10: error: Function expected at
+  MomentLabels
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `MomentLabels` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5733:33: error: Function expected at
+  Ports
+but this term has type
+  ?m.2
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `Ports` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5734:42: error: Function expected at
+  trimZ
+but this term has type
+  ?m.3
+
+Note: Expected a function because this term is being applied to the argument
+  k
+
+Hint: The identifier `trimZ` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5735:6: error(lean.unknownIdentifier): Unknown identifier `right_entry`
+../modular-evidence/draft-116.lean.txt:5734:80: error: unsolved goals
+x✝² : Sort u_1
+MomentLabels : x✝²
+x✝¹ : Sort u_2
+Ports : x✝¹
+x✝ : Sort u_3
+trimZ : x✝
+a u i k q : ℕ
+t : ℤ
+m : ℕ → ℕ
+rb : sorry
+y : sorry
+⊢ scaledTrimmedRight a u i k q t m rb y = sorry
+../modular-evidence/draft-116.lean.txt:5739:51: error: Function expected at
+  RetainedNode
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `RetainedNode` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5741:10: error: Function expected at
+  MomentLabels
+but this term has type
+  ?m.2
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `MomentLabels` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5741:33: error: Function expected at
+  Ports
+but this term has type
+  ?m.3
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `Ports` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5742:4: error: Function expected at
+  Content
+but this term has type
+  ?m.4
+
+Note: Expected a function because this term is being applied to the argument
+  0
+
+Hint: The identifier `Content` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5743:6: error(lean.unknownIdentifier): Unknown identifier `scaled_trimmed_eq`
+../modular-evidence/draft-116.lean.txt:5742:90: error: unsolved goals
+x✝³ : Sort u_1
+RetainedNode : x✝³
+x✝² : Sort u_2
+MomentLabels : x✝²
+x✝¹ : Sort u_3
+Ports : x✝¹
+x✝ : Sort u_4
+Content : x✝
+a u i k : ℕ
+t : sorry
+n : ℕ → ℕ
+hi : padicValInt 2 sorry = i
+hiu : i < u
+hu : u ≤ a
+rb : sorry
+y : sorry
+⊢ sorry
+../modular-evidence/draft-116.lean.txt:5747:10: error: Function expected at
+  MomentLabels
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `MomentLabels` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5747:33: error: Function expected at
+  Ports
+but this term has type
+  ?m.2
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `Ports` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5748:6: error: Function expected at
+  extra
+but this term has type
+  ?m.3
+
+Note: Expected a function because this term is being applied to the argument
+  (representation a u i k q t m rb y).den
+
+Hint: The identifier `extra` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5749:8: error: Function expected at
+  extra
+but this term has type
+  ?m.3
+
+Note: Expected a function because this term is being applied to the argument
+  (trimmedRightRep a u i k t m rb y).den
+
+Hint: The identifier `extra` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5749:53: error: Function expected at
+  gain
+but this term has type
+  ?m.4
+
+Note: Expected a function because this term is being applied to the argument
+  q
+
+Hint: The identifier `gain` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+../modular-evidence/draft-116.lean.txt:5750:46: error(lean.unknownIdentifier): Unknown identifier `trimmedRightRep`
+'OrientationRescaledCreation.extra_scaledDen' depends on axioms: [sorryAx]
+../modular-evidence/draft-116.lean.txt:5755:14: error(lean.unknownIdentifier): Unknown constant `OrientationRescaledCreation.representation_num`
+'OrientationRescaledCreation.scaled_trimmed_integral' does not depend on any axioms
+'OrientationRescaledCreation.actual_work_width' depends on axioms: [propext, sorryAx]
