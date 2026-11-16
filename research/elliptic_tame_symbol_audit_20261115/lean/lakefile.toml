@@ -1,0 +1,11 @@
+name = "elliptic_tame_symbol_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticTameSymbolAudit"]
+
+[[require]]
+name = "weil_auxiliary_ratio_audit"
+path = "../../weil_auxiliary_ratio_audit_20261115/lean"
+
+[[lean_lib]]
+name = "EllipticTameSymbolAudit"
+roots = ["TameImports", "TameLocal", "TameLaws", "TameSteinberg", "TameParameter", "TameProduct", "TameControls", "TameDisjoint", "TameGeometricControls", "TameCertificate"]

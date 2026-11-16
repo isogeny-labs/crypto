@@ -1,0 +1,428 @@
+{
+  "schema": "actual-negation-pullback-source-plan/v1",
+  "created": "2026-11-15T08:00:50.669347+00:00",
+  "formal": {
+    "project": "research/negation_pullback_audit_20261115/lean",
+    "theorem": "NegationPullbackAudit.negation_pullback_certificate",
+    "statement": "theorem negation_pullback_certificate : (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K), Function.Involutive (coordinateNeg W) ∧ Function.Involutive (fieldNeg W)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (x y : K) (h : W.Nonsingular x y) (f : W.FunctionField), finiteAdic W h (fieldNeg W f) = finiteAdic W ((W.nonsingular_neg x y).mpr h) f) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (P : W.Point), pointOrder W (fieldNeg W f) P = pointOrder W f (-P)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W (fieldNeg W f) (field_neg_nonzero W hf) = divisorNeg W (functionDivisor W f hf)) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (a : W.CoordinateRing), polynomialFunction W (Algebra.norm K[X] a) = algebraMap W.CoordinateRing W.FunctionField a * fieldNeg W (algebraMap W.CoordinateRing W.FunctionField a)) ∧ controlFunction ≠ 0 ∧ pointOrder controlCurve controlFunction controlPoint = 3 ∧ pointOrder controlCurve controlFunction (-controlPoint) = 0 ∧ pointOrder controlCurve controlFunction controlPoint ≠ pointOrder controlCurve controlFunction (-controlPoint) ∧ pointOrder controlCurve (fieldNeg controlCurve controlFunction) controlPoint = 0",
+    "decl_sha256": "aeb39697095990a68ba9433163f8b7fa516850bef89f64e69f2b1a4ecac6ed1e",
+    "scope": "Actual Weierstrass negation pullback, constructed on actual AdjoinRoot coordinate ring, full actual FunctionField and actual point localizations, for every field/general model with nonsingular-point guards. Actual coordinate involution fixes coefficient polynomials and has explicit Y→−Y−a1X−a3/basis formulas; squares to identity, not exact order2 for every characteristic/model. Actual algebra norm preserved; evaluation derives actual prime-complement denominator correspondence and actual localization RingEquiv. Actual field inclusion commutes, maximal ideals and uniformizer generators transport. Earlier actual nonsingularity-derived DVR/fullfractionring and actual unit-times-integer-power theorem derive official normalized finite-adic pullback for every actual function, including zero; no valuation-invariance premise. Actual norm-degree/infinity-adic identity gives all-point-order pullback and actual finite-support functionDivisor transport by point-negation Finsupp permutation. Actual coordinate algebra norm equals product with actual conjugation; identity extends to actual function-field fractions. Actual nonzero tangent on actual nonsingular F5 curve y²=x³+1 at actual3torsionP=(0,1) has order3atP and0at−P; correct pulledback order0. This disproves dropping function pullback, while qualified GalbraithLemma7.7.12 survives.47modules39exactcredited+8new/defaults/standardfoundations. Over arbitraryK actualnonsingularKpoints; ellipticmodeloveralgclosedK includesallgeometricpoints. Separate Scheme.localRing/Divisor APIcomparison, geometric degreezero/constantkernel/uniqueness, algebraicclosurebasechange, translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonicalWeil-Tate/MOVFR/full14 remainopen. Samehost/prover/Mathlib; nativeheaderproceduralonly/notcompiler-parser-physicalhostrefinement. No novelty/canonicalpromotion/signedstandingclaim.",
+    "sources": [
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/AllMiller.lean",
+        "bytes": 3541,
+        "sha256": "957b06f548600a2befac32f94513ff5bc5782fbcea21d73079d65ef385c446ae"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FiniteZeros.lean",
+        "bytes": 3615,
+        "sha256": "87c1352f6a533b766cce10ca68f9e092547980451931e34946531dd6fe44f494"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FunctionDivisor.lean",
+        "bytes": 5039,
+        "sha256": "70866614e80ecc49200bc15a09f5b8d8ca30bf76c708d07246c07d5f970751d3"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/FunctionDivisorCertificate.lean",
+        "bytes": 2288,
+        "sha256": "713fa781862832962c898c6db56238c349efe184422ab03c77c45b6ac4914285"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/InfinityMonic.lean",
+        "bytes": 6901,
+        "sha256": "522fc47b03d83b14d6ee0e649b6a61db0de3391ad5ea5ce01c2b3510060f3075"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/LocalNegation.lean",
+        "bytes": 3344,
+        "sha256": "389e1937500b192442e9f8dd858fd0f16c250a4112dc9beb1cbe6d0e7799a7e3"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/LocalOrderAlgebra.lean",
+        "bytes": 4627,
+        "sha256": "208e6317562c3428e3c4ecf87ee2c818e49ca601e58529ed0bc92b37bad601da"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/MillerStep.lean",
+        "bytes": 3712,
+        "sha256": "af03145385dd37fe065e7f532e26f256b010b49f2a8b5c839045987f87e897b3"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NegationCertificate.lean",
+        "bytes": 2363,
+        "sha256": "634c422e8e6c752872b7a960545711bd2cc0c204e063dcd64a92f0546935b555"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NegationControls.lean",
+        "bytes": 2673,
+        "sha256": "d879a00357297322c628f90d29489694be39f15104c978c48cc0ff8f23eaf604"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NegationCoordinate.lean",
+        "bytes": 4229,
+        "sha256": "7757296d2542df2aadcb26c84754163f9c9cb184214305d49a5fa969813790f1"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NegationDivisor.lean",
+        "bytes": 2042,
+        "sha256": "eae68fd2af513043179747ff6c8db825ebb71bb2bdaf57fbade4c4b47c17dc84"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NegationField.lean",
+        "bytes": 2834,
+        "sha256": "b4e670cf28477dc9ca7e9152019ac047935dfada79bb56b151ff1f663464ad4c"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NegationNorm.lean",
+        "bytes": 1963,
+        "sha256": "d58625b3365f957f323a5b0893f593cfcb3b555e9523b3ef7aa018a5f79232b9"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NegationValuation.lean",
+        "bytes": 3340,
+        "sha256": "8ab265d21e0bbef2e6d32a3651310c4055585b369f5a97ddf2cd7d2ab8ff167e"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/NormEvaluation.lean",
+        "bytes": 3070,
+        "sha256": "97a31eb12e47c3ca706def9b3d77947e792d18efb54a53f5272ee7805b9c2eed"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/PolynomialValues.lean",
+        "bytes": 1292,
+        "sha256": "36b18679067f57503a2f3c37eca56d39397c467423fc7d30563c40167943fdf4"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/RationalControls.lean",
+        "bytes": 7157,
+        "sha256": "68b65085186d1011aff59d16671e9725b447c0aafa84a1214f464002804f653d"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/RecursionCertificate.lean",
+        "bytes": 2595,
+        "sha256": "88f37e0bfa19bd6cf009bf8340eae0e82ef79b55478c79e9c7e1f22a4c1cd49f"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/RecursionControls.lean",
+        "bytes": 2016,
+        "sha256": "089da7719c94e96d224c501a97a78dd0f677f1a60b5e75e4ebf3dd77256208dd"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/lakefile.toml",
+        "bytes": 1203,
+        "sha256": "5250271b5b4c8278e3481a35af39be0738ad10cd258ae1c388cbc908b39f39d8"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/negation_pullback_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "AllMiller",
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteValuation",
+    "FiniteZeros",
+    "FunctionDivisor",
+    "FunctionDivisorCertificate",
+    "GuardControls",
+    "InfinityMonic",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalNegation",
+    "LocalOrderAlgebra",
+    "LocalOriginEvaluation",
+    "MillerFunctions",
+    "MillerStep",
+    "NegationCertificate",
+    "NegationControls",
+    "NegationCoordinate",
+    "NegationDivisor",
+    "NegationField",
+    "NegationNorm",
+    "NegationValuation",
+    "NormDegree",
+    "NormEvaluation",
+    "Normalization",
+    "OriginEvaluation",
+    "PointDivisor",
+    "PointLocalization",
+    "PolynomialValues",
+    "RationalControls",
+    "RecursionCertificate",
+    "RecursionControls",
+    "ResidueNormalization",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/negation_pullback_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 15592,
+      "sha256": "770e23bf9bd2c95a8729ce56731101d47df1f9b61907f48b1c0969c380db10a4"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "ad73de893a288d0411ecd567d6a1e7bf57d172b3c864e2d2ac86ac9ee0761e99"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/evidence/attempts.json",
+      "bytes": 226,
+      "sha256": "cd6811e11ca398e8fc76bdc61d24b013ce78381e3b40647949ed4307d5091275"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 5558,
+      "sha256": "c01ff115004fe64d90624b5b02c5269a139bd8c60dc4402cae8bf98ef7cc9235"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/evidence/gate.json",
+      "bytes": 1422,
+      "sha256": "b1330905e3a5751ef82c28aae203c941677ef153260a719c13a2f9f07fc379bc"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/evidence/source-review.json",
+      "bytes": 11070,
+      "sha256": "2a891873d36d32ba820b39485051a697c5435a179fb8c591c30942f28632259c"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/evidence/binding-check.json",
+      "bytes": 5484,
+      "sha256": "bd1dbac01533b7075df40e5df56b064b879e1247befdc630554a554bffe60fd4"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/proof-map.json",
+      "bytes": 9134,
+      "sha256": "109abd325e2fab1c68297c1782910ee2b1fe7598129676696d5e5b29ce379431"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/render_report.py",
+      "bytes": 7117,
+      "sha256": "8d1dbb985e00c977a0c549f4370e3f90f90375e765eaa9495471f7b172725bed"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/export_binding_input.py",
+      "bytes": 1742,
+      "sha256": "42f7ba528791f7c3b855cce698f0f2169fa31d8621d7ea0d2cee11135bc75283"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/PROTOCOL.md",
+      "bytes": 2890,
+      "sha256": "b2a8b5331f412666c868b327b59e518cf9781b85bf493d7f4f680617f3674f18"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/reports/layout.json",
+      "bytes": 259,
+      "sha256": "957ae3b84e39679b996489d2c7b2a8ad93b2255cb8ff05308ef997ff75a42d37"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/reports/negation-pullback.svg",
+      "bytes": 1438,
+      "sha256": "682feab0fdce24e649eb73fb8a6ba85b44730517c3d5b1f19d352b878933bed7"
+    },
+    {
+      "path": "research/negation_pullback_audit_20261115/reports/report.pdf",
+      "bytes": 47090,
+      "sha256": "9778db0949585a4a18fc33eddbeb6ba531c3850e63a89d7957d4463895ce20cc"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 381,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 39,
+    "new_modules": 8,
+    "actual_coordinate_field_localization_maps": true,
+    "actual_normalized_all_function_local_pullback": true,
+    "actual_point_order_divisor_pullback": true,
+    "actual_norm_product_fraction_identity": true,
+    "actual_F5_missing_function_pullback_counter": true,
+    "qualified_source_survives": true,
+    "arbitrary_field_scope": "ActualnonsingularKpoints; ellipticmodeloveralgclosedK includesallgeometricpoints.",
+    "geometric_degree_zero_or_constant_kernel": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "algebraic_closure_basechange_or_canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -11,70 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Distinct pairing-target batch cap](pairing-batch-distinct-target-cap.md) | resolved by added cell | the specified 64 distinct nonidentity targets remain impossible on each frozen order-19 and order-61 group | order-67 degree-two pairing cell supplied 66 public targets and V7/V7B matched prime-field rho plus cold source BSGS, each with 594 scalar replays; counted cost and scaling remain separate |
-| [Root-finding pipeline complete-cost calibration](rootfinding-complete-cost-calibration.md) | open | qualified full-cost or wall-time comparison for the assessed root-finding IC pipeline; 4/8/16-lane, B train/holdout and coverage panels are verified and replayed; a fresh-target equal-prefix component control exists, while native field counts are absent from sealed records and wall data are L0 | serialize and price native work; repeat matched public targets under L2 isolation and on an independent host |
-| [EC Bench GPU matched workload and validation](ecbench-gpu-matched-workload-contract.md) | open | admitted CPU/GPU comparison of the same ECDLP workload | frozen CUDA input/output, exact costs, independent answer replay and GPU contention controls |
-| [N83 recorded-query sampler contract](n83-recorded-query-sampler-contract-mismatch.md) | open | green whole-library validation on the pinned baseline | traced and versioned query law, point checks and passing regression |
-| [Non-rational isogeny fiber DLP cost](nonrational-isogeny-fiber-dlp-cost-gap.md) | open; the projected-base grid completed 384 cold children and replays, and explicit dual transport completed 480/480 with 96 paired cells and 13,482 relation witnesses matched. At order 229, B=64, cold `S_group` direct dual/inverse/destination-direct/rho was 2,492.134/2,559.868/2,431.537/7.979. The earlier larger inverse-order and Linux replay/resource receipts remain linked in the problem. Complete portable price and L2 wall remain open. | attribute a general algebraic coordinate effect and admit complete portable cost | independently price all native primitives on the exact dual workload; run genuinely reused 64-target setup, L2 wall, and a separately frozen larger-order dual comparison |
-| [Release library validation on shared host](release-library-validation-shared-host-20261012.md) | resolved locally; controlled full run passed 4,009 tests | passing release-library gate for the fiber study | complete two-thread, loopback-accessible run passed; preserve the earlier sandboxed 13-failure receipt and recheck only if source or CI changes |
-| [GHS → Smith characteristic mismatch](ghs-to-smith-pipeline-characteristic-mismatch.md) | open | the GHS → Smith → Diem pipeline | a char-2 hyperelliptic→quartic isogeny, or an odd-char descent onto genus-3 hyperelliptic curves |
-| [Smith 18.57% walk extension](smith-kernel-isogeny-class-walk.md) | open | costing walks that lift Smith's coverage toward 50.16% | native Smith Prop. 2/4 tests and per-class success counts |
-| [No class arithmetic on the Jacobian of a plane quartic](plane-quartic-jacobian-class-arithmetic-missing.md) | resolved (toy smokes) | executing the transfer homomorphism, relation collection and any cost comparison on plane-quartic Jacobians (blocked until the linear-equivalence routine landed, #1768) | done for the toy discriminating checks: `quartic_ic.rs` linear-equivalence checks and a pure IC target path; deg-3 canonical forms and any cost statement remain open |
-
-## Add or update a problem
-
-1. Check this index and the affected work for an existing record. Reuse it when
-   the obstruction is the same; link the canonical record across repositories
-   rather than duplicating its evidence.
-2. Copy [TEMPLATE.md](TEMPLATE.md) to a stable, descriptive filename such as
-   `subgroup-preserving-transfer-not-established.md`. Name the mechanism or
-   missing obligation, not a vague "hard problem". The filename above is an
-   illustration, not a recorded finding.
-3. State the exact blocked task or claim and its parameters, assumptions, and
-   acceptance criteria. Separate evidence from conjecture and cite durable
-   artifacts, proofs, reproductions, or source records.
-4. Specify the evidence or capability needed to move past the obstruction and
-   one concrete next experiment or proof obligation that can distinguish
-   explanations. Link an existing execution protocol where applicable; this
-   record does not replace it or impose a new campaign spending cap.
-5. Add the index row and link the problem from the affected note, plan, audit
-   finding, or PR. Update these pointers and the record together as work lands.
-
-Use this directory for consequential or recurring blockers. Routine defects
-and TODOs can stay in their existing trackers. Record a blocker even when its
-cause is unknown; explicit unknowns are useful, invented explanations are not.
-
-## Status and evidence
-
-- `open`: the obstruction remains and its next action is recorded.
-- `investigating`: work on that action is underway; link the task or run.
-- `resolved`: linked evidence meets the stated exit criteria for this specific
-  obstruction. State any remaining limitations.
-- `superseded`: a linked successor now tracks this obstruction; this is not a
-  claim that it was solved.
-
-These statuses describe the problem record, not the scientific status of a
-hypothesis or the completion of a campaign. Stopping work does not resolve
-a problem or authorize abandoning the user's requirement.
-
-Keep observations, calculations, hypotheses, resource/access/assistance gaps,
-and proved limits distinct. Bound a negative result by its exact inputs and
-search limits. A resource ceiling, missing implementation, or failed search
-does not establish a mathematical obstruction or a security theorem.
-
-Preserve historical evidence and append dated updates explaining corrections.
-A resolution cites its evidence and the criteria met; a supersession cites its
-successor and the reason for replacing the record. Follow the repository's
-existing review, archival, and claim-promotion rules.
-
-
-
-
-| [Frozen chained-transfer PCC data addresses](chained-transfer-pcc-evidence-addresses.md) | resolved at feature-checkpoint CI scope | Original current-source PCC succeeds with full source/address custody; PR4396 merged40839 | Keep immutable snapshot subjects; main-ledger integration and scientific NEW28 remain separate. [pcc:unverified] |
-| [Current chained-transfer store and startup](chained-transfer-current-store-and-startup.md) | investigating | Currentb846 PCC/validation store403 and original migration startup0jobs block final-head merge; whole CI115681 retained | Original authenticated current-source pulls/upload/full replay and all unchanged merge gates; no role/identity/policy bypass. [pcc:unverified] |
-| [Original FB30 character extension](https://github.com/isogeny-labs/cryptanalysis/blob/fe91441709ba1860f8e5b0e54834f5fa0e8fd0c3/problems/chained-transfer-original-FB30-character-extension-02.md) | investigating | Collected constraints admit a finite noncharacter functional | Prospective unassisted actual-relation completion, full-population checks and separately admitted matched costs. [pcc:unverified] |
-| [Chained transfer admission and ledger synchronization](chained-transfer-admission-and-ledger-sync.md) | open | admitted solving-cost comparison,lead-atlas integration and root3877/consumer1484 merges;both frozen histories fork | checkpoint/budget access,vault binding,accepted reconciliation retaining both histories and final-head CI/review |
-| [Chained transfer workspace interruption](chained-transfer-workspace-unavailable-20261111.md) | resolved (execution/custody restored) | CT20 compatible gluing/actual Jacobian7-hop and local receipt recovery | usable execution workspace; inspect original pending records or retain fresh gated receipts |
+| [Fourteen-target audit: proof and execution gaps](fourteen-target-audit-proof-and-execution-gaps.md) | open | remaining all-fourteen-item proofs, censuses, independent replay and main integration | real second-host replay, provenance-preserving ledger reconciliation, and exact remaining curve/Jacobian/implementation bridges; local checkpoints already authorized |
+| [Lean statement binding completeness](lean-statement-binding-completeness.md) | open | full declaration hashing for one issued BK audit receipt; canonical parser contract | versioned complete BK wrapper and canonical complete-signature/qualified-name parser with genuine controls |
 | [P3 census rho walk: bimodal, curve-reproducible cost above √n](p3census-rho-walk-bimodal.md) | resolved (walk v2, 2026-11-08) | reading P3's rho outcome as a statement about Pollard rho | identify the binary property on 50 small curves; a corrected walk with flat, unimodal per-curve cost; re-run Y1 |
 | [Split-prime pattern reaches the prime-order group only through scalars](split-prime-pattern-scalar-only.md) | open (derived obstruction for the ℓ-adic / class-group route) | a novel ECDLP algorithm built on the split-prime deficit of the published prime curves | a computable non-scalar entry point verified on a toy class, or a Lean proof that closes the route formally |
 | [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only | current-main PCC prefix/integration | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
@@ -184,12 +122,91 @@ existing review, archival, and claim-promotion rules.
 | [Root-finding pipeline complete-cost calibration](rootfinding-complete-cost-calibration.md) | open; 2026-10-19 conditional pair-cell evidence added | qualified full-cost or wall-time comparison for the assessed root-finding IC pipeline; 4/8/16-lane, B train/holdout and coverage panels are verified and replayed; a fresh-target equal-prefix component control exists, while native field counts are absent from sealed records and wall data are L0 | serialize and price native work; repeat matched public targets under L2 isolation and on an independent host |
 | [N83 cloud online A/A noise](n83-online-aa-noise.md) | investigating | selecting the exact-root factor-base finalist for the five sealed Tier 1 points after two K2543/root22 controls exceeded 10% | frozen mirrored K3072/K2543 adjacent A/A screen with exact base, relation and scalar replay, then an exact IC1 selection record |
 | [EC Bench GPU matched workload and validation](ecbench-gpu-matched-workload-contract.md) | open | admitted CPU/GPU comparison of the same ECDLP workload | one RunPod device solve audited; qualify GPU traffic telemetry, interleave full-cost CPU/GPU trials with A/A controls, and extend curve coverage |
+| [N83 recorded-query sampler contract](n83-recorded-query-sampler-contract-mismatch.md) | open | green whole-library validation on the pinned baseline | traced and versioned query law, point checks and passing regression |
 | [GHS → Smith characteristic mismatch](ghs-to-smith-pipeline-characteristic-mismatch.md) | open | the GHS → Smith → Diem pipeline (char 2 as stated: blocked; odd-char n = 3 descent onto genus-3 hyperelliptic curves exists, 2026-10-14) | a char-2 hyperelliptic→quartic isogeny, or Smith Props. 2/4 passing on the odd-char family (cycle-type screen done: #S(H) = 3 or 1) |
 | [Smith 18.57% walk extension](smith-kernel-isogeny-class-walk.md) | open | costing walks that lift Smith's coverage toward the measured class ceiling (43.0% at `p = 7`, 47.5% at `p = 11`; Prop. 2/4 tests landed 2026-10-14) | explicit isogenies between hyperelliptic class members and their walk length and cost; the empty-class deficit is not iso-class sparsity (2026-10-15); the Prop. 4 sign follows #H(F_p), explaining ~3/4 of it (2026-10-16); that bias shrinks like 1/√p (2026-10-16) nor a `J[2]`/2-Sylow/`J[4]` invariant of `J_H` (2026-10-16); W3a elliptic-side walk (2026-10-25): Smith passes at 0.53-0.61 on descended `H`, a passing `E` is 1.5-3.6 steps away, but the sampled walk is `Θ(p)` and is trapped at `p ≡ 1 mod 4`; next: whether weak/passing curves cluster beyond density `1/p` |
+| [No class arithmetic on the Jacobian of a plane quartic](plane-quartic-jacobian-class-arithmetic-missing.md) | resolved (toy smokes) | executing the transfer homomorphism, relation collection and any cost comparison on plane-quartic Jacobians (blocked until the linear-equivalence routine landed, #1768) | done for the toy discriminating checks: `quartic_ic.rs` linear-equivalence checks and a pure IC target path; deg-3 canonical forms and any cost statement remain open |
 | [Binary decomposition systems capped at 64 Boolean unknowns](binary-boolean-system-64-variable-cap.md) | resolved | Gröbner/SAT decomposition arms on chain systems with `md + (m−2)n > 64` unknowns (the `m = 4`, n ≥ 23 cells of `research/ic_m3_algebraic_vs_mitm_20261014/`); the study itself was completed with the `u128` `wide_groebner` solver (amendment 1) | a ≥128-variable monomial type in `build_decomposition_system`, inherited F4 and the SAT encoder, agreeing with the floor on 12 targets at `m = 4`, n = 23 |
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
 | [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | resolved | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner chose eager (version 2) as the identity, 2026-10-28; original marked pre-#2043; re-recorded as `claim-n13-v2`, which replays with 0 problems, twice |
+
+## Add or update a problem
+
+1. Check this index and the affected work for an existing record. Reuse it when
+   the obstruction is the same; link the canonical record across repositories
+   rather than duplicating its evidence.
+2. Copy [TEMPLATE.md](TEMPLATE.md) to a stable, descriptive filename such as
+   `subgroup-preserving-transfer-not-established.md`. Name the mechanism or
+   missing obligation, not a vague "hard problem". The filename above is an
+   illustration, not a recorded finding.
+3. State the exact blocked task or claim and its parameters, assumptions, and
+   acceptance criteria. Separate evidence from conjecture and cite durable
+   artifacts, proofs, reproductions, or source records.
+4. Specify the evidence or capability needed to move past the obstruction and
+   one concrete next experiment or proof obligation that can distinguish
+   explanations. Link an existing execution protocol where applicable; this
+   record does not replace it or impose a new campaign spending cap.
+5. Add the index row and link the problem from the affected note, plan, audit
+   finding, or PR. Update these pointers and the record together as work lands.
+
+Use this directory for consequential or recurring blockers. Routine defects
+and TODOs can stay in their existing trackers. Record a blocker even when its
+cause is unknown; explicit unknowns are useful, invented explanations are not.
+
+## Status and evidence
+
+- `open`: the obstruction remains and its next action is recorded.
+- `investigating`: work on that action is underway; link the task or run.
+- `resolved`: linked evidence meets the stated exit criteria for this specific
+  obstruction. State any remaining limitations.
+- `superseded`: a linked successor now tracks this obstruction; this is not a
+  claim that it was solved.
+
+These statuses describe the problem record, not the scientific status of a
+hypothesis or the completion of a campaign. Stopping work does not resolve
+a problem or authorize abandoning the user's requirement.
+
+Keep observations, calculations, hypotheses, resource/access/assistance gaps,
+and proved limits distinct. Bound a negative result by its exact inputs and
+search limits. A resource ceiling, missing implementation, or failed search
+does not establish a mathematical obstruction or a security theorem.
+
+Preserve historical evidence and append dated updates explaining corrections.
+A resolution cites its evidence and the criteria met; a supersession cites its
+successor and the reason for replacing the record. Follow the repository's
+existing review, archival, and claim-promotion rules.
+
+
+
+
+| [Distinct pairing-target batch cap](pairing-batch-distinct-target-cap.md) | resolved by added cell | the specified 64 distinct nonidentity targets remain impossible on each frozen order-19 and order-61 group | order-67 degree-two pairing cell supplied 66 public targets and V7/V7B matched prime-field rho plus cold source BSGS, each with 594 scalar replays; counted cost and scaling remain separate |
+| [Root-finding pipeline complete-cost calibration](rootfinding-complete-cost-calibration.md) | open | qualified full-cost or wall-time comparison for the assessed root-finding IC pipeline; 4/8/16-lane, B train/holdout and coverage panels are verified and replayed; a fresh-target equal-prefix component control exists, while native field counts are absent from sealed records and wall data are L0 | serialize and price native work; repeat matched public targets under L2 isolation and on an independent host |
+| [EC Bench GPU matched workload and validation](ecbench-gpu-matched-workload-contract.md) | open | admitted CPU/GPU comparison of the same ECDLP workload | frozen CUDA input/output, exact costs, independent answer replay and GPU contention controls |
+| [Non-rational isogeny fiber DLP cost](nonrational-isogeny-fiber-dlp-cost-gap.md) | open; the projected-base grid completed 384 cold children and replays, and explicit dual transport completed 480/480 with 96 paired cells and 13,482 relation witnesses matched. At order 229, B=64, cold `S_group` direct dual/inverse/destination-direct/rho was 2,492.134/2,559.868/2,431.537/7.979. The earlier larger inverse-order and Linux replay/resource receipts remain linked in the problem. Complete portable price and L2 wall remain open. | attribute a general algebraic coordinate effect and admit complete portable cost | independently price all native primitives on the exact dual workload; run genuinely reused 64-target setup, L2 wall, and a separately frozen larger-order dual comparison |
+| [Release library validation on shared host](release-library-validation-shared-host-20261012.md) | resolved locally; controlled full run passed 4,009 tests | passing release-library gate for the fiber study | complete two-thread, loopback-accessible run passed; preserve the earlier sandboxed 13-failure receipt and recheck only if source or CI changes |
+| [GHS → Smith characteristic mismatch](ghs-to-smith-pipeline-characteristic-mismatch.md) | open | the GHS → Smith → Diem pipeline | a char-2 hyperelliptic→quartic isogeny, or an odd-char descent onto genus-3 hyperelliptic curves |
+| [Smith 18.57% walk extension](smith-kernel-isogeny-class-walk.md) | open | costing walks that lift Smith's coverage toward 50.16% | native Smith Prop. 2/4 tests and per-class success counts |
+
+
+
+
+
+
+
+
+
+
+
+
+| [Frozen chained-transfer PCC data addresses](chained-transfer-pcc-evidence-addresses.md) | resolved at feature-checkpoint CI scope | Original current-source PCC succeeds with full source/address custody; PR4396 merged40839 | Keep immutable snapshot subjects; main-ledger integration and scientific NEW28 remain separate. [pcc:unverified] |
+| [Current chained-transfer store and startup](chained-transfer-current-store-and-startup.md) | investigating | Currentb846 PCC/validation store403 and original migration startup0jobs block final-head merge; whole CI115681 retained | Original authenticated current-source pulls/upload/full replay and all unchanged merge gates; no role/identity/policy bypass. [pcc:unverified] |
+| [Original FB30 character extension](https://github.com/isogeny-labs/cryptanalysis/blob/fe91441709ba1860f8e5b0e54834f5fa0e8fd0c3/problems/chained-transfer-original-FB30-character-extension-02.md) | investigating | Collected constraints admit a finite noncharacter functional | Prospective unassisted actual-relation completion, full-population checks and separately admitted matched costs. [pcc:unverified] |
+| [Chained transfer admission and ledger synchronization](chained-transfer-admission-and-ledger-sync.md) | open | admitted solving-cost comparison,lead-atlas integration and root3877/consumer1484 merges;both frozen histories fork | checkpoint/budget access,vault binding,accepted reconciliation retaining both histories and final-head CI/review |
+| [Chained transfer workspace interruption](chained-transfer-workspace-unavailable-20261111.md) | resolved (execution/custody restored) | CT20 compatible gluing/actual Jacobian7-hop and local receipt recovery | usable execution workspace; inspect original pending records or retain fresh gated receipts |
+
+
+
 
 
 

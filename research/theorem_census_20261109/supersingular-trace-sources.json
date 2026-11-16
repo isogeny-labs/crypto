@@ -1,0 +1,41 @@
+{
+  "schema": "supersingular-trace-source-plan/v1",
+  "created": "2026-11-10T02:27:12.346067+00:00",
+  "status": "Whole331kernel gate passed; preissue source plan, no trace packet.",
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "SupersingularTraceClassesAudit.trace_classification_audit_certificate",
+    "statement": "theorem trace_classification_audit_certificate : (\u2200 (K : Type*) [Field K] [Fintype K] (E : WeierstrassCurve.Affine K) (r : \u2115), Nat.Prime r \u2192 r\u2223Nat.card E.Point \u2192 TraceSquares (Fintype.card K) (fieldTrace E) \u2192 (orderOf (Fintype.card K:ZMod r)=1 \u2228 orderOf (Fintype.card K:ZMod r)=2 \u2228 orderOf (Fintype.card K:ZMod r)=3 \u2228 orderOf (Fintype.card K:ZMod r)=4 \u2228 orderOf (Fintype.card K:ZMod r)=6) \u2227 orderOf (Fintype.card K:ZMod r)\u22646 \u2227 Nat.Coprime r (Fintype.card K) \u2227 (\u2203 P : E.Point,addOrderOf P=r)) \u2227 (Nat.Coprime 81 289 \u2227 81\u2223(324:\u2115) \u2227 TraceSquares 289 ((289:\u2124)+1-324) \u2227 \u00ac orderOf (289:ZMod 81)\u22646)",
+    "decl_sha256": "8ea7c208ce1f34eb39d74d1dd70a40c97fc48fb66435bb5f50542f9e544f4269",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/SupersingularTraceClasses.lean",
+        "bytes": 7821,
+        "sha256": "6f50f299794aecf2e85e42ffa651001f4a7a69b3f7e0f7daf3a6f8ef5aaff275"
+      }
+    ],
+    "gate": {
+      "path": "evidence/supersingular-trace-gate.log",
+      "declarations": 331,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Actual finite-field curve and prime divisor of actual point count, conditional on explicit integer trace-square classification: modular order in {1,2,3,4,6}, bound6, coprimality and actual prime-order point via Cauchy. Composite q289/N324/r81 control is arithmetic only; no actual curve/point81 claimed. Classification and modular-order/embedding-field identification remain open."
+  },
+  "literature": {
+    "primary": "FST2010 Definitions2.1/Remark2.2pp230\u2013231 and trace-square listp237 read. Original Waterhouse1969Theorem4.1and proof beginningpp536\u2013537(PDF17\u201318)read and visually inspected after successful resumed fetch; classification itself remains an explicit Lean premise.",
+    "fst_pdf_sha256": "2acd937be8567abfb26bb3861e3aaf34312270c36df9a86f91cf9676c3caf785",
+    "mathlib": "Affine/Point.lean nonsingularPointEquiv/group instances and GroupTheory/Perm/Cycle/Type.lean additive Cauchy; pinned56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "waterhouse": {
+      "url": "https://www.numdam.org/item/ASENS_1969_4_2_4_521_0.pdf",
+      "pdf_bytes": 4549114,
+      "pdf_sha256": "7be2bf9dde45454afa3dd9a0ea1ba05acbe952b6b573a0c37c2b1b8f0cccbb47",
+      "read_scope": "Theorem4.1and proof beginning, printedpp536\u2013537/PDF17\u201318; actual source pages visually inspected. Not a claim of reading the entire paper.",
+      "finding": "For q=p^a, supersingular trace cases yield square0,q,2q,3q,4q; original classification includes parity/characteristic/congruence restrictions. The Lean predicate deliberately retains only the necessary square-list consequence.",
+      "fetch": "Initial45second partial download failed28; 120second-cap resumed fetch exited0, exact complete PDF parsed41pages."
+    }
+  },
+  "native_experiments": 0,
+  "paid_compute": 0,
+  "inherited_sources": "Previously issued Lean sources remain unchanged; only additive module root registration."
+}

@@ -1,0 +1,69 @@
+⚠ [3156/3158] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3157/3158] Replayed S3Completion
+warning: S3Completion.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Completion.lean:25:2: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Completion.lean:25:2: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Completion.lean:67:44: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [WeierstrassCurve.Affine.addX, ha1, ha2, hn, zero_mul, mul_zero, add_zero, sub_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✖ [3158/3158] Building BinaryS3 (4.7s)
+warning: BinaryS3.lean: imports `Mathlib.Algebra.CharP.Two` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/mathlib4/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/crypto-audit/research/theorem_census_20261109/lean/BinaryS3.lean -o /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/BinaryS3.olean -i /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/BinaryS3.ilean -c /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/BinaryS3.c --setup /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/BinaryS3.setup.json --json
+warning: BinaryS3.lean:45:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.zero_coordinate_no_root`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: BinaryS3.lean:107:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.curve_equation`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+error: BinaryS3.lean:205:63: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+W : WeierstrassCurve.Affine K
+ha1 : W.a₁ = 1
+ha3 : W.a₃ = 0
+ha4 : W.a₄ = 0
+⊢ W.a₂ * W.a₆ * 12 + W.a₂ ^ 2 * W.a₆ * 48 + W.a₂ ^ 3 * W.a₆ * 64 + W.a₆ + W.a₆ ^ 2 * 432 = W.a₆
+error: BinaryS3.lean:214:26: unsolved goals
+K : Type u_1
+inst✝² : Field K
+inst✝¹ : CharP K 2
+inst✝ : IsAlgClosed K
+a b x : K
+p : K[X] := X ^ 2 + C x * X - C (x ^ 3 + a * x ^ 2 + b)
+hh : p.degree = 0
+hz : 1 - ((C x ^ 3).coeff 2 + a * (C x ^ 2).coeff 2) = 0
+⊢ False
+info: BinaryS3.lean:263:0: 'BinaryS3Audit.binaryS3_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: BinaryS3.lean:264:0: 'BinaryS3Audit.binaryS3_zero_iff_exists_points' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- BinaryS3
+error: build failed

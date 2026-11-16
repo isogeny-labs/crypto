@@ -1,0 +1,68 @@
+{
+  "schema": "msolve-degree-written-header-check/v1",
+  "positive": [
+    {
+      "case_id": "degree-word-full-main",
+      "expected_decl_sha256": "285221ce90632adbf8398f66d7c011b1c8b9ad6cdc5be42b95e1616cd6011e64",
+      "full_characters": 131,
+      "full_decl_sha256": "285221ce90632adbf8398f66d7c011b1c8b9ad6cdc5be42b95e1616cd6011e64",
+      "full_normalized_signature": "theorem actual_degree_word_certificate : ActualWordBounds ∧ ActualPolynomialBoundary ∧ ActualRecordedPrefix ∧ LegacyFullF4Statement",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "actual_degree_word_certificate",
+        "end_byte": 3796,
+        "file": "/workspace/scratch/msolve-degree-binding-input-positive01/DegreeCertificate.lean",
+        "qualified_decl_id": "MsolveDegreeWordAudit.actual_degree_word_certificate",
+        "signature": "theorem actual_degree_word_certificate :\n    ActualWordBounds ∧ ActualPolynomialBoundary ∧ ActualRecordedPrefix ∧ LegacyFullF4Statement",
+        "start_byte": 3655
+      },
+      "recorded_statement": "theorem actual_degree_word_certificate : ActualWordBounds ∧ ActualPolynomialBoundary ∧ ActualRecordedPrefix ∧ LegacyFullF4Statement",
+      "recorded_text_sha256": "285221ce90632adbf8398f66d7c011b1c8b9ad6cdc5be42b95e1616cd6011e64",
+      "source_plan": "research/msolve_degree_word_audit_20261116/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "MsolveDegreeWordAudit.actual_degree_word_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "legacy_negative": [
+    {
+      "case_id": "legacy-real-prefix",
+      "expected_decl_sha256": "f868c7b674c87cbd060619ed651942ebc04006ef79ecb5155781bfca4877ac41",
+      "full_characters": 613,
+      "full_decl_sha256": "d099e0291d627a3db2153ce0bf28f68c69d6e7322bbfe32655c6a217db5aa838",
+      "full_normalized_signature": "theorem expected_output_audit_certificate : (∀ (V A : Type*) [Field A] (D : ℕ) (F : Set (MvPolynomial V A)) (G : ℕ→Set (MvPolynomial V A)),F4Run D F G → ∀ t,G t⊆Ideal.span F) ∧ (¬ ∀ (F : Set P) (h p : P), SaturationMember (Ideal.span F) h p → ∃ (D t : ℕ) (G : ℕ→Set P),F4Run D F G ∧ p∈G t) ∧ ordinaryRows=booleanGenerators (K:=ZMod 101) ∧ ordinaryRows⊆Ideal.span (booleanGenerators (K:=ZMod 101)) ∧ (∀ p∈saturatedRows, SaturationMember (Ideal.span (booleanGenerators (K:=ZMod 101))) x p) ∧ y (K:=ZMod 101)∉Ideal.span booleanGenerators ∧ (∀ (D t : ℕ) (G : ℕ→Set P),saturatedRows⊆G t → ¬F4Run D booleanGenerators G)",
+      "omitted_suffix": ":=ZMod 101) ∧ ordinaryRows⊆Ideal.span (booleanGenerators (K:=ZMod 101)) ∧ (∀ p∈saturatedRows, SaturationMember (Ideal.span (booleanGenerators (K:=ZMod 101))) x p) ∧ y (K:=ZMod 101)∉Ideal.span booleanGenerators ∧ (∀ (D t : ℕ) (G : ℕ→Set P),saturatedRows⊆G t → ¬F4Run D booleanGenerators G)",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "expected_output_audit_certificate",
+        "end_byte": 2389,
+        "file": "/workspace/scratch/msolve-degree-binding-input-legacy01/F4ExpectedOutputs.lean",
+        "qualified_decl_id": "F4ExpectedOutputsAudit.expected_output_audit_certificate",
+        "signature": "theorem expected_output_audit_certificate :\n    (∀ (V A : Type*) [Field A] (D : ℕ) (F : Set (MvPolynomial V A))\n      (G : ℕ→Set (MvPolynomial V A)),F4Run D F G → ∀ t,G t⊆Ideal.span F) ∧\n    (¬ ∀ (F : Set P) (h p : P),\n      SaturationMember (Ideal.span F) h p →\n        ∃ (D t : ℕ) (G : ℕ→Set P),F4Run D F G ∧ p∈G t) ∧\n    ordinaryRows=booleanGenerators (K:=ZMod 101) ∧\n    ordinaryRows⊆Ideal.span (booleanGenerators (K:=ZMod 101)) ∧\n    (∀ p∈saturatedRows,\n      SaturationMember (Ideal.span (booleanGenerators (K:=ZMod 101))) x p) ∧\n    y (K:=ZMod 101)∉Ideal.span booleanGenerators ∧\n    (∀ (D t : ℕ) (G : ℕ→Set P),saturatedRows⊆G t → ¬F4Run D booleanGenerators G)",
+        "start_byte": 1658
+      },
+      "recorded_statement": "theorem expected_output_audit_certificate : (∀ (V A : Type*) [Field A] (D : ℕ) (F : Set (MvPolynomial V A)) (G : ℕ→Set (MvPolynomial V A)),F4Run D F G → ∀ t,G t⊆Ideal.span F) ∧ (¬ ∀ (F : Set P) (h p : P), SaturationMember (Ideal.span F) h p → ∃ (D t : ℕ) (G : ℕ→Set P),F4Run D F G ∧ p∈G t) ∧ ordinaryRows=booleanGenerators (K",
+      "recorded_text_sha256": "f868c7b674c87cbd060619ed651942ebc04006ef79ecb5155781bfca4877ac41",
+      "source_plan": "research/theorem_census_20261109/f4-model-sources.json",
+      "status": "truncated_signature_prefix",
+      "theorem": "F4ExpectedOutputsAudit.expected_output_audit_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 0,
+      "summary": true,
+      "truncated_prefixes": 1,
+      "unresolved": 0
+    }
+  ],
+  "scope": "After completed gate; full current main versus actual historical prefix, separate cases; no independent parser/compiler/host refinement."
+}

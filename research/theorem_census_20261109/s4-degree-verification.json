@@ -1,0 +1,55 @@
+{
+  "schema": "s4-degree-verification/v1",
+  "created": "2026-11-09T17:30:03.405Z",
+  "formal_source_commit": "3d1dd96b01ce8324440565391efeb3dbb0deabd0",
+  "formal_source": "research/theorem_census_20261109/lean/S4Degree.lean",
+  "formal_source_sha256": "b26b20cddee5ec12369b5b3447c6d3b352f878a1f9201219090271ed201f2c20",
+  "binding": "S4DegreeAudit.s4_degree_audit_certificate",
+  "decl_sha256": "7ad96690d2650883613c7a90bb0cac36c792ef005ba087eca5cf3e4a56465acc",
+  "gate": {
+    "path": "evidence/s4-degree-gate.log",
+    "sha256": "2a61850f3732e5fffedd18886bc270c2513a3a8ffe929c574362ac4e555d04b2",
+    "declarations": 259,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "packet": {
+    "id": "PCC-20261109-b93977",
+    "path": "evidence/pcc-s4-degree-check.json",
+    "sha256": "264cbe5d44a8032438d14d646d8a46d67785298b05adcf377a463db71b64e11b",
+    "verdict": "pass",
+    "verified_at": "2026-11-09T17:28:09Z",
+    "standing": "Unsigned producer check; no signed or separate-host promotion"
+  },
+  "identity": {
+    "id": "IDC1h9d53585cac843775",
+    "path": "s4-degree-identity-certificate.json",
+    "sha256": "c3a990ecf2a70be7dd803252525a3e1e6d5d23845969158976de3d1b5109281f",
+    "source_sha256": "844178881ab475afdebe9e0767eb086fea9aed789109b1314267b0482744ceda",
+    "points": 32,
+    "extra_points": 11,
+    "variables": 4,
+    "degree_bound": 6,
+    "modulus_decimal": "2305843009213693951",
+    "proof_pointer_matches": true,
+    "issue_and_extra_check_exit": 0,
+    "scope": "Only res22(a,b,c,1,-2z,z^2)=(az^2+bz+c)^2 supplementary finite rewrite check. Actual coefficient extraction and generic/specialized degree theorems rest on Lean.",
+    "independence": "Producer-issued on one host with unchanged repository checker. Lean proves the actual determinant/coefficient/degree statements; this finite rewrite supplement supplies no all-characteristic, signed or independent-host inference."
+  },
+  "actual_negative_control": {
+    "field": 5,
+    "curve": "y^2=x^3-x",
+    "fixed_other_inputs": [
+      0,
+      1,
+      4
+    ],
+    "canonical_polynomial": "1",
+    "natDegree": 0,
+    "interpretation": "Refutes preservation of generic degree under arbitrary specialization; not the qualified generic degree theorem."
+  },
+  "scope": "Canonical m4degree/evaluation/coefficient results in all four positions; no all-mdegree/recursion, irreducibility, solving-degree or complexity claim.",
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

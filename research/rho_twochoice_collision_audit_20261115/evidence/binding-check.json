@@ -1,0 +1,49 @@
+{
+  "schema": "rho-twochoice-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "rho-twochoice-certificate",
+      "expected_decl_sha256": "ce864beb518e06e523e89e965cc96ef0d00e05836cae76e1e4d229659cb0d339",
+      "full_characters": 1090,
+      "full_decl_sha256": "ce864beb518e06e523e89e965cc96ef0d00e05836cae76e1e4d229659cb0d339",
+      "full_normalized_signature": "theorem twochoice_collision_certificate : (∀ (p : ℕ) [Fact p.Prime], ensembleMean p = ∑ f : Fin 2 ↪ ZMod p, (uniformLaw (Fin 2 ↪ ZMod p) f).toReal * ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal * (firstCollision p (fun x => x + f (h x)) 0 : ℝ)) ∧ (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 0 < m → 4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 2 ≤ ensembleMean p) ∧ (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime, (C : ℝ) * p < (@ensembleMean p ⟨hp⟩)^2) ∧ (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime, @ensembleMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧ (∀ W n : ℕ, ∀ s : ℤ, (W : ℝ)^2 * hitMass W n s ≤ (s : ℝ)^2 + n) ∧ (hitMass 1 1 0 = 1 ∧ hitMass 2 1 0 = 0) ∧ ((∀ i : Fin 2, 0 < fair i) ∧ (∑ i : Fin 2, fair i) = 1 ∧ (∑ i : Fin 2, (fair i)^2) = 1 / 2) ∧ (∀ (p : ℕ) [Fact p.Prime] (d : ℕ), 0 < d → d < p → ∀ k : ZMod p, finiteMean (fun z : TwoSupport p => if (d : ZMod p) * z.1 + k * z.2.val = 0 then (1 : ℝ) else 0) = 1 / p) ∧ (¬∀ w : Fin 3 → Fin 2, expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) => if observations controlUpdate h 0 3 = w then (1 : ℝ) else 0) = weight controlWeights w)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "twochoice_collision_certificate",
+        "end_byte": 1785,
+        "file": "/workspace/scratch/rho-twochoice-binding-input02/TwoChoiceCertificate.lean",
+        "qualified_decl_id": "RhoTwoChoiceCollisionAudit.twochoice_collision_certificate",
+        "signature": "theorem twochoice_collision_certificate :\n    (∀ (p : ℕ) [Fact p.Prime], ensembleMean p =\n      ∑ f : Fin 2 ↪ ZMod p, (uniformLaw (Fin 2 ↪ ZMod p) f).toReal *\n        ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal *\n          (firstCollision p (fun x => x + f (h x)) 0 : ℝ)) ∧\n    (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 0 < m →\n      4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 2 ≤ ensembleMean p) ∧\n    (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime,\n      (C : ℝ) * p < (@ensembleMean p ⟨hp⟩)^2) ∧\n    (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime,\n      @ensembleMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧\n    (∀ W n : ℕ, ∀ s : ℤ, (W : ℝ)^2 * hitMass W n s ≤ (s : ℝ)^2 + n) ∧\n    (hitMass 1 1 0 = 1 ∧ hitMass 2 1 0 = 0) ∧\n    ((∀ i : Fin 2, 0 < fair i) ∧ (∑ i : Fin 2, fair i) = 1 ∧\n      (∑ i : Fin 2, (fair i)^2) = 1 / 2) ∧\n    (∀ (p : ℕ) [Fact p.Prime] (d : ℕ), 0 < d → d < p → ∀ k : ZMod p,\n      finiteMean (fun z : TwoSupport p =>\n        if (d : ZMod p) * z.1 + k * z.2.val = 0 then (1 : ℝ) else 0) = 1 / p) ∧\n    (¬∀ w : Fin 3 → Fin 2,\n      expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) =>\n        if observations controlUpdate h 0 3 = w then (1 : ℝ) else 0) =\n          weight controlWeights w)",
+        "start_byte": 443
+      },
+      "recorded_statement": "theorem twochoice_collision_certificate : (∀ (p : ℕ) [Fact p.Prime], ensembleMean p = ∑ f : Fin 2 ↪ ZMod p, (uniformLaw (Fin 2 ↪ ZMod p) f).toReal * ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal * (firstCollision p (fun x => x + f (h x)) 0 : ℝ)) ∧ (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 0 < m → 4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 2 ≤ ensembleMean p) ∧ (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime, (C : ℝ) * p < (@ensembleMean p ⟨hp⟩)^2) ∧ (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime, @ensembleMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧ (∀ W n : ℕ, ∀ s : ℤ, (W : ℝ)^2 * hitMass W n s ≤ (s : ℝ)^2 + n) ∧ (hitMass 1 1 0 = 1 ∧ hitMass 2 1 0 = 0) ∧ ((∀ i : Fin 2, 0 < fair i) ∧ (∑ i : Fin 2, fair i) = 1 ∧ (∑ i : Fin 2, (fair i)^2) = 1 / 2) ∧ (∀ (p : ℕ) [Fact p.Prime] (d : ℕ), 0 < d → d < p → ∀ k : ZMod p, finiteMean (fun z : TwoSupport p => if (d : ZMod p) * z.1 + k * z.2.val = 0 then (1 : ℝ) else 0) = 1 / p) ∧ (¬∀ w : Fin 3 → Fin 2, expectation controlWeights (fun h : Hash (ZMod 3) (Fin 2) => if observations controlUpdate h 0 3 = w then (1 : ℝ) else 0) = weight controlWeights w)",
+      "recorded_text_sha256": "ce864beb518e06e523e89e965cc96ef0d00e05836cae76e1e4d229659cb0d339",
+      "source_plan": "research/rho_twochoice_collision_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "RhoTwoChoiceCollisionAudit.twochoice_collision_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "prior_prefix_control": {
+    "full_characters": 1134,
+    "recorded_characters": 435,
+    "summary": {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 0,
+      "summary": true,
+      "truncated_prefixes": 1,
+      "unresolved": 0
+    },
+    "retained_in_attempt_archive": true
+  },
+  "scope": "Frozen procedural native source/header check, not kernel parser/hash/compiler/physicalhost refinement. Explicit primeFact arguments give full unchanged mathematical statement; verifier unchanged."
+}
