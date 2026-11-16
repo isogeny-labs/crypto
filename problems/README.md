@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Shared CI archive object reads403](ci-archive-object-read-403.md) | open | backend/IC leaderboard checks before their computations | exact archived object availability and authorized CI reads, then unchanged-command replay |
 | [P-256 aligned auxiliary relation solver](p256-aligned-auxiliary-solver.md) | open | actual P-256 m2..7 matched 2x relation-stage result and structured regularity | qualified big-prime CAS execution, complete replay, checkpoint/EKS admission and matched measurements |
 | [Prepared/joint collector runtime qualification](point-table-joint-runtime-qualification.md) | open | matched native point-table/joint runtime result | current-source S3 upload/readback, authenticated exact native image/execution, admitted matched comparison |
 | [Prepared-table PCC/artifact storage](prepared-point-tables-ledger-artifact-policy.md) | open | canonical producer artifact registration | reviewed append-only storage contract or approved policy exception covering gate and migration readers |

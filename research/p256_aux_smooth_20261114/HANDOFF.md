@@ -81,3 +81,13 @@ check-run API census returned23/23: native-checks succeeded, other jobs were
 pending, with no submitted reviews or inline comments. This snapshot is
 PCC-20261114-3db01e, unsigned; it does not establish later-head CI or merge
 success [pcc:unverified]. No experiment/check-in automation was created.
+
+2026-11-16 publication: code head3f57265a is pushed to this same PR.
+Both native-checks and linear-replay succeed there. One parser failure
+requires supported PINNED registration for the two exact-byte workflow
+subjects; local draft-tier/workflow/merge-policy checks pass on that fix.
+Two other checks fail on shared archived input HeadObject403s; see
+problems/ci-archive-object-read-403.md. PCC-20261116-b9df82 is unsigned;
+no full CI or merge success is claimed [pcc:unverified]. Keep the PR open
+while requirements are red and do not bypass checks or retry unchanged
+403s. Auto-merge remains enabled; the pre-existing needs-human label remains.
