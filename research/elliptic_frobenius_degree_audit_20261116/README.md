@@ -53,3 +53,15 @@ credited bounded175/176 visuals, no fullchapter/external Silverman proof
 read claimed. Author gcd(a,b)=1 erratum respected by actual reduced
 normal forms. No native experiment or paid spend. All14 remain active.
 [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4389](https://github.com/isogeny-labs/crypto/pull/4389).
+Local proof receipt `299dee136cf2c33c6e86d09925c78661680613f7` and remote proof
+`86519b15235f8b3e94262ef5c0812ff1437d0d90` share tree
+`26e70321e8c52a6b404200f18d86a94080534da5`. Completed anonymous fetch and fresh exact
+head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Current-head CI/review/signing remain
+pending. Local replay PASS does not establish signed standing. The author
+correction is acknowledged; general corrected factorization/Weil nondegeneracy
+and Scheme API comparison remain open. All14 targets stay active. [pcc:unverified]
