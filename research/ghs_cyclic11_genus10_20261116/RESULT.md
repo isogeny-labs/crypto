@@ -38,6 +38,9 @@ PGL2(F3) has order 24. The position audit finds one orbit of four rational
 branch points; two orbits of two rational points plus a quadratic pair,
 of sizes 6 and 12; two orbits of one rational point plus a cubic orbit,
 of sizes 8 and 24; and one orbit of two quadratic pairs, of size 3.
+For three branch points it also verifies one orbit of three rational points
+(four configurations) and one orbit of a rational point plus a quadratic pair
+(twelve configurations). The table representatives meet these two orbits.
 For rational Kummer equations, an orbit of four conjugate branch points alone
 cannot occur: equal orders at the four conjugates would make infinity a fifth
 branch point because `11` does not divide `4a` for `a≠0 mod 11`.
@@ -75,7 +78,10 @@ subgroup transfer or attack benchmark.
 
 ## Verification and prior work
 
-`positions.py` independently enumerates the branch-position PGL2 orbits.
+`positions.py` independently enumerates the four-branch PGL2 orbits;
+`positions_three.py` adds the two three-branch orbit checks, preserving the
+original receipt in `POSITIONS.json` and recording the extension separately
+in `POSITIONS_THREE.json`.
 `screen.py` computes every exponent row with finite-field log histograms.
 `verify_three.py` independently recounts one representative of each of the
 three genus-five trace cells by direct eleventh-power tests over F243.
