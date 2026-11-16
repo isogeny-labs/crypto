@@ -89,3 +89,36 @@
 
 - The Rust toolchain's `rust-objcopy` emitted its known missing
   `libLLVM.dylib` warning; the corrected compile returned zero.
+
+## 2026-11-16, source-bound local timing run
+
+### What was done
+
+- `scripts/checkpoint.sh gate` exited zero and uploaded the branch-specific
+  handoff to the S3 URI in `RUN_RECORD.json`. The downloaded `RESUME.md`
+  matched local bytes at SHA-256 `2cd71da8aa01...`.
+- Checked the executable SHA-256 immediately before the run. The one frozen
+  test under the 600-second watchdog exited zero, passed 1/1, emitted three
+  fixed-case records and all 1,515 planned measured rows. Saved its exact
+  command interval, stdout, stderr and whole-process resource counters.
+  The harness checked every duplicate pair as a group equation, all
+  first-witness lookups and every arm checksum. [pcc:unverified]
+- `analyze.py` asserted the identity/count/row matrix and derived
+  `RESULTS.json` from immutable `run.stdout`. Its comparison is limited
+  to fresh index insertion plus precomputed-key lookup under L0.
+
+### Decisions made
+
+- Archive the raw run and machine derivation before the derived visual
+  report. The local component result cannot decide complete-call ordering
+  against F4/F5/F6. [pcc:unverified]
+
+### Open threads
+
+- Commit and push run records, then render and inspect the editable graph,
+  report and PDF, and open the ready stacked PR.
+
+### Errors
+
+- None in the bounded run. The 0.38-second `/usr/bin/time -l` wall value
+  covers the entire harness and is not a per-arm interval.
