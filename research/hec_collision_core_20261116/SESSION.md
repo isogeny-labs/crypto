@@ -13,3 +13,17 @@ Freeze/checkpoint/run, retain all outcomes, native reduction and quantitative re
 
 ### Errors
 Conductor check initially waited on live CLI handle, then returned clear; did not restart it. Build result in BUILD.*. No unrelated cleanup/resume edit.
+
+## Original screen completed; full-row replay pre-registered
+
+### What was done
+Frozen273d1c564833/checkpoint20261116T163306Z, original gate exits0/empty stderr. All12original-size source/target cases verify, including full-degree sources from[37]D1in each genus. Four additional recoveries at genus3H18; every success has full core rank. All other32policies remain failures. All12Compact controls recover. Smaller cores generally exhaust principal family or lack input rows; current rank is from emitted core only.
+
+### Decisions made
+Freeze a separate identical-stream replay retaining all admitted original rows for independent full-catalogue consistency/target-observability ranks. No cap/anchor/input extension. New rank fields must leave first24outputfields byte-identical. Not independent samples or a timing comparison. Original Cargo source preserved before binary addition.
+
+### Open threads
+Run certified replay, preserve failures, summarize/reconcile counts natively, write quantitative report/PDF, commit/update PR. Need a sound tenfold cost case; no goal completion. Shared daily log reserved.
+
+### Errors
+No original scientific error. Imported warnings retained. Disk tight, no cleanup authorized.
