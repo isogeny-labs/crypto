@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R76-QUADRATIC-FIBER-CLASSIFICATION",
+  "version":1,
+  "goal":"classify all rational omitted branches by the integral quadratic coordinate V",
+  "claims":[{"id":"quadratic_fibers76","class":"exact_computation","statement":"V is nonzero square-zero on both z=0 factors and equals zero or one on each z+1 primitive factor, with two of each"}],
+  "arms":{"reference":"R72 primitive factors and R52 source table","candidate":"full sourceLift50 column 17 multiplied in each primitive factor","positive":["source equation in both fibers","all six primitive idempotents rebound","two V=0 and two V=1 branches at z+1"],"negative":[],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic complete fibers"}},
+  "variables":{"fixed":["both rational fibers","all six primitive factors","full 528-product table","one thread","1200 seconds","4 GiB virtual"],"measured":["factor classifications","native exit/errors/hashes"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"complete primitive factor enumeration","seeds":[76]},
+  "blinding":{"method":"none","reason":"exact algebra"},
+  "sample_size":{"instances":6,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["two z=0 square-zero factors","four z+1 V residues"],
+  "execution":{"launcher":"REPLAY_CAS.sh quadratic76-01 QUADRATIC76.sing QUADRATIC76_ALL_CHECKS_PASS","backend":"authorized local Singular","timeout_seconds":1200,"virtual_KiB":4194304,"threads":1,"seed":76,"queue":"one math job at a time","source_gate":"frozen Git bytes and all donor hashes","checkpoint":"existing checkpoint gate; raw copy"},
+  "stopping":{"accept":"exit0, exact marker, zero native error lines and all assertions","failure":"retain failed raw attempt; freeze repair before next ID"},
+  "analysis":{"method":"exact primitive projection using full multiplication table","scope":"rational finite branch classification; valuation derivation separately from Eisenstein and norm identities"}
+}
