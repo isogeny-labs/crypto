@@ -288,21 +288,60 @@ fn reverse_index(f:&[Labelled])->HashMap<u64,Vec<usize>> {
 fn algebraic_mode<const FAST:bool>(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic
 )->Result<(Option<Solution>,Stats),String> {
+    algebraic_mode_precomp::<FAST,false>(parts,q,ar)
+}
+
+// EXP-R31-XFIBRE: x-only factorized S3 discriminant. For S3(X,Y,Z)=aZ²+bZ+c,
+// b²-4ac=16 f(X) f(Y) with f(X)=X³+A X+B. Each first/second-list x
+// needs just ONE independently obtained Fp square root, reused for all
+// pair queries. No source ordinates, group additions, or scalar labels enter
+// candidate root discovery. The method remains generic MITM equivalent.
+fn rhs_from_x<const FAST:bool>(x:u64)->u64 {
+    let x2=mulp_mode::<FAST>(x,x);
+    addp(addp(mulp_mode::<FAST>(x2,x),
+        mulp_mode::<FAST>(PRIME31.a,x)),PRIME31.b)
+}
+fn algebraic_mode_precomp<const FAST:bool,const XFIBRE:bool>(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic
+)->Result<(Option<Solution>,Stats),String> {
     let lookup=reverse_index(&parts[2]);
     let mut stats=Stats::default();
+    let mut roots:[Vec<u64>;2]=std::array::from_fn(|j|
+        Vec::with_capacity(if XFIBRE {parts[j].len()} else {0}));
+    if XFIBRE {
+        for j in 0..2 {
+            for point in &parts[j] {
+                // Use ONLY public abscissa; even the stored y is excluded.
+                let rhs=rhs_from_x::<FAST>(point.pt.0);
+                let y=sqrtp_mode::<FAST>(rhs)
+                    .ok_or("public abscissa has no rational fibre root")?;
+                if mulp_mode::<FAST>(y,y)!=rhs {
+                    return Err("incorrect x-fibre square-root certificate".into());
+                }
+                roots[j].push(y);
+                stats.s3_sqrt+=1;
+            }
+        }
+    }
     for (i,p) in parts[0].iter().enumerate() {
         let mut coefficients=Vec::with_capacity(parts[1].len());
         let mut sqrts=Vec::with_capacity(parts[1].len());
         let mut prefixes=Vec::with_capacity(parts[1].len()+1);
         let mut denominators=Vec::with_capacity(parts[1].len());
         prefixes.push(1u64);
-        for other in &parts[1] {
+        for (j,other) in parts[1].iter().enumerate() {
             let f=s3_coeff_mode::<FAST>(p.pt.0,other.pt.0);
             let (a,b,c)=f;
             let (denom,sqr) = if a!=0 {
-                let disc=subp(mulp_mode::<FAST>(b,b),mulp_mode::<FAST>(mulp_mode::<FAST>(4,a),c));
-                stats.s3_sqrt+=1;
-                let root=sqrtp_mode::<FAST>(disc).ok_or("S3 Fp discriminant nonsquare on rational points")?;
+                let root=if XFIBRE {
+                    mulp_mode::<FAST>(4,mulp_mode::<FAST>(roots[0][i],roots[1][j]))
+                } else {
+                    let disc=subp(mulp_mode::<FAST>(b,b),
+                        mulp_mode::<FAST>(mulp_mode::<FAST>(4,a),c));
+                    stats.s3_sqrt+=1;
+                    sqrtp_mode::<FAST>(disc)
+                        .ok_or("S3 Fp discriminant nonsquare on rational points")?
+                };
                 (mulp_mode::<FAST>(2,a),Some(root))
             } else if b!=0 { (b,None) }
             else {return Err("zero S3 polynomial; cannot discard exceptional branch".into());};
@@ -839,6 +878,10 @@ fn mersenne_field_confirmation()->Result<serde_json::Value,String>{
  // engineering test, not a claimed non-generic attack or full m8 solver.
 fn execute_unequal_profile(q:(u64,u64),sizes:[usize;3],round_limit:usize)
     ->Result<serde_json::Value,String>{
+    execute_unequal_profile_variant(q,sizes,round_limit,false)
+}
+fn execute_unequal_profile_variant(q:(u64,u64),sizes:[usize;3],
+    round_limit:usize,x_fibre:bool) ->Result<serde_json::Value,String>{
     if sizes.iter().any(|&n|n<16 || n>32_768) ||
         sizes.iter().sum::<usize>()>40_000 ||
         round_limit==0 || round_limit>8 {
@@ -860,7 +903,11 @@ fn execute_unequal_profile(q:(u64,u64),sizes:[usize;3],round_limit:usize)
         let source_additions=ar.counts.group_additions-additions_before;
         let root_begin=Instant::now();
         let before_verify=ar.counts.group_additions;
-        let (solution,stats)=algebraic_mode::<true>(&parts,q,&mut ar)?;
+        let (solution,stats)=if x_fibre {
+            algebraic_mode_precomp::<true,true>(&parts,q,&mut ar)?
+        } else {
+            algebraic_mode::<true>(&parts,q,&mut ar)?
+        };
         let root_ns=root_begin.elapsed().as_nanos();
         let verification_additions=ar.counts.group_additions-before_verify;
         let found=solution.is_some();
@@ -869,6 +916,7 @@ fn execute_unequal_profile(q:(u64,u64),sizes:[usize;3],round_limit:usize)
             "source_setup_ns":setup_ns,"source_group_additions":source_additions,
             "rejected_identity":identities,"rejected_duplicate_x":duplicates,
             "s3_query_ns":root_ns,"s3_pair_quadratics":stats.pair_s3,
+            "x_fibre_precompute":x_fibre,
             "s3_sqrts":stats.s3_sqrt,"s3_batch_inversions":stats.batch_inversions,
             "signed_candidates":stats.signed_candidates,
             "verification_group_additions":verification_additions,
@@ -1100,8 +1148,111 @@ fn heldout_twelve()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// New preregistered 24-public-Q matched complete-solver test. The candidate
+// precomputes only S3 x-fibre square roots and uses exactly the same labelled
+// public walk source, output checks, and finite S3 roots as the legacy arm.
+// Both arms are generic MITM-equivalent APS controls, not a new non-generic IC.
+fn s3_xfibre_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const PROFILE:[usize;3]=[384,384,16_384];
+    const CAP:usize=6;
+    let mut rng=0x5846_4942_5245_3234u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    let mut totals=[0u128;3];
+    let mut sqrts=[0u64;3];
+    let mut queries=[0u64;3];
+    let mut wins=0usize;
+    let mut cases=Vec::with_capacity(CASES);
+    for case in 0..CASES {
+        let known=loop{
+            let k=prng(&mut rng)%N;
+            if k>1 && used.insert(k){break k;}
+        };
+        let q=verifier.scalar(PRIME31,known,Some(PRIME31.g))
+            .ok_or("xfibre public target identity")?;
+        let order=if case%2==0{
+            [(0usize,false),(1usize,true),(2usize,true)]
+        }else{
+            [(1usize,true),(2usize,true),(0usize,false)]
+        };
+        let mut results=Vec::with_capacity(3);
+        let mut time=[0u64;3];
+        let mut trial_pairs=[0u64;3];
+        let mut rounds=[0usize;3];
+        let mut logs=[0u64;3];
+        for (position,(arm,xfibre)) in order.into_iter().enumerate(){
+            let v=execute_unequal_profile_variant(q,PROFILE,CAP,xfibre)?;
+            if v["complete_target_scalar_recovered"].as_bool()!=Some(true){
+                return Err(format!("xfibre arm {arm} failed bounded complete solve Q index {case}"));
+            }
+            let attempts=v["attempts"].as_array().ok_or("xfibre missing attempts")?;
+            let last=attempts.last().ok_or("xfibre empty attempts")?;
+            let k=last.pointer("/solution/log").and_then(|r|r.as_u64())
+                .ok_or("xfibre no recovered target scalar")?;
+            if k!=known || verifier.scalar(PRIME31,k,Some(PRIME31.g))!=Some(q){
+                return Err(format!("xfibre arm {arm} incorrect complete Q at {case}"));
+            }
+            let elapsed=v["cold_wall_ns"].as_u64().ok_or("xfibre missing cold wall")?;
+            let pair_count=attempts.iter()
+                .map(|r|r["s3_pair_quadratics"].as_u64().unwrap_or(0)).sum::<u64>();
+            let sqrt_count=attempts.iter()
+                .map(|r|r["s3_sqrts"].as_u64().unwrap_or(0)).sum::<u64>();
+            time[arm]=elapsed;trial_pairs[arm]=pair_count;
+            rounds[arm]=attempts.len();logs[arm]=k;
+            totals[arm]+=u128::from(elapsed);
+            sqrts[arm]+=sqrt_count;queries[arm]+=pair_count;
+            results.push(json!({
+                "arm":match arm{0=>"legacy_s3_sqrt",1=>"xfibre",_=>"xfibre_repeat"},
+                "position":position,"x_fibre_precompute":xfibre,
+                "recovered_scalar":k,"verified":true,
+                "cold_wall_ns":elapsed,"rounds":attempts.len(),
+                "s3_pair_quadratics":pair_count,"field_square_roots":sqrt_count,
+                "attempts":attempts
+            }));
+        }
+        if trial_pairs[0]!=trial_pairs[1] || trial_pairs[1]!=trial_pairs[2]
+            || rounds[0]!=rounds[1] || rounds[1]!=rounds[2]
+            || logs[0]!=logs[1] || logs[1]!=logs[2] {
+            return Err(format!("xfibre changed S3 search/output semantics at {case}"));
+        }
+        if time[1]<time[0]{wins+=1;}
+        cases.push(json!({
+            "case":case,"public_target":q,
+            "known_answer_caller_verifier_only":known,
+            "outcomes":results
+        }));
+    }
+    let ratio=totals[1] as f64 / totals[0] as f64;
+    let drift=((totals[2] as f64 / totals[1] as f64)-1.0).abs();
+    let passes=ratio<=0.8 && drift<=0.05 && wins>=18;
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "curve_p":P,"curve_n":N,"cofactor":1,
+        "method":"APS S3 x-only discriminant fibre precompute versus per-pair square root",
+        "classification":"generic pair-MITM equivalent, no new non-generic ECDLP",
+        "fresh_target_count":CASES,"profile":PROFILE,"round_cap":CAP,
+        "complete_verified_solves_per_arm":[CASES,CASES,CASES],
+        "arms":["legacy_s3_sqrt","xfibre","xfibre_repeat"],
+        "cold_total_ns":totals.map(|n|n.to_string()),
+        "field_square_roots":sqrts,"pair_s3_quadratics":queries,
+        "candidate_over_legacy_ratio":ratio,"candidate_repeat_drift":drift,
+        "candidate_paired_wins":wins,
+        "passes_preregistered_development_gate":passes,
+        "no_source_y_or_group_additions_used_for_root_discovery":true,
+        "limitations":"development CI, nonisolated, no mature external IC/PCC, not asymptotic",
+        "cases_detail":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--xfibre-confirm" {
+        let result=s3_xfibre_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--unequal-384-confirm" {
         let result=unequal_384_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -1175,6 +1326,59 @@ fn main()->Result<(),String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn precomputed_s3_x_fibre_matches_all_signed_roots() {
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let mut points=Vec::new();
+        for i in 2..55u64 {
+            points.push(ar.scalar(PRIME31,i,Some(PRIME31.g)).unwrap());
+        }
+        for &p in &points {
+            let x=p.0;
+            let rhs=rhs_from_x::<true>(x);
+            let root=sqrtp_mode::<true>(rhs).unwrap();
+            assert_eq!(mulp_mode::<true>(root,root),rhs);
+            // The recorded source ordinate is used in this TEST only.
+            assert_eq!(rhs,mulp_mode::<true>(p.1,p.1));
+            let (a,b,c)=s3_coeff_mode::<true>(x,x);
+            assert_eq!(a,0);
+            assert_ne!(b,0);
+            let double_x=mulp_mode::<true>(subp(0,c),pownp_mode::<true>(b,P-2));
+            assert_eq!(ar.add(PRIME31,Some(p),Some(p)).unwrap().0,double_x);
+        }
+        for &p in &points {
+            for &q in &points {
+                if p.0==q.0 {continue;}
+                let (a,b,c)=s3_coeff_mode::<true>(p.0,q.0);
+                let disc=subp(mulp_mode::<true>(b,b),
+                    mulp_mode::<true>(mulp_mode::<true>(4,a),c));
+                let want=mulp_mode::<true>(16,mulp_mode::<true>(
+                    rhs_from_x::<true>(p.0),rhs_from_x::<true>(q.0)));
+                assert_eq!(disc,want);
+                let yp=sqrtp_mode::<true>(rhs_from_x::<true>(p.0)).unwrap();
+                let yq=sqrtp_mode::<true>(rhs_from_x::<true>(q.0)).unwrap();
+                let xr=mulp_mode::<true>(4,mulp_mode::<true>(yp,yq));
+                assert_eq!(mulp_mode::<true>(xr,xr),disc);
+                let old=sqrtp_mode::<true>(disc).unwrap();
+                let inv=pownp_mode::<true>(mulp_mode::<true>(2,a),P-2);
+                let mut roots_old=[
+                    mulp_mode::<true>(subp(old,b),inv),
+                    mulp_mode::<true>(subp(subp(0,old),b),inv)
+                ];
+                let mut roots_new=[
+                    mulp_mode::<true>(subp(xr,b),inv),
+                    mulp_mode::<true>(subp(subp(0,xr),b),inv)
+                ];
+                roots_old.sort_unstable();roots_new.sort_unstable();
+                assert_eq!(roots_old,roots_new);
+                for z in roots_new {
+                    assert_eq!(s3_eval_mode::<true>((a,b,c),z),0);
+                }
+            }
+        }
+    }
+
     #[test]
     fn unequal_walk_profiles_preserve_labelled_point_semantics() {
         let q=PUBLIC_Q;
