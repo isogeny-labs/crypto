@@ -235,6 +235,10 @@ fn fixed_koblitz_triple_collision_rank() {
                 }
                 rows.push(json!({"kind":"identity", "triple":ids,
                     "row":row, "independent":raised_rank, "unique_index":seen.len()}));
+                assert!(
+                    basis.rank < fb.columns,
+                    "homogeneous rank cannot span a nonzero log vector"
+                );
                 continue;
             }
             let key = sum.pack().min(inst.fast.neg(sum).pack());
@@ -284,25 +288,25 @@ fn fixed_koblitz_triple_collision_rank() {
                 "homogeneous rank cannot span a nonzero log vector"
             );
         }
-        if let Some((first, later)) = tamper_witness {
-            let first_sum = triple_sum(&inst.fast, &fb, first);
-            let mut rejected = false;
-            for pos in 0..3 {
-                for replacement in 0..points {
-                    let mut wrong = later;
-                    wrong[pos] = replacement;
-                    let check = triple_sum(&inst.fast, &fb, wrong);
-                    if check != first_sum && check != inst.fast.neg(first_sum) {
-                        rejected = true;
-                        break;
-                    }
-                }
-                if rejected {
+        let (first, later) =
+            tamper_witness.expect("each cell needs a collision for tamper control");
+        let first_sum = triple_sum(&inst.fast, &fb, first);
+        let mut rejected = false;
+        for pos in 0..3 {
+            for replacement in 0..points {
+                let mut wrong = later;
+                wrong[pos] = replacement;
+                let check = triple_sum(&inst.fast, &fb, wrong);
+                if check != first_sum && check != inst.fast.neg(first_sum) {
+                    rejected = true;
                     break;
                 }
             }
-            assert!(rejected, "mutated witness must be rejected");
+            if rejected {
+                break;
+            }
         }
+        assert!(rejected, "mutated witness must be rejected");
         println!(
             "TRIPLE_COLLISION_JSON={}",
             json!({
@@ -320,7 +324,7 @@ fn fixed_koblitz_triple_collision_rank() {
                 "dependent_rows":dependent, "independent_rows":independent,
                 "final_homogeneous_rank":basis.rank, "row_ops":basis.row_ops,
                 "rank_at_unique_triple":rank_at, "rows":rows,
-                "tamper_control":tamper_witness.is_some(),
+                "tamper_control":rejected,
             })
         );
     }
