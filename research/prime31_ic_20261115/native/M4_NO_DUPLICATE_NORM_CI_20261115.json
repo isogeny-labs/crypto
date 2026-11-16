@@ -1,0 +1,149 @@
+{
+  "date": "2026-11-15",
+  "standing": "[pcc:unverified]",
+  "commit": "f1944c706e27d4662047f7e8deab17f1831e976d",
+  "run_id": 43747735303,
+  "job_id": 132914637948,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/43747735303",
+  "result": "success",
+  "change": "m4 scale reuses previously computed public-target eliminant; root extraction no longer repeats norm/GCD; test verifies wrapper/reuse parity",
+  "scope": "One development host run on frozen B4/B8/B16 positive vs fixed [17]G. Setup Base::build excluded, precomputed K cost separate. No cold ECDLP, rho, independent PCC, calibrated speed claim.",
+  "data": {
+    "amortized_pair_support_precompute_reported_separately": true,
+    "cold_factor_base_construction_charged": false,
+    "curve": "ordinary full-prime-order F_(2^31-1)",
+    "end_to_end_ECDLP_recovery": false,
+    "matched_rho_reference_run": false,
+    "rows": [
+      {
+        "base_size": 4,
+        "complete_ecdlp_recovery": false,
+        "eliminant_degree": 6,
+        "eliminant_recomputed_during_extraction": false,
+        "exceptional_target_abscissa": false,
+        "ordered_pair_index_tuples": 6,
+        "ordered_uv": 6,
+        "pair_support_degree": 16,
+        "post_extraction_signed_validation_ns": 50666,
+        "post_extraction_validation_group_additions": 384,
+        "precomputed_pair_support_build_ns": 6560,
+        "projectively_normalized_signed_rows": 1,
+        "public_target": [
+          1418256770,
+          748935662
+        ],
+        "target_dependent_algebraic_root_extraction_ns": 250868,
+        "target_dependent_eliminant_ns": 57236,
+        "target_kind": "planted-positive"
+      },
+      {
+        "base_size": 4,
+        "complete_ecdlp_recovery": false,
+        "eliminant_degree": 0,
+        "eliminant_recomputed_during_extraction": false,
+        "exceptional_target_abscissa": false,
+        "ordered_pair_index_tuples": 0,
+        "ordered_uv": 0,
+        "pair_support_degree": 16,
+        "post_extraction_signed_validation_ns": 50,
+        "post_extraction_validation_group_additions": 0,
+        "precomputed_pair_support_build_ns": 6560,
+        "projectively_normalized_signed_rows": 0,
+        "public_target": [
+          269688432,
+          1935681762
+        ],
+        "target_dependent_algebraic_root_extraction_ns": 80,
+        "target_dependent_eliminant_ns": 55353,
+        "target_kind": "fixed-public"
+      },
+      {
+        "base_size": 8,
+        "complete_ecdlp_recovery": false,
+        "eliminant_degree": 6,
+        "eliminant_recomputed_during_extraction": false,
+        "exceptional_target_abscissa": false,
+        "ordered_pair_index_tuples": 6,
+        "ordered_uv": 6,
+        "pair_support_degree": 64,
+        "post_extraction_signed_validation_ns": 49745,
+        "post_extraction_validation_group_additions": 384,
+        "precomputed_pair_support_build_ns": 18037,
+        "projectively_normalized_signed_rows": 1,
+        "public_target": [
+          1418256770,
+          748935662
+        ],
+        "target_dependent_algebraic_root_extraction_ns": 299811,
+        "target_dependent_eliminant_ns": 1783471,
+        "target_kind": "planted-positive"
+      },
+      {
+        "base_size": 8,
+        "complete_ecdlp_recovery": false,
+        "eliminant_degree": 0,
+        "eliminant_recomputed_during_extraction": false,
+        "exceptional_target_abscissa": false,
+        "ordered_pair_index_tuples": 0,
+        "ordered_uv": 0,
+        "pair_support_degree": 64,
+        "post_extraction_signed_validation_ns": 30,
+        "post_extraction_validation_group_additions": 0,
+        "precomputed_pair_support_build_ns": 18037,
+        "projectively_normalized_signed_rows": 0,
+        "public_target": [
+          269688432,
+          1935681762
+        ],
+        "target_dependent_algebraic_root_extraction_ns": 50,
+        "target_dependent_eliminant_ns": 1784933,
+        "target_kind": "fixed-public"
+      },
+      {
+        "base_size": 16,
+        "complete_ecdlp_recovery": false,
+        "eliminant_degree": 6,
+        "eliminant_recomputed_during_extraction": false,
+        "exceptional_target_abscissa": false,
+        "ordered_pair_index_tuples": 6,
+        "ordered_uv": 6,
+        "pair_support_degree": 256,
+        "post_extraction_signed_validation_ns": 51969,
+        "post_extraction_validation_group_additions": 384,
+        "precomputed_pair_support_build_ns": 136305,
+        "projectively_normalized_signed_rows": 1,
+        "public_target": [
+          1418256770,
+          748935662
+        ],
+        "target_dependent_algebraic_root_extraction_ns": 571779,
+        "target_dependent_eliminant_ns": 106915796,
+        "target_kind": "planted-positive"
+      },
+      {
+        "base_size": 16,
+        "complete_ecdlp_recovery": false,
+        "eliminant_degree": 0,
+        "eliminant_recomputed_during_extraction": false,
+        "exceptional_target_abscissa": false,
+        "ordered_pair_index_tuples": 0,
+        "ordered_uv": 0,
+        "pair_support_degree": 256,
+        "post_extraction_signed_validation_ns": 541,
+        "post_extraction_validation_group_additions": 0,
+        "precomputed_pair_support_build_ns": 136305,
+        "projectively_normalized_signed_rows": 0,
+        "public_target": [
+          269688432,
+          1935681762
+        ],
+        "target_dependent_algebraic_root_extraction_ns": 421,
+        "target_dependent_eliminant_ns": 106554944,
+        "target_kind": "fixed-public"
+      }
+    ],
+    "source_ordinate_or_group_sum_used_in_polynomial_stage": false,
+    "standing": "[pcc:unverified]",
+    "study": "frozen m4 coordinate-only index-calculus relation extraction B4/B8/B16"
+  }
+}
