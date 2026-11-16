@@ -74,6 +74,7 @@ if [[ "$driver_kind" == graph-ic ]]; then
   sampler=$(jq -r '.sampler // "fresh"' "$run_dir/runtime-plan.json")
   cap=$(jq -er .max_residuals "$run_dir/runtime-plan.json")
   argv+=(--oracles "$oracles" --sampler "$sampler" --max-residuals "$cap")
+  if [[ $(jq -r '.record_start_events // false' "$run_dir/runtime-plan.json") == true ]]; then argv+=(--execution-starts); fi
 else
   residual_count=$(jq -er .residuals_per_instance "$run_dir/runtime-plan.json")
   batch_count=$(jq -er .batch_iterations "$run_dir/runtime-plan.json")

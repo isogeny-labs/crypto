@@ -20,7 +20,7 @@
     [p / seed], [Graph oracle], [Wall / rho], [95% interval], [Local A/A],
     ..summary.strata.map(s => (
       [#s.p / #s.seed],
-      [#if s.oracle == "SymmetricPairOnly" { [Symmetric pair] } else if s.oracle == "PreparedSymmetricPairOnly" { [Prepared pair] } else if s.oracle == "F4Groebner" { [Native F4] } else if s.oracle == "Groebner" { [Macaulay S4] } else { [Symmetric triple] }],
+      [#if s.oracle == "SymmetricPairOnly" { [Symmetric pair] } else if s.oracle == "PreparedSymmetricPairOnly" { [Prepared pair] } else if s.oracle == "F4Groebner" { [Native F4] } else if s.oracle == "F4KrylovDelayed" { [F4 delayed graph] } else if s.oracle == "F4Krylov" { [F4 scalar graph] } else if s.oracle == "Groebner" { [Macaulay S4] } else { [Symmetric triple] }],
       [#if s.diagnostic_graph_wall_over_rho == none { [Missing] } else { fmt(s.diagnostic_graph_wall_over_rho.geometric_mean) }],
       [#if s.diagnostic_graph_wall_over_rho == none { [Missing] } else { [#fmt(s.diagnostic_graph_wall_over_rho.bootstrap_95.at(0))–#fmt(s.diagnostic_graph_wall_over_rho.bootstrap_95.at(1))] }],
       [#if s.eligible_local_controlled_comparison { [Pass] } else { [Rejected] }],

@@ -38,6 +38,9 @@ struct Args {
     sampler: Sampler,
     #[arg(long, default_value_t = 10_000)]
     max_residuals: u64,
+    /// Flush a start event before every arm, outside its measured interval.
+    #[arg(long)]
+    execution_starts: bool,
     /// Frozen source commit, externally checked against binary/build receipt.
     #[arg(long)]
     source_revision: String,
@@ -144,6 +147,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let mut rho_reference = None;
                     let mut diagnostics = Vec::new();
                     for arm in arms {
+                        if args.execution_starts {
+                            serde_json::to_writer(
+                                &mut output,
+                                &json!({
+                                    "schema":"gaudry.cubic.graph-comparison/v2","record_type":"execution_start",
+                                    "source_revision":args.source_revision,"sampler":sampler,"phase":phase,
+                                    "p":p,"seed":seed,"round":round,"arm":arm,"oracle_block":solver,
+                                    "field":inst.curve.field,"a":inst.curve.a,"b":inst.curve.b,
+                                    "generator":inst.curve.g,"target":inst.q,"subgroup_order":inst.curve.n,
+                                    "known_answer_scalar":inst.d
+                                }),
+                            )?;
+                            writeln!(output)?;
+                            output.flush()?;
+                        }
                         inst.curve.reset();
                         let start = Instant::now();
                         if arm.starts_with("rho_") {

@@ -127,8 +127,12 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
     let mut identities = BTreeMap::new();
     let mut phase_counts = BTreeMap::<String, usize>::new();
     let mut actual_order = Vec::new();
+    let starts_expected = plan["record_start_events"] == true;
+    let mut starts_order = Vec::new();
+    let mut in_flight = None;
     for row in rows {
-        if row["record_type"] != "execution" {
+        let is_start = row["record_type"] == "execution_start";
+        if row["record_type"] != "execution" && !is_start {
             continue;
         }
         let p = row["p"].as_u64().ok_or("row missing p")?;
@@ -140,7 +144,6 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
         let phase = row["phase"].as_str().ok_or("row missing phase")?.to_owned();
         let round = row["round"].as_u64().ok_or("row missing round")?;
         let arm = row["arm"].as_str().ok_or("row missing arm")?.to_owned();
-        *phase_counts.entry(phase.clone()).or_default() += 1;
         if row["schema"] != "gaudry.cubic.graph-comparison/v2" || row["source_revision"] != source {
             problems.push(format!(
                 "source/schema mismatch p={p} seed={fixture_seed} {oracle} {arm}"
@@ -170,6 +173,22 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
             problems.push(format!("instance mismatch p={p} seed={fixture_seed}"));
         }
         let key = (p, fixture_seed, oracle, phase, round, arm);
+        if is_start {
+            if !starts_expected {
+                problems.push(
+                    "unexpected start record without frozen start-event treatment".to_owned(),
+                );
+            }
+            if in_flight.replace(key.clone()).is_some() {
+                problems.push("start precedes completion of previous arm".to_owned());
+            }
+            starts_order.push(key);
+            continue;
+        }
+        *phase_counts.entry(key.3.clone()).or_default() += 1;
+        if starts_expected && in_flight.take().as_ref() != Some(&key) {
+            problems.push("execution lacks matching preceding start".to_owned());
+        }
         actual_order.push(key.clone());
         if executions.insert(key.clone(), row).is_some() {
             duplicate.insert(key);
@@ -210,6 +229,14 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
         || actual_order != expected_order[..actual_order.len().min(expected_order.len())]
     {
         problems.push("execution order differs from the frozen interleaved schedule".to_owned());
+    }
+    if starts_expected
+        && (starts_order.len() > expected_order.len()
+            || starts_order != expected_order[..starts_order.len().min(expected_order.len())]
+            || starts_order.len() < actual_order.len()
+            || starts_order.len() > actual_order.len() + 1)
+    {
+        problems.push("start-event count/order differs from frozen schedule".to_owned());
     }
     if let Some(pairs) = plan["paired_oracles"].as_array() {
         for pair in pairs {
@@ -444,8 +471,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
         .iter()
         .filter(|r| r["first_repeat_at_recovery"] == true)
         .count();
-    Ok(
-        json!({"schema":"gaudry.cubic.local-analysis/v1","source_revision":source,"backend":"local_user_authorized",
+    let mut result = json!({"schema":"gaudry.cubic.local-analysis/v1","source_revision":source,"backend":"local_user_authorized",
         "standard_lab_admission":false,"reference_scope":plan["reference_scope"],"sampler":plan["sampler"],"raw_execution_count":actual_order.len(),
         "unique_execution_count":executions.len(),"planned_execution_count":expected_order.len(),
         "phase_counts":phase_counts,"global_problems":problems,"strata":strata,
@@ -455,8 +481,13 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
         "extended_summary_status":"post-call summary of the predeclared paired-oracle and epoch controls; original acceptance fields unchanged",
         "interval_scope":"deterministic round bootstrap; timing repeat variation, not independent curve samples",
         "cost_scope":"legacy multiplication-equivalent diagnostics with unpriced work",
-        "failed_blocks":"retained in spent-work diagnostics; invalidate their stratum"}),
-    )
+        "failed_blocks":"retained in spent-work diagnostics; invalidate their stratum"});
+    if starts_expected {
+        result["attempted_execution_count"] = json!(starts_order.len());
+        result["in_flight_without_completion"] = json!(in_flight);
+        result["in_flight_execution_count"] = json!(usize::from(in_flight.is_some()));
+    }
+    Ok(result)
 }
 
 fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
@@ -660,6 +691,44 @@ mod tests {
                 < 1e-12
         );
         assert_eq!(s["strata"][0]["large_order_local_reference_parity"], false);
+    }
+    #[test]
+    fn start_events_count_in_flight_work_and_reject_unmatched_completions() {
+        let (mut plan, executions) = fixture();
+        plan["record_start_events"] = json!(true);
+        let mut rows = Vec::new();
+        for r in executions {
+            let mut start = r.clone();
+            start["record_type"] = json!("execution_start");
+            rows.push(start);
+            rows.push(r);
+        }
+        let good = analyze(&plan, rows.clone(), 0).unwrap();
+        assert_eq!(good["attempted_execution_count"], 30);
+        assert_eq!(good["raw_execution_count"], 30);
+        assert_eq!(good["phase_counts"]["warmup"], 5);
+        assert_eq!(good["in_flight_execution_count"], 0);
+        assert_eq!(
+            good["strata"][0]["eligible_local_controlled_comparison"],
+            true
+        );
+        let mut partial = rows.clone();
+        partial.pop();
+        let s = analyze(&plan, partial, 0).unwrap();
+        assert_eq!(s["attempted_execution_count"], 30);
+        assert_eq!(s["raw_execution_count"], 29);
+        assert_eq!(s["in_flight_execution_count"], 1);
+        assert_eq!(
+            s["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
+        rows.remove(0);
+        let bad = analyze(&plan, rows, 0).unwrap();
+        assert!(!bad["global_problems"].as_array().unwrap().is_empty());
+        assert_eq!(
+            bad["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
     }
     #[test]
     fn a_failed_execution_invalidates_case_without_dropping_spent_work() {
