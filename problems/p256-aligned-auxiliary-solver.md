@@ -10,9 +10,9 @@
 ## Problem
 
 The requested P-256 m=2..7 matched 2x relation-solving comparison cannot yet
-be established: native construction/system exports are implemented, but
-the big-prime CAS adapter has not executed against Magma and no qualified
-solver measurement has passed checkpoint/EKS admission.
+be established: native construction and small-domain CAS qualification
+are implemented, while the intended depth8 complete solver measurement
+has not passed EKS/L2 admission. Structured regularity remains unmeasured.
 
 Target is registered P-256, new auxiliary smooth-subgroup base, intended
 timing depth8. Development depth4 FB1h2704fe49495e is not a replacement
