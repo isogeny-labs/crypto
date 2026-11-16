@@ -8,7 +8,7 @@
 
 ## Problem
 
-The original P-192 speedup test remains open. Kernel3 now has an explicit original-field degree6 map from its quartic to P-192,with a global equation and degree check. All226 retained points have actual elliptic norms,and six source-bound principal rows have rank6. See [BACKMAP.md](../research/nist_cover_three_tests_20261116/BACKMAP.md),PCC-20261116-00cca4 and PCC-20261116-e2980e. Next execute closed public fibers and target class pullback/norm. The full source-Jacobian isogeny/dual and useful restricted-base recovery remain required. Paid performance runs additionally require restored,live-confirmed budget headroom. [pcc:unverified]
+The original P-192 speedup test remains open. Kernel3's explicit degree6 backmap now gives closed public fibers and actual target Jacobian classes. Zero,doubling,cancellation,the public G/Q known-answer relation and norm[6] pass(PCC-20261116-73bb6a,PCC-20261116-8599e0). Six source-bound setup rows have rank6 on225 projected points. See [BACKMAP.md](../research/nist_cover_three_tests_20261116/BACKMAP.md). The full source-Jacobian isogeny/dual and restricted-base individual descent remain open;no scalar is recovered by the known-answer test. Paid performance runs still require restored,live-confirmed headroom. [pcc:unverified]
 
 ## Evidence and uncertainty
 
@@ -31,7 +31,7 @@ The original P-192 speedup test remains open. Kernel3 now has an explicit origin
 
 ## Next discriminating step
 
-Follow the [closed-fiber/class plan](../research/nist_cover_three_tests_20261116/FIBER_CLASS_PLAN.md) from the actual degree6 backmap:recover finite public fibers natively,adapt them to the existing large-model KM representation,and check composition[6],Frobenius,addition and public G/Q. The exact-field Giac bridge now passes native replay(PCC-20261116-21485b),but the one declared60-second seven-variable solve times out. The full-J(H) isogeny and projected individual descent remain separate requirements. Preserve every outcome and exact witness. The original paid experiment envelope remains2CPU/8GiB/1800s,zero retries and totalUSD5 after admission;native functional correctness does not constitute that cost evaluation. [pcc:unverified]
+Construct and check the generic source-Jacobian isogeny using the [formal rational-reference plan](../research/nist_cover_three_tests_20261116/FORMAL_ISOGENY_PLAN.md),which is currently unexecuted. The public closed-fiber/class stage has passed and should not be repeated without a changed input or concern. Preserve the separate projected individual-descent requirement and all witnesses. The first exact-field seven-variable solve timed out under its declared limit;do not silently relaunch it. The original paid envelope remains2CPU/8GiB/1800s,zero retries and totalUSD5 after admission;native correctness units do not constitute that cost evaluation. [pcc:unverified]
 
 ## Resolution and history
 

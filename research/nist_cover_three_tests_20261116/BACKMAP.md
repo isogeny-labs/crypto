@@ -1,6 +1,6 @@
 # An explicit degree-6 map from the kernel3 quartic to P-192
 
-The actual reconstructed kernel3 quartic now has an explicit morphism to the original P-192 elliptic curve over its original prime field. Native arithmetic checks the full rational-map equation and gives degree6. Its map on the retained destination point pool supplies six source-bound principal relations. These are unsigned producer results; public fiber pullback and target divisor-class arithmetic remain to be executed. [pcc:unverified]
+The actual reconstructed kernel3 quartic now has an explicit degree6 morphism to P-192 over the original prime field. Its closed fibers give an executed public transfer into the target Jacobian:zero,doubling,cancellation and the known-answer G/Q relation pass. The retained destination point pool also supplies six source-bound principal relations. All results have unsigned producer standing;the full source-Jacobian isogeny and index-calculus individual descent remain open. [pcc:unverified]
 
 ![The constructed map and the next executable subgroup transfer](figures/backmap.svg)
 
@@ -63,9 +63,29 @@ The unchanged kernel3 point window contains226 rational points and seven fully s
 
 Comparing each split fiber with the reference fiber yields six principal line relations. Their actual elliptic sums vanish,and the merged coefficient rows have rank6 modulo the source order. The full point images,index/sign mapping and projected rows are in [backmap-relations-v2/result.json](evidence/backmap-relations-v2/result.json),PCC-20261116-e2980e. These are setup relations;public-target descent and scalar recovery remain required. [pcc:unverified]
 
-## What this enables next
+## Executed public divisor-class transfer
 
-The curve map defines a Jacobian pullback $f^*:E\to J(C)$ and norm $f_*:J(C)\to E$ with $f_*f^*=[6]$. Since the P-192 subgroup order is coprime to6,the pullback preserves that subgroup. The executable next step is to recover closed degree6 fibers of public source points and construct their differences as target Jacobian classes. That will allow direct composition,Frobenius,addition and public G/Q checks in destination coordinates. The full isogeny from $J(H)$ with the recorded kernel is still a separate acceptance component.
+The curve map defines pullback $f^*:E\to J(C)$ and norm $f_*:J(C)\to E$,with $f_*f^*=[6]$. The source prime-order subgroup is coprime to6. To construct its image without the infinity fiber,fix $S=2G$ and use
+
+$$F(P)=[D_{P+S}-D_S],\qquad D_T=f^{-1}(T).$$
+
+Native Sylvester resultants,exact denominator saturation and residue-algebra gcd recover four complete squarefree degree6 ideals $(U,y-v)$ over the original field. Every ideal passes the quartic,public image and denominator-unit checks. The four signed-divisor norms equal $[6]P$;inverse6 returns the original public point. All52 coefficients pass prime-Frobenius checks. The exact fibers and divisor pairs are in [closed-fibers-v2/result.json](evidence/closed-fibers-v2/result.json),PCC-20261116-73bb6a. [pcc:unverified]
+
+For target arithmetic,the implementation adds the same auxiliary rational degree6 divisor $R$ to each fiber. This gives effective degree12 inputs represented by $H^0(3D_0-D_T-R)$,of dimension22. Subtracting the reference input cancels $R$ and $D_0$,leaving $F(P)$. The unchanged large-model Khuri--Makdisi backend uses85 evaluation points and its general equality/preimage test. [pcc:unverified]
+
+| Public target-class check | Native outcome |
+|---|---:|
+| Zero/nonzero fixtures | Passed |
+| $F(2G)=F(G)+F(G)$ | Passed |
+| Cancellation | Passed |
+| $F(Q)=[37]F(G)$ for public $Q=[37]G$ | Passed |
+| Norm compositions from closed representatives | 4 |
+| Prime-Frobenius class-coordinate checks | 7480 |
+| Completed addflip calls | 28 |
+
+The class spaces and scalar-multiple witness are retained in [public-classes-v2/result.json](evidence/public-classes-v2/result.json),PCC-20261116-8599e0. Scalar37 is used only by the known-answer checker;the public-fiber/class constructor consumes public coordinates. These tests do not recover a scalar by individual descent,and target multiplication by the full subgroup order was not executed. [pcc:unverified]
+
+The full isogeny from all of $J(H)$ with the recorded kernel remains separate. A [formal construction plan](FORMAL_ISOGENY_PLAN.md),based on Tian4.3 and a known rational target reference divisor,is proposed but unexecuted.
 
 The retained first seven-variable inverse call used the exact Fp24 bridge and round-tripped762 distinct coefficients. It reached its predeclared60-second limit without a basis. This is a bounded execution result. The backmap construction proceeds independently of that root solve. Large program/stdout files and the earlier expanded coefficient result remain local with explicit pending-artifact manifests;the current uploader lacks the AWS CLI. No remote-byte verification is asserted. [pcc:unverified]
 
@@ -77,8 +97,12 @@ With ROOT the extracted completed kernel3 study,run each command into a new outp
 ./check-elliptic-backmap.sh "$ROOT" "$MAP_OUT"
 ./check-backmap-relations.sh "$ROOT" "$MAP_OUT/result.json" "$ROWS_OUT"
 ./check-backmap-identity.sh "$IDENTITY_OUT"
+./check-closed-fibers.sh "$ROOT" "$MAP_OUT/result.json" "$FIBERS_OUT"
+./check-public-classes.sh "$ROOT" "$MAP_OUT/result.json" "$FIBERS_OUT/result.json" "$CLASSES_OUT"
 ```
 
 Structural identity records are `IDC1hae5adae69bb1a568` for the generic cover differential and `IDC1h8d27f9064cb875c7` for generic elliptic denominator clearing. Each has32 derived-point checks and an added-one corruption control in the mandated field $2^{61}-1$. They do not verify the P-192 coefficient computation or supply a formal proof. Actual P-192 checks are the native receipts above. The initial understated syntactic-degree metadata and point-evaluator compile rejection are retained. [pcc:unverified]
+
+Additional structural records `IDC1h43a2ccf526839b41` and `IDC1h837d35b860476d8b` cover the generic Bareiss determinant step and linear auxiliary cancellation in the same limited field/scope. The actual residue-product-algebra,CRT,altered-fiber and changed-class-coordinate controls are native P-192 checks. [pcc:unverified]
 
 Sources checked: Tian arXiv:2007.03172 sections4.2.3,4.3 and Remark4.3;the original cover and checked differential/curve receipts;the smooth-curve Riemann--Roch pencil argument stated above. KB tools and repository wrapper were unavailable. No novelty claim or performance measurement is made.

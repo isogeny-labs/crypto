@@ -1,6 +1,6 @@
 # Next native step: closed public fibers and target classes
 
-Design notes after the degree6 backmap and restricted point norms. These are implementation plans,not executed fiber/class results. Keep the full original isogeny/public-transfer/relation goal active.
+Original design notes after the degree6 backmap and restricted point norms. The closed-fiber portion now executes as PCC-20261116-73bb6a. Target classes now execute as PCC-20261116-8599e0,using a common auxiliary6-divisor rather than the proposed residual cubic. Zero,doubling,cancellation,the public G/Q fixture and norm[6] pass. Keep the separate generic-isogeny and projected-descent goals active. The preserved paragraphs below describe the original plan and are not additional outcomes. [pcc:unverified]
 
 Use the exact Fp rational functions from elliptic-backmap-v1. For a finite public E point P,form g=A-x(P)B and h=V-y(P)M,where M=2LB^2. Compute the two resultants in y against the quartic by native fraction-free Bareiss determinants over Fp[x]. Their gcd contains the wanted fiber and affine base points. Saturate by the norm of B using repeated polynomial gcd/exact division. Require squarefree monic degree6 support;this certifies completeness for the degree6 map in the supported chart. Any lost infinity/ramified/base-point case must stop or have an explicit chart extension.
 

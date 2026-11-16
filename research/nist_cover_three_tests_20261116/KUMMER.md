@@ -2,7 +2,7 @@
 
 2026-11-16. The actual P-192 d7 cover now has executable quotient-coordinate evaluation on public elliptic pullbacks and an exact8-by8 match to functions on the reconstructed kernel3 quartic. All results below have unsigned producer standing. The remaining construction is the finite inverse to destination divisors, including its sign and divisor-class arithmetic. [pcc:unverified]
 
-The subgroup construction now has an additional concrete route:an [explicit degree6 map from the quartic to P-192](BACKMAP.md),with global equation and degree checks. Its divisor pullback can supply the elliptic-subgroup transfer without first solving the seven-variable Kummer inverse. Closed public fibers and class arithmetic remain to be implemented. [pcc:unverified]
+The subgroup construction now has an executed route through the [degree6 map from the quartic to P-192](BACKMAP.md):closed public fibers and target class arithmetic pass zero,doubling,cancellation,the known-answer G/Q relation and norm[6]. This does not require solving the seven-variable Kummer inverse for those subgroup inputs. The generic full-J(H) map remains open. [pcc:unverified]
 
 ![Recorded coordinate components and remaining inverse](figures/kummer.svg)
 

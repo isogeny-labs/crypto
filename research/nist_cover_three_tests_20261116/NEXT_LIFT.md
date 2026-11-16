@@ -4,7 +4,9 @@ Design notes,2026-11-16. Keep the goal active until the actual source divisor-cl
 
 The exact-field solver bridge is now qualified by native coefficient/ideal replay(PCC-20261116-21485b). The actual seven-variable G solve timed out at its declared60-second limit. A different construction has produced an explicit degree6 original-field map from the kernel3 quartic to P-192,with a global equation and degree check(PCC-20261116-00cca4). All226 retained C points project and six principal relations have rank6 over the source order(PCC-20261116-e2980e). [pcc:unverified]
 
-Next follow [FIBER_CLASS_PLAN.md](FIBER_CLASS_PLAN.md):native resultants and etale-algebra gcd/CRT recover degree6 closed public fibers,then a residual cubic and the existing large-model KM backend encode their differences as classes. Check public G/Q,addition,Frobenius and norm composition[6]. This subgroup path does not discharge the separate full-J(H) isogeny/dual requirement. [pcc:unverified]
+The native closed public fibers and class adapter now complete their declared checks(PCC-20261116-73bb6a,PCC-20261116-8599e0):public zero,doubling,cancellation,G/Q relation,norm[6] and Frobenius. A common auxiliary6-divisor cancels from the class differences,so no residual cubic was needed. See [BACKMAP.md](BACKMAP.md) for all actual coordinates. [pcc:unverified]
+
+Next construct the generic full-J(H) map and dual. [FORMAL_ISOGENY_PLAN.md](FORMAL_ISOGENY_PLAN.md) proposes using source infinity and a known rational target degree3 reference as the differential seed,then online formal coefficients and rational reconstruction over Fp. This is based on Tian4.3/Remark4.4 and is unexecuted. Freeze controls before data,prove/check its coordinate bounds,global incidence,recorded kernel and dual composition. Projected individual descent remains a separate open stage;the public37 fixture is not scalar recovery. [pcc:unverified]
 
 The remaining paragraphs preserve the original construction plan and its formulas; their good-function,coordinate and equation-construction portions now have receipts in KUMMER.md. Actual inversion,orientation and class arithmetic remain the implementation frontier.
 
