@@ -252,7 +252,7 @@ fn factor_base_equation(ring: &TowerRing, poly: &[u64], at: usize) -> RPoly {
         .map(|(degree,&c)|term(width,c,&[(at,degree as u32)])).collect();
     ring.from_raw(&raw)
 }
-fn f4_arms() -> Result<Value, String> {
+fn f4_arms(caps: &[u64], exact_only: bool) -> Result<Value, String> {
     let mut ar = Arithmetic::default();
     let e = PRIME31;
     check_curve(e,&mut ar)?;
@@ -265,8 +265,10 @@ fn f4_arms() -> Result<Value, String> {
         return Err("factor-base polynomial is not degree 31 monic".into());
     }
     let mut out = Vec::new();
-    for exact_base in [false,true] {
-        for oriented in [false,true] {
+    for &cap in caps {
+        for exact_base in [false,true] {
+            if exact_only && !exact_base { continue; }
+            for oriented in [false,true] {
             let n_free = if oriented {3} else {1};
             let ring = ring(base.terminal,n_free);
             ring.check();
@@ -284,7 +286,7 @@ fn f4_arms() -> Result<Value, String> {
             let setup_ns = started.elapsed().as_nanos();
             let opts = TowerF4Options::new(12)
                 .with_budget(Duration::from_secs(5))
-                .with_max_nnz(15_000).with_max_dense(15_000);
+                .with_max_nnz(cap).with_max_dense(cap);
             let started = Instant::now();
             let rep = f4_tower(&input,&ring,&opts);
             let full_f4_ns = started.elapsed().as_nanos();
@@ -296,6 +298,7 @@ fn f4_arms() -> Result<Value, String> {
             out.push(json!({
                 "arm":if oriented {"oriented_chord_tangent"} else {"S3_x_only"},
                 "exact_B31_membership":exact_base,
+                "F4_cap":cap,
                 "polynomial_count":input.len(),
                 "tower_variables":N_TOWER,"free_variables":n_free,
                 "input_terms_after_tower_nf":input.iter().map(RPoly::len).collect::<Vec<_>>(),
@@ -310,13 +313,14 @@ fn f4_arms() -> Result<Value, String> {
                 "basis_elements":rep.basis.len(),
                 "f4_internal_reported_ms":rep.ms,
                 "root_extraction":"not_implemented",
-                "limits":{"degree":12,"max_nnz":15000,"max_dense":15000,"seconds":5},
+                "limits":{"degree":12,"max_nnz":cap,"max_dense":cap,"seconds":5},
             }));
+            }
         }
     }
     Ok(json!({
         "standing":"[pcc:unverified]",
-        "scope":"fixed S3 two-leaf structural F4 ablation; not m8 target oracle or ECDLP",
+        "scope":if exact_only {"paired B31 30k/60k cap ladder; no roots or ECDLP"} else {"fixed S3 two-leaf structural F4 ablation; not m8 target oracle or ECDLP"},
         "p":P,"n":e.n,"factor_base_size":base.points.len(),
         "note":"unrestricted Dickson64 arms have unequal Fp projections because the oriented ideal enforces first-point liftability; compare exact B31 membership arms only for same rational projection",
         "arms":out
@@ -324,13 +328,16 @@ fn f4_arms() -> Result<Value, String> {
 }
 fn main() -> Result<(), String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
-    if args.len()>1 || args.first().is_some_and(|v|v!="--f4" && v!="--verify") {
-        return Err("usage: prime31_s3_oriented_pair [--verify|--f4]".into());
+    if args.len()>1 || args.first().is_some_and(|v|v!="--f4" && v!="--verify" && v!="--ladder") {
+        return Err("usage: prime31_s3_oriented_pair [--verify|--f4|--ladder]".into());
     }
     let identity = verify_identity_and_lifts()?;
     println!("{}",serde_json::to_string_pretty(&identity).map_err(|x|x.to_string())?);
     if args.first().is_some_and(|v|v=="--f4") {
-        println!("{}",serde_json::to_string_pretty(&f4_arms()?).map_err(|x|x.to_string())?);
+        println!("{}",serde_json::to_string_pretty(&f4_arms(&[15_000],false)?).map_err(|x|x.to_string())?);
+    }
+    if args.first().is_some_and(|v|v=="--ladder") {
+        println!("{}",serde_json::to_string_pretty(&f4_arms(&[30_000,60_000],true)?).map_err(|x|x.to_string())?);
     }
     Ok(())
 }
