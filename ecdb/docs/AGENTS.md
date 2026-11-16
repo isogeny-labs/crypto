@@ -8,6 +8,10 @@ It holds:
   isogeny-walk outputs and the trait catalogue;
 - 20,815 genus-2 and genus-3 cover curves, their Jacobians and explicit
   covers;
+- 128 Ciani plane quartics (genus 3, non-hyperelliptic, family
+  `ciani-quartic`) over F_p, p < 64, with their three elliptic quotients
+  (`curve_morphism` kind `quotient`) and L(Jac C) = L(E_x) L(E_y) L(E_z)
+  verified by exhaustive counts (`ecdb import ciani-quartics`);
 - 478 kernel-certified isogenies;
 - 61,305 priced DLP transfer routes;
 - Frobenius data, End(E), volcano levels, embedding degrees, twists and
@@ -44,10 +48,27 @@ It holds:
   graphs over every F_p with p < 2^10, and the ℓ-neighbours of the crypto
   and pairing curves. Walk them with `ecdb_curve_detail part=graph` or
   `GET /v1/curves/{ref}/graph?ell=&depth=`.
+- the rational ℓ-isogenies for ℓ = 7, 11, 13 of every curve over F_p, p < 2^10,
+  computed by ecdb (`ecdb import ell-isogenies`) and cross-checked against
+  Φ_ℓ. A curve's ℓ-neighbourhood is complete exactly when it has a
+  `curve_ell_torsion` row for that ℓ with a non-null `rational_isogenies`;
+  F_7, F_11 and F_13 are skipped at ℓ = p.
 - the ℓ-volcanoes of those graphs: each curve's level (`endomorphism_level`),
   the components (`isogeny_volcano`, `volcano_vertex`) and each edge's
   direction (horizontal, ascending, descending). End(E) is stored for 149,593
-  census curves whose conductor is {2, 3, 5}-smooth.
+  census curves whose conductor is {2, 3, 5}-smooth; `ecdb import end-rings`
+  computes it for every other ordinary census curve (Kohel's criterion).
+- Frobenius on E[ℓ] (ℓ ≤ 13) of every census curve: `curve_ell_torsion`
+  (action, rational ℓ-isogenies, torsion and isogeny field degrees, ψ_ℓ
+  factor degrees) and `frobenius_ell` (characteristic polynomial mod ℓ,
+  depth, splitting), from `ecdb import ell-torsion`.
+  `ecdb import levels57` certifies the ℓ = 5, 7 levels of every ordinary
+  census curve from rational isogenies it computes, replacing upper bounds
+  (`level_at_most`) with exact levels.
+- genus-2 curves glued from census-fp pairs with full rational 2-torsion
+  over F_p, p < 50 (`ecdb import gluings`, Howe–Leprévost–Poonen Prop. 4):
+  family `gluing`, the two degree-2 maps C -> E1, C -> E2 as `curve_morphism`
+  kind `gluing_2_2`, and L(Jac C) = L(E1) L(E2), verified by point counts.
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).
@@ -118,8 +139,9 @@ Rules for the token:
 | `ecdb_isogeny_class` | one isogeny class over F_q (any dimension) by label `g.q.a1_..._ag` or id | `GET /v1/isogeny-classes/{label}` |
 | `ecdb_transfers` | transfer routes across all curves, by route kind, verdict, target and minimum ratio | `GET /v1/transfers` |
 | `ecdb_polynomials` | `modular` (Phi_l, l = 2..19), `class` (H_D, class number one) or `summation` (Semaev S_2, S_3) | `GET /v1/*-polynomials` |
-| `ecdb_results` | `leaderboard` (filters `family`, `regime`, `validation`; `recipes=true`), `progress` (`series`), `boundary` (`regime`, `stage`), `benchmarks` (`listed`, `q`) | `GET /v1/ic/*`, `GET /v1/benchmarks` |
+| `ecdb_results` | `leaderboard` (filters `family`, `regime`, `validation`; `recipes=true`), `progress` (`series`), `boundary` (`regime`, `stage`), `benchmarks` (`listed`, `q`), `claims` (IC tool-program claims; `rule_version`, `curve`, `candidate_id`, `validation_status`; `summary=true`), `designs` (factor-base design grids) | `GET /v1/ic/*`, `GET /v1/benchmarks`, `GET /v1/factor-base-designs` |
 | `ecdb_ecbench` | a page of ecbench sessions (filters `method`, `curve`, `label`, `path`); with `session_id`, its per-arm summaries and comparisons | `GET /v1/ecbench/sessions[/{id}]` |
+| `ecdb_factor_bases` | factor bases of the IC work: a page filtered by `curve`, `family`, `scheme`, `min_columns`, `max_columns`, `solved` (sorted by `results`, `best_s`, `columns`, `key`). With `key` (FB1h…, FBS1h…, archive digest, PS1 label, cited digest), the base with its aliases, FBM1 configurations and results by source. Add `results=true` for its results, or `points=true` for its points | `GET /v1/factor-bases[/{key}[/results]]` |
 | `ecdb_sql` | one read-only SELECT over schema `ec` (15 s timeout, 5,000 rows) | `POST /v1/sql` |
 | `ecdb_record_evidence` | attach a claim, with its artifact, to a curve; needs the write token | `POST /v1/evidence` |
 
@@ -156,6 +178,10 @@ repository's files matches the checkout.
     equal traces give `isomorphism` (same model) or `birational_model_change`
     (e.g. Montgomery or Edwards against Weierstrass).
   - Sextic and quartic twists at j = 0, 1728 are not recorded yet.
+  - `prym_complement` links the target E of a genus-2 cover H to E', the
+    other elliptic factor of Jac(H) ~ E x E'. Its `map` names H. E' is a
+    curve of family `prym-complement`, and `av_component` holds the
+    decomposition ([`SCHEMA.md`](SCHEMA.md), "Prym complements").
   - None of them transports a discrete logarithm. A walk needs an `isogeny`
     row with its kernel certificate, as the typed curve-link rules require.
 - **GLV.** An endomorphism of kind `glv` with a non-null `eigenvalue` was
@@ -197,6 +223,29 @@ own rules:
   - `v_ecbench_arm` excludes warm-up runs.
   - A session's replay audit, when it has one, is in
     `ecbench_session.audit`.
+- **Factor bases.**
+  - Cite a yield, rank or degree of regularity with both its FB1 and FBM1
+    ids, as `docs/ecbench/FACTOR_BASE_PROTOCOL.md` asks.
+  - `digest_verified = true` means ecdb recomputed the id from its
+    preimage.
+  - FBS1 ids are ecdb's own. They name a construction (`curve`, `family`,
+    `params`), not a point set, so don't cite one as if it were FB1.
+  - A large-prime cell's `solved` is the producer's
+    `recovered_matches_planted`. SECG small-x rows hold yields, not solves:
+    `yield_log2` is the exact pair-sum yield.
+  - `best_s_solved` is the minimum over all solved runs of that base: a best
+    case, not an arm summary. Compare arms with `v_ecbench_arm` and the §5a
+    band.
+- **IC tool-program claims.**
+  - `online_speedup` leaves out the IC reusable set-up. Quote
+    `cold_ratio_ic_over_rho`, which includes it, as the distance remaining
+    to rho.
+  - The claims are single-target wall times on one container: not
+    leaderboard rows, and not validated under the gate.
+- **Design grids.** `factor_base_design` counts tuples, not results.
+  - Its members are specs that were mostly never run: `disposition_counts`
+    says why.
+  - Use `/v1/factor-bases?design=<study>` to list the members.
 - **Sibling measurements.** `measurement` keeps each producer's metric and
   unit:
   - ml-cryptanalysis S of plain and automorphism-class rho, with SEM and
@@ -273,7 +322,11 @@ re-imports every catalogue and the computed enrichment:
     `jacobian-transfers.json`, the certificates, or a walk output;
   - `docs/ic/leaderboard.json`, `progress-timeline.json`,
     `boundary_targets.json` or `benchmarks/`;
-  - a new ecbench session;
+  - a new ecbench session (its factor bases come with it: run
+    `import factor-bases` after `import ecbench`);
+  - `research/ecbench_factor_bases_20261013/`, the large-prime receipts,
+    the SECG small-x data, or the cryptanalysis `experiments/fb-archive/`
+    index;
   - the sibling files listed in `ecdb/src/import/siblings.rs`.
 
   `scripts/ecdb.sh check` lists the files whose checkout differs from what

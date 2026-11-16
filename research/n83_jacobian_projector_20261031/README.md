@@ -17,6 +17,22 @@ isogeny factor with the source curve.
 - [Formal identities](Projector.lean)
 - [Polynomial identity certificate](prym-factorization.identity.json)
 
+## Formal proof map
+
+The declaration namespace is `N83JacobianProjector`; the `Projector.` prefix
+in the frozen results report is a source-reference error.
+
+| Lean theorem | Exact premise | Scope of conclusion |
+| --- | --- | --- |
+| `imageOperator_quadratic` | Additive pull and push maps with `push (pull x) = degree • x` for every source element. | The composite image operator satisfies `e² = degree • e`. |
+| `complementary_push_zero` | The same pull/push composition law. | Pushforward kills `degree • y - pull (push y)`. |
+| `prym_factor_expansion` | Integer polynomial variables only. | Expands the product of the two quadratic factors. |
+| `prym_factorization` | The supplied relation `a² = 2q`. | The product equals `X⁴ + q²`. |
+
+These Lean identities do not construct the geometric maps, establish the
+composition law for the concrete cover, or derive the stated Frobenius traces
+from the curve. Those inputs have separate native and mathematical evidence.
+
 The native replay command is:
 
 ```sh

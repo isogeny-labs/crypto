@@ -1,0 +1,48 @@
+{
+  "schema": "durable-root-library-validation-proposal/v1",
+  "status": "prospective_unadmitted",
+  "workspace": null,
+  "unit": null,
+  "uid": 1000,
+  "gid": 1000,
+  "toolchain": null,
+  "absolute_deadline": null,
+  "limits": {
+    "total_seconds": 1800,
+    "outer_term_seconds": 1795,
+    "outer_kill_grace_seconds": 5,
+    "aggregate_cpu": 2,
+    "aggregate_memory_bytes": 17179869184,
+    "target_stop_threshold_bytes": 6442450944,
+    "logs_stop_threshold_bytes": 268435456,
+    "minimum_free_bytes": 6442450944
+  },
+  "inputs_sha256": null,
+  "recipe_files": {},
+  "exact_tests": [
+    "cryptanalysis::ecbench::three_leads::pencil::tests::actual_some_none_known_answer_and_diagnostic_ledger",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations"
+  ],
+  "launch_command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "1795s",
+    "python3",
+    "-B",
+    "durable-launcher.py"
+  ],
+  "compiler_invoked": false,
+  "admission": false,
+  "lease": null,
+  "durable_run": null,
+  "publication": null,
+  "cost": {
+    "finite_dollar_ceiling_usd": null,
+    "source": "root must allocate before release"
+  },
+  "attempts": 1,
+  "automatic_retry": false
+}

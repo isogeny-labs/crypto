@@ -1,0 +1,26 @@
+import ReturnAfterFinds
+set_option autoImplicit false
+namespace UnionReturn
+open SignedWord
+variable {n : Nat}
+-- Capture anchors before updates, then use the updated state for anchor().
+def sourceReturn (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot) :=
+ let oldChild:=s.fixed child
+ let oldParent:=s.fixed parent
+ let out:=joinWord r s child parent p
+ match oldChild with
+ | none => GraphSameRoot.Result.none
+ | some ab =>
+   let moved:=transportPair r p ab
+   if oldParent.isSome then
+     (anchor r ⟨out.graph,out.fixed⟩ parent moved.1 moved.2).2
+   else .none
+theorem source_return_eq (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot) :
+ sourceReturn r s child parent p=word r s child parent p := by
+ cases hc:s.fixed child with
+ | none => simp [sourceReturn,word,hc]
+ | some ab =>
+   cases ht:s.fixed parent with
+   | none => simp [sourceReturn,word,hc,ht]
+   | some xy => simp [sourceReturn,word,anchor,joinWord,hc,ht]
+end UnionReturn

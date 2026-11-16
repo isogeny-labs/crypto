@@ -1,0 +1,12 @@
+[package]
+name = "isomu_search"
+version = "0.1.0"
+edition = "2021"
+
+# Standalone on purpose: no dependencies, builds offline.
+[workspace]
+
+[dependencies]
+
+[profile.release]
+opt-level = 3

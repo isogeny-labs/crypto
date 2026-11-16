@@ -2542,6 +2542,7 @@ mod tests {
             twists: true,
             protocol_sha256: Some(super::super::digest(&protocol_bytes)),
             split_rule: "curve-twist-component-sha256-v1".into(),
+            factor_base_policies: Vec::new(),
         };
         let typed_hash = plan.binding_sha256().unwrap();
         let config = plan.cell(0).unwrap();

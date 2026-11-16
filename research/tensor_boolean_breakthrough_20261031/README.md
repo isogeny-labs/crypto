@@ -35,8 +35,17 @@ The null changes only the global wiring of interior ports while preserving the v
 1. **Implemented:** a canonical, versioned network IR with stable edge/port ordering, interface order, pins, predicate semantics, and provenance.
 2. **Implemented on tiny controls:** exact IR round trip and all five E0 mutations. See [`E0_IMPLEMENTATION.md`](E0_IMPLEMENTATION.md).
 3. **Implemented 2026-11-01:** the exact `tensor-census` core materializes the boundary tensor for an explicit canonical vertex cut and computes fraction-free integer ranks. See [`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md).
-4. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+4. **2026-11-01 follow-up:** production semantic cuts and an exact equality-
+   signal quotient are now implemented. Four frozen natural cells and two null
+   families are retained in
+   [`../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md`](../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md).
+   The legacy raw-edge contractor is infeasible even on F5; minimal typed
+   rewiring leaves conditioned ranks unchanged, while arbitrary rewiring still
+   lacks an exact projected model counter. The full E1 protocol remains draft.
 5. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
+4. **Proved 2026-11-01:** a nonzero-minor certificate gives a rigorous finite rank lower bound and forces the dimension of every exact linear separator factorization; a uniform exponential family lemma would force exponential work in that architecture. See [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md). The family lemma is open.
+5. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+6. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
 
@@ -60,7 +69,7 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 | Make the next action concrete | E0 implementation slice and E1 protocol | Complete at design scope |
 | Include controls and falsifiers | `PROTOCOL.md` §§ Controls, decision rule, invalidation | Complete at design scope |
 | Prevent post-hoc search claims | Frozen train/holdout policy in E3 and protocol freeze gate | Complete at design scope |
-| Implement semantic comparison gate | `canonical.rs` and `E0_IMPLEMENTATION.md` | Core implemented and tiny controls verified; final-ladder preflight open |
+| Implement semantic comparison gate | `canonical.rs`, `census.rs` and `E0_IMPLEMENTATION.md` | Semantic cuts, equality quotient and held-out structural controls implemented; full arbitrary-null/final ladder open |
 | Produce measured evidence | No rows or exports exist | Not started; intentionally blocked by draft status |
 | Establish a tensor/Boolean breakthrough | Requires E1–E5 evidence and, for asymptotics, a theorem | Open |
 
@@ -71,6 +80,8 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`experiment-matrix.json`](experiment-matrix.json) — machine-readable experiment cards and dependencies.
 - [`E0_IMPLEMENTATION.md`](E0_IMPLEMENTATION.md) — canonical-IR format, controls, evidence boundary, and open obligations.
 - [`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md) — exact boundary contraction/rank core, local controls and remaining generator gates.
+- [`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md) — proved finite separator bounds, conditional family/work theorem, certificate contract and proof map.
+- [`BOUNDS_REPORT.md`](BOUNDS_REPORT.md) and `bounds-20261101.pdf` — one-page visual bound/scope brief.
 - [`SEARCH_20261101.md`](SEARCH_20261101.md) — reconciliation of the requested separator, small-root and special-prime leads.
 - [`REPORT.md`](REPORT.md) — visual decision brief.
 - `report.pdf` — rendered report after validation.

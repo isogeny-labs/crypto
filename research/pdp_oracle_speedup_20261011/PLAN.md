@@ -198,7 +198,6 @@ days (before PS-7).
 ## 8. Status of requirements
 
 | item | status |
-|:--|:--|
 | Scope every task with a frozen protocol | **verified complete** by this PR (§3 and `protocols/`) |
 | Baseline recorded | **verified complete** by PS-0 ([`baseline_v1/`](baseline_v1/README.md)): corpus, digests, A/A, counts; supersedes §2 |
 | PS-1 | **partial**: bit-degree, exactness theorem, group-law formulation and gate counts done; identity certificates blocked (schema is `F_p`-only), two candidate formulations not attempted ([`ps1_algebra/`](ps1_algebra/README.md)) |
@@ -217,3 +216,37 @@ days (before PS-7).
 plan moves no number.  The boundary target "sub-`2^{2ℓ}` oracle at fixed
 `ℓ = 8`" remains the yardstick for anything algorithmic rather than
 constant-factor; no task here attempts it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| PS-4, PS-5 | **stopped early** (the authoring agents hit the organisation's API spend limit): partial work snapshotted on `exp/pdp-ps4-symmetry` and, in `cryptanalysis`, `exp/pdp-ps5-gpu-emulation`; no results, no READMEs ([`LEADS.md`](LEADS.md) L5-L7) |
+| PS-7 | **closed with a measured negative; partial in four respects**: on `ℓ = 8, 9, 10` (13 refuted targets per rung) leaves visited equal the pair count for every realisation of arms 2 and 3 (library solver, bare-guard encoding, lexicographic order, re-evaluated minimum-vertex-cover order), so nothing is pruned (the stop condition is met, the success condition is not); the shell costs 8×–38× the plain loop's counted bit operations (leaf in PS-1's gate model plus a stated 64-per-step shell convention; the ordering holds for any shell weight); the monomial graph of the descended `S₄` is `K_{ℓ,ℓ,ℓ}` and the dynamic order reproduces the lexicographic one (0 of 2,361,391 decisions differ).  Partial: the 60-input regression corpus is run from its parameters with PS-0's quartic leaf and without bit operations; the instrumented count-check was done on another tree and no longer builds on `main` (its `opcount` module is absent); the dynamic-order arm runs on an example-local copy of the solver (verified equal to the library by every counter on 48 targets); wall is one isolated block on a different host class.  No `benchmarks/` entry (counted-unit null result; no validation artifacts exist) ([`ps7_cdcl/`](ps7_cdcl/README.md)) |
+| PS-6, PS-3b | **not attempted** (each updates this row when it lands) |
+| PS-8 (added after the others were frozen) | protocol frozen ([`protocols/PS-8.md`](protocols/PS-8.md)); arm written, not yet built or measured ([`LEADS.md`](LEADS.md) L1) |
+
+

@@ -1,0 +1,111 @@
+   Compiling hashed-cpu-panel-tools v0.1.0 (/home/ec2-user/crypto-hashed-ecdl-cpu-20261030/research/hashed_ecdl_cpu_20261030/native-panel-tools)
+    Finished `release` profile [optimized] target(s) in 20.76s
+     Running unittests src/lib.rs (/home/ec2-user/hashed-ecdl-cpu-round20/native-panel-target/release/deps/hashed_cpu_panel_tools-d21cc1aa17dd8571)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/home/ec2-user/hashed-ecdl-cpu-round20/native-panel-target/release/deps/hashed_cpu_panel_tools-1ed2de12499887f8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/panel.rs (/home/ec2-user/hashed-ecdl-cpu-round20/native-panel-target/release/deps/panel-91cf1324c0ba0e1f)
+
+running 12 tests
+test complete_export_and_no_overwrite ... FAILED
+test changed_analyzer_source_rejected ... FAILED
+test complete_six_arm_panel ... FAILED
+test malformed_fields ... FAILED
+test mismatched_full_certificate ... FAILED
+test missing_or_duplicate_cell ... FAILED
+test empty_certificates ... FAILED
+test incomplete_rows_rejected ... FAILED
+test row_order_does_not_change_summary ... FAILED
+test stale_pass_does_not_bypass_certificate_check ... FAILED
+test unsupported_study_is_not_relabelled ... FAILED
+test wrong_returned_manifest_rejected ... FAILED
+
+failures:
+
+---- complete_export_and_no_overwrite stdout ----
+
+thread 'complete_export_and_no_overwrite' (1868934) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- changed_analyzer_source_rejected stdout ----
+
+thread 'changed_analyzer_source_rejected' (1868933) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- complete_six_arm_panel stdout ----
+
+thread 'complete_six_arm_panel' (1868935) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- malformed_fields stdout ----
+
+thread 'malformed_fields' (1868938) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- mismatched_full_certificate stdout ----
+
+thread 'mismatched_full_certificate' (1868939) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- missing_or_duplicate_cell stdout ----
+
+thread 'missing_or_duplicate_cell' (1868940) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- empty_certificates stdout ----
+
+thread 'empty_certificates' (1868936) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- incomplete_rows_rejected stdout ----
+
+thread 'incomplete_rows_rejected' (1868937) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- row_order_does_not_change_summary stdout ----
+
+thread 'row_order_does_not_change_summary' (1868941) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- stale_pass_does_not_bypass_certificate_check stdout ----
+
+thread 'stale_pass_does_not_bypass_certificate_check' (1868942) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- unsupported_study_is_not_relabelled stdout ----
+
+thread 'unsupported_study_is_not_relabelled' (1868943) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+---- wrong_returned_manifest_rejected stdout ----
+
+thread 'wrong_returned_manifest_rejected' (1868944) panicked at tests/panel.rs:21:68:
+PANEL_STUDY required
+
+
+failures:
+    changed_analyzer_source_rejected
+    complete_export_and_no_overwrite
+    complete_six_arm_panel
+    empty_certificates
+    incomplete_rows_rejected
+    malformed_fields
+    mismatched_full_certificate
+    missing_or_duplicate_cell
+    row_order_does_not_change_summary
+    stale_pass_does_not_bypass_certificate_check
+    unsupported_study_is_not_relabelled
+    wrong_returned_manifest_rejected
+
+test result: FAILED. 0 passed; 12 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test panel`

@@ -1,0 +1,641 @@
+[
+ {
+  "lead": "LEAD-RHO-r-adding-walk-mixing",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-RHO-r-adding-walk-mixing/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-RHO-r-adding-walk-mixing && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/notes/index-calculus/RESEARCH_HYPERELLIPTIC_IC_RHO.md"
+  ],
+  "hypothesis": "On Z_N (N=1048573), r-adding walks with hashed partition need >=1.10x the random-mapping expected steps to first repeat at r=4, are within [0.95,1.07] at r=64, and none beats the random mapping (ratio<0.95).",
+  "prediction": "r=4 hashed ratio >=1.10; r=64 hashed ratio in [0.95,1.07]; no arm below 0.95; null, positive (r=2 >1.25) and A/A (|z|<3.5) controls pass; verdict consistent_with_prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-automorphism-quotient-rho",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-automorphism-quotient-rho/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-automorphism-quotient-rho && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-06.md"
+  ],
+  "hypothesis": "Quotienting r-adding rho on a prime-order cyclic group by an automorphism subgroup of order k in {2,4,6} cuts mean steps to first genuine collision by a factor within [0.9,1.4]/sqrt(k) of the k=1 mean, never beyond sqrt(k), after restarting fruitless short cycles.",
+  "prediction": "R_k = steps(k)/steps(1) is about 1/sqrt(k) (up to 1.4x from fruitless cycles) at N around 2^16, 2^18 and 2^20. Falsified if R_k + 1.96 SE falls below 0.9/sqrt(k) with controls OK (a gain beyond the sqrt|Aut| ceiling). Verdict is inconclusive if the controls fail.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-class-group-ecdlp-bridge",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-class-group-ecdlp-bridge/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-class-group-ecdlp-bridge && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "In a toy generic model with a free exponent-preserving class-group transport oracle across h curves, collision-walk query cost (group ops plus action calls) is not lower than the no-action baseline: ratio B/A >= 0.95 with log-log slope in N of 0.4 to 0.6.",
+  "prediction": "Lower bootstrap CI bound of the B/A median cost ratio is >= 0.95 (action calls are pure overhead) and slope_B is in [0.4,0.6]. The verdict is falsified if the upper CI bound is < 0.95. The A/A arm must contain 1 or lie in [0.9,1.1], and the planted index-8 leak positive control must show an upper CI bound < 0.6. Otherwise the verdict is inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-class-representative-ic-selection",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-class-representative-ic-selection/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-class-representative-ic-selection && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "Best-of-K gain in size-normalised two-point decomposition yield across isomorphic x-scaled models (small-x factor base, B=p/16) is no larger than a size-matched random-FB null (q99), so the recorded ~4-7% model effect is FB-size fluctuation, not structure.",
+  "prediction": "S_obs <= null q99 gives consistent_with_prediction; S_obs > q99 gives falsified; inconclusive if the positive control (multiples-of-G FB, yield < 0.5x random) is not detected. Smoke run gave consistent_with_prediction, positive control detected.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-curve-generation-provenance-seeds",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-curve-generation-provenance-seeds/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-curve-generation-provenance-seeds && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "Seed grinding against a hidden keyed predicate of density 2^-6 costs a geometric number of trials with mean 64 (within 15%), and the ground curves are indistinguishable from random-seed curves on five public screens (|z|<3.3 each). This is a toy re-derivation of the recorded obstruction that public screens are blind to a hidden class.",
+  "prediction": "consistent_with_prediction. A/A passes, the anomalous positive control is detected by the not_anomalous screen, ground-vs-random z stays below 3.3 on all five screens, and mean grinding trials is about 64. falsified if any ground-vs-random |z| is at least 3.3 with A/A and positive control valid.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-endo-scalar-action-generic",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-endo-scalar-action-generic/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-endo-scalar-action-generic && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "In a generic prime-order cyclic group, rho on orbit classes under H=<lambda> of order k takes ~1/sqrt(k) of plain steps for k in {2,3,6} (sqrt|Aut| ceiling), while a large orbit (k=60) charged k ops per canonicalisation has charged cost ratio > 1, so no net gain.",
+  "prediction": "step_ratio within +-25% of 1/sqrt(k) for k=2,3,6; charged_cost_ratio(k=60) > 1; A/A ratio ~1 and k=2 positive control < 0.85. Falsified if either scaling or no-gain claim fails.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-glv-gls-isogeny-loop-scalar-mult",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-glv-gls-isogeny-loop-scalar-mult/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-glv-gls-isogeny-loop-scalar-mult && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "On a toy j=0 prime-order curve (N ~ 2^17), GLV+Shamir cuts group-op count of known-scalar mult to 1/r of binary double-and-add with r in [1.45,2.0], and the only endomorphism gain for collision search is the unit-orbit ceiling 1/sqrt(6)=0.408 (+-0.08); no sub-sqrt(N) lever.",
+  "prediction": "S1 (binary/GLV ops) in [1.45,2.0] with all products correct; S2 (orbit/plain draws to collision) in 0.408 +- 0.08; wrong-lambda control fails >=15/20; A/A plain ratio in [0.8,1.25]. Outside S1/S2 bands means falsified; A/A failure means inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-isogeny-class-generic-invariance",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-isogeny-class-generic-invariance/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-isogeny-class-generic-invariance && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "All prime-order F_p curves with the same trace (one isogeny class, distinct j) have equal mean generic Pollard-rho step counts: each curve's ratio to the pooled rest lies in [1/1.08, 1.08] at p ~ 2^14.",
+  "prediction": "Consistent: all 8 class curves have 90% CI inside the 8% equivalence band, the A/A arm is equivalent, and the positive control (p2 ~ 2.25p, expected ratio ~1.5) is detected. Falsified if any class curve's 99% CI lies wholly outside the band with valid controls.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-isogeny-walk-weak-neighbour",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-isogeny-walk-weak-neighbour/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-isogeny-walk-weak-neighbour && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "Rational 2-isogeny walks over F_p preserve group order and order-derived weakness flags, and Pollard rho cost on the neighbour equals that on the root (ratio in [0.8,1.25]), so no weak neighbour arises from a non-weak curve.",
+  "prediction": "0 order or flag mismatches across all walk curves; twist positive control differs in at least 80% of roots; rho neighbour/root ratio and the A/A ratio both in [0.8,1.25]; verdict consistent_with_prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-isogeny-transport-preprocessing",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-isogeny-transport-preprocessing/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-isogeny-transport-preprocessing && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "Transporting a precomputed x-table across an odd-l Velu isogeny costs more field operations than regenerating it on the isogenous curve. The cost ratio grows about linearly in l: it is in (1.0, 2.0] at l=3 and in [10, 25] at l=31, and it exceeds 1 for every tested l. This re-derives the recorded 1.5x-21x loss.",
+  "prediction": "Consistent if all ratios are above 1, the minimum is in (1, 2], the maximum is in [10, 25], the ratios do not decrease with l, and both controls pass. Falsified if any ratio is at most 1 or the range falls outside those bands. Inconclusive if a control fails. In the smoke run at p=3011 the ratio was 1.03 at l=3 and 2.06 at l=5.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-jmv-random-self-reduction",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-jmv-random-self-reduction/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-jmv-random-self-reduction && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "Used as an attack subroutine, the JMV walk-then-query self-reduction on an expander Cayley graph (k=log2 h random generators, L=4 log2 h) hits a delta-density oracle set with probability delta within +-15% (random and target-adjacent sets), so it only adds an L/delta overhead; without expansion (k=1) it does not.",
+  "prediction": "Ratio P_hit/delta is within [0.85,1.15] in all expander cells at h=16411, 65537, 262147 (delta=0.05, 20000 walks), the k=1 positive control gives ratio > 3, and A/A half gaps are <= 0.30; verdict consistent_with_prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-koblitz-volcano-descendants",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-koblitz-volcano-descendants/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-koblitz-volcano-descendants && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "On Koblitz curve y^2+xy=x^3+x^2+1 over F_{2^m}, the Frobenius-orbit collapse is the only lever, worth exactly a factor m in collision rate (sqrt(m) in rho steps). Curves below it in the volcano have the same group order but no tau endomorphism, so they get factor 1 and no gain over plain rho. This is consistent with the closed class-invariance result.",
+  "prediction": "The Frobenius/plain collision ratio R_m lies in [0.75m, 1.3m] for m=11,13,15,17 over 5 seeds. The A/A ratio lies in [0.7, 1.4]. The order formula equals the brute count at m=11 and 13. All three holding gives consistent_with_prediction. Control and A/A passing with R_m outside the band gives falsified.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-level-structure-torsor",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-level-structure-torsor/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-level-structure-torsor && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/README.md",
+   "/home/user/crypto/docs/session-logs/2026-11-01.md"
+  ],
+  "hypothesis": "Size obstruction holds exactly: g(X_1(N)) = (N-5)(N-7)/24 ~ N^2/24 for prime N, so for N > p/2 in the Hasse range the Hasse-Weil bound 2g*sqrt(p) exceeds p and no point-count or function-field certificate on X_1(N)/F_p can discriminate diamond translates cheaply.",
+  "prediction": "For prime N in 29..47, g/(N^2/24) lies in (0.45, 1.0). For every toy p in {31,53,79,101,127} and prime N in the Hasse interval with N > p/2, 2g*sqrt(p) > p. Positive, negative and A/A controls pass, so the verdict is consistent_with_prediction. The smoke test already returns consistent_with_prediction, with ratios 0.63 to 0.76.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-p192-class-cm-relations",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-p192-class-cm-relations/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-p192-class-cm-relations && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "On prime-order E(F_p) with j=0, every smooth-norm CM element a+b*zeta acts as the scalar a+b*lambda mod N (lambda a root of x^2+x+1 mod N), so CM relations are known integer relations carrying no discrete-log information.",
+  "prediction": "100% of (element, point) checks pass in both the CM arm and the A/A arm, every lambda is a root of x^2+x+1 mod N, and the wrong-scalar (lambda^2) control matches under 5%. Any single mismatch falsifies the scalar-action claim.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-safecurves-parameter-audit",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-safecurves-parameter-audit/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-safecurves-parameter-audit && timeout 660 python3 -I run.py",
+  "est_minutes": 8,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "Twist security (largest prime factor of the twist order) is not an ECDLP-cost criterion: for random prime-order prime-field toy curves, log(steps/sqrt N) of generic rho is equal for twist-insecure and twist-secure curves within a margin of 0.2.",
+  "prediction": "The 95% bootstrap CI of the insecure-minus-secure difference lies inside (-0.2, 0.2), the A/A split of the secure arm also lies inside, and the size positive control is detected (CI above 0). Falsified if the CI excludes 0 with |D| > 0.1 while both controls pass.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-secp256k1-cm-class-audit",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-secp256k1-cm-class-audit/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-secp256k1-cm-class-audit && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "On toy prime-order j=0 curves, rho with 6-orbit (+-lambda^k) canonicalization needs fewer mean steps than plain rho by a factor R6 in [0.75*sqrt6, 1.10*sqrt6] = [1.84, 2.69], so the recorded sqrt|Aut| = sqrt6 ceiling holds and is roughly reachable.",
+  "prediction": "R6 lands in [1.84, 2.69] with controls passing: positive control (negation-only) about sqrt2, generic-curve negation null about sqrt2 (not sqrt6), and A/A ratio in [0.8, 1.25]. R6 > 2.69 with controls passing falsifies the obstruction. The smoke test gave R6=2.27 on a trivial size.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-small-cm-disc-nonunit-endo",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-small-cm-disc-nonunit-endo/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-small-cm-disc-nonunit-endo && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For alpha of norm n in 2..8 in Z[sqrt(-d)] and lambda its eigenvalue mod prime N, ord(lambda) >= 2 log(sqrt N - 1)/log n always; the equality regime is constructible but sparse; and with canonicalisation charged at h-1 endomorphism applications the net factor sqrt(h)/h <= 0.71, so no gain over rho.",
+  "prediction": "0 bound violations; positive-control min h/log_n N in [1,3]; max net factor <= 0.71; generic median h/log_n N more than 20x the positive-control minimum. Falsified if any pair violates the bound.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-torsion-module-leak",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-torsion-module-leak/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-torsion-module-leak && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "For E(Fp)=Z/2 x Z/2N with G of prime order N, the 2-descent map is a homomorphism that kills the odd-order subgroup, so it is trivial on every kG and leaks nothing about k. A non-homomorphic statistic (Legendre symbol of x(kG)) is uncorrelated with k mod 2.",
+  "prediction": "The count of k with nontrivial delta(kG) is exactly 0. The Legendre-vs-parity z-score and the A/A z-score are both below 4 in absolute value. The positive control (a point of order 2N) recovers k mod 2 with accuracy 1.0. Verdict: consistent_with_prediction. Any nontrivial delta(kG) falsifies it.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-STR-special-j-ic-semaev",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-STR-special-j-ic-semaev/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-STR-special-j-ic-semaev && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_leads_20261031/L1_lower_bound/atlas_update.md"
+  ],
+  "hypothesis": "At fixed factor-base size B and prime group order N, an Aut-orbit-closed factor base on j=0 (|Aut|=6) and j=1728 (|Aut|=4) curves gives the same two-point-decomposition (S_3-like) sumset coverage |F+F|/N as a +-closed base on generic curves, within the A/A noise band. In other words, the Aut symmetry gives no yield gain beyond the sqrt|Aut| accounting.",
+  "prediction": "Both ratios r_j0 and r_j1728 (normalised coverage relative to generic) fall within band = max(3*SE of the A/A ratio, 0.02, 3*SE of r_k) of 1. The structured-base positive control has ratio below 0.5. A ratio outside the band, up or down, falsifies the prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-anomalous-padic-lift",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-anomalous-padic-lift/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-anomalous-padic-lift && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "The lead's obstruction is exactly #E=p: the Smart p-adic lift recovers d on anomalous curves (12..22 bit primes) with >=95% success using ~3 log2 p Jacobian ops over Z/p^2, while the identical code on non-anomalous curves succeeds only at chance (~1/p).",
+  "prediction": "Anomalous arms A and A' each >=0.95 success with |A-A'|<=0.10; null pooled successes <=5; Smart ops/rho reference ratio decreasing with size. Falsified if a positive arm <0.95 or null >5; inconclusive if degenerate >20%.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-cm-canonical-lift-heights",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-cm-canonical-lift-heights/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-cm-canonical-lift-heights && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_leads_20261031/C1_lift_torsion/atlas_update.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "On the CM curve y^2=x^3+17 (rank 2) mod primes p=1 mod 3, N in 2^12..2^18, the reduction of small-height rational combinations (closed under mu_3) covers a random point with probability |S|/N, with no enrichment from CM, so the recorded bound Pr[Q in red(S)] <= |S|/N is tight.",
+  "prediction": "Pooled hit/pred ratio <= 1.25 and Stouffer z < 4; positive control hit rate 1.0; A/A |z| <= 4. Falsified only if z > 4 and ratio > 1.25.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-cover-catalog-jacobian-transfer",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-cover-catalog-jacobian-transfer/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-cover-catalog-jacobian-transfer && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For even-degree genus-2 covers y^2=x^6+ax^4+bx^2+c over F_p, #J(F_p) = #E1(F_p)*#E2(F_p) exactly, so pushing an E1 DLP into J(C) lands in a same-size isogeny factor with no group-order reduction.",
+  "prediction": "Split arm and A/A arm: 100% of curves satisfy #J = #E1*#E2. Null arm (no even symmetry): at most 20%. Any split or A/A violation falsifies.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-curve-parameter-transfer-audits",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-curve-parameter-transfer-audits/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-curve-parameter-transfer-audits && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "Among random prime-field curves (p about 2^11), the rate of small embedding degree (1<k<=6 w.r.t. largest prime factor of #E) and of trace one is no higher than a uniform-residue null predicts, so a non-adversarial audit yields no revisit trigger.",
+  "prediction": "Pooled z=(hits-expected)/sqrt(expected) <= 3; positive control (supersingular y^2=x^3+x) flagged 100%; A/A |z|<=3. z>3 would falsify.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-function-field-xedni-lift",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-function-field-xedni-lift/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-function-field-xedni-lift && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "For linear-in-t sections (a,x,y) of y^2=x^3+a(t)x+b(t) with b defined by the section, the prescribed-fibre lift probability is exactly p^-3, so alpha_hat is about 3 and the shape does not reach the alpha<1/2 reopen condition.",
+  "prediction": "Exhaustive counts at p=5,7,11,13 give alpha_hat in [2.5,3.5] for both A/A targets, planted control reads 1.0, with 0 identity violations. Falsified if alpha_hat is below 0.5.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-ghs-binary-composite",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-ghs-binary-composite/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-ghs-binary-composite && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "For generic b in F_{2^N}, N=l*n, the F_q-span of Galois conjugates has full dimension n at the exact normal-element density, so the GHS cover has generic maximal size and the closed obstruction is the genus blow-up.",
+  "prediction": "Per-config full-span fraction matches normal density within 4 sigma + 0.02 for odd n, positive control (b in F_q gives dimension 1) passes, A/A arms agree, and the proxy cost table shows no IC advantage over rho for n>=4.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-global-lift-small-height",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-global-lift-small-height/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-global-lift-small-height && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For a toy xedni-style Q-lift family (two integer points with coordinates bounded by H, curve forced through both), the probability of dependence (a*P1=+-b*P2 with a,b<=6, or torsion) decays as H^-alpha with alpha>=1/2, so the family does not reach the alpha<1/2 needed to beat sqrt(p).",
+  "prediction": "Log-log slope of dependence rate vs H over {8..128} is <= -0.5. Falsified if the slope is > -0.5 with >=10 events at H=128. Positive control (planted P2=kP1) must detect >=95%, with two-seed A/A as the noise floor.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-jv-nagao-genus2-cover-decomp",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-jv-nagao-genus2-cover-decomp/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-jv-nagao-genus2-cover-decomp && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "For genus-2 Jacobian index calculus with a degree-1 factor base over F_p, a random reduced degree-2 divisor is smooth with probability 1/2 (+-0.04), so relation collection alone costs at least 2.2x matched rho in group operations at every toy size. The recorded S/rho of 151-293 is therefore not a constant-factor accounting artefact.",
+  "prediction": "P_smooth is in 0.5 +- 0.04 for p in {251, 509, 1021, 2039, 4093}. The lower 99% CI bound of R = ((p+1)/P)/sqrt(pi*p^2/4) is at least 1 at every p, with R about 2.2-2.5. The forced-smooth positive control gives P=1 and the A/A arm agrees within the CI. Falsified if the upper CI of R is below 1 at any p.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-kernel-of-reduction-lemma",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-kernel-of-reduction-lemma/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-kernel-of-reduction-lemma && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "For non-anomalous prime-order E/F_p (N != p) lifted to Z/p^2, the Smart-style ratio psi(N Q~)/psi(N P~) mod p equals k mod p only with probability 1/p (uniform, independent of k), so the formal-group kernel channel carries no log information; only at N = p does it recover k exactly.",
+  "prediction": "Null arms: hits <= mu + 5 sqrt(mu) + 2 (mu = usable/p), chi2 (15 df) <= 37.7, A/A hit difference <= 3; positive control (anomalous curves) hits = 100% of usable trials. Smoke test already passed with verdict consistent_with_prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-jv-sieve-fp6-weak-class",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-jv-sieve-fp6-weak-class/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-jv-sieve-fp6-weak-class && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For generic E over F_{p^6} with factor base {P: x(P) in F_{p^2}}, a uniformly random point is a sum of exactly three factor-base points with probability 1/6 (+O(1/q)), at p=7, 11, 13.",
+  "prediction": "Measured 3-point decomposition rate within 3*sigma0 + 0.02 of 1/6 at every p. The null (x in F_p factor base) rate is at most 0.02, planted decompositions are found 20/20, and the A/A |z| is at most 3.5. Falsified if any p deviates by more than 3*sigma0 + 0.06.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-mov-small-embedding-degree",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-mov-small-embedding-degree/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-mov-small-embedding-degree && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For random ordinary prime-field curves with r >= p/8 at p in [4096, 8792], embedding degree k = ord_r(p) is not small: fraction with k <= 10 is <= 0.01 and median k/(r-1) matches a random null (within 0.15) and is >= 0.1, so MOV gives no route (recorded obstruction).",
+  "prediction": "Pooled fraction with k<=10 <= 0.01, median k/(r-1) >= 0.1 and within 0.15 of the null; positive control (supersingular y^2=x^3+1, k=2) passes and A/A arms agree within 0.01 -> consistent_with_prediction. Failed controls give inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-miller-cocycle-nonhom-transfer",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-miller-cocycle-nonhom-transfer/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-miller-cocycle-nonhom-transfer && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "ell(k)=log_g Nm f_{k,P}(S) (Miller function at a twist point, prime-order curve with gcd(N,p-1)=1) is statistically indistinguishable from i.i.d. uniform in Z/(p-1) in residues mod small q, increments, and doubling defect.",
+  "prediction": "All 6 toy curves have T_real at or below the 99th percentile of the matched uniform null. The positive control (planted linear structure) is detected and the A/A arm stays inside the null range, so the verdict is consistent_with_prediction, meaning the map is hash-like.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-odd-prime-ghs-cover-floor",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-odd-prime-ghs-cover-floor/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-odd-prime-ghs-cover-floor && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "For q=5 and prime n in {5,7}, random E/F_{q^n} with j not in F_q hit the set B of n-th-power subfield Frobenius traces (where Res E loses simplicity and the cover genus floor n can drop) at ordinary density, with the ratio to shifted decoy sets in [0.5,2].",
+  "prediction": "Ratio of hit rate in B to mean decoy hit rate lies in [0.5, 2.0] with at least 5 hits at n=5, N=3000. The positive control (subfield curves) lands in B with exact divisibility 100%. The A/A halves agree.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-odd-char-descent-smith-quartic",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-odd-char-descent-smith-quartic/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-odd-char-descent-smith-quartic && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "Over F_5, smooth plane quartics with Frobenius polynomial x^6 - t x^3 + q^3 (a1=a2=0, the Weil-restriction shape) realise at least 80% of admissible traces |t|<=11, 5\u2224t, so the existence/rationality side of the Smith-to-quartic step is not obstructed at toy size.",
+  "prediction": "Pooled coverage C >= 0.80 over two A/A arms of 20000 random quartics each (arms within 0.15, at least 30 smooth hits). Falsified if C < 0.50, and inconclusive otherwise.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-one-point-self-pairing",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-one-point-self-pairing/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-one-point-self-pairing && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For E/F_p with prime order r != p, k=ord_r(p)>1 so the Tate self-pairing target F_p^*/(F_p^*)^r is trivial (no non-degenerate one-point self-pairing), and k is large (median k/(r-1) >= 0.1).",
+  "prediction": "On about 240 random prime-order toy curves (p in 2^12..2^16): 100% have gcd(r,p-1)=1, median k/(r-1) >= 0.1, at most 5% have k<=20; positive control (k=1 curves, Miller-computed Tate self-pairing) is at least 90% nontrivial and bilinear; A/A halves within 0.15. Verdict consistent_with_prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-pairing-target-field-recost",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-pairing-target-field-recost/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-pairing-target-field-recost && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "With exTNFS cost in GF(p^12) anchored to 2^128 at 3072 bits and memory charged as T*sqrt(T)^w (w in 0..1), BN254 beats matched rho at w=0 but loses at w=1 (rank flips in the band), and BLS12-381 is within 4 bits of rho at w=0 and does not beat rho at w=0.5.",
+  "prediction": "Both model claims hold, with the toy GF(p^2) torus rho positive control (ratio to sqrt(pi r/4) in [1,6]) and the A/A arm (|ln ratio| < 0.5) passing. The verdict is falsified if either claim fails with controls passing, and inconclusive if a control fails.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-padic-canonical-section",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-padic-canonical-section/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-padic-canonical-section && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_leads_20261031/C1_lift_torsion/atlas_update.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For prime-order E/F_p (N prime, N != p) lifted to Z/p^2, the section s(P)=[1-Nc]P~ (multiplier 1 mod N, 0 mod p) is a homomorphism with N*s(P)=O exactly, the Smart functional vanishes on N*s(P), and non-homomorphic random-lift sections recover d mod p only at chance rate 1/p.",
+  "prediction": "All exact section checks pass on both lift curves, psi(N s(P)) is 0 in every trial, random-lift hits stay below the Binomial(T,1/p) 1e-4 tail threshold at p near 2^12, 2^14 and 2^16, random lifts fail additivity in at least 90% of triples, and the anomalous N=p positive control recovers d in 100% of trials. Verdict consistent_with_prediction. The 0.05 s smoke run already gave this verdict at p near 2^10, but the full run was not executed.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-prime-field-isogeny-to-weak",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-prime-field-isogeny-to-weak/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-prime-field-isogeny-to-weak && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "Tate: F_p-isogenous curves have equal group order, so order-determined weakness (anomalous, MOV k<=6) is constant on an isogeny class; 2-isogeny walks never change #E or weak status.",
+  "prediction": "Zero order mismatches and zero weak-status mismatches over all sampled 2-isogeny pairs in both the main and A/A arms; positive control (independent random curves) differs in >=50% of pairs; weak curves exist in the sample.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-same-field-genus-g-embedding",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-same-field-genus-g-embedding/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-same-field-genus-g-embedding && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "For bielliptic genus-2 curves over F_p, #Jac = #E1*#E2 exactly with cofactor #E2 >= (sqrt p - 1)^2, so a same-field genus-2 embedding of E1 sits in a group of order N*Theta(p) and index calculus costs exponent 1 vs rho's 1/2 (no advantage).",
+  "prediction": "Identity holds for 100% of bielliptic curves with zero Hasse cofactor violations, and generic sextic null curves match E1*E2 in under 50% of cases; any failure falsifies the recorded arithmetic. Smoke test passed with identity rate 1.0 and null match rate 0.0.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-second-torsion-direction",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-second-torsion-direction/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-second-torsion-direction && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/docs/session-logs/2026-10-27.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/candidate_matches.json"
+  ],
+  "hypothesis": "Among random toy prime-field curves with largest prime factor n>=100 of #E, the fraction with ord_n(p)<=12 (second n-torsion direction defined at small extension degree) is <=0.5%, re-deriving the field-of-definition obstruction behind the closed trace-zero transfer lead.",
+  "prediction": "F = fraction with embedding degree <=12 is <=0.005; positive control (n|p-1, n|#E) all k=1; A/A halves agree within 3 sigma. F>0.02 would falsify.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-small-genus-cover-general",
+  "kind": "desk_only",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-small-genus-cover-general/PROTOCOL.md",
+  "run_cmd": "",
+  "est_minutes": 0,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "Re-derived minimum genus of GHS/Kummer-type covers over F_{p^k} is not below the recorded floors 9/49/41 for k=6/10/14.",
+  "prediction": "Riemann-Hurwitz re-derivation reproduces 9/49/41 exactly; falsified if any smaller genus arises.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-teske-trapdoor-fp6-weak-class",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-teske-trapdoor-fp6-weak-class/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-teske-trapdoor-fp6-weak-class && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "For a weak set not aligned with the isogeny graph, a blind public non-backtracking 2-isogeny walk costs the same as random sampling (steps*w in [0.85,1.15]), so only a graph-informed trapdoor holder gains (BFS ratio < 0.5).",
+  "prediction": "Pooled public_ratio over 5 primes (p=1009..3001) falls in [0.85,1.15] with A/A relative diff <= 0.08 and informed ratio < 0.5; outside the band with valid controls falsifies.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-weil-restriction-jacobian-class",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-weil-restriction-jacobian-class/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-weil-restriction-jacobian-class && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "For q=3, an exhaustive census of hyperelliptic genus-3 curves y^2=f(x) (deg f 7 or 8, f squarefree over F_3) finds at least one whose point counts N1=4, N2=10 and N3=28-3t, with t an admissible trace for E/F_27. Such a curve has L-polynomial 1 - tT^3 + 27T^6, so its Jacobian is isogenous to the Weil restriction of an elliptic curve over F_27. The n=2 genus-2 control makes the same claim over F_9.",
+  "prediction": "The control hit count C is at least 1 and the n=3 hit count H is at least 1, so the verdict is consistent_with_prediction. The verdict is inconclusive if C=0 or if the A/A recount or the Hasse-Weil check fails. It is falsified for the hyperelliptic locus only if C is at least 1 and H=0.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-TRF-teske-secret-isogeny-trapdoor",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-teske-secret-isogeny-trapdoor/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-TRF-teske-secret-isogeny-trapdoor && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "Within one F_p isogeny class (fixed trace, so fixed N by Tate), generic Pollard rho cost on the largest prime-order subgroup does not differ between 2-torsion rank-2 and rank-1 curves: |mean log step ratio| <= 0.15 at p=4093. This is a toy re-derivation of the recorded obstruction.",
+  "prediction": "The bootstrap 95% CI of D (mean log of rank-2 over rank-1 rho steps over matched pairs) lies inside [-0.15, 0.15]. The A/A CI contains 0 and the positive control (l1 vs l2 subgroup cost) passes. The verdict is consistent_with_prediction. The verdict is falsified if the CI lies wholly outside the margin, and inconclusive if a control fails.",
+  "blocked_on": ""
+ }
+]

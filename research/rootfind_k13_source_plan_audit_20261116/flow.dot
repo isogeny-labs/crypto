@@ -1,0 +1,13 @@
+digraph k13 {
+  graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.32", ranksep="0.45"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#546477", fillcolor="#eaf3f5"];
+  edge [color="#526477", fontname="Helvetica", fontsize=9];
+  plan [label="Source-built plan\n288 / 560 exact cells\nREAD-ONLY PASS", fillcolor="#d8f0e4"];
+  counters [label="Archived bitop/v1\n48 / 48 self-complete\nREAD-ONLY PASS", fillcolor="#d8f0e4"];
+  validator [label="Native launcher check\nPENDING", fillcolor="#fff0cc"];
+  l2 [label="L2 admission + replay\nPENDING", fillcolor="#fff0cc"];
+  full [label="Frozen ten-arm panel\nPENDING", fillcolor="#fff0cc"];
+  audit [label="Instruction audit\nPENDING", fillcolor="#fff0cc"];
+  plan -> validator -> l2 -> full;
+  counters -> audit -> full;
+}

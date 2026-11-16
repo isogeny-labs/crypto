@@ -16,10 +16,10 @@ performance loss.
   preregistration: it permanently claims each frozen shard, runs native L2
   ECBench on Spot, retains failures, and returns result PRs without treating
   the queue as a scientific decision maker.
-- In the current runtime, `gh auth status` reports the injected `GH_TOKEN` as
-  invalid. There is also no direct Iso Lab/EKS MCP tool, AWS CLI, kubectl or
-  Conductor client. The earlier publication proves the route, but it does not
-  give this runtime current submission authority.
+- In the current runtime, `gh auth status` now succeeds for the authorized
+  repository account. There is still no direct Iso Lab/EKS MCP tool, AWS CLI,
+  kubectl or Conductor client. Repository access is restored, but it does not
+  by itself provide checkpoint transport or paid-execution authority.
 
 ## Blocking admission gate
 
@@ -67,7 +67,8 @@ draft until those are complete.
 
 Provision a checkpoint upload token for this workspace. Then:
 
-1. restore an authorized GitHub/AWS/Iso Lab submission identity;
+1. provision an authorized AWS/Iso Lab submission identity while retaining the
+   working repository identity;
 2. run exact-image runtime preflight and preserve the bound analysis-script bytes;
 3. run `scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate`;
 4. freeze and merge the exact preregistration to `main` before any warmup;

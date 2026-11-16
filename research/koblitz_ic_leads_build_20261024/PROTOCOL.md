@@ -268,3 +268,105 @@ part of the $80 cap (about $24.50 already spent).
   covers the whole lifetime, plus the other pods running on the account.
   The previous pod was most likely deleted when the balance ran out.
 - **Reading:** outcomes are read as in §C1.
+
+## Amendment 7 (2026-11-03, after Amendment 6's out-of-memory runs, before these runs): C1 with the incremental engine, resumable
+
+Amendment 6's dense runs aborted at about 424 GB resident under a 471 GB
+address-space cap, so this amendment moves C1 to the incremental engine.
+
+**Engine.**
+- `pe_closure`, `partial` mode, low-first, batch 64, no variable
+  restriction (the registered L2 order).
+- Degree 5, m = 3 (19, 7), draws 0 then 3, the same committed draws file
+  (`a6bf7f15…`).
+- The engine holds at most one row per column plus one chunk: about
+  73 GB at 760,099 columns.
+
+**Surviving a lost pod.**
+- **Checkpoints.** `pe_closure_checkpointed` saves its whole state at
+  consistent points, at most every 30 min: basis, pivots, queue,
+  completion flag, seed position and counters. The file is written to
+  `.tmp`, fsynced and renamed. A run resumed from a checkpoint ends
+  exactly where an uninterrupted one does.
+  - Unit test: `resumed_run_equals_uninterrupted_run`.
+  - End to end, on m = 4 (11, 5) draw 8 at degree 4, both a capped run and
+    a SIGKILLed run, once resumed, match the uninterrupted run on every
+    counter.
+  - A checkpoint from another system or option set is refused.
+- **Network volume.** Inputs, checkpoints and records live on a RunPod
+  network volume in EU-RO-1.
+  - A replacement pod attached to that volume finds the hash-verified
+    inputs and restarts the job by itself (`pod/upload_launch.py`, the
+    `RESUMING_FROM_VOLUME` path).
+  - `pod/job_pe.sh` skips finished draws and resumes started ones.
+- **Watchdog.** The launching session checks in hourly. If the pod is gone
+  before the job is done, it relaunches onto the same volume, within the
+  budget.
+
+**Budget.**
+- Host: `cpu3m-32-256` ($1.76/h). The engine needs about 80 GB, so the
+  280 GB floor of the dense engine does not apply.
+- Total pod lifetime across relaunches: at most 27 h, about $47.50, plus
+  the volume (200 GB, about $0.50 a day).
+- Total C1 spend stays inside the owner's $80 cap, with about $27 spent
+  before this amendment.
+- When the budget runs out first, the checkpoints remain on the volume, and
+  the run continues only with a new budget.
+
+**Reading.** As in §C1:
+- refuted at 5;
+- saturated without refuting (degree at least 6);
+- not finished, which is unmeasured.
+
+**Amendment 7a (2026-11-03, at launch, before any C1 output).** RunPod
+refused a network volume on CPU pods ("no longer any instances available"
+with a volume; the same pod without one launched). Two changes follow.
+
+- **Persistence.** It is a 200 GB pod volume at `/workspace` instead.
+  - **What it survives:** a container restart and a pod stop/start.
+    On start, the receiver resumes from the verified inputs and the
+    checkpoint.
+  - **What it does not survive:** termination of the pod. The watchdog
+    restarts a stopped pod. A deleted pod loses its checkpoints, which
+    was the cause of the earlier loss, a zero balance; the balance is now
+    about $197.
+  - **What would fix that:** off-host copies need S3 credentials, which
+    this session does not hold.
+- **Host.** `cpu5m-32-256` at $2.08/h, the only stocked 256 GB shape.
+  - Pod `r2ttfdddgd1zdp` started draw 0 at 18:32:30Z. Its uploads were
+    hash-verified: `pe_closure` `5fdb71c1…`, the draws file and
+    `job_pe.sh`.
+  - The lifetime cap is 82,000 s (about $47.50). Across restarts, the
+    total pod time stays within that budget.
+
+**Amendment 7b (2026-11-03, after pod `r2ttfdddgd1zdp`, before its rerun).**
+That pod's first checkpoint, 23.4 GB written at 19:02:54Z (about 246k
+basis rows after 30 min), succeeded. The second hit "No space left on
+device", because `/workspace` was the 40 GB container disk.
+
+- **No volume on CPU pods.** A 2-vCPU probe pod with `volumeInGb: 50`
+  showed CPU pods mount no pod volume at all: only the overlay root of
+  `--disk` size.
+- **No GPU fallback today.** Every GPU type with at least 120 GB of system
+  RAM was refused in every volume-capable data center (probes created and
+  deleted within seconds).
+- **The failure.** The save failure panicked and killed draw 0 after
+  3,650 s. The job then started draw 3. The pod was terminated, at about
+  $2.25.
+
+**Changes.**
+1. **A failed checkpoint save is non-fatal.** It logs a warning, removes
+   the partial `.tmp` file and keeps computing. The previous checkpoint
+   stays valid.
+2. **`job_pe.sh` checks the disk before starting.** It records `df` and
+   the mount table, and refuses to start when the free space plus the
+   checkpoints already present is under 160 GB.
+3. **A failed draw is retried in place,** up to 3 times, from its
+   checkpoint. A draw that still fails stops the job instead of moving on.
+4. **Host.** A 32-vCPU, 256 GB CPU pod with a 200 GB container disk. Its
+   state survives a process crash or OOM kill through the in-place retry,
+   but not a pod stop or deletion. The watchdog checks the account balance,
+   the earlier cause of a deletion, every hour.
+5. **Budget.** The Amendment 7 budget is unchanged. What remains of it,
+   about $45, caps the new pod's lifetime.
+

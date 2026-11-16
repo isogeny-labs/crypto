@@ -63,9 +63,11 @@ pub mod operation_tally;
 pub mod poly_f2m;
 
 pub use cover_transfer::{
-    BinaryCoverCertificate, BinaryCoverPoint, CoverTransferError, ImageEndomorphismCertificate,
-    OrdinaryBinaryCover, PullPushCompositionCertificate, PullbackFiberKind, SubgroupTransferStatus,
-    TorsionProjectorCertificate, UnsupportedCoverOperation,
+    BinaryCoverCertificate, BinaryCoverPoint, ClosedPointPushforwardCertificate,
+    CoverTransferError, ImageEndomorphismCertificate, JacobianPushforwardCertificate,
+    OrdinaryBinaryCover, PullPushCompositionCertificate, PullbackClosedPointCertificate,
+    PullbackFiberKind, SubgroupTransferStatus, TorsionProjectorCertificate,
+    UnsupportedCoverOperation,
 };
 pub use curve::{BinaryCurve, BinaryPoint};
 pub use f2m::{F2mElement, IrreduciblePoly};

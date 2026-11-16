@@ -46,6 +46,8 @@ fn main() {
         r,
         cofactor: 1,
         generator: (gx, gy),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &inst.curve,
@@ -93,6 +95,8 @@ fn f4cost(a: &[String]) {
         r,
         cofactor: 1,
         generator: (gx, gy),
+
+        representation: None,
     };
     let curve = &inst.curve;
     let ctx = InstanceCtx {

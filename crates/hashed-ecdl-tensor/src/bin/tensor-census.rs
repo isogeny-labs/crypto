@@ -74,7 +74,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!(
         "{}",
         serde_json::to_string_pretty(&json!({
-            "schema": "tensor-boundary-census/v1",
+            "schema": "tensor-boundary-census/v2",
             "canonical_ir_sha256": ir_sha256,
             "left_vertices": left_vertices,
             "cut_edges": tensor.cut_edges,
@@ -88,6 +88,18 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             "canonical_rank": ranks.canonical_rank,
             "best_balanced_rank": ranks.best_balanced_rank,
             "best_row_positions": ranks.best_row_positions,
+            "canonical_rank_certificate": {
+                "row_positions": ranks.canonical_certificate.row_positions,
+                "minor_rows": ranks.canonical_certificate.minor_rows,
+                "minor_columns": ranks.canonical_certificate.minor_columns,
+                "determinant_decimal": ranks.canonical_certificate.determinant.to_string()
+            },
+            "best_balanced_rank_certificate": {
+                "row_positions": ranks.best_balanced_certificate.row_positions,
+                "minor_rows": ranks.best_balanced_certificate.minor_rows,
+                "minor_columns": ranks.best_balanced_certificate.minor_columns,
+                "determinant_decimal": ranks.best_balanced_certificate.determinant.to_string()
+            },
             "balanced_splits_examined": ranks.balanced_splits_examined,
             "normalized_log_rank": normalized_log_rank,
             "rank_operations": {

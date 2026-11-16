@@ -1,0 +1,463 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "prime-normalized-square-20261106",
+  "version": 1,
+  "created": "2026-11-06",
+  "repository": "crypto",
+  "study_dir": "research/prime_square_kernel_20261106",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "protocol_note": "PROTOCOL.md"
+  },
+  "question": "Does the normalized square lower exact admissible crossing-mode tuple counts after representing every finite-cell entry?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Exact reconstruction and controls pass for every finite panel cell.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Candidate has fewer admissible tuples in a matched cell and factorization.",
+      "class": "comparative",
+      "decided_by": [
+        "kernel"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "description": "original exact crossing matrix or development control",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4d8292ec8b4194c51f0648176e306ec0f430dc6f",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "binary_sha256": "83de01c9153210582abd6417eab13e58379ef25794c01fb758bae41bb67c4d2e",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "kernel": "original"
+      }
+    },
+    {
+      "id": "square",
+      "role": "candidate",
+      "description": "square exact crossing matrix or development control",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4d8292ec8b4194c51f0648176e306ec0f430dc6f",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "binary_sha256": "83de01c9153210582abd6417eab13e58379ef25794c01fb758bae41bb67c4d2e",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "kernel": "square"
+      }
+    },
+    {
+      "id": "repeat",
+      "role": "control_aa",
+      "description": "repeat exact crossing matrix or development control",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4d8292ec8b4194c51f0648176e306ec0f430dc6f",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "binary_sha256": "83de01c9153210582abd6417eab13e58379ef25794c01fb758bae41bb67c4d2e",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "kernel": "repeat"
+      }
+    },
+    {
+      "id": "double",
+      "role": "control_positive",
+      "description": "double exact crossing matrix or development control",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4d8292ec8b4194c51f0648176e306ec0f430dc6f",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "binary_sha256": "83de01c9153210582abd6417eab13e58379ef25794c01fb758bae41bb67c4d2e",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "kernel": "double"
+      }
+    },
+    {
+      "id": "unnormalized",
+      "role": "control_negative",
+      "description": "unnormalized exact crossing matrix or development control",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "4d8292ec8b4194c51f0648176e306ec0f430dc6f",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "binary_sha256": "83de01c9153210582abd6417eab13e58379ef25794c01fb758bae41bb67c4d2e",
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "kernel": "unnormalized"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "double",
+      "expected_detection": "Smith weights rise by one, truncated at q",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "unnormalized",
+      "null_population": {
+        "description": "Unnormalized square at its own nonunit-valued node",
+        "generator": "L4 delta2 T2 original node value5, square25",
+        "n": 1,
+        "why_n": "Exact expected-value algebraic negative control; not population inference",
+        "matched_on": [
+          "L",
+          "delta",
+          "node",
+          "base polynomial"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "kernel",
+        "levels": [
+          "original",
+          "square"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "how": "every listed L,t,zeta,q tile and crossing row in PROTOCOL.md"
+      },
+      {
+        "name": "binary",
+        "treatment": "fixed",
+        "how": "one native executable with exact GMP rational and integer arithmetic"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "single threaded checker"
+      },
+      {
+        "name": "host_load",
+        "treatment": "measured",
+        "how": "record host metadata; no clocks or speed claims; exact values independent of contention"
+      },
+      {
+        "name": "factorization",
+        "treatment": "crossed",
+        "how": "Newton and Smith separately, never mix their comparisons"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "paired exact arithmetic in same process; no warmups or timing"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "kernel",
+        "arms": [
+          "original",
+          "square"
+        ],
+        "differs_in": [
+          "kernel"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "original",
+          "repeat"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic exact values; no timed metrics or order-sensitive cache estimates.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "nonce": null,
+      "note": "No random inputs; seed0 labels exhaustive frozen finite cells."
+    },
+    "instance_sampling": {
+      "rule": "Exhaust listed finite cells, not a sample from a curve distribution.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact descriptive comparisons, no statistical test or adaptive selection.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1344,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact finite enumeration with replay; no population inference, p-value or statistical power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "Not timed: conservative hard execution ceiling; only fixed development units ran."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "tuples",
+        "name": "admissible exponent tuples",
+        "unit": "count",
+        "kind": "exact",
+        "definition": "Number of nonnegative exponent tuples whose summed integer weights are below q, one packet.",
+        "source": "panel.csv original_tuples,candidate_tuples",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "tuple_count",
+      "mode_weight"
+    ],
+    "record": [
+      "binary_sha256",
+      "compiler_version",
+      "kernel_release",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_limit_bytes": 2147483648,
+      "backend_authorization": "Explicit session approval for local backend must be recorded before launch; otherwise do not execute the panel."
+    },
+    "measurement_class": "throughput",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "One full panel plus one identical replay, 1344 cells x2 methods per invocation; stop on first correctness failure and retain partial output.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any reconstruction/control failure invalidates comparisons; preserve all partial rows.",
+    "No wall-clock speed conclusion.",
+    "Pending backend exception prevents panel launch."
+  ],
+  "decision_rule": {
+    "text": "Classify each matched cell/method as candidate fewer/equal/more tuples. Publish every cell and per-level counts. Only exact within-cell component conclusions.",
+    "comparison_ids": [
+      "kernel"
+    ],
+    "threshold": "strict integer inequality with exact A/A equality",
+    "statistic": "exact tuple counts and wins/ties/losses by L,level,method",
+    "interval": "none: deterministic finite census",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "exact pair of integer counts per cell",
+    "verdict_vocabulary": [
+      "component_gain",
+      "tie",
+      "component_loss",
+      "invalid",
+      "not_run"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/prime_square_kernel_20261106/check.cpp",
+      "sha256": "a1ba6868861371f29ea32222cc2f884f20406dff75b0497897065e85a387d2c4"
+    },
+    "inputs": [
+      "panel.csv",
+      "replay.csv"
+    ],
+    "outputs": [
+      "exact per-cell tuples",
+      "per-level descriptive counts"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-level wins/ties/losses, if executed"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Extrapolating finite tuple counts to an ECDLP runtime",
+    "Omitting polynomial degree, recovery precision or basis construction cost",
+    "Selecting only successful cells or odd levels",
+    "Changing panel after observing its results"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:research/prime_common_kernel_20261030/sources.md",
+      "provenance": "internal",
+      "claim": "Pinned primary sources for Cauchy deformation and crossing modes",
+      "verified_by": "source/proof-scope inspection; no independent signed verdict"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "44899fb67b85f2c1403e92bc24057f58e56e08e29d8734e3c5ab94ff3cff5de6",
+    "commit": "4d8292ec8b4194c51f0648176e306ec0f430dc6f",
+    "frozen_at": "2026-11-06T15:54:45Z",
+    "filed_before_affected_data": true
+  }
+}

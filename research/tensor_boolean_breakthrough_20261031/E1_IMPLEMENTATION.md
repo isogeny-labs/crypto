@@ -4,6 +4,12 @@ Date: 2026-11-01
 Status: exact census core implemented and locally verified; protocol remains draft
 Affected E1 data: none
 
+> Follow-up: the initial receipt below is historical. Later on 2026-11-01 the
+> semantic cut, equality quotient and typed rewiring diagnostics were
+> implemented and run under separately frozen screens. See
+> [`../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md`](../prime_ic_elimination_20261101/RANK1_QUOTIENT_RESULT.md).
+> The full E1 protocol remains draft and no full-E1 row was promoted.
+
 ## Outcome
 
 The missing `tensor-census` core now contracts one explicitly selected side of
@@ -51,6 +57,14 @@ growth. The implementation records big-integer additions/subtractions,
 multiplications, comparisons and row normalizations. No modular rank is
 promoted to exact rank.
 
+For the canonical and selected minimum-rank balanced split, the implementation
+also emits a nonzero-minor certificate. It records the split, selected rows and
+columns, and the exact signed determinant. The public verifier reconstructs
+the matrix from the boundary tensor and recomputes only that determinant with
+Bareiss elimination; it does not call the rank routine. The mathematical
+implication and its formal proof are in
+[`RIGOROUS_BOUNDS.md`](RIGOROUS_BOUNDS.md).
+
 ## CLI
 
 [`tensor-census.rs`](../../crates/hashed-ecdl-tensor/src/bin/tensor-census.rs)
@@ -61,9 +75,9 @@ tensor-census BTNIR LEFT_VERTICES [MAX_FREE_EDGES] [EXHAUSTIVE_WIDTH]
 ```
 
 `LEFT_VERTICES` is a strictly increasing comma-separated list. Output is one
-`tensor-boundary-census/v1` JSON object carrying the canonical-IR and tensor
-digests, exact ranks and counts, cut identities, operation counters and the
-bounded claim scope. A caller can rerun the same bytes in a fresh process and
+`tensor-boundary-census/v2` JSON object carrying the canonical-IR and tensor
+digests, exact ranks and counts, cut identities, nonzero-minor certificates,
+operation counters and the bounded claim scope. A caller can rerun the same bytes in a fresh process and
 compare every exact field; the experiment runner that performs and records
 that A/A comparison is not yet implemented.
 
@@ -85,7 +99,10 @@ The four focused release tests pass:
 - exact contraction of a canonical equality network to the 2-by-2 identity;
 - free-edge-cap and pinned-cut rejection;
 - 1,152 deterministic integer matrices of sizes 1-by-1 through 6-by-6,
-  cross-checked against independent rational Gaussian elimination.
+  cross-checked against independent rational Gaussian elimination; every
+  discovered rank-profile minor also has a recomputed nonzero determinant;
+- independent certificate verification and rejection after determinant
+  corruption.
 
 Current stable Rust 1.99.1 all-target Clippy passes with warnings denied. Rust
 1.78 all-target Clippy reaches an unrelated pre-existing `format_collect`
@@ -100,6 +117,10 @@ measured. In particular, this receipt does not establish low boundary rank,
 full boundary rank, a solver improvement, a relation-oracle improvement or an
 asymptotic result.
 
+Even a full-rank certificate at one size is finite evidence. A uniform family
+minor/rank theorem is separately tracked in
+[`problems/hashed-ecdl-boundary-rank-family-lower-bound.md`](../../problems/hashed-ecdl-boundary-rank-family-lower-bound.md).
+
 Before E1 freezes, the workstream still needs:
 
 - stable semantic-region/cut metadata for every final production fixture;
@@ -108,3 +129,24 @@ Before E1 freezes, the workstream still needs:
 - fresh-process A/A and known-rank control records from the same runner;
 - disjoint preflight, final cap and ladder, power justification and hashes;
 - a committed source revision and verified Iso Lab execution image.
+
+## 2026-11-01 follow-up boundary
+
+The production encoder now binds semantic slot regions into canonical
+predicate parameters and assigns equality/fanout wiring to the producer
+region. A shape preflight showed why the original contractor cannot run the
+declared object: F5 has raw cut width 154 and free enumeration exponents
+15,959--31,918.
+
+An exact functional quotient maps the raw cut copies back to seven typed
+signals on F5 and 9--15 signals on four held-out fields. Exact raw balanced
+ranks are computed from the quotient without materializing zero copy rows or
+columns; exhaustive tiny controls validate the symmetry reduction. A
+support-matched sparse null advanced, but a frozen one-pair typed topology null
+returned the same conditioned rank in all four fields and rejected that
+minimal global-wiring mechanism.
+
+This follow-up does not satisfy the draft protocol's arbitrary all-interior
+rewired null. Such a null destroys the parsimonious program and needs an exact
+projected model counter. Binary/image/power/final-ladder fields therefore
+remain open and the protocol remains draft.

@@ -1,0 +1,74 @@
+{
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "pkm-t2-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=2",
+          "oracle": "pkm-semaev:m=2,mode=full",
+          "max_trials": "2000000"
+        }
+      }
+    },
+    {
+      "name": "pkm-t2-m3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=2",
+          "oracle": "pkm-semaev:m=3,mode=chain",
+          "max_trials": "2000000"
+        }
+      }
+    },
+    {
+      "name": "inc",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    }
+  ],
+  "description": "research/curve25519_ic_ratchet_20261102/PROTOCOL.md Part 4 feasibility (one target; no decision uses timing).",
+  "label": "Curve25519-family ratchet 1, Part 4 feasibility smoke, k = 20",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 2026110530,
+    "timeout_seconds": 900,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 63700,
+        "b": 872826,
+        "group_order": 1049624,
+        "gx": 349837,
+        "gy": 122,
+        "kind": "prime_explicit",
+        "p": 1048573,
+        "r": 131203
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026110620,
+    "targets_per_curve": 1
+  }
+}

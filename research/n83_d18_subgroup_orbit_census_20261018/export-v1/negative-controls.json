@@ -1,0 +1,35 @@
+{
+  "schema": "n83.d18-negative-controls/v1",
+  "controls": [
+    {
+      "mode": "header",
+      "mutation": "curve_a 0 to 1",
+      "object": "header/objects/2ec7370ac75a7685e502b71b698b2b54197e3490ae949502963c07960e29e2f3.jsonl.gz",
+      "compressed_sha256": "27c90d5090420289b3819910573e830390d345dc34b23847eaaa6c94fcb71590",
+      "exit_code": 1,
+      "expected_rejection": "object header or curve identity differs",
+      "observed": "Error: \"object header or curve identity differs\"",
+      "pass": true
+    },
+    {
+      "mode": "row",
+      "mutation": "first coefficient 1 to 2",
+      "object": "row/objects/839c3e705860283eccafe6bbcd415294d34175c5a8cff28d600034f6f647bcc4.jsonl.gz",
+      "compressed_sha256": "2c927602d73d01fcd45439fd12129a3f4b1bd970c4dd08bd71c0394fbc18d1c1",
+      "exit_code": 1,
+      "expected_rejection": "generic row point, label or uniqueness check failed",
+      "observed": "Error: \"generic row point, label or uniqueness check failed\"",
+      "pass": true
+    },
+    {
+      "mode": "archive",
+      "mutation": "last compressed byte xor 1",
+      "object": "archive/objects/e0c24980207cbb15fa57ec76bcfc6a628a763a80834cba1117ca83ea04678682.jsonl.gz",
+      "compressed_sha256": "c4257fc9dacc18c018a546b531ac4032dd26dfc4156a39085940fef8dd15a442",
+      "exit_code": 1,
+      "expected_rejection": "corrupted archive rejected",
+      "observed": "Error: Custom { kind: InvalidInput, error: \"corrupt gzip stream does not have a matching checksum\" }",
+      "pass": true
+    }
+  ]
+}

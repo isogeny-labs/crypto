@@ -10,33 +10,40 @@ from prior_work import gf_pow, relative_trace
 
 HERE = Path(__file__).resolve().parent
 SCAN = HERE / "degree3_all_q16_scan_receipt.json"
+BASE = HERE / "base_isogeny_degree3_gate_receipt.json"
 JV = "https://eprint.iacr.org/2011/020.pdf"
 MAGMA = "https://www.math.uzh.ch/sepp/magma-2.25.2-ds/HandbookVolume10.pdf"
 GENERAL = "https://globals.ieice.org/en_transactions/fundamentals/10.1093/ietfec/e88-a.1.97/_p"
+TRACE_ZERO = "https://www.aimsciences.org/article/doi/10.3934/amc.2015.9.515"
 
 
 def main():
     raw = SCAN.read_bytes()
     scan = json.loads(raw)
+    base_raw = BASE.read_bytes()
+    base = {row["class"]: row for row in json.loads(base_raw)["rows"]}
     assert scan["counts"] == {"models": 10664, "exact_hits": 60}
     records = []
     for hit in scan["hits"]:
         b, u = hit["b_mask"], hit["u_mask"]
         assert relative_trace(b) == hit["trace_b_mask"]
         if b == 1:
-            label = "base-field coefficient; existing descent setting"
+            label = "base-field coefficient and base-field isogeny class; existing descent setting"
         elif hit["trace_b_mask"] == 0:
             label = "published Joux-Vitse trace-zero cover locus"
         else:
-            label = "outside Joux-Vitse trace-zero locus; exact-cover publication unverified"
+            assert base[hit["class"]]["is_k_defined_isogeny_class"]
+            label = "outside Joux-Vitse trace-zero coefficient locus; base-field isogeny class and trace-zero-factor route already known"
         records.append({
             "class": hit["class"], "model_index": hit["model_index"],
             "u_mask": u, "b_mask": b, "relative_trace_b_mask": hit["trace_b_mask"],
             "frobenius_orbit_u": [gf_pow(u, 16**i) for i in range(3)],
             "frobenius_orbit_b": [gf_pow(b, 16**i) for i in range(3)],
             "prior_family_label": label,
+            "base_field_isogeny_class": base[hit["class"]]["is_k_defined_isogeny_class"],
             "joux_vitse_reference": JV, "general_ghs_reference": MAGMA,
             "general_extension_reference": GENERAL,
+            "trace_zero_index_calculus_reference": TRACE_ZERO,
             "exact_equation_publication_status": "unverified",
             "new_attack_method_claim": False,
             "measured_speedup_claim": False,
@@ -48,7 +55,8 @@ def main():
     receipt = {
         "schema": "ghs-q16-degree3-all60-prior-family-gates-v1",
         "scan_sha256": hashlib.sha256(raw).hexdigest(),
-        "literature_scope": "General GHS and cover/decomposition methods are published; Joux-Vitse Appendix A.2 covers the trace-zero genus-three locus. Search did not establish absence of any exact equation from all publications.",
+        "base_isogeny_receipt_sha256": hashlib.sha256(base_raw).hexdigest(),
+        "literature_scope": "General GHS and cover/decomposition methods are published; Joux-Vitse Appendix A.2 covers the trace-zero coefficient locus. All nonzero-trace hits here are K-isogenous to k-defined elliptic curves, placing their large-prime subgroups in established trace-zero-factor territory. Search did not establish absence of any exact equation from all publications.",
         "rows": records,
         "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }

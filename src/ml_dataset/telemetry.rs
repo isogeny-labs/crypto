@@ -1,6 +1,8 @@
 //! Phase-scoped native PMU and process counters. Missing counters remain missing.
 pub(crate) mod checked;
 #[cfg(target_os = "linux")]
+pub(crate) mod pmu_containment;
+#[cfg(target_os = "linux")]
 pub(crate) mod whole_worker;
 use serde_json::{json, Value};
 use std::path::Path;
@@ -98,6 +100,7 @@ mod tests {
             key_index: 0,
             seed: 20261027,
             factor_base_size: 4,
+            factor_base_policy: None,
             degree_bound: 3,
             work_limit: 20_000,
             solver: "bsgs".into(),

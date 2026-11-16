@@ -1,0 +1,23 @@
+{
+  "schema": "n83.factor-base-scheduling-format/v1",
+  "files": {
+    "pod-api.json": {
+      "role": "raw_kubernetes_api",
+      "structure": "Kubernetes Pod JSON returned by read-only GET. Contains metadata, container image/argv, node selector, required anti-affinity, resource requests and observed scheduling status.",
+      "sensitive_fields": "No secret values; retain exact API response."
+    },
+    "events-api.json": {
+      "role": "raw_kubernetes_api",
+      "structure": "Kubernetes Events list filtered to the exact Pod name. Includes event reason, message, timestamps, count and involved-object identity."
+    },
+    "scheduling-receipt.json": {
+      "role": "normalized_observation",
+      "structure": "Job and Pod UIDs, state, resource placement requirements, scheduler messages, results-prefix observation and whether computation began. `data_generated=false` means this is execution-state evidence only."
+    },
+    "DATA_INDEX.json": {
+      "role": "file_map",
+      "structure": "Relative path, byte count, SHA-256 and media type for every other file in this directory."
+    }
+  },
+  "hash_rule": "SHA-256 is over exact file bytes; the index does not hash itself."
+}

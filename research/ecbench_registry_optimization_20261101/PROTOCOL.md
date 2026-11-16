@@ -1,15 +1,15 @@
 # Protocol: optimize the complete ECBench registry
 
 Status: the methodology and admission rules below were frozen before new
-measurements. The 111-spec all-method development roster now passes `ecbench
-optimize audit --require-all` with 78/78 methods and 24/24 nested algorithms.
+measurements. The 114-spec all-method development roster now passes `ecbench
+optimize audit --require-all` with 79/79 methods and 24/24 nested algorithms.
 No paid job may launch before the independent checkpoint gate also passes.
 
 ## 1. Boundary and question
 
 The boundary is the live `methods::registry()` plus the native nested solver
 registry and the binary-linked PDP3 and prime PKM tower engines. At the current
-source state, that is 78 top-level methods, 11 system solvers, nine PDP3
+source state, that is 79 top-level methods, 11 system solvers, nine PDP3
 engines, and four PKM tower engines.
 
 “Complete” means complete over that executable ECBench boundary. Standalone
@@ -197,7 +197,7 @@ table costs.
 ## 8. Admission and publication
 
 The all-method development roster is admitted only when the native auditor says
-all 78 methods and all 24 nested paths are present and every structural error
+all 79 methods and all 24 nested paths are present and every structural error
 list is empty. A successful run then additionally requires queue export checks,
 native L2 admission where clocks are used, record audit, exact payload hashes
 and independent replay.
