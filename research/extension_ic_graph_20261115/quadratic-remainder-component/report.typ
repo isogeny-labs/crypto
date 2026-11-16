@@ -2,7 +2,7 @@
 #set text(size: 10pt)
 #set heading(numbering: none)
 = Quadratic remainder relations over Fp²
-Development component for PR4288 · 16 November 2026
+Library follow-up PR4452 after PR4288 · 16 November 2026
 
 The opt-in degree-nine extractor keeps seven signed small-point classes and
 a quadratic remainder class over Fp². The quadratic must be irreducible over
