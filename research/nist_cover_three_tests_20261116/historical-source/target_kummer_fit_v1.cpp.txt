@@ -1,0 +1,50 @@
+#include "good_functions_arithmetic.hpp"
+#include "even_kummer.hpp"
+
+std::vector<GoodPoint> ek_input_points(TargetWeil& target,const Json& descent,const Json& receipt){
+    auto matrix=good_matrix(descent.at("change_of_coordinates"));T24 slope=target.infinity2[1];std::vector<GoodPoint> out;int index=0;
+    for(auto& row:receipt.at("points").arr){Line base{good_fp(row.at("x")),good_fp(row.at("y")),T24(1)},old{};
+        for(int i=0;i<3;++i)for(int j=0;j<3;++j)old[i]=old[i]+matrix[i][j]*base[j];
+        require(target.f.eval(old)==T24(0),"Kummer input point curve equation");
+        if(old[2]!=T24(0)){T24 x=old[0]/old[2],y=old[1]/old[2],l=y-slope*x;out.push_back({Line{x,y,T24(1)},Values8{T24(1),x,x*x,y,y*y,x*y,x*l*l,y*l*l},index});}++index;
+    }return out;
+}
+TVector ek_good_values(const std::vector<GoodPoint>& points,const Triple& triple,const std::vector<Triple>& monomials,const TSpace& functions){
+    const auto& a=points.at(size_t(triple[0]));const auto& b=points.at(size_t(triple[1]));const auto& c=points.at(size_t(triple[2]));
+    Matrix3<T24> m{a.point,b.point,c.point};T24 omega=determinant3(m);require(omega!=T24(0),"noncollinear Kummer fit support");auto values=symmetric_values(monomials,a.basis,b.basis,c.basis);TVector out;for(auto& f:functions)out.push_back(good_dot(f,values)/(omega*omega));return out;
+}
+TSpace ek_solve(TSpace left,const TSpace& right){
+    require(left.size()==8&&right.size()==8,"eight fit equations");for(int i=0;i<8;++i){require(left[i].size()==8&&right[i].size()==8,"eight fit columns");left[i].insert(left[i].end(),right[i].begin(),right[i].end());}
+    for(int col=0;col<8;++col){int pick=col;while(pick<8&&left[pick][col]==T24(0))++pick;require(pick<8,"Kummer interpolation rank8");std::swap(left[pick],left[col]);T24 inv=left[col][col].inv();for(int j=col;j<16;++j)left[col][j]=left[col][j]*inv;
+        for(int row=0;row<8;++row)if(row!=col){T24 c=left[row][col];if(c!=T24(0))for(int j=col;j<16;++j)left[row][j]=left[row][j]-c*left[col][j];}
+    }
+    TSpace map(8,TVector(8,T24(0)));for(int j=0;j<8;++j)for(int i=0;i<8;++i)map[j][i]=left[i][8+j];return map;
+}
+bool ek_fit_equal(const TSpace& matrix,const Values8& k,const TVector& h){TVector values(k.begin(),k.end());for(int i=0;i<8;++i)if(good_dot(matrix[i],values)!=h[i])return false;return true;}
+void emit_ek_values(const Values8& a){emit_good_vector(TVector(a.begin(),a.end()));}
+int main(int argc,char** argv){try{
+    require(argc==3,"usage: target_kummer_fit kernel3-study good-function-result.json");std::string root=argv[1];initialize_cover(read_json(root+"/inputs/p192-d7-prym.json"));Level2Input input;TargetWeil target(root);
+    auto good=read_json(argv[2]),descent=read_json(root+"/evidence/descent-v1/result.json"),receipt=read_json(root+"/evidence/destination-relations-v2/result.json");require(good.at("kernel").integer()==3,"fixed kernel3 matching input");
+    auto points=ek_input_points(target,descent,receipt);require(points.size()==good.at("point_receipt_indices").arr.size(),"identical finite point pool");for(size_t i=0;i<points.size();++i)require(points[i].receipt_index==good.at("point_receipt_indices").arr[i].integer(),"finite point receipt binding");
+    std::vector<Triple> monomials;for(auto& row:good.at("symmetric_triples").arr){Triple t{};for(int i=0;i<3;++i)t[i]=row.arr[i].integer();monomials.push_back(t);}require(monomials.size()==120,"symmetric product index count");
+    TSpace functions;for(auto& row:good.at("function_coefficients").arr){TVector f;for(auto& c:row.arr)f.push_back(read_t24(c));require(f.size()==120,"good-function coefficient width");functions.push_back(f);}require(functions.size()==8,"eight pinned good functions");
+    std::vector<Triple> training;for(auto& row:good.at("generic_triples").arr){Triple t{};for(int i=0;i<3;++i)t[i]=row.arr[i].integer();training.push_back(t);}require(training.size()==8,"fixed eight generic fit triples");
+    EvenKummer even(target,root);const auto& first=training[0];auto generic=ek_points(points[first[0]],points[first[1]],points[first[2]],target);int commutators=0;
+    for(int s=0;s<8;++s)if(even.paths[s][1]){require(even.raw(s,generic)==even.raw(s,generic,true),"generic Weil path-order commutator");++commutators;}
+    int torsion_checks=0;for(int s=0;s<8;++s)for(int t=0;t<8;++t){require(even.scales[s]*even.at_torsion_raw(s,t)==even.theta[s^t]/even.theta[t],"all eight-subgroup torsion values");++torsion_checks;}
+    auto origin=even.coordinates(even.values(even.origin));require(ek_projective_equal(origin,even.nulls),"Kummer origin coordinate identity");std::cerr<<"even functions and theta-null identities passed\n";
+    auto values=even.values(generic),coordinates=even.coordinates(values);int group_checks=0,heisenberg=0;
+    for(int s=0;s<8;++s){auto shifted=even.shift(s,generic),next=even.values(shifted);for(int t=0;t<8;++t){require(values[s]*next[t]==values[s^t],"generic normal even-subgroup equations");++group_checks;}auto expected=coordinates;for(int i=0;i<8;++i)expected[i]=expected[i]*T24(ek_sign(i,s));require(ek_projective_equal(even.coordinates(next),expected),"Kummer subgroup sign action");++heisenberg;}
+    TSpace left,right;
+    for(int n=0;n<8;++n){auto t=training[n];auto e=ek_points(points[t[0]],points[t[1]],points[t[2]],target),k=even.coordinates(even.values(e));left.emplace_back(k.begin(),k.end());auto h=ek_good_values(points,t,monomials,functions);for(int j=0;j<8;++j)require(h[j]==read_t24(good.at("generic_values").arr[n].arr[j]),"pinned good-function generic values");right.push_back(h);}
+    auto matrix=ek_solve(left,right);for(int n=0;n<8;++n){Values8 k;std::copy(left[n].begin(),left[n].end(),k.begin());require(ek_fit_equal(matrix,k,right[n]),"training coordinate match");}std::cerr<<"eight-function coordinate map fitted\n";
+    std::set<Triple> used;for(auto t:training){std::sort(t.begin(),t.end());used.insert(t);}std::vector<Triple> heldout;std::vector<Values8> heldout_k;TSpace heldout_h;int attempts=0,excluded=0,npoints=int(points.size());
+    for(int attempt=0;attempt<128&&heldout.size()<16;++attempt){++attempts;Triple t{(attempt+53)%npoints,(attempt+79)%npoints,(attempt+113)%npoints},canonical=t;std::sort(canonical.begin(),canonical.end());
+        Matrix3<T24> m{points[t[0]].point,points[t[1]].point,points[t[2]].point};if(t[0]==t[1]||t[0]==t[2]||t[1]==t[2]||used.count(canonical)||determinant3(m)==T24(0)){++excluded;continue;}used.insert(canonical);
+        auto e=ek_points(points[t[0]],points[t[1]],points[t[2]],target),k=even.coordinates(even.values(e));auto h=ek_good_values(points,t,monomials,functions);require(ek_fit_equal(matrix,k,h),"heldout full coordinate match");heldout.push_back(t);heldout_k.push_back(k);heldout_h.push_back(h);
+    }
+    require(heldout.size()==16,"16 unused heldout Kummer triples");int nonzero=0;while(nonzero<8&&heldout_k[0][nonzero]==T24(0))++nonzero;require(nonzero<8,"nonzero heldout Kummer coordinate");
+    rejects([&]{auto bad=matrix;bad[0][nonzero]=bad[0][nonzero]+T24(1);require(ek_fit_equal(bad,heldout_k[0],heldout_h[0]),"changed Kummer coordinate map");},"changed Kummer coordinate map");
+    std::cout<<"{\"scope\":\"P192-kernel3-even-Weil-good-function-match\",\"torsion_value_checks\":"<<torsion_checks<<",\"generic_group_checks\":"<<group_checks<<",\"commutator_checks\":"<<commutators<<",\"Heisenberg_checks\":"<<heisenberg<<",\"fit_rank\":8,\"heldout_triples\":16,\"heldout_attempts\":"<<attempts<<",\"heldout_excluded\":"<<excluded<<",\"divisor_map_constructed\":false,\"standing\":\"producer-unverified\",\"theta_null\":";emit_ek_values(even.nulls);std::cout<<",\"scales\":";emit_ek_values(even.scales);std::cout<<",\"paths\":[";for(int s=0;s<8;++s)std::cout<<(s?",":"")<<'['<<even.paths[s][0]<<','<<even.paths[s][1]<<']';
+    std::cout<<"],\"good_from_kummer\":[";for(int j=0;j<8;++j){if(j)std::cout<<',';emit_good_vector(matrix[j]);}std::cout<<"],\"heldout_supports\":[";for(size_t j=0;j<heldout.size();++j)std::cout<<(j?",":"")<<'['<<heldout[j][0]<<','<<heldout[j][1]<<','<<heldout[j][2]<<']';std::cout<<"],\"heldout_K\":[";for(size_t j=0;j<heldout_k.size();++j){if(j)std::cout<<',';emit_ek_values(heldout_k[j]);}std::cout<<"],\"heldout_H\":[";for(size_t j=0;j<heldout_h.size();++j){if(j)std::cout<<',';emit_good_vector(heldout_h[j]);}std::cout<<"]}\n";
+}catch(const std::exception& e){std::cerr<<"REJECT "<<e.what()<<'\n';return 1;}}
