@@ -1,0 +1,13 @@
+# Independent qualifier v3 correction review
+
+Accepted the explicit inspection directory correction at source scope. Twenty-four independent replay controls passed: 22 producer controls plus two reviewer controls. Runtime qualification remains unadmitted.
+
+Observation: the failed attempt could not allocate a default temporary file under ProtectSystem=strict. The new helper passes the owned command directory explicitly. Producer and reviewer tests exercised rejected default lookup, poisoned environment, anonymous file lifecycle, fallback behavior and invalid explicit directories.
+
+Comparison: production changes only add inspection_capture(directory) and replace the command allocation call. The independent replay exited zero in 0.142484 seconds under a 120-second, 2-GiB envelope. EROFS and command ordering are mocked/static checks, not a service replay.
+
+Inference: explicit directory allocation addresses the recorded default-temp failure without broadening filesystem permissions. New owner-scoped source and receipt directories are separately required because the failed attempt left fixed directories on retained disk.
+
+Custody: a successor may derive retained assembled-image identity from original assembly plus the failed qualification endpoint and current worker disk hash, joined to stopped/cgroup/loop observations. Preserve failed qualification status; do not claim new Qcase success or reuse stale disk custody.
+
+Limitations and next action: no gate, daemon, mount or runtime was executed. Require the separate directory correction, exact current predecessor and input bindings, prospective budget review and publication before any next attempt. Review is independent of authorship but informed by prior diagnosis. Exact hashes are in review.json and frozen-plan.json.

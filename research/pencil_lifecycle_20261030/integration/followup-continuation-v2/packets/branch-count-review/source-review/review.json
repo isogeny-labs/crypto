@@ -1,0 +1,81 @@
+{
+  "schema": "formal.source-review/v1",
+  "task": "T-1358",
+  "reviewed_commit": "5342909fbcaffae8f8bce2b290bdc095d47eccb6",
+  "machine_status": "not_verified",
+  "machine_note": "No fresh Lean replay by this source-fidelity reviewer; producer checks retained, separate replay obligation",
+  "fidelity": "faithful_scoped",
+  "outcome": "source_joints_hold_pending_machine_review",
+  "claims": [
+    {
+      "name": "constraint_bound",
+      "fidelity": "faithful_scoped",
+      "joint": "counter placement"
+    },
+    {
+      "name": "anchor_bound",
+      "fidelity": "faithful_scoped",
+      "joint": "counter placement"
+    },
+    {
+      "name": "same_bound",
+      "fidelity": "faithful_scoped",
+      "joint": "counter placement"
+    },
+    {
+      "name": "union_bound",
+      "fidelity": "faithful_scoped",
+      "joint": "counter placement"
+    },
+    {
+      "name": "run_bounds",
+      "fidelity": "faithful_scoped",
+      "joint": "counter placement"
+    },
+    {
+      "name": "update_exact",
+      "fidelity": "faithful_scoped",
+      "joint": "four independent strict overflow bounds"
+    }
+  ],
+  "concrete_mismatches": [],
+  "review_attestation": {
+    "reviewer": "/root/array_independent_review",
+    "non_author": true,
+    "prior_related_authorship": "stored Jacobian validity wrapper, not branch counters",
+    "joints_owned": [
+      "source-counter-placement",
+      "overflow-premise fidelity"
+    ],
+    "sources_read": [
+      "committed review-plan.md",
+      "CountHelpers.lean.txt",
+      "CountDispatch.lean.txt",
+      "CounterUpdate.lean.txt",
+      "BranchReadback.lean.txt",
+      "REPORT.md",
+      "status.json",
+      "graph-data.json",
+      "native-counters.rs.txt",
+      "source-binding.json",
+      "native-full.rs:1490-1711",
+      "WordCounter.lean.txt",
+      "DispatchConsequences.lean.txt",
+      "/var/tmp/pencil-word-union-20261101-v1/WordConstraint.lean:1-23",
+      "/var/tmp/pencil-word-union-20261101-v1/WordSameRoot.lean:38-66",
+      "review-evidence/references/lean-review.md"
+    ],
+    "sibling_reports_accessed": false,
+    "blind_rederivation": false,
+    "inherited_context": true,
+    "verdict": "holds"
+  },
+  "scope_exclusions": [
+    "full projection proof review",
+    "fresh Lean verification",
+    "native failure chronology",
+    "other counter and integer overflow",
+    "ring operation costs",
+    "scientific results"
+  ]
+}

@@ -5,6 +5,7 @@ directory per paper.
 
 | directory | title | status |
 |---|---|---|
+| [nist-exact-pair-audit-20261030/](nist-exact-pair-audit-20261030/) | Exact Label-Allocation Audit of Frobenius Splitting Scores | anonymous verified addendum; exact tail 5869345/20037600; no newly sampled curve; public generator base-change interpretation; historical cause and weakness remain open; not submitted |
 | [nist-broader-census-20261030/](nist-broader-census-20261030/) | Scope Dependence of Strict Splitting Counts: An Exact Check of 69 Recorded Seed Positions | anonymous verified addendum; all 82 branches retained; splitting alone fails throughout 100--5000 on the broader cohort; original narrow result preserved; historical selection and weakness remain open; not submitted |
 | [nist-expanded-cutoff-20261030/](nist-expanded-cutoff-20261030/) | Cutoff Sensitivity of Strict Splitting Counts: An Exact Extension to 5000 on the Fixed Curve Cohort | anonymous exact-reanalysis report; full 100--5000 sweep independently verified; only 32 of 4901 integer cutoffs separate; random-curve baseline and historical/weakness conclusions remain open; not submitted |
 | [nist-strict-splitting-20261029/](nist-strict-splitting-20261029/) | Strict Splitting Counts in Reconstructed Elliptic-Curve Candidate Streams: An Exact Reproduction and Its Limits | anonymous ePrint-style replication draft; previously reported empirical separator reproduced on 21 choices; historical use and weakness unproved; not submitted |

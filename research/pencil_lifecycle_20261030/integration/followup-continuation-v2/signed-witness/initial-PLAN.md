@@ -1,0 +1,7 @@
+# Exact target-information certificates for retained streams
+
+Frozen scope: all 64 native software streams already retained in signed-native-restarts/native-streams.tar, checked against every named stream digest in its manifest. No collector rerun. Extract each final relation system from edge events and any identity events. Node0 is known zero and is omitted; rows are [U,-b,-a], encoding U*x-b*k-a=0. Repeated nodes accumulate coefficients modulo r. Final node width is fixed per stream.
+
+Use separately written modular Gaussian elimination to produce one of: a row combination [0,1,-k], an affine solution at k=0 plus a null direction with target coordinate1, or a contradictory row combination [0,0,1]. A separate checker uses direct modular sums only, with no elimination/inverse/native graph calls. Verify every produced certificate; compare with the retained terminal scalar/cap status without changing it. Preserve mismatches and all capped cases. Synthetic determined/undetermined/inconsistent controls and corrupted certificates must pass/reject as specified.
+
+This is exact offline software/mathematical validation, not a new cohort, timing comparison or cost claim. Limits: one local process, 180 seconds, 1 GiB virtual memory; at most 512 rows and 2048 nuisance columns per system; prime at most1000000; input archive pinned. No automatic retry or expanded inputs. The original 1,260-target goal, source-group verification records and scientific execution gates remain intact. Independent source-fidelity review remains pending.

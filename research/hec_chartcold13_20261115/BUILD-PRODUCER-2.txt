@@ -1,0 +1,169 @@
+   Compiling hec-chart-cold13 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_chartcold13_20261115)
+warning: function `reduce` is never used
+   --> verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hec-chart-cold13` (bin "verify13") generated 1 warning
+error[E0425]: cannot find function `splitmix64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:511:21
+    |
+511 |                 s = splitmix64(s);
+    |                     ^^^^^^^^^^ not found in this scope
+    |
+note: function `crate::target_program::target::splitmix64` exists but is inaccessible
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:1:1
+    |
+  1 | fn splitmix64(mut x: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessible
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:747:61
+    |
+747 |         if !(QUARTIC_MIN_P..QUARTIC_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                             ^^^^^^^^^^^^ not found in this scope
+    |
+note: function `crate::target_program::target::is_prime_u64` exists but is inaccessible
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessible
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:763:65
+    |
+763 |         if !(QUARTIC_MIN_P..QUARTIC_LAW_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                                 ^^^^^^^^^^^^ not found in this scope
+    |
+note: function `crate::target_program::target::is_prime_u64` exists but is inaccessible
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessible
+
+error[E0425]: cannot find function `splitmix64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:511:21
+    |
+511 |                 s = splitmix64(s);
+    |                     ^^^^^^^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:1:1
+    |
+  1 | fn splitmix64(mut x: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | |
+    | `crate::conic::target::splitmix64`: not accessible
+    | `crate::model::target::splitmix64`: not accessible
+    | `crate::target::splitmix64`: not accessible
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:747:61
+    |
+747 |         if !(QUARTIC_MIN_P..QUARTIC_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                             ^^^^^^^^^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | |
+    | `crate::conic::target::is_prime_u64`: not accessible
+    | `crate::model::target::is_prime_u64`: not accessible
+    | `crate::target::is_prime_u64`: not accessible
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:763:65
+    |
+763 |         if !(QUARTIC_MIN_P..QUARTIC_LAW_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                                 ^^^^^^^^^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> ../hec_alignment13_20261115/atlas/target_api.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | |
+    | `crate::conic::target::is_prime_u64`: not accessible
+    | `crate::model::target::is_prime_u64`: not accessible
+    | `crate::target::is_prime_u64`: not accessible
+
+error[E0425]: cannot find function `splitmix64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:511:21
+    |
+511 |                 s = splitmix64(s);
+    |                     ^^^^^^^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> ../hec_calibrationfiber13_20261115/target_support.rs:1:1
+    |
+  1 | fn splitmix64(mut x: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::target::splitmix64`: not accessible
+    |
+   ::: ../hec_alignment13_20261115/atlas/target_api.rs:1:1
+    |
+  1 | fn splitmix64(mut x: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::mapper::target::splitmix64`: not accessible
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:747:61
+    |
+747 |         if !(QUARTIC_MIN_P..QUARTIC_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                             ^^^^^^^^^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> ../hec_calibrationfiber13_20261115/target_support.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::target::is_prime_u64`: not accessible
+    |
+   ::: ../hec_alignment13_20261115/atlas/target_api.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::mapper::target::is_prime_u64`: not accessible
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:763:65
+    |
+763 |         if !(QUARTIC_MIN_P..QUARTIC_LAW_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                                 ^^^^^^^^^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> ../hec_calibrationfiber13_20261115/target_support.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::target::is_prime_u64`: not accessible
+    |
+   ::: ../hec_alignment13_20261115/atlas/target_api.rs:8:1
+    |
+  8 | fn is_prime_u64(p: u64) -> bool {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::mapper::target::is_prime_u64`: not accessible
+
+error[E0425]: cannot find function `splitmix64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:511:21
+    |
+511 |                 s = splitmix64(s);
+    |                     ^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:747:61
+    |
+747 |         if !(QUARTIC_MIN_P..QUARTIC_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                             ^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:763:65
+    |
+763 |         if !(QUARTIC_MIN_P..QUARTIC_LAW_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                                 ^^^^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `hec-chart-cold13` (bin "generate13") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `hec-chart-cold13` (bin "recover13") due to 3 previous errors
+error: could not compile `hec-chart-cold13` (bin "descent13") due to 3 previous errors
+error: could not compile `hec-chart-cold13` (bin "fiberalign13") due to 3 previous errors

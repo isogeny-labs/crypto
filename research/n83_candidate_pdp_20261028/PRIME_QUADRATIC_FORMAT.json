@@ -1,0 +1,49 @@
+{
+  "schema": "n83.prime-quadratic-format/v1",
+  "status": "bounded_production_contract",
+  "encoding": "UTF-8 JSON; field elements as canonical decimal strings; indices zero-based",
+  "template": {
+    "variables": "7 selectors per block in block-major order then m-2 unrestricted intermediate U variables",
+    "columns": "generator-major, then lexicographic pairs a<=b excluding a=b<7m",
+    "column_count": "(m-1)*((8m-2)*(8m-1)/2-7m)",
+    "monomial": "Sorted list of six variable indices; repeated selectors reduce to zero, U exponents unrestricted",
+    "pivot_rows": "Original coefficient row [column,decimal coefficient], monomial, pivot column and nonzero pre-normalization pivot",
+    "replay": "Reconstruct all original coefficients and deterministic sparse Gaussian elimination; reported rank alone is insufficient"
+  },
+  "coverage": {
+    "construction": "For every local pair i<=j, pad {i,j} with smallest missing indices to seven, then deduplicate",
+    "validation": "Every ordered pair in0..26 x0..26 covered by at least one subset; every U retained",
+    "purpose": "Coefficient restrictions of original27-selector system, not replacement factor bases"
+  },
+  "bounds": {
+    "success": "Full rank plus source normalization and pair-cover proof implies FFD>=7",
+    "deficiency": "Inconclusive for original system; no lifted kernel claimed",
+    "lfd": "No new claim",
+    "current_production": "Governed by the separate frozen protocol and run records; development records do not supply production bounds"
+  },
+  "development_summary": "validation-prime-quadratic-development/summary.json; layout fields are exact domain dimensions, not measured ranks or memory bounds",
+  "bounded_contract": "PRIME_QUADRATIC_BOUNDED.md",
+  "journal": {
+    "encoding": "UTF-8 JSONL; each event flushed; canonical coefficients are decimal strings",
+    "events": [
+      "header",
+      "column",
+      "pending_column",
+      "matrix_complete",
+      "row_complete",
+      "pending_row",
+      "terminal"
+    ],
+    "column": "column index plus exact [sorted monomial,coefficient] pairs",
+    "row_complete": "matrix row cursor,monomial,pivot record or null,cumulative reduction updates and basis entries",
+    "pending_row": "partially reduced row plus next reducer or null for pending insertion",
+    "terminal": "complete certificate or capped record with null certificate",
+    "hard_interruption": "Unverified prefix only; do not report a successful replay"
+  },
+  "attempt": "Per-template producer/replay exit codes,timeouts,started flags,result/journal hashes;125 indicates replay not attempted",
+  "assembly": "All42 source checks; new bound only when producer and fresh replay both succeeded and complete projected map is injective",
+  "replay_commands": [
+    "instrument template-replay M LIMITS TEMPLATE_DIR",
+    "instrument assemble-replay ROOT PROTOCOL RESULTS"
+  ]
+}

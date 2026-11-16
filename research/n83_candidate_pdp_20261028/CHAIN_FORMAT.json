@@ -1,0 +1,43 @@
+{
+  "schema": "n83.chain-format/v1",
+  "scope": "84 retained binary/Koblitz systems m3..9, original/baseline/spike40, planted/natural; original top-form degree bounds only",
+  "files": {
+    "protocol-chain.json": "Frozen source/binary/case/base identities, limits and analysis plan",
+    "inputs/<key>/input.json": "Exact previous metadata",
+    "inputs/<key>/system.sing": "Exact previous complete Singular source",
+    "certificates/global.json": "Rabin field proof; full83 and both selector27 Moore matrices/inverses; first/middle cubic coefficient certificates for both domains",
+    "certificates/controls.json": "30 explicit tiny Hilbert matrix calculations plus128 arithmetic checks",
+    "certificates/<key>.json": "Complete input identity, all coordinate source-line hashes/top counts, selected disjoint blocks, final quadratic embedding relations, lower projection and full-system interval",
+    "certificates/partial-summary-NNN.json": "Immutable cumulative snapshot after NNN cases; every snapshot retained",
+    "certificates/summary.json": "All84 case results or explicit errors; unknown exact values are null",
+    "replay.json": "Fresh-process recomputation summary hash and acceptance",
+    "instrument": "Pinned native executable",
+    "development-validation/": "Unit, build, Lean, controls and pre-freeze logs",
+    "status.json": "Producer/replay exit codes",
+    "terminal.json": "Batch status and diagnostic times",
+    "manifest.sha256": "Every raw file except manifest itself; verify before/after restored replay"
+  },
+  "encodings": {
+    "field": "Unsigned DECIMAL strings represent coefficients by bits in K=F2[z]/(z^83+z^45+z^2+z+1); parse exact integers",
+    "modulus_hex": "HEX bit polynomial includes leading degree83 bit",
+    "matrix": "Row k,col i equals weight_i^(2^k). Full83 matrix changes all intermediate coordinates; selector27 matrix uses first27 embeddings. Stored inverses verified both ways.",
+    "coordinate_equation_coefficients": "83 decimal K scalars combine source coordinate equations r=0..82 in a single chain group",
+    "coefficient_u128le_sha256": "SHA256 of verified coefficients as16-byte little-endian integers in lexicographic Cartesian product order; for quadratic embedding proofs order is abstract product basis1,z,...,z^82",
+    "blocks": "start_zero_based and width specify original variables; Singular v(i) is one-based",
+    "chain_equation": "Zero-based S3 group; its coordinate r has one-based I[83*k+r+1]",
+    "top_counts": "Number of canonical highest-degree monomials in each coordinate; every actual coefficient checked and expected support count matched",
+    "p0_scale": "c_k=t^(2^k-1) for nonzero t; P_k+c_k*P_0 equals stored original-quadratic combination",
+    "lower_retained_variables": "Projection retains first27 base selectors plus all83(m-2) intermediate variables",
+    "upper_bound": "N-27*number_of_selected_disjoint_components+1, N=27m+83(m-2)",
+    "hashes": "SHA256 over exact file/line bytes; source_line_sha256 excludes line-ending newline"
+  },
+  "claims_not_made": [
+    "Exact full-chain regularity where bounds differ",
+    "Exact full Hilbert functions",
+    "Affine solving degree",
+    "LFD or universal FFD/LFD result",
+    "Elite-base improvement",
+    "Timing comparison"
+  ],
+  "replay": "Extract complete raw archive to a fresh root; sha256sum -c manifest.sha256; instrument replay ROOT; recheck manifest. Never run producer into an existing root."
+}

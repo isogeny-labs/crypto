@@ -1,0 +1,21 @@
+import Support
+namespace NormalizationInverseControls
+open Polynomial MumfordNormalization MumfordValidity NormalizationInverse
+ theorem point_fixture : forward (2:ℚ) 3 (5,8)=(1,1) := by norm_num [forward]
+ theorem inverse_fixture : backward (2:ℚ) 3 (1,1)=(5,8) := by norm_num [backward]
+ theorem signed_fixture : forward (2:ℚ) 3 (5,-8)=(1,-1) := by norm_num [forward]
+ theorem omitted_y_scaling : ¬onCurve (T 6 (2:ℚ) 3 (C 64)) (1,8) := by
+  norm_num [onCurve,eval_transport]
+ theorem zero_scale_not_injective : ¬Function.Injective (forward (0:ℚ) 3) := by
+  intro h
+  have he : forward (0:ℚ) 3 (0,0)=forward (0:ℚ) 3 (1,0) := by simp [forward]
+  have hn := congrArg Prod.fst (h he)
+  norm_num at hn
+ theorem polynomial_round_trip : T 2 (2:ℚ)⁻¹ (-3/2) (T 2 2 3 (X^2-1))=X^2-1 :=
+  inverse_left 2 2 3 (by norm_num) _
+ theorem support_fixture : onSupport (X-5 : ℚ[X]) (C 8) (5,8) := by
+  norm_num [onSupport]
+ theorem signed_support_transport : onSupport (T 1 (2:ℚ) 3 (X-5)) (T 3 2 3 (C 8)) (1,1) := by
+  apply (support_iff 1 2 3 (by norm_num) _ _ (1,1)).2
+  norm_num [onSupport,backward]
+end NormalizationInverseControls

@@ -1,0 +1,63 @@
+{
+  "schema": "n83.factor-base-variant-source-index/v9",
+  "source_prefix_rule": "For each unique Job root runs/n83-fb-variants-rNN-20261031-r1/, immutable factor-base source/assets are downloaded by exact keys from runs/n83-fb-variants-r27-20261031-r4/source-v4/; the corrected runner plus this v9 protocol/index and the same coordinate-derived command are downloaded from that Job root source-v9/. The launcher derives NN from the exact Job-root name, validates NN in 29..39, then passes it to the runner. The final Pod-scoped ISOLAB_RESULTS_URI is never used as a local path.",
+  "protocol_sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2",
+  "source_commit": "cf4c4829ea821909e76cd50556b58b43ea945d87",
+  "instrument_binary_sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+  "entries": [
+    {
+      "path": "src/bin/factor_base.rs",
+      "bytes": 18424,
+      "sha256": "c67dd93d827936fb8c8bde0e0158f3ff82cd63c06eadb960e2539be6f0e00dd9",
+      "role": "native_source"
+    },
+    {
+      "path": "src/field.rs",
+      "bytes": 10035,
+      "sha256": "dd297b8ec1297a7e84ce2728e748c7ce511217b7d8c62d134d4ffa012574150d",
+      "role": "native_source"
+    },
+    {
+      "path": "FORMAT.json",
+      "bytes": 1535,
+      "sha256": "baea1b3362eccacf7af41132f4a7dc571e783f861e557b46c811d61ac2c3befd",
+      "role": "base_file_format"
+    },
+    {
+      "path": "FACTOR_BASE_VARIANT_SWEEP_DESIGN.md",
+      "bytes": 5578,
+      "sha256": "a2c8e601f5e8fbb504b11c1572746878875b5ba8b8941883670f988174dfdb0c",
+      "role": "design"
+    },
+    {
+      "path": "RUN_OUTPUT_FORMAT.json",
+      "bytes": 2430,
+      "sha256": "e23469a9a5b7b095a501a4fb50f1b17c7b872968d4eb8243e9e3d5bd0dfd574b",
+      "role": "run_output_format"
+    },
+    {
+      "path": "run-base-variant-v2.sh",
+      "bytes": 6888,
+      "sha256": "a880a3e5bc844b4391af27e170ac88da9a727a453aec463360f405bb970acd98",
+      "role": "runner"
+    },
+    {
+      "path": "target/release/factor_base",
+      "bytes": 1675832,
+      "sha256": "949b020e880f1b638d43fdd79bbebe842b2d91d8ccbabcb94a849f22629eb9f2",
+      "role": "instrument_binary"
+    },
+    {
+      "path": "protocol-factor-base-variants-v9-r29-39.json",
+      "bytes": 82764,
+      "sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2",
+      "role": "frozen_protocol"
+    },
+    {
+      "path": "protocol-factor-base-variants-v9-r29-39.sha256",
+      "bytes": 111,
+      "sha256": "d94ee42ad9ed8864ac06242db81987a0f9a8bcae035436f56326cee20c43ef88",
+      "role": "protocol_hash"
+    }
+  ]
+}

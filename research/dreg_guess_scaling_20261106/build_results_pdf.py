@@ -1,0 +1,51 @@
+# Renders RESULTS.md (headings, paragraphs, bullets, tables, one image) to RESULTS.pdf. Layout only.
+import re
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, ListFlowable, ListItem
+from reportlab.lib import colors
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+for name, f in [('DV', 'DejaVuSans.ttf'), ('DVB', 'DejaVuSans-Bold.ttf'), ('DVM', 'DejaVuSansMono.ttf')]:
+    pdfmetrics.registerFont(TTFont(name, '/usr/share/fonts/truetype/dejavu/' + f))
+pdfmetrics.registerFontFamily('DV', normal='DV', bold='DVB', italic='DV', boldItalic='DVB')
+ss = getSampleStyleSheet()
+for s in ss.byName.values():
+    s.fontName = 'DVB' if s.name.startswith(('Heading', 'Title')) else 'DV'
+body = ParagraphStyle('b', parent=ss['BodyText'], fontSize=8.6, leading=11.2)
+cell = ParagraphStyle('c', parent=body, fontSize=7.4, leading=9.2)
+def md(t):
+    t = t.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    t = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', t)
+    t = re.sub(r'`(.+?)`', r'<font face="DVM" size="7.6">\1</font>', t)
+    t = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', t)
+    return t.replace('\\|', '|')
+lines = open('RESULTS.md').read().split('\n'); story = []; i = 0
+while i < len(lines):
+    l = lines[i]
+    if l.startswith('# '): story += [Paragraph(md(l[2:]), ss['Title'])]
+    elif l.startswith('## '): story += [Spacer(1, 5), Paragraph(md(l[3:]), ss['Heading2'])]
+    elif l.startswith('!['): story += [Image('results.png', width=180*mm, height=67*mm)]
+    elif l.startswith('|'):
+        rows = []
+        while i < len(lines) and lines[i].startswith('|'):
+            if not re.match(r'^\|[\s:\-|]+\|$', lines[i]):
+                rows.append([Paragraph(md(c.strip()), cell) for c in re.split(r'(?<!\\)\|', lines[i])[1:-1]])
+            i += 1
+        n = len(rows[0]); w = 180*mm / n
+        t = Table(rows, colWidths=[w]*n, repeatRows=1)
+        t.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.3, colors.grey), ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#e8edf3')), ('VALIGN', (0,0), (-1,-1), 'TOP')]))
+        story += [t, Spacer(1, 4)]; continue
+    elif re.match(r'^(\d+\.|-) ', l):
+        items = []
+        while i < len(lines) and re.match(r'^(\d+\.|-) ', lines[i]):
+            items.append(ListItem(Paragraph(md(re.sub(r'^(\d+\.|-) ', '', lines[i])), body))); i += 1
+        story += [ListFlowable(items, bulletType='bullet', start='•', leftIndent=10)]; continue
+    elif l.strip():
+        para = [l.strip()]
+        while i + 1 < len(lines) and lines[i+1].strip() and not re.match(r'^(#|\||!\[|\d+\. |- )', lines[i+1]):
+            i += 1; para.append(lines[i].strip())
+        story += [Paragraph(md(' '.join(para)), body), Spacer(1, 3)]
+    i += 1
+SimpleDocTemplate('RESULTS.pdf', pagesize=A4, leftMargin=15*mm, rightMargin=15*mm, topMargin=14*mm, bottomMargin=14*mm, title='dreg guess scaling results').build(story)

@@ -1,0 +1,298 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc-c2",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wsum:coef=15,free=1",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x05-j4-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.5,jumps=4,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x05-j4-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.5,jumps=4,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x05-j8-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.5,jumps=8,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x05-j8-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.5,jumps=8,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x05-j16-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.5,jumps=16,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x05-j16-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.5,jumps=16,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x07-j4-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=4,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x07-j4-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=4,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x07-j8-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=8,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x07-j8-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=8,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x07-j16-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=16,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x07-j16-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,jumps=16,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x10-j4-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.0,jumps=4,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x10-j4-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.0,jumps=4,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x10-j8-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.0,jumps=8,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x10-j8-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.0,jumps=8,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x10-j16-w",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.0,jumps=16,g=1,grow=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "c1-x10-j16-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.0,jumps=16,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "description": "research/curve25519_autolab_20261104/c1: C = 1 boundary study (owner approved 2026-11-07, labelled boundary result outside the main ratchet). In-sample screen on the five multi-curve curves; confirmation uses five fresh sibling curves (confirm-curves.json) and one pre-registered arm per size. Public synthetic targets; no security claim.",
+ "label": "C = 1 boundary screen k = 20: one-seed wwalk (seed=run) on five dev curves",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 20261530,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 63700,
+    "b": 872826,
+    "gx": 349837,
+    "gy": 122,
+    "group_order": 1049624,
+    "p": 1048573,
+    "r": 131203,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 1048538,
+    "b": 14,
+    "gx": 16,
+    "gy": 48572,
+    "group_order": 1050536,
+    "p": 1048549,
+    "r": 131317,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 764849,
+    "b": 152118,
+    "gx": 699367,
+    "gy": 210922,
+    "group_order": 1048808,
+    "p": 1048357,
+    "r": 131101,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 58025,
+    "b": 357343,
+    "gx": 1185,
+    "gy": 430240,
+    "group_order": 1048904,
+    "p": 1048213,
+    "r": 131113,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 396530,
+    "b": 125505,
+    "gx": 469,
+    "gy": 65518,
+    "group_order": 1049144,
+    "p": 1047997,
+    "r": 131143,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261520,
+  "targets_per_curve": 12
+ }
+}

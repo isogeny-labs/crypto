@@ -1,0 +1,36 @@
+{
+  "schema": "native-local-algebra-length-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "actual-local-length",
+      "expected_decl_sha256": "58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249",
+      "full_characters": 771,
+      "full_decl_sha256": "58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249",
+      "full_normalized_signature": "theorem actual_local_algebra_length_certificate : (∀ (K : Type*) [Field K], (∀ m : ℕ, Module.length (Thick K m) (Thick K m) = m ∧ Module.length (BiAlgebra K m) (BiAlgebra K m) = m) ∧ (∀ m : ℕ, 0 < m → IsLocalRing (Thick K m) ∧ IsLocalRing (BiAlgebra K m) ∧ ∀ (L : Type*) [Field L] [Algebra K L], Nat.card (Solution (biIdeal K m) L) = 1) ∧ (Module.length (Thick K 0) (Thick K 0) = 0 ∧ ¬IsLocalRing (Thick K 0) ∧ Module.length (BiAlgebra K 0) (BiAlgebra K 0) = 0 ∧ ¬IsLocalRing (BiAlgebra K 0)) ∧ (∀ b : ℕ, ∃ m : ℕ, 1 < m ∧ (b : ℕ∞) < Module.length (BiAlgebra K m) (BiAlgebra K m) ∧ IsLocalRing (BiAlgebra K m))) ∧ (Nat.card F4 = 4 ∧ IsLocalRing F4 ∧ Module.finrank F2 F4 = 2 ∧ Module.length F4 F4 = 1 ∧ Module.length F2 F4 = 2 ∧ ¬Module.length F4 F4 = Module.length F2 F4)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "actual_local_algebra_length_certificate",
+        "end_byte": 1031,
+        "file": "/workspace/scratch/local-length-input01/LocalLengthCertificate.lean",
+        "qualified_decl_id": "LocalAlgebraLengthAudit.actual_local_algebra_length_certificate",
+        "signature": "theorem actual_local_algebra_length_certificate :\n    (∀ (K : Type*) [Field K],\n      (∀ m : ℕ, Module.length (Thick K m) (Thick K m) = m ∧\n        Module.length (BiAlgebra K m) (BiAlgebra K m) = m) ∧\n      (∀ m : ℕ, 0 < m → IsLocalRing (Thick K m) ∧ IsLocalRing (BiAlgebra K m) ∧\n        ∀ (L : Type*) [Field L] [Algebra K L], Nat.card (Solution (biIdeal K m) L) = 1) ∧\n      (Module.length (Thick K 0) (Thick K 0) = 0 ∧ ¬IsLocalRing (Thick K 0) ∧\n        Module.length (BiAlgebra K 0) (BiAlgebra K 0) = 0 ∧ ¬IsLocalRing (BiAlgebra K 0)) ∧\n      (∀ b : ℕ, ∃ m : ℕ, 1 < m ∧\n        (b : ℕ∞) < Module.length (BiAlgebra K m) (BiAlgebra K m) ∧\n        IsLocalRing (BiAlgebra K m))) ∧\n    (Nat.card F4 = 4 ∧ IsLocalRing F4 ∧ Module.finrank F2 F4 = 2 ∧\n      Module.length F4 F4 = 1 ∧ Module.length F2 F4 = 2 ∧\n      ¬Module.length F4 F4 = Module.length F2 F4)",
+        "start_byte": 113
+      },
+      "recorded_statement": "theorem actual_local_algebra_length_certificate : (∀ (K : Type*) [Field K], (∀ m : ℕ, Module.length (Thick K m) (Thick K m) = m ∧ Module.length (BiAlgebra K m) (BiAlgebra K m) = m) ∧ (∀ m : ℕ, 0 < m → IsLocalRing (Thick K m) ∧ IsLocalRing (BiAlgebra K m) ∧ ∀ (L : Type*) [Field L] [Algebra K L], Nat.card (Solution (biIdeal K m) L) = 1) ∧ (Module.length (Thick K 0) (Thick K 0) = 0 ∧ ¬IsLocalRing (Thick K 0) ∧ Module.length (BiAlgebra K 0) (BiAlgebra K 0) = 0 ∧ ¬IsLocalRing (BiAlgebra K 0)) ∧ (∀ b : ℕ, ∃ m : ℕ, 1 < m ∧ (b : ℕ∞) < Module.length (BiAlgebra K m) (BiAlgebra K m) ∧ IsLocalRing (BiAlgebra K m))) ∧ (Nat.card F4 = 4 ∧ IsLocalRing F4 ∧ Module.finrank F2 F4 = 2 ∧ Module.length F4 F4 = 1 ∧ Module.length F2 F4 = 2 ∧ ¬Module.length F4 F4 = Module.length F2 F4)",
+      "recorded_text_sha256": "58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249",
+      "source_plan": "research/local_algebra_length_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "LocalAlgebraLengthAudit.actual_local_algebra_length_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source-processing check; entire written self-module length/locality/support/zero/unbounded/residue-degree certificate. Not proved by mathematical certificate."
+}

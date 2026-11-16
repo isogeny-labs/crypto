@@ -1,0 +1,144 @@
+{
+  "schema": "validator-report",
+  "status": "pass",
+  "study": "research/dreg_m4_link_guess_d3_20261106",
+  "recomputed_by": {
+    "tool": "examples/dreg_m4_link_score.rs",
+    "command": "dreg_m4_link_score --plot-data research",
+    "binary_sha256": "00e0e30cf6214482c9bee62eb7037cc452cd539ed7e1b8dd297a5ced5d04afa0"
+  },
+  "note": "Producer-run recompute of the RESULTS.md headline numbers. The 16 branch-record files live in the artifact store; runs/.artifacts.json (pinned here) pins each by SHA-256, and artifact_store_files repeats those pins as the scorer read them. Unsigned, so independence is not established.",
+  "headline": [
+    {
+      "name": "arm I refuting branches (of 8192)",
+      "claimed": 1888,
+      "recomputed": 1888,
+      "rel_tol": 0
+    },
+    {
+      "name": "arm R refuting branches (of 8192)",
+      "claimed": 1312,
+      "recomputed": 1312,
+      "rel_tol": 0
+    },
+    {
+      "name": "draws with I > R",
+      "claimed": 4,
+      "recomputed": 4,
+      "rel_tol": 0
+    },
+    {
+      "name": "draws with R > I",
+      "claimed": 3,
+      "recomputed": 3,
+      "rel_tol": 0
+    },
+    {
+      "name": "two-sided sign test p",
+      "claimed": 1.0,
+      "recomputed": 1.0000,
+      "rel_tol": 1E-9
+    }
+  ],
+  "disagreements": [],
+  "raw_data": [
+    {
+      "path": "examples/dreg_m4_link_score.rs",
+      "sha256": "236d9b69a585a5c72d5d8a2f0f72baaa6d2ba45e7a4a2ed93a6e58677d33b667"
+    },
+    {
+      "path": "research/dreg_closure_driver_20261016/draws/m4-11-5.jsonl",
+      "sha256": "6202db301397a7dfccf6a4cc2a076b02606bd71935d7c86fff71f9008a5470d0"
+    },
+    {
+      "path": "research/dreg_closure_driver_20261016/draws/m4-12-5.jsonl",
+      "sha256": "ec26d4668e3afec0a08f2f74f043b90909690fcd05865f5bb2e958e87002ed7e"
+    },
+    {
+      "path": "research/dreg_invariant_guess_20261029/runs/S3.d5.b0.jsonl",
+      "sha256": "a0477e259d0991fd77b039e40656a94defb27a1e72d4ce6bc1dfe3f9a0ebf250"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/PREREGISTRATION.md",
+      "sha256": "22c28eacc1045dbc295ef049f2360198367dd39ef0b2f3df20e53f3dc590b2f7"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/N.d5.jsonl",
+      "sha256": "1b968b76fe9cb3014254bc2842cf5f3775eeb1cb44a4de44b391871114120863"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/score-output.txt",
+      "sha256": "1d5c1801f33a85e2cd67a13d0d69af1cdf7709f7167395bf18d755ba6f5f54fa"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/.artifacts.json",
+      "sha256": "b306ff819eb944a8ba939f68831145ec7b97c9e345cd236a97fb68b4e1bc0f40"
+    }
+  ],
+  "artifact_store_files": [
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d107.jsonl",
+      "sha256": "53787d0edddd67990f6e3f976e92180cac3c0dfa0e00682564d5696019be5fe0"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d143.jsonl",
+      "sha256": "4b5a87b4db374ce92ffd98921fb86d5e94b080ba7c0a4669be62b12076a451a3"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d24.jsonl",
+      "sha256": "c0e2456e73e6125c54d1bdc5953f3f87eb3a107bdb1e48a04b27c0c348598bb9"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d26.jsonl",
+      "sha256": "0f9141f6f8bdf22378ff1b916c4f4483749e40039cf5c1b8aaf9318c259fc8c5"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d47.jsonl",
+      "sha256": "4581d769b3ca73fb1e5c5cfea1a4680fc0ed0c6b69aad362910b1e30b2dc8664"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d52.jsonl",
+      "sha256": "e5cc5580bbfb3207186f2f472f7a058494a5b53e5a16d4e0fe5885be122078d1"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d67.jsonl",
+      "sha256": "3c193bef31ced6d73f1d26fd79734e2360f628d908bfa7e008caffab68bc417f"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/I.d8.jsonl",
+      "sha256": "b3b22e443846568f94fa6686ac40c3e2a91da689761441a49ef2dbe81dce2009"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d107.jsonl",
+      "sha256": "34797b6cd44e11d6272fc011a55c23ac47a2af6776bcab57ae0b87571a70d60f"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d143.jsonl",
+      "sha256": "b97521edc930e4ea6081afb142fb5fdfc23f3092b232d50e4c9f47cfe2d38fd3"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d24.jsonl",
+      "sha256": "3a1253deaa8b2c722ed4885d702b90f974293d5954d0e44122a516d8fa1b1cc9"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d26.jsonl",
+      "sha256": "680a97c3c3e01a9ab429d145035d0e9c16632eaafd445d3b57e37260dddc7d9b"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d47.jsonl",
+      "sha256": "c251de5c0fa362accfa71b36d48ce94f786c01dfaa8f019d2695f6be3294eab8"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d52.jsonl",
+      "sha256": "1b14e33030c0f5a4d208c971bc4072cda72828029559713e61a2629941a2382d"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d67.jsonl",
+      "sha256": "f531673b656bce423642f2afbb1f2e0e61d672b00a552644b9c37949574788d4"
+    },
+    {
+      "path": "research/dreg_m4_link_guess_d3_20261106/runs/R.d8.jsonl",
+      "sha256": "d9fedee82a40c39a21c940a65290ff2f561aa5fb678279fba15aae4343aba04e"
+    }
+  ]
+}

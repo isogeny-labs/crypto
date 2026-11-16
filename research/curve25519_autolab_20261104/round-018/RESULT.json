@@ -1,0 +1,108 @@
+{
+  "assessed": "2026-11-04T06:47:33Z",
+  "round": 18,
+  "rule": "improvement = paired sel/inc 95% interval below 1 at w = 0 and band order sel < inc at every weight; regression = interval above 1 or band inc < sel; else null",
+  "schema": "ic_autolab.result/v1",
+  "sizes": {
+    "28": {
+      "band_rho": "rho-neg < sel",
+      "band_verdict": "sel < inc",
+      "class": "improvement",
+      "distance_to_rho": {
+        "inc": [
+          7.566256252404772,
+          7.350723440663889,
+          6.347787844512525
+        ],
+        "sel": [
+          3.005073379871379,
+          3.0024785798021747,
+          2.9904042356070644
+        ]
+      },
+      "evidence": {
+        "binary_sha256": "e7242bc192bda8c8da9e64895afe943e8aa47cfa37bd490d656e2181758e9533",
+        "compare_verdict": "ops (ok): sel / inc = 0.3972 [0.372, 0.424] (linearised_t, df 31) over 64 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.3972, w=0.1: 0.4085, w=1: 0.4711): sel < inc at every weight; wall: admitted ns/GAE sel/inc 1.1819 [1.108, 1.261], bias-corrected 1.1746 [1.089, 1.267] (A/A 1.0062, includes arm A), outside noise; end-to-end wall 0.4694 [0.422, 0.522]; ns/GAE of inc, sel is an upper bound on its cost per operation (GAE is a lower bound)",
+        "levels": {
+          "verified": 480
+        },
+        "session_dir": "research/curve25519_autolab_20261104/round-018/sessions/holdout-k28",
+        "session_id": "ECBS1h22b557bd4431",
+        "spec_sha256": "29a1dde7fbf1cc6a6b5a08dbfb37699116dfd0b3f967cbf4904b4129c165e6bc",
+        "verify_exit": 0,
+        "verify_receipt": "research/curve25519_autolab_20261104/round-018/analysis/verify-holdout-k28.json",
+        "verify_receipt_sha256": "e44bf9dbe28a14610a5ebb0b91ef98dc430dbfe1a483c31ed36fa32930318e26"
+      },
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=18,scan_cap=288",
+        "family": "ksum4",
+        "n": 18,
+        "name": "ksum4-n18",
+        "oracle": "ksum:m=4"
+      },
+      "ratio": {
+        "aa": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "ratio": 1.0
+        },
+        "w0": {
+          "admissible": true,
+          "ci95": [
+            0.3718608413895012,
+            0.4241970300046374
+          ],
+          "ratio": 0.397167803947465,
+          "status": "ok"
+        },
+        "w0.1": {
+          "ci95": [
+            0.38007310158224816,
+            0.4389676681259063
+          ],
+          "ratio": 0.40846028340456847
+        },
+        "w1": {
+          "ci95": [
+            0.42577019542057193,
+            0.521242398777167
+          ],
+          "ratio": 0.47109391631482783
+        }
+      },
+      "s": {
+        "inc": [
+          7.425720320018521,
+          7.888081025342236,
+          12.049327373255668
+        ],
+        "rho_neg": [
+          0.9814259618365972,
+          1.073102680166922,
+          1.8981931451398388
+        ],
+        "sel": [
+          2.9492570322298226,
+          3.221967811129487,
+          5.6763648212264695
+        ]
+      },
+      "sel": {
+        "factor_base": "prime-projected-abscissa:size=3,scan_cap=48",
+        "family": "wsum-b12",
+        "n": 3,
+        "name": "wsum-b12-n3",
+        "oracle": "wsum:coef=12,free=1"
+      },
+      "why": [
+        "compare ops.status = ok, admissible = true",
+        "sel / inc = 0.3972 [0.372, 0.424] at w = 0",
+        "band: sel < inc",
+        "A/A inc-aa / inc interval [1.000, 1.000] contains 1"
+      ]
+    }
+  },
+  "track": "generic"
+}
