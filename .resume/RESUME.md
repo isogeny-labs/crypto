@@ -4378,3 +4378,156 @@ Implement candidate and frozen-reference units/controls, faithful word bridge wh
 
 ## Errors
 No native result yet, no original source/policy/verifier/gate change or paid/signed promotion. [pcc:unverified]
+
+---
+
+2026-11-16T19:12:22.521992+00:00
+# Preserve successful native units and broad immutable-baseline lint failures
+
+## What was done
+pcc/claims/PCC-20261116-0ebbb8.json: actual unit0/all3tests/all15frozen fixtures and cofactor/parity/two-sided/control checks pass. Every row original declared counters23/1/8, candidate16/1/3; no time/instruction/DLP gain. Complete whole run-tree archive/current target and source/environment/logs retained, expected caught originalzero panic explicit. Broad format1/Clippy101 on immutable original source style remain failures. [pcc:unverified]
+
+## Decisions made
+No original-byte edit or lint suppression. Run explicitly new-package format and strict no-deps Clippy under already frozen new-code scope; preserve broad failures and source pins. Then attempt raw word bridge with original gates and report exact program/field/counter/admission gaps. [pcc:unverified]
+
+## Open threads
+Scoped checks/word proof/report/CI/continuous commit, Root19:20/Consumer19:30 current-sourceCI/full replay/normal merge, original full science/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+Producer broad lint invocations included immutable historical reference. Broad failures stay1/101; no benchmark or native/general proof/signed/paid promotion. [pcc:unverified]
+
+---
+
+2026-11-16T19:14:41.335696+00:00
+# Complete scoped native code checks with frozen reference untouched
+
+## What was done
+pcc/claims/PCC-20261116-495eb9.json: new-package format0 and strict no-deps/all-target Clippy0, whole outputs/original source hash checks retained. Frozen baseline compiles/tests unchanged; broad historical source format1/Clippy101 remain rejected scope attempts0ebbb8. All15 first-unit rows/3tests unchanged, no redundant unit rerun. [pcc:unverified]
+
+## Decisions made
+Freeze current native candidate before raw-word formalization; retain declared counter diagnostic only, no time/physical/ECDLP gain. Attempt normalized UInt64 multiplication/subtraction/cofactor-to-Fin polynomial correspondence and overflow control under original dual proof gates. [pcc:unverified]
+
+## Open threads
+Faithful word bridge, native report/CI/continuous commit, Root19:20/Consumer19:30 current-sourceCI/full replay/normal merge; all original full scientific/admission/matched costs. [pcc:unverified]
+
+## Errors
+No baseline source mutation or suppressed original test. All broad style and previous proof/resource/metadata failures remain frozen; no signed/native-execution/paid/performance promotion. [pcc:unverified]
+
+---
+
+2026-11-16T19:16:54.224528+00:00
+# Preregister raw word cofactor refinement
+
+## What was done
+pcc/claims/PCC-20261116-bcce0b.json: exact originalWord/full04/current native code and real UInt64/Fin interfaces checked. Plan derives normalized raw multiply/subtract/cofactor-to-polynomial/canonical values, with large noncanonical overflow control, before source edits. [pcc:unverified]
+
+## Decisions made
+Exact oldWord prefix and original dualj1/120s/default memory, full source/log failures; no weaker decoded-only conclusion if raw canonical values are feasible. Full compiler/inversion/field/Jacobian/counter/cost scope remains open. [pcc:unverified]
+
+## Open threads
+Word07 attempt, native report/CI/commit, Root19:20/Consumer19:30 current ownCI/whole replay/normal merge; original full scientific/admission/cost. [pcc:unverified]
+
+## Errors
+No word result yet; all old failures including broad lint1/101 remain, no signed/native-execution/paid/performance promotion. [pcc:unverified]
+
+---
+
+2026-11-16T19:20:29.044376+00:00
+# Complete normalized raw word cofactor correspondence
+
+## What was done
+pcc/claims/PCC-20261116-15a361.json: source22bd90207f04182513291a40a25a52a951c975502d4eaf35c3985f8fdb2f0c16, exact originalWord01 prefix, both original gates42 audited/0 failing/0 trusted. Eleven full bindings cover mul/sub/no-overflow/canonicality/cofactor Fin polynomial and exact raw values, canonical/overflow controls. Four new generated equations retained in actual audit. [pcc:unverified]
+
+## Decisions made
+Freeze word07/source/proofs and nonfatal four deprecated-if warnings per build. Native unit3/15/counter diagnostics and scoped checks remain separate495eb9; prepare precise implementation/word report/CI/commit. Current RootCI19:20 now eligible, Consumer19:30 next. [pcc:unverified]
+
+## Open threads
+Original current head CI/store/full replay/gates/normal merge; new native/word report/CI/checkpoint; full compiler/base inversion/field/Jacobian/full original scientific/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+No first word07 proof failure. Old broad format1/Clippy101 and all proof/metadata/storage failures remain. No signed/native-execution/paid/runtime gain claimed. [pcc:unverified]
+
+---
+
+2026-11-16T19:32:44.838673+00:00
+# Observe currentc91 six proof successes and original S3 failure
+
+## What was done
+pcc/claims/PCC-20261116-8bffd9.json: current open/unstableheadc91, all six proof workflow statuses succeed. PCC/backend/leaderboard/validation fail original S3pull403; original migration now starts job133511935744 and fails HeadObject403 in upload/replay, no15-object closure observed. Full failed logs/metadata retained, whole proof archives being collected. [pcc:unverified]
+
+## Decisions made
+Keep merge blocked, update current store problem to distinguish progressed startup from remaining403. Inspect/map exact failed keys and original manifests without assuming absence or changing identity/role/provider/policy. No unchanged suite rerun; Consumer eligible19:30 next. [pcc:unverified]
+
+## Open threads
+Whole current7archives/all proof logs/full original byte replay/final gates/normal merge, native/word report/CI/commit, original full science/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+Old startup failure remains historical; current job fails inside original migrator. Tool warning is not proof of missing objects, cause unknown. No signed/native/paid/performance promotion. [pcc:unverified]
+
+---
+
+2026-11-16T19:43:29.907162+00:00
+# Close entire currentc91 six-proof CI custody
+
+## What was done
+pcc/claims/PCC-20261116-3dd59d.json: Seven whole ZIPs/413 regular members/all6proof+5failed logs/APIs retained; exact-source/workflow/original tools and both original9/13/37/24/55/17 audits0. Current migrator starts then fails S3Head403; PCCpartial explicitly failed. [pcc:unverified]
+
+## Decisions made
+Update current store problem and queue; no unchanged rerun/absence inference/identity workaround. Next unchanged Root observation23:20UTC. Finish native06/word07 report/CI/commit. [pcc:unverified]
+
+## Open threads
+Original authenticated store/full15 replay/final-head gates/reviews/normal merge, native report/checkpoint, full scientific/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+Old b846 startup0jobs remains historical; current startup progressed but access failure persists. No original data/gate/policy deletion or signed/native/paid/performance promotion. [pcc:unverified]
+
+---
+
+2026-11-16T19:49:14.514910+00:00
+# Freeze native cofactor report and exact-source CI
+
+## What was done
+pcc/claims/PCC-20261116-c13b66.json: implementation/all15 units/counter diagnostics0ebbb8 and scoped checks495eb9, word original dual42/0/11 bindings15a361 documented. Actual46663B2-page PDF both pages viewed/legible, new additive native+word workflow actionlint0. Full original sources/graphs/gates unchanged. [pcc:unverified]
+
+## Decisions made
+Commit completed substantive native06/word07/report/CI and full current ownCI3dd59d, publish normal expected-c91 descendant FF/tag; original store/policy/current gates remain required. Force-stage only the required already-generated Cargo.lock ignored by global rule, exact bytes retained. Next nonzero-norm proof is separately reviewed/preregistered before code. [pcc:unverified]
+
+## Open threads
+Original full17 prospective whole-object replay/final-head gates/reviews/normal merge; Consumer original store/current metadata checkpoint; full norm/base inverse/field/compiler/Jacobian/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+First report producer guessed incorrect binding filename and failed before outputs; full caller/diagnostic retained. Broad historical format1/Clippy101 remain failures; no physical/runtime/benchmark/paid/signed promotion. [pcc:unverified]
+
+---
+
+2026-11-16T19:53:02.653399+00:00
+# Preserve immutable unit-output whitespace checkpoint rejection
+
+## What was done
+pcc/claims/PCC-20261116-a27e40.json: first source checkpoint stops original cached2 on exact pinned0ebbb8 unit stdout line24/new blank EOF. Raw bytes/caller/diagnostic/alternate index retained, canonical5f7 unchanged, no commit. [pcc:unverified]
+
+## Decisions made
+Retain original whole2; scoped authored check excludes only this exact already-pinned raw receipt, no trim/rewrite. Continue with actual inherited staged alternate, never assume empty. Original17 prospective store replay/current gates remain required. [pcc:unverified]
+
+## Open threads
+Finish normal source checkpoint/publication, new ownCI/report/queue and reviewed next norm proof; all original scientific/runtime/admission/cost requirements. [pcc:unverified]
+
+## Errors
+Producer expected whole cached0 despite raw immutable output; corrected explicitly without changing source/proofs/policy or rewriting raw data. [pcc:unverified]
+
+---
+
+2026-11-16T19:55:27.527444+00:00
+# Checkpoint complete native cofactor and raw word bridge
+
+## What was done
+pcc/claims/PCC-20261116-4aa949.json: frozen native3tests/all15/counter diagnostics, word42/0/11bindings, inspected2-page report/new exact-source CI c13b66 and entire currentc91 custody3dd59d. Original5f7/c91 prefixes/prose/scoped-authored/actionlint0; original whole cached2 stays2 solely on immutable unit stdout/newblankEOF, preserved; original policy1 selects exactly2 new whole holds/cumulative17. Generic wiring1 unchanged5f7/not green. [pcc:unverified]
+
+## Decisions made
+Normal authored child5f7/expected-c91 descendant FF/new immutable tag; update existing ready4425 to completed component scope. Original authenticated full17 replay/final current-head gates remain required. New proof lead only after primary review/preregistration. [pcc:unverified]
+
+## Open threads
+Current new ownCI/gates/store/reviews/normal merge; Consumer metadata checkpoint and original store, full nonzero-norm/base inverse/compiler/field/Jacobian and original full scientific/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+Current S3403 remains, old startup failure historical; initial metadata/prose/index/storage/broad lint/proof failures retained. No policy/source/gate waiver or native-execution/paid/signed/performance promotion. [pcc:unverified]
