@@ -58,3 +58,6 @@ Build and validate full census under the exact new integrated/PROTOCOL.md. No in
 
 ### Errors
 No new scientific run yet; all old source/build failures remain immutable. [pcc:unverified]
+
+###02:19integrated first build
+C++build0; Rust101 because source assembly omitted standard JSON/Path/SHA imports and digest helper located after the old recovery function. Exact failed6b0512b source/logs retained in run01; added imports/helper ONLY, unchanged native verification predicates. New source checkpoint before retry; no data has run. [pcc:unverified]

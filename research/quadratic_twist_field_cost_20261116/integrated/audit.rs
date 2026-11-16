@@ -1,5 +1,7 @@
 // Independent coefficient-pair field arithmetic, linear Miller chain and linear field DLP reference.
 use std::{collections::BTreeSet,fmt::Write as _,fs,io::Write};
+use sha2::{Digest,Sha256};use serde_json::{Value,json};use std::path::Path;
+fn digest(s:&[u8])->String{format!("{:x}",Sha256::digest(s))}
 type F=(i64,i64);type P=Option<(F,F)>;fn md(x:i64)->i64{x.rem_euclid(61)}fn addf(x:F,y:F)->F{(md(x.0+y.0),md(x.1+y.1))}fn nf(x:F)->F{(md(-x.0),md(-x.1))}fn subf(x:F,y:F)->F{addf(x,nf(y))}fn mf(x:F,y:F)->F{(md(x.0*y.0+59*x.1*y.1),md(x.0*y.1+x.1*y.0))}fn pow(mut x:F,mut n:i64)->F{let mut r=(1,0);while n>0{if n%2==1{r=mf(r,x)}x=mf(x,x);n/=2;}r}fn div(x:F,y:F)->F{assert_ne!(y,(0,0));mf(x,pow(y,3719))}fn enc(x:F)->i64{x.0+61*x.1}
 fn neg(p:P)->P{p.map(|(x,y)|(x,nf(y)))}fn on(p:P,a:i64,b:i64)->bool{p.is_none_or(|(x,y)|mf(y,y)==addf(addf(mf(mf(x,x),x),mf((a,0),x)),(b,0)))}
 fn plus(p:P,q:P,a:i64)->P{let((x,y),(u,v))=match(p,q){(None,q)=>return q,(p,None)=>return p,(Some(p),Some(q))=>(p,q)};if x==u&&addf(y,v)==(0,0){return None}let m=if x==u{div(addf(mf((3,0),mf(x,x)),(a,0)),mf((2,0),y))}else{div(subf(v,y),subf(u,x))};let z=subf(subf(mf(m,m),x),u);let c=subf(y,mf(m,x));Some((z,nf(addf(mf(m,z),c))))}
