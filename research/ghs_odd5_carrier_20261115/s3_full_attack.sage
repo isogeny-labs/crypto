@@ -86,7 +86,9 @@ for aa in range(1,20001):
 else:
  print(json.dumps({'phase':'relation_rank_cap','factor_base_size':n,'rational_points':len(pts),
                    'attempts':attempts,'accepted':len(rows),
-                   'rank':int(matrix(GF(r),rows).rank()) if rows else 0},sort_keys=True),flush=True)
+                   'rank':int(matrix(GF(r),rows).rank()) if rows else 0,
+                   'zero_projected_indices':[i for i in range(n) if h*base[i]==O],
+                   'column_support':[sum(v[i]!=0 for v in rows) for i in range(n)]},sort_keys=True),flush=True)
  raise RuntimeError('relation rank not reached within 20000 walk steps')
 M=matrix(GF(r),rows);logs=M.solve_right(vector(GF(r),rhs))
 assert all(int(logs[i]) * G==h*base[i] for i in range(n))
