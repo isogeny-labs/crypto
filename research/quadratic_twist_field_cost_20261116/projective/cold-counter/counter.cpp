@@ -29,7 +29,7 @@ void corrupt(const fs::path&,const fs::path&,const std::string&);
 
 int main(int argc,char**argv){try{
  if(argc==5&&std::string(argv[1])=="corrupt"){corrupt(argv[2],argv[3],argv[4]);return 0;}
- check(argc==8,"counter STREAM START END OUT RAWBASE HEAD preflight|full");check(RUNNING_ON_VALGRIND>0,"actual external counter required");std::string tag=argv[1];check(tag=="A"||tag=="B","fresh stream identity");int first=std::stoi(argv[2]),end=std::stoi(argv[3]);check(0<=first&&first<end&&end<=455,"complete declared policy interval");fs::path out=fs::canonical(argv[4]);std::string rawbase=argv[5],head=argv[6];check(std::string(argv[7])=="preflight"||std::string(argv[7])=="full","scope kind");bool preflight=std::string(argv[7])=="preflight";if(preflight)check(first==0&&end==1,"engineering scope fixed before data");check(head.size()==40,"actual source head");check(rawbase==(out/"raw-counter").string(),"fresh raw output scope");
+ check(argc==8,"counter STREAM START END OUT RAWBASE HEAD preflight|full");check(RUNNING_ON_VALGRIND>0,"actual external counter required");std::string tag=argv[1];check(tag=="A"||tag=="B","fresh stream identity");int first=std::stoi(argv[2]),end=std::stoi(argv[3]);check(0<=first&&first<end&&end<=455,"complete declared policy interval");fs::path out=fs::canonical(argv[4]);std::string rawbase=argv[5],head=argv[6];check(std::string(argv[7])=="preflight"||std::string(argv[7])=="full","scope kind");bool preflight=std::string(argv[7])=="preflight";if(preflight)check(first==0&&end==1,"engineering scope fixed before data");else check(end-first<=40,"bounded raw batch, no unfiled full population in one process");check(head.size()==40,"actual source head");check(rawbase==(out/"raw-counter").string(),"fresh raw output scope");
  auto resource_start=std::chrono::steady_clock::now();
  Legacy::RECORD=false;RootCover::RECORD=false;Legacy::terminal_stop=true;RootCover::terminal_stop=true;
  Legacy::P lg{Legacy::F(0),Legacy::F(10),false},ls=Legacy::chi(Legacy::P{Legacy::F(37),Legacy::F(14),false});
@@ -38,32 +38,39 @@ int main(int argc,char**argv){try{
  for(auto p:oldpoints)if(!p.o&&p<Legacy::neg(p))oldreps.push_back(p);for(auto p:newpoints)if(!p.o&&p<RootCover::neg(p))newreps.push_back(p);check(oldreps.size()==15&&newreps.size()==15,"complete public factor-base domain");
  for(int qi=0;qi<31;qi++)check(oldpoints[qi].o==newpoints[qi].o&&Legacy::encode(oldpoints[qi].x)==RootCover::encode(newpoints[qi].x)&&Legacy::encode(oldpoints[qi].y)==RootCover::encode(newpoints[qi].y),"same actual original points");
  std::vector<std::array<int,3>>policies;for(int a=0;a<15;a++)for(int b=a+1;b<15;b++)for(int c=b+1;c<15;c++)policies.push_back({a,b,c});check(policies.size()==455,"full policy membership");
- std::ostringstream records,warmups;records<<"S twist.policy-counter.v1 61 59 31 "<<tag<<' '<<first<<' '<<end<<' '<<head<<'\n';warmups<<"S twist.policy-warmup.v1 "<<tag<<' '<<first<<' '<<head<<'\n';int part=0;
- auto call=[&](int method,int route,int policy,std::string label,bool inside,bool outside,bool counted){
-  auto ids=policies.at(policy);std::vector<Legacy::P>lb{oldreps[ids[0]],oldreps[ids[1]],oldreps[ids[2]]};std::vector<RootCover::P>nb{newreps[ids[0]],newreps[ids[1]],newreps[ids[2]]};std::array<Rec,30>results;
-  std::string unique=tag+"-"+head+"-"+label+"-m"+std::to_string(method)+"-r"+std::to_string(route)+"-p"+std::to_string(policy)+"-d"+std::to_string(method==0?4:3)+"-n30";
-  Legacy::ROUTE=route;RootCover::ROUTE=route;if(outside)probe();
-  auto old_fn=&Legacy::recover_cold;auto new_fn=&RootCover::recover_cold;
-  asm volatile("" : "+r"(old_fn), "+r"(new_fn) :: "memory"); // Same indirect-call boundary; bodies remain O2.
-  if(counted){CALLGRIND_ZERO_STATS;CALLGRIND_TOGGLE_COLLECT;}
+ struct Plan{int method,route,policy;std::string label,unique;bool inside,outside,counted;std::vector<Legacy::P>lb;std::vector<RootCover::P>nb;std::array<Rec,30>results;};
+ std::vector<Plan>plans;plans.reserve(6*(end-first)+15);
+ auto add_plan=[&](int method,int route,int policy,std::string label,bool inside,bool outside,bool counted){
+  auto ids=policies.at(policy);std::string unique=tag+"-"+head+"-"+label+"-m"+std::to_string(method)+"-r"+std::to_string(route)+"-p"+std::to_string(policy)+"-d"+std::to_string(method==0?4:3)+"-n30";
+  plans.push_back(Plan{method,route,policy,label,unique,inside,outside,counted,{oldreps[ids[0]],oldreps[ids[1]],oldreps[ids[2]]},{newreps[ids[0]],newreps[ids[1]],newreps[ids[2]]},{}});
+ };
+ for(int route:{3,4,5})for(int method:{0,1})for(int rep=0;rep<2;rep++)add_plan(method,route,first,"warmup-"+std::to_string(rep),false,false,false);
+ if(tag=="A")for(int policy=first;policy<end;policy++)for(int route:{3,4,5})for(int method:{0,1})add_plan(method,route,policy,"plain",false,false,true);
+ else for(int policy=end-1;policy>=first;policy--)for(int route:{5,4,3})for(int method:{1,0})add_plan(method,route,policy,"plain",false,false,true);
+ add_plan(0,3,first,"repeat-aa",false,false,true);add_plan(0,3,first,"positive-inside",true,false,true);add_plan(0,3,first,"negative-outside",false,true,true);
+ auto old_fn=&Legacy::recover_cold;auto new_fn=&RootCover::recover_cold;
+ asm volatile("" : "+r"(old_fn), "+r"(new_fn) :: "memory");
+ // No collector allocation, compression, hashing or serialization between intervals.
+ // All inputs, labels and numeric result storage already exist. Tool dumps use tool memory.
+ for(auto&plan:plans){
+  Legacy::ROUTE=plan.route;RootCover::ROUTE=plan.route;if(plan.outside)probe();
+  if(plan.counted){CALLGRIND_ZERO_STATS;CALLGRIND_TOGGLE_COLLECT;}
   for(int qi=1;qi<31;qi++){
-   if(method==0){auto r=old_fn(oldpoints[qi],lg,ls,lb,4);results[qi-1]=packed(r);}
-   else{auto r=new_fn(newpoints[qi],ng,ns,nb,3);results[qi-1]=packed(r);}
+   if(plan.method==0){auto r=old_fn(oldpoints[qi],lg,ls,plan.lb,4);plan.results[qi-1]=packed(r);}
+   else{auto r=new_fn(newpoints[qi],ng,ns,plan.nb,3);plan.results[qi-1]=packed(r);}
   }
-  if(inside)probe();if(counted){CALLGRIND_TOGGLE_COLLECT;CALLGRIND_DUMP_STATS_AT(unique.c_str());}else{
-   warmups<<"W "<<method<<' '<<route<<' '<<policy<<' '<<label<<'\n';for(int qi=1;qi<31;qi++){auto p=oldpoints[qi];warmups<<"R "<<qi<<' '<<Legacy::encode(p.x)<<' '<<Legacy::encode(p.y);for(auto x:results[qi-1].v)warmups<<' '<<x;warmups<<'\n';}return;
-  }
+  if(plan.inside)probe();if(plan.counted){CALLGRIND_TOGGLE_COLLECT;CALLGRIND_DUMP_STATS_AT(plan.unique.c_str());}
+ }
+ // Only now serialize and losslessly compact this bounded batch's NEW raw dumps.
+ std::ostringstream records,warmups;records<<"S twist.policy-counter.v1 61 59 31 "<<tag<<' '<<first<<' '<<end<<' '<<head<<'\n';warmups<<"S twist.policy-warmup.v1 "<<tag<<' '<<first<<' '<<head<<'\n';int part=0;
+ for(const auto&plan:plans){
+  if(!plan.counted){warmups<<"W "<<plan.method<<' '<<plan.route<<' '<<plan.policy<<' '<<plan.label<<'\n';for(int qi=1;qi<31;qi++){auto p=oldpoints[qi];warmups<<"R "<<qi<<' '<<Legacy::encode(p.x)<<' '<<Legacy::encode(p.y);for(auto x:plan.results[qi-1].v)warmups<<' '<<x;warmups<<'\n';}continue;}
   fs::path raw=rawbase+"."+std::to_string(++part);std::string original=bytes(raw);check(!original.empty(),"actual profiler dump");long long declared=-1;std::istringstream lines(original);std::string line;while(std::getline(lines,line))if(line.starts_with("summary:")){std::istringstream row(line.substr(8));row>>declared;}check(declared>0,"external positive instruction summary");
   std::string name="counter-"+std::to_string(part)+".raw.gz";fs::path compressed=out/name;gz_new(compressed,original);check(gz_read(compressed)==original,"lossless inflate byte equality BEFORE raw removal");std::string compressed_bytes=bytes(compressed);
-  records<<"P "<<part<<' '<<method<<' '<<route<<' '<<policy<<' '<<(method==0?4:3)<<' '<<label<<' '<<name<<' '<<hash(original)<<' '<<original.size()<<' '<<hash(compressed_bytes)<<' '<<compressed_bytes.size()<<' '<<declared<<'\n';
-  for(int qi=1;qi<31;qi++){auto p=oldpoints[qi];records<<"R "<<qi<<' '<<Legacy::encode(p.x)<<' '<<Legacy::encode(p.y);for(auto x:results[qi-1].v)records<<' '<<x;records<<'\n';}
-  check(raw.parent_path()==out&&raw.filename().string().starts_with("raw-counter."),"only newly created redundant dump may be removed");check(fs::remove(raw),"remove only inflated-equal fresh raw copy");
- };
- // Two complete policy warmups per implementation, with no answer reuse.
- for(int route:{3,4,5})for(int method:{0,1})for(int rep=0;rep<2;rep++)call(method,route,first,"warmup-"+std::to_string(rep),false,false,false);
- if(tag=="A")for(int policy=first;policy<end;policy++)for(int route:{3,4,5})for(int method:{0,1})call(method,route,policy,"plain",false,false,true);
- else for(int policy=end-1;policy>=first;policy--)for(int route:{5,4,3})for(int method:{1,0})call(method,route,policy,"plain",false,false,true);
- call(0,3,first,"repeat-aa",false,false,true);call(0,3,first,"positive-inside",true,false,true);call(0,3,first,"negative-outside",false,true,true);
+  records<<"P "<<part<<' '<<plan.method<<' '<<plan.route<<' '<<plan.policy<<' '<<(plan.method==0?4:3)<<' '<<plan.label<<' '<<name<<' '<<hash(original)<<' '<<original.size()<<' '<<hash(compressed_bytes)<<' '<<compressed_bytes.size()<<' '<<declared<<'\n';
+  for(int qi=1;qi<31;qi++){auto p=oldpoints[qi];records<<"R "<<qi<<' '<<Legacy::encode(p.x)<<' '<<Legacy::encode(p.y);for(auto x:plan.results[qi-1].v)records<<' '<<x;records<<'\n';}
+  check(raw.parent_path()==out&&raw.filename().string().starts_with("raw-counter."),"only new redundant dump copy");check(fs::remove(raw),"remove only exact-byte restored new raw copy");
+ }
  gz_new(out/"cases.tsv.gz",records.str());gz_new(out/"warmups.tsv.gz",warmups.str());check(part==6*(end-first)+3,"entire declared counter interval population");
  auto elapsed=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now()-resource_start).count();
  check(!fs::exists(out/"resource-observation.json"),"fresh resource metadata");std::ofstream resource(out/"resource-observation.json");resource<<J{{"schema","twist.resource-observation.v1"},{"wall_ns",elapsed},{"counter_intervals",part},{"speed_claim",false},{"purpose","Runtime/storage envelope only; producer main excludes external tool startup"}}.dump()<<'\n';check(bool(resource),"resource metadata write");return 0;

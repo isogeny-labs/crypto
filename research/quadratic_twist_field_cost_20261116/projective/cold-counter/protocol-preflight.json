@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "twist-whole-policy-counter-preflight-20261116",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-16",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_field_cost_20261116/projective/cold-counter",
@@ -643,7 +643,7 @@
       {
         "name": "inputs",
         "treatment": "fixed",
-        "value": "Fixed engineeringpolicy0;3roles×2methods×30actualtargets,9counterintervals including3calibrations,12warmupintervals perstream",
+        "value": "Fixed engineeringpolicy0;3roles\u00d72methods\u00d730actualtargets,9counterintervals including3calibrations,12warmupintervals perstream",
         "how": "No new favorable policy/target selection, all failures retained"
       },
       {
@@ -969,17 +969,33 @@
       "claim": "Official3.28tar/releasehash checked in prior component; reuse unchanged installedtool, no reinstall"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "buffered-context-v2",
+      "filed": "2026-11-16",
+      "filed_before_affected_data": true,
+      "reason": "Unblinded collector-context correction after prior engineering observations; no threshold, mathematical algorithm or population change",
+      "changes": [
+        "Preallocate labels/public bases/numeric results before any measuredinterval",
+        "Defer all collector allocation, serialization,hashing,compression until AFTER completeboundedbatch",
+        "Retain original exact counter/predicate/result/control checks; preserve every prior source/raw/failure",
+        "Bound prospectivefullmode at40policies/process; current engineeringrunner remains policy0ONLY"
+      ],
+      "supersedes_fields": [
+        "extensions.storage_contract"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "8510586bffa197668c72525e19b5c48813665eef765ab94713cb806c249d857d",
-    "commit": "b740cdc3953f7edee4344bc2559f4e0b739d7adc",
-    "frozen_at": "2026-11-16T08:58:54Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
   },
   "extensions": {
-    "pins_sha256": "448403afb168863c5f8ee91fdfc2994d0a914e4fdf97bc7d1b9f34b28d66b78d",
-    "window": "08:30–09:30UTC2026-11-16",
+    "pins_sha256": "43a4caf52ee833f249a9748f14330469e9f96f13fb5f5ae4b88ed53e08f95da2",
+    "window": "08:30\u201309:30UTC2026-11-16",
     "deadline_epoch": 1794821400,
     "stage_plan": [
       {
@@ -1104,13 +1120,14 @@
     "target_workloads_per_stream_including_controls": 270,
     "stored_warmup_workloads_per_stream": 360,
     "full_panel_not_launched": true,
-    "future_full_scope": "ALL455policies×3roles×2methods×30targets perstream; new full protocol/resource binding required before data",
-    "storage_contract": "read/hash NEWdump,gzip exclusivefile,inflate exactbytes,bind hashes/sizes,then remove only redundant NEWrawcopy; every path rehydrates",
+    "future_full_scope": "ALL455policies\u00d73roles\u00d72methods\u00d730targets perstream; new full protocol/resource binding required before data",
+    "storage_contract": "Preallocate complete boundedbatch first; collect/dump without userIO or collectorallocation between intervals; afterbatch read/hash/gzip/inflate exactbytes,then remove only NEWredundantrawcopy; max40policies/fullprocess,engineeringpolicy0ONLY",
     "no_python_research_dispatch": true,
     "historical_results_observed": true,
     "samebranch_GitHub_source_protocol_checkpoint": true,
     "raw_assets_and_detailed_results_local_only": true,
     "no_paid_resources": true,
-    "canonical_guide_gap": "Current encrypted guide unreadable; historical plaintext canonical fallback/current pinned validator used; engineering-only counter validity, no timing verdict"
+    "canonical_guide_gap": "Current encrypted guide unreadable; historical plaintext canonical fallback/current pinned validator used; engineering-only counter validity, no timing verdict",
+    "execution_context_correction_after_prior_observations": true
   }
 }
