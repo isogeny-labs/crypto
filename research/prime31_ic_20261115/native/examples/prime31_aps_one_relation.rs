@@ -421,6 +421,89 @@ fn partition_size_sweep()->Result<serde_json::Value,String>{
     }))
 }
 
+// Paired, source-cold, fresh 24-target confirmation. The two APS arms use
+// identical public Q and published S3 one-relation extraction. A/A repeats
+// the incumbent T=1536 with the same deterministic public labels to expose
+// same-host sequential timing instability, not to claim statistical isolation.
+// Every trial, including repeats and misses, remains charged in the transcript.
+fn fresh_size_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    let mut rng=0x4652_4553_485f_5332_u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    let mut results=Vec::with_capacity(CASES);
+    let mut total_a=0u128;
+    let mut total_b=0u128;
+    let mut total_aa=0u128;
+    let mut success_a=0usize;
+    let mut success_b=0usize;
+    let mut success_aa=0usize;
+    for case in 0..CASES {
+        let known=loop {
+            let candidate=prng(&mut rng)%N;
+            if candidate>1 && used.insert(candidate){break candidate;}
+        };
+        let q=verifier.scalar(PRIME31,known,Some(PRIME31.g))
+            .ok_or("confirmation target was identity")?;
+        let sequence=if case%2==0 {
+            [("A1024",1024usize,8usize),("B1536",1536,3),
+             ("B1536_repeat",1536,3)]
+        } else {
+            [("B1536",1536usize,3usize),
+             ("B1536_repeat",1536,3),("A1024",1024,8)]
+        };
+        let mut outcomes=Vec::new();
+        for (position,(label,count,rounds)) in sequence.iter().enumerate() {
+            let v=execute_sized(false,*rounds,q,*count)?;
+            let attempts=v["attempts"].as_array().ok_or("missing confirm attempts")?;
+            let found=attempts.last().and_then(|row|
+                row.pointer("/solution/log")).and_then(|x|x.as_u64());
+            let solved=v["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if solved && (found!=Some(known)
+                || verifier.scalar(PRIME31,found.unwrap(),Some(PRIME31.g))!=Some(q)) {
+                return Err(format!("confirmation target {case} returned an invalid scalar"));
+            }
+            let wall=v["cold_rust_wall_ns"].as_u64().ok_or("missing confirm cold time")?;
+            let pairs=attempts.iter().map(|row|
+                row["algebraic_visited_pairs"].as_u64().unwrap_or(0)
+            ).sum::<u64>();
+            match *label {
+                "A1024"=>{total_a+=u128::from(wall);if solved{success_a+=1;}},
+                "B1536"=>{total_b+=u128::from(wall);if solved{success_b+=1;}},
+                "B1536_repeat"=>{total_aa+=u128::from(wall);if solved{success_aa+=1;}},
+                _=>return Err("unknown confirm arm".into())
+            }
+            outcomes.push(json!({
+                "arm":label,"execution_order":position,
+                "points_per_partition":count,"maximum_rounds":rounds,
+                "complete_scalar_recovered":solved,
+                "recovered_log":found,
+                "rounds":attempts.len(),
+                "cold_wall_ns":wall,
+                "algebraic_pair_quadratics":pairs,
+                "unresolved_within_cap":!solved
+            }));
+        }
+        results.push(json!({"case":case,"public_target":q,
+            "caller_known_answer_verifier_only":known,
+            "execution_order":"alternates A-B-B and B-B-A",
+            "outcomes":outcomes}));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "scope":"fresh 24 public Q, complete Rust APS one-relation same-source paired development confirmation",
+        "classification":"published IC; finite S3 list enumeration generic MITM-equivalent",
+        "curve_prime":P,"group_order":N,
+        "known_scalar_never_enters_solver":true,
+        "cases":CASES,"successes_1024":success_a,
+        "successes_1536":success_b,"successes_1536_repeat":success_aa,
+        "cold_total_1024_ns":total_a.to_string(),
+        "cold_total_1536_ns":total_b.to_string(),
+        "cold_total_1536_repeat_ns":total_aa.to_string(),
+        "result_scope":"one runner, alternating order and A/A timing diagnostic; not isolated or external IC-frontier benchmark",
+        "cases_detail":results
+    }))
+}
 fn heldout_twelve()->Result<serde_json::Value,String>{
     // Caller-side fixture generation; the scalar is never passed to execute().
     // These known answers are verified only after the complete algebraic solve.
@@ -477,6 +560,11 @@ fn heldout_twelve()->Result<serde_json::Value,String>{
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--size-confirm" {
+        let result=fresh_size_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--size-sweep" {
         let result=partition_size_sweep()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -494,7 +582,7 @@ fn main()->Result<(),String> {
         [] => false,
         [a] if a=="--one" => false,
         [a] if a=="--compare" => true,
-        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep".into())
+        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep|--size-confirm".into())
     };
     let v=execute(compare,ROUNDS,PUBLIC_Q)?;
     println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
