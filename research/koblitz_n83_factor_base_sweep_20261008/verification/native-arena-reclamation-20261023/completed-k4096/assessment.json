@@ -1,0 +1,27 @@
+{
+  "card_id": "CARD-native-arena-reclamation-k4096-r1",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "interpretation": "not_assessed",
+  "specification_errors": [],
+  "card_sha256": "8e34cc63155af36c2501296ccf7e48a0c17fbab5e266c84e491618d9da671ed9",
+  "prompt_sha256": "4dc80bbfb9eb41ba2961e4a80d6b81340a9c26ae5bab854b2e06e77a614bb433",
+  "relay_sha256": "d57a273d8e71bd490165c204ba8fd710a24a070081b6a2a64e6d2359e8f257c8",
+  "commit": "37631c5cda4a370745e5c229fe73e90aba52b2bf",
+  "worker_sha256": "4fcda42fe79c90912c4ba4e8f702945dc0cc2914d93d3c1941dd3966d481d060",
+  "guard_sha256": "563d2168849f7096c217c6bcbba18ed915e2c3c44bc50f422de226631b0dbad0",
+  "reasons": [
+    "Native card-check exited0 and returned record_digests_verified=true, relay_verbatim=true, status=completed; see card-check.stdout.",
+    "Receipt and relay are byte-identical by cmp; relay SHA256 matches executor return.",
+    "Native card-prompt regenerated to scratch is byte-identical to authoritative frozen prompt; see prompt.regenerated.txt.",
+    "Receipt card_changed=false, commit matches frozen HEAD, commands_total=1, exact command argv verified by native card-check.",
+    "Receipt records one attempt, exit_code0, timed_out=false, succeeded=true, elapsed3647.735922895seconds within7200seconds.",
+    "Receipt dirty_before and dirty_after are empty; current tracked git status is empty.",
+    "Native card-check validated all frozen binds and recorded stdout, stderr and output digests against files on disk.",
+    "Recorded lock requested600seconds and acquired after0.00001093seconds; outer cleanup_verified=true. These records are covered by verified output digests."
+  ],
+  "assessment_scope": "Card execution and preserved relay custody only; scientific interpretation not assessed. No builds, source changes, retries or new dispatch performed."
+}

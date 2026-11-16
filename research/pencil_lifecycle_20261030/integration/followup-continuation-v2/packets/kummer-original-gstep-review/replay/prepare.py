@@ -1,0 +1,29 @@
+from pathlib import Path
+import json,hashlib,shutil,difflib
+D=Path(__file__).parent;S=Path('/var/tmp/pencil-kummer-four-corner-delta-20261031');B=Path('/var/tmp/pencil-kummer-successful-repair-20261031');I=Path('/var/tmp/pencil-five-leads-kummer-check-20261030')
+shutil.copytree(S/'native',D/'native',dirs_exist_ok=True);shutil.copytree(S/'src',D/'src',dirs_exist_ok=True)
+for n in ['Cargo.toml','Cargo.lock']:shutil.copyfile(S/n,D/n)
+(D/'fixtures.json').write_bytes((I/'fixtures.json').read_bytes());assert len(json.loads((D/'fixtures.json').read_text()))==21
+old=(B/'src/eager.rs').read_text().split('\npub fn fixture_check(')[0];new=(S/'src/pruned.rs').read_text().split('\npub fn fixture_check(')[0];start=new.index('    pub fn grid_step(');end=new.index('    pub fn repair_probe(',start);new=new[:start]+new[end:]
+wrapper=r'''
+pub fn original_gstep_fixture(input:&Value)->Value{
+ let v=&input["target"];let th=&input["theta"]["selected"];let t=&th["constants"];let p=v["p"].as_u64().unwrap();let r=v["r"].as_u64().unwrap();assert!((2..=(1u64<<63)).contains(&r));let r0=th["r0"].as_u64().unwrap();let delta=th["delta"].as_u64().unwrap();let acts:Vec<_>=input["model"]["torsion_actions"].as_array().unwrap().iter().map(|z|(mul_mod(sub_mod(z["root"].as_u64().unwrap(),r0,p),inv_mod(delta,p),p),parse_matrix(&z["action"]["matrix"]))).collect();let f=signed::curve_coeff(t,p);let j=Jacobian{f:Field::new(p,1,0),polynomial:f[..6].to_vec()};let cases=v["cases"].as_array().unwrap();let g:Divisor=serde_json::from_value(cases[1]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();let q:Divisor=serde_json::from_value(cases[2]["coordinate_witness"]["jacobian_expected"].clone()).unwrap();assert!(j.valid(g)&&j.valid(q));assert_ne!(j.add(g,g),Divisor::O);assert_eq!(j.mul(g,r),Divisor::O);assert_eq!(j.mul(q,r),Divisor::O);
+ let before=j.f.counts();walk::reset_ops();signed::reset_ops();let qg=j.add(q,g);let(mut k,mut kp)=(walk::project_any(q,&j,t,&acts,p).unwrap(),walk::project_any(qg,&j,t,&acts,p).unwrap());let kg=walk::project_any(g,&j,t,&acts,p).unwrap();let k0=walk::project_any(Divisor::O,&j,t,&acts,p).unwrap();let initialization=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});let constants=["A","B","C","D"].map(|z|t[z].as_u64().unwrap());let(mut a,mut b)=(0,1);let mut rows=vec![];
+ for index in 0..3{
+  assert!(a<r&&b<r);walk::reset_ops();signed::reset_ops();let before=j.f.counts();let step=advance(k,kp,kg,k0,constants,&acts,&j,t,p,r,g,q,a,b,false);let transition=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});a=(2*a+step.choice)%r;b=2*b%r;
+  let Some((nk,nkp))=step.next else{rows.push(json!({"index":index,"status":"step_failed","choice":step.choice,"labels":[a,b],"transition":transition,"fallback":step.used_fallback,"pass":false}));break;};
+  // No expected signed point is computed until after recovery consumes propagated pair.
+  walk::reset_ops();signed::reset_ops();let before=j.f.counts();let(recovered,status,tested)=signed::lift(g,nk,nkp,kg,t,&acts,&j,p);let recovery=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});
+  walk::reset_ops();signed::reset_ops();let before=j.f.counts();let expected=j.add(j.mul(g,a),j.mul(q,b));let ep=j.add(expected,g);let expected_pair=[expected,ep].map(|d|walk::project_any(d,&j,t,&acts,p).unwrap());let corners=[walk::same_k(nk,expected_pair[0],p),walk::same_k(nkp,expected_pair[1],p)];let signed_ok=recovered==Some(expected);let verification=json!({"field":j.f.counts()-before,"walk":walk::read_ops(),"signed":signed::read_ops()});
+  rows.push(json!({"index":index,"status":"checked","choice":step.choice,"labels":[a,b],"pair":[nk,nkp],"roots":step.roots,"evaluated":step.evaluated,"selected":step.selected,"fallback":step.used_fallback,"fallback_checks":step.fallback_validity_checks,"internal_transition_checks":step.transition_checks,"corner_matches":corners,"recovered":recovered,"expected":expected,"recovery_status":status,"recovery_tested":tested,"signed_ok":signed_ok,"pass":corners.iter().all(|&x|x)&&signed_ok,"counts":{"transition":transition,"recovery":recovery,"verification":verification}}));k=nk;kp=nkp;
+ }
+ json!({"p":p,"r":r,"workload_id":v["workload_id"],"initialization":initialization,"rows":rows})
+}
+'''
+(D/'src/eager.rs').write_text(old+wrapper);(D/'src/pruned.rs').write_text(new+wrapper);(D/'integration.patch').write_text(''.join(difflib.unified_diff(old.splitlines(True),new.splitlines(True),fromfile='a/eager.rs',tofile='b/pruned-boundary-delta.rs')))
+(D/'src/check.rs').write_text(r'''
+mod eager;mod pruned;use serde_json::{json,Value};fn main(){let fixtures:Value=serde_json::from_str(include_str!("../fixtures.json")).unwrap();let mut cases=vec![];let mut complete=true;
+ for f in fixtures.as_array().unwrap(){let e=eager::original_gstep_fixture(f);let p=pruned::original_gstep_fixture(f);let mut equal=true;let es=e["rows"].as_array().unwrap();let ps=p["rows"].as_array().unwrap();equal&=es.len()==ps.len();for(x,y)in es.iter().zip(ps){for key in["choice","labels","pair","selected","fallback"]{equal&=x[key]==y[key];}equal&=y["evaluated"]==y["selected"];equal&=x["evaluated"]==json!([true,true,true]);}let candidate_pass=ps.len()==3&&ps.iter().all(|r|r["pass"]==true);complete&=equal&&candidate_pass;cases.push(json!({"eager":e,"candidate":p,"equal_selected_state":equal,"candidate_pass":candidate_pass}));}
+ println!("{}",json!({"schema":"original-gstep-paired-software-integration/v1","cases":cases,"complete":complete,"scientific_execution":false}));assert!(complete);}
+''')
+(D/'pre-execution-manifest.json').write_text(json.dumps({'files':[{'path':str(p.relative_to(D)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(D.rglob('*')) if p.is_file()]},indent=2))

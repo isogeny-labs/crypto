@@ -1,0 +1,29 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-inverse631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_inverse631_20261116)
+error[E0425]: cannot find function `splitmix64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:511:21
+    |
+511 |                 s = splitmix64(s);
+    |                     ^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:747:61
+    |
+747 |         if !(QUARTIC_MIN_P..QUARTIC_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                             ^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `is_prime_u64` in this scope
+   --> ../hec_alignment13_20261115/atlas/target.rs:763:65
+    |
+763 |         if !(QUARTIC_MIN_P..QUARTIC_LAW_MAX_P).contains(&p) || !is_prime_u64(p) {
+    |                                                                 ^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `base_divisor_control` in this scope
+   --> ../hec_calibration631_20261115/good.rs:303:5
+    |
+303 |     base_divisor_control(&v, &h, &triples);
+    |     ^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `hec-inverse631` (bin "generate631") due to 4 previous errors

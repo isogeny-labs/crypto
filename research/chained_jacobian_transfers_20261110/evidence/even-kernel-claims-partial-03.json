@@ -1,0 +1,52 @@
+[
+  {
+    "name": "EvenKernels.cubic_homogenization",
+    "claim_path": "pcc/claims/PCC-20261112-c9aa3b.json",
+    "statement": "theorem cubic_homogenization {R : Type} [CommRing R] (a b c e x d : R) : a*d^3+b*(x*d)*d^2+c*(x*d)^2*d+e*(x*d)^3 = d^3*(a+b*x+c*x^2+e*x^3)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+      "theorem": "EvenKernels.cubic_homogenization",
+      "decl_sha256": "a9c3b983974eb9170397c6fec45dc88448890bc19071202d57254e652eb8d247"
+    }
+  },
+  {
+    "name": "EvenKernels.geometric_half_coordinates",
+    "claim_path": "pcc/claims/PCC-20261112-e1bd7f.json",
+    "statement": "theorem geometric_half_coordinates : (2 : Fin 7)*4=1 \u2227 (2 : Fin 7)*55=5 \u2227 \u2200 q : Fin 7, (2 : Fin 7)*4*q=q \u2227 ((2 : Fin 7)*55*q=q \u2194 q=0)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+      "theorem": "EvenKernels.geometric_half_coordinates",
+      "decl_sha256": "92ca618262cab4a38d2eea0299337b638d64c84e3b1ab2afae25cb896e5d2724"
+    }
+  },
+  {
+    "name": "EvenKernels.geometric_wrong_half_counts",
+    "claim_path": "pcc/claims/PCC-20261112-f5bb27.json",
+    "statement": "theorem geometric_wrong_half_counts : (7 : Nat)*6=42 \u2227 (49 : Nat)-7=42 \u2227 (7 : Nat)*7=49 \u2227 (49 : Nat)*49=2401",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+      "theorem": "EvenKernels.geometric_wrong_half_counts",
+      "decl_sha256": "4340c81bfd0f65df961476504fcafa9324eb47856af4a0d1a1d15fbce7177477"
+    }
+  },
+  {
+    "name": "EvenKernels.first_kernel_x_period",
+    "claim_path": "pcc/claims/PCC-20261112-063ed6.json",
+    "statement": "theorem first_kernel_x_period : (5 : Nat)^6%7=1 \u2227 (5 : Nat)^3%7=6 \u2227 \u2200 n : Fin 2, (5 : Nat)^(n.val+1)%7\u22601 \u2227 (5 : Nat)^(n.val+1)%7\u22606",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+      "theorem": "EvenKernels.first_kernel_x_period",
+      "decl_sha256": "ed48f869b4044bc37343d0de410996fdeef21c932eb427aba32086acc35f1c1e"
+    }
+  },
+  {
+    "name": "EvenKernels.first_primitive_x_period",
+    "claim_path": "pcc/claims/PCC-20261112-7310b6.json",
+    "statement": "theorem first_primitive_x_period : (33 : Nat)^21%49=48 \u2227 \u2200 n : Fin 20, (33 : Nat)^(n.val+1)%49\u22601 \u2227 (33 : Nat)^(n.val+1)%49\u226048",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+      "theorem": "EvenKernels.first_primitive_x_period",
+      "decl_sha256": "2c24ff0dacf8d58cabfe633aecd1bb605d800551a14ea12987515a0faea86a63"
+    }
+  }
+]

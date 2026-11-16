@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Thin orchestration of the unchanged native producer and metadata comparisons.
+set -euo pipefail
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+receipt=research/quadratic_twist_evidence_20261021/validation/group-map-20261023/jacobian
+mkdir -p "$receipt"
+scratch=$(mktemp -d /tmp/twist-jacobian-20261023.XXXXXX)
+trap 'rm -rf "$scratch"' EXIT
+cp docs/curves/jacobian-transfers.json "$scratch/before.json"
+git show 02b37807a9bec066b5508be22a9f0a62bc1a2369:docs/curves/registry.json > "$scratch/base-registry.json"
+sha256sum docs/curves/registry.json docs/curves/jacobian-transfers.json \
+  docs/curves/JACOBIAN_TRANSFERS.md > "$receipt/before.sha256"
+sha256sum "$scratch/base-registry.json" > "$receipt/base-registry.sha256"
+cargo build --release --locked --bin jacobian_transfers > "$receipt/build.log" 2>&1
+producer=./target/release/jacobian_transfers
+set +e
+timeout 300 "$producer" check > "$receipt/stale-check.log" 2>&1
+stale_exit=$?
+set -e
+printf '%s\n' "$stale_exit" > "$receipt/stale-check.exit"
+test "$stale_exit" -eq 1
+timeout 300 "$producer" check --registry "$scratch/base-registry.json" \
+  > "$receipt/base-check.log" 2>&1
+timeout 300 "$producer" build --budget 200000 > "$receipt/regenerate.log" 2>&1
+timeout 300 "$producer" check > "$receipt/check.log" 2>&1
+"$producer" table --write-doc docs/curves/JACOBIAN_TRANSFERS.md > "$receipt/table-write.log" 2>&1
+"$producer" table > "$scratch/table.md"
+sed -n '/<!-- jacobian_transfers table -->/,$p' docs/curves/JACOBIAN_TRANSFERS.md | tail -n +2 > "$scratch/committed.md"
+diff "$scratch/committed.md" "$scratch/table.md" > "$receipt/table-diff.log"
+jq -e --slurpfile old "$scratch/before.json" --slurpfile reg docs/curves/registry.json '
+  (.curves | map({key:.icv1,value:.}) | from_entries) as $by_id |
+  ($old[0].curves | all(. as $c | $by_id[$c.icv1] == $c)) and
+  ((.curves | map(.icv1) | sort) == ($reg[0].curves | map(.icv1) | sort)) and
+  ((.curves | map(.icv1) | unique | length) == (.curves | length)) and
+  (.cost_model == $old[0].cost_model) and (.factor_budget == $old[0].factor_budget)
+  ' docs/curves/jacobian-transfers.json > "$receipt/coverage-and-prior-rows.log"
+jq --slurpfile old "$scratch/before.json" '{
+  status:"passed",old_models:($old[0].curves|length),models:(.curves|length),
+  prior_objects_unchanged:true,registry_exact_membership:true,duplicate_ids:false,
+  cost_model_unchanged:true,factor_budget,registry_sha256,
+  routes:.summary.routes,by_class:.summary.by_class,by_route_kind:.summary.by_route_kind
+  }' docs/curves/jacobian-transfers.json > "$receipt/summary.json"
+"$producer" show 'Oakley Group 3' > "$receipt/show-oakley.log"
+"$producer" show ECC2K-130 > "$receipt/show-ecc2k130.log"
+"$producer" rank --top 10 > "$receipt/rank.log"
+"$producer" rank --class formula_advantage > "$receipt/rank-formula.log"
+report=research/quadratic_twist_evidence_20261021/reports/group-map-20261023
+mkdir -p "$report"
+"$producer" chart --svg "$report/jacobian-chart.svg" --tikz "$report/jacobian-chart.tex"
+cp docs/curves/jacobian-transfers.json "$scratch/altered.json"
+sed -i '0,/"magic_number": 5,/s//"magic_number": 6,/' "$scratch/altered.json"
+! cmp -s docs/curves/jacobian-transfers.json "$scratch/altered.json"
+sha256sum "$scratch/altered.json" > "$receipt/altered.sha256"
+set +e
+timeout 300 "$producer" check --report "$scratch/altered.json" > "$receipt/altered-check.log" 2>&1
+altered_exit=$?
+set -e
+printf '%s\n' "$altered_exit" > "$receipt/altered-check.exit"
+test "$altered_exit" -eq 1
+sha256sum docs/curves/registry.json docs/curves/jacobian-transfers.json \
+  docs/curves/JACOBIAN_TRANSFERS.md > "$receipt/after.sha256"
+printf '%s\n' 'PASS: native Jacobian replay, exact old objects, registry membership, table, queries, chart and altered-file rejection'

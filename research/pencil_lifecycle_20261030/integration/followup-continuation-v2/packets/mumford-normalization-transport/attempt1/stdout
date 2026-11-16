@@ -1,0 +1,21 @@
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:11:18: error: unexpected token '('; expected ':=', 'where' or '|'
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:14:52: warning: Unused tactic linter: `congr 1` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:26:13: error: unexpected token '('; expected ')', ',' or ':'
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:35:9: error: unexpected token '('; expected '⟩'
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:35:7: error: Insufficient number of fields for `⟨...⟩` constructor: Constructor `Exists.intro` has 2 explicit field, but only 1 was provided
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:39:7: warning: Possibly looping simp theorem: `T.eq_1`
+
+Note: Possibly caused by: `affine`, `mul_comm`, and `X_mul_C`
+
+Hint: You can disable a simp theorem from the default simp set by passing `- theoremName` to `simp`.
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:39:9: warning: Possibly looping simp theorem: `affine.eq_1`
+
+Note: Possibly caused by: `mul_comm` and `X_mul_C`
+
+Hint: You can disable a simp theorem from the default simp set by passing `- theoremName` to `simp`.
+/var/tmp/pencil-mumford-normalization-20261031-v1/Transport.lean:39:1: error: Tactic `simp` failed with a nested error:
+maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information

@@ -1,0 +1,57 @@
+{
+  "schema": "q4-source-only-validation-v1",
+  "recorded_at": "2026-10-29T16:12:30.209491+00:00",
+  "verdict": "verified_source_only_preparation_operationally_unexecuted",
+  "checks": {
+    "published_admission_bytes": true,
+    "current_claim_and_T5_proofs": true,
+    "dispatcher_only_Task30_running": true,
+    "protected12production_sources_match": true,
+    "originalC1_source_and_binary_hashes_match": true,
+    "helper_source_binary_toolchain_libraries_match": true,
+    "image_identity_match": true,
+    "native_seal_exit0": true,
+    "accepted80_historical_hashes_match": true,
+    "accepted4557159684bytes": true,
+    "excluded0": true,
+    "ancillary25_files_intact": true,
+    "all_JSON_parses": true,
+    "launcher_bash_syntax_exit": 0
+  },
+  "execution_counts": {
+    "native_seal": 1,
+    "advice": 0,
+    "container_create_start": 0,
+    "guard_driver": 0,
+    "guard_worker": 0,
+    "allocator": 0,
+    "case": 0,
+    "scientific": 0
+  },
+  "library_validation": {
+    "passed": 5198,
+    "failed": 8,
+    "ignored": 123,
+    "cargo_exit": 101,
+    "individual_same_binary_replays_passed": 8,
+    "full_suite_PASS": false,
+    "raw_full_log_bytes": 464884,
+    "raw_full_log_sha256": "484e23d62444cf64ab020ecda783475bf28344d0370029730307b1c3b23e87cb",
+    "canonical_upload_complete": false
+  },
+  "tests": "Source-only scope: no full Rust or heavy jobs; prior current-source failures and separate replays retained intact. Launcher operational behavior untested by explicit preparation-only admission.",
+  "gates_remaining": [
+    "Actual root owner stage commit/push and isolated6cad2d programme snapshot publication",
+    "Separate actual advice admission if conditional one pass is needed",
+    "Fresh maintained T6/case claim/publication and actual prelaunch admission with current H/resources",
+    "Sole future Q4 observed outcome and independent review"
+  ],
+  "model": {
+    "managed": "gpt-6.1-sol",
+    "effort": "high",
+    "session": "native-q4prep-20261029",
+    "APIprobe": "unverified",
+    "fallback_used": false
+  },
+  "retained_control_diagnostic": "freeze-sizecheck-diagnostic.txt: initial metadata scan rejected large existing session Markdown; corrected scope, journal preserved. No native/helper failure or retry."
+}

@@ -4,7 +4,7 @@
 - **Kind:** implementation and measurement gap
 - **Affected work:** [five-leads follow-up](../research/five_leads_e2e_20261019/STATUS.md), L3
 - **Next action owner:** unassigned follow-up
-- **Last updated:** 2026-10-20
+- **Last updated:** 2026-11-15 (prime31 related adapter; original cohort preserved)
 
 ## Problem
 
@@ -56,3 +56,29 @@ query systems and an F4-backed collector replay recovered all 540 scalars. Its
 counted row-reduction lower bound alone loses to rho and the pair table in
 every pooled price cell. Complete F4 primitive counts and external msolve
 comparison remain unresolved.
+
+## Related prime31 native continuation (2026-11-15)
+
+The [source-reusing Rust adapter](../research/prime31_ic_20261115/native/README.md)
+extends #4188 on the exact ordinary F_2147483647 curve of prime order
+2147446831. Its two-summand oracle puts S3 and Dickson fibre membership into
+the existing `f4_fp_tower` engine, extracts field roots and replays signed
+relations. The producer's focused suite reports 40 passing development tests,
+including prime31 relation controls and one full p1031 toy public-target solve;
+these are not the older mixed-fibre cohort or a full prime31 experiment.
+`PCC-20261115-d73efd` remains unverified. [pcc:unverified]
+
+The same complete-cost gap remains: symbolic F4 work, allocation, hashing and
+normalisation are not fully counted; no independent full prime31 recovery,
+matched strongest-rho cost or external F4 panel is supplied. Separate access
+limits are recorded in `native/admission-check.txt`: AWS CLI/checkpoint token
+absent, unauthenticated GitHub CLI, no loaded EKS or dispatch operation.
+No research benchmark was launched. [pcc:unverified]
+
+The next execution is specified as EXP-R31-A in
+[EXPERIMENTS.md](../research/prime31_ic_20261115/native/EXPERIMENTS.md).
+The m=8 successor additionally needs six free intermediate abscissae; this
+packed engine supplies four. That is an implementation limit, not a proof
+against another algebraic representation. Complete ecbench accounting,
+authenticated checkpoint/EKS admission, independent replay and all original
+comparison gates remain exit criteria. The historical evidence above is unchanged.

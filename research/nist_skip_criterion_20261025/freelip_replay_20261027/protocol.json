@@ -1,0 +1,482 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "nist-freelip-full21-20261027",
+  "version": 3,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/nist_skip_criterion_20261025/freelip_replay_20261027",
+  "authors": [
+    "Native historical-curve study"
+  ],
+  "links": {
+    "protocol": "PROTOCOL.md",
+    "source_audit": "source-audit.json",
+    "prepared": "PREPARED.json",
+    "prior_trial": "../period_ecpp_20261026/REPORT.md"
+  },
+  "question": "Does one fixed recovered FreeLIP implementation/configuration accept all ten published prime orders and reject all eleven skipped prime orders?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "All 84 fixed version/method/order calls are recorded with exact input/configuration binding and unknowns retained.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "At least one fixed configuration separates all published and skipped labels by observed software acceptance/rejection.",
+      "class": "exact_computation",
+      "decided_by": [],
+      "if_supported": "requires exact-path replay and independent arithmetic diagnosis; not historical attribution",
+      "if_not_supported": "this fixed recovered-program family does not supply a complete reject-all-skips explanation"
+    }
+  ],
+  "arms": [
+    {
+      "id": "v10-probprime",
+      "role": "baseline",
+      "description": "FreeLIP 1.0 probprime with seven random-base trials",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "939664878a4bb679d8a74aa9f0fef39f43b4a5d4",
+        "build": [
+          [
+            "sh",
+            "development.sh"
+          ]
+        ],
+        "binary_sha256": "50431395853cc75ae48f05410bec34fb71fd3e6926536b8f44232df66f9511a2",
+        "flags": {
+          "target": "x86-linux-musl",
+          "limbs": "SINGLE_MUL NBITS26 DOUBLES_LOW_HIGH",
+          "legacy": "GNU89 O0 fcommon fwrapv",
+          "driver": "C99 O2 Wall Wextra Werror",
+          "runtime": "QEMU i3867.2.0 -R268435456"
+        },
+        "env": {
+          "UBSAN_OPTIONS": "halt_on_error=1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "probprime",
+        "version": "1.0",
+        "tests": 7
+      }
+    },
+    {
+      "id": "v10-ordinary",
+      "role": "reference",
+      "description": "FreeLIP 1.0 ordinary with seven random-base trials",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "939664878a4bb679d8a74aa9f0fef39f43b4a5d4",
+        "build": [
+          [
+            "sh",
+            "development.sh"
+          ]
+        ],
+        "binary_sha256": "50431395853cc75ae48f05410bec34fb71fd3e6926536b8f44232df66f9511a2",
+        "flags": {
+          "target": "x86-linux-musl",
+          "limbs": "SINGLE_MUL NBITS26 DOUBLES_LOW_HIGH",
+          "legacy": "GNU89 O0 fcommon fwrapv",
+          "driver": "C99 O2 Wall Wextra Werror",
+          "runtime": "QEMU i3867.2.0 -R268435456"
+        },
+        "env": {
+          "UBSAN_OPTIONS": "halt_on_error=1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ordinary",
+        "version": "1.0",
+        "tests": 8
+      }
+    },
+    {
+      "id": "v11-probprime",
+      "role": "candidate",
+      "description": "FreeLIP 1.1 probprime with seven random-base trials",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "939664878a4bb679d8a74aa9f0fef39f43b4a5d4",
+        "build": [
+          [
+            "sh",
+            "development.sh"
+          ]
+        ],
+        "binary_sha256": "92c855dc7c98303906dbe4ce45a478b39db3ba71405d03b320b70ff2011759c1",
+        "flags": {
+          "target": "x86-linux-musl",
+          "limbs": "SINGLE_MUL NBITS26 DOUBLES_LOW_HIGH",
+          "legacy": "GNU89 O0 fcommon fwrapv",
+          "driver": "C99 O2 Wall Wextra Werror",
+          "runtime": "QEMU i3867.2.0 -R268435456"
+        },
+        "env": {
+          "UBSAN_OPTIONS": "halt_on_error=1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "probprime",
+        "version": "1.1",
+        "tests": 7
+      }
+    },
+    {
+      "id": "v11-ordinary",
+      "role": "reference",
+      "description": "FreeLIP 1.1 ordinary with seven random-base trials",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "939664878a4bb679d8a74aa9f0fef39f43b4a5d4",
+        "build": [
+          [
+            "sh",
+            "development.sh"
+          ]
+        ],
+        "binary_sha256": "92c855dc7c98303906dbe4ce45a478b39db3ba71405d03b320b70ff2011759c1",
+        "flags": {
+          "target": "x86-linux-musl",
+          "limbs": "SINGLE_MUL NBITS26 DOUBLES_LOW_HIGH",
+          "legacy": "GNU89 O0 fcommon fwrapv",
+          "driver": "C99 O2 Wall Wextra Werror",
+          "runtime": "QEMU i3867.2.0 -R268435456"
+        },
+        "env": {
+          "UBSAN_OPTIONS": "halt_on_error=1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ordinary",
+        "version": "1.1",
+        "tests": 8
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "No clock, noise comparison or random statistic; fixed-seed deterministic functional outputs only."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Both original versions/methods passed the fixed13 generic prime/composite fixtures before cohort execution; they exercise both return values without a separate cohort arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Complete fixed known-prime historical census, not a sampled null population; no p-value or security-rate inference."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "version",
+        "levels": [
+          "1.0",
+          "1.1"
+        ]
+      },
+      {
+        "name": "route",
+        "levels": [
+          "probprime",
+          "ordinary"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "all21 original decimal inputs",
+        "how": "byte-copy of already independently proved input packets; source hashes bound"
+      },
+      {
+        "name": "ABI",
+        "treatment": "fixed",
+        "value": "ILP32 little-endian double words,26-bit limbs",
+        "how": "strict runtime assertions and unchanged-source builds"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "serial fresh processes"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 7157891,
+        "how": "unmodified FreeLIP default RNG initialization, no extra draws"
+      },
+      {
+        "name": "host_load",
+        "treatment": "measured",
+        "how": "not measured; no timing metric or speed comparison; address/time limits are guards only"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-routes-v10",
+        "arms": [
+          "v10-probprime",
+          "v10-ordinary"
+        ],
+        "differs_in": [
+          "route"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-source-versions",
+        "arms": [
+          "v10-probprime",
+          "v11-probprime"
+        ],
+        "differs_in": [
+          "version"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-fixed-family",
+        "arms": [
+          "v10-probprime",
+          "v10-ordinary",
+          "v11-probprime",
+          "v11-ordinary"
+        ],
+        "differs_in": [
+          "version",
+          "route"
+        ],
+        "design": "factorial"
+      }
+    ],
+    "aa_not_applicable": "No timing/noise or stochastic label statistic.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Complete deterministic fixed census; no clock is a metric; no one-time cost comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        7157891
+      ],
+      "nonce": null,
+      "note": "Unmodified default RNG state per fresh process; no seed search."
+    },
+    "instance_sampling": {
+      "rule": "all21 original orders,10 published and11 skipped; no sampling or omission",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Existing historical labels and prior studies are visible; no predictive/statistical claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 21,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact full-census digital classification; alpha is schema-required metadata and is not used for a hypothesis-test claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 600,
+      "measured_on": "600s is a conservative enforced total resource-budget ceiling, not a measured or predicted algorithm runtime; generic development controls pass."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "legacy_return",
+        "name": "Legacy software return",
+        "unit": "0 or1, otherwise unavailable",
+        "kind": "exact",
+        "definition": "Completed legacy routine return with requested root and ABI bound; unknown/crash/timeout never assigned a numeric return.",
+        "source": "per-case stdout RESULT line",
+        "aggregation": "per_row",
+        "resolution": "one integer return",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [],
+    "record": [
+      "input",
+      "configuration",
+      "exit_status",
+      "stdout",
+      "stderr",
+      "binary_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "host": "managed shared executor",
+      "cpu_mode": "serial QEMU user-mode i386",
+      "host_virtual_address_KiB": 786432,
+      "guest_reservation_bytes": 268435456
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Precreate all84 input-bound case directories, run each once, then summarize all outcomes;60s per call and600s total.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "A failed input/hash/configuration/control gate stops admission. Preserve failures and never encode unknown as rejection.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Malformed/missing/nonzero exit or UBSan failure is INDETERMINATE, not software rejection; every row retained.",
+    "Modern recovered-source configuration is not an authenticated historical executable or original caller."
+  ],
+  "decision_rule": {
+    "text": "A fixed configuration must accept all10 published orders and software-reject all11 skipped orders, with zero unknowns, to be a candidate explanation; any claimed rejection needs exact-path independent diagnosis before interpretation.",
+    "comparison_ids": [
+      "C-fixed-family"
+    ],
+    "threshold": "10 published accepted,11 skipped rejected,0 unknown under one fixed configuration",
+    "statistic": "exact per-configuration class counts; no fitted threshold",
+    "interval": "none: exact finite observations",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "counts of accepted/rejected/indeterminate for each role",
+    "verdict_vocabulary": [
+      "candidate_separator_requires_diagnosis",
+      "not_a_complete_separator",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "summarize.cpp",
+      "sha256": "9f7852051dfd6422dc4ab26dc50b0b0a76208733cabc69d7d4cbe64b1670eebf"
+    },
+    "inputs": [
+      "inputs/cohort.tsv",
+      "per-case inputs/status/stdout/stderr"
+    ],
+    "outputs": [
+      "results/cohort.tsv",
+      "results/summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-configuration acceptance/rejection/unknown counts, all21 retained"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Dropping controls, timing out cases into rejection, inventing numeric unknown labels or changing thresholds after seeing outcomes.",
+    "Claiming original caller, weakness, attack, security or a1997 cost from this recovered-code result.",
+    "Counting revalidation or repeated routes as independent historical choices."
+  ],
+  "literature": [
+    {
+      "ref": "https://www.anthropic.com/research/ecdsa-curve-origins",
+      "provenance": "retrieved",
+      "claim": "Recovered FreeLIP connection and seven-output base-point recipe, not original caller.",
+      "verified_by": "source review27October2026"
+    },
+    {
+      "ref": "https://words.filippo.io/seeds-solved/",
+      "provenance": "retrieved",
+      "claim": "Complete21-curve eligibility census and residual unexplained skips.",
+      "verified_by": "source review27October2026"
+    },
+    {
+      "ref": "source-audit.json",
+      "provenance": "internal",
+      "claim": "Exact recovered original source bodies, API and RNG paths.",
+      "verified_by": "byte-bound source inspection before cohort"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A-build",
+      "filed": "2026-10-27",
+      "filed_before_affected_data": true,
+      "reason": "Generic development failures exposed legacy header/word-layout configuration requirements before any historical order execution.",
+      "changes": [
+        "Separate typed dependency shim, strict driver; unchanged original arithmetic.",
+        "Explicit ILP32/little-double26-bit configuration, retained UBSan runtime/halt and all controls."
+      ]
+    },
+    {
+      "id": "A-backend",
+      "filed": "2026-10-27",
+      "filed_before_affected_data": true,
+      "reason": "Configured EKS routes are denied/unsupported for this command; bounded local functional workflow uses existing task authorization.",
+      "changes": [
+        "Explicit local fallback before affected data, same84 calls and budgets; no paid resource or benchmark claim."
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "6cddd67e331ed5ae990c90cfa7c8ee94fdfe00a84a1dccf239fa6fc179dcd0ca",
+    "commit": "939664878a4bb679d8a74aa9f0fef39f43b4a5d4",
+    "frozen_at": "2026-10-27T01:20:15.268Z",
+    "filed_before_affected_data": true
+  }
+}

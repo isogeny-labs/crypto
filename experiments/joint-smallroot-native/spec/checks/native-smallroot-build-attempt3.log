@@ -1,0 +1,679 @@
+make: Entering directory '/workspace/crypto-native-smallroot/experiments/joint-smallroot-native'
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror src/main.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lcddgmp -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-build/native-smallroot
+g++ -Isrc -I/workspace/skeleton_sage-runtime/include -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror tests/structural.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lcddgmp -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-build/structural
+In file included from /workspace/skeleton_sage-runtime/include/cddlib/cdd.h:21,
+                 from src/polytope.hpp:6,
+                 from src/pipeline.hpp:5,
+                 from src/control.hpp:3,
+                 from src/main.cpp:3:
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:34:9: error: ‘set_type’ does not name a type
+   34 | typedef set_type dd_rowset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:35:9: error: ‘set_type’ does not name a type
+   35 | typedef set_type dd_colset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:41:9: error: ‘set_type’ does not name a type
+   41 | typedef set_type *dd_SetVector;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:43:9: error: ‘set_type’ does not name a type
+   43 | typedef set_type *dd_Aincidence;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:54:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+   54 |   dd_rowset ZeroSet;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:169:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  169 |   dd_rowset equalityset;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:173:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  173 |   dd_rowset redset_extra;  /* a set of rows that are newly recognized redundan by the extensive search. */
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:174:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  174 |   dd_rowset redset_accum;  /* the accumulated set of rows that are recognized redundant */
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:175:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  175 |   dd_rowset posset_extra;  /* a set of rows that are recognized non-linearity */
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:205:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  205 |   dd_rowset linset;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:221:3: error: ‘dd_SetVector’ does not name a type
+  221 |   dd_SetVector set;
+      |   ^~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:271:3: error: ‘dd_Aincidence’ does not name a type
+  271 |   dd_Aincidence Ainc;
+      |   ^~~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:273:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  273 |   dd_rowset Ared;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:275:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  275 |   dd_rowset Adom;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:310:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  310 |   dd_rowset GroundSet, EqualitySet, NonequalitySet,
+      |   ^~~~~~~~~
+      |   dd_set
+In file included from /workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:22,
+                 from /workspace/skeleton_sage-runtime/include/cddlib/cdd.h:26:
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:35:9: error: ‘set_type’ does not name a type
+   35 | typedef set_type ddf_rowset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:36:9: error: ‘set_type’ does not name a type
+   36 | typedef set_type ddf_colset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:42:9: error: ‘set_type’ does not name a type
+   42 | typedef set_type *ddf_SetVector;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:44:9: error: ‘set_type’ does not name a type
+   44 | typedef set_type *ddf_Aincidence;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:55:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+   55 |   ddf_rowset ZeroSet;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:170:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  170 |   ddf_rowset equalityset;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:174:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  174 |   ddf_rowset redset_extra;  /* a set of rows that are newly recognized redundan by the extensive search. */
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:175:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  175 |   ddf_rowset redset_accum;  /* the accumulated set of rows that are recognized redundant */
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:176:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  176 |   ddf_rowset posset_extra;  /* a set of rows that are recognized non-linearity */
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:206:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  206 |   ddf_rowset linset;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:222:3: error: ‘ddf_SetVector’ does not name a type
+  222 |   ddf_SetVector set;
+      |   ^~~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:272:3: error: ‘ddf_Aincidence’ does not name a type
+  272 |   ddf_Aincidence Ainc;
+      |   ^~~~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:274:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  274 |   ddf_rowset Ared;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:276:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  276 |   ddf_rowset Adom;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:311:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  311 |   ddf_rowset GroundSet, EqualitySet, NonequalitySet,
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:105:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  105 | ddf_rowset ddf_RedundantRows(ddf_MatrixPtr M, ddf_ErrorType * error);  /* 092 */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:107:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  107 | ddf_rowset ddf_SRedundantRows(ddf_MatrixPtr M, ddf_ErrorType * error);  /* 093a */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:108:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  108 | ddf_rowset ddf_RedundantRowsViaShooting(ddf_MatrixPtr M, ddf_ErrorType * error); /* 092 */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:112:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  112 | ddf_rowset ddf_ImplicitLinearityRows(ddf_MatrixPtr M, ddf_ErrorType * error);  /* 092  */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:113:72: error: ‘ddf_rowset’ has not been declared
+  113 | int ddf_FreeOfImplicitLinearity(ddf_MatrixPtr M, ddf_Arow certificate, ddf_rowset * imp_linrows, ddf_ErrorType * error) ; /* 094 */
+      |                                                                        ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:114:64: error: ‘ddf_rowset’ has not been declared
+  114 | ddf_boolean ddf_MatrixCanonicalizeLinearity(ddf_MatrixPtr * M, ddf_rowset * impl_linset,ddf_rowindex * newpos, ddf_ErrorType * error); /* 094 */
+      |                                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:115:55: error: ‘ddf_rowset’ has not been declared
+  115 | ddf_boolean ddf_MatrixCanonicalize(ddf_MatrixPtr * M, ddf_rowset * impl_linset, ddf_rowset * redset, ddf_rowindex * newpos, ddf_ErrorType * error); /* 094 */
+      |                                                       ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:115:81: error: ‘ddf_rowset’ has not been declared
+  115 | ddf_boolean ddf_MatrixCanonicalize(ddf_MatrixPtr * M, ddf_rowset * impl_linset, ddf_rowset * redset, ddf_rowindex * newpos, ddf_ErrorType * error); /* 094 */
+      |                                                                                 ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:116:58: error: ‘ddf_rowset’ has not been declared
+  116 | ddf_boolean ddf_MatrixRedundancyRemove(ddf_MatrixPtr *M, ddf_rowset *redset,ddf_rowindex *newpos, ddf_ErrorType * error); /* 094 */
+      |                                                          ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:117:55: error: ‘ddf_rowset’ has not been declared
+  117 | ddf_boolean ddf_FindRelativeInterior(ddf_MatrixPtr M, ddf_rowset * ImL, ddf_rowset * Lbasis, ddf_LPSolutionPtr * lps, ddf_ErrorType * err);  /* 094 */
+      |                                                       ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:117:73: error: ‘ddf_rowset’ has not been declared
+  117 | ddf_boolean ddf_FindRelativeInterior(ddf_MatrixPtr M, ddf_rowset * ImL, ddf_rowset * Lbasis, ddf_LPSolutionPtr * lps, ddf_ErrorType * err);  /* 094 */
+      |                                                                         ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:118:55: error: ‘ddf_rowset’ has not been declared
+  118 | ddf_boolean ddf_ExistsRestrictedFace(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);  /* 0.94 */
+      |                                                       ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:118:69: error: ‘ddf_rowset’ has not been declared
+  118 | ddf_boolean ddf_ExistsRestrictedFace(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);  /* 0.94 */
+      |                                                                     ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:119:56: error: ‘ddf_rowset’ has not been declared
+  119 | ddf_boolean ddf_ExistsRestrictedFace2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_LPSolutionPtr * lps, ddf_ErrorType * err); /* 0.94 */
+      |                                                        ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:119:70: error: ‘ddf_rowset’ has not been declared
+  119 | ddf_boolean ddf_ExistsRestrictedFace2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_LPSolutionPtr * lps, ddf_ErrorType * err); /* 0.94 */
+      |                                                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:38: error: ‘ddf_rowset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:62: error: ‘ddf_colset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                                              ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:86: error: ‘ddf_rowset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                                                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:109: error: ‘ddf_colset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                                                                                             ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:139:52: error: ‘ddf_rowset’ has not been declared
+  139 | ddf_MatrixPtr ddf_MatrixSubmatrix(ddf_MatrixPtr M, ddf_rowset delset); /* 092 */
+      |                                                    ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:140:53: error: ‘ddf_rowset’ has not been declared
+  140 | ddf_MatrixPtr ddf_MatrixSubmatrix2(ddf_MatrixPtr M, ddf_rowset delset,ddf_rowindex* newpos); /* 094.  It returns new row positions. */
+      |                                                     ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:141:54: error: ‘ddf_rowset’ has not been declared
+  141 | ddf_MatrixPtr ddf_MatrixSubmatrix2L(ddf_MatrixPtr M, ddf_rowset delset,ddf_rowindex* newpos); /* 094.  Linearity shifted up. */
+      |                                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:145:44: error: ‘ddf_rowset’ has not been declared
+  145 | int ddf_MatrixRowsRemove(ddf_MatrixPtr *M, ddf_rowset delset); /* 094 */
+      |                                            ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:146:45: error: ‘ddf_rowset’ has not been declared
+  146 | int ddf_MatrixRowsRemove2(ddf_MatrixPtr *M, ddf_rowset delset,ddf_rowindex* newpos); /* 094 */
+      |                                             ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:181:52: error: ‘ddf_rowset’ has not been declared
+  181 | ddf_LPPtr ddf_Matrix2Feasibility2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);
+      |                                                    ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:181:66: error: ‘ddf_rowset’ has not been declared
+  181 | ddf_LPPtr ddf_Matrix2Feasibility2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);
+      |                                                                  ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:212:53: error: ‘ddf_colset’ has not been declared
+  212 | ddf_MatrixPtr ddf_BlockElimination(ddf_MatrixPtr M, ddf_colset delset, ddf_ErrorType * error);
+      |                                                     ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:217:80: error: ‘ddf_rowset’ has not been declared
+  217 | void ddf_UniqueRows(ddf_rowindex OV, long p, long r, ddf_Amatrix A, long dmax, ddf_rowset preferred, long * uniqrows);
+      |                                                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:261:48: error: ‘ddf_rowset’ has not been declared
+  261 | void ddf_SelectNextHalfspace(ddf_ConePtr cone, ddf_rowset excluded, ddf_rowrange * hh);
+      |                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:263:64: error: ‘ddf_rowset’ has not been declared
+  263 | ddf_Bmatrix T,ddf_RowOrderType roworder,ddf_rowindex ordervec, ddf_rowset equalityset,ddf_rowrange rowmax,ddf_rowset NopivotRow,
+      |                                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:263:107: error: ‘ddf_rowset’ has not been declared
+  263 | ddf_Bmatrix T,ddf_RowOrderType roworder,ddf_rowindex ordervec, ddf_rowset equalityset,ddf_rowrange rowmax,ddf_rowset NopivotRow,
+      |                                                                                                           ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:264:1: error: ‘ddf_colset’ has not been declared
+  264 | ddf_colset NopivotCol,ddf_rowrange * r,ddf_colrange * s,ddf_boolean * selected);
+      | ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:265:49: error: ‘ddf_rowset’ has not been declared
+  265 | void ddf_SelectPreorderedNext(ddf_ConePtr cone, ddf_rowset excluded, ddf_rowrange * hh);
+      |                                                 ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:272:49: error: ‘ddf_rowset’ has not been declared
+  272 | void ddf_UpdateRowOrderVector(ddf_ConePtr cone, ddf_rowset PriorityRows);
+      |                                                 ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:275:93: error: ‘ddf_rowset’ has not been declared
+  275 | void ddf_ZeroIndexSet(ddf_rowrange m_size, ddf_colrange d_size, ddf_Amatrix A, myfloat * x, ddf_rowset ZS);
+      |                                                                                             ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:104:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  104 | dd_rowset dd_RedundantRows(dd_MatrixPtr M, dd_ErrorType * error);  /* 092 */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:106:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  106 | dd_rowset dd_SRedundantRows(dd_MatrixPtr M, dd_ErrorType * error);  /* 093a */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:107:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  107 | dd_rowset dd_RedundantRowsViaShooting(dd_MatrixPtr M, dd_ErrorType * error); /* 092 */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:111:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  111 | dd_rowset dd_ImplicitLinearityRows(dd_MatrixPtr M, dd_ErrorType * error);  /* 092  */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:112:69: error: ‘dd_rowset’ has not been declared
+  112 | int dd_FreeOfImplicitLinearity(dd_MatrixPtr M, dd_Arow certificate, dd_rowset * imp_linrows, dd_ErrorType * error) ; /* 094 */
+      |                                                                     ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:113:61: error: ‘dd_rowset’ has not been declared
+  113 | dd_boolean dd_MatrixCanonicalizeLinearity(dd_MatrixPtr * M, dd_rowset * impl_linset,dd_rowindex * newpos, dd_ErrorType * error); /* 094 */
+      |                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:114:52: error: ‘dd_rowset’ has not been declared
+  114 | dd_boolean dd_MatrixCanonicalize(dd_MatrixPtr * M, dd_rowset * impl_linset, dd_rowset * redset, dd_rowindex * newpos, dd_ErrorType * error); /* 094 */
+      |                                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:114:77: error: ‘dd_rowset’ has not been declared
+  114 | dd_boolean dd_MatrixCanonicalize(dd_MatrixPtr * M, dd_rowset * impl_linset, dd_rowset * redset, dd_rowindex * newpos, dd_ErrorType * error); /* 094 */
+      |                                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:115:55: error: ‘dd_rowset’ has not been declared
+  115 | dd_boolean dd_MatrixRedundancyRemove(dd_MatrixPtr *M, dd_rowset *redset,dd_rowindex *newpos, dd_ErrorType * error); /* 094 */
+      |                                                       ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:116:52: error: ‘dd_rowset’ has not been declared
+  116 | dd_boolean dd_FindRelativeInterior(dd_MatrixPtr M, dd_rowset * ImL, dd_rowset * Lbasis, dd_LPSolutionPtr * lps, dd_ErrorType * err);  /* 094 */
+      |                                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:116:69: error: ‘dd_rowset’ has not been declared
+  116 | dd_boolean dd_FindRelativeInterior(dd_MatrixPtr M, dd_rowset * ImL, dd_rowset * Lbasis, dd_LPSolutionPtr * lps, dd_ErrorType * err);  /* 094 */
+      |                                                                     ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:117:52: error: ‘dd_rowset’ has not been declared
+  117 | dd_boolean dd_ExistsRestrictedFace(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);  /* 0.94 */
+      |                                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:117:65: error: ‘dd_rowset’ has not been declared
+  117 | dd_boolean dd_ExistsRestrictedFace(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);  /* 0.94 */
+      |                                                                 ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:118:53: error: ‘dd_rowset’ has not been declared
+  118 | dd_boolean dd_ExistsRestrictedFace2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_LPSolutionPtr * lps, dd_ErrorType * err); /* 0.94 */
+      |                                                     ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:118:66: error: ‘dd_rowset’ has not been declared
+  118 | dd_boolean dd_ExistsRestrictedFace2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_LPSolutionPtr * lps, dd_ErrorType * err); /* 0.94 */
+      |                                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:36: error: ‘dd_rowset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:59: error: ‘dd_colset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                                           ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:82: error: ‘dd_rowset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:104: error: ‘dd_colset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                                                                                        ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:138:49: error: ‘dd_rowset’ has not been declared
+  138 | dd_MatrixPtr dd_MatrixSubmatrix(dd_MatrixPtr M, dd_rowset delset); /* 092 */
+      |                                                 ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:139:50: error: ‘dd_rowset’ has not been declared
+  139 | dd_MatrixPtr dd_MatrixSubmatrix2(dd_MatrixPtr M, dd_rowset delset,dd_rowindex* newpos); /* 094.  It returns new row positions. */
+      |                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:140:51: error: ‘dd_rowset’ has not been declared
+  140 | dd_MatrixPtr dd_MatrixSubmatrix2L(dd_MatrixPtr M, dd_rowset delset,dd_rowindex* newpos); /* 094.  Linearity shifted up. */
+      |                                                   ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:144:42: error: ‘dd_rowset’ has not been declared
+  144 | int dd_MatrixRowsRemove(dd_MatrixPtr *M, dd_rowset delset); /* 094 */
+      |                                          ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:145:43: error: ‘dd_rowset’ has not been declared
+  145 | int dd_MatrixRowsRemove2(dd_MatrixPtr *M, dd_rowset delset,dd_rowindex* newpos); /* 094 */
+      |                                           ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:180:49: error: ‘dd_rowset’ has not been declared
+  180 | dd_LPPtr dd_Matrix2Feasibility2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);
+      |                                                 ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:180:62: error: ‘dd_rowset’ has not been declared
+  180 | dd_LPPtr dd_Matrix2Feasibility2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);
+      |                                                              ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:211:50: error: ‘dd_colset’ has not been declared
+  211 | dd_MatrixPtr dd_BlockElimination(dd_MatrixPtr M, dd_colset delset, dd_ErrorType * error);
+      |                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:216:77: error: ‘dd_rowset’ has not been declared
+  216 | void dd_UniqueRows(dd_rowindex OV, long p, long r, dd_Amatrix A, long dmax, dd_rowset preferred, long * uniqrows);
+      |                                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:260:46: error: ‘dd_rowset’ has not been declared
+  260 | void dd_SelectNextHalfspace(dd_ConePtr cone, dd_rowset excluded, dd_rowrange * hh);
+      |                                              ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:262:61: error: ‘dd_rowset’ has not been declared
+  262 | dd_Bmatrix T,dd_RowOrderType roworder,dd_rowindex ordervec, dd_rowset equalityset,dd_rowrange rowmax,dd_rowset NopivotRow,
+      |                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:262:102: error: ‘dd_rowset’ has not been declared
+  262 | dd_Bmatrix T,dd_RowOrderType roworder,dd_rowindex ordervec, dd_rowset equalityset,dd_rowrange rowmax,dd_rowset NopivotRow,
+      |                                                                                                      ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:263:1: error: ‘dd_colset’ has not been declared
+  263 | dd_colset NopivotCol,dd_rowrange * r,dd_colrange * s,dd_boolean * selected);
+      | ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:264:47: error: ‘dd_rowset’ has not been declared
+  264 | void dd_SelectPreorderedNext(dd_ConePtr cone, dd_rowset excluded, dd_rowrange * hh);
+      |                                               ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:271:47: error: ‘dd_rowset’ has not been declared
+  271 | void dd_UpdateRowOrderVector(dd_ConePtr cone, dd_rowset PriorityRows);
+      |                                               ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:274:88: error: ‘dd_rowset’ has not been declared
+  274 | void dd_ZeroIndexSet(dd_rowrange m_size, dd_colrange d_size, dd_Amatrix A, mytype * x, dd_rowset ZS);
+      |                                                                                        ^~~~~~~~~
+src/polytope.hpp: In function ‘jsr::Domain jsr::hull(const std::vector<std::vector<int> >&, const std::function<void(const Domain&)>&)’:
+src/polytope.hpp:97:39: error: ‘struct dd_matrixdata’ has no member named ‘linset’
+   97 |     f.equality = set_member(i + 1, H->linset);
+      |                                       ^~~~~~
+make: *** [Makefile:14: /workspace/native-smallroot-build/native-smallroot] Error 1
+make: *** Waiting for unfinished jobs....
+In file included from /workspace/skeleton_sage-runtime/include/cddlib/cdd.h:21,
+                 from src/polytope.hpp:6,
+                 from tests/structural.cpp:3:
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:34:9: error: ‘set_type’ does not name a type
+   34 | typedef set_type dd_rowset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:35:9: error: ‘set_type’ does not name a type
+   35 | typedef set_type dd_colset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:41:9: error: ‘set_type’ does not name a type
+   41 | typedef set_type *dd_SetVector;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:43:9: error: ‘set_type’ does not name a type
+   43 | typedef set_type *dd_Aincidence;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:54:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+   54 |   dd_rowset ZeroSet;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:169:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  169 |   dd_rowset equalityset;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:173:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  173 |   dd_rowset redset_extra;  /* a set of rows that are newly recognized redundan by the extensive search. */
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:174:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  174 |   dd_rowset redset_accum;  /* the accumulated set of rows that are recognized redundant */
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:175:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  175 |   dd_rowset posset_extra;  /* a set of rows that are recognized non-linearity */
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:205:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  205 |   dd_rowset linset;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:221:3: error: ‘dd_SetVector’ does not name a type
+  221 |   dd_SetVector set;
+      |   ^~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:271:3: error: ‘dd_Aincidence’ does not name a type
+  271 |   dd_Aincidence Ainc;
+      |   ^~~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:273:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  273 |   dd_rowset Ared;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:275:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  275 |   dd_rowset Adom;
+      |   ^~~~~~~~~
+      |   dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes.h:310:3: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  310 |   dd_rowset GroundSet, EqualitySet, NonequalitySet,
+      |   ^~~~~~~~~
+      |   dd_set
+In file included from /workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:22,
+                 from /workspace/skeleton_sage-runtime/include/cddlib/cdd.h:26:
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:35:9: error: ‘set_type’ does not name a type
+   35 | typedef set_type ddf_rowset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:36:9: error: ‘set_type’ does not name a type
+   36 | typedef set_type ddf_colset;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:42:9: error: ‘set_type’ does not name a type
+   42 | typedef set_type *ddf_SetVector;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:44:9: error: ‘set_type’ does not name a type
+   44 | typedef set_type *ddf_Aincidence;
+      |         ^~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:55:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+   55 |   ddf_rowset ZeroSet;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:170:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  170 |   ddf_rowset equalityset;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:174:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  174 |   ddf_rowset redset_extra;  /* a set of rows that are newly recognized redundan by the extensive search. */
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:175:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  175 |   ddf_rowset redset_accum;  /* the accumulated set of rows that are recognized redundant */
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:176:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  176 |   ddf_rowset posset_extra;  /* a set of rows that are recognized non-linearity */
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:206:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  206 |   ddf_rowset linset;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:222:3: error: ‘ddf_SetVector’ does not name a type
+  222 |   ddf_SetVector set;
+      |   ^~~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:272:3: error: ‘ddf_Aincidence’ does not name a type
+  272 |   ddf_Aincidence Ainc;
+      |   ^~~~~~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:274:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  274 |   ddf_rowset Ared;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:276:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  276 |   ddf_rowset Adom;
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cddtypes_f.h:311:3: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  311 |   ddf_rowset GroundSet, EqualitySet, NonequalitySet,
+      |   ^~~~~~~~~~
+      |   ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:105:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  105 | ddf_rowset ddf_RedundantRows(ddf_MatrixPtr M, ddf_ErrorType * error);  /* 092 */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:107:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  107 | ddf_rowset ddf_SRedundantRows(ddf_MatrixPtr M, ddf_ErrorType * error);  /* 093a */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:108:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  108 | ddf_rowset ddf_RedundantRowsViaShooting(ddf_MatrixPtr M, ddf_ErrorType * error); /* 092 */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:112:1: error: ‘ddf_rowset’ does not name a type; did you mean ‘ddf_set’?
+  112 | ddf_rowset ddf_ImplicitLinearityRows(ddf_MatrixPtr M, ddf_ErrorType * error);  /* 092  */
+      | ^~~~~~~~~~
+      | ddf_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:113:72: error: ‘ddf_rowset’ has not been declared
+  113 | int ddf_FreeOfImplicitLinearity(ddf_MatrixPtr M, ddf_Arow certificate, ddf_rowset * imp_linrows, ddf_ErrorType * error) ; /* 094 */
+      |                                                                        ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:114:64: error: ‘ddf_rowset’ has not been declared
+  114 | ddf_boolean ddf_MatrixCanonicalizeLinearity(ddf_MatrixPtr * M, ddf_rowset * impl_linset,ddf_rowindex * newpos, ddf_ErrorType * error); /* 094 */
+      |                                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:115:55: error: ‘ddf_rowset’ has not been declared
+  115 | ddf_boolean ddf_MatrixCanonicalize(ddf_MatrixPtr * M, ddf_rowset * impl_linset, ddf_rowset * redset, ddf_rowindex * newpos, ddf_ErrorType * error); /* 094 */
+      |                                                       ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:115:81: error: ‘ddf_rowset’ has not been declared
+  115 | ddf_boolean ddf_MatrixCanonicalize(ddf_MatrixPtr * M, ddf_rowset * impl_linset, ddf_rowset * redset, ddf_rowindex * newpos, ddf_ErrorType * error); /* 094 */
+      |                                                                                 ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:116:58: error: ‘ddf_rowset’ has not been declared
+  116 | ddf_boolean ddf_MatrixRedundancyRemove(ddf_MatrixPtr *M, ddf_rowset *redset,ddf_rowindex *newpos, ddf_ErrorType * error); /* 094 */
+      |                                                          ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:117:55: error: ‘ddf_rowset’ has not been declared
+  117 | ddf_boolean ddf_FindRelativeInterior(ddf_MatrixPtr M, ddf_rowset * ImL, ddf_rowset * Lbasis, ddf_LPSolutionPtr * lps, ddf_ErrorType * err);  /* 094 */
+      |                                                       ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:117:73: error: ‘ddf_rowset’ has not been declared
+  117 | ddf_boolean ddf_FindRelativeInterior(ddf_MatrixPtr M, ddf_rowset * ImL, ddf_rowset * Lbasis, ddf_LPSolutionPtr * lps, ddf_ErrorType * err);  /* 094 */
+      |                                                                         ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:118:55: error: ‘ddf_rowset’ has not been declared
+  118 | ddf_boolean ddf_ExistsRestrictedFace(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);  /* 0.94 */
+      |                                                       ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:118:69: error: ‘ddf_rowset’ has not been declared
+  118 | ddf_boolean ddf_ExistsRestrictedFace(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);  /* 0.94 */
+      |                                                                     ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:119:56: error: ‘ddf_rowset’ has not been declared
+  119 | ddf_boolean ddf_ExistsRestrictedFace2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_LPSolutionPtr * lps, ddf_ErrorType * err); /* 0.94 */
+      |                                                        ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:119:70: error: ‘ddf_rowset’ has not been declared
+  119 | ddf_boolean ddf_ExistsRestrictedFace2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_LPSolutionPtr * lps, ddf_ErrorType * err); /* 0.94 */
+      |                                                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:38: error: ‘ddf_rowset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:62: error: ‘ddf_colset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                                              ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:86: error: ‘ddf_rowset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                                                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:123:109: error: ‘ddf_colset’ has not been declared
+  123 | long ddf_MatrixRank(ddf_MatrixPtr M, ddf_rowset ignoredrows, ddf_colset ignoredcols, ddf_rowset * rowbasis, ddf_colset * colbasis);
+      |                                                                                                             ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:139:52: error: ‘ddf_rowset’ has not been declared
+  139 | ddf_MatrixPtr ddf_MatrixSubmatrix(ddf_MatrixPtr M, ddf_rowset delset); /* 092 */
+      |                                                    ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:140:53: error: ‘ddf_rowset’ has not been declared
+  140 | ddf_MatrixPtr ddf_MatrixSubmatrix2(ddf_MatrixPtr M, ddf_rowset delset,ddf_rowindex* newpos); /* 094.  It returns new row positions. */
+      |                                                     ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:141:54: error: ‘ddf_rowset’ has not been declared
+  141 | ddf_MatrixPtr ddf_MatrixSubmatrix2L(ddf_MatrixPtr M, ddf_rowset delset,ddf_rowindex* newpos); /* 094.  Linearity shifted up. */
+      |                                                      ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:145:44: error: ‘ddf_rowset’ has not been declared
+  145 | int ddf_MatrixRowsRemove(ddf_MatrixPtr *M, ddf_rowset delset); /* 094 */
+      |                                            ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:146:45: error: ‘ddf_rowset’ has not been declared
+  146 | int ddf_MatrixRowsRemove2(ddf_MatrixPtr *M, ddf_rowset delset,ddf_rowindex* newpos); /* 094 */
+      |                                             ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:181:52: error: ‘ddf_rowset’ has not been declared
+  181 | ddf_LPPtr ddf_Matrix2Feasibility2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);
+      |                                                    ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:181:66: error: ‘ddf_rowset’ has not been declared
+  181 | ddf_LPPtr ddf_Matrix2Feasibility2(ddf_MatrixPtr M, ddf_rowset R, ddf_rowset S, ddf_ErrorType * err);
+      |                                                                  ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:212:53: error: ‘ddf_colset’ has not been declared
+  212 | ddf_MatrixPtr ddf_BlockElimination(ddf_MatrixPtr M, ddf_colset delset, ddf_ErrorType * error);
+      |                                                     ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:217:80: error: ‘ddf_rowset’ has not been declared
+  217 | void ddf_UniqueRows(ddf_rowindex OV, long p, long r, ddf_Amatrix A, long dmax, ddf_rowset preferred, long * uniqrows);
+      |                                                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:261:48: error: ‘ddf_rowset’ has not been declared
+  261 | void ddf_SelectNextHalfspace(ddf_ConePtr cone, ddf_rowset excluded, ddf_rowrange * hh);
+      |                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:263:64: error: ‘ddf_rowset’ has not been declared
+  263 | ddf_Bmatrix T,ddf_RowOrderType roworder,ddf_rowindex ordervec, ddf_rowset equalityset,ddf_rowrange rowmax,ddf_rowset NopivotRow,
+      |                                                                ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:263:107: error: ‘ddf_rowset’ has not been declared
+  263 | ddf_Bmatrix T,ddf_RowOrderType roworder,ddf_rowindex ordervec, ddf_rowset equalityset,ddf_rowrange rowmax,ddf_rowset NopivotRow,
+      |                                                                                                           ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:264:1: error: ‘ddf_colset’ has not been declared
+  264 | ddf_colset NopivotCol,ddf_rowrange * r,ddf_colrange * s,ddf_boolean * selected);
+      | ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:265:49: error: ‘ddf_rowset’ has not been declared
+  265 | void ddf_SelectPreorderedNext(ddf_ConePtr cone, ddf_rowset excluded, ddf_rowrange * hh);
+      |                                                 ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:272:49: error: ‘ddf_rowset’ has not been declared
+  272 | void ddf_UpdateRowOrderVector(ddf_ConePtr cone, ddf_rowset PriorityRows);
+      |                                                 ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd_f.h:275:93: error: ‘ddf_rowset’ has not been declared
+  275 | void ddf_ZeroIndexSet(ddf_rowrange m_size, ddf_colrange d_size, ddf_Amatrix A, myfloat * x, ddf_rowset ZS);
+      |                                                                                             ^~~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:104:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  104 | dd_rowset dd_RedundantRows(dd_MatrixPtr M, dd_ErrorType * error);  /* 092 */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:106:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  106 | dd_rowset dd_SRedundantRows(dd_MatrixPtr M, dd_ErrorType * error);  /* 093a */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:107:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  107 | dd_rowset dd_RedundantRowsViaShooting(dd_MatrixPtr M, dd_ErrorType * error); /* 092 */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:111:1: error: ‘dd_rowset’ does not name a type; did you mean ‘dd_set’?
+  111 | dd_rowset dd_ImplicitLinearityRows(dd_MatrixPtr M, dd_ErrorType * error);  /* 092  */
+      | ^~~~~~~~~
+      | dd_set
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:112:69: error: ‘dd_rowset’ has not been declared
+  112 | int dd_FreeOfImplicitLinearity(dd_MatrixPtr M, dd_Arow certificate, dd_rowset * imp_linrows, dd_ErrorType * error) ; /* 094 */
+      |                                                                     ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:113:61: error: ‘dd_rowset’ has not been declared
+  113 | dd_boolean dd_MatrixCanonicalizeLinearity(dd_MatrixPtr * M, dd_rowset * impl_linset,dd_rowindex * newpos, dd_ErrorType * error); /* 094 */
+      |                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:114:52: error: ‘dd_rowset’ has not been declared
+  114 | dd_boolean dd_MatrixCanonicalize(dd_MatrixPtr * M, dd_rowset * impl_linset, dd_rowset * redset, dd_rowindex * newpos, dd_ErrorType * error); /* 094 */
+      |                                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:114:77: error: ‘dd_rowset’ has not been declared
+  114 | dd_boolean dd_MatrixCanonicalize(dd_MatrixPtr * M, dd_rowset * impl_linset, dd_rowset * redset, dd_rowindex * newpos, dd_ErrorType * error); /* 094 */
+      |                                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:115:55: error: ‘dd_rowset’ has not been declared
+  115 | dd_boolean dd_MatrixRedundancyRemove(dd_MatrixPtr *M, dd_rowset *redset,dd_rowindex *newpos, dd_ErrorType * error); /* 094 */
+      |                                                       ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:116:52: error: ‘dd_rowset’ has not been declared
+  116 | dd_boolean dd_FindRelativeInterior(dd_MatrixPtr M, dd_rowset * ImL, dd_rowset * Lbasis, dd_LPSolutionPtr * lps, dd_ErrorType * err);  /* 094 */
+      |                                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:116:69: error: ‘dd_rowset’ has not been declared
+  116 | dd_boolean dd_FindRelativeInterior(dd_MatrixPtr M, dd_rowset * ImL, dd_rowset * Lbasis, dd_LPSolutionPtr * lps, dd_ErrorType * err);  /* 094 */
+      |                                                                     ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:117:52: error: ‘dd_rowset’ has not been declared
+  117 | dd_boolean dd_ExistsRestrictedFace(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);  /* 0.94 */
+      |                                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:117:65: error: ‘dd_rowset’ has not been declared
+  117 | dd_boolean dd_ExistsRestrictedFace(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);  /* 0.94 */
+      |                                                                 ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:118:53: error: ‘dd_rowset’ has not been declared
+  118 | dd_boolean dd_ExistsRestrictedFace2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_LPSolutionPtr * lps, dd_ErrorType * err); /* 0.94 */
+      |                                                     ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:118:66: error: ‘dd_rowset’ has not been declared
+  118 | dd_boolean dd_ExistsRestrictedFace2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_LPSolutionPtr * lps, dd_ErrorType * err); /* 0.94 */
+      |                                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:36: error: ‘dd_rowset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                    ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:59: error: ‘dd_colset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                                           ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:82: error: ‘dd_rowset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:122:104: error: ‘dd_colset’ has not been declared
+  122 | long dd_MatrixRank(dd_MatrixPtr M, dd_rowset ignoredrows, dd_colset ignoredcols, dd_rowset * rowbasis, dd_colset * colbasis);
+      |                                                                                                        ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:138:49: error: ‘dd_rowset’ has not been declared
+  138 | dd_MatrixPtr dd_MatrixSubmatrix(dd_MatrixPtr M, dd_rowset delset); /* 092 */
+      |                                                 ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:139:50: error: ‘dd_rowset’ has not been declared
+  139 | dd_MatrixPtr dd_MatrixSubmatrix2(dd_MatrixPtr M, dd_rowset delset,dd_rowindex* newpos); /* 094.  It returns new row positions. */
+      |                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:140:51: error: ‘dd_rowset’ has not been declared
+  140 | dd_MatrixPtr dd_MatrixSubmatrix2L(dd_MatrixPtr M, dd_rowset delset,dd_rowindex* newpos); /* 094.  Linearity shifted up. */
+      |                                                   ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:144:42: error: ‘dd_rowset’ has not been declared
+  144 | int dd_MatrixRowsRemove(dd_MatrixPtr *M, dd_rowset delset); /* 094 */
+      |                                          ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:145:43: error: ‘dd_rowset’ has not been declared
+  145 | int dd_MatrixRowsRemove2(dd_MatrixPtr *M, dd_rowset delset,dd_rowindex* newpos); /* 094 */
+      |                                           ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:180:49: error: ‘dd_rowset’ has not been declared
+  180 | dd_LPPtr dd_Matrix2Feasibility2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);
+      |                                                 ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:180:62: error: ‘dd_rowset’ has not been declared
+  180 | dd_LPPtr dd_Matrix2Feasibility2(dd_MatrixPtr M, dd_rowset R, dd_rowset S, dd_ErrorType * err);
+      |                                                              ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:211:50: error: ‘dd_colset’ has not been declared
+  211 | dd_MatrixPtr dd_BlockElimination(dd_MatrixPtr M, dd_colset delset, dd_ErrorType * error);
+      |                                                  ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:216:77: error: ‘dd_rowset’ has not been declared
+  216 | void dd_UniqueRows(dd_rowindex OV, long p, long r, dd_Amatrix A, long dmax, dd_rowset preferred, long * uniqrows);
+      |                                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:260:46: error: ‘dd_rowset’ has not been declared
+  260 | void dd_SelectNextHalfspace(dd_ConePtr cone, dd_rowset excluded, dd_rowrange * hh);
+      |                                              ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:262:61: error: ‘dd_rowset’ has not been declared
+  262 | dd_Bmatrix T,dd_RowOrderType roworder,dd_rowindex ordervec, dd_rowset equalityset,dd_rowrange rowmax,dd_rowset NopivotRow,
+      |                                                             ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:262:102: error: ‘dd_rowset’ has not been declared
+  262 | dd_Bmatrix T,dd_RowOrderType roworder,dd_rowindex ordervec, dd_rowset equalityset,dd_rowrange rowmax,dd_rowset NopivotRow,
+      |                                                                                                      ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:263:1: error: ‘dd_colset’ has not been declared
+  263 | dd_colset NopivotCol,dd_rowrange * r,dd_colrange * s,dd_boolean * selected);
+      | ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:264:47: error: ‘dd_rowset’ has not been declared
+  264 | void dd_SelectPreorderedNext(dd_ConePtr cone, dd_rowset excluded, dd_rowrange * hh);
+      |                                               ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:271:47: error: ‘dd_rowset’ has not been declared
+  271 | void dd_UpdateRowOrderVector(dd_ConePtr cone, dd_rowset PriorityRows);
+      |                                               ^~~~~~~~~
+/workspace/skeleton_sage-runtime/include/cddlib/cdd.h:274:88: error: ‘dd_rowset’ has not been declared
+  274 | void dd_ZeroIndexSet(dd_rowrange m_size, dd_colrange d_size, dd_Amatrix A, mytype * x, dd_rowset ZS);
+      |                                                                                        ^~~~~~~~~
+src/polytope.hpp: In function ‘jsr::Domain jsr::hull(const std::vector<std::vector<int> >&, const std::function<void(const Domain&)>&)’:
+src/polytope.hpp:97:39: error: ‘struct dd_matrixdata’ has no member named ‘linset’
+   97 |     f.equality = set_member(i + 1, H->linset);
+      |                                       ^~~~~~
+make: *** [Makefile:16: /workspace/native-smallroot-build/structural] Error 1
+make: Leaving directory '/workspace/crypto-native-smallroot/experiments/joint-smallroot-native'

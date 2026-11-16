@@ -1,0 +1,112 @@
+{
+  "branch": "claude/curve25519-ic-autolab-round4",
+  "closed_utc": "2026-11-04T04:46:35+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ic_autolab",
+        "--home",
+        "research/curve25519_autolab_20261104",
+        "loop",
+        "--rounds",
+        "1",
+        "--track",
+        "generic",
+        "--sizes",
+        "24",
+        "--max-candidates",
+        "9",
+        "--train-targets",
+        "32",
+        "--cpus",
+        "auto",
+        "--allow-busy",
+        "--replay",
+        "8"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T04:45:38+00:00",
+      "wall_s": 9.861
+    }
+  ],
+  "commit": "fdeed51f64bdb7c43a639fdbef55d3ffeebbcdd6",
+  "commit_dirty": true,
+  "created_utc": "2026-11-04T04:45:38+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T0445Z-c25519-autolab-r12-k24",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 32,
+      "name": "s_w0_incumbent",
+      "note": "train screen; incumbent ksum4-n12 kept; stride stream 7.413 (P1 falsified); pcc PCC-20261104-4afdff unverified",
+      "reference": 1.238,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.857
+    }
+  ],
+  "problem": "ic:curve25519-family-k24",
+  "raw": [
+    {
+      "bytes": 717,
+      "path": "research/curve25519_autolab_20261104/round-012/RESULT.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/29822c14bc9e6bc6d85c718eb3b8a99d6e6453eb9c3c8dea876a12e339d25e97",
+      "sha256": "29822c14bc9e6bc6d85c718eb3b8a99d6e6453eb9c3c8dea876a12e339d25e97",
+      "uploaded": false
+    },
+    {
+      "bytes": 2258,
+      "path": "research/curve25519_autolab_20261104/round-012/selection.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e7c5680e1bcc5aef8557b2a3898200b2920d5614f9698923ff28ccbe1640fee5",
+      "sha256": "e7c5680e1bcc5aef8557b2a3898200b2920d5614f9698923ff28ccbe1640fee5",
+      "uploaded": false
+    },
+    {
+      "bytes": 3409,
+      "path": "research/curve25519_autolab_20261104/round-012/analysis/band-train-k24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/64f1c71ca642a26d97e0ae4569a191246792463dd9957a1ef0533c1c90385b22",
+      "sha256": "64f1c71ca642a26d97e0ae4569a191246792463dd9957a1ef0533c1c90385b22",
+      "uploaded": false
+    },
+    {
+      "bytes": 1090,
+      "path": "research/curve25519_autolab_20261104/round-012/analysis/run-train.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/41/41a6aa3c835a5bda33dbf37c39cd7e201911d28d32c8b1e9dbf48bb19bf90980",
+      "sha256": "41a6aa3c835a5bda33dbf37c39cd7e201911d28d32c8b1e9dbf48bb19bf90980",
+      "uploaded": false
+    },
+    {
+      "bytes": 2508,
+      "path": "research/curve25519_autolab_20261104/round-012/analysis/verify-train-k24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4c/4c4b2bb576a6cccb0160ec4d99852cb81280d99ecd65c00169bf80786e8c6960",
+      "sha256": "4c4b2bb576a6cccb0160ec4d99852cb81280d99ecd65c00169bf80786e8c6960",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/round-012/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/curve25519_autolab_20261104/round-012/round.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-autolab-r12-k24",
+  "status": "measured",
+  "summary": "ic_autolab round 12, k = 24: the stride target stream raises the incumbent's cost 1.081x (P1 falsified); no challenger",
+  "validation": null
+}

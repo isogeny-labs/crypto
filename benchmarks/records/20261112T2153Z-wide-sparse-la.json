@@ -1,0 +1,429 @@
+{
+  "branch": "claude/ecstatic-thompson-0jpmjv",
+  "closed_utc": "2026-11-14T19:23:53+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/89d98138-21ce-5c29-8de4-5fe8ac9e919c/scratchpad/awsvenv/bin/python",
+        "research/ic_techniques_20261012/wide_sparse_la/runpod/launch.py"
+      ],
+      "cwd": ".",
+      "exit": 1,
+      "started_utc": "2026-11-12T21:55:07+00:00",
+      "wall_s": 12.686
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/89d98138-21ce-5c29-8de4-5fe8ac9e919c/scratchpad/awsvenv/bin/python",
+        "research/ic_techniques_20261012/wide_sparse_la/runpod/launch.py"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T21:55:50+00:00",
+      "wall_s": 19.729
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/89d98138-21ce-5c29-8de4-5fe8ac9e919c/scratchpad/awsvenv/bin/python",
+        "research/ic_techniques_20261012/wide_sparse_la/runpod/launch.py"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T22:24:04+00:00",
+      "wall_s": 18.145
+    }
+  ],
+  "commit": "248183b64a934503ef4476c748f7a2995a50f3f3",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T21:53:47+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-wide-sparse-la"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T2153Z-wide-sparse-la",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "beta_row_ops_u192_129_full_bw",
+      "note": "counted; size law fit D=2^12..2^19 (2^20 timed out); 95% bootstrap; dimensionless exponent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.9584901132083512,
+        1.9636550157624442
+      ],
+      "unit": "ratio",
+      "value": 1.9608991810901908
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "beta_row_ops_u192_129_full_bl",
+      "note": "counted; size law fit D=2^12..2^19 (2^20 timed out); 95% bootstrap; dimensionless exponent",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.9603631971564432,
+        1.9655591953224478
+      ],
+      "unit": "ratio",
+      "value": 1.962772675112476
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u128_61_full_bw",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.088813966245767,
+        3.6558024344624895
+      ],
+      "unit": "ratio",
+      "value": 3.5251258659305584
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u128_89_full_bw",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.93543245530079,
+        4.365064334450554
+      ],
+      "unit": "ratio",
+      "value": 4.2899300628992725
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u128_127_full_bw",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        5.877259329898187,
+        6.378661456159762
+      ],
+      "unit": "ratio",
+      "value": 6.280680593517921
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u192_129_full_bw",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        9.708682497358632,
+        10.579491420380377
+      ],
+      "unit": "ratio",
+      "value": 10.511512430352784
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u192_190_full_bw",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        7.060233786633725,
+        10.275052729947166
+      ],
+      "unit": "ratio",
+      "value": 9.097098967615967
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u256_255_full_bw",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        15.021892383434997,
+        17.581433351915297
+      ],
+      "unit": "ratio",
+      "value": 17.122644187448063
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u128_61_full_bl",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.6747778267955833,
+        3.252290941828533
+      ],
+      "unit": "ratio",
+      "value": 2.889486869059283
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u128_89_full_bl",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.0615958024394456,
+        4.037120651234849
+      ],
+      "unit": "ratio",
+      "value": 3.448919005061468
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u128_127_full_bl",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.129775953352881,
+        5.19270482184397
+      ],
+      "unit": "ratio",
+      "value": 4.1793043094024585
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u192_129_full_bl",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        6.1728463749674,
+        7.560062272834707
+      ],
+      "unit": "ratio",
+      "value": 6.873229602433442
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u192_190_full_bl",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        5.516509427874462,
+        6.613279284013998
+      ],
+      "unit": "ratio",
+      "value": 5.543651087458177
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "time_per_row_op_ratio_to_u64_61_d2e19_u256_255_full_bl",
+      "note": "derived: ns_per_row_op(arm)/ns_per_row_op(u64@61) within each pod; median and min-max over 3 RunPod pods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        9.290840025910672,
+        11.291488873174465
+      ],
+      "unit": "ratio",
+      "value": 10.925356054698796
+    }
+  ],
+  "problem": "kernel:ic_sparse_la_wide",
+  "raw": [
+    {
+      "bytes": 7818,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed1/aa.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d4/d499d34fbbfc3e4773fc593f35fad0ac62999db7c9bc50ac3acd4af1b46c2191",
+      "sha256": "d499d34fbbfc3e4773fc593f35fad0ac62999db7c9bc50ac3acd4af1b46c2191",
+      "uploaded": true
+    },
+    {
+      "bytes": 153491,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed1/grid.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/67/6749211e42bcc81417262a20c823526f7e1d171502b8c6fea6d937d46e8a2d19",
+      "sha256": "6749211e42bcc81417262a20c823526f7e1d171502b8c6fea6d937d46e8a2d19",
+      "uploaded": true
+    },
+    {
+      "bytes": 32992,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed1/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4e/4ee99ac77849891b90924406060068a63f41715a9cd071b20ec62274d99e630f",
+      "sha256": "4ee99ac77849891b90924406060068a63f41715a9cd071b20ec62274d99e630f",
+      "uploaded": true
+    },
+    {
+      "bytes": 18123,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed1/wide_coeffs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/34fc637fb6118c4e97d9abac88ebdddd11735aa6193873c49768ea09350b6ce2",
+      "sha256": "34fc637fb6118c4e97d9abac88ebdddd11735aa6193873c49768ea09350b6ce2",
+      "uploaded": true
+    },
+    {
+      "bytes": 7823,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed2/aa.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2a/2a7b2ae1fa4727832c4c2f229a71f93ab12439a83cd04547069ca084986845c2",
+      "sha256": "2a7b2ae1fa4727832c4c2f229a71f93ab12439a83cd04547069ca084986845c2",
+      "uploaded": true
+    },
+    {
+      "bytes": 153448,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed2/grid.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6e/6e2ddba7037dc78d6c1447199397619809ec8c582229ae75c0c9bfcc62b73967",
+      "sha256": "6e2ddba7037dc78d6c1447199397619809ec8c582229ae75c0c9bfcc62b73967",
+      "uploaded": true
+    },
+    {
+      "bytes": 32990,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed2/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ec/ec61e163300a536799fb3456d2d6439dcf7d566b7305aac611edff09b19dbebe",
+      "sha256": "ec61e163300a536799fb3456d2d6439dcf7d566b7305aac611edff09b19dbebe",
+      "uploaded": true
+    },
+    {
+      "bytes": 18130,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed2/wide_coeffs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b6b983b1b33d5585511c3d81f818314b2bb21dba6ac73b2d17ae68dd329ea239",
+      "sha256": "b6b983b1b33d5585511c3d81f818314b2bb21dba6ac73b2d17ae68dd329ea239",
+      "uploaded": true
+    },
+    {
+      "bytes": 7829,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed3/aa.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/94/9414efc64b180589fdc61a6db2810ed6248cb45a8d61112cddd4f6594b773c62",
+      "sha256": "9414efc64b180589fdc61a6db2810ed6248cb45a8d61112cddd4f6594b773c62",
+      "uploaded": true
+    },
+    {
+      "bytes": 153411,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed3/grid.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a3/a3cf498950780bb61c43bfcbd1eac213b40fd63b33a4b540fa7f32504e6a3826",
+      "sha256": "a3cf498950780bb61c43bfcbd1eac213b40fd63b33a4b540fa7f32504e6a3826",
+      "uploaded": true
+    },
+    {
+      "bytes": 32990,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed3/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/41/416d20956fe64162b568f6733239e4c400a278d37a55a90496481c0b9e20d2e0",
+      "sha256": "416d20956fe64162b568f6733239e4c400a278d37a55a90496481c0b9e20d2e0",
+      "uploaded": true
+    },
+    {
+      "bytes": 18149,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed3/wide_coeffs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9b/9b59cc3e6fdb1e0537ae168b6da211e7457c64fe48af95d73ce424ffb91c16d4",
+      "sha256": "9b59cc3e6fdb1e0537ae168b6da211e7457c64fe48af95d73ce424ffb91c16d4",
+      "uploaded": true
+    },
+    {
+      "bytes": 477,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed1/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6c/6c82825e752cd3ad3c5abf9e315d375c506a3f8287e68f7f08917faa72a6bfb8",
+      "sha256": "6c82825e752cd3ad3c5abf9e315d375c506a3f8287e68f7f08917faa72a6bfb8",
+      "uploaded": true
+    },
+    {
+      "bytes": 498,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed2/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/122dadbd019451f120228ab5c1f2a28c004a757068ca8578eab3391cc6d16d83",
+      "sha256": "122dadbd019451f120228ab5c1f2a28c004a757068ca8578eab3391cc6d16d83",
+      "uploaded": true
+    },
+    {
+      "bytes": 477,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed3/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c2/c2edd6fa735d2c11ffaf7031d022ce2657e4a40f4f5001242b5b9b94c0d9e76b",
+      "sha256": "c2edd6fa735d2c11ffaf7031d022ce2657e4a40f4f5001242b5b9b94c0d9e76b",
+      "uploaded": true
+    },
+    {
+      "bytes": 64,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed1/done.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fd5b2090cbd0c8f419d1e4c8117678ed634ca9dae620f4b558c1a670bd7078f0",
+      "sha256": "fd5b2090cbd0c8f419d1e4c8117678ed634ca9dae620f4b558c1a670bd7078f0",
+      "uploaded": true
+    },
+    {
+      "bytes": 64,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed2/done.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8c/8cb0ed0bca183c57408b2aa9110b35fcf16b3fda5dd0358a9011311004ab171c",
+      "sha256": "8cb0ed0bca183c57408b2aa9110b35fcf16b3fda5dd0358a9011311004ab171c",
+      "uploaded": true
+    },
+    {
+      "bytes": 64,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed3/done.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1a/1a250ac4d39514e2ec35b0fd4e9c8b0cd5d33c85158caee8c67635280936dc69",
+      "sha256": "1a250ac4d39514e2ec35b0fd4e9c8b0cd5d33c85158caee8c67635280936dc69",
+      "uploaded": true
+    },
+    {
+      "bytes": 24032,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed1/pod.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/19/19850ede4d0806ca6798b9cf63c9030db8454e8d10529f954bbec5e548f6d344",
+      "sha256": "19850ede4d0806ca6798b9cf63c9030db8454e8d10529f954bbec5e548f6d344",
+      "uploaded": true
+    },
+    {
+      "bytes": 24030,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed2/pod.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/26a0efe3765866542006e4a24cb53c604045e9c18680397382e2cbfd4c07eaf1",
+      "sha256": "26a0efe3765866542006e4a24cb53c604045e9c18680397382e2cbfd4c07eaf1",
+      "uploaded": true
+    },
+    {
+      "bytes": 24030,
+      "path": "research/ic_techniques_20261012/wide_sparse_la/raw/seed3/pod.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7f/7f46237c56fb96894d99584a3aa5903d42d9bf2525ca79e71544f949824661a0",
+      "sha256": "7f46237c56fb96894d99584a3aa5903d42d9bf2525ca79e71544f949824661a0",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261112-wide-sparse-la/REPORT.pdf",
+    "png": [
+      "benchmarks/20261112-wide-sparse-la/ns_per_row_op_vs_limbs.png"
+    ],
+    "svg": [
+      "benchmarks/20261112-wide-sparse-la/ns_per_row_op_vs_limbs.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "wide-sparse-la",
+  "status": "measured",
+  "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+  "validation": null
+}

@@ -1,0 +1,175 @@
+{
+  "argv": [
+    "/tmp/claude-0/-home-user/717e4727-b5a7-5b25-924a-7b31edb43331/scratchpad/r71_bin",
+    "selftest",
+    "11,13,17,19,23,29,31",
+    "research/isogeny_fibers_20261010/round7/r7_1_complete_cost/selftest.json"
+  ],
+  "field_bits": 61,
+  "mode": "selftest",
+  "rows": [
+    {
+      "ell": 11,
+      "fast": {
+        "A": 264687,
+        "I": 1,
+        "M": 265798,
+        "Meq": 265889,
+        "W": 0,
+        "WA": 0
+      },
+      "p": 2194022016159817771,
+      "reference": {
+        "A": 264687,
+        "I": 1,
+        "M": 265798,
+        "Meq": 265889,
+        "W": 0,
+        "WA": 0
+      },
+      "tables_equal_fast_reference": true,
+      "tables_equal_library": true,
+      "tallies_equal": true
+    },
+    {
+      "ell": 13,
+      "fast": {
+        "A": 531849,
+        "I": 1,
+        "M": 533537,
+        "Meq": 533628,
+        "W": 0,
+        "WA": 0
+      },
+      "p": 2151853678799533843,
+      "reference": {
+        "A": 531849,
+        "I": 1,
+        "M": 533537,
+        "Meq": 533628,
+        "W": 0,
+        "WA": 0
+      },
+      "tables_equal_fast_reference": true,
+      "tables_equal_library": true,
+      "tallies_equal": true
+    },
+    {
+      "ell": 17,
+      "fast": {
+        "A": 1702659,
+        "I": 1,
+        "M": 1706053,
+        "Meq": 1706144,
+        "W": 0,
+        "WA": 0
+      },
+      "p": 1163510948089645577,
+      "reference": {
+        "A": 1702659,
+        "I": 1,
+        "M": 1706053,
+        "Meq": 1706144,
+        "W": 0,
+        "WA": 0
+      },
+      "tables_equal_fast_reference": true,
+      "tables_equal_library": true,
+      "tallies_equal": true
+    },
+    {
+      "ell": 19,
+      "fast": {
+        "A": 2794051,
+        "I": 1,
+        "M": 2798622,
+        "Meq": 2798713,
+        "W": 0,
+        "WA": 0
+      },
+      "p": 1629698833169257909,
+      "reference": {
+        "A": 2794051,
+        "I": 1,
+        "M": 2798622,
+        "Meq": 2798713,
+        "W": 0,
+        "WA": 0
+      },
+      "tables_equal_fast_reference": true,
+      "tables_equal_library": true,
+      "tallies_equal": true
+    },
+    {
+      "ell": 23,
+      "fast": {
+        "A": 6637449,
+        "I": 1,
+        "M": 6645142,
+        "Meq": 6645233,
+        "W": 0,
+        "WA": 0
+      },
+      "p": 2203562403569377813,
+      "reference": {
+        "A": 6637449,
+        "I": 1,
+        "M": 6645142,
+        "Meq": 6645233,
+        "W": 0,
+        "WA": 0
+      },
+      "tables_equal_fast_reference": true,
+      "tables_equal_library": true,
+      "tallies_equal": true
+    },
+    {
+      "ell": 29,
+      "fast": {
+        "A": 19355361,
+        "I": 1,
+        "M": 19370017,
+        "Meq": 19370108,
+        "W": 0,
+        "WA": 0
+      },
+      "p": 1652449555620525083,
+      "reference": {
+        "A": 19355361,
+        "I": 1,
+        "M": 19370017,
+        "Meq": 19370108,
+        "W": 0,
+        "WA": 0
+      },
+      "tables_equal_fast_reference": true,
+      "tables_equal_library": true,
+      "tallies_equal": true
+    },
+    {
+      "ell": 31,
+      "fast": {
+        "A": 26427597,
+        "I": 1,
+        "M": 26445278,
+        "Meq": 26445369,
+        "W": 0,
+        "WA": 0
+      },
+      "p": 1635704326435178603,
+      "reference": {
+        "A": 26427597,
+        "I": 1,
+        "M": 26445278,
+        "Meq": 26445369,
+        "W": 0,
+        "WA": 0
+      },
+      "tables_equal_fast_reference": true,
+      "tables_equal_library": true,
+      "tallies_equal": true
+    }
+  ],
+  "total_wall_s_contended": 2.036438395,
+  "unit": "M = F_p mults+squarings (incl. schoolbook/Karatsuba coefficient products); W = word mults mod 62-bit NTT primes, counted as 1 M; I = F_p inversions; Meq = M + W + 91 I (R6.4's unit); A = F_p additions/subtractions/negations incl. fused schoolbook accumulations and the two u128 accumulations per NTT output coefficient; WA = additions/subtractions mod the NTT primes; cost(a) = Meq + a (A + WA)"
+}

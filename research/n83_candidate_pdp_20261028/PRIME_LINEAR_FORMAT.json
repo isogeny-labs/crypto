@@ -1,0 +1,30 @@
+{
+  "schema": "n83.prime-linear-format/v1",
+  "encoding": "UTF-8 JSON; nonnegative field elements encoded as decimal strings; indices are zero-based",
+  "root": {
+    "inputs/KEY/input.json": "Immutable input identity and planted witness, if present",
+    "inputs/KEY/system.sing": "Exact original Singular source",
+    "protocol-prime-linear.json": "Frozen protocol with all42 input and point-base identities",
+    "instrument": "Exact native executable",
+    "results/template-mM.json": "Seven shared projected degree-five coefficient-map certificates",
+    "results/KEY.json": "Source validation, nonzero weight inverses, six covering subsets and conditional FFD lower bound",
+    "results/summary.json": "42 case records; templates explicitly shared",
+    "results/primality.json": "Inherited full Lucas certificate",
+    "manifest.sha256": "SHA256 of every other raw payload"
+  },
+  "template": {
+    "variables": "ell_projected=5 selectors per block in block-major order, then m-2 unrestricted U variables; selector indices less than5*m",
+    "monomial": "Sorted list of five variable indices, repeated U indices permitted; selector repetition reduced to zero",
+    "columns": "(quartic_index * nvars) + multiplier_variable; nvars=6*m-2",
+    "pivot_rows": "Each stores original sparse coefficient row as [column, decimal coefficient] pairs, its degree-five monomial, pivot column and pre-normalization nonzero pivot",
+    "rank": "Number of retained independent rows, <=columns; injective iff equal",
+    "reconstruction": "Regenerate all quartics and variable multiples from PRIME_LINEAR_DESIGN.md, then deterministic sparse Gaussian elimination in lexicographic monomial order",
+    "limitation": "A deficient projected rank is inconclusive for original27-selector systems; no original kernel is inferred"
+  },
+  "case": {
+    "first_fall_lower_bound": "6 only if full source, normalization, projected injection and complete coverage verify; otherwise null",
+    "last_fall_lower_bound": "always null; no new LFD claim",
+    "exact_first_fall": "always null"
+  },
+  "replay": "instrument replay INPUT_ROOT PROTOCOL RESULTS recomputes source checks, field certificate, all seven full coefficient maps and pivot certificates; writes no results"
+}

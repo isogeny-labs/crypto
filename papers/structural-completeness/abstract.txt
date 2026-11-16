@@ -53,10 +53,12 @@ scalar-side attack surface.
 Companion artefacts (all open source, in the same repository as
 this submission):
 
-  - 13 PARI/GP scripts (~3000 lines) with committed baseline
-    outputs for reproducibility
-  - 1 Rust integration test (~390 lines) running the full audit on
-    every CurveParams constant via cargo test, plus a
-    freshly-generated CM curve at test time
+  - 16 PARI/GP scripts (3305 lines at commit 57fa35852), 12 of
+    them with a committed expected output; no automated check
+    compares those outputs with fresh runs
+  - 1 Rust integration test (tests/curve_audit.rs, 568 lines at
+    the same commit) running the audit via cargo test on every
+    CurveParams constant defined in the codebase, plus a small CM
+    curve generated at test time (skipped when PARI/GP is absent)
   - 5 supporting research notes covering the individual proposals
     and the GLV-HNP / Mestre directions

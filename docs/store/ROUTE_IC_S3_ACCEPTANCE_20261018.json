@@ -1,0 +1,43 @@
+{
+  "schema": "crypto.ic-route-s3-acceptance/v1",
+  "date_utc": "2026-10-18",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261018T032855Z-route-ic-29f31044-ba90-49a2-928d-7b362dd0b3b7",
+  "object_key": "ic/v1/acceptance/20261018T032855Z-route-ic-29f31044-ba90-49a2-928d-7b362dd0b3b7/sha256/06/0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+  "logical_name": "isogeny-routes/public-prime271/20261018T032855Z-route-ic-29f31044-ba90-49a2-928d-7b362dd0b3b7/routes.json",
+  "bytes": 4103,
+  "sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+  "ic_binary_sha256": "b5272e866ebbc0877544eb292092bd763dd5d1d604efd68833b5df53f19a8ade",
+  "producer": "isogeny_walk walk --primes 11 --max-curves 3 --max-depth 1 on public E(F_271): y^2 = x^3 + x + 19",
+  "consumer": "ic solve-prime --p 271 --a 1 --b 19 --n 281 --gx 3 --gy 7 --qx 231 --qy 54 --route-file store:NAME --route-id IW1E11h1h1a619f4ab250 --rho-steps 0 --json",
+  "public_curve": {
+    "p": 271,
+    "a": 1,
+    "b": 19,
+    "n": 281,
+    "generator": [
+      3,
+      7
+    ],
+    "target": [
+      231,
+      54
+    ]
+  },
+  "route_id": "IW1E11h1h1a619f4ab250",
+  "results": {
+    "push_uploaded": true,
+    "head_bytes_match": true,
+    "store_verify_remote": true,
+    "fresh_cache_fetched": true,
+    "route_hash_checked": true,
+    "graph_nodes_verified": 3,
+    "graph_edges_verified": 2,
+    "ic_scalar": "190",
+    "source_and_destination_verified": true,
+    "delete_unique_test_object": true,
+    "head_after_delete_http_status": 404
+  }
+}

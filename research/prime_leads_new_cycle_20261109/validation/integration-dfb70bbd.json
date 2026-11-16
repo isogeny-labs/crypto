@@ -1,0 +1,52 @@
+{
+  "schema": "prime-leads.merge-review/v1",
+  "merge": "bad7e29b88036dd805bd1d51ab6671442b0d35e2",
+  "parents": [
+    "6262c8b7be3aa6c6c0d2b3890dea459ba5f6eab4",
+    "dfb70bbdfa1f571d1a96fe461db964df0551feda"
+  ],
+  "resolution": "automatic ort; zero conflicted files, no manual selection",
+  "log_parents": [
+    {
+      "parent": "6262c8b7be3aa6c6c0d2b3890dea459ba5f6eab4",
+      "paragraph_occurrences": 81,
+      "all_preserved": true,
+      "whole_byte_prefix": false
+    },
+    {
+      "parent": "dfb70bbdfa1f571d1a96fe461db964df0551feda",
+      "paragraph_occurrences": 45,
+      "all_preserved": true,
+      "whole_byte_prefix": true
+    }
+  ],
+  "paragraph_rule": "strip only document-edge LF terminators then split exact blocks on blank lines; preserve occurrence counts",
+  "review_parser_first_attempt": "EOF newline boundary caused false missing final paragraph; parser corrected, no log bytes changed",
+  "scope": "Both log paragraph occurrence multisets preserved. Whole local byte-prefix not retained because main inserted complete middle blocks. No content dropped.",
+  "source_bindings": {
+    "research/prime_leads_new_cycle_20261109/controls.rs": "7360fd7abe3a7f41904ed5c93b7b58522937cca5",
+    "research/prime_leads_new_cycle_20261109/anchor_cycle2.rs": "f2a893c473ed20b699c03795a00bed532dabeb78",
+    "research/prime_leads_new_cycle_20261109/lean/BinaryPrimitiveGuard.lean": "e9b791af08c1667b54ffb45bfc00298724713b45",
+    "research/prime_leads_new_cycle_20261109/lean/lakefile.toml": "236b212c43d5dd5d1a1a1d48f3f57c28e73c71e6",
+    "research/prime_leads_new_cycle_20261109/lean/lake-manifest.json": "b6e6ba3c84337472e2e6b07e5edbfd24c5719b70",
+    "research/prime_leads_new_cycle_20261109/lean/lean-toolchain": "ba8ebf2dbaf6a668cd2a0e086186d6d569b69ff5"
+  },
+  "formal_inputs_unchanged": true,
+  "gate_and_policy_unchanged": true,
+  "library_validation_claimed": false,
+  "first_parent_delta": [
+    "docs/session-logs/2026-11-09.md",
+    "research/trace_homomorphism_tests_20261109/.gitignore",
+    "research/trace_homomorphism_tests_20261109/Cargo.toml",
+    "research/trace_homomorphism_tests_20261109/README.md",
+    "research/trace_homomorphism_tests_20261109/REPORT.pdf",
+    "research/trace_homomorphism_tests_20261109/figure.svg",
+    "research/trace_homomorphism_tests_20261109/plot.py",
+    "research/trace_homomorphism_tests_20261109/results/SHA256SUMS",
+    "research/trace_homomorphism_tests_20261109/results/all.jsonl",
+    "research/trace_homomorphism_tests_20261109/results/t123.jsonl",
+    "research/trace_homomorphism_tests_20261109/results/t4.jsonl",
+    "research/trace_homomorphism_tests_20261109/results/t5.jsonl",
+    "research/trace_homomorphism_tests_20261109/src/main.rs"
+  ]
+}

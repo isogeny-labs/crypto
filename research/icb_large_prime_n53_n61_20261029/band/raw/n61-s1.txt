@@ -1,0 +1,50 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | lp0-k440 | 8/8 | 11.225 | 13.455 | 33.523 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | lp2-k20-c10 | 8/8 | 6.911 | 10.919 | 46.988 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | lp2-k40-c10 | 8/8 | 4.199 | 6.165 | 23.862 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | lp2-k80-c3 | 8/8 | 6.350 | 9.878 | 41.628 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | plain-k220 | 8/8 | 21.271 | 25.540 | 63.955 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | plain-k440 | 8/8 | 11.225 | 13.455 | 33.523 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | plain-k440-aa | 8/8 | 11.225 | 13.455 | 33.523 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | plain-k660 | 8/8 | 8.178 | 9.727 | 23.669 | — |
+| icv1-f2m61-t158598901-ab42b6c5 | 47.21 | rho-strong | 8/8 | 0.141 | 0.169 | 0.424 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs lp2-k20-c10 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs lp2-k40-c10 | lp2-k40-c10 < lp0-k440 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs lp2-k80-c3 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs plain-k220 | lp0-k440 < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs plain-k440 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs plain-k660 | plain-k660 < lp0-k440 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp0-k440 vs rho-strong | rho-strong < lp0-k440 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k20-c10 vs lp2-k40-c10 | lp2-k40-c10 < lp2-k20-c10 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k20-c10 vs lp2-k80-c3 | lp2-k80-c3 < lp2-k20-c10 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k20-c10 vs plain-k220 | lp2-k20-c10 < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k20-c10 vs plain-k440 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k20-c10 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k20-c10 vs plain-k660 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k20-c10 vs rho-strong | rho-strong < lp2-k20-c10 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k40-c10 vs lp2-k80-c3 | lp2-k40-c10 < lp2-k80-c3 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k40-c10 vs plain-k220 | lp2-k40-c10 < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k40-c10 vs plain-k440 | lp2-k40-c10 < plain-k440 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k40-c10 vs plain-k440-aa | lp2-k40-c10 < plain-k440-aa |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k40-c10 vs plain-k660 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k40-c10 vs rho-strong | rho-strong < lp2-k40-c10 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k80-c3 vs plain-k220 | lp2-k80-c3 < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k80-c3 vs plain-k440 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k80-c3 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k80-c3 vs plain-k660 | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | lp2-k80-c3 vs rho-strong | rho-strong < lp2-k80-c3 |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k220 vs plain-k440 | plain-k440 < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k220 vs plain-k440-aa | plain-k440-aa < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k220 vs plain-k660 | plain-k660 < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k220 vs rho-strong | rho-strong < plain-k220 |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k440 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k440 vs plain-k660 | plain-k660 < plain-k440 |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k440 vs rho-strong | rho-strong < plain-k440 |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k440-aa vs plain-k660 | plain-k660 < plain-k440-aa |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k440-aa vs rho-strong | rho-strong < plain-k440-aa |
+| icv1-f2m61-t158598901-ab42b6c5 | plain-k660 vs rho-strong | rho-strong < plain-k660 |

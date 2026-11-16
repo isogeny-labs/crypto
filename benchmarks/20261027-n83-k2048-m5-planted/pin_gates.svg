@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="title desc">
+  <title id="title">N83 K2048 five-summand pinning controls</title>
+  <desc id="desc">With five summand x coordinates pinned, U and D both end Unknown at 5000 conflicts. With the three intermediate group-sum x coordinates also pinned, U returns Sat at 510 conflicts and D at 204 conflicts. This is a satisfiability control, not a factor-base speed comparison.</desc>
+  <rect width="1200" height="480" fill="#f7f9fc"/>
+  <text x="52" y="57" font-family="Arial,sans-serif" font-size="31" font-weight="700" fill="#152b44">Five-summand model: where the frozen search stops</text>
+  <text x="52" y="89" font-family="Arial,sans-serif" font-size="17" fill="#456079">Primary N83 · two 2,048-orbit bases · exact five-point group-sum controls</text>
+  <rect x="52" y="129" width="510" height="252" rx="18" fill="#fff" stroke="#c8d5e5" stroke-width="2"/>
+  <rect x="638" y="129" width="510" height="252" rx="18" fill="#fff" stroke="#c8d5e5" stroke-width="2"/>
+  <text x="82" y="172" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#152b44">Five summand x values pinned</text>
+  <text x="668" y="172" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#152b44">Five summands + three chain x values</text>
+  <text x="82" y="204" font-family="Arial,sans-serif" font-size="15" fill="#60758c">Constructed target and membership verified</text>
+  <text x="668" y="204" font-family="Arial,sans-serif" font-size="15" fill="#60758c">Same constructed target and model dimensions</text>
+  <rect x="82" y="229" width="450" height="58" rx="9" fill="#fff1df"/>
+  <rect x="82" y="299" width="450" height="58" rx="9" fill="#fff1df"/>
+  <rect x="668" y="229" width="450" height="58" rx="9" fill="#e0f5e9"/>
+  <rect x="668" y="299" width="450" height="58" rx="9" fill="#e0f5e9"/>
+  <text x="104" y="266" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#9b5700">U  ·  Unknown  ·  5,000 conflicts</text>
+  <text x="104" y="336" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#9b5700">D  ·  Unknown  ·  5,000 conflicts</text>
+  <text x="690" y="266" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#166d43">U  ·  Sat  ·  510 conflicts</text>
+  <text x="690" y="336" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#166d43">D  ·  Sat  ·  204 conflicts</text>
+  <path d="M576 254 L624 254 M612 243 L624 254 L612 265" fill="none" stroke="#56718e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M576 324 L624 324 M612 313 L624 324 L612 335" fill="none" stroke="#56718e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="52" y="420" font-family="Arial,sans-serif" font-size="17" fill="#3f5670">Extra chain pins change the search problem. Both Sat models and five-point group sums passed exact replay.</text>
+  <text x="52" y="448" font-family="Arial,sans-serif" font-size="14" fill="#65798e">Source: evidence/audit.json · pin_gates.data.json · one run per cell · shared Apple M4 Pro host</text>
+</svg>
