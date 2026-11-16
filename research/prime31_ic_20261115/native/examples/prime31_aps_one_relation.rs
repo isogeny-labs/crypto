@@ -2593,8 +2593,8 @@ fn neg_rho_hash(mut x:u64)->u64{
     x=x.wrapping_mul(0x846c_a68b);
     x^(x>>16)
 }
-fn neg_rho_restart(q:(u64,u64),gq:Option<(u64,u64)>,
-    rng:&mut u64)->Result<Labelled,String>{
+fn neg_rho_restart_policy(q:(u64,u64),gq:Option<(u64,u64)>,
+    rng:&mut u64,fold:bool)->Result<Labelled,String>{
     loop{
         let a=prng(rng)%N;
         let b=prng(rng)%N;
@@ -2602,7 +2602,7 @@ fn neg_rho_restart(q:(u64,u64),gq:Option<(u64,u64)>,
         let pt=joint_public_jac(a,b,q,gq);
         if pt.z==0{continue;}
         let labels=normalize_jac_batch(&[(pt,a,b)])?;
-        return Ok(neg_rho_fold(labels[0]));
+        return Ok(if fold{neg_rho_fold(labels[0])}else{labels[0]});
     }
 }
 // All setup, group operations, normalizations, DP hashing, modular inverses,
@@ -2615,6 +2615,13 @@ fn neg_rho_cold(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
 }
 fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
     step_cap:u64,watchdog_limit:usize)->Result<serde_json::Value,String>{
+    neg_rho_cold_policy(q,seed,lanes,dp_bits,step_cap,watchdog_limit,true)
+}
+// The public scalar source, mixed-Jacobian arithmetic and hash table are
+// shared with folded rho. Unfolded mode must retain the full signed point
+// and adjust collision labels when two points have equal x but opposite y.
+fn neg_rho_cold_policy(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
+    step_cap:u64,watchdog_limit:usize,fold:bool)->Result<serde_json::Value,String>{
     if lanes==0 || lanes>128 || dp_bits==0 || dp_bits>=20 ||
         step_cap<(lanes as u64){
         return Err("negation rho comparator admission".into());
@@ -2646,11 +2653,11 @@ fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
     }
     let mut states:Vec<NegRhoLane>=normalize_jac_batch(&first)?
         .into_iter().map(|v|NegRhoLane{
-            point:neg_rho_fold(v),prior_x:None
+            point:if fold{neg_rho_fold(v)}else{v},prior_x:None
         }).collect();
     let mut no_new_dp=vec![0usize;lanes];
     let mut watchdog_restarts=0u64;
-    let mut distinguished:HashMap<u64,(u64,u64)>=HashMap::new();
+    let mut distinguished:HashMap<u64,(u64,u64,u64)>=HashMap::new();
     let mask=(1u64<<dp_bits)-1;
     let mut steps=0u64;
     let mut short_cycles=0u64;
@@ -2682,11 +2689,11 @@ fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
         let normalized=normalize_jac_batch(&next_block)?;
         steps+=lanes as u64;
         for (i,v) in normalized.into_iter().enumerate(){
-            let v=neg_rho_fold(v);
+            let v=if fold{neg_rho_fold(v)}else{v};
             let old=states[i];
-            if v.pt.0==old.point.pt.0 || Some(v.pt.0)==old.prior_x{
+            if fold && (v.pt.0==old.point.pt.0 || Some(v.pt.0)==old.prior_x){
                 short_cycles+=1;
-                states[i].point=neg_rho_restart(q,gq,&mut rng)?;
+                states[i].point=neg_rho_restart_policy(q,gq,&mut rng,fold)?;
                 states[i].prior_x=None;
                 no_new_dp[i]=0;
                 restarts+=1;
@@ -2698,7 +2705,7 @@ fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
             if watchdog_limit>0 && no_new_dp[i]>=watchdog_limit{
                 // Long fruitless cycles without a NEW DP silently consumed
                 // the frozen 2m-step pilot cap; charge a fresh public start.
-                states[i].point=neg_rho_restart(q,gq,&mut rng)?;
+                states[i].point=neg_rho_restart_policy(q,gq,&mut rng,fold)?;
                 states[i].prior_x=None;
                 no_new_dp[i]=0;
                 watchdog_restarts+=1;
@@ -2706,7 +2713,18 @@ fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                 continue;
             }
             if v.pt.0&mask!=0{continue;}
-            if let Some(&(a0,b0))=distinguished.get(&v.pt.0){
+            if let Some(&(stored_a,stored_b,stored_y))=distinguished.get(&v.pt.0){
+                // x-coordinate collisions can be between P and -P. The
+                // folded representation always agrees in y; an unfolded
+                // collision must conjugate the stored labels when y differs.
+                if v.pt.1!=stored_y && v.pt.1!=subp(0,stored_y){
+                    return Err("rho x collision without signed point equality".into());
+                }
+                let (a0,b0)=if v.pt.1==stored_y{
+                    (stored_a,stored_b)
+                }else{
+                    (subn(0,stored_a),subn(0,stored_b))
+                };
                 let db=subn(v.b,b0);
                 if db!=0{
                     // aG+bQ=a0G+b0Q gives k=(a0-a)/(b-b0) mod n.
@@ -2714,7 +2732,8 @@ fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                     if arithmetic.scalar(PRIME31,k,Some(PRIME31.g))==Some(q){
                         useful_collisions+=1;
                         return Ok(json!({
-                            "method":"optimized negation r-adding rho, batched Jacobian and distinguished points",
+                            "method":if fold {"optimized negation r-adding rho, batched Jacobian and distinguished points"} else {"unfolded r-adding rho, batched Jacobian and distinguished points"},
+                            "fold_negation":fold,"automorphism_classes":if fold{2}else{1},
                             "standing":"[pcc:unverified]","p":P,"n":N,
                             "public_Q":q,"seed":format!("{seed:016x}"),
                             "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
@@ -2733,19 +2752,20 @@ fn neg_rho_cold_watchdog(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
                     }
                 }
                 useless_collisions+=1;
-                states[i].point=neg_rho_restart(q,gq,&mut rng)?;
+                states[i].point=neg_rho_restart_policy(q,gq,&mut rng,fold)?;
                 states[i].prior_x=None;
                 no_new_dp[i]=0;
                 restarts+=1;
             }else{
-                distinguished.insert(v.pt.0,(v.a,v.b));
+                distinguished.insert(v.pt.0,(v.a,v.b,v.pt.1));
                 maximum_table=maximum_table.max(distinguished.len());
                 no_new_dp[i]=0;
             }
         }
     }
     Ok(json!({
-        "method":"optimized negation r-adding rho, batched Jacobian and distinguished points",
+        "method":if fold {"optimized negation r-adding rho, batched Jacobian and distinguished points"} else {"unfolded r-adding rho, batched Jacobian and distinguished points"},
+                            "fold_negation":fold,"automorphism_classes":if fold{2}else{1},
         "standing":"[pcc:unverified]","p":P,"n":N,
         "public_Q":q,"seed":format!("{seed:016x}"),
         "lanes":lanes,"dp_bits":dp_bits,"jump_count":JUMPS,
@@ -2953,8 +2973,110 @@ fn rho_watchdog_match_panel()->Result<serde_json::Value,String>{
     }))
 }
 
+// Frozen 24-Q prospective batch-rho unfolded control. See the protocol
+// committed before this source edit; the caller alone knows target scalars.
+fn rho_unfolded_match_panel()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const TARGET_SEED:u64=0x5248_4f5f_4e45_5733;
+    const RHO_SEED:u64=0x5248_4f5f_4352_3031;
+    const STEP_CAP:u64=2_000_000;
+    let mut rng=TARGET_SEED;
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut used=HashSet::new();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut total_ns=[0u128;4];
+    let mut all_complete=[0u64;4];
+    let mut pair_wins=[0u64;2];
+    for i in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let rho_seed=RHO_SEED^(i as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
+        let chronological:[usize;4]=match i%4{
+            0=>[0,1,2,3],1=>[1,2,3,0],
+            2=>[2,3,0,1],_=>[3,0,1,2]
+        };
+        let mut arms:[serde_json::Value;4]=std::array::from_fn(|_|json!(null));
+        for index in chronological{
+            let res=match index{
+                0=>execute_factorized_unequal_index_variant_joint(
+                    q,[384,384,16_384],6,false,true,true)?,
+                1|3=>neg_rho_cold_policy(q,rho_seed,32,4,STEP_CAP,512,false)?,
+                2=>neg_rho_cold_policy(q,rho_seed^0x3634_5f44_5035,64,5,STEP_CAP,512,false)?,
+                _=>return Err("invalid unfolded rho panel arm".into())
+            };
+            let complete=res["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if complete{
+                let answer=if index==0{
+                    res["attempts"].as_array()
+                        .and_then(|a|a.last())
+                        .and_then(|a|a["solution"]["log"].as_u64())
+                }else{res["log"].as_u64()};
+                if answer!=Some(known) ||
+                    verifier.scalar(PRIME31,known,Some(PRIME31.g))!=Some(q){
+                    return Err(format!("invalid complete scalar i={i}, arm={index}"));
+                }
+                all_complete[index]+=1;
+            }
+            total_ns[index]+=res["cold_wall_ns"].as_u64()
+                .ok_or("missing fully cold ns")? as u128;
+            arms[index]=res;
+        }
+        if arms[0]["complete_target_scalar_recovered"].as_bool()==Some(true){
+            for (j,idx) in [1usize,2].into_iter().enumerate(){
+                if arms[idx]["complete_target_scalar_recovered"].as_bool()==Some(true) &&
+                    arms[0]["cold_wall_ns"].as_u64()<arms[idx]["cold_wall_ns"].as_u64(){
+                    pair_wins[j]+=1;
+                }
+            }
+        }
+        cases.push(json!({
+            "case":i,"public_Q":q,
+            "caller_known_scalar_verifier_only":known,
+            "chronological_order":chronological,
+            "incumbent_joint_APS":arms[0],
+            "unfolded_rho32_dp4":arms[1],
+            "unfolded_rho64_dp5":arms[2],
+            "unfolded_rho32_dp4_AA":arms[3]
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_VS_UNFOLDED_RHO_PROTOCOL_20261116.md",
+        "curve":"ordinary prime-order prime31",
+        "p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),
+        "rho_seed_base":format!("{RHO_SEED:016x}"),
+        "cases_count":CASES,
+        "arm_names":["incumbent_joint_APS","unfolded_rho32_dp4",
+            "unfolded_rho64_dp5","unfolded_rho32_dp4_AA"],
+        "successful_complete_calls":all_complete,
+        "fully_cold_ns":total_ns.map(|x|x.to_string()),
+        "paired_APS_wins_vs_unfolded32_unfolded64":pair_wins,
+        "all_96_complete":all_complete.iter().all(|&k|k==CASES as u64),
+        "ratios_APS_over_unfolded32_unfolded64":[
+            total_ns[0] as f64/total_ns[1] as f64,
+            total_ns[0] as f64/total_ns[2] as f64
+        ],
+        "unfolded32_AA_drift":(total_ns[1] as f64/total_ns[3] as f64-1.0).abs(),
+        "classification":"published APS explicit S3 pair MITM vs unfolded generic r-adding rho",
+        "scope":"source-specific unisolated development CI; tuned WZ rho and independent PCC untested",
+        "cases":cases
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--rho-unfolded-match" {
+        let result=rho_unfolded_match_panel()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--rho-watchdog-match" {
         let result=rho_watchdog_match_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -3488,5 +3610,24 @@ mod packed_x_index_tests{
         assert_eq!(old.as_ref().map(|x|x.indices),new.as_ref().map(|x|x.indices));
         assert_eq!(old.as_ref().map(|x|x.signs),new.as_ref().map(|x|x.signs));
         assert_eq!(old_stats.pair_s3,new_stats.pair_s3);
+    }
+}
+
+#[cfg(test)]
+mod unfolded_rho_collision_tests {
+    use super::*;
+    #[test]
+    fn folded_and_unfolded_rho_verify_unknown_public_logs() {
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        // Both cases exercise unknown-answer recovery from public Q only;
+        // neither known k is passed to the rho solver.
+        for &(k,seed) in &[(17u64,0x5c14u64),(N-19,0x5c15)] {
+            let q=ar.scalar(PRIME31,k,Some(PRIME31.g)).unwrap();
+            let unfolded=neg_rho_cold_policy(q,seed,32,4,2_000_000,512,false).unwrap();
+            assert_eq!(unfolded["complete_target_scalar_recovered"].as_bool(),Some(true));
+            assert_eq!(unfolded["log"].as_u64(),Some(k));
+            assert_eq!(unfolded["fold_negation"].as_bool(),Some(false));
+        }
     }
 }
