@@ -1,0 +1,25 @@
+SUMMARY arm=cold n=5 median_ns=1780974708 min_ns=1706933666 max_ns=1938462791 wall_median_ns=1784938625
+SUMMARY arm=compact n=5 median_ns=797166 min_ns=434917 max_ns=1196125 wall_median_ns=5186084
+SUMMARY arm=fast n=5 median_ns=1452792 min_ns=1267083 max_ns=2768875 wall_median_ns=5570083
+SUMMARY arm=hybrid n=5 median_ns=1188166 min_ns=1148458 max_ns=2023333 wall_median_ns=5494542
+PHASE_SUMMARY arm=cold name=descent n=5 median_ns=25244334
+PHASE_SUMMARY arm=cold name=field_kernels n=5 median_ns=55060125
+PHASE_SUMMARY arm=cold name=geometry n=5 median_ns=113973750
+PHASE_SUMMARY arm=cold name=input n=5 median_ns=145417
+PHASE_SUMMARY arm=cold name=map_generator n=5 median_ns=1382098958
+PHASE_SUMMARY arm=cold name=map_target n=5 median_ns=152435708
+PHASE_SUMMARY arm=cold name=points_jacobian n=5 median_ns=721125
+PHASE_SUMMARY arm=cold name=relations n=5 median_ns=2085917
+PHASE_SUMMARY arm=cold name=source_weil n=5 median_ns=4234041
+PHASE_SUMMARY arm=cold name=verification n=5 median_ns=23568708
+PHASE_SUMMARY arm=cold name=weil_normalization n=5 median_ns=17316625
+PHASE_SUMMARY arm=compact name=input n=5 median_ns=288958
+PHASE_SUMMARY arm=compact name=native_solve n=5 median_ns=376958
+PHASE_SUMMARY arm=compact name=verification n=5 median_ns=29708
+PHASE_SUMMARY arm=fast name=input n=5 median_ns=140625
+PHASE_SUMMARY arm=fast name=native_solve n=5 median_ns=1283083
+PHASE_SUMMARY arm=fast name=verification n=5 median_ns=29083
+PHASE_SUMMARY arm=hybrid name=input n=5 median_ns=154959
+PHASE_SUMMARY arm=hybrid name=native_solve n=5 median_ns=986458
+PHASE_SUMMARY arm=hybrid name=verification n=5 median_ns=28750
+GATE cells=20 k=183049 best_native=compact best_over_cold=0.00044760096615589 threshold=10 pass=false scope=fixed_instance_local_unisolated

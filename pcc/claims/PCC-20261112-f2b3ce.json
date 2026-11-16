@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T20:02:06Z",
+ "id": "PCC-20261112-f2b3ce",
+ "kind": "theorem",
+ "producer": {
+  "commit": "c7af55d0002cf09d5b8d7003cd237229662e926b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "80477b6dc77b26f7ff593d18b8b241b41baada5c31707b67a8436c6dc6277662",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/T20Whole.lean",
+   "theorem": "T20Whole.branch_permutation_cubes"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact IntModule recovery under12317torsion,wrongtranspose-sign fixedpoint and publicscalar constants; finite canonical six-branch permutations/listfixedpairs/counts16vs4. Actual grouporder/Picardcorrespondence/Weierstrass-pairidentification/branch relabeling remain explicit written/native bridges,notformalAVaxioms; localpass is not scientificsigning.",
+ "statement": "theorem branch_permutation_cubes : \u2200 i : Fin 6, sourcePermutation (sourcePermutation (sourcePermutation i.val))=i.val \u2227 targetPermutation (targetPermutation (targetPermutation i.val))=opposite i.val"
+}

@@ -1,0 +1,11 @@
+name = "pairing_k1_audit"
+version = "0.1.0"
+defaultTargets = ["PairingKOneAudit"]
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[lean_lib]]
+name = "PairingKOneAudit"
+roots = ["ActualGroup", "ActualQuotient", "MillerData", "TateValues", "UnitTarget", "RawClasses", "CyclicObstruction", "Inflection", "Certificate"]

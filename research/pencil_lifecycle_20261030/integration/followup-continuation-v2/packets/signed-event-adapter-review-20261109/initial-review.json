@@ -1,0 +1,60 @@
+{
+  "schema": "research.source-review/v1",
+  "status": "one_failure_provenance_defect",
+  "new_execution": false,
+  "candidate_patch_sha256": "614a22d94773da188a215317923ca2333a9a19388208eac932c2a64597453953",
+  "findings": [
+    {
+      "id": "S1",
+      "finding": "After a sink failure sets self.failed and trace.failure=Output/ByteLimit/RecordLimit, later observe calls reject, which overwrites trace.failure with State. This violates existing Trace first-error retention and loses the actual terminal failure cause.",
+      "fix": "Preserve and return the first trace.failure when already failed; do not replace it. Add fault control covering repeated callback after first failure."
+    }
+  ],
+  "supported_scope": [
+    "Existing collector emits candidate before every identity/split/duplicate/nonsplit disposition; identity and solved edge emit before early walk break. Degree-one edges are padded to two nodes. New-node IDs begin at1 and align with adapter nodes count.",
+    "First canonical edge attempt is recorded before duplicates; callback duplicate first_attempt matches adapter table when prior callback writes succeeded.",
+    "Callback errors propagate Result and prevent successful collector Outcome; ingest_observed emits before/after exact original ingest and propagates sink errors, but ingest may mutate before result sink failure. Failed prefix must not be retried as though no side effect occurred.",
+    "Kummer scope is Labels::ingest only. Full advance/lift identity/degree-one/fallback paths remain uninstrumented and are not newly observed natural streams.",
+    "Observed JSON is retained as distinct envelope and pencil consumer rejects it, preserving separation from pencil Admission/rank semantics.",
+    "Adapter performs no field arithmetic, but allocations/maps/JSON copies/flushes and expected-header preparation incur real unpriced costs; no timing equivalence inferred.",
+    "Structural validator is not scalar/geometric/label truth validation; external source/header custody remains necessary."
+  ],
+  "required_prospective_validation": [
+    "Actual solve_genus2_observed invocation through NativeEvents, compare full algorithm output and existing arithmetic counters against absent observer on a fixed qualified fixture. Cover identity and solved-edge early exits, duplicates, nonsplit, nodes, choices/restarts; report branches not hit rather than claiming coverage.",
+    "Actual Labels::ingest_observed inputs covering first, redundant, invariant error, candidate verified/rejected and noncanonical label. Preserve separate fixed/planted/archive/natural provenance.",
+    "Faulting Write/flush at identity, duplicate and label-result callbacks and terminal: propagate failure, no successful Outcome/complete Trace, original error retained; retain changed Labels state as failed-attempt side effect.",
+    "Negative first-reference, stale node, unknown kind, incomplete/truncated terminal; post-failure callback attempts retain original cause. Existing manually authored event fixtures cover adapter parsing only."
+  ],
+  "initial_sources": [
+    {
+      "path": "candidate.patch",
+      "sha256": "614a22d94773da188a215317923ca2333a9a19388208eac932c2a64597453953",
+      "bytes": 14441
+    },
+    {
+      "path": "adapter.rs",
+      "sha256": "441d082fba7366ca74d43f7a763f2d6ff387b674fc898fb091c9227c2c5fb831",
+      "bytes": 7174
+    },
+    {
+      "path": "adapter-controls.rs",
+      "sha256": "e663fe9eacc6ff085f8c4cb0e6721766b9b257e913e31059f4f46b8c4cf77ed3",
+      "bytes": 3897
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "65dc2d1259e0485983efb17a0ea479224dec818757ae0b3332eb1d1d91bc3e6b",
+      "bytes": 5477
+    },
+    {
+      "path": "coverage.json",
+      "sha256": "167a9fd42084f9cef548e51074bd428d50bd4627790d9667bedbde1db56bc46c",
+      "bytes": 1816
+    },
+    {
+      "path": "base-bindings.json",
+      "sha256": "f9ef23a4e2bbf500f9d027a9cabae03c515477ae9b8d6c8c00500a429fd2cc7d",
+      "bytes": 502
+    }
+  ]
+}

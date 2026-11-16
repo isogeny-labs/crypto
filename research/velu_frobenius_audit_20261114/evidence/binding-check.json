@@ -1,0 +1,36 @@
+{
+  "schema": "native-velu-frobenius-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "velu-frobenius",
+      "expected_decl_sha256": "762ed418a4d3a6fe07f37b73f9066c427aa5cf722f3dcfd0c30666e955335fa7",
+      "full_characters": 1385,
+      "full_decl_sha256": "762ed418a4d3a6fe07f37b73f9066c427aa5cf722f3dcfd0c30666e955335fa7",
+      "full_normalized_signature": "theorem velu_frobenius_certificate : (Nat.Prime 3 ∧ Nat.Coprime 3 5 ∧ baseCurve.Δ ≠ 0) ∧ (∀ (G : Type) [AddCommGroup G] (F : G →+ G) (P : G), (∀ Q ∈ AddSubgroup.zmultiples P, F Q ∈ AddSubgroup.zmultiples P) ↔ ∃ k : ℤ, k • P = F P) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra (ZMod 5) K] [CharP K 5] (a : K) (ha : a ^ 2 = 2), (3 : ℕ) • (rationalPoint : (baseCurve.baseChange K).Point) = 0 ∧ (3 : ℕ) • antiPoint a ha = 0 ∧ pointFrobenius baseCurve (rationalPoint : (baseCurve.baseChange K).Point) = rationalPoint ∧ pointFrobenius baseCurve (antiPoint a ha) = -antiPoint a ha ∧ addOrderOf (mixedPoint a ha) = 3 ∧ pointFrobenius baseCurve (mixedPoint a ha) ∉ AddSubgroup.zmultiples (mixedPoint a ha)) ∧ (Fintype.card F25 = 25 ∧ Module.finrank (ZMod 5) F25 = 2 ∧ (baseCurve.baseChange F25).Δ ≠ 0 ∧ ∃ P : (baseCurve.baseChange F25).Point, addOrderOf P = 3 ∧ pointFrobenius baseCurve P ∉ AddSubgroup.zmultiples P ∧ (¬∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧ (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = P)) ∧ (¬∀ P : (baseCurve.baseChange F25).Point, baseCurve.Δ ≠ 0 → addOrderOf P = 3 → ∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧ (∃ B : (baseCurve.baseChange F25).Point, addOrderOf B = 3 ∧ pointFrobenius baseCurve B = -B ∧ (∀ Q ∈ AddSubgroup.zmultiples B, pointFrobenius baseCurve Q ∈ AddSubgroup.zmultiples B) ∧ (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = B))",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "velu_frobenius_certificate",
+        "end_byte": 2195,
+        "file": "/workspace/scratch/velu-frob-input01/VeluFrobeniusCertificate.lean",
+        "qualified_decl_id": "VeluFrobeniusAudit.velu_frobenius_certificate",
+        "signature": "theorem velu_frobenius_certificate :\n    (Nat.Prime 3 ∧ Nat.Coprime 3 5 ∧ baseCurve.Δ ≠ 0) ∧\n    (∀ (G : Type) [AddCommGroup G] (F : G →+ G) (P : G),\n      (∀ Q ∈ AddSubgroup.zmultiples P, F Q ∈ AddSubgroup.zmultiples P) ↔\n        ∃ k : ℤ, k • P = F P) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] [Algebra (ZMod 5) K] [CharP K 5]\n      (a : K) (ha : a ^ 2 = 2),\n      (3 : ℕ) • (rationalPoint : (baseCurve.baseChange K).Point) = 0 ∧\n      (3 : ℕ) • antiPoint a ha = 0 ∧\n      pointFrobenius baseCurve (rationalPoint : (baseCurve.baseChange K).Point) = rationalPoint ∧\n      pointFrobenius baseCurve (antiPoint a ha) = -antiPoint a ha ∧\n      addOrderOf (mixedPoint a ha) = 3 ∧\n      pointFrobenius baseCurve (mixedPoint a ha) ∉ AddSubgroup.zmultiples (mixedPoint a ha)) ∧\n    (Fintype.card F25 = 25 ∧ Module.finrank (ZMod 5) F25 = 2 ∧\n      (baseCurve.baseChange F25).Δ ≠ 0 ∧\n      ∃ P : (baseCurve.baseChange F25).Point, addOrderOf P = 3 ∧\n        pointFrobenius baseCurve P ∉ AddSubgroup.zmultiples P ∧\n        (¬∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧\n        (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = P)) ∧\n    (¬∀ P : (baseCurve.baseChange F25).Point, baseCurve.Δ ≠ 0 →\n      addOrderOf P = 3 → ∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧\n    (∃ B : (baseCurve.baseChange F25).Point, addOrderOf B = 3 ∧\n      pointFrobenius baseCurve B = -B ∧\n      (∀ Q ∈ AddSubgroup.zmultiples B, pointFrobenius baseCurve Q ∈ AddSubgroup.zmultiples B) ∧\n      (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = B))",
+        "start_byte": 551
+      },
+      "recorded_statement": "theorem velu_frobenius_certificate : (Nat.Prime 3 ∧ Nat.Coprime 3 5 ∧ baseCurve.Δ ≠ 0) ∧ (∀ (G : Type) [AddCommGroup G] (F : G →+ G) (P : G), (∀ Q ∈ AddSubgroup.zmultiples P, F Q ∈ AddSubgroup.zmultiples P) ↔ ∃ k : ℤ, k • P = F P) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra (ZMod 5) K] [CharP K 5] (a : K) (ha : a ^ 2 = 2), (3 : ℕ) • (rationalPoint : (baseCurve.baseChange K).Point) = 0 ∧ (3 : ℕ) • antiPoint a ha = 0 ∧ pointFrobenius baseCurve (rationalPoint : (baseCurve.baseChange K).Point) = rationalPoint ∧ pointFrobenius baseCurve (antiPoint a ha) = -antiPoint a ha ∧ addOrderOf (mixedPoint a ha) = 3 ∧ pointFrobenius baseCurve (mixedPoint a ha) ∉ AddSubgroup.zmultiples (mixedPoint a ha)) ∧ (Fintype.card F25 = 25 ∧ Module.finrank (ZMod 5) F25 = 2 ∧ (baseCurve.baseChange F25).Δ ≠ 0 ∧ ∃ P : (baseCurve.baseChange F25).Point, addOrderOf P = 3 ∧ pointFrobenius baseCurve P ∉ AddSubgroup.zmultiples P ∧ (¬∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧ (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = P)) ∧ (¬∀ P : (baseCurve.baseChange F25).Point, baseCurve.Δ ≠ 0 → addOrderOf P = 3 → ∃ k : ℤ, k • P = pointFrobenius baseCurve P) ∧ (∃ B : (baseCurve.baseChange F25).Point, addOrderOf B = 3 ∧ pointFrobenius baseCurve B = -B ∧ (∀ Q ∈ AddSubgroup.zmultiples B, pointFrobenius baseCurve Q ∈ AddSubgroup.zmultiples B) ∧ (¬∃ Q : baseCurve.Point, rationalInclusion F25 Q = B))",
+      "recorded_text_sha256": "762ed418a4d3a6fe07f37b73f9066c427aa5cf722f3dcfd0c30666e955335fa7",
+      "source_plan": "research/velu_frobenius_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "VeluFrobeniusAudit.velu_frobenius_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source processing, not kernel parser/hash/physicalhost/execution refinement."
+}

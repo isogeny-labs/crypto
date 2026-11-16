@@ -1,0 +1,17 @@
+SelectorInstance.lean:21:34: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (↑20632).val
+in the target expression
+  x + d = ZMod.val 20632
+
+x d : ℕ
+hx : x < 32768
+hd : d < 32768
+h : ↑x + ↑d = 20632
+hlt : x + d < modulus
+hcap : 20632 < modulus
+heq : ↑(x + d) = 20632
+values : x + d = ZMod.val 20632
+⊢ x + d = 20632
+'Curve25519SelectorInstance.actual_selector_no_wrap' depends on axioms: [propext, sorryAx, Quot.sound]
+'Curve25519SelectorInstance.actual_selector_range' depends on axioms: [propext, sorryAx, Quot.sound]
+'Curve25519SelectorInstance.small_modulus_counterexample' depends on axioms: [propext, Quot.sound]

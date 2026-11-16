@@ -5,12 +5,14 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct117/**'
       - '.github/workflows/ct117-interpolation-control.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct117/**'
       - '.github/workflows/ct117-interpolation-control.yml'
   workflow_dispatch:
 jobs:
   ct117:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:

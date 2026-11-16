@@ -1,0 +1,75 @@
+{
+  "branch": "fix/immutable-pcc-base-20261116",
+  "closed_utc": "2026-11-16T08:13:18+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "benchmarks/software/browser-generator/20261116/replay.py",
+        "--protocol",
+        "benchmarks/software/browser-generator/20261116/protocol.json",
+        "--variant",
+        "baseline",
+        "--workload-commit",
+        "6b7dca5838c303f9f4f55d87d84e98fe1ecc6aa6",
+        "--output",
+        "benchmarks/software/browser-generator/20261116/raw/baseline-a2.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T08:04:36+00:00",
+      "wall_s": 164.792
+    }
+  ],
+  "commit": "6b7dca5838c303f9f4f55d87d84e98fe1ecc6aa6",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T08:00:33+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261116T0800Z-catalog-baseline-a2",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "catalog_generation_wall",
+      "note": "baseline-a2; unisolated local software; generator main including build/render/document check; excludes module import and independent digest; no attack or rho price",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 162.9898612919933
+    }
+  ],
+  "problem": "software:lab-browser-fixed-catalog-20261116",
+  "raw": [
+    {
+      "bytes": 894,
+      "path": "benchmarks/software/browser-generator/20261116/raw/baseline-a2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/90/90ee1583e82dedbb0582701ec8c72ca725010669a5acfc6a45141da2c102b14d",
+      "sha256": "90ee1583e82dedbb0582701ec8c72ca725010669a5acfc6a45141da2c102b14d",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/software/browser-generator/20261116/report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/software/browser-generator/20261116/report.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "catalog-baseline-a2",
+  "status": "measured",
+  "summary": "baseline-a2: complete document and independent semantic digest pass; unisolated local software control; source and input hashes frozen in code commit",
+  "validation": null
+}

@@ -1,0 +1,11 @@
+name = "bk_actual_case_audit"
+version = "0.1.0"
+defaultTargets = ["BKActualAudit"]
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[lean_lib]]
+name = "BKActualAudit"
+roots = ["ThreeTorsion", "QuadraticWitness", "EmbeddingCriterion", "BKCertificate", "GaloisFieldCase"]

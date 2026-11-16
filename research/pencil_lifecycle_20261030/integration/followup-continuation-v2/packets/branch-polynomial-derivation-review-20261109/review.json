@@ -1,0 +1,72 @@
+{
+  "schema": "mathematical-source-review/v1",
+  "verdict": "faithful_scoped",
+  "kernel_status": "not_replayed_by_reviewer",
+  "new_execution": false,
+  "producer_identity_sha256": "6bfb332a56164220e7e50ef360eb575188daa88eeb0386dcac839d337fb66b61",
+  "reviewer": "renew_materializer",
+  "independence": "Reviewer did not author direct derivative derivation; familiar with ancestor branch replay plumbing and proof repair.",
+  "checks": {
+    "source_sign_scale": "pass",
+    "product_and_factors_nonzero": "pass",
+    "arbitrary_field_characteristic": "pass",
+    "rational_source_fixture": "pass",
+    "three_premise_removal_controls": "pass",
+    "exact_base_theorem_conclusion": "pass",
+    "all_seven_producer_manifest_entries": "pass",
+    "all_five_producer_source_bindings": "pass"
+  },
+  "derivation": [
+    "P=N\u00b2-b\u00b2F by exact source identity.",
+    "F(a)=P(a)=0 gives N(a)\u00b2=0, hence N(a)=0 in the field.",
+    "P prime(a)=2N(a)N prime(a)-b\u00b2F prime(a)=-b\u00b2F prime(a) is nonzero.",
+    "P and each factor are nonzero; a is a simple root of P.",
+    "Product multiplicity additivity twice gives m(u1,a)+m(u2,a)+m(U,a)=1."
+  ],
+  "independent_fixture_expansion": {
+    "differences": "dq=0, dr=2, ds=dt=0",
+    "coefficientData": "B=-4,A=0,C=0,Q=-16,Rbar=0",
+    "numerator": "N=0",
+    "product": "(X\u00b2+1)(X\u00b2-1)(-16X)=-16X5+16X",
+    "derivative_at_zero": 16,
+    "multiplicities": [
+      0,
+      0,
+      1
+    ],
+    "separability": "(-25X3)(X5-X)+(5X4-4)(5X4-1)=4; divide the Bezout coefficients by4 overQ."
+  },
+  "premise_control_review": [
+    {
+      "removed": "b nonzero",
+      "identity": "X\u00b2-X\u00b2=0=0\u00b2X",
+      "product_order": 2,
+      "other_premises": "F=X separable, root/support at0."
+    },
+    {
+      "removed": "simple F root",
+      "identity": "0-(-X\u00b2)=X\u00b2=1\u00b2F",
+      "product_order": 2,
+      "other_premises": "F=X\u00b2 root at0, b=1, support zero."
+    },
+    {
+      "removed": "support zero",
+      "identity": "1-(1-X)=X=1\u00b2F",
+      "product_order": 0,
+      "other_premises": "F=X simple root at0, b=1."
+    }
+  ],
+  "additional_reasoning_controls": [
+    {
+      "purpose": "Characteristic2, generic identity-level nonvacuity",
+      "example": "Over F2: F=X,N=0,b=1,u1=X,u2=U=1,a=0. -X=X; derivativeP=1; multiplicities1+0+0. No claim this tuple is coefficientData-realized."
+    },
+    {
+      "purpose": "Branch-root premise necessity, generic identity-level",
+      "example": "OverQ: N=X+1,b=1,F=2X+1,u1=u2=X,U=1,a=0. N\u00b2-P=F, F separable and P has order2, but F(0)=1. No actual source-realization claim."
+    }
+  ],
+  "scope": "Base-polynomial conclusion and factor nonzero conditions match source_support_base_multiplicity_sum. Source identity is supplied by hb and both divisor congruences; separability plus branch root supplies derivative nonzero. No geometric/DVR conclusion or coefficientData realization of generic counterexamples is inferred.",
+  "formal_api_note": "one_lt_rootMultiplicity_iff_isRoot has no CharZero premise. Full additivity lives in RingDivision.lean, added to reviewer bindings; Div.lean supplies rootMultiplicity_pos. No Lean elaboration performed.",
+  "remaining": "Current branch replay status belongs to coordinator; direct derivative proof is prose/source-level and has no compiled Lean artifact."
+}

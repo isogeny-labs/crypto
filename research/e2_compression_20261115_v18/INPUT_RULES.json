@@ -1,0 +1,41 @@
+{
+  "hypothesis": "Avoid unused prelinear g9, cache immutable moment images, and compress equivalent scalar equations before degree3certificate solving; measured totalcost against cached and lean strongcomparators",
+  "fields": "ActualGF(2^83)conditional chart; GF4/GF8/GF16oraclecontrols only",
+  "outer_cells": 32,
+  "selection": "Grayorderfirst5originalunitE2pivotdirections",
+  "methods": [
+    "reference",
+    "cached",
+    "lean",
+    "compressed"
+  ],
+  "repetitions": 3,
+  "fresh_process": true,
+  "orders": [
+    [
+      "reference",
+      "cached",
+      "lean",
+      "compressed"
+    ],
+    [
+      "compressed",
+      "lean",
+      "cached",
+      "reference"
+    ],
+    [
+      "cached",
+      "compressed",
+      "reference",
+      "lean"
+    ]
+  ],
+  "timeout_seconds": 90,
+  "child_seconds": 20,
+  "memory_mb": 4096,
+  "cpu": 0,
+  "seed": null,
+  "qualified_release_comparison": false,
+  "external_review": false
+}

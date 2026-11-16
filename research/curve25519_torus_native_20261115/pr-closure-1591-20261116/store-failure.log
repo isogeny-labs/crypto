@@ -1,0 +1,17 @@
+store	No added or modified file that belongs in the store	﻿2026-11-16T01:35:46.0934194Z ##[group]Run if python3 tools/artifacts/artifacts.py check HEAD^1 HEAD; then exit 0; fi
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0935287Z [36;1mif python3 tools/artifacts/artifacts.py check HEAD^1 HEAD; then exit 0; fi[0m
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0935732Z [36;1mif [ "$LARGE_FILE_OK" = true ]; then[0m
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0936203Z [36;1m  echo "::warning::store-policy files committed under the large-file-ok label"[0m
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0936632Z [36;1m  exit 0[0m
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0936828Z [36;1mfi[0m
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0937008Z [36;1mexit 1[0m
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0956992Z shell: /usr/bin/bash -e {0}
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0957255Z env:
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0957442Z   LARGE_FILE_OK: false
+store	No added or modified file that belongs in the store	2026-11-16T01:35:46.0957665Z ##[endgroup]
+store	No added or modified file that belongs in the store	2026-11-16T01:35:54.2155625Z 
+store	No added or modified file that belongs in the store	2026-11-16T01:35:54.2156343Z 1 data file(s) belong in the store, not Git. Move them with
+store	No added or modified file that belongs in the store	2026-11-16T01:35:54.2157113Z   python3 tools/artifacts/artifacts.py push <file-or-dir>...
+store	No added or modified file that belongs in the store	2026-11-16T01:35:54.2157828Z and commit the .artifacts.json / .gitignore it writes (docs/artifacts.md).
+store	No added or modified file that belongs in the store	2026-11-16T01:35:54.2158393Z         73,436  pcc/ledger.jsonl
+store	No added or modified file that belongs in the store	2026-11-16T01:35:54.2298459Z ##[error]Process completed with exit code 1.

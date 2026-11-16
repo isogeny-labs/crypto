@@ -1,0 +1,25 @@
+{
+  "time": "2026-11-16T19:16:54.010363+00:00",
+  "sources": [
+    {
+      "path": "research/chained_jacobian_transfers_20261110/lean/CubicNormWordBridge01.lean",
+      "sha256": "5743a021f3767e94d5e37617958596a75ec603a09088184e3218d3e40430febe"
+    },
+    {
+      "path": "research/chained_jacobian_transfers_20261110/lean/CubicRelativeNorm22304.lean",
+      "sha256": "e804f278901b824feaa29361636ba5c6f20dc41015a72a0196816d6df13556e7"
+    },
+    {
+      "path": "research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/src/lib.rs",
+      "sha256": "c29c96650bd301596d38ccd8d2298b69f8ca417275689cff0be9f0952d50b8bd"
+    }
+  ],
+  "official_interfaces": "actual4.35/4.34 UInt64.le_iff_toNat_le/toNat_sub_of_le/toNat_add/toNat_mul/toNat_mod and Fin.val_mul/val_sub read",
+  "question": "derive exact normalized UInt64 multiply/subtract and native cofactor coordinate values in Fin223 polynomial P, with no overflow and raw canonical outputs",
+  "hypotheses": "input UInt64.toNat<223, constant223 modulus/3 cubic coefficient; ordinary unsigned branch/subtraction semantics",
+  "control": "canonical cofactor111/011 and large noncanonical word multiplication overflow must fail unconditional decode homomorphism",
+  "acceptance": "exact frozen Word01 prefix, both unchanged original gates/j1/120s/default memory/standard foundations/no holes/native decision/full population, whole failed source/output retained",
+  "scope": "faithful arithmetic model only; no Rust compiler/Fp inverse/full field/Jacobian/counter/cost proof",
+  "KB": "native task3eafa4 fivequeries127, no novelty/absence inference",
+  "status": "prospective, before word source edit"
+}
