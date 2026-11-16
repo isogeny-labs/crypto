@@ -93,11 +93,29 @@ fn agrees(stat: &Statistics, recorded: &Value) -> Result<()> {
 fn includes_one(s: &Statistics) -> bool {
     s.percentile_95[0] <= 1. && s.percentile_95[1] >= 1.
 }
+fn check_kernel_mode(answer: &Value, expected: &str) -> Result<()> {
+    if !["legacy", "ordered", "cached", "both"].contains(&expected)
+        || answer["kernel_mode"] != expected
+    {
+        return Err("candidate kernel variant does not match protocol".into());
+    }
+    Ok(())
+}
+#[test]
+fn kernel_guard_rejects_missing_wrong_and_unknown_modes() {
+    for mode in ["legacy", "ordered", "cached", "both"] {
+        assert!(check_kernel_mode(&json!({"kernel_mode":mode}), mode).is_ok());
+        assert!(check_kernel_mode(&json!({}), mode).is_err());
+        assert!(check_kernel_mode(&json!({"kernel_mode":"other"}), mode).is_err());
+    }
+    assert!(check_kernel_mode(&json!({"kernel_mode":"legacy"}), "both").is_err());
+    assert!(check_kernel_mode(&json!({"kernel_mode":"unknown"}), "unknown").is_err());
+}
 fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().collect();
-    if a.len() != 5 && a.len() != 6 {
+    if !(5..=7).contains(&a.len()) {
         return Err(
-            "usage: paired-result-report RAW CONDITIONS NEW_REPORT RESULT_PCC [EXPECTED_EXPORTS]"
+            "usage: paired-result-report RAW CONDITIONS NEW_REPORT RESULT_PCC [EXPECTED_EXPORTS [EXPECTED_KERNEL]]"
                 .into(),
         );
     }
@@ -131,6 +149,13 @@ fn main() -> Result<()> {
         .filter(|b| b.len() == 21)
         .ok_or("21 blocks")?;
     let expected_exports = a.get(5).map(|s| s.parse::<u64>()).transpose()?;
+    let expected_kernel = a.get(6).map(String::as_str);
+    if let Some(kernel) = expected_kernel {
+        check_kernel_mode(&json!({"kernel_mode":kernel}), kernel)?;
+        if expected_exports != Some(0) {
+            return Err("kernel mode requires zero-export protocol".into());
+        }
+    }
     if let Some(expected) = expected_exports {
         for panel in std::iter::once(&s["warmup"])
             .chain(
@@ -140,6 +165,9 @@ fn main() -> Result<()> {
             )
             .chain(blocks)
         {
+            if let Some(kernel) = expected_kernel {
+                check_kernel_mode(&panel["samples"][2]["answer"], kernel)?;
+            }
             if panel["samples"][2]["answer"]["completion_exports"] != expected {
                 return Err("candidate completion variant does not match protocol".into());
             }
@@ -233,7 +261,7 @@ fn main() -> Result<()> {
     fs::write(
         out.join("audit.json"),
         serde_json::to_vec_pretty(
-            &json!({"complete_matching_workflow_answers":108,"main_blocks":21,"aa_all_pass":true,"paid_sums_checked":true,"statistics_recomputed":true,"expected_completion_exports":expected_exports,"paired_numeric_15x":flag15,"paired_numeric_10x":flag10,"main_statistics":stats,"standing":"unsigned producer recomputation"}),
+            &json!({"complete_matching_workflow_answers":108,"main_blocks":21,"aa_all_pass":true,"paid_sums_checked":true,"statistics_recomputed":true,"expected_completion_exports":expected_exports,"expected_kernel_mode":expected_kernel,"paired_numeric_15x":flag15,"paired_numeric_10x":flag10,"main_statistics":stats,"standing":"unsigned producer recomputation"}),
         )?,
     )?;
     let path = out.join("ratios.svg");
