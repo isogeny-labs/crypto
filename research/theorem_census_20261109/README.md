@@ -391,6 +391,53 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual quadratic elliptic field-norm proof](../elliptic_field_norm_audit_20261116/README.md)
+constructs the actual K(x)=RatFunc K embedding/scalar towers, derives actual
+full-field localization by clearing every denominator with its conjugate and
+coordinate norm, and localizes the actual1,y basis to derive degree2.
+Official norm-localization and actual fractions give the finite-base norm
+N(f)=f·iota(f) for every actual function. Literal minimal quadratic,
+irreducibility and rational-linear representation are derived. Actual normality
+always holds; separability and Galoisness hold exactly when not(2=0 and
+a1=0 and a3=0). Actual discriminant excludes that boundary on every nonsingular
+general model, including characteristics2/3. Actual finite-base conjugation
+fixes every rational-base function, preserves norm and is nonidentity on every
+nonsingular model. No rank/norm/separability/Galois premise is supplied.
+
+Skeptical controls use actual functions and models. Actual x is transcendental
+over K; the coefficient extension is not finite, so the official determinant
+norm over that wrong base defaults1, while the finite-base norm of x has a
+pole and differs. A credited actual nonsingular F5 example instantiates it.
+Actual nonsingular F2/F3 positives have degree2 and are Galois. Actual singular
+F2 cusp y²=x³ has degree2 and is normal, but is neither separable nor Galois;
+its actual conjugation is identity and its actual norm is squaring. This
+refutes deleted hypotheses, with no qualified-source refutation or novelty.
+
+Exact local **PCC-20261116-826480 PASS at 2026-11-16T00:45:06Z**; signed standing unverified.
+Whole tracked gate57/0failures/0trusted-native;11modules(10concrete/1official
+bridge),246formal17artifact263pins/198pinnedcustom180actuallyimported
+(169credited frozen+11new).249oldpins beforeafter12states/gate;10failedstates
+01–10 and successes11/12 retained. Exact roots from01/24packages/0copies/
+0hydration/no lakeupdate. Finalnewwarnings0/39frozen inherited per build/
+oneauditor deprecation. Full1984header SHA
+cfa04ee22e730426f22ddc08fcfb61d56a28200e218393752dd8582efe56d33f,
+native1complete0prefix0unresolved/empty suffix after completedgate. Lossless
+275files99objects53048B XZ/roundtrip/actualrestoreequal. Firstvalidonepage
+47138B PDF/all4957charsread/individualfullpage inspected/inbounds. Stale
+preparation stdout14states corrected against actual12without repackaging;
+sourceplan55573B retains full paths and module map. Same prover/host/procedural
+binding, no independent compiler/parser/physical-host assurance. Seven correct
+KB calls/initial and expandedConductor127/bounded primary-official-prior
+fallback/noabsence or novelty. Complete bounded local normcompatibility and
+Galbraith normalform proofs read; earlier full Kato dependencies notallread.
+Known methods and transparent local Field.toCommRing pattern credited.
+General local norm/tame projection/ramification/P1/global reciprocity,
+arbitrary divisor representatives/multiplication-isogeny comparison/general
+geometric descent/canonical Tate/general MOV-FR/full14 remain open. No holes/
+customaxioms/nativeproofeval/raisedlimits/newglobalflags/waivers/frozenedit/
+cryptoPython/paidcompute/uploads. [pcc:unverified]
+
+
 The [actual elliptic tame-symbol proof](../elliptic_tame_symbol_audit_20261115/README.md)
 now constructs the classical signed local symbol using the actual general
 Weierstrass function field/local orders/regular-ring unit character. Actual
