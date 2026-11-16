@@ -13,7 +13,7 @@ use serde_json::{json, Value};
 use std::fs::{File, OpenOptions};
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::time::Instant;
 
 #[derive(Parser)]
@@ -38,6 +38,12 @@ struct Args {
     fixture: Option<PathBuf>,
     #[arg(long, hide = true, default_value_t = 239)]
     walk_seed: u64,
+    #[arg(long)]
+    capacity_report: bool,
+    #[arg(long)]
+    validation_only: bool,
+    #[arg(long, default_value_t = 0)]
+    worker_timeout_seconds: u64,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -206,8 +212,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("{}", serde_json::to_string(&result)?);
         return Ok(());
     }
-    if args.rounds < 5
-        || args.warmup_rounds == 0
+    if args.capacity_report {
+        let rows: Vec<_> = args
+            .primes
+            .iter()
+            .map(|&p| {
+                let capacity = sieve::relations_estimate(p, 9);
+                json!({"p":p,"factor_base_upper_bound":p,"m9_model_relations":capacity,
+                "qualifies_model_guard":capacity>=1.25*p as f64,
+                "scope":"existing heuristic capacity model; no runtime or guaranteed-yield claim"})
+            })
+            .collect();
+        println!("{}", serde_json::to_string_pretty(&rows)?);
+        return Ok(());
+    }
+    if (!args.validation_only && (args.rounds < 5 || args.warmup_rounds == 0))
+        || (args.validation_only
+            && (args.rounds != 1 || args.warmup_rounds != 0 || args.worker_timeout_seconds != 900))
         || args.primes.is_empty()
         || args.seeds.is_empty()
         || args
@@ -217,6 +238,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         || !(1..=100).contains(&args.retained_percent)
         || args.source_revision.len() != 40
         || !args.source_revision.bytes().all(|c| c.is_ascii_hexdigit())
+        || (args.validation_only
+            && args
+                .primes
+                .iter()
+                .any(|&p| sieve::relations_estimate(p, 9) < 1.25 * p as f64))
     {
         return Err("invalid frozen cover comparison parameters".into());
     }
@@ -244,17 +270,34 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .open(&fixture_path)?
                 .write_all(&bytes)?;
             let prepare_ns = prepared.elapsed().as_nanos();
-            let base = json!({"schema":"cover.sieve.graph-process/v1","p":p,"seed":seed,
+            let schema = if args.validation_only {
+                "cover.sieve.graph-validation/v1"
+            } else {
+                "cover.sieve.graph-process/v1"
+            };
+            let base = json!({"schema":schema,"p":p,"seed":seed,
             "source_revision":args.source_revision,"family":curve,"input_digest":digest,
-            "retained_percent":args.retained_percent,"rho_options":rho_options(spec.l)});
+            "retained_percent":args.retained_percent,"rho_options":rho_options(spec.l),
+            "validation_only":args.validation_only,"worker_timeout_seconds":args.worker_timeout_seconds,
+            "capacity_model_m9":sieve::relations_estimate(p,9),
+            "sieve_recipe":if args.validation_only {"incidence_shared"}else{"historical_default"}});
             let mut fixture = base.clone();
             fixture["record_type"] = json!("fixture");
             fixture["expected_scalar"] = json!(spec.d);
             fixture["challenge_preparation_ns"] = json!(prepare_ns);
             write_row(&mut out, &fixture)?;
-            for (phase, rounds) in [("warmup", args.warmup_rounds), ("measurement", args.rounds)] {
+            let phases = if args.validation_only {
+                vec![("validation", 1)]
+            } else {
+                vec![("warmup", args.warmup_rounds), ("measurement", args.rounds)]
+            };
+            for (phase, rounds) in phases {
                 for round in 0..rounds {
-                    let mut arms = ["ic_a", "graph_a", "rho_a", "ic_b", "graph_b", "rho_b"];
+                    let mut arms = if args.validation_only {
+                        vec!["ic_a", "graph_a"]
+                    } else {
+                        vec!["ic_a", "graph_a", "rho_a", "ic_b", "graph_b", "rho_b"]
+                    };
                     if round % 2 == 1 {
                         arms.reverse();
                     }
@@ -265,9 +308,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         row["round"] = json!(round);
                         row["arm"] = json!(arm);
                         row["record_type"] = json!("execution_start");
+                        let progress_path = dir.join(format!(
+                            "progress-p{p}-s{seed}-{phase}-{round}-{arm}.stderr"
+                        ));
+                        row["progress_path"] = json!(progress_path);
                         write_row(&mut out, &row)?;
                         let started = Instant::now();
-                        let mut command = Command::new(std::env::current_exe()?);
+                        let executable = std::env::current_exe()?;
+                        let mut command = if args.worker_timeout_seconds > 0 {
+                            let mut c = Command::new("timeout");
+                            c.args([
+                                "--signal=TERM",
+                                "--kill-after=5s",
+                                &format!("{}s", args.worker_timeout_seconds),
+                            ])
+                            .arg(&executable);
+                            c
+                        } else {
+                            Command::new(&executable)
+                        };
                         command
                             .args(["--worker", method, "--fixture"])
                             .arg(&fixture_path)
@@ -285,6 +344,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         command
                             .env("RAYON_NUM_THREADS", "1")
                             .env("OMP_NUM_THREADS", "1");
+                        let progress = OpenOptions::new()
+                            .write(true)
+                            .create_new(true)
+                            .open(&progress_path)?;
+                        command.stderr(Stdio::from(progress));
+                        if args.validation_only {
+                            command
+                                .env("JV_SIEVE_PROGRESS", "1")
+                                .env("JV_ADDS_INC", "1")
+                                .env("JV_ADDS_SHARE", "1");
+                        }
                         let result = command.output()?;
                         let elapsed = started.elapsed().as_nanos();
                         let worker: Value =
@@ -300,7 +370,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         row["child_exit"] = json!(result.status.code());
                         row["valid"] = json!(valid);
                         row["worker"] = worker;
-                        row["stderr"] = json!(String::from_utf8_lossy(&result.stderr));
+                        row["stderr"] = json!(std::fs::read_to_string(&progress_path)?);
                         write_row(&mut out, &row)?;
                     }
                 }

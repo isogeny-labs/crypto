@@ -31,9 +31,13 @@ case "$driver_kind" in
     driver_binary=target/release/examples/gaudry_cubic_s4_trace_compare
     analyzer_binary=$here/native_analysis/target/release/s4-trace-analysis
     ;;
-  cover-sieve-graph)
+  cover-sieve-graph|cover-sieve-validation)
     driver_binary=target/release/examples/jv_sieve_graph_compare
-    analyzer_binary=$here/native_analysis/target/release/cover-graph-analysis
+    if [[ "$driver_kind" == cover-sieve-validation ]]; then
+      analyzer_binary=$here/native_analysis/target/release/cover-validation-analysis
+    else
+      analyzer_binary=$here/native_analysis/target/release/cover-graph-analysis
+    fi
     ;;
   *) echo 'Unknown frozen driver kind.' >&2; exit 2;;
 esac
@@ -82,9 +86,12 @@ memory_kib=$(( $(jq -er .memory_gib "$run_dir/runtime-plan.json") * 1024 * 1024 
 argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" \
   --warmup-rounds "$warmups" --rounds "$rounds" \
   --source-revision "$source_revision" --out "$run_dir/raw.jsonl")
-if [[ "$driver_kind" == cover-sieve-graph ]]; then
+if [[ "$driver_kind" == cover-sieve-graph || "$driver_kind" == cover-sieve-validation ]]; then
   keep_percent=$(jq -er .retained_percent "$run_dir/runtime-plan.json")
   argv+=(--retained-percent "$keep_percent")
+  if [[ "$driver_kind" == cover-sieve-validation ]]; then
+    argv+=(--validation-only --worker-timeout-seconds "$(jq -er .worker_timeout_seconds "$run_dir/runtime-plan.json")")
+  fi
 elif [[ "$driver_kind" == graph-ic ]]; then
   oracles=$(jq -er .oracle_cli "$run_dir/runtime-plan.json")
   sampler=$(jq -r '.sampler // "fresh"' "$run_dir/runtime-plan.json")
@@ -114,6 +121,7 @@ sha256sum "$run_dir/driver" "$run_dir/analyzer" "$run_dir/runtime-plan.json" \
   "$run_dir/os.txt" "$run_dir/cpu.json" "$run_dir/cgroup.txt" "$run_dir/rustc.txt" \
   > "$run_dir/pre-call.sha256" || exit 2
 date -u +%FT%TZ > "$run_dir/started-at.txt"
+if [[ -r /sys/fs/cgroup/cpu.stat ]]; then cp /sys/fs/cgroup/cpu.stat "$run_dir/cpu-stat-before.txt"; fi
 echo "Local run: $run_dir"
 export RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1
 ulimit -v "$memory_kib" || exit 2
@@ -126,10 +134,14 @@ TIMEFORMAT=$'real_s=%R\nuser_s=%U\nsys_s=%S\ncpu_percent=%P'
   wait "$worker_pid"
 }; } 2> "$run_dir/time.txt"
 run_status=$?
+if [[ -r /sys/fs/cgroup/cpu.stat ]]; then cp /sys/fs/cgroup/cpu.stat "$run_dir/cpu-stat-after.txt"; fi
 printf '%s\n' "$run_status" > "$run_dir/exit-code.txt"
 date -u +%FT%TZ > "$run_dir/finished-at.txt"
 sha256sum "$run_dir/exit-code.txt" "$run_dir/time.txt" "$run_dir/stdout.txt" \
   "$run_dir/stderr.txt" > "$run_dir/post-call.sha256"
 if [[ -f "$run_dir/raw.jsonl" ]]; then sha256sum "$run_dir/raw.jsonl" >> "$run_dir/post-call.sha256"; fi
+for captured in "$run_dir"/progress-*.stderr "$run_dir"/public-*.json "$run_dir"/cpu-stat-*.txt; do
+  if [[ -f "$captured" ]]; then sha256sum "$captured" >> "$run_dir/post-call.sha256"; fi
+done
 echo "Local run exited $run_status; raw evidence retained at $run_dir"
 exit "$run_status"

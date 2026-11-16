@@ -1,3 +1,21 @@
+# Current checkpoint (06:57Z, 16 November)
+
+Stage20censor PUBLISHED22b0d7836; artifact-only f15a0ebc6 ff integrated.
+Stage21 SOURCE IN PROGRESS, no scientific data / benchmark active.
+New Amendment16 and cover-validation-plan.json: capacity candidate list selects
+p1009 by native m9 model>=1.25*p; freshseed251. Exactly IC then graph once,
+no warmup/AA/rho/ratios. Worker900s/cohort1900s/CPU0/8GiB/no retry. Both arms
+explicit incidence+share opt-ins, progress stderr persists from start. Original
+20gate remains failed, NOT a scale followup. Separate Rust validation analyzer
+requires both actualscalars and group replay + nontrivial graph no fallback.
+Analyzer tests/build/Clippy pass; final example checks session83386. Need
+manifest, check/commit/push SOURCE BEFORE sole wrappercall to create-new
+/workspace/ic-local-runs/local-cover-sieve-validation-20261116-21.
+No new call launched. Future comparison must be separately frozen after valid
+endpoints. GoalACTIVE; userauthorizeslocal/runpod; local works. No subagents.
+PR4288 open regular/automerge, gates/review unconfirmed; nextCI07:07absentevent.
+Do not stopgoal. Historical manifests unchanged. Journal current06:57.
+
 # Resume: native Rust graph IC toward rho parity
 
 ## Current checkpoint (06:38Z, 16 November)

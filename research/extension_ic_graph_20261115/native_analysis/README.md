@@ -55,3 +55,12 @@ edge counters summing to all pair obligations and positive pruning before a
 case can qualify for follow-up. Undeclared graph counters or changed certifier
 identity are rejected. The original exhaustive stage18 summary recomputes
 byte-exactly with the extended analyzer. [pcc:unverified]
+
+`cover-validation-analysis` handles Amendment16's two fresh public-input
+endpoint checks, keeping exact starts, exits, held-out scalar checks and graph
+witness counters. A successful nontrivial graph projection without fallback is
+required. It always reports comparative eligibility false: no ratio, interval
+or A/A claim is produced by this design. Usage remains `RAW PLAN NEW-DIR`.
+Three new tests cover positive endpoints, scalar/mode/fallback/exit tampering,
+and censor flow; the seven imported comparison tests also execute.
+[pcc:unverified]

@@ -10,7 +10,7 @@ use std::path::Path;
 type Key = (u64, u64, String, u64, String);
 const ARMS: [&str; 6] = ["ic_a", "graph_a", "rho_a", "ic_b", "graph_b", "rho_b"];
 const METHODS: [&str; 3] = ["ic", "graph", "rho"];
-fn int(v: &Value, k: &str) -> Result<u64, String> {
+pub(crate) fn int(v: &Value, k: &str) -> Result<u64, String> {
     v[k].as_u64().ok_or_else(|| format!("missing integer {k}"))
 }
 fn key(v: &Value) -> Result<Key, String> {
@@ -22,7 +22,7 @@ fn key(v: &Value) -> Result<Key, String> {
         v["arm"].as_str().ok_or("arm")?.into(),
     ))
 }
-fn context(v: &Value) -> Value {
+pub(crate) fn context(v: &Value) -> Value {
     json!([
         v["family"],
         v["input_digest"],
@@ -30,7 +30,7 @@ fn context(v: &Value) -> Value {
         v["rho_options"]
     ])
 }
-fn clean(v: &mut Value) {
+pub(crate) fn clean(v: &mut Value) {
     if let Some(o) = v.as_object_mut() {
         o.remove("wall_ms");
         o.remove("filter_call_wall_ns");
@@ -73,7 +73,7 @@ fn estimate(logs: &[f64], draws: usize, mut seed: u64, complete: bool) -> Value 
     boot.sort_by(f64::total_cmp);
     json!({"geometric_mean":mean,"bootstrap_95":[boot[draws*25/1000],boot[(draws*975/1000).min(draws-1)]],"rounds":logs.len()})
 }
-fn public_family(f: &Value, p: u64) -> bool {
+pub(crate) fn public_family(f: &Value, p: u64) -> bool {
     let l = f["l"].as_u64();
     let coords = |v: &Value| {
         v.as_array().is_some_and(|v| {
@@ -94,7 +94,7 @@ fn public_family(f: &Value, p: u64) -> bool {
         && f.get("d").is_none()
         && f.get("expected_scalar").is_none()
 }
-fn valid_graph(g: &Value) -> bool {
+pub(crate) fn valid_graph(g: &Value) -> bool {
     let keys = [
         "calls",
         "projected",
