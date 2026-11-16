@@ -1,4 +1,83 @@
-# Current checkpoint:31PUBLISHED; native rho pricing controls next
+# Current checkpoint:32SOURCE READY; Runpod runner provisioning, NOT MEASURED
+
+USERswitchedpendingmeasurementtoRunpodandprovidedserviceauth. CredentialONLYprivate
+tempheader outsideGit: directorypointer/tmp/ic-runpod-auth-location. NEVERprintheader/
+tokens/APIresponses.env. Readpointertogetprivateheader,task-header,pod.id,cleanupguard
+receipts. No actualsecretinresume/source/logs. APIkeyneverpassedtopod; separateephemeral
+Rustcapturetokenused. UserauthforRunpodpersists/no furtherpermissionquestion.
+
+Currentownpod s1ngkkcetckkq6 (4vCPU/8GiB/cpu3c/$0.12h),45minlocalDELETEguard
+active; exactdeadlinevalidation/runpod32-allocation.json. PREVIOUSpod3aqk0v57a1udnq
+bootstraploginPATHhidrustc; sourcebootlogsretainedredacted/DELETE204confirmed,
+validation/runpod32-startup-cleanup.json. No scientificattemptonfailedpod.
+Correctedstartupbash-candabsolute/usr/local/cargo/bin/rustc; immutableRustimage
+sha256:4b68057dc8c103af4fa66b5cd29f21b18afec79fadfcd8fb91e295e939f0690c.
+CPUonly,notouchunrelatedpods. Newpodhealthcheckpending; APIHeaderauthonlyofficial
+REST, task-headeronlyhttps://PODID-8000.proxy.runpod.net. GET/healthor/status,
+PUT/bundle upload, POST/run ONCE, GET/artifacts afterfinished. NativeRustserver
+runpod_capture.rs test/warnings-deniedcompilePASS. Existingroot11Rho/1publicworker
+tests/twoexamplesbuild/ClippyPASS,frozen2rootsourcehashPASS; standalone16checks
+latestRunpodbackendqualification/Clippy/buildpendingfinalread. No compileractive.
+
+Newprepare-rho-native-runpod.shsealsPUBLISHEDcleanGit/source+buildhashesintoNEW
+stagingdir; copiesnativeworker/generator/qualifier,run-rho-native-task.sh,plan,
+allocation,sourcearchive,resume/compilerandrelativebundlemanifest. Secretsnevercopied.
+Remote taskguardsremaininglifetime>=2110sec,firstallowedCPU,payloadhash,no compiler,
+create-newrun,900worker1900whole60fixture1round0warm/noretry. Originalcopiedqualifier
+runsREMOTEaftermeasurement; allrelativepre/post/preworker/qualifiedhashes portable.
+Native32casefreshp101seed317,harnessvsnativepriceSAMEconfiguredwalk, noIC/rhoparity.
+Protocol27/planbackendnowrunpod_user_authorized. Finalnativecheckscompletebutstill
+DIRTYsource/docs/journal/PCC/lessons. Needfreshsource/buildmanifestCOMMIT+PUSHclean
+BEFOREprepare/upload/POSTrun. Scientific32NOTSTARTED. Guarddeadline45minfromnewpod
+creation~15:55UTC; startwithin~10minelsepreflightrefuses, neverrelaxscientificbudget.
+AftercollectionDELETEownpodimmediatelyviaRESTandconfirm, markprivatepod-ID.deleted
+soownedguardianwon'tre-delete. Capturecleanupreceiptwithoutsecret. No leakedpaidpod.
+GoalACTIVE/no stopgoal/subagents. Existing31publishedcontentbelowunchanged.
+
+# Previous checkpoint:32SELECTED; native rho calibration build active (16 November15:27Z)
+
+CurrentHEADe4ebceecd61fb1705922ca9c490d030626e8a062+DIRTYnativeRhoactual
+towercalibration/comparatoropt-in/tests/qualifier/protocol/docs/journal. No32call/rundir.
+GoalACTIVE/no stopgoal/subagents; userlocalorRunpodauthpersists.
+
+ImplementedArith<const COUNT=false>; truecalibrationhooksactualprime-field
+product/sum/subtractionincldeferredproducts; falseproductionkeepssamewalkmath/RNG.
+Existinginv_modhookonce. measure_native_fq3_primsseparatelegacyharness/TUNED.
+ExistinggraphIC/rhocomparatornew--native-rho-pricesrequires--bitops, recordsnative
+calibrationvectors/marker/removesexactresolvedgap. rho_tallyonlyexplicitcounts+
+separateouterreplay; nowholehooksnapshotdoublecount. Nestedpublicpointanswerfields
+denyunknown. Tests handFp2counts/values, mult-primebasis/random/squares/inverses,
+unchangedsemanticwalk/actualscalar andphaseinversecontrols. Expectedsourcevectors
+M/S55M44A,inv80M42A1I NOTyetnewscientificallymeasured/citedasobserved.
+
+Initialstrictlibrary/exampleClippyPASS. Two rootsourcesfrozensince15:19,
+/tmp/ic-rho-native-root-source-before-tests.sha256PASS. Queue78246:
+finalClippy THENcargo testrelease--libjv_rho_strong::tests THENtouchedgraphcompare
+exampletest THENbuildgraphcompare+twoLPpublicfixturegenerator. STILLRUNNING;
+inspectvalidation/rho-native-{final-clippy,library-tests,public-worker-tests,
+example-build}.log. DO NOTeditrootfileswhilecompilerreads/no timingwhilecompiling.
+
+Standalone rho-native-price-analysis usesindependenthigh-levelphasevectors/
+calibration/bitoprepricing plusmatchingouterreplayresiduals andsemanticwork.
+Initial14tests/build/ClippyPASS; extra3rdhandphasecontrol/OPScleanupadded,
+latestphase-tests/clippy/buildcheckpending. No rootdependency. Thinwrapper
+run-rho-native-local.shcopiesdrivergraphcompare+fixture-drivertwoLPcompare;
+workerJSONisstdoutredirecttoraw.json(no--out). Publicfixtureonlyworkers,
+samep101seed317/negation/batch16/r256/DPpolicy. Amendment27/rho-native-plan.json/
+NATIVE_RHO_PRICE_REVIEW.md/rho-native-report.typprospectivecriteria.
+
+SELECTED32conditionalnativechecks/sourcepublication: freshp101seed317,
+harnesspricesthennativeprices,1validation0warm/CPU0/8GiB/900worker1900whole
+60fixture/noretry. Requirebothactualscalar/native+extraell/heldout,samesemantic
+walk/operationtrace,exactnativecalibration,independentphasevector/reprice/sums,
+matchingouterreplayresidual. Noparity/ICcomparison/algorithmgain/newcompleteprice/
+oldrecordrepricing. TUNEDcredits/RNG/bookkeepinggapsremainexplicit.
+Needfinalchecks/freshsource/buildmanifestsCOMMIT+PUSHcleanBEFOREsolecall
+/workspace/ic-local-runs/local-rho-native-price-validation-20261116-32.
+Thenoriginalcopiedqualifier/exports/hashes/summary/report/viewallpages/exact
+benchmarkcopies/publication. No32data yet. No newnumericpriceobservations.
+
+# Previous checkpoint:31PUBLISHED; native rho pricing controls next
 
 31packet32a51abdc8931378c3603d7b5938585e2e6f8aa8PUSHED/PRupdatedafterPCCproselint0.
 Artifactbot2d3068867da325b76a429e58d47c47b8599f6442inspecteddiffPNGmigrationonly,

@@ -50,11 +50,15 @@ struct Args {
     /// Emit incomplete operation-accounting diagnostics; never a ranked total.
     #[arg(long)]
     bitops: bool,
+    /// Price rho's executed native tower; preserve harness prices by default.
+    #[arg(long, requires = "bitops")]
+    native_rho_prices: bool,
     #[arg(long, default_value_t = 0)]
     worker_timeout_seconds: u64,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct PublicPoint {
     x: [[u64; 2]; 3],
     y: [[u64; 2]; 3],
@@ -116,7 +120,7 @@ fn solve_worker(
     keep: usize,
     mst: bool,
 ) -> Result<Value, String> {
-    solve_worker_inner(curve, method, seed, keep, mst, false)
+    solve_worker_inner(curve, method, seed, keep, mst, false, false)
 }
 
 fn solve_worker_counted(
@@ -125,6 +129,7 @@ fn solve_worker_counted(
     seed: u64,
     keep: usize,
     mst: bool,
+    native_rho_prices: bool,
 ) -> Result<Value, String> {
     // Nested parallel iterators must execute on the tally owner's thread.
     let pool = rayon::ThreadPoolBuilder::new()
@@ -136,7 +141,7 @@ fn solve_worker_counted(
         bitops::set_moduli(curve.p, curve.l);
         bitops::enable(true);
         let _instance = bitops::enter(Phase::Instance);
-        solve_worker_inner(curve, method, seed, keep, mst, true)
+        solve_worker_inner(curve, method, seed, keep, mst, true, native_rho_prices)
     })
 }
 
@@ -147,6 +152,7 @@ fn solve_worker_inner(
     keep: usize,
     mst: bool,
     accounting: bool,
+    native_rho_prices: bool,
 ) -> Result<Value, String> {
     if !is_prime_u64(curve.p)
         || !is_prime_u64(curve.l)
@@ -182,6 +188,7 @@ fn solve_worker_inner(
     let uniform_before = accounting.then(bitops::uniform_snapshot);
     let other_before = bitops::snapshot_other();
     let _attack = bitops::enter(Phase::Model);
+    let mut native_calibration = None;
     let (scalar, work, native_verified, capped, rho_work) = if method == "rho" {
         let instance = CurveInstance {
             p: curve.p,
@@ -198,10 +205,17 @@ fn solve_worker_inner(
         let capped = counted.run.capped;
         let tally = if accounting {
             let _harness = bitops::enter(Phase::Harness);
-            Some(rho::rho_tally(
-                &counted,
-                &rho::measure_fq3_prims(curve.p, curve.l),
-            ))
+            let prices = if native_rho_prices {
+                rho::measure_native_fq3_prims(curve.p, curve.l)
+            } else {
+                rho::measure_fq3_prims(curve.p, curve.l)
+            };
+            if native_rho_prices {
+                native_calibration = Some(
+                    json!({"schema":"rho.native-tower-primitives/v1","mul":bitops::prims_json(&prices.mul),"square":bitops::prims_json(&prices.sq),"inverse":bitops::prims_json(&prices.inv),"complete":false,"legacy_tuned_credits_included":false}),
+                );
+            }
+            Some(rho::rho_tally(&counted, &prices))
         } else {
             None
         };
@@ -276,7 +290,11 @@ fn solve_worker_inner(
             (
                 t,
                 &Phase::RHO[..],
-                "existing generic Fq3 harness primitive prices",
+                if native_rho_prices {
+                    "executed native Barrett tower prime-field primitives"
+                } else {
+                    "existing generic Fq3 harness primitive prices"
+                },
             )
         } else {
             (
@@ -293,6 +311,14 @@ fn solve_worker_inner(
         native["uniform_sampling"] = json!({"schema":"cover.uniform-sampling-diagnostic/v1","complete":false,
             "scope":"selected Fq-coordinate, Wiedemann-vector and initial cover-label samplers; generator and other paths remain incomplete",
             "phases":sampling_phases,"total":bitops::uniform_json(&uniforms.sum(phases).expect("sampling sum fits")).expect("sampling counters fit")});
+        if let Some(calibration) = native_calibration {
+            native["native_tower_calibration"] = calibration;
+            native["counted_items"] = json!(["counted:native_rho_tower_prime_field_arithmetic"]);
+            native["known_uncounted"]
+                .as_array_mut()
+                .expect("gap list")
+                .retain(|v| v["name"] != "native_extension_formula_vs_generic_harness_pricing");
+        }
         let other_after = bitops::snapshot_other();
         result["work_native"] = native;
         result["work_native"]["other_modulus_ops"] = json!(Phase::IC
@@ -360,18 +386,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let curve = serde_json::from_reader(File::open(
             args.fixture.as_ref().ok_or("worker fixture required")?,
         )?)?;
-        let solve = if args.bitops {
-            solve_worker_counted
+        let result = if args.bitops {
+            solve_worker_counted(
+                &curve,
+                method,
+                args.walk_seed,
+                args.retained_percent,
+                args.mst_graph,
+                args.native_rho_prices,
+            )
         } else {
-            solve_worker
-        };
-        let result = solve(
-            &curve,
-            method,
-            args.walk_seed,
-            args.retained_percent,
-            args.mst_graph,
-        )?;
+            solve_worker(
+                &curve,
+                method,
+                args.walk_seed,
+                args.retained_percent,
+                args.mst_graph,
+            )
+        }?;
         println!("{}", serde_json::to_string(&result)?);
         return Ok(());
     }
@@ -511,6 +543,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         if args.bitops {
                             command.arg("--bitops");
                         }
+                        if args.native_rho_prices {
+                            command.arg("--native-rho-prices");
+                        }
                         for (key, _) in std::env::vars_os()
                             .filter(|(key, _)| key.to_string_lossy().starts_with("JV_"))
                         {
@@ -573,12 +608,15 @@ mod tests {
         };
         let serialized = serde_json::to_value(&curve).unwrap();
         assert!(serialized.get("d").is_none() && serialized.get("expected_scalar").is_none());
+        let mut answer_field = serialized.clone();
+        answer_field["q"]["expected_scalar"] = json!(spec.d);
+        assert!(serde_json::from_value::<PublicCurve>(answer_field).is_err());
         let got = solve_worker(&curve, "rho", 3, 75, false).unwrap();
         assert_eq!(got["recovered_scalar"], spec.d);
         assert_eq!(got["verified"], true);
         assert_eq!(got["work"]["run"]["correct"], false); // no planted answer supplied
         assert!(got.get("work_native").is_none());
-        let diagnostic = solve_worker_counted(&curve, "rho", 3, 75, false).unwrap();
+        let diagnostic = solve_worker_counted(&curve, "rho", 3, 75, false, false).unwrap();
         assert_eq!(diagnostic["recovered_scalar"], spec.d);
         assert_eq!(diagnostic["verified"], true);
         let accounting = &diagnostic["work_native"];
@@ -596,5 +634,27 @@ mod tests {
                 > 0
         );
         assert_eq!(diagnostic["signature"]["work_native"], *accounting);
+        let native = solve_worker_counted(&curve, "rho", 3, 75, false, true).unwrap();
+        assert_eq!(native["recovered_scalar"], spec.d);
+        assert_eq!(native["verified"], true);
+        assert_eq!(native["signature"]["work"], diagnostic["signature"]["work"]);
+        assert_eq!(
+            native["work_native"]["native_tower_calibration"]["inverse"]["field_mul"],
+            80
+        );
+        assert_eq!(
+            native["work_native"]["native_tower_calibration"]["inverse"]["field_inv"],
+            1
+        );
+        assert_eq!(native["work_native"]["complete"], false);
+        assert_eq!(
+            native["work_native"]["counted_items"],
+            json!(["counted:native_rho_tower_prime_field_arithmetic"])
+        );
+        assert!(native["work_native"]["known_uncounted"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|v| v["name"] != "native_extension_formula_vs_generic_harness_pricing"));
     }
 }
