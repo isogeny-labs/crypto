@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T1232Z-exact-fused-complete-paid-screen-20261116",
+  "latest_record": "20261116T1243Z-matched-streamed-instruction-profile-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 214,
+    "measured": 215,
     "open": 1
   },
   "repo": "crypto",
@@ -13766,6 +13766,29 @@
     },
     {
       "better": "neutral",
+      "first": 111865803.0,
+      "latest": 111865803.0,
+      "latest_derived": {},
+      "metric": "baseline_guest_instructions",
+      "points": [
+        {
+          "commit": "e0e0a9d0a9ce",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T1243Z-matched-streamed-instruction-profile-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Two exact matched guestIr profiles, same complete checked output/modes/pins,0contention; both reports/raw graphs retained, no native speed inference. PCC0e4eac unsigned.",
+          "value": 111865803.0
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
       "first": 45.0,
       "latest": 180.0,
       "latest_derived": {},
@@ -14261,6 +14284,29 @@
           "spread": null,
           "summary": "90 matching outputs,4 paid recoveries; onlyfirst-star-n16 selected for paired testing. Primary single-call24.828/15.130, prior-replay1.760, optimizedexpanded5.835; not confirmed15x. PCC37a51f/5d63eb, unsigned L0. [pcc:unverified]",
           "value": 4.0
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 108491681.0,
+      "latest": 108491681.0,
+      "latest_derived": {},
+      "metric": "streamed_guest_instructions",
+      "points": [
+        {
+          "commit": "e0e0a9d0a9ce",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T1243Z-matched-streamed-instruction-profile-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Two exact matched guestIr profiles, same complete checked output/modes/pins,0contention; both reports/raw graphs retained, no native speed inference. PCC0e4eac unsigned.",
+          "value": 108491681.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",

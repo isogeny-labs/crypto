@@ -1,3 +1,19 @@
+# Latest: matched1243 profiles CLOSED; nextFGLMfrontier NOTimplemented, pub27pending
+
+1243baseline111865803/direct108491681guestIr, samecheckedbasis/modes/pins/0contention; PCC0e4eac/380191. Directleadself14074655, axpyself12410313, checkeraddself3480336. Two rawarchives andtwo completeRustself/summary/totals/Collected reports, A3PDFwarningfree/visualchecked, CLOSED1243/scopedintegrity/progresspass. No nativegain fromIr. Profiledata fused-profile-01.
+
+Next FGLM_FRONTIER_HYPOTHESIS efbd44 proposedNOTcode. Currentquotient::change_order enumeratesall degree0..d monomials then skipsleadingmultiples. EstablishedFGLM orderedfrontier starts1, expandsONLYindependentstandardmonomials bynvariables, dedup globally/degree<=d cap, skipscachedimmutableleadingterms. Samegrevlexnon-skippedsequence: eachsurvivingmhasindependentproperdivisor; dependentproperdivisor wouldlead-dividem. Atmost1+n*d insertedcandidates beforedimensionoverflow. Keep sameqmul/dependence/rewrite/sign/finalsort/fullnative+unchangedrootchecks, exactbasis/proof/fieldcounters. Privatebit64newBothUpdatesFrontier103=39|64, degreecache16off. Oldgridverbatimdefault. SourcesreviewedlocalQUOTIENT_PROTOCOL andquotientcode, labsparseFGLMREADME appblob2a884..., primarySymPy1.13.3fglmtools.py appblobd68fe5... (borderonlyexpandindependent/pruneLM, zero-dim). Paper503/Sage403gaprecorded, unrelatedSingularpageexcluded. KBunavailable. No novelty/degreeclaim/timingprediction.
+
+Firstpublish27 fullclosed1243+unimplementedhypothesis BEFOREcode. Priorplan26 tree6b3bef762df2f3edb9350e465284a12710e0da97; ctx/tmp/frontier27-remote.json heade4813572fd6c2955e49a27d572a1bdb5933c6365 artifact-only6metadata/11removesmirrored. Bundle27 excludesf473158d7949f8a22225ceb72a333e22636ef55c; envelopefused-profile-01/archive-envelope.json2raw. Finalcommit/bundle/plan27/uploadpending, PRbodyupdated.
+
+Afterpub implementnewfrontier withorderedBTreeSetwrapper cmpandseenset, cachedownedleads onimmutablepush; exactoldcoords/innerprocessing clones. EnqueuechildrenONLYindependent anddegree<d, preservecols>=d failurebeforepush. Differentialprocessedsequence vsoldgrid onstaticmonomialideals(nonradical,mixed,n3/8/16) andbound<=1+n*d, basis/proof/fieldcounts bothfields/fullfixtures/failure. Corefeaturetests/rootnewwrappers (matchedstream39 vsfrontier103)/APItests, compileonce7m+lint2m; no productioneditsduringbuild. Native30cellsoldwire/basis/counters/freshSingular+n3all32, prospective32all30old+matched2 only31/fixedLASThash, all6/31ratios/fullcost/gates unchanged; source/protocol/qualificationpub BEFOREpaidcalls. Goal15ACTIVE/unconfirmed/L0/waivedcheckpoint/zero$/noagents/Rustmath/Pythonmetadataonly/freshseedsuntouched/noretry/gateweakening. Commentary<60sec.
+
+Historical follows:
+
+# Publication26 DONE; matched n16 profiles next
+
+Remote74989d2f363b80bea51758ce51d0f4e9492cfe45/tree6b3bef762df2f3edb9350e465284a12710e0da97 exactlocalf473158d7949f8a22225ceb72a333e22636ef55c, bundle26be445742/419364bytes. /tmp/relation-publication-26-plan.json, /tmp/fused26-publication-receipt.json. PRupdated. Below profilequalification/source/commands authoritative; no n16profileyet. Registercleanmatchedrecordthenfixedbaseline/direct. Goal15ACTIVE, 1232paidnullfullypublished.
+
 # Latest:1232 streamed paid30 CLOSED/NULL; matched profile QUALIFIED, pub26 pending
 
 Paid30 all180match/4recoveries/0contention/pinsunchanged. Fixedlast F4primary16.993/expanded12.750, matchedbaseline1.370/oldlead0.858; no admission/no pair/retry. PCC747182/589c8f, fused-screen-01/report-01 all174ratios/recoverysums computedRust, PDFA3/plot/tablechecked, raw7archives, closed1232/scopedintegrity/progresspass.
