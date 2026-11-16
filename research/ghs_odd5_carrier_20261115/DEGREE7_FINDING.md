@@ -10,6 +10,14 @@ Set `K=F3[a]/(a^5+2a+1)` and `Y/F3: y²=f(x)`, where
 
 For each mask `m`, write `b_m=sum_i floor(m/3^i) mod 3 * a^i` and `E_m/K: v²=u³+2u²+b_m`. The ten trace-`+26` source curves have masks `3,27,30,103,139,167,182,194,230,233`, with `#E_m(K)=218=2*109`. The quadratic-square screen found one explicit cover for each of **30, 103, 139, 194, 233** and none in its specified denominator shapes for the other five. The exact `A,B,C,H` for each hit are in `degree7_quadratic_square_<mask>.json`; the `degree7_evidence_manifest.json` binds each source and receipt hash.
 
+| Mask | Exact `b_m` | Pole quadratic index in the saved factor order | Minimum cover degree for this fixed `Y` |
+|---:|---|---:|---:|
+| 30 | `a+a³` | 3 | 7 |
+| 103 | `1+a+2a²+a⁴` | 1 | 7 |
+| 139 | `1+a+2a³+a⁴` | 2 | 7 |
+| 194 | `2+a+a³+2a⁴` | 4 | 7 |
+| 233 | `2+2a+a²+2a³+2a⁴` | 0 | 7 |
+
 Each positive cover has `u=A/B`, `v=y*C/B²`, `B=Q_i H²`, `deg A=7`, `deg B=6`, and satisfies the exact polynomial identity
 
 `f*C² = B*(A³+2A²B+b_m B³)`.
@@ -25,6 +33,8 @@ For `P in E_m(K)[109]`, let `(U,V)` represent the pullback fiber over `P`, where
 For each of the five masks, `degree7_subgroup_map_<mask>.json` records a source point, its independent `37P` preimage, nonzero order-109 `D(P)` and `T(P)`, Frobenius fixedness of `T(P)`, and both scalar identities `D(37P)=37D(P)` and `T(37P)=37T(P)`. The exact function-field identity plus divisor pullback functoriality supplies the group-homomorphism argument; the point checks certify the selected subgroups. Lean's arithmetic ledger does not formalize that geometric argument.
 
 The same covers base-change to `L=F_(3^55)` over `k_s=F_(3^11)`. For each mask, `degree7_s11_transfer_<mask>.json` records a nonzero image of a source point of prime order `r=333566377062870325133` (69 bits) in `J(Y)(k_s)[r]`, fixed by `Frob_(3^11)`, with independently evaluated scalar preservation at 37. The source and Jacobian orders are `174449211009094048378706606=2*109*2399*r`, hence the Jacobian group at this exact `s=11` is cyclic. These are executable subgroup transfers for five exact curves, with no measured full index-calculus solve yet.
+
+The separate `primitive_cover_s11.json` gives an additional exact curve `E'/F_(3^55)` with `j(E')` of full degree 55 over F3. An evaluable 23-isogeny from the mask-30 source produces `E'`; the saved reverse 23-isogeny maps its order-r point back to `23P`, then the same corrected pullback and trace give a nonzero order-r Jacobian image. `verify_primitive_cover_s11.py` independently rebuilt both isogenies from their kernel polynomials, reconstructed the cover from coefficient vectors, and matched the saved image and its 37-multiple. Thus the exact composite transfer is executable for a primitive-j source; it remains in the known isogeny-assisted attack setting. Composing the forward 23-isogeny with `Y_L→E_30` also gives a degree-161 cover `Y_L→E'`, although its minimum degree is not determined here.
 
 ## Cost and priority boundary
 

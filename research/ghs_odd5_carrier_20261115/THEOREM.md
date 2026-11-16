@@ -1,5 +1,7 @@
 # Degree-five Jacobian carrier theorem and its exact scope
 
+**Update, 16 November 2026:** The later `DEGREE7_FINDING.md` supplies five explicit degree-seven covers for the trace-`+26` fixed carrier, nonzero evaluated subgroup maps at orders 109 and `333566377062870325133`, and one composed primitive-j source over `F_(3^55)`. Earlier statements below that a transfer is only abstract describe the pre-cover snapshot and are superseded for these exact objects. Full attack costs remain open.
+
 15 November 2026. All finite enumeration and algebraic claims in this note are [pcc:unverified] until the repository's independent PCC gate signs them. The scripts and immutable receipts below allow the arithmetic to be checked without relying on this prose.
 
 ## Statement
