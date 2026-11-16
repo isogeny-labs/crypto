@@ -44,3 +44,17 @@ Actual admitted-public-log collector integration is next, with cold setup and th
 
 ### Errors
 Initial failed Rust source and build logs retained. Metadata wrappers refused before execution; report initial wrong working directory failed before PDF then corrected. An ordinary follow-up PCC help invocation used unsupported proselint; official subcommand is lint-prose. No data or scientific predicate changed for these metadata errors. [pcc:unverified]
+
+## New integrated iteration02:09–03:09UTC
+
+### What was done
+Completed prior iteration evidence/publication before selecting the next step. Read current runtime status, lessons brief, previous admitted-public-log producer/auditor and primary-source lineage. Implemented a separate NEW native integrated cold collector contract, not a modification/relaunch of old frozen studies. No new native execution before source checkpoint. [pcc:unverified]
+
+### Decisions made
+All455sourcepolicies, caps3/4, all30targets, four Weil/terminal/Tate/progression arms, independent rational-Tate Rust replay; count blocked/identity separately. Standard denominator elimination and bilinear public/shift progression preserve unknown point input; no target labels or answer caches. New boundedwindow02:09–03:09UTC,600sstages/two LOCALworkers; source checkpoint before builds, binary/canonical freeze before data. [pcc:unverified]
+
+### Open threads
+Build and validate full census under the exact new integrated/PROTOCOL.md. No inferred gain from unexecuted source. [pcc:unverified]
+
+### Errors
+No new scientific run yet; all old source/build failures remain immutable. [pcc:unverified]
