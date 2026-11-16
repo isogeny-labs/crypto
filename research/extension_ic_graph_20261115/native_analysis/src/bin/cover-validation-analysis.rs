@@ -22,6 +22,15 @@ fn key(v: &Value) -> Result<Key, String> {
 fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, String> {
     let counted = plan["operation_accounting"] == true;
     let detail = plan["operation_accounting_detail"] == "projection_and_solve";
+    let required = match plan.get("required_counted_items") {
+        None => Vec::new(),
+        Some(v) => v
+            .as_array()
+            .ok_or("required counted items")?
+            .iter()
+            .map(|v| v.as_str().ok_or("required counted item name"))
+            .collect::<Result<Vec<_>, _>>()?,
+    };
     let source = plan["source_revision"]
         .as_str()
         .filter(|s| s.len() == 40 && s.bytes().all(|c| c.is_ascii_hexdigit()))
@@ -41,6 +50,15 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
         || plan
             .get("operation_accounting_detail")
             .is_some_and(|v| !counted || v != "projection_and_solve")
+        || (!required.is_empty() && (!counted || !detail))
+        || required.len() != required.iter().copied().collect::<BTreeSet<_>>().len()
+        || required.iter().any(|m| {
+            ![
+                "counted:modular_la_native_scans",
+                "counted:cover_residual_scalar_additions",
+            ]
+            .contains(m)
+        })
     {
         return Err("invalid frozen validation plan".into());
     }
@@ -209,6 +227,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
                 component_accounting = accounting::details(work, &w["work_native"], &f["family"]);
                 valid &= component_accounting.is_some();
             }
+            valid &= accounting::required_items(work, &w["work_native"], &required);
         }
         outcomes.push(json!({"p":p,"seed":seed,"arm":arm,"completed":row.is_some(),"endpoint_valid":valid,"nontrivial_graph_without_fallback":exercised,"child_exit":row.map(|r|r["child_exit"].clone()),"recorded_outer_wall_ns":row.map(|r|r["cold_process_wall_ns"].clone()),"recovered_scalar":row.map(|r|r["worker"]["recovered_scalar"].clone()),"work":row.map(|r|r["worker"]["work"].clone()),"progress_path":row.map(|r|r["progress_path"].clone())}));
         if counted {

@@ -328,6 +328,7 @@ fn accounting_json(
         ]
     };
     json!({"schema":"cover.graph.accounting-diagnostic/v1", "unit":"bitop/v1",
+        "counted_items":if method=="rho" {Vec::<&str>::new()} else {vec!["counted:modular_la_native_scans", "counted:cover_residual_scalar_additions"]},
         "complete":false, "total_bitops":Value::Null, "comparison_eligible":false,
         "pricing":pricing, "phases":phase_rows, "observed_primitives":bitops::prims_json(&total),
         "diagnostic_priced_bitops":total.bitops(&widths).expect("known primitives").to_string(),

@@ -1,4 +1,38 @@
-# Current checkpoint:25FINISHED, publish then next coverage (16 November10:42Z)
+# Current checkpoint:26SOURCE READY,26NOTRUN (16 November11:18Z)
+
+Nativepatch countsWiedemann/BM data scans/comparisons;shortcircuitanswercompare;
+coverresidualscalarlabels useam (2modradds/residual,values/RNGunchanged). Old
+arithmetic/legacyops/defaultreportstays; worker countedspecificmarkers only.
+SourcechecksALLPASS:1BMhand5M3A2I15word3legacy,1eqcounter,2Wiedemann,19sieve
+(twoignored),1executedworker;library/example/analyzerstrictClippy+actualbuilds;
+27analyzertests. 21/23/24/25summariesreplayBYTEEXACT. No activecompiler/science.
+
+ProspectiveAmendment21/cover-native-scans-validation-plan.json: p1009fresh277,
+oneICthenPivotgraph,1validation0warm/noRho/AA/ratios;900each1900wholeCPU0/8GiB/
+noretry/incidence+sharedboth. REQUIREDitems nativeLA scans and residualscalaradds:
+solvewords>RNGwords;positivedescentresids withModrAdd>=2*resids. Alsoactualscalars,
+nontrivialgraphnofallback,zeroOTHER/foreign,detailedshapes/phaseprice/sumchecks.
+101filesvalidation/cover-native-scans-source.sha256 PASS,distinctbuildreceipt.
+MUSTcommit/publishcleansource/specBEFOREsolewrappercall to
+/workspace/ic-local-runs/local-cover-native-scans-validation-20261116-26.
+26NOdata/job yet. Afterexit ORIGINALcopiedanalyzer/fullflow/hash/report/publish.
+
+25PUBLISHED262f5b9ca994c6a2d537bf8527b9e5c7d7acea8d/PRactualresultupdated.
+Artifactbot6fba1e5ce FF integrated, exactignored25PNGrestored/hashPASS.
+CurrentHEAD6fba1e5ce+DIRTY26source/prep/journal. DoNOTreaddignoredmigratedPNGs.
+25actualscalar102559623889752301both;525/4721nnz->394/12982nnz,source2c5e;
+observedsolver364321367580->666381953262,filter806228620,replay869597544;
+completecostunknown/no ranking. Prior24/23/22unchanged. GoalACTIVE/localworks.
+
+NEXTafter26: RNG/containercoverage and strongestRhopricing. Rand0.8.8 official
+uniform.rs526-563read:sample_single_inclusive rejectionloop canconsume>1rawdraw;
+currentnominalRNGwordcounterdoesNOTcloseRNGcoverage. No samplerrewrite selected.
+Valgrind3.28.0installed+smokeonly, NOcrypto instructionaudit. Don'tclaimcomplete
+primarytotal/Rhoparity from partialbitops or oldwall/crossruncomposition.
+No stopgoal/subagents. AllclaimsPCCunverified. CIlast2c5e10:35 requiredgatesunknown;
+NEXT>=11:25absentnewsourceevent. PR4288same/automerge,no manualmerge.
+
+# Previous checkpoint:25FINISHED, publish then next coverage (16 November10:42Z)
 
 25source2c5e02b34cb2d56dc392cd3b1f57d706d0d7b24a PUBLISHED beforeSOLEcall.
 Run /workspace/ic-local-runs/local-cover-subcounts-validation-20261116-25

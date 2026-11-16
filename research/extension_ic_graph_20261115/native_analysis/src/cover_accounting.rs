@@ -5,7 +5,7 @@
 mod bitops;
 use bitops::{Field, Prim, Widths};
 use serde_json::Value;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 const KINDS: [&str; 12] = [
     "field_add",
@@ -131,6 +131,45 @@ fn add_counts(sum: &mut BTreeMap<String, u64>, next: &Value) -> Option<()> {
         *slot = slot.checked_add(n)?;
     }
     Some(())
+}
+
+pub(super) fn required_items(work: &Value, outer: &Value, required: &[&str]) -> bool {
+    fn check(work: &Value, outer: &Value, required: &[&str]) -> Option<()> {
+        let markers = outer["counted_items"].as_array()?;
+        let actual: BTreeSet<_> = markers.iter().map(Value::as_str).collect::<Option<_>>()?;
+        if actual.len() != markers.len() || required.iter().any(|m| !actual.contains(m)) {
+            return None;
+        }
+        if required.contains(&"counted:modular_la_native_scans") {
+            let solves = work["work_native"].as_array()?;
+            if solves.is_empty()
+                || solves.iter().any(|s| {
+                    let p = &s["primitives"];
+                    p["word_op"]
+                        .as_u64()
+                        .zip(p["rng_words"].as_u64())
+                        .is_none_or(|(words, rng)| words <= rng)
+                })
+            {
+                return None;
+            }
+        }
+        if required.contains(&"counted:cover_residual_scalar_additions") {
+            let additions = work["descent_residuals"].as_u64()?.checked_mul(2)?;
+            if additions == 0 {
+                return None;
+            }
+            let descent = outer["phases"]
+                .as_array()?
+                .iter()
+                .find(|p| p["phase"] == "descent")?;
+            if descent["primitives"]["modr_add"].as_u64()? < additions {
+                return None;
+            }
+        }
+        Some(())
+    }
+    required.is_empty() || check(work, outer, required).is_some()
 }
 
 /// Check and reprice projection/solver observations inside the LA phase.
@@ -356,6 +395,37 @@ mod tests {
             outer,
             family,
         )
+    }
+
+    #[test]
+    fn required_scan_and_scalar_items_need_executed_counter_coverage() {
+        let (mut work, mut outer, _) = fixture(false);
+        let required = [
+            "counted:modular_la_native_scans",
+            "counted:cover_residual_scalar_additions",
+        ];
+        assert!(!required_items(&work, &outer, &required));
+        outer["counted_items"] = json!(required);
+        work["descent_residuals"] = json!(4);
+        let mut scalar = tally(0);
+        scalar["modr_add"] = json!(8);
+        outer["phases"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({"phase":"descent","primitives":scalar}));
+        assert!(required_items(&work, &outer, &required));
+        let mut zero = work.clone();
+        zero["descent_residuals"] = json!(0);
+        assert!(!required_items(&zero, &outer, &required));
+        let mut bad = outer.clone();
+        bad["phases"][1]["primitives"]["modr_add"] = json!(7);
+        assert!(!required_items(&work, &bad, &required));
+        let mut bad = work.clone();
+        bad["work_native"][0]["primitives"]["rng_words"] = json!(10);
+        assert!(!required_items(&bad, &outer, &required));
+        let mut bad = outer.clone();
+        bad["counted_items"] = json!([required[0], required[0]]);
+        assert!(!required_items(&work, &bad, &required));
     }
     #[test]
     fn projection_and_solve_counts_partition_the_observed_phase() {

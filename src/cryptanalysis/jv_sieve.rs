@@ -2204,8 +2204,10 @@ fn run_cover_sieve_dlp_on_with_filter_mode(
             let idx = rep.descent_residuals + batch.len() as u64;
             batch.push((a, b, r.clone(), idx));
             r = jac.add(&r, &step);
-            a = (a + al) % l;
-            b = (b + be) % l;
+            // Both labels are reduced modulo l < 2^63. The shared helper
+            // preserves the stream and charges its scalar additions.
+            a = am(a, al, l);
+            b = am(b, be, l);
         }
         rep.descent_stream_muls += ctx.f.muls();
         ctx.f.reset_muls();

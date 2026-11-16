@@ -3409,32 +3409,40 @@ impl LargePrimeEliminator {
 /// recurrence `Σ_{j=0}^{L} c_j s_{i−j} = 0` (`c_0 = 1`) satisfied by
 /// the sequence; returns `c`.
 fn berlekamp_massey_u64(seq: &[u64], n: u64, ops: &mut u64) -> Vec<u64> {
+    use super::jv_bitops::words;
     let mut c = vec![1u64];
     let mut b = vec![1u64];
     let mut l = 0usize;
     let mut m = 1usize;
     let mut bb = 1u64;
     for i in 0..seq.len() {
+        words(1); // sequence scan
         let mut d = seq[i];
         for j in 1..=l {
+            words(1); // coefficient-bound comparison
             if j < c.len() {
+                words(2); // recurrence coefficient and sequence entry
                 d = am(d, mm(c[j], seq[i - j], n), n);
                 *ops += 1;
             }
         }
+        words(1); // discrepancy zero test
         if d == 0 {
             m += 1;
             continue;
         }
         let coef = mm(d, inv_mod(bb, n), n);
         let t = c.clone();
+        words(1); // polynomial-length comparison
         if c.len() < b.len() + m {
             c.resize(b.len() + m, 0);
         }
         for j in 0..b.len() {
+            words(2); // old and shifted recurrence coefficients
             c[j + m] = sm(c[j + m], mm(coef, b[j], n), n);
             *ops += 1;
         }
+        words(1); // recurrence-span comparison
         if 2 * l <= i {
             l = i + 1 - l;
             b = t;
@@ -3446,6 +3454,19 @@ fn berlekamp_massey_u64(seq: &[u64], n: u64, ops: &mut u64) -> Vec<u64> {
     }
     c.truncate(l + 1);
     c
+}
+
+/// Data comparisons of the solver's final answer check. Allocation, copies
+/// and loop bookkeeping are outside this scan convention.
+fn equal_solver_words(left: &[u64], right: &[u64]) -> bool {
+    super::jv_bitops::words(1);
+    if left.len() != right.len() {
+        return false;
+    }
+    left.iter().zip(right).all(|(a, b)| {
+        super::jv_bitops::words(1);
+        a == b
+    })
 }
 
 /// A square, singleton-free selection of relations: which relations
@@ -3538,8 +3559,17 @@ pub fn wiedemann_u64(
     rng: &mut StdRng,
     ops: &mut u64,
 ) -> Option<Vec<u64>> {
+    use super::jv_bitops::words;
     assert_eq!(rows.len(), ncols);
+    // Only instrumentation computes this aggregate. Each mat-vec consumes
+    // every sparse entry and indexes its vector once, with no skipped terms.
+    let mat_words = if super::jv_bitops::enabled() {
+        2 * rows.iter().map(|r| r.cols.len() as u64).sum::<u64>()
+    } else {
+        0
+    };
     let mat_vec = |v: &[u64], ops: &mut u64| -> Vec<u64> {
+        words(mat_words);
         rows.iter()
             .map(|r| {
                 let mut acc = 0u64;
@@ -3552,12 +3582,14 @@ pub fn wiedemann_u64(
             .collect()
     };
     let b: Vec<u64> = rows.iter().map(|r| r.rhs).collect();
+    words(rows.len() as u64); // RHS scan
     for _attempt in 0..3 {
         let u: Vec<u64> = (0..ncols).map(|_| rng.gen_range(0..n)).collect();
         super::jv_bitops::rng_words(ncols as u64);
         let mut seq = Vec::with_capacity(2 * ncols);
         let mut v = b.clone();
         for _ in 0..2 * ncols {
+            words(2 * ncols as u64); // both dot-product vectors
             let mut d = 0u64;
             for i in 0..ncols {
                 d = am(d, mm(u[i], v[i], n), n);
@@ -3568,23 +3600,31 @@ pub fn wiedemann_u64(
         }
         let c = berlekamp_massey_u64(&seq, n, ops);
         let l = c.len() - 1;
-        if l == 0 || c[l] == 0 {
+        words(1); // recurrence-length test
+        if l == 0 {
+            continue;
+        }
+        words(2); // terminal coefficient access and zero test
+        if c[l] == 0 {
             continue;
         }
         // x = −(1/c_L) Σ_{j<L} c_j A^{L−1−j} b, by Horner.
         let mut acc = vec![0u64; ncols];
         for &cj in c.iter().take(l) {
+            words(1 + 2 * ncols as u64); // recurrence, accumulator and RHS
             acc = mat_vec(&acc, ops);
             for i in 0..ncols {
                 acc[i] = am(acc[i], mm(cj, b[i], n), n);
             }
             *ops += ncols as u64;
         }
+        words(1); // terminal recurrence coefficient
         let neg_inv = (n - inv_mod(c[l], n)) % n;
         super::jv_bitops::hook_adds(n, 1);
         let x: Vec<u64> = acc.iter().map(|&a| mm(a, neg_inv, n)).collect();
+        words(ncols as u64); // accumulator scan
         *ops += ncols as u64;
-        if mat_vec(&x, ops) == b {
+        if equal_solver_words(&mat_vec(&x, ops), &b) {
             return Some(x);
         }
     }
@@ -4881,6 +4921,49 @@ mod tests {
             st_lazy.lazy_pivots_reduced < st_lazy.lazy_pivots_planned,
             "reduced every planned row: {st_lazy:?}"
         );
+    }
+
+    #[test]
+    fn berlekamp_massey_native_scan_tally_is_hand_computable() {
+        use super::super::jv_bitops::{self, Kind, Phase};
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        jv_bitops::set_moduli(103, 101);
+        let before = jv_bitops::snapshot();
+        let other = jv_bitops::snapshot_other();
+        let mut ops = 0;
+        {
+            let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+            assert_eq!(berlekamp_massey_u64(&[1, 2], 101, &mut ops), vec![1, 99]);
+        }
+        let t = jv_bitops::snapshot().since(&before);
+        let la = t.phase(Phase::LinearAlgebra);
+        assert_eq!(la.get(Kind::ModrMul), 5);
+        assert_eq!(la.get(Kind::ModrAdd), 3);
+        assert_eq!(la.get(Kind::ModrInv), 2);
+        // First discrepancy: 6 scans/compares. Second: 9.
+        assert_eq!(la.get(Kind::WordOp), 15);
+        assert_eq!(la.get(Kind::FieldMul), 0);
+        assert_eq!(t.total(), *la);
+        assert_eq!(jv_bitops::snapshot_other(), other);
+        assert_eq!(ops, 3); // inherited arithmetic counter unchanged
+    }
+
+    #[test]
+    fn solver_equality_counts_only_the_comparisons_it_executes() {
+        use super::super::jv_bitops::{self, Kind, Phase};
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        let before = jv_bitops::snapshot();
+        {
+            let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+            assert!(equal_solver_words(&[], &[]));
+            assert!(!equal_solver_words(&[], &[1, 2]));
+            assert!(!equal_solver_words(&[1, 2], &[1, 3]));
+            assert!(equal_solver_words(&[1, 2], &[1, 2]));
+        }
+        let t = jv_bitops::snapshot().since(&before);
+        assert_eq!(t.total().get(Kind::WordOp), 8);
     }
 
     #[test]
