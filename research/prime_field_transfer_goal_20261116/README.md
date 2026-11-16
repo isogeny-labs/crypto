@@ -1,6 +1,16 @@
 # Prime-field transfer goal: component targets and input-selected examples
 
-Latest component: [round04 source-selected Weber roots](round-04/RESULT.md)
+Latest: [round06 modular construction and growing public inputs](round-06/RESULT.md)
+and [report](reports/round-06.pdf). The new degree21/order127 Weber model is
+constructed, and fixed public-input tests recover4/4 order61 scalars at64/128
+digits and3/4 order127 scalars at32/64. All four order127 processes time out
+during128 work; no128 result is inferred. The route returns a Weber class
+before target solving and source candidate checks. Claims37e825/e0d875 carry
+the PCC-20261116 prefix and are unsigned. Twelve finite split-prime Lean
+endpoints and the unchanged77-theorem gate concern coefficient reconstruction,
+not the full CM/native transfer. Original goal remains active. [pcc:unverified]
+
+Earlier component: [round04 source-selected Weber roots](round-04/RESULT.md)
 and [two-page report](reports/round-04.pdf). Coordinate-input rational Padé
 recognition accepts all18 order19 inputs from F79 to anomalous F19 at the
 tested8/16/32 digits and3/4 declared public order61 inputs from F1531 to

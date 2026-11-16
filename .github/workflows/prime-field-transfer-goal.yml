@@ -105,3 +105,27 @@ jobs:
             timeout 60s /tmp/weber-metric qualify "$study/receipts/round-04/models/u5-v3.model" "$point" > "/tmp/weber-metric-u5-$point.jsonl"
             cmp "/tmp/weber-metric-u5-$point.jsonl" "$study/receipts/round-05/qualify-05-u5-public-$point.jsonl"
           done
+      - name: Reproduce modular CM setup and completed public bins
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/prime_field_transfer_goal_20261116
+          replay=$(mktemp -d)
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-06/v6/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o "$replay/setup"
+          for u in 3 5 7; do
+            timeout 60s "$replay/setup" setup "$u" "$replay/u$u.model" > "$replay/setup-u$u.jsonl"
+            cmp "$replay/u$u.model" "$study/receipts/round-06/u$u.model"
+          done
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-06/v7/recognizer.cpp" -lcrypto -lgmpxx -lgmp -o "$replay/recognizer"
+          timeout 60s "$replay/recognizer" qualify "$replay/u3.model" -1 > "$replay/u3.jsonl"
+          cmp "$replay/u3.jsonl" "$study/receipts/round-06/qualify-07-u3-all.jsonl"
+          for point in 0 1 2 3; do
+            timeout 60s "$replay/recognizer" qualify "$replay/u5.model" "$point" > "$replay/u5-$point.jsonl"
+            cmp "$replay/u5-$point.jsonl" "$study/receipts/round-06/qualify-07-u5-public-$point.jsonl"
+          done
+          # u7 public128 calls timed out; their partial bytes are not deterministic replay targets.
+          g++ -std=c++20 -O2 -Wall -Wextra -Werror "$study/round-06/identity-issuer-v1.cpp" -lcrypto -o "$replay/issuer"
+          "$replay/issuer" "$replay/idc" "$study/lean/SplitPrime199V1.lean"
+          for row in left-row-zero left-row-one right-row-zero right-row-one; do
+            cmp "$replay/idc/$row.json" "$study/receipts/round-06/identity-01/$row.json"
+          done

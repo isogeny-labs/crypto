@@ -53,3 +53,23 @@ prefix survives in the1195-row merged ledger. PR4388 merged at
 6ebf026274395b5de50ddbc8d0523a72ba016a7b,03:21:51Z. This authoring
 session neither performed nor repairs that external frozen-history
 resolution. The closed PR's monitor is stopped. [pcc:unverified]
+
+## 2026-11-16: PR4399 current-base fork before round06 publication
+
+The read-only [baseline diagnostic](../research/prime_field_transfer_goal_20261116/receipts/round-06/ledger-baseline-diagnostic-01.json)
+finds current main with1197 rows, published dfe88f759 with1233 and the round06
+snapshot with1250. Main and both lane versions share1195 rows, then fork:
+sequence1195 is PCC-20261116-942215 on main versus PCC-20261116-aeb339
+on the published lane. The full published1233-row ledger is a byte prefix
+of round06; its new observations were appended with the existing tool.
+The current1197-row base is not a prefix of either lane snapshot. This blocker
+already exists at dfe88f759 and is not repaired by round06. Diagnostic claim
+is in receipts/round-06/ledger-baseline-claim-01.txt, unsigned. [pcc:unverified]
+
+The earlier historical1195-row main-prefix preservation statement does not
+establish preservation of today's1197-row base. No canonical event, frozen
+claim, prefix gate or trust policy is changed to resolve this fork. Both Git
+histories and the exact diagnostic remain available. A later new claim can
+append after the dated snapshot without changing its observed counts.
+Required action remains a canonical provenance-preserving reconciliation
+contract; a normal conflict edit cannot preserve both different linear prefixes.
