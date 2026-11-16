@@ -11,3 +11,6 @@ Build/freeze/control execution and report, then PR update. Full cost evidence fo
 
 ## Errors
 Initial compile found Div versus borrowed Div final comparison; fixed by dereferencing target. Initial build output retained. Task6562 was created while task6560 already existed; reused6560, no competing edits.
+
+## Completed gate
+Frozen source eeefde0f1d8e/checkpoint20261116T043229Z executed once:12 identical reference/candidate cases,3 extra supplied-target recoveries verified, exit0 and empty stderr. Results and one-page PDF generated and visually inspected. No timing inference. Next: charged same-instance comparison; retained catalogue and symbolic potential costs.
