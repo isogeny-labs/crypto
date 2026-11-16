@@ -42,6 +42,8 @@ struct Args {
     capacity_report: bool,
     #[arg(long)]
     validation_only: bool,
+    #[arg(long)]
+    incidence_shared: bool,
     #[arg(long, default_value_t = 0)]
     worker_timeout_seconds: u64,
 }
@@ -238,7 +240,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         || !(1..=100).contains(&args.retained_percent)
         || args.source_revision.len() != 40
         || !args.source_revision.bytes().all(|c| c.is_ascii_hexdigit())
-        || (args.validation_only
+        || ((args.validation_only || args.incidence_shared)
             && args
                 .primes
                 .iter()
@@ -280,7 +282,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "retained_percent":args.retained_percent,"rho_options":rho_options(spec.l),
             "validation_only":args.validation_only,"worker_timeout_seconds":args.worker_timeout_seconds,
             "capacity_model_m9":sieve::relations_estimate(p,9),
-            "sieve_recipe":if args.validation_only {"incidence_shared"}else{"historical_default"}});
+            "sieve_recipe":if args.validation_only || args.incidence_shared {"incidence_shared"}else{"historical_default"}});
             let mut fixture = base.clone();
             fixture["record_type"] = json!("fixture");
             fixture["expected_scalar"] = json!(spec.d);
@@ -318,6 +320,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         let mut command = if args.worker_timeout_seconds > 0 {
                             let mut c = Command::new("timeout");
                             c.args([
+                                "--foreground",
                                 "--signal=TERM",
                                 "--kill-after=5s",
                                 &format!("{}s", args.worker_timeout_seconds),
@@ -349,7 +352,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             .create_new(true)
                             .open(&progress_path)?;
                         command.stderr(Stdio::from(progress));
-                        if args.validation_only {
+                        if args.validation_only || args.incidence_shared {
                             command
                                 .env("JV_SIEVE_PROGRESS", "1")
                                 .env("JV_ADDS_INC", "1")

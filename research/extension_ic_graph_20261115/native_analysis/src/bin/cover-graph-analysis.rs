@@ -192,6 +192,13 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_errors: usize) -> Result<Value,
     let mut pending = None;
     let mut raw_count = 0;
     for row in rows {
+        if (plan.get("sieve_recipe").is_some() && row["sieve_recipe"] != plan["sieve_recipe"])
+            || (plan.get("worker_timeout_seconds").is_some()
+                && row["worker_timeout_seconds"] != plan["worker_timeout_seconds"])
+            || (plan.get("sieve_recipe").is_some() && row["validation_only"] != false)
+        {
+            global.insert("recipe/timeout/comparison mode mismatch".into());
+        }
         if row["schema"] != "cover.sieve.graph-process/v1" || row["source_revision"] != source {
             global.insert("schema/source mismatch".into());
         }
@@ -646,6 +653,29 @@ mod tests {
         assert_eq!(s["measured_executions"], 30);
         assert_eq!(s["allows_later_frozen_scale_trial"], true);
         assert_eq!(s["local_native_reference_parity"], false);
+    }
+    #[test]
+    fn explicit_sieve_recipe_and_process_limits_bind_every_record() {
+        let (mut p, mut rows) = fixture(3, 1_000_003);
+        p["sieve_recipe"] = json!("incidence_shared");
+        p["worker_timeout_seconds"] = json!(900);
+        for row in &mut rows {
+            row["sieve_recipe"] = json!("incidence_shared");
+            row["worker_timeout_seconds"] = json!(900);
+            row["validation_only"] = json!(false);
+        }
+        assert_eq!(
+            analyze(&p, rows.clone(), 0).unwrap()["allows_later_frozen_scale_trial"],
+            true
+        );
+        for k in ["sieve_recipe", "worker_timeout_seconds", "validation_only"] {
+            let mut damaged = rows.clone();
+            damaged[1][k] = Value::Null;
+            assert_eq!(
+                analyze(&p, damaged, 0).unwrap()["allows_later_frozen_scale_trial"],
+                false
+            );
+        }
     }
     #[test]
     fn false_valid_flag_or_placeholder_cannot_hide_wrong_scalar() {

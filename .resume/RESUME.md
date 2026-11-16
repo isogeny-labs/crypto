@@ -1,3 +1,18 @@
+# Current checkpoint (07:04Z, 16 November)
+
+Stage21completePASS/fullpacketpublisheda36d41e26, artifact7201ffintegrated.
+Stage22 SOURCE READY, NOtimingyet. Amendment17/cover-comparison-plan: p1009seed257,
+explicitincidence/sharedbothIC, nativeIC/graph/rho6armsreverseodd,1warm5measure,
+36childexecs,CPU0/8GiB/900worker/3600whole/no retries. SingletonparityALWAYSfalse.
+Controllerexplicitrecipeflag+progress, nestedtimeout--foreground reachescohort
+cancellation. Rustanalysisbindsrecipe/timeout/modeeveryrow; newtampertest.
+41analysisexecutionspass(33distinct/8duplicateimported),1exampletest/builds/
+Clippypass; newanalysisreproduces20and21byteexact. Source manifestready. Need
+commit/pushcleanSOURCE BEFOREsolewrappercall to create-new
+/workspace/ic-local-runs/local-cover-comparison-20261116-22.
+Noactiveprocess. GoalACTIVE/localworks. PR4288body21pass,currentgateunconfirmed;
+nextCI07:07absentevent. DoNOTstopgoal. Historicalmanifestsunaltered.
+
 # Current checkpoint (06:59Z, 16 November)
 
 STAGE21 FINISHED PASS, source8ab624189, sole runlocal-cover-sieve-validation-20261116-21,

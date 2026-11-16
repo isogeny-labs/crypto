@@ -89,6 +89,12 @@ argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" \
 if [[ "$driver_kind" == cover-sieve-graph || "$driver_kind" == cover-sieve-validation ]]; then
   keep_percent=$(jq -er .retained_percent "$run_dir/runtime-plan.json")
   argv+=(--retained-percent "$keep_percent")
+  if [[ $(jq -r '.sieve_recipe // "historical_default"' "$run_dir/runtime-plan.json") == incidence_shared ]]; then
+    argv+=(--incidence-shared)
+  fi
+  if [[ "$driver_kind" == cover-sieve-graph ]]; then
+    argv+=(--worker-timeout-seconds "$(jq -r '.worker_timeout_seconds // 0' "$run_dir/runtime-plan.json")")
+  fi
   if [[ "$driver_kind" == cover-sieve-validation ]]; then
     argv+=(--validation-only --worker-timeout-seconds "$(jq -er .worker_timeout_seconds "$run_dir/runtime-plan.json")")
   fi
