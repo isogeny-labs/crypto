@@ -64,7 +64,20 @@ fn mul(a: u64, b: u64, p: u64) -> u64 {
         c.modular_products += 1;
         cell.set(c);
     });
-    ((a as u128 * b as u128) % p as u128) as u64
+    const M31: u64 = (1 << 31) - 1;
+    if p == M31 && (a | b) <= M31 {
+        // x < 2^62; 2^31 == 1 mod M31. The folded sum is < 2*M31.
+        // The operand guard preserves the old semantics for arbitrary u64s.
+        let x = a * b;
+        let folded = (x & M31) + (x >> 31);
+        if folded >= M31 {
+            folded - M31
+        } else {
+            folded
+        }
+    } else {
+        ((a as u128 * b as u128) % p as u128) as u64
+    }
 }
 fn pow(mut a: u64, mut b: u64, p: u64) -> u64 {
     let mut result = 1;
@@ -1051,6 +1064,40 @@ pub fn analyze(system: &System, cap: usize, limit: usize) -> Result<Value, Strin
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn guarded_m31_products_match_wide_remainder_at_boundaries_and_fallbacks() {
+        let m = (1u64 << 31) - 1;
+        let values = [0, 1, 2, m / 2, m - 2, m - 1, m, m + 1, 1 << 32, u64::MAX];
+        for p in [3, 101, m, 9007199254740881, 18446744073709551557] {
+            for a in values {
+                for b in values {
+                    assert_eq!(
+                        mul(a, b, p),
+                        ((a as u128 * b as u128) % p as u128) as u64,
+                        "a={a}, b={b}, p={p}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn guarded_m31_products_match_wide_remainder_on_fixed_differential_corpus() {
+        let p = (1u64 << 31) - 1;
+        let mut state = 20261116u64;
+        for _ in 0..65536 {
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let a = state & p;
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let b = (state >> 17) & p;
+            assert_eq!(mul(a, b, p), ((a as u128 * b as u128) % p as u128) as u64);
+        }
+    }
 
     #[cfg(feature = "count-field-ops")]
     #[test]

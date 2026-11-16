@@ -28,6 +28,8 @@ pub(super) struct Paths {
     root_consumer: PathBuf,
     root_native: PathBuf,
     root_both: PathBuf,
+    #[serde(default)]
+    m31: Option<PathBuf>,
     mature: PathBuf,
     singular: PathBuf,
     msolve: PathBuf,
@@ -49,8 +51,8 @@ impl Paths {
         ]
     }
 }
-fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
-    if samples.len() != ROUTES.len() {
+fn comparisons_for(samples: &[Value], routes: &[&str]) -> Option<Vec<Value>> {
+    if samples.len() != routes.len() {
         return None;
     }
     let digest = samples[0]["basis_sha256"].as_str()?;
@@ -58,9 +60,9 @@ fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
         return None;
     }
     let mut costs = Vec::new();
-    for (s, name) in samples.iter().zip(ROUTES) {
+    for (s, name) in samples.iter().zip(routes) {
         let cost = s["paid_wall_ns"].as_u64()?;
-        if s["pipeline"] != name
+        if s["pipeline"] != *name
             || s["status"] != "complete"
             || s["basis_sha256"] != digest
             || cost == 0
@@ -70,19 +72,19 @@ fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
         costs.push(cost);
     }
     let candidate = *costs.last()? as f64;
-    Some(costs[..14].iter().zip(ROUTES).map(|(c,name)|json!({"control":name,"full_cost_single_call_ratio":*c as f64/candidate})).collect())
+    Some(costs[..costs.len()-1].iter().zip(routes).map(|(c,name)|json!({"control":name,"full_cost_single_call_ratio":*c as f64/candidate})).collect())
 }
-fn selected(cases: &[Value]) -> Value {
+fn selected_for(cases: &[Value], routes: &[&str]) -> Value {
     let mut chosen = Value::Null;
     let mut best = 15.;
     for case in cases {
         let Some(samples) = case["samples"].as_array() else {
             continue;
         };
-        let Some(rows) = comparisons(samples) else {
+        let Some(rows) = comparisons_for(samples, routes) else {
             continue;
         };
-        let candidate = &samples[14];
+        let candidate = &samples[routes.len() - 1];
         if candidate["used_recovery"] != false
             || candidate["answer"]["constructor"]["subset_succeeded"] != true
             || candidate["answer"]["root_api"] != true
@@ -107,8 +109,23 @@ fn selected(cases: &[Value]) -> Value {
     chosen
 }
 pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, false)
+}
+pub(super) fn run_m31(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, true)
+}
+fn run_impl(prepared: &Path, out: &Path, config: &Path, m31: bool) -> Result<()> {
     let config_bytes = fs::read(config)?;
     let paths: Paths = serde_json::from_slice(&config_bytes)?;
+    if m31 != paths.m31.is_some() {
+        return Err("M31 path must appear only in the new sixteen-workflow mode".into());
+    }
+    let mut routes = ROUTES.to_vec();
+    let mut replay_routes = paths.replay_routes().to_vec();
+    if let Some(exe) = &paths.m31 {
+        routes.push("root-sparse-m31");
+        replay_routes.push((exe.as_path(), "compact-sparse"));
+    }
     let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
     let qualification = manifest["mode"] == "qualification";
     if !qualification && manifest["mode"] != "rust-consumer-screen" {
@@ -140,11 +157,14 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     ] {
         identities.insert(name.into(), json!({"path":path,"sha256":file_hash(&path)?}));
     }
+    if let Some(path) = &paths.m31 {
+        identities.insert("m31".into(), json!({"path":path,"sha256":file_hash(path)?}));
+    }
     fs::create_dir(out)?;
     write_new(&out.join("config.json"), &config_bytes)?;
     save(
         &out.join("pre-call.json"),
-        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}),
+        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
     )?;
     let mut r = Runner {
         worker: paths.worker.clone(),
@@ -238,7 +258,7 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
                 paid_sum(elapsed, 0, prep)?,
                 &dir,
             ));
-            for (kind, (exe, producer)) in ROUTES[5..].iter().zip(paths.replay_routes()) {
+            for (kind, (exe, producer)) in routes[5..].iter().zip(&replay_routes) {
                 let start = Instant::now();
                 let result = fused_sample(
                     &r,
@@ -273,7 +293,7 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
             let rows = if qualification {
                 None
             } else {
-                comparisons(&samples)
+                comparisons_for(&samples, &routes)
             };
             Ok(
                 json!({"id":id,"variables":n,"input_sha256":input_hash,"samples":samples,"all_complete_bases_equal":equal,"comparisons":rows,"scope":if qualification{"correctness only; no ratios or selection"}else{"one call per workflow, no confidence"}}),
@@ -293,11 +313,11 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     let family = if qualification {
         Value::Null
     } else {
-        selected(&cases)
+        selected_for(&cases, &routes)
     };
     save(
         &out.join("summary.json"),
-        &json!({"schema":"rust-consumer-paid-screen/v1","mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
+        &json!({"schema":if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
     )?;
     if !unchanged {
         return Err("changed executable identities".into());
@@ -307,6 +327,42 @@ pub(super) fn run(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
+        comparisons_for(samples, &ROUTES)
+    }
+    fn selected(cases: &[Value]) -> Value {
+        selected_for(cases, &ROUTES)
+    }
+    #[test]
+    fn m31_admission_keeps_every_old_control_and_the_prior_candidate() {
+        let mut routes = ROUTES.to_vec();
+        routes.push("root-sparse-m31");
+        let mut rows = complete();
+        rows[14]["paid_wall_ns"] = json!(20);
+        let mut candidate = rows[14].clone();
+        candidate["pipeline"] = json!(routes[15]);
+        candidate["paid_wall_ns"] = json!(1);
+        rows.push(candidate);
+        assert_eq!(comparisons_for(&rows, &routes).unwrap().len(), 15);
+        assert_eq!(
+            selected_for(&[json!({"id":"new","samples":rows})], &routes),
+            json!("new")
+        );
+        let mut bad = rows.clone();
+        bad[14]["paid_wall_ns"] = json!(1);
+        assert!(selected_for(&[json!({"id":"tie-prior","samples":bad})], &routes).is_null());
+        let mut bad = rows.clone();
+        bad[13]["status"] = json!("failed");
+        assert!(comparisons_for(&bad, &routes).is_none());
+        let mut bad = rows.clone();
+        bad[0]["basis_sha256"] = json!("b".repeat(64));
+        assert!(comparisons_for(&bad, &routes).is_none());
+        let mut bad = rows.clone();
+        bad[2]["paid_wall_ns"] = json!(14);
+        assert!(selected_for(&[json!({"id":"under15","samples":bad})], &routes).is_null());
+        assert!(comparisons_for(&rows[..15], &routes).is_none());
+        assert!(comparisons_for(&rows, &ROUTES).is_none());
+    }
     fn complete() -> Vec<Value> {
         ROUTES.iter().enumerate().map(|(i,p)|json!({"pipeline":p,"status":"complete","paid_wall_ns":if i==14{1}else{20},"basis_sha256":"a".repeat(64),"used_recovery":false,"answer":{"root_api":true,"native_product_criterion":true,"consumer":{"kind":"separate-rust-arithmetic"},"constructor":{"subset_succeeded":true}}})).collect()
     }
@@ -354,6 +410,7 @@ mod tests {
             root_consumer: "10".into(),
             root_native: "01".into(),
             root_both: "11".into(),
+            m31: None,
             mature: "m".into(),
             singular: "s".into(),
             msolve: "ms".into(),
