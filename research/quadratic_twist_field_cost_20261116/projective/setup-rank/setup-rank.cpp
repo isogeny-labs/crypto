@@ -275,12 +275,13 @@ void patch(const std::string&mode){
    bool remove=false;
    if(!t.empty()&&t[0]=="PUBLIC")in_public=true;if(!t.empty()&&t[0]=="ONLINE")in_public=false;
    if(!done&&!t.empty()){
+    if(mode=="premature-setup-stop"&&t[0]=="WORK"&&std::stoi(t[5])>1){t[5]=std::to_string(std::stoi(t[5])-1);t[17]=std::to_string(std::stoi(t[17])-1);done=true;}
     if(mode=="cap"&&t[0]=="CARDANO"){t[3]="4";done=true;}
     if(mode=="columns"&&t[0]=="BASE"){std::swap(t[1],t[3]);std::swap(t[2],t[4]);done=true;}
     if(mode=="rank"&&t[0]=="RANK"){t[1]=std::to_string((std::stoi(t[1])+1)%4);done=true;}
     if(t[0]=="WORK"&&((mode=="scalar")||(mode=="log")||(mode=="cost"))){size_t at=mode=="scalar"?2:mode=="log"?7:10;t[at]=std::to_string((std::stoi(t[at])+1)%(mode=="cost"?1000000:31));done=true;}
     if(t[0]=="BR"&&t.size()>11&&t[3]=="C"){
-     if(mode=="premature-setup-stop"&&in_public&&std::stoi(t[11+std::stoi(t[10])])>0){done=true;remove=true;}
+
      if(mode=="row"&&std::stoi(t[11+std::stoi(t[10])])>0){size_t at=12+std::stoi(t[10]);auto comma=t[at].find(',');need(comma!=std::string::npos,"actual row witness");t[at]=std::to_string((std::stoi(t[at].substr(0,comma))+1)%3)+t[at].substr(comma);done=true;}
      if(mode=="branch"){t[1]=t[1]=="-1"?"1":"-1";done=true;}
      if(mode=="witness"){auto pos=t[8].find(',');need(pos!=std::string::npos,"actual witness");t[8]=t[8].substr(0,pos+1)+std::to_string((std::stoi(t[8].substr(pos+1))+1)%3721);done=true;}
