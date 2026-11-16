@@ -1,6 +1,63 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (04:38Z, 16 November)
+## Current checkpoint (05:03Z, 16 November)
+
+STAGE19SOURCE/VALIDATIONDONE, NOTTIMED. All49cubicreleasechecks +10genericpool/
+paircertificatechecks+5S4examplechecks+22analysischecks PASS. Actual3example
+binaries/analyzersbuild, library/examples/analyzerClippy-Dwarnings PASS.
+The queued secondcargo testwouldwaitbehindproductionrebuild; canceledONLY
+waitingcargo29071 andranSAMEcompiledtestbinaryfilterdirectly,10pass0fail.
+No duplicate test run. Logsretainedincludinginitialtest-onlyPolytypeerror.
+CLIhelp/wrapperbashsyntax/old18byteexactsummaryrecompute PASS. 56-filefrozen
+validation/pair-certificate-source.sha256checks. Needcommit/pushsource/spec
+BEFOREsinglewrappercalllocal-pair-certificate-20261116-19. No compiler/jobactive.
+
+Newread-onlyBORDER_CERTIFICATE_REVIEW.md: primaryKehrein–KreuzerDefinitions1/15,
+Proposition16read, SHA8c928f34f99e94670ff62c0553cc9dae5129bcde808d77e31eb11a2d097be1b5
+inputevaluation+bothidealinclusionswouldberequiredforfuturecertificate.
+Readoldnegativeborderlazyelimination11.12–11.14, correctedceiling1.002x;
+no ceilingtransfer or performanceclaim for a different replaycertificate.
+KBtwoborderqueriesunavailable, receipts /tmp/ic-border-certificate-kb-*.log.
+NOimplementation/trialselectedofthatmethod. Current19planremainsPAIRGRAPH.
+
+Afterpublish/run,analyze864batchesretainalloutcomesandreportbeforeanynextlead.
+FullIConlyif frozen6largestgain/certified-pruningcriterion passes. GoalACTIVE.
+CI/reviewnext05:13absentevent; nogatesconfirmed. Keepold56manifestafterdata.
+
+## Previous implementation checkpoint (04:53Z, superseded pending states)
+
+STAGE18PUBLISHED e5c28d471 + artifact-only58a7f1ed2fast-forward. PR4288body
+updatedactualnegative18. Allraw/presentationhasheschecked;exactPNGsrestoredonly
+targetbenchdirectoriesafterff, originalsremainlocal. No mergegatesconfirmed.
+
+STAGE19IMPLEMENTED/NOTTIMED: nativeBuchbergerpair-dependencygraph certificates,
+explicitTracePool::new_pair_graph/S4TraceState::new_pair_graph/F4TracePairGraph,
+CLIf4-trace-pair-graph. Everyinputreduction/nativeprovenance/fullquotient/root/
+groupgatekept. Exhaustivecheckerandtermkernel/defaultsunchanged. Prior-certified
+edgesonly; product/chain/direct/witness/refusalcounters,100kpair/1mwitnesscaps.
+PrimaryPerryarxiv0906.4358section2Theorems2/3field/admissible-orderreviewdone,
+SHAab9aa3eeb81128f3f016cff9860f1cae711208de804b3e56986832210a3261ec.
+KBstatus/twoqueriesunavailable, receipts /tmp/ic-trace-ordered-kb-*.log.
+
+AMENDMENT_14_PAIR_CERTIFICATE.md+pair-certificate-plan.json frozen:
+p67/127/1039,seeds191/193/197,36distinct-eight-residualfixtures,864batches,
+1warm5rounds,CPU0/8GiB/900s/no-retries. FullICviability>=6largestcontrolled
+gainswithacceptedANDprunedreplay,completecorrectexit0cohort. NO19DATAexists.
+Analyzer22tests/build/ClippyPASS; old18summaryrecomputesbyteexact. Library49cubic
++10pooltestsCOMPILEsession61445. Production3examples/build/tests/ClippyQUEUE
+session51271. Initialtest-onlyPolytypeerrorretained/fixed; no otherfailureyet.
+DoNOTduplicatejobsorchangecoremidcompile. Needinspectlogs,sourcehashmanifest,
+commit/pushsource/specBEFOREwrapper local-pair-certificate-20261116-19.
+
+Independentcover/sieveread-onlyreviewinCOVER_SIEVE_REVIEW.md: primaryauthor
+CoverDecompPDFsections3.2/3.3readSHA7ca88c54ebfcb6fac8d05d313bfe8c26d3cb133081c55c4ab6ea4c1b45729b38,
+existingnativejv_cover/jv_sieve+exactledger/crossoverblobs. WeakFp6scopeonly,
+strongerrhoreferenceunresolved/pricing/reproductioncaveats; no newlead/trial
+selectedthere. KBqueriesunavailable. Thisreviewisnotparityevidence.
+
+GoalACTIVE;currentCI/reviewlast04:23,nextnotbefore05:13absentevent. Localworks.
+
+## Prior evidence checkpoint (04:38Z, superseded pending states)
 
 STAGE18COMPLETE,negative. Published source f8c6f8b891cbca871da3323f915dd9b71d195c2e
 precedes sole local18call. Exit0,131.978s,864starts/completions,144warm720measure,

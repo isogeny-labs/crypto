@@ -32,8 +32,17 @@ fn context(v: &Value) -> Value {
         v["input_digest"],
         v["scalars"],
         v["residual_xs"],
-        v["batch_iterations"]
+        v["batch_iterations"],
+        certifier(v)
     ])
+}
+fn certifier(v: &Value) -> Option<&str> {
+    match v.get("trace_certifier") {
+        None => Some("exhaustive"),
+        Some(v) => v
+            .as_str()
+            .filter(|s| matches!(*s, "exhaustive" | "pair-graph")),
+    }
 }
 fn median(mut v: Vec<f64>) -> f64 {
     v.sort_by(f64::total_cmp);
@@ -90,8 +99,30 @@ fn complete_outputs(v: &Value, p: u64, batch: usize) -> bool {
             })
     })
 }
-fn valid_trace(v: &Value, batch: u64) -> bool {
+fn valid_trace(v: &Value, batch: u64, pair_graph: bool) -> bool {
     let s = &v["pool"];
+    let graph = &s["pair_graph"];
+    if pair_graph {
+        let counters = [
+            "product_edges",
+            "chain_edges",
+            "direct_edges",
+            "witness_tests",
+            "resource_refusals",
+        ];
+        if counters.iter().any(|k| integer(graph, k).is_err())
+            || graph["product_edges"]
+                .as_u64()
+                .and_then(|a| a.checked_add(graph["chain_edges"].as_u64()?))
+                .and_then(|a| a.checked_add(graph["direct_edges"].as_u64()?))
+                != s["certification_pairs"].as_u64()
+            || graph["direct_edges"].as_u64() > s["certification_reductions"].as_u64()
+        {
+            return false;
+        }
+    } else if !graph.is_null() {
+        return false;
+    }
     let vals = [
         "learned",
         "accepted",
@@ -126,6 +157,8 @@ fn valid_trace(v: &Value, batch: u64) -> bool {
 }
 
 fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Value, String> {
+    let expected_certifier = certifier(plan).ok_or("invalid trace certifier")?;
+    let pair_graph = expected_certifier == "pair-graph";
     let source = plan["source_revision"]
         .as_str()
         .filter(|s| s.len() == 40 && s.bytes().all(|c| c.is_ascii_hexdigit()))
@@ -200,6 +233,9 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
     let mut phases = BTreeMap::<String, usize>::new();
     let mut raw_executions = 0;
     for row in rows {
+        if certifier(&row) != Some(expected_certifier) {
+            problems.push("trace certifier identity mismatch".into());
+        }
         if row["schema"] != "gaudry.cubic.trace-batch/v1" || row["source_revision"] != source {
             problems.push("raw schema/source mismatch".into());
         }
@@ -343,7 +379,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                         && signature["fp_muls"].as_u64().is_some_and(|v| v > 0)
                         && signature["quotient_dimension"].as_u64().is_some()
                         && if trace {
-                            valid_trace(&signature["trace"], batch)
+                            valid_trace(&signature["trace"], batch, pair_graph)
                         } else {
                             signature["trace"].is_null()
                         };
@@ -366,6 +402,14 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                         accepted_all &= signature["trace"]["pool"]["accepted"]
                             .as_u64()
                             .is_some_and(|n| n > 0);
+                        if pair_graph {
+                            let graph = &signature["trace"]["pool"]["pair_graph"];
+                            accepted_all &= graph["product_edges"]
+                                .as_u64()
+                                .unwrap_or(0)
+                                .saturating_add(graph["chain_edges"].as_u64().unwrap_or(0))
+                                > 0;
+                        }
                         if first_trace.is_null() {
                             first_trace = signature["trace"].clone();
                         }
@@ -438,8 +482,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                     || r.as_str().unwrap().contains("qualifier")
             })
     });
-    Ok(
-        json!({"schema":"gaudry.cubic.trace-batch-summary/v1","source_revision":source,"backend":plan["backend"],
+    let mut summary = json!({"schema":"gaudry.cubic.trace-batch-summary/v1","source_revision":source,"backend":plan["backend"],
         "observed_process_exit":plan["observed_process_exit"],
         "planned_batch_executions":schedule.len(),"attempted_batch_executions":starts.len(),
         "completed_batch_executions":executions.len(),"raw_batch_executions":raw_executions,
@@ -451,8 +494,11 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
         "allows_later_frozen_full_ic":plan["observed_process_exit"]==0 && all_outputs_correct && starts.len()==schedule.len() && executions.len()==schedule.len() && problems.is_empty() && largest_gains>=6,
         "scope":"complete cold eight-distinct-residual coordinate batches; shared costs outside compared phase; no IC/rho extrapolation",
         "interval_scope":"paired timing rounds on fixed curves/batches, not independent curve inference",
-        "standard_lab_admission":false,"strata":strata}),
-    )
+        "standard_lab_admission":false,"strata":strata});
+    if pair_graph {
+        summary["trace_certifier"] = json!(expected_certifier);
+    }
+    Ok(summary)
 }
 
 fn plot(summary: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
@@ -659,6 +705,46 @@ mod tests {
                 < 1e-12
         );
         assert_eq!(s["allows_later_frozen_full_ic"], false); // fewer than six largest cases
+    }
+
+    #[test]
+    fn pair_graph_requires_declared_identity_and_all_edge_counters() {
+        let (mut p, mut rows) = fixture();
+        p["trace_certifier"] = json!("pair-graph");
+        for row in &mut rows {
+            row["trace_certifier"] = json!("pair-graph");
+            if row["record_type"] == "execution"
+                && row["arm"].as_str().unwrap().starts_with("trace_")
+            {
+                row["signature"]["trace"]["pool"]["pair_graph"] = json!({"product_edges":2,"chain_edges":3,
+                    "direct_edges":2,"witness_tests":20,"resource_refusals":0});
+            }
+        }
+        let s = analyze(&p, rows.clone(), 0).unwrap();
+        assert_eq!(s["strata"][0]["eligible_local_controlled_comparison"], true);
+        assert_eq!(s["trace_certifier"], "pair-graph");
+        for kind in 0..4 {
+            let mut changed = rows.clone();
+            for row in &mut changed {
+                if kind == 0 {
+                    row["trace_certifier"] = json!("exhaustive");
+                }
+                if row["record_type"] == "execution"
+                    && row["arm"].as_str().unwrap().starts_with("trace_")
+                {
+                    let graph = &mut row["signature"]["trace"]["pool"]["pair_graph"];
+                    match kind {
+                        1 => *graph = Value::Null,
+                        2 => graph["direct_edges"] = json!(1),
+                        3 => graph["witness_tests"] = json!(-1),
+                        _ => {}
+                    }
+                }
+            }
+            rejected(&analyze(&p, changed, 0).unwrap());
+        }
+        let (old, _) = fixture();
+        rejected(&analyze(&old, rows, 0).unwrap());
     }
 
     #[test]

@@ -87,6 +87,10 @@ else
   f4_deadline=$(jq -er .f4_deadline_ms "$run_dir/runtime-plan.json")
   argv+=(--residuals-per-instance "$residual_count" --batch-iterations "$batch_count" \
     --f4-max-degree "$f4_degree" --f4-deadline-ms "$f4_deadline")
+  if [[ "$driver_kind" == s4-trace-component ]]; then
+    trace_certifier=$(jq -r '.trace_certifier // "exhaustive"' "$run_dir/runtime-plan.json")
+    argv+=(--trace-certifier "$trace_certifier")
+  fi
   if [[ "$driver_kind" == s4-krylov-component ]]; then argv+=(--extraction-comparison); fi
   if [[ "$driver_kind" == s4-delayed-component ]]; then
     argv+=(--extraction-comparison --delayed-comparison)

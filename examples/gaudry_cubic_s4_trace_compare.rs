@@ -4,11 +4,25 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use std::time::Instant;
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use crypto_lib::cryptanalysis::gaudry_cubic as cubic;
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
 use rand::{rngs::StdRng, SeedableRng};
 use serde_json::{json, Value};
+
+#[derive(Clone, Copy, ValueEnum)]
+enum Certifier {
+    Exhaustive,
+    PairGraph,
+}
+impl Certifier {
+    fn name(self) -> &'static str {
+        match self {
+            Self::Exhaustive => "exhaustive",
+            Self::PairGraph => "pair-graph",
+        }
+    }
+}
 
 #[derive(Parser)]
 struct Args {
@@ -28,6 +42,8 @@ struct Args {
     f4_max_degree: u32,
     #[arg(long, default_value_t = 0)]
     f4_deadline_ms: u64,
+    #[arg(long, value_enum, default_value = "exhaustive")]
+    trace_certifier: Certifier,
     #[arg(long)]
     source_revision: String,
     #[arg(long)]
@@ -143,7 +159,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let fixture = json!({"schema":"gaudry.cubic.trace-batch/v1",
                     "source_revision":args.source_revision,"p":p,"seed":seed,"ordinal":ordinal,
                     "family":family,"input_digest":input_digest,"scalars":scalars,"residual_xs":xs,
-                    "batch_iterations":args.batch_iterations});
+                    "batch_iterations":args.batch_iterations,"trace_certifier":args.trace_certifier.name()});
                 let mut row = fixture.clone();
                 row["record_type"] = json!("fixture");
                 row["shared_prepare_ns"] = json!(prepare_ns);
@@ -169,9 +185,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             row["record_type"] = json!("execution_start");
                             write_row(&mut out, &row)?;
                             let started = Instant::now();
-                            let mut state = arm
-                                .starts_with("trace_")
-                                .then(|| cubic::S4TraceState::new(&inst));
+                            let mut state =
+                                arm.starts_with("trace_")
+                                    .then(|| match args.trace_certifier {
+                                        Certifier::Exhaustive => cubic::S4TraceState::new(&inst),
+                                        Certifier::PairGraph => {
+                                            cubic::S4TraceState::new_pair_graph(&inst)
+                                        }
+                                    });
                             let mut stats = cubic::SolveStats::default();
                             let mut work = cubic::S4F4Stats::default();
                             let mut outputs: Outputs = Vec::with_capacity(xs.len());

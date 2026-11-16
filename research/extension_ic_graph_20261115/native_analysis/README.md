@@ -46,3 +46,12 @@ measured native work signatures accompany each case. The same command shape
 Three companion tests include mismatched outputs and missing start records;
 the original08summary remains byte-identical under the extended analyzer.
 These are producer checks, not signed independent validation. [pcc:unverified]
+
+`s4-trace-analysis` checks cold batches of eight distinct S4 residuals against
+dense complete-coordinate qualification, with exact start/completion identity,
+family/source/order, semantic A/A and timing controls. A declared
+`trace_certifier: "pair-graph"` additionally requires integer product/chain/direct
+edge counters summing to all pair obligations and positive pruning before a
+case can qualify for follow-up. Undeclared graph counters or changed certifier
+identity are rejected. The original exhaustive stage18 summary recomputes
+byte-exactly with the extended analyzer. [pcc:unverified]

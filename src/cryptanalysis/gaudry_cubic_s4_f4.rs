@@ -55,13 +55,26 @@ pub struct S4TraceStats {
 
 impl S4TraceState {
     pub fn new(inst: &Instance3) -> Self {
+        Self::with_pair_graph(inst, false)
+    }
+
+    /// Product/chain dependency certificates; the exhaustive state is retained.
+    pub fn new_pair_graph(inst: &Instance3) -> Self {
+        Self::with_pair_graph(inst, true)
+    }
+
+    fn with_pair_graph(inst: &Instance3, pair_graph: bool) -> Self {
         let family = TraceFamily::new(inst);
         let bytes = serde_json::to_vec(&family).expect("integer trace-family serialization");
         let label = format!("cubic-s4:{}", blake3::hash(&bytes).to_hex());
         Self {
             family,
-            pool: f4::TracePool::new(&label, 4, 1_000_000)
-                .expect("fixed bounded trace-pool parameters"),
+            pool: if pair_graph {
+                f4::TracePool::new_pair_graph(&label, 4, 1_000_000)
+            } else {
+                f4::TracePool::new(&label, 4, 1_000_000)
+            }
+            .expect("fixed bounded trace-pool parameters"),
             family_rejections: 0,
         }
     }
@@ -569,6 +582,7 @@ mod tests {
         let inst = generate_instance3(67, 3);
         let pre = SymmetrisedS4::precompute(&inst.curve);
         let mut trace = S4TraceState::new(&inst);
+        let mut graph = S4TraceState::new_pair_graph(&inst);
         let mut work = S4F4Stats::default();
         let mut stats = SolveStats::default();
         for d in 1..=8 {
@@ -591,6 +605,16 @@ mod tests {
                 &mut trace,
             );
             assert_eq!(got, expected, "distinct residual d={d}");
+            let got_graph = solve_s4_f4_trace_delayed(
+                &inst,
+                &pre,
+                &r.x,
+                &mut StdRng::seed_from_u64(101 + d),
+                &mut SolveStats::default(),
+                &mut S4F4Stats::default(),
+                &mut graph,
+            );
+            assert_eq!(got_graph, expected, "pair graph residual d={d}");
         }
         let trace_work = trace.stats();
         assert_eq!(work.calls, 8);
@@ -601,6 +625,19 @@ mod tests {
         assert!(trace_work.pool.certification_multiplications > 0);
         assert!(trace_work.pool.retained_words <= 1_000_000);
         assert_eq!(trace_work.family_rejections, 0);
+        let graph_stats = graph.stats().pool;
+        assert_eq!(graph_stats.accepted, trace_work.pool.accepted);
+        assert_eq!(graph_stats.learned, trace_work.pool.learned);
+        assert!(
+            graph_stats.certification_multiplications
+                < trace_work.pool.certification_multiplications
+        );
+        let edges = graph_stats.pair_graph.unwrap();
+        assert!(edges.chain_edges + edges.product_edges > 0);
+        assert_eq!(
+            edges.chain_edges + edges.product_edges + edges.direct_edges,
+            graph_stats.certification_pairs
+        );
     }
 
     #[test]
@@ -649,22 +686,24 @@ mod tests {
             ResidualSampler3::RAddingLong,
         );
         assert_eq!(expected.correct, Some(true));
-        opts.solver = Solver::F4TraceDelayed;
-        for backend in [LargePrimeBackend::SymbolicGraph, LargePrimeBackend::Pivot] {
-            let got = run_gaudry_with_sampler(
-                &inst,
-                &base,
-                5,
-                &opts,
-                backend,
-                ResidualSampler3::RAddingLong,
-            );
-            assert_eq!(got.correct, Some(true));
-            assert_eq!(got.lp_input_digest, expected.lp_input_digest);
-            assert_eq!(got.residuals, expected.residuals);
-            assert_eq!(got.recovered_scalar, expected.recovered_scalar);
-            assert_eq!(got.group_ops, expected.group_ops);
-            assert!(got.s4_f4_stats.unwrap().trace.unwrap().pool.learned > 0);
+        for solver in [Solver::F4TraceDelayed, Solver::F4TracePairGraph] {
+            opts.solver = solver;
+            for backend in [LargePrimeBackend::SymbolicGraph, LargePrimeBackend::Pivot] {
+                let got = run_gaudry_with_sampler(
+                    &inst,
+                    &base,
+                    5,
+                    &opts,
+                    backend,
+                    ResidualSampler3::RAddingLong,
+                );
+                assert_eq!(got.correct, Some(true));
+                assert_eq!(got.lp_input_digest, expected.lp_input_digest);
+                assert_eq!(got.residuals, expected.residuals);
+                assert_eq!(got.recovered_scalar, expected.recovered_scalar);
+                assert_eq!(got.group_ops, expected.group_ops);
+                assert!(got.s4_f4_stats.unwrap().trace.unwrap().pool.learned > 0);
+            }
         }
     }
 

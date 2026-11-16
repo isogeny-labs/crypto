@@ -3735,6 +3735,8 @@ pub enum Solver {
     F4KrylovDelayed,
     /// Certified bounded trace reuse with the same delayed sparse extraction.
     F4TraceDelayed,
+    /// Same complete extraction with product/chain pair-dependency certificates.
+    F4TracePairGraph,
     /// **Joux–Vitse**: look for decompositions into `k − 1 = 2` base
     /// points instead of `k = 3`, with one Weil-restricted `S₃` pair
     /// test on the residual itself.
@@ -3921,6 +3923,7 @@ fn run_gaudry_impl(
             | Solver::F4Krylov
             | Solver::F4KrylovDelayed
             | Solver::F4TraceDelayed
+            | Solver::F4TracePairGraph
     ) || cross_check
     {
         Some(SymmetrisedS4::precompute(curve))
@@ -3935,7 +3938,11 @@ fn run_gaudry_impl(
         }
         _ => None,
     };
-    let mut trace_state = (solver == Solver::F4TraceDelayed).then(|| S4TraceState::new(inst));
+    let mut trace_state = match solver {
+        Solver::F4TraceDelayed => Some(S4TraceState::new(inst)),
+        Solver::F4TracePairGraph => Some(S4TraceState::new_pair_graph(inst)),
+        _ => None,
+    };
     let precompute_muls = curve.field.muls();
     curve.reset();
     let mut walk_sampler = match sampler {
@@ -4118,7 +4125,7 @@ fn run_gaudry_impl(
                 rep.oracle_fp_muls += stats.fp_muls - before;
                 decs
             }
-            Solver::F4TraceDelayed => {
+            Solver::F4TraceDelayed | Solver::F4TracePairGraph => {
                 let before = stats.fp_muls;
                 let work = rep.s4_f4_stats.get_or_insert_with(S4F4Stats::default);
                 let decs = s4_f4::triple_oracle_trace_delayed(
@@ -4213,7 +4220,9 @@ fn run_gaudry_impl(
                 | Solver::F4Groebner
                 | Solver::F4Krylov
                 | Solver::F4KrylovDelayed => subspace_triple_oracle(inst, base, &r, &mut rng).0,
-                Solver::F4TraceDelayed => subspace_triple_oracle(inst, base, &r, &mut rng).0,
+                Solver::F4TraceDelayed | Solver::F4TracePairGraph => {
+                    subspace_triple_oracle(inst, base, &r, &mut rng).0
+                }
                 Solver::SymmetricPairOnly
                 | Solver::PreparedSymmetricPairOnly
                 | Solver::PseudoRemainderPairOnly

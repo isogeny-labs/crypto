@@ -6,6 +6,19 @@ with a protected target logarithm and protected constant coordinate. [pcc:unveri
 
 [Implementation report (PDF)](report.pdf) · [Frozen protocol](protocol.json)
 
+## Three graph representations in the Rust integration
+
+| Representation | Vertices and edges | Computation |
+| --- | --- | --- |
+| Relation graph | Unknown large-prime logarithms; coefficient-weighted relation edges | Eliminate tree variables, combine cycles, retain protected target and constant coordinates. [pcc:unverified] |
+| Quotient multiplication graph | Standard monomials; weighted multiplication by elementary coordinates | Sparse Krylov walks and checked recurrence recovery replace dense extraction when supported. [pcc:unverified] |
+| Pair-certificate dependency graph | Basis polynomials; LCM-labelled pair obligations | Direct reductions and coprime pairs seed edges; prior-edge chain witnesses discharge further obligations. [pcc:unverified] |
+
+Algebraic S3/S4 finders supply the elliptic relations. Each graph layer retains
+its own exact algebraic checks, and the collector verifies relations in the
+curve group before admission. The full cold comparisons include relation
+search and failures as well as elimination. [pcc:unverified]
+
 ## Authorized local measurements
 
 The user selected **local or Runpod** after the lab-access question. The
@@ -260,6 +273,12 @@ no standard lab admission or canonical export validation is asserted.
   2.981–16.086 times fresh F4; three timing rejections remain. Largest-field
   pools accept six or seven replays per eight distinct residuals, but produce
   zero controlled gains. The frozen condition rejects a full-IC follow-up.
+  [pcc:unverified]
+- [Pair-dependency certificates](AMENDMENT_14_PAIR_CERTIFICATE.md) add an
+  explicit `f4-trace-pair-graph` mode. Product/chain witnesses discharge pair
+  obligations through prior certified edges; all original-input reductions
+  and complete root/group checks remain. The exhaustive mode stays available.
+  [Frozen fresh comparison](pair-certificate-plan.json) is not timed yet.
   [pcc:unverified]
 
 Native summaries, every local stratum, flow and raw custody hashes accompany
