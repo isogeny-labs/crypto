@@ -213,16 +213,17 @@ fn intervals<const K: usize>(values: &[[f64; K]]) -> [Statistics; K] {
     assert!(n > 0 && n <= 21 && n % 2 == 1);
     let mut state = SEED;
     let mut draws: [Vec<f64>; K] = std::array::from_fn(|_| Vec::with_capacity(DRAWS));
-    let mut sample = [[0.; 21]; K];
+    let mut sample = [[0.; K]; 21];
     for _ in 0..DRAWS {
-        for j in 0..n {
-            let row = &values[index(&mut state, n)];
-            for k in 0..K {
-                sample[k][j] = row[k];
-            }
+        for slot in &mut sample[..n] {
+            *slot = values[index(&mut state, n)];
         }
-        for k in 0..K {
-            draws[k].push(median(&mut sample[k][..n]));
+        for (k, distribution) in draws.iter_mut().enumerate() {
+            let mut column = [0.; 21];
+            for (slot, row) in column[..n].iter_mut().zip(&sample[..n]) {
+                *slot = row[k];
+            }
+            distribution.push(median(&mut column[..n]));
         }
     }
     std::array::from_fn(|k| {
