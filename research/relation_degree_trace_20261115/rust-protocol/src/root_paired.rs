@@ -191,11 +191,14 @@ impl Panel<'_> {
         Ok(panel)
     }
 }
-pub(super) fn run(prepared: &Path, out: &Path, config_path: &Path) -> Result<()> {
-    let config_bytes = fs::read(config_path)?;
-    let c: Config = serde_json::from_slice(&config_bytes)?;
-    let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
+const LAST_INPUT_HASH: &str = "e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3";
+fn admitted_item(manifest: &Value, last: bool) -> Result<&Value> {
     let qualification = manifest["mode"] == "qualification";
+    let (id, digest) = if last {
+        ("star-last-n16-s7", LAST_INPUT_HASH)
+    } else {
+        ("star-first-n16-s7", INPUT_HASH)
+    };
     let item = manifest["cases"]
         .as_array()
         .ok_or("roster")?
@@ -204,18 +207,32 @@ pub(super) fn run(prepared: &Path, out: &Path, config_path: &Path) -> Result<()>
             if qualification {
                 v["id"] == "n3-s7"
             } else {
-                v["id"] == "star-first-n16-s7"
+                v["id"] == id
             }
         })
         .ok_or("fixed admitted case missing")?;
     if !qualification
         && (manifest["mode"] != "rust-consumer-screen"
-            || item["input_sha256"] != INPUT_HASH
+            || item["input_sha256"] != digest
             || item["variables"] != 16
             || item["seed"] != 7)
     {
         return Err("paired fixture outside admitted scope".into());
     }
+    Ok(item)
+}
+pub(super) fn run(prepared: &Path, out: &Path, config_path: &Path) -> Result<()> {
+    run_impl(prepared, out, config_path, false)
+}
+pub(super) fn run_last(prepared: &Path, out: &Path, config_path: &Path) -> Result<()> {
+    run_impl(prepared, out, config_path, true)
+}
+fn run_impl(prepared: &Path, out: &Path, config_path: &Path, last: bool) -> Result<()> {
+    let config_bytes = fs::read(config_path)?;
+    let c: Config = serde_json::from_slice(&config_bytes)?;
+    let manifest: Value = serde_json::from_slice(&fs::read(prepared.join("manifest.json"))?)?;
+    let qualification = manifest["mode"] == "qualification";
+    let item = admitted_item(&manifest, last)?;
     let input = prepared.join(item["id"].as_str().ok_or("case id")?);
     let mut identities = serde_json::Map::new();
     for (name, path) in [
@@ -340,6 +357,44 @@ pub(super) fn run(prepared: &Path, out: &Path, config_path: &Path) -> Result<()>
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn last_selection_rejects_wrong_hash_shape_seed_and_first_only_roster() {
+        let first =
+            json!({"id":"star-first-n16-s7","input_sha256":INPUT_HASH,"variables":16,"seed":7});
+        let selected =
+            json!({"id":"star-last-n16-s7","input_sha256":LAST_INPUT_HASH,"variables":16,"seed":7});
+        let good = json!({"mode":"rust-consumer-screen","cases":[first,selected]});
+        assert_eq!(
+            admitted_item(&good, true).unwrap()["id"],
+            "star-last-n16-s7"
+        );
+        assert_eq!(
+            admitted_item(&good, false).unwrap()["id"],
+            "star-first-n16-s7"
+        );
+        assert!(admitted_item(
+            &json!({"mode":"rust-consumer-screen","cases":[first]}),
+            true
+        )
+        .is_err());
+        for (key, value) in [
+            ("input_sha256", json!(INPUT_HASH)),
+            ("variables", json!(12)),
+            ("seed", json!(8)),
+        ] {
+            let mut bad = good.clone();
+            bad["cases"][1][key] = value;
+            assert!(admitted_item(&bad, true).is_err());
+        }
+        let mut bad = good;
+        bad["mode"] = json!("other");
+        assert!(admitted_item(&bad, true).is_err());
+        assert!(admitted_item(
+            &json!({"mode":"qualification","cases":[{"id":"n3-s7"}]}),
+            true
+        )
+        .is_ok());
+    }
     fn panel(work: [u64; 3], paid: [u64; 3]) -> Value {
         json!({"order":CYCLE[0],"samples":(0..3).map(|i|json!({"pipeline":NAMES[i],"status":"complete","basis_sha256":"a".repeat(64),"pipeline_work_ns":work[i],"paid_wall_ns":paid[i],"answer":{"root_api":true,"native_product_criterion":true,"constructor":{"subset_succeeded":true}}})).collect::<Vec<_>>()})
     }

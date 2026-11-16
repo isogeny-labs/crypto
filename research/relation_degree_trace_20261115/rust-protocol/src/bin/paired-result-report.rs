@@ -126,6 +126,22 @@ fn kernel_guard_rejects_missing_wrong_and_unknown_modes() {
     assert!(check_kernel_mode(&json!({"kernel_mode":"legacy"}), "both").is_err());
     assert!(check_kernel_mode(&json!({"kernel_mode":"unknown"}), "unknown").is_err());
 }
+fn fixture_label(s: &Value) -> Result<&'static str> {
+    match s["input_sha256"].as_str() {
+        Some("63f5d4bcaaf41f57ed81aba878bab41900c552c8ebbfc3956b67b0d016e4350d") => {
+            Ok("first-star")
+        }
+        Some("e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3") => Ok("last-star"),
+        _ => Err("paired input outside known frozen fixtures".into()),
+    }
+}
+#[test]
+fn fixture_label_rejects_unknown_and_binds_each_frozen_hash() {
+    assert_eq!(fixture_label(&json!({"input_sha256":"63f5d4bcaaf41f57ed81aba878bab41900c552c8ebbfc3956b67b0d016e4350d"})).unwrap(),"first-star");
+    assert_eq!(fixture_label(&json!({"input_sha256":"e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3"})).unwrap(),"last-star");
+    assert!(fixture_label(&json!({})).is_err());
+    assert!(fixture_label(&json!({"input_sha256":"a".repeat(64)})).is_err());
+}
 fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().collect();
     if !(5..=7).contains(&a.len()) {
@@ -137,6 +153,7 @@ fn main() -> Result<()> {
     let raw = Path::new(&a[1]);
     let out = Path::new(&a[3]);
     let s: Value = serde_json::from_slice(&fs::read(raw.join("summary.json"))?)?;
+    let fixture_name = fixture_label(&s)?;
     let conditions = fs::read_to_string(&a[2])?;
     if conditions.lines().count() != 1 {
         return Err("single condition record".into());
@@ -271,12 +288,16 @@ fn main() -> Result<()> {
         );
     }
     md+="\nThis Rust audit recomputes A/A and main statistics from integer costs with the frozen100000-draw joint bootstrap, SplitMix64 seed20261115, unbiased index rejection and nearest-rank endpoints. Every paid sum and block order is checked. Decimal JSON statistics compare within four machine epsilons; all gates compare exactly, without rounding. No trimming, replacement or estimator change. All raw panels/wires remain. [pcc:unverified]\n\n![Paired ratios](ratios.svg){width=95%}\n\nPoints: medians; bars: ordinary95% intervals; crosses: adjusted lower bounds. Lines mark10 and15.\n";
+    md = md.replace("first-star", fixture_name).replace(
+        "sixteen-workflow screen results",
+        "retained full-control screen results",
+    );
     fs::create_dir(out)?;
     fs::write(out.join("report.md"), md)?;
     fs::write(
         out.join("audit.json"),
         serde_json::to_vec_pretty(
-            &json!({"complete_matching_workflow_answers":108,"main_blocks":21,"aa_all_pass":true,"paid_sums_checked":true,"statistics_recomputed":true,"expected_completion_exports":expected_exports,"expected_kernel_mode":expected_kernel,"paired_numeric_15x":flag15,"paired_numeric_10x":flag10,"main_statistics":stats,"standing":"unsigned producer recomputation"}),
+            &json!({"complete_matching_workflow_answers":108,"main_blocks":21,"aa_all_pass":true,"paid_sums_checked":true,"statistics_recomputed":true,"expected_completion_exports":expected_exports,"expected_kernel_mode":expected_kernel,"paired_numeric_15x":flag15,"paired_numeric_10x":flag10,"main_statistics":stats,"input_sha256":s["input_sha256"],"fixture":fixture_name,"standing":"unsigned producer recomputation"}),
         )?,
     )?;
     let path = out.join("ratios.svg");

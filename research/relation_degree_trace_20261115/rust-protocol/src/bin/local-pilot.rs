@@ -779,6 +779,7 @@ fn main() -> Result<()> {
     Some("update-screen")if a.len()==5=>rust_capture::run_updates(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("callgrind-profile")if a.len()==5=>callgrind_capture::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     Some("root-paired")if a.len()==5=>root_paired::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
+    Some("update-paired")if a.len()==5=>root_paired::run_last(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen|scale-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }
 #[cfg(test)]

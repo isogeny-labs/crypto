@@ -9,6 +9,22 @@ fn ns(v: &Value) -> Result<u64> {
         .filter(|x| *x > 0)
         .ok_or_else(|| "positive cost required".into())
 }
+fn fixture_label(s: &Value) -> Result<&'static str> {
+    match s["input_sha256"].as_str() {
+        Some("63f5d4bcaaf41f57ed81aba878bab41900c552c8ebbfc3956b67b0d016e4350d") => {
+            Ok("first-star")
+        }
+        Some("e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3") => Ok("last-star"),
+        _ => Err("paired input outside known frozen fixtures".into()),
+    }
+}
+#[test]
+fn fixture_label_rejects_unknown_and_binds_each_frozen_hash() {
+    assert_eq!(fixture_label(&json!({"input_sha256":"63f5d4bcaaf41f57ed81aba878bab41900c552c8ebbfc3956b67b0d016e4350d"})).unwrap(),"first-star");
+    assert_eq!(fixture_label(&json!({"input_sha256":"e4d22ea93228f207b87640813fb925e15973d8ee43d5f966a4d98a63917cbaf3"})).unwrap(),"last-star");
+    assert!(fixture_label(&json!({})).is_err());
+    assert!(fixture_label(&json!({"input_sha256":"a".repeat(64)})).is_err());
+}
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     if args.len() != 6 {
@@ -43,6 +59,7 @@ fn main() -> Result<()> {
         return Err("known kernel".into());
     }
     let s: Value = serde_json::from_slice(&fs::read(raw.join("summary.json"))?)?;
+    let fixture_name = fixture_label(&s)?;
     if s["failure"] != "A/A rejected; main blocks not run"
         || !s["result"].is_null()
         || s["identities_unchanged"] != true
@@ -177,12 +194,16 @@ fn main() -> Result<()> {
         checks.push(json!({"arm":name,"admitted":admitted}));
     }
     md += "\nThe table retains every ordinary A/A interval and exact gate decision. At least one scope rejects this run; the observations do not establish a cause for the labelled difference. The selected kernel mode and zero exports are checked in every candidate answer, alongside native/root acceptance flags. No main speed ratio is computed. [pcc:unverified]\n\nThe computation is the previously selected p2147483647,n16,first-star,seed7 known fixture. Every repeated workflow pays its original measured preparation charge; each panel obtains fresh three-route references charged in full to regeneration arms. Candidate pays construction, serialized proof, separate root API checking and output consumption. These are distinct validation algorithms for the same complete reduced basis. This is not a fresh-target, fastest-control or kernel comparison. [pcc:unverified]\n\nNo fresh seed was generated. The earlier single-call screen remains separate. Certificate/output degrees and quotient dimensions do not establish a reduction in intrinsic regularity. The15x objective remains open. [pcc:unverified]\n\n![Labelled A/A ratios](aa.svg){width=95%}\n\nPoints are medians, bars are ordinary95% percentile intervals. Vertical line marks1. No interval or sample was discarded.\n";
+    md = md.replace("first-star", fixture_name).replace(
+        "sixteen-workflow screen results",
+        "retained full-control screen results",
+    );
     fs::create_dir(out)?;
     fs::write(out.join("report.md"), md)?;
     fs::write(
         out.join("audit.json"),
         serde_json::to_vec_pretty(
-            &json!({"complete_matching_answers":count,"main_blocks":0,"gate":checks,"all_paid_sums_checked":true,"expected_kernel_mode":args[5],"completion_exports":0,"zero_monitor_contention":true,"all_aa_statistics_recomputed":true,"standing":"unsigned producer audit"}),
+            &json!({"complete_matching_answers":count,"main_blocks":0,"gate":checks,"all_paid_sums_checked":true,"expected_kernel_mode":args[5],"completion_exports":0,"zero_monitor_contention":true,"all_aa_statistics_recomputed":true,"input_sha256":s["input_sha256"],"fixture":fixture_name,"standing":"unsigned producer audit"}),
         )?,
     )?;
     let path = out.join("aa.svg");
