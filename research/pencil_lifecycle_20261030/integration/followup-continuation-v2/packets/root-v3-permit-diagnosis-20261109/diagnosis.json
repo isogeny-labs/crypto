@@ -1,0 +1,67 @@
+{
+  "schema": "research.failure-diagnosis/v1",
+  "status": "retained_failure_cause_not_fully_observed",
+  "new_execution": false,
+  "observations": [
+    "Completion failed; seal passed;991.7126608029939seconds.",
+    "Worker guard check_permit raised supervisor permit expired during compile; command reaped -9 after630.008571627026seconds;worker960.1883315590094seconds.",
+    "49 successful heartbeat responses recorded; consecutive expiry gaps20.009093\u201322.369799seconds; no recorded heartbeat transport or lease error. Expiry spacings are not measured request latency.",
+    "Supervisor recorded1549observations1551queries; final receipt2106359bytes. Each show checkpoints cumulative receipt and flushes before permit publication; successful heartbeat also checkpoints.",
+    "Final permit matches invocation15d1304b26834459b62bd6adf6039d07 and expires18:55:16.053503UTC. The expired bytes observed by worker and observation time were not retained."
+  ],
+  "inferences_not_established": [
+    "Read-to-check descheduling may leave an old-but-valid-at-open permit expired despite later atomic replacement.",
+    "Supervisor checkpoint, filesystem or scheduling delay may postpone permit refresh. Cumulative synchronous receipt writing is a concrete delay opportunity, not a measured cause.",
+    "No evidence here establishes a parser failure;61-case parser qualification remains unchanged."
+  ],
+  "minimal_proposal": [
+    "Retain10second permit and15second lease safety margins.",
+    "On first expiry only, retain raw permit hash, invocation/lease identity, expiry, read-start/read-end wall/monotonic times and stat identity; perform at most one immediate fresh read.",
+    "Require second same strict identity and currently unexpired permit; whole recheck must complete inside an explicit small monotonic bound such as250ms. No sleep, grace period, rolling retries or future expiry extrapolation. Failure, malformed data or identity mismatch fail closed immediately.",
+    "Record whether second read bytes/inode/expiry changed; if still expired or bound exceeded, keep original failure and both observations.",
+    "Add permit publication timestamp/sequence and checkpoint timing metadata to distinguish stale snapshot from refresh gaps. This is diagnostics, not authorization to ignore expiry.",
+    "Do not silently reorder ownership durability behind permit publication or widen runtime/resource bounds."
+  ],
+  "qualification_proposal": [
+    "One deterministic stale-first/fresh-second case with matchingidentity succeeds only inside bound.",
+    "Both expired, wrongidentity, malformedsecond, deadline/signal and elapsedbound cases fail.",
+    "Capture both snapshots and preserve original error cause. No actual job/compile required for synthetic control design; parent owns publication/release."
+  ],
+  "sources": [
+    {
+      "path": "/home/ec2-user/pencil-validation-receipts/t1992-root-library-20261109/completion.json",
+      "bytes": 296,
+      "sha256": "127efbdb854d8e88ca46bb607b1e048699cef8e52d72e942a774176f82f671f8"
+    },
+    {
+      "path": "/home/ec2-user/pencil-validation-receipts/t1992-root-library-20261109/supervisor/launch-receipt.json",
+      "bytes": 2106359,
+      "sha256": "6add59c032328fd9e95653fb898def3153a7cb9c5898ffef261cce5f091b140c"
+    },
+    {
+      "path": "/home/ec2-user/pencil-validation-receipts/t1992-root-library-20261109/worker/worker-receipt.json",
+      "bytes": 2497,
+      "sha256": "62970764be838ff781fb53d7729d41fc00965a3134427294d2c16221e98e20a4"
+    },
+    {
+      "path": "/home/ec2-user/pencil-validation-receipts/t1992-root-library-20261109/supervisor-permit.json",
+      "bytes": 305,
+      "sha256": "4602674a4cbd912aefab2b66ed36cb0b45d4f260149b0c815b4f862bd38ebed6"
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-launcher.py",
+      "bytes": 11810,
+      "sha256": "1be89bfce43a31d4cdfd2fb41400a7decbfadfec0b3bb11b887099c31d654fb6"
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable-worker.py",
+      "bytes": 9988,
+      "sha256": "edbcd05b23b0eef59aaa68a8851da7eafd80a18eb771b2fa857ffc16da1b20e1"
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v3-20261109/durable_io.py",
+      "bytes": 6447,
+      "sha256": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c"
+    }
+  ]
+}

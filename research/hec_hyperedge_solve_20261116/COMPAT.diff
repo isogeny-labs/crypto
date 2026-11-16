@@ -1,0 +1,13 @@
+diff --git a/research/hec_table_oracle_20261114/pipeline.rs b/research/hec_hyperedge_solve_20261116/pipeline_compat.rs
+index 636e068198..c89deb09bb 100644
+--- a/research/hec_table_oracle_20261114/pipeline.rs
++++ b/research/hec_hyperedge_solve_20261116/pipeline_compat.rs
+@@ -131,7 +131,7 @@ pub fn solve_table(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParam
+             let k = if params.solver == Solver::Hybrid {
+                 hec_native_ic::hybrid::solve(&rows, m, ell, &steps, &mut rep.solve)
+             } else {
+-                solve_for_last(&rows, m, ell, params.solver, &mut rep.solve)
++                solve_for_last(&rows, m, ell, params.solver, &steps, &mut rep.solve)
+             };
+             rep.solve_ns += t.elapsed().as_nanos();
+             if let Some(k) = k {

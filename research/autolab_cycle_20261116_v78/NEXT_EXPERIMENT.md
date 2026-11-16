@@ -1,0 +1,5 @@
+# Next: precise observation and independent algorithmic improvements
+
+The fast fallback control is noisy even though routing selects the same frozen function. Current wait4 WNOHANG polling sleeps up to5ms before detecting completion. Implement a fresh supervisor variant using pidfd/select readiness (or blocking wait4 with a separately enforced deadline); retain process-group termination and distinguish child lifetime from bookkeeping. Report unavailable event support explicitly. Freeze identical-code A/A pairs first, including startup and memory, and retain failures. This changes the measurement assumption; do not retry the unchanged C78 panel as if it were new evidence.
+
+Kernel alternatives: exact odd-characteristic polynomial squaring can evaluate diagonal squares and one of each symmetric cross product with factor2, preserving characteristic3 and repeated quotients. Binary squaring has no cross terms. Compare against independent polynomial multiplication before benchmarking. The semilinear Frobenius-jump design remains in C76 NEXT_KERNEL_PROOFS.md. Neither a faster helper nor a quiet control satisfies the genuine20-instance full-search gate.

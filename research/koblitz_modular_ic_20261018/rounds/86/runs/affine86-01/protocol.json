@@ -1,0 +1,43 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R86-AFFINE-DIAMOND-LAMBDA",
+  "version": 1,
+  "goal": "check the source-coordinate expressions and affine lambda update on the inverse-base diamond overlap",
+  "claims": [{"id": "affine_lambda86", "class": "exact_computation", "statement": "two denominator-cleared coordinate identities, k simplification, and diamond lambda cross-product hold modulo the quadratic base equation"}],
+  "arms": {
+    "reference": "R49 inverse coordinates, R50 diamond formulas, and R85 inverse-base equation",
+    "candidate": "R86 polynomial b,c and rational affine lambda formula",
+    "positive": ["two coordinate identities", "k simplification", "lambda cross-product"],
+    "negative": ["corrupted b", "corrupted lambda numerator"],
+    "baseline": {"not_applicable_reason": "exact symbolic identity"},
+    "A_A": {"not_applicable_reason": "deterministic polynomial reduction"}
+  },
+  "variables": {
+    "fixed": ["F2 source-base equation", "one Singular/FLINT thread", "1200 seconds", "4 GiB virtual memory"],
+    "measured": ["zero remainders", "nonzero corrupted-control remainders", "native exit and errors"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method": "fixed", "reason": "exact algebra", "seeds": [86]},
+  "blinding": {"method": "none", "reason": "exact algebra"},
+  "sample_size": {"instances": 1, "replicates": 1, "warmups": 0, "power": "not applicable"},
+  "metrics": ["four zero-remainder checks", "two corruption rejections"],
+  "execution": {
+    "launchers": ["REPLAY_CAS.sh affine86-01 AFFINE86.sing AFFINE86_ALL_CHECKS_PASS"],
+    "backend": "authorized local Singular",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB_native": 4194304,
+    "threads": 1,
+    "seed": 86,
+    "queue": "one serial math job",
+    "source_gate": "committed Git bytes and verified donor manifest",
+    "checkpoint": "existing checkpoint gate and immutable raw copy"
+  },
+  "stopping": {
+    "accept": "exit 0, exact marker, zero native ? errors, all assertions and corrupted controls",
+    "failure": "retain raw failure and freeze repair under a new attempt"
+  },
+  "analysis": {
+    "method": "polynomial ideal remainder over F2",
+    "scope": "rational affine lambda update on registered open only; upper relative equation and 32 RR generator lifts remain"
+  }
+}

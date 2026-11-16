@@ -1,0 +1,31 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+../cost-evidence/draft-004.lean.txt:163:78: error: unsolved goals
+a : ℕ
+q : ℚ
+hq : q ∈ grid a
+H : Bits (∑ i ∈ (grid a).erase q, (a + a + 1)) (∏ i ∈ (grid a).erase q, (q - i))
+hb : #((grid a).erase q) ≤ 2 * 2 ^ a
+⊢ #((grid a).erase q) * a + a + 1 = #((grid a).erase q) * (a + a + 1)
+../cost-evidence/draft-004.lean.txt:165:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ∑ x ∈ (grid a).erase q, a + a + 1
+in the target expression
+  Bits (∑ i ∈ (grid a).erase q, (a + a + 1)) (∏ i ∈ (grid a).erase q, (q - i))
+
+a : ℕ
+q : ℚ
+hq : q ∈ grid a
+H : Bits (∑ i ∈ (grid a).erase q, (a + a + 1)) (∏ i ∈ (grid a).erase q, (q - i))
+hb : #((grid a).erase q) ≤ 2 * 2 ^ a
+hs : ∑ x ∈ (grid a).erase q, a + a + 1 = #((grid a).erase q) * (a + a + 1)
+⊢ Bits (derivativeSize a) (∏ j ∈ (grid a).erase q, eval q (X - C j))
+../cost-evidence/draft-004.lean.txt:205:9: error: Tactic `unfold` failed to unfold `absoluteLeft` in
+  Bits (diagonalSize a u i m + (↑rb.2 + a * ↑rb.2)) ((absoluteLeft a u i p m x rb).coeff n)
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
