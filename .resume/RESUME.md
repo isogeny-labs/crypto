@@ -1,3 +1,53 @@
+# Current checkpoint:41READY; publish fresh branch and dispatch once
+
+ACTIVE goal Rust graph IC + cheap extension-field relation finder towardrho parity.
+ALLscienceRust/ALLmeasurementsRunpod;no subagents/stopgoal. Concrete tool actions/
+commentary<=60sec. Source40component qualified andpublished/merged; DON'Trerun/reprice.
+PreviousPR4288MERGED365d2b95f7299164473def0edbfde465a514e45b21:22:04Z,oldbranchdeleted.
+Currentfreshbranch feat/extension-ic-quadratic-remainder-pipeline from1d6ancestor,
+allRootbytes retained while compiling; origin/main ahead inclCargo.toml/lockchanges.
+Do NOTmergeMainmidfrozen41trial; sharedjournalmustlaterretainbothsidesifconflicting.
+No newPR/sourcepublicationyet; abouttocommit/pushsource andcreateDRAFTPR,thenprepare.
+
+41optional production run_extension_remainder_dlp_on: newRoot jv_principal_relation.rs
+(copy40exceptcrateimport), jv_extension_remainder_dlp.rs (samegraphcollector+actualRREF
+kernel+existingNagao/verifieddescent+protected2coltargetsolve+ellipticreplay,Spec.dneverread).
+Old/newpaths share existing quotient helper parentmodule. Existingcomparator methods
+extension-full-smooth/extension-remainders require--small-percent100. Bufferedoutput
+allmethods changescaptureoverheadonly. Defaults/oldentrypoints preserved.
+Final21library/3example/56independentqualifierPASS,strictlib+bothExampleClippy0,
+releasebinarybuilds0;actualfixture/sevenarmtransportpositive/failure/create-newPASS.
+AllcapturedCargostatus0; no compilerjobactive.338source blobs+binarymanifestsfrozen,
+PCC-20261116-0b939eUNVERIFIED; helperbyteequalityproofretained.
+/tmp/ic-extension-pipeline41-final-root-source.sha256 andchecker-source-final-v4.sha256
+match. Developmentmanualrlib+flags/errors/56PASS at/tmp/ic-extension-pipeline41-checker-dev;
+actualfinalCargoqualifieralso56PASS. Don'treruncontrolsforcosmeticouterexecstatus.
+
+41extension-pipeline-plan.json/AMENDMENT36: freshp1009seed389,7coldarms:
+ic,extension-full-smooth,extension-remainders,rho-plain-1,rho-negation-1,
+rho-plain-16,rho-negation-16.600sworker/60fixture/4500whole/900qualifier/7200runner,
+8GiB4vCPU<=.40USDh,0warm/retry. Pairedcollectorsfullbase100%,actualrankn-1complete
+1024Bbatchorfullp²/65536cap; independentALLoriginalCantor/source/norm/witness/rank,
+uniqueh,allaffine/projectedprefixes/unreducedtarget/residuallabels/LAconservation.
+Requirematchedkernel/descents/affinerows/postcollectionLA/otherphases. All7actualscalar
+mustmatchheldoutfixture+elliptic replay. Completecosts/bands/ratiosnull/noT1/parityclaim.
+
+Own41Runpod uoehapnoz96luyCREATED21:48:54ZCPU4/8/cpu3c/.12h/pinnedRustimage.
+7200sDELETEguardianactive,deadline1794872934;allocation validation/runpod41-allocation.json.
+NOscientificdispatchyet. Need >=5700sremaining atwrapperstart. Privateauthpointer
+/tmp/ic-runpod-auth-location;NEVERechoAPIkey/header/token/fullenvresponses/copykeytopod.
+Privatepod41.id/task41-header/create41receipts/cleanup-guard41.sh(sleep7200)persist.
+Prepare-extension-pipeline-runpod.sh expectsNEW
+/workspace/ic-runpod-runs/runpod-extension-pipeline-20261116-41.
+Publishclean/push+explicitfeaturefetch,preparebundle,scanprivatepatterns,PUTbundle,
+POST/runONCE. ReadstatusNOredispatch;collectallhashboundoriginalsTHENimmediateownpod
+DELETE+independentGETabsence/guardmarker,BEFOREoptionalreportreads. Don'ttouchunrelatedpods.
+Serverstatuskeyexit_code (notcode). Existingbootstrap37exactRustcaptureaccepts7200TTL.
+Source/binarymanifestspreserveactualparams;newPRdraftpreventsmergewhilecollectingpacket.
+S3gate1profile/tokenmissing;prioruserRunpodauthorizationpersists,noask/noS3claim.
+
+--- Previous checkpoint retained verbatim ---
+
 # Current checkpoint:40COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet then integrate
 
 GoalACTIVE, Rust graph IC+cheap extension-field relation finder toward rho parity.
