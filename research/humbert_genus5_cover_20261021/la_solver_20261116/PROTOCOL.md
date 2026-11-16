@@ -100,3 +100,12 @@ Before data:
 - The w1/l1 repair path (one more solve when e2e fails) is not implemented. Its expected cost is
   bounded from the observed failure rate (rule of three when 0 failures).
 - The excess fraction (0.10) and the tree score (total non-zeros) are fixed, not tuned on this grid.
+
+## Addendum (2026-11-16, during data; predictions and analysis unchanged)
+
+The q = 24001 launch hit the session's 2 h background limit after 34 of 40 runs (seed 5, protocol
+positions 0–1 done). The remaining six runs (seed 5, positions 2–7) were run with
+`run_v5_part.sh`, using the same binary (hash checked), the same per-run command and the same
+order, and are marked `"resumed": true`. Their wall times come from a later process. q = 32003
+is about 3× slower per run, so it runs as one launch per seed (`run_v5_part.sh`, `SEEDS=<s>`), in
+seed order. No analysis was run on any data before this addendum.
