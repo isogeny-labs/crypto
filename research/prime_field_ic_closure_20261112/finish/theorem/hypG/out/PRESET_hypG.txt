@@ -1,0 +1,13 @@
+PRESET for follow-up hyp-G (written 2026-11-15T19:23:47Z, after the exhaustive grid was launched and BEFORE
+any of its outputs were opened; the three smoke runs test_*.json had been read).  [pcc:unverified]
+Instrument: code/exhaustive_G.py (all target abscissas of a prime-order curve; exact counts, no sampling).
+Grid: code/jobs.txt (80 jobs; m=2 k=2..8, m=3 k=2..5, m=4 k=2..3; p in {769, 12289}; curves c1,c2;
+      g = random coset and g = 1 (subgroup); j=0 curves).
+Decision rules (fixed now):
+  Proven floors (Lemma L, Prop T): any target with delta_weak < k-m+1 (non-degenerate) or delta_det <
+      k - ceil(log2 s_line) or H(delta_det)|V_R| < |W|^m  => the follow-up's proof is WRONG (report, retract).
+  Original G(theta) at t = theta - Delta: holds iff eps1 <= 1/2 and nu <= 4/H(t) min(Ndec, n) (exact counts).
+      Counterexample to "G holds at the C2 threshold" = an instance where G fails at some t <= the
+      threshold t_C2 := ceil(tau_m * m * k) while H(t_C2) >= 4|B|^{m/2-1}.  (Toy instances rarely meet the
+      size condition; report as N/A where they do not.)
+  Reed-Muller analogue for towers (delta_det >= mk - log2|V_R|): any violation REFUTES it.

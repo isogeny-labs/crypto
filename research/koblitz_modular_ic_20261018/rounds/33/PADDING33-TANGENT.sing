@@ -1,0 +1,21 @@
+ideal residuePT33=std(ideal(T^2+T+1));int qPT33;int rowPT33;int colPT33;int omitRowPT33;int omitColPT33;int nextRowPT33;int nextColPT33;int countPT33;int rankPT33;list pPT33;number bPT33;number cPT33;number uPT33;number vPT33;matrix valuesPT33;matrix smallPT33[3][3];ideal minorsPT33;ideal gensPT33;matrix witnessPT33;matrix reconPT33;poly determinantPT33;ideal checkPT33;poly dPT33;poly hPT33;
+for(qPT33=1;qPT33<=2;qPT33++){
+ pPT33=paddingRepresentatives33[qPT33];bPT33=pPT33[1];cPT33=pPT33[2];uPT33=(bPT33+cPT33)/cPT33^2;vPT33=((bPT33/cPT33)*uPT33^3+1)/(uPT33+1);
+ map pointPT33=paddingPolynomial33,pPT33[4]+bPT33*T,pPT33[3]+(1+cPT33)*T,vPT33,uPT33;
+ checkPT33=reduce(pointPT33(localSource33),residuePT33);if(size(checkPT33)!=0){ERROR("PADDING33_TANGENT_SOURCE");}
+ dPT33=pointPT33(localDenominator33);hPT33=pointPT33(localTateFactor33);gensPT33=residuePT33,dPT33*hPT33;if(std(gensPT33)[1]!=1){ERROR("PADDING33_TANGENT_CLEARING_UNIT");}
+ valuesPT33=pointPT33(fullJacPT33);for(rowPT33=1;rowPT33<=4;rowPT33++){for(colPT33=1;colPT33<=4;colPT33++){valuesPT33[rowPT33,colPT33]=reduce(valuesPT33[rowPT33,colPT33],residuePT33);}}
+ determinantPT33=reduce(det(valuesPT33),residuePT33);countPT33=0;minorsPT33=0;
+ for(omitRowPT33=1;omitRowPT33<=4;omitRowPT33++){for(omitColPT33=1;omitColPT33<=4;omitColPT33++){
+  nextRowPT33=0;for(rowPT33=1;rowPT33<=4;rowPT33++){if(rowPT33!=omitRowPT33){nextRowPT33++;nextColPT33=0;for(colPT33=1;colPT33<=4;colPT33++){if(colPT33!=omitColPT33){nextColPT33++;smallPT33[nextRowPT33,nextColPT33]=valuesPT33[rowPT33,colPT33];}}}}
+  countPT33++;minorsPT33[countPT33]=reduce(det(smallPT33),residuePT33);
+ }}
+ gensPT33=residuePT33,minorsPT33;if(std(gensPT33)[1]!=1){ERROR("PADDING33_TANGENT_RANK_BELOW_THREE");}
+ witnessPT33=lift(gensPT33,ideal(1));reconPT33=matrix(gensPT33)*witnessPT33;if(reconPT33[1,1]!=1){ERROR("PADDING33_TANGENT_UNIT_LIFT");}
+ rankPT33=3;if(determinantPT33!=0){rankPT33=4;}
+ print("PADDING33_TOTAL_TANGENT q="+string(qPT33)+" rank="+string(rankPT33)+" determinant="+string(determinantPT33));
+ link outPT33="ASCII:w padding-total-q"+string(qPT33)+".sing";open(outPT33);write(outPT33,"matrix fullPaddingJacobian33[4][4];ideal fullPaddingMinorGenerators33;matrix fullPaddingMinorWitness33["+string(nrows(witnessPT33))+"][1];");
+ for(rowPT33=1;rowPT33<=4;rowPT33++){for(colPT33=1;colPT33<=4;colPT33++){write(outPT33,"fullPaddingJacobian33["+string(rowPT33)+","+string(colPT33)+"]="+string(valuesPT33[rowPT33,colPT33])+";");}}
+ for(rowPT33=1;rowPT33<=ncols(matrix(gensPT33));rowPT33++){write(outPT33,"fullPaddingMinorGenerators33["+string(rowPT33)+"]="+string(gensPT33[rowPT33])+";fullPaddingMinorWitness33["+string(rowPT33)+",1]="+string(witnessPT33[rowPT33,1])+";");}close(outPT33);
+}
+print("PADDING33_TANGENT_ALL_CHECKS_PASS");quit;

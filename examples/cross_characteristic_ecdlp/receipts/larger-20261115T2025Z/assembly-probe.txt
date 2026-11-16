@@ -1,0 +1,46 @@
+import CrossCharacteristicTwo
+import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+import Mathlib.Tactic.NormNum.Prime
+
+namespace LargerAssemblyProbe
+
+instance : Fact (Nat.Prime 65537) := ⟨by norm_num⟩
+
+abbrev Fbig := GaloisField 2 256
+
+noncomputable instance : DecidableEq Fbig := Classical.decEq _
+
+example : Nat.card Fbig = 2 ^ 256 := GaloisField.card 2 256 (by decide)
+
+example : ∃ a : Fbig, IsPrimitiveRoot a 3 := by
+  classical
+  letI : Fintype Fbig := Fintype.ofFinite _
+  have hcard : Fintype.card Fbig = 2 ^ 256 := by
+    rw [← Nat.card_eq_fintype_card]
+    exact GaloisField.card 2 256 (by decide)
+  obtain ⟨u, hu⟩ := exists_prime_orderOf_dvd_card (G := Fbigˣ) 3
+    (by rw [Fintype.card_units, hcard]; norm_num)
+  refine ⟨(u : Fbig), ?_⟩
+  rw [IsPrimitiveRoot.coe_units_iff]
+  simpa only [hu] using IsPrimitiveRoot.orderOf u
+
+example (a : Fbig) (ha : IsPrimitiveRoot a 3) : a ^ 2 + a + 1 = 0 := by
+  have h := ha.geom_sum_eq_zero (by decide : 1 < 3)
+  simpa only [Finset.sum_range_succ, Finset.sum_range_zero, pow_zero,
+    pow_one, zero_add, add_comm, add_left_comm, add_assoc] using h
+
+example (E : WeierstrassCurve (ZMod 65537)) (B : WeierstrassCurve Fbig)
+    (P : E.toAffine.Point) (R : B.toAffine.Point)
+    (hP : addOrderOf P = 7) (hR : addOrderOf R = 7) :
+    ∃ f : AddSubgroup.zmultiples P ≃+ AddSubgroup.zmultiples R,
+      f ⟨P, by simp⟩ = ⟨R, by simp⟩ := by
+  let g : AddSubgroup.zmultiples P := ⟨P, by simp⟩
+  let g' : AddSubgroup.zmultiples R := ⟨R, by simp⟩
+  let f : AddSubgroup.zmultiples P ≃+ AddSubgroup.zmultiples R :=
+    addEquivOfAddOrderOfEq (g := g) (g' := g')
+      (AddSubgroup.forall_zmultiples.mpr (fun n => ⟨n, rfl⟩))
+      (AddSubgroup.forall_zmultiples.mpr (fun n => ⟨n, rfl⟩))
+      (by simpa only [g, g', AddSubgroup.addOrderOf_mk] using hP.trans hR.symm)
+  exact ⟨f, addEquivOfAddOrderOfEq_apply_gen _ _ _⟩
+
+end LargerAssemblyProbe

@@ -98,6 +98,33 @@ pub struct BenchArgs {
     /// `p ≡ 5 (mod 8)`, `#E = 8r`, `#E' = 4r'`, smallest Montgomery `A`.
     #[arg(long, default_value = "generic")]
     pub family: String,
+    /// EFD model for the prime instance (`montgom`, `edwards`, `twisted`,
+    /// `twistedhessian`, `hessian`, `jintersect`, `jquartic`, `2dik`, `3dik`).
+    /// When set, the short-Weierstrass bench engine is built from the EFD
+    /// bridge and `--efd-chart` controls input/output.
+    #[arg(long)]
+    pub efd_model: Option<String>,
+    /// EFD chart id (`affine`, `xz`, `jacobian`, `extended`, ...).
+    #[arg(long, default_value = "affine")]
+    pub efd_chart: String,
+    /// Prime field modulus of the EFD curve (`5 <= p < 2^62`).
+    #[arg(long)]
+    pub efd_p: Option<String>,
+    /// EFD model parameter, `NAME=VALUE`; repeatable.
+    #[arg(long = "efd-param", value_name = "NAME=VALUE")]
+    pub efd_params: Vec<String>,
+    /// Prime subgroup order of the EFD curve.
+    #[arg(long)]
+    pub efd_order: Option<String>,
+    /// Cofactor of the EFD curve.
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u64).range(1..))]
+    pub efd_cofactor: u64,
+    /// Generator in `--efd-chart` coordinates, comma-separated.
+    #[arg(long)]
+    pub efd_generator: Option<String>,
+    /// Lift index for quotient EFD charts.
+    #[arg(long, default_value_t = 0)]
+    pub efd_lift: u32,
     /// Binary-field instance of this field degree (random curve).
     #[arg(long)]
     pub char2_degree: Option<u32>,
@@ -298,7 +325,10 @@ fn listing() -> Value {
                         {"name": "aux", "means": "ordinary (searched, charged to the factor-base phase), supersingular, ss-j1728, ss-j1728-twist, ss-j0 or ss-j0-twist (#E' = p + 1, no search)"}],
                      "needs": "oracle pkm-semaev for the algebraic track"},
                     {"name": "known-log", "regimes": ["prime"],
-                     "parameters": [{"name": "size", "means": "multiples [i]G, 1 <= i <= size, one column each, every logarithm known so linear algebra is skipped"}]},
+                     "parameters": [
+                        {"name": "size", "means": "columns B (need 2*B < r): multiples [i]G or seeded scalars, one column each, every logarithm known so linear algebra is skipped"},
+                        {"name": "scalars", "means": "progression (default): s_i = i, built by B-1 additions; random: s_i uniform in [1, r-1], one charged scalar multiplication each"},
+                        {"name": "seed", "means": "random only: seed of the scalar stream (default 20261019); the base is fixed per (G, size, seed)"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae; the base is their closure under the curve's automorphism group"},
@@ -308,7 +338,8 @@ fn listing() -> Value {
                      "parameters": [
                         {"name": "size", "means": "seed abscissae (columns)"},
                         {"name": "norm", "means": "include alpha(P) = [a]P + [b]phi(P) for every alpha = a + b*phi of norm <= this (needs --family j0, j1728, d7 or d8); 0 for the seeds alone"},
-                        {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"}]},
+                        {"name": "endo", "means": "index of the curve's CM endomorphism; default 0"},
+                        {"name": "mult", "means": "also include [m]P for m = 2..=mult with weight m (needs no endomorphism); default 1"}]},
                     {"name": "hashed-affine", "regimes": ["prime"],
                      "parameters": [
                         {"name": "slots", "means": "independent affine-hashed slot bases, 2..=8; must match the oracle"},
@@ -318,7 +349,8 @@ fn listing() -> Value {
                         {"name": "steps", "means": "enumeration work budget in charged primitive steps"}]},
                     {"name": "gls-line", "regimes": ["gls (examples/glv_invariant_bench.rs)"],
                      "parameters": [
-                        {"name": "no_fold", "means": "1 to fold the same points by negation only"}]},
+                        {"name": "no_fold", "means": "1 to fold the same points by negation only"}],
+                     "needs": "a GLS instance over F_{p^2}: not selectable from `ic bench` (the prime dispatch has no arm for it); run examples/glv_invariant_bench.rs"},
                     {"name": "binary-multiplier", "regimes": ["char2", "koblitz"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae (columns)"},
@@ -732,6 +764,10 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut rootfind_gpu =
+            crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
+                m, inst,
+            );
         let mut hashed = HashedTensorOracle::new();
         // Built on the base's own tower, so it refuses any other base.
         let mut pkm = match or_name {
@@ -745,11 +781,13 @@ fn run_prime(
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
+            "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, hashed-tensor or pkm-semaev"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
+                     hashed-tensor or pkm-semaev"
                 ))
             }
         };
@@ -846,9 +884,9 @@ fn run_binary(
         };
         let mut algebraic = match or_name {
             "descent-algebraic" => {
-                let raw = spec.solver.as_deref().ok_or(
-                    "descent-algebraic needs --solver (try buchberger-f2, sat-cdcl or exhaustive)",
-                )?;
+                let raw = spec.solver.as_deref().unwrap_or(
+                    crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER,
+                );
                 let (sname, sparams) = parse_plugin(raw)?;
                 let budget = (spec.solver_budget_seconds > 0)
                     .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
@@ -898,6 +936,13 @@ impl Instance {
             Instance::Prime(i) => &i.name,
             Instance::Binary(i) => &i.name,
             Instance::Wide255 => "curve25519-wide",
+        }
+    }
+
+    fn representation_json(&self) -> Result<Option<Value>, String> {
+        match self {
+            Instance::Prime(i) => i.representation_json(),
+            _ => Ok(None),
         }
     }
 }
@@ -1043,6 +1088,35 @@ fn spec_from(
     })
 }
 
+fn parse_efd_u64(value: &str) -> Result<u64, String> {
+    let value = value.trim();
+    if let Some(hex) = value
+        .strip_prefix("0x")
+        .or_else(|| value.strip_prefix("0X"))
+    {
+        u64::from_str_radix(hex, 16).map_err(|_| format!("bad integer {value}"))
+    } else {
+        value
+            .parse::<u64>()
+            .map_err(|_| format!("bad integer {value}"))
+    }
+}
+
+fn parse_efd_params(items: &[String]) -> Result<std::collections::BTreeMap<String, u64>, String> {
+    let mut out = std::collections::BTreeMap::new();
+    for item in items {
+        let (name, value) = item
+            .split_once('=')
+            .ok_or_else(|| format!("--efd-param expects NAME=VALUE, got {item}"))?;
+        out.insert(name.trim().to_owned(), parse_efd_u64(value)?);
+    }
+    Ok(out)
+}
+
+fn parse_efd_coords(value: &str) -> Result<Vec<u64>, String> {
+    value.split(',').map(parse_efd_u64).collect()
+}
+
 /// The instance `--bits`, `--char2-degree` or `--koblitz-degree` names.
 fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instance, String> {
     Ok(match regime {
@@ -1053,6 +1127,30 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
                 ArchiveInstance::Prime(i) => Instance::Prime(i),
                 ArchiveInstance::Binary(i) => Instance::Binary(*i),
             }
+        }
+        "prime" if args.efd_model.is_some() => {
+            let model = args.efd_model.as_deref().ok_or("--efd-model required")?;
+            let p = parse_efd_u64(args.efd_p.as_deref().ok_or("--efd-model requires --efd-p")?)?;
+            let order = parse_efd_u64(
+                args.efd_order
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-order")?,
+            )?;
+            let generator = parse_efd_coords(
+                args.efd_generator
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-generator")?,
+            )?;
+            Instance::Prime(PrimeInstance::from_efd(
+                model,
+                &args.efd_chart,
+                p,
+                &parse_efd_params(&args.efd_params)?,
+                order,
+                args.efd_cofactor,
+                &generator,
+                args.efd_lift,
+            )?)
         }
         "prime" if args.family == "curve25519" && degree == 255 => {
             // The real curve, over the generic Fp256 backend.  The relation
@@ -1170,7 +1268,14 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             )
         }
         None => {
-            let (regime, degree) = if args.archive_manifest.is_some() {
+            let (regime, degree) = if args.efd_model.is_some() {
+                let p = parse_efd_u64(
+                    args.efd_p
+                        .as_deref()
+                        .ok_or("--efd-model requires --efd-p")?,
+                )?;
+                ("prime".to_string(), u64::BITS - p.leading_zeros())
+            } else if args.archive_manifest.is_some() {
                 ("archive".to_string(), 0)
             } else {
                 match (args.bits, args.char2_degree, args.koblitz_degree) {
@@ -1287,6 +1392,23 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         .map(|cfg| spec_from(cfg, &args))
         .collect::<Result<Vec<_>, _>>()?;
 
+    // A CUDA worker creates its context before it reads its first request (about 150 ms on an A100).  Start it
+    // now, so that this overlaps the instance build, calibration and the rho reference instead of being waited
+    // for by the first `fes-f2-gpu` call.  Only a configuration that will call it (`descent-algebraic` with that
+    // solver) starts one.
+    let default_solver = crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER;
+    if specs.iter().any(|s| {
+        s.oracle == "descent-algebraic"
+            && s.solver
+                .as_deref()
+                .unwrap_or(default_solver)
+                .split(':')
+                .next()
+                == Some("fes-f2-gpu")
+    }) {
+        crypto_lib::cryptanalysis::fes_gpu::prewarm_shared_server();
+    }
+
     let (mut regime, degree) = instance_spec;
     let instance = match early_instance {
         Some(i) => i,
@@ -1390,7 +1512,8 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             eprintln!("  skipped: {}", f["configuration"].as_str().unwrap_or("?"));
         }
     }
-    Ok(json!({
+    let representation = instance.representation_json()?;
+    let mut report = json!({
         "schema_version": 1,
         "operation": "bench",
         "status": if all_verified { "complete" } else { "incomplete" },
@@ -1420,7 +1543,11 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "markdown": markdown,
         "rows": rows,
         "plan": plan_report,
-    }))
+    });
+    if let Some(representation) = representation {
+        report["representation"] = representation;
+    }
+    Ok(report)
 }
 
 #[cfg(test)]
@@ -1663,5 +1790,36 @@ mod tests {
         )
         .unwrap_err();
         assert!(err.contains("sweep"), "{err}");
+    }
+
+    #[test]
+    fn efd_flags_build_a_prime_instance_with_a_chart() {
+        let args = bench_args(&[
+            "--efd-model",
+            "montgom",
+            "--efd-p",
+            "1019",
+            "--efd-param",
+            "a=131",
+            "--efd-param",
+            "b=1",
+            "--efd-order",
+            "269",
+            "--efd-cofactor",
+            "4",
+            "--efd-generator",
+            "604,1",
+            "--efd-chart",
+            "xz",
+        ]);
+        let instance = build_instance("prime", 10, &args).unwrap();
+        let Instance::Prime(prime) = instance else {
+            panic!("EFD flags must build a prime instance");
+        };
+        assert_eq!(prime.curve.a, 55);
+        assert_eq!(prime.curve.b, 762);
+        assert_eq!(prime.r, 269);
+        assert!(prime.representation.is_some());
+        assert!(prime.representation_json().unwrap().is_some());
     }
 }

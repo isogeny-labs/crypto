@@ -84,10 +84,35 @@ revision that still holds those bytes. The
 custody and runs each study's unchanged `ci_replay.py` in an isolated view that
 restores the pinned workflow bytes from Git
 ([frozen-workflow-check.mjs](scripts/frozen-workflow-check.mjs), which reads a
-pin from a `files`/`sha256` map, a dotted `key:` field, or a JSON `pointer:`,
-and overlays further pinned workflows with `--extra-workflow`). Live workflows
-are free to follow current CI policy. A workflow marked `record` has a pin no
-runtime check asserts; the index documents it and the job keeps custody.
+pin from a `files`/`sha256` map, a dotted `key:` field, a JSON `pointer:`, or
+a coreutils `sha256sum` manifest, and overlays further pinned workflows with
+`--extra-workflow`). Live workflows are free to follow current CI policy. A per-study workflow whose own steps
+assert its pin runs them in the same view, by replay id:
+`node .github/scripts/run-frozen-workflow-replays.mjs --only <id> -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"`,
+with the step's original commands in `env.FROZEN_VIEW_STEP`. That form checks
+custody of that replay's pins only, and fetches the index revision when a
+shallow checkout lacks it. A replay whose study also pins source that has
+since changed on `main` may name an `input_view_manifest`
+(`frozen-input-view/v1`, read by `applyPinnedInputView`): each input is
+restored from a named revision after its digest is matched against the
+study's original freeze manifest (by `source_sha256` key or JSON pointer) and
+that manifest's SHA-256; for a coreutils `sha256sum` freeze,
+`original_manifest_format: "sha256sum"` reads it as its path-to-digest map and
+the pointer names one listed path. The overlay happens before the manifest's
+own digests are checked, so they check the restored bytes and any other drift
+still fails. The input then either equals a current twin
+(`current_equal`) or is named in a committed drift note
+(`current_drift_note`) that says why the checks only verify or replay frozen
+code. [symbolic-oaware-width-gate-source-view-v1.json](scripts/symbolic-oaware-width-gate-source-view-v1.json)
+is the example; [p192-anchor-eight-report-view-v1.json](scripts/p192-anchor-eight-report-view-v1.json)
+restores the P-192 report that the anchor-eight `ARTIFACTS.sha256` pins. A replay whose manifest pins a different version of its
+workflow than the index's top-level `revision` holds carries its own
+`revision`; custody then checks that its manifest pins its workflows' bytes
+at that commit, and the runner fetches it like the top-level one. A workflow
+marked `record` keeps custody of its pin
+but has no replay: either no check on `main` asserts the pin, or its `note`
+says why a workflow view cannot make that check pass (source drift, or a pin
+at a second revision).
 
 ### Result-page triggers
 
@@ -156,7 +181,7 @@ workloads.
 | Rust CodeQL cache warming (`warm-rust-cache`, named exception) | 45 minutes |
 | Rust CodeQL queries (`analyze`, named exception) | 60 minutes |
 | Each PR or merge-group packaging component | 25 minutes |
-| ecbench PR harness | 25 minutes, including a 12-minute historical integrity step |
+| ecbench PR harness (named exception) | 75 minutes (45 until 2026-11-11, when runs 42969362215 and 43000966973 were cancelled at that cap before the audit steps) |
 | ecbench weekly/manual exhaustive audit | Existing 300-minute scientific budget |
 
 The PR Rust CodeQL lane runs in three jobs that hand one database forward:
@@ -229,3 +254,80 @@ The classifier tests exercise real git history, dependencies, unrelated prose,
 workflow changes, embedded data, renames/deletions, newline-containing paths,
 more than 300 changed files, and fail-closed comparisons. No cryptographic
 algorithm, scientific result, or frozen session is modified by this change.
+
+## Runner capacity and stalled PRs (2026-10-22)
+
+Measured from the public Actions API on 2026-10-22 at about 17:00 UTC:
+
+- 807 workflow runs were queued, 790 of them for PRs. Sampled queued jobs had
+  waited a median of about 8 hours (maximum 9.7 hours). The waits were on the
+  self-hosted ARC pools, not on GitHub-hosted runners: 46 sampled jobs waited
+  for `crypto-eks-linux` (6 of its 11 runners busy) and 41 for
+  `crypto-eks-highmem`, which has `maxRunners: 1`.
+- `CRYPTO_EKS_HIGHMEM_WORKFLOWS` sends the always-on PR gates to that single
+  runner: `codeql.yml`, `rust-all-targets.yml`, `rust-lint.yml`,
+  `curve-names.yml`, `ecbench.yml`, `workflows-parse.yml` and
+  `workflow-lint.yml`. Every PR push queues those gates behind every other
+  PR's gates, one job at a time, including YAML parsing and the
+  scope classifier.
+- Each PR push starts a median of 16 workflow runs (up to 39). Of the latest
+  1,000 runs (8.5 hours), 549 were cancelled by a newer push to the same PR,
+  148 succeeded and 11 failed.
+- Of 187 open PRs, none had a complete green head. 40 waited on queued
+  checks, 41 had failing checks, 2 had conflicts, about 80 carried
+  `needs-human` and about 24 were based on another PR's branch.
+
+Rolling back the high-memory routing of the PR gates removes the one-runner
+bottleneck without a workflow change. Each workflow then falls back to
+`crypto-eks-linux` if it is listed in `CRYPTO_EKS_WORKFLOWS`, or otherwise to
+its original GitHub-hosted label. Queued jobs keep the label they were created
+with, so they must be cancelled and re-run (see
+[the ARC README](../taskq/deploy/eks-karpenter/arc/README.md)).
+
+`merge-sweeper.yml` applies the AGENTS.md merge gate to every open PR every
+30 minutes, so a green PR lands after its authoring session has ended. It
+reports only until `MERGE_SWEEPER_APPLY` is `true`.
+
+## CI tiers (2026-10-23)
+
+The three repositories opened about 1,125 PRs from 2026-10-15 to 2026-10-23
+(up to about 240 a day), and on 2026-10-23 about 1,000 runs were queued
+behind 11 EKS runners. The fix is to run less, not to wait longer:
+
+| PR state | What runs on each push |
+| --- | --- |
+| Draft | Fast tier only: `workflows-parse.yml`, `workflow-lint.yml`, `validation-gate.yml`, `ci-tier.yml` (its `full-tier` job skips), `pcc-gate.yml` (mandatory ledger/prose validation), and the four byte-pinned workflows below |
+| Ready for review | Full tier: every applicable workflow, as before |
+
+- Apart from the fast tier and byte-pinned exceptions, every workflow with a `pull_request` trigger gates each job on
+  `!github.event.pull_request.draft` and lists `ready_for_review` in its PR
+  types (label-only triggers are left alone), so marking a PR ready starts the
+  full tier on its head. `.github/scripts/draft_tier_gate.py` checks this in
+  `workflows-parse` and `--apply` adds it to a new workflow; other events
+  (push, schedule, dispatch) carry no PR payload and are unaffected.
+- `weak-curve-lean.yml`, `weak-curve-conjectures.yml`, `release.yml` and
+  `curve-covers.yml` are excluded: their bytes are pinned by sealed evidence
+  or an exact implementation-version dependency.
+- The merge sweeper requires successful `gate`, `size` and `artifacts` checks,
+  every applicable check/status to pass, and no unresolved review threads.
+  Review data is paginated; unavailable data holds the PR. A refused merge is
+  reported as refused and does not clear capacity labels.
+- A gated job on a draft reports `skipped`, so the merge sweeper also requires
+  a successful `full-tier` check on the head. Heads whose checks all started
+  before `ci-tier.yml` reached `main` predate the tiers and need no marker.
+- **Check budget:** the sweeper holds a PR whose head ran more than 30 checks
+  (`MERGE_SWEEPER_MAX_CHECKS`; skipped and neutral checks do not count) and
+  labels it `ci:over-budget`. On 2026-10-23, 9 of the 30 most recently
+  updated PRs were over.
+- **Capacity:** with `MERGE_SWEEPER_APPLY=true`, red, conflicted,
+  over-budget and `needs-human` PRs receive `ci:parked`; PRs beyond
+  `MERGE_SWEEPER_MAX_READY` (default 40) receive `ci:waiting` for merge
+  prioritization. These labels never change a PR's draft/ready state. Waiting
+  labels clear when PRs return within the prioritization cap. Drafts remain
+  drafts only when explicitly requested by the user.
+- **Lanes:** sessions working one study push to `lane/<lane>` with
+  `scripts/lane-push.sh <lane>` instead of opening a PR each; the lane has one
+  regular PR by default.
+
+Queued runs keep the workflow revision they were created with; only new events
+use the tiers.

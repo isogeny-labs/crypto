@@ -1,0 +1,37 @@
+name: CT115 Frobenius Kummer descent and hom obstruction
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct115/**'
+      - '.github/workflows/ct115-frobenius-kummer.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct115/**'
+      - '.github/workflows/ct115-frobenius-kummer.yml'
+  workflow_dispatch:
+jobs:
+  ct115:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct115
+      - name: Independently verify Frobenius descent and x-only Kummer bounds
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct115
+          python3 -B "$D/ct115_frobenius_gate.py" > /tmp/ct115-py.json
+          python3 -O -B "$D/ct115_frobenius_gate.py" > /tmp/ct115-pyopt.json
+          node "$D/ct115_frobenius_independent.js" > /tmp/ct115-js.json
+          node --no-opt "$D/ct115_frobenius_independent.js" > /tmp/ct115-jsopt.json
+          cmp /tmp/ct115-py.json /tmp/ct115-pyopt.json
+          cmp /tmp/ct115-py.json /tmp/ct115-js.json
+          cmp /tmp/ct115-py.json /tmp/ct115-jsopt.json
+          printf '%s  %s\n' da6cfac882015c3a71ad5ae07f872553507cfdddc4579d49bda347e1c8934338 /tmp/ct115-py.json | sha256sum -c
+          cat /tmp/ct115-py.json

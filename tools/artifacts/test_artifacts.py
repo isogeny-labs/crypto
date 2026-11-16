@@ -4,6 +4,8 @@
 """
 
 import base64
+import shlex
+from unittest import mock
 import hashlib
 import json
 import os
@@ -52,6 +54,129 @@ class RoundTrip(unittest.TestCase):
 
     def art(self, *a, check=True, cwd=None):
         return sh(cwd or self.repo, sys.executable, str(TOOL), *a, check=check, env=self.env)
+
+    def test_push_refuses_unmerged_index_without_changing_stages(self):
+        path = "research/r1/runs/a.jsonl"
+        oids = []
+        for payload in (self.big, self.big + b"ours\n", self.big + b"theirs\n"):
+            result = subprocess.run(["git", "hash-object", "-w", "--stdin"], cwd=self.repo,
+                                    input=payload, capture_output=True, check=True, env=self.env)
+            oids.append(result.stdout.decode().strip())
+        self.assertEqual(len(set(oids)), 3)
+        self.git("update-index", "--force-remove", path)
+        rows = "".join(f"100644 {oid} {stage}\t{path}\n" for stage, oid in enumerate(oids, 1))
+        subprocess.run(["git", "update-index", "--index-info"], cwd=self.repo,
+                       input=rows, text=True, check=True, env=self.env)
+        original_index = self.git("ls-files", "--stage")
+        for arguments in (("push", path), ("push", "research"), ("push", "--dry-run", path)):
+            with self.subTest(arguments=arguments):
+                result = self.art(*arguments, check=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("unresolved Git index conflicts", result.stderr)
+                self.assertEqual(self.git("ls-files", "--stage"), original_index)
+                self.assertEqual((self.repo / path).read_bytes(), self.big)
+                self.assertFalse(self.remote.exists())
+                self.assertFalse((self.repo / "research/r1/runs/.artifacts.json").exists())
+
+    def test_pull_preserves_tracked_successor_and_unstaged_edits(self):
+        self.art("push", "research")
+        path = self.repo / "research/r1/runs/a.jsonl"
+        successor = b"current authoritative tracked successor\n"
+        path.write_bytes(successor)
+        self.git("add", "-f", "research/r1/runs/a.jsonl")
+        # Siblings still hydrate, while the staged successor stays authoritative.
+        sibling = self.repo / "research/r1/blob.unknown"
+        sibling.unlink()
+        self.art("pull", "research")
+        self.assertEqual(path.read_bytes(), successor)
+        self.assertTrue(sibling.is_file())
+        edited = successor + b"local edit\n"
+        path.write_bytes(edited)
+        result = self.art("pull", "research/r1/runs/a.jsonl")
+        self.assertEqual(path.read_bytes(), edited)
+        self.assertIn("preserved 1 tracked files", result.stderr)
+        # An omitted tracked path is also authoritative, not a hydration target.
+        path.unlink()
+        self.art("pull", "research/r1/runs/a.jsonl")
+        self.assertFalse(path.exists())
+
+    def test_pull_preserves_case_and_unicode_aliases_of_tracked_paths(self):
+        self.art("push", "research/r1/runs/a.jsonl")
+        directory = self.repo / "research/r1/runs"
+        successor = b"current tracked successor\n"
+        for source_name, alias in (("a.jsonl", "A.JSONL"), ("caf\u00e9.jsonl", "cafe\u0301.JSONL")):
+            with self.subTest(alias=alias):
+                source = directory / source_name
+                source.write_bytes(successor)
+                self.git("add", "-f", f"research/r1/runs/{source_name}")
+                manifest = {"schema": artifacts.MANIFEST_SCHEMA, "files": {
+                    alias: {"sha256": hashlib.sha256(self.big).hexdigest(), "bytes": len(self.big)}}}
+                (directory / ".artifacts.json").write_text(json.dumps(manifest))
+                self.git("add", "research/r1/runs/.artifacts.json")
+                self.art("pull", "research")
+                self.assertEqual(source.read_bytes(), successor)
+                # Source ownership remains authoritative while sparse/omitted.
+                source.unlink()
+                self.art("pull", "research")
+                self.assertFalse(source.exists())
+                self.assertFalse((directory / alias).exists())
+
+    def test_manifest_cannot_replace_linked_worktree_control_files(self):
+        self.art("push", "research/r1/runs/a.jsonl")
+        self.git("commit", "-qm", "store fixture")
+        linked = Path(self.tmp.name) / "linked"
+        self.git("worktree", "add", "-b", "linked-control", str(linked), "HEAD")
+        original = (linked / ".git").read_bytes()
+        for name in (".git", ".GIT", ".git ", ".git.", ".git::$DATA",
+                     ".artifacts.json", ".gitignore", ".gitattributes"):
+            with self.subTest(name=name):
+                manifest = {"schema": artifacts.MANIFEST_SCHEMA, "files": {
+                    name: {"sha256": hashlib.sha256(self.big).hexdigest(), "bytes": len(self.big)}}}
+                (linked / ".artifacts.json").write_text(json.dumps(manifest))
+                sh(linked, "git", "add", ".artifacts.json", env=self.env)
+                result = self.art("pull", cwd=linked, check=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("invalid manifest entry", result.stderr)
+                self.assertEqual((linked / ".git").read_bytes(), original)
+
+    def test_manifest_paths_cannot_escape_their_directory(self):
+        self.art("push", "research/r1/runs/a.jsonl")
+        target = Path(self.tmp.name) / "escaped.jsonl"
+        for name in ("../escaped.jsonl", "nested/file.jsonl", "..\\escaped.jsonl", "", ".", ".."):
+            with self.subTest(name=name):
+                manifest = {"schema": artifacts.MANIFEST_SCHEMA, "files": {
+                    name: {"sha256": hashlib.sha256(self.big).hexdigest(), "bytes": len(self.big)}}}
+                (self.repo / ".artifacts.json").write_text(json.dumps(manifest))
+                self.git("add", ".artifacts.json")
+                result = self.art("pull", check=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("invalid manifest entry", result.stderr)
+                self.assertFalse(target.exists())
+
+    def test_manifest_metadata_is_validated_before_any_pull(self):
+        for entry in ({"sha256": "0" * 64, "bytes": True},
+                      {"sha256": "0" * 64, "bytes": -1},
+                      {"sha256": "BAD", "bytes": 1}, None):
+            with self.subTest(entry=entry):
+                (self.repo / ".artifacts.json").write_text(json.dumps(
+                    {"schema": artifacts.MANIFEST_SCHEMA, "files": {"data.jsonl": entry}}))
+                self.git("add", ".artifacts.json")
+                result = self.art("pull", check=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("invalid manifest entry", result.stderr)
+
+    def test_manifest_directory_symlink_cannot_redirect_hydration(self):
+        self.art("push", "research/r1/runs/a.jsonl")
+        directory = self.repo / "research/r1/runs"
+        outside = Path(self.tmp.name) / "outside"
+        directory.rename(outside)
+        directory.symlink_to(outside, target_is_directory=True)
+        target = outside / "a.jsonl"
+        target.unlink()
+        result = self.art("pull", check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("outside the repository", result.stderr)
+        self.assertFalse(target.exists())
 
     def test_push_commit_clone_pull_verify(self):
         plan = self.art("plan").stdout
@@ -132,6 +257,56 @@ class RoundTrip(unittest.TestCase):
         self.art("pull")
         self.assertEqual((self.repo / "research/r1/runs/a.jsonl").read_bytes(), self.big)
         self.assertEqual(self.git("status", "--porcelain"), "")
+
+    def install_content_filter(self):
+        # Public reversible fixture exercises Git's filter contract, not AES.
+        script = Path(self.tmp.name) / "content_filter.py"
+        script.write_text("import sys\nraw=sys.stdin.buffer.read()\n"
+                          "if sys.argv[1]=='clean': out=b'FILTERED:'+raw.hex().encode()\n"
+                          "else: out=bytes.fromhex(raw[9:].decode()) if raw.startswith(b'FILTERED:') else raw\n"
+                          "sys.stdout.buffer.write(out)\n")
+        command = shlex.quote(sys.executable) + " " + shlex.quote(str(script))
+        self.git("config", "filter.fixture.clean", command + " clean")
+        self.git("config", "filter.fixture.smudge", command + " smudge")
+        self.git("config", "filter.fixture.required", "true")
+        (self.repo / '.gitattributes').write_text('research/** filter=fixture\n')
+        self.git('add', '.gitattributes')
+        self.git('add', '--renormalize', 'research')
+        self.git('commit', '-qm', 'public filter fixture')
+
+    def test_sparse_offload_uses_filtered_plaintext_size_and_preserves_ignore(self):
+        (self.repo / 'research/r1/runs/.gitignore').write_text('/keep-me/\n')
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'ignore fixture')
+        self.install_content_filter()
+        self.git('sparse-checkout', 'set', '--no-cone', '/*', '!/research/')
+        self.art('push', 'research/r1/runs/a.jsonl')
+        digest = hashlib.sha256(self.big).hexdigest()
+        self.assertEqual((self.remote/'sha256'/digest[:2]/digest).read_bytes(), self.big)
+        manifest=json.loads((self.repo/'research/r1/runs/.artifacts.json').read_text())
+        self.assertEqual(manifest['files']['a.jsonl'], {'sha256':digest,'bytes':len(self.big)})
+        self.assertTrue((self.repo/'research/r1/runs/.gitignore').read_text().startswith('/keep-me/\n'))
+
+    def test_required_filter_failure_cannot_upload_raw_staged_bytes(self):
+        self.install_content_filter()
+        self.git('sparse-checkout', 'set', '--no-cone', '/*', '!/research/')
+        self.git('config', 'filter.fixture.smudge', 'false')
+        result=self.art('push', 'research/r1/runs/a.jsonl', check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.repo/'research/r1/runs/.artifacts.json').exists())
+        self.assertFalse(list(self.remote.rglob('*')) if self.remote.exists() else [])
+        self.assertFalse(list((self.cache/'tmp').glob('*')))
+
+    def test_staged_metadata_filter_failure_is_not_absence(self):
+        (self.repo / 'research/r1/runs/.gitignore').write_text('/keep-me/\n')
+        self.git('add', '-A')
+        self.git('commit', '-qm', 'ignore fixture')
+        self.install_content_filter()
+        self.git('sparse-checkout', 'set', '--no-cone', '/*', '!/research/')
+        self.git('config', 'filter.fixture.smudge', 'false')
+        with mock.patch.object(artifacts, 'repo_root', return_value=self.repo):
+            with self.assertRaises(subprocess.CalledProcessError):
+                artifacts.read_text_or_index(self.repo/'research/r1/runs/.gitignore')
 
     def test_check_asks_git_for_full_object_ids(self):
         """A blobless sparse checkout can fetch a missing blob by full id, not by the
@@ -378,6 +553,82 @@ class WorkflowPullStep(unittest.TestCase):
         self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
 
 
+class WorkflowStalePullEntries(unittest.TestCase):
+    """The generated pull line is output, not a reference: entries it names
+    must go once the rest of the workflow stops naming them."""
+
+    MOVED = {"research/study_a_20261031/establishment/certificate.json",
+             "research/study_b_20261031/data.bin"}
+    BEFORE = ("on:\n  push:\n    paths:\n"
+              "      - 'research/study_a_20261031/**'\n"
+              "      - 'research/study_b_20261031/**'\n"
+              "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n"
+              "      - run: python3 build.py\n")
+
+    def _paths(self, text):
+        return wire_workflows.needed(text, self.MOVED, wire_workflows.moved_dirs(self.MOVED))
+
+    def _main(self, wf: Path, *extra: str) -> subprocess.CompletedProcess:
+        script = ("import sys, wire_workflows as w\n"
+                  "w.moved_paths = lambda root: set(%r)\n"
+                  "sys.argv = ['wire_workflows.py', *sys.argv[1:]]\n"
+                  "sys.exit(w.main())\n" % sorted(self.MOVED))
+        return subprocess.run([sys.executable, "-c", script, *extra, str(wf)],
+                              cwd=str(TOOL.parent), capture_output=True, text=True)
+
+    def _wired(self):
+        old = self._paths(self.BEFORE)
+        self.assertEqual(old, ["research/study_a_20261031", "research/study_b_20261031"])
+        return wire_workflows.wire(self.BEFORE, old)[0]
+
+    def test_moved_directory_is_dropped_on_regeneration(self):
+        # The paths: glob narrows to study_a only; the old pull line still names study_b.
+        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        self.assertIn("research/study_b_20261031", stale)
+        self.assertEqual(self._paths(stale), ["research/study_a_20261031"])
+        regenerated = wire_workflows.wire(stale, self._paths(stale))[0]
+        self.assertNotIn("research/study_b_20261031", regenerated)
+        self.assertIn("pull --jobs 16 research/study_a_20261031\n", regenerated)
+
+    def test_check_flags_and_regeneration_fixes_the_stale_entry(self):
+        stale = self._wired().replace("      - 'research/study_b_20261031/**'\n", "")
+        with tempfile.TemporaryDirectory() as d:
+            wf = Path(d) / "wf.yml"
+            wf.write_text(stale)
+            r = self._main(wf, "--check")
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("wf.yml: needs", r.stdout)
+            self.assertEqual(wf.read_text(), stale)
+            r = self._main(wf)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertNotIn("research/study_b_20261031", wf.read_text())
+            self.assertEqual(self._main(wf, "--check").returncode, 0)
+
+    def test_declared_runtime_inputs_survive_and_stale_declarations_do_not(self):
+        bare = ("# tools/artifacts pull: research/study_b_20261031 research/gone_20261031\n"
+                "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n")
+        self.assertEqual(self._paths(bare), ["research/study_b_20261031"])
+        wired = wire_workflows.wire(bare, self._paths(bare))[0]
+        self.assertEqual(self._paths(wired), ["research/study_b_20261031"])
+        self.assertEqual(wire_workflows.wire(wired, self._paths(wired))[0], wired)
+
+    def test_step_is_removed_when_nothing_is_named(self):
+        wired = self._wired()
+        bare = wired.replace("      - 'research/study_a_20261031/**'\n", "").replace(
+            "      - 'research/study_b_20261031/**'\n", "")
+        self.assertEqual(self._paths(bare), [])
+        with tempfile.TemporaryDirectory() as d:
+            wf = Path(d) / "wf.yml"
+            wf.write_text(bare)
+            r = self._main(wf, "--check")
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("stale", r.stdout)
+            self.assertEqual(self._main(wf).returncode, 0)
+            text = wf.read_text()
+            self.assertNotIn(wire_workflows.STEP_NAME, text)
+            self.assertIn("      - uses: actions/checkout@v4\n      - run: python3 build.py\n", text)
+
+
 class S3Argv(unittest.TestCase):
     def setUp(self):
         cfg = artifacts.Config(root=Path("."), remote="s3://bucket/store", endpoint=None, read_url=None,
@@ -431,6 +682,107 @@ class WorkflowBootstrap(unittest.TestCase):
         self.assertIn("shell: bash", once)
         self.assertIn("working-directory: ${{ github.workspace }}", once)
         self.assertIn('export ARTIFACTS_AWS="$artifacts_cli_aws"', once)
+
+
+class GateEvidenceDerivation(unittest.TestCase):
+    """The validation gate's pull list follows VALIDATION.json -> report -> raw_data."""
+
+    GATE = ("jobs:\n  gate:\n    steps:\n      - uses: actions/checkout@v4\n"
+            "      - name: tests\n        run: python3 scripts/test_validation_gate.py\n")
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name).resolve()
+        ev = self.root / "benchmarks" / "20261106-new"
+        (self.root / "research" / "new_20261106" / "sessions" / "a").mkdir(parents=True)
+        (self.root / "research" / "new_20261106" / "sessions" / "b").mkdir(parents=True)
+        ev.mkdir(parents=True)
+        for s in ("a", "b"):
+            d = self.root / "research" / "new_20261106" / "sessions" / s
+            (d / ".artifacts.json").write_text(json.dumps({"schema": "artifacts.manifest/v1", "files": {"records.jsonl": {"sha256": "0" * 64, "bytes": 9}}}))
+        (ev / "validator-report.json").write_text(json.dumps(
+            {"raw_data": [{"path": "../../research/new_20261106/sessions/a/records.jsonl"}]}))
+        (ev / "replay-certificate.json").write_text("{}")
+        (ev / "VALIDATION.json").write_text(json.dumps({
+            "replay_certificate": {"path": "replay-certificate.json"},
+            "validator_report": {"path": "validator-report.json"}}))
+        self.moved = {"research/new_20261106/sessions/a/records.jsonl",
+                      "research/new_20261106/sessions/b/records.jsonl"}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_historical_manifest_does_not_overwrite_a_path_restored_to_git(self):
+        sh(self.root, "git", "init", "-q", "-b", "main")
+        d = self.root / "pcc"
+        d.mkdir()
+        (d / ".artifacts.json").write_text(json.dumps({"schema": "artifacts.manifest/v1", "files": {
+            "ledger.jsonl": {"sha256": "0" * 64, "bytes": 9},
+            "old-records.jsonl": {"sha256": "1" * 64, "bytes": 9}}}))
+        (d / "ledger.jsonl").write_text("current ledger\n")
+        sh(self.root, "git", "add", "pcc/ledger.jsonl", "pcc/.artifacts.json")
+        moved = wire_workflows.moved_paths(self.root)
+        self.assertNotIn("pcc/ledger.jsonl", moved)
+        self.assertIn("pcc/old-records.jsonl", moved)
+        self.assertEqual(wire_workflows.needed("run: cat pcc/ledger.jsonl", moved,
+                                             wire_workflows.moved_dirs(moved)), ["pcc"])
+        # A broad explicit read may still pull siblings, but cannot select the
+        # tracked ledger itself as a moved file.
+        self.assertEqual(wire_workflows.cover({"pcc/old-records.jsonl"}, moved),
+                         ["pcc/old-records.jsonl"])
+
+    def test_only_the_store_backed_raw_data_the_report_lists_is_derived(self):
+        need, notes = wire_workflows.evidence_store_files(self.root, self.moved)
+        self.assertEqual(need, {"benchmarks/20261106-new/VALIDATION.json":
+                                {"research/new_20261106/sessions/a/records.jsonl"}})
+        self.assertFalse([n for n in notes if "store-backed" in n])
+
+    def test_cover_never_pulls_unread_store_data(self):
+        want = {"research/new_20261106/sessions/a/records.jsonl"}
+        self.assertEqual(wire_workflows.cover(want, self.moved), ["research/new_20261106/sessions/a"])
+        extra = self.moved | {"research/new_20261106/sessions/a/other.jsonl"}
+        self.assertEqual(wire_workflows.cover(want, extra), ["research/new_20261106/sessions/a/records.jsonl"])
+        both = want | {"research/new_20261106/sessions/b/records.jsonl"}
+        self.assertEqual(wire_workflows.cover(both, self.moved),
+                         ["research/new_20261106/sessions/a", "research/new_20261106/sessions/b"])
+
+    def test_store_backed_report_pulls_its_whole_study(self):
+        moved = self.moved | {"benchmarks/20261106-new/validator-report.json"}
+        (self.root / "benchmarks/20261106-new/validator-report.json").unlink()
+        need, notes = wire_workflows.evidence_store_files(self.root, moved)
+        self.assertIn("benchmarks/20261106-new/validator-report.json", need["benchmarks/20261106-new/VALIDATION.json"])
+        self.assertTrue([n for n in notes if "not hydrated" in n])
+
+    def test_fixtures_are_not_evidence(self):
+        fx = self.root / "scripts" / "fixtures" / "validation_gate" / "positive"
+        fx.mkdir(parents=True)
+        (fx / "VALIDATION.json").write_text((self.root / "benchmarks/20261106-new/VALIDATION.json").read_text())
+        need, _ = wire_workflows.evidence_store_files(self.root, self.moved)
+        self.assertEqual(list(need), ["benchmarks/20261106-new/VALIDATION.json"])
+
+    def test_only_a_step_that_runs_the_gate_derives(self):
+        self.assertTrue(wire_workflows.reads_validation_gate(self.GATE))
+        self.assertFalse(wire_workflows.reads_validation_gate(
+            "on:\n  push:\n    paths:\n      - 'scripts/validation_gate.py'\n"))
+        self.assertFalse(wire_workflows.reads_validation_gate("      # python3 scripts/validation_gate.py check\n"))
+
+    def test_check_names_the_evidence_and_regeneration_fixes_it(self):
+        wf = self.root / ".github" / "workflows" / "gate.yml"
+        wf.parent.mkdir(parents=True)
+        wf.write_text(self.GATE)
+        script = Path(wire_workflows.__file__)
+        env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t"}
+        sh(self.root, "git", "init", "-q", "-b", "main")
+        sh(self.root, "git", "add", "-A", env=env)
+        bad = sh(self.root, sys.executable, str(script), "--check", str(wf), check=False, env=env)
+        self.assertEqual(bad.returncode, 1, bad.stdout + bad.stderr)
+        self.assertIn("reads store-backed evidence of benchmarks/20261106-new/VALIDATION.json", bad.stdout + bad.stderr)
+        self.assertIn("do not hand-edit", bad.stdout + bad.stderr)
+        sh(self.root, sys.executable, str(script), str(wf), env=env)
+        self.assertIn("pull --jobs 16 research/new_20261106/sessions/a\n", wf.read_text())
+        ok = sh(self.root, sys.executable, str(script), "--check", str(wf), check=False, env=env)
+        self.assertEqual(ok.returncode, 0, ok.stdout + ok.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

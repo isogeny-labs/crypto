@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-07T22:32:52Z",
+ "id": "PCC-20261107-1049c8",
+ "kind": "statement",
+ "producer": {
+  "commit": "64427426deeb7471614e34c4c41979ad7f9bd90f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/prime_signed_mitm.rs",
+    "sha256": "818573824573335fb70d375b331af26c9a76c8b01293ff271359a018abd912ce"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/prime-signed-mitm.md",
+    "sha256": "831c80c2ab61010d1ca47555f76d6079792474e8df336c1b17ff2d98e375fe1d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Source implementation only; no signed execution or performance claim.",
+ "statement": "Producer-supplied native signed four-list prime-field MITM adapter and development tests."
+}

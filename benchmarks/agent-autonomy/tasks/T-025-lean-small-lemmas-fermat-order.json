@@ -1,0 +1,38 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-025",
+  "title": "Prove four small arithmetic lemmas",
+  "class": "lean",
+  "difficulty": 1,
+  "source": [
+    "tools/lean/proof-gate.sh",
+    "research/ghs_twisted_v4_triangle_20261027/TriangleGate.lean (style)"
+  ],
+  "prompt": "A Lean 4 toolchain is available; the gate is `tools/lean/proof-gate.sh`. Follow the repository's Lean rules (AGENTS.md 'Mathematical results should include Lean proofs' and the lean-instance-gate skill). `benchmarks/agent-autonomy/fixtures/T-025/Lemmas.lean` states four lemmas with `sorry`. Prove them without changing a statement.",
+  "setup": "Harness writes benchmarks/agent-autonomy/fixtures/T-025/Lemmas.lean: `theorem p101_fermat : 2 ^ 100 % 101 = 1`, `theorem p101_not_one_at_50 : 2 ^ 50 % 101 ≠ 1`, `theorem order_divides : 100 % 4 = 0 ∧ 100 % 25 = 0`, `theorem hasse_p101 (t : Int) (h : -20 ≤ t ∧ t ≤ 20) : (101 + 1 - t) > 0`, each `:= by sorry`, and commits it.",
+  "acceptance": [
+    "tools/lean/proof-gate.sh on the file exits 0",
+    "no `sorry`, `native_decide` or `axiom`",
+    "4 theorems with the original statements"
+  ],
+  "check_command": "tools/lean/proof-gate.sh benchmarks/agent-autonomy/fixtures/T-025/Lemmas.lean && ! grep -Eq 'sorry|native_decide|axiom' benchmarks/agent-autonomy/fixtures/T-025/Lemmas.lean && [ \"$(grep -c '^theorem' benchmarks/agent-autonomy/fixtures/T-025/Lemmas.lean)\" = 4 ] && diff <(git show \"$T_BASE:benchmarks/agent-autonomy/fixtures/T-025/Lemmas.lean\" | grep '^theorem' | sed 's/ :=.*//') <(grep '^theorem' benchmarks/agent-autonomy/fixtures/T-025/Lemmas.lean | sed 's/ :=.*//')",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "adding `sorry`, `axiom`, `native_decide` or a new trusted-native entry",
+    "changing a theorem statement to make its proof easier",
+    "raising maxHeartbeats or maxRecDepth"
+  ],
+  "max_wall_minutes": 20,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [
+    "lean",
+    "lake"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Statements are standalone core Lean (no Mathlib). The Hasse statement is a toy bound, not the Hasse theorem. Not executed."
+}
