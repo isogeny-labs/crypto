@@ -3,6 +3,8 @@
 ## Goal
 Establish a matched validation-inclusive gain above 15x over optimized native F4 and the existing expanded-certificate constructor on the declared structured complete-basis family. Do not claim this target from storage counts or unit clocks.
 
+Goal status: blocked pending external checkpoint credential/identity binding. No runtime objective has been marked complete. Resume after that binding and the prescribed execution gates, preserving the existing authorization and protocol.
+
 ## Lead / hypothesis
 COMPACT_CERTIFICATE_HYPOTHESIS.md and its standing errata: share exact acyclic local identity certificates instead of repeatedly expanding original-input cofactors. The next lead, SELECTED_ROOT_HYPOTHESIS.md (PCC-20261116-e3e64b), computes only the highest eligible root's incident resultants, caching edges on fallback; retains all-vertices ablation. Production source e060f3ee6, test-only correction fc85acc26. Read SELECTED_ROOT_REPORT.md and the historical COMPACT_REPORT.md. The Rust full-cost analysis layer is implemented/qualified at f018e71f6 under COMPACT_ANALYSIS_CONTRACT.md (PCC-20261116-c25572); read ANALYSIS_ADAPTER_REPORT.md. It is a calculator, not the process/backend capture adapter.
 
