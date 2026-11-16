@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T09:35:18Z",
+ "id": "PCC-20261112-032f9e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "9084c16ce7096ca4c890058d7aa21be85c787a7b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "4e8f1e8f86d980341cf9247a9572cc0f9501df529935a4d8b4e96412ff6668ac",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SpectralControls.lean",
+   "theorem": "SpectralControls.unique_projector_decomposition"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful explicit module/ring consequences of credited CT38/39/40 inputs. Actual abelian varieties,tangent spaces,degree,geometric torsion realization,Frobenius characteristic relation and Tate-module/subgroup bridges remain separate written dependencies. No full geometric formalization or signed scientific standing.",
+ "statement": "theorem unique_projector_decomposition {M : Type} [IntModule M] (p q : M \u2192 M) (pl : \u2200 a b, p (a+b) = p a+p b) (ql : \u2200 a b, q (a+b) = q a+q b) (hs : \u2200 a, p a+q a = a) (hpq : \u2200 a, p (q a) = 0) (hqp : \u2200 a, q (p a) = 0) (x : M) : p x+q x = x \u2227 p (p x) = p x \u2227 q (q x) = q x \u2227 \u2200 a b, p a = a \u2192 q b = b \u2192 a+b = x \u2192 a = p x \u2227 b = q x"
+}
