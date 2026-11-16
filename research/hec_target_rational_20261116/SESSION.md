@@ -13,3 +13,17 @@ Run exact residual/group gate with retained nonprimitive/nullity/exclusion outco
 
 ### Errors
 No scientific compile/run error; build exits0. Primary external PDF access gap inherited and explicitly retained. Unrelated .resume/RESUME.md untouched.
+
+## Exact orbit gate completed
+
+### What was done
+Once-only source61bcd604593f/checkpoint20261116T161039Z, freeze checks pass, exit0/empty stderr. All2856admitted sign-class cases equal direct Cantor residuals;640split residuals pass original group identities. Retained88nonprimitive rejections,25degree drops and503admitted repeated-target cases across2944attempts. Native reduction produces totals/graph. Two-page report built and visually inspected. No scientific rerun or selection change.
+
+### Decisions made
+Target-conditioned representation supplies exactly the same reduced residual for a fixed signed input, so there is no relation-information gain from this representation alone. All8sign masks remain; fixed target invalidates the old target-free global-sign fold. Repeated-support extension is valid within the nonbranch primitive domain, but Cantor already covers it. No timing campaign without a new cheaper evaluation or sampling mechanism and complete cost case against Compact. Tenfold goal active, PR unmerged.
+
+### Open threads
+Need a structural sampling/evaluation mechanism rather than another equivalent residual presentation. Source descent, complete scalar recovery and independent scientific validation remain outside this gate. Today's shared log path is reserved by T-6720 verifying; do not overwrite it. This scoped handoff preserves the work.
+
+### Errors
+No compile/run/render error. Shared-log conflict check explicitly blocks today's file, so no edit attempted. Existing primary PDF access gap remains. Unrelated .resume/RESUME.md preserved and unstaged.
