@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-11T09:46:18Z",
+ "id": "PCC-20261111-dda51e",
+ "kind": "measurement",
+ "producer": {
+  "commit": "eaa8dd9d92bc22b83021e7ea6f1e27b880d6eee5",
+  "model": "",
+  "session": "https://claude.ai/code/session_01TCbLH9FoRiHTPWAKdyQi2r"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/mt_fieldops_v3_20261111/validation/replay-certificate.json",
+   "sha256": "add86c6818849fff863a9463f11e242a1506ac84fbcde302ef29f5aea7084e95"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/mt_fieldops_v3_20261111/validation/claim-report.json",
+   "sha256": "a52d5b5e49f49f08c36995fcd923b2ab19e42eeb791fcf28df9237e79f619a40"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/mt_fieldops_v3_20261111",
+ "statement": "On 44 fresh prime-order Weierstrass curves (group orders about 2^22 to 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the k = 4 term multi-target index calculus ic5 costs 0.47-0.99x per target of ic4 (cheaper in all 36 cell x I/M section-5a decisions) and 1.11-1.49x a paired BSGS (dearer in all 36); against the cheapest of 12 runs of this harness's anchored fixed-database rho family it is 0.85-0.98x, but against the same family with Kuhn-Struik retention (validator arm rho2xks) it is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so no ranking against rho is established."
+}

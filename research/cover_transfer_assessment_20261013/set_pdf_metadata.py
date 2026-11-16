@@ -35,3 +35,18 @@ if PdfReader(temp).metadata.subject != subject:
     temp.unlink()
     raise SystemExit("rendered PDF subject does not match report front matter")
 temp.replace(PDF)
+
+import argparse
+
+from pypdf import PdfReader, PdfWriter, __version__ as pypdf_version
+
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--pdf-engine", choices=("tectonic", "xelatex"), default="tectonic")
+args = parser.parse_args()
+
+
+        "/Creator": f"Pandoc, {args.pdf_engine}, pypdf {pypdf_version}",
+        "/CreationDate": "D:20261021000000Z",
+        "/ModDate": "D:20261021000000Z",

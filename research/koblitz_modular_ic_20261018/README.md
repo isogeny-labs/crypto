@@ -1,26 +1,55 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [21](rounds/21/README.md), with its
-[report](rounds/21/REPORT.md), [PDF](rounds/21/report.pdf),
-[descent geometry](rounds/21/THETA.md), [saturation](rounds/21/SATURATION.md),
-[map status](rounds/21/CM.md), [proof map](rounds/21/PROOF_MAP.md)
-and [ledger](rounds/21/ledger.json).
+The current round is [26](rounds/26/README.md): exact diamond norms exclude
+the invariant quotient as a carrier of the intended CM factor under the
+retained modular bridge. Prym differences act by2 and recover via6 at11.
+The original source fifth iterate is checked exactly, transporting charts
+to all five rational cusps and completing the lifted base-derived entry
+divisors. The next prescribed RR space has degree128/dimension68 under the
+genus61 bridge; its complete basis is still required. See the
+[construction](rounds/26/CM.md),[proof map](rounds/26/PROOF_MAP.md) and
+[next steps](rounds/26/NEXT.md).
 
-Five nineteenth roots cannot sum to zero in characteristic two. With the
-actual trace-zero descent and written valuative/formal-group bridge this
-excludes the old Q34 scalar points.32 coupled norms and1330 pure-source
-resultants still leave four complete scalar models on node187. Whole
-saturation and complete coupled product divisors/arcs remain open.
+[Round25](rounds/25/README.md) records the original quadratic
+source involution, thirteen exact pullback equations for its registered
+b-unit affine quotient, direct norms and fourteen audited Lean identities.
+See the [geometry](rounds/25/CM.md), [PDF](rounds/25/report.pdf),
+[proof scope](rounds/25/PROOF_MAP.md) and [next checks](rounds/25/NEXT.md).
+The quotient's action on the desired order11 factor is untested.
 
-The actual averaged CM recovery is equivariant and satisfies A*Phi=5I.
-A norm/fixed-vector obstruction modulo5 makes denominator5 sharp in this
-CM presentation;the proper source immersion still descends. Full theta
-kernel actions/rational trivialization,243 final quotient sections and
-the integral level77 factor/divisor evaluator remain open. The proof map
-records206 named Lean statements and the explicit native/written limits.
-Earlier relation ranks and costs stay frozen;no IC assessment is supplied.
+[Round24](rounds/24/README.md) records the complete rational infinity fiber
+e1,1,7,7, original coordinate/denominator orders and constant field F2 under
+the written source-normalization bridge. [Round23](rounds/23/README.md)
+records SS5/Z5 exceptional geometry. Four rational polar supports, additional
+zero supports, complete global divisors/RR and the actual F2 factor map
+remain open. Whole quotient saturation/proper polarized embedding and
+arbitrary-divisor reverse evaluation are separate outstanding requirements.
+
+The exact norm-zero recovery remains in [Round22](rounds/22/README.md), with its
+[report](rounds/22/REPORT.md),[PDF](rounds/22/report.pdf),
+[exact recovery](rounds/22/RECOVERY.md),[coupled divisors](rounds/22/SATURATION.md),
+[proper geometry](rounds/22/CM.md),[proof map](rounds/22/PROOF_MAP.md),
+[validation](rounds/22/VALIDATION.md) and [ledger](rounds/22/ledger.json).
+
+The complete integral equivariant recovery calculation succeeds on the
+actual norm-zero targets:least scalar1,eight Smith factors1 and kernel
+rank24. A small two-map certificate B1 M1+B3*(7I)=I passes22 both-sign
+order11 fixtures. The inherited polarization retains determinant5.
+R21's denominator5 theorem still applies to regular target cycles.
+
+The genus-one Tate base,complete base coordinate/denominator divisors,
+generic QR model and degree8-by2 trace tower are checked. Proper normalized
+lifted divisors,complete prescribed RR and the integral level77 factor map
+remain open. A simultaneous valuation/descent argument excludes the four
+old node187 scalar points under explicit geometric bridges;polynomial
+separator/membership extraction and full saturation remain open. The
+arbitrary modular-divisor reverse evaluator and ordinary460/367 fibers/images
+are still required. Earlier relation ranks and costs stay frozen.
 
 Earlier evidence stays frozen:
+
+- [Round21](rounds/21/README.md):five-root obstruction,regular-target
+  sharp denominator5,and four complete Q40 necessary-system models on node187.
 
 - [Round 20](rounds/20/README.md):integral split recovery,proper source equations,canonical Pic2 match,2952 sections and the524288-case controlled-pole null.
 
@@ -73,3 +102,47 @@ failed-attempt records, proof map, immutable raw archive and replay script.
 
 - [Round 14](rounds/14/README.md): all57 ordinary supports/images, eight closed
   signed divisors and principal/deck nonzero ranks15/15 and18/17.
+
+Round22 also certifies the original supersingular SS5 affine incidence fiber,
+keeping nu and every registered unit:four degree20 closed points over F2,
+with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
+matrix. The full proper normalized branch table remains open;see the Round22
+CM and validation records. No relation-rank or IC cost claim follows.
+
+## R27–R29: proper source models and actual ordinary image recovery
+
+[R27](rounds/27/REPORT.md) completes the original pole geometry, constructs
+68/34-section RR bases and the new source P67/quotient P33 models, and proves
+an actual source class of exact order 11. The saturated-ideal conclusion is
+for these complete-linear-system curve models, with a written theorem bridge.
+A proper mixed Prym24 polarization is derived separately; the old det19 theta
+embedding is not constructed. The 455-equation F32 map solve passes all 910
+controls and then hits its fixed 4 GiB cap, with no mathematical verdict.
+
+[R28](rounds/28/REPORT.md) and [R29](rounds/29/REPORT.md) recover ordinary
+paired Hecke images using exact first/second adjugate norms. The degree-12
+image is one point with multiplicity two. The product-plus-one ordinary460
+base difference cancels by Frobenius offsets218/6; the colored C5 lift is
+still needed. The asymmetric284/83 supports do not coincide under the four
+tested base actions. A checked order77 cubic specialization opens the
+independent full-level model comparison, without claiming its global identity.
+
+The batch has 40 named Lean theorems and 41 current audited declarations,
+zero audit failures/trusted-native. Failures and caps are retained. The
+explicit remaining constructions are in [R29/NEXT.md](rounds/29/NEXT.md).
+No IC efficiency/rank verdict or complete modular-factor transfer is promoted.
+
+[R30](rounds/30/REPORT.md) proves the odd generalized recovery family uniformly
+and checks19odd lengths through n1021 (augmentation rank1020), with10even
+obstruction controls. These are formal maps, not new larger-n geometric
+transfers. Actual ordinary kernel calculations exhaust the compatible middles
+for degree12/436 and certify colors(3,4),(4,3)/(3,3), including complete49-level
+transport. Their finite algebras have F2 dimensions60/2180.
+
+The coupled Frobenius/deck check distinguishes an F2 closed-orbit sum from an
+individual F32 component. The latter has a nonzero formal augmentation vector;
+its actual Picard/factor image remains unknown. R30 adds9named/13auditedLean
+claims,0failures/0trusted-native. See [R30/NEXT.md](rounds/30/NEXT.md) for component
+class evaluation,284/83kernels and larger-n construction leads. The raw bundle
+also repairs the durability gap for ignored R29 recorder scratch logs, without
+changing any earlier raw archive. No IC cost/rank conclusion is promoted.

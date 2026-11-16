@@ -1,10 +1,6 @@
 # Prime-field factor-base size and exact-oracle tuning: protocol
 
-**Status: DRAFT — not frozen.** No train, holdout or control session has run.
-The protocol freezes when the blockers in §12 are cleared, this file is
-committed and its git blob is recorded in `card.json` (`protocol.blob`). Until
-then any section may change. Once frozen, a change is a dated amendment, never
-an edit. Card: [`README.md`](README.md). Orchestration:
+**Status: FROZEN 2026-10-29** at `code.commit` `0e124fb1b207a76ae9ef88c2bffb1f5b8d92b1b6` (see `card.json`; its `protocol.blob` is this file's git blob). No train, holdout or control session had run when it froze. A change from here on is a dated amendment appended to §14, never an edit. Card: [`README.md`](README.md). Orchestration:
 [`run.sh`](run.sh). Specs: [`specs/`](specs/).
 
 Every quantitative statement carries one label: *recorded* (a committed
@@ -265,10 +261,11 @@ Holdout: 48 targets × 2 rounds gives 96 matched pairs per arm and size. The
 (workload, round) pairs, both arms sharing the algorithm seed. Its 95%
 interval is a two-stage cluster bootstrap: targets first, then pairs within a
 target. It uses 4,000 resamples and seed 20261002, the defaults. The ratio
-and interval are needed at each `w ∈ {0, 0.1, 1}`. `ecbench compare`
-computes them today only for the charged `S`, which here equals `w = 0`.
-Blocker 1 (§12) adds `--weight`. It is to apply `band::priced_s` to every
-record before the same bootstrap.
+and interval are needed at each `w ∈ {0, 0.1, 1}`. `ecbench compare --weight W`
+(on `main` at the pinned commit) prices every record with `band::priced_s` at
+`W` before matching pairs and before the same bootstrap
+(`src/cryptanalysis/ecbench/compare.rs`, `match_pairs`); `run.sh analyse`
+calls it at each of the three weights.
 
 ### 7.3 Per-size decision (holdout only)
 
@@ -398,31 +395,25 @@ sessions were not kept.
 
 Nothing on a train, holdout or panel-K workload has run.
 
-## 12. Before freezing (blockers)
+## 12. Freezing record (2026-10-29)
 
-1. **Weighted paired intervals.** `ecbench compare` has no weight option.
-   See `src/bin/ecbench.rs:228` (`Compare`) and
-   `src/cryptanalysis/ecbench/compare.rs:288` (`compare`). `ecbench band`
-   (`src/cryptanalysis/ecbench/band.rs:187`) ranks means without intervals.
-   Add `--weight W` and price each record with `band::priced_s` before the
-   bootstrap. Until then `run.sh analyse` exits 3, and §7.3 condition 3 can be
-   read at `w = 0` only.
-2. **Random-base control.** `solve_ic_prime` admits only prime-abscissa,
-   prime-projected-abscissa, glv-orbit, prime-kummer, prime-isogeny and
-   cm-scalar-orbit (`src/cryptanalysis/ecbench/methods.rs:2125–2137`). There is
-   no seeded random signed-point base. This does not block the primary
-   decision. Either land a `prime-random:size=N,seed=S` plug-in and add a
-   `random` holdout control before freezing, or freeze with the stride
-   control alone and record the gap.
-3. **Pin and record.** Merge the card files (and blocker 1). Set
-   `code.commit` to that merge commit. Rerun the plan check so the incumbent
-   method ids still equal the frontier's. Commit this file with the status
-   line changed to FROZEN, and record `git hash-object PROTOCOL.md` as
-   `protocol.blob`. Then run `backlog validate`.
+1. **Weighted paired intervals: resolved.** `ecbench compare` has `--weight W`
+   on `main` (`src/bin/ecbench.rs`, `Compare`), applying `band::priced_s` to
+   every record before the bootstrap (§7.2). `run.sh analyse` no longer exits 3.
+2. **Random-base control: not added; recorded as a gap.** `solve_ic_prime`
+   still admits no seeded random signed-point base. The protocol freezes with
+   the stride control alone (§4.4). The gap concerns a control, not the
+   primary decision, and is reported in the result.
+3. **Pin and plan check: done.** `code.commit` is `main` at
+   `0e124fb1b207a76ae9ef88c2bffb1f5b8d92b1b6`. `ecbench plan` on the four train
+   specs at that commit (*measured*, 2026-10-29) gives 232 / 232 / 208 / 208
+   executions, reports every train curve `registered=false` (fresh), and
+   lists the incumbent method ids `ECM1h586f93741037`, `ECM1h7291b44e96ad`,
+   `ECM1h1729b9b88605` and `ECM1h61a6431fe629` at 20, 24, 28 and 32 bits,
+   equal to the frontier's (§2).
 
 The selection and template filling in `run.sh` are jq over `ecbench band`
-JSON, which is thin orchestration under AGENTS.md "no Python". A reviewer may
-ask for them to move into `ecbench` before freezing.
+JSON, which is thin orchestration under AGENTS.md "no Python".
 
 ## 13. Outputs and landing
 
@@ -442,3 +433,7 @@ Draft runner review (2026-10-20): analysis rechecks the frozen selection,
 requires each canonical holdout and Kummer session to be complete, and excludes
 retained interrupted attempts from band and table inputs. Mocked controls cover
 these cases; this amendment does not execute or freeze the experiment.
+
+## 14. Amendments
+
+None.

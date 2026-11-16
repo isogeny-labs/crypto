@@ -1,0 +1,7 @@
+# Independent literal weighted constructor review plan
+
+Frozen before candidate source/result inspection. Parent describes a literal Rust weighted constructor and unit from_affine initialization correspondence. Scope is initialization into normalized validity, not later walker closure.
+
+Check exact source expression parenthesization against multiplication/square UInt64 definitions; ensure intermediates remain canonical under prime/range assumptions and all required weights are nonzero. Re-derive field decoding by substitution: coefficients scale with z^2,z^4,z^3*w,z^5*w as actually written, not an algebraically equal but machine-different sequence. Verify unscaled affine constructor uses literal unit weights and the appropriate degree branch. Verify validity hypotheses correspond to normalized Mumford divisibility rather than independently assumed coefficient identities.
+
+Strong counterexamples: zero weights, noncanonical inputs, large modulus overflow, altered multiplication parenthesization, omitted degree-two dispatch condition, invalid affine divisor, vacuous validity hypothesis. Inspect nonvacuity/positive controls and negative controls with explicit relevance to assumptions. Recompile pinned sources and dependencies privately, each command bounded120s; separate axiom readback. Preserve any reviewer failures. No source repair/root build/scientific trials. Produce exact hashes and scoped review with PDF/SVG/JSON.

@@ -1,0 +1,5 @@
+Pilot, not evidence. Cell p = 53 seed 2, one thread, 8,486 residuals, all with identical relation_digest.
+Builds changed between files (the diagnostics were added while piloting):
+  p53_s2_A, p53_s2_B              first build: plumbing only; B = scan staircase, chunk 1 (no native counter split)
+  p53_s2_B0, B1, B4, B8, B16, B32  tracker/scan variants (B0 = F4_STAIR=scan chunk 1; B1/B4/B8/B16 tracker, chunk 1/4/8/16); *_B..b/c/d = later builds
+  the final build (degree-pruned staircase walk) is *d: B8d, B16d (the frozen B arm = hilbert:16).

@@ -1,0 +1,34 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,landscape,margin=0.72in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,hyperref}
+\title{Nonvanishing of the common 2+2 source function}
+\author{Formal proof packet}
+\date{28 October 2026}
+\begin{document}
+\maketitle
+\noindent This packet reports conditional Lean declarations on the actual weighted-Proj curve. It contains no new DLP trial or cost ratio.
+\section*{Statement and mechanism}
+Let $K$ be a field and let the affine chart be $K[x,y]/(y^2-f(x))$. The checked nested polynomial equivalence maps the defining relation to a polynomial of degree two in $y$. An $x$-only polynomial has degree zero in $y$. The new affine lemmas prove $y\ne p(x)$ and $p(x)-B y\ne0$ for $B\ne0$.
+\par The common 2+2 numerator $N$ is $x$-only. A checked specialization gives $N-B y\ne0$. The existing injection of this chart into the function field of the actual weighted-Proj curve gives $N/B-y\ne0$ when the quintic is separable and $B\ne0$. The affine degree argument needs no separability or characteristic restriction.
+\section*{Validation and limits}
+Pinned Lean 4.34.1 checked all four declarations. Direct axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}. The standardized CSV separates checked statements from open gates. These include closed-point coheight, every finite and infinity order, a principal divisor, the $\operatorname{Pic}^{0}$ class equation, and compiled Rust correspondence. The prior 1,260-target cohort and matched-rho cost rows are unchanged.
+\par Prior source: the existing chart-degree proof in \texttt{Common22BranchDomain.lean}; the existing embedding in \texttt{WeightedProjSourceFunctionField.lean}; Stacks Project Lemma 10.119.7 for the downstream DVR valuation framework (not used to assert the missing global divisor).
+\clearpage
+\section*{Dependency diagram}
+\begin{center}
+\setlength{\unitlength}{1mm}
+\begin{picture}(250,120)
+\put(0,77){\framebox(52,23){Affine chart (checked)}}
+\put(62,77){\framebox(52,23){$y$ not $x$-only}}
+\put(124,77){\framebox(52,23){$N-By\ne0$}}
+\put(186,77){\framebox(62,23){$N/B-y\ne0$}}
+\put(52,88){\vector(1,0){10}}\put(114,88){\vector(1,0){10}}\put(176,88){\vector(1,0){10}}
+\put(186,35){\framebox(62,22){All orders (open)}}
+\put(186,0){\framebox(62,22){Divisor / Pic$^0$ (open)}}
+\put(217,77){\vector(0,-1){20}}\put(217,35){\vector(0,-1){13}}
+\put(0,44){\makebox(170,15)[l]{Green SVG nodes: Lean checked. Grey SVG nodes: open.}}
+\put(0,14){\makebox(170,15)[l]{No experimental row or cost comparison is changed.}}
+\end{picture}
+\end{center}
+\end{document}

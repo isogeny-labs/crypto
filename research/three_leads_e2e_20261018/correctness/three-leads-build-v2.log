@@ -1,0 +1,12 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-leads-audit)
+error[E0433]: cannot find module or crate `crypto` in this scope
+ --> examples/three_leads_register.rs:2:5
+  |
+2 | use crypto::cryptanalysis::{curve_id,three_leads::StudyInstance};
+  |     ^^^^^^ use of unresolved module or unlinked crate `crypto`
+  |
+  = help: if you wanted to use a crate named `crypto`, use `cargo add crypto` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `crypto` (example "three_leads_register") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,55 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-tm39594-81465462 | 29.00 | inc | 24/24 | 1.979 | 2.082 | 3.010 | — |
+| icv1-fp32-tm39594-81465462 | 29.00 | inc-aa | 24/24 | 1.979 | 2.082 | 3.010 | — |
+| icv1-fp32-tm39594-81465462 | 29.00 | rho-neg | 24/24 | 0.930 | 1.022 | 1.844 | — |
+| icv1-fp32-tm39594-81465462 | 29.00 | rho-neg-aa | 24/24 | 0.930 | 1.022 | 1.844 | — |
+| icv1-fp32-tm55994-4c63baf7 | 29.00 | inc | 24/24 | 2.057 | 2.151 | 2.999 | — |
+| icv1-fp32-tm55994-4c63baf7 | 29.00 | inc-aa | 24/24 | 2.057 | 2.151 | 2.999 | — |
+| icv1-fp32-tm55994-4c63baf7 | 29.00 | rho-neg | 24/24 | 1.101 | 1.210 | 2.186 | — |
+| icv1-fp32-tm55994-4c63baf7 | 29.00 | rho-neg-aa | 24/24 | 1.101 | 1.210 | 2.186 | — |
+| icv1-fp32-tm92986-5a4eb1f2 | 29.00 | inc | 24/24 | 1.812 | 1.899 | 2.683 | — |
+| icv1-fp32-tm92986-5a4eb1f2 | 29.00 | inc-aa | 24/24 | 1.812 | 1.899 | 2.683 | — |
+| icv1-fp32-tm92986-5a4eb1f2 | 29.00 | rho-neg | 24/24 | 0.946 | 1.038 | 1.874 | — |
+| icv1-fp32-tm92986-5a4eb1f2 | 29.00 | rho-neg-aa | 24/24 | 0.946 | 1.038 | 1.874 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | inc | 24/24 | 1.707 | 1.780 | 2.435 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | inc-aa | 24/24 | 1.707 | 1.780 | 2.435 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | rho-neg | 24/24 | 1.013 | 1.112 | 2.009 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | rho-neg-aa | 24/24 | 1.013 | 1.112 | 2.009 | — |
+| icv1-fp32-tm116226-7670da50 | 29.00 | inc | 24/24 | 2.097 | 2.236 | 3.488 | — |
+| icv1-fp32-tm116226-7670da50 | 29.00 | inc-aa | 24/24 | 2.097 | 2.236 | 3.488 | — |
+| icv1-fp32-tm116226-7670da50 | 29.00 | rho-neg | 24/24 | 1.073 | 1.179 | 2.130 | — |
+| icv1-fp32-tm116226-7670da50 | 29.00 | rho-neg-aa | 24/24 | 1.073 | 1.179 | 2.130 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-tm39594-81465462 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp32-tm39594-81465462 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm39594-81465462 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp32-tm39594-81465462 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp32-tm39594-81465462 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp32-tm39594-81465462 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp32-tm55994-4c63baf7 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp32-tm55994-4c63baf7 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm55994-4c63baf7 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp32-tm55994-4c63baf7 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp32-tm55994-4c63baf7 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp32-tm55994-4c63baf7 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp32-tm92986-5a4eb1f2 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp32-tm92986-5a4eb1f2 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm92986-5a4eb1f2 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp32-tm92986-5a4eb1f2 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp32-tm92986-5a4eb1f2 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp32-tm92986-5a4eb1f2 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp32-tm109914-36f5bc82 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp32-tm116226-7670da50 | inc vs inc-aa | unresolved inside the band |
+| icv1-fp32-tm116226-7670da50 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm116226-7670da50 | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp32-tm116226-7670da50 | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp32-tm116226-7670da50 | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp32-tm116226-7670da50 | rho-neg vs rho-neg-aa | unresolved inside the band |

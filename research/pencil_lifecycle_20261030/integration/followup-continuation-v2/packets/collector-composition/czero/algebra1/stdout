@@ -1,0 +1,30 @@
+/var/tmp/pencil-czero-interpolation-20261101-v1/CZero.lean:6:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instAdd', which is 'noncomputable'
+/var/tmp/pencil-czero-interpolation-20261101-v1/CZero.lean:7:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instAdd', which is 'noncomputable'
+/var/tmp/pencil-czero-interpolation-20261101-v1/CZero.lean:31:4: error: unknown tactic
+/var/tmp/pencil-czero-interpolation-20261101-v1/CZero.lean:29:3: error: Tactic `apply` failed: could not unify the conclusion of `(eq_div_iff hb).mp`
+  ?m.100 * bnum q1 r1 q2 r2 = ?m.98
+with the goal
+  anum q1 r1 s1 t1 q2 r2 s2 t2 / bnum q1 r1 q2 r2 * (q1 - q2) = s1 - s2
+
+Note: The full type of `(eq_div_iff hb).mp` is
+  ?m.100 = ?m.98 / bnum q1 r1 q2 r2 → ?m.100 * bnum q1 r1 q2 r2 = ?m.98
+
+case left
+K : Type u_1
+inst✝ : Field K
+q1 r1 s1 t1 q2 r2 s2 t2 : K
+hb : bnum q1 r1 q2 r2 ≠ 0
+hc : cnum q1 r1 s1 t1 q2 r2 s2 t2 = 0
+hq : anum q1 r1 s1 t1 q2 r2 s2 t2 * (q1 - q2) - bnum q1 r1 q2 r2 * (s1 - s2) = 0
+hr : anum q1 r1 s1 t1 q2 r2 s2 t2 * (r1 - r2) - bnum q1 r1 q2 r2 * (t1 - t2) = 0
+⊢ anum q1 r1 s1 t1 q2 r2 s2 t2 / bnum q1 r1 q2 r2 * (q1 - q2) = s1 - s2
+/var/tmp/pencil-czero-interpolation-20261101-v1/CZero.lean:24:66: error: unsolved goals
+case right
+K : Type u_1
+inst✝ : Field K
+q1 r1 s1 t1 q2 r2 s2 t2 : K
+hb : bnum q1 r1 q2 r2 ≠ 0
+hc : cnum q1 r1 s1 t1 q2 r2 s2 t2 = 0
+hq : anum q1 r1 s1 t1 q2 r2 s2 t2 * (q1 - q2) - bnum q1 r1 q2 r2 * (s1 - s2) = 0
+hr : anum q1 r1 s1 t1 q2 r2 s2 t2 * (r1 - r2) - bnum q1 r1 q2 r2 * (t1 - t2) = 0
+⊢ anum q1 r1 s1 t1 q2 r2 s2 t2 / bnum q1 r1 q2 r2 * (r1 - r2) = t1 - t2

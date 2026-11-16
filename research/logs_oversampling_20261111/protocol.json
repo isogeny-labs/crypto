@@ -1,0 +1,279 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-ic-logs-oversampling-20261111",
+  "version": 1,
+  "created": "2026-11-11",
+  "repository": "crypto",
+  "study_dir": "research/logs_oversampling_20261111",
+  "links": {
+    "narrative": "research/logs_oversampling_20261111/PROTOCOL_DRAFT.md",
+    "instrument": "src/bin/ic/oversample.rs",
+    "prior_la_share": "research/la_engines_20261014/README.md"
+  },
+  "question": "In the factor-base log precompute, does solving full_rank + ceil(f*columns) relations (f in 0.1, 0.25, 0.5), with the filter purge spending the surplus, lower total cost (collection + linear algebra) against solving at full rank (f = 0)?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Some f > 0 lowers the paired total counted cost C = trials + lambda*row_ops versus f = 0 on the tested cells, with the sign holding at lambda in {lambda_hat/10, lambda_hat, 10*lambda_hat}.",
+      "class": "comparative",
+      "decided_by": [
+        "primary"
+      ],
+      "if_supported": "oversampling by f is a measured improvement of the precompute on these cells, pending the validation gate",
+      "if_not_supported": "no net saving from oversampling on these cells; not a claim about cells with large Krylov cores"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "Some f > 0 has paired Delta C < 0 (95% bootstrap CI below 0) at all three lambda.",
+      "negation": "For every f > 0, Delta C >= 0 or its CI contains 0."
+    }
+  ],
+  "arms": [
+    {
+      "id": "f0",
+      "role": "baseline",
+      "description": "Prefix = first full-rank relation count.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": "release",
+        "binary_sha256": null,
+        "flags": {
+          "fractions": "0"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": null
+        },
+        "threads": null,
+        "image_digest": null
+      },
+      "parameters": {
+        "fraction": 0
+      }
+    },
+    {
+      "id": "f0.1",
+      "role": "candidate",
+      "description": "Prefix = full rank + ceil(0.1*columns).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": "release",
+        "binary_sha256": null,
+        "flags": {
+          "fractions": "0.1"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": null
+        },
+        "threads": null,
+        "image_digest": null
+      },
+      "parameters": {
+        "fraction": 0.1
+      }
+    },
+    {
+      "id": "f0.25",
+      "role": "candidate",
+      "description": "Prefix = full rank + ceil(0.25*columns).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": "release",
+        "binary_sha256": null,
+        "flags": {
+          "fractions": "0.25"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": null
+        },
+        "threads": null,
+        "image_digest": null
+      },
+      "parameters": {
+        "fraction": 0.25
+      }
+    },
+    {
+      "id": "f0.5",
+      "role": "candidate",
+      "description": "Prefix = full rank + ceil(0.5*columns).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": "release",
+        "binary_sha256": null,
+        "flags": {
+          "fractions": "0.5"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": null
+        },
+        "threads": null,
+        "image_digest": null
+      },
+      "parameters": {
+        "fraction": 0.5
+      }
+    },
+    {
+      "id": "f0_aa",
+      "role": "control_aa",
+      "description": "Second independently timed f = 0 solve of the same prefix.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": "release",
+        "binary_sha256": null,
+        "flags": {
+          "aa-control": true
+        },
+        "env": {
+          "RAYON_NUM_THREADS": null
+        },
+        "threads": null,
+        "image_digest": null
+      },
+      "parameters": {
+        "fraction": 0
+      }
+    },
+    {
+      "id": "logs_default",
+      "role": "reference",
+      "description": "Prefix ic logs first solves (end of the batch where rank became full).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": "release",
+        "binary_sha256": null,
+        "flags": {
+          "logs-arm": true
+        },
+        "env": {
+          "RAYON_NUM_THREADS": null
+        },
+        "threads": null,
+        "image_digest": null
+      },
+      "parameters": {}
+    }
+  ],
+  "controls": {
+    "aa": "f0_aa vs f0: identical counted cost by construction; wall spread is the noise floor",
+    "positive": null,
+    "instrument_checks": [
+      "every column verified [x]G == point in every arm",
+      "collection cost monotone in f (unit test)",
+      "logs_default prefix >= f0 prefix"
+    ]
+  },
+  "variable_ledger": [
+    {
+      "variable": "relation set",
+      "handling": "one pool per seed shared by all arms; arms are prefixes"
+    },
+    {
+      "variable": "arm order",
+      "handling": "rotated by seed index"
+    },
+    {
+      "variable": "filter/solver options",
+      "handling": "identical in every arm within a cell (block Wiedemann, block 4, target_excess fixed); filter is CADO in C1-C3 and legacy in C4. C3 and C4 share seeds and therefore identical relation pools; C3 vs C4 is a secondary paired filter contrast, outside the decision rule"
+    },
+    {
+      "variable": "host",
+      "handling": "isolab-eks, one host class; wall valid only at the required isolation"
+    },
+    {
+      "variable": "collection timing",
+      "handling": "batch seconds pro-rated by trial; trials exact"
+    }
+  ],
+  "randomization": {
+    "seeds": "seed_i = 0x4b6f626c69747a00 + 100 + i, i = 0..29 (pilot used +0..4)",
+    "arm_order": "rotate_left(seed_index)"
+  },
+  "sample_size": {
+    "cells": [
+      "C1 degree 23 a=0 m=2 factor-index 0 (primary)",
+      "C2 degree 37 a=0 m=3 ic-search spec",
+      "C3 degree 37 a=0 m=3 subgroup_orbits points 7400 (factor base research/logs_oversampling_20261111/fb37_subgroup_orbits_7400.json), CADO filter (exploratory)",
+      "C4 = C3 with --filter-strategy legacy (legacy-filter cell): same curve, factor base, seeds and fractions; only the filter differs"
+    ],
+    "seeds_per_cell": 30,
+    "pilot_seeds": 5,
+    "note": "fixed at 30 after the 5-seed pilot (run-20261111T0451Z): sign resolved at 5 seeds; 1%-of-C0 precision needs <=60 except C2 f0.5"
+  },
+  "metrics": [
+    {
+      "id": "primary",
+      "definition": "Delta C(f) = C(f) - C(f0), C = collection.trials + lambda*linear_algebra.row_ops, lambda_hat = median over seeds of (la_seconds/row_ops)/(collection_seconds/trials) on f0 arms; evaluated at lambda_hat/10, lambda_hat, 10*lambda_hat and 0",
+      "unit": "trials",
+      "direction": "lower"
+    },
+    {
+      "id": "total_wall",
+      "definition": "paired difference of collection.seconds_prorated + linear_algebra.seconds",
+      "unit": "s",
+      "direction": "lower"
+    },
+    {
+      "id": "mechanism",
+      "definition": "filter rows/nonzeros out, core_dimension, core_nonzeros, core_dimension*core_nonzeros",
+      "unit": "count",
+      "direction": "lower"
+    }
+  ],
+  "measurement": {
+    "command": "research/logs_oversampling_20261111/full/run_full.sh (ic oversample --seeds 30 --fractions 0,0.1,0.25,0.5 --aa-control --logs-arm per cell; seeds base 0x4b6f626c69747a00 + 100 + i, disjoint from the pilot's 0..4)",
+    "verification": "unverified arm = failure",
+    "command_c4": "ic oversample --degree 37 --curve-a 0 --summands 3 --factor-base research/logs_oversampling_20261111/fb37_subgroup_orbits_7400.json --filter-strategy legacy --seeds 30 --fractions 0,0.1,0.25,0.5 --aa-control --logs-arm --rows-out rows-c4.jsonl --json"
+  },
+  "execution": {
+    "route": "local container, owner-requested (2026-11-11); isolab-eks unavailable (no AWS identity)",
+    "isolation_required": "none earned; wall metrics are secondary and indicative only; the primary metric is in counted units"
+  },
+  "stopping_rules": [
+    "fixed sample; no optional stopping",
+    "pool exhausting --max-trials invalidates that seed for every arm (reported)"
+  ],
+  "decision_rule": "H1 for f iff the primary 95% paired bootstrap CI is below 0 at all three lambda and the wall difference exceeds the A/A 95% range; otherwise H0 for f.",
+  "analysis_plan": {
+    "estimator": "mean paired difference over seeds",
+    "ci": "paired bootstrap over seeds, 10000 resamples, 95%",
+    "multiplicity": "three candidate fractions per cell, four cells; report all, Holm on the primary within each cell; lambda_hat estimated per cell"
+  },
+  "inadmissible": [
+    "dropping unverified arms",
+    "choosing lambda after seeing differences",
+    "comparing arms across different pools"
+  ],
+  "amendments": [
+    {
+      "date": "2026-11-11",
+      "by": "main session at owner's instruction ('run the whole thing')",
+      "changes": [
+        "seeds_per_cell fixed at 30 after pilot",
+        "seed base offset +100 so frozen-run seeds are disjoint from pilot seeds",
+        "route local, unisolated",
+        "S3 resume checkpoint waived by owner (Git instead)"
+      ]
+    }
+  ],
+  "open_issues": [
+    "research-kb not reachable from this container (no MCP server, no research-kb binary): receipt missing; sources checked are the repository files listed in PROTOCOL_DRAFT.md",
+    "no independent reviewer before freeze; frozen by the main session at the owner's instruction"
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "aa928f27f9be1dff19e1d62ee79a148ac14c06d56c0dd80193bef62ae1153076",
+    "commit": null,
+    "frozen_at": "2026-11-11T05:54:42Z",
+    "filed_before_affected_data": true,
+    "protocol_sha256_scheme": "sha256 of sort_keys compact JSON with freeze.protocol_sha256 = null and freeze.commit = null"
+  }
+}

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Delphi tool: dispatch the Iso Lab experiment workflow.
+# Argument: <40-hex sha>[,key=value ...] with keys spec_path, seconds,
+# instance_type, resumable, size_sweep, checkpoint_seconds, max_restores.
+# Prints one JSON object (run id and URL when found). Not a verifier.
+set -euo pipefail
+
+command -v jq >/dev/null || { echo "isolab-dispatch: jq not on PATH" >&2; exit 3; }
+[ $# -eq 1 ] || { echo "usage: isolab-dispatch <sha>[,key=value...]" >&2; exit 2; }
+
+root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
+cd "$root"
+
+IFS=, read -r -a parts <<<"$1"
+sha=${parts[0]}
+[[ $sha =~ ^[0-9a-f]{40}$ ]] || { echo "isolab-dispatch: first field must be a 40-hex commit sha" >&2; exit 2; }
+
+inputs='{}'
+flags=(-f "source_revision=$sha")
+for kv in "${parts[@]:1}"; do
+  [[ $kv == *=* ]] || { echo "isolab-dispatch: bad field '$kv'" >&2; exit 2; }
+  key=${kv%%=*}
+  val=${kv#*=}
+  case "$key" in
+    spec_path | seconds | instance_type | resumable | size_sweep | checkpoint_seconds | max_restores) ;;
+    *) echo "isolab-dispatch: key '$key' is not allowed" >&2; exit 2 ;;
+  esac
+  flags+=(-f "$key=$val")
+  inputs=$(jq -c --arg k "$key" --arg v "$val" '. + {($k): $v}' <<<"$inputs")
+done
+
+if [ "${DELPHI_TOOLS_SKIP_GATE:-}" = 1 ]; then
+  echo "isolab-dispatch: DELPHI_TOOLS_SKIP_GATE=1, checkpoint gate skipped" >&2
+else
+  scripts/checkpoint.sh gate >&2
+fi
+command -v gh >/dev/null || { echo "isolab-dispatch: gh not on PATH" >&2; exit 3; }
+
+before=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+gh workflow run isolab-experiment.yml --ref main "${flags[@]}" >&2
+
+poll_sleep=${DELPHI_TOOLS_POLL_SLEEP:-3}
+run=""
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  list=$(gh run list --workflow isolab-experiment.yml \
+    --json databaseId,headSha,createdAt,url --limit 20 2>/dev/null) || list='[]'
+  run=$(jq -c --arg t "$before" \
+    '[.[] | select(.createdAt >= $t)] | sort_by(.createdAt) | last // empty' <<<"$list" 2>/dev/null) || run=""
+  [ -n "$run" ] && break
+  sleep "$poll_sleep"
+done
+
+if [ -z "$run" ]; then
+  echo "isolab-dispatch: dispatched, but the run was not found; use isolab-status by hand" >&2
+  jq -cn --arg s "$sha" --arg d "$before" --argjson i "$inputs" \
+    '{dispatched: true, run_id: null, url: null, source_revision: $s, inputs: $i, dispatched_at: $d}'
+  exit 0
+fi
+
+mkdir -p .delphi-tools/isolab
+id=$(jq -r '.databaseId' <<<"$run")
+rec=$(jq -cn --argjson r "$run" --arg s "$sha" --arg d "$before" --argjson i "$inputs" \
+  '{run_id: $r.databaseId, url: $r.url, source_revision: $s, inputs: $i, dispatched_at: $d}')
+printf '%s\n' "$rec" >".delphi-tools/isolab/$id.json"
+printf '%s\n' "$rec"

@@ -1,0 +1,37 @@
+// Appended after the original r/circuit prefix. No generic field inversions.
+option(redSB);
+intvec indexes=49,53,239,241,243,1,12,2,2,20,37,65,75;
+ring qr25=2,(n,U,V,b,c),lp;
+poly AS=n^2+b*n+V;
+ideal ASideal=std(ideal(AS));
+if(diff(AS,n)!=b){ERROR("wrong Artin-Schreier derivative");}
+map coefficientsMap=r,n,0,b,c;
+ideal quotientFunctions;
+write("registered-quotient.dump","ring qr25=2,(U,V,b,c),lp;");
+setring r;
+map back=qr25,n,(1+c)*n+b*l,n^2+b*n,b,c;
+int k;int j;int count;int ld;intvec powers;
+for(k=1;k<=13;k++){
+ poly sourceP=nn[indexes[k]];
+ matrix terms=coef(sourceP,l);
+ count=ncols(terms);ld=deg(sourceP,intvec(0,1,0,0));
+ ideal coefficients;
+ for(j=1;j<=count;j++){powers[j]=deg(terms[1,j]);coefficients[j]=terms[2,j];}
+ setring qr25;
+ ideal mappedCoefficients=coefficientsMap(coefficients);
+ poly qrNumerator=0;
+ for(j=1;j<=count;j++){qrNumerator=qrNumerator+mappedCoefficients[j]*(U+(1+c)*n)^powers[j]*b^(ld-powers[j]);}
+ poly Q=reduce(qrNumerator,ASideal);
+ if(deg(Q,intvec(1,0,0,0,0))>0){ERROR("registered quotient still depends on n");}
+ quotientFunctions[k]=Q;
+ print("QUOTIENT_GENERATOR_"+string(k)+"_SOURCE_INDEX_B_POWER");indexes[k];ld;
+ Q;
+ write("registered-quotient.dump","poly Q"+string(k)+"="+string(Q)+";");
+ write("registered-quotient.dump","// source="+string(indexes[k])+", denominator b^"+string(ld));
+ setring r;
+ poly pull=back(Q);
+ poly check=pull-b^ld*sourceP;
+ print("EXACT_SOURCE_PULLBACK_RESIDUAL");check;
+ if(check!=0){ERROR("quotient equation does not pull back to original source");}
+}
+print("Q25_REGISTERED_QUOTIENT_ALL_CHECKS_PASS");quit;

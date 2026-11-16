@@ -1,0 +1,58 @@
+--- a/src/ml_dataset/mod.rs
++++ b/src/ml_dataset/mod.rs
+@@ -2186,6 +2186,26 @@
+     let has = |path: &str| manifest.artifacts.iter().any(|a| a.path == path);
+     let complete_known_answer = has("public.json") && has("witness.json");
+     let complete_factor_base = has("public.json") && has("factor-base.json");
++    let prime_chain_declared =
++        manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
++    let prime_chain_input_expected = manifest.config.family == "prime"
++        && manifest.config.solver == "f4"
++        && (3..=15).contains(&manifest.config.m)
++        && has("prime-f4-input.json");
++    if prime_chain_declared || prime_chain_input_expected {
++        if !has("prime-f4-input.json") {
++            return Err("prime affine-chain strategy lacks its equation/domain artifact".into());
++        }
++        if !complete_factor_base {
++            return Err("prime affine-chain strategy lacks public instance or factor base".into());
++        }
++        if manifest.config.family != "prime"
++            || manifest.config.solver != "f4"
++            || !(3..=15).contains(&manifest.config.m)
++        {
++            return Err("prime affine-chain strategy differs from frozen cell configuration".into());
++        }
++    }
+     if manifest.outcome["known_answer_verified"] == true && !complete_known_answer {
+         return Err("known-answer label lacks required artifacts".into());
+     }
+@@ -2218,6 +2238,28 @@
+         let public = read_json(&dir.join("public.json"))?;
+         let base = read_json(&dir.join("factor-base.json"))?;
+         curves::verify_factor_base(&public, &base)?;
++        if has("prime-f4-input.json") {
++            let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
++            // The m=2 reference uses the same filename with a legacy schema.
++            // A declared chain may not evade reconstruction by changing schema.
++            if prime_chain_declared
++                || prime_chain_input_expected
++                || input["schema"] == "ml-dataset.prime-f4-chain-input/v1"
++                || input["strategy"] == "prime-affine-s3-chain-f4-visitor/v1"
++            {
++                if manifest.config.family != "prime"
++                    || manifest.config.solver != "f4"
++                    || !(3..=15).contains(&manifest.config.m)
++                    || public["family"].as_str() != Some(manifest.config.family.as_str())
++                    || public["m"].as_u64() != Some(manifest.config.m as u64)
++                    || public["n"].as_u64() != Some(u64::from(manifest.config.n))
++                    || public["twist"].as_bool() != Some(manifest.config.twist)
++                {
++                    return Err("prime affine-chain input differs from frozen cell configuration".into());
++                }
++                solvers::verify_prime_f4_chain_input(&public, &base, &input)?;
++            }
++        }
+         for artifact in &manifest.artifacts {
+             if artifact.role == "restricted-large-prime-membership-provenance" {
+                 relations::verify_membership_provenance(

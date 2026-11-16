@@ -1,0 +1,18 @@
+[package]
+name = "aps-independent-replay"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Build the same verifier without linking the producer or crypto library.
+[workspace]
+
+[[bin]]
+name = "aps-independent-replay"
+path = "../../../examples/aps_single_relation_replay.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"

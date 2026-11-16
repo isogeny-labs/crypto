@@ -1,0 +1,118 @@
+{
+  "schema": "repsel.design/v1",
+  "study": "research/ic-representative-selection_20261105",
+  "frozen_with": "PROTOCOL.md",
+  "class_search": {
+    "command": "target/release/volcano-rho --bits {bits} --depth 3 --max-cofactor 4096 --ell 2 --crater split --seed {seed} --controls 0 --level-caps 16,0,0,64 --models 1 --crater-models 16 --targets 8 --ecbench {dir} --out {scratch}",
+    "acceptance": "the export has at least group_min floor groups (floor curves that ascend to one crater instance; repsel specs) and crater_min crater curves, its p is not a p of research/isogeny-volcano-cost_20261017 or research/isogeny-volcano-cost-v2_20261017, and repsel ascend succeeds on every exported floor curve; the first 12 accepted seeds in increasing order are the tier's classes",
+    "seeds": {
+      "24": "2401, 2402, ... (increasing, no gaps skipped silently: every rejected seed is logged with its reason)",
+      "28": "2801, 2802, ..."
+    },
+    "classes_per_tier": 12,
+    "c_classes": {
+      "24": "all 12",
+      "28": "the first 6 accepted (by seed order)"
+    }
+  },
+  "tiers": {
+    "24": {
+      "bits": 24,
+      "ic_size": 32,
+      "rounds": 5,
+      "warmup": 1,
+      "timeout_seconds": 120,
+      "group_cap": 8,
+      "group_min": 6,
+      "crater_cap": 16,
+      "crater_min": 8,
+      "models": 16,
+      "targets": {
+        "ab": 8,
+        "b": 32,
+        "ctl": 2,
+        "cal": 8,
+        "hold": 8
+      },
+      "target_seed": {
+        "ab": 2611052411,
+        "ctl": 2611052412,
+        "cal": 2611052413,
+        "hold": 2611052414
+      },
+      "measurement_seed": {
+        "main": 2611052421,
+        "aa": 2611052422,
+        "holdaa": 2611052423
+      },
+      "shard": {
+        "ab": 4,
+        "b": 8,
+        "aa": 8,
+        "ctl": 8,
+        "cal": 5,
+        "hold": 16,
+        "holdaa": 16
+      },
+      "est_seconds_per_run": {
+        "ic": 0.15,
+        "rho": 0.1,
+        "bsgs": 0.1
+      },
+      "job_budget_seconds": 1400
+    },
+    "28": {
+      "bits": 28,
+      "ic_size": 32,
+      "rounds": 5,
+      "warmup": 1,
+      "timeout_seconds": 120,
+      "group_cap": 8,
+      "group_min": 6,
+      "crater_cap": 16,
+      "crater_min": 8,
+      "models": 16,
+      "targets": {
+        "ab": 8,
+        "b": 32,
+        "ctl": 2,
+        "cal": 8,
+        "hold": 8
+      },
+      "target_seed": {
+        "ab": 2611052811,
+        "ctl": 2611052812,
+        "cal": 2611052813,
+        "hold": 2611052814
+      },
+      "measurement_seed": {
+        "main": 2611052821,
+        "aa": 2611052822,
+        "holdaa": 2611052823
+      },
+      "shard": {
+        "ab": 4,
+        "b": 8,
+        "aa": 8,
+        "ctl": 8,
+        "cal": 2,
+        "hold": 8,
+        "holdaa": 16
+      },
+      "est_seconds_per_run": {
+        "ic": 0.6,
+        "rho": 0.12,
+        "bsgs": 0.15
+      },
+      "job_budget_seconds": 1400
+    }
+  },
+  "analysis": {
+    "boot": 4000,
+    "perm": 10000,
+    "seed": 20261105
+  },
+  "mask": {
+    "nonce": "drawn after the inputs freeze with `od -An -N8 -tx8 /dev/urandom`, recorded in INPUTS.md; the key file stays closed until analysis.json is written"
+  }
+}

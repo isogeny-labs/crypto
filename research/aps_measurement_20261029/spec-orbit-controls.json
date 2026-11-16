@@ -1,0 +1,111 @@
+{
+  "schema": "ecbench.spec/v1",
+  "description": "Development control inputs only. Not a frozen performance protocol or launch authorization. No experiment has run.",
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261030,
+    "isolation_required": "L2",
+    "timeout_seconds": 120
+  },
+  "label": "APS certified orbit development controls",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 103,
+        "a": 0,
+        "b": 5,
+        "group_order": 97,
+        "r": 97,
+        "gx": 2,
+        "gy": 42
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261030
+  },
+  "arms": [
+    {
+      "name": "rho-cubic",
+      "role": "reference",
+      "method": {
+        "id": "rho.cubic_v2"
+      }
+    },
+    {
+      "name": "rho-cubic-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.cubic_v2"
+      }
+    },
+    {
+      "name": "orbit-line",
+      "role": "baseline",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "line3",
+          "roots": "exact",
+          "stop": "exhaustive",
+          "labels": "random",
+          "subset_size": "1",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "cubic",
+          "beta": "56",
+          "lambda": "35",
+          "prune": "false"
+        }
+      }
+    },
+    {
+      "name": "orbit-line-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "line3",
+          "roots": "exact",
+          "stop": "exhaustive",
+          "labels": "random",
+          "subset_size": "1",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "cubic",
+          "beta": "56",
+          "lambda": "35",
+          "prune": "false"
+        }
+      }
+    },
+    {
+      "name": "orbit-pruned",
+      "role": "candidate",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "line3",
+          "roots": "exact",
+          "stop": "exhaustive",
+          "labels": "random",
+          "subset_size": "1",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "cubic",
+          "beta": "56",
+          "lambda": "35",
+          "prune": "true"
+        }
+      }
+    }
+  ]
+}

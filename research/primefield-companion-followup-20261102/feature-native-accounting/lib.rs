@@ -1,0 +1,16 @@
+pub mod meter;
+#[global_allocator] static ALLOCATOR:meter::Counting=meter::Counting;
+#[path="generated/recovery.rs"] pub mod counted;
+#[cfg(test)]#[path="../feature-native-recovery/lib.rs"] mod reference;
+#[cfg(test)]mod accounting_tests{
+ use super::*;use meter::{Stage,Component,Op};
+ fn print_counts(label:&str,c:meter::Counts){for s in 1..5{for k in 0..8{for o in 0..17{if c[s][k][o]!=0{println!("count label={} stage={} component={} op={} value={}",label,meter::STAGES[s],meter::COMPONENTS[k],meter::OPS[o],c[s][k][o]);}}}}}
+ #[test]fn whole_pipeline_equivalence_and_contracts(){
+  meter::reset();let decoder=counted::Decoder::repaired_479().unwrap();let setup=meter::snapshot();assert!(setup[1][1][0]>0);assert!(setup[1][5][8]>0);print_counts("setup",setup);
+  meter::reset();let prepared=decoder.prepare().unwrap();let prep=meter::snapshot();assert!(prep[2][0][0]>0);assert_eq!(prep[2][4][1],1);print_counts("prepare",prep);
+  let original=reference::Decoder::repaired_479().unwrap();let old=original.prepare().unwrap();
+  for line in include_str!("../feature-native-recovery/targets.tsv").lines(){let f:Vec<i64>=line.split('\t').map(|s|s.parse().unwrap()).collect();let q=if f[1]<0{None}else{Some([f[1]as u64,f[2]as u64])};meter::reset();let got=prepared.recover(q).unwrap();let c=meter::snapshot();let expected=old.recover(q).unwrap();assert_eq!(format!("{:?}",got),format!("{:?}",expected));assert_eq!(got.scalar,f[0]as u64);assert_eq!(c[1],[[0;17];8]);assert_eq!(c[2],[[0;17];8]);let finite=if f[0]==0||f[0]==478{15}else{16};assert_eq!(c[3][0][1],1);assert_eq!(c[3][1][1],2*got.direct_phases as u64);assert_eq!(c[3][1][5],got.direct_phases as u64);assert_eq!(c[3][2][1],finite);assert_eq!(c[3][4][1],finite+got.seed_recurrences as u64);assert_eq!(c[3][3][1],c[3][3][16]);assert!(c[3][3][0]>0);assert_eq!(c[3][5][7],477);assert_eq!(c[3][5][0],0);assert_eq!(c[3][6], [0;17]);assert_eq!(c[4][0],[0;17]);if f[0]>1{assert!(c[4][6][0]>0);}print_counts(&format!("k{}",f[0]),c);}
+ }
+ #[test]fn nested_scope_and_thread_isolation(){meter::reset();meter::hit(Component::Source,Op::Product);assert_eq!(meter::snapshot(),[[[0;17];8];5]);{let _a=meter::enter(Stage::Query);meter::hit(Component::Source,Op::Product);{let _b=meter::enter(Stage::Verify);meter::hit(Component::Verifier,Op::Inverse);}meter::hit(Component::Source,Op::Product);}let c=meter::snapshot();assert_eq!(c[3][4][0],2);assert_eq!(c[4][6][1],1);std::thread::spawn(||{assert_eq!(meter::snapshot(),[[[0;17];8];5]);}).join().unwrap();meter::reset();assert_eq!(meter::snapshot(),[[[0;17];8];5]);}
+ #[test]fn allocator_forwarding_contract(){use std::alloc::{GlobalAlloc,Layout};meter::reset();{let _g=meter::enter(Stage::Query);unsafe{let a=Layout::from_size_align(32,8).unwrap();let b=Layout::from_size_align(8,8).unwrap();let mut p=ALLOCATOR.alloc(a);assert!(!p.is_null());p.write(73);let z=ALLOCATOR.alloc_zeroed(b);assert!(!z.is_null());assert_eq!(z.read(),0);p=ALLOCATOR.realloc(p,a,64);assert!(!p.is_null());assert_eq!(p.read(),73);ALLOCATOR.dealloc(p,Layout::from_size_align(64,8).unwrap());ALLOCATOR.dealloc(z,b);}}let c=meter::snapshot();assert_eq!(c[3][7][10],1);assert_eq!(c[3][7][11],1);assert_eq!(c[3][7][12],1);assert_eq!(c[3][7][13],2);assert_eq!(c[3][7][14],104);assert_eq!(c[3][7][15],72);}
+}

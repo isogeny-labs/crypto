@@ -1,0 +1,33 @@
+{
+  "source_sha256": "a165aabdc3c5c6586722272b35fab805302ef6178f0be00b1a6b594e0ece114b",
+  "lean": "leanprover/lean4:v4.35.0",
+  "shared_revision": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+  "mathlib_revision": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+  "reported_theorem_count": 20,
+  "lake_build_exit_code": 0,
+  "explicit_module_build_exit_code": 0,
+  "axiom_audit": {
+    "exit_code": 0,
+    "audited": 20,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms_subset": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "shared_gate": {
+    "exit_code": 0,
+    "status": "PASS",
+    "theorems": 20,
+    "trusted_native": 0,
+    "source_inventory": ["TernaryPacket.lean"]
+  },
+  "module_replay": {
+    "command": "lake env leanchecker --verbose TernaryPacket",
+    "exit_code": 0
+  },
+  "fresh_replay": {
+    "command": "lake env leanchecker --fresh --verbose TernaryPacket",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "formalization_status": "partial: label algebra and structural locality checked; full contraction and ECDLP claims remain open"
+}

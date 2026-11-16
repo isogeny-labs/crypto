@@ -1,0 +1,146 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 43,
+  "runs": [
+    {
+      "attempt": "encode43-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "ab3d7dc2300ea096e8179b5bfd96fae1a65da9b8",
+      "observations": [
+        "ENC43_RESULT coordinates=6 units=8 inverses=8 precision=154 every_polynomial_reconstructed=true"
+      ]
+    },
+    {
+      "attempt": "jets43-02",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "328a8fae2b00d559064f50fc967dd9f4b8648162",
+      "observations": [
+        "JET43_RESULT precision=615 residue_degree=5 evaluation_dimension=3075 ranks=68,196,324 all_pivot_recombinations=checked full_reference_rows=610 every_original_source_equation=pass all_unit_inverses=pass coefficient_descent_conjugates=5 complete_larger_RR_spaces_constructed=false geometric_transfer_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "multiply43-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "fb7b9fc23779584f2e887f3f08601b10ad392e68",
+      "observations": [
+        "MULT43_COMPLETE label=L4D0 input_rank=196 output_rank=452 attempted_products=14746 independent_products=14746 all_recombinations=checked stop=expected_rank_reached",
+        "MULT43_COMPLETE label=L6D0 input_rank=324 output_rank=708 attempted_products=48090 independent_products=48090 all_recombinations=checked stop=expected_rank_reached",
+        "MULT43_COMPLETE label=L12D0 input_rank=708 output_rank=1476 attempted_products=246426 independent_products=246426 all_recombinations=checked stop=expected_rank_reached",
+        "MULT43_COMPLETE label=L24D0 input_rank=1476 output_rank=3012 attempted_products=1085466 independent_products=1085466 all_recombinations=checked stop=expected_rank_reached",
+        "MULT43_RESULT precision=615 evaluation_dimension=3075 ranks=452,708,1476,3012 all_attempted_products_independent_checked=true all_original_recombinations=checked complete_RR_interpretation=conditional_on_retained_proper_pole_bridge geometric_transfer_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "jets43-01",
+      "kind": "native",
+      "status": "rejected",
+      "build_exit": 1,
+      "native_executed": false,
+      "reason": "series-method edit accidentally targeted Field; repaired in committed source before fresh jets43-02"
+    },
+    {
+      "attempt": "lean43-01",
+      "kind": "Lean",
+      "status": "rejected",
+      "compile_exit": 1,
+      "reason": "norm_num did not discharge characteristic-two cast; repaired with explicit CharP.cast_eq_zero"
+    },
+    {
+      "attempt": "lean43-02",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 6,
+      "source_revision": "fb7b9fc23779584f2e887f3f08601b10ad392e68"
+    }
+  ],
+  "source_precision": 615,
+  "reference_precision": 154,
+  "reference_rows": 610,
+  "coordinates": 6,
+  "registered_units": 8,
+  "unit_inverses": 8,
+  "coefficient_conjugates": 5,
+  "evaluation_dimension": 3075,
+  "fixed_section_ranks": [
+    68,
+    196,
+    324
+  ],
+  "product_stages": [
+    {
+      "label": "L4D0",
+      "input_rank": 196,
+      "output_rank": 452,
+      "attempted_products": 14746,
+      "independent_products": 14746,
+      "stop": "expected_rank_reached",
+      "all_recombinations": "checked"
+    },
+    {
+      "label": "L6D0",
+      "input_rank": 324,
+      "output_rank": 708,
+      "attempted_products": 48090,
+      "independent_products": 48090,
+      "stop": "expected_rank_reached",
+      "all_recombinations": "checked"
+    },
+    {
+      "label": "L12D0",
+      "input_rank": 708,
+      "output_rank": 1476,
+      "attempted_products": 246426,
+      "independent_products": 246426,
+      "stop": "expected_rank_reached",
+      "all_recombinations": "checked"
+    },
+    {
+      "label": "L24D0",
+      "input_rank": 1476,
+      "output_rank": 3012,
+      "attempted_products": 1085466,
+      "independent_products": 1085466,
+      "stop": "expected_rank_reached",
+      "all_recombinations": "checked"
+    }
+  ],
+  "requested_larger_space_ranks": [
+    452,
+    1476,
+    3012
+  ],
+  "completeness_interpretation": "native independent rank plus retained proper-curve, pole-divisor and RR-dimension bridge",
+  "complete_larger_spaces_constructed_under_retained_bridge": true,
+  "formal": {
+    "audited_declarations": 6,
+    "generic_AS_identity": true,
+    "ten_term_AS_precision615": true,
+    "coefficient_lift_precision615": true,
+    "coefficient_lift_proof_reused_from_R38": true,
+    "native_arrays_formalized": false,
+    "proper_geometry_formalized": false,
+    "independent_semantic_review": false
+  },
+  "scope": {
+    "ordinary460_or367_complete_divisors_evaluated": false,
+    "chosen_Koblitz_model_isogeny_evaluated": false,
+    "larger_n_geometric_transfer_evaluated": false,
+    "full_modular_Hom_lattice": false,
+    "full_quotient_saturation": false,
+    "proper_polarized_embedding": false,
+    "node187_coupled_divisor_closed": false
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "global_metrics_integration": "exporter extended after T-901 reservation cleared; committed-ref validation follows"
+}

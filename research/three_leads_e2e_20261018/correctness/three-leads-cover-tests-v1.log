@@ -1,0 +1,19 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-leads-audit)
+    Finished `release` profile [optimized] target(s) in 1.83s
+     Running unittests src/bin/curve_cover_check.rs (target/release/deps/curve_cover_check-6763d8f5d0deaed9)
+
+running 11 tests
+test tests::cover_graph_is_content_addressed_and_rejects_wrong_ec1_binding ... ok
+test tests::rejects_invalid_fields_singular_models_and_noncanonical_coefficients ... ok
+test tests::rejects_tampered_certificates ... ok
+test tests::unknown_is_not_no_cover_and_identities_are_bound ... ok
+test tests::all_small_prime_models_and_cover_points ... ok
+test tests::all_f8_models_and_cover_points ... ok
+test tests::all_small_model_changes_have_rational_inverses ... ok
+test tests::rabin_counts_the_irreducible_polynomials ... ok
+test tests::larger_extension_models_verify ... ok
+test tests::all_gf25_models_and_cover_points ... ok
+test tests::entire_catalog_replays_deterministically ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 24.48s
+

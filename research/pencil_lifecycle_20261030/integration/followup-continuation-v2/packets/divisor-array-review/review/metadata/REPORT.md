@@ -1,0 +1,15 @@
+# Divisor fixed-array copy and accessor contract
+
+Ten main declarations establish the modeled constructor and accessor connection for three_leads.rs lines 943-964. The construction preserves initialization, degree assignment, U zeroing, U then V prefix-copy order, and stored capacities three and two. This archive retains the existing proof outputs; packaging performs no new proof run or measurement.
+
+Construction. Successful shape assertions imply every sequential Array.setIfInBounds write is in bounds. The support accessor returns the original U list. The ordinate accessor returns the original V list when V is normalized, including empty or short padded ordinates. Canonicality holds for every stored coefficient, including zero padding. Decoded Mumford validity transports to the stored model. A shared adapter derives the full shape assertion from canonical normalized lists and polynomial validity.
+
+Recorded checks. Five successful proof/control/readback modules, ten main declarations, seven controls and seventeen named axiom readbacks have successful receipts and unchanged input bindings. The deliberately false theorem is rejected with exit one. Readbacks list only subsets of propext, Classical.choice and Quot.sound. Independent source-fidelity review is pending; compiler and dependency caches were reused and hash-bound.
+
+Controls. Exact identity, degree-one padding, degree-two short ordinate, empty ordinate, rejection of three malformed shape classes, and a nonnormalized zero-ordinate counterexample are retained. The seventh control composes the earlier F17 fast-call fixture into canonical fixed arrays with decoded validity. That fixture uses kernel-checked existential returned lists, rather than a new Rust execution.
+
+Retained failures. Two initial copy-module attempts failed on a reserved identifier, arithmetic normalization, symbolic conjunctions and explicit list-equality elimination. One accessor-module attempt failed on malformed polynomial type notation. Exact source snapshots, diagnostics and receipts remain under producer; successful sources also retain harmless warnings.
+
+Scope. The shared adapter requires prime p and 1<p with canonical normalized valid inputs; its fast caller retains prime 2<p<2^31, extension degree one and no tables. This models array values and copy/accessor order, not physical copy_from_slice, allocation, counters, usize/compiler behavior or divisor-class semantics. Assertion failure is modeled by None, not a proof of Rust panic behavior. Scientific cohorts, costs and campaign limits are unchanged.
+
+Sources and next joint. Read the exact constructor/accessors in src/cryptanalysis/three_leads.rs and the archived producer modules and dependency bindings; reuse the established fast-call and strict-storage constructions. This archival step proposes no new mathematical method. The next joint is whole addition dispatch and classifier validity on the constructed result, followed by exact fast/fallback representative agreement. The diagram shows proof structure because this packet has no comparable timing measurements.

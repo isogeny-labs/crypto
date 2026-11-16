@@ -13,7 +13,7 @@
 //!
 //! The on-disk contract is the managed worker's `manifest-sha256-v1`
 //! ([`NATIVE_CHECKPOINTS.md`](../../../infra/spot-system/NATIVE_CHECKPOINTS.md)):
-//! immutable `gen-<n>` directories, files streamed through SHA-256 and
+//! immutable `gen-<20 decimal digits>` directories, files streamed through SHA-256 and
 //! fsynced, and `checkpoint-manifest.json` written last by an atomic rename
 //! followed by a directory fsync.  A generation without the manifest is
 //! partial and is never restored.  Two committed generations are kept; the
@@ -33,7 +33,7 @@ use super::koblitz_bench::ClosureDegree;
 use crate::cryptanalysis::pq_groebner_f2::{mask_from64, masks_to_words_checked, F2BoolPoly, Mask};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufReader, BufWriter, Read, Write};
 #[cfg(unix)]
@@ -130,12 +130,14 @@ struct Catalog {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Entry {
     path: String,
     sha256: String,
     bytes: u64,
 }
 #[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Manifest {
     schema: String,
     job_id: String,
@@ -143,6 +145,29 @@ struct Manifest {
     generation: u64,
     committed: bool,
     files: Vec<Entry>,
+}
+
+fn generation_from_name(name: &str) -> Option<u64> {
+    let digits = name.strip_prefix("gen-")?;
+    if digits.len() != 20 || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    let generation = digits.parse().ok()?;
+    (generation >= 1).then_some(generation)
+}
+
+fn lower_hex_sha256(value: &str) -> bool {
+    value.len() == 64
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+}
+
+fn safe_checkpoint_basename(value: &str) -> bool {
+    let mut bytes = value.bytes();
+    bytes.next().is_some_and(|b| b.is_ascii_alphanumeric())
+        && bytes.all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+        && !value.contains("..")
 }
 
 struct HashWriter {
@@ -312,38 +337,70 @@ impl Store {
             saves: 0,
         };
         let mut gens = Vec::new();
+        let mut last_err = None;
         for entry in fs::read_dir(&store.root)? {
             let entry = entry?;
-            if let Some(n) = entry
-                .file_name()
-                .to_str()
-                .and_then(|s| s.strip_prefix("gen-"))
-                .and_then(|s| s.parse::<u64>().ok())
-            {
+            let path = entry.path();
+            let manifest_path = path.join("checkpoint-manifest.json");
+            let has_manifest = match fs::symlink_metadata(&manifest_path) {
+                Ok(_) => true,
+                Err(e)
+                    if matches!(
+                        e.kind(),
+                        io::ErrorKind::NotFound | io::ErrorKind::NotADirectory
+                    ) =>
+                {
+                    false
+                }
+                Err(e) => return Err(e),
+            };
+            if let Some(n) = entry.file_name().to_str().and_then(generation_from_name) {
                 store.generation = store.generation.max(n);
-                if entry.path().join("checkpoint-manifest.json").is_file() {
-                    gens.push((n, entry.path()));
-                } else {
+                if has_manifest {
+                    gens.push((n, path));
+                } else if entry.file_type()?.is_dir() {
                     // A save that was cut off (SIGKILL after the grace period,
                     // a lost node) can be hundreds of gigabytes of a state that
                     // can never be restored; the local disk is finite.
                     eprintln!("checkpoint: removing uncommitted generation {n}");
-                    fs::remove_dir_all(entry.path())?;
+                    fs::remove_dir_all(path)?;
                 }
+            } else if has_manifest {
+                let e = invalid(format!(
+                    "malformed committed-generation path {}",
+                    path.display()
+                ));
+                eprintln!("checkpoint: {e}; retaining it");
+                last_err = Some(e);
             }
         }
         gens.sort();
-        let mut last_err = None;
         for (n, dir) in gens.into_iter().rev() {
-            match Self::verify(&dir) {
-                Ok(()) => {
-                    let mut catalog: Catalog = serde_json::from_reader(BufReader::new(
-                        File::open(dir.join("catalog.json"))?,
-                    ))?;
-                    if catalog.version != 1 {
-                        return Err(invalid("unsupported checkpoint catalog"));
-                    }
-                    catalog.segments += 1;
+            let restored = (|| -> io::Result<Catalog> {
+                let manifest = Self::verify(&dir, n)?;
+                let catalog_path = dir.join("catalog.json");
+                let catalog_metadata = fs::symlink_metadata(&catalog_path)?;
+                if !catalog_metadata.file_type().is_file() {
+                    return Err(invalid("checkpoint catalog is not a regular file"));
+                }
+                let mut catalog: Catalog =
+                    serde_json::from_reader(BufReader::new(File::open(catalog_path)?))?;
+                if catalog.version != 1 {
+                    return Err(invalid("unsupported checkpoint catalog"));
+                }
+                if catalog.system_sha256 != manifest.spec_sha256 {
+                    return Err(invalid(
+                        "manifest spec_sha256 disagrees with the checkpoint catalog",
+                    ));
+                }
+                catalog.segments = catalog
+                    .segments
+                    .checked_add(1)
+                    .ok_or_else(|| invalid("checkpoint segment count overflow"))?;
+                Ok(catalog)
+            })();
+            match restored {
+                Ok(catalog) => {
                     eprintln!(
                         "checkpoint: restoring generation {n}: {} degrees done, active {:?}, segment {}",
                         catalog.completed.len(),
@@ -378,19 +435,56 @@ impl Store {
         Ok(store)
     }
 
-    fn verify(dir: &Path) -> io::Result<()> {
-        let manifest: Manifest =
-            serde_json::from_reader(File::open(dir.join("checkpoint-manifest.json"))?)?;
-        if manifest.schema != SCHEMA || !manifest.committed {
+    fn verify(dir: &Path, generation: u64) -> io::Result<Manifest> {
+        let dir_metadata = fs::symlink_metadata(dir)?;
+        if !dir_metadata.file_type().is_dir() {
+            return Err(invalid("checkpoint generation is not a regular directory"));
+        }
+        let manifest_path = dir.join("checkpoint-manifest.json");
+        let manifest_metadata = fs::symlink_metadata(&manifest_path)?;
+        if !manifest_metadata.file_type().is_file() {
+            return Err(invalid("checkpoint manifest is not a regular file"));
+        }
+        let manifest: Manifest = serde_json::from_reader(File::open(manifest_path)?)?;
+        if manifest.schema != SCHEMA || manifest.job_id != "dreg-closure" || !manifest.committed {
             return Err(invalid("manifest is not a committed spot.checkpoint/v1"));
         }
+        if !lower_hex_sha256(&manifest.spec_sha256) {
+            return Err(invalid("manifest spec_sha256 is not lowercase SHA-256"));
+        }
+        if manifest.generation != generation {
+            return Err(invalid("manifest generation disagrees with its directory"));
+        }
+        if manifest.files.is_empty() {
+            return Err(invalid("manifest has no files"));
+        }
+        let mut manifest_paths = BTreeSet::new();
         for entry in &manifest.files {
-            if entry.path.contains('/') || entry.path.contains("..") {
-                return Err(invalid("manifest path escapes the generation"));
+            if !safe_checkpoint_basename(&entry.path) {
+                return Err(invalid("manifest path is not a safe ASCII basename"));
+            }
+            if !manifest_paths.insert(entry.path.as_str()) {
+                return Err(invalid(format!(
+                    "manifest repeats checkpoint path {}",
+                    entry.path
+                )));
+            }
+            if !lower_hex_sha256(&entry.sha256) {
+                return Err(invalid(format!(
+                    "{} has a non-canonical SHA-256",
+                    entry.path
+                )));
             }
             let path = dir.join(&entry.path);
-            if fs::symlink_metadata(&path)?.file_type().is_symlink() {
-                return Err(invalid("checkpoint symlink"));
+            let metadata = fs::symlink_metadata(&path)?;
+            if !metadata.file_type().is_file() {
+                return Err(invalid(format!(
+                    "{} is not a regular checkpoint file",
+                    entry.path
+                )));
+            }
+            if metadata.len() != entry.bytes {
+                return Err(invalid(format!("{} byte count disagrees", entry.path)));
             }
             let mut f = File::open(path)?;
             let mut hash = Sha256::new();
@@ -408,7 +502,36 @@ impl Store {
                 return Err(invalid(format!("{} checksum disagrees", entry.path)));
             }
         }
-        Ok(())
+        if !manifest_paths.contains("catalog.json") {
+            return Err(invalid("manifest does not contain catalog.json"));
+        }
+        let mut disk_paths = BTreeSet::new();
+        for actual in fs::read_dir(dir)? {
+            let actual = actual?;
+            if actual.file_name() == "checkpoint-manifest.json" {
+                continue;
+            }
+            let name = actual
+                .file_name()
+                .into_string()
+                .map_err(|_| invalid("generation contains a non-UTF-8 entry"))?;
+            if !safe_checkpoint_basename(&name) || !actual.file_type()?.is_file() {
+                return Err(invalid(format!(
+                    "generation entry {name:?} is not a regular safe-named file"
+                )));
+            }
+            disk_paths.insert(name);
+        }
+        if disk_paths.len() != manifest_paths.len()
+            || !disk_paths
+                .iter()
+                .all(|path| manifest_paths.contains(path.as_str()))
+        {
+            return Err(invalid(
+                "manifest paths do not exactly match the generation files",
+            ));
+        }
+        Ok(manifest)
     }
 
     /// Process starts that have worked on this store (1 on a fresh one).
@@ -443,10 +566,15 @@ impl Store {
         let mut committed: Vec<PathBuf> = fs::read_dir(&self.root)?
             .filter_map(|e| e.ok().map(|e| e.path()))
             .filter(|p| {
-                p.file_name()
+                let canonical_name = p
+                    .file_name()
                     .and_then(|s| s.to_str())
-                    .is_some_and(|s| s.starts_with("gen-"))
-                    && p.join("checkpoint-manifest.json").is_file()
+                    .and_then(generation_from_name)
+                    .is_some();
+                let regular_dir = fs::symlink_metadata(p).is_ok_and(|m| m.file_type().is_dir());
+                let regular_manifest = fs::symlink_metadata(p.join("checkpoint-manifest.json"))
+                    .is_ok_and(|m| m.file_type().is_file());
+                canonical_name && regular_dir && regular_manifest
             })
             .collect();
         committed.sort();
@@ -462,11 +590,15 @@ impl Store {
 
     fn save(&mut self, payload: Payload<'_>) -> io::Result<()> {
         let started = Instant::now();
+        let next_generation = self
+            .generation
+            .checked_add(1)
+            .ok_or_else(|| invalid("checkpoint generation overflow"))?;
         // Make room first: keep only the newest committed generation while the
         // next is written, so the peak is two states on disk, not three, and a
         // valid generation survives a loss at any point of the write.
         self.prune(KEEP - 1)?;
-        self.generation += 1;
+        self.generation = next_generation;
         let dir = self.root.join(format!("gen-{:020}", self.generation));
         fs::create_dir(&dir)?;
         let mut files = vec![write_file(&dir, "catalog.json", |w| {
@@ -978,6 +1110,46 @@ mod tests {
         dir
     }
 
+    fn fixture_generation(
+        root: &Path,
+        name: &str,
+        generation: u64,
+        system_sha256: &str,
+    ) -> (PathBuf, serde_json::Value) {
+        let dir = root.join(name);
+        fs::create_dir_all(&dir).unwrap();
+        let catalog = Catalog {
+            version: 1,
+            system_sha256: system_sha256.into(),
+            segments: 1,
+            ..Default::default()
+        };
+        let catalog_bytes = serde_json::to_vec(&catalog).unwrap();
+        fs::write(dir.join("catalog.json"), &catalog_bytes).unwrap();
+        let manifest = serde_json::json!({
+            "schema": SCHEMA,
+            "job_id": "dreg-closure",
+            "spec_sha256": system_sha256,
+            "generation": generation,
+            "committed": true,
+            "files": [{
+                "path": "catalog.json",
+                "sha256": format!("{:x}", Sha256::digest(&catalog_bytes)),
+                "bytes": catalog_bytes.len(),
+            }],
+        });
+        write_fixture_manifest(&dir, &manifest);
+        (dir, manifest)
+    }
+
+    fn write_fixture_manifest(dir: &Path, manifest: &serde_json::Value) {
+        fs::write(
+            dir.join("checkpoint-manifest.json"),
+            serde_json::to_vec(manifest).unwrap(),
+        )
+        .unwrap();
+    }
+
     /// Chained draws, unsatisfiable and satisfiable, whose closure takes
     /// several rounds at degrees 3 and 4.
     fn systems() -> Vec<(String, Vec<F2BoolPoly>, usize)> {
@@ -1075,6 +1247,204 @@ mod tests {
             }
         }
         panic!("the scan never finished");
+    }
+
+    #[test]
+    fn a_committed_generation_name_must_be_canonical_and_is_retained_on_failure() {
+        assert_eq!(generation_from_name("gen-00000000000000000001"), Some(1));
+        assert_eq!(
+            generation_from_name("gen-18446744073709551615"),
+            Some(u64::MAX)
+        );
+        assert_eq!(generation_from_name("gen-00000000000000000000"), None);
+        assert_eq!(generation_from_name("gen-1"), None);
+
+        let root = scratch("generation-name");
+        let system = "1".repeat(64);
+        let (malformed, _) = fixture_generation(&root, "gen-1", 1, &system);
+        assert!(Store::open(&root, Duration::from_secs(3600)).is_err());
+        assert!(
+            malformed.is_dir(),
+            "malformed committed generation was removed"
+        );
+
+        fixture_generation(&root, "gen-00000000000000000001", 1, &system);
+        let store = Store::open(&root, Duration::from_secs(3600)).unwrap();
+        assert_eq!(store.catalog.system_sha256, system);
+        assert!(
+            malformed.is_dir(),
+            "malformed committed generation was removed during fallback"
+        );
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn checkpoint_generation_overflow_is_an_invalid_store_error() {
+        let root = scratch("generation-overflow");
+        let mut store = Store::open(&root, Duration::from_secs(3600)).unwrap();
+        store.generation = u64::MAX;
+        let err = store.save(Payload::Catalog).unwrap_err();
+        assert_eq!(err.kind(), io::ErrorKind::InvalidData);
+        assert_eq!(fs::read_dir(&root).unwrap().count(), 0);
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn checkpoint_manifests_and_entries_reject_unknown_fields() {
+        for target in ["manifest", "entry"] {
+            let root = scratch(&format!("unknown-{target}"));
+            let (generation, mut manifest) =
+                fixture_generation(&root, "gen-00000000000000000001", 1, &"2".repeat(64));
+            if target == "manifest" {
+                manifest["unknown"] = serde_json::json!(true);
+            } else {
+                manifest["files"][0]["unknown"] = serde_json::json!(true);
+            }
+            write_fixture_manifest(&generation, &manifest);
+            assert!(
+                Store::verify(&generation, 1).is_err(),
+                "accepted an unknown {target} field"
+            );
+            let _ = fs::remove_dir_all(root);
+        }
+    }
+
+    #[test]
+    fn checkpoint_manifest_identity_is_exact() {
+        for field in [
+            "schema",
+            "job_id",
+            "spec_sha256",
+            "generation",
+            "committed",
+            "files",
+        ] {
+            let root = scratch(&format!("identity-{field}"));
+            let (generation, mut manifest) =
+                fixture_generation(&root, "gen-00000000000000000001", 1, &"3".repeat(64));
+            match field {
+                "schema" => manifest[field] = serde_json::json!("spot.checkpoint/v2"),
+                "job_id" => manifest[field] = serde_json::json!("another-job"),
+                "spec_sha256" => manifest[field] = serde_json::json!("A".repeat(64)),
+                "generation" => manifest[field] = serde_json::json!(2),
+                "committed" => manifest[field] = serde_json::json!(false),
+                "files" => manifest[field] = serde_json::json!([]),
+                _ => unreachable!(),
+            }
+            write_fixture_manifest(&generation, &manifest);
+            assert!(
+                Store::verify(&generation, 1).is_err(),
+                "accepted wrong manifest {field}"
+            );
+            let _ = fs::remove_dir_all(root);
+        }
+    }
+
+    #[test]
+    fn checkpoint_manifest_spec_is_bound_to_the_catalog() {
+        let root = scratch("spec-binding");
+        let (generation, mut manifest) =
+            fixture_generation(&root, "gen-00000000000000000001", 1, &"9".repeat(64));
+        manifest["spec_sha256"] = serde_json::json!("a".repeat(64));
+        write_fixture_manifest(&generation, &manifest);
+        assert!(Store::open(&root, Duration::from_secs(3600)).is_err());
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn checkpoint_manifest_paths_are_unique_and_complete() {
+        let system = "7".repeat(64);
+
+        let root = scratch("duplicate-path");
+        let (generation, mut manifest) =
+            fixture_generation(&root, "gen-00000000000000000001", 1, &system);
+        let duplicate = manifest["files"][0].clone();
+        manifest["files"].as_array_mut().unwrap().push(duplicate);
+        write_fixture_manifest(&generation, &manifest);
+        assert!(Store::verify(&generation, 1).is_err());
+        let _ = fs::remove_dir_all(root);
+
+        let root = scratch("missing-catalog");
+        let (generation, mut manifest) =
+            fixture_generation(&root, "gen-00000000000000000001", 1, &system);
+        fs::rename(
+            generation.join("catalog.json"),
+            generation.join("basis.bin"),
+        )
+        .unwrap();
+        manifest["files"][0]["path"] = serde_json::json!("basis.bin");
+        write_fixture_manifest(&generation, &manifest);
+        assert!(Store::verify(&generation, 1).is_err());
+        let _ = fs::remove_dir_all(root);
+
+        for kind in ["file", "directory"] {
+            let root = scratch(&format!("unlisted-{kind}"));
+            let (generation, _) = fixture_generation(&root, "gen-00000000000000000001", 1, &system);
+            if kind == "file" {
+                fs::write(generation.join("unlisted.bin"), b"unlisted").unwrap();
+            } else {
+                fs::create_dir(generation.join("unlisted-dir")).unwrap();
+            }
+            assert!(
+                Store::verify(&generation, 1).is_err(),
+                "accepted an unlisted {kind}"
+            );
+            let _ = fs::remove_dir_all(root);
+        }
+    }
+
+    #[test]
+    fn checkpoint_entry_names_match_the_runner_ascii_basename_rule() {
+        for valid in ["catalog.json", "A-1_2.3", "0"] {
+            assert!(safe_checkpoint_basename(valid), "rejected {valid}");
+        }
+        for invalid in [
+            "",
+            "_catalog.json",
+            "a..b",
+            "dir/catalog.json",
+            "dir\\catalog.json",
+            "café.json",
+        ] {
+            assert!(!safe_checkpoint_basename(invalid), "accepted {invalid}");
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn checkpoint_entries_must_be_regular_non_symlink_files() {
+        use std::os::unix::fs::symlink;
+
+        let root = scratch("symlink");
+        let (generation, _) =
+            fixture_generation(&root, "gen-00000000000000000001", 1, &"4".repeat(64));
+        fs::rename(
+            generation.join("catalog.json"),
+            generation.join("catalog-real.json"),
+        )
+        .unwrap();
+        symlink("catalog-real.json", generation.join("catalog.json")).unwrap();
+        assert!(Store::verify(&generation, 1).is_err());
+
+        let (generation, _) =
+            fixture_generation(&root, "gen-00000000000000000002", 2, &"8".repeat(64));
+        symlink("catalog.json", generation.join("unlisted-link")).unwrap();
+        assert!(Store::verify(&generation, 2).is_err());
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn a_corrupt_newest_fixture_falls_back_to_the_previous_generation() {
+        let root = scratch("fixture-fallback");
+        let old_system = "5".repeat(64);
+        fixture_generation(&root, "gen-00000000000000000001", 1, &old_system);
+        let (newest, _) = fixture_generation(&root, "gen-00000000000000000002", 2, &"6".repeat(64));
+        fs::write(newest.join("catalog.json"), b"corrupt").unwrap();
+
+        let store = Store::open(&root, Duration::from_secs(3600)).unwrap();
+        assert_eq!(store.catalog.system_sha256, old_system);
+        assert_eq!(store.segments(), 2);
+        let _ = fs::remove_dir_all(root);
     }
 
     #[test]

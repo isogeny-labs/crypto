@@ -1,5 +1,7 @@
 # Prime-field and general ECDLP index-calculus leads in aburan28/crypto: inventory, status, kills, next steps
 
+> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands.
+
 Scope: the local repo at `/home/user/crypto`, read on 2026-10-14. Sources are the top-level `RESEARCH_*.md` files, `docs/ic/`, `research/notes/index-calculus/`, and dated study directories under `research/`. All source links are repo-relative paths. Git dates are merge dates. The clone's history starts on 2026-09-28, so it is probably shallow, and documents give their own dates, which are quoted below. Binary, Koblitz, ECC2K-130 and Weil-descent leads are covered by another researcher and appear here only where they touch prime-field or general leads.
 
 ---
@@ -166,7 +168,10 @@ Isogeny, fiber, transfer and conductor-gap leads are all closed as constant-fact
 **K. Other closed prime-field probes**
 - Symmetric `S₃` rewrite (asymptotic reach 1/9 < 1/6) is closed on paper. — [Source](RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md) §4.6
 - Multiplicative-subgroup bases (`x^B = 1`, no exponent change) are closed on paper. — same source
-- xedni lifting is closed on paper (JKSST 2000). — same source
+- classic xedni lifting has a strong conditional obstruction on paper (JKSST
+  2000); its selected-lift and probability interfaces are not unconditional
+  closure theorems. — same source; see the Lean audit in
+  `research/jksst_xedni_audit_20261101/`
 - Embedding into `F_{p^n}` is closed on paper (`p^{2−2/n}` against `√p`). — same source
 - The zero-minor guess-and-determine method (Mahalanobis, arXiv 2607.09814) has slope 0.905. Its cost ratio to rho grows from 260× to 6,715× over 16 to 26 bits. — [Source](research/lit2026_w12_flagged_claims_20261011/README.md)
 - The P-256 backdoor map ranks four hypotheses. "UnknownAlgorithm" is "NotPubliclyTestable". The prime-regime IC ladder "remains above rho at every measured size". — [Source](RESEARCH_P256_BACKDOOR_SPECULATION.md) §4

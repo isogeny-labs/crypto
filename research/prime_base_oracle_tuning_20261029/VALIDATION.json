@@ -1,0 +1,105 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-fp20-tm565-6d7d1d32"
+ ],
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "abfda6629a6df76ea1a58e769bc7c16e308a92a21bd58429bf8978b61a8abde2"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "b476bdb2a87e214e7d2c7cf925ba4beafae8d4499f71227489411765e77cbb58"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md section 4.4 holdout arm rho-neg: rho.negation, same session ECBS1h685271327a8a, same 48 targets, rounds and algorithm seeds as sel and inc",
+  "unit": "ecbench.gae / sqrt(r) (S), unpriced native operations priced at w GAE each (AGENTS.md section 5a); rho canonicalisations priced the same way",
+  "binary_or_process": "ecbench sha256 bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9, session ECBS1h685271327a8a (sessions/holdout-P20)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "E: y^2 = x^3 + 232725x + 341758 over F_803441 (prime field), r = 804007 prime, cofactor 1, j = 109888 (neither 0 nor 1728), so Aut(E) = {+-1} and the negation map is the only automorphism fold; a curve over a prime field has no subfield, so no Frobenius/GLS fold exists. Records: automorphisms_available 2, automorphisms_used 2 for rho.negation.",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band_row": "icv1-fp20-tm565-6d7d1d32: ic = sel mean S over 96 measured runs, rho = rho-neg mean S over the same 96 (target, round) pairs",
+  "gae_band": {
+   "0": {
+    "ic": 10.514525023004323,
+    "rho": 1.3571363693225533
+   },
+   "0.1": {
+    "ic": 11.828568810036169,
+    "rho": 1.4743369477713688
+   },
+   "1": {
+    "ic": 23.654962893322775,
+    "rho": 2.529142153810707
+   }
+  },
+  "gae_band_baseline": {
+   "0": {
+    "ic": 12.853413437618684,
+    "rho": 1.3571363693225533
+   },
+   "0.1": {
+    "ic": 14.825797662429673,
+    "rho": 1.4743369477713688
+   },
+   "1": {
+    "ic": 32.57725568572858,
+    "rho": 2.529142153810707
+   }
+  },
+  "paired_ratio_sums": {
+   "0": {
+    "sel_over_rho": 7.747581791100991,
+    "inc_over_rho": 9.470981493211895,
+    "sel_over_inc": 0.8180336744036392
+   },
+   "0.1": {
+    "sel_over_rho": 8.022975228231527,
+    "inc_over_rho": 10.05590864750462,
+    "sel_over_inc": 0.7978369244854301
+   },
+   "1": {
+    "sel_over_rho": 9.35295900931523,
+    "inc_over_rho": 12.88075311885645,
+    "sel_over_inc": 0.7261189561674933
+   }
+  },
+  "order_holds_across_band": true,
+  "order": "rho-neg < sel < inc at w = 0, 0.1 and 1 (band ranks and paired ratios); rho is ahead by 7.7x to 9.4x: distance remaining, not a beat"
+ },
+ "verdict": "passed",
+ "caveats": [
+  "PROTOCOL.md section 13 second-host replay: established by an independent validation (VAL-20261029-7ff9db, validation/second-host/replay-certificate.json). The frozen holdout-P20 spec was re-executed on isolab-eks (EC2 c8a.2xlarge, AMD EPYC 9R45, L2; session ECBS1h517504d65837, ecbench 583e62f0 built from cb2ec687) with only label, measurement.rounds 2 -> 5 and measurement.isolation_required L0 -> L2 changed. All 1,008 records of ECBS1h685271327a8a have a partner with the same arm, workload, round and algorithm seed, identical in every counted, band-priced and outcome field (validator's own comparison); priced S is identical at w = 0, 0.1 and 1 on every pair; the local binary bf5eec6d replays 1,680/1,680 second-host measured runs identically; [d]G = Q holds on 2,016/2,016 second-host records under the validator's own arithmetic. The statements in replay-certificate.json and validator-report.json that no second-host replay exists predate this and are superseded by it.",
+  "Form of the second-host replay: a new session from the frozen spec matched record by record to the original, plus a local `ecbench verify --replay-all` of the new session; not an `ecbench verify --replay-all` receipt of the original session's bytes produced on the second host. `ecbench claim build --independent-receipt` (vs_rho claims) would need that form. The second-host binary's source revision is attested by its image (build-info.json), not rebuilt by the validator.",
+  "replay_certificate above is the same-host, same-binary replay (env class ECBENV3hc4d998f5ae3f); the second-host replay is a different host class and ecbench build. Neither is an independent implementation: both hosts ran ecbench. The validators' own [d]G = Q checks and stdlib recomputes are the implementation-independent checks.",
+  "The second host's older build does not emit the bitop/v1 `work` block or phase `work_native`, so no bitop/v1 figure is covered by the second-host replay. Wall times differ by host and are not compared.",
+  "The second-host session's rounds 3-5 (144 extra target-round pairs per arm on the same curve, seeds the original never ran) are post-freeze data. Over its 240 pairs sel/inc is 0.836 [0.806, 0.866], 0.817 [0.786, 0.847] and 0.746 [0.714, 0.779] at w = 0, 0.1 and 1, consistent with the frozen 96-pair reading; the decision-bearing numbers remain the frozen holdout's (gae_band and paired_ratio_sums above).",
+  "One fresh holdout curve at 20 bits (icv1-fp20-tm565-6d7d1d32, log2 r = 19.62); 48 targets x 2 rounds. The interval covers target-to-target variation on that curve only, not curve-to-curve variation. No exponent, pooled or other-size claim.",
+  "Counted unit only: ecbench GAE / sqrt(r), with unpriced native work priced at w = 0, 0.1, 1 (section 5a). At w = 0 the IC arms are lower bounds (`lower_bound: true`). No wall-clock claim; wall ratios in the compare files are L0 and descriptive.",
+  "The 20-bit holdout gain (18.2% at w = 0, 27.4% at w = 1) is larger than PROTOCOL.md section 10 prediction 4 ('any holdout gain is under about 10%'); the README does not mention the prediction. The train sweep already showed it (mitm2 n45 vs n32 at w = 0.1: 11.24 vs 13.92). Not a decision criterion; recorded as an unexpected observation."
+ ],
+ "promotion_blockers": [],
+ "promotion_note": "No evidence blocker known to the validators remains for row icv1-fp20-tm565-6d7d1d32: the section 13 second-host replay now exists and verifies. Promotion itself is the Coordinator's decision; this file records evidence admissibility, not authorization.",
+ "second_host_replay": {
+  "status": "verified",
+  "validation_id": "VAL-20261029-7ff9db",
+  "replay_certificate": {
+   "path": "validation/second-host/replay-certificate.json",
+   "sha256": "5a39b0defe4d556d0c204b145824be42da32c7e2239e135aa57561e29fc31981"
+  },
+  "validation_report": {
+   "path": "validation/second-host/validation_report.yaml",
+   "sha256": "ddf3a590a7e01bcf21f7518fdf4b8009f56c535aa94e63ab0d74d53b522650fd"
+  },
+  "receipts_sha256sums": {
+   "path": "validation/second-host/SHA256SUMS",
+   "sha256": "6370172c7bf9b0d504c57d1937f9e0dfb7f33d6fb3e9ce0ff7624a6d9b4784c1"
+  },
+  "session": "second-host/eks-results/session (ECBS1h517504d65837)",
+  "original_session": "sessions/holdout-P20 (ECBS1h685271327a8a)",
+  "records_matched_identical": "1008/1008"
+ }
+}

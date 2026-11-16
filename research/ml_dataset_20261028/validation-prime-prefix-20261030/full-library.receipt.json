@@ -1,0 +1,19 @@
+{
+  "kind": "software-validation",
+  "source_commit": "113526b577044a6283be81acb1a847c89c96aa4e",
+  "started_utc": "2026-10-30T02:57:29Z",
+  "finished_utc": "2026-10-30T03:33:43Z",
+  "exit_code": 0,
+  "source_readback_matches": true,
+  "command": [
+    "env",
+    "RAYON_NUM_THREADS=8",
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--",
+    "--test-threads=1"
+  ],
+  "verified_cloud_dataset_cells": 0
+}

@@ -29,7 +29,6 @@ From this directory:
 lake exe cache get
 lake build
 lake env lean AxiomAudit.lean
-```
 
 `AxiomAudit.lean` rejects proof dependencies outside the repository's standard
 allowlist (`propext`, `Classical.choice`, and `Quot.sound`) and also prints the
@@ -49,9 +48,7 @@ Mathlib.GroupTheory.OrderOfElement`.
 In that project, `lake build CoverTransfer` completed successfully (1,131
 jobs), and `lake env lean AxiomAudit.lean` exited zero.  The audit printed:
 
-```text
 AXIOM_AUDIT|CoverTransfer.pull_injective_on_subgroup|[propext, Classical.choice, Quot.sound]
-```
 
 This is a local kernel and axiom check of the conditional theorem as stated.
 The exact-head hosted proof job must also pass before this PR merges.  Neither
@@ -78,3 +75,45 @@ If `gcd(d, r) ≠ 1`, the theorem is merely inapplicable; it does not prove that
 pullback has a nontrivial kernel.  Each catalog row still needs independent
 certificates for its geometric and arithmetic hypotheses before this lemma can
 promote an injectivity claim.
+
+
+
+
+
+
+
+
+
+
+
+### Original local attempt (2026-10-13)
+
+The session installed and identified Lean `v4.34.1`, and `lake update`
+completed in a temporary copy and produced the included manifest.  The
+remaining replay could not be completed in this workspace.  The exact cache
+command was:
+
+XDG_CACHE_HOME=/tmp/cover-transfer-cache lake exe cache get
+
+Its last captured progress was 2,536 of 8,908 cache files; the sandbox then
+reported `No space left on device` while creating a workspace mount.  The
+temporary downloader and its files were stopped and removed.  Consequently,
+`lake build` and `lake env lean AxiomAudit.lean` were not executed in that
+session, so the original attempt did not establish kernel verification.
+
+### Pinned replay (2026-10-22)
+
+The five source and dependency files were copied byte-for-byte to local scratch
+storage, where the pinned Mathlib cache completed. The [cache log](evidence/2026-10-22-cache-get.log)
+records 8,908 downloaded and decompressed files. The [build log](evidence/2026-10-22-build.log)
+records a successful `lake build` of 1,131 jobs. The [axiom audit](evidence/2026-10-22-axiom-audit.log)
+completed with only `propext`, `Classical.choice`, and `Quot.sound` for
+`pull_injective_on_subgroup`. The exact input hashes, commands, and the failed
+mounted-home checkout attempt are in the [replay receipt](evidence/2026-10-22-replay.json).
+
+This verifies the named conditional theorem under the pinned Lean and Mathlib
+dependencies. It does not discharge any per-cover premise below.
+
+
+
+

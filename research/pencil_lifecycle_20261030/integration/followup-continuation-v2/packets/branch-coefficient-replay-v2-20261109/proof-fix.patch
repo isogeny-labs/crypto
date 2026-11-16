@@ -1,0 +1,25 @@
+--- failed/BranchConjugateOrders.lean.txt
++++ successor/BranchConjugateOrders.lean.txt
+@@ -53,10 +53,18 @@
+     rw [AddValuation.map_mul, hm, hp]
+     norm_num
+   refine ⟨hm,hp,hprod,?_,?_,?_,?_⟩
+-  · simp [hm]
+-  · simp [hp]
+-  · simp [hm]
+-  · simp [hprod]
++  · change v (N-B*Y) ≠ ⊤
++    rw [hm]
++    norm_num
++  · change v (N+B*Y) ≠ ⊤
++    rw [hp]
++    norm_num
++  · change (v (N-B*Y)).toNat = 1
++    rw [hm]
++    norm_num
++  · change (v ((N-B*Y)*(N+B*Y))).toNat = 2
++    rw [hprod]
++    norm_num
+ 
+ -- A separable actual quintic supplies hsimple. A root of the norm support
+ -- supplies the numerator root using the existing polynomial factor theorem.

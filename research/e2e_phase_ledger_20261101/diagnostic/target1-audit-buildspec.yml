@@ -1,0 +1,13 @@
+version: 0.2
+env:
+  shell: bash
+phases:
+  build:
+    commands:
+      - set -euo pipefail
+      - script_sha=f4fc1740115b745f548054af61b5571c215c7bec1513d3c4a2c35e124870d6f0
+      - script_key="inputs/requests/$script_sha.audit-diagnose"
+      - aws s3 cp "s3://$ISOLAB_BUCKET/$script_key" /tmp/audit-diagnose --only-show-errors
+      - test "$(sha256sum /tmp/audit-diagnose | cut -d ' ' -f1)" = "$script_sha"
+      - chmod 0700 /tmp/audit-diagnose
+      - /tmp/audit-diagnose gh-41343654905-1 a518dca6-0894-4dce-bc3c-5bf02a165242 3516bd65ea320e1d5555def621f8130684312f8a9eef654dc89d5e28f790ce19 32303a6d51d7a43ce887cd9da8f6d82afea4793c f3aab23417ece64cb3373e5c66d2c3be343e18c0e89347f626e0aea18ab1b774 41343654905 d5c4f94f-7171-46a0-a14f-e5cb7e213dca 9a1f74a1-2ae0-4dd3-ab1e-51fa771eca69

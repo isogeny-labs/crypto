@@ -1,0 +1,23 @@
+\documentclass[10pt]{article}
+\usepackage[margin=21mm]{geometry}
+\usepackage[T1]{fontenc}\usepackage{lmodern}
+\begin{document}
+\section*{Independent review: degree-two ordered-guard exclusion}
+\textbf{Finding.} No blocking discrepancy was found at the claimed field guard scope. The exact helper expression and inverse-before-equal source ordering agree with the three propositions. Fresh private main, producer controls, separate axiom readback and reviewer boundary controls all exited0.
+
+\begin{center}\fbox{Outer equal arm: crossed ordinates equal, inverse false}\par $\downarrow$\par
+\fbox{Assume inner B=0 and s=0}\par $\downarrow$\par
+\fbox{$B=-2t^2=0$, with $2\ne0$, gives $t=0$}\par $\downarrow$\par
+\fbox{Both crossed pairs zero imply earlier inverse guard true}\par $\downarrow$\par
+\fbox{Contradiction: B=0 must select the point-doubling arm}\end{center}
+
+The retained Rust source computes $B=2((qs-t)t-(rs)s)$ at lines735--737. The outer dispatcher checks support equality, then crossed inverse ordinates, then equal ordinates at lines921--929. The theorem uses precisely equal crossed ordinates plus the earlier inverse predicate being false. It does not assume polynomial validity, nonzero representation weights or output properties. Omitting support equalities makes the algebraic theorem stronger; those equalities remain part of actual source reachability.
+
+A direct helper call with s=t=0 can return b\_zero\_identity; the reviewed theorem excludes that labeled branch only in this ordered outer-call context. Selecting the point-doubling arm does not prove its eventual output degree, nonidentity, validity or class sum. The arm calls dbl, whose result requires separate payload reasoning.
+
+Reviewer controls checked a nonvacuous rational B-zero point arm, the direct identity case, a characteristic-two counterexample to the standalone scalar implication, and zero-weight simultaneous inverse/equal predicates. Producer controls additionally use nonunit weighted equal inputs. Readback contains only propext, Classical.choice and Quot.sound. Producer files were not modified. An initial review hash reader assumed a nested manifest and failed before copying; the corrected flat-map verification passed and the failure is recorded.
+
+The proposed next component is an exact UInt64 B expression, canonical decode and the implication crossPreludeWord=Some sameUDouble and Bword=0 implies a.s!=0. Existing cross-scaling and classifier correspondence supply actual guard ordering. Prime $5\le p<2^{31}$, canonical inputs and the no-table n1 route remain explicit; no new scientific or performance claim is introduced. The proposal is recorded separately and was not implemented by this review.
+
+Source, producer manifest, native receipts and review-plan hashes are bound in review.json and manifest.json. Every replay command was capped at120seconds using existing pinned dependencies. No scientific execution occurred; cost ratio is null.
+\end{document}

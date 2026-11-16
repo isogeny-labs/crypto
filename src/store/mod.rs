@@ -38,7 +38,7 @@ pub mod backend;
 pub mod cli;
 pub mod index;
 
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -190,6 +190,7 @@ pub enum CacheState {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RemoteState {
     Ok,
+    BytesOk,
     Absent,
     Mismatch(String),
 }
@@ -206,7 +207,26 @@ pub struct VerifyRow {
 pub struct Store {
     pub cfg: Config,
     pub index: Index,
+    index_at_open: Index,
     backend: Option<Box<dyn Backend>>,
+}
+
+fn lock_index(path: &Path) -> Result<fs::File, String> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
+    }
+    let mut name = path.as_os_str().to_os_string();
+    name.push(".lock");
+    let lock_path = PathBuf::from(name);
+    let lock = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(false)
+        .open(&lock_path)
+        .map_err(|e| format!("{}: {e}", lock_path.display()))?;
+    lock.lock()
+        .map_err(|e| format!("{}: {e}", lock_path.display()))?;
+    Ok(lock)
 }
 
 fn make_backend(cfg: &Config) -> Option<Box<dyn Backend>> {
@@ -238,11 +258,25 @@ fn make_read_only(path: &Path) {
 fn make_read_only(_path: &Path) {}
 
 impl Store {
+    /// Open with a caller-owned backend, preserving the index/cache semantics.
+    /// Dataset publication uses this to install its admitted native transport;
+    /// the default store factory remains unchanged.
+    pub fn open_with_backend(cfg: Config, backend: Box<dyn Backend>) -> Result<Self, String> {
+        let index = Index::load(&cfg.index_path)?;
+        Ok(Self {
+            cfg,
+            index_at_open: index.clone(),
+            index,
+            backend: Some(backend),
+        })
+    }
+
     pub fn open(cfg: Config) -> Result<Self, String> {
         let index = Index::load(&cfg.index_path)?;
         let backend = make_backend(&cfg);
         Ok(Self {
             cfg,
+            index_at_open: index.clone(),
             index,
             backend,
         })
@@ -268,8 +302,33 @@ impl Store {
         })
     }
 
-    pub fn save_index(&self) -> Result<(), String> {
-        self.index.save(&self.cfg.index_path)
+    pub fn save_index(&mut self) -> Result<(), String> {
+        let _lock = lock_index(&self.cfg.index_path)?;
+        let current = Index::load(&self.cfg.index_path)?;
+        if current != self.index_at_open {
+            return Err(format!(
+                "{}: index changed since this store was opened; reopen before saving",
+                self.cfg.index_path.display()
+            ));
+        }
+        self.index.save(&self.cfg.index_path)?;
+        self.index_at_open = self.index.clone();
+        Ok(())
+    }
+
+    /// Remove a name from the current on-disk index under the same lock as push.
+    /// The remote object and cached bytes are left alone.
+    pub fn remove_name(&mut self, name: &str) -> Result<Entry, String> {
+        let _lock = lock_index(&self.cfg.index_path)?;
+        let mut next = Index::load(&self.cfg.index_path)?;
+        let removed = next
+            .entries
+            .remove(name)
+            .ok_or_else(|| format!("{name} is not in the index"))?;
+        next.save(&self.cfg.index_path)?;
+        self.index_at_open = next.clone();
+        self.index = next;
+        Ok(removed)
     }
 
     /// Turn `store:NAME`, `NAME` or `sha256:DIGEST` into
@@ -327,29 +386,46 @@ impl Store {
         }
     }
 
-    /// A verified local path for a named object, downloading it when it is
-    /// not cached. A cached object is trusted by size only (it was hashed
-    /// when it entered the cache and is read-only); `verify` re-hashes.
+    /// A verified local path for a named object. Cached bytes are re-hashed
+    /// before use; a damaged entry is replaced from the remote only after
+    /// the downloaded replacement passes the same digest check.
     pub fn ensure(&self, spec: &str) -> Result<Resolved, String> {
         let (name, sha256, expected) = self.lookup(spec)?;
         let path = self.cache_path(&sha256);
-        if let Ok(meta) = fs::metadata(&path) {
-            if expected.is_none_or(|b| b == meta.len()) {
-                return Ok(Resolved {
-                    path,
-                    sha256,
-                    bytes: meta.len(),
-                    fetched: false,
-                    name,
-                });
+        let mut cache_damaged = false;
+        match fs::symlink_metadata(&path) {
+            Ok(meta) => {
+                if !meta.file_type().is_file() {
+                    return Err(format!(
+                        "{}: cached object is not a regular file",
+                        path.display()
+                    ));
+                }
+                if let Ok((digest, bytes)) = hash_file(&path) {
+                    if digest == sha256 && expected.is_none_or(|b| b == bytes) {
+                        return Ok(Resolved {
+                            path,
+                            sha256,
+                            bytes,
+                            fetched: false,
+                            name,
+                        });
+                    }
+                }
+                cache_damaged = true;
             }
-            // Wrong size: the cache entry is damaged. Replace it.
-            let _ = fs::remove_file(&path);
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => return Err(format!("{}: {e}", path.display())),
         }
         let remote = self.remote().map_err(|e| {
             format!(
-                "{} is not in the local cache ({}) and cannot be fetched: {e}",
+                "{} {} ({}) and cannot be fetched: {e}",
                 name.as_deref().unwrap_or(&sha256),
+                if cache_damaged {
+                    "has a damaged local cache entry"
+                } else {
+                    "is not in the local cache"
+                },
                 self.cfg.cache_dir.display()
             )
         })?;
@@ -378,15 +454,18 @@ impl Store {
                 return Err(e);
             }
         };
-        if got != sha256 {
+        if got != sha256 || expected.is_some_and(|b| b != bytes) {
             let _ = fs::remove_file(&tmp);
             return Err(format!(
-                "{key}: downloaded bytes hash to {got}, expected {sha256}; discarded"
+                "{key}: downloaded bytes hash to {got} ({bytes} bytes), expected {sha256}; discarded"
             ));
         }
         make_read_only(&tmp);
         if let Some(dir) = path.parent() {
             fs::create_dir_all(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
+        }
+        if cache_damaged {
+            fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
         }
         fs::rename(&tmp, &path).map_err(|e| {
             let _ = fs::remove_file(&tmp);
@@ -418,18 +497,29 @@ impl Store {
             provenance: meta.provenance.clone(),
             superseded: vec![],
         };
-        // Settle the index first: a name conflict must fail before any upload.
-        let replaced = self.index.get(name).is_some_and(|old| old.sha256 != sha256);
-        let mut next = self.index.clone();
+        // A separate process may have published since this Store was opened.
+        // Hold the index lock through the remote write and manifest commit so
+        // both names and replacement history are checked against the latest file.
+        let _lock = lock_index(&self.cfg.index_path)?;
+        let mut next = Index::load(&self.cfg.index_path)?;
+        let replaced = next.get(name).is_some_and(|old| old.sha256 != sha256);
         next.put(name, entry, meta.replace)?;
 
         let remote = self.remote()?;
         let key = object_key(&sha256)?;
         let present: Option<Meta> = remote.head(&key)?;
         let uploaded = match present {
-            Some(m) if m.bytes == bytes => false,
-            _ => {
-                remote.put(&key, file, &sha256)?;
+            Some(m) => {
+                if m.bytes != bytes || m.sha256.as_deref() != Some(sha256.as_str()) {
+                    return Err(format!(
+                        "{key}: existing remote object has {} bytes and digest {:?}; expected {bytes} bytes and {sha256}",
+                        m.bytes, m.sha256
+                    ));
+                }
+                false
+            }
+            None => {
+                let created = remote.put(&key, file, &sha256)?;
                 let after = remote
                     .head(&key)?
                     .ok_or_else(|| format!("{key}: absent from the remote right after upload"))?;
@@ -439,14 +529,13 @@ impl Store {
                         after.bytes
                     ));
                 }
-                if let Some(s) = &after.sha256 {
-                    if *s != sha256 {
-                        return Err(format!(
-                            "{key}: the remote recorded digest {s}, expected {sha256}"
-                        ));
-                    }
+                if after.sha256.as_deref() != Some(sha256.as_str()) {
+                    return Err(format!(
+                        "{key}: the remote recorded digest {:?}, expected {sha256}",
+                        after.sha256
+                    ));
                 }
-                true
+                created
             }
         };
         let mut cached = false;
@@ -458,8 +547,9 @@ impl Store {
             }
             cached = true;
         }
+        next.save(&self.cfg.index_path)?;
+        self.index_at_open = next.clone();
         self.index = next;
-        self.save_index()?;
         Ok(PushReport {
             name: name.to_string(),
             sha256,
@@ -473,6 +563,21 @@ impl Store {
     /// Check indexed objects: re-hash the cached copy and, with `remote`,
     /// confirm the remote object exists with the indexed size.
     pub fn verify(&self, names: &[String], remote: bool) -> Result<Vec<VerifyRow>, String> {
+        self.verify_selected(names, remote, false)
+    }
+
+    /// Verify remote bytes independently of the local cache and remote HEAD
+    /// metadata. Downloads are temporary and are never entered into the cache.
+    pub fn verify_download(&self, names: &[String]) -> Result<Vec<VerifyRow>, String> {
+        self.verify_selected(names, true, true)
+    }
+
+    fn verify_selected(
+        &self,
+        names: &[String],
+        remote: bool,
+        download: bool,
+    ) -> Result<Vec<VerifyRow>, String> {
         let chosen: Vec<(&String, &Entry)> = if names.is_empty() {
             self.index.entries.iter().collect()
         } else {
@@ -499,18 +604,42 @@ impl Store {
             };
             let remote_state = if remote {
                 let be = self.remote()?;
-                Some(match be.head(&object_key(&e.sha256)?)? {
+                let key = object_key(&e.sha256)?;
+                let head_state = match be.head(&key)? {
                     None => RemoteState::Absent,
                     Some(m) if m.bytes != e.bytes => {
                         RemoteState::Mismatch(format!("{} bytes, index says {}", m.bytes, e.bytes))
                     }
                     Some(m) => match m.sha256 {
-                        Some(s) if s != e.sha256 => {
-                            RemoteState::Mismatch(format!("recorded digest {s}"))
-                        }
-                        _ => RemoteState::Ok,
+                        Some(s) if s == e.sha256 => RemoteState::Ok,
+                        Some(s) => RemoteState::Mismatch(format!("recorded digest {s}")),
+                        None => RemoteState::Mismatch("remote has no recorded digest".into()),
                     },
-                })
+                };
+                if download && head_state == RemoteState::Ok {
+                    let tmp = self.cfg.cache_dir.join("tmp").join(format!(
+                        "verify-{}-{}",
+                        e.sha256,
+                        unique_suffix()
+                    ));
+                    let checked = (|| -> Result<RemoteState, String> {
+                        be.get(&key, &tmp)?;
+                        let (digest, bytes) = hash_file(&tmp)?;
+                        if digest == e.sha256 && bytes == e.bytes {
+                            Ok(RemoteState::BytesOk)
+                        } else {
+                            Ok(RemoteState::Mismatch(format!(
+                                "downloaded bytes hash to {digest} ({bytes} bytes)"
+                            )))
+                        }
+                    })();
+                    let _ = fs::remove_file(&tmp);
+                    Some(checked.unwrap_or_else(|err| {
+                        RemoteState::Mismatch(format!("download failed: {err}"))
+                    }))
+                } else {
+                    Some(head_state)
+                }
             } else {
                 None
             };
@@ -595,6 +724,33 @@ pub fn resolve_path(arg: &Path) -> Result<PathBuf, String> {
 mod tests {
     use super::*;
     use std::sync::atomic::{AtomicU32, Ordering};
+
+    struct StaleHead {
+        path: PathBuf,
+        digest: String,
+        bytes: u64,
+    }
+
+    impl Backend for StaleHead {
+        fn describe(&self) -> String {
+            "test-stale-head".into()
+        }
+        fn head(&self, _: &str) -> Result<Option<Meta>, String> {
+            Ok(Some(Meta {
+                bytes: self.bytes,
+                sha256: Some(self.digest.clone()),
+            }))
+        }
+        fn put(&self, _: &str, _: &Path, _: &str) -> Result<bool, String> {
+            Err("unused in verification test".into())
+        }
+        fn get(&self, _: &str, dest: &Path) -> Result<(), String> {
+            backend::copy_into(&self.path, dest)
+        }
+        fn list(&self, _: &str) -> Result<Vec<(String, u64)>, String> {
+            Err("unused in verification test".into())
+        }
+    }
 
     static N: AtomicU32 = AtomicU32::new(0);
 
@@ -718,6 +874,33 @@ mod tests {
     }
 
     #[test]
+    fn stale_store_handles_preserve_other_names_and_reject_conflicts() {
+        let (root, mut first) = scratch();
+        let mut second = Store::open(first.cfg.clone()).unwrap();
+        let a = file(&root, "a", b"one");
+        let b = file(&root, "b", b"two");
+        first.push("first", &a, PushMeta::default()).unwrap();
+        second.push("second", &b, PushMeta::default()).unwrap();
+        let on_disk = Index::load(&first.cfg.index_path).unwrap();
+        assert!(on_disk.get("first").is_some());
+        assert!(on_disk.get("second").is_some());
+
+        let err = first.push("second", &a, PushMeta::default()).unwrap_err();
+        assert!(err.contains("--replace"), "{err}");
+        assert_eq!(first.remote().unwrap().list("").unwrap().len(), 2);
+
+        first.remove_name("first").unwrap();
+        let err = second.save_index().unwrap_err();
+        assert!(err.contains("index changed"), "{err}");
+        second.remove_name("second").unwrap();
+        assert!(Index::load(&first.cfg.index_path)
+            .unwrap()
+            .entries
+            .is_empty());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
     fn a_corrupted_remote_object_is_refused_and_not_cached() {
         let (root, mut s) = scratch();
         let src = file(&root, "x", b"original");
@@ -726,6 +909,10 @@ mod tests {
         let key = object_key(&r.sha256).unwrap();
         fs::remove_file(root.join("remote").join(&key)).unwrap();
         fs::write(root.join("remote").join(&key), b"tampered").unwrap();
+        let rows = s.verify(&[], true).unwrap();
+        assert!(matches!(rows[0].remote, Some(RemoteState::Mismatch(_))));
+        let push_err = s.push("x", &src, PushMeta::default()).unwrap_err();
+        assert!(push_err.contains("existing remote object"), "{push_err}");
         let mut cfg = s.cfg.clone();
         cfg.cache_dir = root.join("fresh");
         let t = Store::open(cfg).unwrap();
@@ -737,24 +924,62 @@ mod tests {
     }
 
     #[test]
+    fn downloaded_verification_catches_bytes_hidden_by_stale_head_metadata() {
+        let (root, mut s) = scratch();
+        let src = file(&root, "source", b"original");
+        let report = s.push("evidence/item", &src, PushMeta::default()).unwrap();
+        let remote_path = root
+            .join("remote")
+            .join(object_key(&report.sha256).unwrap());
+        fs::remove_file(&remote_path).unwrap();
+        fs::write(&remote_path, b"tampered").unwrap();
+        s.backend = Some(Box::new(StaleHead {
+            path: remote_path,
+            digest: report.sha256,
+            bytes: report.bytes,
+        }));
+        assert_eq!(
+            s.verify(&[], true).unwrap()[0].remote,
+            Some(RemoteState::Ok)
+        );
+        let deep = s.verify_download(&[]).unwrap();
+        assert!(matches!(deep[0].remote, Some(RemoteState::Mismatch(_))));
+        assert!(fs::read_dir(s.cfg.cache_dir.join("tmp"))
+            .unwrap()
+            .next()
+            .is_none());
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
     fn a_damaged_cache_entry_is_replaced_and_verify_reports_it() {
         let (root, mut s) = scratch();
         let src = file(&root, "y", b"payload-1234");
         let r = s.push("y", &src, PushMeta::default()).unwrap();
         let cached = s.cache_path(&r.sha256);
-        // Same size, wrong bytes: only `verify` can see it.
+        // Same size, wrong bytes: verify reports it and ensure refetches.
         fs::remove_file(&cached).unwrap();
         fs::write(&cached, b"payload-9999").unwrap();
         let rows = s.verify(&[], true).unwrap();
         assert!(matches!(rows[0].cache, CacheState::Corrupt(_)));
         assert_eq!(rows[0].remote, Some(RemoteState::Ok));
-        // Wrong size: `ensure` notices and refetches.
+        let got = s.ensure("y").unwrap();
+        assert!(got.fetched);
+        assert_eq!(fs::read(&got.path).unwrap(), b"payload-1234");
+        // Wrong size is also replaced.
         fs::remove_file(&cached).unwrap();
         fs::write(&cached, b"short").unwrap();
         let got = s.ensure("y").unwrap();
         assert!(got.fetched);
         assert_eq!(fs::read(&got.path).unwrap(), b"payload-1234");
         assert_eq!(s.verify(&[], false).unwrap()[0].cache, CacheState::Ok);
+        // A damaged cache entry cannot be returned when the remote is absent.
+        fs::remove_file(&cached).unwrap();
+        fs::write(&cached, b"payload-9999").unwrap();
+        let remote_path = root.join("remote").join(object_key(&r.sha256).unwrap());
+        fs::remove_file(remote_path).unwrap();
+        assert!(s.ensure("y").unwrap_err().contains("absent"));
+        assert_eq!(fs::read(&cached).unwrap(), b"payload-9999");
         let _ = fs::remove_dir_all(&root);
     }
 

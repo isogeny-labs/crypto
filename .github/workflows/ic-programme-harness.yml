@@ -53,6 +53,9 @@ jobs:
             /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
           df -h .
       - uses: actions/checkout@v4
+      - name: Keep only build and harness inputs in the Linux worktree
+        if: runner.os == 'Linux'
+        run: scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos/ --path research/ic_tool_program/rule/v8/runs/
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Install valgrind, for callgrind_annotate
@@ -70,6 +73,7 @@ jobs:
           test $? -eq 3
 
   disclosed-sat-replay:
+    if: ${{ !github.event.pull_request.draft }}
     strategy:
       fail-fast: false
       matrix:
@@ -83,6 +87,9 @@ jobs:
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
           df -h .
       - uses: actions/checkout@v4
+      - name: Keep only build and harness inputs in the Linux worktree
+        if: runner.os == 'Linux'
+        run: scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos/
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Bootstrap native build serialization

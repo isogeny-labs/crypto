@@ -982,7 +982,9 @@ impl<'i> FiberDescentOracle<'i> {
         let shape = system.shape();
         let verdict = self.harness.solve(&system);
         let exceeded = matches!(verdict, SolverVerdict::BudgetExceeded);
-        self.totals.absorb(&shape, self.harness.cost(), exceeded);
+        let found = matches!(&verdict, SolverVerdict::Solved(s) if !s.is_empty());
+        self.totals
+            .absorb_outcome(&shape, self.harness.cost(), exceeded, found);
         // The descent (counted on this thread since `decompose` began),
         // the copy, and two shape computations (here and in the harness).
         charge_system_build(&mut self.totals.extra, &system, &shape, 2);

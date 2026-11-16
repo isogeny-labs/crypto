@@ -1,0 +1,8 @@
+/workspace/audit/coded-operator-native.cpp: In function ‘int main()’:
+/workspace/audit/coded-operator-native.cpp:32:17: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   32 |                 if(j<a)xx^=1U<<j; if(h<a)yy^=1U<<h;
+      |                 ^~
+/workspace/audit/coded-operator-native.cpp:32:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   32 |                 if(j<a)xx^=1U<<j; if(h<a)yy^=1U<<h;
+      |                                   ^~
+cc1plus: all warnings being treated as errors

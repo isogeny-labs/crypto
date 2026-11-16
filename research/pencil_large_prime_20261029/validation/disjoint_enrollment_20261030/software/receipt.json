@@ -1,0 +1,50 @@
+{
+  "schema": "pencil-disjoint-preparation-software-validation/v1",
+  "status": "software_validated_plan_generation_not_invoked",
+  "observed_at_utc": "2026-10-30T01:55:50Z",
+  "repository_head_before_changes": "f25e988c0346db3ed2224b57699348c96d05eef3",
+  "branch": "codex/pencil-disjoint-preparation-20261030",
+  "source_sha256": {
+    "Cargo.toml": "0d5fafc970dbb9b9d9fea33fcd0344c130c7184f732858b26fa1b2290c0a200e",
+    "Cargo.lock": "22228eb5115c49911bc588d440baf7528eba4a6dd69eda763598b52308225726",
+    "README.md": "c78adea25dd367acc5461fa38b45e5897133eba0b32f92464e07011669c7a02e",
+    "DISJOINT_ENROLLMENT.md": "aa9307576b3c4d96e40337c3e9e431789dd2f8bc79bdedc471dd6d952b00af11",
+    "src/lib.rs": "eef13d6bda79930002a97cd64d7fbbdaef67128f86b48b3818db9f229aa126b4",
+    "src/main.rs": "d6366d8f7a02c3b5135af576e1d7f53e2bc082040dadd58dc3c456a8e9d3ab19",
+    "src/disjoint_enrollment.rs": "583377eed49f1f6d409376d8f57040379be95671e9274613f579319225ff19ae"
+  },
+  "software_checks": [
+    {
+      "command": "cargo +1.99.1 fmt --all -- --check",
+      "passed": true,
+      "log": "cargo-fmt-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo +1.99.1 test --release --locked --offline",
+      "passed": true,
+      "tests_passed": 11,
+      "tests_failed": 0,
+      "log": "cargo-test-release-locked.log",
+      "log_sha256": "4a1f269aa67ea203698480383d44fb53aecc0a11af497627dda15535920ef8b0"
+    },
+    {
+      "command": "cargo +1.99.1 clippy --release --all-targets --locked --offline -- -D warnings",
+      "passed": true,
+      "log": "cargo-clippy-release-locked.log",
+      "log_sha256": "aaefbb45b0c5903a07c22891d1c41c428648fa9bdf894db341b5b5975ba07fb2"
+    }
+  ],
+  "prospective_request": {
+    "path_outside_repository": "/tmp/pencil-disjoint-request.json",
+    "sha256": "6b99db317edac83a401126ec1d427739b2e786591e4fbaffd0003ce882c846f2",
+    "invoked": false
+  },
+  "execution_boundary": {
+    "ecbench_plan_only_invocations": 0,
+    "solver_executions": 0,
+    "cohorts_launched": 0,
+    "cloud_jobs_launched": 0
+  },
+  "claim_boundary": "This receipt validates native preparation software only. It records no generated remainder plan, enrollment certificate, scientific admission, timing qualification, empirical execution, or launch authorization."
+}

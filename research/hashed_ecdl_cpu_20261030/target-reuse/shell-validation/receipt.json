@@ -1,0 +1,46 @@
+{
+  "scope": "software validation of shell reproduction; no scientific run or performance claim",
+  "release_tests_passed": 32,
+  "strict_clippy": "PASS",
+  "cargo_fmt": "PASS",
+  "bash_syntax": "PASS",
+  "negative_controls": [
+    "existing snapshot refused without overwrite",
+    "wrong shared-source digest refused before destination creation",
+    "wrong patch digest refused before destination creation"
+  ],
+  "files": {
+    "validate.sh": {
+      "sha256": "37691c2c5556dd05a0d790d72ec67401aed171dd517a48d639e243ac8309c280",
+      "bytes": 2957
+    },
+    "shell-validation/validation-0.log": {
+      "sha256": "47d9daa52250f665ea11022430df55c9a5be2db3a0a06ea38206972037c35d87",
+      "bytes": 5101
+    },
+    "shell-validation/2963-existing-destination.log": {
+      "sha256": "4c0cdf96fa2021bfe3da6222486381d7c0d94bc2a29f0bc7082aeecefe670094",
+      "bytes": 96
+    },
+    "shell-validation/2963-wrong-patch.log": {
+      "sha256": "9d9e4aaad1d379a4edcd776ca332f63c32689d0a2617769f70381f50c7678d16",
+      "bytes": 142
+    },
+    "shell-validation/validation-2.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "shell-validation/validation.json": {
+      "sha256": "7382f6b8dd0199ca444ed91898b7e940ee9c51d88dc547526650703da2f30c88",
+      "bytes": 1914
+    },
+    "shell-validation/validation-1.log": {
+      "sha256": "85439d83a3c11d318bb18f69b1db895c01e8268e9003cf9906bc6dd821652727",
+      "bytes": 862
+    },
+    "shell-validation/2963-wrong-source.log": {
+      "sha256": "ae4dd6eeb96432517edc4a0d97885427c010d17e97c976539c2bce76fb370b69",
+      "bytes": 109
+    }
+  }
+}

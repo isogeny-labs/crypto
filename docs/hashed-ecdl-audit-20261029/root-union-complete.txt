@@ -1,0 +1,34 @@
+Complete combined crypto root regression, recovered 2026-10-30 04:37 UTC
+
+Command: cargo test --locked --release --lib
+Directory: /workspace/crypto
+Tested source HEAD: 08557506bbc49bcb36196e4ad2be706acd1b5f85
+Started: 2026-10-30T03:31:22Z
+Finished: 2026-10-30T04:30:41Z
+Actual exit receipt: 0
+Full parent summary:
+test result: ok. 5430 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 3033.73s
+
+Output: /tmp/crypto-root-union-restored-20261030.log
+Raw bytes: 487358
+SHA-256: d841b215c031945b92624258327db17eb7b407726e384d62c3b595b1e68c2587
+Metadata/exit: /tmp/crypto-root-union-restored-20261030.{meta,exit}
+Raw output and runtime receipts: NOT_UPLOADED, local only.
+All earlier failed/incomplete histories remain unchanged, separately scoped.
+The 123 ignored cases are existing exclusions; no check/test was disabled.
+
+Peer PR1302 merged at 2026-10-30T03:56:10Z, merge commit
+3cc4cad5b8c25b47952252e4a2625e4c19af0c2c, head
+018fd41bd9950d5ec6bc50c80371c34c4fbb4b29. Its head's applicable checks
+completed successfully; the informational CodeQL aggregate is neutral and
+opcounts is inapplicable to pull_request by its workflow condition. No open
+review thread is reported. No second push to that merged PR is needed.
+
+The published peer native tree differs from the tested local union by one
+blank line before the sample method only. Matched that whitespace in crypto;
+all 26 tracked native files now equal the actual merged peer head byte-for-byte.
+The new sources-merged-peer.sha256 records those publication bytes; earlier
+source manifests are untouched. No executable code changed after the root run.
+Formatting is checked again; a complete regression is not repeated for a blank
+line. Remaining publication changes are receipts/documentation only.
+General theorem/complexity audit remains open; no performance claim or campaign.

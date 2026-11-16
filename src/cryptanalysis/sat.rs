@@ -87,6 +87,147 @@ use std::sync::Arc;
 /// index (0-based internally; 1-based in DIMACS).
 pub type Lit = i32;
 
+fn capacity_bytes<T>(buffer: &Vec<T>) -> u64 {
+    buffer.capacity() as u64 * std::mem::size_of::<T>() as u64
+}
+
+fn storage_snapshot_due(phase: &str, conflicts: u64) -> bool {
+    matches!(phase, "solve_enter" | "solve_return")
+        || (phase == "conflict_snapshot" && conflicts.is_multiple_of(10_000))
+/// Typed semantic search events, not an independently checked UNSAT proof. Clause IDs
+/// are immutable arena offsets; XOR row IDs are indices in the current matrix,
+/// reset by `XorMatrixReset`. Literal/variable names use DIMACS indexing.
+/// A unit clause may be declared before assignment and again after installation;
+/// repeated clause IDs must carry the same literal set.
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum SolverEvent {
+    Snapshot {
+        version: u32,
+        variables: u32,
+        trail_limits: Vec<usize>,
+        already_unsat: bool,
+    },
+    Clause {
+        clause_id: u32,
+        literals: Vec<Lit>,
+        existing: bool,
+        detached: bool,
+    },
+    XorConstraint {
+        row_id: usize,
+        mask: Vec<u64>,
+        rhs: bool,
+    },
+    /// A newly added constraint refuted immediately, before arena storage.
+    /// The clause is retained before root simplification; XOR duplicates are
+    /// retained so a consumer can independently check their cancellation.
+    FormulaContradiction {
+        level: usize,
+        constraint: SolverEventConstraint,
+    },
+    XorMatrixReset,
+    XorMatrixRow {
+        row_id: usize,
+        mask: Vec<u64>,
+        rhs: bool,
+    },
+    XorRowXor {
+        destination: usize,
+        source: usize,
+    },
+    XorImplication {
+        row_id: usize,
+        literal: Lit,
+        explanation: Vec<Lit>,
+    },
+    XorConflict {
+        row_id: usize,
+        explanation: Vec<Lit>,
+    },
+    SolveBegin {
+        conflicts: u64,
+        conflict_budget: u64,
+    },
+    Decision {
+        literal: Lit,
+        level: usize,
+        trail_index: usize,
+        activity_bits: u64,
+        priority: bool,
+    },
+    Assignment {
+        literal: Lit,
+        level: i32,
+        trail_index: usize,
+        initial: bool,
+        reason: SolverEventReason,
+    },
+    Conflict {
+        level: usize,
+        reason: SolverEventReason,
+        literals: Vec<Lit>,
+    },
+    AnalysisReason {
+        resolved_literal: Lit,
+        reason: SolverEventReason,
+        literals: Vec<Lit>,
+    },
+    Learned {
+        clause_id: u32,
+        literals: Vec<Lit>,
+        backjump_level: i32,
+    },
+    Backjump {
+        from_level: usize,
+        to_level: usize,
+        retained_trail: usize,
+        removed: Vec<Lit>,
+    },
+    Restart {
+        restart: u64,
+        conflicts: u64,
+    },
+    DeleteClause {
+        clause_id: u32,
+    },
+    SolveEnd {
+        result: String,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum SolverEventConstraint {
+    Clause { literals: Vec<Lit> },
+    Xor { variables: Vec<u32>, rhs: bool },
+}
+
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum SolverEventReason {
+    Decision,
+    Clause {
+        clause_id: u32,
+    },
+    /// Copy the explanation immediately: native XOR reason buffers are reused.
+    Xor {
+        explanation: Vec<Lit>,
+    },
+}
+
+type EventObserver = Box<dyn FnMut(&SolverEvent) -> Result<(), String> + Send + Sync>;
+
+fn emit_to(observer: &mut Option<EventObserver>, failure: &mut Option<String>, event: SolverEvent) {
+    if failure.is_none() {
+        if let Some(observer) = observer {
+            if let Err(error) = observer(&event) {
+                *failure = Some(error);
+            }
+        }
+    }
+}
+
 #[inline]
 fn var_of(lit: Lit) -> u32 {
     lit.unsigned_abs() - 1
@@ -159,6 +300,8 @@ pub enum SolveResult {
 pub enum RootPropagationResult {
     Fixpoint,
     Unsat,
+    /// A fallible event observer stopped propagation; never a refutation.
+    Unknown,
 }
 
 /// Coarse location of an instrumented solver. A concurrent observer can see
@@ -261,6 +404,9 @@ enum Conflict {
 /// which engine is actually costing the time.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SolverStats {
+    /// Completed in-place arena compactions and words removed, cumulative.
+    pub arena_reclamations: u64,
+    pub arena_reclaimed_words: u64,
     pub decisions: u64,
     pub conflicts: u64,
     pub restarts: u64,
@@ -283,6 +429,10 @@ pub struct SolverStats {
     pub xor_row_ops: u64,
     /// Rows examined in the parity read-off, each `O(words)`.
     pub xor_row_scans: u64,
+    /// Actual 64-bit matrix updates (dense or indexed engine).
+    pub xor_word_updates: u64,
+    /// Word positions visited while merging nonzero supports.
+    pub xor_support_visits: u64,
     /// Literals written into parity reason clauses.
     pub xor_reason_lits: u64,
     /// Clauses examined by watched-literal propagation.
@@ -478,6 +628,8 @@ impl VarHeap {
 /// CDCL SAT solver.
 pub struct Solver {
     progress: Option<Arc<SolverProgress>>,
+    event_observer: Option<EventObserver>,
+    event_failure: Option<String>,
     /// Number of variables (1-indexed externally).
     n_vars: u32,
     /// Centre of the literal-indexed tables `values` and `watches`:
@@ -514,8 +666,8 @@ pub struct Solver {
     /// [`Solver::next_cref`] panics past that, where per-clause vectors
     /// had no cap.  And growing it by doubling briefly holds the old and
     /// the new buffer together, about three times the arena at once.
-    /// Forgotten clauses are never freed, which was already so with a
-    /// vector per clause.
+    /// At reductions, detached clauses are compacted to small tautology
+    /// tombstones and excess capacity is returned to the allocator.
     arena: Vec<Lit>,
     /// `clause_at[i]` is clause `i`'s arena offset, in the order clauses
     /// were added; learnt clauses start at `n_orig_clauses`.  Offsets
@@ -624,6 +776,11 @@ pub struct Solver {
     /// chasing a pointer per row.
     matrix: Vec<u64>,
     matrix_rhs: Vec<bool>,
+    /// Sorted exact nonzero word positions; never a stale superset.
+    matrix_support: Vec<Vec<usize>>,
+    indexed_xors: bool,
+    xor_support_src: Vec<usize>,
+    xor_support_merge: Vec<usize>,
     /// `pivot[i]` is row `i`'s basic variable; `None` once the row has
     /// no unassigned variable left.
     pivot: Vec<Option<u32>>,
@@ -649,10 +806,12 @@ pub struct Solver {
     /// comparison key, refreshed wherever either input changes.
     heap_key: Vec<u64>,
     /// Learnt clauses that have been detached from the watch lists and
-    /// are no longer propagated, by clause index.  They stay in the
-    /// arena so that every offset — in `reason`, in `watches` — remains
-    /// valid.
+    /// are no longer propagated, by clause index. Compaction preserves
+    /// their indices so database-reduction scheduling is unchanged.
     detached: Vec<bool>,
+    /// Reclaim detached clause storage at database reductions. Disabling
+    /// this retains the append-only layout for matched diagnostic controls.
+    pub reclaim_detached_clauses: bool,
     /// Learnt-clause budget before the next reduction.  Set it before
     /// `solve()` to force more aggressive forgetting; left at 0 it is
     /// chosen from the problem size.
@@ -718,6 +877,8 @@ impl Solver {
         let n = n_vars as usize;
         Solver {
             progress: None,
+            event_observer: None,
+            event_failure: None,
             n_vars,
             lit_base: n_vars,
             arena: Vec::new(),
@@ -749,6 +910,10 @@ impl Solver {
             xor_conflict: Vec::new(),
             matrix: Vec::new(),
             matrix_rhs: Vec::new(),
+            matrix_support: Vec::new(),
+            indexed_xors: true,
+            xor_support_src: Vec::new(),
+            xor_support_merge: Vec::new(),
             pivot: Vec::new(),
             xor_src: Vec::new(),
             seen: vec![false; n],
@@ -759,6 +924,7 @@ impl Solver {
             branch_priority: vec![false; n],
             heap_key: vec![order_key(0.0, false); n],
             detached: Vec::new(),
+            reclaim_detached_clauses: true,
             max_learnts: 0,
             // Initialising the tables: the two literal-indexed ones
             // (`values`, `watches`), eight per-variable ones and the two
@@ -767,6 +933,124 @@ impl Solver {
                 word_ops: 2 * (2 * n as u64 + 1) + 8 * n as u64 + 2 * bs_words(n_vars) as u64,
                 ..SolverStats::default()
             },
+        }
+    }
+
+    /// Attach before search. Emits the existing formula and trail immediately,
+    /// allowing attachment after encoding-time unit assignments. Observation
+    /// never changes native operation counters. The first sink error is sticky:
+    /// later solves return Unknown and callers can inspect the exact error.
+    pub fn set_event_observer(
+        &mut self,
+        observer: impl FnMut(&SolverEvent) -> Result<(), String> + Send + Sync + 'static,
+    ) -> Result<(), String> {
+        if self.event_observer.is_some() || self.event_failure.is_some() {
+            return Err("SAT event observer already installed or failed".into());
+        }
+        self.event_observer = Some(Box::new(observer));
+        self.emit(SolverEvent::Snapshot {
+            version: 1,
+            variables: self.n_vars,
+            trail_limits: self.trail_lim.clone(),
+            already_unsat: self.is_unsat,
+        });
+        for i in 0..self.clause_at.len() {
+            if self.event_failure.is_some() {
+                break;
+            }
+            let clause_id = self.clause_at[i];
+            self.emit(SolverEvent::Clause {
+                clause_id,
+                literals: clause_in(&self.arena, clause_id).to_vec(),
+                existing: true,
+                detached: self.detached.get(i).copied().unwrap_or(false),
+            });
+        }
+        for i in 0..self.xors.len() {
+            if self.event_failure.is_some() {
+                break;
+            }
+            self.emit(SolverEvent::XorConstraint {
+                row_id: i,
+                mask: self.xors[i].mask.clone(),
+                rhs: self.xors[i].rhs,
+            });
+        }
+        // An observer attached after a root pass must retain its actual matrix.
+        for i in 0..self.matrix_rhs.len() {
+            if self.event_failure.is_some() {
+                break;
+            }
+            let words = bs_words(self.n_vars);
+            self.emit(SolverEvent::XorMatrixRow {
+                row_id: i,
+                mask: self.matrix[i * words..(i + 1) * words].to_vec(),
+                rhs: self.matrix_rhs[i],
+            });
+        }
+        for index in 0..self.trail.len() {
+            if self.event_failure.is_some() {
+                break;
+            }
+            let literal = self.trail[index];
+            let v = var_of(literal) as usize;
+            self.emit(SolverEvent::Assignment {
+                literal,
+                level: self.level[v],
+                trail_index: index,
+                initial: true,
+                reason: self.event_reason(self.reason[v], v),
+            });
+        }
+        self.event_failure.clone().map_or(Ok(()), Err)
+    }
+
+    pub fn event_observer_error(&self) -> Option<&str> {
+        self.event_failure.as_deref()
+    }
+
+    #[inline]
+    fn observing(&self) -> bool {
+        self.event_observer.is_some() && self.event_failure.is_none()
+    }
+
+    fn emit(&mut self, event: SolverEvent) {
+        emit_to(&mut self.event_observer, &mut self.event_failure, event);
+    }
+
+    fn event_reason(&self, reason: Reason, variable: usize) -> SolverEventReason {
+        match reason {
+            Reason::Decision => SolverEventReason::Decision,
+            Reason::Propagated(clause_id) => SolverEventReason::Clause { clause_id },
+            Reason::XorPropagated => SolverEventReason::Xor {
+                explanation: self.xor_reason[variable].clone(),
+            },
+        }
+    }
+
+    fn conflict_event(
+        &self,
+        conflict: Conflict,
+        resolved_literal: Lit,
+    ) -> (SolverEventReason, Vec<Lit>) {
+        match conflict {
+            Conflict::Clause(clause_id) => (
+                SolverEventReason::Clause { clause_id },
+                clause_in(&self.arena, clause_id).to_vec(),
+            ),
+            Conflict::Xor => {
+                let literals = if resolved_literal == 0 {
+                    self.xor_conflict.clone()
+                } else {
+                    self.xor_reason[var_of(resolved_literal) as usize].clone()
+                };
+                (
+                    SolverEventReason::Xor {
+                        explanation: literals.clone(),
+                    },
+                    literals,
+                )
+            }
         }
     }
 
@@ -873,12 +1157,29 @@ impl Solver {
         if mask.iter().all(|w| *w == 0) {
             // Empty parity: `0 = rhs`.  Satisfiable iff rhs is false.
             if rhs {
+                if self.observing() {
+                    self.emit(SolverEvent::FormulaContradiction {
+                        level: self.trail_lim.len(),
+                        constraint: SolverEventConstraint::Xor {
+                            variables: vars.to_vec(),
+                            rhs,
+                        },
+                    });
+                }
                 self.is_unsat = true;
                 return false;
             }
             return true;
         }
         self.xors.push(XorRow { mask, rhs });
+        if self.observing() {
+            let row_id = self.xors.len() - 1;
+            self.emit(SolverEvent::XorConstraint {
+                row_id,
+                mask: self.xors[row_id].mask.clone(),
+                rhs,
+            });
+        }
         self.clear_matrix(); // rebuilt on the next pass
         self.xor_epoch = u64::MAX; // force a pass on the next propagate
         true
@@ -896,6 +1197,10 @@ impl Solver {
     /// symmetry breaking, cardinality chains — over an encoding they
     /// did not size themselves; call it before `solve`, at level 0.
     pub fn add_vars(&mut self, count: u32) -> std::ops::RangeInclusive<u32> {
+        if self.observing() && count != 0 {
+            self.event_failure =
+                Some("changing variable count after event attachment is not supported".into());
+        }
         debug_assert!(
             self.trail_lim.is_empty(),
             "add_vars must be called at decision level 0"
@@ -1080,6 +1385,7 @@ impl Solver {
             }
         }
         self.assert_names_variables(&lits);
+        let observed_input = self.observing().then(|| lits.clone());
         // Incremental clauses may arrive after root propagation has
         // already consumed the trail. Remove root-false literals before
         // choosing watches: otherwise both watches can be false with no
@@ -1096,12 +1402,29 @@ impl Solver {
         }
         match lits.len() {
             0 => {
+                if let Some(literals) = observed_input {
+                    self.emit(SolverEvent::FormulaContradiction {
+                        level: self.trail_lim.len(),
+                        constraint: SolverEventConstraint::Clause { literals },
+                    });
+                }
                 self.is_unsat = true;
                 false
             }
             1 => {
                 // Unit clause: assign now (at level 0).
                 let l = lits[0];
+                // The native unit path assigns before storage. Declare its
+                // stable ID first so an incremental trace has no forward
+                // reference; push_clause confirms the same declaration.
+                if self.observing() {
+                    self.emit(SolverEvent::Clause {
+                        clause_id: self.next_cref(),
+                        literals: vec![l],
+                        existing: false,
+                        detached: false,
+                    });
+                }
                 match self.enqueue(l, Reason::Propagated(self.next_cref())) {
                     Ok(()) => {
                         self.push_clause(&[l]);
@@ -1109,6 +1432,12 @@ impl Solver {
                         true
                     }
                     Err(()) => {
+                        if let Some(literals) = observed_input {
+                            self.emit(SolverEvent::FormulaContradiction {
+                                level: self.trail_lim.len(),
+                                constraint: SolverEventConstraint::Clause { literals },
+                            });
+                        }
                         self.is_unsat = true;
                         false
                     }
@@ -1260,6 +1589,14 @@ impl Solver {
         self.arena.push(len);
         self.arena.extend_from_slice(lits);
         self.clause_at.push(cref);
+        if self.observing() {
+            self.emit(SolverEvent::Clause {
+                clause_id: cref,
+                literals: lits.to_vec(),
+                existing: false,
+                detached: false,
+            });
+        }
         cref
     }
 
@@ -1314,6 +1651,15 @@ impl Solver {
         self.trail.push(lit);
         self.epoch += 1;
         self.stats.propagations += 1;
+        if self.observing() {
+            self.emit(SolverEvent::Assignment {
+                literal: lit,
+                level: self.level[v],
+                trail_index: self.trail.len() - 1,
+                initial: false,
+                reason: self.event_reason(r, v),
+            });
+        }
     }
 
     /// Propagate to fixpoint over *both* reasoning engines: watched-
@@ -1327,11 +1673,17 @@ impl Solver {
     /// no special-casing.
     fn propagate(&mut self) -> Option<Conflict> {
         loop {
+            if self.event_failure.is_some() {
+                return None;
+            }
             self.progress_phase(SolverProgressPhase::ClausePropagation);
             let t = std::time::Instant::now();
             let cnf = self.propagate_clauses();
             self.stats.ns_propagate_clauses += t.elapsed().as_nanos() as u64;
             self.progress_phase(SolverProgressPhase::Idle);
+            if self.event_failure.is_some() {
+                return None;
+            }
             if let Some(c) = cnf {
                 return Some(Conflict::Clause(c));
             }
@@ -1408,6 +1760,9 @@ impl Solver {
         // the `O(rows² × words)` of re-eliminating from scratch.
         let mut step = XorStep::Fixpoint;
         for i in 0..rows {
+            if self.event_failure.is_some() {
+                return XorStep::Fixpoint;
+            }
             let intact = match self.pivot[i] {
                 Some(p) => self.var_value(p as usize).is_none(),
                 None => false,
@@ -1418,7 +1773,15 @@ impl Solver {
             self.stats.xor_repivots += 1;
 
             let row_i = i * words..(i + 1) * words;
-            match self.lowest_unassigned(&self.matrix[row_i.clone()]) {
+            let next_pivot = if self.indexed_xors {
+                self.matrix_support[i].iter().find_map(|&w| {
+                    let free = self.matrix[i * words + w] & !self.assigned_w[w];
+                    (free != 0).then(|| (w * 64) as u32 + free.trailing_zeros())
+                })
+            } else {
+                self.lowest_unassigned(&self.matrix[row_i.clone()])
+            };
+            match next_pivot {
                 None => {
                     // No unassigned variable left: the row is decided.
                     // Its words were scanned for a pivot, then for the
@@ -1432,6 +1795,12 @@ impl Solver {
                         self.stats.word_ops += (words + buf.len()) as u64;
                         self.xor_conflict = buf;
                         self.stats.xor_conflicts += 1;
+                        if self.observing() {
+                            self.emit(SolverEvent::XorConflict {
+                                row_id: i,
+                                explanation: self.xor_conflict.clone(),
+                            });
+                        }
                         return XorStep::Conflict;
                     }
                 }
@@ -1446,8 +1815,19 @@ impl Solver {
                     let (pw, pbit) = (p as usize / 64, 1u64 << (p % 64));
                     let src_rhs = self.matrix_rhs[i];
                     let mut src = std::mem::take(&mut self.xor_src);
-                    src.clear();
-                    src.extend_from_slice(&self.matrix[row_i]);
+                    let mut support = std::mem::take(&mut self.xor_support_src);
+                    let mut merged = std::mem::take(&mut self.xor_support_merge);
+                    if self.indexed_xors {
+                        src.resize(words, 0);
+                        support.clear();
+                        support.extend_from_slice(&self.matrix_support[i]);
+                        for &w in &support {
+                            src[w] = self.matrix[i * words + w];
+                        }
+                    } else {
+                        src.clear();
+                        src.extend_from_slice(&self.matrix[row_i]);
+                    }
                     let matrix = &mut self.matrix[..rows * words];
                     let matrix_rhs = &mut self.matrix_rhs[..rows];
                     let mut row_ops = 0u64;
@@ -1457,7 +1837,50 @@ impl Solver {
                         }
                         row_ops += 1;
                         matrix_rhs[j] ^= src_rhs;
+                        let target = &mut matrix[j * words..(j + 1) * words];
+                        if self.indexed_xors {
+                            for &w in &support {
+                                target[w] ^= src[w];
+                            }
+                            self.stats.xor_word_updates += support.len() as u64;
+                            // Merge the sorted supports after cancellation, preserving
+                            // ascending word/pivot/reason order exactly.
+                            merged.clear();
+                            let old = &self.matrix_support[j];
+                            let (mut a, mut b) = (0, 0);
+                            while a < old.len() || b < support.len() {
+                                let w = match (old.get(a), support.get(b)) {
+                                    (Some(&x), Some(&y)) => x.min(y),
+                                    (Some(&x), None) => x,
+                                    (None, Some(&y)) => y,
+                                    _ => unreachable!(),
+                                };
+                                if old.get(a) == Some(&w) {
+                                    a += 1;
+                                }
+                                if support.get(b) == Some(&w) {
+                                    b += 1;
+                                }
+                                self.stats.xor_support_visits += 1;
+                                if target[w] != 0 {
+                                    merged.push(w);
+                                }
+                            }
+                            std::mem::swap(&mut self.matrix_support[j], &mut merged);
+                        } else {
+                            xor_into(target, &src);
+                            self.stats.xor_word_updates += words as u64;
                         xor_into(&mut matrix[j * words..(j + 1) * words], &src);
+                        if self.event_observer.is_some() && self.event_failure.is_none() {
+                            emit_to(
+                                &mut self.event_observer,
+                                &mut self.event_failure,
+                                SolverEvent::XorRowXor {
+                                    destination: j,
+                                    source: i,
+                                },
+                            );
+                        }
                     }
                     self.stats.xor_row_ops += row_ops;
                     // Pivot search up to `p`'s word, the row copied out,
@@ -1466,6 +1889,8 @@ impl Solver {
                     self.stats.word_ops +=
                         (pw + 1 + words + rows) as u64 + row_ops * (words as u64 + 1);
                     self.xor_src = src;
+                    self.xor_support_src = support;
+                    self.xor_support_merge = merged;
                 }
             }
         }
@@ -1477,32 +1902,39 @@ impl Solver {
         // a popcount, and no further elimination is needed.
         let mut propagated = false;
         'rows: for i in 0..rows {
+            if self.event_failure.is_some() {
+                return XorStep::Fixpoint;
+            }
             let p = match self.pivot[i] {
                 Some(p) => p,
                 None => continue, // decided in phase 1
             };
             self.stats.xor_row_scans += 1;
-            let row = &self.matrix[i * words..(i + 1) * words];
-            let mut parity = self.matrix_rhs[i];
-            for (w, ((&m, &assigned), &value)) in row
-                .iter()
-                .zip(&self.assigned_w)
-                .zip(&self.value_w)
-                .enumerate()
-            {
-                if m == 0 {
-                    continue;
-                }
-                let free = m & !assigned;
-                if free.count_ones() > 1
-                    || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
-                {
-                    // The read-off stopped at word `w`.
-                    self.stats.word_ops += w as u64 + 1;
+            let parity = if self.indexed_xors {
+                let Some(parity) = self.unit_parity(
+                    i, words, p, self.matrix_support[i].iter().copied(),
+                ) else {
                     continue 'rows;
+                };
+                parity
+            } else {
+                let row = &self.matrix[i * words..(i + 1) * words];
+                let mut parity = self.matrix_rhs[i];
+                for (w, ((&m, &assigned), &value)) in row
+                    .iter().zip(&self.assigned_w).zip(&self.value_w).enumerate()
+                {
+                    if m == 0 { continue; }
+                    let free = m & !assigned;
+                    if free.count_ones() > 1
+                        || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
+                    {
+                        self.stats.word_ops += w as u64 + 1;
+                        continue 'rows;
+                    }
+                    parity ^= ((m & assigned & value).count_ones() & 1) == 1;
                 }
-                parity ^= ((m & assigned & value).count_ones() & 1) == 1;
-            }
+                parity
+            };
 
             // The read-off reached the end of the row.
             self.stats.word_ops += words as u64;
@@ -1522,6 +1954,13 @@ impl Solver {
             self.stats.word_ops += (words + buf.len()) as u64;
             self.xor_reason[p as usize] = buf;
             self.stats.xor_propagations += 1;
+            if self.observing() {
+                self.emit(SolverEvent::XorImplication {
+                    row_id: i,
+                    literal: lit,
+                    explanation: self.xor_reason[p as usize].clone(),
+                });
+            }
             if self.enqueue(lit, Reason::XorPropagated).is_err() {
                 // Unreachable while the invariant holds — the pivot was
                 // unassigned — but treat it as a conflict rather than
@@ -1559,24 +1998,78 @@ impl Solver {
             .sum::<u64>();
         self.matrix.clear();
         self.matrix_rhs.clear();
+        self.matrix_support.clear();
         for row in &self.xors {
             self.matrix.extend_from_slice(&row.mask);
             self.matrix_rhs.push(row.rhs);
+            self.matrix_support.push(if self.indexed_xors {
+                row.mask
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(w, &m)| (m != 0).then_some(w))
+                    .collect()
+            } else {
+                Vec::new()
+            });
         }
         self.pivot.clear();
         self.pivot.resize(self.matrix_rhs.len(), None);
+        if self.observing() {
+            self.emit(SolverEvent::XorMatrixReset);
+        }
+    }
+
+    /// Select the dense reference or exact nonzero-word engine. Resetting the
+    /// matrix preserves the original constraints and trail.
+    pub fn set_indexed_xors(&mut self, indexed: bool) {
+        self.indexed_xors = indexed;
+        self.clear_matrix();
+        self.xor_epoch = u64::MAX;
     }
 
     /// Drop the working matrix; the next pass rebuilds it from `xors`.
     fn clear_matrix(&mut self) {
         self.matrix.clear();
         self.matrix_rhs.clear();
+        self.matrix_support.clear();
+    }
+
+    fn unit_parity(
+        &self,
+        i: usize,
+        words: usize,
+        p: u32,
+        positions: impl Iterator<Item = usize>,
+    ) -> Option<bool> {
+        let mut parity = self.matrix_rhs[i];
+        for w in positions {
+            let m = self.matrix[i * words + w];
+            if m == 0 {
+                continue;
+            }
+            let free = m & !self.assigned_w[w];
+            if free.count_ones() > 1 || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
+            {
+                return None;
+            }
+            parity ^= ((m & self.assigned_w[w] & self.value_w[w]).count_ones() & 1) == 1;
+        }
+        Some(parity)
     }
 
     /// `rhs ⊕ parity(assigned-true variables of the row)` — zero when a
     /// fully assigned row is satisfied.
     fn row_residual(&self, i: usize, words: usize) -> bool {
         let mut parity = self.matrix_rhs[i];
+        if self.indexed_xors {
+            for &w in &self.matrix_support[i] {
+                parity ^= ((self.matrix[i * words + w] & self.assigned_w[w] & self.value_w[w])
+                    .count_ones()
+                    & 1)
+                    == 1;
+            }
+            return parity;
+        }
         for (w, &m) in self.matrix[i * words..(i + 1) * words].iter().enumerate() {
             if m != 0 {
                 parity ^= ((m & self.assigned_w[w] & self.value_w[w]).count_ones() & 1) == 1;
@@ -1650,7 +2143,7 @@ impl Solver {
     fn propagate_clauses(&mut self) -> Option<u32> {
         let n = self.lit_base as i32;
         let mut conflict: Option<u32> = None;
-        while conflict.is_none() && self.qhead < self.trail.len() {
+        while conflict.is_none() && self.qhead < self.trail.len() && self.event_failure.is_none() {
             let lit = self.trail[self.qhead];
             self.qhead += 1;
             // Clauses watching `¬lit` — that watcher has just become
@@ -1670,6 +2163,9 @@ impl Solver {
             let (mut i, mut j) = (0usize, 0usize);
 
             while i < ws.len() {
+                if self.event_failure.is_some() {
+                    break;
+                }
                 let w = ws[i];
                 i += 1;
                 // Blocker: if this literal is already true the clause is
@@ -1832,6 +2328,14 @@ impl Solver {
         let mut trail_pos = self.trail.len();
 
         loop {
+            if self.observing() {
+                let (reason, literals) = self.conflict_event(src, p);
+                self.emit(SolverEvent::AnalysisReason {
+                    resolved_literal: p,
+                    reason,
+                    literals,
+                });
+            }
             // Read the reason in place.  Copying it into a scratch
             // buffer was a memcpy of up to a hundred literals at every
             // resolution step, and conflict analysis is the hottest
@@ -1997,6 +2501,14 @@ impl Solver {
             return;
         }
         let target = self.trail_lim[level];
+        if self.observing() {
+            self.emit(SolverEvent::Backjump {
+                from_level: self.trail_lim.len(),
+                to_level: level,
+                retained_trail: target,
+                removed: self.trail[target..].to_vec(),
+            });
+        }
         // Each unassignment: the two literal slots, the bitset word and
         // the level; the heap re-insertion charges itself.
         self.stats.word_ops += 3 * (self.trail.len() - target) as u64 + 1;
@@ -2039,8 +2551,7 @@ impl Solver {
     /// stopped earning their keep.  Clauses are ranked by length, the
     /// cheap stand-in for LBD: a short clause prunes more.
     ///
-    /// Detached clauses stay in the arena and are only unhooked from
-    /// the watch lists, so every stored offset stays valid; they are
+    /// Detached clauses are unhooked from the watch lists; they are
     /// learnt, hence implied by the original problem, so dropping them
     /// can cost propagation power but never soundness.  A clause that
     /// is currently some variable's reason is kept, or conflict
@@ -2084,18 +2595,87 @@ impl Solver {
         candidates.sort_by_key(|&i| std::cmp::Reverse(clause_len(i)));
         for &i in candidates.iter().take(candidates.len() / 2) {
             self.detached[i] = true;
+            if self.observing() {
+                self.emit(SolverEvent::DeleteClause {
+                    clause_id: self.clause_at[i],
+                });
+            }
         }
 
+        if self.reclaim_detached_clauses {
+            self.reclaim_clause_arena();
+        }
+        self.rebuild_clause_watches();
+    }
+
+    /// Compact in place, preserving every clause ordinal and live clause's
+    /// literal order. Three-word tautologies keep detached slots harmless
+    /// if incremental clause addition later promotes the learnt prefix to
+    /// originals (including DIMACS export); empty tombstones would be UNSAT.
+    /// No live reason may be detached. Stale reasons of unassigned variables
+    /// are cleared, and every surviving reason offset is relocated.
+    ///
+    /// Only compact when at least a quarter of used words can be recovered.
+    /// Retain 50% headroom to avoid an immediate doubling on the next learnt
+    /// clause. Copying in place avoids holding a second full-sized arena;
+    /// the allocator's subsequent shrink may still move its allocation.
+    fn reclaim_clause_arena(&mut self) {
+        debug_assert!(self.trail_lim.is_empty());
+        let reclaimable: usize = self
+            .clause_at
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| self.detached.get(*i).copied().unwrap_or(false))
+            .map(|(_, &cref)| clause_in(&self.arena, cref).len().saturating_sub(2))
+            .sum();
+        if reclaimable == 0 || reclaimable < self.arena.len() / 4 {
+            return;
+        }
+        let old_offsets = self.clause_at.clone();
+        let mut end = 0usize;
+        for (i, &offset) in old_offsets.iter().enumerate() {
+            let start = offset as usize;
+            let words = self.arena[start] as usize + 1;
+            self.clause_at[i] = u32::try_from(end).expect("compacted arena offset");
+            if self.detached.get(i).copied().unwrap_or(false) && words > 3 {
+                self.arena[end..end + 3].copy_from_slice(&[2, 1, -1]);
+                end += 3;
+            } else {
+                self.arena.copy_within(start..start + words, end);
+                end += words;
+            }
+        }
+        for v in 0..self.reason.len() {
+            if let Reason::Propagated(offset) = self.reason[v] {
+                let i = old_offsets
+                    .binary_search(&offset)
+                    .expect("stored reason offset");
+                self.reason[v] = if self.detached.get(i).copied().unwrap_or(false) {
+                    assert!(self.var_value(v).is_none(), "detached live reason");
+                    Reason::Decision
+                } else {
+                    Reason::Propagated(self.clause_at[i])
+                };
+            }
+        }
+        self.stats.arena_reclamations += 1;
+        self.stats.arena_reclaimed_words += (self.arena.len() - end) as u64;
+        self.arena.truncate(end);
+        self.arena
+            .shrink_to(end.saturating_add((end / 2).max(4096)));
+    }
+
+    fn rebuild_clause_watches(&mut self) {
         // Rebuild the watch lists from what survives.  Cheaper and much
         // less error-prone than unhooking clauses one at a time.  One per
         // list cleared, two per clause (offset, length and detached
         // test) and two watchers per survivor, charged as every clause.
-        self.stats.word_ops += self.watches.len() as u64 + 4 * n_clauses as u64;
+        self.stats.word_ops += self.watches.len() as u64 + 4 * self.clause_at.len() as u64;
         for w in self.watches.iter_mut() {
             w.clear();
         }
         let n = self.lit_base as i32;
-        for idx in 0..n_clauses {
+        for idx in 0..self.clause_at.len() {
             let cref = self.clause_at[idx];
             let c = clause_in(&self.arena, cref);
             if c.len() < 2 || self.detached.get(idx).copied().unwrap_or(false) {
@@ -2116,7 +2696,28 @@ impl Solver {
             self.trail_lim.is_empty(),
             "root propagation requires decision level zero"
         );
-        if self.is_unsat || self.propagate().is_some() {
+        if self.event_failure.is_some() {
+            return RootPropagationResult::Unknown;
+        }
+        let conflict = if self.is_unsat {
+            None
+        } else {
+            self.propagate()
+        };
+        if let Some(conflict) = conflict {
+            if self.observing() {
+                let (reason, literals) = self.conflict_event(conflict, 0);
+                self.emit(SolverEvent::Conflict {
+                    level: 0,
+                    reason,
+                    literals,
+                });
+            }
+        }
+        if self.event_failure.is_some() {
+            return RootPropagationResult::Unknown;
+        }
+        if self.is_unsat || conflict.is_some() {
             self.is_unsat = true;
             RootPropagationResult::Unsat
         } else {
@@ -2154,6 +2755,208 @@ impl Solver {
     where
         F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
     {
+        let trace = (std::env::var("N83_SAT_PHASE_TRACE").as_deref() == Ok("1"))
+            .then(std::time::Instant::now);
+        self.trace_solve_phase(trace, "solve_enter", None);
+        let outcome = self.solve_with_lazy_clauses_inner(trigger_vars, theory, trace);
+        self.trace_solve_phase(trace, "solve_return", Some(outcome));
+        outcome
+    }
+
+    /// Exact buffer ownership at this point, excluding allocator overhead and
+    /// everything outside this solver. Capacity bytes are not resident bytes.
+    /// The glibc/process observations are captured before allocating the JSON.
+    fn storage_inventory(&self) -> serde_json::Value {
+        #[cfg(all(target_os = "linux", target_env = "gnu"))]
+        let allocator = {
+            // SAFETY: mallinfo2 takes no pointers and returns process allocator
+            // counters by value. This does not inspect or modify allocations.
+            let info = unsafe { libc::mallinfo2() };
+            serde_json::json!({"backend":"glibc_mallinfo2",
+                "arena_bytes":info.arena,"in_use_arena_bytes":info.uordblks,
+                "mmap_bytes":info.hblkhd,"free_arena_bytes":info.fordblks})
+        };
+        #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
+        let allocator = serde_json::Value::Null;
+        let process_status: Option<Vec<String>> = std::fs::read_to_string("/proc/self/status")
+            .ok()
+            .map(|raw| {
+                raw.lines()
+                    .filter(|line| {
+                        [
+                            "VmSize:", "VmRSS:", "VmHWM:", "RssAnon:", "RssFile:", "VmSwap:",
+                        ]
+                        .iter()
+                        .any(|prefix| line.starts_with(prefix))
+                    })
+                    .map(str::to_owned)
+                    .collect()
+            });
+        let components = std::collections::BTreeMap::from([
+            ("clause_arena", capacity_bytes(&self.arena)),
+            ("clause_offsets", capacity_bytes(&self.clause_at)),
+            ("detached_flags", capacity_bytes(&self.detached)),
+            ("watch_headers", capacity_bytes(&self.watches)),
+            (
+                "watch_entries",
+                self.watches.iter().map(capacity_bytes).sum(),
+            ),
+            ("xor_row_headers", capacity_bytes(&self.xors)),
+            (
+                "xor_row_masks",
+                self.xors.iter().map(|row| capacity_bytes(&row.mask)).sum(),
+            ),
+            ("xor_matrix", capacity_bytes(&self.matrix)),
+            ("xor_matrix_rhs", capacity_bytes(&self.matrix_rhs)),
+            ("xor_support_headers", capacity_bytes(&self.matrix_support)),
+            (
+                "xor_support_words",
+                self.matrix_support.iter().map(capacity_bytes).sum(),
+            ),
+            (
+                "xor_support_scratch",
+                capacity_bytes(&self.xor_support_src) + capacity_bytes(&self.xor_support_merge),
+            ),
+            ("xor_reason_headers", capacity_bytes(&self.xor_reason)),
+            (
+                "xor_reason_literals",
+                self.xor_reason.iter().map(capacity_bytes).sum(),
+            ),
+            ("xor_conflict", capacity_bytes(&self.xor_conflict)),
+            ("xor_pivots", capacity_bytes(&self.pivot)),
+            ("xor_row_scratch", capacity_bytes(&self.xor_src)),
+            ("literal_values", capacity_bytes(&self.values)),
+            (
+                "assignment_bitsets",
+                capacity_bytes(&self.assigned_w) + capacity_bytes(&self.value_w),
+            ),
+            (
+                "levels_and_reasons",
+                capacity_bytes(&self.level) + capacity_bytes(&self.reason),
+            ),
+            (
+                "phase_and_activity",
+                capacity_bytes(&self.saved_phase) + capacity_bytes(&self.activity),
+            ),
+            (
+                "trail",
+                capacity_bytes(&self.trail) + capacity_bytes(&self.trail_lim),
+            ),
+            (
+                "analysis_scratch",
+                capacity_bytes(&self.seen)
+                    + capacity_bytes(&self.seen_stack)
+                    + capacity_bytes(&self.redundant_stack)
+                    + capacity_bytes(&self.learnt_buf),
+            ),
+            (
+                "branch_heap",
+                capacity_bytes(&self.order.heap)
+                    + capacity_bytes(&self.order.pos)
+                    + capacity_bytes(&self.branch_priority)
+                    + capacity_bytes(&self.heap_key),
+            ),
+        ]);
+        let mut original_words = 0u64;
+        let mut active_learnt_words = 0u64;
+        let mut detached_learnt_words = 0u64;
+        let mut detached_learnt_clauses = 0u64;
+        for (index, &offset) in self.clause_at.iter().enumerate() {
+            let words = 1 + clause_in(&self.arena, offset).len() as u64;
+            if index < self.n_orig_clauses {
+                original_words += words;
+            } else if self.detached.get(index).copied().unwrap_or(false) {
+                detached_learnt_words += words;
+                detached_learnt_clauses += 1;
+            } else {
+                active_learnt_words += words;
+            }
+        }
+        serde_json::json!({"schema":"n83.sat-storage/v1",
+            "scope":"owned Vec buffer capacities, not RSS or allocator usable sizes; allocator/process counters include non-solver storage",
+            "components_capacity_bytes":components,
+            "owned_capacity_bytes":components.values().sum::<u64>(),
+            "arena_used_words":self.arena.len(),"arena_capacity_words":self.arena.capacity(),
+            "arena_reclamations":self.stats.arena_reclamations,
+            "arena_reclaimed_words":self.stats.arena_reclaimed_words,
+            "literal_word_bytes":std::mem::size_of::<Lit>(),
+            "original_clause_words":original_words,"active_learnt_clause_words":active_learnt_words,
+            "detached_learnt_clause_words":detached_learnt_words,
+            "stored_clauses":self.clause_at.len(),"original_clauses":self.n_orig_clauses,
+            "detached_learnt_clauses":detached_learnt_clauses,
+            "allocator":allocator,"worker_pid_in_namespace":std::process::id(),
+            "worker_process_status":process_status})
+    }
+
+    /// Opt-in diagnostic snapshots. Timers and counters are cumulative for this
+    /// solver instance; elapsed time is relative to this particular solve call.
+    /// Writing only at boundaries and every 1,000 conflicts avoids a per-step
+    /// trace cost. Ownership snapshots add a read-only scan at solve boundaries
+    /// and every 10,000 conflicts. A killed worker's last snapshot is not terminal.
+    fn trace_solve_phase(
+        &self,
+        started: Option<std::time::Instant>,
+        phase: &str,
+        outcome: Option<SolveResult>,
+    ) {
+        if let Some(started) = started {
+            use std::io::Write;
+            let storage =
+                storage_snapshot_due(phase, self.stats.conflicts).then(|| self.storage_inventory());
+            let record = serde_json::json!({
+                "schema":"n83.sat-phase/v1", "phase":phase,
+                "elapsed_ms":started.elapsed().as_secs_f64()*1000.0,
+                "outcome":outcome.map(|v| format!("{v:?}")),
+                "counter_scope":"solver_instance_cumulative",
+                "conflicts":self.stats.conflicts, "decisions":self.stats.decisions,
+                "propagations":self.stats.propagations, "xor_passes":self.stats.xor_passes,
+                "xor_propagations":self.stats.xor_propagations,
+                "ns_propagate_clauses":self.stats.ns_propagate_clauses,
+                "ns_propagate_xors":self.stats.ns_propagate_xors,
+                "ns_analyze":self.stats.ns_analyze, "ns_minimize":self.stats.ns_minimize,
+                "ns_reduce_db":self.stats.ns_reduce_db,
+                "storage":storage,
+            });
+            let mut stderr = std::io::stderr().lock();
+            let _ = writeln!(stderr, "{record}");
+            let _ = stderr.flush();
+        if self.event_failure.is_some() {
+            return SolveResult::Unknown;
+        }
+        if self.observing() {
+            self.emit(SolverEvent::SolveBegin {
+                conflicts: self.conflicts,
+                conflict_budget: self.conflict_budget,
+            });
+        }
+        if self.event_failure.is_some() {
+            return SolveResult::Unknown;
+        }
+        let result = self.solve_with_lazy_clauses_inner(trigger_vars, theory);
+        if self.event_failure.is_some() {
+            return SolveResult::Unknown;
+        }
+        if self.observing() {
+            self.emit(SolverEvent::SolveEnd {
+                result: format!("{result:?}"),
+            });
+        }
+        if self.event_failure.is_some() {
+            SolveResult::Unknown
+        } else {
+            result
+        }
+    }
+
+    fn solve_with_lazy_clauses_inner<F>(
+        &mut self,
+        trigger_vars: &[u32],
+        theory: &mut F,
+        trace: Option<std::time::Instant>,
+    ) -> SolveResult
+    where
+        F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
+    {
         if self.is_unsat {
             return SolveResult::Unsat;
         }
@@ -2164,8 +2967,23 @@ impl Solver {
         self.backjump(0);
         // Initial propagation at level 0 catches trivial UNSAT from
         // unit clauses.
-        if self.propagate().is_some() {
+        self.trace_solve_phase(trace, "initial_propagation_begin", None);
+        let initial_conflict = self.propagate().is_some();
+        self.trace_solve_phase(trace, "initial_propagation_complete", None);
+        if initial_conflict {
+        if let Some(conflict) = self.propagate() {
+            if self.observing() {
+                let (reason, literals) = self.conflict_event(conflict, 0);
+                self.emit(SolverEvent::Conflict {
+                    level: self.trail_lim.len(),
+                    reason,
+                    literals,
+                });
+            }
             return SolveResult::Unsat;
+        }
+        if self.event_failure.is_some() {
+            return SolveResult::Unknown;
         }
         if self.max_learnts == 0 {
             self.max_learnts = (self.n_orig_clauses / 3).max(4000);
@@ -2176,7 +2994,11 @@ impl Solver {
         let mut luby_index = 1u64;
         let mut restart_limit = 100u64 * luby(luby_index);
         let mut pending_conflict = None;
+        self.trace_solve_phase(trace, "cdcl_enter", None);
         loop {
+            if self.event_failure.is_some() {
+                return SolveResult::Unknown;
+            }
             if self
                 .deadline
                 .is_some_and(|deadline| std::time::Instant::now() >= deadline)
@@ -2184,12 +3006,28 @@ impl Solver {
                 return SolveResult::Unknown;
             }
             if let Some(conflict_idx) = pending_conflict.take().or_else(|| self.propagate()) {
+                if self.observing() {
+                    let (reason, literals) = self.conflict_event(conflict_idx, 0);
+                    self.emit(SolverEvent::Conflict {
+                        level: self.trail_lim.len(),
+                        reason,
+                        literals,
+                    });
+                }
+                if self.event_failure.is_some() {
+                    return SolveResult::Unknown;
+                }
                 self.conflicts += 1;
                 self.stats.conflicts += 1;
                 if let Some(progress) = &self.progress {
                     progress
                         .conflicts
                         .store(self.stats.conflicts, Ordering::Relaxed);
+                }
+                if trace.is_some()
+                    && (self.stats.conflicts == 1 || self.stats.conflicts % 1000 == 0)
+                {
+                    self.trace_solve_phase(trace, "conflict_snapshot", None);
                 }
                 let lvl = self.trail_lim.len() as u64;
                 self.stats.conflict_level_sum += lvl;
@@ -2211,6 +3049,16 @@ impl Solver {
                 let t = std::time::Instant::now();
                 let (learnt, bj_level) = self.analyze(conflict_idx);
                 self.stats.ns_analyze += t.elapsed().as_nanos() as u64;
+                if self.observing() {
+                    self.emit(SolverEvent::Learned {
+                        clause_id: self.next_cref(),
+                        literals: learnt.clone(),
+                        backjump_level: bj_level,
+                    });
+                }
+                if self.event_failure.is_some() {
+                    return SolveResult::Unknown;
+                }
                 self.backjump(bj_level);
                 self.progress_phase(SolverProgressPhase::Idle);
                 // Install the learnt clause.
@@ -2240,6 +3088,12 @@ impl Solver {
                 }
                 // Restart?
                 if self.conflicts_since_restart >= restart_limit {
+                    if self.observing() {
+                        self.emit(SolverEvent::Restart {
+                            restart: self.stats.restarts + 1,
+                            conflicts: self.conflicts,
+                        });
+                    }
                     self.progress_phase(SolverProgressPhase::Restart);
                     self.backjump(0);
                     self.stats.restarts += 1;
@@ -2272,6 +3126,9 @@ impl Solver {
                     self.progress_phase(SolverProgressPhase::Idle);
                 }
             } else {
+                if self.event_failure.is_some() {
+                    return SolveResult::Unknown;
+                }
                 // Through the `n_vars`-long assignment, so a trigger past the
                 // variables panics on the index as it did before the tables
                 // had spare slots, instead of reading as never assigned.
@@ -2343,6 +3200,18 @@ impl Solver {
                         } else {
                             -((v + 1) as i32)
                         };
+                        if self.observing() {
+                            self.emit(SolverEvent::Decision {
+                                literal: lit,
+                                level: self.trail_lim.len(),
+                                trail_index: self.trail.len(),
+                                activity_bits: self.activity[v as usize].to_bits(),
+                                priority: self.branch_priority[v as usize],
+                            });
+                        }
+                        if self.event_failure.is_some() {
+                            return SolveResult::Unknown;
+                        }
                         self.assign(lit, Reason::Decision);
                         if let Some(progress) = &self.progress {
                             progress
@@ -2702,8 +3571,549 @@ pub fn check_model(clauses: &[Vec<Lit>], model: &[bool]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn observer_pigeonhole(pigeons: u32, holes: u32) -> Solver {
+        let mut s = Solver::new(pigeons * holes);
+        for pigeon in 0..pigeons {
+            s.add_clause(
+                (0..holes)
+                    .map(|hole| (pigeon * holes + hole + 1) as Lit)
+                    .collect(),
+            );
+        }
+        for hole in 0..holes {
+            for a in 0..pigeons {
+                for b in a + 1..pigeons {
+                    s.add_clause(vec![
+                        -((a * holes + hole + 1) as Lit),
+                        -((b * holes + hole + 1) as Lit),
+                    ]);
+                }
+            }
+        }
+        s.max_learnts = 8;
+        s.conflict_budget = 400;
+        s
+    }
+
+    /// Replay semantic changes with an independent representation. This checks
+    /// propagation reasons and parity operations, not learned-clause proofs.
+    fn replay_observer(events: &[SolverEvent]) -> Result<Vec<Option<bool>>, String> {
+        use std::collections::BTreeMap;
+        let mut assignment = Vec::new();
+        let mut trail = Vec::<Lit>::new();
+        let mut clauses = BTreeMap::<u32, Vec<Lit>>::new();
+        let mut xors = BTreeMap::<usize, (Vec<u64>, bool)>::new();
+        let mut matrix = BTreeMap::<usize, (Vec<u64>, bool)>::new();
+        let lit_value = |a: &[Option<bool>], lit: Lit| {
+            a.get(var_of(lit) as usize)
+                .copied()
+                .flatten()
+                .map(|v| v != (lit < 0))
+        };
+        for event in events {
+            match event {
+                SolverEvent::Snapshot { variables, .. } => {
+                    assignment = vec![None; *variables as usize]
+                }
+                SolverEvent::Clause {
+                    clause_id,
+                    literals,
+                    ..
+                }
+                | SolverEvent::Learned {
+                    clause_id,
+                    literals,
+                    ..
+                } => {
+                    if let Some(old) = clauses.insert(*clause_id, literals.clone()) {
+                        let mut old = old;
+                        let mut new = literals.clone();
+                        old.sort();
+                        new.sort();
+                        if old != new {
+                            return Err("clause ID changed literals".into());
+                        }
+                    }
+                }
+                SolverEvent::XorConstraint { row_id, mask, rhs } => {
+                    xors.insert(*row_id, (mask.clone(), *rhs));
+                }
+                SolverEvent::XorMatrixReset => matrix = xors.clone(),
+                SolverEvent::XorMatrixRow { row_id, mask, rhs } => {
+                    matrix.insert(*row_id, (mask.clone(), *rhs));
+                }
+                SolverEvent::XorRowXor {
+                    destination,
+                    source,
+                } => {
+                    let (source_mask, source_rhs) = matrix
+                        .get(source)
+                        .ok_or("missing source parity row")?
+                        .clone();
+                    let (mask, rhs) = matrix
+                        .get_mut(destination)
+                        .ok_or("missing destination parity row")?;
+                    if mask.len() != source_mask.len() {
+                        return Err("parity width differs".into());
+                    }
+                    for (a, b) in mask.iter_mut().zip(source_mask) {
+                        *a ^= b;
+                    }
+                    *rhs ^= source_rhs;
+                }
+                SolverEvent::XorImplication {
+                    row_id,
+                    literal,
+                    explanation,
+                } => {
+                    let (mask, rhs) = matrix.get(row_id).ok_or("missing implication row")?;
+                    let mut free = Vec::new();
+                    let mut parity = *rhs;
+                    for (v, a) in assignment.iter().enumerate() {
+                        if mask[v / 64] >> (v % 64) & 1 == 0 {
+                            continue;
+                        }
+                        match a {
+                            Some(value) => parity ^= *value,
+                            None => free.push(v),
+                        }
+                    }
+                    if free != vec![var_of(*literal) as usize]
+                        || parity != (*literal > 0)
+                        || !explanation.contains(literal)
+                    {
+                        return Err("invalid parity implication".into());
+                    }
+                }
+                SolverEvent::XorConflict {
+                    row_id,
+                    explanation,
+                } => {
+                    let (mask, rhs) = matrix.get(row_id).ok_or("missing conflict parity row")?;
+                    let mut parity = *rhs;
+                    for (v, a) in assignment.iter().enumerate() {
+                        if mask[v / 64] >> (v % 64) & 1 != 0 {
+                            parity ^= a.ok_or("free variable in parity conflict")?;
+                        }
+                    }
+                    if !parity
+                        || explanation
+                            .iter()
+                            .any(|l| lit_value(&assignment, *l) != Some(false))
+                    {
+                        return Err("invalid parity conflict".into());
+                    }
+                }
+                SolverEvent::Assignment {
+                    literal,
+                    trail_index,
+                    reason,
+                    ..
+                } => {
+                    if *trail_index != trail.len() || lit_value(&assignment, *literal).is_some() {
+                        return Err("invalid assignment trail".into());
+                    }
+                    let explanation = match reason {
+                        SolverEventReason::Decision => None,
+                        SolverEventReason::Clause { clause_id } => {
+                            Some(clauses.get(clause_id).ok_or("unknown reason clause")?)
+                        }
+                        SolverEventReason::Xor { explanation } => Some(explanation),
+                    };
+                    if let Some(explanation) = explanation {
+                        if !explanation.contains(literal)
+                            || explanation
+                                .iter()
+                                .filter(|l| **l != *literal)
+                                .any(|l| lit_value(&assignment, *l) != Some(false))
+                        {
+                            return Err("reason was not unit on prior trail".into());
+                        }
+                    }
+                    assignment[var_of(*literal) as usize] = Some(*literal > 0);
+                    trail.push(*literal);
+                }
+                SolverEvent::Decision {
+                    literal,
+                    trail_index,
+                    ..
+                } => {
+                    if *trail_index != trail.len() || lit_value(&assignment, *literal).is_some() {
+                        return Err("invalid decision".into());
+                    }
+                }
+                SolverEvent::Backjump {
+                    retained_trail,
+                    removed,
+                    ..
+                } => {
+                    if *retained_trail > trail.len()
+                        || &trail[*retained_trail..] != removed.as_slice()
+                    {
+                        return Err("invalid backjump suffix".into());
+                    }
+                    for lit in trail.drain(*retained_trail..) {
+                        assignment[var_of(lit) as usize] = None;
+                    }
+                }
+                SolverEvent::Conflict { literals, .. } => {
+                    if literals
+                        .iter()
+                        .any(|l| lit_value(&assignment, *l) != Some(false))
+                    {
+                        return Err("conflict is not falsified".into());
+                    }
+                }
+                SolverEvent::FormulaContradiction { constraint, .. } => match constraint {
+                    SolverEventConstraint::Clause { literals } => {
+                        if literals
+                            .iter()
+                            .any(|l| lit_value(&assignment, *l) != Some(false))
+                        {
+                            return Err("added clause is not falsified".into());
+                        }
+                    }
+                    SolverEventConstraint::Xor { variables, rhs } => {
+                        let mut odd = std::collections::BTreeSet::new();
+                        for variable in variables {
+                            if *variable == 0 || *variable as usize > assignment.len() {
+                                return Err("invalid added XOR variable".into());
+                            }
+                            if !odd.insert(*variable) {
+                                odd.remove(variable);
+                            }
+                        }
+                        if !odd.is_empty() || !rhs {
+                            return Err("added XOR is not an immediate contradiction".into());
+                        }
+                    }
+                },
+                SolverEvent::DeleteClause { clause_id } if !clauses.contains_key(clause_id) => {
+                    return Err("deleted unknown clause".into());
+                }
+                _ => {}
+            }
+        }
+        Ok(assignment)
+    }
+
+    #[test]
+    fn observer_preserves_answers_all_work_counters_and_reconstructs_cnf_search() {
+        use std::sync::Mutex;
+        let mut saw_restart = false;
+        let mut saw_deletion = false;
+        for (pigeons, holes) in [(5, 4), (7, 6)] {
+            let mut plain = observer_pigeonhole(pigeons, holes);
+            let mut observed = observer_pigeonhole(pigeons, holes);
+            let events = Arc::new(Mutex::new(Vec::new()));
+            let output = Arc::clone(&events);
+            observed
+                .set_event_observer(move |event| {
+                    output.lock().unwrap().push(event.clone());
+                    Ok(())
+                })
+                .unwrap();
+            let expected = plain.solve();
+            let actual = observed.solve();
+            assert_eq!(actual, expected);
+            let deterministic = |mut st: SolverStats| {
+                st.ns_propagate_clauses = 0;
+                st.ns_propagate_xors = 0;
+                st.ns_analyze = 0;
+                st.ns_minimize = 0;
+                st.ns_reduce_db = 0;
+                format!("{st:?}")
+            };
+            assert_eq!(deterministic(plain.stats), deterministic(observed.stats));
+            assert_eq!(plain.word_ops(), observed.word_ops());
+            assert_eq!(plain.assignment(), observed.assignment());
+            let events = events.lock().unwrap();
+            assert_eq!(replay_observer(&events).unwrap(), observed.assignment());
+            assert!(events
+                .iter()
+                .any(|e| matches!(e, SolverEvent::Learned { .. })));
+            assert!(events
+                .iter()
+                .any(|e| matches!(e, SolverEvent::Backjump { .. })));
+            saw_restart |= events
+                .iter()
+                .any(|e| matches!(e, SolverEvent::Restart { .. }));
+            saw_deletion |= events
+                .iter()
+                .any(|e| matches!(e, SolverEvent::DeleteClause { .. }));
+            let mut corrupted = events.clone();
+            let assignment = corrupted
+                .iter_mut()
+                .find(|e| {
+                    matches!(
+                        e,
+                        SolverEvent::Assignment {
+                            reason: SolverEventReason::Clause { .. },
+                            ..
+                        }
+                    )
+                })
+                .unwrap();
+            if let SolverEvent::Assignment { reason, .. } = assignment {
+                *reason = SolverEventReason::Clause {
+                    clause_id: u32::MAX,
+                };
+            }
+            assert!(replay_observer(&corrupted).is_err());
+        }
+        assert!(saw_restart, "fixture must exercise actual restart events");
+        assert!(saw_deletion, "fixture must exercise actual deletion events");
+    }
+
+    #[test]
+    fn observer_reconstructs_xor_operations_and_copies_reasons() {
+        use std::sync::Mutex;
+        let mut solver = Solver::new(5);
+        solver.add_xor(&[1, 2, 3], true);
+        solver.add_xor(&[1, 2, 4], false);
+        solver.add_xor(&[3, 4, 5], false);
+        solver.add_clause(vec![1]);
+        solver.add_clause(vec![-2]);
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let output = Arc::clone(&events);
+        solver
+            .set_event_observer(move |event| {
+                output.lock().unwrap().push(event.clone());
+                Ok(())
+            })
+            .unwrap();
+        assert_eq!(solver.solve(), SolveResult::Sat);
+        let events = events.lock().unwrap();
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, SolverEvent::XorRowXor { .. })));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, SolverEvent::XorImplication { .. })));
+        assert_eq!(replay_observer(&events).unwrap(), solver.assignment());
+        for event in events.iter() {
+            let encoded = serde_json::to_vec(event).unwrap();
+            assert_eq!(
+                serde_json::from_slice::<SolverEvent>(&encoded).unwrap(),
+                *event
+            );
+        }
+    }
+
+    #[test]
+    fn observer_replays_incremental_units_and_censors_root_conflicts() {
+        use std::sync::Mutex;
+        fn assert_send_sync<T: Send + Sync>() {}
+        assert_send_sync::<Solver>();
+        let mut solver = Solver::new(2);
+        solver.add_clause(vec![-1, 2]);
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let output = Arc::clone(&events);
+        solver
+            .set_event_observer(move |event| {
+                output.lock().unwrap().push(event.clone());
+                Ok(())
+            })
+            .unwrap();
+        assert!(solver.add_clause(vec![1]));
+        assert_eq!(solver.propagate_root(), RootPropagationResult::Fixpoint);
+        assert_eq!(
+            replay_observer(&events.lock().unwrap()).unwrap(),
+            solver.assignment()
+        );
+
+        let mut root_conflict = Solver::new(2);
+        root_conflict.add_clause(vec![-1, 2]);
+        root_conflict.add_clause(vec![-1, -2]);
+        root_conflict.add_clause(vec![1]);
+        root_conflict
+            .set_event_observer(|event| {
+                if matches!(event, SolverEvent::Conflict { .. }) {
+                    Err("root conflict sink failure".into())
+                } else {
+                    Ok(())
+                }
+            })
+            .unwrap();
+        assert_eq!(
+            root_conflict.propagate_root(),
+            RootPropagationResult::Unknown
+        );
+        assert!(!root_conflict.is_unsat);
+        assert_eq!(root_conflict.solve(), SolveResult::Unknown);
+    }
+
+    #[test]
+    fn observer_retains_immediate_incremental_contradictions_and_censors_sink_errors() {
+        use std::sync::Mutex;
+        fn base() -> Solver {
+            let mut solver = Solver::new(2);
+            solver.add_clause(vec![1]);
+            solver.add_clause(vec![-2]);
+            solver
+        }
+        fn contradict(solver: &mut Solver, which: u8) -> bool {
+            match which {
+                0 => solver.add_clause(vec![]),
+                1 => solver.add_clause(vec![-1, 2]),
+                _ => solver.add_xor(&[1, 1], true),
+            }
+        }
+        for which in 0..3 {
+            let mut solver = base();
+            let mut plain = base();
+            let events = Arc::new(Mutex::new(Vec::new()));
+            let output = Arc::clone(&events);
+            solver
+                .set_event_observer(move |event| {
+                    output.lock().unwrap().push(event.clone());
+                    Ok(())
+                })
+                .unwrap();
+            assert!(!contradict(&mut solver, which));
+            assert!(!contradict(&mut plain, which));
+            assert_eq!(solver.solve(), SolveResult::Unsat);
+            assert_eq!(plain.solve(), SolveResult::Unsat);
+            assert_eq!(solver.word_ops(), plain.word_ops());
+            let events = events.lock().unwrap();
+            assert_eq!(replay_observer(&events).unwrap(), solver.assignment());
+            let event = events
+                .iter()
+                .find(|e| matches!(e, SolverEvent::FormulaContradiction { .. }))
+                .unwrap();
+            let expected = match which {
+                0 => SolverEventConstraint::Clause { literals: vec![] },
+                1 => SolverEventConstraint::Clause {
+                    literals: vec![-1, 2],
+                },
+                _ => SolverEventConstraint::Xor {
+                    variables: vec![1, 1],
+                    rhs: true,
+                },
+            };
+            assert_eq!(
+                event,
+                &SolverEvent::FormulaContradiction {
+                    level: 0,
+                    constraint: expected
+                }
+            );
+            assert_eq!(
+                serde_json::from_slice::<SolverEvent>(&serde_json::to_vec(event).unwrap()).unwrap(),
+                *event
+            );
+
+            let mut censored = base();
+            censored
+                .set_event_observer(|event| {
+                    if matches!(event, SolverEvent::FormulaContradiction { .. }) {
+                        Err("contradiction sink failed".into())
+                    } else {
+                        Ok(())
+                    }
+                })
+                .unwrap();
+            assert!(!contradict(&mut censored, which));
+            assert_eq!(censored.solve(), SolveResult::Unknown);
+            assert_eq!(censored.propagate_root(), RootPropagationResult::Unknown);
+            assert_eq!(
+                censored.event_observer_error(),
+                Some("contradiction sink failed")
+            );
+        }
+    }
+
+    #[test]
+    fn observer_errors_always_censor_including_terminal_unsat() {
+        for stop in ["snapshot", "assignment", "conflict", "learned", "finish"] {
+            let mut solver = observer_pigeonhole(5, 4);
+            let install = solver.set_event_observer(move |event| {
+                let fail = match stop {
+                    "snapshot" => matches!(event, SolverEvent::Snapshot { .. }),
+                    "assignment" => matches!(event, SolverEvent::Assignment { .. }),
+                    "conflict" => matches!(event, SolverEvent::Conflict { .. }),
+                    "learned" => matches!(event, SolverEvent::Learned { .. }),
+                    _ => matches!(event, SolverEvent::SolveEnd { .. }),
+                };
+                if fail {
+                    Err(format!("test sink failed at {stop}"))
+                } else {
+                    Ok(())
+                }
+            });
+            assert_eq!(install.is_err(), stop == "snapshot");
+            assert_eq!(solver.solve(), SolveResult::Unknown, "{stop}");
+            assert!(solver.event_observer_error().unwrap().contains(stop));
+            assert_eq!(solver.solve(), SolveResult::Unknown);
+            solver.reset_search();
+            assert_eq!(solver.propagate_root(), RootPropagationResult::Unknown);
+        }
+    }
     use std::collections::HashSet;
 
+    #[test]
+    fn storage_inventory_partitions_clause_words_and_nested_buffers() {
+        let mut s = Solver::new(8);
+        s.add_clause(vec![1, 2, 3]);
+        s.add_clause(vec![-1, 4]);
+        let originals = s.arena.len() as u64;
+        s.push_clause(&[2, 4, 5, 6]);
+        s.push_clause(&[-2, 7]);
+        s.detached.resize(s.clause_at.len(), false);
+        s.detached[s.n_orig_clauses] = true;
+        s.xor_reason[0] = Vec::with_capacity(19);
+        let inventory = s.storage_inventory();
+        assert_eq!(inventory["original_clause_words"], originals);
+        assert_eq!(inventory["active_learnt_clause_words"], 3);
+        assert_eq!(inventory["detached_learnt_clause_words"], 5);
+        assert_eq!(inventory["detached_learnt_clauses"], 1);
+        assert_eq!(inventory["arena_used_words"], originals + 8);
+        let components = inventory["components_capacity_bytes"].as_object().unwrap();
+        assert_eq!(components["clause_arena"], capacity_bytes(&s.arena));
+        assert_eq!(components["xor_reason_literals"], 19 * 4);
+        assert_eq!(
+            inventory["owned_capacity_bytes"].as_u64().unwrap(),
+            components
+                .values()
+                .map(|v| v.as_u64().unwrap())
+                .sum::<u64>()
+        );
+    }
+
+    #[test]
+    fn storage_observation_leaves_the_search_and_model_unchanged() {
+        let clauses = [vec![1, 2], vec![-1, 3], vec![-2, -3]];
+        let build = || {
+            let mut solver = Solver::new(4);
+            for clause in &clauses {
+                solver.add_clause(clause.clone());
+            }
+            solver.add_xor(&[2, 3, 4], true);
+            solver
+        };
+        let mut observed = build();
+        let mut reference = build();
+        let before_arena = observed.arena.clone();
+        let before_capacity = observed.arena.capacity();
+        let _ = observed.storage_inventory();
+        assert_eq!(observed.arena, before_arena);
+        assert_eq!(observed.arena.capacity(), before_capacity);
+        assert_eq!(observed.solve(), reference.solve());
+        assert_eq!(observed.model(), reference.model());
+        assert_eq!(observed.stats.conflicts, reference.stats.conflicts);
+        assert_eq!(observed.stats.decisions, reference.stats.decisions);
+        assert_eq!(observed.stats.propagations, reference.stats.propagations);
+        assert!(check_model(&clauses, &observed.model()));
+    }
+
+    #[test]
+    fn storage_sampling_is_limited_to_boundaries_and_ten_thousand_conflicts() {
+        assert!(storage_snapshot_due("solve_enter", 0));
+        assert!(storage_snapshot_due("solve_return", 450_000));
+        assert!(storage_snapshot_due("conflict_snapshot", 10_000));
+        assert!(!storage_snapshot_due("conflict_snapshot", 1_000));
+        assert!(!storage_snapshot_due("initial_propagation_complete", 0));
     /// Re-entering `solve` after a conflict-budget stop must give the
     /// same answer as one unbounded call.  Before the level-zero restart
     /// on entry, a resumed solve could return SAT with a model that
@@ -2915,6 +4325,107 @@ mod tests {
     ///
     /// A silent incompleteness here would show up as a missed
     /// propagation, not a crash, so it is worth checking explicitly.
+    #[test]
+    fn indexed_words_match_dense_across_growth_and_blocking() {
+        let mut rng = 0x83a9_47d2_1bce_7731u64;
+        fn next(rng: &mut u64) -> u64 {
+            *rng ^= *rng << 13;
+            *rng ^= *rng >> 7;
+            *rng ^= *rng << 17;
+            *rng
+        }
+        for n in [1u32, 63, 64, 65, 127, 130] {
+            for _ in 0..12 {
+                let mut dense = Solver::new(n);
+                dense.set_indexed_xors(false);
+                let mut indexed = Solver::new(n);
+                let truth: Vec<bool> = (0..n).map(|_| next(&mut rng) & 1 != 0).collect();
+                for _ in 0..40 {
+                    let vars: Vec<u32> = (0..5)
+                        .map(|_| 1 + (next(&mut rng) % n as u64) as u32)
+                        .collect();
+                    let rhs = vars.iter().fold(false, |p, &v| p ^ truth[v as usize - 1]);
+                    assert_eq!(dense.add_xor(&vars, rhs), indexed.add_xor(&vars, rhs));
+                }
+                for _ in 0..40 {
+                    let mut clause: Vec<Lit> = (0..4)
+                        .map(|_| {
+                            let v = (1 + next(&mut rng) % n as u64) as Lit;
+                            if next(&mut rng) & 1 == 0 {
+                                v
+                            } else {
+                                -v
+                            }
+                        })
+                        .collect();
+                    if !clause
+                        .iter()
+                        .any(|&l| truth[l.unsigned_abs() as usize - 1] == (l > 0))
+                    {
+                        clause[0] = -clause[0];
+                    }
+                    assert_eq!(dense.add_clause(clause.clone()), indexed.add_clause(clause));
+                }
+                for _ in 0..3 {
+                    dense.conflict_budget = 1000;
+                    indexed.conflict_budget = 1000;
+                    let a = dense.solve();
+                    let b = indexed.solve();
+                    assert_eq!(a, b, "width {n}");
+                    assert_eq!(dense.model(), indexed.model());
+                    assert_eq!(
+                        (
+                            dense.stats.conflicts,
+                            dense.stats.decisions,
+                            dense.stats.xor_row_ops,
+                            dense.stats.xor_passes,
+                            dense.stats.xor_reason_lits
+                        ),
+                        (
+                            indexed.stats.conflicts,
+                            indexed.stats.decisions,
+                            indexed.stats.xor_row_ops,
+                            indexed.stats.xor_passes,
+                            indexed.stats.xor_reason_lits
+                        )
+                    );
+                    let words = bs_words(indexed.n_vars);
+                    for (i, support) in indexed.matrix_support.iter().enumerate() {
+                        let exact: Vec<_> = indexed.matrix[i * words..(i + 1) * words]
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(w, &m)| (m != 0).then_some(w))
+                            .collect();
+                        assert_eq!(*support, exact);
+                    }
+                    if a != SolveResult::Sat {
+                        break;
+                    }
+                    let block: Vec<_> = dense
+                        .model()
+                        .iter()
+                        .enumerate()
+                        .map(|(v, &t)| if t { -((v + 1) as Lit) } else { (v + 1) as Lit })
+                        .collect();
+                    dense.reset_search();
+                    indexed.reset_search();
+                    assert_eq!(dense.add_clause(block.clone()), indexed.add_clause(block));
+                }
+                // Widen the already-used matrix across another word boundary.
+                dense.reset_search();
+                indexed.reset_search();
+                dense.add_vars(65);
+                indexed.add_vars(65);
+                assert_eq!(
+                    dense.add_xor(&[n, n + 1, n + 65], true),
+                    indexed.add_xor(&[n, n + 1, n + 65], true)
+                );
+                assert_eq!(dense.solve(), indexed.solve());
+                assert_eq!(dense.model(), indexed.model());
+            }
+        }
+    }
+
     #[test]
     fn incremental_matrix_matches_full_elimination() {
         let n_vars = 12u32;
@@ -3827,6 +5338,70 @@ mod tests {
             0x0623_2f40_9d26_5579,
         ];
         assert_eq!(digests, want, "search trace moved: {digests:#018x?}");
+    }
+
+    #[test]
+    fn arena_reclamation_relocates_reasons_and_preserves_incremental_exports() {
+        fn fixture() -> Solver {
+            let mut s = Solver::new(6);
+            s.add_clause(vec![-1, 2, 5]);
+            s.add_clause(vec![-1, 2, -5]);
+            s.add_clause(vec![-2, 3]);
+            s.add_clause(vec![1]);
+            s.add_xor(&[3, 4], false);
+            // Implied by the original root unit, deliberately large enough
+            // to exercise both physical compaction and capacity shrinking.
+            s.push_clause(&vec![1; 20_000]);
+            let live = s.push_clause(&[2]);
+            s.detached.resize(s.clause_at.len(), false);
+            s.detached[s.n_orig_clauses] = true;
+            s.enqueue(2, Reason::Propagated(live)).unwrap();
+            s.reason[5] = Reason::Propagated(s.clause_at[s.n_orig_clauses]);
+            assert!(s.propagate().is_none());
+            s
+        }
+        let mut compact = fixture();
+        let mut retained = fixture();
+        let before = compact.arena.len();
+        let capacity = compact.arena.capacity();
+        compact.reclaim_clause_arena();
+        compact.rebuild_clause_watches();
+        assert!(compact.arena.len() < before / 4);
+        assert!(compact.arena.capacity() < capacity);
+        assert_eq!(compact.clause_at.len(), retained.clause_at.len());
+        assert!(compact.clause_at.windows(2).all(|w| w[0] < w[1]));
+        assert!(matches!(compact.reason[5], Reason::Decision));
+        match compact.reason[1] {
+            Reason::Propagated(c) => assert_eq!(clause_in(&compact.arena, c), &[2]),
+            _ => panic!("live reason lost"),
+        }
+        for s in [&mut compact, &mut retained] {
+            s.add_clause(vec![5, 6]);
+        }
+        fn exported_truth(s: &Solver) -> Vec<bool> {
+            (0..64)
+                .map(|bits| {
+                    s.clause_at.iter().take(s.n_orig_clauses).all(|&c| {
+                        clause_in(&s.arena, c)
+                            .iter()
+                            .any(|&l| ((bits >> var_of(l)) & 1 == 1) == (l > 0))
+                    })
+                })
+                .collect()
+        }
+        assert_eq!(exported_truth(&compact), exported_truth(&retained));
+        assert_eq!(compact.solve(), retained.solve());
+        assert_eq!(compact.model(), retained.model());
+        let mut replay = parse_dimacs(&to_dimacs(&compact)).unwrap();
+        assert_eq!(replay.solve(), SolveResult::Sat);
+        let mut replay_xor = parse_dimacs_xor(&to_dimacs_xor(&compact)).unwrap();
+        assert_eq!(replay_xor.solve(), SolveResult::Sat);
+        assert_eq!(compact.stats.arena_reclamations, 1);
+        // A second pass is harmless, including tombstones now in originals.
+        let after = compact.arena.clone();
+        compact.reset_search();
+        compact.reclaim_clause_arena();
+        assert_eq!(compact.arena, after);
     }
 
     /// **The search trace is pinned across bitset word boundaries.**

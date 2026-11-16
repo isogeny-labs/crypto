@@ -1,0 +1,11 @@
+id,status,scope,evidence,next_gate
+mathlib_function_field,api_present_conditional,Scheme.functionField field and germToFunctionField injective under IsIntegral,Mathlib/AlgebraicGeometry/FunctionField.lean,prove IsIntegral for actual weighted-Proj scheme
+actual_affine_domain,existing_checked,affine and rational-point stalk domain under separable quintic,Common22SeparableAffineDomain.lean,upgrade to whole-scheme IsIntegral and all closed points
+actual_curve_smooth,existing_checked,weighted-Proj structure map smooth under perfect field and 2 nonzero and squarefree quintic,WeightedProjSmoothFinal.smooth,link to one-dimensional regular/Dedekind local structure
+actual_curve_proper,existing_checked,weighted-Proj proper over field,WeightedProjBase.weightedProj_proper_over_K,use with function field and infinity valuation
+degree_two_support,diagnostic_exact,valid common 2+2 inputs over F3 with no rational support roots,global-divisor-counterexample.py,formalize residue-field closed points and valuations
+whole_curve_integral,open,IsIntegral actual weighted-Proj scheme,,needed for Scheme.functionField field
+source_function,open,n divided by B minus Y in actual function field,,needs whole-curve integrality and chart generic germ
+all_closed_point_divisor,open,finitely supported valuations at all closed points,,needs Dedekind or equivalent curve divisor construction
+principal_divisor,open,global divisor of source-style function including infinity and degree drop,,needs all-closed-point divisor and local order allocation
+pic0_transport,open,concrete degree-zero class and returned Mumford pair relation,,needs principal divisor and representation bridge

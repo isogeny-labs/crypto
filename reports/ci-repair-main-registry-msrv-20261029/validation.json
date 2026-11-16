@@ -1,0 +1,138 @@
+{
+  "added": 22,
+  "existing_rows_unchanged": 20787,
+  "all_new_ec1_representations": true,
+  "new_source_sha256": "208470a10d346f76b9175263067530be2b410da60c63c1fa2c9d52a15ee0a3f5",
+  "full_builder_not_run": true,
+  "affected_prose_files": 17,
+  "original_diagnostics_reproduced": 403,
+  "repaired_diagnostics": 0,
+  "alias_map_current": true,
+  "full_hosted_naming_scan_pending": true,
+  "independent_prime_subgroup_checks": 21,
+  "binary_exhaustive_count": 274,
+  "binary_generator_on_curve": true,
+  "archived_name_controls_passed": 8,
+  "full_library": {
+    "base_source": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "curve_aliases_sha256": "e50217d9c478f4d3f68f25965c5df6a6784ad2aa1ece87e441e6808f48ae6089",
+    "command": [
+      "cargo",
+      "+1.98.0",
+      "test",
+      "--release",
+      "--lib"
+    ],
+    "cargo_exit_code": 0,
+    "seconds": 1355.0,
+    "log": "/workspace/main-health-full-library-rechecked-20261029.log"
+  },
+  "full_library_summary": {
+    "passed": 5206,
+    "failed": 0,
+    "ignored": 123
+  },
+  "workflow_pins": {
+    "old": "1.90.0",
+    "new": "1.98.0",
+    "root_crate_workflows": [
+      "release.yml",
+      "polynomial-reuse.yml",
+      "gpu-ecc2k-host-verification.yml"
+    ],
+    "standalone_pqc_pin_changed": false
+  },
+  "original_full_test_failure": {
+    "passed": 5179,
+    "failed": 27,
+    "ignored": 123,
+    "reason": "missing exact tracked runtime fixtures in sparse checkout",
+    "all_27_rerun_exit_code": 0
+  },
+  "artifact_wiring": {
+    "regenerated_workflow": ".github/workflows/ic-leaderboard.yml",
+    "all_tracked_manifests_present": true,
+    "all_workflows_check_exit": 0,
+    "newly_retained_roots": [
+      "research/postgb_linear_stage_20261026",
+      "research/twist_index_calculus_20261020"
+    ]
+  },
+  "native_catalog_closure": {
+    "semantic_delta": "main-catalog-semantic-delta-20261029.json",
+    "preserved_existing_rows": true,
+    "traits_added": {
+      "new_registry": 22,
+      "existing_registry_previously_absent": 148
+    },
+    "budgets": {
+      "jacobian": 200000,
+      "traits": 262144
+    },
+    "browser_curves": 20809,
+    "browser_unassessed": 0,
+    "catalog_controls_passed": 6,
+    "browser_controls_passed": 4,
+    "assessment_changed_scalar_paths": [
+      "/source_artifacts/18/sha256"
+    ],
+    "assessment_catalog_commit": "728304718cb0ab6df70da620a908a5f76f175293",
+    "workflow_wiring_exit": 0,
+    "workflow_lint_exit": 0,
+    "traits_native_check": {
+      "exit_code": 0,
+      "seconds": 837.24
+    },
+    "generated_files": {
+      "docs/curves/covers.json": {
+        "bytes": 23389357,
+        "sha256": "b5e6f1c5b5cc1d45334af57ece75eea9fe6d61919feef9f0b09a4dbb77ff9038"
+      },
+      "docs/curves/cover-links.yaml": {
+        "bytes": 57807772,
+        "sha256": "7b6c8792d1fe51ef122391a4270e53044133eb396adee42895150ac5174069ce"
+      },
+      "docs/curves/jacobian-transfers.json": {
+        "bytes": 95105604,
+        "sha256": "b7677b9b91df85a096a6d8a86168cb55ee6230201323cd3568e159a9480812cf"
+      },
+      "docs/curves/traits.json": {
+        "bytes": 96124788,
+        "sha256": "cf6f23d0e1132bccfc508fa5bc526ed6a44422f23111aba16bd7a057024800ca"
+      },
+      "docs/curves/cover-transfer-assessments.json": {
+        "bytes": 29059170,
+        "sha256": "9abb95c7bcc3e4874e41ab651a40da73f6db9c87cbd53f4bab6b5d980ed8bec1"
+      },
+      "docs/browser/data.json": {
+        "bytes": 82959299,
+        "sha256": "c9e7a53cc6799f2fc2d40ec7b23081b3951c129a8c3ec6a5740f2cc018ef3528"
+      }
+    }
+  },
+  "current_main_integration": {
+    "tested_source": "3a7831d07975d0d223c1cbbcf6828281e59242b7",
+    "integrated_head_before_report": "4b1db6fd78d56511830ed6fe3d4047aaf571325a",
+    "full_library": {
+      "source_head": "3a7831d07975d0d223c1cbbcf6828281e59242b7",
+      "cargo_exit_code": 0,
+      "seconds": 1728,
+      "log": "/workspace/main-health-current-main-full-library-20261029.log"
+    },
+    "full_library_summary": {
+      "passed": 5206,
+      "failed": 0,
+      "ignored": 123,
+      "test_seconds": 1278.68
+    },
+    "rust_cargo_build_inputs_equal_after_metadata_merge": true,
+    "native_generated_bytes_unchanged": true,
+    "all_parent_journal_content_preserved": true,
+    "runtime_sparse_paths_reserved_before_materializer": true,
+    "first_compile_interrupted_before_test_cases": {
+      "exit_code": 130,
+      "retained": true
+    },
+    "log_gzip_sha256": "648c3f12d66fd1609b74ab0a1363885ead17f6c3701df8fdad1defc90932020b"
+  }
+}

@@ -1,0 +1,105 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-13-15
+experiment_id: BLINDSPOT-13
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Part B: native CPU rate of the ecc2k130 client (five one-thread runs) and the costed completion plan.
+
+receipt: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/receipt-card-15.json
+binds:
+  - {path: examples/blindspots_13_rho_negation.rs, sha256: cb4a84e5300e64e088d98cd816f09d6c7d0830a7684cada519c18540aa0d20ad}
+  - {path: ecc2k130/src/main.cu, sha256: 76117541000ba000eb52eb5fc2079c0798ae5fb004c546d02caf419a6d08c302}
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw", "target/blindspots-13/card-15"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-13/card-15/b13", "examples/blindspots_13_rho_negation.rs"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-15-build.stdout.log
+    stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-15-build.stderr.log
+  - id: build-cpu-client
+    argv: ["prlimit", "--as=4294967296", "g++", "-O3", "-std=c++17", "-march=native", "-fopenmp", "-DECC_BATCH=32", "-DECC_THREADS=128", "-DECC_MINBLOCKS=2", "-DECC_STREAM_KARAT=0", "-DECC_SMEM_SPILL=0", "-DECC_PACKED_SINGLE_PRODUCT=0", "-DECC_PACKED_CACHE_DENOM=0", "-DECC_PACKED_BY_VALUE=0", "-DECC_PACKED_PERM_SIGMA=0", "-DECC_PACKED_PARTIAL_SIGMA=0", "-DECC_PACKED_SIGMA_ORDER=0", "-DECC_PACKED_BYTE_SIGMA=0", "-DECC_PACKED_FAST_CONVERT=0", "-DECC_PACKED_POLY_CHAIN=0", "-DECC_PACKED_UNROLL_INV=0", "-DECC_PACKED_PAIR_PRODUCTS=0", "-DECC_PACKED_POLY_STATE=0", "-DECC_PACKED_DIRECT_REDUCE=0", "-DECC_PACKED_DIRECT_REDUCE=0", "-DECC_PACKED_ADD_COMBINE=0", "-DECC_PACKED_GENERATED_PRODUCT=0", "-DECC_PACKED_INLINE_POLY=0", "-DECC_PACKED_CLMAD=0", "-DECC_PACKED_CLMAD_SQUARE=0", "-DECC_PACKED_KARAT3=0", "-DECC_PACKED_WEIGHTED_PREFIX=0", "-DECC_PACKED_COMPACT_STATE=0", "-DECC_PACKED_SHARED_SIGMA=0", "-DECC_PACKED_TOP_CLMAD=0", "-DECC_PACKED_STATE_TILE=0", "-DECC_PACKED_ADD_COMBINE=0", "-DECC_PACKED_PAIR_ILP=0", "-DECC_UNROLL_SLOTS=1", "-DECC_PACKED_SLOT_PREFETCH=0", "-DECC_PACKED_SLOT_PIPELINE=0", "-DECC_SIGMA_FUSED=0", "-DECC_SIGMA_FUSED_LATE_Y=0", "-DECC_SIGMA_FUSED_SHARED_SLOTS=0", "-DECC_SIGMA_SQUARE_TABLE=0", "-DECC_PACKED_L2_PERSIST=0", "-DECC_PACKED_TOP_HOIST=0", "-DECC_PACKED_ONB_INV=0", "-DECC_PACKED_FROM_REDUCED=0", "-DECC_PACKED_SIGMA_TABLE=0", "-DECC_PACKED_CLMUL_FLAT=0", "-DECC_PACKED_PAIR_CLMUL=0", "-DECC_PACKED_ALU_SQR=0", "-DECC_WALK_TABLE=0", "-DECC_TABLE_BRANCHES=8", "-DECC_TABLE_PIVOT_BYTES=0", "-DECC_TABLE_PHASE_POPC=0", "-DECC_TABLE_TAG_DENOM=0", "-DECC_TABLE_FUSED=0", "-DECC_TABLE_FUSED_PIPE=0", "-DECC_PHASE_PROFILE=0", "-DECC_TABLE_PIPE_SELECT=0", "-DECC_TABLE_SPLIT_FORWARD=0", "-DECC_TABLE_BATCH_HINTS=0", "-DECC_TABLE_BLOCK_HINTS=0", "-DECC_TABLE_HINT_QUEUE=512", "-DECC_CYCLE_FAST2=0", "-DECC_CYCLE_PROFILE=0", "-DECC_PACKED_CHAIN_FIRST=0", "-DECC_PACKED_CHAINS=1", "-DECC_TABLE_GLOBAL_HINTS=0", "-DECC_TABLE_GLOBAL_HINT_THREADS=128", "-DECC_TABLE_GLOBAL=0", "-DECC_TABLE_ADDEND_GLOBAL=0", "-DECC_PACKED_ALU_SQUARE=0", "-DECC_PACKED_SQUARE_TABLE=0", "-DECC_PACKED_INV_POLY=0", "-DECC_WITNESS=1", "-DECC_SIGMA_SIGN=0", "-DECC_PACKED_NATIVE_PRODUCT=0", "-DECC_PACKED_NATIVE_REDUCE=0", "-DECC_PACKED_FUSED_SIGMA=0", "-DECC_PACKED_INLINE=0", "-DECC_PACKED_BLOCK_INVERSE=0", "-DECC_PACKED_BATCH_SPLIT=1", "-DECC_PACKED_LAST_SLOT_CACHE=0", "-DECC_PACKED_TAIL_LAYOUT=0", "-DECC_PACKED_SHARED_X_SLOTS=0", "-DECC_PACKED_XONLY_23=0", "-DECC_PACKED_XONLY_DOUBLE_ONLY=0", "-DECC_PACKED_XONLY_BRIDGE3=0", "-DECC_PACKED_XONLY_BRIDGE1_COMMON=0", "-DECC_PACKED_XONLY_BRIDGE_MOD72=0", "-DECC_PACKED_XONLY_SKIP_EMPTY_BRIDGE=0", "-DECC_PACKED_XONLY_ARITHMETIC_ONLY=0", "-DECC_PACKED_XONLY_POLY_SELECT=0", "-DECC_PACKED_XONLY_POLY_DP_CONVERT=1", "-DECC_PACKED_XONLY_POLY_SELECT_MASK=4095", "-DECC_PACKED_XONLY_POLY_SELECT_TARGET=14", "-DECC_NO_CUDA", "-Wall", "-Wno-unused-function", "-Wno-unknown-pragmas", "-x", "c++", "src/main.cu", "-o", "../target/blindspots-13/card-15/ecc2k130-cpu"]
+    cwd: ecc2k130
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-15-build-cpu.stdout.log
+    stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-15-build-cpu.stderr.log
+  - id: host-load-before
+    argv: ["uptime"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-loadavg-before.txt
+  - id: host-cpu
+    argv: ["lscpu"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-lscpu.txt
+  - id: bench-1
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    env: {"OMP_NUM_THREADS": "1"}
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-1.log
+    stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-1.stderr.log
+  - id: bench-2
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    env: {"OMP_NUM_THREADS": "1"}
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-2.log
+    stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-2.stderr.log
+  - id: bench-3
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    env: {"OMP_NUM_THREADS": "1"}
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-3.log
+    stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-3.stderr.log
+  - id: bench-4
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    env: {"OMP_NUM_THREADS": "1"}
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-4.log
+    stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-4.stderr.log
+  - id: bench-5
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/ecc2k130-cpu", "--curve", "131", "--bench", "--threads", "1", "--steps", "32", "--launches", "800", "--verify", "0"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    env: {"OMP_NUM_THREADS": "1"}
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-5.log
+    stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-5.stderr.log
+  - id: host-load-after
+    argv: ["uptime"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-loadavg-after.txt
+  - id: plan
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-13/card-15/b13", "plan", "--cpu-logs", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-1.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-2.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-3.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-4.log,research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-5.log", "--out-md", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.md", "--out-json", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.json"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-15-plan.stdout.log
+    outputs: ["research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.md", "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/plan.json"]
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-13/card-15/b13", "target/blindspots-13/card-15/ecc2k130-cpu"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-13/card-15"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-13
+background: false
+write_scope:
+  - research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

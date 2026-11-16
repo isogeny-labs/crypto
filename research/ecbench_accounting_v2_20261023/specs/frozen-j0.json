@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "accounting v2 study: frozen ids on a registered j = 0 curve, run on the branch binary and on the main binary",
+  "description": "The curve, targets and seeds of docs/ecbench/specs/check-prime-j0-floor-v2.json (registered j = 0 curve, p = 23736841, r = 1977259) with only frozen ids (rho.negation reference, rho.cubic, rho.plain). On the main binary these records carry the first floor rule (A = 2), the reading the review reported (rho.cubic about 0.91x its floor); on the branch binary the same counts carry A = 6.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 23736841,
+        "a": 0,
+        "b": 1,
+        "group_order": 23727108,
+        "r": 1977259,
+        "gx": 19157303,
+        "gy": 13563414
+      }
+    ],
+    "targets_per_curve": 6,
+    "target_seed": 7
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-cubic",
+      "role": "candidate",
+      "method": {
+        "id": "rho.cubic"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

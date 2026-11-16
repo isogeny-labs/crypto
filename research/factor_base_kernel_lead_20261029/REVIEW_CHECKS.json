@@ -1,0 +1,102 @@
+{
+  "schema": "factor-base-lead-review/v1",
+  "date": "2026-10-29",
+  "review_kind": "literature-and-source-audit",
+  "source_commit": "4c87143544eab488543cefacd59a3e86f59c6592",
+  "source_blobs": {
+    "src/bin/factor_base_sweep/engine.rs": "b85258ac30d626f643944bc0c24c746b79739004",
+    "src/bin/factor_base_sweep/profile.rs": "66e19ab630327be7d410fc2f1e8307146850a892",
+    "src/cryptanalysis/three_leads.rs": "b5b56a64580043d28e704826d66c30b5e872ea2b",
+    "problems/factor-base-shape-to-successful-work.md": "a6f8a664e1c814db1bfd7951fbaf206c473e2bfc"
+  },
+  "sibling_cryptanalysis_commit": "80231e58a4dfa32951309fe365c39dfa569d79dc",
+  "sibling_sym_blob": "24f80b87411f72939f81f21d238ecca530129145",
+  "sibling_factor_base_blob": "8e80273c65825d1566cd6c4e35ac49db8c3e84b6",
+  "experiments_launched": 0,
+  "native_research_programs_executed": 0,
+  "old_cards_dispatched": 0,
+  "new_adapter_implemented": false,
+  "native_or_full_library_validation_run": false,
+  "matched_cost_winner": null,
+  "certified_degree_of_regularity": null,
+  "pdf": {
+    "path": "report.pdf",
+    "pages": 4,
+    "all_pages_visually_inspected": true,
+    "sha256": "a496fc9e732058833bbac76dc816f50ba4b65c2b7dd3fe7693c221030402ef61"
+  },
+  "svg": {
+    "path": "kernel-flow.svg",
+    "xml_parse_passed": true,
+    "sha256": "e23a6254faab46a9de33ea0225e057ae69b9fb1354ff82a09f0f2a62d1eed73b"
+  },
+  "relative_links": [
+    {
+      "source": "README.md",
+      "target": "LITERATURE.md",
+      "status": "present"
+    },
+    {
+      "source": "README.md",
+      "target": "kernel-flow.svg",
+      "status": "present"
+    },
+    {
+      "source": "README.md",
+      "target": "NEXT_TEST.md",
+      "status": "present"
+    },
+    {
+      "source": "README.md",
+      "target": "LITERATURE.md",
+      "status": "present"
+    }
+  ],
+  "coordination": {
+    "command": "conductor check --summary <review scope> --scope path:research/factor_base_kernel_lead_20261029 --scope path:problems/factor-base-shape-to-successful-work.md --scope path:docs/session-logs/2026-10-29.md",
+    "exit_code": 127,
+    "status": "binary unavailable; no lease claimed"
+  },
+  "primary_source": {
+    "url": "https://eprint.iacr.org/2004/031.pdf",
+    "curl_exit_code": 22,
+    "http_status": 403,
+    "full_paper_read": false
+  },
+  "atlas_metadata_lookup": {
+    "first_attempt": "missing tracked orchestration import in sparse checkout",
+    "recovery": "materialize exact tracked orchestration path; unchanged canonical metadata command succeeded",
+    "research_python_executed": false
+  },
+  "setup_observations": [
+    "First sparse-checkout add included unsupported --no-cone option; no paths changed, then normal add succeeded.",
+    "Initial diagram line exceeded its box; shortened text and rebuilt PDF. Final pages2-4 render byte-identical to previously inspected pages; final page1 reinspected."
+  ],
+  "scope_note": "No native/Cargo/fixture/old-study/card/registry/alias/store/benchmark/leaderboard edit. This file reports review/document validation only, not a measured result or a validation/v1 claim.",
+  "documentation_checks": {
+    "artifact_policy": {
+      "command": "python3 tools/artifacts/artifacts.py check 4c87143544eab488543cefacd59a3e86f59c6592",
+      "exit_code": 0,
+      "output": "artifacts check: no data files committed"
+    },
+    "large_files": {
+      "command": "bash scripts/check-large-files.sh 4c87143544eab488543cefacd59a3e86f59c6592",
+      "exit_code": 0,
+      "output": "no added or modified file over10485760bytes"
+    },
+    "git_diff_check": {
+      "exit_code": 0
+    },
+    "canonical_graph_search": {
+      "paths": [
+        "docs/index-calculus-scoreboard.html",
+        "docs/ic/progress-timeline.json",
+        "docs/ic/LEADERBOARD.md"
+      ],
+      "query": "factor_base_excess_20261026|factor_base_chart_complements_20261019",
+      "matches": 0,
+      "changes": 0,
+      "rationale": "no new measured or admitted result in this source-audit review"
+    }
+  }
+}

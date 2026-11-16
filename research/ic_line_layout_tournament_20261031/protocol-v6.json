@@ -1,0 +1,971 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "IC-LINE-LAYOUT-E2E-FP28-V6-20261106",
+  "version": 6,
+  "created": "2026-11-06",
+  "repository": "crypto",
+  "study_dir": "research/ic_line_layout_tournament_20261031",
+  "authors": [
+    "Claude experiment director (drafted for coordinator review; revised under Revision 1 of the coordinator decision; owner choices decided 2026-11-06, see extensions.owner_choices)"
+  ],
+  "links": {
+    "spec": "research/ic_line_layout_tournament_20261031/spec-fp28-v6.json",
+    "spec_qualification": "research/ic_line_layout_tournament_20261031/spec-fp28-v6-qual.json",
+    "spec_counted": "research/ic_line_layout_tournament_20261031/spec-fp28-v6-counted.json",
+    "supersedes_design": [
+      "research/ic_line_layout_tournament_20261031/protocol-v5.json",
+      "research/ic_line_layout_tournament_20261031/DECISION-V6-REDESIGN-20261106.md"
+    ],
+    "decision": "research/ic_line_layout_tournament_20261031/DECISION-V6-REDESIGN-20261106.md",
+    "narrative": "research/ic_line_layout_tournament_20261031/PROTOCOL-V6.md",
+    "prefreeze_checks": "research/ic_line_layout_tournament_20261031/prefreeze-checks-v6.md",
+    "design_predecessor": "research/prime_ic_program_20261029/hashtable_prefetch/README.md",
+    "incumbent_evidence": [
+      "research/prime_base_oracle_tuning_20261029/sessions/holdout-P28/spec.json",
+      "backlog/XP-20261029-srenew-deferred-guard/PROTOCOL.md",
+      "backlog/XP-20261029-srenew-deferred-guard/spec-P28.json"
+    ],
+    "prior_evidence": "research/ic_line_layout_tournament_20261031/TERMINAL-OBSERVATION-V3A2-20261106.md",
+    "infrastructure_preflight": "research/ic_line_layout_tournament_20261031/spec-fp28-v6-qual.json",
+    "requests": "research/ic_line_layout_tournament_20261031/launch-v6/"
+  },
+  "question": "On two fresh, previously unmeasured public 28-bit prime-order curves, does the opt-in cache-line pair index and relation guard (layout=lines) reduce the complete verified wall time of the current 28-bit generic index-calculus incumbent (prime-abscissa size 407, mitm:negation_folded=1, targets walk) while preserving every counted operation?",
+  "claims": [
+    {
+      "id": "C-correct",
+      "text": "Every measured execution recovers and verifies the planted discrete logarithm, and replay reproduces every measured record.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-parity",
+      "text": "The candidate and incumbent have identical complete counted cost on every paired workload and round, and agree record by record (warm-ups included) on the recovered logarithm, total_gae, every unpriced-operation count that ecbench band prices, and every phase's adds, doubles, scalar_mults and gae, apart from the native counters listed in the freeze with their reasons.",
+      "class": "comparative",
+      "decided_by": [
+        "C-layout"
+      ],
+      "if_supported": "the layout changes native constants only; it is not a counted or asymptotic improvement",
+      "if_not_supported": "the candidate is not the same algorithmic work and no layout-only speed claim is admitted"
+    },
+    {
+      "id": "C-wall",
+      "text": "The cache-line layout lowers complete verified solve wall time relative to the frozen incumbent on the specified fp28 workload and hardware class, in each of two independent L2 sessions.",
+      "class": "comparative",
+      "decided_by": [
+        "C-layout"
+      ],
+      "if_supported": "a scoped constant-factor native engineering speed-up in the generic-decomposition track at 28 bits (mitm:negation_folded=1,layout=lines against mitm:negation_folded=1, prime-abscissa:size=407, targets=walk, two fresh public fp28 curves, AMD c8a.2xlarge, the ea8e9ef7 executable, exactly identical counted GAE); a component speed-up reported outside tables A-C, not a counted, asymptotic, algebraic-track or rho-beating result, and not a result at fp20",
+      "if_not_supported": "no end-to-end wall speed-up is established for this candidate at fp28"
+    },
+    {
+      "id": "C-rho-gap",
+      "text": "The counted companion session records the remaining counted distance to the matched rho.negation reference for the incumbent and the candidate, as counted S at 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md 5a band). Counted only: rho wall time is not a claim anywhere in version 6, and the layout experiment does not claim to close the gap.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-layout",
+      "statement": "Replacing the incumbent hash-map pair index and repeat guard with fixed cache-line buckets reduces native lookup overhead enough to reduce the complete solve wall time at 28 bits, where the packed pair table (about 2 MiB) exceeds the 1 MiB of L2 per core of a c8a core and the walk target source probes the repeat guard on each trial (less often than stride-renew, so the guard contribution may be smaller; decision Revision 1, section 12.3).",
+      "mechanism": "A miss scans one aligned cache line with no hashbrown control/bucket indirection; batched lanes can prefetch the pure home address. Table emission order, relation stream, linear algebra, recovery, and counted operations are unchanged.",
+      "predictions": [
+        {
+          "id": "P-wall",
+          "metric": "full_solve_wall",
+          "direction": "lower",
+          "minimum_effect": "in each of two independent L2 sessions, both the A/A-corrected per-operation wall interval and the complete total-wall 95% interval lie wholly below 1, outside the A/A noise; coordinator prior (not a threshold): corrected ratio 0.90-0.99, probability about 0.45 that both sessions support; the prior is kept under targets=walk, with its lower end less likely, decision section 12.3",
+          "provenance": {
+            "written_at": "2026-11-06",
+            "first_recorded_in": "research/ic_line_layout_tournament_20261031/DECISION-V6-REDESIGN-20261106.md",
+            "data_seen": [
+              {
+                "path": "research/ic_line_layout_tournament_20261031/reports/v3a2-qualification/summary.json",
+                "measured": "v5 (fp20) qualification: 108/108 executions verified, audit OK, 102/108 refused by the L2 gate as solves under 1 ms; no candidate arm, no candidate data"
+              },
+              {
+                "path": "backlog/XP-20261029-packed-filter/pilot/run28/session.json",
+                "measured": "start and finish timestamps only of a local L0 pilot (9 executions in 908 ms at 28 bits); no record, wall field or comparison opened by the coordinator"
+              },
+              {
+                "path": "backlog/XP-20261029-packed-filter/pilot/run32/session.json",
+                "measured": "start and finish timestamps only of a local L0 pilot (9 executions in 3,357 ms at 32 bits); no record, wall field or comparison opened by the coordinator"
+              },
+              {
+                "path": "backlog/XP-20261029-packed-filter/PROTOCOL.md",
+                "measured": "quoted figures only: pilot ns/GAE (order of magnitude), the dg-blocked/packed-filter 28-bit results (mitm-prime-blocked corrected 0.93 against mitm:negation_folded=1 at 28 bits; the 28-bit wall session had no execution below L2; 2 of 1,344 executions under 1 ms at 24 bits; one execution lost to 3 foreign task slices at 32 bits); other oracle, other protocol"
+              },
+              {
+                "path": "backlog/XP-20261029-srenew-deferred-guard/PROTOCOL.md",
+                "measured": "28-bit stride-renew relations phase of 93,544 trials (XP-20261029 mean) and the incumbent recipe; counted quantities, no wall figure for layout=lines"
+              },
+              {
+                "path": "research/ic_line_layout_tournament_20261031/TERMINAL-OBSERVATION-20261101.md",
+                "measured": "the excluded fp20 local L0 diagnostic of the same binary: candidate/incumbent wall ratio 1.1345 and median paired ratio 1.0495; descriptive, other size, not an L2 measurement"
+              },
+              {
+                "path": "research/ic_line_layout_tournament_20261031/DECISION-V6-REDESIGN-20261106.md",
+                "measured": "the coordinator's prior: corrected ratio 0.90-0.99 and probability about 0.45 of supported_within_scope in both sessions, written before any v6 data"
+              },
+              {
+                "path": "research/ic_line_layout_tournament_20261031/prefreeze-checks-v6.md",
+                "measured": "pre-freeze local checks F4 and F6, development runs on non-study curves (F4 curve seed 2026110628902, F6 curve seed 2026110628904): F4 counted S identical for incumbent and candidate under walk and stride-renew and all four executions graded L2 locally; F6 read only five A/A-shape facts of one comparison that does not involve the candidate and 24 executions graded L2 locally; no wall time or ratio of either run was read or recorded"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "fresh prime_search 28-bit curve seeds 2026110628101 and 2026110628102 with target seed 2026110628103 on two independent c8a.2xlarge L2 jobs after one successful qualification; targets=walk throughout; no fp28 wall datum for layout=lines has been seen"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-parity",
+          "metric": "complete_gae",
+          "direction": "equal_within",
+          "minimum_effect": "exact ratio and interval [1,1], same seeds, no unpaired runs; record-level agreement on the fields of claim C-parity",
+          "provenance": {
+            "written_at": "2026-11-06",
+            "first_recorded_in": "research/ic_line_layout_tournament_20261031/DECISION-V6-REDESIGN-20261106.md",
+            "data_seen": [
+              {
+                "path": "research/ic_line_layout_tournament_20261031/TERMINAL-OBSERVATION-20261101.md",
+                "measured": "the excluded fp20 local L0 diagnostic recorded exactly equal candidate/incumbent counted operation ratios at fp20 (other size, other target source)"
+              },
+              {
+                "path": "research/ic_line_layout_tournament_20261031/DECISION-V6-REDESIGN-20261106.md",
+                "measured": "the coordinator's prior; parity under stride-renew at N=407 is listed there as an untested risk"
+              },
+              {
+                "path": "research/ic_line_layout_tournament_20261031/prefreeze-checks-v6.md",
+                "measured": "pre-freeze check F4 (local, L0, one non-study fp28 curve, one target): incumbent and candidate counted S identical (16.289 / 16.289 under walk, 21.066 / 21.066 under stride-renew) and no counted or native counter differing between the records; one curve and one target, not the study workload"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "all candidate/incumbent pairs on the fresh fp28 seeds in both wall sessions and in the counted companion"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "incumbent",
+      "role": "baseline",
+      "description": "Current 28-bit prime-field generic-track incumbent, the recipe merged on origin/main (decision Revision 1, section 12.3; research/prime_base_oracle_tuning_20261029/sessions/holdout-P28/spec.json): prime-abscissa size 407, negation-folded MITM with the default map layout, relation targets walk. Structural spec role baseline in the wall, qualification and counted specs (roles are structural only; analysis reads arms by name).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4,
+        "image_digest": "sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914"
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=407",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "26479085",
+        "targets": "walk",
+        "specs": [
+          "spec-fp28-v6.json (baseline)",
+          "spec-fp28-v6-qual.json (baseline)",
+          "spec-fp28-v6-counted.json (baseline)"
+        ]
+      }
+    },
+    {
+      "id": "incumbent-aa",
+      "role": "control_aa",
+      "description": "An identical incumbent arm under a second name for position bias and the wall-time noise floor. Its twin is incumbent, so the launcher's native A/A admission (pc-fb2x against incumbent-aa) carries the real incumbent/incumbent-aa A/A interval.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4,
+        "image_digest": "sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914"
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=407",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "26479085",
+        "targets": "walk",
+        "specs": [
+          "spec-fp28-v6.json (control, the first and only control)",
+          "spec-fp28-v6-qual.json (control, the first and only control)"
+        ]
+      },
+      "same_instrument_as": "incumbent"
+    },
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "The incumbent with only oracle layout=lines, which also selects the equivalent cache-line repeat guard.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4,
+        "image_digest": "sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914"
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=407",
+        "oracle": "mitm:negation_folded=1,layout=lines",
+        "max_trials": "26479085",
+        "targets": "walk",
+        "specs": [
+          "spec-fp28-v6.json (candidate)",
+          "spec-fp28-v6-qual.json (candidate)",
+          "spec-fp28-v6-counted.json (candidate)"
+        ]
+      },
+      "same_instrument_as": "incumbent"
+    },
+    {
+      "id": "pc-fb2x",
+      "role": "control_positive",
+      "description": "Positive control with a known IC slowdown: the incumbent with factor_base prime-abscissa:size=814 (2 x N_inc) and everything else unchanged. Oracle set-up rises 4x (166,056 to 663,410 additions), so the counted GAE ratio is well above 1 by construction. Structural spec role reference (the launcher's first and only reference arm, so its native A/A admission compares pc-fb2x against incumbent-aa; decision section 12.2), placed last in spec order. The decision reads arms by name, never by role.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4,
+        "image_digest": "sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914"
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=814",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "26479085",
+        "targets": "walk",
+        "specs": [
+          "spec-fp28-v6.json (reference, last)",
+          "spec-fp28-v6-qual.json (reference, last)"
+        ]
+      },
+      "same_instrument_as": "incumbent"
+    },
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "Matched negation-map Pollard rho, run only in the counted companion session for the matched-rho reference and the AGENTS.md 5a band. No wall field of it is read or reported. Structural spec role reference in the counted spec (decision section 12.1); no analysis reads the role.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4,
+        "image_digest": "sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914"
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "specs": [
+          "spec-fp28-v6-counted.json (reference)"
+        ]
+      },
+      "same_instrument_as": "incumbent"
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "An identical rho.negation arm under a second name; the counted companion's A/A. No wall field is read.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4,
+        "image_digest": "sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914"
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "specs": [
+          "spec-fp28-v6-counted.json (control)"
+        ]
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "pc-fb2x",
+      "expected_detection": "pc-fb2x against incumbent has ops.ratio_b_over_a > 1 (counted, by construction) and wall.status admitted with wall.total_wall_ci95[0] > 1, in both wall sessions",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "the incumbent/incumbent-aa comparison is the matched empirical null for this one-factor performance claim; no separate scientific null population is asserted"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "native_layout",
+        "levels": [
+          "map",
+          "lines"
+        ]
+      },
+      {
+        "name": "factor_base_size",
+        "levels": [
+          407,
+          814
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "ic.pipeline",
+          "rho.negation"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "two prime_search bits=28 curves, seeds 2026110628101 and 2026110628102 (slugs icv1-fp28-tm10425-13a2119a and icv1-fp28-t15757-68bdca4a from ecbench plan)",
+        "how": "two fresh public synthetic curves fixed before measurement, absent from research/, backlog/, docs/ic/ and benchmarks/ (pre-freeze check F3)"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "8 public targets per curve from target_seed 2026110628103",
+        "how": "the same fresh target law and exact targets are crossed through every arm and every job; the counted companion uses the same curves, targets, rounds and measurement seed so its IC records pair one-to-one with the wall sessions"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "one source revision, static ecbench binary, image digest, compiler and flags for all arms and all jobs; observed hashes bind the export"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "crossed",
+        "how": "ecbench derives the same seed for each arm in every workload and measured round from measurement seed 2026110628104 (plan shows one seed per workload/round cell, independent of the arm)"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "alternate_measured interleaves arm positions within every round; the validator tabulates each arm's block positions"
+      },
+      {
+        "name": "host_epoch",
+        "treatment": "crossed",
+        "how": "two independent EKS Jobs, each on its own fresh c8a.2xlarge Spot node under the launcher's required pod anti-affinity; both must decide in the same direction and retain distinct Job/Pod/node identities"
+      },
+      {
+        "name": "host_state",
+        "treatment": "measured",
+        "how": "CPU model, node, affinity, isolation grade, blockers, steal, PSI and foreign busy ticks are recorded per execution; below-L2 rows are inadmissible"
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "each execution is a fresh child process; eight rounds and two jobs repeat process placement and ASLR effects"
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "how": "ordinary non-resumable jobs; interruption is retained and a job that wrote no job-exit.json is rerun whole once under the host-loss rule"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "unblinded native analysis script analyze-v6.sh and exact thresholds frozen before data; all sessions must pass"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-layout",
+        "arms": [
+          "incumbent",
+          "candidate"
+        ],
+        "differs_in": [
+          "native_layout"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "incumbent",
+          "incumbent-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "incumbent",
+          "pc-fb2x"
+        ],
+        "differs_in": [
+          "factor_base_size"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-rho-counted",
+        "arms": [
+          "rho-neg",
+          "incumbent",
+          "candidate"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "confounded",
+        "reason": "a different method family, read in the counted companion session only as counted S at three pricing weights for the matched-rho reference; no wall comparison against rho is made at fp28"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench's frozen plan derives algorithm_seed from measurement.seed=2026110628104 (qualification 2026110628113); the same workload/round seed is used for every arm and recorded; plan shows identical seeds for the incumbent and candidate arms in the wall and counted specs. Full seed list: curves 2026110628101 and 2026110628102; targets 2026110628103; measurement 2026110628104; qualification curve, targets, measurement 2026110628111, 2026110628112, 2026110628113; analysis bootstrap (candidate, A/A, positive) 2026110661, 2026110662, 2026110663"
+    },
+    "instance_sampling": {
+      "rule": "eight public targets per curve from fresh target_seed 2026110628103 on each of two fresh fixed curves",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "not masked: method records and exact parity checks reveal the representation; the native script and thresholds are frozen before data, and the qualification and counted-session wall fields are sealed until the stated release points"
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 16,
+    "warmups": 2,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Each wall session has 2 curves x 8 targets x (1 warmup + 8 measured rounds) x 4 arms = 576 executions and 128 measured pairs per arm pair (v3 had 64); the qualification has 48 executions (2 targets x 4 arms x (1 warmup + 5 rounds), 10 A/A pairs) and the counted companion 576. Both independent sessions must separately put the 95% full-wall interval below 1. This is stricter than pooling and is intended to resolve a repeatable native constant effect, not a minimum percentage effect; sensitivity is bounded by the same-session A/A interval, which must lie inside [0.9,1.1]. Four thousand bootstrap resamples are used by the fixed native comparison. instances is 16 workloads per session; replicates 16 is 8 measured rounds in each of the 2 sessions; warmups 2 is 1 per session."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 60,
+      "per_sample_seconds": 2,
+      "threads": 4,
+      "estimated_total_seconds": 1500,
+      "measured_on": "decision section 3.8: the v5 qualification went from launch to result in 230 s for 108 executions (upper bound 2.1 s per execution, 2 s budgeted); packed-filter L0 pilots ran 9 executions in 908 ms at 28 bits. Estimate per wall session 1,240-1,500 s; the qualification's elapsed-time projection is the measured check before any scientific seed is spent"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "full_solve_wall",
+        "name": "complete verified solve wall time",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "ecbench solve interval for the whole cold method, including factor-base construction, oracle setup, relation collection, linear algebra, recovery and target verification",
+        "source": "records.jsonl time.solve_wall_ns; ecbench compare wall.total_wall_ratio and wall.total_wall_ci95",
+        "aggregation": "paired_ratio",
+        "resolution": "1 ns recorded; effective resolution gated by L2 and the same-session A/A interval",
+        "uncertainty": "range"
+      },
+      {
+        "id": "complete_gae",
+        "name": "complete counted GAE",
+        "unit": "ecbench.gae",
+        "kind": "counted",
+        "definition": "all counted setup, relation, linear-algebra, recovery and verification group work",
+        "source": "records.jsonl cost.total_gae; ecbench compare ops",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall_per_gae",
+        "name": "A/A-corrected wall per GAE",
+        "unit": "ns/GAE",
+        "kind": "derived",
+        "definition": "candidate/incumbent ns-per-GAE ratio divided by the incumbent-aa/incumbent ratio",
+        "formula": "(candidate ns_per_gae / incumbent ns_per_gae) / (incumbent-aa ns_per_gae / incumbent ns_per_gae)",
+        "source": "ecbench compare wall.corrected_ratio and wall.corrected_ci95",
+        "aggregation": "paired_ratio",
+        "resolution": "double precision over integer clocks and counts",
+        "uncertainty": "range"
+      },
+      {
+        "id": "phase_wall",
+        "name": "phase wall times",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "setup, relations, linear algebra and verification phases reported separately as diagnostics; no phase decides the speedup",
+        "source": "records.jsonl phases",
+        "aggregation": "paired_ratio",
+        "resolution": "1 ns",
+        "uncertainty": "range"
+      },
+      {
+        "id": "rho_distance",
+        "name": "remaining counted gap to matched rho",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "complete incumbent/candidate counted S divided by rho.negation counted S on the same public targets, at 0, 0.1 and 1 GAE per unpriced native operation, from the counted companion session only; no wall gap to rho is reported at fp28",
+        "formula": "sum(method S_w over paired rows) / sum(rho-neg S_w over the same paired rows), w in {0, 0.1, 1}",
+        "source": "ecbench compare --weight W and ecbench band --ranks on the counted companion",
+        "aggregation": "paired_ratio",
+        "resolution": "double precision",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "cost.total_gae",
+      "cost.s",
+      "trials",
+      "relations",
+      "lookups",
+      "walk_operations",
+      "linear_algebra native counters",
+      "field_ops"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "foreign_busy_ticks",
+      "run_cpu",
+      "threads",
+      "job_uid",
+      "pod_uid"
+    ],
+    "timed_primary_justification": "The independent variable is a native memory representation whose intended effect is not represented by group-operation counts. Therefore complete wall time is the decisive metric, but only at L2 with same-session A/A correction, exact counted-cost parity, a positive timing control with a guaranteed direction (pc-fb2x), and two independent host epochs. Per-execution timeout_seconds 600 and order alternate_measured (the spec spelling of the interleaved order) apply to the qualification, wall and counted specs. The counted spec must use L2 because the pinned run-ecbench refuses any other isolation_required."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "measurement_class": "measurement",
+    "timeout_seconds": 600,
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true,
+      "jobs": {
+        "qualification": 1,
+        "wall_sessions": 2,
+        "counted": 1
+      },
+      "pod_anti_affinity": true,
+      "pod_anti_affinity_note": "applied by the launcher's Job template (required, label isolab.dev/job=true, topology kubernetes.io/hostname); isolab.eks.request/v1 has no field for it",
+      "route": {
+        "client": "taskq/deploy/eks-karpenter/remote/launch-remote (AWS CodeBuild bridge), submitted from the agent with the executor's existing AWS identity in account 104186811093",
+        "build": {
+          "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914",
+          "source_revision": "ea8e9ef71c3c82027dd9e01535302725519c3fca",
+          "ecbench_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+          "provenance": "the existing image of isolab-experiment.yml run 41271383665 attempt 1 (tag gh-41271383665-1-ea8e9ef71c3c82027dd9e01535302725519c3fca), pinned by digest and reused for every arm of every job and for analysis, not rebuilt. Keeping this pin is owner-decided 2026-11-06 (decision section 12.4 choice 4)."
+        },
+        "requests": {
+          "qualification": "research/ic_line_layout_tournament_20261031/launch-v6/request-qualification.json",
+          "session_1": "research/ic_line_layout_tournament_20261031/launch-v6/request-session-1.json",
+          "session_2": "research/ic_line_layout_tournament_20261031/launch-v6/request-session-2.json",
+          "counted": "research/ic_line_layout_tournament_20261031/launch-v6/request-counted.json"
+        },
+        "job_names": {
+          "qualification": "ic-line-v6-qual-20261106",
+          "session_1": "ic-line-v6-s1-20261106",
+          "session_2": "ic-line-v6-s2-20261106",
+          "counted": "ic-line-v6-counted-20261106"
+        },
+        "job_deadline_seconds": {
+          "qualification": 900,
+          "session_1": 3600,
+          "session_2": 3600,
+          "counted": 3600
+        },
+        "spec_sha256": {
+          "qualification": "c54ccf39c0d8ceb94e40a4c8c60cc626400b934caaae2d5d13fcda300649738d",
+          "wall_sessions": "0116954ff2646a81fa4383ef87125d445f2f3d3d4315a4ed49db9d0845515a81",
+          "counted": "ac231ee6303942e3d491daa2c31e07216a72cf227e15015778aa7ffe829bb2a2"
+        },
+        "budget_usd_ceiling": 5,
+        "budget_note": "USD 5 ceiling for v6, separate from v4/v5, failed attempts included; expected spend about USD 1-2. Worst case (decision section 13.3(c)): each of the four jobs runs to its deadline once and is rerun once on host loss, 2 x (0.25 + 1 + 1 + 1) = 6.5 c8a.2xlarge node-hours plus the CodeBuild launcher builds. The AWS price list was not read: the launch card records the actual on-demand and Spot list prices, and if 6.5 node-hours at the on-demand price plus CodeBuild could exceed USD 5 (above about USD 0.72 per node-hour) the director returns to the coordinator before launch. The USD 5 ceiling is owner-decided 2026-11-06 (decision section 12.4 choice 4).",
+        "concurrency_note": "The two wall requests are submitted back to back. The L2 NodePool cap (about 8 vCPU) can admit them one after the other instead of side by side; that serial admission is an observation, not a deviation, and each still runs on its own fresh L2 node and decides alone. The counted job is submitted after both wall jobs have written job-exit.json.",
+        "launcher_note": "remote/run-request exports the launcher bin/ on PATH (PR #3517); launch from a main checkout that contains it"
+      },
+      "retry_note": "retries.max_attempts 2 counts launches including the first: one whole rerun under -r2, with the same request apart from the job name, only for a job that wrote no job-exit.json (Spot reclaim or node loss)"
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 60,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Qualification stage: run exactly one non-resumable job from launch-v6/request-qualification.json (spec-fp28-v6-qual.json: the four wall arms in the same order, one fresh non-scientific fp28 curve seed 2026110628111, 2 targets, 1 warmup + 5 measured rounds, L2, 2 targets x 4 arms x (1 + 5) = 48 executions and 10 A/A pairs; job deadline 900 s; roles incumbent baseline, incumbent-aa control, candidate candidate, pc-fb2x reference, so the launcher's admission compares pc-fb2x against incumbent-aa; decision section 12.1 and 12.2). It passes only if, read mechanically from the job's own files after the SHA256SUMS check: job-exit.json exit_code is 0 from a single pod; audit.json is OK with every execution verified and every replay identical; l2-gate.json has accepted true, every execution graded L2 or L3 and invalid_outcomes []; the minimum time.solve_wall_ns over all 48 executions is at least 5,000,000; and (finished_unix_ms - started_unix_ms) of session.json times 576/48 is at most 1,800,000 ms. No ecbench compare is run on the qualification and no per-arm wall statistic or ratio is computed or read until both scientific sessions have written job-exit.json; only the global minimum and the elapsed projection are evaluated. If any condition fails, version 6 stops before the scientific stage; the qualification is not retried except under the host-loss rule.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Scientific stage, conditional only on the qualification: submit exactly two independent wall jobs from launch-v6/request-session-1.json and request-session-2.json (spec-fp28-v6.json, byte-identical in both: 2 fresh curves x 8 targets x (1 warmup + 8 measured rounds) x 4 arms = 576 executions, 128 measured pairs per arm pair), run each once, and stop.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Counted companion: after both wall jobs have written job-exit.json, run exactly one job from launch-v6/request-counted.json (spec-fp28-v6-counted.json, 576 executions, isolation_required L2 only; roles incumbent baseline, candidate candidate, rho-neg reference, rho-neg-aa control; the rho executions are expected to be graded below L2, so exit 42 is expected), once. It is accepted if the audit is OK, every execution verified, every measured replay identical, invalid_outcomes [] and the input spec and build match the freeze; exit code 0, 42 or 43 are all accepted under those conditions. A counted-session failure does not change the wall verdict; it blocks the leaderboard validation gate and is reported. No wall field of this session is read or reported.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Host loss: a job that writes no job-exit.json is rerun once, whole, as the same request with the job name suffixed -r2 (infrastructure retry only). A job that wrote job-exit.json with a non-zero code is never rerun. The noise-rerun clause is NOT adopted (owner-decided 2026-11-06, decision section 12.4 choice 3: not adopted; its text stays in PROTOCOL-V6.md section 8 as a record only, and F7 is not run). Without a noise-rerun clause, one execution graded below L2 (exit 42), or any other non-zero wall-session exit, makes that session invalid_measurement and ends version 6; no scientific rerun is allowed.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "No scientific retry, alternate seed, factor-base retuning, load-factor tuning, threshold change or selective host replacement after seeing a result. Any infrastructure or payload failure is retained, the affected session is invalid_measurement, and this version is not repeated within itself.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Budget: USD 5 ceiling for the qualification, both wall jobs, the counted job, host-loss reruns and failed attempts. The launch card records the actual c8a.2xlarge on-demand and Spot list prices; if the worst case of 6.5 node-hours (each of the four jobs run to its deadline once and rerun once on host loss; decision section 13.3(c)) at the on-demand price plus CodeBuild could exceed USD 5, return to the coordinator before launch.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "any wrong answer, missing replay, mismatched source/binary/spec hash, unpaired run or non-identical candidate/incumbent counted cost invalidates the speed claim",
+    "any record-level parity mismatch between candidate and incumbent outside the native counters enumerated in the freeze invalidates the speed claim",
+    "any measured row below L2, any restored timing interval, fewer than five admitted pairs, or A/A interval not containing 1 inside [0.9,1.1] makes that session descriptive",
+    "the pc-fb2x positive control must be detected independently in both sessions: counted ops ratio above 1 and total_wall_ci95 lower bound above 1; a pc-fb2x counted ratio at or below 1 invalidates the design",
+    "any wall-session exit code other than 0 invalidates that session",
+    "a qualification elapsed-time projection above 1,800,000 ms, or a minimum qualification solve under 5,000,000 ns, stops version 6 before any scientific seed is used",
+    "a stage-only improvement or one successful session is not a full end-to-end speedup",
+    "the qualification and the counted companion are not candidate wall evidence and cannot be pooled with either wall session",
+    "failure of the single qualification terminates version 6 without dispatching the scientific jobs",
+    "a spec that fails run-ecbench's pre-check, or a wall or qualification job that exits 43, invalidates that job"
+  ],
+  "decision_rule": {
+    "text": "C-wall is supported only if, in each of the two independent wall sessions, all of the following hold: ecbench verify --replay-all exits 0 with no wrong or unpaired row; ops.ratio_b_over_a == 1 and ops.ci95 == [1,1] for candidate against incumbent and the record-level parity of claim C-parity holds; wall.status is admitted and wall.pairs_below_level is 0 and the job exited 0; wall.aa_ci95 of the incumbent-against-candidate comparison (which must show aa_arms equal to {incumbent, incumbent-aa} and self_aa false) and wall.aa_ci95 of the job's control-comparison.json (pc-fb2x against incumbent-aa) are each non-null, contain 1 and lie within [0.9,1.1] (the direct incumbent against incumbent-aa comparison is a self-A/A, descriptive only); pc-fb2x against incumbent has ops.ratio_b_over_a > 1, wall.status admitted and wall.total_wall_ci95[0] > 1; and total_wall_ci95[1] < 1, corrected_ci95[1] < 1 and outside_noise is true. Otherwise the verdict is within_control_distribution, invalid_measurement, or inconclusive as mapped by analyze-v6.sh, whose precedence is adopted as frozen (decision section 13.3(a)): per session, any failed replay, parity, admission, A/A or positive-control gate gives invalid_measurement; else wholly-below-1 intervals outside the noise give supported_within_scope; else outside_noise false gives within_control_distribution; else inconclusive (a valid session with intervals wholly above 1 is inconclusive and its direction is reported descriptively); overall, both supported gives supported_within_scope, else any invalid_measurement, else any inconclusive, else within_control_distribution. The counted-session rule decides only the validation-gate inputs; its comparisons use the pinned binary's default resample seed 20261002 (decision section 13.3(b)).",
+    "comparison_ids": [
+      "C-layout"
+    ],
+    "threshold": "in each session: total_wall_ci95 upper < 1 and corrected_ci95 upper < 1 and outside_noise true; both aa_ci95 intervals (candidate comparison, control-comparison.json) contain 1 within [0.9,1.1]; pc-fb2x ops ratio > 1 and total_wall_ci95 lower > 1; exact ops ratio 1 and record-level parity",
+    "statistic": "candidate/incumbent ratio of total solve wall and A/A-corrected ns per GAE, evaluated separately per session",
+    "interval": "ecbench linearised paired t 95% intervals; 4,000 bootstrap resamples, seeds 2026110661 (candidate), 2026110662 (descriptive direct incumbent against incumbent-aa; no gate reads it), 2026110663 (positive)",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "total_wall_ratio and corrected_ratio, with reciprocal baseline/candidate speedup reported",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/ic_line_layout_tournament_20261031/analyze-v6.sh",
+      "sha256": "23e614ad0b7c74ba53a4fcd51097a44194987617661343b2243b6dec6d0f422e"
+    },
+    "inputs": [
+      "two authenticated ecbench.session/v1 wall directories and one counted directory downloaded from their exact private S3 results URIs, after the SHA256SUMS, job-exit.json, input-spec.json and build-info.json checks",
+      "the control-comparison.json written by run-ecbench into each wall job's output directory (read for the A/A gate)"
+    ],
+    "outputs": [
+      "replay receipts",
+      "candidate comparisons",
+      "A/A comparisons",
+      "positive-control comparisons",
+      "counted comparisons at w = 0, 0.1 and 1 and the 5a band",
+      "verdict.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "per-session candidate/incumbent total-wall and A/A-corrected ratios with 95% intervals, beside the A/A and the pc-fb2x positive control",
+      "phase contribution diagnostic with the full solve total emphasized",
+      "counted S of incumbent and candidate against matched rho.negation with the AGENTS.md 5a pricing band at w = 0, 0.1 and 1"
+    ],
+    "report_dir": "research/ic_line_layout_tournament_20261031/reports/v6/"
+  },
+  "inadmissible": [
+    "changing seeds, curve, targets, base size, load factor, number of sessions, rounds, thresholds or analysis after observing data",
+    "calling a relation-phase or setup-only improvement a speedup",
+    "pooling only favorable sessions or discarding contention not excluded by the frozen L2 rule",
+    "claiming a counted, asymptotic, algebraic-track or rho-beating improvement from a native layout result, or any result at fp20",
+    "treating a successful Kubernetes job or private S3 receipt as a performance verdict without running the frozen analysis on authenticated raw records",
+    "dispatching either scientific job after a failed or unverified qualification",
+    "using consumed v1, v2, v3a1 or v5 jobs, the excluded fp20 local diagnostic, the v6 qualification or the v6 counted companion as a v6 performance sample",
+    "reading any qualification or counted-session wall field",
+    "reading the first session of a noise rerun before the rerun exits, if the owner adopts a noise-rerun clause",
+    "reporting rho wall time"
+  ],
+  "literature": [
+    {
+      "ref": "research/ic_line_layout_tournament_20261031/DECISION-V6-REDESIGN-20261106.md",
+      "provenance": "internal",
+      "claim": "the fp20 design cannot pass L2 on ecbench 73362eed (102 of 108 qualification executions solved under the 1 ms minimum); the coordinator recommends fp28 with the XP-20261029 per-size incumbent, a pc-fb2x positive control and a counted rho companion; Revision 1 (section 12) sets the incumbent to targets=walk, the structural roles of section 12.2, the 2-target 5-round qualification and the L2-only counted session",
+      "verified_by": "Claude experiment director read the complete decision including Revision 1 (section 12) on 2026-11-06"
+    },
+    {
+      "ref": "backlog/XP-20261029-srenew-deferred-guard/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "28 bits: stride-renew is the per-size baseline from XP-20261029 (PR #2826, unmerged); the 28-bit relations phase recorded about 93,544 trials. Used here for max_trials and the trial count only: the v6 incumbent is targets=walk (Revision 1, section 12.3)",
+      "verified_by": "Claude experiment director read section 1-2 and spec-P28.json on 2026-11-06"
+    },
+    {
+      "ref": "research/prime_base_oracle_tuning_20261029/sessions/holdout-P28/spec.json",
+      "provenance": "internal",
+      "claim": "the 28-bit incumbent merged on origin/main is prime-abscissa:size=407, mitm:negation_folded=1, max_trials 26479085 with no targets key, and its plan expands to targets walk; docs/ic/leaderboard.json carries the n_inc 407 row",
+      "verified_by": "Claude experiment director read both with git show on the local origin/main ref fde9b7d3 on 2026-11-06 (prefreeze-checks-v6.md F2); the main session then fetched origin/main 23cf569058, whose 12 later commits touch neither the recipe nor ic_framework, and #2826 is unmerged (decision section 13.3(d))"
+    },
+    {
+      "ref": "backlog/XP-20261029-packed-filter/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "run-ecbench's native A/A admission compares the first reference arm with the first control arm; the noise-rerun clause and the counted-session exit-42/43 clauses",
+      "verified_by": "Claude experiment director read sections 2, 4 and 6 on 2026-11-06"
+    },
+    {
+      "ref": "taskq/deploy/eks-karpenter/run-ecbench",
+      "provenance": "internal",
+      "claim": "the launcher's pre-checks (isolation_required L2, rounds >= 5, warmup >= 1, a reference and a control arm) and exit codes 41/42/43",
+      "verified_by": "Claude experiment director read the file at HEAD and at ea8e9ef7 on 2026-11-06; the pre-check lines are identical"
+    },
+    {
+      "ref": "docs/ecbench/README.md",
+      "provenance": "internal",
+      "claim": "wall claims require L2, at least five pairs, same-session A/A, replay, complete solve boundaries and explicit total-wall reading",
+      "verified_by": "carried from protocol-v5.json; not re-read in this draft"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "V6-AMENDMENT-1",
+      "filed": "2026-11-06",
+      "filed_before_affected_data": true,
+      "reason": "Wall sessions s1 (ic-line-v6-s1-20261106) and s2 (ic-line-v6-s2-20261106) both exited 0 with full integrity but ran one after the other on the same node ip-10-84-67-216.us-east-2.compute.internal, so the frozen host_epoch factor (each wall job on its own fresh node with distinct Job/Pod/node identity) is not met. The pod anti-affinity only keeps two live pods apart; the idle node was reused. Filed before any wall field of s1 or s2 was read. No frozen rule can supply a second host epoch. Coordinator ruling: DECISION-V6-REDESIGN-20261106.md sections 15 and 15.5.",
+      "changes": [
+        "Amendment file: research/ic_line_layout_tournament_20261031/PROTOCOL-V6-AMENDMENT-1.md, sha256 6383bbfc3171ff8828a300ca97df4e12e2d23dc9ee162d99203b04703135968c; it governs where it names a field of this document (its section 6). The prior freeze (protocol_sha256 12415faa3330276b6ccbed718a03bc598d9717576c332577024ebc4e9752543c, commit 7c173e5a1d418dce4c734c43a25718a71107a36c, frozen_at 2026-11-06T04:25:05Z) is recorded in extensions.v6_amendment_1.prior_freeze and is reproducible with experiment_protocol.py hash on this document with amendments set to [] and extensions.v6_amendment_1 removed.",
+        "s1 and s2 are kept whole and both stay decision-bearing; together they are host epoch H1 (node ip-10-84-67-216.us-east-2.compute.internal).",
+        "One additional wall job, ic-line-v6-s3-20261106, is host epoch H2: launch-v6/request-session-3.json (sha256 9302e585d73197c2428fd78471135c76b323d366b52f77774a4f2c1ee8a6c4ed), byte-identical to request-session-1.json apart from job_name and the provenance harness label; same spec, seeds, image, binary and 3600 s deadline.",
+        "Distinct-node rule before launch: no instance outside the terminated state has private DNS name ip-10-84-67-216.us-east-2.compute.internal or private address 10.84.67.216 (EC2 form of the kubectl check, both counts 0); after the run: the node_name in s3 job-exit.json differs from H1. node_name alone decides; EC2 data is recorded only. If s3 lands on H1 node, C-wall is at most inconclusive (a combined supported_within_scope becomes inconclusive, other combined verdicts stand) and no further session is added.",
+        "s3 follows the frozen host-loss rule unchanged (rerun name ic-line-v6-s3-20261106-r2 only for a job with no job-exit.json; a non-zero job-exit is never rerun). No -r2 request file is frozen, for s3 or any other v6 job: the -r2 request is generated at rerun time as the same request with the job name suffixed -r2, and the card proves before launch that jq -S -c 'del(.job.job_name)' of the generated request is byte-equal to that of the frozen request and that job.job_name equals the frozen name plus -r2.",
+        "If s3 and its -r2 both write no job-exit.json, or s3 exits non-zero, or analysis run (ii) cannot write verdict.json, s3 enters the combination as invalid_measurement (an infrastructure outcome, not evidence about the candidate); the job-exit.json decides this, not analyze-v6.sh.",
+        "C-wall is supported only if each of s1, s2 and s3 separately passes every frozen gate and the host-epoch condition holds between H1 and H2; otherwise the frozen overall precedence runs over all three per-session verdicts; no session may be dropped or chosen after data.",
+        "analyze-v6.sh is unchanged (sha256 23e614ad0b7c74ba53a4fcd51097a44194987617661343b2243b6dec6d0f422e) and is run twice: analysis-a on (s1, s2) and analysis-b on (s3, s1), each with --counted; s1 is passed by the same absolute path in both runs, the card records it, and its verify_exit, verdict and gates must be identical in both, a mismatch is invalid_measurement; the final verdict combines the s1, s2 and s3 per-session verdicts.",
+        "Sealing: no wall field, compare or analyze-v6.sh output of s1 or s2 is opened until this amendment is frozen and merged and s3 (or its -r2) has written job-exit.json.",
+        "Budget: the decision section 14.1 rolling hard-bound gate replaces the fixed 6.5 node-hour worst case before each launch (s3, the counted job, any -r2); HB(3600 s job) = 0.93108 USD; s3 is reserved in the gate of every earlier launch; the USD 5 ceiling is unchanged.",
+        "Claim hardware scope becomes two c8a.2xlarge host epochs (three sessions); the prediction, control and scope texts that say two or both sessions are superseded as listed in supersedes_fields."
+      ],
+      "supersedes_fields": [
+        "variable_ledger.factors[name=host_epoch].how",
+        "stopping_rules[1].rule",
+        "stopping_rules[5].rule",
+        "decision_rule.text",
+        "claims[id=C-wall].text",
+        "hypotheses[id=H-layout].predictions[id=P-wall].minimum_effect",
+        "hypotheses[id=H-layout].predictions[id=P-wall].provenance.decisive_scope",
+        "hypotheses[id=H-layout].predictions[id=P-parity].provenance.decisive_scope",
+        "controls.positive.expected_detection",
+        "analysis_plan.script invocations (two runs of the unchanged script)",
+        "analysis_plan.inputs",
+        "analysis_plan.outputs",
+        "execution.placement.concurrency_note",
+        "execution.placement.jobs.wall_sessions",
+        "execution.placement.route.requests",
+        "execution.placement.route.job_names",
+        "execution.placement.route.job_deadline_seconds",
+        "execution.placement.route.budget_note",
+        "sample_size.power.note"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "2aedaaf8dd64f7bb7a481c25efc02a561022b9ebb85b78dac8fd53863b689873",
+    "commit": "5d9203cabdc6aae15f3623faf97fd87d19c7494d",
+    "frozen_at": "2026-11-06T05:19:55Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "native_counters_allowed_to_change": "none: pre-freeze check F4 found no counted or native counter changed by layout=lines under walk or stride-renew; analyze-v6.sh ALLOWED_NATIVE is []",
+    "findings_resolved_by_revision_1": [
+      "B1: qualification is 2 targets x 4 arms x (1 warmup + 5 rounds) = 48 executions and 10 A/A pairs, which passes run-ecbench's rounds >= 5 pre-check; the counted session is at L2 only under the exit 0/42/43 acceptance clause",
+      "B2: roles incumbent baseline, incumbent-aa control, candidate candidate, pc-fb2x reference; pre-freeze check F6 passed (self_aa false, aa_pairs 5, aa_ci95 non-null, aa_arms {incumbent, incumbent-aa}) on a non-study curve",
+      "F2/B3: the incumbent is targets=walk as merged on origin/main; F1 rerun for walk passed; F4 passed"
+    ],
+    "remaining_unverified": [
+      "F7 (anchored grading strings of the noise-rerun clause against ea8e9ef7) is not run because the owner did not adopt the clause",
+      "F6 checked the pc-fb2x against incumbent-aa admission only; the coordinator requires pre-freeze check F6b (decision section 13.1: compare --a incumbent --b pc-fb2x shape and gate-field presence, record-field presence with PROJ parity at cells 6, and verify-output fields, on the F6 session, types and booleans only) to pass before the freeze",
+      "resolved: origin/main confirmed at 23cf569058 (decision section 13.3(d))"
+    ],
+    "coordinator_decisions_revision_2": [
+      "DEC-20261106-662e33 section 13: freeze approved, conditional on F6b PASS",
+      "F6 development seeds 2026110628904 (curve), 2026110628905 (targets), 2026110628906 (measurement): development-only, never v6 evidence, never reused as scientific seeds",
+      "verdict mapping adopted as frozen; counted bootstrap seed = pinned default 20261002; AWS price unread, governed by the launch-card rule with the 6.5 node-hour worst case"
+    ],
+    "owner_choices": [
+      "1 (owner-decided 2026-11-06): the walk incumbent, prime-abscissa:size=407, mitm:negation_folded=1, targets=walk, max_trials=26479085, at fp28",
+      "2 (owner-decided 2026-11-06): pc-fb2x as the structural reference (B2 fix), with rho counted-only in an L2 session (B1 fix)",
+      "3 (owner-decided 2026-11-06): the noise-rerun clause is NOT adopted; one foreign task slice ends a wall session; F7 not run",
+      "4 (owner-decided 2026-11-06): the USD 5 ceiling and the ea8e9ef7 / 73362eed pin stand as drafted"
+    ],
+    "v6_amendment_1": {
+      "file": "research/ic_line_layout_tournament_20261031/PROTOCOL-V6-AMENDMENT-1.md",
+      "file_sha256": "6383bbfc3171ff8828a300ca97df4e12e2d23dc9ee162d99203b04703135968c",
+      "decision": "DECISION-V6-REDESIGN-20261106.md sections 15 (Revision 4) and 15.5 (addendum)",
+      "prior_freeze": {
+        "protocol_sha256": "12415faa3330276b6ccbed718a03bc598d9717576c332577024ebc4e9752543c",
+        "commit": "7c173e5a1d418dce4c734c43a25718a71107a36c",
+        "frozen_at": "2026-11-06T04:25:05Z",
+        "reproducible_as": "experiment_protocol.py hash on this document with amendments set to [] and extensions.v6_amendment_1 removed"
+      },
+      "request_session_3": {
+        "path": "research/ic_line_layout_tournament_20261031/launch-v6/request-session-3.json",
+        "sha256": "9302e585d73197c2428fd78471135c76b323d366b52f77774a4f2c1ee8a6c4ed"
+      },
+      "rerun_request_generation": "no -r2 request file is frozen for any v6 job; the -r2 request is generated at rerun time and the card checks jq -S -c 'del(.job.job_name)' byte-equality with the frozen request and job.job_name equal to the frozen name plus -r2"
+    }
+  }
+}

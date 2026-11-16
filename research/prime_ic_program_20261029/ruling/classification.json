@@ -1,0 +1,152 @@
+{
+  "schema": "ic-oracle-classification-memo/v0",
+  "date": "2026-10-29",
+  "status": "proposal memo (recommended B); superseded by ../DECISIONS.md R1 = Option C (delegated, confirmed by merging the PR that carries DECISIONS.md); AGENTS.md not yet edited",
+  "legend": {
+    "IC": "counted as index calculus",
+    "table": "generic table or enumeration method; reference, not counted",
+    "control": "cross-check or cost floor; not counted",
+    "generic": "counted only in Option C's generic-decomposition track, never ranked against algebraic"
+  },
+  "options": {
+    "B": "mechanism plus random-base test (recommended), README 5.1",
+    "A": "univariate root finding at m = 2 counts, README 5.2",
+    "C": "two counted tracks, algebraic and generic decomposition, README 5.3"
+  },
+  "oracles": [
+    {
+      "oracle": "rootfind-subtract",
+      "m": 2,
+      "source": "src/cryptanalysis/ic_framework/plugins.rs:2258",
+      "B": "table",
+      "A": "IC",
+      "C": "generic"
+    },
+    {
+      "oracle": "rootfind-subtract",
+      "m": 3,
+      "source": "src/cryptanalysis/ic_framework/plugins.rs:2258",
+      "B": "table",
+      "A": "table",
+      "C": "generic"
+    },
+    {
+      "oracle": "gpu-rootfind",
+      "m": 2,
+      "source": "src/cryptanalysis/gpu_rootfind.rs; gpu/rootfind/",
+      "B": "table",
+      "A": "IC",
+      "C": "generic"
+    },
+    {
+      "oracle": "subtract",
+      "m": 2,
+      "source": "src/cryptanalysis/ic_framework/plugins.rs:2003",
+      "B": "table",
+      "A": "IC",
+      "C": "generic"
+    },
+    {
+      "oracle": "semaev_s3_roots",
+      "m": 2,
+      "source": "src/cryptanalysis/ic_boundary.rs:6350",
+      "B": "table",
+      "A": "IC",
+      "C": "generic"
+    },
+    {
+      "oracle": "rootfind-mitm",
+      "m": 2,
+      "source": "src/cryptanalysis/ic_framework/rootfind.rs:161",
+      "B": "table",
+      "A": "table",
+      "C": "generic"
+    },
+    {
+      "oracle": "rootfind-mitm",
+      "m": 3,
+      "source": "src/cryptanalysis/ic_framework/rootfind.rs:161",
+      "B": "table",
+      "A": "table",
+      "C": "generic"
+    },
+    {
+      "oracle": "rootfind-pairs",
+      "m": 3,
+      "source": "src/cryptanalysis/ic_framework/rootfind.rs:290",
+      "B": "table",
+      "A": "table",
+      "C": "generic"
+    },
+    {
+      "oracle": "mitm / mitm-prime-batch / mitm-prime-blocked / mitm-fiber / Table B mitm_m2_negfold_walk*",
+      "m": "2,3",
+      "source": "src/cryptanalysis/ic_framework/plugins.rs:2045,2127; src/cryptanalysis/ic_boundary.rs",
+      "B": "table",
+      "A": "table",
+      "C": "generic"
+    },
+    {
+      "oracle": "binary pair tables: pdp3-koblitz engine=rootfind|rootfind-negfold|rootfind-window*; mitm-frobenius* incl. large primes",
+      "m": "2,3",
+      "source": "src/cryptanalysis/ecbench/methods.rs:191 (help text); ic_framework",
+      "B": "table",
+      "A": "table",
+      "C": "generic"
+    },
+    {
+      "oracle": "linear S3 Weil descent",
+      "m": 2,
+      "source": "examples/ic_m2_linear.rs; research/ic_m2_linear_ladder_20261024",
+      "B": "IC",
+      "A": "IC",
+      "C": "IC"
+    },
+    {
+      "oracle": "descent-algebraic (F4 family, SAT); pdp3-koblitz inherited-f4 / f6-ic",
+      "m": "2,3",
+      "source": "src/cryptanalysis/ic_framework/plugins.rs:2829",
+      "B": "IC",
+      "A": "IC",
+      "C": "IC"
+    },
+    {
+      "oracle": "pkm-semaev engine=f4 on prime-kummer",
+      "m": "2,3",
+      "source": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+      "B": "IC (report the budget_exceeded/grid-decided rate)",
+      "A": "IC",
+      "C": "IC"
+    },
+    {
+      "oracle": "pkm-semaev engine=exhaustive",
+      "m": "2,3",
+      "source": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+      "B": "control",
+      "A": "table",
+      "C": "control"
+    },
+    {
+      "oracle": "pkm-tower (planned)",
+      "m": ">=2",
+      "source": "research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md section 4.3",
+      "B": "IC",
+      "A": "IC",
+      "C": "IC"
+    },
+    {
+      "oracle": "small-root lattice decomposition (lead, not implemented)",
+      "m": ">=2",
+      "source": "crypto-autoresearcher:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-coppersmith-smallroot-semaev.yaml",
+      "B": "IC if a window counts as algebraic parametrisation (owner)",
+      "A": "IC",
+      "C": "IC"
+    }
+  ],
+  "adopted_option": {
+    "option": "C",
+    "source": "../DECISIONS.md R1",
+    "state": "delegated; pending merge",
+    "note": "the C column is operative after merge; DECISIONS.md D2 ('rank the Table B incumbent against the published algebraic reference') conflicts with Option C's 'never ranked against each other' and must be reconciled before the reference-arm freeze"
+  }
+}

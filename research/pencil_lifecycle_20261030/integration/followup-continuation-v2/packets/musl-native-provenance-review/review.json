@@ -1,0 +1,27 @@
+{
+  "schema": "software.provenance-review/v1",
+  "reviewed_at": "2026-10-31T02:39:58.960880+00:00",
+  "status": "validated_scoped",
+  "binary_sha256": "16b6eecd16e4cdc3c56bd733090ae80bb9b558f3f8b5dc449d5b8d3344d880d1",
+  "source_commit": "b985ddb30b46abbd9a050e5753c7e301f40b07f6",
+  "source_predates_lock_correction": true,
+  "observations": [
+    "Five startup/termination objects occur explicitly in final linker arguments and map LOAD records.",
+    "Rust self-contained libc.a appears in map LOAD and 362 archive-member references; final arguments select libc by library search.",
+    "No private musl prefix reference occurs in linker map.",
+    "Native dependency logs select private musl-gcc for ring, sqlite3 and blake3.",
+    "ELF has no interpreter or NEEDED entry; a dynamic section remains for static PIE.",
+    "Existing CLI receipts: positive exit0, wrong-request-hash exit2; 22 referenced files independently hash-match: 5244979bytes plus6049 request bytes equals5251028bytes."
+  ],
+  "binding_limits": [
+    "Rust bundled CRT/libc exact file hashes and installed toolchain path are bound; upstream bundled musl source revision/build recipe is not established by these receipts.",
+    "Printed final driver is cc; current resolution is /usr/bin/gcc and matches recorded hash, not an independent historical exec trace.",
+    "CC selection declarations do not record complete compiler subprocess/header provenance.",
+    "Static diagnostic CLI verifies inventory only, with owner authentication and scientific admission false.",
+    "Candidate source predates lock correction; no current-head or image qualification inference."
+  ],
+  "rebuild_required_solely_due_to_bundled_libc": false,
+  "scientific_runs": 0,
+  "cost_ratio_to_rho": null,
+  "reviewer_executed_candidate": false
+}

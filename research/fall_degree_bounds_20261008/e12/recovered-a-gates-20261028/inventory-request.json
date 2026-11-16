@@ -1,0 +1,16 @@
+{
+  "DocumentName": "AWS-RunShellScript",
+  "InstanceIds": [
+    "i-0f1e979a30bc4f52b"
+  ],
+  "Comment": "Read-only inventory of existing E12a gate artifacts omitted by output archive",
+  "TimeoutSeconds": 60,
+  "Parameters": {
+    "commands": [
+      "#!/bin/sh\nset -eu\njq -e '.id == \"20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f\"' /work/job.json >/dev/null\njq '{id,deadline}' /work/job.json\ncd /work/fall-degree-source/research/fall_degree_bounds_20261008/e7/validate\nset -- *.jsonl\n[ \"$#\" -le 32 ]\nfor path do\n  [ -f \"$path\" ] && [ ! -L \"$path\" ]\n  stat -c '%n %s' \"$path\"\n  sha256sum \"$path\"\ndone\n"
+    ],
+    "executionTimeout": [
+      "60"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+name,treatment,value,how
+workload,fixed,550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339,21 models x60 exact archived targets; all arms share workload SHA and original source equation.
+instrument,fixed,,"One immutable source commit, lockfile, flags, binary and image for all arms; unresolved hashes block freezing."
+threads,fixed,1,Single method thread; pin physical-core placement and SMT sibling exclusion before execution.
+host,measured,,"Record instance ID/type, CPU model/microcode, SMT, affinity, NUMA, kernel, hypervisor, governor/frequency, steal, PSI, co-tenants and isolation blockers. Reject timed rows below L2; no cross-host timing pooling after recovery."
+placement,fixed,c8a.2xlarge,Dedicated qualified L2 c8a.2xlarge Spot placement; no heterogeneous fallback.
+memory_environment,fixed,8,"8GiB execution cap, same allocator preparation/environment for every arm; record actual RSS, allocator, ASLR and resolved environment. No memory-cap increase."
+arm_order,randomized,,Use existing prepared spec shuffle rule and seed2026101801; freeze emitted plan bytes before data. Interleave all three arms in each workload/round.
+algorithm_stream,crossed,,"Five predetermined measured streams per workload shared exactly across all three arms; index0 preserves archived seed; indices1..4 are new streams, not repeat measurements of index0."
+warmup,fixed,1,One warmup execution per arm/workload; retain records but exclude from ratios.
+preemption,measured,,"Retain checkpoint, interruption and restore records; resumed execution clocks invalid. Restart only under frozen infrastructure retry limit, never restart a scientific cap."
+analyst,fixed,,"Unblinded deterministic native exporter; no hand-selected workloads, thresholds or best stream. External reviewer receives all rows and reasons."
+rho_hash_policy,fixed,1,Retain DefaultHasher/BuildHasherDefault policy version1 and exact resolved rho semantics. Actual final compiler/source/binary pins are unresolved and must establish equivalence; do not silently import historical clock comparability.
+finite_operation_model,fixed,eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8,"pencil-algorithm-cost/atomic-scalar-disjoint-v1; source-bound nine-category independent coverage required.36cells, symmetric scalar inverse normalization, disjoint primitive registry, separate algorithm/calibration/resource boundaries."
+diagnostic_callbacks_and_publication,fixed,,Same prospective instrument/profile across all three arms; bind exact callback and I/O semantics and retain costs. Source parity alone cannot qualify timing.
+owner_and_campaign_enforcement,fixed,,One owner and one active scientific payload; fixed authenticated accounting/stop semantics; actual job/pod/session IDs measured and bound after preparation.
+legacy_reuse,measured,,Prior p739 exact fresh-row finite equivalence/replay must be reviewed for changed instrument; old clocks remain invalid and are never pooled into qualified fresh timing.

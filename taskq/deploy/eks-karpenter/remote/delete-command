@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Runs inside the VPC launcher (CodeBuild) for an isolab.eks.command-delete/v1
+# request: deletes ONE Job in the isolab namespace by name, only if it carries
+# the isolab.dev/job=true label and its UID matches the request (so a reused
+# name cannot delete a newer Job). Pods go with it (Background propagation).
+# Already-uploaded S3 results are untouched. Self-contained; uploads a receipt.
+set -euo pipefail
+export PATH="${CODEBUILD_SRC_DIR:+$CODEBUILD_SRC_DIR/bin:}$PATH"
+: "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${AWS_REGION:?}" "${ISOLAB_REQUEST_KEY:?}"
+[[ "$ISOLAB_REQUEST_KEY" =~ ^inputs/requests/([a-f0-9]{64})\.json$ ]] || { echo 'Invalid request key' >&2; exit 2; }
+request_hash=${BASH_REMATCH[1]}
+receipt_dir=$(mktemp -d)
+aws s3 cp "s3://$ISOLAB_BUCKET/$ISOLAB_REQUEST_KEY" "$receipt_dir/request.json" --only-show-errors
+printf '%s  %s\n' "$request_hash" "$receipt_dir/request.json" | sha256sum -c - >/dev/null
+jq -e 'type=="object" and (keys-["schema","job_name","job_uid","reason"]|length)==0
+  and .schema=="isolab.eks.command-delete/v1"
+  and (.job_name|type)=="string" and (.job_name|test("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")) and (.job_name|length)<=55
+  and (.job_uid|type)=="string" and (.job_uid|test("^[a-f0-9-]{36}$"))
+  and (.reason|type)=="string" and (.reason|length)>=1 and (.reason|length)<=2048' "$receipt_dir/request.json" >/dev/null \
+  || { echo 'Invalid isolab.eks.command-delete/v1 request' >&2; exit 2; }
+job=$(jq -r .job_name "$receipt_dir/request.json")
+want_uid=$(jq -r .job_uid "$receipt_dir/request.json")
+launch_id=${CODEBUILD_BUILD_ID:-local-$(date -u +%Y%m%dT%H%M%SZ)}
+launch_id=${launch_id##*:}
+receipt_uri="s3://$ISOLAB_BUCKET/runs/$job/launcher/$launch_id/"
+state=launcher_failed
+finish() {
+  exit_code=$?
+  trap - EXIT
+  set +e
+  jq -n --arg state "$state" --arg job "$job" --arg job_uid "$want_uid" --arg receipts "$receipt_uri" \
+    --arg request_sha256 "$request_hash" --arg launcher "${CODEBUILD_BUILD_ID:-local}" --argjson exit_code "$exit_code" \
+    '{schema:"isolab.eks.command-delete-result/v1",state:$state,job_name:$job,job_uid:$job_uid,
+      receipt_uri:$receipts,request_sha256:$request_sha256,launcher:$launcher,exit_code:$exit_code}' > "$receipt_dir/result.json"
+  if ! aws s3 cp "$receipt_dir/" "$receipt_uri" --recursive --only-show-errors; then exit 91; fi
+  cat "$receipt_dir/result.json"
+  exit "$exit_code"
+}
+trap finish EXIT
+export KUBECONFIG="$receipt_dir/../kubeconfig-$launch_id"
+aws eks update-kubeconfig --name "$ISOLAB_CLUSTER" --region "$AWS_REGION" --alias isolab --kubeconfig "$KUBECONFIG" > "$receipt_dir/kubeconfig-setup.log"
+kube=(kubectl --kubeconfig "$KUBECONFIG" --context isolab -n isolab --request-timeout=30s)
+if ! "${kube[@]}" get job "$job" -o json > "$receipt_dir/job-before.json" 2> "$receipt_dir/job.stderr"; then
+  state=missing; exit 0
+fi
+[[ $(jq -r '.metadata.labels["isolab.dev/job"] // ""' "$receipt_dir/job-before.json") == true ]] || { state=refused_unlabelled; exit 28; }
+[[ $(jq -r .metadata.uid "$receipt_dir/job-before.json") == "$want_uid" ]] || { state=refused_uid_mismatch; exit 29; }
+"${kube[@]}" delete job "$job" --cascade=background --wait=false -o name > "$receipt_dir/delete.out" 2>&1
+state=deleted

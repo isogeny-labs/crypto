@@ -1,0 +1,19 @@
+{
+  "schema": "ml-dataset.consumer-software-validation/v1",
+  "recorded_utc": "2026-10-28T05:42:54.211347+00:00",
+  "command": "python3 -m unittest -v test_consumer.py",
+  "tests_run": 25,
+  "failures": 0,
+  "errors": 0,
+  "exit_code": 0,
+  "fixture_type": "synthetic format and telemetry consistency fixtures; not scientific evidence",
+  "native_dataset_end_to_end_verified": false,
+  "pmu_calibration_performed": false,
+  "prior_s3_integration": "evidence/s3-integration-20261028/s3-integration.json",
+  "s3_code_path_changed": false,
+  "files": {
+    "consumer.py": "9f3dcb502eda5dbedea536e5dfcb58ffa229c8c7021e7081871370fc9fb5fb34",
+    "test_consumer.py": "4549370d164cf79efbc228ebb0874122e060e839a34a9452ef2a607eca19c96b"
+  },
+  "independent_review": "Counter consistency review found incomplete cycle/missing-counter checks; fixed with shared tuple validation and regression tests."
+}

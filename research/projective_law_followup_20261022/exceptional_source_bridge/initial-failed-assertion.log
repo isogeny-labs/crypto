@@ -1,0 +1,21 @@
+   Compiling projective-law-followup v0.1.0 (/var/tmp/crypto-rust-law-bridge-20261025/research/projective_law_followup_20261022)
+    Finished `release` profile [optimized] target(s) in 0.79s
+     Running unittests src/bin/projective_f17_semantic_probe.rs (research/projective_law_followup_20261022/target/release/deps/projective_f17_semantic_probe-d2f9c61971b3f001)
+
+running 1 test
+
+thread 'projective_f17_semantic_probe_tests::author_dbl2b0_zero_weight_counterexample' (495033) panicked at src/bin/projective_f17_semantic_probe.rs:1544:9:
+assertion `left == right` failed
+  left: "same_u_inverse"
+ right: "b_zero_identity"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test projective_f17_semantic_probe_tests::author_dbl2b0_zero_weight_counterexample ... FAILED
+
+failures:
+
+failures:
+    projective_f17_semantic_probe_tests::author_dbl2b0_zero_weight_counterexample
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin projective_f17_semantic_probe`

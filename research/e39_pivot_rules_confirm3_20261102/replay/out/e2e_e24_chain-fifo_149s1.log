@@ -1,0 +1,11 @@
+
+thread 'main' (29411) panicked at examples/quartic_pipeline_v4.rs:42:40:
+--sizes: ParseIntError { kind: InvalidDigit }
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::result::unwrap_failed
+   3: <core::iter::adapters::map::Map<core::str::iter::Split<char>, quartic_pipeline_v4::main::{closure#0}> as core::iter::traits::iterator::Iterator>::next
+   4: <alloc::vec::Vec<u64> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u64, core::iter::adapters::map::Map<core::str::iter::Split<char>, quartic_pipeline_v4::main::{closure#0}>>>::from_iter
+   5: quartic_pipeline_v4::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

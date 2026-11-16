@@ -1,0 +1,134 @@
+{
+  "schema": "pencil-controller-automatic-successor-review/v1",
+  "created_utc": "2026-10-30T06:30:08Z",
+  "scope": "Read-only audit of the observed CodeBuild successor. No cloud mutation, build submission, cancellation, worker action, protocol edit, or scientific execution was performed.",
+  "supersedes_prior_review": false,
+  "prior_review": {
+    "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/independent-review.json",
+    "sha256": "29930c343935b23fd705798e714229e450bba8e73f544243997ca4a27cf1d850",
+    "status": "preserved historical pre-discovery review; its manual-takeover proposal was not executed"
+  },
+  "observed_chain": {
+    "original": {
+      "id": "isolab-recovery-controller:9a658f4d-b903-4083-9a77-b04c217cb6a0",
+      "start_utc": "2026-10-30T05:41:40.774Z",
+      "end_utc": "2026-10-30T06:27:08.972Z",
+      "status": "FAILED",
+      "timeout_minutes": 45,
+      "auto_retry_number": 0,
+      "next_auto_retry": "isolab-recovery-controller:592e9381-e505-48bc-a796-3d02c4d3a922"
+    },
+    "successor": {
+      "id": "isolab-recovery-controller:592e9381-e505-48bc-a796-3d02c4d3a922",
+      "start_utc": "2026-10-30T06:27:09.164Z",
+      "status_at_observation": "IN_PROGRESS",
+      "timeout_minutes": 45,
+      "auto_retry_limit": 2,
+      "auto_retry_number": 1,
+      "previous_auto_retry": "isolab-recovery-controller:9a658f4d-b903-4083-9a77-b04c217cb6a0",
+      "initiator": "isolab-recovery-controller-Role-L8mks6myTPFt/AWSCodeBuild-9a658f4d-b903-4083-9a77-b04c217cb6a0"
+    },
+    "invariants": {
+      "request_object_key": "inputs/recovery-requests/92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907.json",
+      "source_version": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+      "project": "isolab-recovery-controller",
+      "worker_instance": "i-04d58c2b309fb6549",
+      "worker_pod_uid": "3a7ab215-49d1-4982-8c78-5a0c71646842",
+      "state_attempt_before_after": 0,
+      "state_restores_before_after": 0,
+      "state_next_generation_before_after": 7,
+      "only_observed_state_change": "owner_build changed from original to successor after the original build became terminal"
+    }
+  },
+  "mechanism": {
+    "classification": "AWS CodeBuild project automatic retry",
+    "not_package_self_start": true,
+    "evidence": [
+      "The project template sets AutoRetryLimit: 2 and grants its service role codebuild:RetryBuild.",
+      "The buildspec and run-controller wrapper contain no StartBuild or RetryBuild action.",
+      "The Rust controller submit route has the only package StartBuild call; it is an external submission ingress and was not invoked by the running controller.",
+      "The successor initiator is the CodeBuild service role for the original build, and autoRetryConfig links both builds."
+    ],
+    "aws_semantics": {
+      "source": "https://docs.aws.amazon.com/codebuild/latest/APIReference/API_AutoRetryConfig.html",
+      "auto_retry_limit_2": "two additional retries after the initial failed build, for at most three builds in the chain",
+      "auto_retry_number_0": "initial build",
+      "auto_retry_number_1": "first additional retry",
+      "auto_retry_number_2": "second additional retry"
+    }
+  },
+  "protocol_interpretation": {
+    "frozen_protocol_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/replacement-frozen-protocol.json",
+    "frozen_protocol_sha256": "4b1290eb3802af06238d70e83d6cdf049d85f483dc709ba89e40d9f73563166e",
+    "declared_retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    },
+    "finding": "The current successor is controller invocation 2 and remains inside the declared total-attempt cap. It is not a worker restore, second scientific payload, or new scientific submission. If it fails, the project may automatically create autoRetryNumber 2, which would be controller invocation 3 and would exceed the current frozen maximum-two-attempt wording.",
+    "worker_restore_relation": "Independent. Durable State.attempt equals State.restores and increments only on begin_restore; the observed successor claim left both at zero.",
+    "single_submission_relation": "The automatic retry reuses the exact request object and CodeBuild retry chain. It does not create another external recovery-submission receipt or new run identity."
+  },
+  "deadlines": {
+    "successor_projected_timeout_utc": "2026-10-30T07:12:09.164Z",
+    "request_deadline_utc": "2026-10-30T08:10:24Z",
+    "outer_expiry_utc": "2026-10-30T11:17:54Z",
+    "potential_auto_retry_2": "If the successor fails, CodeBuild may start a third chain member with the same inherited 45-minute timeout. A start near 07:12Z would project to about 07:57Z, still before the immutable request deadline, but it is not admitted by the current maximum-two-attempt protocol."
+  },
+  "prospective_amendment_review": {
+    "permissible": true,
+    "condition": "A new dated, independently reviewed and frozen protocol version must be committed before the third controller invocation it affects, while retaining both prior versions and all raw observations.",
+    "required_separation": {
+      "controller_invocations": "A new explicit operational cap may admit at most four same-request controller invocations.",
+      "worker_scientific_attempts": "Retain execution.retries.max_attempts = 2 because canonical history admission uses it as a total per-row scientific-attempt cap.",
+      "worker_restores": "Retain max_restores = 1.",
+      "scientific_payloads": "Retain one active payload and prohibit a new run identity or automatic scientific retry."
+    },
+    "immutable_fields": [
+      "request bytes and SHA-256",
+      "run name and durable ConfigMap state",
+      "current worker instance and Pod unless the already admitted single restore is required",
+      "source revision, binary and image digests",
+      "workload, arms, methods, seeds and execution order",
+      "request deadline 2026-10-30T08:10:24Z",
+      "outer expiry 2026-10-30T11:17:54Z",
+      "21600 cumulative active-worker-second cap"
+    ],
+    "fourth_controller_constraint": "Only after controller invocation 3 is terminal and the durable run remains nonterminal; use the same request with autoRetryLimitOverride 0, bounded queue/time overrides and a distinct takeover receipt. No project update or IAM/RBAC change.",
+    "reason_not_to_reuse_execution_max_attempts": "Changing execution.retries.max_attempts to four would silently broaden scientific record-attempt admission; native output_contract rejects histories above the existing value and the unknown-runtime gate lint pins the current value."
+  },
+  "evidence": [
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/original-build-observed.json",
+      "sha256": "40d516b6bbb618bd0a7f01b3963afd3c154b483d0db0030a4fc6c22a31849f3e"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/automatic-successor-build.json",
+      "sha256": "f8cc40bf05e6e02820b13737c86effaa5d37b07e7885219f1cfa915e3c83c6d2"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/state-before.json",
+      "sha256": "03683730e36337ae0e75eeb5912f031a728198cf97ebda6499f5a1ab800b1e54"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/state-after-automatic-successor.json",
+      "sha256": "7e339924d96ce36b6a51a447b5c76b4de5f2f64c1568df44758dd2d4047ec09a"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/project-before.json",
+      "sha256": "c629d36974b4300e3f8f2ae6f41513ff4b27cf1bdf5c484b5dd4129fe109e8c4"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/bridge.yaml",
+      "sha256": "8c98178d2082a3cd3ba26f9fc91738741ce658bcb51f59ad771699a870b8baae"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs",
+      "sha256": "ec633a6af0e9475731f0b7f9757828bfdd6b6baab6918ec6d082803a6cd0ec91"
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/model.rs",
+      "sha256": "fd104ff4c54cf35b6f6b23ea08b38c480e032f60e6e7db2e54f981a9ff483f45"
+    }
+  ],
+  "verdict": "Current automatic successor is a same-request infrastructure controller retry and is admitted as the second total controller attempt. No manual takeover should run concurrently. A possible third automatic chain member is technically expected after another failure but is scientifically unadmitted unless the prospective operational amendment is reviewed, frozen and committed before that third invocation."
+}

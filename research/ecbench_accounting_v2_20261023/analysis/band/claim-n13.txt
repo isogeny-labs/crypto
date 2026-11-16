@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m13-t181-515ee569 | 10.97 | ic-f4-m2 | 24/24 | 16.490 | 846.783 | 8319.419 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | ic-f4-m3 | 24/24 | 15.702 | 22539.742 | 225256.097 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | ic-rootfind-m2 | 24/24 | 28.200 | 29.075 | 36.948 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | ic-rootfind-m3 | 24/24 | 38.423 | 40.850 | 62.688 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-frob-v2 | 24/24 | 2.451 | 2.566 | 3.595 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-strong-frozen | 24/24 | 14.118 | 14.304 | 15.979 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-strong-v2 | 24/24 | 2.571 | 2.663 | 3.492 | — |
+| icv1-f2m13-t181-515ee569 | 10.97 | rho-strong-v2-aa | 24/24 | 2.571 | 2.663 | 3.492 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m13-t181-515ee569 | ic-f4-m2 vs ic-f4-m3 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | ic-f4-m2 vs ic-rootfind-m2 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | ic-f4-m2 vs ic-rootfind-m3 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | ic-f4-m2 vs rho-frob-v2 | rho-frob-v2 < ic-f4-m2 |
+| icv1-f2m13-t181-515ee569 | ic-f4-m2 vs rho-strong-frozen | rho-strong-frozen < ic-f4-m2 |
+| icv1-f2m13-t181-515ee569 | ic-f4-m2 vs rho-strong-v2 | rho-strong-v2 < ic-f4-m2 |
+| icv1-f2m13-t181-515ee569 | ic-f4-m2 vs rho-strong-v2-aa | rho-strong-v2-aa < ic-f4-m2 |
+| icv1-f2m13-t181-515ee569 | ic-f4-m3 vs ic-rootfind-m2 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | ic-f4-m3 vs ic-rootfind-m3 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | ic-f4-m3 vs rho-frob-v2 | rho-frob-v2 < ic-f4-m3 |
+| icv1-f2m13-t181-515ee569 | ic-f4-m3 vs rho-strong-frozen | rho-strong-frozen < ic-f4-m3 |
+| icv1-f2m13-t181-515ee569 | ic-f4-m3 vs rho-strong-v2 | rho-strong-v2 < ic-f4-m3 |
+| icv1-f2m13-t181-515ee569 | ic-f4-m3 vs rho-strong-v2-aa | rho-strong-v2-aa < ic-f4-m3 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m2 vs ic-rootfind-m3 | ic-rootfind-m2 < ic-rootfind-m3 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m2 vs rho-frob-v2 | rho-frob-v2 < ic-rootfind-m2 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m2 vs rho-strong-frozen | rho-strong-frozen < ic-rootfind-m2 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m2 vs rho-strong-v2 | rho-strong-v2 < ic-rootfind-m2 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m2 vs rho-strong-v2-aa | rho-strong-v2-aa < ic-rootfind-m2 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m3 vs rho-frob-v2 | rho-frob-v2 < ic-rootfind-m3 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m3 vs rho-strong-frozen | rho-strong-frozen < ic-rootfind-m3 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m3 vs rho-strong-v2 | rho-strong-v2 < ic-rootfind-m3 |
+| icv1-f2m13-t181-515ee569 | ic-rootfind-m3 vs rho-strong-v2-aa | rho-strong-v2-aa < ic-rootfind-m3 |
+| icv1-f2m13-t181-515ee569 | rho-frob-v2 vs rho-strong-frozen | rho-frob-v2 < rho-strong-frozen |
+| icv1-f2m13-t181-515ee569 | rho-frob-v2 vs rho-strong-v2 | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | rho-frob-v2 vs rho-strong-v2-aa | unresolved inside the band |
+| icv1-f2m13-t181-515ee569 | rho-strong-frozen vs rho-strong-v2 | rho-strong-v2 < rho-strong-frozen |
+| icv1-f2m13-t181-515ee569 | rho-strong-frozen vs rho-strong-v2-aa | rho-strong-v2-aa < rho-strong-frozen |
+| icv1-f2m13-t181-515ee569 | rho-strong-v2 vs rho-strong-v2-aa | unresolved inside the band |

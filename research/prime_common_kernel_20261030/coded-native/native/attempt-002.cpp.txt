@@ -1,0 +1,54 @@
+#include <gmpxx.h>
+#include <bit>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
+using Q=mpq_class;
+static void check(bool b) { if(!b) throw std::runtime_error("control failed"); }
+static unsigned syndrome(unsigned x) {
+    unsigned s=0;
+    for(unsigned j=0; x; ++j,x>>=1) if(x&1U) s^=(j+1);
+    return s;
+}
+static int v2(Q x) {
+    if(x==0) return 100000;
+    mpz_class n=x.get_num(),d=x.get_den(); if(n<0)n=-n;
+    return static_cast<int>(mpz_scan1(n.get_mpz_t(),0))-static_cast<int>(mpz_scan1(d.get_mpz_t(),0));
+}
+static Q cardinal(int l,int q,int t) {
+    Q x=1;
+    for(int s=-l;s<l;++s) if(s!=q) x*=Q(t-s,q-s);
+    x.canonicalize(); return x;
+}
+int main() {
+    unsigned pairchecks=0,orientchecks=0,selectors=0;
+    for(unsigned a=1;a<=6;++a) {
+        const unsigned l=1U<<a, r=std::bit_width(a), k=(l*l)>>r;
+        std::vector<unsigned> counts(l);
+        for(unsigned x=0;x<l;++x) for(unsigned y=0;y<l;++y) if(syndrome(x^y)==0) {
+            ++counts[x];
+            for(unsigned j=0;j<=a;++j) for(unsigned h=0;h<=a;++h) {
+                unsigned xx=x,yy=y;
+                if(j<a)xx^=1U<<j;
+                if(h<a)yy^=1U<<h;
+                check((syndrome(xx^yy)==0)==(j==h)); ++pairchecks;
+            }
+        }
+        unsigned total=0;
+        for(unsigned c:counts) {check(c==(l>>r)); total+=c; ++orientchecks;}
+        check(total==k);
+        const int li=static_cast<int>(l), t=1+2*li;
+        const Q star=cardinal(li,0,t);
+        std::vector<Q> f(a);
+        for(int q=-li;q<li;++q) if(q!=0) {
+            const unsigned j=q==-li ? 0U : std::countr_zero(static_cast<unsigned>(q<0?-q:q));
+            f[j]+=cardinal(li,q,t);
+        }
+        check(v2(star)==static_cast<int>(a+1)); ++selectors;
+        for(unsigned j=1;j<a;++j) {check(v2(f[j])>=static_cast<int>(a+2)); ++selectors;}
+        Q sum=star; for(const Q& z:f) sum+=z; check(sum==1);
+        std::cout<<"dimension\t"<<a<<"\tcode_size\t"<<k<<"\tv_star\t"<<v2(star)<<'\n';
+        if(a==3) { std::cout<<"a3_star\t"<<star<<'\n'; for(unsigned j=0;j<a;++j)std::cout<<"a3_f\t"<<j<<'\t'<<f[j]<<"\tv2\t"<<v2(f[j])<<'\n'; }
+    }
+    std::cout<<"operator_pair_checks\t"<<pairchecks<<"\norientation_checks\t"<<orientchecks<<"\nselector_checks\t"<<selectors<<"\nPASS\n";
+}

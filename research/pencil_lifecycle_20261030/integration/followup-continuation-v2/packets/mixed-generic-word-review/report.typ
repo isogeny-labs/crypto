@@ -1,0 +1,22 @@
+#set page(paper:"a4",margin:18mm)
+#set text(size:10pt)
+#text(size:18pt,weight:"bold")[Independent generic mixed UInt64 review]
+#image("diagram.svg",width:100%)
+
+#text("Independent review supports the five generic mixed-degree UInt64 theorems at their stated value-correspondence scope. Fresh isolated main, producer controls, separate readback and reviewer boundary controls all exited0. The five named declarations use only propext, Classical.choice and Quot.sound. No producer source or evidence was changed.")
+
+#text("The source checklist maps every retained Rust local in add12_weighted_generic232-292 to genericExpr and genericWords, including the nested K,A,B,C,L,M expressions, q3/r3 signs and parentheses, s3/t3, outputZ and literal outputW=1. Squares are represented as multiplication of equal operands. No pow loop occurs in this branch; imported exponentiation machinery is not exercised by this expression tree. This is a value mapping, not a square-versus-multiply counter mapping.")
+
+#text("Theorems require prime5<=p<2^31, ten canonical input coordinate words and canonical curve[3]. Literal1 canonicality follows from the bound and is present in the proof. FieldExpr composition proves intermediate canonical residues and field decoding with bounded UInt64 arithmetic. Other curve coefficients enter the validity theorem as field values because this branch does not read their words. The curve remains the explicitly monic quintic without an X4 coefficient.")
+
+#text("The generic guard uses q*(z²*(x*Za²)), while the outer complete-dispatch guard uses q*((x*z²)*Za²). The proof does not assume word associativity: it decodes both canonical K words, applies the reviewed field genericK_same identity, then reflects equality back to UInt64. The guard theorem proves wordK=0 if and only if fieldK=0. Option mapping covers both None and Some, not merely the nonzero branch.")
+
+#text("The composed preservation theorem states original normalized input validity and four nonzero input word weights, then derives a canonical degree-two payload with nonzero output weights and normalized validity. Its K premise is written at field scope; the separately proved guard equivalence supplies precisely the word-to-field bridge. There is no output-validity premise. Previously independently reviewed field preservation is used unchanged.")
+
+#text("The producer full F7 nonunit fixture applies the composed theorem after constructing original input divisibilities. Other producer controls cover zeroK None, canonical payload, noncanonical y=p and zero-weight K. Reviewer controls check actual outer/generic wordK equality, literalW=1, p5 zeroK None with canonical unused payload, and exclusion of curve[3]=p from the canonical premise. All fixed controls passed.")
+
+#text("The pure genericWords bundle defines the full payload even when K=0. The Rust source returns before computing it. The theorem therefore establishes Option value correspondence, not equality of executed operations, counters, side effects or compiler behavior. Retained Field arithmetic mapping is n=1,tables=None with ordinary execution/counter headroom. No divisor-class addition, complete dispatcher, tripling, scientific trajectory or performance ratio is asserted.")
+
+#text("Exact producer manifest, source references and dependency bindings were checked. Fresh modules ran in an isolated reviewer directory with existing pinned Lean and cached dependency oleans, each bounded120seconds. Pre/post dependency hashes agree; no independent binary/kernel rechecker was used. The initial reviewer manifest reader assumed a nested files key and failed before any replay; it was corrected to read the actual flat mapping and retained in hash-check notes. This did not change evidence bytes.")
+
+#text("No blocking discrepancy was found. All five claims have machine status passed, fidelity faithful_scoped and review outcome validated_scoped. The review plan and literal source checklist preceded proof inspection. This reviewer authored neither the word packet nor its field proof; the earlier field review is linked provenance, not a second producer proof.")
