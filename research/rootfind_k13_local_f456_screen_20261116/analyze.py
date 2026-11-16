@@ -61,7 +61,7 @@ def analyze(session_dir, replay_path, work_path):
             "outcome_statuses": dict(Counter((r.get("outcome") or {}).get("status", "missing") for r in rows)),
             "process_wall_ns_median_valid": median([(r.get("time") or {}).get("process_wall_ns") for r in good]),
             "method_call_wall_ns_median_valid": median([(r.get("time") or {}).get("method_call_wall_ns") for r in good if isinstance((r.get("time") or {}).get("method_call_wall_ns"), (int, float))]),
-            "peak_rss_bytes_median_valid": median([(r.get("memory") or {}).get("peak_rss_bytes") for r in good if isinstance((r.get("memory") or {}).get("peak_rss_bytes"), (int, float))]),
+            "max_rss_kib_median_valid": median([(r.get("time") or {}).get("max_rss_kib") for r in good if isinstance((r.get("time") or {}).get("max_rss_kib"), (int, float))]),
             "phase_wall_ns_median_valid": {name: median(vals) for name, vals in sorted(phases.items())},
             "work_rows": len(work_rows),
             "work_complete_rows": sum(bool((x.get("work") or {}).get("Ok", {}).get("complete")) for x in work_rows),
