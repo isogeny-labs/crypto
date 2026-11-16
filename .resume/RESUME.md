@@ -1,6 +1,54 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (05:11Z, 16 November)
+## Current checkpoint (06:14Z, 16 November)
+
+STAGE20IMPLEMENTED/VALIDATED, NOT TIMED. WeakFp6cover/univariate-sieve existing
+finder now has opt-in graph/hypergraph projection before Wiedemann. Retain75%
+basecolumns+ALWAYStarget; original-input combinations replayed, cap/refusal/
+wrongprojectedrecovery triggers chargedoriginalsolve. Old default API/serialized
+report retained. Legacy graph arithmetic counts explicitly incomplete; wall primary.
+Core src/cryptanalysis/jv_sieve_graph.rs + hooks jv_sieve.rs. Strongrho new
+strong_rho_counted_with_scalar returns actual scalar; old walk/report unchanged.
+
+New example jv_sieve_graph_compare spawns FRESH EXEC workers per arm; public-only
+fixture, zero legacyanswerplaceholder, ICtransfer rebuilt INSIDE child solve.
+Native+outer full EllE scalar replay, then parent heldoutanswer check. Native
+knownanswerflags FALSE EXPECTED (solvernevergetsanswer), actualverified true.
+Sixarms ic_a/graph_a/rho_a/ic_b/graph_b/rho_b reverseodd,1warm5rounds. NewRust
+cover-graph-analysis handles public BLAKE3 family, source/order/starts/exits,
+signatures (stripONLYwall fields), actualscalar/placeholder, bothAA clocks,
+graph stats, censor/nullincompleteCI and observedcohortexit. 7newanalysis tests
++22oldanalysis pass; allanalysis build/Clippy pass. Wholecurve duplicate detection.
+
+VALIDATION PASS:15cover/sieve tests (2existing ignored long),5genericfilter,
+9strongrho,1example actualscalar/noanswerworker check,29analysis total.
+Actualproductionexample build +library/example Clippy PASS. Initial range-style
+Clippyerror fixed/logretained. Firstcompile intentionally canceled to add scalar
+API; zombie rustc30487 underPID1 (stateZ) executesnothing. Wrapper now uses ps/awk
+to reject LIVE compiler processes, ignoringzombies, dependencieschecked.
+DoNOT use plainpgrep as scientificguard or killPID1. No compiler/jobsactive.
+
+AMENDMENT_15_COVER_GRAPH.md + cover-graph-pilot-plan.json: p127seed239,
+36childexecs(6warm30measure),CPU0/8GiB/900sWHOLEcohort,no retries. Nativefast
+linear/stop64/degree24/tracefalse/margin1.25; graph75%,cap4096, rho neg/batch16/
+r256 and public-order DPbits rule. Pilotparityflag ALWAYS false. Scaleallowed
+only completecorrect controls+nontrivial graph projection; no speed requirement
+on undersizedpilot. AllJVchildoverridesremoved. Primary outercoldprocesswall,
+innerwallalso retained. Legacyunitcosts incomplete. No canonicaladmission.
+
+Need final cover-graph-source.sha256, COMMIT/PUSH source/spec FIRST then single
+wrapper /workspace/ic-local-runs/local-cover-sieve-graph-20261116-20. NO20DATA.
+NativeanalysisCargo addedblake3 dependency, lockupdated. Oldmanifestsunchanged.
+RootREADME/PR neednewweakfamilyscope; currentPRbody onlythrough19. LastCI/review
+05:14on a3c02:appmigrate/reviewSUCCESS, gate/size/artifactsunconfirmed;nextallowed
+06:04(NOWallowed), doonceafternewsourcepublication. No merge/bypass. GoalACTIVE.
+
+Stage19allpacketPUBLISHED a3c02eacd0602bf7a3048d6af3a95591b48b3143, bodyupdated.
+No newdata since. Standardpanel currentorigin/main read, no matchingweakFp6
+family. PrimaryJV12sections3.2/3.3/nativefilter/strongreference/priorcrossover
+scope/gaps receipts in Amendment15/COVER_SIEVE_REVIEW +journal06:14.
+
+## Prior evidence checkpoint (05:11Z, superseded pending states)
 
 STAGE19COMPLETE,NEGATIVE. Source1de7ddec033ba24e158c9aa3ee6893897deec4abpublished
 before solelocalcall. Exit0in29.356s,864starts/completions,144warm720measure,

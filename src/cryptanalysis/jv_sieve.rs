@@ -43,6 +43,10 @@ use super::jv_cover::{
 };
 use super::residual_walk::inv_mod;
 
+#[path = "jv_sieve_graph.rs"]
+mod graph_filter;
+pub use graph_filter::{SieveGraphOptions, SieveGraphStats};
+
 /// The harness's price of one `F_p` inversion, as in `jv_cover`.
 const INV_COST: u64 = 16;
 
@@ -1552,6 +1556,10 @@ pub fn sieve_core(rels: &[SparseRel], ncols: usize) -> Option<super::gaudry_cubi
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SieveDlpReport {
+    /// Opt-in graph projection; absent under the historical default.
+    /// Its modular/native costs are in cold wall, not legacy multiplication totals.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub graph_filter: Option<SieveGraphStats>,
     /// Factor-base line search (`JV_FB_LINE=n`, `JV_FB_LINE_MODE`); its
     /// multiplications are inside `setup_muls`, its additions and lookups in
     /// `total_plus`.  Absent when off, so the default record is unchanged.
@@ -1836,6 +1844,28 @@ pub fn run_cover_sieve_dlp_on(
     m_override: Option<usize>,
     trace: bool,
 ) -> SieveDlpReport {
+    run_cover_sieve_dlp_on_with_filter(
+        spec, seed, rho_runs, rho_s_ref, stop, margin, m_override, trace, None,
+    )
+    .0
+}
+
+/// Same verified cover/sieve route with an explicit graph projection option.
+/// Returns the recovered scalar separately for external replay. The planted
+/// answer is used only by the existing final correctness flag. Graph work is
+/// fully charged in cold wall; legacy primitive totals omit graph arithmetic.
+#[allow(clippy::too_many_arguments)]
+pub fn run_cover_sieve_dlp_on_with_filter(
+    spec: &Spec,
+    seed: u64,
+    rho_runs: usize,
+    rho_s_ref: f64,
+    stop: Option<usize>,
+    margin: f64,
+    m_override: Option<usize>,
+    trace: bool,
+    graph_options: Option<&SieveGraphOptions>,
+) -> (SieveDlpReport, Option<u64>) {
     use super::jv_bitops::{enter, Phase};
     let start = Instant::now();
     // Opt-in: JV_FB_LINE=n moves the instance to the best of n factor-base
@@ -1874,6 +1904,7 @@ pub fn run_cover_sieve_dlp_on(
         .and_then(|v| v.parse().ok())
         .unwrap_or(0);
     let mut rep = SieveDlpReport {
+        graph_filter: graph_options.map(|_| SieveGraphStats::new()),
         fb_line,
         p,
         seed,
@@ -2171,6 +2202,7 @@ pub fn run_cover_sieve_dlp_on(
     let mut la_ops = 0u64;
     let mut next_attempt = small;
     let descent_cap = 400u64 * 720 * 4;
+    let mut recovered = None;
     'collect: loop {
         if !sieve_round(&mut rep, &mut sieve_rows, &mut sieve_rels) {
             rep.exhausted = true;
@@ -2219,13 +2251,33 @@ pub fn run_cover_sieve_dlp_on(
             .collect();
         sel.extend(usable.iter().map(|r| mapped(r)));
         let before = la_ops;
-        let x = wiedemann_u64(&sel, sel.len(), l, &mut rng, &mut la_ops);
-        let dd = x.map(|x| x[k]);
-        let _verify = enter(Phase::Verification);
-        let ec = super::jv_cover::EllE::new(&ctx.f, &spec.alpha);
-        if dd.is_some_and(|dd| ec.mul(&spec.g, dd) == spec.q) {
+        let projection = graph_options.and_then(|options| {
+            graph_filter::project(&sel, l, options, rep.graph_filter.as_mut().unwrap())
+        });
+        let verified_scalar = |dd: Option<u64>| {
+            let _verify = enter(Phase::Verification);
+            let ec = super::jv_cover::EllE::new(&ctx.f, &spec.alpha);
+            dd.filter(|&dd| ec.mul(&spec.g, dd) == spec.q)
+        };
+        let mut dd = None;
+        if let Some((projected, target)) = &projection {
+            dd = verified_scalar(
+                wiedemann_u64(projected, projected.len(), l, &mut rng, &mut la_ops)
+                    .map(|x| x[*target]),
+            );
+        }
+        if dd.is_none() {
+            if let Some(stats) = &mut rep.graph_filter {
+                stats.fallback_solves += 1;
+            }
+            dd = verified_scalar(
+                wiedemann_u64(&sel, sel.len(), l, &mut rng, &mut la_ops).map(|x| x[k]),
+            );
+        }
+        if dd.is_some() {
             rep.solved = true;
             rep.correct = dd == Some(spec.d);
+            recovered = dd;
             rep.unknowns = sel.len();
             rep.filtered_out = sieve_rows.len() + 1 - core.rows.len();
             rep.la_ops_last = la_ops - before;
@@ -2293,7 +2345,7 @@ pub fn run_cover_sieve_dlp_on(
     rep.descent_over_rho = rep.descent_muls as f64 / rho_muls;
     rep.la_over_rho = rep.la_muls as f64 / rho_muls;
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
-    rep
+    (rep, recovered)
 }
 
 #[cfg(test)]

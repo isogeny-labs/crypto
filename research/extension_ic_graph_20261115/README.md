@@ -1,10 +1,20 @@
-# Cubic-extension algebraic IC with symbolic graph elimination
+# Extension-field algebraic IC with graph elimination
 
 This integration reuses the existing `gaudry_cubic` algebraic relation finders
 and `pencil-symbolic-graph` forest. It changes the auxiliary-variable eliminator,
 with a protected target logarithm and protected constant coordinate. [pcc:unverified]
 
 [Implementation report (PDF)](report.pdf) · [Frozen protocol](protocol.json)
+
+The [weak-cover continuation](AMENDMENT_15_COVER_GRAPH.md) reuses the existing
+Rust Joux–Vitse univariate sieve over Fp² and adds checked graph/hypergraph
+filtering before its linear solve. This is a restricted weak elliptic family
+over Fp6. Target coordinates stay protected, output rows carry replayed input
+combinations, and failures invoke the charged original solve. The cold-process
+comparison includes native sieve IC and negation/batched-inversion rho on the
+same public challenge. [Frozen pilot](cover-graph-pilot-plan.json), not timed
+yet. Workers receive no planted answer and rebuild their own public transfer.
+[pcc:unverified]
 
 ## Three graph representations in the Rust integration
 

@@ -7,8 +7,8 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repo=$(/usr/bin/git -C "$here" rev-parse --show-toplevel)
 cd "$repo" || exit 2
 plan=${2:-$here/local-pilot-plan.json}
-for program in jq taskset timeout sha256sum; do command -v "$program" >/dev/null || exit 2; done
-if pgrep -x rustc >/dev/null || pgrep -x cargo >/dev/null || pgrep -x clippy-driver >/dev/null; then
+for program in jq taskset timeout sha256sum ps awk; do command -v "$program" >/dev/null || exit 2; done
+if ps -eo stat=,comm= | awk '$2 ~ /^(rustc|cargo|clippy-driver)$/ && $1 !~ /^Z/ { active=1 } END { exit !active }'; then
   echo 'Compiler/build activity exists; do not time this run yet.' >&2; exit 2
 fi
 [[ -z $(/usr/bin/git status --porcelain --untracked-files=normal) ]] || { echo 'Publish the clean source/spec first.' >&2; exit 2; }
@@ -30,6 +30,10 @@ case "$driver_kind" in
   s4-trace-component)
     driver_binary=target/release/examples/gaudry_cubic_s4_trace_compare
     analyzer_binary=$here/native_analysis/target/release/s4-trace-analysis
+    ;;
+  cover-sieve-graph)
+    driver_binary=target/release/examples/jv_sieve_graph_compare
+    analyzer_binary=$here/native_analysis/target/release/cover-graph-analysis
     ;;
   *) echo 'Unknown frozen driver kind.' >&2; exit 2;;
 esac
@@ -57,6 +61,10 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
   src/cryptanalysis/f4_fp.rs src/cryptanalysis/f4_fp src/cryptanalysis/groebner_f4.rs src/cryptanalysis/fx_hash.rs \
   examples/gaudry_cubic_graph_compare.rs examples/gaudry_cubic_s4_f4_probe.rs \
   examples/gaudry_cubic_s4_trace_compare.rs \
+  examples/jv_sieve_graph_compare.rs src/cryptanalysis/jv_cover.rs \
+  src/cryptanalysis/jv_sieve.rs src/cryptanalysis/jv_sieve_graph.rs \
+  src/cryptanalysis/jv_rho_strong.rs src/cryptanalysis/jv_isogeny_walk.rs \
+  src/cryptanalysis/large_prime_filter.rs \
   research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \
   research/pencil_large_prime_20261029/src/sparse.rs research/extension_ic_graph_20261115 \
@@ -74,7 +82,10 @@ memory_kib=$(( $(jq -er .memory_gib "$run_dir/runtime-plan.json") * 1024 * 1024 
 argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" \
   --warmup-rounds "$warmups" --rounds "$rounds" \
   --source-revision "$source_revision" --out "$run_dir/raw.jsonl")
-if [[ "$driver_kind" == graph-ic ]]; then
+if [[ "$driver_kind" == cover-sieve-graph ]]; then
+  keep_percent=$(jq -er .retained_percent "$run_dir/runtime-plan.json")
+  argv+=(--retained-percent "$keep_percent")
+elif [[ "$driver_kind" == graph-ic ]]; then
   oracles=$(jq -er .oracle_cli "$run_dir/runtime-plan.json")
   sampler=$(jq -r '.sampler // "fresh"' "$run_dir/runtime-plan.json")
   cap=$(jq -er .max_residuals "$run_dir/runtime-plan.json")

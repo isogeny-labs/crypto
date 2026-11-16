@@ -841,6 +841,17 @@ pub struct CountedRun {
 /// [`strong_rho`] on `inst`, counted for `bitop/v1` ([`rho_tally`]).  Its
 /// [`StrongRun`] is priced in the harness unit as `strong_rho`'s is.
 pub fn strong_rho_counted(inst: &CurveInstance, seed: u64, run: u64, o: StrongOpts) -> CountedRun {
+    strong_rho_counted_with_scalar(inst, seed, run, o).0
+}
+
+/// The same counted reference and walk, also returning its actual collision
+/// scalar for external group replay. Existing result serialization is unchanged.
+pub fn strong_rho_counted_with_scalar(
+    inst: &CurveInstance,
+    seed: u64,
+    run: u64,
+    o: StrongOpts,
+) -> (CountedRun, Option<u64>) {
     validate_options(o).expect("invalid strong rho options");
     let start = Instant::now();
     let ph = harness_prices(inst.p);
@@ -863,15 +874,18 @@ pub fn strong_rho_counted(inst: &CurveInstance, seed: u64, run: u64, o: StrongOp
         .found
         .and_then(|k| ar.mul_scalar(&g, k))
         .is_some_and(|pt| pt.x == q.x && pt.y == q.y);
-    CountedRun {
-        run: r,
-        setup: ex.setup,
-        verify: ar.c,
-        rng_draws: ex.rng_draws,
-        flips: ex.flips,
-        collision_solves: ex.collision_solves,
-        verified,
-    }
+    (
+        CountedRun {
+            run: r,
+            setup: ex.setup,
+            verify: ar.c,
+            rng_draws: ex.rng_draws,
+            flips: ex.flips,
+            collision_solves: ex.collision_solves,
+            verified,
+        },
+        ex.found,
+    )
 }
 
 /// The `bitop/v1` primitives of one `F_{q³}` product, squaring and
