@@ -31,6 +31,13 @@ do not revert that update on later main integration. No policy was edited to
 make this payload pass. The child waits for actual parent integration, then
 retargets to main and must satisfy its actual current-head gates and reviews.
 
+Source publication: regular [PR #4456](https://github.com/isogeny-labs/crypto/pull/4456),
+initial published source merge `6c7a1f4266f8d4ae43a77a8e0ce08600a2d2d906`
+from local `58633ba01fbd5f97d1382e40de04b157f4126b8f`. All 77 owned paths
+and the complete initial tree match. `PUBLICATION_RECEIPT.json` records that
+Git identity, not store publication; PCC-20261116-0bd924 remains unsigned.
+[pcc:unverified]
+
 **Pending:** genuine receipt and trusted upload commit; source PR publication
 does not itself establish upload. Do not invent a receipt, rename/split data to
 avoid policy, export credentials or remove remote objects. Keep inspected local

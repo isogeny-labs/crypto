@@ -20,3 +20,22 @@
 ### Errors (what went wrong, how it was handled)
 - Python-launched historical interface checks remain preserved/excluded; corrected shell evidence is separately pinned. AWS CLI absence, then no credentials, are retained transport failures. A prose-lint finding on a hypothetical NEXT sentence was reworded; final prose lint has zero findings. An initial narrow patch context missed and changed no bytes before the corrected patch. No qualified Rust/source fixture or raw native output was edited.
 - Current main instructions/journal were fetched/read; conflicting canonical files are not rewritten. Append this complete pending entry to the canonical journal only after preservation-consistent integration, preserving all older pending entries and journal block multiplicities.
+
+## 2026-11-16T22:57:34Z — Initial affine source published; final metadata handoff (Codex)
+
+### What was done (commands, files, features)
+- Published source58633ba01fbd5f97d1382e40de04b157f4126b8f with maintained lane helper as6c7a1f4266f8d4ae43a77a8e0ce08600a2d2d906, parents1d3a8879144aed8942132488e7609a28be33ca68/58633ba0, tree78cbe981f2da96dfa2f0e1926b48b7fcacce02f2. All77 owned changed paths and the complete initial tree match. Opened regular child PR4456 against lane/curve25519-torus, after exact-body prose lint. Publication identity PCC-20261116-0bd924, unsigned/unverified. [pcc:unverified]
+- Seeded only the new area lane at the actual parent commit, then used the maintained merge/push helper; no source/policy/conflicted-path push to parent4447, no rebase or force push. Child base is a feature branch, so main auto-merge remains inapplicable until retargeting.
+- A dependent Git remote readback still shows initial6c7a1f42 and no child study artifact manifest. The complete local146256-byte core payload remains present with its frozen hash. This is not an upload receipt. No unchanged download or credential command was retried.
+
+### Decisions made (and why)
+- Final metadata records publication identity and pending upload, preserves original source/report/claim bytes, and records applied PR-body lesson T-231fbbefae26. No native tests rerun for metadata.
+- Restore the SAME paused authoring-session checker for the two actual active authoring PRs4447/4456, without duplicate schedules; it handles CI/review/publication/merge only. Real new source publication resets unchanged count; own scheduling/prose does not.
+
+### Open threads (unfinished, pick up next time)
+- Inspect the actual final child head's fresh CI once, then respect cadence. Require a trusted artifact-autofix receipt binding ef5b561a184672f36ac9c2e12963f23d14d56aa731ea6e3d79f68968b3e2a875/146256 before claiming stored; preserve inspected local bytes.
+- Await preservation-consistent parent main integration and current-head gates/reviews; then retarget child to main and enable MERGE auto-merge. Never merge child into feature parent to avoid gates. Parent canonical history/CI blockers remain explicit and unchanged by this source.
+- All broader original-base, cost, yield/family/selection/kernel/recovery and validation obligations remain open. Branch-local reduction is an unscheduled next implementation, not work assigned to the checker.
+
+### Errors (what went wrong, how it was handled)
+- Source publication and local metadata identity checks succeeded at their stated scope. Artifact policy is not claimed passing while its selected payload awaits offload. Two frozen EOF advisories remain. A metadata patch context missed and changed no bytes before correction. The guarded metadata commit stopped on an unpinned pending-journal EOF blank line; trimmed that new prose only, with no frozen evidence edit.
