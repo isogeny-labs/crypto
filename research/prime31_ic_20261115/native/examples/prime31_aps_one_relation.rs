@@ -1627,6 +1627,69 @@ fn post_jacobian_partition_screen()->Result<serde_json::Value,String>{
 // roots of S3(x,z,U), with no public ordinates or EC group operations in
 // candidate discovery. This is classical E arithmetic and an explicitly
 // enumerated pair support: generic-MITM-equivalent, not novel algebraic IC.
+
+// One canonical x -> one third-partition index, in a packed u64 slot.
+// Distinctness is a required invariant of the public source (verified here).
+// Exact matches, probing and sentinel are checked; no false-positive
+// truncation, approximate filter or group-addition oracle is allowed.
+struct PackedXIndex {
+    slots:Vec<u64>,
+    mask:usize,
+    shift:u32
+}
+impl PackedXIndex {
+    fn bucket(&self,x:u64)->usize {
+        ((x.wrapping_mul(0x9e37_79b9_7f4a_7c15))>>(64-self.shift)) as usize
+    }
+    fn from_source(base:&[Labelled])->Result<Self,String>{
+        if base.is_empty() || base.len()>=65_535 {
+            return Err("packed APS index: invalid source capacity".into());
+        }
+        let size=base.len().checked_mul(2)
+            .and_then(|k|k.checked_next_power_of_two())
+            .ok_or("packed APS index: overflow")?;
+        let mut out=Self{slots:vec![0u64;size],mask:size-1,
+            shift:size.trailing_zeros()};
+        for (i,label) in base.iter().enumerate(){
+            let x=label.pt.0;
+            if x>=P {return Err("packed APS index: noncanonical x".into());}
+            let key=x+1;
+            let word=(key<<16)|((i as u64)+1);
+            let mut at=out.bucket(x)&out.mask;
+            let mut stored=false;
+            for _ in 0..size{
+                let old=out.slots[at];
+                if old==0 {
+                    out.slots[at]=word;
+                    stored=true;
+                    break;
+                }
+                if old>>16==key{
+                    return Err("packed APS index: duplicate x".into());
+                }
+                at=(at+1)&out.mask;
+            }
+            if !stored{return Err("packed APS index: full table".into());}
+        }
+        Ok(out)
+    }
+    fn get(&self,x:u64)->Option<usize>{
+        if x>=P{return None;}
+        let key=x+1;
+        let mut at=self.bucket(x)&self.mask;
+        for _ in 0..self.slots.len(){
+            let word=self.slots[at];
+            if word==0{return None;}
+            if word>>16==key{
+                let index=(word&0xffff) as usize;
+                return index.checked_sub(1);
+            }
+            at=(at+1)&self.mask;
+        }
+        None
+    }
+}
+
 // Distinct abscissae are a checked invariant of the labelled source.
 fn algebraic_mode_factorized(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic
@@ -1639,7 +1702,14 @@ fn algebraic_mode_factorized(
 fn algebraic_mode_factorized_index(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,compact:bool
 )->Result<(Option<Solution>,Stats),String>{
-    let lookup=(!compact).then(||reverse_index(&parts[2]));
+    algebraic_mode_factorized_index_variant(parts,q,ar,compact,false)
+}
+fn algebraic_mode_factorized_index_variant(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,compact:bool,packed:bool
+)->Result<(Option<Solution>,Stats),String>{
+    if compact && packed {return Err("APS index: choose only one mode".into());}
+    let lookup=(!compact && !packed).then(||reverse_index(&parts[2]));
+    let packed_lookup=if packed{Some(PackedXIndex::from_source(&parts[2])?)}else{None};
     let compact_lookup=if compact{
         let mut map=HashMap::with_capacity(parts[2].len());
         for (k,pt) in parts[2].iter().enumerate(){
@@ -1711,7 +1781,12 @@ fn algebraic_mode_factorized_index(
             roots.sort_unstable();
             for (ridx,&root) in roots.iter().enumerate(){
                 if ridx==1 && root==roots[0] {continue;}
-                if let Some(&k)=compact_lookup.as_ref().and_then(|m|m.get(&root)){
+                if let Some(k)=packed_lookup.as_ref().and_then(|m|m.get(root)){
+                    stats.matched_x+=1;
+                    if let Some(solution)=verify_candidate(
+                        left,right,&parts[2][k],[i,j,k],q,ar,&mut stats
+                    ){return Ok((Some(solution),stats));}
+                } else if let Some(&k)=compact_lookup.as_ref().and_then(|m|m.get(&root)){
                     stats.matched_x+=1;
                     if let Some(solution)=verify_candidate(
                         left,right,&parts[2][k],[i,j,k],q,ar,&mut stats
@@ -1736,6 +1811,10 @@ fn execute_factorized_unequal(q:(u64,u64),sizes:[usize;3],round_limit:usize)
 }
 fn execute_factorized_unequal_index(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool)
     ->Result<serde_json::Value,String>{
+    execute_factorized_unequal_index_variant(q,sizes,round_limit,compact,false)
+}
+fn execute_factorized_unequal_index_variant(q:(u64,u64),sizes:[usize;3],round_limit:usize,compact:bool,packed:bool)
+    ->Result<serde_json::Value,String>{
     if sizes.iter().any(|&n|n<16 || n>32_768)
        || sizes.iter().sum::<usize>()>40_000
        || round_limit==0 || round_limit>8{
@@ -1759,7 +1838,7 @@ fn execute_factorized_unequal_index(q:(u64,u64),sizes:[usize;3],round_limit:usiz
         let source_additions=ar.counts.group_additions-before;
         let root_begin=Instant::now();
         let before_verify=ar.counts.group_additions;
-        let (solution,stats)=algebraic_mode_factorized_index(&parts,q,&mut ar,compact)?;
+        let (solution,stats)=algebraic_mode_factorized_index_variant(&parts,q,&mut ar,compact,packed)?;
         let root_ns=root_begin.elapsed().as_nanos();
         let verify_additions=ar.counts.group_additions-before_verify;
         let found=solution.is_some();
@@ -1771,7 +1850,7 @@ fn execute_factorized_unequal_index(q:(u64,u64),sizes:[usize;3],round_limit:usiz
             "rejected_duplicate_x":duplicates,
             "s3_query_ns":root_ns,
             "s3_pair_quadratics":stats.pair_s3,
-            "x_fibre_precompute":true,"jacobian_source":true,"compact_x_index":compact,
+            "x_fibre_precompute":true,"jacobian_source":true,"compact_x_index":compact,"packed_x_index":packed,
             "s3_sqrts":stats.s3_sqrt,
             "s3_batch_inversions":stats.batch_inversions,
             "signed_candidates":stats.signed_candidates,
@@ -2217,8 +2296,116 @@ fn compact_x_index_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+
+// Fixed and preregistered new targets; compare only the two indexing
+// mechanisms and the generic BSGS reference, not different algebraic work.
+fn packed_x_index_confirmation()->Result<serde_json::Value,String>{
+    const CASES:usize=24;
+    const PROFILE:[usize;3]=[384,384,16_384];
+    const TARGET_SEED:u64=0x4658_5441_424c_4531;
+    let mut rng=TARGET_SEED;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    check_curve(PRIME31,&mut verifier)?;
+    let mut totals=[0u128;4];
+    let mut wins=[0u64;3];
+    let mut cases=Vec::with_capacity(CASES);
+    for case in 0..CASES{
+        let (known,q)=loop{
+            let k=prng(&mut rng)%N;
+            if k<=1 || !used.insert(k){continue;}
+            if let Some(q)=verifier.scalar(PRIME31,k,Some(PRIME31.g)){
+                break (k,q);
+            }
+        };
+        let order:[usize;4]=match case%4{
+            0=>[0,1,2,3],1=>[1,2,3,0],2=>[2,3,0,1],_=>[3,0,1,2]
+        };
+        let mut arms:[serde_json::Value;4]=std::array::from_fn(|_|json!(null));
+        for idx in order{
+            let result=match idx{
+                0=>execute_factorized_unequal_index_variant(q,PROFILE,6,true,false)?,
+                1|2=>execute_factorized_unequal_index_variant(q,PROFILE,6,false,true)?,
+                3=>cold_batched_bsgs(q)?,
+                _=>return Err("packed x-index invalid arm".into())
+            };
+            if result["complete_target_scalar_recovered"].as_bool()!=Some(true){
+                return Err(format!("packed x-index incomplete case={case} arm={idx}"));
+            }
+            let k=if idx==3 {
+                result["log"].as_u64().ok_or("BSGS scalar missing")?
+            }else{
+                result["attempts"].as_array()
+                    .and_then(|v|v.last())
+                    .and_then(|v|v["solution"]["log"].as_u64())
+                    .ok_or("packed APS scalar missing")?
+            };
+            if k!=known || verifier.scalar(PRIME31,k,Some(PRIME31.g))!=Some(q){
+                return Err(format!("packed index caller-only scalar replay failed case={case} arm={idx}"));
+            }
+            totals[idx]+=result["cold_wall_ns"].as_u64()
+                .ok_or("packed index cold clock missing")? as u128;
+            arms[idx]=result;
+        }
+        let original=arms[0]["attempts"].as_array().ok_or("compact attempts missing")?;
+        let changed=arms[1]["attempts"].as_array().ok_or("packed attempts missing")?;
+        let duplicate=arms[2]["attempts"].as_array().ok_or("packed AA attempts missing")?;
+        if original.len()!=changed.len()||original.len()!=duplicate.len(){
+            return Err(format!("packed index attempts differ case={case}"));
+        }
+        for i in 0..original.len(){
+            for other in [changed,duplicate]{
+                for field in ["s3_pair_quadratics","signed_candidates","solution",
+                              "rejected_duplicate_x","rejected_identity","round"]{
+                    if original[i][field]!=other[i][field]{
+                        return Err(format!("packed index transcript differs case={case} attempt={i} field={field}"));
+                    }
+                }
+            }
+        }
+        if arms[1]["cold_wall_ns"].as_u64()<arms[0]["cold_wall_ns"].as_u64(){wins[0]+=1;}
+        if arms[2]["cold_wall_ns"].as_u64()<arms[0]["cold_wall_ns"].as_u64(){wins[1]+=1;}
+        if arms[1]["cold_wall_ns"].as_u64()<arms[3]["cold_wall_ns"].as_u64(){wins[2]+=1;}
+        cases.push(json!({
+            "case":case,"public_Q":q,"caller_known_scalar_verifier_only":known,
+            "rotated_order":order,
+            "compact_hashmap_APS":arms[0],
+            "packed_open_address_APS":arms[1],
+            "packed_open_address_APS_AA":arms[2],
+            "cold_BSGS":arms[3]
+        }));
+    }
+    let ratio=(totals[1] as f64)/(totals[0] as f64);
+    let drift=(((totals[1] as i128)-(totals[2] as i128)).abs() as f64)/(totals[1] as f64);
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "protocol":"APS_PACKED_X_INDEX_PROTOCOL_20261116.md",
+        "method":"published APS S3 pair root search, 64-bit packed open-addressed x index",
+        "classification":"generic MITM-equivalent index calculus engineering",
+        "p":P,"n":N,"cofactor":1,
+        "target_seed":format!("{TARGET_SEED:016x}"),"profile":PROFILE,
+        "cases":cases,"cases_count":CASES,"all_cold_arms_verified":4*CASES,
+        "arm_names":["compact_std_HashMap_APS","packed_linear_probing_APS",
+                     "packed_linear_probing_AA","cold_BSGS"],
+        "fully_cold_ns":totals,
+        "packed_vs_compact_aggregate_ratio":ratio,
+        "packed_AA_drift_fraction":drift,
+        "per_case_wins_packed_vs_compact":wins[0],
+        "per_case_wins_packed_AA_vs_compact":wins[1],
+        "per_case_wins_packed_vs_BSGS":wins[2],
+        "passes_preregistered_10_percent_engineering_gate":
+            ratio<=0.90 && wins[0]>=18 && drift<=0.05,
+        "note":"all costs and misses charged; developer only, no PCC, no rho, no claimed non-generic speedup"
+    }))
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--packed-x-index-confirm" {
+        let result=packed_x_index_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--compact-x-index-confirm" {
         let result=compact_x_index_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -2648,6 +2835,41 @@ mod compact_x_index_tests{
             algebraic_mode_factorized_index(&parts,PUBLIC_Q,&mut old_ar,false).unwrap();
         let (new,new_stats)=
             algebraic_mode_factorized_index(&parts,PUBLIC_Q,&mut new_ar,true).unwrap();
+        assert_eq!(old.as_ref().map(|x|x.log),new.as_ref().map(|x|x.log));
+        assert_eq!(old.as_ref().map(|x|x.indices),new.as_ref().map(|x|x.indices));
+        assert_eq!(old.as_ref().map(|x|x.signs),new.as_ref().map(|x|x.signs));
+        assert_eq!(old_stats.pair_s3,new_stats.pair_s3);
+    }
+}
+
+
+#[cfg(test)]
+mod packed_x_index_tests{
+    use super::*;
+    #[test]
+    fn packed_u64_table_roundtrips_full_public_source_and_exact_relation(){
+        let mut ar=Arithmetic::default();
+        check_curve(PRIME31,&mut ar).unwrap();
+        let (parts,_,_)=source_walk_profile_jac(
+            PUBLIC_Q,SEED,&mut ar,[384,384,16_384]).unwrap();
+        let idx=PackedXIndex::from_source(&parts[2]).unwrap();
+        let mut keys=HashSet::new();
+        for (j,lab) in parts[2].iter().enumerate(){
+            assert!(keys.insert(lab.pt.0));
+            assert_eq!(idx.get(lab.pt.0),Some(j));
+        }
+        for x in [0u64,1,2,P-1,P]{
+            assert_eq!(idx.get(x),parts[2].iter().position(|v|v.pt.0==x));
+        }
+        let mut tampered=parts[2].clone();
+        tampered[1].pt.0=tampered[0].pt.0;
+        assert!(PackedXIndex::from_source(&tampered).is_err());
+        let mut old_ar=Arithmetic::default();
+        let mut new_ar=Arithmetic::default();
+        let (old,old_stats)=
+            algebraic_mode_factorized_index_variant(&parts,PUBLIC_Q,&mut old_ar,true,false).unwrap();
+        let (new,new_stats)=
+            algebraic_mode_factorized_index_variant(&parts,PUBLIC_Q,&mut new_ar,false,true).unwrap();
         assert_eq!(old.as_ref().map(|x|x.log),new.as_ref().map(|x|x.log));
         assert_eq!(old.as_ref().map(|x|x.indices),new.as_ref().map(|x|x.indices));
         assert_eq!(old.as_ref().map(|x|x.signs),new.as_ref().map(|x|x.signs));
