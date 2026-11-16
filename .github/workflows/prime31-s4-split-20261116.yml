@@ -45,3 +45,6 @@ jobs:
       - name: Cold Rust APS single-relation solver on ordinary prime31
         timeout-minutes: 4
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --one
+      - name: Same-source Rust APS algebraic versus independent direct group join
+        timeout-minutes: 4
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --compare
