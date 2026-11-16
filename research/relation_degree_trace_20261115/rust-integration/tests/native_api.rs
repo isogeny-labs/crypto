@@ -1,6 +1,38 @@
 //! Public Rust API integration tests. Development correctness, not timing evidence.
 use certified_relations as algebra;
 use crypto_lib::cryptanalysis::f4_fp::{self, certified::*, normalise, F4Options, Ordering, Poly};
+#[test]
+fn separate_replay_public_api_checks_complete_basis_and_changed_identity() {
+    let system = algebra::workload::generate(2147483647, 3, 7)
+        .unwrap()
+        .system;
+    let produced = algebra::replay::produce_native_product(&system, "compact-sparse").unwrap();
+    let input = serde_json::to_vec(&system).unwrap();
+    let checked =
+        verify_replay_certificate_json(&input, &serde_json::to_vec(&produced.witness).unwrap())
+            .unwrap();
+    let actual: std::collections::BTreeSet<algebra::Poly> = checked
+        .basis
+        .into_iter()
+        .map(|r| r.into_iter().collect())
+        .collect();
+    let expected: std::collections::BTreeSet<algebra::Poly> = produced
+        .witness
+        .basis
+        .iter()
+        .map(|r| {
+            r.polynomial
+                .iter()
+                .map(|t| (t.exponents.clone(), t.coefficient))
+                .collect()
+        })
+        .collect();
+    assert_eq!(actual, expected);
+    assert_eq!(checked.stats.pairs, produced.witness.pair_reductions.len());
+    let mut bad = produced.witness;
+    bad.definitions[0].proof.clear();
+    assert!(verify_replay_certificate_json(&input, &serde_json::to_vec(&bad).unwrap()).is_err());
+}
 fn fixture(n: usize, p: u64) -> Vec<Poly> {
     let system = algebra::workload::generate(p, n, 7).unwrap().system;
     system

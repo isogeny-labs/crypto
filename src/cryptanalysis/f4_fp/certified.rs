@@ -8,6 +8,18 @@ use ::certified_relations as algebra;
 pub use algebra::quotient::compact::{Certificate as CompactCertificate, Info as CompactInfo};
 pub use algebra::quotient::Info as QuotientInfo;
 pub use algebra::Row as CertificateRow;
+pub use relation_replay_checker::{Checked as ReplayChecked, Stats as ReplayCheckStats};
+
+/// Exact bounded replay of a serialized original system and certificate using
+/// separate arithmetic, without invoking a basis solver or external process.
+/// Currently p=2^31-1 and3..16 variables; parsing and every acceptance check are
+/// included in this call. Unsupported or malformed certificates return Err.
+pub fn verify_replay_certificate_json(
+    original: &[u8],
+    witness: &[u8],
+) -> Result<ReplayChecked, String> {
+    relation_replay_checker::verify_json(original, witness)
+}
 
 /// Complete basis with an acyclic chain of checked local membership identities.
 /// Local stored term counts are a different representation from expanded

@@ -74,7 +74,7 @@ fn selected(cases: &[Value]) -> Value {
     }
     chosen
 }
-fn fused_sample(
+pub(super) fn fused_sample(
     r: &Runner,
     exe: &Path,
     input: &Path,
@@ -110,13 +110,13 @@ fn fused_sample(
         json!({"status":"complete","basis_sha256":digest,"pipeline_wall_ns":ns(start).max(1),"answer":answer}),
     )
 }
-fn paid_sum(attempt: u64, recovery: u64, prep: u64) -> Result<u64> {
+pub(super) fn paid_sum(attempt: u64, recovery: u64, prep: u64) -> Result<u64> {
     attempt
         .checked_add(recovery)
         .and_then(|x| x.checked_add(prep))
         .ok_or_else(|| "paid cost overflow".into())
 }
-fn failed_native_work(elapsed: u64, setup: Option<u64>, prep: u64) -> Result<u64> {
+pub(super) fn failed_native_work(elapsed: u64, setup: Option<u64>, prep: u64) -> Result<u64> {
     // Setup already contains preparation. Recovery adds preparation once,
     // while retaining the full failed validation setup as charged work.
     let validation = match setup {
@@ -127,15 +127,15 @@ fn failed_native_work(elapsed: u64, setup: Option<u64>, prep: u64) -> Result<u64
     };
     paid_sum(elapsed, validation, 0)
 }
-struct Context<'a> {
-    r: &'a Runner,
-    input: &'a Path,
-    system: &'a System,
-    prep: u64,
-    reference: Option<&'a Basis>,
+pub(super) struct Context<'a> {
+    pub(super) r: &'a Runner,
+    pub(super) input: &'a Path,
+    pub(super) system: &'a System,
+    pub(super) prep: u64,
+    pub(super) reference: Option<&'a Basis>,
 }
 impl Context<'_> {
-    fn finish(
+    pub(super) fn finish(
         &self,
         kind: &str,
         result: Result<Value>,

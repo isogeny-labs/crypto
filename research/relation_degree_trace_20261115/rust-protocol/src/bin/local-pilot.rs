@@ -21,6 +21,8 @@ const ORDERS: [&str; 6] = ["FEC", "ECF", "CFE", "CEF", "EFC", "FCE"];
 mod phase_capture;
 #[path = "../replay_capture.rs"]
 mod replay_capture;
+#[path = "../rust_capture.rs"]
+mod rust_capture;
 #[path = "../sparse_capture.rs"]
 mod sparse_capture;
 fn arm_name(a: Arm) -> &'static str {
@@ -112,6 +114,9 @@ fn prepare(root: &Path, mode: &str) -> Result<()> {
     }
     if mode == "sparse-screen" {
         return prepare_graphs(root, true, "sparse-screen");
+    }
+    if mode == "rust-consumer-screen" {
+        return prepare_graphs(root, true, "rust-consumer-screen");
     }
     let roster: Vec<_> = match mode {
         "qualification" => [3].into_iter().map(|n| (n, 7)).collect(),
@@ -294,7 +299,10 @@ fn prepare_graphs(root: &Path, scale: bool, mode: &str) -> Result<()> {
         fs::create_dir(&dir)?;
         let f = system.decode()?;
         let bytes = serde_json::to_vec(&system)?;
-        if mode == "replay-screen" || mode == "sparse-screen" {
+        if matches!(
+            mode,
+            "replay-screen" | "sparse-screen" | "rust-consumer-screen"
+        ) {
             let declared: Value =
                 serde_json::from_str(include_str!("../../../scale-screen-01/input-manifest.json"))?;
             let expected = declared["cases"]
@@ -759,6 +767,8 @@ fn main() -> Result<()> {
     Some("replay-screen")if a.len()==9=>replay_capture::run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),PathBuf::from(&a[7]),a[8].clone()),
     Some("sparse-screen")if a.len()==10=>sparse_capture::run(Path::new(&a[2]),Path::new(&a[3]),sparse_capture::Paths{worker:PathBuf::from(&a[4]),legacy_cli:PathBuf::from(&a[5]),fused:PathBuf::from(&a[6]),singular:PathBuf::from(&a[7]),msolve:PathBuf::from(&a[8]),cpu:a[9].clone()}),
     Some("phase-profile")if a.len()==8=>phase_capture::run(Path::new(&a[2]),Path::new(&a[3]),PathBuf::from(&a[4]),PathBuf::from(&a[5]),PathBuf::from(&a[6]),a[7].clone()),
+    Some("phase-render")if a.len()==4=>phase_capture::render(Path::new(&a[2]),Path::new(&a[3])),
+    Some("rust-screen")if a.len()==5=>rust_capture::run(Path::new(&a[2]),Path::new(&a[3]),Path::new(&a[4])),
     _=>Err("usage: local-pilot prepare NEW_DIR qualification|pilot|graph-screen|scale-screen OR local-pilot run INPUT_DIR NEW_OUTPUT WORKER SINGULAR MSOLVE CPU".into())}
 }
 #[cfg(test)]

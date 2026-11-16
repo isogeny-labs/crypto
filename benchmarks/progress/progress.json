@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0605Z-sparse-paid-screen-20261116",
+  "latest_record": "20261116T0620Z-replay-phase-diagnosis-20261116",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 7,
     "invalid": 4,
-    "measured": 199,
+    "measured": 200,
     "open": 1
   },
   "repo": "crypto",
@@ -13782,6 +13782,29 @@
           "spread": null,
           "summary": "Complete sparse screen, no follow-up:66 matching outer outputs,four charged recoveries. No case meets both primary10x gates; no15x confirmation. PCCf8e097/437abb, unsigned L0. [pcc:unverified]",
           "value": 66.0
+        }
+      ],
+      "problem": "kernel:certified-relations-grevlex",
+      "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 18.0,
+      "latest": 18.0,
+      "latest_derived": {},
+      "metric": "complete_phase_observations",
+      "points": [
+        {
+          "commit": "78183b28b8cc",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": null,
+          "record": "20261116T0620Z-replay-phase-diagnosis-20261116",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "18 complete known-input phase observations; construction/completion and external arithmetic both substantial. No speed ratios, generation cost, numerical selection or15x result. PCCd6a9a8, unsigned L0. [pcc:unverified]",
+          "value": 18.0
         }
       ],
       "problem": "kernel:certified-relations-grevlex",

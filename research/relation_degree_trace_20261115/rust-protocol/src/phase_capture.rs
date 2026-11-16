@@ -152,6 +152,11 @@ pub(super) fn run(
     }
     Ok(())
 }
+pub(super) fn render(input: &Path, out: &Path) -> Result<()> {
+    let summary: Value = serde_json::from_slice(&fs::read(input.join("summary.json"))?)?;
+    fs::create_dir(out)?;
+    report(out, &summary)
+}
 fn report(out: &Path, summary: &Value) -> Result<()> {
     let records = summary["records"].as_array().ok_or("records")?;
     let mut complete = 0usize;
@@ -208,14 +213,14 @@ fn report(out: &Path, summary: &Value) -> Result<()> {
         .margin(20)
         .x_label_area_size(60)
         .y_label_area_size(340)
-        .build_cartesian_2d(0f64..maximum, 0usize..records.len() + 1)?;
+        .build_cartesian_2d(0f64..maximum, 0f64..records.len() as f64 + 3.)?;
     chart
         .configure_mesh()
         .disable_y_mesh()
         .y_labels(records.len() + 1)
         .y_label_formatter(&|i| {
             records
-                .get(i.wrapping_sub(1))
+                .get((*i as usize).wrapping_sub(1))
                 .map(|r| {
                     format!(
                         "{} / {}",
@@ -232,7 +237,7 @@ fn report(out: &Path, summary: &Value) -> Result<()> {
             .draw_series(data.iter().enumerate().map(|(i, c)| {
                 let start = c[..phase].iter().sum::<f64>();
                 Rectangle::new(
-                    [(start, i + 1), (start + c[phase], i + 2)],
+                    [(start, i as f64 + 0.7), (start + c[phase], i as f64 + 1.3)],
                     Palette99::pick(phase).filled(),
                 )
             }))?
@@ -246,7 +251,7 @@ fn report(out: &Path, summary: &Value) -> Result<()> {
     }
     chart
         .configure_series_labels()
-        .position(SeriesLabelPosition::LowerRight)
+        .position(SeriesLabelPosition::UpperRight)
         .background_style(WHITE.mix(0.9))
         .border_style(BLACK.mix(0.3))
         .draw()?;

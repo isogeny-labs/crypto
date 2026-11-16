@@ -90,6 +90,18 @@ fn reduced(basis: &[Row]) -> bool {
 /// Check acyclic membership identities, both ideal containments, reducedness
 /// and every S-pair. This is exact arithmetic, not an independent signature.
 pub fn verify(certificate: &Certificate, inputs: &[Poly], n: usize, p: u64) -> bool {
+    verify_impl(certificate, inputs, n, p, false)
+}
+pub fn verify_product(certificate: &Certificate, inputs: &[Poly], n: usize, p: u64) -> bool {
+    verify_impl(certificate, inputs, n, p, true)
+}
+fn verify_impl(
+    certificate: &Certificate,
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    product: bool,
+) -> bool {
     if !admitted(inputs, n, p)
         || certificate.definitions.len() > n
         || certificate.basis.is_empty()
@@ -128,7 +140,12 @@ pub fn verify(certificate: &Certificate, inputs: &[Poly], n: usize, p: u64) -> b
     }
     // check_reference verifies final row identities as well as all inputs
     // and S-pairs; definitions already have inductive original membership.
-    reduced(&certificate.basis) && check_reference(&certificate.basis, &generators, n, p)
+    reduced(&certificate.basis)
+        && if product {
+            check_reference_product(&certificate.basis, &generators, n, p)
+        } else {
+            check_reference(&certificate.basis, &generators, n, p)
+        }
 }
 struct Chain {
     generators: Vec<Poly>,
@@ -173,7 +190,10 @@ fn original_bound(row: &Row, bounds: &[usize]) -> usize {
 /// Same polynomial construction as the expanded control, with a different
 /// retained certificate representation. No oracle, witness or hidden fallback.
 pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
-    solve_impl(inputs, n, p, false, false)
+    solve_impl(inputs, n, p, false, false, false)
+}
+pub fn solve_product(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
+    solve_impl(inputs, n, p, false, false, true)
 }
 pub struct SparseOutput {
     pub output: Output,
@@ -183,14 +203,29 @@ pub struct SparseOutput {
 /// Try a short certified root consequence, then the unchanged full constructor.
 /// Both attempts run in the caller's interval. No output bypasses final checks.
 pub fn solve_sparse(inputs: &[Poly], n: usize, p: u64) -> Result<SparseOutput, String> {
-    match solve_impl(inputs, n, p, false, true) {
+    solve_sparse_impl(inputs, n, p, false)
+}
+pub fn solve_sparse_product(inputs: &[Poly], n: usize, p: u64) -> Result<SparseOutput, String> {
+    solve_sparse_impl(inputs, n, p, true)
+}
+fn solve_sparse_impl(
+    inputs: &[Poly],
+    n: usize,
+    p: u64,
+    product: bool,
+) -> Result<SparseOutput, String> {
+    match solve_impl(inputs, n, p, false, true, product) {
         Ok(output) => Ok(SparseOutput {
             output,
             subset_succeeded: true,
             subset_error: None,
         }),
         Err(error) => Ok(SparseOutput {
-            output: solve(inputs, n, p)?,
+            output: if product {
+                solve_product(inputs, n, p)?
+            } else {
+                solve(inputs, n, p)?
+            },
             subset_succeeded: false,
             subset_error: Some(error),
         }),
@@ -199,7 +234,7 @@ pub fn solve_sparse(inputs: &[Poly], n: usize, p: u64) -> Result<SparseOutput, S
 /// Explicit ablation: eagerly construct every vertex before selecting a root.
 /// Polynomial kernels, proof representation and final checks match solve.
 pub fn solve_all_vertices(inputs: &[Poly], n: usize, p: u64) -> Result<Output, String> {
-    solve_impl(inputs, n, p, true, false)
+    solve_impl(inputs, n, p, true, false, false)
 }
 fn solve_impl(
     inputs: &[Poly],
@@ -207,6 +242,7 @@ fn solve_impl(
     p: u64,
     all_vertices: bool,
     subset: bool,
+    product: bool,
 ) -> Result<Output, String> {
     if !admitted(inputs, n, p) {
         return Err("compact: unsupported prime/input shape".into());
@@ -328,7 +364,11 @@ fn solve_impl(
         definitions: chain.definitions,
         basis,
     };
-    if !verify(&certificate, inputs, n, p) {
+    if !(if product {
+        verify_product(&certificate, inputs, n, p)
+    } else {
+        verify(&certificate, inputs, n, p)
+    }) {
         return Err("compact: final chain/basis verification or budget failed".into());
     }
     let mut bounds: Vec<_> = inputs.iter().map(degree).collect();

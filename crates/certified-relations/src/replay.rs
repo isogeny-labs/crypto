@@ -116,6 +116,51 @@ pub fn produce_sparse(system: &System) -> Result<SparseWitness, String> {
         subset_error: output.subset_error,
     })
 }
+#[derive(Serialize)]
+pub struct NativeWitness {
+    pub witness: Witness,
+    pub constructor: serde_json::Value,
+}
+/// Opt-in native pair-verification optimization, keeping witness completion and
+/// its validation unchanged. The external consumer is a separate caller choice.
+pub fn produce_native_product(system: &System, kind: &str) -> Result<NativeWitness, String> {
+    let input = system.decode()?;
+    let n = system.variables.len();
+    let p = system.prime;
+    let (certificate, constructor) = match kind {
+        "compact" => {
+            let output = quotient::compact::solve_product(&input, n, p)?;
+            (output.certificate, serde_json::json!({"info":output.info}))
+        }
+        "compact-sparse" => {
+            let output = quotient::compact::solve_sparse_product(&input, n, p)?;
+            (
+                output.output.certificate,
+                serde_json::json!({"info":output.output.info,"subset_succeeded":output.subset_succeeded,"subset_error":output.subset_error}),
+            )
+        }
+        "expanded" => {
+            let (basis, info) = quotient::solve_product(&input, n, p)?;
+            (
+                quotient::compact::Certificate {
+                    definitions: Vec::new(),
+                    basis,
+                },
+                serde_json::json!({"info":info}),
+            )
+        }
+        _ => return Err("native product constructor kind".into()),
+    };
+    let witness = complete_product(
+        system,
+        certificate.definitions.iter().map(member).collect(),
+        certificate.basis.iter().map(member).collect(),
+    )?;
+    Ok(NativeWitness {
+        witness,
+        constructor,
+    })
+}
 fn produce_impl(system: &System, compact: bool, product: bool) -> Result<Witness, String> {
     let input = system.decode()?;
     let n = system.variables.len();
@@ -472,6 +517,41 @@ pub fn singular_script(system: &System, witness: &Witness) -> Result<String, Str
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn opt_in_native_product_verification_keeps_complete_original_ideals() {
+        for n in [3, 6] {
+            let s = workload::generate(2147483647, n, 7).unwrap().system;
+            let input = s.decode().unwrap();
+            let legacy = quotient::compact::solve(&input, n, s.prime).unwrap();
+            for kind in ["compact", "compact-sparse", "expanded"] {
+                let output = produce_native_product(&s, kind).unwrap();
+                let actual: Vec<_> = output
+                    .witness
+                    .basis
+                    .iter()
+                    .map(|r| decode_poly(&r.polynomial, n, s.prime).unwrap())
+                    .collect();
+                assert_eq!(
+                    actual,
+                    legacy
+                        .certificate
+                        .basis
+                        .iter()
+                        .map(|r| r.poly.clone())
+                        .collect::<Vec<_>>()
+                );
+                assert!(singular_script(&s, &output.witness).is_ok());
+            }
+            let mut bad = legacy.certificate.clone();
+            bad.definitions[0].proof.clear();
+            assert!(!quotient::compact::verify_product(&bad, &input, n, s.prime));
+            let bad_basis = vec![Row {
+                poly: BTreeMap::from([(vec![0; n], 1)]),
+                proof: Proof::new(),
+            }];
+            assert!(!check_reference_product(&bad_basis, &input, n, s.prime));
+        }
+    }
     fn fixture() -> (System, Witness) {
         let system = workload::generate(2147483647, 3, 7).unwrap().system;
         let witness = produce(&system, true).unwrap();

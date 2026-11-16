@@ -319,18 +319,22 @@ fn change_order(h: &Row, rules: &[Option<Row>], t: usize, p: u64) -> Result<Vec<
 /// Unsupported shape/zero divisors/budgets return Err; there is no hidden GB
 /// fallback and no use of fixture witnesses or a reference completion oracle.
 pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), String> {
-    solve_impl(inputs, n, p, true)
+    solve_impl(inputs, n, p, true, false)
+}
+pub fn solve_product(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), String> {
+    solve_impl(inputs, n, p, true, true)
 }
 /// Explicit legacy scheduling ablation: reuse each coordinate immediately in
 /// the current edge scan. It has the same equations, checks and budgets.
 pub fn solve_input_order(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), String> {
-    solve_impl(inputs, n, p, false)
+    solve_impl(inputs, n, p, false, false)
 }
 fn solve_impl(
     inputs: &[Poly],
     n: usize,
     p: u64,
     breadth_first: bool,
+    product: bool,
 ) -> Result<(Vec<Row>, Info), String> {
     if !(3..=MAX_VARIABLES).contains(&n)
         || p < 3
@@ -449,7 +453,12 @@ fn solve_impl(
                     .all(|(j, s)| i == j || !divides(lead(&s.poly), m))
             })
     });
-    if !reduced || !check_reference(&basis, inputs, n, p) {
+    let checked = if product {
+        check_reference_product(&basis, inputs, n, p)
+    } else {
+        check_reference(&basis, inputs, n, p)
+    };
+    if !reduced || !checked {
         return Err("quotient: full final basis check failed".into());
     }
     let info = Info {

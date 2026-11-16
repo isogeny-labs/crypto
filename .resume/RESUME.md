@@ -1,3 +1,33 @@
+# Live update: actual-root Rust consumer ready for paid screen (2026-11-16)
+
+Goal remains ACTIVE: accurate measured15x with complete answers/paid checking, PR4349. User waived checkpoint; no credentials needed, zero cloud spend, bounded local L0. No subagents. No15x result yet.
+
+Current implementation: separate crates/relation-replay-checker (no producer arithmetic dependency), own exact p31 JSON/order/field/ideal/S-pair consumer; opt-in native product-criterion checks in shared constructor; actual root public certified::verify_replay_certificate_json; four matched actual-root adapter cells (native full/product x CAS/Rust). Legacy algorithms/wires/binaries preserved. Mature controls use same Rust consumer directly. No input/proof/work/file cap changed. Default shared8/research16; newchecker onlyp2147483647,n3..16.
+
+Qualification COMPLETE: standalone73 cases45accept/28reject freshSingular (PCCa81c66); fused73 embedded+54 native/mature cases freshCAS (af1681); actual root7 API/3CLI tests97164a and strictclippy; actual-root73 wires +60 four-cell native cases through16; n3 capture15 workflows allcomplete/match/zero recovery/null ratios,14 capture tests/clippy, all hashes unchanged (PCC724858). Shared native tests43default/44scale/45counter. RUST_CONSUMER_QUALIFICATION_REPORT.md is authoritative. Earlier errors/nulls retained. No whole-root-suite/signed independent standing.
+
+Qualified source-bound executables: /workspace/relation-native-qualifiers/root-{baseline,consumer,native,both}-8e17003a8-07; root-wire-qualifier/root-cell-qualifier same suffix; root-paid-driver-723f4c2dd-08. Frozen config research/relation_degree_trace_20261115/rust-consumer-development/capture-config-08.json contains all old/new controls and CPU0. Root normal CLI is INPUT KIND SINGULAR MSOLVE NEW_OUTPUT; root verify mode SYSTEM WITNESS. CAS markers strict/empty stderr. All immutable programs/runtime pinned pre-root-07/post-root-08, archives-root-08.
+
+NEW prospective RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md (PCC8b3a72):15workflows, fixed6 n10/12/16 first/last stars seed7 p31; freshly regenerate and assertold published System hashes. All15 complete/match before any ratios; onecall each, allfailed innerwork+onefresh3CAS recoverycharged, no capraise/retry. Candidate actualRoot/Rust/native-product/sparse proof fastpath only. Admission requires lower cost than all14 controls/ablations and BOTH original F4+regeneration and expanded+regeneration ratios>=15; rank smallerprimary/tie fixedorder. No numerical confirmation fromscreen. Native/mature/currentbest stronger controls remain visible even below15 ratios. Separate paired/A-A/adjusted-interval/fresh protocol needed afterward. Originalreservedseeds19001/23003/29009 untouched.
+
+FIRST NEW PAID CALL NOT RUN. Next finish app-publication06 of exactsource/protocol/qualification plus closedphase0620/raw/report, then registerclean-source and execute:
+DRIVER prepare NEW_INPUTS rust-consumer-screen
+DRIVER rust-screen NEW_INPUTS NEW_RESULTS research/relation_degree_trace_20261115/rust-consumer-development/capture-config-08.json
+Use benchrec separate record. CPU0/thread1, child/group30s2GiB16MiB,F4coop10sdegree12,case180/global600. No compiler running when measuring.
+
+Most recent COMPLETED measurements:0605 closed sparse66 complete/4paidrecoveries,no admission; bestF4paid13.411 hasexpanded8.437 samecase, oldreplay1.950. No15x. F4observeddegree5all6; sparsecertificatebounds14(original21) differentnotregularity. Report sparse-pipeline-01/report-01.0620 CLOSED phase18observations,knowninputs/generationexcluded,no ratios; n16sparse production+completion15–16ms/CAS12–15ms. Report phase-profile-01/report-02 centeredplot; firstplotretaineddraft. PCCd6a9a8. Both motivate current two-factor changes, not completedobjective.
+
+Git/API: mainworktree /workspace/crypto-integrate, branchcodex/native-certified-relation-integration-20261115, readyPRhttps://github.com/isogeny-labs/crypto/pull/4349,auto-mergeenabled,inheritedPCC/mainprefixCONFLICTING; noforce/rebase/ledgerrewrite. CLIauth401, connectedGitHubappworks. Lastpublishedbd96816596a0bc45a24e77c9f539ea2a3bab9bd6 tree8f528a7221fd718ca43c8fc50d133975fcd3b4c7 corresponds localsource78183b28b8cc91fba7e0a5bea07d251e5b37667b +extras. Currentartifactheadc45c1c090a79696f89d40cfbfa8e48696af61012; mainbase592395bac95cca39cb07bddf25ad8a8ebbd87c37. Migrationmetadata mirrored; no physicalrawpayloaddeleted.
+
+Publication06 pending. Source bundle06 NOT generatedyet: namedrefs/codex/replay-publication-06 HEAD, bundle exclude78183b28b. Incrementalbundle05 holds thatsource; exactlocalcommits differ appmetadata, retainbundles. .gitignore already06bundle/metapatterns. Priorplan/tmp/phase05-plan.json contains serverextras; migrationctx/tmp/root06-remote.json hashead,deletedpaths,metas+SHAs. Constructbase8f528+ctxdelta in scratchindex then candidateHEAD+retainedpriorserverextras+bundle06/meta+NEWignoredraws: phase-profile-01/archive-envelope.json2archives and rust-consumer-development/archives-root-08.json4archives. Olderconsumer03/05archivesalreadytracked/history. Preserve migrationdeletions (sparse-pipeline summary/traces movedtopointers, phaseexes05,etc); metadata mirrored andgittrackingremoved, rawphysicalbytesstay. Current0605scopedintegritywithmanifests passed. Newrootarchivesignorednotlocalhistory; apppublishasextras. No source/control/benchmark active.
+
+API createblob uses393216bytebase64chunks, max_output_tokens1000000, verifylengthandGitblobSHA; neverprintbase64. Buildexpectedtrees withalternateindex,write-tree --missing-ok,GIT_NO_LAZY_FETCH=1 toavoidexpiredlazyfetch. createtreeassertrootSHA, commitparentcurrentremote, leasedupdate_ref(forcefalse). UpdatePRbodyfromPR_BODY_CURRENT.md (now rewrittenaroundnewcode, alloldnulls/qualification; newpaidoutcomepending). Capture all receiptsdisk; tools.store mayreseton usermessages. New sourcebundle may be severalMiB because oldqualarchives are alreadylocalhistory; GitHub supportslargeblobs. No wrapper only-upload success claim; establish actualnewcosts next.
+
+Research obligations: Rustmath/capture/stats/reports; Pythonmetadata/hash/Git/archive/PCC only. Exactboundedcheckingnotformalproof; allresultsunsigned[pcc:unverified] until signedCIverdict. LintproseBEFOREpinning; dependent shellset-e. Nevereditfrozenproofsubject/closedrecord; usecorrectiveclaim/sibling. Scopeintegrity+artifactmanifests notglobalcatalog. KB MCPabsent/wrapperunavailable; primarySingularprodcrit/manual+replayderivationreviewrecorded. Conductorabsent. Frequentmeaningfulcommentary<60sec. Keepgoing after nullsubtask.
+
+---
+Historical handoff below (superseded by live update above):
+
 # Resume: accurate 15x Rust relation pipeline objective
 
 ## Goal and authorization
