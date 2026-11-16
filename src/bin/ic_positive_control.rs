@@ -17,8 +17,8 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::chained_transfer::ic_control as ic;
 use crypto_lib::cryptanalysis::chained_transfer::ic_control::{
-    fb_size, jacobian_order_bsgs, random_curve, run_ic_cfg, run_rho, split_order, Arm, IcParams,
-    IcResult, Instance, LaMode, RhoOut, SplitOracle, RESTART_DEFAULT,
+    fb_size, jacobian_order_bsgs, random_curve, run_ic_full, run_rho, split_order, Arm, IcCfg,
+    IcParams, IcResult, Instance, LaMode, RhoOut, SplitOracle, WalkMode, RESTART_DEFAULT,
 };
 use crypto_lib::cryptanalysis::ic_boundary::CountedGroup;
 use serde_json::{json, Value};
@@ -489,14 +489,24 @@ fn main() -> ExitCode {
                                     LaMode::Baseline,
                                 ),
                                 'N' => (SplitOracle::LucasRoots, Some("C_coord"), LaMode::Coord),
-                                'S' => (
+                                'S' | 'U' => (
                                     SplitOracle::LucasRoots,
-                                    Some("C_coord_square"),
+                                    Some(if a == 'S' {
+                                        "C_coord_square"
+                                    } else {
+                                        "C_unit_t"
+                                    }),
                                     LaMode::CoordSquare,
                                 ),
                                 _ => (SplitOracle::Frobenius, None, LaMode::Baseline),
                             };
-                            let o = run_ic_cfg(
+                            // U: arm S with the unit-T walk.
+                            let walk = if a == 'U' {
+                                WalkMode::UnitT
+                            } else {
+                                WalkMode::Mixed
+                            };
+                            let o = run_ic_full(
                                 inst,
                                 IcParams {
                                     arm,
@@ -506,8 +516,7 @@ fn main() -> ExitCode {
                                     verify_relations: false,
                                 },
                                 RESTART_DEFAULT,
-                                oracle,
-                                la,
+                                IcCfg { oracle, la, walk },
                             );
                             if !o.certified {
                                 *bad.lock().unwrap() = true;
@@ -515,6 +524,7 @@ fn main() -> ExitCode {
                             let mut v = ic_json(&o, inst, j.seed, j.ci, w_rel, w_la);
                             v["oracle"] = json!(oracle.name());
                             v["la_mode"] = json!(la.name());
+                            v["walk"] = json!(walk.name());
                             v["la_fallbacks"] = json!(o.la_fallbacks);
                             if let Some(l) = label {
                                 v["arm"] = json!(l);

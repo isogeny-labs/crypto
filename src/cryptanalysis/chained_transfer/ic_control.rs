@@ -1459,6 +1459,52 @@ pub fn run_ic_cfg(
     oracle: SplitOracle,
     la: LaMode,
 ) -> IcResult {
+    run_ic_full(
+        inst,
+        prm,
+        restart,
+        IcCfg {
+            oracle,
+            la,
+            walk: WalkMode::Mixed,
+        },
+    )
+}
+
+/// How the relation walk combines `G` and `T`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum WalkMode {
+    /// The baseline: starts `a G + b T` and jumps `α G + β T`, so every
+    /// relation carries a random `T`-coefficient (a dense column).
+    Mixed,
+    /// Starts `a G + T` and jumps `α G`: every relation's `T`-coefficient
+    /// is the cofactor constant `−h`.  The unknown is `h · log T`, whose
+    /// column is all `−1` (cycle-combined rows: small integers), and
+    /// `log T` is that times `h⁻¹ mod r`.
+    UnitT,
+}
+
+impl WalkMode {
+    pub fn name(self) -> &'static str {
+        match self {
+            WalkMode::Mixed => "mixed",
+            WalkMode::UnitT => "unit_t",
+        }
+    }
+}
+
+/// Every choice [`run_ic_full`] takes beyond [`IcParams`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct IcCfg {
+    pub oracle: SplitOracle,
+    pub la: LaMode,
+    pub walk: WalkMode,
+}
+
+/// [`run_ic_cfg`] with the walk chosen too ([`IcCfg`]).
+pub fn run_ic_full(inst: &Instance, prm: IcParams, restart: u64, cfg: IcCfg) -> IcResult {
+    let IcCfg { oracle, la, walk } = cfg;
+    let unit_t = walk == WalkMode::UnitT;
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1511,6 +1557,10 @@ pub fn run_ic_cfg(
     let mut jumps: Vec<(H64Div, u64, u64)> = Vec::new();
     for _ in 0..16 {
         let a = rng.gen_range(1..short);
+        if unit_t {
+            jumps.push((curve.mul(&mut ops, inst.g, a), a, 0));
+            continue;
+        }
         let b = rng.gen_range(1..short);
         let ag = curve.mul(&mut ops, inst.g, a);
         let bt = curve.mul(&mut ops, inst.target, b);
@@ -1535,7 +1585,14 @@ pub fn run_ic_cfg(
                 res.exhausted = true;
                 break 'outer;
             }
-            if since_restart >= restart.max(1) {
+            if since_restart >= restart.max(1) && unit_t {
+                let a = rng.gen_range(1..r);
+                let ag = curve.mul(&mut ops, inst.g, a);
+                cur = curve.add(&mut ops, ag, inst.target);
+                ca = a;
+                cb = 1;
+                since_restart = 0;
+            } else if since_restart >= restart.max(1) {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
                 let ag = curve.mul(&mut ops, inst.g, a);
@@ -1598,9 +1655,16 @@ pub fn run_ic_cfg(
             if rel.nfb == 0 && lps.is_empty() {
                 continue;
             }
-            res.rel.mul += 2;
             rel.rhs = mulmod(h % r, ca, r);
-            rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            if unit_t {
+                // unknown h·log T: coefficient −1 (cb = 1 on every row)
+                debug_assert_eq!(cb, 1);
+                res.rel.mul += 1;
+                rel.tcoef = r - 1;
+            } else {
+                res.rel.mul += 2;
+                rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            }
             if prm.verify_relations {
                 // Σ ε hP_i must equal h R, tested on the divisor classes.
                 let mut sum = H64Div::IDENTITY;
@@ -1661,6 +1725,14 @@ pub fn run_ic_cfg(
         }
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
+        // UnitT solves for h·log T: one inversion of h and one product.
+        let h_inv = if unit_t {
+            w_nat.mul += pivot_inversion_steps(r) + 1;
+            invm(h % r, r)
+        } else {
+            1
+        };
+        let to_log = |t: u64| if unit_t { mulmod(t, h_inv, r) } else { t };
         let certify = |t: u64, ops: &mut GroupOps| {
             curve.mul(ops, inst.g, t) == inst.target && curve.mul_rtl(inst.g, t) == inst.target
         };
@@ -1676,7 +1748,7 @@ pub fn run_ic_cfg(
                     la == LaMode::CoordSquare,
                     &mut w_nat,
                 );
-                match t {
+                match t.map(to_log) {
                     Some(t) => {
                         let v0 = ops.adds + ops.doubles;
                         let ok = certify(t, &mut ops);
@@ -1714,7 +1786,7 @@ pub fn run_ic_cfg(
         res.la_wied.merge(w_nat);
         res.la.merge(w_nat);
         if let Some(x) = sol {
-            let t = x[ct as usize];
+            let t = to_log(x[ct as usize]);
             let v0 = ops.adds + ops.doubles;
             let ok = certify(t, &mut ops);
             res.verify_ops += ops.adds + ops.doubles - v0;
@@ -1957,6 +2029,54 @@ mod tests {
                 if x.la_fallbacks == 0 {
                     assert!(x.la_wied.mul < b.la_wied.mul, "{la:?} p={p}");
                 }
+            }
+        }
+    }
+
+    /// The unit-T walk certifies with every LA mode, every relation has the
+    /// T-coefficient −1 (before cycle combination), and with the coordinate
+    /// square solver it spends fewer LA multiplications than the mixed walk.
+    #[test]
+    fn unit_t_walk_certifies_and_removes_the_dense_column() {
+        for p in [101u64, 131, 257] {
+            let inst = small_instance(p);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: 12,
+                seed: 7,
+                max_trials: 3_000_000,
+                verify_relations: true,
+            };
+            let cfg = |la, walk| IcCfg {
+                oracle: SplitOracle::LucasRoots,
+                la,
+                walk,
+            };
+            for la in [LaMode::Baseline, LaMode::Coord, LaMode::CoordSquare] {
+                let u = run_ic_full(&inst, prm, RESTART_DEFAULT, cfg(la, WalkMode::UnitT));
+                assert!(u.certified, "{la:?} p={p}");
+                assert_eq!(u.bad_relations, 0);
+                assert_eq!(u.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+            }
+            let m = run_ic_full(
+                &inst,
+                prm,
+                RESTART_DEFAULT,
+                cfg(LaMode::CoordSquare, WalkMode::Mixed),
+            );
+            let u = run_ic_full(
+                &inst,
+                prm,
+                RESTART_DEFAULT,
+                cfg(LaMode::CoordSquare, WalkMode::UnitT),
+            );
+            if m.la_fallbacks == 0 && u.la_fallbacks == 0 && u.core_cols >= m.core_cols {
+                assert!(
+                    u.la_wied.mul < m.la_wied.mul,
+                    "p={p}: {} vs {}",
+                    u.la_wied.mul,
+                    m.la_wied.mul
+                );
             }
         }
     }
