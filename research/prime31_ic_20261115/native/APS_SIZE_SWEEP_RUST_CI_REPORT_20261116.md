@@ -40,3 +40,18 @@ Primary prior work: [PKM 2016](https://doi.org/10.1007/978-3-662-49387-8_1) and 
 - **Discard as new IC advance:** treating split K roots as a group-sum lookup, B31 m4 factorized stage alone, swapping S4 for chained S3 with identical censored ideal, or quoting uncompleted F4 internal milliseconds against a completed scalar solve.
 
 The research-KB/Conductor/EKS route was unavailable here; GitHub exact sources and published primary literature were used as bounded fallback. No new leaderboard row or independent security claim, and no paid compute.
+
+
+## Fresh 24-target confirmatory result — **T=1024 rejected as default**
+
+[Exact-source Rust Actions 43793061150](https://github.com/isogeny-labs/crypto/actions/runs/43793061150), job 133055634090, source `baba1a495bcbe5807a98098ff0dcf65133459dde`, completed **all 72 complete cold unknown-log solves** (24 new Q × T1024, T1536, and repeated T1536 A/A). Every returned scalar matched the caller's withheld known answer, and every configured run charged all internal setup and attempts. Individual caller-side known scalars, attempt counts, ordered calls and full raw stdout are frozen in [APS_SIZE_CONFIRM_RUST_CI_20261116.json](APS_SIZE_CONFIRM_RUST_CI_20261116.json).
+
+| Rust arm on same 24 fresh public Q | Correct unknown logs | Charged total cold wall | Average / Q |
+|---|---:|---:|---:|
+| T=1024, max 8 rounds | 24/24 | **5,175.152 ms** | 215.631 ms |
+| **T=1536**, max 3 rounds | **24/24** | **3,920.747 ms** | **163.365 ms** |
+| T=1536 A/A repeat | 24/24 | 3,913.221 ms | 163.051 ms |
+
+**The fresh result reverses the initial twelve-target tuning observation:** T1536 was 1.31994× faster *in total cold cost* than T1024, and faster for **15 of 24 individual targets**, with 9 favoring T1024. The repeat T1536 total differed by about **0.192%** from its first pass (ratio 0.998081), supporting that this aggregate reversal is not solely a gross fixed-order A/A disturbance. However that observation does not eliminate process/host variability, input heterogeneity or seed dependence. Alternating A-B-B vs B-B-A order reduces one source of bias but is still a single nonisolated GitHub development runner, [pcc:unverified]. The experiment did **not** compare a mature external APS implementation or establish a security advance.
+
+**Decision / stop-go:** preserve **T1536 as the default** and do not promote the exploratory T1024 aggregate advantage. This is a measured negative for the proposed partition-size change and useful calibration for future complete algebraic index-calculus controls. No benchmark leaderboard update is justified as a validated large speedup. Next genuine non-generic scientific gate remains a target-conditioned, original-ideal-certified S5/K quotient oracle on ordinary prime31 without expanding a generic support catalogue. No completed m8 ECDLP or superiority over the published prime-field IC frontier is claimed.
