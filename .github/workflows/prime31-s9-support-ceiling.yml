@@ -1,0 +1,38 @@
+name: prime31 signed S9 support ceiling (source-specific Rust)
+on:
+  push:
+    branches:
+      - research/prime31-aps-walk-source-20261116
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_s9_support_ceiling.rs
+      - .github/workflows/prime31-s9-support-ceiling.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-support:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Existing native Rust library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Signed-word brute-force and exact-curve unit tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_support_ceiling
+      - name: Exhaustive B4 and B8 image census over actual prime31 curve
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_support_ceiling > prime31-s9-support-ceiling.json
+          python3 -m json.tool prime31-s9-support-ceiling.json >/dev/null
+          cat prime31-s9-support-ceiling.json
+      - name: Archive exact producer receipt (not PCC)
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-s9-support-ceiling
+          path: prime31-s9-support-ceiling.json
+          retention-days: 30

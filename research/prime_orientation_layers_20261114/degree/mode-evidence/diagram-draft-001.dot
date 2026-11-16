@@ -1,0 +1,8 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white"];
+ node [shape=box,style="rounded,filled",fillcolor="#eef4ff",fontname="Helvetica",fontsize=10];
+ a [label="Actual left/right support\none target/source bit side"];
+ b [label="Weight w+b\nfiber capacity <= 2^u"];
+ c [label="Negative-pole polynomial width >= 2^u\npositive multiplicities, residual1 only"];
+ a -> b; b -> c [style=dashed,label="separate scoped rank test"];
+}

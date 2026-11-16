@@ -1,0 +1,16 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans"];
+ node [shape=box, style="rounded,filled", fillcolor="#eef5fd", color="#315d89", fontname="DejaVu Sans", fontsize=11];
+ edge [color="#315d89"];
+ actual [label="SAME actual completed kernel / first jet\nDerived c != 0, w=v2(c), normalized R"];
+ rows [label="Rows agree mod 2^v\nActual denominator ratios == 1 mod 2^(v-u+1)"];
+ upper [label="Literal row representatives\n2^v integral factors; residual w+v-u+1"];
+ minor [label="One literal port per retained residue\nActual minor M == identity mod 2"];
+ det [label="Finite-product determinant congruence\ndet M != 0; rank M = 2^u"];
+ lower [label="Any rational factors at residual w+1\nneed at least 2^u columns"];
+ match [label="At the lowest bit: 2^u is necessary and sufficient\nNo minimum 2^v claim at higher precision",fillcolor="#eaf7ee"];
+ open [label="OPEN: smaller higher-precision moment profile,\nall chart jets, full recursive/public-input cost",style="rounded,dashed,filled",fillcolor="#fff2d9"];
+ actual -> rows -> upper;
+ actual -> minor -> det -> lower;
+ upper -> match; lower -> match; match -> open;
+}
