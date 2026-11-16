@@ -43,7 +43,7 @@ identity `f(u)/u^4 = x0^3 + a x0 + b = y0^2` (every pulled-back point on `H`)
 were verified symbolically and in the unit tests. At `gamma = 1, a = -3`,
 `f = u^7 + b u^4 + u` — the known degree-2 cover of the `a=-3` curve
 (`research/p256_genus_dlp_20261115`). `gamma` free is the one-parameter family;
-it is the search space for a Smith-positive member of a *fixed* `E`.
+it is the search space for a Smith-positive member of a *fixed* `E`. `[pcc:unverified]`
 
 Novelty scope: the family generalizes the repository's existing `gamma=1`
 cover; it is not asserted novel against the full literature (the shared
@@ -104,7 +104,7 @@ The matched reference is negation-map rho on `E` over the order-`r` subgroup,
 target. This study makes **no** speed or complexity-improvement claim; the gap
 to rho is the distance remaining. The deliverable is the verified explicit
 artifact and the checked map — which the `(3,3,3)` route does not supply on
-this family.
+this family. `[pcc:unverified]`
 
 ## What is established, and the gaps
 
@@ -127,7 +127,7 @@ Gaps (recorded, not done):
   assumed, as in `smith_canonical_20261115`; only its consequences are tested.
 * Correctness of the reused `smith_*` / `plane_quartic_pic` modules is taken
   from their own studies.
-* No independent validator has replayed this run; no pcc claim filed.
+* No independent validator has replayed this run; no pcc claim filed. `[pcc:unverified]`
 
 ## Deviations from the protocol
 
