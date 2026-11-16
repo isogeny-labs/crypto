@@ -1,5 +1,26 @@
 # Curve25519 torus/S4: native Rust qualification
 
+## Guarded trace lift and next direct-solver gate
+
+The [trace-lift report](reports/trace-lift-v1/REPORT.md) and
+[inspected two-page PDF](reports/trace-lift-v1/report.pdf) describe the new
+isolated [Rust adapter](../../tools/torus-trace-lift/README.md). It reconstructs
+the original imaginary coordinate from a scalar Chebyshev root and public
+label on the guarded chart. All149776 fixed field-pair comparisons agree;
+24 original toy members also replay through the unchanged membership
+circuit. Native PCC-20261116-35f196; unsigned/unverified. [pcc:unverified]
+
+Three narrow existing-law Lean endpoints retain the actual degree213156431
+and derivative identity; they do not prove the native lift or root-discovery
+costs. PCC-20261116-03a7ff. Report/diagram/coverage plot:5451de.
+[pcc:unverified]
+
+The [next gate](trace-lift-v1/NEXT.md) compares original and trace-projected
+direct elimination on identical public targets, with original-root replay
+and complete cold accounting. The adapter is not a decomposition solver;
+the earlier bounded reference's triple enumeration remains unchanged.
+All earlier source, criteria, raw evidence and direct Lean bindings stay frozen.
+
 ## Current reduction and revised scaling plan
 
 The [bounded public-input reference](reports/root-reference-v1/REPORT.md)
