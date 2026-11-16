@@ -82,9 +82,14 @@ injective on it (`phi_* phi^* = [2]`).
 3. First such `gamma` is the instance.
 
 `b` is the first `a=-3` nonsingular curve of prime order found by ascending
-search at each `p`; `gamma` is the first admissible one. Primes: the run sweeps
-a fixed ascending grid and records, per prime, the first prime-order `a=-3`
-curve that admits a Smith-positive cover.
+search at each `p`; `gamma` is the first admissible one. Primes: the fixed
+grid `{1009, 2003, 4001, 10007}`, `gamma_max = 800`, planted `k = r/3 + 1`.
+Larger primes are not run here: `Transfer::usable_points` enumerates the
+~`p` affine points of `H` over `U`, so instance build is `O(p)`; the prior
+Smith trigonal studies (`smith_canonical_20261115`, `smith_transfer_cost_20261115`)
+stopped at `p = 211` and `p = 8209` respectively, and `p = 10007` already
+exceeds both. A larger grid needs a faster usable-point pass, recorded as a
+gap, not done.
 
 ## Checks (per instance)
 
