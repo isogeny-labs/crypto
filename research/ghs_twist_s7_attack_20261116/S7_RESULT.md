@@ -1,6 +1,6 @@
 # Full s=7 GHS solve on the negative-trace twist
 
-16 November 2026 UTC. This result solves one saved 48-bit source subgroup target through a degree-seven cover and genus-five Jacobian relation pipeline. The same-target Frobenius-aware rho run is still in progress. Therefore the present record does not establish an observed speedup or a practical vulnerability. Finite claims remain [pcc:unverified] until PCC admission.
+16 November 2026 UTC. This result solves one saved 48-bit source subgroup target through a degree-seven cover and genus-five Jacobian relation pipeline. A completed, independently audited, same-target Frobenius-aware rho run measures a 14.14-fold CPU advantage for this GHS implementation on this instance. This is an observed one-solve result, not a guarantee across targets or implementations. Finite claims remain [pcc:unverified] until PCC admission.
 
 ## Exact target and transfer
 
@@ -41,6 +41,13 @@ Suppose H is a finite subgroup of E^- of order n coprime to 3 and 21,156,227. If
 
 ## Matched rho and claim status
 
-The source-group rho script uses the same saved P,Q and the checked order-seven F_(3^5)-Frobenius eigenvalue 173,253,049,031,852 modulo r. It canonicalizes each Frobenius orbit and uses distinguished points to bound memory. Its first 10,000-step run was censored at its stated cap; the optimized run measured 0.145212 s setup and 4.555784 s walk CPU. The complete one-solve rho cost is pending; that 10,000-step timing must not be promoted to a solve or speedup.
+The [source-group rho receipt](rho_s7_result.json) uses the same saved P,Q and the checked order-seven F_(3^5)-Frobenius eigenvalue 173,253,049,031,852 modulo r. It canonicalizes each Frobenius orbit and uses distinguished points to bound memory. The walk found a verified collision at step 7,761,729, recovered scalar 12,345, and used 0.294091 s setup plus 3,267.740265 s walk CPU, for **3,268.034356 s total**. The [independent rho audit](audit_rho_s7.json) rebuilt E, P, Q, checked the eigenvalue, both collision representations, the scalar and the CPU sum. The first 10,000-step rho calibration was censored at its stated cap and is separate from this complete run.
+
+| Complete same-target solve | CPU seconds | Relative cost |
+|---|---:|---:|
+| GHS cover, relation solve, target descent | 231.125131 | 1.00 |
+| Order-seven Frobenius rho | 3,268.034356 | 14.14 |
+
+Thus the measured GHS solve is **14.14 times faster** than this rho run on the exact same 48-bit subgroup target. The GHS total stitches checkpointed relation collection to separately timed setup, linear algebra and descent. Rho is one checkpointed run. Both exclude Sage interpreter startup. Rho collision time has substantial single-run variance; the source implementation uses the order-seven Frobenius quotient but does not claim to exhaust every possible rho optimization. Optimized implementations on either side could change the ratio. This finite result supports a potentially vulnerable **exact curve instance** under the stated cost model; it does not establish a new eligible family or a new attack method.
 
 The [2015 Iijima–Momose–Chao classification](https://eprint.iacr.org/2015/805.pdf), Section 5 Case 13, concerns a direct degree-five genus-five (2,...,2) construction with full rational 2-torsion. This exact source has order 2 modulo 4 and a degree-seven cover, outside that specified direct case. [Joux and Vitse 2012](https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf) already describe cover plus decomposition index calculus, including covers found after an isogeny walk. Our cover arises by an ordinary quadratic twist of the positive-trace cover, so the mechanism and twist closure are prior art. The exact negative-trace cover and subgroup solve are new explicit records in this project; global publication priority remains unestablished. An independent new eligible family or new attack method is not claimed.
