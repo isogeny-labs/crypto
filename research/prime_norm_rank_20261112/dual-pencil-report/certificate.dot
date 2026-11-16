@@ -1,0 +1,14 @@
+digraph certificate {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf5ff",fontname="Helvetica",fontsize=12,margin="0.13"];
+ edge [fontname="Helvetica",fontsize=10];
+ pencil [label="Candidate: coupled norm-quadrics pencil\nS(lambda) = sum lambda_t Q_t\nFinder and certificate completeness unproved"];
+ checks [label="Required: symmetric S; det S=0; corank one\nNonzero adj S; every <Q_t, adj S>=0",fillcolor="#e9f7e9"];
+ recovery [label="Checked recovery: adj S = s w w^T, s != 0\nA nonzero column gives a quadratic witness\nNormalize and verify the actual norm"];
+ falseRoot [label="Actual F17 false spectral root\nSame singular matrix as positive case\nBut pairing and actual norm fail",fillcolor="#ffecec"];
+ ghost [label="Generic higher-corank control\nadj S=0; all pairings pass\nNo nonzero quadratic witness",fillcolor="#ffecec"];
+ pencil -> checks;
+ checks -> recovery [label="all checks pass"];
+ pencil -> falseRoot [label="determinant alone"];
+ pencil -> ghost [label="omit corank / adjugate check"];
+}

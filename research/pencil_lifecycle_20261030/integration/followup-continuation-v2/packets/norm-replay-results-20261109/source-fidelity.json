@@ -1,0 +1,46 @@
+{
+  "schema": "lean.source-fidelity-review/v1",
+  "reviewer": "/root/materializer_qualification",
+  "not_blind": true,
+  "did_not_author_frozen_math_sources": true,
+  "machine_status": "recorded_passed",
+  "fidelity": "faithful_scoped",
+  "review_outcome": "archival_machine_consistency_and_source_fidelity_supported",
+  "official_validated_scoped": false,
+  "fresh_independent_kernel_replay": false,
+  "claims": [
+    {
+      "names": "ActualNonbranchNorm.affine_curve/germ_curve/point_scalar/point_affine_eval",
+      "scope": "Polynomial quotient curve relation and transport to actual weighted-Proj point stalk; point evaluation maps constants and polynomials correctly.",
+      "assumptions": "Field K; on-curve equation when point is supplied."
+    },
+    {
+      "names": "ActualNonbranchNorm.scalar_unit/numerator_nonunit/stalk_norm",
+      "scope": "Nonzero scalar is unit; branch-selected numerator vanishes at point and is nonunit; polynomial norm identity transports to stalk.",
+      "assumptions": "scalar nonzero for scalar_unit; n(x0)=b*y0 for numerator_nonunit; supplied polynomial norm identity for stalk_norm."
+    },
+    {
+      "names": "ActualNonbranchNorm.concrete_norm_order/source_norm_identity/source_actual_norm_order",
+      "scope": "Norm valuation equality at actual nonbranch stalk; source coefficient identity derives polynomial norm from two support divisibilities, nonzero determinant and quinticshape.",
+      "assumptions": "Field; on-curve point; separable quintic;2nonzero;y0nonzero;determinantbnonzero; two support divisibilities; selected-sheet equation n(x0)=b*y0. No unconditional allpoints/branch statement."
+    },
+    {
+      "names": "IndependentNonbranch.* (20 names)",
+      "scope": "Explicit Qfixture discharges hypotheses and separates selected/conjugate points.",
+      "construction": "F=X^5-5X^3+4X+1,u=X^2-1,v=X^2-4,n=-9,U=-81X,b=-9. Coefficienttuple(-9,0,0,-81,0); Bezoutconstant38569 nonzero. Points(1,+1)/(1,-1). Selected n-by=0; conjugate n-by=-18nonzero.",
+      "derived_identity": "81+81X(X^2-1)(X^2-4)=81(X^5-5X^3+4X+1).",
+      "boundary": "Valuationequality selected; conjugate unit valuation0 while productnonunit, so same equality fails on conjugate. ExpectedFailure attempts false sheetselection and records unsolvedFalse."
+    }
+  ],
+  "actual_object_bridge": "Read ProjPointRing as (Proj degreeSubmodule).presheaf.stalk and pointRingEquiv to actual pointIdeal localization; AffineRing quotient byY^2-quintic. Source constructs IsDomain/DVR through imported separability/nonbranch results, not an arbitrary valuation variable.",
+  "limitations": [
+    "No elaborated-type dump beyond namedaxiom audit; source types inspected.",
+    "Imports/binaries remain shared-cache trust; pre/post unchanged doesnotexclude transientedits.",
+    "No independent binary/kernel rechecker or reviewer rerun.",
+    "Review inherited prior reportedpass; no blind rederivation claimed.",
+    "Later finite/branch transport and rootmultiplicity sources explicitly excluded."
+  ],
+  "knowledge_promotion": {
+    "not_warranted": "Technical archival/source-fidelity review only; official promotion and independentkernelreplay not performed."
+  }
+}

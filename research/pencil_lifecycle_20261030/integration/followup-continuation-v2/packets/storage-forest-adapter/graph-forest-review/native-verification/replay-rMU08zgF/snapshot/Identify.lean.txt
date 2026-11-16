@@ -1,0 +1,86 @@
+import Schedule
+import Loop
+set_option autoImplicit false
+namespace TraversalPolynomial
+open Polynomial AffineCoefficientLoop MumfordNormalization CoefficientTraversal
+variable {K : Type*} [Field K]
+
+theorem list_range_sum (f : Nat→K[X]) (n : Nat) :
+ ((List.range n).map f).sum=∑i∈Finset.range n,f i := by
+ induction n with
+ | zero => simp
+ | succ n ih => simp [List.range_succ,ih,Finset.sum_range_succ]
+
+def rawSchedule (n : Nat) : List (Nat×Nat) :=
+ (List.range n).flatMap fun k => (List.range (k+1)).map fun j => (k,j)
+noncomputable def rawPoly (c : Nat→K) (a b s : K) (n : Nat) : K[X] :=
+ ((rawSchedule n).map fun e=>term e.1 e.2 (c e.1) a b s).sum
+
+theorem rawPoly_succ (c : Nat→K) (a b s : K) (n : Nat) :
+ rawPoly c a b s (n+1)=rawPoly c a b s n+row n (c n) a b s := by
+ simp only [rawPoly,rawSchedule,List.range_succ,List.flatMap_append,List.flatMap_cons,
+  List.flatMap_nil,List.append_nil,List.map_append,List.sum_append,List.map_map]
+ rw [list_range_sum]
+ simp only [row,Finset.sum_range_succ,List.map_singleton,List.sum_singleton,Function.comp_apply]
+
+theorem rawPoly_outer (c : Nat→K) (a b s : K) (n : Nat) :
+ rawPoly c a b s n=outer c a b s n := by
+ induction n with
+ | zero => simp [rawPoly,rawSchedule,outer]
+ | succ n ih =>
+   rw [rawPoly_succ,ih,outer,inner_complete,row_equation]
+
+theorem rawPoly_composition (c : Nat→K) (a b s : K) (n : Nat) :
+ rawPoly c a b s n=C s⁻¹*(sourcePoly c n).comp (affine a b) := by
+ rw [rawPoly_outer,outer_equation]
+
+noncomputable def eventPoly (c : Nat→K) (a b s : K) (n : Nat) : K[X] :=
+ ((schedule n).map fun e=>term e.val.1 e.val.2 (c e.val.1) a b s).sum
+
+theorem eventPoly_composition (c : Nat→K) (a b s : K) (n : Nat) (hn : n≤6) :
+ eventPoly c a b s n=C s⁻¹*(sourcePoly c n).comp (affine a b) := by
+ have he := schedule_source_order ⟨n,by omega⟩
+ have hm := congrArg (fun es : List (Nat×Nat) => (es.map fun e=>term e.1 e.2 (c e.1) a b s).sum) he
+ have heq : eventPoly c a b s n=rawPoly c a b s n := by simpa [eventPoly,rawPoly,rawSchedule,List.map_map,Function.comp_def] using hm
+ rw [heq,rawPoly_composition]
+
+noncomputable def extend {n : Nat} (p : UInt64) (c : Fin n→UInt64) (k : Nat) : ZMod p.toNat :=
+ if h:k<n then (c ⟨k,h⟩).toNat else 0
+
+theorem term_coefficient {n : Nat} (p : UInt64) [Fact p.toNat.Prime]
+ (c : Fin n→UInt64) (a b s : UInt64) (e : Event n) (i : Fin n) :
+ (term e.val.1 e.val.2 (extend p c e.val.1)
+  (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (s.toNat : ZMod p.toNat)).coeff i.val=
+ contribution p c a b s e i := by
+ simp only [term,coeff_C_mul_X_pow,contribution,extend,dif_pos e.property.1]
+
+theorem eventPoly_coefficient {n : Nat} (p : UInt64) [Fact p.toNat.Prime]
+ (c : Fin n→UInt64) (a b s : UInt64) (i : Fin n) :
+ (eventPoly (extend p c) (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat) (s.toNat : ZMod p.toNat) n).coeff i.val=
+ ((schedule n).map fun e=>contribution p c a b s e i).sum := by
+ rw [eventPoly,coeff_list_sum_map]
+ congr 1
+ apply List.map_congr_left
+ intro e he
+ exact term_coefficient p c a b s e i
+
+theorem word_transform_coefficient {n : Nat} (hn : n≤6) (p : UInt64) [Fact p.toNat.Prime]
+ (c : Fin n→UInt64) (a b s : UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hc : ∀i,(c i).toNat<p.toNat)
+ (ha : a.toNat<p.toNat) (hbeta : b.toNat<p.toNat) (hs : s.toNat<p.toNat) (hs0 : s≠0)
+ (i : Fin n) :
+ decode p (transform hn p c a b s) i=
+ (C ((s.toNat : ZMod p.toNat)⁻¹)*(sourcePoly (extend p c) n).comp
+  (affine (a.toNat : ZMod p.toNat) (b.toNat : ZMod p.toNat))).coeff i.val := by
+ rw [(transform_correct hn p c a b s hp hb hc ha hbeta hs hs0).2 i]
+ rw [←eventPoly_coefficient p c a b s i,eventPoly_composition _ _ _ _ n hn]
+
+theorem eventPoly_high (c : Nat→K) (a b s : K) (n i : Nat) (hi : n ≤ i) :
+ (eventPoly c a b s n).coeff i=0 := by
+ rw [eventPoly,coeff_list_sum_map]
+ apply List.sum_eq_zero
+ intro v hv
+ obtain ⟨e,he,rfl⟩ := List.mem_map.mp hv
+ have hj : e.val.2 < i := by have := e.property.1; have := e.property.2; omega
+ simp only [term,coeff_C_mul_X_pow,if_neg (show i ≠ e.val.2 by omega)]
+end TraversalPolynomial

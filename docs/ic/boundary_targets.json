@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "title": "Index-calculus boundary ledger",
-  "updated": "2026-10-12",
+  "updated": "2026-10-31",
   "claim_hygiene": "Public synthetic / known-answer fixtures only. Primary vs_rho claims use exactly one unseen target paired on the identical public point and resource envelope. Headline time is verified online wall after reusable IC preparation; exclude process launch, input loading, target generation, and target-independent setup. Multi-target averages, batch throughput, and shared-table amortization are secondary only and require a separate declared question after the primary one-target result. Never combine best component costs from different runs into a synthetic win. A new CPU wall-time speedup requires a qualifying host-isolation receipt; rows without one remain exploratory. Raw IC probes and rho walk steps use different units. An equal-budget precomputed-rho or multi-target study is secondary and cannot replace the one-target rho pair.",
-  "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gr\u00f6bner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
+  "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
   "stages": [
     "factor_base",
     "decomposition",
@@ -217,7 +217,7 @@
     "Pass the row acceptance_gates.",
     "PR updates current, appends history, sets next_target, links evidence.",
     "vs_rho and end_to_end_dlp past prior size require independent recomputation.",
-    "Incomplete measurement_schema fields fail closed \u2014 no row promotion."
+    "Incomplete measurement_schema fields fail closed — no row promotion."
   ],
   "agent_priorities": [
     {
@@ -259,7 +259,7 @@
   ],
   "regimes": {
     "binary": {
-      "label": "Binary fields (Weil\u2013Semaev / non-Koblitz)",
+      "label": "Binary fields (Weil–Semaev / non-Koblitz)",
       "best_stack": [
         "semaev_decomp",
         "semaev_sat",
@@ -303,7 +303,7 @@
         "decomposition": {
           "status": "record",
           "current": {
-            "summary": "Sub-2^(2l) MITM oracle ladder through l=12 (2026-10-16) on the non-Koblitz curve y^2+xy=x^3+z*x^2+1: l=8 (94x-277x), l=9 (2,473.9x), l=10 (4,244.2x), l=11 (928.0x, 8,068 vs 2,098,176), l=12 (2,187.2x, 16,092 vs 8,390,656 \u2014 the largest rung pairs-and-solve was historically usable at); 0 disagreements vs pairs-and-solve on all 320 targets, all witnesses group-verified; tables 1 MiB..259 MB charged to the factor-base stage; FFD unmeasured with reason",
+            "summary": "Sub-2^(2l) MITM oracle ladder through l=12 (2026-10-16) on the non-Koblitz curve y^2+xy=x^3+z*x^2+1: l=8 (94x-277x), l=9 (2,473.9x), l=10 (4,244.2x), l=11 (928.0x, 8,068 vs 2,098,176), l=12 (2,187.2x, 16,092 vs 8,390,656 — the largest rung pairs-and-solve was historically usable at); 0 disagreements vs pairs-and-solve on all 320 targets, all witnesses group-verified; tables 1 MiB..259 MB charged to the factor-base stage; FFD unmeasured with reason",
             "metrics": {
               "oracle_class": "mitm_pair_table",
               "construction_method": "group-law meet-in-the-middle over subspace factor-base points",
@@ -1013,7 +1013,7 @@
                     }
                   ]
                 },
-                "f4_splits": "flat across 39\u219246 unknowns (scaling note)",
+                "f4_splits": "flat across 39→46 unknowns (scaling note)",
                 "oracle_classes": [
                   "enumerate",
                   "groebner",
@@ -1182,14 +1182,14 @@
                 "ic_degree_doc_max": 23
               },
               "recorded": "2026-09-12-pre-shared-log-record",
-              "summary": "Known-answer recovery on toys n\u22487\u201313; ic runner degrees <=23 with caps"
+              "summary": "Known-answer recovery on toys n≈7–13; ic runner degrees <=23 with caps"
             }
           ]
         },
         "vs_rho": {
           "status": "record",
           "current": {
-            "summary": "Seventh primary single-target online rung at K=800 on the same rung and host class: a=0 n=61 compact-orbit IC beats strong rho rung 3 on the identical public point, 64 one-target workloads, claim-check PASS 64/64, producer identity identical to its frozen reference. Median online speedup 37.13x, 95% CI [21.44, 58.54], range 0.59-1421.69. Supersedes the K=500 record on this rung (12.87x [7.30,19.08]) because the beat's K tune optimises cold wall, not the online claim: at 64 workloads on this host K=400 gave 11.70x [5.72,16.61] and K=500 11.97x [8.45,19.21], K=800 37.13x. Pre-registered before the K=800 run: promote only if the lower 95% bound exceeds 12.87x; 21.44 > 12.87. Constant-factor win only, no asymptotic sub-rho claim, no key recovery, public synthetic fixtures; the pinned x86 host has not been re-run at K=800. Reproduce: python3 research/sat_factor_base_review_20260908/autolab/boundary_autolab.py launch-single --beat koblitz.compact_orbit.n61_single_target --workloads 64 --k 800, then claim-check --report research/sat_factor_base_review_20260908/autolab/runs/20261031T073321Z-5ff6094e6f/artifacts/claim_draft.json --stage vs_rho.",
+            "summary": "Seventh primary single-target online rung at K=800 on the same rung and host class: a=0 n=61 compact-orbit IC beats strong rho rung 3 on the identical public point, 64 one-target workloads, claim-check PASS 64/64, producer identity identical to its frozen reference. Median online speedup 37.13x, 95% CI [21.44, 58.54], range 0.59-1421.69. Supersedes the K=500 record on this rung (12.87x [7.30,19.08]) because the beat's K tune optimises cold wall, not the online claim: at 64 workloads on this host K=400 gave 11.70x [5.72,16.61] and K=500 11.97x [8.45,19.21], K=800 37.13x. Pre-registered before the K=800 run: promote only if the lower 95% bound exceeds 12.87x; 21.44 > 12.87. Constant-factor win only, no asymptotic sub-rho claim, no key recovery, public synthetic fixtures; the pinned x86 host has not been re-run at K=800. Reproduce: python3 research/sat_factor_base_review_20260908/autolab/boundary_autolab.py launch-single --beat koblitz.compact_orbit.n61_single_target --workloads 64 --k 800, then claim-check --report research/sat_factor_base_review_20260908/autolab/runs/20261031T073321Z-5ff6094e6f/artifacts/claim_draft.json --stage vs_rho. **First n=71 single-target online rung (2026-10-31, PENDING_INDEPENDENT_VALIDATION):** K=600 tuned over {200,600}, 16 one-target workloads on the unpinned arm64 host, claim-check PASS 16/16, median online speedup 6.12x (95% CI 4.0-11.9), cold ratio median 177.7; promotion awaits a taskset-pinned or second-host replay. Run 20261031T071642Z-140c04e457; note docs/ic/N71_SINGLE_TARGET_METHOD_20261031.md.",
             "metrics": {
               "n": 61,
               "a": 0,
@@ -1340,13 +1340,15 @@
               "multi-target, projected-rho, and precomputed-rho results remain separately labeled secondary studies"
             ],
             "historical_secondary_note": "Parallel guided rank changes reusable preparation. Host load cannot be assumed to affect both arms equally.",
-            "projection_class_research_target": "Extend the a=1 arm past n=83: n=97 a=0 (r ~ 2^95, cofactor 4) needs a rho projection-class rung (online rho ~ 2^44 steps is not wall-runnable); n=107/109/113 a=1 (r ~ 2^107-2^112, cofactor 2) and n=127 a=1 (r ~ 2^115, cofactor 7114) are the u128-ceiling rungs, also projection-class. ECC2K-130 itself (n=131 a=0, r ~ 2^129.6) additionally needs u256 field words, an implicit S3 index, and 130-bit sparse LA; 4-sum total-work parity with rho is not reachable there (see RESEARCH_ECC2K130_IC_FEASIBILITY.md) \u2014 the 5-sum relation shape is the top unexplored lever."
+            "projection_class_research_target": "Extend the a=1 arm past n=83: n=97 a=0 (r ~ 2^95, cofactor 4) needs a rho projection-class rung (online rho ~ 2^44 steps is not wall-runnable); n=107/109/113 a=1 (r ~ 2^107-2^112, cofactor 2) and n=127 a=1 (r ~ 2^115, cofactor 7114) are the u128-ceiling rungs, also projection-class. ECC2K-130 itself (n=131 a=0, r ~ 2^129.6) additionally needs u256 field words, an implicit S3 index, and 130-bit sparse LA; 4-sum total-work parity with rho is not reachable there (see RESEARCH_ECC2K130_IC_FEASIBILITY.md) — the 5-sum relation shape is the top unexplored lever."
           },
           "evidence": [
             "experiments/koblitz-single-target-n83-20261006/claim_report_vs_rho.json",
             "experiments/koblitz-single-target-n83-20261006/frozen/fixture.json",
             "experiments/koblitz-single-target-n73-20261003/claim_report_vs_rho.json",
-            "research/sat_factor_base_review_20260908/autolab/runs_manual/koblitz_parallel_rank_n73_20261005/"
+            "research/sat_factor_base_review_20260908/autolab/runs_manual/koblitz_parallel_rank_n73_20261005/",
+            "research/sat_factor_base_review_20260908/autolab/runs/20261031T071642Z-140c04e457/state.json",
+            "docs/ic/N71_SINGLE_TARGET_METHOD_20261031.md"
           ],
           "history": [
             {
@@ -2262,6 +2264,51 @@
                 "research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23",
                 "modal volume ic-autolab-runs:20261012T210541Z-20261012T202048Z-5521627904.tar.gz"
               ]
+            },
+            {
+              "recorded": "2026-10-31-n71-single-target-first-rung-pending",
+              "summary": "First a=0 n=71 single-target online rung (2026-10-31, autolab run 20261031T071642Z-140c04e457): compact-orbit IC (K=600 tuned over candidates 200/600 on 1 disjoint one-target tune workload) vs strong rho rung 3 on the identical public point per workload; 16 one-target workloads on an unpinned arm64 macOS host (Apple M4 Pro, 14 CPUs); claim-check PASS 16/16; median online speedup 6.12x (bootstrap 95% CI 4.00-11.89, range 0.29-294.90); cold ratio median 177.7 (reusable setup outside the online interval); both scalars verified; status PENDING_INDEPENDENT_VALIDATION - not a promotion: no taskset-pinned second host yet",
+              "metrics": {
+                "n": 71,
+                "a": 0,
+                "target_count": 1,
+                "timing_class": "single_target_online",
+                "curve_id": "EC1N71Ce0hac1355ef3db6",
+                "K": 600,
+                "k_candidates": [
+                  200,
+                  600
+                ],
+                "workloads": 16,
+                "claim_check": "PASS 16/16",
+                "median_online_speedup": 6.122,
+                "median_95ci_bootstrap": [
+                  3.9984897683181506,
+                  11.894407189299415
+                ],
+                "online_speedup_range": [
+                  0.2926882592321631,
+                  294.9006019857314
+                ],
+                "cold_ratio_median": 177.74,
+                "candidate_id": "IC1N71Ckb0fb85200PDP4s3rootindexRCguidedLAdenseTDsingleISO0h6367473b54e6",
+                "candidate_manifest_sha256": "6367473b54e6406fadd6ea3ba7496c61433557d4795f12fe2c391bc4a0835c8f",
+                "hosts": [
+                  {
+                    "host_id": "arm64 macOS (Adams-MacBook-Pro.local, Apple M4 Pro, 14 CPUs), unpinned",
+                    "run_id": "20261031T071642Z-140c04e457",
+                    "git_head": "d51b908a77574e8d7ac7aa2cb3332961578cade8",
+                    "claim_check": "PASS 16/16"
+                  }
+                ],
+                "paired_same_public_point": true,
+                "ic_scalar_verified": true,
+                "rho_scalar_verified": true,
+                "status": "PENDING_INDEPENDENT_VALIDATION",
+                "reproduce_command": "python3 research/sat_factor_base_review_20260908/autolab/boundary_autolab.py launch-single --beat koblitz.compact_orbit.n71_single_target --workloads 16",
+                "method_note": "docs/ic/N71_SINGLE_TARGET_METHOD_20261031.md",
+                "claim_boundary": "constant-factor win only, no asymptotic sub-rho claim"
+              }
             }
           ],
           "accounting_non_claims_20261008": "The retained n=41 through n=83 rows pair one public target per rung. Repeated runs on the same point measure timing variation, not the distribution across targets. The historical online wall ratios have no qualifying host-isolation receipt and are exploratory. IC probes and rho walk steps are distinct counters; their quotient is not an operation-count speedup. Guided-rank mean probes follow a different query policy and do not establish a target-luck factor. A precomputed-rho comparator has not been measured; any such equal-budget study is secondary to the required one-target rho pair.",
@@ -2339,7 +2386,7 @@
               "eq_var_ratio": "not applicable: direct univariate root finding per (x_i, x_j) pair",
               "ffd": {
                 "status": "inapplicable",
-                "reason": "direct univariate quartic root finding (Cantor-Zassenhaus); no Boolean/Gr\u00f6bner system solved"
+                "reason": "direct univariate quartic root finding (Cantor-Zassenhaus); no Boolean/Gröbner system solved"
               },
               "oracle_class": "quartic_root_find_cantor_zassenhaus",
               "median_ms_per_target": 3320.0,
@@ -2371,7 +2418,7 @@
           ],
           "history": [
             {
-              "summary": "S3 2-decomp through bench sizes; S4/Gr\u00f6bner not a scaling win; FFD not published on 2-decomp frontier",
+              "summary": "S3 2-decomp through bench sizes; S4/Gröbner not a scaling win; FFD not published on 2-decomp frontier",
               "metrics": {
                 "summation": "S3",
                 "summands": 2,
@@ -2620,7 +2667,7 @@
       "title": "Index-calculus boundary ledger",
       "updated": "2026-09-22",
       "claim_hygiene": "Public synthetic / known-answer fixtures only. Never combine best component costs from different runs into a synthetic vs_rho win.",
-      "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gr\u00f6bner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
+      "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
       "stages": [
         "factor_base",
         "decomposition",
@@ -2799,7 +2846,7 @@
         "Pass the row acceptance_gates.",
         "PR updates current, appends history, sets next_target, links evidence.",
         "vs_rho and end_to_end_dlp past prior size require independent recomputation.",
-        "Incomplete measurement_schema fields fail closed \u2014 no row promotion."
+        "Incomplete measurement_schema fields fail closed — no row promotion."
       ],
       "agent_priorities": [
         {
@@ -2860,7 +2907,7 @@
       ],
       "regimes": {
         "binary": {
-          "label": "Binary fields (Weil\u2013Semaev / non-Koblitz)",
+          "label": "Binary fields (Weil–Semaev / non-Koblitz)",
           "best_stack": [
             "semaev_decomp",
             "semaev_sat",
@@ -8625,7 +8672,7 @@
                       }
                     ]
                   },
-                  "f4_splits": "flat across 39\u219246 unknowns (scaling note)",
+                  "f4_splits": "flat across 39→46 unknowns (scaling note)",
                   "oracle_classes": [
                     "enumerate",
                     "groebner",
@@ -9648,7 +9695,7 @@
                     "demo_n_max": 13,
                     "ic_degree_doc_max": 23
                   },
-                  "summary": "Known-answer recovery on toys n\u22487\u201313; ic runner degrees <=23 with caps"
+                  "summary": "Known-answer recovery on toys n≈7–13; ic runner degrees <=23 with caps"
                 },
                 {
                   "metrics": {
@@ -14715,7 +14762,7 @@
             "decomposition": {
               "status": "record",
               "current": {
-                "summary": "S3 2-decomp through bench sizes; S4/Gr\u00f6bner not a scaling win; FFD not published on 2-decomp frontier",
+                "summary": "S3 2-decomp through bench sizes; S4/Gröbner not a scaling win; FFD not published on 2-decomp frontier",
                 "metrics": {
                   "summation": "S3",
                   "summands": 2,

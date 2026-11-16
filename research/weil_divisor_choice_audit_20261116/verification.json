@@ -1,0 +1,98 @@
+{
+  "schema": "weil-divisor-choice-verification/v1",
+  "source_commit": "cfe89d996b76008e978c7e582bf9fbd357c633d2",
+  "claim_id": "PCC-20261116-c356c4",
+  "declaration_sha256": "2c2c650e7341720a2c8e4e3a290e87ee62224df0b4af1ea50f1b412d8249d270",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 337,
+  "gate_declarations": 34,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 324,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-c356c4",
+    "claim_sha256": "11ff4c74dce2404dd933f2f9d27e9cf757f9d0b4da6d1f9fbac6ab5a90d0946a",
+    "commit": "cfe89d996b76008e978c7e582bf9fbd357c633d2",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/weil_divisor_choice_audit_20261116/lean (ChoiceCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T06:26:06Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-c356c4",
+    "claim_sha256": "11ff4c74dce2404dd933f2f9d27e9cf757f9d0b4da6d1f9fbac6ab5a90d0946a",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47158,
+    "sha256": "685013059f8047ee6c09d4643c0b8d4ccb12559a7bf7b6708941e96614a764d0",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "all342pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_states_retained": true,
+    "known_source_methods_credited": true,
+    "actual_proper_evaluation_addition_integer_scaling_function_powers": true,
+    "actual_geometric_moving_with_function_witness": true,
+    "actual_source_26_1_quotient_orientation": true,
+    "actual_function_choice": true,
+    "actual_integer_level_roots_of_unity": true,
+    "actual_swap_inverse": true,
+    "actual_one_coordinate_divisor_choice": true,
+    "actual_two_coordinate_divisor_choice_without_cross_disjointness": true,
+    "actual_n_principal_function_existence": true,
+    "actual_torsion_pair_proper_representative_existence": true,
+    "actual_zero_level_quotient_one": true,
+    "actual_nonsingular_F2_three_point_population": true,
+    "actual_F2_no_rational_shift_counter": true,
+    "first_gate_no_sources_failure_retained": true,
+    "general_closed_point_residue_norms": false,
+    "multiplication_isogeny_comparison": false,
+    "full_canonical_nondegeneracy": false,
+    "general_geometric_descent_canonical_Tate_MOV_FR": false,
+    "full14complete": false,
+    "qualified_source_refuted": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 34,
+    "new_modules": 9,
+    "new_concrete_modules": 8,
+    "official_import_bridge_modules": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 265,
+    "actually_imported_custom_modules": 253,
+    "actually_imported_frozen_modules": 244
+  }
+}

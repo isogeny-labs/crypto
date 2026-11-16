@@ -1,0 +1,104 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261025-cm8-quadratic-transfer",
+  "title": "Verify the registered F13 quadratic-twist degree-two transfer and S3 yield",
+  "status": "draft",
+  "status_note": "Executed local finite evidence:12arms/72source scalars/196addition pairs;3of54reduced joint gains/0original; matched rows conserved and4matched degree changes favor source. Draft remains for main-ancestry/Cairn gate; no lease.",
+  "created": "2026-10-25",
+  "authors": [
+    "research reasoning lane"
+  ],
+  "owner_hint": "Existing PR2381 research continuation",
+  "question": "Does the explicit degree-two CM-minus8 route between the registered F13 quadratic twists preserve source scalars and support a finite useful-row/relevant-degree comparison with full matched-base controls?",
+  "decision_value": "Verified point/scalar transport makes the paired S3 experiment meaningful; any map/kernel/non-isomorphism or recovery failure is retained. A joint useful-rank/operational-degree gain is scoped to the fixed policy and target, with matched-base conservation and all losses reported.",
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/quadratic-twist-evidence-import",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/quadratic_twist_evidence_20261021/native/cm8-transfer-audit/Cargo.toml"
+      ]
+    ]
+  },
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "run": {
+    "argv": [
+      "research/quadratic_twist_evidence_20261021/run-cm8-transfer.sh",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "scheme": "single",
+    "count": 1,
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Use existing local resources; native command caps600 seconds and one iteration envelope3600 seconds. Estimates remain null until the implementation and protocol are fixed; no paid compute or upload requested."
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261025-cm8-quadratic-transfer"
+    ],
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Draft: explicit F13 degree-two map, exact registered models, independent point/scalar/actual S3 solver verification and faithful Lean proofs."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261025-cm8-quadratic-transfer"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No funding, paid resource or task reservation requested."
+    },
+    "ttl_s": 86400,
+    "notes": "Draft only; no Cairn lease, run or publication performed."
+  },
+  "outputs": {
+    "result_schema": "quadratic-twist-cm8-transfer/v1",
+    "verify": [],
+    "land": "research/quadratic_twist_evidence_20261021"
+  },
+  "links": {
+    "prs": [
+      2381
+    ],
+    "lead": "crypto-autoresearcher:LEAD-ICP-isogeny-transported-relation-yield",
+    "notes": [
+      "research/quadratic_twist_evidence_20261021/CM8_TRANSFER_20261025_PROTOCOL.md",
+      "research/quadratic_twist_evidence_20261021/reports/cm8-transfer-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/reports/direct-sign-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/CONTINUATION.md"
+    ]
+  },
+  "blocked_on": []
+}

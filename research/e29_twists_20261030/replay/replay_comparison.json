@@ -1,0 +1,138 @@
+{
+ "schema": "e29-replay-comparison/v1",
+ "tool": "research/e29_twists_20261030/validate_e29.rs compare",
+ "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form; integers compared exactly as i128), strings and booleans exactly; wall_ms is wall-clock and listed, not compared",
+ "runs_total": 6,
+ "runs_identical": 6,
+ "fields_compared": 26124,
+ "fields_identical": 26124,
+ "all_identical": true,
+ "runs": [
+  {
+   "run": "kill",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/kill.json",
+    "sha256": "0aca3733b0cd0c8ef9bc300a33ab61744e60593f035aa74fbb300b678ba3734c"
+   },
+   "replay": {
+    "path": "research/e29_twists_20261030/replay/kill.json",
+    "sha256": "0aca3733b0cd0c8ef9bc300a33ab61744e60593f035aa74fbb300b678ba3734c"
+   },
+   "fields_compared": 112,
+   "fields_identical": 112,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [],
+   "identical": true
+  },
+  {
+   "run": "stage_r_p241",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_r_p241.json",
+    "sha256": "6b67abb555a1035b20071c54b692c7752bcee1e1e083a2a3e922a1a8b366d0aa"
+   },
+   "replay": {
+    "path": "research/e29_twists_20261030/replay/stage_r_p241.json",
+    "sha256": "6b67abb555a1035b20071c54b692c7752bcee1e1e083a2a3e922a1a8b366d0aa"
+   },
+   "fields_compared": 729,
+   "fields_identical": 729,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [],
+   "identical": true
+  },
+  {
+   "run": "stage_r_rest",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_r_rest.json",
+    "sha256": "e3193c18b6ac2b2699a618815ca2cc1233f3739b6f915673dbac31469909fb87"
+   },
+   "replay": {
+    "path": "research/e29_twists_20261030/replay/stage_r_rest.json",
+    "sha256": "e3193c18b6ac2b2699a618815ca2cc1233f3739b6f915673dbac31469909fb87"
+   },
+   "fields_compared": 5103,
+   "fields_identical": 5103,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p241",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_a_p241.json",
+    "sha256": "54a852d0a6c1b40ba42fc48a2f756a41a9513c15e443d64c72853c5f404ebaf5"
+   },
+   "replay": {
+    "path": "research/e29_twists_20261030/replay/stage_a_p241.json",
+    "sha256": "6cb734a16d8e7e6c2e03cb39de3883f2ddc79a1959fef7a86ba6262e11dc2c46"
+   },
+   "fields_compared": 3905,
+   "fields_identical": 3905,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].report.wall_ms",
+     "committed": 49691.883760000004,
+     "replay": 48568.116962
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p337",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_a_p337.json",
+    "sha256": "6e5647ad16b3111e3594d93e6e710291c1d096f8fdd85504c8ceb54a9eda9044"
+   },
+   "replay": {
+    "path": "research/e29_twists_20261030/replay/stage_a_p337.json",
+    "sha256": "90fdd0f8c0246fcd2020471b10fd4c8274dd971bdbc52d2922dfe005fedcb8fd"
+   },
+   "fields_compared": 6724,
+   "fields_identical": 6724,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].report.wall_ms",
+     "committed": 94667.28591,
+     "replay": 84911.302482
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "stage_a_p541",
+   "committed": {
+    "path": "experiments/34_twist24_stage_r/stage_a_p541.json",
+    "sha256": "f5dec977a38497f4e86bde3d9184cd8d8a7ab45386aeea6ae13609409b8b0002"
+   },
+   "replay": {
+    "path": "research/e29_twists_20261030/replay/stage_a_p541.json",
+    "sha256": "d62718179eb87058110a36178e56cc25e50a6e53c0052df5e4b2542c4024a944"
+   },
+   "fields_compared": 9551,
+   "fields_identical": 9551,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].report.wall_ms",
+     "committed": 465424.984335,
+     "replay": 371161.627075
+    }
+   ],
+   "identical": true
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+spec ECS1h367c167e77aa (engine items (cv=0, chained rho set-up), single target, k=24, session 7): 260 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm rho-neg-chained  candidate  ECM1h87ac359b3aa8 rho.negation_chained {"cap_multiple": "64"}
+  arm twcj             baseline   ECM1h0d7290053fef ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=16,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  arm twcj-cv0         candidate  ECM1h30a1404ad225 ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=16,seed=run,cv=0", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  workload W2bbb0324a6d5 icv1-fp24-tm1578-e83ed1b2 r=2^21.00 A=2 registered=true ec1=-

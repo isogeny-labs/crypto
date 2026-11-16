@@ -1,0 +1,248 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-split-graph-secant-cost-20261107-A2-1
+experiment_id: split_graph_secant_cost_20261107
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.receipt.json
+binds:
+- path: research/split_graph_secant_cost_20261107/cards/request_diff_a2.jq
+  sha256: 7885db1b3b6cb68d24095c752a55b7273480c8fb12ac703c84c34ab56c4ccd0c
+- path: research/split_graph_secant_cost_20261107/PROTOCOL.md
+  sha256: 20acbf94d87b87f47fa20b4866c79143e9df6154e64cc1a07de9e56e10a84ed1
+- path: research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
+  sha256: d23b6b66cb90422cb32a4305328dbc3b0bfd25c0609ea9b34804ab896ac857c2
+- path: research/split_graph_secant_cost_20261107/eks/r2img_request.json
+  sha256: 146d7f2649a910f4e4bade65cbff8b1c27595ab40294a6319c4c315a0f49b100
+- path: research/split_graph_secant_cost_20261107/eks/layer-receipt.json
+  sha256: 76b81c42f3731cc1202473046c06bbad24a1eef2161db8f2ab908bd3135a35eb
+- path: research/split_graph_secant_cost_20261107/eks/r2img_validate.sh
+  sha256: d398cdb586088614a05030004fabd2f1f5f676db3bd8cb97aedef80bfa12a42f
+- path: research/split_graph_secant_cost_20261107/eks/R2_READY.md
+  sha256: 8dd437322ae1e99f07aab3b92533f9f6265fb61f42fc0dd4ce5058993129a451
+- path: research/split_graph_secant_cost_20261107/eks/ATTEMPT2.md
+  sha256: 573de0e47bc48d813263fadf3836c5700a6ed10f283940977723f878a09433d8
+- path: research/split_graph_secant_cost_20261107/sgsecant_recheck.py
+  sha256: 034f49dae528c4473e9abaab8bc21068d0449c61e3770fb938a7e30976e321c8
+- path: research/split_graph_secant_cost_20261107/cards/status_request_a2.json
+  sha256: 8c656c1e1e88477f9551527d6ccd727c5f70227acb18b7d036b9a7ca44fbdba1
+- path: research/split_graph_secant_cost_20261107/cards/wait_command_status.sh
+  sha256: 78c14129882014e011ce614549c76c9e78b56ac35946ec9abee893f17686f049
+- path: research/split_graph_secant_cost_20261107/cards/verify_results.sh
+  sha256: 14edc3fe9a1139678bbe70d5d44e14a2458d16b6f83a8d89fe1fcfecd8d126f8
+- path: scripts/checkpoint.sh
+  sha256: 6fc6b9311461111ecf55cdb70ae4dd52a408d0b0bf6b44fbe1177788756c12e8
+- path: tools/benchrec.py
+  sha256: a3c03754409cd88bce7faadc49a70da4cc0e239f45b7f2abdf08241cb3bd7bc0
+- path: tools/task_card.py
+  sha256: 9425ae71f4c855923d337fe8304dee0d630b6d7c81e9a7e81099ef4129caa812
+- path: taskq/deploy/eks-karpenter/remote/launch-remote-command
+  sha256: 7e1daae8dc70f8fcb813d9315daa73df3e18e7e5f72e2d47f34f9a3c85637416
+- path: taskq/deploy/eks-karpenter/remote/run-command
+  sha256: 1cdaa7447893fd5c2dc337d3903f8981107df1de6d77ca18cd8191cc8449ced2
+- path: taskq/deploy/eks-karpenter/remote/status-command
+  sha256: 435c9a2f35cace854534accf300402365a4f99f15babb0bbd187aa3e1ff92809
+- path: taskq/deploy/eks-karpenter/remote/current-run-request-buildspec.yml
+  sha256: 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e
+- path: taskq/deploy/eks-karpenter/remote/check-ready
+  sha256: 746440f29360983290eb9c22d435ccf8ca1d49ba66f84af8db2b7326a04f44ea
+- path: taskq/deploy/eks-karpenter/submit-job
+  sha256: def41b1a72b6e48dc4e6f8256455be44ccc5100a017f515d8bd2821558abcbce
+- path: benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+  sha256: 1d6636aaba00538ce381e997fd210954d52cb451af9703684bcb48a5404b0912
+must_not_exist:
+- research/split_graph_secant_cost_20261107/receipts/A2
+- research/split_graph_secant_cost_20261107/results/A2
+commands:
+- id: head-ancestor
+  argv:
+  - git
+  - merge-base
+  - --is-ancestor
+  - d032c1e1ee5b7b730b2ea130573b3e160107946e
+  - HEAD
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.head-ancestor.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.head-ancestor.stderr
+- id: head-paths-unchanged
+  argv:
+  - git
+  - diff
+  - --quiet
+  - d032c1e1ee5b7b730b2ea130573b3e160107946e
+  - HEAD
+  - --
+  - research/split_graph_secant_cost_20261107
+  - :(exclude)research/split_graph_secant_cost_20261107/cards
+  - taskq/
+  - tools/task_card.py
+  - tools/benchrec.py
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.head-paths-unchanged.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.head-paths-unchanged.stderr
+- id: request-protocol-identity
+  argv:
+  - jq
+  - -e
+  - --arg
+  - h
+  - 20acbf94d87b87f47fa20b4866c79143e9df6154e64cc1a07de9e56e10a84ed1
+  - .provenance.protocol_sha256 == $h
+  - research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.request-protocol-identity.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.request-protocol-identity.stderr
+- id: request-differs-only-as-allowed
+  argv:
+  - jq
+  - -e
+  - -n
+  - -f
+  - research/split_graph_secant_cost_20261107/cards/request_diff_a2.jq
+  - --slurpfile
+  - a
+  - research/split_graph_secant_cost_20261107/eks/r2img_request.json
+  - --slurpfile
+  - b
+  - research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.request-differs-only-as-allowed.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.request-differs-only-as-allowed.stderr
+- id: image-equals-layer-receipt
+  argv:
+  - jq
+  - -e
+  - -n
+  - --slurpfile
+  - r
+  - research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
+  - --slurpfile
+  - l
+  - research/split_graph_secant_cost_20261107/eks/layer-receipt.json
+  - --arg
+  - i
+  - 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b
+  - $r[0].job.image == $i and $l[0].image_uri == $i
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.image-equals-layer-receipt.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.image-equals-layer-receipt.stderr
+- id: validate-request
+  argv:
+  - bash
+  - research/split_graph_secant_cost_20261107/eks/r2img_validate.sh
+  - research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.validate-request.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.validate-request.stderr
+- id: image-exists-in-ecr
+  argv:
+  - aws
+  - ecr
+  - describe-images
+  - --repository-name
+  - isolab/tasks
+  - --image-ids
+  - imageDigest=sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b
+  - --region
+  - us-east-2
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.image-exists-in-ecr.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.image-exists-in-ecr.stderr
+- id: checkpoint-gate
+  argv:
+  - scripts/checkpoint.sh
+  - gate
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.checkpoint-gate.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.checkpoint-gate.stderr
+- id: launch
+  argv:
+  - python3
+  - tools/benchrec.py
+  - run
+  - benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+  - --
+  - taskq/deploy/eks-karpenter/remote/launch-remote-command
+  - research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
+  timeout_seconds: 2100
+  success_exit_codes:
+  - 0
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+    ISOLAB_CLIENT_OUTPUT: /home/user/crypto/research/split_graph_secant_cost_20261107/receipts/A2/launch
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.launch.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.launch.stderr
+  outputs:
+  - research/split_graph_secant_cost_20261107/receipts/A2/launch/result.json
+- id: record-launch
+  argv:
+  - jq
+  - -c
+  - '{job_name, job_uid, pods, state, exit_code, launcher, receipt_uri, results_prefix, request_sha256, manifest_sha256}'
+  - research/split_graph_secant_cost_20261107/receipts/A2/launch/result.json
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.record-launch.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.record-launch.stderr
+- id: wait-short
+  argv:
+  - python3
+  - tools/benchrec.py
+  - run
+  - benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+  - --
+  - research/split_graph_secant_cost_20261107/cards/wait_command_status.sh
+  - research/split_graph_secant_cost_20261107/cards/status_request_a2.json
+  - sgsecant-panel-20261108-a2
+  - research/split_graph_secant_cost_20261107/receipts/A2/status
+  - '5400'
+  - '60'
+  - taskq/deploy/eks-karpenter/remote/launch-remote-command
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  - 41
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.wait-short.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-1.wait-short.stderr
+bus_address: executor-mechanical-split-graph-secant
+background: true
+write_scope:
+- research/split_graph_secant_cost_20261107/
+- benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+- .resume/
+- .benchrec/
+stop_when:
+- Any command exits with a code outside its success_exit_codes or reaches its timeout; return the tool output verbatim and run no later command.
+- A step before `launch` fails; nothing was submitted, so return the tool output verbatim and submit nothing.
+- The `launch` step exits nonzero or times out; do not run it again, start no job with another name, and return the tool output verbatim.
+- The tool exits 2 before running any command; return `refused` with the IMPEDIMENT line.
+notes: 'Attempt 2 of the split-graph secant panel: Job sgsecant-panel-20261108-a2 (4 vCPU, 8Gi, 10800 s), image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b, request research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json. Attempt 1 (Job sgsecant-panel-20261107, card CARD-split-graph-secant-cost-20261107-R2-1) stayed Pending for its whole 3600 s deadline and produced no output; see research/split_graph_secant_cost_20261107/eks/ATTEMPT2.md. Attempt 1 files under receipts/R2 and results/R2 are not read or written by any step; this card family uses receipts/A2 and results/A2. The request differs from the attempt-1 request only in job.job_name, job.seconds and provenance.note, and the first precondition step checks that with jq. The `launch` step is the only step that submits a Job and it appears once in this card family. The `wait-short` step polls isolab.eks.command-status/v1 for at most 5400 s and its exit 41 (no terminal state yet) counts as success, so the card ends with a receipt. There is no pool check; the 10800 s deadline absorbs queueing. After this card, the collect cards CARD-split-graph-secant-cost-20261107-A2-C01 to CARD-split-graph-secant-cost-20261107-A2-C04 are fired one at a time, each only after the previous one has stopped. The head-paths-unchanged step passes when no commit after the pinned commit changed the study directory (its cards subdirectory excepted), taskq/, tools/task_card.py or tools/benchrec.py; other commits are accepted. No commit field is set because task_card.py run refuses any HEAD other than the pinned one. Pinned commit d032c1e1ee5b7b730b2ea130573b3e160107946e. The record stays open, and the card runs no close, report or analysis command.'

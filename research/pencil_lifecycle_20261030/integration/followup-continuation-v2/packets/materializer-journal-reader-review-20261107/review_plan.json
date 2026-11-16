@@ -1,0 +1,30 @@
+{
+  "schema": "source-review-plan/v1",
+  "created_at": "2026-11-07T00:47:05.511209+00:00",
+  "task": "T-1748",
+  "scope": "Independent source ABI consumer and deterministic unit fixtures; not runtime completion authentication or science",
+  "prior": "Unknown until exact candidate inspected; source checksum consistency is not authenticated custody",
+  "owner": "review_journal_reader",
+  "producer_basis": "085234 successor storage ABI; independent source review 2f0bfc",
+  "joints": [
+    {
+      "joint": "Bounded prefix parsing",
+      "attack": "Off-by-one length, truncated UTF-8 or newline, record-count mismatch, duplicate keys, nonfinite JSON, boolean counts"
+    },
+    {
+      "joint": "Path custody",
+      "attack": "Absolute/traversal paths, symlink final and parent components, nonregular files, giant metadata lengths"
+    },
+    {
+      "joint": "Final consistency",
+      "attack": "Pass with hidden suffix or inline mismatch; failure with acknowledged prefix mismatch; absent prefix with alleged zero children"
+    },
+    {
+      "joint": "Claim boundary",
+      "attack": "Internally consistent forged metadata must never imply authenticated completion"
+    }
+  ],
+  "blind_derivation": "For bytes b, prefix n, valid count c: hash only b[:n], require length >= n and complete strict JSONL exactly c records. Passed final requires no suffix and inline==prefix. Failed final can retain unacknowledged suffix but cannot validate its contents as acknowledged.",
+  "sources": "KB tools absent in exposed catalog; exact repository producer and review used as primary sources. No novelty claim.",
+  "permitted_validation": "Deterministic local Python fixtures under 30 seconds. No materializer/cloud/compiler/scientific run."
+}

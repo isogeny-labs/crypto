@@ -1,0 +1,49 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1
+experiment_id: isogeny_class_ic_yield_20261102
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: d97f5953b24e05096208a54df6e699827d021541
+receipt: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.receipt.json
+binds:
+- {path: research/isogeny_class_ic_yield_20261102/DESIGN.md, sha256: f3748782cd1254a0db75dafa85989edfcb297a7d7aac46bf6f51be42d75712f9}
+- {path: research/isogeny_class_ic_yield_20261102/p3_ecc2k130/PROTOCOL.md, sha256: eebb535828638bf00b45e803180d024a92fe3254d27c8da511869c9927673451}
+- {path: research/isogeny_class_ic_yield_20261102/p3_ecc2k130/protocol.json, sha256: b6c40d445e82808d71514e82245ddc526ef5dea85d80139643fc0e0bb62d7b49}
+- {path: research/isogeny_class_ic_yield_20261102/p3_ecc2k130/run_full.sh, sha256: 43fae4b2dc5b704e49e8b81ea955a4892494ab9f00dab07684ed3e37f6f3735a}
+- {path: research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/src/main.rs, sha256: 57219432c086e0c5177ac7fe23eff3d0e0884440d9a136d3fb1d0fe4ceb4c63d}
+- {path: research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.toml, sha256: c56350781bd45cca0c1a5fefaf3c974a36c7800c6969164ad7c3c55e635e404b}
+- {path: research/isogeny_class_ic_yield_20261102/p3_ecc2k130/harness/Cargo.lock, sha256: c984bb4d5e99709f10270d7c031574e25f49f0199af4403753ef29e9a6579161}
+- {path: target/release/p3h, sha256: 73f1ff63410bdf819b8c8e691e91f3739714b390c6a154737289a2320aed3299}
+- {path: research/isogeny_class_ic_yield_20261102/p3_ecc2k130/data/ecc2k130_curves.tsv, sha256: ee987b52191581be4d38006324b8aaf3b932f503794a2fd81c2417665dcc63ea}
+must_not_exist: [research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0a.jsonl, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0b.jsonl, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0c.jsonl]
+commands:
+- id: measure-s0a
+  argv: [target/release/p3h, measure, --n, '131', --curves, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/data/ecc2k130_curves.tsv, --ks, '3,4,5,6', --attempts, '1', --select, '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43', --arms, stdv, --presentations, '2', --dmax, '9', --seed, '20261102', --out, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0a.jsonl]
+  env: {RAYON_NUM_THREADS: '1'}
+  timeout_seconds: 10320
+  success_exit_codes: [0]
+  stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.measure-s0a.stdout
+  stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.measure-s0a.stderr
+  outputs: [research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0a.jsonl]
+- id: measure-s0b
+  argv: [target/release/p3h, measure, --n, '131', --curves, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/data/ecc2k130_curves.tsv, --ks, '3,4,5,6', --attempts, '1', --select, '44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87', --arms, stdv, --presentations, '2', --dmax, '9', --seed, '20261102', --out, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0b.jsonl]
+  env: {RAYON_NUM_THREADS: '1'}
+  timeout_seconds: 10320
+  success_exit_codes: [0]
+  stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.measure-s0b.stdout
+  stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.measure-s0b.stderr
+  outputs: [research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0b.jsonl]
+- id: measure-s0c
+  argv: [target/release/p3h, measure, --n, '131', --curves, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/data/ecc2k130_curves.tsv, --ks, '3,4,5,6', --attempts, '1', --select, '88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131', --arms, stdv, --presentations, '2', --dmax, '9', --seed, '20261102', --out, research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0c.jsonl]
+  env: {RAYON_NUM_THREADS: '1'}
+  timeout_seconds: 10320
+  success_exit_codes: [0]
+  stdout: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.measure-s0c.stdout
+  stderr: research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.measure-s0c.stderr
+  outputs: [research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/p3b_stdv.s0c.jsonl]
+bus_address: executor-mechanical-isogeny-ic-yield-p3
+background: true
+write_scope: [research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/, research/isogeny_class_ic_yield_20261102/cards/]
+stop_when: ['Any command exits nonzero or reaches its timeout; retain every file already written and the receipt, and delete nothing.']
+notes: 'LOCAL ROUTE under protocol amendment A1 (PROTOCOL.md section 10, protocol.json version 1): isolation L0, the clock metric is descriptive only. Not an EKS card. P3 (ECC2K-130), card b-stdv-s0: lane B, position B3: run the cards of one lane one at a time in the position order of PROTOCOL.md section 10; the lanes A and B may run at the same time, at most two P3 cards at once; start no lane card before the setup card has completed. Run in the worktree /home/user/crypto-p3run (detached at the pinned commit).'

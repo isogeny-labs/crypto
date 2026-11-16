@@ -1,0 +1,113 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "f1-x07",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        2.446979347509146,
+        2.5140312231529114,
+        3.1174981039467964
+      ],
+      "charged_sum": 56726.0,
+      "native_sum": 15544,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "rho-neg",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        1.547231520580652,
+        1.6576100199355583,
+        2.6510165141297137
+      ],
+      "charged_sum": 35868.0,
+      "native_sum": 25588,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "tw-x15",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        2.7378509362031176,
+        2.7423328519772983,
+        2.7826700939449296
+      ],
+      "charged_sum": 63469.0,
+      "native_sum": 1039,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "twcj-x15",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        2.218613013452217,
+        2.2230949292263973,
+        2.263432171194029
+      ],
+      "charged_sum": 51432.0,
+      "native_sum": 1039,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "f1-x07",
+      "b": "rho-neg",
+      "verdict": "rho-neg < f1-x07"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "f1-x07",
+      "b": "tw-x15",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "f1-x07",
+      "b": "twcj-x15",
+      "verdict": "twcj-x15 < f1-x07"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "tw-x15",
+      "verdict": "rho-neg < tw-x15"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "twcj-x15",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "tw-x15",
+      "b": "twcj-x15",
+      "verdict": "twcj-x15 < tw-x15"
+    }
+  ]
+}

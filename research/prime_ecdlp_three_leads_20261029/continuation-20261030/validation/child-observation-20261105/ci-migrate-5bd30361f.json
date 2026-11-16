@@ -1,0 +1,28 @@
+{
+  "recorded_utc": "2026-11-05T13:30:01.064983+00:00",
+  "head": "5bd30361f553044faf3cba9e45c902980e1ee4e0",
+  "run": 42035691612,
+  "job": "migrate/artifact-autofix",
+  "conclusion": "FAILURE",
+  "actual_step": "Prefetch changed Git blobs in bounded batches",
+  "error": "trusted/.github/scripts/artifact_prefetch.py missing; exit2",
+  "event_BASE_SHA": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "raw_utf8": "migrate\tPrefetch changed Git blobs in bounded batches\t\ufeff2026-11-05T13:26:09.0856535Z ##[group]Run set -euo pipefail\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0856948Z \u001b[36;1mset -euo pipefail\u001b[0m\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0857190Z \u001b[36;1mcd candidate\u001b[0m\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0857445Z \u001b[36;1mbase=$(git merge-base \"$BASE_SHA\" HEAD)\u001b[0m\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0857834Z \u001b[36;1mpython3 ../trusted/.github/scripts/artifact_prefetch.py \"$base\" HEAD\u001b[0m\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0883758Z shell: /usr/bin/bash -e {0}\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0884029Z env:\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0884287Z   BASE_SHA: d30b9e0db7ec00c55330effef5f64532f97cd160\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.0884579Z ##[endgroup]\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.1335712Z python3: can't open file '/home/runner/work/crypto/crypto/candidate/../trusted/.github/scripts/artifact_prefetch.py': [Errno 2] No such file or directory\nmigrate\tPrefetch changed Git blobs in bounded batches\t2026-11-05T13:26:09.1369541Z ##[error]Process completed with exit code 2.\n",
+  "raw_bytes": 1429,
+  "raw_sha256": "75f8218112d2d77daebfed6c0dc72fc94f92b8f166a43e72d8d54e87ef071919",
+  "workflow_blob_at_HEAD_and_d30": "25e7f27d61cc7387ad5f126782fcce90cc46ca4d",
+  "github_delta_versus_d30": "empty",
+  "helper_at_d30": "absent from Git tree",
+  "helper_at_main3a7882f5d": "a113e5a73efe276f0af9e58df8ac78ee4a092218",
+  "scope": "auxiliary trusted-tool version mismatch; no native test failure, policy pass, or missing credential inference",
+  "other_head_snapshot": {
+    "review": "SUCCESS",
+    "gate": "ABSENT",
+    "size": "ABSENT",
+    "artifacts": "ABSENT",
+    "autoMergeRequest": null,
+    "review_comments": []
+  },
+  "next_action": "shared workflow owner must align required trusted helper with trusted checkout ref; do not run untrusted PR helper or patch around inherited failure",
+  "pcc_standing": "unverified producer observation"
+}

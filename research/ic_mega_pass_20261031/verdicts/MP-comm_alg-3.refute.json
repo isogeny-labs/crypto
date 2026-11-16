@@ -1,0 +1,12 @@
+{
+ "idea_id": "MP-comm_alg-3",
+ "skeptic_lens": "mathematical refutation",
+ "verdict": "refuted",
+ "confidence": 0.93,
+ "reason": "In B_K=K[a,b]/(x^2+x), char 2, u^2 = sum c_m^2 m = sigma(u) (coefficient Frobenius), and deg sigma(u)=2. Closure rows m*f with deg m+deg f<=d put u*u=sigma(u) into V^K_d(u) for every d>=4, and by induction sigma^i(u)=sigma^{i-1}(u)^2 too. span_K F = span_K{sigma^i u} (Moore matrix of the trace dual basis is invertible), and the closure (monomial multiplication + degree cap, defined over F_2) commutes with tensoring by K. So V^K_d(u) = W_d(F) (x) K for all d>=4: dim_K V^K_d(u) = dim_F2 W_d(F) exactly, and d_K = d_F whenever d_F>=4 (certified d_F>=5 at n=33-45; d_K<=max(d_F,4) in general). Consequences: (a) d_K-d_F<=1 is a tautology with no content; there are no 'cross-conjugate falls' at d>=4, so the split isolates nothing; (b) 'd_K>=ck' is open problem 12 restated word for word; the claimed n-fold matrix saving is false (same dimension, K-arithmetic is ~n times dearer per entry than F_2 bit ops); the falsifier's prediction 'n*dim_K V^K accounts for >=90% of dim_F2 W' is wrong by a factor n (the correct ratio is 1). Also the top part of u is alpha*beta with alpha=sum v_j a_j, and alpha*u already has degree 2 because alpha^2=sigma(alpha): the Frobenius enters the single-generator closure through the field equations at degree 3, so the 'without using its Frobenius conjugates' notion is ill-posed. Nongenericity: theory item with no B or D change; it is a relabelling of the same closure object.",
+ "evidence": "python3 check, F_{2^7} (x^7+x+1), k=4, random v, Phi, kappa: u^2 reduced == sigma(u) True; deg(u^2)=2. Script: $TMPDIR/chk.py (scratch).",
+ "fix": "None that survives as a reduction. Only salvage: the pure algebraic identity V^K_d(u)=W_d(F)(x)K for d>=4 can be used as a notational convenience (single K-polynomial generator, Galois-equivariant) when attempting open problem 12; it is classed relabelling, not advance.",
+ "classification": "relabelling",
+ "collisions": ["THM_SEMAEV_FALL1 Lemma 1 (Frobenius collapse)", "LEAD-ICB-frobenius-search-symmetry", "treatise falldegree.tex Thm reform", "open problem 12 (prog_openproblems.tex)"],
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-comm_alg-3.refute.json"
+}
