@@ -1,6 +1,6 @@
 # Ten-target trace +26 cover-degree bound
 
-**Update, 16 November 2026:** Five exact targets (masks 30, 103, 139, 194, 233) now have independently checked degree-seven covers and nonzero subgroup transfers; see `DEGREE7_FINDING.md`. Their minimum degree for this fixed carrier is exactly 7. The earlier `[7,20]` window remains the verified interval for the other five targets. Full attack costs remain open.
+**Update, 16 November 2026:** Five exact targets (masks 30, 103, 139, 194, 233) now have independently checked degree-seven covers and nonzero subgroup transfers; see `DEGREE7_FINDING.md`. Their minimum degree for this fixed carrier is exactly 7. These five K-models and their covers are one Frobenius orbit; the other five masks form the second orbit and retain the verified `[7,20]` interval. A complete measured s=3 attack for mask 30 is recorded in `S3_FULL_ATTACK_RESULT.md`; the s=11 costs remain open.
 
 15 November 2026. This is a finite-class statement for one explicit carrier,
 not a new infinite family of vulnerable elliptic curves. The finite-search

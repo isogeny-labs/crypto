@@ -120,6 +120,33 @@ theorem degree_seven_prime_transfer_arithmetic :
       2 * 109 * 2399 * 333566377062870325133 ∧
     Nat.gcd 7 333566377062870325133 = 1 := by decide
 
+/- Power-basis multiplication circuit for F3[a]/(a^5 + 2a + 1).
+   Since a^5 = a + 2, a^(5+k) = a^(k+1) + 2a^k for 0 ≤ k ≤ 3.
+   Sage and Magma independently check the field realization. -/
+def maskCoeff (m i : Nat) : Nat := m / 3^i % 3
+
+def basisCoeff (e t : Nat) : Nat :=
+  if e < 5 then (if e = t then 1 else 0)
+  else (if e - 4 = t then 1 else 0) + (if e - 5 = t then 2 else 0)
+
+def productCoeff (u v t : Nat) : Nat :=
+  ((List.range 5).foldl (fun acc i =>
+    acc + (List.range 5).foldl (fun inner j =>
+      inner + maskCoeff u i * maskCoeff v j * basisCoeff (i + j) t) 0) 0) % 3
+
+def multiplyMasks (u v : Nat) : Nat :=
+  (List.range 5).foldl (fun acc t => acc + productCoeff u v t * 3^t) 0
+
+def cubeMask (u : Nat) : Nat := multiplyMasks (multiplyMasks u u) u
+
+theorem trace26_cover_positive_frobenius_orbit :
+    cubeMask 30 = 194 ∧ cubeMask 194 = 103 ∧
+    cubeMask 103 = 139 ∧ cubeMask 139 = 233 ∧ cubeMask 233 = 30 := by decide
+
+theorem trace26_other_frobenius_orbit :
+    cubeMask 3 = 27 ∧ cubeMask 27 = 167 ∧
+    cubeMask 167 = 182 ∧ cubeMask 182 = 230 ∧ cubeMask 230 = 3 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -149,4 +176,6 @@ theorem degree_seven_prime_transfer_arithmetic :
 #print axioms degree_seven_quadratic_square_assignment_counts
 #print axioms degree_seven_five_hits
 #print axioms degree_seven_prime_transfer_arithmetic
+#print axioms trace26_cover_positive_frobenius_orbit
+#print axioms trace26_other_frobenius_orbit
 end GHSOdd5Ledger
