@@ -138,3 +138,14 @@ The first local Cargo command selected Homebrew rustc1.93 despite the newer Carg
 Trusted publication run 43817399144 selected no files because JSON below 1 MiB remains in Git under the existing policy. Removed the unused prospective store locator and ignore file; retained the exact new report in Git. Regenerated the two workflow pulls using the existing generator, which now passes its check. No upload is claimed.
 
 The release native cover checker regenerated all 22,300 rows and replayed its own committed output. All 22,278 previous certificate rows compare equal; 22 additional restored-registry rows are covered, with zero invalid or unsupported rows. Six catalog consistency controls pass. The registry, checker source, original scientific reports and raw evidence are unchanged by this metadata regeneration. Dated receipt records the generated file hashes.
+
+## Catalog display and registered software-control preparation (2026-11-16)
+
+### Validation
+The three merge checks passed at head 6458fa6a05. A final native standards check found that the mutable leaderboard display still pinned the rollback registry. Regenerated roster/source metadata with the existing helper; all scientific JSON values compare equal using exact Decimal parsing. The browser refresh changes its source digest alone. The original generator passes the refreshed complete display check. [pcc:unverified]
+
+### Implementation
+The catalog generator now batches sparse size queries, reuses resolved object IDs and keeps one bounded-lifetime Git batch reader for complete sparse reads. Materialized worktree inputs retain precedence; streaming record consumers keep their streaming path. Literal-prefix pruning retains the original component matcher. Ten controls cover sparse, deleted, staged, missing, binary, empty, newline, hidden and bracket-name cases and child cleanup on generation failure. Fixed three legacy test fixtures to close their new batch readers explicitly; all ten controls pass with ResourceWarning treated as an error. [pcc:unverified]
+
+### Measurement boundary
+Private profiling identified subprocess overhead; its exploratory times are not a registered performance result. Freeze the checked source/input hashes and the baseline/candidate/candidate/baseline protocol in the code commit before opening all four benchmark records. Raw JSON and the standard progress report follow the existing benchmark-record and CI S3-custody flow. These are unisolated local software controls with no elliptic-curve price or rho claim.
