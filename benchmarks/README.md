@@ -1,5 +1,7 @@
 # Benchmarks
 
+The [production section-shortcut comparison](20261115-hec-jetfree631/) verifies all ten cells but demonstrates no stable speedup: median previous-direct/production ratio 0.930, with strong run-order drift in both arms. The registered 10x gate fails. Component accounting only; separate from the prior 1.621x cohort and outside admitted results. [Record](records/20261116T0331Z-hec-jetfree631.json) [pcc:unverified].
+
 The [F631 inverse component comparison](20261115-hec-inversecost631/) verifies all ten cells. Direct symmetric inversion has median 1.503780 s versus ordered 2.437092 s, a derived 1.621x component gain; the 10x gate fails. Quotient setup and public-coordinate preparation are reused outside the timer. Shared ARM host, unvalidated producer evidence; no cold end-to-end gain or admitted leaderboard change. [Record](records/20261116T0314Z-hec-inversecost631.json) [pcc:unverified].
 
 The [15 November complete-cold genus-3 quotient comparison](20261115-hec-coldcost13/)
