@@ -21,8 +21,16 @@ clean source build and its binary/image hashes still need binding for launch.
 
 The [machine-readable protocol](protocol.json) passed the
 `experiment.protocol/v1` checker with zero findings and was frozen before
-data at canonical hash
+data as [version 1](protocol-v1.json) at canonical hash
 `8a090e8c7ee70c6969ef652eaab0c0ade66cc4cba6794b5b9f281491c7c05b66`.
+[Amendment 1](AMENDMENT-1.md) was filed before any panel data and froze
+version 2 at canonical hash
+`441c2fd187f759d3e5cccaf78c89ede1057ab0d92bd9a44cbd8055ba6b0c228a`.
+It accepts NUMA node zero and requires the fixed registered curve, target seed,
+indices and cross-arm workload identity. Its synthetic 560-row acceptance,
+wrong-seed rejection and changed-target rejection controls passed; one
+existing L2 K13 record demonstrated the former zero-node bug. These are
+local validation observations [pcc:unverified], not study data.
 The [prose protocol](PROTOCOL.md) defines the same full cold L2 wall rule,
 all-pair requirement, Bonferroni-adjusted intervals, A/A, replay and failure
 handling. The [analysis script](analyze.py) is pinned in the JSON protocol;
@@ -51,8 +59,9 @@ it does not resolve the measurement or budget impediment.
 
 ## Checkable resume
 
-Publish a GitHub receipt binding the combined spec, both protocols, analysis
-script and exact source commit after these files are committed and pushed.
+Publish a new GitHub receipt binding the combined spec, both protocol versions,
+amendment, corrected analysis script and exact source commit after these files
+are committed and pushed. The version 1 receipt remains immutable.
 At admission,
 re-read daily and monthly balances including reserved spend, confirm at least
 USD 5 remaining headroom in each, check for an existing request/Job under the

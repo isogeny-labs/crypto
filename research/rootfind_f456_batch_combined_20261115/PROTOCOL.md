@@ -114,3 +114,12 @@ The JSON protocol holds the machine-readable variable ledger, comparisons,
 metrics, invalidation and freeze fields. The source and spec hashes in the
 publication receipt are authoritative for launch; an updated source requires
 a new receipt. A timing result here is limited to K13 and this fixed panel.
+
+## Pre-data analyzer amendment
+
+[Amendment 1](AMENDMENT-1.md) and [protocol v2](protocol.json) correct the
+analyzer's admission rule before any panel data. NUMA node zero is valid;
+every row must also identify the frozen registered curve, target seed and
+index, with the same workload hash and target point across all arms and
+rounds. The [original protocol](protocol-v1.json) remains available by its
+frozen hash. The sample count, metric and comparison rules above are unchanged.

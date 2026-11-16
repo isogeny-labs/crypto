@@ -63,6 +63,7 @@ fn replay_recomputes_and_rejects_tampered_digest() {
     assert!(output.status.success());
     let receipt: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(receipt["checked"], 16);
+    assert_eq!(receipt["three_checked"], 16);
     rows.iter_mut().find(|r| r["kind"] == "query").unwrap()["result_sha256"] =
         Value::String("00".repeat(32));
     write(&rows);
