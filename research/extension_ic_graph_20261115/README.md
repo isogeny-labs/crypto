@@ -78,6 +78,13 @@ Observed LA primitive bitops fall903928056050to661359105264, including6171
 known gate events; other phases match. Native bookkeeping remains incomplete,
 with no full-cost ratio or parity assertion. [pcc:unverified]
 
+The [recorded normalization replay](runpod-recorded-zero-normalization-20261116-36/report.pdf)
+measures the remaining dense-normalization candidate before a library change.
+It avoids105532modular products with150156added zero tests, with all390pivot
+states independently matching and the same scalar/rank. Subtractions and
+inversions are unchanged. This is a matrix component, without repricing35
+or claiming a new DLP sample or complete-cost ratio. [pcc:unverified]
+
 ## Three graph representations in the Rust integration
 
 | Representation | Vertices and edges | Computation |

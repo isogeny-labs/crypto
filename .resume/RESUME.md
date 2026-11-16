@@ -1,3 +1,52 @@
+# Current checkpoint:36COMPLETE/QUALIFIED/COLLECTED/DELETED; publish packet
+
+GoalACTIVE/RustgraphIC+cheapalgebraicrelationfinderresearchtowardrho parity.
+UserallscienceRust/allfuturemeasurementsRunpod. No subagents/stopgoal.
+ALLownpaidpods32/33/34/35/36DELETED;no compiler/scientificjobactive.
+Privateauthpointer/tmp/ic-runpod-auth-location persists;NEVERprintkey/header/token/
+envresponses/copyAPIkeytoPod. Don'taskcredential/profileagain.
+
+36source6a8258839beforeoneRunpodPOST20218:19:40Z. Immutable35candidateinput
+571735B SHA11ac30e4e22202b12dd79fe9d30085b15979b89a47809e7e876f9017a875cfe3,
+originalsourcec79. Bothmodes+separatecolumn-keyedu128oracle matchALL390inserted
+pivotstates/actualscalar61513282845831007/rank387/columns387;batchtargetmatches.
+Baseline7897311M→candidate7791779M,normalization150156→44624M;105532zero products
+avoided/150156addedzero-testwordeventscharged. Subtractions7747155/inverses387,
+factorconstructions72593/scanprofilesunchanged. Incompleteobservedbitops
+326047986000→321779117640. Nativegapspersist,no ratio/band/completecost,
+NOnewDLPsample/NO35end-to-end repricing/composition/NOproductionintegrationyet.
+1pairedreplay0warm/retry,worker+copiedqualifierexit0,1.543swholepracticality
+includesdiagnostichashing/baselinezero-observer. PCC77059aUNVERIFIED;
+lessonO-b66f645e86d7.20qualifier/18driver/sourceClippy/build/transportcontrolspass.
+
+LOCALexact/workspace/ic-runpod-runs/runpod-recorded-zero-normalization-20261116-36/
+returned/task/run:109777Braw/685889Bexport/571735Binputuntruncated/hashbound;
+2880BsummaryGitpacket. All290committedsource/input/portablepre/preworker/post/
+qualifiedhashPASS. Originalinputcmp35exact;credentialsabsent. Ownpodh0vdoz5vz4mtn3
+CPU4vCPU8GiB0.12USDh/actualCPU47v2DELETE204+GET40418:21:55Zaftercollection;
+privatepod-ID.deletedmarker/900sguardinert. FinalonepagePDFVIEWED/exactPDF/SVG/
+150dpiPNG/nativefigurecopieshashPASS. No originalraw/qualifier/summarymodified.
+Packetresearch/.../runpod-recorded-zero-normalization-20261116-36;benchmarks/
+20261116-runpod-zero-normalization. CurrentlyDIRTYpacket/PCC/lesson/journal/resume/
+studyREADME;nextcommitpushandPRactual36afterPCCproselint0.
+
+NEXTafterpublication: focusactualrelation/descentfinderparameterbalanceusing
+existingRustcode/flagsbeforeanotherRREFrewrite. Possiblefactor-base-fraction
+sweep(existing--small-percent)onfreshmatchedpubliccurvewithstructuralgate,
+compareoriginalICcontext; readactualconstructor/collector+JV3.3/KBbeforechoosing.
+No37protocol/call/implementationselectedyet. Do NOTcompose36numberswith35or34;
+no computedfullpipelinegain. ActualEllEhasgenerala2/a4fromalpha/sigmaalpha,
+notanassumedj0model;don'timplementorder3CMfoldwithoutsource/applicabilitycheck.
+Thebroadnew-sparse-RREFrewritepremisewasalreadyrefutedbyactualexistingzeroskips.
+
+Keepgoalactive. Completeparity/publicunknown-logcohort/strongestreferences/full
+unpricedcountrequirementsremainopen,notablockertoconcretework. No manualmerge;
+PR4288regular/automerge/requiredCIreviewunconfirmed. Last7fCIread17:53EMPTY,
+newpublicationeventcanread;don'tbusypoll. ArtifactbotifPNGmigrationinspect/FF/
+exactignoredPNGrestorefromLOCAL/hash;neverreaddignoredPNG. Maintain<=60secprogress
+commentary;don'tspend5-14minonspeculativealgebrawithouttoolactions. Chooseone
+concretelead, nativecontrols, freeze/publishBEFOREnextRunpodcall.
+
 # Current checkpoint:36SOURCE READY; ownRunpodCPUready/NOTDISPATCHED
 
 GoalACTIVE/RustICgraph+cheapalgebraicfinderresearchtowardrho parity,Runpodonly
