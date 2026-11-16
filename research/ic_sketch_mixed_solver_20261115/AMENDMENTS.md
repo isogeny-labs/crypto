@@ -50,3 +50,25 @@ Predictions for the new arm (exploratory; scored separately from P1–P6):
 
 Part A v3 runs all 11 arms; Part B specs gain the `mixed-peel-lazy` arm before any
 Part B run.
+
+## A3 (2026-11-16, after Part B on real curves; `mixed-peel*` defect)
+
+Part B v1 (`sessions/aborted-A3/`; p24 complete with 352 records, p28 stopped by hand at
+254) showed every `mixed-peel` variant **exhausting the 10^8-trial cap** on 11 of 32
+p24 runs and 7–8 of 23 p28 runs, at structural full rank. Every other arm verified
+32/32 (p24) and 23/23 (p28). Cause: real index-calculus rows are
+`±x_i ± x_j + b·t = a`: the factor-base coefficients are ±1, not random. The
+Schwartz–Zippel argument of the protocol (a full matching makes the matched square
+block non-singular with probability ≥ 1 − cols/r) assumed random coefficients, and is
+false here: an even cycle of ±1 rows in the column graph is singular whichever rows
+the matching picks, and the retry cadence kept picking the same block. Part A's
+synthetic streams used random coefficients, so they could not show it; P2 and Q1
+were scored on that assumption and hold only for random-coefficient rows.
+
+Change (implementation only; predictions unchanged): when the matched square block is
+singular, `mixed-peel*` eliminates over **all stored rows** (same peeling and
+Markowitz code, pivots chosen among every row), checks every row against the
+solution, and stays in that mode. New unit test `mixed_peel_solves_signed_two_term_rows`.
+Part A is re-run (v4; it must reproduce v3 exactly, since the fallback only fires on
+a singular block) and Part B is re-run in full with the fixed binary. Part B v1 is kept
+as the observed failure.

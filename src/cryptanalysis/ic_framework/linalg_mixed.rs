@@ -282,6 +282,10 @@ struct MixedState {
     uncovered: usize,
     bookkeeping: u64,
     arithmetic: u64,
+    /// Amendment A3: the matched square block was singular once; solve
+    /// over all stored rows from then on.
+    fallback: bool,
+    fallbacks: u64,
 }
 
 /// `mixed-peel`: see the module documentation.
@@ -343,14 +347,42 @@ impl MixedPeel {
             return;
         }
         st.attempts += 1;
-        let matched: Vec<usize> = (0..self.cols)
+        let square: Vec<usize> = (0..self.cols)
             .map(|c| gate.row_of(c).expect("full matching"))
             .collect();
-        let solved = if st.lazy {
-            solve_square_fast(&st.rows, &matched, self.cols, self.modulus)
-        } else {
-            solve_square(&st.rows, &matched, self.cols, self.modulus)
+        let all: Vec<usize> = (0..st.rows.len()).collect();
+        let solve = |rows: &[usize], st: &MixedState| {
+            if st.lazy {
+                solve_square_fast(&st.rows, rows, self.cols, self.modulus)
+            } else {
+                solve_square(&st.rows, rows, self.cols, self.modulus)
+            }
         };
+        // Amendment A3: index-calculus rows carry ±1 on the factor-base
+        // columns, so a full matching does not make the matched square
+        // block non-singular (an even cycle of ±1 rows is singular whatever
+        // the matching).  When the square block fails, eliminate over every
+        // stored row instead (pivots chosen among all of them), and from
+        // then on go straight to that.
+        let mut matched = if st.fallback { all.clone() } else { square };
+        let mut solved = solve(&matched, st);
+        if solved.is_err() && !st.fallback {
+            if let Err(rep) = solved {
+                st.bookkeeping += rep.book;
+                st.arithmetic += rep.row_ops - rep.book;
+                st.row_ops += rep.row_ops;
+                st.inversions += rep.inversions;
+                st.failed_attempts += 1;
+            }
+            st.fallback = true;
+            st.fallbacks += 1;
+            matched = all;
+            solved = solve(&matched, st);
+        }
+        if st.fallback {
+            // Every row is checked below: none is "matched".
+            matched.clear();
+        }
         match solved {
             Ok((x, rep)) => {
                 st.bookkeeping += rep.book;
@@ -381,7 +413,7 @@ impl MixedPeel {
                         return;
                     }
                 }
-                st.dependent += (st.rows.len() - self.cols) as u64;
+                st.dependent += st.rows.len().saturating_sub(self.cols) as u64;
                 st.solution = Some(x);
             }
             Err(rep) => {
@@ -390,8 +422,7 @@ impl MixedPeel {
                 st.row_ops += rep.row_ops;
                 st.inversions += rep.inversions;
                 st.failed_attempts += 1;
-                // Numerically singular despite a full matching
-                // (probability at most cols / r): retry on a cadence.
+                // Rank-deficient over all stored rows: retry on a cadence.
                 st.next_attempt = st.rows.len() + (self.cols / 32).max(1);
             }
         }
@@ -434,14 +465,16 @@ fn solve_square(
             col_rows[c as usize].push(i as u32);
         }
     }
-    let mut row_alive = vec![true; n];
+    let _ = nr;
+    let nr = matched.len();
+    let mut row_alive = vec![true; nr];
     let mut col_alive = vec![true; n];
     let mut col_w: Vec<usize> = col_rows.iter().map(|v| v.len()).collect();
     let mut x = vec![0u64; n];
     let mut known = vec![false; n];
     // Back-substitution stack: (row index, its pivot column, its frozen entries, rhs).
     let mut stack: Vec<(u32, u32)> = Vec::new();
-    let mut frozen: Vec<Option<(BTreeMap<u32, u64>, u64)>> = vec![None; n];
+    let mut frozen: Vec<Option<(BTreeMap<u32, u64>, u64)>> = vec![None; nr];
 
     // Live rows of a column (lazy: incidence lists keep stale entries).
     // Lists can hold a row twice (a cancelled entry refilled later), so
@@ -462,7 +495,7 @@ fn solve_square(
     while changed {
         changed = false;
         // Forward: rows with one live column.
-        for i in 0..n {
+        for i in 0..nr {
             if !row_alive[i] || w[i].len() != 1 {
                 continue;
             }
@@ -635,12 +668,13 @@ fn solve_square_fast(
         }
         book!(row.len());
     }
-    let mut row_alive = vec![true; n];
+    let nr = matched.len();
+    let mut row_alive = vec![true; nr];
     let mut col_alive = vec![true; n];
     let mut col_w: Vec<usize> = col_rows.iter().map(|v| v.len()).collect();
     let mut x = vec![0u64; n];
     let mut stack: Vec<(u32, u32)> = Vec::new();
-    let mut frozen: Vec<Option<(BTreeMap<u32, u64>, u64)>> = vec![None; n];
+    let mut frozen: Vec<Option<(BTreeMap<u32, u64>, u64)>> = vec![None; nr];
     let live_rows = |c: usize,
                      col_rows: &Vec<Vec<u32>>,
                      w: &Vec<BTreeMap<u32, u64>>,
@@ -658,7 +692,7 @@ fn solve_square_fast(
         v.dedup();
         v
     };
-    let mut row_q: Vec<u32> = (0..n as u32).filter(|&i| w[i as usize].len() == 1).collect();
+    let mut row_q: Vec<u32> = (0..nr as u32).filter(|&i| w[i as usize].len() == 1).collect();
     let mut col_q: Vec<u32> = (0..n as u32).filter(|&c| col_w[c as usize] == 1).collect();
     book!(2 * n);
     loop {
@@ -995,6 +1029,9 @@ impl RelationSolver for MixedPeel {
         out.insert("mixed_peeled_backward".into(), st.peeled_backward);
         out.insert("mixed_core_dim".into(), st.core_dim);
         out.insert("mixed_core_fill".into(), st.core_fill);
+        if st.fallbacks > 0 {
+            out.insert("mixed_fallbacks".into(), st.fallbacks);
+        }
         if st.lazy {
             out.insert("mixed_bookkeeping".into(), st.bookkeeping);
             out.insert("mixed_arithmetic".into(), st.arithmetic);
@@ -1124,6 +1161,49 @@ mod tests {
                 assert_eq!(s.rank(), cols);
                 for c in 0..cols {
                     assert_eq!(s.pinned(c), Some(x[c]), "seed {seed} col {c}");
+                }
+            }
+        }
+    }
+
+    /// Index-calculus rows `±x_i ± x_j + b·t = a` (±1 on the base): the
+    /// matched square block can be singular (even ±1 cycles); every
+    /// variant must still solve, through the all-rows fallback.
+    #[test]
+    fn mixed_peel_solves_signed_two_term_rows() {
+        let m = 16_782_299u64;
+        for seed in 0..120u64 {
+            let mut rng = StdRng::seed_from_u64(0xA3 ^ seed);
+            let fb = [8usize, 32, 128][(seed % 3) as usize];
+            let cols = fb + 1;
+            let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..m)).collect();
+            for variant in 0..3 {
+                let mut s = match variant {
+                    0 => MixedPeel::new(cols, m),
+                    1 => MixedPeel::with_bloom(cols, m, 10, 4),
+                    _ => MixedPeel::lazy(cols, m),
+                };
+                let mut r2 = StdRng::seed_from_u64(seed);
+                let mut done = false;
+                for _ in 0..60 * cols {
+                    let mut row = vec![0u64; cols];
+                    let i = r2.gen_range(0..fb);
+                    let j = r2.gen_range(0..fb);
+                    let si = if r2.gen_bool(0.5) { 1 } else { m - 1 };
+                    let sj = if r2.gen_bool(0.5) { 1 } else { m - 1 };
+                    row[i] = addmod(row[i], si, m);
+                    row[j] = addmod(row[j], sj, m);
+                    row[fb] = r2.gen_range(1..m);
+                    let rhs = row.iter().zip(&x).fold(0u64, |a, (&p, &q)| addmod(a, mulmod(p, q, m), m));
+                    assert_ne!(s.add_row(row, rhs), RowStatus::Inconsistent);
+                    if s.pinned(fb).is_some() && s.rank() == cols {
+                        done = true;
+                        break;
+                    }
+                }
+                assert!(done, "seed {seed} variant {variant}: not solved");
+                for c in 0..cols {
+                    assert_eq!(s.pinned(c), Some(x[c]), "seed {seed} variant {variant} col {c}");
                 }
             }
         }
