@@ -1,0 +1,30 @@
+# Process/file/hash orchestration only, no research arithmetic.
+from pathlib import Path
+import subprocess,json,hashlib,sys,os,datetime,shutil
+root=Path('/workspace/crypto-twist-field-cost');scope=Path('research/quadratic_twist_field_cost_20261116');out=Path(sys.argv[1]);head=sys.argv[2];phase=sys.argv[3];assert phase in ['build','run'];assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==head;assert subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True)==''
+pins=json.loads((root/scope/'PINS.json').read_text())
+for p,h in pins['inputs'].items():assert hashlib.sha256((root/p).read_bytes()).hexdigest()==h
+if phase=='build':assert not out.exists();out.mkdir()
+else:assert(out/'build.json').exists()
+stages=[];start=datetime.datetime.now(datetime.timezone.utc).isoformat();deadline=datetime.datetime.fromisoformat('2026-11-16T01:42:00+00:00');env=dict(os.environ,CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup',CARGO_BUILD_JOBS='2',CARGO_TARGET_DIR='/workspace/twist-field-cost-20261116/cargo-target')
+def run(n,cmd,expected=0):
+ remain=int((deadline-datetime.datetime.now(datetime.timezone.utc)).total_seconds());assert remain>0
+ with(out/(n+'.stdout')).open('wb')as a,(out/(n+'.stderr')).open('wb')as b:p=subprocess.run(['timeout',str(min(600,remain)),*cmd],cwd=root,env=env,stdout=a,stderr=b)
+ stages.append(dict(name=n,command=cmd,exit=p.returncode,expected=expected));(out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n');assert p.returncode==expected,(n,p.returncode)
+try:
+ if phase=='build':
+  for name,flag in [('counted','1'),('release','0')]:run('build-'+name,['g++','-std=c++20','-O3','-march=native','-DCOUNT_OPERATIONS='+flag,'-I/workspace/twist-native-tooling/include','-I/workspace/twist-field-cost-20261116/ntl/include',str(scope/'native/scale.cpp'),'-L/workspace/twist-field-cost-20261116/ntl/lib','-lntl','-lgmp','-lcrypto','-o',str(out/name)])
+  run('build-audit',['/workspace/twist-native-tooling/cargo/bin/cargo','+1.85.1','build','--offline','--locked','--release','--manifest-path',str(scope/'native/Cargo.toml')]);shutil.copyfile(Path(env['CARGO_TARGET_DIR'])/'release/twist-field-cost-scale-audit',out/'auditor');(out/'auditor').chmod(0o700)
+  build=dict(checkpoint=head,inputs=pins['inputs'],binaries={n:hashlib.sha256((out/n).read_bytes()).hexdigest()for n in ['counted','release','auditor']},commands=stages.copy());(out/'build.json').write_text(json.dumps(build,indent=2)+'\n');sys.exit(0)
+ build=json.loads((out/'build.json').read_text());proto=json.loads((root/scope/'protocol.json').read_text());assert build['binaries']==proto['extensions']['binary_pins'];assert all(hashlib.sha256((out/n).read_bytes()).hexdigest()==h for n,h in build['binaries'].items())
+ (out/'precall.json').write_text(json.dumps(dict(checkpoint=head,build=build,protocol_sha256=hashlib.sha256((root/scope/'protocol.json').read_bytes()).hexdigest(),qualifier_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),start=start),indent=2)+'\n')
+ for tag,binary in [('C','counted'),('A','release'),('B','release')]:
+  run('producer'+tag,[str(out/binary),str(out/('cases'+tag))]);run('audit'+tag,[str(out/'auditor'),str(out/('cases'+tag)),str(out/('audit'+tag+'.json'))])
+ receipts=[json.loads((out/('audit'+t+'.json')).read_text())for t in ['C','A','B']];assert len(set(r['semantic_sha256']for r in receipts))==1
+ controls=[]
+ for m in pins['modes']:
+  p=out/('false-'+m);receipt=out/('false-'+m+'-receipt.json');run('mutate-'+m,[str(out/'counted'),'mutate',str(out/'casesC'),str(p),m]);assert(p/'cases.json').read_bytes()!=(out/'casesC/cases.json').read_bytes()or m=='trace'
+  run('reject-'+m,[str(out/'auditor'),str(p),str(receipt)],101);assert not receipt.exists();controls.append(dict(mode=m,payload_sha256=hashlib.sha256((p/'cases.json').read_bytes()).hexdigest(),receipt=False))
+ (out/'controls.json').write_text(json.dumps(controls,indent=2)+'\n')
+finally:
+ (out/('build-stages.json'if phase=='build'else'data-stages.json')).write_text(json.dumps(stages,indent=2)+'\n');(out/('build-postcall.json'if phase=='build'else'postcall.json')).write_text(json.dumps(dict(checkpoint=head,start=start,finish=datetime.datetime.now(datetime.timezone.utc).isoformat(),stages=len(stages)),indent=2)+'\n')

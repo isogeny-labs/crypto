@@ -318,6 +318,9 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
+      - name: Test frozen archive pointer recovery
+        run: python3 .github/scripts/test_ecbench_hydrate_pointers.py
       - name: Test audit download partitioning
         run: python3 .github/scripts/test_ecbench_download_shard.py
       - name: Plan audit downloads once from hydrated sessions
@@ -396,6 +399,15 @@ jobs:
           python3 research/ecbench_factor_bases_20261013/check_fb_ids.py
           python3 research/ecbench_factor_bases_20261013/check_fbm_ids.py
           python3 -m py_compile research/ecbench_factor_bases_20261013/join_sage_dor.py
+      - name: Re-derive the conductor-gap instruction census from archived profiles
+        run: |
+          study=research/ecbench_conductor_gap_ir_20261014
+          archive=research/ecbench_conductor_gap_20261012
+          cargo test --release --example conductor_gap_ir
+          (cd "$study" && sha256sum -c raw-callgrind.tar.xz.sha256)
+          tar -xJf "$study/raw-callgrind.tar.xz" -C "$study"
+          cargo run --release --example conductor_gap_ir -- analyze "$study" "$archive"
+          git diff --exit-code -- "$study/analysis.json" "$study/analysis.md"
       - name: Host
         run: ./target/release/ecbench host | tee -a "$GITHUB_STEP_SUMMARY"
       # Bounds are re-derivable from the sessions they name, challenges must
@@ -715,6 +727,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - name: Weigh every session, check the long-session pins and plan the week
         env:
           QUARTER: ${{ inputs.quarter }}
@@ -787,6 +800,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/mine.txt"
           printf '/%s/\n' "${artifact_sessions[@]}" | git sparse-checkout add --stdin
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - uses: actions/download-artifact@v4
         if: steps.mine.outputs.count != '0'
         with:
@@ -864,6 +878,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - uses: actions/download-artifact@v4
         with:
           name: ecbench-pr-audit-bin
@@ -946,6 +961,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - uses: actions/download-artifact@v4
         with:
           name: ecbench-pr-audit-bin

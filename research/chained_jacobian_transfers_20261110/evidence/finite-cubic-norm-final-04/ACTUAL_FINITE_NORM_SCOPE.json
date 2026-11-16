@@ -1,0 +1,45 @@
+{
+  "time": "2026-11-16T20:08:32.225220+00:00",
+  "source_sha256": "5f9ad6da74d02cc262e04a4255b31305db48f035d0976f99cfedfa76e31a873d",
+  "exact_constructor_prefix_sha256": "e81532c9df6d5c416f26693ed7849d70e512d5225558adbab5147266f1e59738",
+  "both_original_gates": "37 audited/0 failing/0 trusted each",
+  "new_named": 20,
+  "new_generated": [
+    "CubicFiniteNorm22308.coefficientNorm.eq_1",
+    "CubicFiniteNorm22308.coefficientProduct.eq_1",
+    "CubicFiniteNorm22308.cofactor.eq_1",
+    "CubicFiniteNorm22308.scale.eq_1"
+  ],
+  "literal_full04_definitions": [
+    {
+      "name": "coefficientProduct",
+      "bytes": 213,
+      "sha256": "414306df34419bdfcaef09c844b18ef8436b027cf05d7acb632b318bb4862e06",
+      "same_literal_definition_as_full04": true
+    },
+    {
+      "name": "cofactor",
+      "bytes": 149,
+      "sha256": "7c8edec2eaf02c1302b66849eef0f84e7b87b9331ddbd62dddab91e93d1dc2a9",
+      "same_literal_definition_as_full04": true
+    },
+    {
+      "name": "coefficientNorm",
+      "bytes": 114,
+      "sha256": "7ffdc9c8b6855aa677ab8108fe903cebb32d4ab9ee9d66215f174458dec2ee04",
+      "same_literal_definition_as_full04": true
+    },
+    {
+      "name": "scale",
+      "bytes": 122,
+      "sha256": "74c8cda18417f82725079e2217028d095a1820d4be8e02b0fbb34ae366312e93",
+      "same_literal_definition_as_full04": true
+    }
+  ],
+  "resources": "one worker/120s/original memory defaults, default tactics unchanged",
+  "finite_certificates": "only223 base elements per certificate; no223^3 triple enumeration",
+  "mathematical_result": "coefficientNorm x=0 iff x=(0,0,0), explicit N^221*N=1 and both finite schoolbook/cofactor inverse orders for every nonzero tuple, no supplied norm/unit/domain assumption",
+  "controls": "zero/unit axis and reducible d=1 nonzero(222,1,0) zero norm",
+  "rejections": "firste5bbb1 missing mul-zero simp; second7faa57 leaves sub-zero; both full sources/sorryAx rejected. Final original grind only repairs one low-degree simplification, no statement/hypothesis/gate/limit change",
+  "limits": "no full cubic CommRing/field instance, Rust norm/Fp.inv loop/compiler, actual Jacobian/group map, counters, runtime/cold benchmark/original population/admission/signed proof"
+}

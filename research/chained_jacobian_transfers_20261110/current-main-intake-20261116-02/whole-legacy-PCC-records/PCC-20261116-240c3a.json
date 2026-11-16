@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T20:48:42Z",
+ "id": "PCC-20261116-240c3a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e12f0ed198ebe96f5be4e7e43ffa9613ab05fb51",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "77797db223f6a239b8961f961343f0f8bde205744ce75c52a5b6bab11f2a2080",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+   "theorem": "CubicNativeNormEuclid22309.euclid_trace_safety_table"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal normalized UInt64 q223 norm and actual signed Euclid arithmetic; finite223 certificates derive termination/gcd/unit/all-state signed64 safety. Original dual66/0/j1/120/default memory. Seventeen complete types include two explicit corollaries replacing original let-type binding limitations; no Rust compiler/complete composition/field/Jacobian/counter/runtime or signed standing.",
+ "statement": "theorem euclid_trace_safety_table : \u2200 n : Fin 223, (euclidTrace 16 (initialState n)).all (fun s => decide (safeState s))=true"
+}

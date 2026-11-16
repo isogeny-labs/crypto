@@ -1,0 +1,59 @@
+{
+  "schema": "gaudry.cubic.local-evidence/v1",
+  "source_revision": "73efa9eb54b7d6d329639fb704ae1aab240de0f1",
+  "raw": {
+    "path": "/workspace/ic-local-runs/local-delayed-pseudo-pair-20261116-17/raw.jsonl",
+    "sha256": "44adbecea77c1115f873af9897e1e85d7fb534971a9f69197075e5649a5b298a",
+    "bytes": 2502689,
+    "custody": "local_user_authorized_remote_upload_pending"
+  },
+  "flow": {
+    "planned_executions": 810,
+    "attempted_executions": 810,
+    "completed_executions": 810,
+    "in_flight_executions": 0,
+    "unattempted_executions": 0,
+    "phases": {
+      "measurement": 675,
+      "warmup": 135
+    }
+  },
+  "outer_wall_seconds": 19.901,
+  "complete_aa_rejected_strata": 1,
+  "direct_comparisons": [
+    {
+      "reference": "PreparedSymmetricPairOnly",
+      "candidate": "DelayedPseudoRemainderPairOnly",
+      "controlled": 8,
+      "upper_below_one": 8
+    },
+    {
+      "reference": "PreparedSymmetricPairOnly",
+      "candidate": "PseudoRemainderPairOnly",
+      "controlled": 9,
+      "upper_below_one": 5
+    },
+    {
+      "reference": "PseudoRemainderPairOnly",
+      "candidate": "DelayedPseudoRemainderPairOnly",
+      "controlled": 8,
+      "upper_below_one": 2
+    }
+  ],
+  "measurement_attempts": 1,
+  "retries": 0,
+  "exit_code": 0,
+  "standard_lab_admission": false,
+  "canonical_export_validation": "unavailable_encrypted_vlt1_sources",
+  "post_call_presentation": {
+    "change": "shorten plot label only; report spacing",
+    "timing_rerun": false,
+    "original_summary_sha256": "a304610303f6fc22fbf86a0165e1af4c227c6dbc661be351becf53bf7ebf4d48",
+    "regenerated_summary_sha256": "a304610303f6fc22fbf86a0165e1af4c227c6dbc661be351becf53bf7ebf4d48",
+    "original_analyzer_sha256": "96ed928a77a34340c9afa6d603d81967f2ced8d78a25da7d04962923be7d8497",
+    "label_analyzer_sha256": "47c0ba91b2fe2f04415d14d82adc1df93a1c80955865f5ab05a7c26df5265915",
+    "label_source_sha256": "377c7904d38929f143b328e540564231cb555656701fd144578fb008b735344b",
+    "producer_summary_byte_equality": true,
+    "signed_independent_verdict": false
+  }
+}
