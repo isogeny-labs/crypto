@@ -70,9 +70,10 @@ fn run_arm(c: &PrimeCurve, g: PrimePoint, q: PrimePoint,
 
         let candidate = rho.recovered;
         if let Some(d) = candidate {
-            let mut check_ops = GroupOps::default();
-            if !rho.verified || c.mul(&mut check_ops, g, d) != q {
-                return Err(format!("bad rho collision arm={arm_label} case={case} seed={seed}"));
+            // rho_reference_negation / rho_walk_with_policy ALREADY charge
+            // the in-solver scalar verification in rho.wall_ns and rho.gae.
+            if !rho.verified {
+                return Err(format!("unchecked rho collision arm={arm_label} case={case} seed={seed}"));
             }
             recovered = Some(d);
         }
@@ -83,9 +84,20 @@ fn run_arm(c: &PrimeCurve, g: PrimePoint, q: PrimePoint,
         }));
         if recovered.is_some() { break; }
     }
+    // End the fully cold SOLVER call before the separately charged caller-side
+    // independent replay; otherwise WZ pays a second verifier while APS does
+    // not. The WZ library has already paid for its own scalar verification.
+    let solver_cold_wall_ns = cold.elapsed().as_nanos().to_string();
+    let mut replay_ops = GroupOps::default();
+    if let Some(d) = recovered {
+        if c.mul(&mut replay_ops, g, d) != q {
+            return Err(format!("external rho replay failed arm={arm_label} case={case}"));
+        }
+    }
     Ok(json!({
         "arm": arm_label, "complete": recovered.is_some(),
-        "log": recovered, "cold_wall_ns": cold.elapsed().as_nanos().to_string(),
+        "log": recovered, "cold_wall_ns": solver_cold_wall_ns,
+        "caller_replay_group_ops_outside_cold": replay_ops,
         "total_attempts": attempts.len(), "charged_steps": charged_steps,
         "charged_walks": charged_walks, "charged_gae": charged_gae,
         "attempts": attempts

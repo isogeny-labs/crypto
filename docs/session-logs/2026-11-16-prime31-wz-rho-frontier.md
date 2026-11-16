@@ -23,3 +23,23 @@
 - This execution environment has neither local Rust/Cargo nor GitHub clone/EKS access; Rust source is committed for GitHub Actions, not locally compiled. No fabricated benchmarks.
 - Shared canonical `docs/session-logs/2026-11-16.md` exceeds the connector's readable inline content and was empty with nonempty blob SHA; used this scoped log rather than overwriting concurrent sessions.
 - Repository main native source paths gave 404 despite existing at merged immutable SHA; pinned exact source and recorded the discrepancy rather than claiming those files have been permanently deleted.
+
+
+## 23:31–23:33 UTC — exact CI failure and repaired source pin
+
+### What was done (commands, files, features)
+- PR #4460 merged at 23:31:37Z with auto-merge enabled, **even though its source CI had failed**. Source-specific [run #43979628900](https://github.com/isogeny-labs/crypto/actions/runs/43979628900) failed in the *build* before running any math: `cargo test --example prime31_wz_rho_frontier` invoked on current main root, whose `crates/ecdl-tensor-ic/Cargo.toml` is absent; Cargo error `no matching package named ecdl-tensor-ic found`. No WZ benchmark or scalar answers were produced by this run.
+- Independently verified pinned merged commit `1df714645aa683cf975bc76fcacb9842cb4780fd` contains both missing `ecdl-tensor-ic` and `hashed-ecdl-tensor` manifests plus the complete native APS source, whereas current `main` does not resolve them.
+- On new branch `research/prime31-wz-rho-ci-repair-20261116`, updated the workflow to copy the new Rust example into the complete immutable pinned tree and build/run both the native APS solver and the exact library WZ rho benchmark from that pinned tree; same runner, same Q and known source. Commit `ab551608aa8a46598d44f448d11b3cc790fcea84`. This is a build-integration fix, not a new algorithm or measured result.
+
+### Decisions made (and why)
+- Retain the CI failure as an explicit negative execution record. A successful merge or source push does not imply completed benchmarking.
+- Repair on a distinct branch/PR, rather than rewriting merged history or restoring missing dependency crates on concurrently changing main.
+- Do not advertise a speedup, completion rate or WZ-versus-APS ordering until source-specific tests and full results pass; do not enable early merge of untested repair.
+
+### Open threads (unfinished, pick up next time)
+- Source-specific CI for the repaired workflow, root and native Rust tests, and all three complete WZ cold arms; independently audit raw JSON and maintain all truncated or failed attempts.
+- Fresh blind 96-Q CPU-isolated strongest-external-rho comparison and target-conditioned certified S9 extraction.
+
+### Errors (what went wrong, how it was handled)
+- First CI failed solely because current main root lacks the local `ecdl-tensor-ic` crate; no cryptographic runtime failure was observed. Separate pinned checkout was already present but was not used by the root Cargo invocation; now both builds target the complete pinned tree.

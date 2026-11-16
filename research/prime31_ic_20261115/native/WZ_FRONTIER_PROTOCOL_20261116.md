@@ -36,3 +36,7 @@ The workflow checks out the **immutable merged APS baseline** `1df714645aa683cf9
 ## Safety and evidence status
 
 Public synthetic points only. No private keys, real-world target, paid compute, merge, leaderboard promotion or claims of full cryptanalytic breakthrough. Source test and CI status must be read from actual Actions logs; a committed workflow is not a completed experiment.
+
+## Prospective measurement clarification before CI repair implementation (2026-11-16 UTC)
+
+The source-exact WZ reference **already verifies** every candidate internally and includes that scalar replay in `rho.wall_ns` and its `rho.gae` group-ops accounting. The new *independent caller-side* equality `[d]G=Q` is an audit operation, analogous to the caller-side APS-known-answer replay, and therefore must be performed **after stopping each arm's cold solver timer**. The first committed runner redundantly charged that additional external replay to WZ wall time while excluding it from WZ GAE. Fix both accounting mismatches before interpreting any WZ/APS comparison; retain the first-source failure as a failed build without claiming new timings. WZ's own original in-solver scalar verification remains fully charged. No previous benchmark gate or target seed is changed.
