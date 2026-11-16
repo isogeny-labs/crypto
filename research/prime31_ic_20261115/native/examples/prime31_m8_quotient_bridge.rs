@@ -37,6 +37,40 @@ fn value(poly:&[u64],x:u64)->u64{
 fn derivative(poly:&[u64])->Vec<u64>{
     poly.iter().enumerate().skip(1).map(|(i,&c)|mul(i as u64,c)).collect()
 }
+fn power(mut x:u64,mut e:u64)->u64 {
+    let mut out=1u64;
+    while e!=0 {
+        if e&1!=0{out=mul(out,x);}
+        x=mul(x,x);
+        e>>=1;
+    }
+    out
+}
+// Exact Euclidean check for squarefreeness over Fp; this does NOT
+// factor K or enumerate pair roots and is not an attack oracle.
+fn remainder(mut a:Vec<u64>,b:&[u64])->Result<Vec<u64>,String>{
+    let lead=*b.last().ok_or("division by zero polynomial")?;
+    if lead==0{return Err("unnormalized divisor".into());}
+    let inverse=power(lead,P-2);
+    while a.len()>=b.len(){
+        let offset=a.len()-b.len();
+        let factor=mul(*a.last().ok_or("empty dividend")?,inverse);
+        for (j,&coefficient) in b.iter().enumerate(){
+            let k=offset+j;
+            a[k]=sub(a[k],mul(factor,coefficient));
+        }
+        while a.last()==Some(&0){a.pop();}
+    }
+    Ok(a)
+}
+fn gcd_degree(mut a:Vec<u64>,mut b:Vec<u64>)->Result<usize,String>{
+    while !b.is_empty(){
+        let remainder=remainder(a,&b)?;
+        a=b;
+        b=remainder;
+    }
+    Ok(a.len().saturating_sub(1))
+}
 fn s3_pair(x:u64,y:u64)->Vec<u64>{
     // S3(x,y,U) on E:y^2=x^3+a x+b. Off-diagonal quadratic,
     // diagonal degree-one; the identity branch is not an affine root.
@@ -93,6 +127,13 @@ fn run()->Result<serde_json::Value,String>{
     if k.len()!=962 || quadratics!=465 || linears!=31{
         return Err("pair-support algebraic degree mismatch".into());
     }
+    // The original fixed B31 support was squarefree in an earlier Python
+    // diagnostic. Independently check it now using the Rust Fp Euclidean
+    // algorithm before claiming a reduced/separable coordinate quotient.
+    let squarefree_gcd_degree=gcd_degree(k.clone(),derivative(&k))?;
+    if squarefree_gcd_degree!=0 {
+        return Err(format!("K has repeated roots: gcd degree {squarefree_gcd_degree}"));
+    }
     let mut pair_tests=0u64;
     for (i,&u) in base.points.iter().enumerate(){
         for &v in base.points.iter().skip(i){
@@ -123,6 +164,8 @@ fn run()->Result<serde_json::Value,String>{
       "base_size":xs.len(),"full_dickson_x":base.values.len(),
       "rational_base_H_degree":h.len()-1,"H_squarefree":true,
       "pair_support_K_degree":k.len()-1,
+      "pair_support_K_gcd_derivative_degree":squarefree_gcd_degree,
+      "pair_support_quotient_is_reduced_over_Fp":squarefree_gcd_degree==0,
       "pair_S3_quadratic_factors":quadratics,"diagonal_linear_factors":linears,
       "checked_affine_signed_pair_roots":pair_tests,
       "eight_leaf_quotient_dimension":dimension.to_string(),
