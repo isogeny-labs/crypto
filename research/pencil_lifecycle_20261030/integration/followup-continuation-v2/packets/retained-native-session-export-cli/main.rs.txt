@@ -1,0 +1,31 @@
+mod custody;
+mod retained_export;
+use crypto_lib::cryptanalysis::ecbench::{canonical::sha256_hex,diagnostic_binding_core::parse,diagnostic_resources::FreshOwnerPins};
+use serde::Deserialize;
+use serde_json::{json,Value};
+use std::{path::{Path,PathBuf},fs::{File,OpenOptions},io::{Read,Write},os::unix::fs::OpenOptionsExt};
+#[derive(Deserialize)] #[serde(deny_unknown_fields)]
+struct Files {inventory_request:PathBuf,inventory_sha256:String,route:String,host:PathBuf,session:PathBuf,preparation:PathBuf,launch:PathBuf,contexts:Vec<PathBuf>,journal:PathBuf,owner:PathBuf,config:PathBuf,custody:PathBuf}
+#[derive(Deserialize)] #[serde(deny_unknown_fields)]
+struct Expected {fresh:FreshOwnerPins,controller_custody_sha256:String}
+#[derive(Deserialize)] #[serde(deny_unknown_fields)]
+struct Request {schema:String,files:Files,expected:Expected}
+fn digest(s:&str)->bool{s.len()==64&&s.bytes().all(|b|b.is_ascii_digit()||(b'a'..=b'f').contains(&b))}
+fn bounded(mut f:File,cap:usize)->Result<Vec<u8>,String>{if !f.metadata().map_err(|e|e.to_string())?.is_file(){return Err("regular file required".into())}let mut b=Vec::new();(&mut f).take(cap as u64+1).read_to_end(&mut b).map_err(|e|e.to_string())?;if b.len()>cap{return Err("input byte bound".into())}Ok(b)}
+fn write(out:&Path,name:&str,b:&[u8])->Result<(),String>{let mut f=OpenOptions::new().write(true).create_new(true).mode(0o400).custom_flags(libc::O_NOFOLLOW).open(out.join(name)).map_err(|e|e.to_string())?;f.write_all(b).and_then(|_|f.sync_all()).map_err(|e|e.to_string())}
+fn run(args:&[String])->Result<Value,String>{
+ if args.len()!=8{return Err("required: --request ABS --request-sha256 HEX --binary-sha256 HEX --out ABS".into())}
+ let mut flags=std::collections::BTreeMap::new();for pair in args.chunks_exact(2){if !["--request","--request-sha256","--binary-sha256","--out"].contains(&pair[0].as_str())||flags.insert(pair[0].as_str(),pair[1].as_str()).is_some(){return Err("unknown or duplicate CLI flag".into())}}
+ let request=Path::new(flags["--request"]);let out=Path::new(flags["--out"]);if !request.is_absolute()||!out.is_absolute()||out.exists(){return Err("absolute request and fresh absolute output required".into())}
+ if !digest(flags["--request-sha256"])||!digest(flags["--binary-sha256"]){return Err("lowercase SHA256 required".into())}
+ let b=bounded(OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW|libc::O_NONBLOCK).open(request).map_err(|e|e.to_string())?,1024*1024)?;let request_sha=sha256_hex(&b);if request_sha!=flags["--request-sha256"]{return Err("CLI request hash mismatch".into())}
+ // Only this fixed kernel magic link is followed, to identify the executing image.
+ let exe=bounded(File::open("/proc/self/exe").map_err(|e|e.to_string())?,256*1024*1024)?;let executable_sha=sha256_hex(&exe);if executable_sha!=flags["--binary-sha256"]{return Err("CLI executable hash mismatch".into())}
+ let r:Request=serde_json::from_value(parse(&b,1024*1024)?).map_err(|e|e.to_string())?;if r.schema!="ecbench.retained-export-cli-request/v1"{return Err("CLI request schema".into())}
+ let f=r.files;for p in [&f.inventory_request,&f.host,&f.session,&f.preparation,&f.launch,&f.journal,&f.owner,&f.config,&f.custody].into_iter().chain(f.contexts.iter()){if !p.is_absolute(){return Err("absolute native input paths required".into())}}
+ let native=retained_export::NativeFiles{inventory_request:f.inventory_request,inventory_sha256:f.inventory_sha256,route:f.route,host:f.host,session:f.session,preparation:f.preparation,launch:f.launch,contexts:f.contexts,journal:f.journal,owner:f.owner,config:f.config,custody:f.custody};let expected=retained_export::Expected{fresh:r.expected.fresh,controller_custody_sha256:r.expected.controller_custody_sha256};let report=retained_export::export(&native,&expected,out)?;
+ let rb=bounded(OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW|libc::O_NONBLOCK).open(out.join("export-report.json")).map_err(|e|e.to_string())?,16*1024*1024)?;
+ let receipt=json!({"schema":"ecbench.retained-export-cli-invocation/v1","status":"postrun_structural_export_checked","request_sha256":request_sha,"executable_sha256":executable_sha,"export_report_sha256":sha256_hex(&rb),"output":out,"owner_authentication_verified":false,"external_owner_verification_required":true,"worker_allocation_ns":null,"total_active_worker_ns":null,"exact_kernel_exit_ns":null,"scientific_execution_admitted":false,"report":report});
+ write(out,"cli-request.json",&b)?;write(out,"cli-invocation.json",&serde_json::to_vec(&receipt).map_err(|e|e.to_string())?)?;File::open(out).and_then(|f|f.sync_all()).map_err(|e|e.to_string())?;Ok(receipt)
+}
+fn main(){let args:Vec<String>=std::env::args().skip(1).collect();match run(&args){Ok(v)=>println!("{v}"),Err(e)=>{let out=args.windows(2).find(|p|p[0]=="--out").map(|p|p[1].clone());let exists=out.as_ref().map(|p|Path::new(p).exists()).unwrap_or(false);eprintln!("{}",json!({"schema":"ecbench.retained-export-cli-error/v1","status":"failed","error":e,"requested_output":out,"output_exists":exists,"output_may_contain_partial_files":exists,"retry_performed":false,"owner_authentication_verified":false}));std::process::exit(1)}}}

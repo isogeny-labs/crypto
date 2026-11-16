@@ -1,0 +1,47 @@
+{
+  "schema": "ecdlp.claim-corpus/v1",
+  "fragment": "lean-pq2-20261104",
+  "notes": "Kernel-checked degree-2 solving-degree criterion aimed at Petit-Quisquater Assumption 2 (WEAKNESS_TRIAGE W1). Lean module research/ecdlp_weakness_lean_20261104/lean/SolvingDegreeBound.lean. It does not refute the assumption: it reduces the literal reading (D_reg = D_ff + o(1) with D_ff = 2) to a per-instance rank check.",
+  "sources": [],
+  "nodes": [
+    {
+      "id": "THM-SD-DEGREE2-CRITERION",
+      "label": "Solving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Let F be polynomials over a field, I = <F>, 1 not in I, and fix a degree-compatible monomial order. If I contains k polynomials whose leading monomials are k distinct variables, then any Groebner basis of I lying in span_K(F) supplies k independent elements of total degree <= 1, so k <= dim(span_K F intersect deg <= 1) <= |F| - rank(degree-2 homogeneous parts of F). Hence if k + rank(top_2 F) > |F|, no Groebner basis lies in span_K F: for generators of degree exactly 2 (field equations included) the Caminata-Gorla solving degree is at least 3.",
+      "scope": "General criterion with a concrete F_2 non-vacuity instance (x0^2+x0, x1^2+x1, x0x1+x0+x1: k = 2, rank 3, |F| = 3). For the m = 2 Weil-descended S_3 system with n equations, N bit variables and N field equations it reads r2 < k, where r2 = dim of the degree-<=1 part of the degree-2 span (Kosters-Yeo: r2 >= 1, generically 1) and k >= N - affdim(Z) for solution set Z. Not formalised: the finite-field Nullstellensatz step giving k, the descended system itself, and the identification of PQ's 'maximal degree reached' with the Caminata-Gorla solving degree.",
+      "assumptions": ["Degree-compatible monomial order", "Generators of total degree exactly 2 (so the degree-2 Macaulay rows are the generators)", "1 not in the ideal"],
+      "source_refs": ["S-WEAKNESS-LEAN"],
+      "source_locations": ["SolvingDegreeBound.solving_degree_ge_three", "SolvingDegreeBound.linear_count_of_gb_in_span", "SolvingDegreeBound.low_add_top_le_card", "SolvingDegreeBound.Toy.toy_solving_degree_ge_three", "SolvingDegreeBound.not_tendsto_of_frequently_gap"],
+      "tags": ["groebner", "solving-degree", "first-fall", "lean"],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          { "path": "research/ecdlp_weakness_lean_20261104/lean/SolvingDegreeBound.lean", "decl": "SolvingDegreeBound.solving_degree_ge_three" }
+        ],
+        "notes": "Compiled locally with lake env lean -o against Mathlib v4.34.1; AxiomAudit.lean: propext, Classical.choice, Quot.sound only. Repository proof gate runs on the landing PR."
+      }
+    },
+    {
+      "id": "GAP-PQ2-M2-RANK-CENSUS",
+      "label": "Does r2 < k hold on m = 2 descended S_3 instances for infinitely many n?",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "For the Weil descent over F_2 of S_3 with an n'-dimensional factor-base subspace (n' = ceil(n/2)), decide whether, for infinitely many n, some instance with a solution has r2 < k: fewer independent linear polynomials in the degree-2 span than independent linear consequences of the system. Each such instance has solving degree >= 3 = D_ff + 1 by THM-SD-DEGREE2-CRITERION, and infinitely many refute the literal reading of Petit-Quisquater Assumption 2 (SolvingDegreeBound.not_tendsto_of_frequently_gap).",
+      "scope": "A finite linear-algebra check per instance (rank of an n x (N choose 2) matrix plus the solution set), cheap far beyond the n <= 48 Groebner computations. Kousidis-Wiemers' reading D_reg = m^2 - m + 1 + o(1) (= 3 at m = 2) is not addressed: refuting it needs solving degree >= 4.",
+      "assumptions": [],
+      "source_refs": ["S-WEAKNESS-LEAN"],
+      "tags": ["groebner", "solving-degree", "census"],
+      "evidence_class": "open"
+    }
+  ],
+  "edges": [
+    { "id": "PQ2-001", "from": "THM-SD-DEGREE2-CRITERION", "to": "HEUR-GB-PQ-ASSUMPTION-2", "relation": "qualifies", "statement": "Under the literal reading (D_ff = 2 at m = 2), the assumption predicts solving degree 2; the criterion shows that is impossible on any instance with r2 < k, a finite rank check.", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "PQ2-002", "from": "THM-SD-DEGREE2-CRITERION", "to": "HEUR-FIRST-FALL-DEGREE", "relation": "qualifies", "statement": "A first fall at degree 2 yields solving degree 2 only if the degree-2 span already contains as many independent linear polynomials as the ideal has linear consequences.", "source_refs": ["S-WEAKNESS-LEAN"] },
+    { "id": "PQ2-003", "from": "GAP-PQ2-M2-RANK-CENSUS", "to": "HEUR-GB-PQ-ASSUMPTION-2", "relation": "leaves_open", "statement": "Whether r2 < k on infinitely many m = 2 instances is the remaining step to refute the literal reading.", "source_refs": ["S-WEAKNESS-LEAN"] }
+  ]
+}

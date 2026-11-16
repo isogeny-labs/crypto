@@ -1,0 +1,32 @@
+{
+  "schema": "ecbench.gpu_stage/v1",
+  "kind": "gpu_ecc_stage",
+  "binary": "/usr/bin/true",
+  "binary_sha256": "95202858b65afc961d4c0507e7c5e935a69181309965d973fe9c36272757b54f",
+  "cuda_visible_devices": null,
+  "mode": "rho",
+  "args": [],
+  "timeout_seconds": 20,
+  "selftest": {
+    "argv": [
+      "/tmp/ecbench-gpu-capsule-2039903/out/gpu-bench.binary",
+      "selftest"
+    ],
+    "started_unix_ms": 1793407184841,
+    "elapsed_ms": 68,
+    "elapsed_ns": 68099979,
+    "child_pid": 2056617,
+    "exit_code": 0,
+    "timed_out": false,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "benchmark": null,
+  "benchmark_output_recognized": null,
+  "status": "selftest_failed",
+  "limitation": "Fixed-curve GPU stage output: no shared EC Bench workload identity, external answer replay, matched CPU baseline, GPU contention sampling, or admitted end-to-end comparison",
+  "host_sha256": "dfa2393c5caa629176d182be3972afbd714e6021d7c8807ea04a43a0c0b0cc9a",
+  "env_class_id": "ECBENV3hf3b9bf36e272",
+  "lock_path": "/tmp/ecbench-gpu-capsule-2039903/lock",
+  "elapsed_scope": "elapsed_ns/elapsed_ms run from spawn to reap: process start, CUDA runtime and context initialisation, allocation, the benchmark itself, and teardown. They are not the benchmark's time; use the driver's own reported figures for that."
+}

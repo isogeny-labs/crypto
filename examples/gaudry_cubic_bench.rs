@@ -67,6 +67,7 @@ fn one(
         SmallBase::Rule => (base.len() as f64).powf(2.0 / 3.0).ceil() as usize,
     };
     let opts = GaudryOptions {
+        cofactor: 1,
         max_residuals,
         solver,
         cross_check,
@@ -74,6 +75,7 @@ fn one(
         small_base: small,
         max_large_primes: max_lp,
         max_merge_level: merge_cap,
+        arity: 3,
     };
     let g = run_gaudry_opts(&inst, &base, seed, &opts);
     let r = run_rho3(&inst, seed);

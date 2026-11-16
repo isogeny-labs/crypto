@@ -1,0 +1,3 @@
+# Reviewer boundary controls, frozen before compilation
+
+Instantiate full field theorem in ZMod2 with unit-weight input a=(0,1,1,1),b=(0,1,0,0,1,1), f=X5+X2-X+1. Construct original point and degree2 divisibility witnesses directly. This tests absence of an implicit odd-characteristic or inverse2 condition in the polynomial statement; no curve smoothness or group law is inferred. Add source-value check zero input z makes output z zero (outside valid premises). Read back remaining named disjoint_product_dvd,residual_degree,genericK_same,slope_decode declarations. One fresh Lean file,120seconds bound; no native measurements.

@@ -1,0 +1,1203 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-cm61-field-full-20261115",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_chord_proof_20261105/cm8-61-field-full-20261115",
+  "authors": [
+    "producer"
+  ],
+  "question": "Does stopping BEFORE the unused zero-remainder witness improve exact uniform INITIAL useful-rank/constructed finite-field-witness-degree frontier and original-source cold recovery versus ALL455 legacy source policies on the SAME actual twist-pairing-image inputs?",
+  "claims": [
+    {
+      "id": "row-degree-frontier",
+      "text": "Exact same-field TERMINAL-STOP versus LEGACY full-source frontier; actual capped constructed witnesses, public setup and original scalars, not a twistexclusive gain",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Intrinsic regularity, original S3 pullback degree, stationary yield and calibrated complete cost/speed are outside this finite engineering study",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "producerA",
+      "role": "candidate",
+      "description": "producerA ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "auditA",
+      "role": "control_positive",
+      "description": "auditA ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "producerB",
+      "role": "control_aa",
+      "description": "producerB ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "auditB",
+      "role": "control_aa",
+      "description": "auditB ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-source",
+      "role": "candidate",
+      "description": "mutate-source ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "reject-source ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-setup-free",
+      "role": "candidate",
+      "description": "mutate-setup-free ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-setup-free",
+      "role": "control_negative",
+      "description": "reject-setup-free ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-miller-cost",
+      "role": "candidate",
+      "description": "mutate-miller-cost ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-miller-cost",
+      "role": "control_negative",
+      "description": "reject-miller-cost ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-missing-failure",
+      "role": "candidate",
+      "description": "mutate-missing-failure ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-missing-failure",
+      "role": "control_negative",
+      "description": "reject-missing-failure ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-setup-log",
+      "role": "candidate",
+      "description": "mutate-setup-log ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-setup-log",
+      "role": "control_negative",
+      "description": "reject-setup-log ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-scalar",
+      "role": "candidate",
+      "description": "mutate-scalar ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "reject-scalar ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-rank",
+      "role": "candidate",
+      "description": "mutate-rank ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-rank",
+      "role": "control_negative",
+      "description": "reject-rank ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-online-kind",
+      "role": "candidate",
+      "description": "mutate-online-kind ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-online-kind",
+      "role": "control_negative",
+      "description": "reject-online-kind ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-certificate",
+      "role": "candidate",
+      "description": "mutate-certificate ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-certificate",
+      "role": "control_negative",
+      "description": "reject-certificate ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-root",
+      "role": "candidate",
+      "description": "mutate-root ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "reject-root ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-missing-target",
+      "role": "candidate",
+      "description": "mutate-missing-target ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-missing-target",
+      "role": "control_negative",
+      "description": "reject-missing-target ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-degree",
+      "role": "candidate",
+      "description": "mutate-degree ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-degree",
+      "role": "control_negative",
+      "description": "reject-degree ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-missing-policy",
+      "role": "candidate",
+      "description": "mutate-missing-policy ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-missing-policy",
+      "role": "control_negative",
+      "description": "reject-missing-policy ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-base",
+      "role": "candidate",
+      "description": "mutate-base ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-base",
+      "role": "control_negative",
+      "description": "reject-base ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "mutate-prior-binding",
+      "role": "candidate",
+      "description": "mutate-prior-binding ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 8190
+      }
+    },
+    {
+      "id": "reject-prior-binding",
+      "role": "control_negative",
+      "description": "reject-prior-binding ALL8190profiles/245700 cold source workloads or predeclared false full index/shard",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+        "build": null,
+        "binary_sha256": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 8190
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "auditA",
+      "expected_detection": "Fresh independent audit accepts exact full partial/cold-recovery bundle",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-source",
+      "null_population": {
+        "description": "Fifteen genuinely changed full-index/rehash semantic attacks, all retained",
+        "generator": "Native C++ mutation modes in frozen order",
+        "n": 15,
+        "why_n": "All15 fixed coverage/binding/log/scalar/witness/counter controls, not a sample",
+        "matched_on": [
+          "same original bundle",
+          "all untargeted fields",
+          "rehash rule"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "C++ producer, binary Miller",
+          "Independent Rust field/group/linear Miller/Euclidean/RREF replay"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "fixture",
+        "treatment": "fixed",
+        "value": "Actual E/F61 A21B39, nonsquare59 twist A23B54, r31 P0,10 U37,14 S=chi(U), curvefield61/relationfield31",
+        "how": "Native independent field/group route checks"
+      },
+      {
+        "name": "policy_encoding_cap",
+        "treatment": "fixed",
+        "value": "455 fixed source policies x2 same-field algorithm variants x9caps,31diagnostic/30cold queries each",
+        "how": "Complete nested native loops, unchanged after data"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "A",
+          "B"
+        ],
+        "how": "Fresh full executions"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "producerA",
+          "auditA",
+          "producerB",
+          "auditB",
+          "mutate-source",
+          "reject-source",
+          "mutate-setup-free",
+          "reject-setup-free",
+          "mutate-miller-cost",
+          "reject-miller-cost",
+          "mutate-missing-failure",
+          "reject-missing-failure",
+          "mutate-setup-log",
+          "reject-setup-log",
+          "mutate-scalar",
+          "reject-scalar",
+          "mutate-rank",
+          "reject-rank",
+          "mutate-online-kind",
+          "reject-online-kind",
+          "mutate-certificate",
+          "reject-certificate",
+          "mutate-root",
+          "reject-root",
+          "mutate-missing-target",
+          "reject-missing-target",
+          "mutate-degree",
+          "reject-degree",
+          "mutate-missing-policy",
+          "reject-missing-policy",
+          "mutate-base",
+          "reject-base",
+          "mutate-prior-binding",
+          "reject-prior-binding"
+        ],
+        "how": "Fixed dependency order, no timing metric"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "auditA",
+          "auditB",
+          "reject-source",
+          "reject-setup-free",
+          "reject-miller-cost",
+          "reject-missing-failure",
+          "reject-setup-log",
+          "reject-scalar",
+          "reject-rank",
+          "reject-online-kind",
+          "reject-certificate",
+          "reject-root",
+          "reject-missing-target",
+          "reject-degree",
+          "reject-missing-policy",
+          "reject-base",
+          "reject-prior-binding"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exact ALL8190profile/245700target/253890diagnostic reconstruction, A/A equality, all15 altered controls101/no receipt"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "producerA",
+          "producerB"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "threshold": "Exact complete native stream and receipt equality"
+      }
+    ],
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "domain": "Actual original cyclic subgroup31 and its independently replayed twist minus-space partner only",
+        "check": "Every fresh cold recovered scalar checked on original E/P; logs derive only from admitted public mP relations; actual prior finite pairing bridge separately executed, not generic classification"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Complete deterministic finite census, no distinct-DLP/statistical replicate claim; previous one-policy legacy engineering known, new terminal/full data unseen."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 20,
+      "per_sample_seconds": 500,
+      "threads": 1,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Actual prior cold engineering6.1seconds including2builds/14independent270workload reconstructions; conservative full/native600sstage caps and23:29-00:29UTC iteration limit. Not a speed measurement."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Actual native exit code, expected101 only for false-payload rejection; no timing inference",
+        "source": "data-stages.json exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "profiles",
+        "name": "profiles",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "8190policy/variant/cap profiles, not unique challenges",
+        "source": "*.receipt.json profiles",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "target_workloads",
+        "name": "target_workloads",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "245700 separate cold attempts on SAME30actual points",
+        "source": "*.receipt.json target_workloads",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "same_policy_cap_initial_rank_gains",
+        "name": "same_policy_cap_initial_rank_gains",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Matched policy/cap strict INITIAL coefficient-rank numerator gains",
+        "source": "*.receipt.json same_policy_cap_initial_rank_gains",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "same_policy_cap_constructed_degree_gains",
+        "name": "same_policy_cap_constructed_degree_gains",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Matched fully-algebraic recovery profiles with lower actual constructed SAME-FIELD witness peak",
+        "source": "*.receipt.json same_policy_cap_constructed_degree_gains",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "strict_unmatched_rank_degree_pair_records",
+        "name": "strict_unmatched_rank_degree_pair_records",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Strict rank-higher/degree-lower eligible pair RECORDS vs all legacy source profiles, not unique wins",
+        "source": "*.receipt.json strict_unmatched_rank_degree_pair_records",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "strongest_legacy_same_field_frontier_extensions",
+        "name": "strongest_legacy_same_field_frontier_extensions",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "All30algebraic candidate profiles above best eligible LEGACY rank at degree<=candidate on SAME finite-field inputs",
+        "source": "*.receipt.json strongest_legacy_same_field_frontier_extensions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "profiles",
+      "target_workloads",
+      "same_policy_cap_initial_rank_gains",
+      "same_policy_cap_constructed_degree_gains",
+      "strict_unmatched_rank_degree_pair_records",
+      "strongest_legacy_same_field_frontier_extensions"
+    ],
+    "record": [
+      "actual source and binary/qualifier/analysis hashes",
+      "all8190profile witnesses/sign rows/initial ranks",
+      "all245700 fresh setup/recovery workloads and failures",
+      "algorithmic phase-request counts, NOT machine-field price",
+      "actual original scalar checks",
+      "every false index/changed shard/exit/log"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 1800,
+    "placement": {
+      "outer_seconds": 3600,
+      "max_local_workers": 2,
+      "paid_resources": false,
+      "per_stage_seconds": 600
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Complete34 declared data/control processes after2builds; stop at first mismatch or600sstage/00:29deadline, retain all failures; do not shrink scope.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Exact coverage/control reconstruction first, then complete SAME-field rank/actual witness frontier with eligible30algebraic original recoveries; losses/ties/nulls retained",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "Exact ALL8190profile/245700target/253890diagnostic reconstruction, A/A equality, all15 altered controls101/no receipt",
+    "statistic": "Exact uniform INITIAL coefficient rank numerator/30 and constructed finite-field witness peak, all source policies; not cross-ring intrinsic degree or calibrated cost",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact defects, no statistical effect size",
+    "verdict_vocabulary": [
+      "finite_frontier_extension_unsigned",
+      "finite_null_unsigned",
+      "invalid",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "audit.rs",
+      "sha256": "cede6fec52315b90869c5c9fec13bdb8f1265ac456a55be1c94897a022a162c0"
+    },
+    "inputs": [
+      "Both8190-shard full case trees/indexes, all245700cold records",
+      "15false full indexes with changed/shard rehashes",
+      "Exact prior full16380index and operational receipt pins, ALL4095 used old main source shards",
+      "actual source/binary/qualifier/canonical protocol bindings"
+    ],
+    "outputs": [
+      "auditA.json",
+      "auditB.json",
+      "all profiles/cap stats/frontier counters",
+      "all true/false shard payloads/exits/logs"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Complete LEGACY/TERMINAL cap initial-rank and constructed-degree/cold eligibility frontier",
+      "All455policy/cap blocked and original algebraic/identity outcomes"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Use reference pair enumeration to supply candidate stopping/roots",
+    "Admit an uncertified branch root",
+    "Hide diagonal/O/failed branches or blocked setups",
+    "Read target scalar labels in recovery",
+    "Call chord expanded degree original S3 pullback degree or intrinsic regularity",
+    "Free log/setup caching between cold targets",
+    "Select favorable policy/cap prefix",
+    "Upload denied raw archives or use credentials/paid resources",
+    "Interpret conditional state counts as stationary weights or iid stopping expectation",
+    "Treat query-call proxy as complete polynomial/field/root/setup cost",
+    "Interpret source6 span containment as a universal cost or ECDLP impossibility"
+  ],
+  "literature": [
+    {
+      "ref": "../cm8-61-field-cold-20261115/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Known one-policy engineering source-recovery execution and degree6legacy behavior"
+    },
+    {
+      "ref": "https://libntl.org/doc/ZZ_pEX.cpp.html",
+      "provenance": "retrieved",
+      "claim": "Standard extension-field polynomial monic gcd/Bezout contract, no novelty claim"
+    },
+    {
+      "ref": "https://raw.githubusercontent.com/libntl/ntl/main/src/ZZ_pEX.cpp",
+      "provenance": "retrieved",
+      "claim": "Primary implementation reference before avoiding unused terminal zero-row work"
+    },
+    {
+      "ref": "https://arxiv.org/pdf/math/0405054",
+      "provenance": "retrieved",
+      "claim": "Earlier primary distinct Frobenius eigenspace/CM8 pairing antecedents, fixed actual route independently checked"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "f7e2d1fa0faecd2c8437dbd2ba4d2953c2b28739ad3f0b47ab23d847d244a95a",
+    "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+    "frozen_at": "2026-11-15T23:46:13Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "source_commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+    "binary_pins": {
+      "producer": "a2d4e48cb52b1d002ad98dbcdaa2d8f949ca70b7b4c43960818f4ffc6a22a1c7",
+      "auditor": "3565a79af53a116337dfe72638e0018bed78a40418c119291d40d2291290da29"
+    },
+    "modes": [
+      "source",
+      "setup-free",
+      "miller-cost",
+      "missing-failure",
+      "setup-log",
+      "scalar",
+      "rank",
+      "online-kind",
+      "certificate",
+      "root",
+      "missing-target",
+      "degree",
+      "missing-policy",
+      "base",
+      "prior-binding"
+    ],
+    "resource_window": "23:29-00:29UTC,600sstages/max2existingLOCALworkers",
+    "checkpoint": "Same branch actual authorized GitHub source/protocol publication, no S3 or rawasset claim",
+    "algorithms": [
+      "legacy terminal zero-row witness constructed",
+      "terminal-stop skips unused zero row BEFORE construction"
+    ],
+    "profiles": 8190,
+    "source_policies": 455,
+    "diagnostic_cells": 253890,
+    "target_workloads": 245700,
+    "degree_scope": "Actual constructed original-FINITE-FIELD-input expanded witnesses, NOT original chord/S3/intrinsic regularity",
+    "old_arithmetic_rerun": false,
+    "engineering_seen": true,
+    "full_new_data_seen": false,
+    "field_machine_operations_priced": false
+  }
+}

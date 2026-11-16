@@ -1,0 +1,73 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T19:50:39Z",
+ "id": "PCC-20261111-7409b3",
+ "kind": "theorem",
+ "producer": {
+  "commit": "c1b9aa2c16c9d1061354abe5af7e23e0bfb45134",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ed803c747492ee6cfff0159175a9e9646ce12159944890be403e92af7fdaac54",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean",
+   "theorem": "ChainTransport.chain_kills_two_torsion"
+  },
+  {
+   "decl_sha256": "4866e275cd17158d1d7fa0ee260f192f038a2fef7781a5b0e6c2907e4e8d23f6",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean",
+   "theorem": "ChainTransport.transported_square"
+  },
+  {
+   "decl_sha256": "48f848d6638d50a3fd8136c1a4cef91e061afae78fef7c7a2270198ed61eb3a6",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean",
+   "theorem": "ChainTransport.composite_norm28"
+  },
+  {
+   "decl_sha256": "19fc8dc8ea44cb4299cdcca9cb9a75cb756f3a5210032df09a7768af23a60ddf",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean",
+   "theorem": "ChainTransport.half_input_order12317"
+  },
+  {
+   "decl_sha256": "0cd2496cf4b27c75eaf95bde58efee99c637d5299f8bbc129bdbeb8a41bd30d0",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean",
+   "theorem": "ChainTransport.full_source_reverse28"
+  },
+  {
+   "decl_sha256": "079b985c5f34351a40b9bb3527519e0a5a3ce41c56ef5ecc2614f8f7298568bd",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/ChainTransport.lean",
+   "theorem": "ChainTransport.target_coordinate4"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/chain-transport-lean-02.txt",
+    "sha256": "15effe596e684cffaaa8675b52e48a8bb93fb3df454acd6f2b760bfd3bdc75eb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/chain-transport-lean-02-build.txt",
+    "sha256": "59851cc90dc8fa94e4cf231df81cd9a26ac9108dbc387c0f7f4f6fa21bb0b7af"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/chain-transport-lean-02-audit.txt",
+    "sha256": "aea928883a75adf5b7b729d986790400fd534a3f27dfd5aa32a483e7f45e32dc"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Six conditional structural lemmas for the transported odd-isogeny square: composite kills two-torsion,global square from factor and surjective doubling,adjoint composite norm28,rational half modulo12317,full source reverse28 and target coordinate4. Point groups retain geometric two-torsion. Actual finite fields,regular quotient morphisms,Picard duality,polarizations,degree and elliptic-subvariety uniqueness are not formalized;the geometry remains a separate written bridge. Lean4.35.0 and standard foundations only;unsigned standing."
+}

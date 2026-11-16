@@ -1,0 +1,44 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\begin{document}
+\section*{Additive component overview}
+Evidence snapshot: 2026-10-31T00:31:16.583824+00:00
+
+Results below are component proofs, fixed software fixtures or retained-archive checks. Original enrollment and prior failures remain preserved. Cost-ratio fields are null.
+
+\begin{center}\begin{tabular}{lrr}\toprule
+Original-G fixture (21 models) & Eager & Candidate\\\midrule
+Transitions &63&63\\
+Signed recoveries &61&63\\
+Graph equations &35&35\\
+Nonsplit quadratics &26&26\\
+Geometric cycles / returns &0 / 0&0 / 0\\\bottomrule
+\end{tabular}\end{center}
+
+The two additional degree-one recoveries are skipped by the retained graph interface. All 35 equations per arm match. Independent matrix checks cover 70 geometric prefixes and nine synthetic control prefixes. Synthetic stopping at prefixes 3, 2, 4 is separate from the geometric trajectory.
+
+\textbf{Retained archive.} Independent extraction of 420 dispositions gives 175 vertices, 61 components and 114 edges, with zero cycles. Dispositions: 114 edges, 120 duplicates, 126 nonsplit/repeated-root cases and 60 degree skips. This is the deduplicated degree-two distinct-root graph. It does not show that differently labelled duplicates or known-answer labels cannot yield constraints.
+
+\textbf{Earlier Kummer fixtures.} Supplied-neighbour recovery retains the original 80/84 baseline and additive 84/84 result. A different torsion-step grid retains original 251/252 failure and later 252/252 recovery, with 1,008 corner checks. Those families are not pooled with the original-G fixture. Square-root nonresidue search remains work outside a complete priced model.
+
+\textbf{Links.} See \href{../packets/kummer-original-gstep-review/status.json}{original-G independent review}, \href{../packets/kummer-graph-review/review.json}{graph review}, \href{../packets/geometric-forest-review/result.json}{forest recount}, and \href{../packets/geometric-forest-scope/ADDENDUM.md}{duplicate-scope clarification}. Exact linked-file hashes are in index.json.
+
+\newpage
+\section*{Formal and interface results}
+\textbf{Word prelude.} Literal cross-scaling, support guard and ordered word classifier compose with common normalized validity to exclude the specified zero-slope error. Assumptions include prime $5\le p<2^{31}$, canonical inputs and nonzero weights. This is value semantics with explicit source conditions.
+
+\textbf{Constructor.} Exact constructor association $s(z_3w)$ and $t(z_5w)$ preserves canonical weighted coordinates and normalized validity. Unit weights match the degree-two from-affine branch. Five independent compile/readback commands pass, including added nonzero-coefficient and noncanonical-weight controls. Canonical affine inputs and mathematical validity remain premises. \href{../packets/constructor-review/review.json}{Independent constructor review}.
+
+\textbf{Distinct add11.} With unit weights and distinct affine x coordinates, interpolation and a Bezout identity establish normalized output validity and nonzero weights. Four independent compile/readback commands pass. The field theorem uses degree-one validity premises; it does not establish machine arithmetic or divisor class-sum correctness. An invalid equal-x control exposes the difference between modeled fallback and Rust assertion outside the theorem premise. \href{../packets/add11-distinct-review/review.json}{Independent add11 review}.
+
+\textbf{Relation-row adapter.} Native augmented RHS $[A,b,-a]$ maps to zero-equation constant $[A,b,+a]$. Three release tests, including 343 single-row systems over F7 with 49 assignments each, and independent source review support this convention. No production trace or measured total-cost claim is attached. \href{../relation-adapter/report/result.json}{Adapter result}.
+
+\textbf{Preflight.} Original integrated typed validation passed all three tests with receipt ending 2026-10-31 00:20:45.871342 UTC. This precedes the full-host-digest correction. Independent source review supports that correction; \textbf{final corrected validation is pending at this snapshot}. The original receipt is \href{../preflight-review/typed-tests/receipt.json}{linked here}. A later terminal receipt must be recorded additively.
+
+Inventory checks retain nine plans, 1,260 workloads, 22,680 cohort slots and 18 separate gate slots. These are enrollment counts. Static and actual-session stages both retain scientific admission as false; owner authentication and runtime qualification remain external.
+
+\textbf{Review package.} index.json provides standardized component rows, count units, scope, null cost ratios and evidence hashes. INDEX.md provides relative links. overview.svg is an editable scope/count diagram. This report supplements the earlier immutable overview.
+\end{document}

@@ -1,0 +1,242 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "QT-degree-failed-01-20261030",
+  "created": "2026-10-30T09:04:45Z",
+  "protocol": {
+    "path": "protocol-failed-01.json",
+    "sha256": "ee7cb924fd9a69aebd447624229a6c7c5438192258dc61930d0c4600aa33a687",
+    "protocol_id": "QT-degree-qualified-F13-20261030",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "fb8b59f4182c6dfd0b117017972c60561e4ff861",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "cpp",
+      "role": "reference",
+      "binary_sha256": null,
+      "commit": "fb8b59f4182c6dfd0b117017972c60561e4ff861"
+    },
+    {
+      "id": "rust",
+      "role": "candidate",
+      "binary_sha256": null,
+      "commit": "fb8b59f4182c6dfd0b117017972c60561e4ff861"
+    },
+    {
+      "id": "domain",
+      "role": "control_positive",
+      "binary_sha256": null,
+      "commit": "fb8b59f4182c6dfd0b117017972c60561e4ff861"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "failed-01-cpp",
+      "arm": "cpp",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "cancelled",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "invalid implementation attempt,no admitted scientific result"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "Compile101 duplicate Clone;native producer/audit/controls never ran."
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Compile101 duplicate Clone;native producer/audit/controls never ran."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "failed-01-rust",
+      "arm": "rust",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "invalid implementation attempt,no admitted scientific result"
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Compile101 duplicate Clone;native producer/audit/controls never ran."
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Compile101 duplicate Clone;native producer/audit/controls never ran."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "failed-01-domain",
+      "arm": "domain",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "cancelled",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "invalid implementation attempt,no admitted scientific result"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "Compile101 duplicate Clone;native producer/audit/controls never ran."
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Compile101 duplicate Clone;native producer/audit/controls never ran."
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 3,
+    "attempted": 3,
+    "completed": 1,
+    "not_completed": 2,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": [
+      {
+        "rule": "Compile101 duplicate Clone;native producer/audit/controls never ran.",
+        "run_ids": [
+          "failed-01-cpp",
+          "failed-01-rust",
+          "failed-01-domain"
+        ]
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "runs.tar.xz",
+      "sha256": "688a5a4b19bd0f09ab396183e5d3cc68be67c49e9114e9ca93f42041ba658c06",
+      "bytes": 37124,
+      "kind": "raw"
+    },
+    {
+      "path": "RUNS.sha256.xz",
+      "sha256": "fb37c340677055aa4261723caea015ee87949409d7e14cabaddbb03427c628e0",
+      "bytes": 35984,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-receipt.json",
+      "sha256": "e10c1dd105722ad9468acc489f9d417c773cdf10deec367ca6598d7d1842e8df",
+      "bytes": 549,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "source-failed-01.rs.txt",
+      "sha256": "0466598724f9ceeb026a5f32415527e294bf273806a526e3e30d9e972411b2ce",
+      "bytes": 25881,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "failure scope",
+      "text": "Compile101 duplicate Clone;native producer/audit/controls never ran. Status describes accepted scientific execution,not a claim that the successful C++ compiler/producer process returned nonzero. Original argv/log/exits/source commit restore from raw archive."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

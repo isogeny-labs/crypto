@@ -1,0 +1,61 @@
+{
+  "schema": "independent-source-review/v1",
+  "pcc": "unverified",
+  "candidate_commit": "ec632eadbadadae6d378162e3334d6dcae9e6068",
+  "candidate_sha256": "dbe4d4f9cfd23d004d853d8061b69b226dccc1507af753ad38942d9fcc3c61dc",
+  "preread_plan_sha256": "3dd0910d0e3ee5d3821392eeacb68e8af712b47fd24d0cf8e5f1c07e474a2751",
+  "machine_status": "not_verified",
+  "fidelity": "faithful_scoped",
+  "outcome": "source_delta_no_blocking_defect_found_runtime_unverified",
+  "new_findings": [],
+  "observations": [
+    {
+      "joint": "address_space",
+      "source": "materialize.py:10",
+      "disposition": "holds_source_scope",
+      "observation": "Exactly one setrlimit(RLIMIT_AS) line replaced by comment; does not ensure inherited limit is unlimited."
+    },
+    {
+      "joint": "resource_envelope",
+      "source": "materialize.py:61-66",
+      "disposition": "holds_source_scope",
+      "observation": "Before Git child commands, cgroup name and cpu<=2, memory=4294967296, swap=0, pids=512 checked."
+    },
+    {
+      "joint": "custody_and_cleanup",
+      "source": "materialize.py:19-51,68-70,163-178",
+      "disposition": "unchanged_source",
+      "observation": "Deadline/heartbeat, bounded cleanup helper call, input hashes and final rechecks retained byte-for-byte."
+    },
+    {
+      "joint": "attempt_boundary",
+      "source": "proposal.json; README.md",
+      "disposition": "holds_source_scope",
+      "observation": "Prior attempt consumed; one additional 900-second attempt only proposed, unreleased; fresh paths/lease/admission required."
+    },
+    {
+      "joint": "native_failure_cause",
+      "source": "attempt-20261105T182144Z/native/worker/receipt.json",
+      "disposition": "partial_causal_evidence",
+      "observation": "Git mapping ENOMEM, exit128 and zero files recorded. Exact failing mapping length and resident demand unknown."
+    }
+  ],
+  "tests_executed": 0,
+  "materializer_executed": false,
+  "runtime_authorization": false,
+  "required_before_runtime": [
+    "explicit finite additional-attempt release",
+    "fresh unique workspace/output/unit and lease",
+    "exact published admission including helper/config and candidate hash",
+    "retain inherited-limit observation or qualify continued mapping risk",
+    "live cgroup and terminal-owner confirmation"
+  ],
+  "independence": {
+    "author_of_candidate": false,
+    "prior_context": "Prior materializer reviews and parent disclosed native failure and proposed correction; not blind to motivation.",
+    "candidate_read_after_plan": true,
+    "producer_repair_performed": false,
+    "sibling_reports_used": false
+  },
+  "knowledge_promotion": "Not warranted: source-only operational correction, no completed materialization."
+}

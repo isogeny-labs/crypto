@@ -4,6 +4,9 @@ workflow text it reads, and that it refuses the forms it does not model."""
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+from contextlib import redirect_stderr, redirect_stdout
+import io
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -47,7 +50,7 @@ class Glob(unittest.TestCase):
 
 
 class Workflow(unittest.TestCase):
-    def read(self, text: str, event: str) -> list[str]:
+    def read(self, text: str, event: str) -> list[str] | None:
         with tempfile.TemporaryDirectory() as d:
             f = Path(d) / "w.yml"
             f.write_text(text)
@@ -74,12 +77,47 @@ jobs:
         self.assertEqual(self.read(self.TEXT, "pull_request"), ["a/**", "b/c.json", "d/e.txt"])
         self.assertEqual(self.read(self.TEXT, "push"), ["z/**"])
 
-    def test_absent_event_is_empty(self):
-        self.assertEqual(self.read(self.TEXT, "schedule"), [])
+    def test_absent_event_is_distinct_from_unfiltered(self):
+        self.assertIsNone(self.read(self.TEXT, "schedule"))
+        self.assertEqual(self.read("on:\n  push:\n    branches: [main]\n", "push"), [])
+
+    def test_job_name_cannot_invent_an_event(self):
+        self.assertIsNone(self.read("on:\n  workflow_dispatch:\njobs:\n  push:\n    paths:\n      - 'z/**'\n", "push"))
+
+    def test_empty_or_inline_paths_are_refused(self):
+        for text in ("on:\n  push:\n    paths:\n", "on:\n  push:\n    paths: []\n"):
+            with self.assertRaises(SystemExit):
+                self.read(text, "push")
 
     def test_paths_ignore_is_refused(self):
         with self.assertRaises(SystemExit):
             self.read("on:\n  push:\n    paths-ignore:\n      - 'a/**'\n", "push")
+
+
+class ConfiguredCoverage(unittest.TestCase):
+    def check(self, events):
+        with tempfile.TemporaryDirectory() as directory:
+            workflow = Path(directory) / "w.yml"
+            workflow.write_text("on:\n" + events)
+            with patch.object(chk, "builder_reads", return_value=[chk.BUILDER, "research/new/summary.json"]), \
+                    patch.object(sys, "argv", ["check", str(workflow)]), \
+                    redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                return chk.main()
+
+    def test_owner_main_only_policy_keeps_complete_push_coverage(self):
+        self.assertEqual(self.check("  push:\n    paths:\n      - 'scripts/build_ic_leaderboard.py'\n      - 'research/**'\n"), 0)
+
+    def test_missing_push_input_is_still_refused(self):
+        self.assertEqual(self.check("  push:\n    paths:\n      - 'scripts/build_ic_leaderboard.py'\n"), 1)
+
+    def test_configured_pull_request_cannot_escape_coverage(self):
+        self.assertEqual(self.check("  push:\n  pull_request:\n    paths:\n      - 'scripts/build_ic_leaderboard.py'\n"), 1)
+
+    def test_unfiltered_push_covers_every_input(self):
+        self.assertEqual(self.check("  push:\n    branches: [main]\n"), 0)
+
+    def test_no_automatic_event_is_refused(self):
+        self.assertEqual(self.check("  workflow_dispatch:\n"), 1)
 
 
 if __name__ == "__main__":

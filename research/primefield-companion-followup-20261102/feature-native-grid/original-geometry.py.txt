@@ -1,0 +1,53 @@
+"""General Jacobian group arithmetic and one batch conversion."""
+def grid(C,Q,b,q,s,epsilon,m,metrics,control_pairs=None,projective_only=False):
+ p,r=C['p'],C['r'];events=[];one=m.f(1);base=(Q[0],Q[1],one)
+ def double(A):
+  X,Y,Z=A
+  if not Y:return None
+  XX=X*X;YY=Y*Y;ZZ=Z*Z;S=4*X*YY;M=3*XX+C['a']*(ZZ*ZZ);T=M*M-2*S
+  return (T,M*(S-T)-8*(YY*YY),2*Y*Z)
+ def add(A,B):
+  metrics['group_addition_calls']+=1
+  with m.at('group'):
+   if A is None:R=B;kind='identity'
+   elif B is None:R=A;kind='identity'
+   elif A==B:R=double(A);kind='double' if A[1] else 'zero_y'
+   else:
+    X1,Y1,Z1=A;X2,Y2,Z2=B;Z1Z1=Z1*Z1;Z2Z2=Z2*Z2;U1=X1*Z2Z2;U2=X2*Z1Z1;S1=Y1*Z2*Z2Z2;S2=Y2*Z1*Z1Z1;H=U2-U1;rr=S2-S1
+    if not H:
+     if not rr:R=double(A);kind='equivalent_double' if A[1] else 'equivalent_zero_y'
+     else:R=None;kind='vertical'
+    else:
+     HH=H*H;HHH=H*HH;V=U1*HH;X3=rr*rr-HHH-2*V;Y3=rr*(V-X3)-S1*HHH;Z3=Z1*Z2*H;R=(X3,Y3,Z3);kind='add'
+  events.append(dict(A=A,B=B,R=R,kind=kind));return R
+ def mul(n):
+  metrics['known_scalar_calls']+=1;T=None;A=base
+  while n:
+   if n&1:T=add(T,A)
+   n>>=1
+   if n:A=add(A,A)
+  return T
+ if control_pairs is not None:
+  for A,B in control_pairs:add(A,B)
+  return None,dict(events=events)
+ H=mul((r+1)//2);S=mul(2*b);points=[H,S];labels=[(r+1)//2,2*b];T=H
+ for j in range(b):T=add(T,base);points.append(T);labels.append(((r+1)//2+j+1)%r)
+ for i in range(q-1):T=add(T,S);points.append(T);labels.append(((r+1)//2+b+(i+1)*2*b)%r)
+ if s:points.append(mul(s+epsilon));labels.append(s+epsilon)
+ if projective_only:return points,dict(events=events,labels=labels)
+ affine,inverses=batch(points,m)
+ metrics['converted_points']=len(points);metrics['projective_coordinate_field_slots']=3*len(points);metrics['affine_coordinate_field_slots']=2*len(points)
+ cert=dict(events=events,slots=[dict(known_multiplier=n,projective=T,inverse_z=z,affine=A) for n,T,z,A in zip(labels,points,inverses,affine)])
+ return affine,cert
+
+def batch(points,m):
+ if not points or any(P is None or not P[2] for P in points):raise ValueError('batch requires nonempty finite points')
+ with m.at('conversion'):
+  prefix=[points[0][2]]
+  for T in points[1:]:prefix.append(prefix[-1]*T[2])
+  acc=prefix[-1]**-1;inv=[None]*len(points)
+  for i in range(len(points)-1,0,-1):inv[i]=acc*prefix[i-1];acc=acc*points[i][2]
+  inv[0]=acc;affine=[]
+  for (X,Y,Z),v in zip(points,inv):
+   v2=v*v;v3=v2*v;affine.append((X*v2,Y*v3))
+ return affine,inv

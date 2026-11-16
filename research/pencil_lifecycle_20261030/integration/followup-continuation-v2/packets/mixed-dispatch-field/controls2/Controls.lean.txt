@@ -1,0 +1,62 @@
+import MixedDispatch
+open Polynomial MixedCancellation MixedDispatcher
+example : (dispatch (1:ℚ) 0 0 1 ⟨0,1,1,1⟩ ⟨0,1,0,1,1,1⟩).2=.common := by
+ norm_num [dispatch,rawK]
+example : (dispatch (1:ℚ) (-1) 0 0 ⟨0,-1,1,1⟩ ⟨-1,0,0,1,1,1⟩).2=.cancellation := by
+ norm_num [dispatch,rawK,rawW3,rawY3]
+example : (dispatch (1:ℚ) (-1) 0 0 ⟨0,1,1,1⟩ ⟨-1,0,0,1,1,1⟩).2=.positiveDistinct := by
+ norm_num [dispatch,rawK,rawW3,rawY3,other]
+example : (dispatch (1:ℚ) 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩).2=.tripling := by
+ norm_num [dispatch,rawK,rawW3,rawY3,other]
+example : (dispatch (0:ℚ) 0 0 0 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩).2=.cancellation := by
+ norm_num [dispatch,rawK,rawW3,rawY3]
+example : dispatch (1:ℚ) 0 0 0 ⟨0,2,1,1⟩ ⟨0,0,0,1,1,1⟩=(none,.mismatch) := by
+ norm_num [dispatch,rawK,rawW3,rawY3]
+example : ∃ (v : Value ℚ) (tag : Tag),
+ dispatch 1 0 0 1 ⟨0,1,1,1⟩ ⟨0,1,0,1,1,1⟩=(some v,tag) ∧
+ valid (MixedGeneric.curve 1 0 0 1) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4+X^2,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [validTwo,nq,nr,ns,nt,support,ordinate]
+   refine ⟨X^3,?_⟩;simp [MixedGeneric.curve];ring
+example : ∃ (v : Value ℚ) (tag : Tag),
+ dispatch 1 (-1) 0 0 ⟨0,-1,1,1⟩ ⟨-1,0,0,1,1,1⟩=(some v,tag) ∧
+ valid (MixedGeneric.curve 1 (-1) 0 0) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [validTwo,nq,nr,ns,nt,support,ordinate]
+   refine ⟨X^3+X^2+X+1,?_⟩;simp [MixedGeneric.curve];ring
+example : ∃ (v : Value ℚ) (tag : Tag),
+ dispatch 1 (-1) 0 0 ⟨0,1,1,1⟩ ⟨-1,0,0,1,1,1⟩=(some v,tag) ∧
+ valid (MixedGeneric.curve 1 (-1) 0 0) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [validTwo,nq,nr,ns,nt,support,ordinate]
+   refine ⟨X^3+X^2+X+1,?_⟩;simp [MixedGeneric.curve];ring
+example : ∃ (v : Value ℚ) (tag : Tag),
+ dispatch 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩=(some v,tag) ∧
+ valid (MixedGeneric.curve 1 0 0 0) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [validTwo,nq,nr,ns,nt,support,ordinate]
+   refine ⟨X^3,?_⟩;simp [MixedGeneric.curve];ring

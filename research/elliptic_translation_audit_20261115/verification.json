@@ -1,0 +1,89 @@
+{
+  "schema": "elliptic-translation-verification/v1",
+  "source_commit": "0e95ff8cfbebe6978a590846c70584d2f381d01d",
+  "claim_id": "PCC-20261115-2e952c",
+  "declaration_sha256": "2569e8f18530d274a7a60789d4a0a33f511b376793a856212a165811f5f72bb8",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 105,
+  "gate_declarations": 82,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 480,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-2e952c",
+    "claim_sha256": "016178b487896be7c004e60f8a0aa68ca828d7f360f3c99eeba1364ac50a86f3",
+    "commit": "0e95ff8cfbebe6978a590846c70584d2f381d01d",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/elliptic_translation_audit_20261115/lean (TranslationCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T20:30:05Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-2e952c",
+    "claim_sha256": "016178b487896be7c004e60f8a0aa68ca828d7f360f3c99eeba1364ac50a86f3",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47299,
+    "sha256": "2ba2d226ee35f34e9253aa0e0a1335133f0c7c8c119360c8c9973bfd01293184",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 82,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "canonical_localization_algebra_and_smul": true,
+    "actual_official_Point_map_and_add_some_adapters": true,
+    "actual_generic_point_nonconstant_and_transcendence_derived": true,
+    "actual_norm_coordinate_injectivity_derived": true,
+    "actual_fraction_field_translation": true,
+    "actual_FF_RingEquiv_explicit_inverse_composition_faithful": true,
+    "actual_coefficient_fixing_and_generic_point_compatibility": true,
+    "actual_integer_divisor_translation_degree_pointsum_formula": true,
+    "actual_principal_preservation_via_proved_Picard_criterion": true,
+    "actual_induced_Picard_action_identity": true,
+    "actual_source_FF_formula": true,
+    "actual_ACF5_CharP5_nonsingular_translation_not_affine_coordinate_ring": true,
+    "actual_F5_raw_affine_Q_counter": true,
+    "actual_F5_guarded_positive": true,
+    "supplied_transcendence_injectivity_inverse_or_action_premise": false,
+    "all_local_order_residue_pullback": false,
+    "divisor_pushforward_Q_would_match_FF_pullback_negative_Q_not_assumed": true,
+    "general_basefield_descent": false,
+    "linebundle_Scheme_comparison": false,
+    "canonical_pairing_comparison": false,
+    "qualified_source_refuted": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

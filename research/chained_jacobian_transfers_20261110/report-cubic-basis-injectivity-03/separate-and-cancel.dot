@@ -1,0 +1,14 @@
+digraph S {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#eef4fb",color="#456987",fontname="DejaVu Sans",fontsize=12,margin="0.12,0.12"];
+ edge [color="#456987",fontname="DejaVu Sans",fontsize=10];
+ q [label="E(x)=E(y)
+q-power twice"];
+ s [label="Three coefficient equations
+separate A,B,C"];
+ c [label="Cancel z and z²
+z³=3, 3·149=1"];
+ i [label="Recover a,b,c
+encoding injective"];
+ q -> s -> c -> i;
+}

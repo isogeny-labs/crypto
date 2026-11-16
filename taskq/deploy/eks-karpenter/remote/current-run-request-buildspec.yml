@@ -1,0 +1,14 @@
+version: 0.2
+env:
+  shell: bash
+phases:
+  build:
+    commands:
+      - set -euo pipefail
+      - '[[ "$ISOLAB_RUN_REQUEST_SHA256" =~ ^[a-f0-9]{64}$ ]]'
+      - run_request_key="inputs/requests/$ISOLAB_RUN_REQUEST_SHA256.run-request"
+      - run_request="$CODEBUILD_SRC_DIR/remote/run-request.override"
+      - aws s3 cp "s3://$ISOLAB_BUCKET/$run_request_key" "$run_request" --only-show-errors
+      - '[[ $(sha256sum "$run_request" | cut -d " " -f1) == "$ISOLAB_RUN_REQUEST_SHA256" ]]'
+      - chmod 0700 "$run_request"
+      - '"$run_request"'

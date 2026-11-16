@@ -806,3 +806,52 @@ fn write_public_fixtures() {
     )
     .unwrap();
 }
+
+#[test]
+fn derived_relations_match_exhaustive_multisets_on_prime_and_binary_bases() {
+    let mut configs = vec![config()];
+    configs.extend(
+        serde_json::from_str::<Vec<Config>>(include_str!("../examples/prime-structured.json"))
+            .unwrap(),
+    );
+    for c in configs {
+        let root = temp();
+        let id = build(&c, &root).unwrap();
+        let (_, g) = verify(&root, &id).unwrap();
+        let mut targets = sample_targets(&g.curve, 8, 77, "discovery").unwrap();
+        targets.push(targets[0].clone()); // Duplicate public queries retain their own slots.
+        for arity in 2..=4 {
+            let mut w = workload();
+            w.queries = targets.len();
+            w.arity = arity;
+            w.regularity_targets = 0;
+            w.targets = Some(targets.iter().map(Point::spec).collect());
+            let reference = evaluate(&root, &id, &w).unwrap();
+            assert_eq!(reference["semantic"]["relation_status"], "complete");
+            let request = crate::decomposition::Request {
+                targets: w.targets.unwrap(),
+                arity,
+                search_cap: 100000,
+            };
+            let actual = crate::decomposition::evaluate(&root, &id, &request).unwrap();
+            assert_eq!(actual["semantic"]["result"]["complete"], true);
+            assert_eq!(
+                actual["semantic"]["result"]["witnesses"],
+                reference["semantic"]["witnesses"]
+            );
+            assert!(crate::decomposition::replay(&root, &id, &actual).is_ok());
+            let mut forged = actual.clone();
+            forged["semantic"]["result"]["complete"] = json!(false);
+            assert!(crate::decomposition::replay(&root, &id, &forged).is_err());
+        }
+        let capped = crate::decomposition::decompose(&g, &targets, 2, 1).unwrap();
+        assert!(!capped.complete);
+        assert!(capped.witnesses.iter().all(Option::is_none));
+        assert!(crate::decomposition::decompose(&g, &[], 2, 10).is_err());
+        assert!(crate::decomposition::decompose(&g, &targets, 1, 10).is_err());
+        assert!(crate::decomposition::decompose(&g, &targets, 2, 0).is_err());
+        let invalid = Point { x: n(0), y: n(0) };
+        assert!(crate::decomposition::decompose(&g, &[invalid], 2, 100).is_err());
+        std::fs::remove_dir_all(root).unwrap();
+    }
+}

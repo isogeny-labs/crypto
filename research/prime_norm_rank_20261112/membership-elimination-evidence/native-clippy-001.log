@@ -1,0 +1,19 @@
+    Checking serde_core v1.0.229
+    Checking itoa v1.0.19
+    Checking ryu v1.0.23
+    Checking memchr v2.8.3
+    Checking serde_json v1.0.145
+    Checking norm-membership-elimination-control v0.1.0 (/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/membership-elimination-control)
+error: manual implementation of `.is_multiple_of()`
+  --> src/main.rs:55:12
+   |
+55 |         if c % P != 0 {
+   |            ^^^^^^^^^^ help: replace with: `!c.is_multiple_of(P)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+   = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: could not compile `norm-membership-elimination-control` (bin "norm-membership-elimination-control" test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `norm-membership-elimination-control` (bin "norm-membership-elimination-control") due to 1 previous error

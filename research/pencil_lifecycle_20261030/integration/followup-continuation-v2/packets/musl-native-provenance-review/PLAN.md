@@ -1,0 +1,3 @@
+# Native provenance source review
+
+Read-only review of built_static_candidate receipt for exactb985 and binary16b6eecd16e4cdc3c56bd733090ae80bb9b558f3f8b5dc449d5b8d3344d880d1. Verify actual file hashes, linker invocation and map provenance, distinguish C-dependency compiler wrapper/private musl installation from Rust target self-contained CRT/libc selected by final linker. Check static ELF receipts, known source freshness (b985 precedes lock correction), and remaining release/image qualification gaps. No executable invocation, build, image action, cloud action or source/cache mutation. Bound output to selected non-secret arguments; do not print arbitrary build environment/credential values. Produce immutable PDF/SVG/JSON with scope and exact provenance gaps.
