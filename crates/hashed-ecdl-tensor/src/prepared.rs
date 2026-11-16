@@ -181,6 +181,150 @@ impl<S: BuildHasher + Clone> PairTable<S> {
         )
     }
 
+    // Coefficients never enter this API. The optional callback sees only a
+    // replayed, slot-ordered witness and graph connectivity.
+    pub(crate) fn decompose_configured(
+        &self,
+        query: crate::optimized::Query<'_>,
+        options: &crate::optimized::Options,
+        statistics: &mut crate::optimized::Statistics,
+        mut closes: impl FnMut(&[Point], &mut Meter) -> Result<bool>,
+        meter: &mut Meter,
+    ) -> Result<Option<Vec<Point>>> {
+        use crate::optimized::{increment, Query};
+        use crate::witness_policy::{self, ScanStep};
+        if options.batch_chunk == 1 && options.extra_scans == 0 {
+            let before = statistics.prepared.lookups;
+            let result = match query {
+                Query::Checked(point) => {
+                    self.decompose(point, true, &mut statistics.prepared, meter)
+                }
+                Query::Proven(point) => {
+                    point.for_curve(&self.curve)?;
+                    increment(&mut statistics.trusted_queries, 1)?;
+                    self.decompose_subgroup(point, true, &mut statistics.prepared, meter)
+                }
+            };
+            increment(
+                &mut statistics.complements,
+                usize::try_from(statistics.prepared.lookups - before)
+                    .map_err(|_| overflow("prepared complement events"))?,
+            )?;
+            return result;
+        }
+        let target = match query {
+            Query::Checked(point) => {
+                if !self.curve.in_subgroup(point, meter)? {
+                    return Err(invalid("prepared query outside the certified subgroup"));
+                }
+                point
+            }
+            Query::Proven(point) => {
+                let point = point.for_curve(&self.curve)?;
+                increment(&mut statistics.trusted_queries, 1)?;
+                point
+            }
+        };
+        add(&mut statistics.prepared.queries, 1)?;
+        let first = usize::from(self.bases[1].threshold() < self.bases[0].threshold());
+        let last = 1 - first;
+        let ordered = &self.ordered[first];
+        let mut position = 0usize;
+        let mut buffer = Vec::new();
+        let mut offset = 0usize;
+        let mut computed = 0usize;
+        let mut seen_witness = false;
+        let mut extra_remaining = options.extra_scans;
+        let mut policy = std::mem::take(&mut statistics.policy);
+        let result = witness_policy::choose(
+            options.extra_scans,
+            |work| {
+                if position == ordered.len() {
+                    return Ok(ScanStep::Exhausted);
+                }
+                if offset == buffer.len() {
+                    let chunk = if seen_witness {
+                        options.batch_chunk.min(extra_remaining)
+                    } else {
+                        options.batch_chunk
+                    };
+                    if chunk == 0 {
+                        return Err(integrity("witness cursor exceeded extra-scan cap"));
+                    }
+                    let end = position.saturating_add(chunk).min(ordered.len());
+                    if options.batch_chunk == 1 {
+                        work.vector(1, "prepared complement buffer")?;
+                        buffer = vec![self.curve.add(
+                            target,
+                            &self.curve.negate(&ordered[position])?,
+                            work,
+                        )?];
+                    } else {
+                        buffer = crate::batch::complement_chunk_with_statistics(
+                            &self.curve,
+                            target,
+                            &ordered[position..end],
+                            &mut statistics.batch,
+                            work,
+                        )?;
+                    }
+                    if buffer.len() != end - position {
+                        return Err(integrity("prepared complement chunk length"));
+                    }
+                    computed = computed
+                        .checked_add(buffer.len())
+                        .ok_or_else(|| overflow("computed complements"))?;
+                    increment(&mut statistics.complements, buffer.len())?;
+                    offset = 0;
+                }
+                if seen_witness {
+                    extra_remaining = extra_remaining
+                        .checked_sub(1)
+                        .ok_or_else(|| integrity("witness cursor extra-scan accounting"))?;
+                }
+                work.charge(1, "prepared pair candidate")?;
+                let point = ordered[position].clone();
+                let complement = buffer[offset].clone();
+                position += 1;
+                offset += 1;
+                add(&mut statistics.prepared.lookups, 1)?;
+                if !self.members[last].contains(&complement) {
+                    return Ok(ScanStep::Miss);
+                }
+                let mut witness = vec![point, complement];
+                if first == 1 {
+                    witness.swap(0, 1);
+                }
+                let mut sum = Point::Infinity;
+                for (base, point) in self.bases.iter().zip(&witness) {
+                    if !base.contains(&self.curve, point, work)? {
+                        return Err(integrity("prepared policy witness membership replay"));
+                    }
+                    sum = self.curve.add(&sum, point, work)?;
+                }
+                if &sum != target {
+                    return Err(integrity("prepared policy witness sum replay"));
+                }
+                add(&mut statistics.prepared.replays, 1)?;
+                seen_witness = true;
+                Ok(ScanStep::Witness(witness))
+            },
+            |witness, work| closes(witness, work),
+            &mut policy,
+            meter,
+        );
+        statistics.policy = policy;
+        // Already computed batch tails are charged by the arithmetic kernel,
+        // even when witness selection does not inspect or retain them.
+        increment(
+            &mut statistics.unused_complements,
+            computed
+                .checked_sub(position)
+                .ok_or_else(|| integrity("prepared batch tail accounting"))?,
+        )?;
+        Ok(result?.map(|selection| selection.witness))
+    }
+
     fn decompose_validated(
         &self,
         target: &Point,
@@ -429,22 +573,28 @@ mod tests {
                 let mut checked = Meter::new(Limits::default());
                 let mut trusted = Meter::new(Limits::default());
                 let mut subgroup = Meter::new(Limits::default());
-                assert!(curve.in_subgroup(admitted.point(), &mut subgroup).unwrap());
+                let (valid, subgroup_groups) =
+                    crate::collector_metrics::observe_group_calls(&mut subgroup, |work| {
+                        curve.in_subgroup(admitted.point(), work).unwrap()
+                    });
+                assert!(valid);
                 let mut checked_stats = Statistics::default();
                 let mut trusted_stats = Statistics::default();
-                assert_eq!(
-                    table
-                        .decompose(admitted.point(), smallest, &mut checked_stats, &mut checked)
-                        .unwrap(),
-                    table
-                        .decompose_subgroup(&admitted, smallest, &mut trusted_stats, &mut trusted)
-                        .unwrap(),
-                );
+                let (checked_points, checked_groups) =
+                    crate::collector_metrics::observe_group_calls(&mut checked, |work| {
+                        table
+                            .decompose(admitted.point(), smallest, &mut checked_stats, work)
+                            .unwrap()
+                    });
+                let (trusted_points, trusted_groups) =
+                    crate::collector_metrics::observe_group_calls(&mut trusted, |work| {
+                        table
+                            .decompose_subgroup(&admitted, smallest, &mut trusted_stats, work)
+                            .unwrap()
+                    });
+                assert_eq!(checked_points, trusted_points);
                 assert_eq!(checked.used, trusted.used + subgroup.used);
-                assert_eq!(
-                    checked.curve_additions,
-                    trusted.curve_additions + subgroup.curve_additions
-                );
+                assert_eq!(checked_groups, trusted_groups + subgroup_groups);
                 assert_eq!(checked_stats.queries, trusted_stats.queries);
                 assert_eq!(checked_stats.lookups, trusted_stats.lookups);
                 assert_eq!(checked_stats.replays, trusted_stats.replays);

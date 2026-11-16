@@ -15,9 +15,11 @@ mod serialization;
 
 pub mod admission;
 pub mod arithmetic;
+pub mod batch;
 pub mod binary;
 pub mod canonical;
 pub mod census;
+mod collector_metrics;
 pub mod contraction;
 pub mod curve;
 pub mod encoding;
@@ -25,17 +27,22 @@ pub mod factoring;
 pub mod finite;
 pub mod joint;
 pub mod network;
+pub mod optimized;
 pub mod partial;
 pub mod prepared;
 pub mod primality;
 pub mod reduction;
+mod relation_graph;
 pub mod relations;
 pub mod ring;
 pub mod structured;
 pub mod structured_runner;
+mod subgroup;
+pub mod target_walk;
 pub mod treewidth;
 pub mod weighted;
 pub mod width;
+mod witness_policy;
 
 pub use num_bigint::{BigInt, BigUint};
 

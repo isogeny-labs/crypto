@@ -17,7 +17,7 @@ use crate::{invalid, overflow, BigUint, Error, Meter, Result};
 
 /// Events incurred by complement chunks; not calibrated arithmetic prices.
 #[derive(Clone, Debug, Default)]
-pub(crate) struct BatchStatistics {
+pub struct BatchStatistics {
     /// Nonempty chunks begun after all input coordinates were checked.
     pub batches: u64,
     /// Complements attempted, including an attempt later limited by resources.
@@ -64,7 +64,7 @@ fn product(
 /// Invalid/noncanonical inputs and resource errors propagate as errors. Chunk
 /// validation/allocation precede arithmetic; error ordering can consequently
 /// differ from calling the scalar affine routine until its first early hit.
-pub(crate) fn complement_chunk(
+pub fn complement_chunk(
     curve: &Curve,
     target: &Point,
     points: &[Point],
@@ -80,7 +80,7 @@ pub(crate) fn complement_chunk(
 }
 
 /// Compute a complete chunk while retaining batch-stage event counts.
-pub(crate) fn complement_chunk_with_statistics(
+pub fn complement_chunk_with_statistics(
     curve: &Curve,
     target: &Point,
     points: &[Point],
@@ -120,6 +120,7 @@ pub(crate) fn complement_chunk_with_statistics(
                 // The checked scalar operation charges once per R + (-P).
                 // Retain that event even though its inversion is now shared.
                 meter.charge(1, "curve addition")?;
+                crate::collector_metrics::batch_group(false)?;
                 let denominator = curve.sub(x, xx);
                 let numerator = (y + yy) % modulus;
                 let prefix = if let Some(previous) = ordinary.last() {
@@ -263,14 +264,17 @@ mod tests {
                 let expected = scalar_control(&curve, &target, &points);
                 for size in [1, 2, 8, 32, 128] {
                     let mut meter = Meter::new(Limits::default());
-                    let actual: Vec<Point> = points
-                        .chunks(size)
-                        .flat_map(|chunk| {
-                            complement_chunk(&curve, &target, chunk, &mut meter).unwrap()
-                        })
-                        .collect();
+                    let (actual, groups) =
+                        crate::collector_metrics::observe_group_calls(&mut meter, |work| {
+                            points
+                                .chunks(size)
+                                .flat_map(|chunk| {
+                                    complement_chunk(&curve, &target, chunk, work).unwrap()
+                                })
+                                .collect::<Vec<Point>>()
+                        });
                     assert_eq!(actual, expected);
-                    assert_eq!(meter.curve_additions, points.len() as u64);
+                    assert_eq!(groups, points.len() as u64);
                 }
             }
         }
@@ -289,9 +293,10 @@ mod tests {
             .collect();
         let mut statistics = BatchStatistics::default();
         let mut meter = Meter::new(Limits::default());
-        let actual =
-            complement_chunk_with_statistics(&curve, target, &points, &mut statistics, &mut meter)
-                .unwrap();
+        let (actual, groups) = crate::collector_metrics::observe_group_calls(&mut meter, |work| {
+            complement_chunk_with_statistics(&curve, target, &points, &mut statistics, work)
+                .unwrap()
+        });
         assert_eq!(actual, scalar_control(&curve, target, &points));
         assert_eq!(statistics.batches, 1);
         assert_eq!(statistics.complements, points.len() as u64);
@@ -301,7 +306,7 @@ mod tests {
             statistics.product_multiplications,
             3 * (points.len() as u64 - 1)
         );
-        assert_eq!(meter.curve_additions, points.len() as u64);
+        assert_eq!(groups, points.len() as u64);
     }
 
     #[test]
@@ -315,14 +320,14 @@ mod tests {
         let points = [zero_y.clone(), Point::Infinity, zero_y.clone()];
         let mut statistics = BatchStatistics::default();
         let mut meter = Meter::new(Limits::default());
-        assert_eq!(
-            complement_chunk_with_statistics(&curve, &zero_y, &points, &mut statistics, &mut meter)
-                .unwrap(),
-            scalar_control(&curve, &zero_y, &points)
-        );
+        let (actual, groups) = crate::collector_metrics::observe_group_calls(&mut meter, |work| {
+            complement_chunk_with_statistics(&curve, &zero_y, &points, &mut statistics, work)
+                .unwrap()
+        });
+        assert_eq!(actual, scalar_control(&curve, &zero_y, &points));
         assert_eq!(statistics.ordinary_inversions, 0);
         assert_eq!(statistics.exceptional_fallbacks, 3);
-        assert_eq!(meter.curve_additions, 3);
+        assert_eq!(groups, 3);
         let all = all_points(&curve);
         assert_eq!(
             complement_chunk(&curve, &Point::Infinity, &all, &mut meter).unwrap(),
@@ -372,20 +377,22 @@ mod tests {
             },
         ] {
             let mut meter = Meter::new(Limits::default());
-            assert!(matches!(
-                complement_chunk(&curve, &invalid, &[Point::Infinity], &mut meter),
-                Err(Error::Invalid(_))
-            ));
-            assert!(matches!(
-                complement_chunk(
-                    &curve,
-                    curve.generator(),
-                    &[curve.generator().clone(), invalid],
-                    &mut meter
-                ),
-                Err(Error::Invalid(_))
-            ));
-            assert_eq!(meter.curve_additions, 0);
+            let (_, groups) = crate::collector_metrics::observe_group_calls(&mut meter, |work| {
+                assert!(matches!(
+                    complement_chunk(&curve, &invalid, &[Point::Infinity], work),
+                    Err(Error::Invalid(_))
+                ));
+                assert!(matches!(
+                    complement_chunk(
+                        &curve,
+                        curve.generator(),
+                        &[curve.generator().clone(), invalid],
+                        work
+                    ),
+                    Err(Error::Invalid(_))
+                ));
+            });
+            assert_eq!(groups, 0);
         }
     }
 
