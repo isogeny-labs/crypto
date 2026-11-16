@@ -1,0 +1,16 @@
+# Prospective bounded software verification design
+
+Status: design only; no execution admitted by this packet. Fixed six controls; one invocation, no retry-until-pass. Parent must approve a concrete implementation/source hash and command before execution.
+
+Use a dedicated single-threaded helper process, not a raw fork from a parallel Rust test harness. Import the exact BenchLock primitive or extract it mechanically with hash and byte correspondence. Allocate unique temporary lock paths; use pipe barriers, no sleeps for correctness ordering. All post-fork child operations use preallocated state plus async-signal-safe libc read/write/close/getpid/flock/_exit; inherited guard destruction may only perform the reviewed getpid/flock/File-close path. Do not run formatting, allocation, panic or stdio machinery in the child. Parent enforces timeout and always closes pipes, kills if necessary, and waitpid-reaps child. Internal alarm15s; external timeout60s with kill-after5s. Compile separately under a reviewed bounded command; no compiler invocation in this proposal.
+
+C1 baseline: parent acquires; fresh independent descriptor gets EAGAIN/EWOULDBLOCK; parent drops; fresh acquisition succeeds.
+C2 old-semantics control: raw parent flock, fork child, child acknowledges fd retained, parent closes raw descriptor, independent acquisition returns EAGAIN11, parent releases child barrier, child closes/exits, waitpid then succeeds. No new BenchLock destructor involved.
+C3 candidate owner release: parent BenchLock acquired; child acknowledges inherited fd retained; parent drops guard; acquisition succeeds BEFORE release of child barrier. Reap child afterwards. This distinguishes explicit release from close-only.
+C4 inherited Drop: parent holds guard; child destroys inherited guard, acknowledges completion and remains alive; independent parent acquisition must still report WouldBlock. Parent drops original; independent acquisition succeeds. Then release/reap child. This catches missing PID guard.
+C5 thread move: acquire on main helper thread, move guard to a joined thread that drops it, fresh acquire succeeds. No child is alive in this control; begin after fork controls complete.
+C6 failed output setup: call a small helper acquiring a guard then returning an intentional Result error; while a barrier child retains fd, helper return must release owner lock. This models the second selftest call's early-return shape without asserting it reproduces the original failure.
+
+Capture each control disposition, raw errno where applicable, parent/child PID, barrier event sequence, descriptor CLOEXEC flag, waitpid status, source/patch hashes and command exit. No negative expected control is counted as a failed verification. Any unexpected failure or timeout ends with nonzero status and remains recorded. Controls must complete fixed expectations, not merely reach an exit code.
+
+After mechanism review: run existing touched GPU lock/capsule/selftest tests and runner lock-before-planning test once using the approved test binary; then one full library test invocation at8threads under root's separate build/test budget. Preserve prior failed suites and any new failure. Targeted success does not establish full parallel-suite success. No clocks are used for performance claims.

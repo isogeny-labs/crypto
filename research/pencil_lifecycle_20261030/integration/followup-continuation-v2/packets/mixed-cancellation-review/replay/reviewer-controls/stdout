@@ -1,0 +1,91 @@
+'MixedCancellation.scales' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MixedCancellation.shared_support_conclusions' depends on axioms: [propext, Classical.choice, Quot.sound]
+theorem PencilWordRefinement.mixed_word_branch_invariant : ∀ (p : UInt64) [inst : Fact (Nat.Prime p.toNat)]
+  (f : Polynomial (ZMod p.toNat)) (a : WordD1) (b : WeightedWord),
+  5 ≤ p.toNat →
+    p.toNat < 2 ^ 31 →
+      WordD1.canonical p a →
+        WeightedWord.canonical p b →
+          a.z ≠ 0 →
+            a.w ≠ 0 →
+              b.z ≠ 0 →
+                b.w ≠ 0 →
+                  WordD1.normalizedValid p f a →
+                    WeightedWord.normalizedValid p f b →
+                      mixedClassifyWord p a b ≠ MixedCancellation.Branch.mismatch ∧
+                        (mixedClassifyWord p a b = MixedCancellation.Branch.cancellation →
+                          have c := (mixedWords p a b).point;
+                          WordD1.canonical p c ∧ c.z ≠ 0 ∧ c.w ≠ 0 ∧ WordD1.normalizedValid p f c) :=
+fun p [Fact (Nat.Prime p.toNat)] f a b hfive hbound ha hb haz haw hbz hbw hva hvb =>
+  have hp := Decidable.byContradiction fun a => mixed_word_branch_invariant._proof_1_1 p hfive hbound a;
+  have az := canonical_word_nonzero p a.z hp ha.right.right.left haz;
+  have aw := canonical_word_nonzero p a.w hp ha.right.right.right haw;
+  have bz := canonical_word_nonzero p b.z hp hb.right.right.right.right.left hbz;
+  have bw := canonical_word_nonzero p b.w hp hb.right.right.right.right.right hbw;
+  have va := hva;
+  have vb := hvb;
+  have hd := mixed_classifier_decode p hfive hbound a b ha hb;
+  ⟨Eq.mpr (id (congrArg (fun _a => _a ≠ MixedCancellation.Branch.mismatch) hd))
+      (MixedCancellation.mismatch_excluded f (WordD1.decode p a) (WeightedWord.decodeTwo p b) az aw bz bw va vb),
+    fun hcancel =>
+    have hk :=
+      Decidable.byContradiction fun hn =>
+        False.elim
+          (Eq.mp
+            (Eq.trans
+              (congrFun'
+                (congrArg Eq
+                  (ite_eq_left_of_eq_true MixedCancellation.Branch.common
+                    (if
+                        (WordD1.decode p a).y * MixedCancellation.rawW3 (WeightedWord.decodeTwo p b) =
+                          -(MixedCancellation.rawY3 (WordD1.decode p a) (WeightedWord.decodeTwo p b) *
+                              (WordD1.decode p a).w) then
+                      MixedCancellation.Branch.cancellation
+                    else
+                      if
+                          (WordD1.decode p a).y * MixedCancellation.rawW3 (WeightedWord.decodeTwo p b) ≠
+                            MixedCancellation.rawY3 (WordD1.decode p a) (WeightedWord.decodeTwo p b) *
+                              (WordD1.decode p a).w then
+                        MixedCancellation.Branch.mismatch
+                      else MixedCancellation.Branch.positiveCoincidence)
+                    (Eq.trans (congrArg Not (eq_false hn)) not_false_eq_true)))
+                MixedCancellation.Branch.cancellation)
+              (eq_false' fun h => False.elim (noConfusion_of_Nat MixedCancellation.Branch.ctorIdx h)))
+            (Eq.mp (congrArg (fun _a => _a = MixedCancellation.Branch.cancellation) hd) hcancel));
+    And.casesOn
+      (MixedCancellation.shared_support_conclusions f (WordD1.decode p a) (WeightedWord.decodeTwo p b) az aw bz bw va vb
+        hk)
+      fun left right =>
+      And.casesOn right fun hz right =>
+        And.casesOn right fun hw hvalid =>
+          And.casesOn (mixed_decode p hfive hbound a b ha hb) fun left right =>
+            And.casesOn right fun left right =>
+              And.casesOn right fun left right =>
+                And.casesOn right fun hc right =>
+                  And.casesOn right fun left right =>
+                    And.casesOn right fun left right =>
+                      And.casesOn right fun left hpoint =>
+                        have hcz := Eq.mpr (id (congrArg (fun _a => _a.z ≠ 0) hpoint)) hz;
+                        have hcw := Eq.mpr (id (congrArg (fun _a => _a.w ≠ 0) hpoint)) hw;
+                        ⟨hc,
+                          ⟨fun he =>
+                            hcz
+                              (id
+                                (Eq.mpr (id (congrArg (fun _a => ↑_a.toNat = 0) he))
+                                  (of_eq_true
+                                    (Eq.trans
+                                      (congrFun'
+                                        (congrArg Eq (Eq.trans (congrArg Nat.cast UInt64.toNat_zero) Nat.cast_zero)) 0)
+                                      (eq_self 0))))),
+                            ⟨fun he =>
+                              hcw
+                                (id
+                                  (Eq.mpr (id (congrArg (fun _a => ↑_a.toNat = 0) he))
+                                    (of_eq_true
+                                      (Eq.trans
+                                        (congrFun'
+                                          (congrArg Eq (Eq.trans (congrArg Nat.cast UInt64.toNat_zero) Nat.cast_zero))
+                                          0)
+                                        (eq_self 0))))),
+                              id
+                                (Eq.mpr (id (congrArg (fun _a => MixedCancellation.validPoint f _a) hpoint)) hvalid)⟩⟩⟩⟩

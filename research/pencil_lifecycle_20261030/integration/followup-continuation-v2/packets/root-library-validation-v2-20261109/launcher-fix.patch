@@ -1,0 +1,63 @@
+--- root-library-validation-20261109/durable-launcher.py
++++ root-library-validation-v2-20261109/durable-launcher.py
+@@ -50,15 +50,23 @@
+   HB_NEXT=time.monotonic()+5
+   if HB_EXPIRY is None:raise RuntimeError('no maintained initial lease')
+ 
+-def call(argv,timeout=5):
++def call(argv,timeout=5,record_checkpoint=True):
+  t=max(.1,min(timeout,END-time.monotonic()))
+  x=subprocess.run(argv,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=t)
+  R.setdefault('queries',[]).append({'argv':argv,'exit_code':x.returncode,'stdout':x.stdout.decode(errors='replace'),'stderr':x.stderr.decode(errors='replace')})
+- checkpoint('query-recorded')
++ if record_checkpoint:checkpoint('query-recorded')
+  if x.returncode:raise RuntimeError('command failed: '+repr(argv))
+  return x.stdout.decode()
+ def show():
+- value=call(['/usr/bin/systemctl','show',UNIT]+['--property='+k for k in KEYS]);d=dict(line.split('=',1) for line in value.splitlines() if '=' in line);R['observations'].append(d);return d
++ value=call(['/usr/bin/systemctl','show',UNIT]+['--property='+k for k in KEYS],record_checkpoint=False)
++ d=dict(line.split('=',1) for line in value.splitlines() if '=' in line)
++ if R['unit_launch_attempted'] and d.get('InvocationID'):
++  if R.get('invocation_id'):assert d['InvocationID']==R['invocation_id'],'unit ownership changed'
++  else:R['invocation_id']=d['InvocationID']
++  if d.get('ControlGroup'):
++   if R.get('cgroup'):assert d['ControlGroup']==R['cgroup'],'unit cgroup changed'
++   R['cgroup']=d['ControlGroup']
++ R['observations'].append(d);checkpoint('query-recorded');return d
+ def permit():
+  assert R.get('invocation_id') and HB_EXPIRY is not None
+  now=datetime.datetime.now(datetime.timezone.utc)
+@@ -70,6 +78,20 @@
+  path=Path('/sys/fs/cgroup')/cgroup.lstrip('/')
+  if not path.exists():return True
+  return not (path/'cgroup.procs').read_text().strip() and 'populated 0' in (path/'cgroup.events').read_text()
++def precreate_unit_logs(directory):
++ directory=Path(directory)
++ for name in ('unit.stdout','unit.stderr'):
++  fd=os.open(directory/name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
++  try:
++   os.fchmod(fd,0o600)
++   st=os.fstat(fd)
++   assert st.st_uid==os.geteuid() and st.st_gid==os.getegid(),'caller-owned unit log required'
++   assert st.st_mode&0o777==0o600,'private unit log required'
++   os.fsync(fd)
++  finally:os.close(fd)
++ fd=os.open(directory,os.O_RDONLY|os.O_DIRECTORY)
++ try:os.fsync(fd)
++ finally:os.close(fd)
+ try:
+  assert END-START>=300,'insufficient absolute deadline margin'
+  assert not D.exists(),'no duplicate durable attempt directory'
+@@ -77,10 +99,11 @@
+  for name,digest in F['recipe_files'].items():assert hashlib.sha256((P/name).read_bytes()).hexdigest()==digest,name
+  heartbeat(force=True)
+  before=show();assert before['LoadState']=='not-found','unit already exists'
++ precreate_unit_logs(OUT);checkpoint('caller-owned-unit-logs-created')
+  props={'User':str(F['uid']),'Group':str(F['gid']),'Type':'exec','RemainAfterExit':'yes','CPUQuota':'200%','MemoryMax':str(16*1024**3),'MemorySwapMax':'0','OOMPolicy':'stop','TasksMax':'512','KillMode':'control-group','TimeoutStopSec':'5s','RuntimeMaxSec':str(int(END-time.monotonic()-20))+'s','NoNewPrivileges':'yes','CapabilityBoundingSet':'','ProtectControlGroups':'yes','RestrictNamespaces':'yes','PrivateNetwork':'yes','PrivateTmp':'no','ProtectSystem':'strict','ProtectHome':'read-only','ReadWritePaths':str(W)+' '+str(D),'WorkingDirectory':str(W/'source'),'UMask':'0077','StandardOutput':'append:'+str(OUT/'unit.stdout'),'StandardError':'append:'+str(OUT/'unit.stderr')}
+  argv=['/usr/bin/sudo','-n','/usr/bin/systemd-run','--no-block','--unit='+UNIT]+['--property='+k+'='+v for k,v in props.items()]+['--setenv=PENCIL_CHECK_END_MONOTONIC='+str(END),'/usr/bin/python3','-B',str(P/'durable-worker.py')]
+  R['launch_argv']=argv;R['properties']=props;R['unit_launch_attempted']=True;checkpoint('before-unit-launch')
+- call(argv,10);owned=None;cgroup=None
++ call(argv,10,record_checkpoint=False);owned=None;cgroup=None
+  while time.monotonic()<END-15:
+   heartbeat()
+   if INTERRUPTED:raise RuntimeError('interrupted')

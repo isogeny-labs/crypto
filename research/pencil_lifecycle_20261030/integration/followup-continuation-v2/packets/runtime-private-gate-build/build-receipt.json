@@ -1,0 +1,63 @@
+{
+  "schema": "private.gate.candidate-build/v1",
+  "source_sha256": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc",
+  "compiler_path": "/usr/bin/gcc",
+  "compiler_sha256": "8bffae62fd101725fa713a76b6a5d24efe1dea5d6ab24b902aa2e58e7976eaec",
+  "frozen_plan_sha256": "27ebf58390449ca2c461fb6278b7b2b5e9694636e6970f772cdad354c7f95f8d",
+  "runtime_admitted": false,
+  "image_admitted": false,
+  "candidate_executed": false,
+  "commands": [
+    {
+      "label": "compiler-version",
+      "argv": [
+        "/usr/bin/gcc",
+        "--version"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 3987054,
+      "pgid": 3987054,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "compiler-target",
+      "argv": [
+        "/usr/bin/gcc",
+        "-dumpmachine"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 3987055,
+      "pgid": 3987055,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "candidate-build",
+      "argv": [
+        "/usr/bin/gcc",
+        "-static",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-qualifier/gate.c",
+        "-o",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-build/attempt1/gate-candidate.bin"
+      ],
+      "cap_seconds": 60,
+      "launch_uncertain": false,
+      "pid": 3987056,
+      "pgid": 3987056,
+      "exit_code": 1,
+      "reap_confirmed": true
+    }
+  ],
+  "compiler_target": "x86_64-amazon-linux",
+  "status": "failed",
+  "error": "RuntimeError: candidate-build failed",
+  "pending_signal": null,
+  "elapsed_seconds": 7.47144680499332
+}

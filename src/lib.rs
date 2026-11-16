@@ -33,6 +33,7 @@ pub mod kdf;
 pub mod keys;
 pub mod ml_dataset;
 pub mod pqc;
+pub mod prime_ecc;
 pub mod prime_hyperelliptic;
 pub mod store;
 pub mod symmetric;

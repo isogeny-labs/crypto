@@ -1,0 +1,686 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "IC-LINE-LAYOUT-E2E-FP20-V2-20261101",
+  "version": 2,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/ic_line_layout_tournament_20261031",
+  "authors": [
+    "Codex experiment director"
+  ],
+  "links": {
+    "spec": "research/ic_line_layout_tournament_20261031/spec-fp20-v2.json",
+    "design_predecessor": "research/prime_ic_program_20261029/hashtable_prefetch/README.md",
+    "incumbent_evidence": "research/prime_base_oracle_tuning_20261029/README.md",
+    "prior_evidence": "research/ic_line_layout_tournament_20261031/TERMINAL-OBSERVATION-20261101.md",
+    "infrastructure_preflight": "taskq/deploy/eks-karpenter/l2-validation.json"
+  },
+  "question": "On a fresh, previously unmeasured public 20-bit prime-order curve, does the opt-in cache-line pair index and relation guard reduce the complete verified wall time of the current generic index-calculus incumbent while preserving every counted operation?",
+  "claims": [
+    {
+      "id": "C-correct",
+      "text": "Every measured execution recovers and verifies the planted discrete logarithm, and replay reproduces every measured record.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-parity",
+      "text": "The candidate and incumbent have identical complete counted cost on every paired workload and round.",
+      "class": "comparative",
+      "decided_by": [
+        "C-layout"
+      ],
+      "if_supported": "the layout changes native constants only; it is not a counted or asymptotic improvement",
+      "if_not_supported": "the candidate is not the same algorithmic work and no layout-only speed claim is admitted"
+    },
+    {
+      "id": "C-wall",
+      "text": "The cache-line layout lowers complete verified solve wall time relative to the frozen incumbent on the specified fp20 workload and hardware class.",
+      "class": "comparative",
+      "decided_by": [
+        "C-layout"
+      ],
+      "if_supported": "a scoped generic-track native engineering speedup at fp20; no scaling, asymptotic, algebraic-track, or rho-beating claim",
+      "if_not_supported": "no full end-to-end speedup is established for this candidate"
+    },
+    {
+      "id": "C-rho-gap",
+      "text": "The matched rho arm records the remaining distance to rho; the layout experiment does not claim to close it.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-layout",
+      "statement": "Replacing the incumbent hash-map pair index and repeat guard with fixed cache-line buckets reduces native lookup overhead enough to reduce the complete solve wall time.",
+      "mechanism": "A miss scans one aligned cache line with no hashbrown control/bucket indirection; batched lanes can prefetch the pure home address. Table emission order, relation stream, linear algebra, recovery, and counted operations are unchanged.",
+      "predictions": [
+        {
+          "id": "P-wall",
+          "metric": "full_solve_wall",
+          "direction": "lower",
+          "minimum_effect": "in each of two independent L2 sessions, both the A/A-corrected per-operation wall interval and the complete total-wall 95% interval lie wholly below 1",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "data_seen": [
+              {
+                "path": "research/prime_ic_program_20261029/hashtable_prefetch/README.md",
+                "measured": "prior stage split on different 28/32-bit curves; no measurements of this implementation or the fresh fp20 seed"
+              },
+              {
+                "path": "research/prime_base_oracle_tuning_20261029/README.md",
+                "measured": "incumbent selection on disjoint curve and target seeds"
+              },
+              {
+                "path": "research/ic_line_layout_tournament_20261031/TERMINAL-OBSERVATION-20261101.md",
+                "measured": "the consumed v1 runs failed at L2 and supplied no admitted performance data; the excluded diagnostic used different curve and target seeds"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "fresh prime_search seed 20261101041 and target seed 20261101042 on two independent c8a.2xlarge L2 jobs after one successful infrastructure qualification"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P-parity",
+          "metric": "complete_gae",
+          "direction": "equal_within",
+          "minimum_effect": "exact ratio and interval [1,1], same seeds, no unpaired runs",
+          "provenance": {
+            "written_at": "2026-11-01",
+            "data_seen": [],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "all candidate/incumbent pairs in both sessions"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "Matched negation-map Pollard rho, retained as the generic ECDLP reference and gap measurement.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "incumbent",
+      "role": "baseline",
+      "description": "Current generic-track fp20 incumbent: prime-abscissa size 45 and negation-folded MITM with the default map layout.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=45",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "The incumbent with only oracle layout=lines, which also selects the equivalent cache-line repeat guard.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=45",
+        "oracle": "mitm:negation_folded=1,layout=lines",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "incumbent"
+    },
+    {
+      "id": "incumbent-aa",
+      "role": "control_aa",
+      "description": "An identical incumbent arm under a second name for position bias and the wall-time noise floor.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=45",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "incumbent"
+    },
+    {
+      "id": "rho-plain",
+      "role": "control_positive",
+      "description": "Plain rho against negation-map rho: a known constant-factor slowdown through the same harness and timing detector.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--no-default-features",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "4",
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "method": "rho.plain"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "rho-plain",
+      "expected_detection": "rho.plain has a complete total-wall 95% interval wholly above rho.negation in both sessions",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "the incumbent/incumbent-aa comparison is the matched empirical null for this one-factor performance claim; no separate scientific null population is asserted"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "native_layout",
+        "levels": [
+          "map",
+          "lines"
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "rho.plain"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "prime_search bits=20 seed=20261101041",
+        "how": "one fresh public synthetic curve fixed before measurement and distinct from the consumed v1 curve"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "8 public targets from target_seed 20261101042",
+        "how": "the same fresh target law and exact targets are crossed through every arm"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "one source revision, static ecbench binary, image digest, compiler and flags for all arms; observed hashes bind the export"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "crossed",
+        "how": "ecbench derives the same seed for each arm in every workload and measured round from measurement seed 20261101043"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "alternate_measured interleaves arm positions within every round"
+      },
+      {
+        "name": "host_epoch",
+        "treatment": "crossed",
+        "how": "two concurrent EKS Jobs with required pod anti-affinity; both must decide in the same direction and retain distinct Job/Pod/node identities"
+      },
+      {
+        "name": "host_state",
+        "treatment": "measured",
+        "how": "CPU model, node, affinity, isolation grade, blockers, steal, PSI and foreign busy ticks are recorded per execution; below-L2 rows are inadmissible"
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "each execution is a fresh child process; eight rounds and two jobs repeat process placement and ASLR effects"
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "how": "ordinary non-resumable jobs; interruption is retained and the affected session is not a timed result"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "unblinded native analysis script and exact thresholds frozen before data; all sessions must pass"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-layout",
+        "arms": [
+          "incumbent",
+          "candidate"
+        ],
+        "differs_in": [
+          "native_layout"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "incumbent",
+          "incumbent-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "rho-neg",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench's frozen plan derives algorithm_seed from measurement.seed=20261101043; the same workload/round seed is used for every arm and recorded"
+    },
+    "instance_sampling": {
+      "rule": "eight public targets from fresh target_seed 20261101042 on the fresh fixed curve",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "not masked: method records and exact parity checks reveal the representation; the native script and thresholds are frozen before data",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 8,
+    "replicates": 16,
+    "warmups": 2,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Each session has 64 paired measurements per arm, and both independent sessions must separately put the 95% full-wall interval below 1. This is stricter than pooling; it is intended to resolve a repeatable native constant effect, not a minimum percentage effect. Four thousand bootstrap resamples are used by the fixed native comparison."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 60,
+      "per_sample_seconds": 0.01,
+      "threads": 4,
+      "estimated_total_seconds": 180,
+      "measured_on": "Conservative scheduling estimate from prior disjoint fp20 prime-base sessions; v1 produced no admitted timing and no v2 seed has been executed"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "full_solve_wall",
+        "name": "complete verified solve wall time",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "ecbench solve interval for the whole cold method, including factor-base construction, oracle setup, relation collection, linear algebra, recovery and target verification",
+        "source": "records.jsonl time.solve_wall_ns; ecbench compare wall.total_wall_ratio and wall.total_wall_ci95",
+        "aggregation": "paired_ratio",
+        "resolution": "1 ns recorded; effective resolution gated by L2 and the same-session A/A interval",
+        "uncertainty": "range"
+      },
+      {
+        "id": "complete_gae",
+        "name": "complete counted GAE",
+        "unit": "ecbench.gae",
+        "kind": "counted",
+        "definition": "all counted setup, relation, linear-algebra, recovery and verification group work",
+        "source": "records.jsonl cost.total_gae; ecbench compare ops",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall_per_gae",
+        "name": "A/A-corrected wall per GAE",
+        "unit": "ns/GAE",
+        "kind": "derived",
+        "definition": "candidate/incumbent ns-per-GAE ratio divided by the incumbent-aa/incumbent ratio",
+        "formula": "(candidate ns_per_gae / incumbent ns_per_gae) / (incumbent-aa ns_per_gae / incumbent ns_per_gae)",
+        "source": "ecbench compare wall.corrected_ratio and wall.corrected_ci95",
+        "aggregation": "paired_ratio",
+        "resolution": "double precision over integer clocks and counts",
+        "uncertainty": "range"
+      },
+      {
+        "id": "phase_wall",
+        "name": "phase wall times",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "setup, relations, linear algebra and verification phases reported separately as diagnostics; no phase decides the speedup",
+        "source": "records.jsonl phases",
+        "aggregation": "paired_ratio",
+        "resolution": "1 ns",
+        "uncertainty": "range"
+      },
+      {
+        "id": "rho_distance",
+        "name": "remaining gap to matched rho",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "complete incumbent/candidate cost and wall time divided by rho.negation on the same public targets",
+        "formula": "sum(method metric over paired rows) / sum(rho-neg metric over the same paired rows)",
+        "source": "ecbench compare",
+        "aggregation": "paired_ratio",
+        "resolution": "double precision",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "cost.total_gae",
+      "cost.s",
+      "trials",
+      "relations",
+      "lookups",
+      "walk_operations",
+      "linear_algebra native counters",
+      "field_ops"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "foreign_busy_ticks",
+      "run_cpu",
+      "threads",
+      "job_uid",
+      "pod_uid"
+    ],
+    "timed_primary_justification": "The independent variable is a native memory representation whose intended effect is not represented by group-operation counts. Therefore complete wall time is the decisive metric, but only at L2 with same-session A/A correction, exact counted-cost parity, a positive timing control, and two independent host epochs."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true,
+      "jobs": 2,
+      "pod_anti_affinity": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 60,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Infrastructure stage: dispatch exactly one non-resumable taskq/deploy/eks-karpenter/l2-validation.json job on the exact tested commit. It qualifies routing and L2 only, contributes no candidate datum, and is not retried. If it fails or lacks a manifest-verified accepted L2 receipt, stop this evidence version before the tournament.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Scientific stage, conditional only on the fixed infrastructure qualification: submit exactly two concurrent independent jobs, each with 5 arms x 8 targets x (1 warmup + 8 measured rounds), then stop.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "No scientific retry, alternate seed, factor-base retuning, load-factor tuning or selective host replacement after seeing a result. Any infrastructure or payload failure is retained and this version is inconclusive.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "any wrong answer, missing replay, mismatched source/binary/spec hash, unpaired run or non-identical candidate/incumbent counted cost invalidates the speed claim",
+    "any measured row below L2, any restored timing interval, fewer than five admitted pairs, or A/A interval not containing 1 inside [0.9,1.1] makes that session descriptive",
+    "the positive rho control must be detected independently in both sessions",
+    "a stage-only improvement or one successful session is not a full end-to-end speedup",
+    "the infrastructure qualification is not candidate performance evidence and cannot be pooled with either tournament session",
+    "failure of the single infrastructure qualification terminates v2 without dispatching the two scientific jobs"
+  ],
+  "decision_rule": {
+    "text": "C-wall is supported only if both independent sessions pass replay and controls, candidate/incumbent complete GAE is exactly 1 with interval [1,1], the same-session A/A-corrected wall interval lies wholly below 1, and the complete total-wall 95% interval lies wholly below 1. Otherwise the verdict is within_control_distribution, invalid_measurement, or inconclusive as applicable.",
+    "comparison_ids": [
+      "C-layout"
+    ],
+    "threshold": "in each session: total_wall_ci95 upper < 1 and corrected_ci95 upper < 1; A/A contains 1 within [0.9,1.1]; positive control lower > 1; exact ops ratio 1",
+    "statistic": "candidate/incumbent ratio of total solve wall and A/A-corrected ns per GAE, evaluated separately per session",
+    "interval": "ecbench linearised paired t 95% intervals; 4,000 bootstrap resamples retained for counted summaries",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "total_wall_ratio and corrected_ratio, with reciprocal baseline/candidate speedup reported",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/ic_line_layout_tournament_20261031/analyze.sh",
+      "sha256": "1856d6285f8b5949247dc34ffb222bb00335dbfb728eaca4a95458abef9ffe2d"
+    },
+    "inputs": [
+      "two authenticated ecbench.session/v1 directories downloaded from their exact private S3 results URIs"
+    ],
+    "outputs": [
+      "replay receipts",
+      "candidate comparisons",
+      "A/A comparisons",
+      "positive-control comparisons",
+      "verdict.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "candidate/incumbent complete-wall ratio with 95% interval for each independent session, alongside A/A and positive control",
+      "phase contribution diagnostic with full solve total emphasized"
+    ],
+    "report_dir": "research/ic_line_layout_tournament_20261031/reports/v2"
+  },
+  "inadmissible": [
+    "changing seeds, curve, targets, base size, load factor, number of sessions, rounds, thresholds or analysis after observing data",
+    "calling a relation-phase or setup-only improvement a speedup",
+    "pooling only favorable sessions or discarding contention not excluded by the frozen L2 rule",
+    "claiming a counted, asymptotic, algebraic-track or rho-beating improvement from a native layout result",
+    "treating a successful Kubernetes job or private S3 receipt as a performance verdict without running the frozen analysis on authenticated raw records",
+    "dispatching either scientific job after a failed or unverified infrastructure qualification",
+    "using the consumed v1 jobs, excluded local diagnostic, or infrastructure qualification as a v2 performance sample"
+  ],
+  "literature": [
+    {
+      "ref": "research/prime_ic_program_20261029/hashtable_prefetch/README.md",
+      "provenance": "internal",
+      "claim": "hash-table guard and pair-index work is a material native fraction and exposed line addresses are the predeclared next constant-engineering candidate",
+      "verified_by": "Codex read complete design note and draft protocol on 2026-10-31"
+    },
+    {
+      "ref": "research/prime_base_oracle_tuning_20261029/README.md",
+      "provenance": "internal",
+      "claim": "prime-abscissa size 45 with negation-folded MITM is the current fp20 generic-track incumbent; the track remains bounded by sqrt(r) and behind matched rho",
+      "verified_by": "Codex read study and frozen protocol on 2026-10-31"
+    },
+    {
+      "ref": "docs/ecbench/README.md",
+      "provenance": "internal",
+      "claim": "wall claims require L2, at least five pairs, same-session A/A, replay, complete solve boundaries and explicit total-wall reading",
+      "verified_by": "Codex read comparison and wall-time rules on 2026-10-31"
+    },
+    {
+      "ref": "research/relation_yield_pruning_20261031/REPORT.md",
+      "provenance": "internal",
+      "claim": "relation hits, verified rows, independent rank, coverage and full-rank success must remain distinct; pruning instrumentation does not establish pipeline speed",
+      "verified_by": "Codex read the complete report and its PKM 2016 and Gaudry 2009 source boundary on 2026-11-01"
+    },
+    {
+      "ref": "research/ic_linalg_pipeline_20261019/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "relation collection and relation-matrix solving are separate charged phases and a matrix-stage wall result does not establish an end-to-end gain",
+      "verified_by": "Codex read the complete frozen protocol on 2026-11-01"
+    },
+    {
+      "ref": "research/ic_line_layout_tournament_20261031/TERMINAL-OBSERVATION-20261101.md",
+      "provenance": "internal",
+      "claim": "v1 consumed both planned sessions at the L2 isolation gate and supplied no admitted timing, requiring a new version and preregistration",
+      "verified_by": "Codex checked the merged terminal record and byte-bound diagnoses on 2026-11-01"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "0dc2be59cd4860fae6775d0dff823c1025d4fa999b2c9550bd4d7e19c030f92b",
+    "commit": "6913f53dc1c6d09ee0d3d73a66f356132a968ee6",
+    "frozen_at": "2026-11-01T03:47:00Z",
+    "filed_before_affected_data": true
+  }
+}

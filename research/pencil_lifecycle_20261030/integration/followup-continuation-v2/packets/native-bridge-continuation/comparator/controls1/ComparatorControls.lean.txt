@@ -1,0 +1,23 @@
+import Comparator
+set_option autoImplicit false
+namespace ProjectiveComparatorControls
+open ProjectiveComparator
+def e0 : V ℚ := fun i=>if i=0 then 1 else 0
+def e1 : V ℚ := fun i=>if i=1 then 1 else 0
+def e3 : V ℚ := fun i=>if i=3 then 1 else 0
+def zero : V ℚ := fun _=>0
+theorem positive_scale : same e0 (fun i=>2*e0 i) := scaled_same _ _
+theorem negative_scale : same e1 (fun i=> -3*e1 i) := scaled_same _ _
+theorem different_axes : ¬same e0 e1 := by unfold same e0 e1;decide
+theorem zero_left : same zero e0 := zero_matches_everything _
+theorem zero_right : same e1 zero := same_symm _ _ (zero_matches_everything _)
+theorem zero_breaks_transitivity : same e0 zero ∧ same zero e1 ∧ ¬same e0 e1 := by
+ exact ⟨same_symm _ _ (zero_matches_everything _),zero_matches_everything _,different_axes⟩
+theorem last_pivot : nonzero e3 ∧ same e3 (fun i=>7*e3 i) := by
+ exact ⟨⟨3,by decide⟩,scaled_same _ _⟩
+theorem zero_has_no_nonzero_scale : ¬∃ c:ℚ,c≠0 ∧ ∀ j,zero j=c*e0 j := by
+ rintro ⟨c,hc,h⟩
+ have hh:=h 0
+ simp [zero,e0] at hh
+ exact hc hh.symm
+end ProjectiveComparatorControls

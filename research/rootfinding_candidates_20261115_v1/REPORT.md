@@ -1,0 +1,15 @@
+# Conditional candidate reductions — 2026-11-15
+
+Two experiments executed: paired-factor controls/actual cells PASSED; directtwo-candidate controls were INCONCLUSIVE. The dependent direct timing profile was not executed. No unchanged retry occurred; the third execution slot was unused.
+
+The direct failure is a fixture counterexample, not a proved algorithm error: GF8 curve y²+xy=x³+1 has only4rationalpoints includinginfinity, with finiteabscissae0and1, bothinside the selected prefixdomains. The requested first target outsideV does not exist; next()raisesStopIteration, caught as an empty error string after68predicates. This source/raw failure is preserved. A fresh declared GF8A1/B1fixture or nonprefix domain plus explicit unavailable-target handling is required before another profile.
+
+The paired2+2+1 norm solver passed16640tinyrawstates over80normcells (16GF4,64GF16),32admittedcells and136constructed support positives. There were no positive norm cells; GF8hadno normcells andGF4no admittedcells. Scalar quadratic controls and constructed products do not substitute for missing odd-degree norm-cell coverage. ActualGF(2^83)firsth withk0/k1 produced independently verified inconsistency certificates; both conditional norm sets were empty. The166-variablecoefficient ranks were165and164, consistent with the provedat-most4candidatebound before support filtering. No2^73enumeration occurred. [pcc:unverified]
+
+Paired worker wall1.142244s/selfRSS153804KiB. Failed direct controls wall0.060565s/RSS86744KiB. Individual process peaks are not aggregate tree memory. Workers used90s/4GiB-per-process/onecore budgets. No speedratio is claimed. Field setup, literal norms and complete source ordering are inside the declared scoped workers; original ordinate/auxiliary roots are not recovered.
+
+Primary prior-work review found complete source-pattern overlap: the4+1pattern has affinecentroidrank≤1, and2+2+1rank≤2. Both lie within previously covered low-rank components. These are new conditional norm parameterizations/crosschecks, NOTnewrank3coverage or novelty. The firstpotentialnewmultiplicityfrontier is2+1+1+1: a regular nonzero doubledroot permits at most2parameterpairs per fixedh,k,a; exceptional a0/G(a)0 branches remain UNKNOWN/separate. A stronger fresh plan fixesh,a,y and leavesk free, yielding anF2-affine quotientcubic and≤79span equations on83kbits. Nullity is atLEAST4ifconsistent, not anassumedupperbound; actualrank must be measured and largefamilies capped. Both plans are unexecuted and leaveglobaloutersearch explicit.
+
+All frozen old/newsource, inputs, manifests andraw evidence are preserved. Independent reviews precededrunnerregistration; recordedresults exposed the fixture limitation. lab.runner resume/run-ready ran onlythetwoeligibleworkers; failedcontrols leftprofilepending. Releasegate andqualifiedglobal8xtargetremainopen:20hardmatchedgenuineF4/F5/F6original-rootinputs,coldreps,isolation/A-Aandallrequestedfields. No globalallroots/UNSAT,originalcomponentcount or repository-wide test claim.
+
+Readable source/proof/review/report update is authorized forPR3763; opaque rawarchive remainslocal.

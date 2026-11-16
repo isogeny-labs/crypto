@@ -1,0 +1,80 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Frobenius-orbit IC exponent across n = 13, 19, 23 at one base size: Koblitz a=0 n=13",
+  "description": "Frozen in research/ic_acct7_symmetrised_20261021/PROTOCOL.md section B before any of its data. The same three index-calculus arms as research/bitop_unit_20261016/specs/koblitz-a0-n{13,19,23}.json, with the base size fixed at one choice for all three sizes (compact-orbit-scan columns=2; koblitz-standard-subspace dimension=6) so that `ecbench bound fit` over the three sessions fits an exponent within the toy tier (every field is at most 32 bits, src/cryptanalysis/ecbench/bounds.rs `tier_of_bits`). Every arm is a *_full method: all native counters priced. Engineering; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 202610212013,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    },
+    {
+      "name": "ic-orbit-c2-renew",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "ic-orbit-c2-walk",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "1000000000",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "ic-negfold-d6-renew",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_full",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=6",
+          "oracle": "pdp3-koblitz:m=2,engine=rootfind-negfold",
+          "max_trials": "1000000000",
+          "targets": "stride-renew"
+        }
+      }
+    },
+    {
+      "name": "rho-frob-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_full"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610213013,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

@@ -1,0 +1,45 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp10-t5-192cb216 | 9.68 | ic-mitm | 8/8 | 53.276 | 54.573 | 66.243 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | rho-neg | 8/8 | 3.194 | 3.312 | 4.375 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | rho-neg-aa | 8/8 | 3.194 | 3.312 | 4.375 | — |
+| icv1-fp10-t5-192cb216 | 9.68 | tensor-m2 | 8/8 | 13791.265 | 16587.012 | 41748.727 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | ic-mitm | 8/8 | 26.952 | 27.607 | 33.508 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | rho-neg | 8/8 | 2.979 | 3.170 | 4.891 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | rho-neg-aa | 8/8 | 2.979 | 3.170 | 4.891 | — |
+| icv1-fp12-t19-d4a315df | 11.93 | tensor-m2 | 8/8 | 80539.085 | 96749.644 | 242644.672 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | ic-mitm | 8/8 | 14.994 | 15.537 | 20.420 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-neg | 8/8 | 1.857 | 1.986 | 3.147 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | rho-neg-aa | 8/8 | 1.857 | 1.986 | 3.147 | — |
+| icv1-fp14-tm43-158b6914 | 13.99 | tensor-m2 | 8/8 | 315083.554 | 378299.980 | 947247.815 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | ic-mitm | 8/8 | 10.353 | 11.010 | 16.928 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-neg | 8/8 | 1.862 | 1.988 | 3.122 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | rho-neg-aa | 8/8 | 1.862 | 1.988 | 3.122 | — |
+| icv1-fp16-t351-d433f24e | 15.99 | tensor-m2 | 8/8 | 1253698.337 | 1504843.495 | 3765149.915 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp10-t5-192cb216 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp10-t5-192cb216 | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp10-t5-192cb216 | ic-mitm vs tensor-m2 | ic-mitm < tensor-m2 |
+| icv1-fp10-t5-192cb216 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp10-t5-192cb216 | rho-neg vs tensor-m2 | rho-neg < tensor-m2 |
+| icv1-fp10-t5-192cb216 | rho-neg-aa vs tensor-m2 | rho-neg-aa < tensor-m2 |
+| icv1-fp12-t19-d4a315df | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp12-t19-d4a315df | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp12-t19-d4a315df | ic-mitm vs tensor-m2 | ic-mitm < tensor-m2 |
+| icv1-fp12-t19-d4a315df | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp12-t19-d4a315df | rho-neg vs tensor-m2 | rho-neg < tensor-m2 |
+| icv1-fp12-t19-d4a315df | rho-neg-aa vs tensor-m2 | rho-neg-aa < tensor-m2 |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp14-tm43-158b6914 | ic-mitm vs tensor-m2 | ic-mitm < tensor-m2 |
+| icv1-fp14-tm43-158b6914 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp14-tm43-158b6914 | rho-neg vs tensor-m2 | rho-neg < tensor-m2 |
+| icv1-fp14-tm43-158b6914 | rho-neg-aa vs tensor-m2 | rho-neg-aa < tensor-m2 |
+| icv1-fp16-t351-d433f24e | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp16-t351-d433f24e | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp16-t351-d433f24e | ic-mitm vs tensor-m2 | ic-mitm < tensor-m2 |
+| icv1-fp16-t351-d433f24e | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp16-t351-d433f24e | rho-neg vs tensor-m2 | rho-neg < tensor-m2 |
+| icv1-fp16-t351-d433f24e | rho-neg-aa vs tensor-m2 | rho-neg-aa < tensor-m2 |

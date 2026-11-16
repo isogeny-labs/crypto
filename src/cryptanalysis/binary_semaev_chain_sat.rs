@@ -9,10 +9,6 @@
 
 use num_bigint::BigUint;
 
-/// Opt-in bounded provenance of the unsimplified original construction.
-#[path = "binary_semaev_chain_provenance.rs"]
-pub mod provenance;
-
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
 use crate::cryptanalysis::sat::{Lit, Solver};
@@ -24,8 +20,18 @@ pub enum ChainBuildError {
     DomainClauseCap { required: usize, maximum: usize },
 }
 
-/// Worst-case SAT variable count for the field-product circuit, before a
+/// Polynomial multiplication circuit used inside each S3 equation.
+/// Karatsuba is opt-in so existing sweep receipts retain their source meaning.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ChainProductKernel {
+    Schoolbook,
+    Karatsuba,
+    ShallowKaratsuba,
+}
+
+/// Worst-case SAT variable count for the schoolbook circuit, before a
 /// finite-coordinate domain. The bound is exact for the all-affine pattern.
+/// Defined through m = 15, the widest supported summand count.
 pub fn chain_s3_max_variables(n: u32, m: usize) -> Option<u64> {
     // m=15 uses only 13 intermediate-identity bits. Keep this explicit
     // bound below the u32 mask width; build() checks its allocation cap
@@ -178,6 +184,7 @@ fn reduced_monomial(degree: usize, irr: &IrreduciblePoly) -> Vec<usize> {
 
 struct Circuit {
     n: usize,
+    product_kernel: ChainProductKernel,
     next: u32,
     reductions: Vec<Vec<usize>>,
     square_inputs: Vec<Vec<usize>>,
@@ -188,29 +195,20 @@ struct Circuit {
 }
 
 impl Circuit {
-    fn new(irr: &IrreduciblePoly) -> Self {
-        Self::new_checked(irr, &mut || Ok(())).expect("infallible legacy probe")
-    }
-    fn new_checked(
-        irr: &IrreduciblePoly,
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    ) -> Result<Self, ChainBuildError> {
+    fn new_with_kernel(irr: &IrreduciblePoly, product_kernel: ChainProductKernel) -> Self {
         let n = irr.degree as usize;
         let reductions: Vec<_> = (0..2 * n - 1)
-            .map(|degree| {
-                check()?;
-                Ok(reduced_monomial(degree, irr))
-            })
-            .collect::<Result<_, ChainBuildError>>()?;
+            .map(|degree| reduced_monomial(degree, irr))
+            .collect();
         let mut square_inputs = vec![Vec::new(); n];
         for bit in 0..n {
-            check()?;
             for &output in &reductions[2 * bit] {
                 square_inputs[output].push(bit);
             }
         }
-        Ok(Self {
+        Self {
             n,
+            product_kernel,
             next: 1,
             reductions,
             square_inputs,
@@ -218,7 +216,7 @@ impl Circuit {
             xors: Vec::new(),
             units: Vec::new(),
             impossible: false,
-        })
+        }
     }
 
     fn wire(&mut self) -> u32 {
@@ -238,18 +236,14 @@ impl Circuit {
     }
 
     fn product(&mut self, left: &[u32], right: &[u32]) -> Vec<u32> {
-        self.product_checked(left, right, &mut || Ok(()))
-            .expect("infallible legacy probe")
-    }
-    fn product_checked(
-        &mut self,
-        left: &[u32],
-        right: &[u32],
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    ) -> Result<Vec<u32>, ChainBuildError> {
+        if self.product_kernel == ChainProductKernel::Karatsuba {
+            return self.product_karatsuba(left, right);
+        }
+        if self.product_kernel == ChainProductKernel::ShallowKaratsuba {
+            return self.product_shallow_karatsuba(left, right);
+        }
         let mut rows = vec![Vec::new(); self.n];
         for (i, &a) in left.iter().enumerate() {
-            check()?;
             for (j, &b) in right.iter().enumerate() {
                 let gate = self.wire();
                 self.ands.push((gate, a, b));
@@ -263,38 +257,170 @@ impl Circuit {
             row.push(output[bit]);
             self.xors.push((row, false));
         }
-        Ok(output)
+        output
+    }
+
+    fn xor_terms(&mut self, mut terms: Vec<u32>) -> u32 {
+        terms.retain(|&wire| wire != 0);
+        terms.sort_unstable();
+        let mut odd = Vec::with_capacity(terms.len());
+        let mut index = 0;
+        while index < terms.len() {
+            let wire = terms[index];
+            let mut end = index + 1;
+            while end < terms.len() && terms[end] == wire {
+                end += 1;
+            }
+            if (end - index) & 1 == 1 {
+                odd.push(wire);
+            }
+            index = end;
+        }
+        match odd.len() {
+            0 => 0,
+            1 => odd[0],
+            _ => {
+                let output = self.wire();
+                odd.push(output);
+                self.xors.push((odd, false));
+                output
+            }
+        }
+    }
+
+    // Zero is a private constant-zero sentinel, never a SAT variable.
+    fn polynomial_karatsuba(&mut self, left: &[u32], right: &[u32]) -> Vec<u32> {
+        debug_assert_eq!(left.len(), right.len());
+        debug_assert!(left.len().is_power_of_two());
+        if left.len() == 1 {
+            if left[0] == 0 || right[0] == 0 {
+                return vec![0];
+            }
+            let output = self.wire();
+            self.ands.push((output, left[0], right[0]));
+            return vec![output];
+        }
+        let half = left.len() / 2;
+        let low = self.polynomial_karatsuba(&left[..half], &right[..half]);
+        let high = self.polynomial_karatsuba(&left[half..], &right[half..]);
+        let left_sum: Vec<u32> = (0..half)
+            .map(|i| self.xor_terms(vec![left[i], left[i + half]]))
+            .collect();
+        let right_sum: Vec<u32> = (0..half)
+            .map(|i| self.xor_terms(vec![right[i], right[i + half]]))
+            .collect();
+        let mixed = self.polynomial_karatsuba(&left_sum, &right_sum);
+        let mut rows = vec![Vec::new(); 4 * half - 1];
+        for (i, &wire) in low.iter().enumerate() {
+            rows[i].push(wire);
+            rows[i + half].push(wire);
+        }
+        for (i, &wire) in high.iter().enumerate() {
+            rows[i + half].push(wire);
+            rows[i + 2 * half].push(wire);
+        }
+        for (i, &wire) in mixed.iter().enumerate() {
+            rows[i + half].push(wire);
+        }
+        rows.into_iter().map(|row| self.xor_terms(row)).collect()
+    }
+
+    fn product_karatsuba(&mut self, left: &[u32], right: &[u32]) -> Vec<u32> {
+        let padded = self.n.next_power_of_two();
+        let mut a = vec![0; padded];
+        let mut b = vec![0; padded];
+        a[..self.n].copy_from_slice(left);
+        b[..self.n].copy_from_slice(right);
+        let polynomial = self.polynomial_karatsuba(&a, &b);
+        let mut rows = vec![Vec::new(); self.n];
+        for (degree, &wire) in polynomial.iter().enumerate() {
+            // Padded coefficients above the true 2n-2 degree cancel by the
+            // Karatsuba identities; they do not contribute to field output.
+            if wire == 0 || degree >= self.reductions.len() {
+                continue;
+            }
+            for &output in &self.reductions[degree] {
+                rows[output].push(wire);
+            }
+        }
+        let output = self.block();
+        for (bit, mut row) in rows.into_iter().enumerate() {
+            row.push(output[bit]);
+            self.xors.push((row, false));
+        }
+        output
+    }
+
+    fn product_shallow_karatsuba(&mut self, left: &[u32], right: &[u32]) -> Vec<u32> {
+        // A=A0+x^h A1, B=B0+x^h B1, with h=ceil(n/2).  Form only
+        // L=A0 B0, H=A1 B1, and M=(A0+A1)(B0+B1).  Each AND gate is
+        // routed directly to the reduced output; no coefficient wires for
+        // L, H, or M are introduced into the SAT instance.
+        let half = self.n.div_ceil(2);
+        let high = self.n - half;
+        let mut rows = vec![Vec::new(); self.n];
+        let mut left_mix = Vec::with_capacity(half);
+        let mut right_mix = Vec::with_capacity(half);
+        for i in 0..half {
+            left_mix.push(self.xor_terms(vec![left[i], left.get(i + half).copied().unwrap_or(0)]));
+            right_mix
+                .push(self.xor_terms(vec![right[i], right.get(i + half).copied().unwrap_or(0)]));
+        }
+        for i in 0..half {
+            for j in 0..half {
+                let gate = self.wire();
+                self.ands.push((gate, left[i], right[j]));
+                for &degree in &[i + j, i + j + half] {
+                    for &bit in &self.reductions[degree] {
+                        rows[bit].push(gate);
+                    }
+                }
+            }
+        }
+        for i in 0..high {
+            for j in 0..high {
+                let gate = self.wire();
+                self.ands.push((gate, left[i + half], right[j + half]));
+                for &degree in &[i + j + half, i + j + 2 * half] {
+                    for &bit in &self.reductions[degree] {
+                        rows[bit].push(gate);
+                    }
+                }
+            }
+        }
+        for i in 0..half {
+            for j in 0..half {
+                let gate = self.wire();
+                self.ands.push((gate, left_mix[i], right_mix[j]));
+                for &bit in &self.reductions[i + j + half] {
+                    rows[bit].push(gate);
+                }
+            }
+        }
+        let output = self.block();
+        for (bit, mut row) in rows.into_iter().enumerate() {
+            row.push(output[bit]);
+            self.xors.push((row, false));
+        }
+        output
     }
 
     fn s3(&mut self, x: &[u32], y: &[u32], z: &[u32], b: &F2mElement) {
-        self.s3_checked(x, y, z, b, &mut || Ok(()))
-            .expect("infallible legacy probe")
-    }
-    fn s3_checked(
-        &mut self,
-        x: &[u32],
-        y: &[u32],
-        z: &[u32],
-        b: &F2mElement,
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    ) -> Result<(), ChainBuildError> {
         let sum = self.block();
         for bit in 0..self.n {
             self.xors.push((vec![sum[bit], x[bit], y[bit]], false));
         }
-        let xy = self.product_checked(x, y, check)?;
-        let sum_z = self.product_checked(&sum, z, check)?;
-        let xyz = self.product_checked(&xy, z, check)?;
+        let xy = self.product(x, y);
+        let sum_z = self.product(&sum, z);
+        let xyz = self.product(&xy, z);
         let b_bits = b.to_biguint();
         for output in 0..self.n {
-            check()?;
             let mut row = vec![xyz[output]];
             for &input in &self.square_inputs[output] {
                 row.extend([xy[input], sum_z[input]]);
             }
             self.xors.push((row, b_bits.bit(output as u64)));
         }
-        Ok(())
     }
 
     fn finish(self) -> Solver {
@@ -336,105 +462,8 @@ pub struct ChainedS3Encoding {
     orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
-}
-
-// Shared unsimplified construction; the legacy solver path consumes exactly
-// the same ordered gates, XORs and units as before.
-fn prepare_circuit(
-    m: usize,
-    irr: &IrreduciblePoly,
-    b: &F2mElement,
-    target_x: Option<&F2mElement>,
-    identity_mask: u32,
-    max_variables: u32,
-) -> Result<(Circuit, Vec<Vec<u32>>, usize), ChainBuildError> {
-    prepare_circuit_checked(
-        m,
-        irr,
-        b,
-        target_x,
-        identity_mask,
-        max_variables,
-        &mut || Ok(()),
-    )
-}
-
-fn prepare_circuit_checked(
-    m: usize,
-    irr: &IrreduciblePoly,
-    b: &F2mElement,
-    target_x: Option<&F2mElement>,
-    identity_mask: u32,
-    max_variables: u32,
-    check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-) -> Result<(Circuit, Vec<Vec<u32>>, usize), ChainBuildError> {
-    let n = irr.degree;
-    let Some(required) = chain_s3_max_variables(n, m) else {
-        return Err(ChainBuildError::Unsupported);
-    };
-    if max_variables == 0 || required > u64::from(max_variables) {
-        return Err(ChainBuildError::VariableCap {
-            required,
-            maximum: max_variables,
-        });
-    }
-    if b.m_value() != n
-        || target_x.is_some_and(|x| x.m_value() != n)
-        || identity_mask >= (1u32 << (m - 2))
-        || !irr.low_terms.contains(&0)
-        || irr.low_terms.iter().any(|&term| term >= n)
-        || {
-            let mut terms = irr.low_terms.clone();
-            terms.sort_unstable();
-            terms.dedup();
-            terms.len() != irr.low_terms.len()
-        }
-    {
-        return Err(ChainBuildError::Unsupported);
-    }
-    let mut circuit = Circuit::new_checked(irr, check)?;
-    let blocks: Vec<Vec<u32>> = (0..2 * m - 1).map(|_| circuit.block()).collect();
-    let target = &blocks[2 * m - 2];
-    let target_bits = target_x.map(F2mElement::to_biguint);
-    for (bit, &wire) in target.iter().enumerate() {
-        circuit.units.push((
-            wire,
-            target_bits.as_ref().is_some_and(|x| x.bit(bit as u64)),
-        ));
-    }
-
-    let mut n_s3_nodes = 0;
-    let mut previous = &blocks[0];
-    for step in 1..m {
-        check()?;
-        let output = if step == m - 1 {
-            target
-        } else {
-            &blocks[m + step - 1]
-        };
-        let previous_infinity = step > 1 && (identity_mask & (1 << (step - 2))) != 0;
-        let output_infinity = if step == m - 1 {
-            target_x.is_none()
-        } else {
-            (identity_mask & (1 << (step - 1))) != 0
-        };
-        if step < m - 1 && output_infinity {
-            for &wire in output {
-                circuit.units.push((wire, false));
-            }
-        }
-        match (previous_infinity, output_infinity) {
-            (true, true) => circuit.impossible = true, // O + affine != O
-            (true, false) => circuit.equal(&blocks[step], output),
-            (false, true) => circuit.equal(previous, &blocks[step]),
-            (false, false) => {
-                circuit.s3_checked(previous, &blocks[step], output, b, check)?;
-                n_s3_nodes += 1;
-            }
-        }
-        previous = output;
-    }
-    Ok((circuit, blocks, n_s3_nodes))
+    all_summands_exchangeable: bool,
+    all_summands_ordered: bool,
 }
 
 impl ChainedS3Encoding {
@@ -446,9 +475,110 @@ impl ChainedS3Encoding {
         identity_mask: u32,
         max_variables: u32,
     ) -> Result<Self, ChainBuildError> {
-        let (circuit, blocks, n_s3_nodes) =
-            prepare_circuit(m, irr, b, target_x, identity_mask, max_variables)?;
+        Self::build_with_kernel(
+            m,
+            irr,
+            b,
+            target_x,
+            identity_mask,
+            max_variables,
+            ChainProductKernel::Schoolbook,
+        )
+    }
+
+    /// Build the same S3 equations with an explicitly chosen multiplication
+    /// circuit. The Karatsuba path is separate from frozen schoolbook arms.
+    pub fn build_with_kernel(
+        m: usize,
+        irr: &IrreduciblePoly,
+        b: &F2mElement,
+        target_x: Option<&F2mElement>,
+        identity_mask: u32,
+        max_variables: u32,
+        kernel: ChainProductKernel,
+    ) -> Result<Self, ChainBuildError> {
         let n = irr.degree;
+        let Some(required) = chain_s3_max_variables(n, m) else {
+            return Err(ChainBuildError::Unsupported);
+        };
+        if max_variables == 0 {
+            return Err(ChainBuildError::VariableCap {
+                required: if kernel == ChainProductKernel::Schoolbook {
+                    required
+                } else {
+                    1
+                },
+                maximum: max_variables,
+            });
+        }
+        if kernel == ChainProductKernel::Schoolbook && required > u64::from(max_variables) {
+            return Err(ChainBuildError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        if b.m_value() != n
+            || target_x.is_some_and(|x| x.m_value() != n)
+            || identity_mask >= (1u32 << (m - 2))
+            || !irr.low_terms.contains(&0)
+            || irr.low_terms.iter().any(|&term| term >= n)
+            || {
+                let mut terms = irr.low_terms.clone();
+                terms.sort_unstable();
+                terms.dedup();
+                terms.len() != irr.low_terms.len()
+            }
+        {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let mut circuit = Circuit::new_with_kernel(irr, kernel);
+        let blocks: Vec<Vec<u32>> = (0..2 * m - 1).map(|_| circuit.block()).collect();
+        let target = &blocks[2 * m - 2];
+        let target_bits = target_x.map(F2mElement::to_biguint);
+        for (bit, &wire) in target.iter().enumerate() {
+            circuit.units.push((
+                wire,
+                target_bits.as_ref().is_some_and(|x| x.bit(bit as u64)),
+            ));
+        }
+
+        let mut n_s3_nodes = 0;
+        let mut previous = &blocks[0];
+        for step in 1..m {
+            let output = if step == m - 1 {
+                target
+            } else {
+                &blocks[m + step - 1]
+            };
+            let previous_infinity = step > 1 && (identity_mask & (1 << (step - 2))) != 0;
+            let output_infinity = if step == m - 1 {
+                target_x.is_none()
+            } else {
+                (identity_mask & (1 << (step - 1))) != 0
+            };
+            if step < m - 1 && output_infinity {
+                for &wire in output {
+                    circuit.units.push((wire, false));
+                }
+            }
+            match (previous_infinity, output_infinity) {
+                (true, true) => circuit.impossible = true, // O + affine != O
+                (true, false) => circuit.equal(&blocks[step], output),
+                (false, true) => circuit.equal(previous, &blocks[step]),
+                (false, false) => {
+                    circuit.s3(previous, &blocks[step], output, b);
+                    n_s3_nodes += 1;
+                }
+            }
+            previous = output;
+        }
+        let actual_variables = u64::from(circuit.next - 1);
+        if actual_variables > u64::from(max_variables) || actual_variables > i32::MAX as u64 {
+            return Err(ChainBuildError::VariableCap {
+                required: actual_variables,
+                maximum: max_variables,
+            });
+        }
         let n_and_gates = circuit.ands.len();
         let mut solver = circuit.finish();
         solver.set_branch_priority(&(1..=(m as u32 * n)).collect::<Vec<_>>());
@@ -467,6 +597,8 @@ impl ChainedS3Encoding {
             orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
+            all_summands_exchangeable: false,
+            all_summands_ordered: false,
         })
     }
 
@@ -496,6 +628,7 @@ impl ChainedS3Encoding {
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
+        self.all_summands_exchangeable = true;
         Ok(required)
     }
 
@@ -566,6 +699,7 @@ impl ChainedS3Encoding {
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
+        self.all_summands_exchangeable = true;
         Ok(required)
     }
 
@@ -630,6 +764,7 @@ impl ChainedS3Encoding {
             });
         }
         self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
+        self.all_summands_exchangeable = sorted_domains.windows(2).all(|w| w[0] == w[1]);
         for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
             self.orbit_choice_wires.push(add_frobenius_orbit_domain(
                 &mut self.solver,
@@ -654,7 +789,7 @@ impl ChainedS3Encoding {
     /// node depends only on its output. This is optional so ordered and
     /// unrestricted searches remain separate sweep arms.
     pub fn order_first_pair(&mut self, max_variables: u32) -> Result<(), ChainBuildError> {
-        if self.first_pair_ordered || !self.first_pair_exchangeable {
+        if self.first_pair_ordered || self.all_summands_ordered || !self.first_pair_exchangeable {
             return Err(ChainBuildError::Unsupported);
         }
         let extra = self.n - 1;
@@ -667,6 +802,69 @@ impl ChainedS3Encoding {
         }
         add_lex_leq(&mut self.solver, &self.blocks[0], &self.blocks[1]);
         self.first_pair_ordered = true;
+        Ok(())
+    }
+
+    /// Restrict the affine intermediate `y_step` (the x-coordinate of the
+    /// partial sum after summand `step + 1`, `1 <= step <= m - 2`) to a
+    /// finite set of codes, by the same trie as a summand domain. The caller
+    /// must pass a set that contains every value the intermediate can take
+    /// in a decomposition (for example all x-coordinates of sums of
+    /// `step + 1` base points, or of `R` minus sums of `m - step - 1`), so
+    /// that no decomposition is lost. Refused for an identity step, whose
+    /// block is fixed to zero, and before the summand domain is installed.
+    pub fn constrain_intermediate(
+        &mut self,
+        step: usize,
+        codes: &[BigUint],
+        max_domain_clauses: usize,
+    ) -> Result<usize, ChainBuildError> {
+        if !self.domain_installed
+            || step == 0
+            || step + 2 > self.m
+            || (self.identity_mask & (1 << (step - 1))) != 0
+        {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let required =
+            finite_domain_clause_count(codes, self.n, 1).ok_or(ChainBuildError::Unsupported)?;
+        if required > max_domain_clauses {
+            return Err(ChainBuildError::DomainClauseCap {
+                required,
+                maximum: max_domain_clauses,
+            });
+        }
+        let mut codes = codes.to_vec();
+        codes.sort_unstable();
+        codes.dedup();
+        let block = self.blocks[self.m + step - 1].clone();
+        add_coordinate_domain(&mut self.solver, &block, &codes, self.n as usize);
+        Ok(required)
+    }
+
+    /// Keep one representative of every summand permutation:
+    /// `x_1 <= x_2 <= ... <= x_m` as unsigned codes. A decomposition
+    /// `R = P_1 + ... + P_m` has a chain witness in every summand order, its
+    /// partial sums landing in some identity pattern, so a caller that
+    /// searches every pattern loses no decomposition; it only stops searching
+    /// the `m!` reorderings of each one. Requires one shared summand domain.
+    /// Optional, like [`Self::order_first_pair`], so the arms stay separate.
+    pub fn order_all_summands(&mut self, max_variables: u32) -> Result<(), ChainBuildError> {
+        if self.first_pair_ordered || self.all_summands_ordered || !self.all_summands_exchangeable {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let extra = u64::from(self.n - 1) * (self.m as u64 - 1);
+        let required = u64::from(self.solver.n_vars()) + extra;
+        if required > u64::from(max_variables) || required > i32::MAX as u64 {
+            return Err(ChainBuildError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        for i in 0..self.m - 1 {
+            add_lex_leq(&mut self.solver, &self.blocks[i], &self.blocks[i + 1]);
+        }
+        self.all_summands_ordered = true;
         Ok(())
     }
 
@@ -934,60 +1132,31 @@ fn add_lex_leq(solver: &mut Solver, a: &[u32], b: &[u32]) {
     }
 }
 
-fn visit_coordinate_domain(
-    emit: &mut impl FnMut(Vec<Lit>),
-    block: &[u32],
-    codes: &[BigUint],
-    bit: usize,
-) {
-    visit_coordinate_domain_checked(emit, &mut || Ok(()), block, codes, bit)
-        .expect("infallible legacy probe")
-}
-fn visit_coordinate_domain_checked(
-    emit: &mut impl FnMut(Vec<Lit>),
-    check: &mut impl FnMut() -> Result<(), ChainBuildError>,
-    block: &[u32],
-    codes: &[BigUint],
-    bit: usize,
-) -> Result<(), ChainBuildError> {
+fn add_coordinate_domain(solver: &mut Solver, block: &[u32], codes: &[BigUint], bit: usize) {
     fn visit(
-        emit: &mut impl FnMut(Vec<Lit>),
-        check: &mut impl FnMut() -> Result<(), ChainBuildError>,
+        solver: &mut Solver,
         block: &[u32],
         codes: &[BigUint],
         bit: usize,
         prefix: &mut Vec<Lit>,
-    ) -> Result<(), ChainBuildError> {
-        check()?;
+    ) {
         if codes.is_empty() {
-            emit(prefix.clone());
-            return Ok(());
+            solver.add_clause(prefix.clone());
+            return;
         }
         if bit == 0 {
-            return Ok(());
+            return;
         }
         let position = bit - 1;
         let split = codes.partition_point(|code| !code.bit(position as u64));
         let wire = block[position] as Lit;
         prefix.push(wire);
-        visit(emit, check, block, &codes[..split], position, prefix)?;
+        visit(solver, block, &codes[..split], position, prefix);
         *prefix.last_mut().expect("pushed") = -wire;
-        visit(emit, check, block, &codes[split..], position, prefix)?;
+        visit(solver, block, &codes[split..], position, prefix);
         prefix.pop();
-        Ok(())
     }
-    visit(emit, check, block, codes, bit, &mut Vec::new())
-}
-
-fn add_coordinate_domain(solver: &mut Solver, block: &[u32], codes: &[BigUint], bit: usize) {
-    visit_coordinate_domain(
-        &mut |clause| {
-            solver.add_clause(clause);
-        },
-        block,
-        codes,
-        bit,
-    );
+    visit(solver, block, codes, bit, &mut Vec::new());
 }
 
 #[cfg(test)]
@@ -1081,35 +1250,41 @@ mod tests {
                 let left = F2mElement::from_biguint(&BigUint::from(a), n);
                 let right = F2mElement::from_biguint(&BigUint::from(b), n);
                 let expected = left.mul(&right, &irr).to_biguint();
-                let mut circuit = Circuit::new(&irr);
-                let x = circuit.block();
-                let y = circuit.block();
-                let z = circuit.product(&x, &y);
-                for (bit, &wire) in x.iter().enumerate() {
-                    circuit
-                        .units
-                        .push((wire, left.to_biguint().bit(bit as u64)));
+                for kernel in [
+                    ChainProductKernel::Schoolbook,
+                    ChainProductKernel::Karatsuba,
+                    ChainProductKernel::ShallowKaratsuba,
+                ] {
+                    let mut circuit = Circuit::new_with_kernel(&irr, kernel);
+                    let x = circuit.block();
+                    let y = circuit.block();
+                    let z = circuit.product(&x, &y);
+                    for (bit, &wire) in x.iter().enumerate() {
+                        circuit
+                            .units
+                            .push((wire, left.to_biguint().bit(bit as u64)));
+                    }
+                    for (bit, &wire) in y.iter().enumerate() {
+                        circuit
+                            .units
+                            .push((wire, right.to_biguint().bit(bit as u64)));
+                    }
+                    let mut solver = circuit.finish();
+                    assert_eq!(solver.solve(), SolveResult::Sat);
+                    let model = solver.model();
+                    let actual =
+                        BigUint::from(z.iter().enumerate().fold(0u32, |bits, (bit, &wire)| {
+                            bits | (u32::from(model[wire as usize - 1]) << bit)
+                        }));
+                    assert_eq!(actual, expected);
+                    solver.reset_search();
+                    solver.add_clause(vec![if expected.bit(0) {
+                        -(z[0] as Lit)
+                    } else {
+                        z[0] as Lit
+                    }]);
+                    assert_eq!(solver.solve(), SolveResult::Unsat);
                 }
-                for (bit, &wire) in y.iter().enumerate() {
-                    circuit
-                        .units
-                        .push((wire, right.to_biguint().bit(bit as u64)));
-                }
-                let mut solver = circuit.finish();
-                assert_eq!(solver.solve(), SolveResult::Sat);
-                let model = solver.model();
-                let actual =
-                    BigUint::from(z.iter().enumerate().fold(0u32, |bits, (bit, &wire)| {
-                        bits | (u32::from(model[wire as usize - 1]) << bit)
-                    }));
-                assert_eq!(actual, expected);
-                solver.reset_search();
-                solver.add_clause(vec![if expected.bit(0) {
-                    -(z[0] as Lit)
-                } else {
-                    z[0] as Lit
-                }]);
-                assert_eq!(solver.solve(), SolveResult::Unsat);
             }
         }
     }
@@ -1128,22 +1303,120 @@ mod tests {
         let left = F2mElement::from_biguint(&left_bits, n);
         let right = F2mElement::from_biguint(&right_bits, n);
         let expected = left.mul(&right, &irr).to_biguint();
-        let mut circuit = Circuit::new(&irr);
-        let x = circuit.block();
-        let y = circuit.block();
-        let z = circuit.product(&x, &y);
-        for (bit, &wire) in x.iter().enumerate() {
-            circuit.units.push((wire, left_bits.bit(bit as u64)));
+        for kernel in [
+            ChainProductKernel::Karatsuba,
+            ChainProductKernel::ShallowKaratsuba,
+        ] {
+            let mut circuit = Circuit::new_with_kernel(&irr, kernel);
+            let x = circuit.block();
+            let y = circuit.block();
+            let z = circuit.product(&x, &y);
+            assert!(circuit.ands.len() < (n as usize) * (n as usize));
+            for (bit, &wire) in x.iter().enumerate() {
+                circuit.units.push((wire, left_bits.bit(bit as u64)));
+            }
+            for (bit, &wire) in y.iter().enumerate() {
+                circuit.units.push((wire, right_bits.bit(bit as u64)));
+            }
+            let mut solver = circuit.finish();
+            assert_eq!(solver.solve(), SolveResult::Sat);
+            let model = solver.model();
+            for (bit, &wire) in z.iter().enumerate() {
+                assert_eq!(model[wire as usize - 1], expected.bit(bit as u64));
+            }
         }
-        for (bit, &wire) in y.iter().enumerate() {
-            circuit.units.push((wire, right_bits.bit(bit as u64)));
+    }
+
+    #[test]
+    fn karatsuba_n83_s3_circuit_has_fewer_and_gates() {
+        let irr = IrreduciblePoly {
+            degree: 83,
+            low_terms: vec![0, 1, 2, 45],
+        };
+        let mut counts = Vec::new();
+        for kernel in [
+            ChainProductKernel::Schoolbook,
+            ChainProductKernel::Karatsuba,
+            ChainProductKernel::ShallowKaratsuba,
+        ] {
+            let mut circuit = Circuit::new_with_kernel(&irr, kernel);
+            let x = circuit.block();
+            let y = circuit.block();
+            let z = circuit.block();
+            circuit.s3(&x, &y, &z, &F2mElement::one(83));
+            counts.push((circuit.ands.len(), circuit.next - 1, circuit.xors.len()));
         }
-        let mut solver = circuit.finish();
-        assert_eq!(solver.solve(), SolveResult::Sat);
-        let model = solver.model();
-        for (bit, &wire) in z.iter().enumerate() {
-            assert_eq!(model[wire as usize - 1], expected.bit(bit as u64));
-        }
+        println!(
+            "N83 single S3 schoolbook={:?} karatsuba={:?} shallow={:?}",
+            counts[0], counts[1], counts[2]
+        );
+        assert_eq!(counts[0].0, 3 * 83 * 83);
+        assert!(counts[1].0 < counts[0].0);
+        assert_eq!(counts[2].0, 3 * (2 * 42 * 42 + 41 * 41));
+    }
+
+    #[test]
+    fn karatsuba_n83_five_sum_build_preserves_explicit_kernel_choice() {
+        let irr = IrreduciblePoly {
+            degree: 83,
+            low_terms: vec![0, 1, 2, 45],
+        };
+        let b = F2mElement::one(83);
+        let target = F2mElement::one(83);
+        let schoolbook = ChainedS3Encoding::build(5, &irr, &b, Some(&target), 0, 200_000)
+            .expect("schoolbook capacity");
+        let karatsuba = ChainedS3Encoding::build_with_kernel(
+            5,
+            &irr,
+            &b,
+            Some(&target),
+            0,
+            200_000,
+            ChainProductKernel::Karatsuba,
+        )
+        .expect("Karatsuba capacity");
+        let shallow = ChainedS3Encoding::build_with_kernel(
+            5,
+            &irr,
+            &b,
+            Some(&target),
+            0,
+            200_000,
+            ChainProductKernel::ShallowKaratsuba,
+        )
+        .expect("shallow Karatsuba capacity");
+        println!(
+            "N83 m5 schoolbook vars={} clauses={} ands={}; karatsuba vars={} clauses={} ands={}; shallow vars={} clauses={} ands={}",
+            schoolbook.solver.n_vars(),
+            schoolbook.solver.n_clauses(),
+            schoolbook.n_and_gates,
+            karatsuba.solver.n_vars(),
+            karatsuba.solver.n_clauses(),
+            karatsuba.n_and_gates,
+            shallow.solver.n_vars(),
+            shallow.solver.n_clauses(),
+            shallow.n_and_gates,
+        );
+        assert_eq!(schoolbook.n_and_gates, 4 * 3 * 83 * 83);
+        assert!(karatsuba.n_and_gates < schoolbook.n_and_gates);
+        assert!(karatsuba.solver.n_clauses() < schoolbook.solver.n_clauses());
+        assert_eq!(shallow.n_and_gates, 12 * (2 * 42 * 42 + 41 * 41));
+        assert!(shallow.solver.n_vars() < schoolbook.solver.n_vars());
+        assert!(shallow.solver.n_clauses() < schoolbook.solver.n_clauses());
+        let below = karatsuba.solver.n_vars() - 1;
+        assert!(matches!(
+            ChainedS3Encoding::build_with_kernel(
+                5,
+                &irr,
+                &b,
+                Some(&target),
+                0,
+                below,
+                ChainProductKernel::Karatsuba,
+            ),
+            Err(ChainBuildError::VariableCap { required, maximum })
+                if required == u64::from(below + 1) && maximum == below
+        ));
     }
 
     #[test]
@@ -1185,17 +1458,22 @@ mod tests {
         }
         assert_eq!((roots, nonroots), (4, 4));
         for (values, is_root) in cases {
-            let mut circuit = Circuit::new(&irr);
-            let blocks = [circuit.block(), circuit.block(), circuit.block()];
-            circuit.s3(&blocks[0], &blocks[1], &blocks[2], &b);
-            for (block, value) in blocks.iter().zip(values.iter()) {
-                let bits = value.to_biguint();
-                for (bit, &wire) in block.iter().enumerate() {
-                    circuit.units.push((wire, bits.bit(bit as u64)));
+            for kernel in [
+                ChainProductKernel::Schoolbook,
+                ChainProductKernel::Karatsuba,
+            ] {
+                let mut circuit = Circuit::new_with_kernel(&irr, kernel);
+                let blocks = [circuit.block(), circuit.block(), circuit.block()];
+                circuit.s3(&blocks[0], &blocks[1], &blocks[2], &b);
+                for (block, value) in blocks.iter().zip(values.iter()) {
+                    let bits = value.to_biguint();
+                    for (bit, &wire) in block.iter().enumerate() {
+                        circuit.units.push((wire, bits.bit(bit as u64)));
+                    }
                 }
+                let mut solver = circuit.finish();
+                assert_eq!(solver.solve() == SolveResult::Sat, is_root);
             }
-            let mut solver = circuit.finish();
-            assert_eq!(solver.solve() == SolveResult::Sat, is_root);
         }
     }
 
@@ -1205,9 +1483,12 @@ mod tests {
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
         assert_eq!(chain_s3_max_variables(83, 9), Some(169_403));
+        assert_eq!(chain_s3_max_variables(83, 10), Some(190_568));
         assert_eq!(chain_s3_max_variables(83, 7), Some(127_073));
         assert_eq!(chain_s3_max_variables(83, 15), Some(296_393));
         assert_eq!(chain_s3_max_variables(83, 16), None);
+        assert_eq!(chain_s3_max_variables(1, 4), None);
+        assert_eq!(chain_s3_max_variables(128, 4), None);
     }
 
     #[test]

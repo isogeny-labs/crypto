@@ -1,0 +1,72 @@
+// Actual normalized image packet, evaluated in the complete rank64 algebra.
+proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../51/runs/universal51-01/universal-polynomial51.sing"));
+ideal targets53=qr51,G51,N51;
+int count53=0;int i53;int j53;int k53;int e53;int row53;
+for(i53=1;i53<=5;i53++){count53=count53+size(targets53[i53]);}
+intmat catalog53[count53][5];intvec maxima53=0,0,0,0;intvec exponents53;
+poly rest53;poly term53;
+row53=0;
+for(i53=1;i53<=5;i53++){
+ rest53=targets53[i53];
+ while(rest53!=0){
+  term53=lead(rest53);exponents53=leadexp(term53);row53=row53+1;
+  catalog53[row53,1]=i53;
+  for(j53=1;j53<=4;j53++){catalog53[row53,j53+1]=exponents53[j53];if(exponents53[j53]>maxima53[j53]){maxima53[j53]=exponents53[j53];}}
+  rest53=rest53-term53;
+ }
+}
+execute(read("../../../51/runs/line51-01/qr-line-certificate51.sing"));
+execute(read("../../../51/runs/collision51-01/collision-certificate51.sing"));
+execute(read("../../../52/runs/normline52-01/normline-certificate52.sing"));
+execute(read("../tate53-03/tate-base-certificate53.sing"));
+ring packet53=(2,b,c),(t,n,l),lp;short=0;
+map lineMap53=QRlineCertificate51,t,n,l;
+ideal lineSource53=lineMap53(source51);matrix torsionLift53=lineMap53(torsionLift51);
+map collisionMap53=collisionCertificate51,t;
+poly psi53=collisionMap53(psi3_51);poly delta53=collisionMap53(delta51);
+poly V53=collisionMap53(V51);poly U53=collisionMap53(U51);poly psi753=collisionMap53(psi7_51);
+ideal source53=lineSource53[1],lineSource53[2],psi53;
+ideal gb53=std(source53);require53(vdim(gb53)==64,"PACKET53_RANK64");
+matrix forward53=lift(source53,gb53);matrix reverse53=lift(gb53,source53);
+require53(matrix(source53)*forward53==matrix(gb53) && matrix(gb53)*reverse53==matrix(source53),"PACKET53_BOTH_IDEAL_PRODUCTS");
+map normMap53=normLineCertificate52,0,0,0,t,l,n;
+poly alpha53=normMap53(alpha52);poly beta53=normMap53(beta52);poly gamma53=normMap53(gamma52);
+require53(alpha53==lineSource53[3],"PACKET53_ACTUAL_ALPHA");
+require53(matrix(lineSource53)*torsionLift53==matrix(ideal(psi753)),"PACKET53_SOURCE_TORSION_PRODUCT");
+require53(U53*psi53+V53*psi753==delta53^16,"PACKET53_BEZOUT_PRODUCT");
+poly vReduced53=reduce(V53,gb53);poly zReduced53=reduce(torsionLift53[3,1],gb53);
+poly alphaInverse53=reduce(vReduced53*zReduced53/delta53^16,gb53);
+require53(reduce(alpha53*alphaInverse53,gb53)==1,"PACKET53_COMPOSED_INVERSE");
+poly L53=reduce(beta53*alphaInverse53,gb53);poly N53=reduce(gamma53*alphaInverse53,gb53);
+print("PACKET53_INVERSE_AND_LINE_PASS");
+map tateMap53=tateBaseCertificate53,t;
+poly r53=tateMap53(r53);poly q53=tateMap53(q53);poly s53=tateMap53(s53);
+poly iu53=tateMap53(uInverse53);poly bnew53=tateMap53(bnew53);poly cnew53=tateMap53(cnew53);
+poly lnew53=reduce((L53+s53)*iu53,gb53);
+poly nnew53=reduce((L53*r53+N53+q53)*iu53^3,gb53);
+poly deltaNew53=reduce(bnew53^3*(bnew53+cnew53*(1+cnew53)^3),gb53);
+matrix deltaUnit53=lift(ideal(psi53,deltaNew53),ideal(1));
+require53(matrix(ideal(psi53,deltaNew53))*deltaUnit53==matrix(ideal(1)),"PACKET53_TARGET_DELTA_UNIT");
+link out53="ASCII:w packet-coordinates53.sing";
+write(out53,"ring packetCoordinatesCertificate53=(2,b,c),(t,n,l),lp;short=0;ideal source53="+string(source53)+";ideal gb53="+string(gb53)+";poly alphaInverse53="+string(alphaInverse53)+";poly lnew53="+string(lnew53)+";poly nnew53="+string(nnew53)+";poly bnew53="+string(bnew53)+";poly cnew53="+string(cnew53)+";poly deltaNew53="+string(deltaNew53)+";");close(out53);
+print("PACKET53_COORDINATES_SAVED");
+int max53=0;for(j53=1;j53<=4;j53++){if(maxima53[j53]>max53){max53=maxima53[j53];}}
+matrix powers53[4][max53+1];matrix inputs53[1][4]=nnew53,lnew53,bnew53,cnew53;
+for(j53=1;j53<=4;j53++){
+ powers53[j53,1]=1;
+ for(e53=1;e53<=maxima53[j53];e53++){powers53[j53,e53+1]=reduce(powers53[j53,e53]*inputs53[1,j53],gb53);}
+ print("PACKET53_POWERS variable="+string(j53));
+}
+matrix residuals53[1][5];poly value53;
+for(row53=1;row53<=count53;row53++){
+ value53=1;
+ for(j53=1;j53<=4;j53++){value53=reduce(value53*powers53[j53,catalog53[row53,j53+1]+1],gb53);}
+ i53=catalog53[row53,1];residuals53[1,i53]=residuals53[1,i53]+value53;
+}
+for(i53=1;i53<=5;i53++){
+ require53(residuals53[1,i53]==0,"PACKET53_TARGET_IDENTITY_"+string(i53));
+ print("PACKET53_TARGET_ZERO index="+string(i53));
+}
+require53(reduce((1+cnew53)^2*deltaNew53,gb53)!=0,"PACKET53_CHANGED_INTERCEPT_DETECTED");
+print("PACKET53_ALL_CHECKS_PASS");quit;

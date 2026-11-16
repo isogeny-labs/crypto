@@ -1,0 +1,38 @@
+{
+  "schema": "research.parallel-component-packet/v1",
+  "task": "T-1216",
+  "producer_task": "T-1215",
+  "components": {
+    "graph": {
+      "main": 9,
+      "producer_controls": 9,
+      "reviewer_controls": 6,
+      "review_readbacks": 24
+    },
+    "czero": {
+      "main": 9,
+      "producer_controls": 6,
+      "reviewer_declarations": 6,
+      "review_readbacks": 21
+    },
+    "kummer": {
+      "main": 3,
+      "producer_controls": 3,
+      "reviewer_controls": 8,
+      "review_readbacks": 14
+    },
+    "accounting": {
+      "archive_rows": 180,
+      "selected": 60,
+      "dispositions": 420,
+      "negative_controls": 4,
+      "independent_output_identical": true,
+      "provenance": "partial"
+    }
+  },
+  "scientific_execution": false,
+  "full_cohort_obligation": 1260,
+  "complete_cost_ratio": null,
+  "natural_yield": null,
+  "full_review_workflow_complete": false
+}

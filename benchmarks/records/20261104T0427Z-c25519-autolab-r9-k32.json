@@ -1,0 +1,64 @@
+{
+  "branch": "claude/curve25519-ic-autolab-round4",
+  "closed_utc": "2026-11-04T04:28:26+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/curve25519_autolab_20261104/round-009/sessions/train-k32",
+        "--allow-interrupted",
+        "--out",
+        "research/curve25519_autolab_20261104/round-009/analysis/verify-train-k32-interrupted.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-04T04:28:24+00:00",
+      "wall_s": 1.395
+    }
+  ],
+  "commit": "521933f163502a4504649a3445072725eddcaca8",
+  "commit_dirty": false,
+  "created_utc": "2026-11-04T04:27:51+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39"
+  },
+  "id": "20261104T0427Z-c25519-autolab-r9-k32",
+  "metrics": [],
+  "problem": "ic:curve25519-family-k32",
+  "raw": [
+    {
+      "bytes": 1695,
+      "path": "research/curve25519_autolab_20261104/round-009/analysis/verify-train-k32-interrupted.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3ff50bec5291045fd3b91f22af5212b3fbb04f724e50395e8fdd654b83c82238",
+      "sha256": "3ff50bec5291045fd3b91f22af5212b3fbb04f724e50395e8fdd654b83c82238",
+      "uploaded": false
+    },
+    {
+      "bytes": 725,
+      "path": "research/curve25519_autolab_20261104/round-009/MANIFEST.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2c/2c743d1342b5f72a31006e9ced7522bdcae279ffb91991b364d52e93aa0ce78f",
+      "sha256": "2c743d1342b5f72a31006e9ced7522bdcae279ffb91991b364d52e93aa0ce78f",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-autolab-r9-k32",
+  "status": "censored",
+  "summary": "ic_autolab round 9 (k = 32) stopped by the operator after 10 of its train records: the panel held rootfind-pairs:m=3 at N = 179, which every earlier screen put at 70x-320x the incumbent and which could hold the host for hours under the 1800 s per-run cap; the session is kept as interrupted evidence and the round is not assessed",
+  "validation": null
+}

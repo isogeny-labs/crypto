@@ -1,0 +1,1 @@
+cargo fmt --check found wrapping only in the example target_after_elimination literal. Applied cargo fmt; diagnostic library remains byte-identical to independently reviewed source. Example fixture values unchanged.

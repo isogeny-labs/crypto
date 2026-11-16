@@ -1,0 +1,20 @@
+// Append already computed native model metadata, preserving all historical bytes.
+import fs from 'node:fs';import crypto from 'node:crypto';
+const s='research/twist_routes_1_3_20261021',d=s+'/execution-v15';
+const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
+const input=JSON.parse(fs.readFileSync(d+'/MODELS.json'));
+const path='docs/curves/registry.json',aliases='src/cryptanalysis/curve_aliases.json';
+const old=fs.readFileSync(path,'utf8'),aold=fs.readFileSync(aliases,'utf8');
+const existing=new Set(JSON.parse(old).curves.map(x=>x.slug)),amap=JSON.parse(aold).aliases;
+const additions=input.models.filter(x=>!existing.has(x.slug));
+const pos=old.lastIndexOf('\n ]\n}');if(pos<0)throw Error('unexpected registry array ending');
+const newer=old.slice(0,pos)+(additions.length?',\n'+additions.map(x=>JSON.stringify(x,null,1).split('\n').map(l=>'  '+l).join('\n')).join(',\n'):'')+old.slice(pos);
+const ap=aold.lastIndexOf('\n}\n}');if(ap<0)throw Error('unexpected alias map ending');
+const aa=additions.filter(x=>!amap[x.slug]);
+const anew=aold.slice(0,ap)+(aa.length?',\n'+aa.map(x=>JSON.stringify(x.slug)+': '+JSON.stringify(x.slug)).join(',\n'):'')+aold.slice(ap);
+if(newer.slice(0,pos)!==old.slice(0,pos)||anew.slice(0,ap)!==aold.slice(0,ap))throw Error('historical bytes changed');
+JSON.parse(newer);JSON.parse(anew);
+const receipt={schema:'twist.model-registration/v1',source_models_sha256:sha(fs.readFileSync(d+'/MODELS.json')),registry_before_sha256:sha(old),registry_after_sha256:sha(newer),aliases_before_sha256:sha(aold),aliases_after_sha256:sha(anew),historical_registry_bytes_preserved:true,historical_alias_bytes_preserved:true,added_slugs:additions.map(x=>x.slug),cross_repository_comparison:false};
+if(fs.existsSync(d+'/REGISTRATION.json'))throw Error('fresh registration receipt required');
+fs.writeFileSync(path,newer);fs.writeFileSync(aliases,anew);fs.writeFileSync(d+'/REGISTRATION.json',JSON.stringify(receipt,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({added:additions.length,historical_bytes_preserved:true}));

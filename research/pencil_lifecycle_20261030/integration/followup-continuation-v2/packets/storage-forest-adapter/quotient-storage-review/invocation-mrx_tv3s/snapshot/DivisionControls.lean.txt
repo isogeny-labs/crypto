@@ -1,0 +1,40 @@
+import DivisionInterface
+set_option autoImplicit false
+namespace DivisionControls
+open Polynomial ScaleTrim NativeDivision MonicRemainder
+abbrev F:=ZMod 17
+
+theorem assignment_replaces : writeCoeff (C (2:F)) 0 3=C 3 := by
+ simp only [writeCoeff,coeff_C_zero,pow_zero,mul_one,map_sub]
+ ring
+
+theorem addition_wrong_at_used_slot : (C (2:F)+C 3 : F[X])≠writeCoeff (C 2) 0 3 := by
+ rw [assignment_replaces]
+ intro h
+ have he:=congrArg (fun q:F[X]=>q.eval 0) h
+ norm_num at he
+ exact (show (5:F)≠3 by decide) he
+
+theorem empty_divisor_rejected : checkedDiv 17 [] [1,2] 10=none := by
+ simp [checkedDiv]
+
+theorem nonmonic_divisor_rejected : checkedDiv 17 [1,2] [1,2] 10=none := by
+ simp [checkedDiv]
+
+theorem zero_input : checkedDiv 17 [16,1] [0,0] 0=some (0,[]) := by
+ rfl
+
+theorem no_fuel : checkedDiv 17 [16,1] [16,0,1] 0=none := by rfl
+
+theorem exact_two_steps : checkedDiv 17 [16,1] [16,0,1] 2=some (X+C 1,[]) := by
+ change some (writeCoeff (writeCoeff (0:F[X]) 1 1) 0 1, ([]:List UInt64))=some (X+C 1,[])
+ congr 2
+ simp [writeCoeff]
+
+theorem nonexact_remainder : checkedDiv 17 [16,1] [1,0,1] 2=some (X+C 1,[2]) := by
+ change some (writeCoeff (writeCoeff (0:F[X]) 1 1) 0 1, ([2]:List UInt64))=some (X+C 1,[2])
+ congr 2
+ simp [writeCoeff]
+
+theorem insufficient_one_step : checkedDiv 17 [16,1] [16,0,1] 1=none := by rfl
+end DivisionControls

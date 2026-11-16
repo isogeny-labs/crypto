@@ -1,0 +1,17 @@
+[package]
+name = "torus-trace-lift"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+sha2 = "0.10"
+flate2 = "1"
+torus-s4 = { path = "../torus-s4" }
+torus-s4-tree = { path = "../torus-s4-tree" }
+torus-coset-circuit = { path = "../torus-coset-circuit" }

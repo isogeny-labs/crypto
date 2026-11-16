@@ -1,0 +1,5311 @@
+{
+  "arms": [
+    {
+      "method": {
+        "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
+        "family": "rho",
+        "id": "rho.negation",
+        "method_id": "ECM1hefea4e0ebe79",
+        "method_sha256": "efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995",
+        "params": {
+          "cap_multiple": "64"
+        }
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "entry": "ic_framework::run_pipeline",
+        "family": "ic",
+        "id": "ic.pipeline",
+        "method_id": "ECM1hddcbbac717de",
+        "method_sha256": "ddcbbac717de710cbec22accdb14711e8d5c236c2fa53890339b54f3fd74b4c8",
+        "params": {
+          "factor_base": "cm-scalar-orbit:columns=4,length=32,abs_d=43,mode=scalar",
+          "linalg": "incremental-gauss",
+          "max_trials": "1000000",
+          "oracle": "mitm:negation_folded=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-scalar",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "entry": "ic_framework::run_pipeline",
+        "family": "ic",
+        "id": "ic.pipeline",
+        "method_id": "ECM1h772c5b8a1825",
+        "method_sha256": "772c5b8a1825dcea1eda2cfb476f766d410290a0845a76bb0d35f93082e2d242",
+        "params": {
+          "factor_base": "cm-scalar-orbit:columns=4,length=32,abs_d=43,mode=recurrence",
+          "linalg": "incremental-gauss",
+          "max_trials": "1000000",
+          "oracle": "mitm:negation_folded=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-recurrence",
+      "role": "candidate"
+    }
+  ],
+  "executions": 384,
+  "spec_id": "ECS1hf7b48f249645",
+  "spec_sha256": "f7b48f2496458b0f99fb25d3d0cbb9591f30ebace06fc898b8ef01c3f872b3b8",
+  "workloads": [
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0x98007fe",
+        "0x17a564b5"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W2b6b8af5051c",
+      "workload_sha256": "2b6b8af5051c04978e74f015240d08331a90f6e8e8d4f0688d7bd379f62e900a"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0x8add0f8",
+        "0x4b842b"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W62b0fc0aa7d1",
+      "workload_sha256": "62b0fc0aa7d170d5141f1324baccbdda8d86f10a6d3e607a705d0390990e4d88"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x22a2e11c",
+        "0x1800144c"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "We47dd9e2d5da",
+      "workload_sha256": "e47dd9e2d5daada1033be8dfe9707edb6835b92ccdbc9417d83eebff46b1e195"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0x33e3525",
+        "0x11e2ce58"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W0202fe96cee7",
+      "workload_sha256": "0202fe96cee70a8f71035225c3dc749cc38f731758acfcc5fd4cb474ec568153"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0x19640233",
+        "0x1f222aa"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wcbf079b0300a",
+      "workload_sha256": "cbf079b0300a5c71569463e164cf5961205444cfbb0ac9fb462ccd10138aea1d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0x20210ba",
+        "0xf26480d"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wff0f6325e6f3",
+      "workload_sha256": "ff0f6325e6f38a91c57d502298a9f5455bc51afd351ccb34a939224fca7b1e13"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x21bae94d",
+        "0xee6327"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Weea4a215f039",
+      "workload_sha256": "eea4a215f039632f67b5940df9fcb0d7c630a06e9cb30a7212b3e1ee84d114e6"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x1306ff67",
+        "0x2734088f"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W7adc0cf405f8",
+      "workload_sha256": "7adc0cf405f81aa91991f5b066707a22f68ca0f05669fed92b0544ee7f6961ea"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0x2499c6b2",
+        "0x89574a2"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "We9ecd91d5f00",
+      "workload_sha256": "e9ecd91d5f006a494d73ca5ff8a661da9a99cf378d5978f3a4f517f77d01bf06"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x1187349e",
+        "0x1dcb06aa"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W4b0ec1714d57",
+      "workload_sha256": "4b0ec1714d57fab3cee91a0dca58f9ef63aec1c3d7361f97b67dc125b93c89f0"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0x9744052",
+        "0x1a134d4"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd51dd3aef552",
+      "workload_sha256": "d51dd3aef552b2c02f281ef0b02be80b95ae576808308860e303f75865d02e30"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x1e4e61c3",
+        "0x2386328f"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W7d3721da7ec8",
+      "workload_sha256": "7d3721da7ec803726a45d0cba3c47fb0c352adc3f2cc2665f2ae430a7a910f8d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x215f1b84",
+        "0x169fb560"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W53b30448715d",
+      "workload_sha256": "53b30448715ddda90a6f7c3ce9a3b47befb907252d1b23f400032a732a61ec15"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x180fd8e6",
+        "0xc18453e"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W907b79333e2b",
+      "workload_sha256": "907b79333e2b8fd9508c283eda3ed3f2910d4aacb207d9ab8126406f65b6685a"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0xa607c56",
+        "0x15a03572"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W9bdb0df0ba81",
+      "workload_sha256": "9bdb0df0ba8104f6ea98f619ee0174d6d5e4dd7e063b6de891119aa1f6b279c4"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 610395862, b: 643045557 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:18b863182a470f1ca8c0797eaa648f3d01719bd397c1c38f0df852cfc8eb2e6e",
+        "ec1": "EC1P30Cfph18b863182a47",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0xa565a3c"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:3144794d67d0",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-3144794d"
+      },
+      "curve_spec": {
+        "a": 610395862,
+        "b": 643045557,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 173431356,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x10b7ff17",
+        "0x1547af2c"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W65542bb56c27",
+      "workload_sha256": "65542bb56c27527f635edd81a43fe967e9ab39474d227627d8936aa1f46d9757"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0x1f3094dc",
+        "0x2051e4d1"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W00bcb4499a68",
+      "workload_sha256": "00bcb4499a6803fb5d34c6f6a30c158d5c13eccbf1e3160ad3ad010594ab10b8"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0x22628b63",
+        "0xe511843"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "We1288f3fbe2f",
+      "workload_sha256": "e1288f3fbe2ffd0ea782ac63b0a237fb9eb79eb4bb316d9f83fe11b246152ec4"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x357ca01",
+        "0x1787ac1b"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W2c7bf004dd2d",
+      "workload_sha256": "2c7bf004dd2d42532af878bda09862ea4d41bd673e4db7240570f409ba2469ab"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0x1c9cb00e",
+        "0xb06b29f"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wac10c3de6a8c",
+      "workload_sha256": "ac10c3de6a8cca0e9a0d3cca8ddb84c5358a4f0220a4ab2e3aabcfc19fc0acde"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0x1c0e90d7",
+        "0xff305a3"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "We59ef51fb7a3",
+      "workload_sha256": "e59ef51fb7a32df8e815f2a289824fec7a434669c8b678df82cd089df70b584c"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0xb883640",
+        "0x1beda700"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd6b9d21893a6",
+      "workload_sha256": "d6b9d21893a690e2097ad1ff7901a6ec40e14cc6276d9e5a099dd6bd1b0c7c5f"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x25fda0f",
+        "0xf616286"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W1d463486595c",
+      "workload_sha256": "1d463486595cc1cc0995d75c0591cd4fcc95eb252c8ae6fc55f40e99957aa552"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x14467e86",
+        "0x1a5890c8"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W16cb8400d738",
+      "workload_sha256": "16cb8400d73852ba9b8a4501303ec0018740047529847c050ccc7b57034aaf9f"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0xcbcbe5d",
+        "0x22541dc7"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W1b0cb4763899",
+      "workload_sha256": "1b0cb47638998d19f319233f4d78b5b7a4e8a8625eb72dd12f1d20ac7e5a2a91"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x21adab67",
+        "0xc97a4f7"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wfa52eea5f6a7",
+      "workload_sha256": "fa52eea5f6a70ca772691926e6b2b74d0d238fdad0086d00cb1649d5b7899926"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0x1cef5cf0",
+        "0x25cfd7f0"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wb1d723834410",
+      "workload_sha256": "b1d72383441092d12ee481fb62190800da03d4615e84599037f2153173afd54e"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x853e359",
+        "0x17f33061"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W9e0be9df079a",
+      "workload_sha256": "9e0be9df079acc63a58c4a9e83024c30ea02854baf1669040e54585b34e81383"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x1c3bf543",
+        "0x1d27ef56"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W98343820ab53",
+      "workload_sha256": "98343820ab53f4d8997f8893b64bbad90e1794fba3ec9d20471e36d8efa3c6d6"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x66127c7",
+        "0x1683c3df"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W8cc3e84040b4",
+      "workload_sha256": "8cc3e84040b4a35ee36b8d01865e560f94bb01fe68e78f97354c6f663edadeeb"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0x1eb85b07",
+        "0x22477cdc"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W9efbfe8b4978",
+      "workload_sha256": "9efbfe8b4978357f784200fb9aaf725bb3c164d17e09fd4e9fe4f84e6fafcc1f"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 221832215, b: 368120968 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:979bf33fea98ce0f5a5e0fbebe807395022843e2f39085ab9aea815882bae885",
+        "ec1": "EC1P30Cfph979bf33fea98",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0x1bbcd1a7"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:572587354:unk:unk:r:cf20de2881f8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-cf20de28"
+      },
+      "curve_spec": {
+        "a": 221832215,
+        "b": 368120968,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 465359271,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x2572eb3d",
+        "0x288926c"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wa25541927be5",
+      "workload_sha256": "a25541927be5eb7ef58ffeb48c57227bf75d1564529171aa51186417a3eb68d8"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0x1f5e2b46",
+        "0xd136b29"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W549fd50c99b7",
+      "workload_sha256": "549fd50c99b75909a25ffe58e0e64dfa125a3590263a5cf4ae7a267b6810162a"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0xfa9ee40",
+        "0x212df77f"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W0154dc2b1725",
+      "workload_sha256": "0154dc2b1725747b345ba6c202d69461d2fdd35deb3198ce3bb9292de4f1a4e8"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x1f24bda0",
+        "0x13735b78"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W7da7cea6da6c",
+      "workload_sha256": "7da7cea6da6c637b8e456b8ca89e5d9bbe45287a0e898117a2f3633a824c4e73"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0xe97ce39",
+        "0x159159d9"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W399f56af7a24",
+      "workload_sha256": "399f56af7a2448cd9fc5cd6716c0541188537706e4a0ad7cf7232764ff8994a0"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0xce0ff30",
+        "0x197c655d"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W9cad8322b65e",
+      "workload_sha256": "9cad8322b65e3b0d815188ab0ee0ac9610a2570e99a59945d1f68fed83df2f56"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0x157cb2f7",
+        "0x1ff63ae8"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wf7aab3004459",
+      "workload_sha256": "f7aab300445924307150ba722fbfd03d12f17f15ac7af1322c4d78afd756e5fe"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x2427c956",
+        "0xbae92ff"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "We60d44a9b119",
+      "workload_sha256": "e60d44a9b119617f451a3f0776b29424b1fbfde282dbda125520570329a0169d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x39adac7",
+        "0x2212205c"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W24e96e38f889",
+      "workload_sha256": "24e96e38f88997c474a29159757dbc5223160dd525267b6fd9fbfaef1a9c4c90"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0x13ca37f8",
+        "0x269b1f32"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W33566f1a2aeb",
+      "workload_sha256": "33566f1a2aeba2ad02bf2b480f1f17052195e8f2a1720a5456b5b7fe38e7dca3"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x26cbed1a",
+        "0x1e6d960a"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W39b4b5689625",
+      "workload_sha256": "39b4b5689625692eb88988386d7c574c8a423e841aaa70f38129727c97b4f4fb"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0xfd2cc97",
+        "0x1ab5f23"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd35623e36d2c",
+      "workload_sha256": "d35623e36d2cca4e96d0373aa3c84d8c26dab35f1a3fa96e7a2b97bf4fdc9a83"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x105ea89c",
+        "0x1d8c96fc"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wcb3c25640f22",
+      "workload_sha256": "cb3c25640f223bd20e4612231b5a6434380a53c6fc4085872f6be739b323a856"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x7dc1183",
+        "0xe02248"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W0824a991413c",
+      "workload_sha256": "0824a991413cc5ecf4728af246fd76db1b3387064b0ac5d191bf44efcc2e9a0f"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x958d1ef",
+        "0x25a57422"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W1df37bfe5497",
+      "workload_sha256": "1df37bfe54979cc754827d66c3c28c5bdc2c00751641e527dc8346794ef5046e"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0x14e09bb2",
+        "0x190ed760"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd444f4bc976e",
+      "workload_sha256": "d444f4bc976ef3432d1778e35b5749a565f37681bb5a08fd2271c51e4fa52118"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 336018930, b: 91913704 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:81bb9d255f3c7795d1873e9116556d9d12fd63da531b7f546a411875e0d8a6d0",
+        "ec1": "EC1P30Cfph81bb9d255f3c",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x2",
+          "0x393bf4b"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:0ef164ba1de8",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-0ef164ba"
+      },
+      "curve_spec": {
+        "a": 336018930,
+        "b": 91913704,
+        "group_order": 728661587,
+        "gx": 2,
+        "gy": 60014411,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x17cd6e3f",
+        "0x121f3d60"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W724865ac8c1e",
+      "workload_sha256": "724865ac8c1e83405b0800458e8d387728f0eb1b8956694ac69cfa273efced42"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0x10eaf6bf",
+        "0xb8f9c54"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wf032d93f510f",
+      "workload_sha256": "f032d93f510f9f3cb5a14fe51a84fbf720286a9a208740f4b88349e8b914de52"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0x1d3030c3",
+        "0x180f61b"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wb8736d196228",
+      "workload_sha256": "b8736d1962281a5291d9065992d05822e94046c067a72fbf508fcb2f650f89a8"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x5ecf9f9",
+        "0x1a85d863"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W04ed8500b31e",
+      "workload_sha256": "04ed8500b31ebe3c459bf814400ba60a69a0aee9b3ca90d69e231790959e0fae"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0x14268e19",
+        "0xe5f42dd"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wbc8ad01ab685",
+      "workload_sha256": "bc8ad01ab68595c95efc619cc3154f79f6bae7fa841efa5e0b7e4916376cd8c8"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0x1705eaba",
+        "0xbea59c6"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W5796af8af806",
+      "workload_sha256": "5796af8af806f7dd2db169f93646fe9e7b4271023e95e8ac6241383589be1372"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0xa82610f",
+        "0x12243a8c"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W0aa61e99b59e",
+      "workload_sha256": "0aa61e99b59e4c1aa3b281dbeeb94b13bf3925e265db1611247f84a6626f2ceb"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x2259be6e",
+        "0xb316d7d"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W27c778e951a0",
+      "workload_sha256": "27c778e951a003878241f2541113cd6a824c7036d4e291b1da3efd377681038b"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x2e9e563",
+        "0x32e3f7b"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W8aa64d21452b",
+      "workload_sha256": "8aa64d21452be208c7fb2180a1ec8ef184856ba1d8cbfe63aad27dc7e96858fe"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0xe35d39a",
+        "0x26a05e8e"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wa333fad90754",
+      "workload_sha256": "a333fad9075456344486c726f26d5e8ddd8dbd5286fd479edf1f3b47e7668f3c"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x21791aeb",
+        "0xd3d4536"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W750bfe6fa9a5",
+      "workload_sha256": "750bfe6fa9a5b1af5cded3b35d738805529cf9be07abeb0c16383cbc215a1f59"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0x2502bf6a",
+        "0x800091c"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W1842e7235a7d",
+      "workload_sha256": "1842e7235a7da16b741172c891897c0a0c3e230ad14f191dc5c7c74cd5e7a2ec"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x14595db2",
+        "0xfcd002f"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W7066f971292e",
+      "workload_sha256": "7066f971292efeeffa1f9efaa5fe6a820527726fbc8a048f5e01492329e3f8f3"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x25ab64ab",
+        "0x27b6f66a"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wea3a25e7653e",
+      "workload_sha256": "ea3a25e7653e955fafaa9ac9f3169478619754f26b06b70d0db317182c2539b2"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x17af3bfd",
+        "0xd7da2d9"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W93181cb9f317",
+      "workload_sha256": "93181cb9f317cba0a2ff2b1a93a12303b3302cd5e8ed47b287583d55fd345359"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0x18106b87",
+        "0x26db167f"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W12d565d9f5b1",
+      "workload_sha256": "12d565d9f5b15d4e63b8be216f0671ee2b84fae74b8c580786e78b4981333302"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 152974491, b: 216075216 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:72da4871bca486973adb0aa515a34d806f945dce5c38c16c176bf9f27796ea0b",
+        "ec1": "EC1P30Cfph72da4871bca4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x62",
+          "0xadf7291"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:208128508:unk:unk:r:4084388fd6d1",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4084388f"
+      },
+      "curve_spec": {
+        "a": 152974491,
+        "b": 216075216,
+        "group_order": 728661587,
+        "gx": 98,
+        "gy": 182416017,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x25193c7d",
+        "0x52278fd"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wfbd36d6c5aec",
+      "workload_sha256": "fbd36d6c5aec726bead2324a41d0b4144769f3f01fbe6e287dc3216c3bb2b512"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0x117e5c19",
+        "0x13de8ae"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W69aea9d64f72",
+      "workload_sha256": "69aea9d64f72fc0373f117bb3a1d49300b91ff39a3a590e4e2bb108be3c2961e"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0x10dfa8f7",
+        "0xe724d61"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W3390dbc70bcb",
+      "workload_sha256": "3390dbc70bcb7059b5dc8be4198d2debb69aa6e4a4ab32c4e6facced36d0d1b3"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x14468d4b",
+        "0x19a2d7a7"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W793d8bdc00c1",
+      "workload_sha256": "793d8bdc00c1610799eab3f9cacc8fd55ce42d2c1da3e466c25c54c4324d29f0"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0x25175a80",
+        "0x1ade769d"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W42fb4442d107",
+      "workload_sha256": "42fb4442d1075a8733706f6571b61d38dbe05062143842c6c6fdc927cd70743c"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0x94bfeaf",
+        "0x3c9053b"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W9e2370445d4f",
+      "workload_sha256": "9e2370445d4f18006827c3243469cc005433cfb4b09b11bd0b8572d1e1625080"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0x2c45ec0",
+        "0x9415c5c"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W96f7152a9cda",
+      "workload_sha256": "96f7152a9cdaf378624bb86dfa4ce0e374624d1c957f3a495217942537a408ee"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x3e8803f",
+        "0x27f3ccf0"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W9002580a090c",
+      "workload_sha256": "9002580a090c74b69c1326f9322f4aaf41f27fa998ce9fcb1a4e168972f4c728"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x4ed5522",
+        "0x163f91"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W499bba065e67",
+      "workload_sha256": "499bba065e67e4966e76534a3df8202853c96a931de82237dd6f07ab1b7ae3cb"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0x99de09b",
+        "0x25925920"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "We484c2f6394f",
+      "workload_sha256": "e484c2f6394f719fc6fb2ac3bf13b27160da441c27ff89b3b3991723fd46382d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x3f19c41",
+        "0x1709f6e"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wa22dc4040dc2",
+      "workload_sha256": "a22dc4040dc2251d253c2e42a8703424ca8f7242b143816d7331b4d3ed4a552f"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0x2787e049",
+        "0x12dfd28a"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W22b6c863f3be",
+      "workload_sha256": "22b6c863f3be8095648e3120c8609b7a61210a03bab6990a88a49ac88a40b893"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x40f1a6c",
+        "0x1a39f9db"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W69f13880adc5",
+      "workload_sha256": "69f13880adc5afb4b6a3123e82a7e3a49223b7ed165083d24aee0c6a08655ef5"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x1d6dd733",
+        "0x2109e1ce"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W222968acb72d",
+      "workload_sha256": "222968acb72d81f0bad634a3d2bedd610b98b8970dc6ad2c7c367d4bbd352890"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x173bd0e7",
+        "0x27656a57"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wdf5a99287025",
+      "workload_sha256": "df5a9928702520b285abb541138c33ec009373e62ab80df37229897201cbf216"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0x238f6d53",
+        "0x9671fe"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W41c6430503c4",
+      "workload_sha256": "41c6430503c446a19f8f618494c8886182c32ec6efc54eb82d6de03e65eeffae"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 488098743, b: 619614171 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:ff4a2be9f882426153d46cec38e3f55f8948c454b5a580bc67da2eb7e2770148",
+        "ec1": "EC1P30Cfphff4a2be9f882",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x51efba8"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:2d35d7eaf6af",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-2d35d7ea"
+      },
+      "curve_spec": {
+        "a": 488098743,
+        "b": 619614171,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 85916584,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x217e1458",
+        "0x11daac06"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W2afa20f5697b",
+      "workload_sha256": "2afa20f5697b420374a9b579f22ea0771e10332de3ab5e148e6da4749377e10b"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0x1ffc39f2",
+        "0x23104d0d"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wc9662327d203",
+      "workload_sha256": "c9662327d20359aedb8101c397650380d8f3e7eef324ca9cc3bcd4a96c7510f6"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0x19bf070",
+        "0x3f143ed"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wce539803dc3d",
+      "workload_sha256": "ce539803dc3d77a5835212e91b0df0775196e7e227f7899ac8359e01147b3818"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x2602287d",
+        "0x13fefc3f"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd2c27ced9b86",
+      "workload_sha256": "d2c27ced9b869051677210b9df0f0e12dae4aa14864c083c1d36c58170cc899d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0x24c608cb",
+        "0x8900517"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W3ee2cabb85c2",
+      "workload_sha256": "3ee2cabb85c27432c256df8f7c928141280bcffe27521823af82ac93ea9f420f"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0x153accbd",
+        "0x26d1a874"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W64e10652e066",
+      "workload_sha256": "64e10652e06698795d5e16bda58b15dc1ba39ea3f7106d55d2f11256586f2b1a"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0x54aa6b9",
+        "0x4109fef"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W3b64d40e1d7e",
+      "workload_sha256": "3b64d40e1d7e54d4986ebf2ee4a2f84a5f82b4285e0d1bf553756c29adaaf0fe"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x11c6915b",
+        "0x16b1b6b1"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wc67ae2085b05",
+      "workload_sha256": "c67ae2085b05ae4dc2e832373b7a3266c4d0efa00bceb3bd977d414d0b35cdd0"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x1844d221",
+        "0x1dcf2b47"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd38d39d860a9",
+      "workload_sha256": "d38d39d860a95cddfdaf3bf2ba73d323496505b5d50982336d16203a0b3ab180"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0x24e70ae9",
+        "0x1f52f1d8"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Waec229d4417d",
+      "workload_sha256": "aec229d4417dd7ae8313cd12721406b6e46b3d214b6ecc544ec10eeb75d32173"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x1384edbd",
+        "0x10262af3"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W82165fedba97",
+      "workload_sha256": "82165fedba97be36401f2c32fef0230a8f118701b78c178d2375c6d9a55fda07"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0x1a04283d",
+        "0x2935c35"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W263a38940a21",
+      "workload_sha256": "263a38940a21b77194c2375dd2e05ab9515959096d651015ca82c0bcdbeb132b"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x192a13f8",
+        "0x555568a"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W402d01e9886a",
+      "workload_sha256": "402d01e9886a24a86aa585e096738413a31653f93657582d6cf27c4aa9901f50"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x8c7dc76",
+        "0x2804e34e"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W632716fd0b89",
+      "workload_sha256": "632716fd0b89c4eacd4c92884ef811e451c05af38ddf759649cc3cbc339209e5"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x93a1ea5",
+        "0x5a59666"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wafe8554259ed",
+      "workload_sha256": "afe8554259edf9689b5cc08d59ff4aaa64f7bf996cf7ca32b2dc9ca948ff5c6e"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0x53021db",
+        "0x1bd8c09e"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wfedfaa3a7a4c",
+      "workload_sha256": "fedfaa3a7a4cbfa3f9e6b6e88bda217448e47fc3d57a705c17bd87d276da4229"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 237105327, b: 216113545 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:e0a15b6290c47ae348984414f2842f3e61a7d306916f23eb3873d50cd27b560d",
+        "ec1": "EC1P30Cfphe0a15b6290c4",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x133f6310"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:216119242:unk:unk:r:4eb306ad9c84",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-4eb306ad"
+      },
+      "curve_spec": {
+        "a": 237105327,
+        "b": 216113545,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 322921232,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x222995d7",
+        "0x20b6c1"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wf71ecf4ebbd7",
+      "workload_sha256": "f71ecf4ebbd7cf62acf84893e0b3f7a7c71d72e09c1441528a2b85e7f62308d6"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0x1582784b",
+        "0x27ac5ac2"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W03ba22172f57",
+      "workload_sha256": "03ba22172f574848f5229ac41e205fb4285b9d09770fec8e1060f5bb98679ebd"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0x3024785",
+        "0x24cb153d"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd2abf6e5b81a",
+      "workload_sha256": "d2abf6e5b81a8eb6914ff3b1da2b4b417a1fb64978d2ee74846aef58b8cf85ce"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x19398846",
+        "0xfad0339"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W419a5f93ce8a",
+      "workload_sha256": "419a5f93ce8a06fed6231ef8e4b322604cb9e63b6e3e341b0055e15bd7df3b75"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0x1619ad18",
+        "0x13447a53"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wab6e935824d5",
+      "workload_sha256": "ab6e935824d5f1e5dc6e8e0bf3488e7c20dd10c95f827686cb630e1c62ba0b3a"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0xc59b992",
+        "0x1c6588e1"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W3be720df4bd3",
+      "workload_sha256": "3be720df4bd3f085c9491427aa188149f5bb8d5566f7c78c628021da08066694"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0x1d41e0a2",
+        "0x1ca64d5e"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W175fe148e64e",
+      "workload_sha256": "175fe148e64e070de67e537096969cc322a99eda78737fec5304896b4f7cb133"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x192ff684",
+        "0x49cd8ad"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W6af40e49e9b4",
+      "workload_sha256": "6af40e49e9b4d638b1c624d594d6009a079c5b706c4cffd00274a182935b283e"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x1850f826",
+        "0x1f8e2821"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wdcffb8f894c3",
+      "workload_sha256": "dcffb8f894c328fd4d40c73db4bbd6e0662732a6bb8d222d93025fe64c81020c"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0xd2dcab9",
+        "0x14b36c91"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W78bbf98a316e",
+      "workload_sha256": "78bbf98a316e65ccc57bfed0e532ef86f8d3be916cc2447000111362275d3390"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x18a57a4e",
+        "0x28c6c681"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W626502c5c0b7",
+      "workload_sha256": "626502c5c0b710a0d5961b8afbc1d9ceca038bddd20c46eb9919917b6e4803c4"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0x923629f",
+        "0x74a2c23"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd9ea946cb81f",
+      "workload_sha256": "d9ea946cb81f561a06724553d05cf731059bfb6a8f032bca0986805acab8827b"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x1a927732",
+        "0x9a9b3f6"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wf1bd73fd4a18",
+      "workload_sha256": "f1bd73fd4a1805970202db5dcc1db89b6c6a88315a1b27f67a24c869985c3a1b"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x17a438de",
+        "0x21414c67"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wd08cf00707df",
+      "workload_sha256": "d08cf00707dfa04fca6eba3260bf92805d61625f3825f55ffcd66a08209b6540"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x28cf32c5",
+        "0xc85fc8e"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W1b123004b6df",
+      "workload_sha256": "1b123004b6dff31fa4894fb07a9e70e85be5cfa4e2012e3c3e4cf9ce376c692a"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0x1fa440f6",
+        "0x2a4fc168"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wb8c2bf1acc6d",
+      "workload_sha256": "b8c2bf1acc6d3c208a4a2ae9a21f3127c913c94636ada070246534c5ebbfb254"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 415725719, b: 66367550 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:b395a181b163fee4f4198e150c1fac5e5c58c9f32b34359f02618c9525c5f625",
+        "ec1": "EC1P30Cfphb395a181b163",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x1",
+          "0x1464586d"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:743d4f416ca5",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-743d4f41"
+      },
+      "curve_spec": {
+        "a": 415725719,
+        "b": 66367550,
+        "group_order": 728661587,
+        "gx": 1,
+        "gy": 342120557,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x117fcc6e",
+        "0x4fff6d5"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wf269f4cbac25",
+      "workload_sha256": "f269f4cbac25ab252473d7bb05a7f783bb4b94834043f11c37d8a90f41d41f73"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 417353577,
+      "target": [
+        "0xb9d2623",
+        "0xdd4b869"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W919e3fe320fd",
+      "workload_sha256": "919e3fe320fde90d99260d8351ef6399e95527be5621c1a3ec69ef8116789a38"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 336177860,
+      "target": [
+        "0x1124346e",
+        "0x18edf4c1"
+      ],
+      "target_index": 1,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W65d590838c7a",
+      "workload_sha256": "65d590838c7afe131057d2a82a71f20ef408c801a662c1190eb23382b3daefa4"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 201431188,
+      "target": [
+        "0x13ed3a7a",
+        "0x22b87440"
+      ],
+      "target_index": 2,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W9d61b69c684d",
+      "workload_sha256": "9d61b69c684dd1d1d8287774a36713d6097e513332e696a65299c0ea36c8a9c1"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 382571556,
+      "target": [
+        "0x288e4160",
+        "0x724ae7d"
+      ],
+      "target_index": 3,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W581c2d41da62",
+      "workload_sha256": "581c2d41da6216cdb7eb98fe0ddf109db2f2382f43f36e7cb48e83b55970061e"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 568450293,
+      "target": [
+        "0x28901629",
+        "0xb5b8e17"
+      ],
+      "target_index": 4,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W0332f773ff58",
+      "workload_sha256": "0332f773ff58f34bb33dff47446e62276737d4ef7df13241e09d94a15490e947"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 192383483,
+      "target": [
+        "0x5daab5",
+        "0xb45d438"
+      ],
+      "target_index": 5,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W73b691fc7141",
+      "workload_sha256": "73b691fc71417a1374cd3816d98109038406c9db142cf72f326e14631cd94e1f"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 387705553,
+      "target": [
+        "0x12185458",
+        "0x129c7f77"
+      ],
+      "target_index": 6,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W25cef959fed0",
+      "workload_sha256": "25cef959fed0bcb1e67e7e72783749f1ece0a2c24582c60f0d9e57a11136a224"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 153942291,
+      "target": [
+        "0x12d82307",
+        "0x8fe8df2"
+      ],
+      "target_index": 7,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W3a453bed2e34",
+      "workload_sha256": "3a453bed2e340bf466f929424a94911b396989205e403b45e09544cd13af5be4"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 276350016,
+      "target": [
+        "0x25b8dff3",
+        "0x150bce20"
+      ],
+      "target_index": 8,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W4543d4abd343",
+      "workload_sha256": "4543d4abd343d8be4ea6cc87928375b08cd894c4b706823a415c4d1a74923e93"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 247156286,
+      "target": [
+        "0x23050caf",
+        "0x158a13d"
+      ],
+      "target_index": 9,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W8112993717b1",
+      "workload_sha256": "8112993717b1d5f0fe4152cb4015ae20379b3563f4256f045b31e915263b6a5d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 102092914,
+      "target": [
+        "0xd74edad",
+        "0x18c6ee60"
+      ],
+      "target_index": 10,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W1486d819808d",
+      "workload_sha256": "1486d819808d405f8a471ca75305891d01ca993b031cc5c43280d962def3175d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 671493946,
+      "target": [
+        "0x2a8476f9",
+        "0xd92833e"
+      ],
+      "target_index": 11,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W497b2acd0a38",
+      "workload_sha256": "497b2acd0a387d7004e023cc6d3379bf4cf81be7fb00dae42330d2130fb7167c"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 194334052,
+      "target": [
+        "0x1d3604ec",
+        "0x1b67b8f3"
+      ],
+      "target_index": 12,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W7c6453df2795",
+      "workload_sha256": "7c6453df2795dcf192e67892a579de071511f5e8680ada2201f337f5f5f83147"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 31509271,
+      "target": [
+        "0x1cdf49f",
+        "0x2738e408"
+      ],
+      "target_index": 13,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "W4ab36e8c6b3e",
+      "workload_sha256": "4ab36e8c6b3e4c03fb2a5c68da7f9d4bf01dc515be13c5195a77eecefb178b1d"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 476841586,
+      "target": [
+        "0x1e551d6f",
+        "0x6b2dca2"
+      ],
+      "target_index": 14,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wabca8aba16e6",
+      "workload_sha256": "abca8aba16e6008b38b0ab689f26f7d6666716180f634c1a080e38bc60c93bb8"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 1,
+        "construction": "PrimeCurve { p: 728661677, a: 619615506, b: 466020895 } (explicit)",
+        "curve_uid": "urn:ec-record:1:sha256:8ff563a89d0e48ca86d8942a8c0df33f61913eb5c36df51ea6bc4f2b2913e400",
+        "ec1": "EC1P30Cfph8ff563a89d0e",
+        "family": "prime",
+        "field_bits": 30,
+        "field_degree": null,
+        "generator": [
+          "0x31",
+          "0x1f4cf3e"
+        ],
+        "group_order": 728661587,
+        "icv1": "ICV1:fp-728661677:91:728661587:249931777:unk:unk:r:36937666fab4",
+        "r": 728661587,
+        "registered": true,
+        "slug": "icv1-fp30-t91-36937666"
+      },
+      "curve_spec": {
+        "a": 619615506,
+        "b": 466020895,
+        "group_order": 728661587,
+        "gx": 49,
+        "gy": 32821054,
+        "kind": "prime_explicit",
+        "p": 728661677,
+        "r": 728661587
+      },
+      "planted": 566894067,
+      "target": [
+        "0x2042ba37",
+        "0x151e6b08"
+      ],
+      "target_index": 15,
+      "target_law": "uniform_scalar_sha256_shared_v1",
+      "target_seed": 2026102511,
+      "workload_id": "Wbe67fd3ce523",
+      "workload_sha256": "be67fd3ce5236b0c78e7dc78d32c615f3ce6d4d3b099939651e8c99db0b2f22a"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1ha81899274c038263",
+  "statement": {
+    "name": "quadratic-character overlap indicator expansion",
+    "source": "lean-v4/TwistShiftOverlap.lean mask_expansion; elementary ring identity, not a novelty or complexity claim",
+    "variables": [
+      "x",
+      "y"
+    ],
+    "degree_bound": 2,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "const",
+              "args": 1
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": -1
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "const",
+              "args": 1
+            },
+            {
+              "op": "var",
+              "args": "y"
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "const",
+          "args": 1
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -1
+            },
+            {
+              "op": "var",
+              "args": "x"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "y"
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -1
+            },
+            {
+              "op": "var",
+              "args": "x"
+            },
+            {
+              "op": "var",
+              "args": "y"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261023,
+  "value_digest": "de4aea9d53148c0e87f7fa46279340b92dd0d02cbd413fb666f93171e09bc426",
+  "independence": "native issuer plus extra domain-separated checker points; this is same-host replay",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/twist_routes_1_3_20261021/lean-v4/TwistShiftOverlap.lean",
+    "sha256": "6f39de9eb9da7a0856f0545cbdcf04ccf2d337c5e011f5f8833454def481e418"
+  }
+}

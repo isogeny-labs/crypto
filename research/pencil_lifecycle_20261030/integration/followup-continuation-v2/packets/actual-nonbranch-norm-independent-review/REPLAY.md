@@ -1,0 +1,19 @@
+# Prospective independent replay, T-1577
+
+No invocation authorized by this file. Root review/release required. One attempt per phase, no automatic retries. Original PLAN.md remains immutable. Producer source ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1 is copied byte-for-byte; no producer object reused for its fresh module. We reuse pinned precursor/mathlib/toolchain objects, not a separately implemented binary kernel. Exact closure baseline is16736files/3111892318bytes; imported tactic objects are already in it. Final acceptance waits producer corrected controls and fresh reviewer results.
+
+The owner-reviewed proposal is three finite phases: pre300s + compiler600s + post300s =1200s maximum. Work cutoffs280/580/280s retain20s cleanup/receipt reserve. Outer commands use TERM at295/595/295s with KILL5s. Each process8GiB RLIMIT_AS,10MiB hard OS stack,16MiB per-file limit. Lean -j1 -M3500 -s16384. One compiler at a time; no scientific payload.256MiB aggregate workspace is sampled, not a hard filesystem quota; startupfree1GiB. The current producer prehash190.328s and post152.232s rule out a credible150s custody bound. Four ordered Lean calls are fresh producer, reviewer fixture, named readback, deliberate false-branch rejection. Earlier calls' failures stop subsequent compiler calls. Post custody runs after compiler failure as well, but never authorizes a retry. No test performance comparison.
+
+Exact commands from packet directory:
+
+```
+timeout --signal=TERM --kill-after=5s 295s python3 replay.py pre
+timeout --signal=TERM --kill-after=5s 595s python3 replay.py compiler
+timeout --signal=TERM --kill-after=5s 295s python3 replay.py post
+```
+
+Capture each native outer exit/stdout/stderr under this packet or exact retained workspace. Compiler runs only after pre passed. Post is required after any compiler launch, including failure; pre failure stops compiler and is retained. Exclusive per-phase marker prevents rerun; workspace must be absent for pre. A killed wrapper/missing receipt is failed/incomplete, never evidence of passage. All started child process groups are killed if still present even after leader exit, reaped and checked. Signals and terminal deadlines make status fail. Receipts preserve failures; no source repair is authorized under this attempt. Every phase checks source pins; custody phases verify full imported file hashes and identities, runtime pins, exact baseline joins. Shared caches could change transiently between observations, explicitly a trust limit.
+
+Fixture f=X^5-5X^3+4X+1, u1=X²-1,u2=X²-4,v1=v2=1 gives(b,alpha,c,q,r)=(-9,0,0,-81,0),n=-9,U=-81X. Rational separability has explicit Bézout A*f+B*f'=38569, then scaled coefficients. Twenty reviewer declarations separately check coefficient extraction, numerator/residual, determinant nonzero, both actual divisibilities, Bézout/separability, two curve points, selected/rejected branch, source identity, selected numerator nonunit, actual source valuation equality, actual localization unit criterion, conjugate numerator unit/orderzero, conjugate product nonunit and order inequality. Exact ten producer plus twenty reviewer axiom names are required once each; allowed axioms propext,Classical.choice,Quot.sound only. Missing/duplicate/sorryAx parser controls are mandatory. False branch must fail mathematically; syntax/unknown-name rejection is not accepted. No global divisor-class claim, points at infinity or arbitrary residue-field claim.
+
+This follows the independent review plan and hand derivation. Fixture code and wrapper are source constructions awaiting their first check. A missing `python` launcher while generating the source was corrected to python3 before any compiler; no Lean execution occurred. All source evidence and failures will be preserved. Root owns final scientific promotion; this file grants no runtime/image admission.

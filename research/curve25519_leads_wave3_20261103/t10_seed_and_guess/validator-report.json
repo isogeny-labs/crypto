@@ -1,0 +1,616 @@
+{
+ "schema": "validator-report/v1 (validation-gate/v1 companion)",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_scope": "T10 exploratory F4-model engine measurement only: the frozen J/columns seed selection from the k20 census, the 36 f4cost cells, the E_w table and w=0 ranking, prediction verdicts P0-P8 (P3 failed, the other eight held, none inconclusive) and the P6-triggered recommendation of (t=5, G=4, seed 1307) as the next end-to-end candidate. E is a model of F4 work (ignores linear algebra, group operations, seed-search cost, relation slack); it is not an end-to-end solve, not an ecbench session, not a leaderboard or benchmarks/ row and not an improvement claim, and the README says so. This is not a pass of the IC validation gate (no replay certificate, no same-unit matched rho row). The errata are reporting errata in labels and in the exploratory section; none changes a number that a prediction verdict depends on.",
+ "independent": true,
+ "validator": "validator subagent (core tier, claude-opus-5-5). Not the producer of T10.",
+ "date": "2026-11-04",
+ "validated_commit": "fccd78e1fd8f71d5443e99414390f76d02add637",
+ "protocol_freeze_commit": "505ecbb154f907657e6b3865699d41a54c550406",
+ "tree_state": "HEAD fccd78e1fd8f71d5443e99414390f76d02add637 on branch claude/curve25519-index-calculus-i674j4, git status clean for tracked files. git diff 505ecbb..HEAD touches only .github/scripts/ci-scope.mjs; nothing under this lead, src/ or crates/. PROTOCOL.md, scripts/run.sh, scripts/analyze.py and scripts/select_seeds.py are byte-identical to their blobs in 505ecbb. Commit 505ecbb is dated 2026-11-03T21:59:32Z, 20 s before the run started (21:59:52Z, data/env.txt); commit dates are author-supplied metadata. README.md, data/, analysis/ and selection/ are untracked and excluded by .git/info/exclude ('TEMP: until wave-3 validation finishes'): they were produced after the freeze and are not committed, so this validation is bound to the sha256 values in artifact_hashes_at_validation and raw_data, re-checked at the end of validation with the same values. Any change to them voids this report. Git was used read-only (status, log, show, diff, ls-files, check-ignore, rev-parse); nothing was staged or committed.",
+ "artifact_hashes_at_validation": {
+  "PROTOCOL.md": "a5f889a21c665bd56350ca4b98bb031717824b327855a855c370bee72e9de10d",
+  "README.md": "c15e9a92c68adb39f4a0960943208266f1d786fa7b1bcea587bf234328153b56",
+  "scripts/run.sh": "547b15771039f6e3a67e8d0fb410123bac7a378d2b16af09040529fe0604cc3b",
+  "scripts/analyze.py": "be1aebd849b3320d43e84b8873d2424e1178a350bc5474ed517d6bdb8b0cc029",
+  "scripts/select_seeds.py": "b9fa3b0549f5826b5c980d64fc3252ed2c682b52a0bf6fd2391d84788d13c182",
+  "analysis/summary.json": "c283d71d42c7b5abd9a08e8a80be2049ea8c1a597a566c887b6591dbbd0f55be",
+  "selection/seeds.json": "73a38a285b48adf21e5053a0fe3a625c9abe48092b3ccec42c940df255c69a5e",
+  "data/SHA256SUMS": "6798f00a5b4e2b539eeb8c6c5cb8b522e2773730e89b5f18d20cfbb5200f9aac"
+ },
+ "instrument": {
+  "binary": "/home/user/ctarget/release/curve25519_family",
+  "sha256": "ba1e3c0518eae58ae39a9b08e1f757c7e9fe1eb02c86b158b883244bc6a5ecef",
+  "checks": "Equal to the PROTOCOL.md frozen value, data/env.txt and data/binary.sha256; re-hashed by the validator before both rerun batches with the same value. Census k20.jsonl sha256 bc74d8ac...7adc equals the frozen value and that lead's data/SHA256SUMS. The binary's source commit and toolchain are not recorded anywhere in the lead; its hash is its only identity. Circumstantial provenance: its mtime 2026-11-03T18:45:27Z is 26 s before commit 80c0b568ad (which changes only the bits-form path of src/bin/curve25519_family.rs), and no file under src/, crates/, Cargo.toml or Cargo.lock changed between 80c0b568ad and HEAD. The validator did not rebuild it."
+ },
+ "requirements": [
+  {
+   "id": "R1 data files match data/SHA256SUMS",
+   "result": "pass",
+   "evidence": "sha256sum -c data/SHA256SUMS inside data/: 112/112 OK (36 .json, 36 .status, 36 .stderr, run.log, env.txt, binary.sha256, seeds.used.json). The file set under data/ equals the listed set plus ALL_DONE (0 bytes, touched after SHA256SUMS by frozen run.sh, by design). All 36 .stderr files are 0 bytes. No *.try* files (no F2 reruns). data/seeds.used.json is byte-identical to selection/seeds.json.",
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/SHA256SUMS"
+  },
+  {
+   "id": "R2 independent re-run of measurement cells with the frozen command",
+   "result": "pass",
+   "evidence": "Validator re-ran all 36 cells (not just one), strictly sequentially, one validator process at a time (nice 19), with the exact frozen command 'curve25519_family f4cost 20 <isogeny|isogeny@S> <t> <G> 100 <2026111500+t> 3600 2 full 0 30000000' on the frozen binary. Key-by-key comparison of the flattened JSON (48-51 fields per cell, every field except wall_s): 0 differences in 36/36 cells. A concurrent T11 ecbench process (isolation L0, counts only) was running on the host; counts are deterministic and reproduced exactly. No ecbench session exists in T10, so 'verify --replay' does not apply.",
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/rerun/"
+  },
+  {
+   "id": "R3 recompute every README number and every prediction verdict from the data",
+   "result": "pass_with_errata",
+   "evidence": "Independent code (recompute.py, written from PROTOCOL.md, not from analyze.py) read data/cells/*.json, the census and the T5 band.txt. All 36 README table rows agree (cols, covered, deg, mpt to 0.01, nat exactly, E_0/E_0.1/E_1 to the printed 4 s.f.). coverage_exact = covered_points/131203 in every cell; f4_muladds/targets_done = mpt; muladds_per_relation_at_exact_coverage = mpt/coverage. The exact-E_0 ranking list, the incumbent's 13th place and the 'predicted top five in predicted order' statement agree. All 34 headline numbers agree (headline list). All nine verdicts agree with the README and with analysis/summary.json. Separately, the frozen analyze.py run on a copy of data/ and selection/ reproduces analysis/summary.json byte-identically (c283d71d...55be), and the frozen select_seeds.py reproduces selection/seeds.json byte-identically (73a38a28...9a5e). Errata E1-E3 are label/wording errors; no number is wrong.",
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/recompute.out.json"
+  },
+  {
+   "id": "R4 Rust code changes (T11-style diff review, unit test, rustfmt --check)",
+   "result": "not_applicable",
+   "evidence": "git diff 505ecbb..HEAD -- src crates: 0 lines; git status shows no modified or untracked files under src/, crates/, Cargo.toml, Cargo.lock. T10 changed no Rust code, so there is nothing to review, test or format-check; nothing was built (CARGO_TARGET_DIR=/home/user/ctarget-t11 not used).",
+   "path": "src/"
+  },
+  {
+   "id": "R5 claims stay within scope; failed predictions reported as failed",
+   "result": "pass_with_errata",
+   "evidence": "P3 is reported as failed (t=5 G0->1 step 1.2466 < 1.25 in both seed series; argmin G=t-1 holds in all six), with 'Nothing was retuned'. No rule, threshold, seed, cell or target count differs from the frozen protocol and scripts. The README states the class (modelled F4 work, not an end-to-end solve, not a leaderboard row), the ignored costs (linear algebra, group ops, seed search) and 'Rho remains ahead'. The distance to rho-neg is quoted from the measured T5 session band (all three weights) and the 18.65x carry-over is labelled 'Projection only'. Exploratory observations are labelled not preregistered. The P6 recommendation is the protocol's own trigger outcome. Exceptions: errata E2 (exploratory t=7 claim overstated) and E3 (hits called verified without a certificate).",
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/README.md"
+  },
+  {
+   "id": "R6 reproducibility bindings",
+   "result": "pass_with_notes",
+   "evidence": "Seeds (target_seed 2026111500+t, tower seeds 0/1307/1308/1594), command, host, nproc, uname, start/end UTC, per-cell status lines and load are recorded (data/env.txt, data/run.log, data/cells/*.status). Run order equals the frozen order. Missing: the binary's source commit and toolchain (instrument.checks), and the protocol-required resume checkpoint and Conductor check (disclosed in README Deviations).",
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/env.txt"
+  },
+  {
+   "id": "R7 controls and reporting contract",
+   "result": "pass",
+   "evidence": "Instrument control P0: t6_g4_s0 equals the T4 cell research/curve25519_leads_wave2_20261103/t4_seed_replication/data/k20_t6_g4_s0.json (7a438b1d binary) in all 48 fields except wall_s. Reference arm: incumbent (6,4,0) measured and priced at w=0, 0.1, 1 in the same table and unit as every other row; seed 0 measured beside every selected seed, paired on the same targets. Band: native *_uncharged Fp mults priced at 0, 0.1, 1; the argmin is t5_g4_s1307 at every w and the incumbent/winner order holds at every w. Progress stated as ratios (18.65x, 9.28x). Rho is not re-measured here; the only rho statement is the measured T5 band and a labelled projection, so there is no unpriced arm. The m=83 / ECC2K-130 rule does not apply (prime-field Curve25519 miniature, no ECC2K-130 claim).",
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/README.md"
+  },
+  {
+   "id": "R8 certificate discipline",
+   "result": "pass_with_errata",
+   "evidence": "T10 claims no discrete-log solve and no closure, and its results (E, ranking, P0-P8) do not use relations. The README does report in-base hits at t=7 (1 for seed 0, 4 for seed 1594, in every G) as 'all verified'; the cell JSONs carry only the engine's counters (hits = hits_exact = hits_verified), no relation witnesses, so the validator could not re-verify them with independent code (erratum E3). Consistency checks only: hit counts are identical across G for each (t, seed), as paired targets require, and are plausible against 100*coverage (0.91 and 1.40 expected).",
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/"
+  }
+ ],
+ "predictions": {
+  "P0": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "mpt(6,4,0) = 710094.0, rel. dev. 0.0 from 710094.0; full cell equal to the T4 7a438b1d cell except wall_s."
+  },
+  "P1": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "f4cost (columns, covered_points) equal the census in 36/36 cells: seed 0 (18,72), (25,172), (65,1188); selected (22,210), (36,498), (83,1840)."
+  },
+  "P2": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "18/18 pairs in [0.90, 1.10]; overall range 0.98118-1.00019; t=5,6 max |r-1| = 9.757e-06; t=7 by G: [1.00019, 0.98155, 0.98254, 0.98997, 0.98241, 0.98118, 0.98475]."
+  },
+  "P3": {
+   "outcome": "failed",
+   "readme": "failed",
+   "agree": true,
+   "evidence": "Steps per series: {\"t5_s0\": [1.2466, 3.8705, 4.6308, 3.3534], \"t5_s1307\": [1.2466, 3.8705, 4.6308, 3.3534], \"t6_s0\": [2.3052, 2.2148, 3.5347, 4.317, 4.8482], \"t6_s1308\": [2.3052, 2.2148, 3.5346, 4.317, 4.8483], \"t7_s0\": [3.2816, 2.5286, 3.4859, 2.6768, 5.2165, 4.3553], \"t7_s1594\": [3.344, 2.5261, 3.4597, 2.6974, 5.2231, 4.3394]}. Failing: t5_s0 and t5_s1307 G0->1 = 1.2466 < 1.25. Argmin G = t-1 in all 6 series."
+  },
+  "P4": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "argmin E_0 over 36 cells = t5_g4_s1307 (725,959,944); inconclusive list empty (no missing, failed, capped or undecided cells)."
+  },
+  "P5": {
+   "outcome": "held",
+   "readme": "held (18.65)",
+   "agree": true,
+   "evidence": "E_0(6,4,0)/E_0(winner) = 18.653422 >= 10."
+  },
+  "P6": {
+   "outcome": "held",
+   "readme": "held (9.28x, recommend)",
+   "agree": true,
+   "evidence": "best other (t,G) = (5,4) at seed 1307; best (6,4) at seed 1308; ratio 9.277282 > 1.5."
+  },
+  "P7": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "incumbent/winner at w = 0, 0.1, 1: 18.653422, 18.646270, 18.582178; argmin cell identical at all three weights."
+  },
+  "P8": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "mpt(5,4,0) = 52,816.0 in [3.0e4, 8.0e4]."
+  }
+ },
+ "errata": [
+  "E1 (label, README 'Results' preamble): 'nat = per-target native.pkm_system_fp_mults_uncharged' is wrong for the 14 t = 7 cells. There nat is the per-target sum of pkm_system_fp_mults_uncharged and pkm_grid_fp_mults_uncharged, as PROTOCOL.md section 1 and analyze.py define it (e.g. t7_g0_s0: 1800/100 + 17280/100 = 18.0 + 172.8 = 190.8, the tabled value; the grid term is most of nat at t = 7). The tabled nat and E_w values are correct; only the description is wrong. Fix: 'nat = per-target sum of native.*_uncharged (pkm_system_fp_mults_uncharged, plus pkm_grid_fp_mults_uncharged at t = 7)'.",
+  "E2 (overstated exploratory claim, 'Exploratory observations' bullet 1): 'at t = 7 the selected seed is 1-2% cheaper per target' holds for G = 1..6 (1.00% to 1.88% cheaper) but not for G = 0, where the selected seed is 0.019% dearer (mpt ratio 1.00019; the README's own P2 row gives the range 0.9812-1.0002). The suggested cause (4 vs 1 hits, hit targets stop early) is present at G = 0 too, where no saving appears, so the G = 0 cell does not support it. The bullet is labelled untested; it should say G = 1..6 and note the G = 0 exception.",
+  "E3 (uncertified claim, 'Hits' paragraph): 'all verified (hits_verified = hits_exact = hits)' rests only on the engine's own counters. data/ holds no relation witnesses, so no independent certificate exists and the validator could not re-verify the hits. Nothing in T10 depends on them (they do not enter E or any prediction). Fix: call them engine-reported and not independently certified."
+ ],
+ "notes": [
+  "P0 row says 'No drift from the 7a438b1d... binary'. The evidence is one cell: t6_g4_s0 equals the T4 cell from the 7a438b1d binary in all 48 fields except wall_s, which the validator confirmed. The binary changed between T4 and T10 through commit 80c0b568ad, which touches only the bits-form path; no other cell of T10 has an exact counterpart on the old binary. Read the statement as 'P0 detected no drift'.",
+  "README 'Deviations' discloses that the resume checkpoint (scripts/checkpoint.sh init) and the Conductor check were not run, although PROTOCOL.md section 3 lists both as pre-run steps; that the route was local, not isolab-eks (as frozen); and that no graph, PDF or benchmarks/ entry was made. The counts do not depend on any of these, and all 36 cells reproduce. The research-visuals rule in CLAUDE.md still applies when this result lands in a PR, unless the owner waives it.",
+  "PROTOCOL.md still says 'Status: design, not yet frozen' and does not record its freeze hash. The validator checked the freeze the README could not: PROTOCOL.md and all three scripts are byte-identical to 505ecbb, which is dated 20 s before the run started. selection/seeds.json (21:47Z) is not committed, but the frozen select_seeds.py reproduces it byte for byte from the frozen census.",
+  "The 'Distance remaining' projection divides the T5 seed-0 arm's whole S at w = 0.1 and w = 1 by the w = 0 E ratio 18.65. With the band ratios 18.646 and 18.582 it would be 8.98e4 and 9.01e5 instead of 8.97e4 and 8.97e5; the README names the 18.65x factor explicitly and labels the figure a projection. The projection also assumes every unpriced native operation in that S is F4 work that scales with E. Both are inside the stated projection caveat.",
+  "The producer's run.log shows load1 between 2.08 and 4.96 on 4 cores during the T10 run, so other processes were running on the host. Wall time is not a result here. Counts are deterministic and reproduce exactly.",
+  "Validator process incident, outside the repository: the validator's first rerun batch wrote to the shared session scratchpad, which other validators also use. (a) It overwrote /tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun.sh, the T3 validator's ephemeral rerun script that research/curve25519_leads_wave2_20261103/t3_m3_engine/validator-report.json pins at sha256 013bad6f...181d. The original content cannot be recovered; that pin no longer resolves. (b) It appended 16 lines to scratchpad/rerun/rerun.log; these were removed, and the file again hashes to the T3 pin 8c62173f...8745. (c) It wrote scratchpad/rerun/binary.sha256, which was either new or overwritten; T3 does not pin it. All T10 validator files were then moved to scratchpad/validator_t10/. No repository file other than this report was written.",
+  "Git was used read-only. The dispatch's 'no git' is read as 'no git writes', since item (4) asks for git diff."
+ ],
+ "recompute_agrees": true,
+ "recompute_agrees_detail": "Every README number and all nine verdicts agree with the validator's independent recomputation. The errata concern a label (E1), an exploratory sentence (E2) and the certification wording for hits (E3), not values.",
+ "headline": [
+  {
+   "name": "E_0 winner t5_g4_s1307 (F4 mul-adds per modelled solve)",
+   "claimed": 725959944,
+   "recomputed": 725959944.0761905,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "E_0 incumbent t6_g4_s0",
+   "claimed": 13541637076,
+   "recomputed": 13541637076,
+   "rel_tol": 1e-09,
+   "agrees": true
+  },
+  {
+   "name": "P5 incumbent/winner E_0",
+   "claimed": 18.65,
+   "recomputed": 18.65342184010483,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "P6 best other (t,G) vs best (6,4): t5_g4_s1307 vs t6_g4_s1308",
+   "claimed": 9.28,
+   "recomputed": 9.277282225207735,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "runner-up E_0 t6_g5_s1308",
+   "claimed": 1389000000.0,
+   "recomputed": 1389145748.819277,
+   "rel_tol": 0.0005,
+   "agrees": true
+  },
+  {
+   "name": "runner-up behind winner",
+   "claimed": 1.91,
+   "recomputed": 1.9135294724656107,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "P7 band w=0",
+   "claimed": 18.653,
+   "recomputed": 18.65342184010483,
+   "rel_tol": 5e-05,
+   "agrees": true
+  },
+  {
+   "name": "P7 band w=0.1",
+   "claimed": 18.646,
+   "recomputed": 18.646270243301814,
+   "rel_tol": 5e-05,
+   "agrees": true
+  },
+  {
+   "name": "P7 band w=1",
+   "claimed": 18.582,
+   "recomputed": 18.582177697473526,
+   "rel_tol": 5e-05,
+   "agrees": true
+  },
+  {
+   "name": "P0 mpt(6,4,0)",
+   "claimed": 710094.0,
+   "recomputed": 710094.0,
+   "rel_tol": 1e-12,
+   "agrees": true
+  },
+  {
+   "name": "P8 mpt(5,4,0)",
+   "claimed": 52816.0,
+   "recomputed": 52816.0,
+   "rel_tol": 1e-12,
+   "agrees": true
+  },
+  {
+   "name": "P3 failing step t5 G0->1 (both seeds)",
+   "claimed": 1.2466,
+   "recomputed": 1.2466,
+   "rel_tol": 5e-05,
+   "agrees": true
+  },
+  {
+   "name": "P3 other steps min",
+   "claimed": 2.21,
+   "recomputed": 2.2148,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "P3 other steps max",
+   "claimed": 5.22,
+   "recomputed": 5.2231,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "P2 t7 ratio min",
+   "claimed": 0.9812,
+   "recomputed": 0.9811779970098586,
+   "rel_tol": 5e-05,
+   "agrees": true
+  },
+  {
+   "name": "P2 t7 ratio max",
+   "claimed": 1.0002,
+   "recomputed": 1.0001885946432978,
+   "rel_tol": 5e-05,
+   "agrees": true
+  },
+  {
+   "name": "incumbent rank at w=0",
+   "claimed": 13,
+   "recomputed": 13,
+   "rel_tol": 0,
+   "agrees": true
+  },
+  {
+   "name": "muladds_per_relation_at_exact_coverage winner",
+   "claimed": 33000000.0,
+   "recomputed": 32998179.276190475,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "muladds_per_relation_at_exact_coverage incumbent",
+   "claimed": 542000000.0,
+   "recomputed": 541665483.0348837,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "census cols/cov ratio sel/seed0 t=5",
+   "claimed": 0.419,
+   "recomputed": 0.419,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "census cols/cov ratio sel/seed0 t=6",
+   "claimed": 0.497,
+   "recomputed": 0.4973,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "census cols/cov ratio sel/seed0 t=7",
+   "claimed": 0.824,
+   "recomputed": 0.8244,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "seed search group ops t=5 (build+selector)",
+   "claimed": 6940000.0,
+   "recomputed": 6935271,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "seed search group ops t=6",
+   "claimed": 13500000.0,
+   "recomputed": 13528559,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "seed search group ops t=7",
+   "claimed": 32800000.0,
+   "recomputed": 32757358,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "measured distance seed1093/rho-neg w=0 (T5 band.txt)",
+   "claimed": 18.3,
+   "recomputed": 18.27781617138908,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "measured distance w=0.1",
+   "claimed": 690000.0,
+   "recomputed": 693504.8215901746,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "measured distance w=1",
+   "claimed": 4400000.0,
+   "recomputed": 4382467.958333334,
+   "rel_tol": 0.015,
+   "agrees": true
+  },
+  {
+   "name": "projection seed-0 S at w=0.1 (S/18.65)",
+   "claimed": 89700.0,
+   "recomputed": 89748.2822374531,
+   "rel_tol": 0.001,
+   "agrees": true
+  },
+  {
+   "name": "projection w=0.1 over rho-neg",
+   "claimed": 58000.0,
+   "recomputed": 58014.40351483717,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "projection seed-0 S at w=1",
+   "claimed": 897000.0,
+   "recomputed": 897468.4001413179,
+   "rel_tol": 0.001,
+   "agrees": true
+  },
+  {
+   "name": "projection w=1 over rho-neg",
+   "claimed": 370000.0,
+   "recomputed": 366612.9085544599,
+   "rel_tol": 0.015,
+   "agrees": true
+  },
+  {
+   "name": "cells",
+   "claimed": 36,
+   "recomputed": 36,
+   "rel_tol": 0,
+   "agrees": true
+  },
+  {
+   "name": "targets total",
+   "claimed": 3600,
+   "recomputed": 3600,
+   "rel_tol": 0,
+   "agrees": true
+  }
+ ],
+ "raw_data": [
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/SHA256SUMS",
+   "sha256": "6798f00a5b4e2b539eeb8c6c5cb8b522e2773730e89b5f18d20cfbb5200f9aac"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g0_s0.json",
+   "sha256": "5842a3f0ad8084de367ffc2970d209682a2f635cf120b33236810808cf2bf613"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g0_s1307.json",
+   "sha256": "2f4b95d14310571a31367e882364dc1363e6c3ea4890eeda5ddb157a5ca748b7"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g1_s0.json",
+   "sha256": "837b3e536905c91ee1e87c4f0db659debe8309a9012d52ddb94186b919b5ffd6"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g1_s1307.json",
+   "sha256": "1b599367fc1e3e3314b93d4a581cde150f47e8b58e12f6ecc07d9c25b15ce129"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g2_s0.json",
+   "sha256": "497880eb5c178cf2f887b1e26909cb2694cee38efa6c1e2ec26b25ba01954f59"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g2_s1307.json",
+   "sha256": "f6c80fa350c6b558b25a83a8d9022487a607a6a0271c3052f27d9b773063a8d0"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g3_s0.json",
+   "sha256": "c3bee3f8198bf8486393295113c97f983aa9edd9166871d954b69fe1bd0603c3"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g3_s1307.json",
+   "sha256": "877d9decc19339fba33f49fc217ccb3eae599f8b269cf4acb691f7b2e6ff1708"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g4_s0.json",
+   "sha256": "337d9ed4f1cf8805c1a2fc2f72e41ba34a92dba255fdb4b97459236547dcb210"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t5_g4_s1307.json",
+   "sha256": "96b174e04fcdd4ad4856e87cb08e44590667e6a1db435d08fbd10d018c9b5a3b"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g0_s0.json",
+   "sha256": "67fb8a79e40ce73f8bb60a35c63faf71fdb25a707ae30e151b52c6feafb6210c"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g0_s1308.json",
+   "sha256": "59b3d8d4bfb78522be7083cea4998633f7691b44f6a9b80bd4b369038b35c935"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g1_s0.json",
+   "sha256": "ea72a4f257126cc8bacbc5284ce26412f1d3b9598f37e4e6fd52f77af5a433aa"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g1_s1308.json",
+   "sha256": "ffa818171e9bc85c928171fc3b55ce5a71706048b90b17f91e3aa26265b9c5e0"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g2_s0.json",
+   "sha256": "1be3d1fc8fe4e2069b1f65c8d8903eca714d0419dfa3b564fd5001a198a6d7ea"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g2_s1308.json",
+   "sha256": "32f4724a60bd2b119566e4c8c28ec4427df2cdef5c15de48695a06d686eb5250"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g3_s0.json",
+   "sha256": "f92906c2378a613cd3f0a7b3898ae72547d00bc9c7fda645cc10baaca2c8d766"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g3_s1308.json",
+   "sha256": "f26254dbd8e69c7907a7ec2da1a9c5c754161a55a04a42b3a386e5fad7762844"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g4_s0.json",
+   "sha256": "89d7e9adf512f028f711a2b48228f82ee4755388276da43f0970d4482323f6f0"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g4_s1308.json",
+   "sha256": "2736ce4c63a8fd97bafa81434cb4c14142b0a279aa06c369cafc0922a85ddb5e"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g5_s0.json",
+   "sha256": "f530c62620b3468811ad2c6ed4959ba2a5ab190c8ed868ebad810df21a503bbb"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t6_g5_s1308.json",
+   "sha256": "671f23de8c7fbbc74ceb9618c30e1afddaedcef46e4265d5c1ee87f755262194"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g0_s0.json",
+   "sha256": "9f8ce415a806e3e45e4b7e8e1355bad34f77c2fab8a81a2b9510fc5ecb78f16c"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g0_s1594.json",
+   "sha256": "02740d16c67274f0b7245b7e227fa712d7cefbc3f096ae586d46ae38aa788ec7"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g1_s0.json",
+   "sha256": "5672c52b2c8c35305d3ad80e10de1fb7c2861c5c1da5061152f9773584e56712"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g1_s1594.json",
+   "sha256": "2766ed55a5e2afcf2004a0fcb60ec4d4f41b51e691e60ee319460f95571e283b"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g2_s0.json",
+   "sha256": "0508ac6d6a8bce215f94490f294c715d089ce13c29cb0abed1f1c60a792126e6"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g2_s1594.json",
+   "sha256": "1f8695b5710bff2b10ec19d207a32534ab2aa1d2f535d62f31af303a44ede6d0"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g3_s0.json",
+   "sha256": "ac1d9d78d84fa44b03dcb373097ff8e4c7faae748769df150c3353af05d7c69c"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g3_s1594.json",
+   "sha256": "80927394eba150ad4a0fc8f8125e035fa1e4b11fe8f4a3683729d2ddff73606b"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g4_s0.json",
+   "sha256": "95e6f2ea2381dddebd199fe44c4c2f409f28d7840077f02694c6af9f2782aed4"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g4_s1594.json",
+   "sha256": "637163d86083aeb3ef14a93ef46c48c476b3fd87dffb2cdb241960b58d3379ea"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g5_s0.json",
+   "sha256": "0a37b2a30b21257da0a550da34fe1abecda98eb2890a5b5c0c53c4398ceaadcf"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g5_s1594.json",
+   "sha256": "a5cc945d02b943183f5357a8175be5d4f56ed88535d59d2167c369fb6a370596"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g6_s0.json",
+   "sha256": "fcd02f36677a9f6b854c9a322d832337c3a7aa0c8aeb25bfe9f82ad2829498d1"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/t7_g6_s1594.json",
+   "sha256": "74a3e776767d35c8263c940ac8a43906474da278b6f98c95e1763e5847ae5578"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/run.log",
+   "sha256": "36219a5d72a757c90bd915ca82bedd06357cb7e01e17162e434eee5778d62fd6"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/env.txt",
+   "sha256": "2ad13a3eeacbd0eccbc85c581a6d2799b57c4314b9028c812fc543e74fdb743a"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/binary.sha256",
+   "sha256": "8f739147d842dec4ec92a3b54a3e02f31377e9347e0a5184ebbc76ad1eae0e6c"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/seeds.used.json",
+   "sha256": "73a38a285b48adf21e5053a0fe3a625c9abe48092b3ccec42c940df255c69a5e"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/selection/seeds.json",
+   "sha256": "73a38a285b48adf21e5053a0fe3a625c9abe48092b3ccec42c940df255c69a5e"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/analysis/summary.json",
+   "sha256": "c283d71d42c7b5abd9a08e8a80be2049ea8c1a597a566c887b6591dbbd0f55be"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/data/k20.jsonl",
+   "sha256": "bc74d8ac5151713c59f6c6d5bf58df1c0bf5e3442c6b50c7d234163c4c807adc"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/ecbench/band.txt",
+   "sha256": "943b4e7c34eaf23fcd3762ed340eb264d10651f4a562be63a4fab29c065ca0a9"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t4_seed_replication/data/k20_t6_g4_s0.json",
+   "sha256": "c83de9f4f4098975e7a7cb47f5907b282956a41a97d83ce6b29fe7b79569a682"
+  }
+ ],
+ "validator_scripts": {
+  "note": "Validator-owned, outside the repository (session scratchpad); not producer code. Paths are ephemeral; hashes pin the content used.",
+  "recompute": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/recompute.py",
+   "sha256": "238a6e79555c57df8a7d9d926e811ae9ea7fdd2a77dad0c421eeec0c083213e9"
+  },
+  "recompute_output": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/recompute.out.json",
+   "sha256": "3cf2a37853e1ba29c67a956d5576b957b9d323b23262e54d1e21a773da6f87d1"
+  },
+  "compare": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/cmp_rerun.py",
+   "sha256": "9433072a703ebf7a2936ed9e237a56a67836dd08c8576605b8a0482dec0ce033"
+  },
+  "rerun_script_batch1": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/rerun.sh",
+   "sha256": "d321d695cc990e350dc90598c501078b59661ff13b50284f68de540a61038fda",
+   "note": "16 cells; executed with OUT=scratchpad/rerun, then outputs moved here and OUT rewritten in this copy"
+  },
+  "rerun_script_batch2": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/rerun_rest.sh",
+   "sha256": "df0aa9dd8550fb7661c400e08e6425eeb50a73e4be952738e577a512a69a96f4",
+   "note": "remaining 20 cells"
+  },
+  "rerun_dir": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/rerun",
+   "sha256_of_sorted_json_sums": "a94c30b5a2a23431ade90d3b0660ec769553d9ebda9e62663d9dff6d1f28e905",
+   "rerun_log_sha256": "b898c6a42e87a36724a0bafbf61060508b8d37e24e278196391d0ffb2bc46b06"
+  },
+  "frozen_analyze_reproduction": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/leadcopy/analysis/summary.json",
+   "sha256": "c283d71d42c7b5abd9a08e8a80be2049ea8c1a597a566c887b6591dbbd0f55be"
+  },
+  "frozen_selector_reproduction": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/seeds.rebuilt.json",
+   "sha256": "73a38a285b48adf21e5053a0fe3a625c9abe48092b3ccec42c940df255c69a5e"
+  },
+  "report_generator": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/validator_t10/mkreport.py"
+  }
+ }
+}
