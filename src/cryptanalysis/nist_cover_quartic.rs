@@ -960,9 +960,9 @@ mod tests {
             q[mon_index(0, 2, 2)] = p - 1;
             q[mon_index(3, 0, 1)] = 1;
             q[mon_index(0, 4, 0)] = 1;
-            match wide::smooth_certificate(&q, p, 7) {
-                Ok((ok, msg)) => assert!(!ok, "nodal quartic must not certify at p={p}: {msg}"),
-                Err(_) => {} // degenerate is also a non-certification
+            // A degenerate input (Err) is also a non-certification.
+            if let Ok((ok, msg)) = wide::smooth_certificate(&q, p, 7) {
+                assert!(!ok, "nodal quartic must not certify at p={p}: {msg}");
             }
         }
     }
