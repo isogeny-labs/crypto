@@ -1625,6 +1625,121 @@ mod tests {
         }
     }
 
+    /// `simd=ifma` on primes up to just below 2^52 (the curves above use
+    /// p < 2^36; the Montgomery product's final reduction only matters past
+    /// about 2^51): random field values, a probe set holding about a third of
+    /// the candidates' abscissae (computed with u128), lanes against the
+    /// scalar sweep and against that expectation.
+    #[test]
+    fn ifma_lanes_match_scalar_sweep_near_2_52() {
+        if !ifma_present() {
+            return;
+        }
+        fn mulm(a: u64, b: u64, p: u64) -> u64 {
+            (a as u128 * b as u128 % p as u128) as u64
+        }
+        fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
+            let mut r = 1;
+            while e > 0 {
+                if e & 1 == 1 {
+                    r = mulm(r, a, p);
+                }
+                a = mulm(a, a, p);
+                e >>= 1;
+            }
+            r
+        }
+        fn is_prime(n: u64) -> bool {
+            if n < 4 || n.is_multiple_of(2) {
+                return n == 2 || n == 3;
+            }
+            let (mut d, mut s) = (n - 1, 0);
+            while d.is_multiple_of(2) {
+                d /= 2;
+                s += 1;
+            }
+            'w: for a in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+                let mut x = powm(a % n, d, n);
+                if x <= 1 || x == n - 1 {
+                    continue;
+                }
+                for _ in 1..s {
+                    x = mulm(x, x, n);
+                    if x == n - 1 {
+                        continue 'w;
+                    }
+                }
+                return false;
+            }
+            true
+        }
+        let mut seed = 0x1234_5678_9abc_def0u64;
+        let mut rnd = |n: u64| {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed % n
+        };
+        let starts = [(1u64 << 52) - 1, (1 << 52) - 5000, 3 << 50, (1 << 51) + 777];
+        for start in starts {
+            let mut p = start | 1;
+            while !is_prime(p) {
+                p -= 2;
+            }
+            let f = Fp64::new(p);
+            let k = 37usize;
+            let xs: Vec<u64> = (0..k).map(|_| rnd(p)).collect();
+            let ys: Vec<u64> = (0..k).map(|_| rnd(p)).collect();
+            let reps: Vec<SweepRep> = xs
+                .iter()
+                .zip(&ys)
+                .map(|(&x, &y)| SweepRep {
+                    x: f.to_mont(x),
+                    y: f.to_mont(y),
+                    plus: 0,
+                    minus: 0,
+                })
+                .collect();
+            let mut targets: Vec<PrimePoint> = (0..19)
+                .map(|_| PrimePoint::affine(rnd(p), rnd(p)))
+                .collect();
+            targets.push(PrimePoint::affine(xs[3], ys[3])); // a degenerate row
+            targets.push(PrimePoint::affine(p - 1, p - 1)); // values at the edge
+                                                            // The candidates' abscissae with u128 arithmetic; keep every third.
+            let mut canon = Vec::new();
+            let mut expected = vec![0usize; targets.len()];
+            for (t, q) in targets.iter().enumerate() {
+                for i in 0..k {
+                    if xs[i] == q.x {
+                        continue;
+                    }
+                    let inv = powm((q.x + p - xs[i]) % p, p - 2, p);
+                    let num = [(q.y + ys[i]) % p, (q.y + p - ys[i]) % p];
+                    for (e, yy) in num.into_iter().enumerate() {
+                        let lam = mulm(yy, inv, p);
+                        let x3 = (mulm(lam, lam, p) + 2 * p - q.x - xs[i]) % p;
+                        if (t + i + e) % 3 == 0 {
+                            canon.push(x3);
+                            expected[t] += 1;
+                        }
+                    }
+                }
+            }
+            canon.extend((0..50).map(|_| rnd(p)));
+            let mont: Vec<u64> = canon.iter().map(|&x| f.to_mont(x)).collect();
+            let scalar = NativeSweep::new(f, &reps, &mont, 2, false).unwrap();
+            let lanes = NativeSweep::new(f, &reps, &canon, 2, true).unwrap();
+            for len in [targets.len(), 1, 8, 9] {
+                let a = scalar.sweep(&targets[..len]);
+                let b = lanes.sweep(&targets[..len]);
+                assert_eq!(a, b, "p = {p:#x}, len {len}");
+                for t in 0..len {
+                    assert!(b[t].len() >= expected[t], "p = {p:#x}, target {t}");
+                }
+            }
+        }
+    }
+
     /// `worker=native,simd=ifma` equals `rootfind-subtract` over whole pipelines.
     #[test]
     fn native_ifma_matches_rootfind_subtract() {

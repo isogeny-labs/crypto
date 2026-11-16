@@ -140,6 +140,11 @@ int rf_warmup(void);
  * cgroup quota). */
 unsigned rf_emu_threads(void);
 
+/* CUDA only: the pair-table key kernels (per cell, batched runs) on a random base of n
+ * abscissae over p: device times of each and the count of cells whose keys differ.
+ * -1 without the CUDA backend. */
+int rf_pairs_bench(uint64_t p, uint32_t n, uint64_t seed, double *t_cell, double *t_run, uint64_t *mismatch);
+
 /* 1 if the CUDA backend is compiled in and at least one device answers. */
 int rf_cuda_available(void);
 

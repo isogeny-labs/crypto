@@ -1,0 +1,35 @@
+{
+  "schema": "local.ml-dataset.instruction-capability-proposal/v1",
+  "production_wiring_present": false,
+  "current_phase_collection": {
+    "collector": "checked-native-pmu/v1",
+    "scope": "calling_thread_user_space_between_successful_enable_and_disable",
+    "schema": "crypto.ml-dataset.phase-metrics/v2",
+    "whole_worker_coverage_verified": false,
+    "instruction_count_to_solve": null,
+    "training_cost_eligible": false,
+    "scaling": "raw_preserved_checked_integer_estimate_only",
+    "phase_sums_are_whole_worker_counts": false
+  },
+  "proposed_whole_worker_collection": {
+    "status": "integration_required",
+    "unit": "worker_exec_to_exit_user_space_retired_instructions",
+    "included": ["target_loader_and_startup", "worker_construction", "worker_replay", "solver", "worker_artifact_writes", "worker_measurement_overhead", "worker_destruction", "all_verified_target_descendants"],
+    "excluded": ["kernel", "hypervisor", "supervisor", "uploads", "later_independent_validation", "preexisting_external_services"],
+    "requirements": ["versioned_bound_policy", "verified_before_exec_attachment", "complete_task_lifecycle_and_exit", "uninterrupted_exec_to_exit_coverage_for_every_included_task", "checked_event_identity_and_syscalls", "positive_unmultiplexed_runtime", "platform_event_semantics_admission", "independent_receipt_replay", "objective_and_domain_certificate", "successful_uncensored_terminal_outcome"],
+    "permission_escalation_automatic": false,
+    "missing_counts_imputed": false,
+    "scaled_counts_eligible_as_exact_labels": false,
+    "software_reservations_are_instructions": false,
+    "hardware_truth_proven_by_receipt_replay": false
+  },
+  "dataset_scope_preserved": {
+    "families": ["koblitz", "binary", "prime"],
+    "twists": [false, true],
+    "n_ranges_inclusive": [[23, 31], [47, 61]],
+    "prime_modulus_explicit": "2305843009213693951",
+    "m_range_inclusive": [2, 15],
+    "all_methods_controls_populations_and_censored_attempts_retained": true,
+    "new_sampling_or_launch_authorization": false
+  }
+}

@@ -1,0 +1,275 @@
+[
+  {
+    "theorem": "OrientationBivariate.content_zero",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem content_zero (k : \u2124) : Content k (0:\u211a[X])",
+    "decl_sha256": "fb504a180b1e752608917ef5435fc54cfb1209d461afc48c99f9bb7a2e85ad6f",
+    "claim_id": "PCC-20261114-ef9641"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.one",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem one : Weighted (1:(\u211a[X])[X])",
+    "decl_sha256": "bc87679d5a6248980229c078a9cbb2cd8479bd1c9d4cb7a70ff659d438d137be",
+    "claim_id": "PCC-20261114-c5aa0e"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.C",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem C {P : \u211a[X]} (hP : Content 0 P) : Weighted (C P)",
+    "decl_sha256": "8b3a922cf099bdf787aa4cf73f294785b5dff0a9f4a63a9038ef6c2710bdc756",
+    "claim_id": "PCC-20261114-aae7b4"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.add",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem add {P Q : (\u211a[X])[X]} (hP : Weighted P) (hQ : Weighted Q) : Weighted (P+Q)",
+    "decl_sha256": "761923335f39a55e0c8f3f6974a72d286eb575a20038fe6bf066c987023802b9",
+    "claim_id": "PCC-20261114-ad5fb3"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.sub",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem sub {P Q : (\u211a[X])[X]} (hP : Weighted P) (hQ : Weighted Q) : Weighted (P-Q)",
+    "decl_sha256": "ff717339e4ae6fc411911fb259c0d5871f5a0069654af9060bb96a2747532b07",
+    "claim_id": "PCC-20261114-2c9783"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.mul",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem mul {P Q : (\u211a[X])[X]} (hP : Weighted P) (hQ : Weighted Q) : Weighted (P*Q)",
+    "decl_sha256": "3bb3be449be482896752b33c823406c40e091a97fdb3c7d6a99e6efdc03c6b8a",
+    "claim_id": "PCC-20261114-5cc31e"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.pow",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem pow {P : (\u211a[X])[X]} (hP : Weighted P) (n : \u2115) : Weighted (P^n)",
+    "decl_sha256": "a38f714ae58df167cf2e22bc32f6cfab87b54e65ef03e625f0ae5b172aede0e7",
+    "claim_id": "PCC-20261114-1c3b7a"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.prod",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem prod {\u03b9 : Type*} (S : Finset \u03b9) (P : \u03b9 \u2192 (\u211a[X])[X]) (hP : \u2200 j \u2208 S,Weighted (P j)) : Weighted (\u220f j \u2208 S,P j)",
+    "decl_sha256": "9b0c89c8e136ce1c9a3282d7ebfe1c9d5adf76ae1888f154cd493c7ce3d388cd",
+    "claim_id": "PCC-20261114-217960"
+  },
+  {
+    "theorem": "OrientationBivariate.Weighted.sum",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem sum {\u03b9 : Type*} (S : Finset \u03b9) (P : \u03b9 \u2192 (\u211a[X])[X]) (hP : \u2200 j \u2208 S,Weighted (P j)) : Weighted (\u2211 j \u2208 S,P j)",
+    "decl_sha256": "c5eec7864f84e31b0a65c261b5a24434aaa299d49750297d79227b082e8c9340",
+    "claim_id": "PCC-20261114-453798"
+  },
+  {
+    "theorem": "OrientationBivariate.weighted_affine",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem weighted_affine (A B : \u211a[X]) (hA : Content 0 A) (hB : Content 1 B) : Weighted (C A+C B*X)",
+    "decl_sha256": "5621c108ce465fad6cce664faf3d7eb0f41aec9d2900bccedb589bab46917aea",
+    "claim_id": "PCC-20261114-5179e6"
+  },
+  {
+    "theorem": "OrientationBivariate.weighted_geometric",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem weighted_geometric (D : (\u211a[X])[X]) (k : \u2115) (hD : Weighted D) : Weighted (geometricRows D k)",
+    "decl_sha256": "aee5b0067c9fc8c336c5330cf8a8953bdaa1ac0ae2f53349a549977ddbc3c53f",
+    "claim_id": "PCC-20261114-2e5f36"
+  },
+  {
+    "theorem": "OrientationBivariate.eval_tail_content",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem eval_tail_content (P : (\u211a[X])[X]) (hP : Weighted P) (k : \u2115) (hz : \u2200 n<k,P.coeff n=0) (z : \u2124) : Content (k:\u2124) (P.eval (C (z:\u211a)))",
+    "decl_sha256": "a3f2e161de41b22398aa2496ef94a79a1a3b9fe0a1120e06b515e613fc99d082",
+    "claim_id": "PCC-20261114-ead17d"
+  },
+  {
+    "theorem": "OrientationBivariate.weighted_low",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem weighted_low (P : (\u211a[X])[X]) (k : \u2115) (hP : Weighted P) : Weighted (lowRows P k)",
+    "decl_sha256": "3bc1cd973c4409901380f2661b2265b82259fd38e7b7725b2c0876291f175843",
+    "claim_id": "PCC-20261114-1c27a4"
+  },
+  {
+    "theorem": "OrientationBivariate.low_rows_error",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem low_rows_error (P : (\u211a[X])[X]) (hP : Weighted P) (k : \u2115) (z : \u2124) : Content (k:\u2124) (P.eval (C (z:\u211a))-(lowRows P k).eval (C (z:\u211a)))",
+    "decl_sha256": "918390a0b9a20b83d7f39bccf31705f2d21fc79eae3218a065778fe9a887c93e",
+    "claim_id": "PCC-20261114-84f0c7"
+  },
+  {
+    "theorem": "OrientationBivariate.anchor_rows_weighted",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem anchor_rows_weighted (u x y : \u2115) (m : \u2115 \u2192 \u2115) : Weighted (anchorRows u x y m)",
+    "decl_sha256": "82d0c2e9d102d484a8a60b45e5a69331461dfcbb4751f7a9179fd0404da96df8",
+    "claim_id": "PCC-20261114-95ece3"
+  },
+  {
+    "theorem": "OrientationBivariate.denom_rows_weighted",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem denom_rows_weighted (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (hu : u\u2264a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : Weighted (denomRows a u x y t m)",
+    "decl_sha256": "48ec28557249d4b4ab3b49b9f659cbf1754a3306fb4e8139812f3952dc430319",
+    "claim_id": "PCC-20261114-66f342"
+  },
+  {
+    "theorem": "OrientationBivariate.approx_rows_weighted",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem approx_rows_weighted (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (hc : x.testBit i=y.testBit i) : Weighted (approxRows a u i x y k t m)",
+    "decl_sha256": "619b9c31668c3529dd1aa1aa05dba1579723de1293610a84913dea618f422b55",
+    "claim_id": "PCC-20261114-f8833c"
+  },
+  {
+    "theorem": "OrientationBivariate.anchor_ratio_inverse",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem anchor_ratio_inverse (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (correctionRatio u x (rowResidue u x) y m)\u207b\u00b9 = \u220f j \u2208 mask u x y, (1+slope u (rowResidue u x) y ((2:\u211a)^j)*(rowQuotient u x:\u211a))^m j",
+    "decl_sha256": "f1db736c674702593aafcc7ee0f1a75f10edc28ace8e6fa8be6ea4d6ed4a1fd4",
+    "claim_id": "PCC-20261114-fad137"
+  },
+  {
+    "theorem": "OrientationBivariate.anchor_rows_eval",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem anchor_rows_eval (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (anchorRows u x y m).eval (C (rowQuotient u x:\u211a)) = C ((correctionRatio u x (rowResidue u x) y m)\u207b\u00b9)",
+    "decl_sha256": "dc9dc94e40fea32de43c32e773b39653967a8a7179c9996bd99261b6edeb0408",
+    "claim_id": "PCC-20261114-358795"
+  },
+  {
+    "theorem": "OrientationBivariate.row_denominator_split",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem row_denominator_split (u x y : \u2115) (t : \u2124) (hd : (t:\u211a)-delta (rowResidue u x) y \u2260 0) : ((t:\u211a)-delta x y)/((t:\u211a)-delta (rowResidue u x) y)= 1+slope u (rowResidue u x) y (t:\u211a)*(rowQuotient u x:\u211a)",
+    "decl_sha256": "fee19b0897fabfc70a4a7f988627a0c29f264e614917b5dacb04f7d46b945255",
+    "claim_id": "PCC-20261114-ae7e91"
+  },
+  {
+    "theorem": "OrientationBivariate.denom_rows_eval",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem denom_rows_eval (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : (denomRows a u x y t m).eval (C (rowQuotient u x:\u211a))=rowDenominator a u x y t m",
+    "decl_sha256": "983e434e64d265f074f73768c81daf0c9ae39104a973e97697fbf43aed62a652",
+    "claim_id": "PCC-20261114-4f155f"
+  },
+  {
+    "theorem": "OrientationBivariate.geometric_rows_eval",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem geometric_rows_eval (D : (\u211a[X])[X]) (k : \u2115) (h : \u211a[X]) : (geometricRows D k).eval h=geometricInverse (D.eval h) k",
+    "decl_sha256": "bb00c2f8d28197e3e6df8bd8d44d69c6dbf0c454da89adb839f8189476e47232",
+    "claim_id": "PCC-20261114-a6865f"
+  },
+  {
+    "theorem": "OrientationBivariate.actual_approx_rows_eval",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem actual_approx_rows_eval (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hiu : i<u) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) : (approxRows a u i x y k t m).eval (C (rowQuotient u x:\u211a))= actualChartApproximation a u i x y k t m",
+    "decl_sha256": "baf4a981b21c5d3f452f5db45f11a0bec8c46b09ec5e0be708bad53a488c5664",
+    "claim_id": "PCC-20261114-49020e"
+  },
+  {
+    "theorem": "OrientationBivariate.actual_low_rows_precision",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem actual_low_rows_precision (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x<2^a) (hy : y<2^a) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (hc : x.testBit i=y.testBit i) : Content (k:\u2124) (normalizedNodeEntry a u i x y t m- (lowRows (approxRows a u i x y k t m) k).eval (C (rowQuotient u x:\u211a)))",
+    "decl_sha256": "0a42d3f070c890da0c117e67aa7c93cf5366ae2e51715a4e9e449fa044037991",
+    "claim_id": "PCC-20261114-e87981"
+  },
+  {
+    "theorem": "OrientationBivariate.anchor_rows_class",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem anchor_rows_class (u x y : \u2115) (m : \u2115 \u2192 \u2115) : anchorRows u x y m=anchorRows u (rowResidue u x) y m",
+    "decl_sha256": "0a4be6d5f35a48422f1c0b6fd98a7512dc32ba0aebcde4f1ac7795e8ec2e0e0d",
+    "claim_id": "PCC-20261114-7c8c39"
+  },
+  {
+    "theorem": "OrientationBivariate.denom_rows_class",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem denom_rows_class (a u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : denomRows a u x y t m=denomRows a u (rowResidue u x) y t m",
+    "decl_sha256": "c162d47218b32477a3002dd2d2a8f2386bc4d12e273cdc03ff3f421f15c276c4",
+    "claim_id": "PCC-20261114-b678ab"
+  },
+  {
+    "theorem": "OrientationBivariate.numerator_rows_class",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem numerator_rows_class (a u i x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : rowNumerator a u i x y t m=rowNumerator a u i (rowResidue u x) y t m",
+    "decl_sha256": "e6f59993de9a920eb61d0cf7588acb1e5d7cb74e25e66eaf5c2ec59aa3709782",
+    "claim_id": "PCC-20261114-4f6474"
+  },
+  {
+    "theorem": "OrientationBivariate.approx_rows_class",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem approx_rows_class (a u i x y k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) : approxRows a u i x y k t m=approxRows a u i (rowResidue u x) y k t m",
+    "decl_sha256": "70d45f01c1af4eaf6f02f062b9e4fe5a9364c043183af67c6834d1ac0f4f4ccd",
+    "claim_id": "PCC-20261114-0d4cdd"
+  },
+  {
+    "theorem": "OrientationBivariate.low_rows_eval",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem low_rows_eval (P : (\u211a[X])[X]) (k : \u2115) (h : \u211a[X]) : (lowRows P k).eval h=\u2211 b : Fin k,P.coeff b.val*h^b.val",
+    "decl_sha256": "db11f67574dac53c31359ac9c98298e255b63d7b18d7fbc20e5448c40314c9b4",
+    "claim_id": "PCC-20261114-859619"
+  },
+  {
+    "theorem": "OrientationBivariate.poly_left_weight",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem poly_left_weight (a u k : \u2115) (x : Ports a) (rb : MomentLabels u k) : Content (rb.2.val:\u2124) (polyLeft a u k x rb)",
+    "decl_sha256": "fde6fa92242f14320353a30afaa199576dc3f406948b34ccc355c187aa6b3595",
+    "claim_id": "PCC-20261114-6774af"
+  },
+  {
+    "theorem": "OrientationBivariate.poly_right_integral",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem poly_right_integral (a u i k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (rb : MomentLabels u k) (y : Ports a) : Content 0 (polyRight a u i k t m rb y)",
+    "decl_sha256": "6f752c57b51cb40e2d261c6055da35976c0ee2f2751c19de5ff04410e335fac4",
+    "claim_id": "PCC-20261114-8af989"
+  },
+  {
+    "theorem": "OrientationBivariate.coefficient_moment_cancel",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem coefficient_moment_cancel (b : \u2115) (h : \u211a) (R : \u211a[X]) : C ((2:\u211a)^b*h^b)*(C (((2:\u211a)^b)\u207b\u00b9)*R)=R*(C h)^b",
+    "decl_sha256": "4b277ac82eccbd05ba8bc93f2d465ecef8388a5b681757df7250967227eb969a",
+    "claim_id": "PCC-20261114-1fb6e4"
+  },
+  {
+    "theorem": "OrientationBivariate.poly_product",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem poly_product (a u i k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (polyLeft a u k*polyRight a u i k t m) x y = if (rowResidue u x.val).testBit i=y.val.testBit i then (lowRows (approxRows a u i (rowResidue u x.val) y.val k t m) k).eval (C (rowQuotient u x.val:\u211a)) else 0",
+    "decl_sha256": "b983289f553650ceb00da5caf0fdabf2d28595766cb3dd573c5786379a04a7e0",
+    "claim_id": "PCC-20261114-fc23ef"
+  },
+  {
+    "theorem": "OrientationBivariate.actual_compact_poly_precision",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem actual_compact_poly_precision (a u i k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (x y : Ports a) : Content (k:\u2124) (nodePolynomialMatrix a u i t m x y- (polyLeft a u k*polyRight a u i k t m) x y)",
+    "decl_sha256": "be7249136c59e57bcb2e64ca8f9d79b75bfee69f92ccdaf3b544a82072de1aca",
+    "claim_id": "PCC-20261114-ce6456"
+  },
+  {
+    "theorem": "OrientationBivariate.weighted_left_weight",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem weighted_left_weight (a u i k : \u2115) (m : \u2115 \u2192 \u2115) (hiu : i<u) (hu : u\u2264a) (x : Ports a) (rb : MomentLabels u k) : Content (jetWeight a u i m+rb.2.val) (weightedLeft a u i k m x rb)",
+    "decl_sha256": "2722d66020d48c3151f6a6b9f4855a0f3e4c59538d0c4a32b5f8e282f0147396",
+    "claim_id": "PCC-20261114-73c39f"
+  },
+  {
+    "theorem": "OrientationBivariate.weighted_left_integral",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem weighted_left_integral (a u i k : \u2115) (m : \u2115 \u2192 \u2115) (hiu : i<u) (hu : u\u2264a) (hw : 0\u2264jetWeight a u i m) (x : Ports a) (rb : MomentLabels u k) : Content 0 (weightedLeft a u i k m x rb)",
+    "decl_sha256": "b2072bc22e0a72c467371e633f4712f8737382579a9d5b6783ef884af3653d64",
+    "claim_id": "PCC-20261114-9dd81e"
+  },
+  {
+    "theorem": "OrientationBivariate.weighted_poly_product",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem weighted_poly_product (a u i k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (weightedLeft a u i k m*polyRight a u i k t m) x y= C (diagonalJet a u i m)*(polyLeft a u k*polyRight a u i k t m) x y",
+    "decl_sha256": "c4ffa03733a238b1062941572bfaaf75e2a1b5154c9dfdcf1ddc2bbdfd230901",
+    "claim_id": "PCC-20261114-af7365"
+  },
+  {
+    "theorem": "OrientationBivariate.actual_compact_weighted_precision",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem actual_compact_weighted_precision (a u i k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (x y : Ports a) : Content (jetWeight a u i m+k) (nodeCrossingPolynomial a u i t m x y- (weightedLeft a u i k m*polyRight a u i k t m) x y)",
+    "decl_sha256": "ed680bf685989c20fcfd8a09cf24c6c1483b34ba115297f167c12061c7ef7e32",
+    "claim_id": "PCC-20261114-2bf244"
+  },
+  {
+    "theorem": "OrientationBivariate.actual_compact_weighted_profile",
+    "source": "research/prime_orientation_layers_20261114/compact/lean/OrientationCompact.lean",
+    "statement": "theorem actual_compact_weighted_profile (a u i k : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) : (\u2200 (x : Ports a) (rb : MomentLabels u k), Content (jetWeight a u i m+rb.2.val) (weightedLeft a u i k m x rb)) \u2227 (\u2200 (rb : MomentLabels u k) (y : Ports a),Content 0 (polyRight a u i k t m rb y)) \u2227 (\u2200 x y : Ports a,Content (jetWeight a u i m+k) (nodeCrossingPolynomial a u i t m x y- (weightedLeft a u i k m*polyRight a u i k t m) x y)) \u2227 Fintype.card (MomentLabels u k)=2^u*k",
+    "decl_sha256": "ed761a7feae23339051eff1fe06ed6dd66d998ab510de11fd35691bed6428372",
+    "claim_id": "PCC-20261114-6a7512"
+  }
+]

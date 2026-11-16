@@ -1,0 +1,59 @@
+{
+  "schema": "koblitz.metrics-validation/v1",
+  "round": 44,
+  "committed_ref_rows": [
+    {
+      "metric": "koblitz_modular.ordinary_source_algebra_blocks",
+      "value": 6.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "fixed source blocks",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Actual nonsplit-kernel source checks; proper/moduli interpretation retained, not IC rank",
+      "source": "research/koblitz_modular_ic_20261018/rounds/44/results.json@361f84ade4b4"
+    },
+    {
+      "metric": "koblitz_modular.orientation_trace_cases",
+      "value": 3.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "fixed middle cases",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Independent seven-kernel/Tate-twist trace decomposition; not a success distribution",
+      "source": "research/koblitz_modular_ic_20261018/rounds/44/results.json@361f84ade4b4"
+    },
+    {
+      "metric": "koblitz_modular.orientation_filter_control_blocks",
+      "value": 20.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "retained controls",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Trace screen against recorded83/284source algebras; not independent collector images",
+      "source": "research/koblitz_modular_ic_20261018/rounds/44/results.json@361f84ade4b4"
+    },
+    {
+      "metric": "koblitz_modular.max_ordinary_source_tuple_degree",
+      "value": 4360.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "absolute residue degree",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Largest certified source tuple on fixed n5carrier; not a larger-n Koblitz transfer",
+      "source": "research/koblitz_modular_ic_20261018/rounds/44/results.json@361f84ade4b4"
+    }
+  ],
+  "head_ref_exit": 0,
+  "default_ref_exit": 0,
+  "each_timeout_seconds": 60,
+  "prior_timeout_retained": "metrics-initial-timeout.json",
+  "pre_existing_rows_byte_equivalent": 604,
+  "batch_blob_tests": "three committed text blobs plus missing object equal git show",
+  "history_tests": "three paths identical first-parent per-day records",
+  "source": "committed Git blobs only",
+  "current_main_integration_claimed": false
+}

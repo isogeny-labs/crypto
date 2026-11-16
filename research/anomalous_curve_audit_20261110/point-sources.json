@@ -1,0 +1,159 @@
+{
+  "schema": "anomalous-point-source-plan/v1",
+  "created": "2026-11-10T08:19:41.723342+00:00",
+  "status": "Whole59theoremkernel/axiomgatePASS; preissue frozen source plan.",
+  "formal": {
+    "project": "research/anomalous_curve_audit_20261110/lean",
+    "theorem": "AnomalousPointTraceAudit.large_order_audit_certificate",
+    "statement": "theorem large_order_audit_certificate : Nat.Prime p \u2227 2^159\u2264p \u2227 p<2^160 \u2227 formulaCurve.\u0394\u22600 \u2227 addOrderOf G=p \u2227 G\u22600 \u2227 knownScalar \u2022 G=Q \u2227 formulaCurve.j=(-32768 : F) \u2227 printedCurve.j\u2260(-32768 : F)",
+    "decl_sha256": "7211b8f321eae029431f1629aa7271cd3ce5734616730e58277c541d59ccb577",
+    "sources": [
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/PrattCertificate.lean",
+        "bytes": 688,
+        "sha256": "0a66bc5ec0e671a683b2ec9cce0e0b6d4198f87166cd36d7fa2a1b433a8cf56e"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/AnomalousPrime.lean",
+        "bytes": 22550,
+        "sha256": "116092e7d601559bfe132d3ea27b9098a50554eae0c5ea44ce4472a9cb74f9db"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/CurveData.lean",
+        "bytes": 2678,
+        "sha256": "3d041db780c57a6e97ecd96d8c2b13c5f33ab9ff60ad3abe851b8a4aaccd1352"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/AffineCertificates.lean",
+        "bytes": 1928,
+        "sha256": "98666778dc23561bd080aa911780f4fd680f83e505cfa28baaab6c6c2085a9e9"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/PointTrace.lean",
+        "bytes": 469137,
+        "sha256": "21250b694ff0c30e15c0047f16cb0b638d28d69c00b946b9e88894094f56a6d8"
+      }
+    ],
+    "scope": "Actual160bitprime, nonsingularcorrectedWeierstrasscurve, actualMathlibpointofexactprimeorderp andactualknownanswerQ=dG, plusknownuncorrectedpreprintj-invariantdiscrepancyconsistentwithauthorerratum. Wholecurvepointcardinality=p, Smartalgorithm/formalgroupbridge,securitycostandmatchedrhoarenotproved."
+  },
+  "gate": {
+    "theorems": 59,
+    "failing": 0,
+    "trusted_native": 0,
+    "archive": "research/anomalous_curve_audit_20261110/evidence/point-gate.tar.gz",
+    "roundtrip_equal": true,
+    "private_proofs": "448candidatepointnodeswithprivatearithmetic/addition/scalarproofscheckedinkernel; finalpubliccertificatecoversallreachabledependencies.59countspublictheoremsincluding35Lucasnodes, not448researchtheorems."
+  },
+  "candidate_construction": {
+    "class": "theorem / exact proof-input construction",
+    "native_sources": [
+      {
+        "path": "research/anomalous_curve_audit_20261110/native/certificate_inputs.cpp",
+        "bytes": 1504,
+        "sha256": "156286f2d515273f1c850b5167151f9ddf54b072dcca5b0e655f4b28f48d5da6"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/native/emit_lean.mjs",
+        "bytes": 4280,
+        "sha256": "f3dc58be862426ff90e491ebf4850cb7bc8fb01f6cd1dcdd5e78573d9d6e7516"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/native/formula_candidates.cpp",
+        "bytes": 1906,
+        "sha256": "fc24a0e461a8a7bfcc3e696cc841da17f392bb2ffac99e748ee17e4bb0ff4cff"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/native/point_candidates.cpp",
+        "bytes": 1627,
+        "sha256": "2bdf226b367517cfa0ec53c29c3ac5f6554a67f360fa65026ed9af4b8bb2cbf3"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/native/pratt_candidates.cpp",
+        "bytes": 2164,
+        "sha256": "bfb3190147fe3945d31032b3bdf918906980b75e6a6b0d60fa00029af25754ea"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/native/trace_candidates.cpp",
+        "bytes": 2403,
+        "sha256": "2dcd2e40d2717d127ac77ae39f015a59651de85bf66d6bd5197f1462a778db6a"
+      }
+    ],
+    "candidate_inputs": [
+      {
+        "path": "research/anomalous_curve_audit_20261110/evidence/pratt-candidates-02.json",
+        "bytes": 3790,
+        "sha256": "d1ff357c5923d2729292299baf3a06a3eabc92d9561adefe380e1b3c20dae21a"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/evidence/trace-candidates-01.json",
+        "bytes": 118401,
+        "sha256": "75125638bf2e6b3f63b257d6a91dbec056eeee2d9a8f6098395b60f5b17bd2b9"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/evidence/certificate-inputs.txt",
+        "bytes": 356,
+        "sha256": "8a01c96ccd4a5cb02ae0559ed46fbb62c0441d76025452661528c0b2452a1945"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/evidence/certificate-inputs-02.txt",
+        "bytes": 532,
+        "sha256": "527d705cf08d8dd1017225ba1bc76da625de84b1cdbdb0ebaa0d8be4b8011a03"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/evidence/point-candidates-01.txt",
+        "bytes": 286,
+        "sha256": "675a718dbb19e0071ffde74a240b609e462dde52ef9f72d18cf4cd987d5a94c8"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/evidence/formula-candidates-01.txt",
+        "bytes": 284,
+        "sha256": "3033f2061c0ce6f1ff1b91d3839caee0fb9cfcb441fbb34a60857121225d03e0"
+      }
+    ],
+    "trust": "C++GMP/FLINToutputsareuntrustedwitnesses. AcceptedfactsreprovedinactualLean; nospeed/population/nativeattackexecutionclaim.",
+    "policy": ".agents/skills/controlled-experiment/SKILL.md section1: theorem/identity needsproof, no controls; exactfactorisation/orderrequiresreproducibleverifiedcomputation. Actualproofusedhere. Anyforthcomingnativeattackrunrequiresseparatefrozenprotocol."
+  },
+  "literature": [
+    {
+      "id": "LMVV05-preprint",
+      "url": "https://www.monnerat.info/publications/anomalous.pdf",
+      "sha256": "297a41dfb40365165d79129a90200294141ff31b9546b369c8b71d90c6cef63b",
+      "scope": "Sections2and4/Example1; PDFpage8visuallyinspected. Uncorrectedcoefficient, not treatedasvalidanomalousfixture."
+    },
+    {
+      "id": "LMVV05-erratum",
+      "url": "https://www.monnerat.info/publications/anomalous_erratum.pdf",
+      "sha256": "73663ca9e49acb0fae3c11e3e6e672e70b1294715b3d1e2ee06535007ff3a1c4",
+      "scope": "Bothpagesreadandvisuallyinspected. Explicitlycorrectsmissingleadingdigitandnewpoints; correctedcurveused, ourG/Qfreshknownanswer."
+    },
+    {
+      "id": "LMVV05-publication",
+      "url": "https://doi.org/10.1016/j.ipl.2004.11.008",
+      "scope": "Primaryauthorandpublishermetadata: InformationProcessingLetters93(5)225\u2013230(2005). Originalpublishedfulltextnotseparatelyretrieved; authorpreprintanderratumread."
+    },
+    {
+      "id": "Smart1997",
+      "url": "https://shiftleft.com/mirrors/www.hpl.hp.com/techreports/97/HPL-97-128.pdf",
+      "sha256": "a2e31d05fc769d1867f5d0938922da81efb398cfed08b9ffbd534316b033692a",
+      "scope": "Originalattackandexamplepagesread. Nop-adic/formal-groupbridgeorattackruninthiscomponent."
+    },
+    {
+      "id": "NIST800186",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf",
+      "sha256": "53c7cf3340528aaa0a7bbeaef947f2099568192367d4341a7d4abceb55f78432",
+      "scope": "Section3.1.2andAppendixC.1criteria4/5re-read: excludesanomalous/lowembeddingcurves; screenedrecommendationnotrefuted."
+    }
+  ],
+  "fallback": "KB/Conductorunavailable; primary/repository/Mathlibfallback. No noveltyclaim: publishedauthorerratumalreadycorrectserror.",
+  "lean": "4.35.0",
+  "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+  "fresh_checker": "lean4checkerunavailable; actualkernelbuildandwholetransitiveaxiomgate.",
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "exceptions": "No hole/customaxiom/native_decide/linterwaiver/addedelaborationoption.",
+  "paid_compute": 0,
+  "smart_attack_runs": 0
+}

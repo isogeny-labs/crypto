@@ -1,0 +1,85 @@
+--- base/inspect_wire.py
++++ selected/inspect_wire.py
+@@ -79,6 +79,8 @@
+         self.identity = {}
+         self.snapshot = None
+         self.status = None
++        self.retention = None
++        self.retained = {}
+     def number(self):
+         return struct.unpack('<Q', self.r.read(8))[0]
+     def value(self, path=(), depth=0):
+@@ -93,6 +95,9 @@
+             raise Invalid('root must be map')
+         if path == ('identity',) and tag != 6:
+             raise Invalid('identity must be map')
++        retain = self.retention is not None and bool(path) and path[0] in ('expansion', 'normalized', 'continuation')
++        if retain:
++            self.retention.charge(1, 128)
+         result = None
+         if tag == 0:
+             pass
+@@ -107,6 +112,7 @@
+             n = self.number()
+             if n > self.limits.string_bytes:
+                 raise Invalid('string bound exceeded')
++            if retain: self.retention.charge(0, 64 + 4*n)
+             try:
+                 result = self.r.read(n).decode('utf-8', errors='strict')
+             except UnicodeDecodeError as e:
+@@ -116,15 +122,26 @@
+             identity_hash = len(path) == 2 and path[0] == 'identity' and path[1].endswith('_sha256')
+             if identity_hash and n != 32:
+                 raise Invalid('identity hash must have32 bytes')
+-            result = self.r.raw(n, retain=identity_hash)
++            if retain:
++                self.retention.charge(0, 64 + 2*n)
++                pieces = []
++                left = n
++                while left:
++                    k = min(left, 65536);pieces.append(self.r.read(k));left -= k
++                result = b''.join(pieces)
++            else:
++                result = self.r.raw(n, retain=identity_hash)
+         else:
+             count = self.number()
+             minimum = count * (2 if tag == 6 else 1)
+             if minimum > self.limits.values - self.values:
+                 raise Invalid('declared value count exceeds bound')
++            if retain: self.retention.charge(0, count * (64 if tag == 5 else 256))
+             if tag == 5:
++                if retain: result = []
+                 for i in range(count):
+-                    self.value(path + (i,), depth + 1)
++                    child = self.value(path + (i,), depth + 1)
++                    if retain: result.append(child)
+             else:
+                 if count > self.limits.map_fields:
+                     raise Invalid('map field bound exceeded')
+@@ -132,6 +149,7 @@
+                 if expected is not None and count != len(expected):
+                     raise Invalid('wrong fixed map size')
+                 keys = set()
++                if retain: result = {}
+                 for i in range(count):
+                     key = self.value(path + ('<key>',), depth + 1)
+                     if not isinstance(key, str) or key in keys:
+@@ -139,7 +157,8 @@
+                     keys.add(key)
+                     if expected is not None and key != expected[i]:
+                         raise Invalid('wrong fixed key or order')
+-                    self.value(path + (key,), depth + 1)
++                    child = self.value(path + (key,), depth + 1)
++                    if retain: result[key] = child
+         if path == ('schema',) and (tag != 3 or result != SCHEMA):
+             raise Invalid('wrong schema')
+         if path == ('encoding_complete',) and (tag != 1 or result is not True):
+@@ -156,6 +175,8 @@
+             if tag != 4:
+                 raise Invalid('identity hash must be raw bytes')
+             self.identity[path[1]] = result.hex()
++        if retain and len(path) == 1:
++            self.retained[path[0]] = result
+         return result
+     def inspect(self):
+         if self.r.read(len(MAGIC)) != MAGIC:

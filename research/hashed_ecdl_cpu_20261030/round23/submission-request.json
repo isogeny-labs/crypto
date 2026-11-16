@@ -1,0 +1,13 @@
+{
+  "job_name": "hashed-ecdl-cpu-round23-20261030",
+  "cpu": 2,
+  "memory": "4Gi",
+  "seconds": 300,
+  "retries": 0,
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+  "command": [
+    "bash",
+    "-lc",
+    "set -euo pipefail\nexport AWS_DEFAULT_REGION=us-east-2 AWS_MAX_ATTEMPTS=1\nmkdir -p /work/cpu-round23 /work/results\ncd /work/cpu-round23\naws s3 cp s3://isolab-results-104186811093-us-east-2/inputs/hashed-ecdl-cpu-round23-20261030/ . --recursive --only-show-errors\nsha256sum -c input.sha256\nchmod +x baseline candidate previous inverse analyze\nexport EPHEMERAL_OUT=/work/results\nset +e\nbash run.sh\ncode=$?\nset -e\nprintf '%s\\n' \"$code\" > /work/results/exit-code.txt\n(cd /work/results && find . -type f ! -name manifest.sha256 -print0 | sort -z | xargs -0 sha256sum > manifest.sha256)\naws s3 cp /work/results/ \"${ISOLAB_RESULTS_URI%/}/\" --recursive --only-show-errors\nprintf 'RESULTS_URI=%s\\n' \"$ISOLAB_RESULTS_URI\"\nexit \"$code\""
+  ]
+}

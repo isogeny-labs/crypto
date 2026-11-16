@@ -1,0 +1,61 @@
+{
+  "schema": "prospective-lean-source-validation/v1",
+  "status": "source_only_not_admitted",
+  "source_review_required": true,
+  "compiler_executed": false,
+  "statement_comparison": "Exact source theorem hypothesis/conclusion text matches branch-v2; namespace/import and proof route differ.",
+  "expected_named_axiom_readbacks": [
+    "DirectBranchCoefficientMultiplicity.source_support_base_multiplicity_sum",
+    "DirectBranchCoefficientControls.coefficients",
+    "DirectBranchCoefficientControls.residual_value",
+    "DirectBranchCoefficientControls.determinant_nonzero",
+    "DirectBranchCoefficientControls.valid_first",
+    "DirectBranchCoefficientControls.valid_second",
+    "DirectBranchCoefficientControls.bezout",
+    "DirectBranchCoefficientControls.separable",
+    "DirectBranchCoefficientControls.branch_root",
+    "DirectBranchCoefficientControls.support_zero",
+    "DirectBranchCoefficientControls.actual_source_instance",
+    "DirectBranchCoefficientControls.equal_support_determinant_zero",
+    "DirectBranchCoefficientControls.wrong_branch_rejected",
+    "DirectBranchCoefficientMultiplicity.identity_support_multiplicity_sum",
+    "DirectBranchCoefficientControls.x_multiplicity",
+    "DirectBranchCoefficientControls.zero_determinant_counterexample",
+    "DirectBranchCoefficientControls.nonsimple_root_counterexample",
+    "DirectBranchCoefficientControls.missing_support_counterexample"
+  ],
+  "source_modules": [
+    {
+      "source": "DirectBranchCoefficientMultiplicity.lean.txt",
+      "module": "DirectBranchCoefficientMultiplicity"
+    },
+    {
+      "source": "DirectBranchControls.lean.txt",
+      "module": "DirectBranchControls"
+    },
+    {
+      "source": "DirectReadback.lean.txt",
+      "module": "DirectReadback"
+    },
+    {
+      "source": "DirectExpectedFailure.lean.txt",
+      "module": "DirectExpectedFailure",
+      "expected_exit": "nonzero with specific wrong-branch unsolved goal"
+    }
+  ],
+  "qualification": "Original rational source fixture is retained. Three generic premise-removal controls prove explicit identities and altered multiplicity sums. Positive controls and separate axiom readback required; no sorry or added axioms accepted.",
+  "upstream_Nonbranch": {
+    "source_sha256": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1",
+    "candidate_native_directory": "/home/ec2-user/pencil-native-branch-coefficient-v2-20261109",
+    "successful_compiler_receipt": "pending coordinator final binding",
+    "olean_custody": "pending exact output hash plus pre/post runtime dependency custody",
+    "do_not_recompile_geometry_implicitly": true
+  },
+  "campaign": {
+    "ceiling_seconds": 43200,
+    "absolute_deadline": "2026-11-10T05:11:39Z",
+    "new_reservation_seconds": null,
+    "current_ledger": "pending coordinator ledger at release"
+  },
+  "execution_sequence": "Independent source review; bind successful Nonbranch exact olean/transitive dependency custody and existing runtime; coordinator freezes one finite serial replay; publish/readback exact inputs and command; then compile candidate, controls, separate readback and expected-failure control. No payload starts from this source packet."
+}

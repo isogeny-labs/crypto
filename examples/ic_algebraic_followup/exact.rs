@@ -7,10 +7,17 @@ use std::collections::BTreeMap;
 pub struct Quadratic<'a> {
     gf: &'a Gf2,
     pivots: Vec<(u64, u64)>,
+    semaev_b: u64,
 }
 
 impl<'a> Quadratic<'a> {
+    #[allow(dead_code)] // b=1 compatibility API shared by the independent audit examples.
     pub fn new(gf: &'a Gf2) -> Self {
+        Self::with_b(gf, 1)
+    }
+
+    pub fn with_b(gf: &'a Gf2, b: u64) -> Self {
+        assert!(b != 0 && b < (1u64 << gf.n));
         let mut pivots: Vec<(u64, u64)> = Vec::new();
         for j in 1..gf.n {
             let mut image = gf.sqr(1 << j) ^ (1 << j);
@@ -25,7 +32,11 @@ impl<'a> Quadratic<'a> {
             pivots.push((image, preimage));
             pivots.sort_unstable_by_key(|&(v, _)| std::cmp::Reverse(63 - v.leading_zeros()));
         }
-        Self { gf, pivots }
+        Self {
+            gf,
+            pivots,
+            semaev_b: b,
+        }
     }
 
     fn artin(&self, mut v: u64) -> Option<u64> {
@@ -40,7 +51,7 @@ impl<'a> Quadratic<'a> {
     }
 
     /// None denotes the identically zero polynomial, whose root set is the
-    /// whole field. Such a link cannot occur for S3 with b=1.
+    /// whole field. Such a link cannot occur for S3 with nonzero curve b.
     pub fn roots(&self, a: u64, b: u64, c: u64) -> Option<Vec<u64>> {
         let gf = self.gf;
         if a == 0 {
@@ -72,7 +83,7 @@ impl<'a> Quadratic<'a> {
 
     fn link(&self, x: u64, y: u64) -> Vec<u64> {
         let xy = self.gf.mul(x, y);
-        self.roots(self.gf.sqr(x ^ y), xy, self.gf.sqr(xy) ^ 1)
+        self.roots(self.gf.sqr(x ^ y), xy, self.gf.sqr(xy) ^ self.semaev_b)
             .expect("nonzero S3 polynomial")
     }
 }
@@ -80,9 +91,12 @@ impl<'a> Quadratic<'a> {
 /// Meet in the middle on the chain, not on group points. For m=3 and m=4
 /// this uses O(|V|^2) quadratic solves, and exactly counts intermediate roots.
 pub fn count(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> u64 {
+    count_for_b(gf, bs, xr, m, 1)
+}
+pub fn count_for_b(gf: &Gf2, bs: &[u64], xr: u64, m: usize, b: u64) -> u64 {
     assert!((3..=12).contains(&m));
     let domain = span(bs);
-    let quad = Quadratic::new(gf);
+    let quad = Quadratic::with_b(gf, b);
     if m > 4 {
         let mut states = BTreeMap::<u64, u64>::new();
         for &x in &domain {
@@ -142,10 +156,20 @@ pub fn count(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> u64 {
 }
 
 /// One exact chain witness, returned as (summand x values, intermediates).
+#[allow(dead_code)] // b=1 compatibility API used by the frozen-fixture audit example.
 pub fn witness(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> Option<(Vec<u64>, Vec<u64>)> {
+    witness_for_b(gf, bs, xr, m, 1)
+}
+pub fn witness_for_b(
+    gf: &Gf2,
+    bs: &[u64],
+    xr: u64,
+    m: usize,
+    b: u64,
+) -> Option<(Vec<u64>, Vec<u64>)> {
     assert!((3..=12).contains(&m));
     let domain = span(bs);
-    let quad = Quadratic::new(gf);
+    let quad = Quadratic::with_b(gf, b);
     if m > 4 {
         let mut states = BTreeMap::new();
         for &x in &domain {
@@ -242,12 +266,17 @@ mod tests {
         let gf = Gf2::new(&irr);
         let bs = [1, 2];
         let base: Vec<_> = bs.iter().map(|&x| element(x, 5)).collect();
-        for m in [3, 4, 5, 6] {
-            for xr in 0..32 {
-                assert_eq!(
-                    count(&gf, &bs, xr, m),
-                    chained_solution_count(m, &base, &element(xr, 5), &element(1, 5), &irr)
-                );
+        for b in [1, 2, 7] {
+            for m in [3, 4, 5, 6] {
+                for xr in 0..32 {
+                    assert_eq!(
+                        count_for_b(&gf, &bs, xr, m, b),
+                        chained_solution_count(m, &base, &element(xr, 5), &element(b, 5), &irr)
+                    );
+                    if b == 1 {
+                        assert_eq!(count(&gf, &bs, xr, m), count_for_b(&gf, &bs, xr, m, b));
+                    }
+                }
             }
         }
     }

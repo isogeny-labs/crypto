@@ -1,0 +1,27 @@
+card_id: CARD-conductor-gap-size-20261026-1
+relay_verbatim: true
+outcome: stopped
+stopped_at_step: search
+recommendation: respecify
+reasons:
+- 'research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.receipt.json (sha256 b793e9ec200992a8c9585a1e0b0bffd2ad143c0a2ac831f38cbbf8043c2adaa2)
+  records the first two exact card argv at commit ee0f5489b8a946ccb6ea870c56b7fea6e8300993: self-test exited 0;
+  search exited 3. Both ran once without timeout; the tool stopped at command 2 as specified.'
+- 'research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.search.stdout reports: Parameter
+  candidates retained: 131; complete cells: 19/22; ECDLP solves: 0; explicit models: 0. feasibility.cpp:298-302
+  returns 3 when cells are incomplete. This is the retained stopped observation.'
+- The third command, verify, did not run. results/verification.json and the card-prefixed verify stdout/stderr files
+  are absent; no independent-verification result is claimed. Further execution requires a separately specified card
+  rather than rerunning this completed attempt.
+- All six bound input digests, both retained output digests (results/candidates.csv and results/design.json), and
+  all four executed stdout/stderr digests match research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.yaml
+  and its receipt.
+- The prescribed check-relay CLI was attempted but refused post-execution lint because the now-generated results/candidates.csv
+  appears as an unbound file argument of the unrun verify command. The unchanged tools/task_card.py check_relay
+  function reports relay_verbatim=true with no missing lines or verification findings; research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.executor.txt
+  also matches original tool stdout byte-for-byte including its final newline. No tool, card or evidence was changed.
+- research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.receipt.json dirty_before
+  already lists the main-session README.md, render.py and checks/test/hydration logs. The dirty_before/dirty_after
+  comparison records no executor writes outside research/conductor_gap_size_ladder_20261026/. Bound source, protocol,
+  binaries and HEAD remain unchanged.
+interpretation: not_assessed

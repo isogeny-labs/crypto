@@ -1,0 +1,133 @@
+./bin/bash: OK
+./bin/true: OK
+./etc/group: OK
+./etc/passwd: OK
+./lib/x86_64-linux-gnu/libc.so.6: OK
+./lib/x86_64-linux-gnu/libcrypto.so.3: OK
+./lib/x86_64-linux-gnu/libm.so.6: OK
+./lib/x86_64-linux-gnu/libpcre2-8.so.0: OK
+./lib/x86_64-linux-gnu/libselinux.so.1: OK
+./lib/x86_64-linux-gnu/libtinfo.so.6: OK
+./lib/x86_64-linux-gnu/libz.so.1: OK
+./lib/x86_64-linux-gnu/libzstd.so.1: OK
+./lib64/ld-linux-x86-64.so.2: OK
+./opt/nist/bin/journal_check: OK
+./opt/nist/bin/journal_tests: OK
+./opt/nist/bin/known-orders: OK
+./opt/nist/bin/run-field: OK
+./opt/nist/bin/sampler_resume: OK
+./opt/nist/source/baseline_runtime_20261107/known-orders.cpp: OK
+./opt/nist/source/baseline_runtime_20261107/test-launcher.sh: OK
+./opt/nist/source/journal_qualification_20261104/journal_check.cpp: OK
+./opt/nist/source/journal_qualification_20261104/journal_tests.cpp: OK
+./opt/nist/source/journal_qualification_20261104/resume.hpp: OK
+./opt/nist/source/journal_qualification_20261104/sampler_resume.cpp: OK
+./opt/nist/source/journal_qualification_20261104/test-cli.sh: OK
+./opt/nist/source/random_curve_validation_20261029/sampler.cpp: OK
+./opt/nist/source/strict_elkies_20261029/inputs.tsv: OK
+./usr/bin/cat: OK
+./usr/bin/dirname: OK
+./usr/bin/env: OK
+./usr/bin/find: OK
+./usr/bin/id: OK
+./usr/bin/mkdir: OK
+./usr/bin/mktemp: OK
+./usr/bin/realpath: OK
+./usr/bin/sha256sum: OK
+./usr/bin/stat: OK
+./usr/bin/wc: OK
+./workspace/tools/sage_skeleton_env/share/pari/seadata/README: OK
+./workspace/tools/sage_skeleton_env/share/pari/seadata/sea0: OK
+./workspace/tools/sage_skeleton_env/share/pari/seadata/sea2: OK
+ok 1 - 21 frozen seed/root/primality and independent multiplier fixtures
+ok 2 - counter encoding, leading-zero seeds, 160-bit wrap and field separation
+ok 3 - frozen cohort SHA-256 and production field lookup
+ok 4 - bounded exhaustive toy oracle and complete producer A/A bytes
+ok 5 - positive
+# refusal changed-seed: seed derivation
+ok 6 - changed-seed
+# refusal changed-c: expanded coefficient
+ok 7 - changed-c
+# refusal changed-b: coefficient root
+ok 8 - changed-b
+# refusal changed-n: full point count
+ok 9 - changed-n
+# refusal changed-status: order rejection/acceptance disposition
+ok 10 - changed-status
+# refusal index-gap: field/index gap or reorder
+ok 11 - index-gap
+# refusal wrong-field: field/index gap or reorder
+ok 12 - wrong-field
+# refusal changed-point: point equation
+ok 13 - changed-point
+# refusal changed-split: splitting profile
+ok 14 - changed-split
+# refusal changed-ramified: splitting profile
+ok 15 - changed-ramified
+# refusal wrong-ordinal: accepted field/ordinal/index
+ok 16 - wrong-ordinal
+# refusal accepted-binding: accepted/attempt binding
+ok 17 - accepted-binding
+# refusal reordered-attempts: field/index gap or reorder
+ok 18 - reordered-attempts
+# refusal duplicate-attempt: field/index gap or reorder
+ok 19 - duplicate-attempt
+# refusal missing-middle-acceptance: accepted field/ordinal/index
+ok 20 - missing-middle-acceptance
+# refusal extra-acceptance: extra/unmatched accepted row
+ok 21 - extra-acceptance
+# refusal attempt-after-target: records beyond target-th accepted curve
+ok 22 - attempt-after-target
+# refusal trailing-empty-cell: empty cell
+ok 23 - trailing-empty-cell
+# refusal noncanonical-counter: noncanonical decimal
+ok 24 - noncanonical-counter
+# refusal prime-labelled-early-abort: early-abort composite order
+ok 25 - prime-labelled-early-abort
+ok 26 - composite-full-order-replay
+# refusal strict-orphan-refusal: missing accepted row
+ok 27 - strict-orphan-refusal
+ok 28 - inspect-orphan
+ok 29 - inspect-torn-acceptance
+# refusal strict-torn-acceptance-refusal: unterminated journal row
+ok 30 - strict-torn-acceptance-refusal
+ok 31 - inspect-prefix
+ok 32 - inspect-torn-attempt
+# refusal strict-torn-attempt-refusal: unterminated journal row
+ok 33 - strict-torn-attempt-refusal
+# refusal orphan-followed-by-attempt: orphan followed by partial attempt
+ok 34 - orphan-followed-by-attempt
+ok 35 - inspect-empty-prefix
+# refusal oversized-row: oversized journal row
+ok 36 - oversized-row
+ok 37 - changed-cohort-pin
+ok 38 - recovery-positive
+ok 39 - recovery-inspect-orphan
+ok 40 - recovery-inspect-torn-acceptance
+ok 41 - recovery-inspect-prefix
+ok 42 - recovery-inspect-torn-attempt
+ok 43 - recovery-inspect-empty-prefix
+ok 44 - fresh-wrapper-matches-frozen-producer
+ok 45 - worker-refuses-existing-output
+ok 46 - worker-refuses-corrupt-source-before-output
+# controls=46 toy_attempts=86 toy_accepted=3 baseline_accepted=0 signed_verification=false
+{"schema":"nist-journal-check/v1","mode":"inspect","status":"incomplete","order_replay":"ellcard-all-mapped","bits":192,"p":"6277101735386680763835789423207666416083908700390324961279","nonce":"0000000000000000000000000000000000000000000000000000000000000000","target":10,"cohort_sha256":"f425dc7c323bdbe6660fc599d1c625e1851a0e30d2a83d38a1c62d35e002f8fe","attempts":0,"accepted":0,"next_index":0,"replay_last_accepted":false,"attempt_prefix_bytes":29,"accepted_prefix_bytes":58,"attempt_tail_bytes":0,"accepted_tail_bytes":0,"attempts_bytes":29,"attempts_sha256":"7a0bb6134db47d3c3dba9cf7a4d61238c5496d3c1434bfba5934ebf9205ac1e4","accepted_bytes":58,"accepted_sha256":"e5ab44c6db0a9b0817f7c8dfd14408f66242566206ce6327bc6732b9f935c234","mutated_inputs":false,"production_qualified":false,"signed_verification":false}
+ok CLI refusal incomplete exit=1: REFUSED: accepted target incomplete
+ok CLI refusal toy-field exit=1: REFUSED: six frozen fields
+ok CLI refusal target exit=1: REFUSED: protocol pilot or primary target
+ok CLI refusal format exit=1: REFUSED: format must be sampler-v1
+ok CLI refusal acknowledgement exit=1: FAIL: explicit checkpoint acknowledgement
+Operational errors are not curve rejections.
+ok CLI refusal worker-toy-field exit=1: FAIL: six frozen fields
+Operational errors are not curve rejections.
+CLI controls complete: one empty-prefix inspection, six refusals, no sampler launch
+ok launcher refusal marker exit=2: REFUSED: command recovery supervisor marker required
+ok launcher refusal mode exit=2: REFUSED: mode
+ok launcher refusal field exit=2: REFUSED: one frozen field required
+ok launcher refusal nonce exit=2: REFUSED: 32-byte lowercase nonce required
+ok launcher refusal acknowledgement exit=2: REFUSED: checkpoint acknowledgement required
+ok launcher refusal output exit=2: REFUSED: existing controller output directory under /work/compute required
+ok launcher refusal identity exit=2: REFUSED: AWS identity must not enter payload
+ok launcher refusal overwrite exit=2: mkdir: cannot create directory '/work/compute/launcher-controls.hfI9IP/existing/field-192': File exists
+REFUSED: field output already exists; retain original
+Eight launcher refusals; no producer launched and no journal created.

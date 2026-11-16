@@ -6,9 +6,11 @@
 set -euo pipefail
 L="$1"
 case "$L" in
-  7)  ARMS="${2:-oracle,native,chain-p12,lin,lin-nolex,native-aa,cms,cadical}"; BUDGET=4000000 ;;
+  # AM2: chain-p12 dropped at l = 7 after its one complete (censored) target
+  7)  ARMS="${2:-oracle,native,lin,lin-nolex,native-aa,cms,cadical}"; BUDGET=4000000 ;;
   8|9) ARMS="${2:-oracle,native,lin,lin-nolex,native-aa,cms,cadical}"; BUDGET=4000000 ;;
-  10) ARMS="${2:-oracle,native,lin,lin-nolex,native-aa}"; BUDGET=16000000 ;;
+  # AM3: native arms censored by construction at l = 10 (budget below C(2^l, 3)); not run
+  10) ARMS="${2:-oracle,lin,lin-nolex}"; BUDGET=16000000 ;;
   *) echo "rung ℓ=$L is not in the frozen grid {7,8,9,10}" >&2; exit 2 ;;
 esac
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
