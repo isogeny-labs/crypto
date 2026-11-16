@@ -13,3 +13,19 @@ Local PCC-20261116-4592c6 PASS at2026-11-16T23:06:01Z, signedunverified. Three w
 Fresh bounded Galbraith ch26 before protocol/code, exact canonical/official sources and prior F25 expressions credited; no novelty or source-refutation claim. FiveKB/sourceConductor127; final selector correction timing is explicit. Original FR1994 remains unread. General canonical Tate construction/every function-divisor choice independence/Galois descent/generalMOVFR/Scheme comparison remain open. Samehost checks do not establish parser/compiler/host independence or signed standing; latest fresh checker probe unavailable. All14active, zero spend. [pcc:unverified]
 
 Ready4444 is the current route; merged4389 stays closed. Fetched4cc03 main snapshot1215ledger rows/common274/neitherprefix remains an integration blocker; local654preserves653prefix. No rechain/reissue/force/main merge. Current-head CI/review/signing unconfirmed; owner00UTC17Nov/no busy polling. [pcc:unverified]
+
+## Publication
+
+Published in ready [PR4444](https://github.com/isogeny-labs/crypto/pull/4444),
+now titled for actual Miller functions, proper divisor evaluation and F19
+controls. Local proof receipt `cc012b8d4a7df281395d8f633f6bd178bad73835`
+and remote proof `a53c27ca16a887ec67c8c7fa791cf5cb40db2f57` share
+tree `08593ed13d6fb29818a2363d46d2da5d7b57a6c3`. Completed anonymous fetch
+and fresh exact head/title/body/open/ready confirmation are recorded in
+[publication.json](publication.json). Local replay passes; independent signed
+standing and current-head CI/review remain unconfirmed. Auto-merge remains
+enabled under the owner default, with the explicit ledger-prefix integration
+blocker and actual nonmergeable state. General canonical Tate construction,
+every function/divisor choice independence, descent, MOV/Frey–Ruck and
+Scheme comparison remain open. The chosen direct-sample counterexample
+remains null, with positive agreement proved. [pcc:unverified]
