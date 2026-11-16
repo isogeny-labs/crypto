@@ -1,0 +1,37 @@
+diff --git a/examples/koblitz_orbit_dlp_fast.rs b/examples/koblitz_orbit_dlp_fast.rs
+index 1365fd850..3527418ab 100644
+--- a/examples/koblitz_orbit_dlp_fast.rs
++++ b/examples/koblitz_orbit_dlp_fast.rs
+@@ -4196,6 +4196,7 @@ mod wide {
+                     else {
+                         continue;
+                     };
++                    PROF_HITS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                     let (left2, right2, relative2, stored_shift) = unpack(value);
+                     let left_shift2 = ((stored_shift + n - partner_shift) % n) as usize;
+                     let right_shift2 = (left_shift2 + relative2) % n as usize;
+@@ -4224,6 +4225,9 @@ mod wide {
+         None
+     }
+ 
++    static PROF_STATES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
++    static PROF_HITS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
++
+     fn extract128(
+         gf: &Gf2_128,
+         fast: &FastBinaryCurve128,
+@@ -4239,9 +4243,14 @@ mod wide {
+         let mut probes = 0u64;
+         let mut scan = StateScan128::new(gf.n);
+         let mut lift_scratch = LiftScratch128::default();
++        let prof_cap: u64 = std::env::var("KIC_PROF_MAX_STATES").ok().and_then(|v| v.parse().ok()).unwrap_or(u64::MAX);
+         let start = start % index.states.len().max(1);
+         for offset in 0..index.states.len() {
+             let state = index.states.get((start + offset) % index.states.len());
++            if PROF_STATES.fetch_add(1, std::sync::atomic::Ordering::Relaxed) >= prof_cap {
++                eprintln!("PROF states={} probes={} hits={} index_states={}", prof_cap, probes, PROF_HITS.load(std::sync::atomic::Ordering::Relaxed), index.states.len());
++                std::process::exit(0);
++            }
+             if let Some(relation) = scan_state128(
+                 gf,
+                 fast,

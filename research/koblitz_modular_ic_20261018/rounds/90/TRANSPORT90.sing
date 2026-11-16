@@ -1,0 +1,104 @@
+proc require90(int ok,string tag){if(!ok){print("RR90_FATAL "+tag);exit;}}
+string saved90=read("rr-pid50.sing");
+int start90=find(saved90,"ring inverseBaseCertificate50=");
+require90(start90>0,"RR90_PID_HEADER");
+execute(saved90[start90,size(saved90)-start90+1]);
+setring inverseBaseCertificate50;
+matrix B0=matrix(basis50);
+matrix S0=sourceLift50;
+poly F0=commonDenominator50;
+require90(nrows(B0)==32 && ncols(B0)==32 && normalizationIndex50==376,"RR90_PID_DONOR_SHAPE");
+execute(read("relative-infinity50.sing"));
+ring field90=(2,u),(l,v),dp;
+map relativeMap90=relativeInfinity50,l,v,u;
+ideal I90=std(relativeMap90(relativeInfinityIdeal50));
+require90(vdim(I90)==32,"RR90_SOURCE_FIELD_DIMENSION");
+qring Q90=I90;
+map pidMap90=inverseBaseCertificate50,u;
+matrix B90=pidMap90(B0);
+matrix S90=pidMap90(S0);
+poly F90=pidMap90(F0);
+matrix unit90[32][32];int index90;
+for(index90=1;index90<=32;index90++){unit90[index90,index90]=1;}
+require90(B90*S90==F90*unit90,"RR90_SOURCE_EMBEDDING_PRODUCT");
+poly E90=v^2+u^2*v+u+u^3;
+poly h90=u+v;
+poly N90=v+u*v+u^2;
+poly g90=1+u+u^2+v;
+poly D90=u^2*g90;
+poly A90=l+(1+u)^2*g90;
+poly forwardZ90=lift(h90,1)[1,1];
+poly forwardV90=reduce(N90*forwardZ90^2,std(0));
+poly forwardT90=reduce(A90*lift(D90,1)[1,1],std(0));
+poly inverseK90=u+v+u^2;
+poly inverseG90=u*inverseK90^2+u+inverseK90^2;
+poly inverseZ90=lift(inverseK90,1)[1,1];
+poly inverseV90=reduce(inverseZ90+1/u,std(0));
+poly inverseT90=reduce(inverseG90*(l+(inverseK90+1)^2)*inverseZ90^4/u,std(0));
+link out90="ASCII:w transport90.sing";open(out90);
+write(out90,"matrix forwardC90[32][32];matrix forwardW90[32][32];intvec forwardM90;matrix reverseC90[32][32];matrix reverseW90[32][32];intvec reverseM90;");
+int direction90;int column90;int row90;int power90;int selected90;int good90;int position90;
+intvec exponent90;
+poly mappedZ90;poly mappedV90;poly mappedT90;poly clear90;
+poly mappedF90;poly inverseF90;poly mappedNumerator90;poly current90;poly remaining90;poly reconstructed90;
+ideal tPowers90;ideal basisTerms90;
+vector powerVector90;matrix coordinates90[32][1];matrix corrupted90[32][1];
+for(direction90=1;direction90<=2;direction90++){
+ if(direction90==1){mappedZ90=forwardZ90;mappedV90=forwardV90;mappedT90=forwardT90;clear90=h90;}
+ else{mappedZ90=inverseZ90;mappedV90=inverseV90;mappedT90=inverseT90;clear90=inverseK90;}
+ mappedF90=reduce(subst(F90,u,mappedZ90),std(0));
+ require90(mappedF90!=0,"RR90_TRANSFORMED_COMMON_DENOMINATOR_ZERO");
+ inverseF90=lift(mappedF90,1)[1,1];
+ require90(reduce(mappedF90*inverseF90,std(0))==1,"RR90_TRANSFORMED_COMMON_DENOMINATOR_INVERSE");
+ tPowers90[1]=1;
+ for(row90=2;row90<=16;row90++){tPowers90[row90]=reduce(tPowers90[row90-1]*mappedT90,std(0));}
+ for(row90=1;row90<=32;row90++){
+  basisTerms90[row90]=tPowers90[((row90-1)%16)+1];
+  if(row90>16){basisTerms90[row90]=reduce(basisTerms90[row90]*mappedV90,std(0));}
+ }
+ print("RR90_STAGE direction="+string(direction90)+" field_maps_ready=true columns=32 max_pole_power=61");
+ for(column90=1;column90<=32;column90++){
+  mappedNumerator90=0;
+  for(row90=1;row90<=32;row90++){
+   if(B90[row90,column90]!=0){
+    mappedNumerator90=reduce(mappedNumerator90+reduce(subst(B90[row90,column90],u,mappedZ90),std(0))*basisTerms90[row90],std(0));
+   }
+  }
+  current90=reduce(mappedNumerator90*inverseF90,std(0));
+  selected90=-1;
+  for(power90=0;power90<=61;power90++){
+   remaining90=reduce(current90,std(0));powerVector90=0;reconstructed90=0;
+   while(remaining90!=0){
+    exponent90=leadexp(remaining90);
+    require90(exponent90[1]<16 && exponent90[2]<2,"RR90_NONSTANDARD_FIELD_REMAINDER");
+    position90=exponent90[1]+16*exponent90[2]+1;
+    powerVector90=powerVector90+leadcoef(remaining90)*gen(position90);
+    reconstructed90=reconstructed90+leadcoef(remaining90)*l^exponent90[1]*v^exponent90[2];
+    remaining90=remaining90-lead(remaining90);
+   }
+   require90(reduce(reconstructed90+current90,std(0))==0,"RR90_POWER_VECTOR_RECONSTRUCTION");
+   coordinates90=S90*matrix(powerVector90);
+   require90(B90*coordinates90==F90*matrix(powerVector90),"RR90_FULL_MODULE_PRODUCT");
+   good90=1;
+   for(row90=1;row90<=32;row90++){
+    if(coordinates90[row90,1]!=leadcoef(coordinates90[row90,1]) || denominator(leadcoef(coordinates90[row90,1]))!=1){good90=0;}
+   }
+   if(good90==1){selected90=power90;power90=62;}
+   else{current90=reduce(current90*clear90,std(0));}
+  }
+  require90(selected90>=0,"RR90_POLE_BOUND_EXHAUSTED_DIRECTION_"+string(direction90)+"_COLUMN_"+string(column90));
+  corrupted90=coordinates90;corrupted90[1,1]=corrupted90[1,1]+1;
+  require90(B90*corrupted90!=F90*matrix(powerVector90),"RR90_CORRUPTED_COEFFICIENT_ACCEPTED");
+  if(direction90==1){write(out90,"forwardM90["+string(column90)+"]="+string(selected90)+";");}
+  else{write(out90,"reverseM90["+string(column90)+"]="+string(selected90)+";");}
+  for(row90=1;row90<=32;row90++){
+   if(direction90==1){write(out90,"forwardC90["+string(row90)+","+string(column90)+"]="+string(coordinates90[row90,1])+";forwardW90["+string(row90)+","+string(column90)+"]="+string(powerVector90[row90])+";");}
+   else{write(out90,"reverseC90["+string(row90)+","+string(column90)+"]="+string(coordinates90[row90,1])+";reverseW90["+string(row90)+","+string(column90)+"]="+string(powerVector90[row90])+";");}
+  }
+  print("RR90_COLUMN direction="+string(direction90)+" column="+string(column90)+" pole_power="+string(selected90)+" full_module_product=1");
+ }
+}
+close(out90);
+print("RR90_RESULT directions=2 columns_per_direction=32 full_products=64 certificate_exported=1");
+print("TRANSPORT90_ALL_CHECKS_PASS");
+quit;
