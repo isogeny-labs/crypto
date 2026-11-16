@@ -7,8 +7,14 @@ key. The documented timeout fallback is merging main222394077d locally, with
 exact main ledger prefix, two unchanged appended local bodies and complete
 journal block multisets. See results-merge-20261116T0311Z.json in the scale
 directory and today's session log. Sources/protocols/claims/data are unchanged.
-Next: finish focused checks, publish merge, inspect new-head merge gates and
-required reviews, then bounded follow-up if pending. No benchmarks are needed.
+Merge9c9801cd05 is pushed and PR4358 is mergeable again. Native formatting,
+clippy -D warnings, five unit groups and three CLI tests pass. Ledger1190,
+lessons170, relevant two censored records and progress checks pass locally;
+claim-file and pinned-proof hashes agree [pcc:unverified]. Receipts/logs are
+postmerge-checks-20261116T0314Z.json and postmerge-*-20261116.log in the scale
+directory. Current-head merge gates started; auto-merge remains enabled.
+Next bounded follow-up: inspect the then-current head and required reviews,
+record merge if landed, otherwise diagnose actual failures. No benchmarks needed.
 
 ## Current state — 22:15 UTC
 
