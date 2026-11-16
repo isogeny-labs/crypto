@@ -1,0 +1,35 @@
+     Locking 5 packages to highest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+   Compiling autocfg v1.5.1
+   Compiling hec-native-ic v0.1.0 (/Users/adamburan/pq-work/hec-followups/crates/hec-native-ic)
+   Compiling num-traits v0.2.19
+   Compiling num-integer v0.1.47
+   Compiling num-bigint v0.4.8
+   Compiling hec-torsion13-gate v0.1.0 (/Users/adamburan/pq-work/hec-followups/research/hec_torsion13_20261115)
+warning: unused import: `Z`
+ --> main.rs:3:52
+  |
+3 | use arith::{base, Curve, Div, Field, Pol, E, O, P, Z};
+  |                                                    ^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `path::Path`
+ --> main.rs:5:37
+  |
+5 | use std::{collections::HashSet, fs, path::Path};
+  |                                     ^^^^^^^^^^
+
+warning: method `scale` is never used
+  --> arith.rs:31:12
+   |
+21 | impl Field {
+   | ---------- method in this implementation
+...
+31 |     pub fn scale(&self, a: E, b: u64) -> E {
+   |            ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hec-torsion13-gate` (bin "torsion13") generated 3 warnings (run `cargo fix --bin "torsion13" -p hec-torsion13-gate` to apply 2 suggestions)
+    Finished `release` profile [optimized + debuginfo] target(s) in 3.18s

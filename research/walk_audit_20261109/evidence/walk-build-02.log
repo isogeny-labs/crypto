@@ -1,0 +1,15 @@
+WalkBoundary.lean:30:26: warning: This simp argument is unused:
+  Fintype.card_fun
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [uniformPMF_apply, ENNReal.inv_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+WalkBoundary.lean:99:43: error: unsolved goals
+p t : ℕ
+inst✝ : NeZero p
+h : 6 * t + 2 ≤ p
+hmixed : ∀ (s : Set (ZMod p)), (walkLaw p t).toOuterMeasure s ≤ (uniformPMF (ZMod p)).toOuterMeasure s + 1 / 4
+he : 1 ≤ (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) + 1 / 4
+hu : (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) ≤ 1 / 2
+⊢ 2⁻¹ + 4⁻¹ < 1

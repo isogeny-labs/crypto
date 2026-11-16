@@ -512,6 +512,13 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
         MethodDecl {
             id: super::prime_orbit::ID,
             family: "ic",
@@ -1178,6 +1185,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_framework::run_pipeline + ecbench::ic_report(counted)",
             applies: Applies::Any,
             params: IC_COUNTED_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.hashed_native_v1",
+            family: "ic",
+            summary: "native BigUint hashed-base IC with explicit source/selector/width/partial backend; group calls charged, all meter/native work unpriced; cold and exclusive online phases; bounded failures retained",
+            entry: "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+            applies: Applies::PrimeOnly,
+            params: super::hashed_native::PARAMS,
         },
         MethodDecl {
             id: "ic.tensor_contraction_v1",
@@ -3755,6 +3770,9 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if m.id == "ic.hashed_native_v1" => {
+            super::hashed_native::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
@@ -5151,6 +5169,9 @@ fn solve_ext(
             }
             solve_endo_orbit(m, &i.curve, i.frobenius, i.generator, target, i.r, seed, "frobenius-orbit walk on {±π^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
         }
+        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
+            unreachable!("returned above")
+        }
     }
 }
 
@@ -6168,6 +6189,17 @@ fn ic_report(
     // (`audit::legacy_solver_rounding` reproduces those records).
     let mut total = rep.total_gae;
     if let Some(s) = &rep.decomposition.solver {
+        // New opt-in Boolean variants retain their exact Gray search work
+        // separately from calibrated Macaulay word XORs. A reduction in the
+        // latter must not silently price the tail enumeration at zero.
+        for name in [
+            "quadratic_tail_assignments_uncharged",
+            "generalized_assignments_uncharged",
+        ] {
+            if let Some(&count) = s.extra.get(name).filter(|&&count| count > 0) {
+                phases[2].native.insert(name.into(), count);
+            }
+        }
         // `counted` (field multiplications priced at the curve's own
         // multiplications per addition, `gaudry-d4`) is a count, like
         // `pinned`, and stays in the total.
@@ -8675,7 +8707,7 @@ pub fn dump_factor_base(
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
-        | Instance::Hyper(_) => unreachable!("returned above"),
+        | Instance::Hyper(_) | Instance::ThreeLeads(_) => unreachable!("returned above"),
     }
 }
 
@@ -11462,6 +11494,7 @@ mod accounting_tests {
     }
 }
 
+/// `rho.negation_strong` end to end through `solve`, on curves over F_(2^m)^4.
 #[cfg(test)]
 mod neg_strong_tests {
     use super::*;

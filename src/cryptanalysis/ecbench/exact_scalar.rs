@@ -31,6 +31,16 @@ impl ExactScalar {
     pub fn checked_u128(self) -> Option<u128> {
         (self.0[2..] == [0; 2]).then_some(u128::from(self.0[0]) | (u128::from(self.0[1]) << 64))
     }
+    /// Floating-point display/pricing approximation, never scalar arithmetic.
+    /// Preserve the historical cast for every legacy u128 value.
+    pub fn to_f64(self) -> f64 {
+        if let Some(value) = self.checked_u128() {
+            return value as f64;
+        }
+        num_traits::ToPrimitive::to_f64(&self.to_biguint())
+            .expect("256-bit integer is finite in f64")
+    }
+
     pub fn bits(self) -> u32 {
         self.0
             .iter()
@@ -51,6 +61,18 @@ impl From<u64> for ExactScalar {
 impl From<u128> for ExactScalar {
     fn from(value: u128) -> Self {
         Self([value as u64, (value >> 64) as u64, 0, 0])
+    }
+}
+impl TryFrom<ExactScalar> for u64 {
+    type Error = &'static str;
+    fn try_from(value: ExactScalar) -> Result<Self, Self::Error> {
+        value.checked_u64().ok_or("scalar exceeds u64")
+    }
+}
+impl TryFrom<ExactScalar> for u128 {
+    type Error = &'static str;
+    fn try_from(value: ExactScalar) -> Result<Self, Self::Error> {
+        value.checked_u128().ok_or("scalar exceeds u128")
     }
 }
 impl Ord for ExactScalar {
@@ -120,6 +142,19 @@ impl<'de> Deserialize<'de> for ExactScalar {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn checked_conversions_and_legacy_float_cast_are_preserved() {
+        for value in fixtures() {
+            let exact = ExactScalar::from_biguint(&value).unwrap();
+            assert_eq!(u64::try_from(exact).ok(), exact.checked_u64());
+            assert_eq!(u128::try_from(exact).ok(), exact.checked_u128());
+            assert!(exact.to_f64().is_finite());
+            if let Some(old) = exact.checked_u128() {
+                assert_eq!(exact.to_f64(), old as f64);
+            }
+        }
+    }
+
     fn fixtures() -> Vec<BigUint> {
         let mut values = vec![BigUint::from(0u8), BigUint::from(1u8)];
         for bit in [32usize, 64, 65, 127, 128, 129, 192, 252, 255, 256] {

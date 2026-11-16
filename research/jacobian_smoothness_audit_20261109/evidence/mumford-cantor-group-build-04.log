@@ -1,0 +1,11 @@
+MumfordCantorGroup.lean:149:2: error: Type mismatch
+  subgroupSmoothFraction_value
+has type
+  subgroupSmoothFraction = 1
+but is expected to have type
+  ↑(Fintype.card { Q // (↑Q).u.Splits }) / ↑(Fintype.card ↥smallSubgroup) = 1
+'MumfordCantorGroupAudit.cantor_subgroup_audit_certificate' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'MumfordCantorGroupAudit.useful_smooth_fractions' depends on axioms: [propext, Classical.choice, Quot.sound]
