@@ -1,0 +1,73 @@
+{
+  "schema": "actual-local-algebra-length-verification/v1",
+  "source_commit": "e861d602f56c6eeb0b9e0da075105377b9ef9a10",
+  "claim_id": "PCC-20261114-81195a",
+  "declaration_sha256": "58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 13,
+  "gate_declarations": 28,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 64,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-81195a",
+    "claim_sha256": "c127aed1fb94c6f5b76007ea68e026ddcb976f9cc25888b0f42c2dee964432be",
+    "commit": "e861d602f56c6eeb0b9e0da075105377b9ef9a10",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/local_algebra_length_audit_20261114/lean (LocalLengthCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T16:43:35Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-81195a",
+    "claim_sha256": "c127aed1fb94c6f5b76007ea68e026ddcb976f9cc25888b0f42c2dee964432be",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46331,
+    "sha256": "90ee8b17378ae241f292a7601fc6fbab1e9999c5d5e03915d6876509d687fe98",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 28,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_self_module_length_proved": true,
+    "actual_positive_locality_proved": true,
+    "residue_degree_omission_counterexample": true,
+    "general_cycle_intersection_bound_proved": false,
+    "JV_ring_length8_proved": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

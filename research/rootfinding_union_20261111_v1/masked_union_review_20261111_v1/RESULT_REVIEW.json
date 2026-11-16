@@ -1,0 +1,81 @@
+{
+  "schema": "independent-recorded-evidence-review/v1",
+  "created_utc": "2026-11-11T21:17:18.256936+00:00",
+  "decision": "PASSED_CONDITIONAL_COMPONENT_SCOPE",
+  "review_operation": "Recorded bytes, complete row/tuple coverage and timing-statistic recomputation only; no scientific algorithm rerun",
+  "results": [
+    {
+      "mode": "controls",
+      "root_union_size": 18,
+      "all_arm_unions_identical": true,
+      "recorded_native_fibers": 30,
+      "mask_rows": 5,
+      "retained_mask_vectors": 245,
+      "candidate_u_checks": 735,
+      "wall_seconds": 4.458416612000008,
+      "whole_worker_peak_rss_kib": 194096,
+      "raw_sha256": "499e7ca4ab7a8a0a642844d87cee45a6081438fbf36566e06081370a943aec62",
+      "native_recovery_rss_range_kib": [
+        14208,
+        14284
+      ],
+      "arm_times": [
+        {
+          "arm": "all",
+          "seconds": 0.23315380500002902
+        },
+        {
+          "arm": "masked",
+          "seconds": 0.2493586599999844
+        }
+      ]
+    },
+    {
+      "mode": "profile",
+      "root_union_size": 15,
+      "all_arm_unions_identical": true,
+      "recorded_native_fibers": 135,
+      "mask_rows": 15,
+      "retained_mask_vectors": 735,
+      "candidate_u_checks": 5880,
+      "wall_seconds": 32.06912537100004,
+      "whole_worker_peak_rss_kib": 194112,
+      "raw_sha256": "691606d1747d946f888411eed8f1ac68cd68578c5e0136515f1a111cd4bfd67c",
+      "native_recovery_rss_range_kib": [
+        14208,
+        16448
+      ],
+      "arm_times": [
+        {
+          "arm": "all",
+          "seconds": 5.1708387129999664
+        },
+        {
+          "arm": "masked",
+          "seconds": 3.7652545809999083
+        },
+        {
+          "arm": "masked",
+          "seconds": 3.687839123999993
+        },
+        {
+          "arm": "all",
+          "seconds": 5.320451561000027
+        },
+        {
+          "arm": "all",
+          "seconds": 5.940362866999976
+        },
+        {
+          "arm": "masked",
+          "seconds": 3.925195049000081
+        }
+      ]
+    }
+  ],
+  "observed_conditional_component_median_ratio": 1.4130389981723674,
+  "ratio_is_qualified": false,
+  "whole_global_root_search_complete": false,
+  "matching_genuine_F4_F5_F6_measured": false,
+  "interpretation": "Observed 1.413038998x conditional component gain on five exposed positive NIST blocks, not a global solver or GB speedup. Common compilation and shared Python wrapper excluded from arm ratio; no A/A or qualified isolation."
+}

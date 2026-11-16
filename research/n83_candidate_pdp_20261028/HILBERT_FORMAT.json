@@ -1,0 +1,24 @@
+{
+ "schema":"n83.hilbert-layout/v1",
+ "encoding":"UTF-8 JSON; exact dimensions are integers below 2^53 where applicable, parse all as integers; field elements and modulus are decimal strings; sha256 hex lowercase",
+ "raw_files":{
+  "inputs/<key>/input.json":"Unchanged retained input metadata, hashed in protocol",
+  "inputs/<key>/system.sing":"Unchanged full Singular presentation, hashed in protocol; no solver execution implied",
+  "certificates/primality.json":"Lucas full-factorization witness for p, prime factors, exponents, exact modular residues",
+  "certificates/controls.json":"Every explicit matrix rank/product control and formula value, including small-characteristic deficiencies",
+  "certificates/hilbert.json":"28 rank certificates, 784 bidegree dimensions/images/quotients, 56 Hilbert coefficients indexed by degree0..55; exact first zero and total dimension",
+  "certificates/<key>.json":"Source identity, complete-template check, all54 normalization weights/inverses, Hilbert and primality file hashes, degree",
+  "certificates/summary.json":"Six rows; original/baseline/spike40 distinguished; producer certification only until replay passes",
+  "replay.json":"Fresh-process complete equality check of all certificates and source hashes",
+  "protocol-hilbert.json":"Frozen experiment.protocol/v1 with six exact cases",
+  "instrument":"Frozen native executable",
+  "producer.log":"Native producer stdout/stderr; nonzero exit is failure, not a bound",
+  "replay.log":"Native fresh-process replay stdout/stderr",
+  "status.json":"Both process exit codes",
+  "terminal.json":"Run identity, UTC start/end, outer exit, backend, wall_valid=false",
+  "manifest.sha256":"All sealed raw file hashes except this manifest"
+ },
+ "keys":"original-prime-m2-{planted,natural}, baseline-prime-m2-{planted,natural}, spike40-prime-m2-{planted,natural}; natural source bytes may coincide across retained datasets; these are not six independent samples",
+ "definition":"dreg_exact is first zero graded component of quotient by ORIGINAL highest forms. Unknowns omitted/null, never zero. No LFD or solving degree inferred.",
+ "retention":"All raw bytes in deterministic runs.tar.xz plus content-addressed S3 pointer; source and reports have separate retained hashes"
+}

@@ -1,0 +1,15 @@
+{
+  "action": "assert every key it reads exists in the records (index with [], not .get)",
+  "created": "2026-11-15T18:41:18Z",
+  "evidence": [
+    "research/ic_native_sweep_20261115/VALIDATION_REVIEW.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "research",
+    "validator"
+  ],
+  "trigger": "writing or checking an identity script that compares record fields",
+  "why": "a missing key compares None == None and the check passes silently; analyze.py read dbls/field_ops, which no record has"
+}

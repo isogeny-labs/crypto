@@ -1,0 +1,172 @@
+[
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.recover_annihilated_point",
+    "claim": "pcc/claims/PCC-20261116-39e216.json",
+    "normalized_statement": "theorem recover_annihilated_point {M : Type} [IntModule M] (d r u v : Int) (hbez : u*d+v*r=1) (x : M) (hr : r \u2022 x=0) : u \u2022 (d \u2022 x)=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.recover_annihilated_point",
+      "decl_sha256": "3a07c66c9e0799e1e19c7b9ed27407b32eb24ed14f780a76770429670aea02e1"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.trace3_add",
+    "claim": "pcc/claims/PCC-20261116-714116.json",
+    "normalized_statement": "theorem trace3_add {M : Type} [IntModule M] (F : M \u2192 M) (hadd : \u2200 x y, F (x+y)=F x+F y) (x y : M) : trace3 F (x+y)=trace3 F x+trace3 F y",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.trace3_add",
+      "decl_sha256": "74d0adbd326ab6c2162068188a967fb1066c19381ffb83212c40f1a977ae2271"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.trace3_smul",
+    "claim": "pcc/claims/PCC-20261116-1c2a2b.json",
+    "normalized_statement": "theorem trace3_smul {M : Type} [IntModule M] (F : M \u2192 M) (hlin : \u2200 (n : Int) x, F (n \u2022 x)=n \u2022 F x) (n : Int) (x : M) : trace3 F (n \u2022 x)=n \u2022 trace3 F x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.trace3_smul",
+      "decl_sha256": "ee317ecbda73e5243a8a9138c668b9131e5451e07d9d80f7a1bd5075e0ac6548"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.trace3_commutes",
+    "claim": "pcc/claims/PCC-20261116-a5bc36.json",
+    "normalized_statement": "theorem trace3_commutes {M : Type} [IntModule M] (F : M \u2192 M) (hcube : \u2200 x, F (F (F x))=x) (x : M) : trace3 F (F x)=trace3 F x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.trace3_commutes",
+      "decl_sha256": "ec284092f161311c1273a29f1030eae9f6ab73ef350e48c51c604ae14f0b29ef"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.trace3_fixed_image",
+    "claim": "pcc/claims/PCC-20261116-e53864.json",
+    "normalized_statement": "theorem trace3_fixed_image {M : Type} [IntModule M] (F : M \u2192 M) (hadd : \u2200 x y, F (x+y)=F x+F y) (hcube : \u2200 x, F (F (F x))=x) (x : M) : F (trace3 F x)=trace3 F x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.trace3_fixed_image",
+      "decl_sha256": "c1ae60d5f9ccae797d0f0b8479c455ad660837a576ce64454905d276c931b4e5"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.trace3_fixed_input",
+    "claim": "pcc/claims/PCC-20261116-396522.json",
+    "normalized_statement": "theorem trace3_fixed_input {M : Type} [IntModule M] (F : M \u2192 M) (x : M) (hx : F x=x) : trace3 F x=(3 : Int) \u2022 x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.trace3_fixed_input",
+      "decl_sha256": "82e2fb70104042b6fcbe8c64c616737a38270cb6896336dc92c52a9cb97d7fb7"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.normalized_fixed_input",
+    "claim": "pcc/claims/PCC-20261116-2bebef.json",
+    "normalized_statement": "theorem normalized_fixed_input {M : Type} [IntModule M] (F : M \u2192 M) (r u v : Int) (hbez : u*3+v*r=1) (x : M) (hr : r \u2022 x=0) (hx : F x=x) : normalized u F x=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.normalized_fixed_input",
+      "decl_sha256": "dc0912a73b4f2cc95b9baafcef53aed4ccfe0b37d648eed283d6669652792eb1"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.normalized_fixed_iff",
+    "claim": "pcc/claims/PCC-20261116-45c6bc.json",
+    "normalized_statement": "theorem normalized_fixed_iff {M : Type} [IntModule M] (F : M \u2192 M) (hadd : \u2200 x y, F (x+y)=F x+F y) (hlin : \u2200 (n : Int) x, F (n \u2022 x)=n \u2022 F x) (hcube : \u2200 x, F (F (F x))=x) (r u v : Int) (hbez : u*3+v*r=1) (x : M) (hr : r \u2022 x=0) : normalized u F x=x \u2194 F x=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.normalized_fixed_iff",
+      "decl_sha256": "0aac880d5ed9df405fda328147b40fd079ba6d0c4ab780b7ad2f8420b8e054c0"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.normalized_idempotent",
+    "claim": "pcc/claims/PCC-20261116-492961.json",
+    "normalized_statement": "theorem normalized_idempotent {M : Type} [IntModule M] (F : M \u2192 M) (hadd : \u2200 x y, F (x+y)=F x+F y) (hlin : \u2200 (n : Int) x, F (n \u2022 x)=n \u2022 F x) (hcube : \u2200 x, F (F (F x))=x) (r u v : Int) (hbez : u*3+v*r=1) (hr : \u2200 x : M, r \u2022 x=0) (x : M) : normalized u F (normalized u F x)=normalized u F x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.normalized_idempotent",
+      "decl_sha256": "eaa021ac61a2434ade4c3ee98b6b5a2de0a2a4ef78b21c5936ab90c533027186"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.trace_zero_complement",
+    "claim": "pcc/claims/PCC-20261116-288c9a.json",
+    "normalized_statement": "theorem trace_zero_complement {M : Type} [IntModule M] (F : M \u2192 M) (hadd : \u2200 x y, F (x+y)=F x+F y) (hlin : \u2200 (n : Int) x, F (n \u2022 x)=n \u2022 F x) (hcube : \u2200 x, F (F (F x))=x) (r u v : Int) (hbez : u*3+v*r=1) (hr : \u2200 x : M, r \u2022 x=0) (x : M) : trace3 F (x-normalized u F x)=0 \u2227 normalized u F x+(x-normalized u F x)=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.trace_zero_complement",
+      "decl_sha256": "7306e1d8eee7debd38655ba153b75c1f5275596b3d591f848855512a5c592b1c"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.faithful_stable_cyclic_forces_fixed",
+    "claim": "pcc/claims/PCC-20261116-5a3b3c.json",
+    "normalized_statement": "theorem faithful_stable_cyclic_forces_fixed {M : Type} [IntModule M] (F : M \u2192 M) (hlin : \u2200 (n : Int) x, F (n \u2022 x)=n \u2022 F x) (hcube : \u2200 x, F (F (F x))=x) (P : M) (lam : Int) (heigen : F P=lam \u2022 P) (faithful : \u2200 a b : Int, a \u2022 trace3 F P=b \u2022 trace3 F P \u2192 a \u2022 P=b \u2022 P) : F P=P",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.faithful_stable_cyclic_forces_fixed",
+      "decl_sha256": "713e4580dce46b3bae78f1f64e5a314052ef2f4b1dffdb6c38a8f7e3158e2a0b"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.fixed_target_eigenline_zero",
+    "claim": "pcc/claims/PCC-20261116-1e0c33.json",
+    "normalized_statement": "theorem fixed_target_eigenline_zero {M T : Type} [IntModule M] [IntModule T] (F : M \u2192 M) (f : M \u2192 T) (flin : \u2200 (n : Int) x, f (n \u2022 x)=n \u2022 f x) (fixed_target : \u2200 x, f (F x)=f x) (P : M) (r lam u v : Int) (hr : r \u2022 P=0) (heigen : F P=lam \u2022 P) (hbez : u*(lam-1)+v*r=1) : f P=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.fixed_target_eigenline_zero",
+      "decl_sha256": "ef46871ff0027813b03b00c12c6bb1a6e325ed45c2c8e03a14d8960b7bc2c76b"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.trace_eigenline_zero",
+    "claim": "pcc/claims/PCC-20261116-c6bc51.json",
+    "normalized_statement": "theorem trace_eigenline_zero {M : Type} [IntModule M] (F : M \u2192 M) (hlin : \u2200 (n : Int) x, F (n \u2022 x)=n \u2022 F x) (hcube : \u2200 x, F (F (F x))=x) (P : M) (r lam u v : Int) (hr : r \u2022 P=0) (heigen : F P=lam \u2022 P) (hbez : u*(lam-1)+v*r=1) : trace3 F P=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.trace_eigenline_zero",
+      "decl_sha256": "d5d197fef6ff8ad66cdcdd9244f3626df480b8e91ceaed932d7b2fc88a478020"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.composition_covariance",
+    "claim": "pcc/claims/PCC-20261116-817c13.json",
+    "normalized_statement": "theorem composition_covariance {A B C : Type} (s : A \u2192 A) (t : B \u2192 B) (w : C \u2192 C) (f : A \u2192 B) (g : B \u2192 C) (hf : \u2200 x, f (s x)=t (f x)) (hg : \u2200 y, g (t y)=w (g y)) : \u2200 x, g (f (s x))=w (g (f x))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.composition_covariance",
+      "decl_sha256": "5c888954c792e60743f3354f19e121dc9d13a0d813d4967c2e1073df24bee614"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.nonfixed_scalar_control",
+    "claim": "pcc/claims/PCC-20261116-3158e3.json",
+    "normalized_statement": "theorem nonfixed_scalar_control : \u2200 x : Fin 109, 45*(45*(45*x))=x \u2227 x+45*x+45*(45*x)=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.nonfixed_scalar_control",
+      "decl_sha256": "8a199f41939d08e7c54d3bc1daefefc1b3ebdc46809ec8d89ccca3b7f42842a3"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.fixed_scalar_control",
+    "claim": "pcc/claims/PCC-20261116-37cf8e.json",
+    "normalized_statement": "theorem fixed_scalar_control : \u2200 x : Fin 109, 73*(x+x+x)=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.fixed_scalar_control",
+      "decl_sha256": "7c0f32760cbe4f6355196bd834bfd3b7aa960d00622bed643f211f004d2bec98"
+    }
+  },
+  {
+    "theorem": "CubicFrobeniusTraceDescent05.characteristic_three_exception_control",
+    "claim": "pcc/claims/PCC-20261116-77faf8.json",
+    "normalized_statement": "theorem characteristic_three_exception_control : (3 : Fin 3)=0 \u2227 \u00ac \u2203 u : Fin 3, u*3=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-descent-final-04/CubicFrobeniusTraceDescent05.lean",
+      "theorem": "CubicFrobeniusTraceDescent05.characteristic_three_exception_control",
+      "decl_sha256": "bb66e1c253a7979255a17933fb223cc27c637f42c27541f34f774f5507ea75d8"
+    }
+  }
+]

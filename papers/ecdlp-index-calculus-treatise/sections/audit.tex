@@ -1,12 +1,14 @@
 \chapter{Corrections and validation}\label{ch:audit}
 
-A ratchet is worth only as much as its pawl. Several recorded results were
+Several recorded results were
 corrected once the reference was matched, native work was priced, or the
 evidence was replayed. Each correction is recorded in the source with a
 dated note; frozen evidence is never rewritten. Figure~\ref{fig:audit}
-shows the before and after values. Every correction moved IC's position
-against rho \emph{down}, and several moved it from apparently ahead of rho
-to behind it.
+shows the before and after values. Most corrections below moved
+IC's position against rho \emph{down}, and several moved it from
+apparently ahead of rho to behind it. Appendix~\ref{ch:corrections}
+records two that moved it up: the byte-counter pricing rule and the
+matched-rho re-measurement of the Joux--Vitse sieve.
 
 \begin{figure}[t]
 \centering
@@ -105,6 +107,37 @@ last two are rho studies, neither yet in a campaign arm.}
 \label{tab:audit-rho}
 \end{table}
 
+\paragraph{3a. The matched reference re-priced every Table~B row.}
+Through \S17 of the boundary ledger every prime and random-binary row was
+divided by a frozen plain walk (16 jumps, two scalar multiplications per
+walk start, distinguished points every $\sqrt r/8$). The matched
+negation-map walk of 23 September replaced it, and the frozen walk was
+replayed exactly on all 616 recorded runs of the ten re-priced reports
+(\art{research/ic_rho_reference_20260923/README.md}).
+Table~\ref{tab:fr-reprice} gives every row of the three round-5 reports.
+\begin{itemize}
+\item Ladder: best IC over rho $0.84$--$15.96$ before, $5.47$--$38.21$
+  after. The one row below its rho, $0.84$ at 12 bits, reads $5.47$.
+\item Headline: $4.19$ and $21.38$ before, $13.08$ and $45.29$ after.
+\item Holdout: $4.74$--$16.79$ before, $12.67$--$37.07$ after.
+\end{itemize}
+The index-calculus $S$ is the same in both columns; only the reference
+changed.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-fr-reprice}
+\caption[]{Round-5 boundary reports re-priced against the matched rho. $S$
+in GAE per $\sqrt r$; $S_{\rm IC}$: best of nine recipes; frozen $S_\rho$:
+the plain walk used through \S17; matched $S_\rho$: the negation-map walk.
+The ladder rows are leaderboard Table~B
+(Table~\ref{tab:fr-boardB}). Source:
+\art{research/ic_rho_reference_20260923/analysis.json}
+(\texttt{tables.boundary}). Data: \art{figures/data-fr-leaderboard.json}.}
+\label{tab:fr-reprice}
+\end{table}
+
 \paragraph{4. A replay regression, and its root cause.} The root-finder
 ecbench session was recorded with a replay certificate of 120 of 168
 identical records; the 48 mismatches were all in inherited F4's word-XOR
@@ -143,7 +176,10 @@ within the run it is $305.8\to94.4$ (Chapter~\ref{sec:koblitz}).
   \art{research/ghs_cubic_quartic_ic_20261012/quartic_ic.rs} that merges
   distinct classes (reported in an open pull request). Recoveries are still
   checked against the planted scalar, but relation counts and $S$ are
-  unverified.
+  unverified. Canonical $\mathrm{Pic}^0$ keys later fixed the merge
+  (\art{research/quartic_pic_canonical_20261018/}). The N4 and N4~v2
+  measurements of Chapter~\ref{ch:distance} use the fixed code; the
+  withdrawn values are the earlier toys only.
 \item \emph{Volcano census crater.} A claim that IC is 22--25\% cheaper on
   the volcano crater was withdrawn, because the crater's rho reference
   should have been the cubic-automorphism rho. Against it, IC is
@@ -189,7 +225,7 @@ A & Koblitz descent, one target & 6 & validated at baseline v7 & as-built, same 
 \addlinespace
 C & 32-target batch & 9 & pre-gate & none matched, no band & \\
 \addlinespace
---- & components outside A--C & 2 & validated & & \\
+--- & components outside A--C & (2) & validated & & \\
 \bottomrule
 \end{tabular}
 \caption[]{Validation status of the leaderboard on 29 October. Table~B
@@ -200,15 +236,140 @@ numbers recompute to relative $10^{-9}$; index calculus stays above rho at
 every band weight. Table~A (64 targets per size) validated at baseline v7
 (\art{research/ic_tool_program/rule/v7/}); the sweep flags the reference as
 only partly adequate, and the rule~v8 row is from
-Chapter~\ref{ch:distance}. Table~C's replays and recomputations pass, but
-no matched rho with a band exists for them. The two components are the
-prime-field base-size tuning and the post-Gröbner linear stage
+Chapter~\ref{ch:distance} (rule v8 also carries a \texttt{VALIDATION.json},
+\art{research/ic_tool_program/rule/v8/VALIDATION.json}; the board has not
+been regenerated on it). Table~C's replays and recomputations pass, but
+no matched rho with a band exists for them. The component row is not
+counted in the 28 rows; it names two of several validated components
+(\art{docs/ic/leaderboard.json} has more, among them the generator-orbit
+and aimed-gather components): the prime-field base-size tuning and the post-Gröbner linear stage
 (\art{research/prime_base_oracle_tuning_20261029/VALIDATION.json},
 \art{research/postgb_linear_stage_20261026/validation/VALIDATION.json}).}
 \label{tab:audit-validation}
 \end{table}
 Validation says the numbers are what the archive says, and that the
-reference is fair. \textbf{No validated row is below its reference.}
+reference is fair. \textbf{No validated leaderboard row is below its
+reference.} Two validated measurements outside Tables~A--C are
+below a matched rho, both on restricted weak families. The first is the
+Joux--Vitse sieve route on the \texttt{jv\_cover} weak class
+($0.0065\times$, $p=1511$, \texttt{VAL-20261103-c31c76};
+\S\ref{sec:jac-jv}); it is not a leaderboard row, never has prime order,
+and has no pcc claim. The second, validated on 14 November, is the
+double-large-prime plane-quartic arm on the GHS-weak family
+$E_0/\FF_{q^3}$ with $\#E_0(K)=4\ell$: $0.0027$, $0.0025$ and $0.0018$ of
+negation-map rho at $k=22$ across the band
+(\art{research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json}).
+The 19 validated board rows each
+have a pcc measurement claim, of standing unverified.
+
+\paragraph{Validator dispositions, 12--15 November.}
+Table~\ref{tab:audit-nov} lists the validator passes and gate files that
+landed on \texttt{origin/main} after 12 November, 19:20Z. On 15 November
+the board's counts are unchanged: 19 rows validated and 9 unvalidated
+(pre-gate) (\art{docs/ic/leaderboard.json},
+\texttt{validation\_gate.status\_counts}). Table~A now carries rule v9,
+admitted with caveats, at $4.08$--$11.1\times$ a matched rho
+(\S\ref{sec:tablea}). Every disposition below is a validator pass without a
+keyring signature, so its pcc standing is unverified.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.26\linewidth}>{\raggedright}p{0.2\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Target & Disposition & What decided it \\
+\midrule
+Chained transfers v3, \texttt{tower\_large}, \texttt{cover\_pushforward} & not admitted & data reproduce; the rho reference is plain ($A=1$) where negation is available, and rho's native work is not emitted \\
+\texttt{small\_de\_endo\_fb} & admitted with caveats & IC above the best matched rho in 120 of 120 arm-cells at 0, 0.1 and 1 GAE (minimum $2.325$, $7.616$, $40.156$) \\
+Negation re-measurement of the three transfers & validated (second pass) & 0 of 162 rows below rho, 156 above, 6 unresolved lower bounds; first pass failed only on commit binding \\
+Joux--Vitse Nagao--Hilbert & not validated & no independent certificate for 8 of 9 cover solves and 252 rho solves; cover native count a lower bound \\
+FES then batched & gate evidence, no row & $0.739$--$0.889\times$ inherited F4, $35.24$--$3012.56\times$ matched rho; order against inherited F4 unresolved across the band \\
+FES at $n=13$, Koblitz descent & gate evidence & FES below inherited F4 across the band not supported; no wall figure admissible \\
+GHS-weak $c_D=1.7$ with square-root chain & validated & DL against the frozen DL $0.681$--$0.737$ at $w=0$; against negation-map rho at $k=22$: $0.0027$, $0.0025$, $0.0018$ \\
+GHS-weak relation stage, open-addressing tables & validated & identical counted work; relation-stage CPU $0.463$--$0.545$ of v3, whole process $0.90$--$0.96$ \\
+K1 pair-table base sized for $n$ & validated & \texttt{VAL-20261114-d9190c}: $1.32$ and $0.89$ bits over dimension 7 at $w=0$; rho cheaper at every weight (\S\ref{sec:tablea}) \\
+Whole-Jacobian IC against negation rho & admitted with caveats & 2{,}057 values recompute, 0 mismatches; eight reporting errors corrected in \texttt{ERRATA.md}; result unresolved by the frozen slope rule \\
+ecbench $w_{\mathrm{cal}}$ wiring & admitted with caveats (tooling) & 21 of 23 outputs byte-identical before and after; five findings, among them a pre-existing procedure-1 verdict that no longer re-derives \\
+Wall-only fixes, merge against first parent & validated (engineering) & counted results unchanged in 18 of 18 pairs \\
+$j=2$ percolation factor-base size & insufficient evidence & --- \\
+\bottomrule
+\end{tabularx}
+\caption[]{Validator dispositions on \texttt{origin/main} between 12
+November, 19:20Z, and 15 November. Sources:
+\art{research/validation_20261112/REPORT.md},
+\art{research/validation_20261113/REPORT.md},
+\art{research/validation_20261114/REPORT.md} and the
+\texttt{VALIDATION.json} files of
+\art{research/jv_nagao_hilbert_20261112/validation/},
+\art{research/fes_then_batched_20261112/},
+\art{research/fes_k13_validated_20261112/runpod-a1/},
+\art{research/quartic_dl1_cd_sqrt_20261113/combo/validation/},
+\art{research/ic_gw_fasthash_20261114/validation/},
+\art{research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/},
+\art{benchmarks/20261114-wallfix-runpod-abab/} and
+\art{research/leads_followup_20261114/item03_j2_validation/}; the FES
+then batched and GHS-weak figures as \art{docs/ic/LEADERBOARD.md} states
+them.}
+\label{tab:audit-nov}
+\end{table}
+
+None of the binary or Koblitz work of the same days carries a validation
+file beyond the K1 rows and the two FES gate files: the 14 November
+ECC2K-130 sweep (\S\ref{sec:bt-open7}), the $n=83$ solver gates
+(\S\ref{sec:n83l-gates}) and the Table~A set-up records
+(Table~\ref{tab:prog_koblitz-setupab}) are producer-reported and
+\texttt{[pcc:unverified]}. The separate-host replay of the S3 arithmetic
+(two languages, a fixed six-field known-answer population) is frozen and
+prepared as a workflow on \texttt{main}, and no hosted run has occurred
+(\art{research/s3_host_replay_20261113/README.md}).
+
+\paragraph{A misread ratio on the board.} The leaderboard's 14 November
+reconciliation printed the filter-layout A/B ratios $1.104$ and $1.142$ as
+``Top/Low build'' and concluded that the \texttt{Top} layout builds more
+slowly. The source defines its ratios as old (\texttt{Low}) over new
+(\texttt{Top}), and its sort-and-fill step falls from $10.69$ to $7.86$\,ns
+per stored pair, so \texttt{Top} builds faster
+(\art{research/ic_tool_program/explorations/filter-layout-20261113/README.md}).
+No row or ranking depends on the sentence. The generator and the board were
+corrected on 15 November (PR~\#4262): the column now reads Low/Top build time.
+
+
+\paragraph{The benchmarks table.} \art{benchmarks/README.md} on
+\texttt{origin/main} (\texttt{05f7382689}) admits 145 rows
+(Table~\ref{tab:fr-benchcount}). Twenty link a \texttt{VALIDATION.json} in
+the row; 112 are listed in \art{benchmarks/PRE_GATE.json} and render as
+unvalidated (pre-gate); 13 do neither. Fifteen of the twenty measure an
+index-calculus pipeline or one of its stages, and Table~\ref{tab:fr-bench}
+gives the distance to rho each of them states. Thirteen state IC above rho in
+every cell and at every weight they report. The genus-3 linear-algebra row is below rho at
+$w=0$ ($0.38\times$) and above it at $w=0.1$ and~1, so unresolved across
+the band. The Joux--Vitse Hilbert-stop row states only a slope of $S$ over
+rho ($-2.27$) and a lower bound on IC.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fr-benchcount}
+\caption[]{Rows of the admitted benchmarks table by date and gate
+standing. ``Linked'': the row links its \texttt{VALIDATION.json};
+pre-gate: the row's slug is in \art{benchmarks/PRE_GATE.json}; neither:
+admitted under the 24 October gate audit without a file linked in the row.
+Counted by \art{figures/make_tab_fr.py}. Data:
+\art{figures/data-fr-bench.json}.}
+\label{tab:fr-benchcount}
+\end{table}
+
+\begin{table}[t]
+\centering\scriptsize
+\input{figures/tab-fr-bench}
+\caption[]{The 15 admitted benchmark rows with a linked
+\texttt{VALIDATION.json} that measure an index-calculus pipeline or stage,
+with the distance to rho as each row's headline states it (excerpts; every
+number checked against the row by \art{figures/make_tab_fr.py}). The other
+five linked rows are a strong-rho engineering round and four studies of
+generic walks and pencil models priced against rho. Several rows state
+their validation ``with caveats'' (same-host replay, one session). Source: \art{benchmarks/README.md}. Data:
+\art{figures/data-fr-bench.json}.}
+\label{tab:fr-bench}
+\end{table}
 
 The theory of Part~\ref{part:theory} has a different standard of evidence:
 \begin{itemize}

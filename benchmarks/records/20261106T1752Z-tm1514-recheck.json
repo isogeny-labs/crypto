@@ -1,0 +1,51 @@
+{
+  "branch": "claude/tm1514-recheck-20261106",
+  "closed_utc": "2026-11-10T17:52:02+00:00",
+  "commands": [
+    {
+      "argv": [
+        "workflow_dispatch",
+        "isolab-experiment.yml",
+        "ref=main",
+        "source_revision=0f8c37661badb982fb07eb1339766f16a3820e9a",
+        "spec_path=research/tm1514_recheck_20261106/spec-tm1514.json",
+        "instance_type=c8a.2xlarge",
+        "seconds=3600",
+        "resumable=false"
+      ],
+      "cwd": ".",
+      "exit": 23,
+      "note": "Not run under benchrec.py run: the main session dispatched the workflow (GitHub run 42269476702, job gh-42269476702-1). Reconstructed from docs/session-logs/2026-11-06.md (18:20 and 19:05 UTC entries): dispatch 18:18:21Z, 'Launch, await and verify' ended 18:39:00Z with isolab.eks.result/v1 state failed, exit_code 23, no pod, no results URI.",
+      "started_utc": "2026-11-06T18:18:21+00:00",
+      "wall_s": 1239.0
+    }
+  ],
+  "commit": "363306c646953dbbe97fd6d611e10417f5c4dc59",
+  "commit_dirty": true,
+  "created_utc": "2026-11-06T17:52:52+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v242-x86_64-with-glibc2.39"
+  },
+  "id": "20261106T1752Z-tm1514-recheck",
+  "metrics": [],
+  "problem": "ic:curve25519-family-k24",
+  "raw": [],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "tm1514-recheck",
+  "status": "invalid",
+  "summary": "EKS replicate A (GitHub run 42269476702) failed the L2 1 ms floor (inferred), exit 23, no pod and no results; dry run per AMENDMENT-1, records never read; superseded by local replicates A3/B3 (record 20261110T1729Z-tm1514-recheck-a3b3)",
+  "validation": null
+}

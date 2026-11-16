@@ -1,0 +1,10 @@
+ledger 0
+prose 1
+Traceback (most recent call last):
+  File "/workspace/scratch/ct104_checkpoint_root_source_character_result_01.py", line 17, in <module>
+    run('ledger',['python3','tools/pcc/pcc.py','ledger','verify','--base',base]);run('prose',['python3','tools/pcc/pcc.py','lint-prose',*[p.decode()for p in paths()if p.endswith(b'.md')]])
+                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/ct104_checkpoint_root_source_character_result_01.py", line 13, in run
+    q=subprocess.run(cmd,cwd=r,capture_output=True);b=q.stdout+q.stderr;(g/(name+'.txt.xz'if len(b)>60000 else name+'.txt')).write_bytes(lzma.compress(b)if len(b)>60000 else b);(g/(name+'.exit')).write_text(str(q.returncode)+'\n');print(name,q.returncode,flush=True);assert q.returncode==0,b[:1000]
+                                                                                                                                                                                                                                                                                  ^^^^^^^^^^^^^^^
+AssertionError: b"problems/README.md: line 160: 'solved' with no [pcc:ID] citation and no [pcc:unverified] tag\nproblems/README.md: line 171: 'proved' with no [pcc:ID] citation and no [pcc:unverified] tag\nlint-prose: 2 finding(s)\n"

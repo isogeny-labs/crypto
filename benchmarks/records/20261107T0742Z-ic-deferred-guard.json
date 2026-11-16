@@ -1,0 +1,72 @@
+{
+  "branch": "aburan28/wizardly-einstein-i9seky",
+  "closed_utc": "2026-11-07T07:45:05+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_ic_deferred_guard_20261107/specs/P20.json",
+        "--out",
+        "research/ecbench_ic_deferred_guard_20261107/sessions/P20",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T07:42:33+00:00",
+      "wall_s": 6.563
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_ic_deferred_guard_20261107/specs/P24.json",
+        "--out",
+        "research/ecbench_ic_deferred_guard_20261107/sessions/P24",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T07:42:39+00:00",
+      "wall_s": 81.108
+    }
+  ],
+  "commit": "a1d62ef6ed93ea0f3e5b6dda224d7f1c7455bdfe",
+  "commit_dirty": false,
+  "created_utc": "2026-11-07T07:42:28+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261107-ic-deferred-guard"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T0742Z-ic-deferred-guard",
+  "metrics": [],
+  "problem": "ecdlp:prime-ladder-20-28",
+  "raw": [],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-deferred-guard",
+  "status": "censored",
+  "summary": "Withdrawn before analysis: duplicated the frozen, approval-pending C1 protocol research/ic_c1_deferred_guard_fp28_20261106 (deferred guard with a smaller fixed N against walk at the tuned N). Stopped mid-run; no data analysed or committed; a 12-target local smoke run before the prior-art check is not reported as a result.",
+  "validation": null
+}

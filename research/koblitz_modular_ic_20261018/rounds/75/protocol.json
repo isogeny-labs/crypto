@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R75-FINITE-UNIFORMIZER-CLASSES",
+  "version":1,
+  "goal":"find and certify valuation-one uniformizer classes at all six ramified finite branches and base-prime uniformizers at six unramified branches",
+  "claims":[{"id":"finite_uniformizers75","class":"exact_computation","statement":"Complete 32-source-basis searches at all six ramified branches yield exact nilpotency index e, and all unramified branches use the base prime"}],
+  "arms":{"reference":"R72/R74 primitive idempotents and local ranks, R52 full multiplication table","candidate":"full 32-projected-basis search per ramified branch using y^q-y and exact multiplication nilpotency","positive":["all saved primitive operators rechecked","all 32 candidates per ramified branch","all candidate e-th powers zero","successful (e-1)-st power nonzero","all unramified ranks equal residue degree","both complete rational and degree-five programs"],"negative":[],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"complete deterministic finite fibers"}},
+  "variables":{"fixed":["all twelve finite branches","all six ramified 32-element candidate cohorts","full 528-product table","1200sec/4GiB per program","one Singular/FLINT thread","one math job at a time"],"measured":["successful candidate counts","first uniformizer columns","nilpotency indices","exit/errors/UTC/hashes"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"complete source basis in canonical order","seeds":[75]},
+  "blinding":{"method":"none","reason":"exact algebra"},
+  "sample_size":{"instances":6,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["six ramified full 32-candidate counts","six chosen nilpotency indices","six unramified base-prime controls"],
+  "execution":{"launchers":["REPLAY_CAS.sh rational-uniform75-01 RATIONAL_UNIFORM75.sing RATIONAL_UNIFORM75_ALL_CHECKS_PASS","REPLAY_CAS.sh five-uniform75-01 FIVE_UNIFORM75.sing FIVE_UNIFORM75_ALL_CHECKS_PASS"],"backend":"original manually authorized local Singular","timeout_seconds_per_program":1200,"virtual_KiB":4194304,"threads":1,"seed":75,"CPU_affinity":"not pinned","queue":"one math job at a time; R74 terminal and published","source_gate":"copied source/protocol/driver bytes match Git; all donor hashes","checkpoint":"existing checkpoint gate; immutable raw copies"},
+  "stopping":{"accept":"both programs exit0/exact marker/no whitespace-question-mark errors and every assertion","failure":"retain raw attempt; freeze repair before fresh ID"},
+  "analysis":{"method":"complete projected-basis candidate enumeration and exact nilpotency-index test","scope":"uniformizer classes modulo finite base primes; no global lifts, valuations or infinity"}
+}

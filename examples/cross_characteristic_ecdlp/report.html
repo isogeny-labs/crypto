@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>A cross-characteristic subgroup transfer</title>
+<style>
+@page { size: A4; margin: 17mm; }
+body { font: 11pt/1.45 "DejaVu Sans",sans-serif; color: #17332d; max-width: 175mm; margin: auto; }
+h1 { font-size: 24pt; line-height: 1.15; margin-bottom: 5mm; } h2 { font-size: 14pt; margin-bottom: 2mm; }
+p { margin: 2.5mm 0; } img { width:100%; margin:4mm 0; } code { font-size: 9pt; }
+.meta { font-size:9pt; color:#52675f; } a { color:#286357; } .result { padding:4mm; background:#eef5f1; border-left:3px solid #286357; }
+</style>
+<body>
+<p class="meta">Lean example · 15 November 2026 · source-linked formal report</p>
+<h1>A cross-characteristic<br>subgroup transfer</h1>
+<p>The curve <b>y² = x³ + 1</b> over the prime fields of characteristics 5 and 7
+has the chosen points P = (0,1) and R = (0,1), respectively. The Lean module
+checks their nonsingularity, doubling equations and order 3. [pcc:unverified]</p>
+<img src="transfer.png" alt="The complete three-row transfer table between the order-three subgroups">
+<p class="result"><b>Scalar endpoint.</b> For every integer k, the target equation
+S = [k]R holds exactly when the source equation Q = [k]P holds; both read
+2 ≡ k (mod 3). The subgroup table is exhaustive. [pcc:unverified]</p>
+<h2>How the example inherits its proof</h2>
+<p>Mathlib supplies the affine-point abelian group. Its
+<code>addEquivOfAddOrderOfEq</code> constructs the subgroup isomorphism from
+the equal-order generator obligations. The existing scalar law and
+injectivity supply preservation and reflection of the scalar equation.
+No generic group law is reimplemented.</p>
+<h2>Scope and reproducibility</h2>
+<p>The transfer is an abstract subgroup isomorphism, defined using classical
+choice of scalar representatives. It is not a morphism between the base fields
+or an algebraic isogeny, and this definition supplies no general efficient
+evaluator. The example includes the obstruction to a unital field map from
+characteristic 5 to characteristic 7. [pcc:unverified]</p>
+<p>Use Lean 4.24.0 and the dependency revisions in <code>lake-manifest.json</code>.
+Run <code>lake build</code> and <code>lake env lean AxiomAudit.lean</code>.
+The repository gate and its raw build/audit receipts are included in the
+example directory. The proof map lists each obligation and inherited law.</p>
+<p class="meta">Sources:
+<a href="https://github.com/isogeny-labs/crypto/blob/codex/cross-characteristic-lean-example/examples/cross_characteristic_ecdlp/CrossCharacteristicExample.lean">Lean module</a> ·
+<a href="https://github.com/isogeny-labs/crypto/blob/codex/cross-characteristic-lean-example/examples/cross_characteristic_ecdlp/PROOF-MAP.md">proof map</a> ·
+<a href="https://github.com/leanprover-community/mathlib4/blob/v4.24.0/Mathlib/GroupTheory/SpecificGroups/Cyclic.lean">Mathlib cyclic-group construction</a>.
+No numerical performance experiment or benchmark is reported.</p>
+</body></html>
