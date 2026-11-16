@@ -189,7 +189,10 @@ fn panel(ar: &mut Arithmetic, base: &[(u64, u64)], label: &str) -> Value {
     for i in 0..8 { naive[i] = evaluation_row(repeated[i]).unwrap(); }
     // If wrong target happens to be infinity, use another nonzero offset.
     let wrong_target = if wrong_target.is_none() {
-        ar.add(PRIME31, repeated_sum, ar.add(PRIME31, Some(PRIME31.g), Some(PRIME31.g)))
+        {
+            let double_g = ar.add(PRIME31, Some(PRIME31.g), Some(PRIME31.g));
+            ar.add(PRIME31, repeated_sum, double_g)
+        }
     } else { wrong_target };
     naive[8] = evaluation_row(neg(wrong_target)).unwrap();
     let false_zero = determinant(naive);
@@ -237,7 +240,7 @@ mod tests {
         assert_eq!(fp_add(P - 1, 1), 0);
         assert_eq!(fp_sub(0, 1), P - 1);
         assert_eq!(fp_mul(P - 1, P - 1), 1);
-        assert_eq!(fp_pow(7, P - 2), 306_783_378); // checked against Fermat inverse
+        assert_eq!(fp_pow(7, P - 2), 1_840_700_269); // checked against Fermat inverse
         let mut a = [[0u64; 9]; 9];
         for i in 0..9 { a[i][i] = 1; }
         assert_eq!(determinant(a), 1);
