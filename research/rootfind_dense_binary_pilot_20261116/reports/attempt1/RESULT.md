@@ -5,7 +5,7 @@ scientific state transition. Session `ECBS1h3cf526729f36` used the frozen
 fresh-target spec `ECS1hb376719703c9` on the registered Koblitz E0
 `F_(2^13)` curve, subgroup order 2003, eight public targets, four measured
 rounds, one warmup and five arms. It wrote 200/200 records and 200/200 exact
-verified answers. The [replay receipt](../../audits/replay-all.json) reports
+verified answers [pcc:unverified]. The [replay receipt](../../audits/replay-all.json) reports
 160/160 measured deterministic replays identical, with zero audit problems.
 There were no failed or timed-out executions.
 

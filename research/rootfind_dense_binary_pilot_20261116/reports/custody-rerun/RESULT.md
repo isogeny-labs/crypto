@@ -8,7 +8,8 @@ these two epochs use the same targets and are not independent holdouts.
 The unchanged frozen spec `ECS1hb376719703c9` used eight fresh public targets
 of registered Koblitz E0 over `F_(2^13)`, subgroup order 2003, five arms,
 four measured rounds and one warmup. Session `ECBS1h08f6d5475be8` wrote
-200/200 records, with 200 verified answers, no failures or timeouts. The
+200/200 records, with 200 verified answers, no failures or timeouts
+[pcc:unverified]. The
 [audit receipt](../../audits/custody-rerun/replay-all.json) reproduced all
 160 measured deterministic executions with zero problems. All 200 work rows
 exist, and each arm has 32/32 completely priced measured rows in `bitop/v1`.
@@ -41,13 +42,18 @@ The [graph](paired-ratios.svg) displays the eight target-cluster ratios;
 [analysis.json](analysis.json) carries the exact input digests and arithmetic.
 The first epoch's corresponding batch/F6 ratio was 0.1942 but remains
 custody-invalid and is not pooled with this repeat.
+The local ratio has machine-readable measurement record
+`pcc/claims/PCC-20261116-007049.json`; its PCC standing is `not_covered`
+because the producer-authored [recompute](pcc-recompute-wrapper.json) and
+[replay](pcc-replay-wrapper.json) wrappers are unsigned. Their input hashes
+and arithmetic are inspectable, but no independent PCC verification follows.
 
 The F6 relation phase has a 31 ms median, compared with 0.11 ms for batch
 rootfinding, while process startup dominates the batch's cold wall. Those
 phase figures are per-arm medians, not a paired stage ratio. The observed
 batch-versus-scalar cold difference is smaller than the A/A spread; there is
 no local evidence here that the added batching improves the complete solve
-over scalar rootfinding. Dense pair-table work is therefore not prioritized
+over scalar rootfinding [pcc:unverified]. Dense pair-table work is therefore not prioritized
 by this diagnostic. The frozen same-host L2 panel still needs matrix F4, F5,
 inherited F4, F6-IC, A/A and rho on its own targets, plus independent replay,
 before the user's requested full comparison is established.
