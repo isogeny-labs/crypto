@@ -1,0 +1,16 @@
+# Sufficient global norm-chart coverage theorem for binary five-source chains
+
+Let E/K be Y^2+XY=X^3+AX^2+B over K=GF(2^n), B!=0. Let V include0 and let Q be a K-rational point with x(Q)=z outsideV. Write beta=sqrtB and P0=(0,beta). Assume:
+(1) beta/z is outsideV;
+(2) no three nonzero V-coordinates satisfy S3(a,b,c)=0;
+(3) no three nonzero V-coordinates satisfy S3(a,b,beta/c)=0;
+(4) no two nonrational-lift V-coordinates have product beta.
+Then every finite original five-source S3-chain root overK has its source multiset represented by a monic K-function F+YG, F=X^3+rX^2+sX+t,G=hX+k, vanishing atQ, whose norm divided byX+z is the monic source quintic. Converse reconstruction uses exact finite original-chain lifting and filtering; it need not accept every ordering of a norm multiset.
+
+Proof. The defining S3 property over the algebraic closure and sign choices aligned along each finite intermediate point give source points P1..P5 and targetQ summing toO. For x inK, a point is either K-rational or exchanged with its negative by Frobenius; x0 is rationalP0. Apply Frobenius to the relation and subtract: twice the sumU of nonrational sources isO. Since P=-P implies x0 orO in this model, U belongs{O,P0}. One ghost cannot do so. Three ghosts are excluded by(2),(3), using x(P+P0)=beta/x(P). Four ghosts leave one rational source whose x must be z orbeta/z, contradicting target bounds. Five ghosts makeQ two-torsion, contradicting z outsideV. Thus there are zero or two ghosts. A ghost pair summing toP0 would have x-product beta, excluded by(4); a pair summing toO is an opposite/conjugate pair. The effective divisor Q+sumPi is therefore Frobenius-stable, degree6, and has group sumO.
+
+The standard elliptic divisor criterion gives a principal divisor D-6O. Descent of its one-dimensional function space gives a K-function. Since all six zeros are finite, its pole order is exactly6; the basis1,X,Y,X^2,XY,X^3 ofL(6O) permits normalization of its X^3 coefficient to1. This proves the stated form, with multiplicities retained. Conjugation Y->Y+X gives norm F^2+XFG+(X^3+AX^2+B)G^2. At a nonzero x, unramified local valuations count each chosen point; atP0, x has valuation2 and norm has the same x-factor multiplicity as the zero order atP0. Thus the norm is exactly (X+z) times the source quintic, including repeated and zero coordinates.
+
+This theorem gives global representation coverage under its explicit assumptions, not a completed global h/k search or a time bound. Dropping any torsion/ghost condition is not justified. All K-functions in this family are enumerated only if the outer h/k search is complete; current conditional solvers do not do that.
+
+For low-polynomialV_d with4(d-1)<n, condition(2) follows if degB>4(d-1). For B1, a zero would force pairwise-coprime source polynomials (reduce modulo any common irreducible divisor), then abc is a square; each source is a square and Frobenius descent reaches the impossible constant triple1,1,1. Condition(3) is certified by D^2+betaD+BS^2=0 with degD<=3(d-1),degS<=d-1, plus a zero kernel or a separately checked factor/sum exclusion. Condition(4) follows from degbeta>2(d-1) when2(d-1)<n; for beta1, low-polynomial products1 force both coordinates1, which has rational lifts whenTr(A)=0. These are sufficient guards, not universal curve claims.

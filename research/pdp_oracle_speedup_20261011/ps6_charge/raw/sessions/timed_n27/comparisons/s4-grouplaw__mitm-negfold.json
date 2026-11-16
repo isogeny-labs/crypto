@@ -1,0 +1,143 @@
+{
+  "schema": "ecbench.comparison/v1",
+  "comparison_id": "ECC1ha7a7b309da00",
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1h08dbafdea64f",
+    "arm": "s4-grouplaw",
+    "method_id": "ECM1h6e37994e0cee",
+    "method": "ic.pipeline",
+    "measured": 20,
+    "verified": 20,
+    "statuses": {
+      "verified": 20
+    },
+    "mean_s": 23.570245841845193,
+    "mean_ratio_to_floor": 26.596174371257746,
+    "lower_bound": true,
+    "deterministic": true
+  },
+  "b": {
+    "session_id": "ECBS1h08dbafdea64f",
+    "arm": "mitm-negfold",
+    "method_id": "ECM1hc3ee70078d2a",
+    "method": "ic.pipeline",
+    "measured": 20,
+    "verified": 20,
+    "statuses": {
+      "verified": 20
+    },
+    "mean_s": 175.11598160269864,
+    "mean_ratio_to_floor": 197.5972254659662,
+    "lower_bound": false,
+    "deterministic": true
+  },
+  "workloads": [
+    {
+      "workload_id": "W0490fa4e6d3e",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 21.66191418071823,
+      "b_mean_s": 175.86295327432512,
+      "ratio_b_over_a": 8.118532453187576
+    },
+    {
+      "workload_id": "W20922f9b1b7d",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 28.007980546901035,
+      "b_mean_s": 160.90492827992858,
+      "ratio_b_over_a": 5.74496715357552
+    },
+    {
+      "workload_id": "W388bc3b96b0d",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 22.00812606289621,
+      "b_mean_s": 179.30801392069117,
+      "ratio_b_over_a": 8.147354909193696
+    },
+    {
+      "workload_id": "W6f58322d8834",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 22.602962576865288,
+      "b_mean_s": 184.38803093584966,
+      "ratio_b_over_a": 8.157693059429986
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "log2_r": 24.414902680079198,
+      "workloads": 4,
+      "pairs": 20,
+      "ratio_b_over_a": 7.429535643273111,
+      "ci95": [
+        5.818170051829973,
+        8.180277630872068
+      ],
+      "ci_method": "cluster"
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 7.429535643273111,
+    "ci95": [
+      5.818170051829973,
+      8.180277630872068
+    ],
+    "ci_method": "cluster",
+    "pairs": 20,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "17 of 20 pairs did not reach L2",
+      "3 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L2",
+    "pairs": 20,
+    "pairs_below_level": 17,
+    "median_ratio": 0.1085220933396357,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null
+  },
+  "quality": {
+    "score": 45,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 20,
+    "verified_pairs": 20,
+    "admitted_pairs": 3,
+    "levels": {
+      "L1": 17,
+      "L2": 3
+    },
+    "p95_foreign_busy_percent": 1.1050790320353732,
+    "p95_run_queue_percent": 0.02288227286201785,
+    "contention_observed_runs": 40,
+    "notes": [
+      "no admitted A/A interval; calibration bonus unavailable"
+    ]
+  },
+  "verdict": "ops (ok): mitm-negfold / s4-grouplaw = 7.4295 [5.818, 8.180] (cluster) over 20 pairs on 4 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); wall: descriptive (median 0.1085, not a result: 17 of 20 pairs did not reach L2; 3 admitted pairs; at least 5 are needed)"
+}

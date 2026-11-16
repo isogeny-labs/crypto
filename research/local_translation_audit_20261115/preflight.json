@@ -1,0 +1,118 @@
+{
+  "schema": "local-translation-preflight/v1",
+  "build_snapshots": 21,
+  "failed_states": [
+    "01",
+    "02",
+    "03",
+    "05",
+    "07",
+    "08",
+    "09",
+    "11",
+    "13",
+    "15",
+    "16",
+    "18",
+    "19",
+    "20"
+  ],
+  "successful_states": [
+    "04",
+    "06",
+    "10",
+    "12",
+    "14",
+    "17",
+    "21"
+  ],
+  "gate": {
+    "archive": "research/local_translation_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_local_translation_audit_20261115_lean/audit.log",
+        "bytes": 7706,
+        "sha256": "f17e1ed097698f56e28bc1c2e0ce39150dc2869d316d648bd331209c1c3f1bd5"
+      },
+      {
+        "member": "research_local_translation_audit_20261115_lean/build.log",
+        "bytes": 34945,
+        "sha256": "4330ddb2c0fe19f8d2221053c15fc7486f6310d930bb6fe3c495167d08d3b5df"
+      },
+      {
+        "member": "research_local_translation_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_local_translation_audit_20261115_lean/source-build.log",
+        "bytes": 34945,
+        "sha256": "16153f7d8038294cac882060c906710a8e174579527e380dd05e7bc7b1643f31"
+      },
+      {
+        "member": "research_local_translation_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 78,
+    "failing": 0,
+    "trusted_native": 0,
+    "new_modules": 9,
+    "new_concrete_modules": 9,
+    "credited_dependency_modules": 96,
+    "credited_prior_gates": [
+      82,
+      536
+    ],
+    "new_source_warnings": 0,
+    "inherited_advisories": {
+      "build.log": [],
+      "source-build.log": [],
+      "audit.log": [
+        "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+      ]
+    }
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/local_translation_audit_20261115/evidence/attempts.tar.xz",
+    "files": 418,
+    "unique_objects": 120,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "credited_dependency_modules": 96,
+  "copied_modules": 0,
+  "all124predecessor_pins_checked_each_state_and_gate": true,
+  "new_modules": 9,
+  "new_concrete_modules": 9,
+  "early_Lake_latest_only_roots_could_reuse_oleans": true,
+  "complete_root_rebuild_fixed_state": 17,
+  "automatic_exact_root_coverage_from_state": 18,
+  "final21_all9roots": true,
+  "actual_all_point_valuation_order_residue_derived": true,
+  "actual_regular_ring_RingEquiv_explicit_inverse": true,
+  "actual_principal_divisor_negative_Q_identity": true,
+  "actual_guarded_divisor_evaluation_and_support_iff": true,
+  "actual_ACF5_char5_nonsingular_order3_sign_counter": true,
+  "supplied_local_preservation_or_valuation_residue_invariance_or_ramification_premise": false,
+  "separate_Scheme_localRing_comparison": false,
+  "general_basefield_descent": false,
+  "canonical_pairing_comparison": false,
+  "qualified_source_refuted": false,
+  "full14complete": false,
+  "paid_compute_and_agent_upload": 0
+}

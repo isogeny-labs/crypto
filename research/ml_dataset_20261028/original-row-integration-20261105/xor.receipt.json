@@ -1,0 +1,51 @@
+{
+  "started_at": "2026-11-05T15:46:02.586752+00:00",
+  "argv": [
+    "rustc",
+    "+1.98",
+    "--edition=2021",
+    "--test",
+    "/home/ec2-user/ml-dataset-resume-20261029/sat-root-xor-native-validation-20261105/harness.rs",
+    "-L",
+    "dependency=/var/tmp/crypto-ml-rows-target-20261105/release/deps",
+    "-o",
+    "/home/ec2-user/ml-dataset-resume-20261029/sat-root-xor-native-validation-20261105/tests",
+    "--extern",
+    "serde=/var/tmp/crypto-ml-rows-target-20261105/release/deps/libserde-cac565bd9dd1312a.rlib",
+    "--extern",
+    "serde_json=/var/tmp/crypto-ml-rows-target-20261105/release/deps/libserde_json-10f254ba1c7de3e0.rlib"
+  ],
+  "source_hashes": {
+    "sat.rs": "8c045654f9bf23069d0e411a2ba2f1506aebe52aac2cd0d48888f4dfc9602593",
+    "sat_root_cnf_admission.rs": "2e003b5fc1896f3fbc8033b9465735cb568ab6a61eec18a0cbbf835c5c2851b6",
+    "sat_root_xor_admission.rs": "32ab39aee42722e1f13e1dfbe0a41df07d72b3502e623cdf357df1b6a2d76503",
+    "harness.rs": "d998a91f035b8ed5efdd771a0495ee97b6c1843a8bdcd70de802d384349c203a",
+    "dependencies.json": "3adc61f1a7d2ae3846caef6077ce1639e014fd295ebe46cbda93b07b95cba354"
+  },
+  "production_modified": false,
+  "scope": "isolated actual native SAT module plus CNF dependency and new XOR phase; not dataset integration",
+  "compile_exit": 0,
+  "binary_sha256": "0e136b324487e6606ac48ea271cd9bb6afa91f07864bc53c35f93e31981d48fe",
+  "test_argv": [
+    "/home/ec2-user/ml-dataset-resume-20261029/sat-root-xor-native-validation-20261105/tests",
+    "root_xor_admission::",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "test_exit": 0,
+  "counts": [
+    [
+      "7",
+      "0",
+      "0",
+      "0",
+      "45"
+    ]
+  ],
+  "tests_log_sha256": "d65cdb548bea4532a73b20c2a44b00d9387e94c255487a1fb3b999d672fe3f69",
+  "expected_counts_pass": true,
+  "dependencies_unchanged": true,
+  "source_unchanged": true,
+  "compile_log_sha256": "a42610a9f3b5917d9534b3c94064a7576c0f750e65c776e28b8b2309c42def18",
+  "finished_at": "2026-11-05T15:46:07.083661+00:00"
+}

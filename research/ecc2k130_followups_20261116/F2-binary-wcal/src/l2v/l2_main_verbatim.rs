@@ -1,10 +1,10 @@
-//! L2 refutation filters: exact toy-scale instrument (std only).
-//!
-//! l2filters selftest N A
-//! l2filters cells N A OUT.json            Q-a, Q-b1 (degree<=k vanishing filters), PC1, PC2, NC1
-//! l2filters linz N A M D SAMPLES SEED OUT.json D1,D2,..   Q-b2 Macaulay linearisation refutation
-//!
-//! Every count is exact. Every claim is [pcc:unverified].
+// L2 refutation filters: exact toy-scale instrument (std only).
+//
+// l2filters selftest N A
+// l2filters cells N A OUT.json            Q-a, Q-b1 (degree<=k vanishing filters), PC1, PC2, NC1
+// l2filters linz N A M D SAMPLES SEED OUT.json D1,D2,..   Q-b2 Macaulay linearisation refutation
+//
+// Every count is exact. Every claim is [pcc:unverified].
 mod analyze;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Write as _;

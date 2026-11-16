@@ -1,0 +1,87 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:37:25Z",
+ "id": "PCC-20261116-77b508",
+ "kind": "theorem",
+ "producer": {
+  "commit": "9b73666d9837592517ade0dbcdeae775465370f1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-indexed-v1",
+   "theorem": "Curve25519IndexedLabels.actual_subgroup_primitive"
+  },
+  {
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-indexed-v1",
+   "theorem": "Curve25519IndexedLabels.actual_coset_index_exists"
+  },
+  {
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-indexed-v1",
+   "theorem": "Curve25519IndexedLabels.actual_coset_index_unique"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-indexed-v1/IndexLabels.lean",
+    "sha256": "2c015fa71bc643b4ed622f20779998cf09c432d3dcadf0ee8afdaf7bdad922ee"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-indexed-v1/PROOF_MAP.md",
+    "sha256": "c32f72e722a049ce663677d2da759afb16db75c2d91a78dbae3eb7f539d437bf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-indexed-v1/lakefile.toml",
+    "sha256": "9a7437c3ac7b948b675058faf0110acdcabae8238840dcefb169d757a53782e4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-indexed-v1/lake-manifest.json",
+    "sha256": "b3350100fe62eb9775bf0b6a2d23d2ffa9e4b0f7a89cc0ca67ca6afab9ae6cae"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-indexed-v1/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/lean-gate-v1/research_curve25519_torus_native_20261115_lean-indexed-v1/build.log",
+    "sha256": "125da66b0db680148d15ac5375508b8a20e072847bb56837be494acec9b0e961"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/lean-gate-v1/research_curve25519_torus_native_20261115_lean-indexed-v1/audit.log",
+    "sha256": "c36feda5992dec15c9274cb33f98deff740608fe81b18e2a920fd18ab5cbeb5d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/lean-gate-v1/research_curve25519_torus_native_20261115_lean-indexed-v1/source-build.log",
+    "sha256": "65e55d46c0d55071471d982861d0805613cccfcb8ae6ca9533f23acf5b7d44d0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/lean-indexed-v1",
+ "statement": "Three conditional existing-Mathlib primitive-root endpoints at a60824497/q213156431 establish the declared subgroup primitive root and existence/uniqueness of the range-restricted coset index under Field, nonzero h and primitive-root contracts. The focused gate audits3 named theorems with0 failing and0 trusted-native exceptions; standard axioms are retained. This does not prove native arithmetic/primality/exact-order checker semantics, Boolean/compiler/root bijection, curve/group replay or solver cost. Signed standing remains unverified."
+}

@@ -1,0 +1,84 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "round 5 E7b: trace-kernel binary subspace base against the default, a = 0 Koblitz curves over F_2^19 and F_2^23",
+  "description": "research/isogeny_conductor_gap_round5_20261012/PROTOCOL.md E7b: rho, the blind F4 descent and the blind MITM over binary-subspace:dimension=8 with and without trace_kernel=1 (every base point in 2E), on the a = 0 Koblitz curves over F_2^19 and F_2^23 (h = 4).",
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=9",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2"
+        }
+      },
+      "name": "f4-blind",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=9,trace_kernel=1",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2"
+        }
+      },
+      "name": "f4-tracekernel",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=9",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "mitm-blind",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=9,trace_kernel=1",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "mitm-tracekernel",
+      "role": "candidate"
+    }
+  ],
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 1,
+    "timeout_seconds": 1800,
+    "warmup": 0
+  },
+  "workloads": {
+    "curves": [
+      {
+        "a": 0,
+        "kind": "koblitz",
+        "n": 19
+      },
+      {
+        "a": 0,
+        "kind": "koblitz",
+        "n": 23
+      }
+    ],
+    "target_seed": 20261018,
+    "targets_per_curve": 4
+  }
+}
