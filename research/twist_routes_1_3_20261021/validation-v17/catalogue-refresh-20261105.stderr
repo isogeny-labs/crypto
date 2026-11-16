@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/execution-v19/support/refresh-catalogue.py", line 38, in <module>
+    for row in leaderboard.roster(names, measured):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-twist-runs/scripts/build_ic_leaderboard.py", line 734, in roster
+    field = f"GF({p['p']}^{p['k']})"
+                           ~^^^^^
+KeyError: 'k'

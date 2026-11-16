@@ -1,0 +1,488 @@
+warning: unused import: `self`
+ --> continuation.rs:3:59
+  |
+3 | use super::{sparse::{Owner,Charge,Polynomial},scheduler::{self,search},check};
+  |                                                           ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `bqi`
+ --> encoding.test.rs:2:78
+  |
+2 | use super::{capture,equations,continuation,exclusions,scheduler,check,bridge,bqi,checked_model,LiftRecord,OwnerFailure,Stop,capture_p...
+  |                                                                              ^^^
+
+warning: method `variables` is never used
+ --> harness.rs:9:20
+  |
+9 | impl CheckedMap{fn variables(&self)->u32{self.0.variables}}
+  | ---------------    ^^^^^^^^^
+  | |
+  | method in this implementation
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `Bound` is never constructed
+ --> signed_lift.rs:6:8
+  |
+6 | struct Bound<'a,T:VerificationAdmission>{owner:&'a mut T,deadline:Instant,expired:bool,stop:Option<Error>}
+  |        ^^^^^
+
+warning: method `time` is never used
+ --> signed_lift.rs:7:46
+  |
+7 | impl<T:VerificationAdmission> Bound<'_,T>{fn time(&mut self)->Result<(),Error>{if Instant::now()>=self.deadline{self.expired=true;Err...
+  | -----------------------------------------    ^^^^
+  | |
+  | method in this implementation
+
+warning: function `verify_candidate` is never used
+  --> signed_lift.rs:17:8
+   |
+17 | pub fn verify_candidate(map:&CheckedMap,model:&[bool],signed_domain:&[(u64,u64)],target:Option<(u64,u64)>,progress:&mut Progress,dea...
+   |        ^^^^^^^^^^^^^^^^
+
+warning: struct `Limits` is never constructed
+  --> scheduler.rs:11:12
+   |
+11 | pub struct Limits { pub batch_rows:usize, pub batch_ops:usize, pub batches:usize, pub variables:u32, pub generators:usize, pub basis...
+   |            ^^^^^^
+
+warning: variants `Original` and `Pair` are never constructed
+  --> scheduler.rs:17:17
+   |
+17 | pub enum Kind { Original(usize), Pair(usize,usize), Field(usize,u32) }
+   |          ----   ^^^^^^^^         ^^^^
+   |          |
+   |          variants in this enum
+   |
+   = note: `Kind` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: function `order` is never used
+  --> scheduler.rs:22:4
+   |
+22 | fn order(a:&[u32],b:&[u32])->Ordering { a.len().cmp(&b.len()).then_with(||a.cmp(b)) }
+   |    ^^^^^
+
+warning: struct `Meter` is never constructed
+  --> scheduler.rs:23:8
+   |
+23 | struct Meter<'a,T:Owner>{ owner:&'a mut T, limits:Limits, deadline:Instant, charge:Charge }
+   |        ^^^^^
+
+warning: multiple methods are never used
+  --> scheduler.rs:25:5
+   |
+24 | impl<T:Owner> Meter<'_,T>{
+   | ------------------------- methods in this implementation
+25 |  fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{
+   |     ^^^
+...
+33 |  fn scan(&mut self,n:usize)->Result<(),Failure>{self.pay(u64::try_from(n).map_err(|_|Failure::Overflow)?.checked_add(1).ok_or(Failur...
+   |     ^^^^
+34 |  fn alloc<V>(&mut self,n:usize)->Result<Vec<V>,Failure>{let b=n.checked_mul(size_of::<V>()).and_then(|x|x.checked_add(64)).ok_or(Fai...
+   |     ^^^^^
+35 |  fn mono(&mut self,a:&[u32])->Result<Monomial,Failure>{self.scan(a.len())?;let mut v=self.alloc(a.len())?;v.extend_from_slice(a);Ok(v)}
+   |     ^^^^
+36 |  fn union(&mut self,a:&[u32],b:&[u32])->Result<Monomial,Failure>{self.scan(a.len().checked_add(b.len()).ok_or(Failure::Overflow)?)?;...
+   |     ^^^^^
+37 |  fn difference(&mut self,a:&[u32],b:&[u32])->Result<Monomial,Failure>{self.scan(a.len().checked_mul(b.len().max(1)).ok_or(Failure::O...
+   |     ^^^^^^^^^^
+38 |  fn divides(&mut self,a:&[u32],b:&[u32])->Result<bool,Failure>{self.scan(a.len().checked_mul(b.len().max(1)).ok_or(Failure::Overflow...
+   |     ^^^^^^^
+39 |  fn cmp(&mut self,a:&[u32],b:&[u32])->Result<Ordering,Failure>{self.scan(a.len().checked_add(b.len()).ok_or(Failure::Overflow)?)?;Ok...
+   |     ^^^
+40 |  fn toggle(&mut self,p:&mut Polynomial,t:Monomial)->Result<(),Failure>{let mut at=0;while at<p.len(){match self.cmp(&p[at],&t)?{Orde...
+   |     ^^^^^^
+41 |  fn proof_toggle(&mut self,p:&mut Vec<ProofTerm>,t:ProofTerm)->Result<(),Failure>{let mut at=0;while at<p.len(){self.scan(p[at].mult...
+   |     ^^^^^^^^^^^^
+42 |  fn scaled(&mut self,r:&Row,t:&[u32])->Result<Row,Failure>{let mut out=Row{polynomial:self.alloc(r.polynomial.len())?,proof:self.all...
+   |     ^^^^^^
+43 |  fn xor(&mut self,a:&Row,b:&Row)->Result<Row,Failure>{let mut out=Row{polynomial:self.alloc(a.polynomial.len().checked_add(b.polynom...
+   |     ^^^
+44 |  fn validate(&mut self,p:&Polynomial,n:u32)->Result<(),Failure>{if p.len()>self.limits.terms{return Err(Failure::Cap)}for(i,t)in p.i...
+   |     ^^^^^^^^
+
+warning: variants `Build`, `Symbolic`, `Eliminate`, `PrepareCommit`, and `Committed` are never constructed
+  --> scheduler.rs:48:18
+   |
+48 | pub enum Stage { Build, Symbolic, Eliminate, PrepareCommit, Committed }
+   |          -----   ^^^^^  ^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^
+   |          |
+   |          variants in this enum
+   |
+   = note: `Stage` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: function `build_task` is never used
+  --> scheduler.rs:61:4
+   |
+61 | fn build_task<T:Owner>(task:Task,g:&[Polynomial],basis:&[Row],m:&mut Meter<T>)->Result<Row,Failure>{
+   |    ^^^^^^^^^^
+
+warning: function `run` is never used
+  --> scheduler.rs:70:8
+   |
+70 | pub fn run(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut impl Owner)->Attempt{
+   |        ^^^
+
+warning: variant `Branch` is never constructed
+ --> search.rs:3:73
+  |
+3 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Origin{Original(usize),Branch{parent:usize,variable:u32,value:bool}}
+  |                                                  ------                 ^^^^^^
+  |                                                  |
+  |                                                  variant in this enum
+  |
+  = note: `Origin` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Building`, `Ready`, `Branching`, `Branched`, `Refuted`, and `Witness` are never constructed
+ --> search.rs:4:61
+  |
+4 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum NodeStatus{Building,Ready,Running,Branching,Branched,Refuted,Witness}
+  |                                                  ---------- ^^^^^^^^ ^^^^^         ^^^^^^^^^ ^^^^^^^^ ^^^^^^^ ^^^^^^^
+  |                                                  |
+  |                                                  variants in this enum
+  |
+  = note: `NodeStatus` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Witness` and `UnsatDerived` are never constructed
+ --> search.rs:5:66
+  |
+5 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Verdict{Unknown,Witness,UnsatDerived}
+  |                                                  -------         ^^^^^^^ ^^^^^^^^^^^^
+  |                                                  |
+  |                                                  variants in this enum
+  |
+  = note: `Verdict` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Complete` and `Stopped` are never constructed
+ --> search.rs:6:68
+  |
+6 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum NativeDisposition{Complete,LocalCap,Stopped}
+  |                                                  ----------------- ^^^^^^^^          ^^^^^^^
+  |                                                  |
+  |                                                  variants in this enum
+  |
+  = note: `NativeDisposition` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: struct `SearchLimits` is never constructed
+ --> search.rs:7:33
+  |
+7 | #[derive(Clone,Copy)]pub struct SearchLimits{pub native:Limits,pub nodes:usize}
+  |                                 ^^^^^^^^^^^^
+
+warning: struct `NativeOwner` is never constructed
+  --> search.rs:14:8
+   |
+14 | struct NativeOwner<'a,'b,T:Owner>{meter:&'a mut Meter<'b,T>,failure:Option<Failure>}
+   |        ^^^^^^^^^^^
+
+warning: function `copied_poly` is never used
+  --> search.rs:16:4
+   |
+16 | fn copied_poly<T:Owner>(p:&Polynomial,m:&mut Meter<T>)->Result<Polynomial,Failure>{m.pay(1,0)?;let mut q=m.alloc(p.len())?;for t in ...
+   |    ^^^^^^^^^^^
+
+warning: function `empty_node` is never used
+  --> search.rs:17:4
+   |
+17 | fn empty_node<T:Owner>(parent:Option<usize>,eqs:usize,depth:usize,m:&mut Meter<T>)->Result<Node,Failure>{Ok(Node{parent,origins:m.al...
+   |    ^^^^^^^^^^
+
+warning: function `eval` is never used
+  --> search.rs:18:4
+   |
+18 | fn eval<T:Owner>(g:&[Polynomial],point:&[bool],m:&mut Meter<T>)->Result<bool,Failure>{let mut all=true;for p in g{m.pay(1,0)?;let mu...
+   |    ^^^^
+
+warning: function `solve` is never used
+  --> search.rs:22:8
+   |
+22 | pub fn solve(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut impl Owner)->SearchAttempt{
+   |        ^^^^^
+
+warning: multiple variants are never constructed
+ --> bridge.rs:6:20
+  |
+6 | pub enum Failure { Cap,Overflow,Allocation,Malformed,Owner,Deadline,Checker }
+  |          -------   ^^^ ^^^^^^^^ ^^^^^^^^^^ ^^^^^^^^^ ^^^^^ ^^^^^^^^ ^^^^^^^
+  |          |
+  |          variants in this enum
+  |
+  = note: `Failure` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: struct `Limits` is never constructed
+ --> bridge.rs:8:12
+  |
+8 | pub struct Limits { pub variables:u32,pub generators:usize,pub terms:usize,pub degree:usize,pub proof:usize,pub wire:usize,pub work:u...
+  |            ^^^^^^
+
+warning: struct `Meter` is never constructed
+  --> bridge.rs:10:8
+   |
+10 | struct Meter<'a,T:Owner>{owner:&'a mut T,limits:Limits,deadline:Instant,charge:Charge}
+   |        ^^^^^
+
+warning: multiple methods are never used
+  --> bridge.rs:12:5
+   |
+11 | impl<T:Owner> Meter<'_,T>{
+   | ------------------------- methods in this implementation
+12 |  fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{
+   |     ^^^
+...
+20 |  fn scan(&mut self,n:usize)->Result<(),Failure>{self.pay(u64::try_from(n).map_err(|_|Failure::Overflow)?.checked_add(1).ok_or(Failur...
+   |     ^^^^
+21 |  fn vec<V>(&mut self,n:usize)->Result<Vec<V>,Failure>{let bytes=n.checked_mul(size_of::<V>()).and_then(|x|x.checked_add(64)).ok_or(F...
+   |     ^^^
+22 |  fn mono(&mut self,t:&[u32],n:u32)->Result<(),Failure>{self.scan(t.len())?;if t.len()>self.limits.degree{return Err(Failure::Cap)}if...
+   |     ^^^^
+23 |  fn number(&mut self,out:&mut Vec<u8>,value:usize)->Result<(),Failure>{let mut buf=[0u8;20];let(mut i,mut x)=(20,value);loop{i-=1;bu...
+   |     ^^^^^^
+24 |  fn monowire(&mut self,out:&mut Vec<u8>,t:&[u32])->Result<(),Failure>{self.number(out,t.len())?;for v in t{self.number(out,*v as usi...
+   |     ^^^^^^^^
+25 |  fn poly(&mut self,out:&mut Vec<u8>,p:&Polynomial,n:u32)->Result<(),Failure>{
+   |     ^^^^
+
+warning: function `certify` is never used
+  --> bridge.rs:42:8
+   |
+42 | pub fn certify(n:u32,g:&[Polynomial],row:&Row,limits:Limits,checker:bqi::Limits,deadline:Instant,owner:&mut impl Owner)->Certificate{
+   |        ^^^^^^^
+
+warning: struct `Limits` is never constructed
+ --> check.rs:6:33
+  |
+6 | #[derive(Clone,Copy)]pub struct Limits{pub nodes:usize,pub work:u64,pub bytes:u64,pub certificate:bridge::Limits,pub checker:bqi::Lim...
+  |                                 ^^^^^^
+
+warning: struct `Meter` is never constructed
+ --> check.rs:8:8
+  |
+8 | struct Meter<'a,T:Owner>{owner:&'a mut T,limits:Limits,deadline:Instant,charge:Charge}
+  |        ^^^^^
+
+warning: methods `pay`, `scan`, `poly_eq`, and `model` are never used
+  --> check.rs:10:5
+   |
+ 9 | impl<T:Owner> Meter<'_,T>{
+   | ------------------------- methods in this implementation
+10 |  fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{if Instant::now()>=self.deadline{return Err(Failure::Deadline)}let q=Charge{work:...
+   |     ^^^
+11 |  fn scan(&mut self,n:usize)->Result<(),Failure>{self.pay(u64::try_from(n).map_err(|_|Failure::Overflow)?.checked_add(1).ok_or(Failur...
+   |     ^^^^
+12 |  fn poly_eq(&mut self,a:&Polynomial,b:&Polynomial)->Result<(),Failure>{for p in [a,b]{self.pay(1,0)?;for t in p{self.scan(t.len())?}...
+   |     ^^^^^^^
+13 |  fn model(&mut self,g:&[Polynomial],x:&[bool])->Result<(),Failure>{for p in g{self.pay(1,0)?;let mut sum=false;for t in p{self.scan(...
+   |     ^^^^^
+
+warning: struct `Nested` is never constructed
+  --> check.rs:15:8
+   |
+15 | struct Nested<'a,'b,T:Owner>{meter:&'a mut Meter<'b,T>,failure:Option<Failure>}
+   |        ^^^^^^
+
+warning: function `verify` is never used
+  --> check.rs:20:8
+   |
+20 | pub fn verify(n:u32,g:&[Polynomial],a:&SearchAttempt,limits:Limits,deadline:Instant,owner:&mut impl Owner)->Audit{
+   |        ^^^^^^
+
+warning: variants `CandidateRetained` and `RemainingBooleanModelsExhaustedUnderRecordedExclusions` are never constructed
+ --> continuation.rs:6:66
+  |
+6 | ...rtialEq,Eq)]pub enum Outcome{Unknown,CandidateRetained,RemainingBooleanModelsExhaustedUnderRecordedExclusions}
+  |                         -------         ^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |                         |
+  |                         variants in this enum
+  |
+  = note: `Outcome` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Building`, `Ready`, `Candidate`, `Splitting`, `Excluded`, and `Refuted` are never constructed
+ --> continuation.rs:7:57
+  |
+7 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Status{Building,Ready,Running,Candidate,Splitting,Excluded,Refuted}
+  |                                                  ------ ^^^^^^^^ ^^^^^         ^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^ ^^^^^^^
+  |                                                  |
+  |                                                  variants in this enum
+  |
+  = note: `Status` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: struct `Limits` is never constructed
+ --> continuation.rs:8:33
+  |
+8 | #[derive(Clone,Copy)]pub struct Limits{pub partitions:usize,pub work:u64,pub bytes:u64,pub search:search::SearchLimits,pub audit:chec...
+  |                                 ^^^^^^
+
+warning: struct `Meter` is never constructed
+  --> continuation.rs:11:8
+   |
+11 | struct Meter<'a,T:Owner>{owner:&'a mut T,limits:Limits,deadline:Instant,charge:Charge}
+   |        ^^^^^
+
+warning: methods `pay`, `scan`, `reserve`, and `poly` are never used
+  --> continuation.rs:13:5
+   |
+12 | impl<T:Owner> Meter<'_,T>{
+   | ------------------------- methods in this implementation
+13 |  fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{
+   |     ^^^
+...
+20 |  fn scan(&mut self,n:usize)->Result<(),Failure>{self.pay(u64::try_from(n).map_err(|_|Failure::Overflow)?.checked_add(1).ok_or(Failur...
+   |     ^^^^
+21 |  fn reserve<V>(&mut self,v:&mut Vec<V>,extra:usize)->Result<(),Failure>{let bytes=extra.checked_mul(size_of::<V>()).and_then(|b|b.ch...
+   |     ^^^^^^^
+22 |  fn poly(&mut self,p:&Polynomial)->Result<Polynomial,Failure>{self.pay(1,0)?;let mut q=Vec::new();self.reserve(&mut q,p.len())?;for ...
+   |     ^^^^
+
+warning: struct `Bridge` is never constructed
+  --> continuation.rs:24:8
+   |
+24 | struct Bridge<'a,'b,T:Owner>{meter:&'a mut Meter<'b,T>,failure:Option<Failure>}
+   |        ^^^^^^
+
+warning: struct `CandidateCall` is never constructed
+  --> continuation.rs:29:12
+   |
+29 | pub struct CandidateCall<V>{pub value:Option<V>,pub result:Result<(),Failure>}
+   |            ^^^^^^^^^^^^^
+
+warning: struct `Session` is never constructed
+  --> continuation.rs:30:12
+   |
+30 | pub struct Session<'a,T:Owner>{owner:&'a mut T,original:&'a [Polynomial],n:u32,limits:Limits,deadline:Instant,pub attempt:Attempt}
+   |            ^^^^^^^
+
+warning: associated items `new`, `candidate`, `next`, `exclude`, `with_candidate_owner`, and `into_attempt` are never used
+  --> continuation.rs:32:9
+   |
+31 | impl<'a,T:Owner> Session<'a,T>{
+   | ------------------------------ associated items in this implementation
+32 |  pub fn new(n:u32,g:&'a [Polynomial],limits:Limits,deadline:Instant,owner:&'a mut T)->Self{Self{owner,original:g,n,limits,deadline,a...
+   |         ^^^
+33 |  pub fn candidate(&self)->Option<&[bool]>{if self.attempt.failure.is_some()||self.attempt.outcome!=Outcome::CandidateRetained{return...
+   |         ^^^^^^^^^
+34 |  pub fn next(&mut self)->Result<Outcome,Failure>{
+   |         ^^^^
+...
+42 |  pub fn exclude(&mut self,record:u64)->Result<(),Failure>{
+   |         ^^^^^^^
+...
+52 |  pub fn with_candidate_owner<V>(&mut self,f:impl FnOnce(&[bool],Instant,&mut T)->V)->CandidateCall<V>{
+   |         ^^^^^^^^^^^^^^^^^^^^
+...
+64 |  pub fn into_attempt(self)->Attempt{self.attempt}
+   |         ^^^^^^^^^^^^
+
+warning: function `candidate` is never used
+  --> continuation.rs:66:4
+   |
+66 | fn candidate(p:&Partition)->Option<&[bool]>{let a=p.search.as_ref()?;let n=a.nodes.get(a.witness_node?)?;if a.result.is_err()||a.ver...
+   |    ^^^^^^^^^
+
+warning: function `blank` is never used
+  --> continuation.rs:67:4
+   |
+67 | fn blank(parent:Option<usize>)->Partition{Partition{parent,prefix:Vec::new(),equations:Vec::new(),status:Status::Building,search:Non...
+   |    ^^^^^
+
+warning: function `build` is never used
+  --> continuation.rs:68:4
+   |
+68 | fn build<T:Owner>(g:&[Polynomial],p:&mut Partition,m:&mut Meter<T>)->Result<(),Failure>{
+   |    ^^^^^
+
+warning: function `next` is never used
+  --> continuation.rs:75:4
+   |
+75 | fn next<T:Owner>(n:u32,g:&[Polynomial],a:&mut Attempt,m:&mut Meter<T>)->Result<Outcome,Failure>{
+   |    ^^^^
+
+warning: function `exclude` is never used
+  --> continuation.rs:99:4
+   |
+99 | fn exclude<T:Owner>(n:u32,a:&mut Attempt,record:u64,m:&mut Meter<T>)->Result<(),Failure>{
+   |    ^^^^^^^
+
+warning: function `audit` is never used
+   --> continuation.rs:122:8
+    |
+122 | pub fn audit(n:u32,g:&[Polynomial],a:&Attempt,limits:Limits,deadline:Instant,owner:&mut impl Owner)->CoverageAudit{
+    |        ^^^^^
+
+warning: struct `RecordView` is never constructed
+ --> exclusions.rs:5:12
+  |
+5 | pub struct RecordView<'a>{pub partition:usize,pub record:u64,pub model:&'a [bool],pub callback_result:Option<Result<(),continuation::...
+  |            ^^^^^^^^^^
+
+warning: trait `Records` is never used
+ --> exclusions.rs:9:11
+  |
+9 | pub trait Records{fn len(&self)->usize;fn get(&self,index:usize)->Option<RecordView<'_>>;}
+  |           ^^^^^^^
+
+warning: struct `Limits` is never constructed
+  --> exclusions.rs:11:33
+   |
+11 | #[derive(Clone,Copy)]pub struct Limits{pub records:usize,pub work:u64,pub bytes:u64,pub coverage:continuation::Limits}
+   |                                 ^^^^^^
+
+warning: struct `Bound` is never constructed
+  --> exclusions.rs:14:8
+   |
+14 | struct Bound<'a,T:Owner+VerificationAdmission>{owner:&'a mut T,limits:Limits,deadline:Instant,charge:Charge,failure:Option<Failure>}
+   |        ^^^^^
+
+warning: methods `time`, `pay`, `scan`, and `alloc` are never used
+  --> exclusions.rs:16:5
+   |
+15 | impl<T:Owner+VerificationAdmission> Bound<'_,T>{
+   | ----------------------------------------------- methods in this implementation
+16 |  fn time(&mut self)->Result<(),Failure>{if let Some(e)=self.failure{return Err(e)}if Instant::now()>=self.deadline{return Err(Failur...
+   |     ^^^^
+17 |  fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{let r=(||{self.time()?;let q=Charge{work:self.charge.work.checked_add(w).ok_or(Fa...
+   |     ^^^
+18 |  fn scan(&mut self,n:usize)->Result<(),Failure>{self.pay(u64::try_from(n).map_err(|_|Failure::Overflow)?.checked_add(1).ok_or(Failur...
+   |     ^^^^
+19 |  fn alloc<V>(&mut self,v:&mut Vec<V>,n:usize)->Result<(),Failure>{let b=n.checked_mul(size_of::<V>()).and_then(|n|n.checked_add(64))...
+   |     ^^^^^
+
+warning: function `verify` is never used
+  --> exclusions.rs:27:8
+   |
+27 | pub fn verify(n:u32,g:&[Polynomial],map:&CheckedMap,domain:&[(u64,u64)],target:Option<(u64,u64)>,attempt:&continuation::Attempt,reco...
+   |        ^^^^^^
+
+warning: variants `AcceptedSignedRelation`, `ConditionalBooleanCoverage`, and `RetainedModelExclusionsReplayed` are never constructed
+  --> harness.rs:53:2
+   |
+51 | #[derive(Debug,Clone,Copy)]pub enum Status{
+   |                                     ------ variants in this enum
+52 |  Incomplete,
+53 |  AcceptedSignedRelation,
+   |  ^^^^^^^^^^^^^^^^^^^^^^
+54 |  ConditionalBooleanCoverage,
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+57 |  RetainedModelExclusionsReplayed,
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `Status` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: methods `map_ack`, `pattern`, `deadline`, and `binding_sha256` are never used
+  --> encoding.test.rs:12:9
+   |
+11 | impl EncodingSource<'_>{
+   | ----------------------- methods in this implementation
+12 |  pub fn map_ack(&self)->Option<&capture::CommittedEventPosition>{self.identity.map_ack}
+   |         ^^^^^^^
+13 |  pub fn pattern(&self)->Option<u32>{self.identity.pattern}
+   |         ^^^^^^^
+14 |  pub fn deadline(&self)->Instant{self.deadline}
+   |         ^^^^^^^^
+15 |  pub fn binding_sha256(&self)->&[u8;32]{self.identity.binding_sha256}
+   |         ^^^^^^^^^^^^^^
+
+warning: 57 warnings emitted
+

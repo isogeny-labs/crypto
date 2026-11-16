@@ -1,0 +1,16 @@
+{
+ "schema":"unexecuted-next-experiment/v1",
+ "id":"cached-cubic-frobenius-future-v1",
+ "status":"awaiting_new_source_and_independent_review",
+ "hypothesis":"A once-paid source-subspace lambda cache plus explicit cubic Frobenius coordinates reduces total conditional solve cost, with identical complete candidate and support/recovery outputs.",
+ "arms":["current generic with per-k lambda generation","generic remainder with paid per-arm lambda cache","explicit cubic semilinear square with paid per-arm lambda cache"],
+ "controls":"Independent GF4/GF8/trace-mixedGF16 product/remainder/order oracles, repeated/zero roots, every R/R4 receipt; perfield positive coverage explicit",
+ "first_actual":"Same h=0x4208336d0d441df79c400,a=1,ya=0 fixture; rederive all candidate k, observed old16 not generic assumption",
+ "training_ladder":"32h in frozen deterministic Gaussian affine/free-column enumeration order indices0..31; BOTH ya0/ya1 at a1; all64cells retained in every arm; same actual field/target/domain",
+ "selection":"Freeze source/pivots/inputrule before timing/support; no positive/empty/speed postselection; exposed training not holdout",
+ "max_experiments":3,"timeout_seconds":90,"memory_limit_mb":4096,"cores":1,"max_nullity":12,"max_candidates_per_cell":4096,
+ "must_record":["paid cache construction cost and lambda list","Q-specific multipliers","everyboundedk,Q,Lremainder,R4residue","all supported source orderings","cell completion/UNKNOWN","stage and total timings","processpeakRSS","independent postrun replay"],
+ "failed_Ore_followup":"Diagnose exact scalar/fixture/cap/accounting failure first; new variant with changed assumption and independent controls, no identical retry",
+ "remaining_outer_work":"2^18 admittedh times roughly2^18 sourcea and exceptional/lift recovery;64conditionalcells notglobal",
+ "scientific_execution":false,"novelty_claim":false,"qualified_speedup_claim":false,"global_original_root_completion":false
+}

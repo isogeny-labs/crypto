@@ -17,6 +17,9 @@
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, HashMap, VecDeque};
 
+/// Bounded optional row-operation capture; the legacy filter remains unchanged.
+pub mod trace;
+
 #[inline]
 fn add_mod(a: u64, b: u64, modulus: u64) -> u64 {
     ((a as u128 + b as u128) % modulus as u128) as u64

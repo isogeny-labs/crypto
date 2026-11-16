@@ -1,0 +1,148 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=0.78in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}
+{\Large Actual first-jet precision and necessary factor count}\\[4pt]
+Same orientation completion, 14 November 2026\\
+Source \texttt{8455c485411b19c3b6a99cfc6c95f32276867b9b}
+\end{center}
+\textbf{Scope.} A constructed precision upper control and a necessary
+lowest-layer factor count for the actual first crossing jet. These are
+unsigned source-bound claims; no signed standing is asserted [pcc:unverified].
+
+\textbf{Actual objects.} Keep the parent's literal completed polynomial
+$W_{xy}(T)$, with retained bit mask, grid size $2^a$ and positive retained
+multiplicities $m_j$. At a retained pole $t=-2^i$, let $J_{xy}$ be coefficient
+one of $W_{xy}(t+2^{a+1}Z)$. The parent derives its actual nonzero diagonal
+$c=J_{00}$ and exact weight
+\[
+ w=v_2(c)=a+1-i+G_i,\qquad
+ G_i=m_i-\sum_{i<j<u}(j-i)m_j.
+\]
+Write $R_{xy}=J_{xy}/c$ at crossings with equal bit $i$, and $R_{xy}=0$
+otherwise. Assume $i<u\le a$. No arbitrary good scalar or low-rank witness
+is supplied. Node/origin values and source degree remain those of the same
+polynomial family.
+
+\textbf{Precision from actual row residues.} If $u\le v\le a$ and
+$x\equiv z\pmod{2^v}$, their retained masks agree. For every selected anchor
+$q=2^j$, its actual denominator has valuation at most $j<u$; the pole
+denominator has valuation at most $i<u$. Thus
+\[
+ \frac{q-\delta(z,y)}{q-\delta(x,y)}-1
+ =\frac{\delta(x,y)-\delta(z,y)}{q-\delta(x,y)},
+ \quad
+ v_2\left(\frac{q-\delta(z,y)}{q-\delta(x,y)}-1\right)\ge v-u+1.
+\]
+Zero differences are handled by the exact predicate
+$\mathrm{VBound}(k,q)\equiv(q=0\lor v_2(q)\ge k)$.
+Actual polynomial first-jet identities give $R_{xy}=R_{zy}$ times a finite
+product of these near-one ratios. Derived prototype integrality yields
+\[
+ \mathrm{VBound}(v-u+1,R_{xy}-R_{zy}).
+\]
+Noncrossing entries vanish explicitly. This is a quantified source proof,
+not a sampled field certificate.
+
+\textbf{Constructed factors.} Choose the literal valid row $z=x\bmod2^v$.
+For $r\in\{0,\ldots,2^v-1\}$, set
+\[
+ A_{xr}=[x\bmod2^v=r],\qquad B_{ry}=R_{ry}.
+\]
+The exact finite product is $(AB)_{xy}=R_{zy}$. Both factors are integral;
+there are exactly $2^v$ inner labels. Scaling the row factor by $c$ gives
+\[
+ \mathrm{VBound}(w,(cA)_{xr}),\qquad
+ \mathrm{VBound}(w+v-u+1,(J_{\rm cross}-cAB)_{xy}).
+\]
+Feasibility $G_i\ge0$ makes $cA$ integral. At $v=a$ the factorization is
+exact and retains every original source row.
+PCC-20261114-9fb7c1/127309 [pcc:unverified].
+
+\newpage
+\begin{center}{\Large Necessary lowest-layer count}\end{center}
+\textbf{Literal minor.} Embed retained residues $r=0,\ldots,2^u-1$ as actual
+ports, valid because $u\le a$. The parent's constructed leading-layer proof
+implies that the resulting normalized minor $M$ satisfies
+\[
+ \mathrm{VBound}(1,M_{rs}-[r=s]).
+\]
+First derive entry integrality from this actual congruence. Finite-product
+congruence is proved by induction using the fixed ring rearrangement
+\[
+ ab-cd=(a-c)b+c(b-d).
+\]
+Apply it termwise to the determinant's signed permutation sum. Integer signs
+are integral, so
+\[
+ \mathrm{VBound}(1,\det M-1),\qquad \det M\ne0,\qquad
+ \operatorname{rank}_{\mathbb Q}M=2^u.
+\]
+This is the exact rank of this minor, not an exact rank claim for the whole
+rational matrix. PCC-20261114-4d783b [pcc:unverified].
+
+\textbf{Any approximate rational factors.} Suppose rational matrices $P,Q$
+with $k$ inner columns satisfy
+\[
+ \mathrm{VBound}(1,R_{xy}-(PQ)_{xy})
+\]
+for every actual port pair. Restrict the product to the same literal ports.
+Its difference from identity has content one, hence its determinant is
+nonzero by the same lemma. Standard rational rank inequalities then give
+\[
+ 2^u=\operatorname{rank}(P_{\rm res}Q_{\rm res})
+ \le\operatorname{rank}(P_{\rm res})\le k.
+\]
+No integrality assumption on $P$ or $Q$ is needed. Dividing an actual
+unnormalized approximation of residual weight $w+1$ by the derived nonzero
+$c$ gives the same lower bound. PCC-20261114-1bce48/543d60 [pcc:unverified].
+
+\textbf{Precisely what matches.} At $v=u$, the constructed upper control
+uses $2^u$ labels at normalized precision one; the lower theorem requires
+at least $2^u$. At higher precision, the construction uses $2^v$ but no
+matching lower bound is asserted. For $k\ge1$ and $u+k-1\le a$, the charged
+upper count is $2^{u+k-1}$. Other moment constructions may use fewer labels.
+
+These are bounds for the same particular kernel, first jet and approximation
+precision. They establish no lower bound for all completions, all algorithms
+or ECDLP. All higher chart jets and their actual weighted mode counts,
+coefficient construction, degree, recovery, entry and recursion costs remain
+required. Additive weights remain additive.
+
+\newpage
+\begin{center}{\Large Evidence, scope and next proof obligation}\end{center}
+\begin{center}\includegraphics[width=0.94\textwidth,height=0.48\textheight,keepaspectratio]{research/prime_orientation_layers_20261114/successor/report/bounds.pdf}\end{center}
+
+\textbf{Independent-check artifacts.} Two modules contain40 authored
+statements. The pinned shared gate audits44 declarations, including4
+generated congruence lemmas, with0 extra trusted axioms, exit0. Import-inclusive
+fresh OrientationRank exits0 with default imports. All source-bound records
+are unsigned; gate receipt PCC-20261114-341743 [pcc:unverified].
+
+\textbf{Literal native artifact.} Certificate IDC1hbc3887c49b3c9ce8 checks
+only $ab-cd=(a-c)b+c(b-d)$ on32+16 field points. It certifies neither
+parameter binding, valuation, determinant, rank nor cost. Three new adapter
+library tests, format and strict Clippy pass. No cryptographic fixture,
+performance/scaling experiment, paid/cloud/native search or old checker test
+was run [pcc:unverified].
+
+\textbf{Reproducibility and prior work.} Exact signatures, hashes, gate log,
+parent pins, failed drafts and raw logs are retained. KB unavailable; read
+primary orientation/repeated-anchor/LocalCharts sources and pinned Mathlib
+determinant/rank proofs. Standard arithmetic and linear algebra are reused,
+with no priority claim. Protected concurrent ledger histories remain intact;
+PR4118 cannot merge before legitimate reconciliation and current-head gates.
+
+\textbf{Next discriminating work.} Construct and charge the actual reciprocal-
+series moments within each retained residue class, comparing with the prior
+source's existing linear moments. Then cover all chart jets and the original
+recursive interface, with public-input finder/extraction and complete expected
+bit cost. First-jet bounds alone do not discharge those obligations.
+
+{\small\texttt{successor/PROOF\_MAP.md}\\
+\texttt{successor/evidence/claim-pins.json}\\
+\texttt{successor/evidence/gate-validation-001.json}}
+\end{document}
