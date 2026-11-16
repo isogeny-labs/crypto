@@ -7,6 +7,7 @@ use crate::cryptanalysis::large_prime_filter::{
     filter_large_primes, replay_complete_relation, CompleteRelation, LargePrimeFilterOptions,
     LargePrimeFilterReport, PartialRelation,
 };
+use crate::cryptanalysis::large_prime_filter::{filter_large_primes_mst, MstLimits, MstStats};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct SieveGraphOptions {
@@ -36,7 +37,16 @@ pub struct SieveGraphStats {
     pub filter_call_wall_ns: u128,
     pub input_digest: String,
     pub last_report: Option<LargePrimeFilterReport>,
+    /// Last MST attempt only, including a refused attempt. Absent in old mode.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mst: Option<MstStats>,
+    /// Refused MST output whose dimension * nonzeros exceeds the input.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub cost_guard_refusals: u64,
     pub counter_scope: &'static str,
+}
+fn is_zero(v: &u64) -> bool {
+    *v == 0
 }
 impl SieveGraphStats {
     pub(super) fn new() -> Self {
@@ -57,7 +67,29 @@ pub(super) fn project(
     options: &SieveGraphOptions,
     stats: &mut SieveGraphStats,
 ) -> Option<(Vec<SparseRel>, usize)> {
+    project_mode(rows, n, options, stats, false)
+}
+
+pub(super) fn project_mst(
+    rows: &[SparseRel],
+    n: u64,
+    options: &SieveGraphOptions,
+    stats: &mut SieveGraphStats,
+) -> Option<(Vec<SparseRel>, usize)> {
+    project_mode(rows, n, options, stats, true)
+}
+
+fn project_mode(
+    rows: &[SparseRel],
+    n: u64,
+    options: &SieveGraphOptions,
+    stats: &mut SieveGraphStats,
+    mst: bool,
+) -> Option<(Vec<SparseRel>, usize)> {
     let started = Instant::now();
+    if mst {
+        stats.counter_scope = "complete wall includes MST planning/normalization/filter/cost guard/replay/drop; legacy la_ops/la_muls/total_muls omit graph modular and native work";
+    }
     stats.calls += 1;
     stats.input_rows += rows.len() as u64;
     let result = (|| {
@@ -111,16 +143,35 @@ pub(super) fn project(
             })
             .collect();
         stats.input_digest = digest.finalize().to_hex().to_string();
-        let (complete, report) = filter_large_primes(
-            inputs.clone(),
-            &LargePrimeFilterOptions {
-                modulus: n,
-                max_small_weight: options.max_small_weight,
-                max_sources: options.max_sources,
-            },
-        )
-        .ok()?;
-        stats.last_report = Some(report);
+        let filter_options = LargePrimeFilterOptions {
+            modulus: n,
+            max_small_weight: options.max_small_weight,
+            max_sources: options.max_sources,
+        };
+        let complete = if mst {
+            let attempt =
+                filter_large_primes_mst(inputs.clone(), &filter_options, &MstLimits::default())
+                    .ok()?;
+            stats.last_report = Some(attempt.report);
+            stats.mst = Some(attempt.stats);
+            let projected = attempt.relations?;
+            let input_work =
+                width as u128 * rows.iter().map(|r| r.cols.len() as u128).sum::<u128>();
+            let projected_work = projected.len() as u128
+                * projected
+                    .iter()
+                    .map(|r| r.small.len() as u128)
+                    .sum::<u128>();
+            if projected_work > input_work {
+                stats.cost_guard_refusals += 1;
+                return None;
+            }
+            projected
+        } else {
+            let (rows, report) = filter_large_primes(inputs.clone(), &filter_options).ok()?;
+            stats.last_report = Some(report);
+            rows
+        };
         if complete.len() != keep + 1 || !replays_match(&complete, &inputs, n) {
             return None;
         }
@@ -149,6 +200,55 @@ pub(super) fn project(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn mst_projects_a_weighted_system_and_keeps_the_target() {
+        let p = 101;
+        let rows = vec![
+            SparseRel {
+                cols: vec![(0, 1), (2, 2)],
+                rhs: 12,
+            },
+            SparseRel {
+                cols: vec![(1, 1), (2, 3)],
+                rhs: 18,
+            },
+            SparseRel {
+                cols: vec![(2, 7)],
+                rhs: 35,
+            },
+            SparseRel {
+                cols: vec![(3, 1)],
+                rhs: 7,
+            },
+        ];
+        let mut stats = SieveGraphStats::new();
+        let (out, target) =
+            project_mst(&rows, p, &SieveGraphOptions::default(), &mut stats).unwrap();
+        assert_eq!(target, 2);
+        assert_eq!(out.len(), 3);
+        assert_eq!(stats.replayed_rows, 3);
+        assert_eq!(stats.projected, 1);
+        assert_eq!(stats.cost_guard_refusals, 0);
+        let mst = stats.mst.as_ref().unwrap();
+        assert_eq!(mst.trees, 1);
+        assert_eq!(mst.selected_edges, 2);
+        assert_eq!(mst.normalized_rows, 3);
+        let values = [2, 3, 7];
+        for row in &out {
+            let rhs = row.cols.iter().fold(0u64, |s, &(i, v)| {
+                ((s as u128 + v as u128 * values[i] as u128) % p as u128) as u64
+            });
+            assert_eq!(rhs, row.rhs);
+        }
+    }
+
+    #[test]
+    fn unused_mst_fields_preserve_original_default_report_serialization() {
+        let value = serde_json::to_value(SieveGraphStats::new()).unwrap();
+        assert!(value.get("mst").is_none());
+        assert!(value.get("cost_guard_refusals").is_none());
+    }
 
     #[test]
     fn projection_keeps_the_target_and_unique_retained_solution() {

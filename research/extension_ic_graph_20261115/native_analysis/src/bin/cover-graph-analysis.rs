@@ -95,6 +95,48 @@ pub(crate) fn public_family(f: &Value, p: u64) -> bool {
         && f.get("expected_scalar").is_none()
 }
 pub(crate) fn valid_graph(g: &Value) -> bool {
+    if let Some(v) = g.get("cost_guard_refusals") {
+        match (v.as_u64(), g["refusals"].as_u64()) {
+            (Some(c), Some(r)) if c <= r => {}
+            _ => return false,
+        }
+    }
+    if !g["mst"].is_null() {
+        let m = &g["mst"];
+        let fields = [
+            "trees",
+            "edge_evaluations",
+            "infeasible_edge_candidates",
+            "normalized_rows",
+            "selected_edges",
+            "largest_column_degree",
+            "largest_active_coefficients",
+            "input_nonzeros",
+            "output_nonzeros",
+            "budget_refusals",
+        ];
+        if fields.iter().any(|k| int(m, k).is_err())
+            || (m["budget_refusals"] == 0
+                && m["largest_column_degree"].as_u64().is_none_or(|v| v > 64))
+            || m["edge_evaluations"].as_u64().is_none_or(|v| v > 1_000_000)
+            || m["largest_active_coefficients"]
+                .as_u64()
+                .is_none_or(|v| v > 1_000_000)
+        {
+            return false;
+        }
+        if m["budget_refusals"] == 0
+            && (m["normalized_rows"].as_u64()
+                != m["selected_edges"].as_u64().and_then(|e| {
+                    g["last_report"]["pivots"]
+                        .as_u64()
+                        .and_then(|p| e.checked_add(p))
+                })
+                || m["selected_edges"] != g["last_report"]["merges"])
+        {
+            return false;
+        }
+    }
     let keys = [
         "calls",
         "projected",
@@ -145,6 +187,9 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_errors: usize) -> Result<Value,
         .filter(|x| x.is_finite() && *x >= 1.0)
         .ok_or("AA tolerance")?;
     if rounds < 5
+        || plan
+            .get("graph_strategy")
+            .is_some_and(|v| v.as_str().is_none_or(|s| !["pivot", "mst"].contains(&s)))
         || warm == 0
         || draws < 1000
         || seed == 0
@@ -192,6 +237,12 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_errors: usize) -> Result<Value,
     let mut pending = None;
     let mut raw_count = 0;
     for row in rows {
+        if (plan.get("graph_strategy").is_some() && row["graph_strategy"] != plan["graph_strategy"])
+            || (plan.get("graph_strategy").is_none()
+                && row.get("graph_strategy").is_some_and(|v| v != "pivot"))
+        {
+            global.insert("graph strategy mismatch".into());
+        }
         if (plan.get("sieve_recipe").is_some() && row["sieve_recipe"] != plan["sieve_recipe"])
             || (plan.get("worker_timeout_seconds").is_some()
                 && row["worker_timeout_seconds"] != plan["worker_timeout_seconds"])
@@ -339,6 +390,9 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_errors: usize) -> Result<Value,
                             work["solved"] == true
                                 && work["correct"] == false
                                 && valid_graph(&work["graph_filter"])
+                                && ((plan["graph_strategy"] == "mst")
+                                    == !work["graph_filter"]["mst"].is_null())
+                                && (plan["graph_strategy"] != "mst" || w["graph_strategy"] == "mst")
                         }
                         _ => {
                             work["run"]["correct"] == false
@@ -353,6 +407,8 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_errors: usize) -> Result<Value,
                         }
                     };
                     valid &= row["valid"] == true
+                        && (plan.get("graph_strategy").is_none()
+                            || w["graph_strategy"] == plan["graph_strategy"])
                         && row["child_exit"] == 0
                         && w["method"] == METHODS[method]
                         && w["solver_answer_placeholder"] == 0
@@ -462,8 +518,6 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_errors: usize) -> Result<Value,
 }
 fn plot(s: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
     let cases = s["strata"].as_array().ok_or("strata")?;
-    let root = SVGBackend::new(path, (1200, 650)).into_drawing_area();
-    root.fill(&WHITE)?;
     let names = ["graph_over_ic", "graph_over_rho", "ic_over_rho"];
     let labels: Vec<_> = cases
         .iter()
@@ -485,32 +539,52 @@ fn plot(s: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
             })
         })
         .flatten()
+        .filter(|v| v.is_finite() && *v > 0.0)
         .collect();
-    let lo = values.iter().copied().fold(1.0, f64::min).max(0.0001) * 0.8;
-    let hi = values.iter().copied().fold(1.0, f64::max) * 1.2;
+    let root =
+        SVGBackend::new(path, (1200, 200 + 75 * labels.len().max(1) as u32)).into_drawing_area();
+    root.fill(&WHITE)?;
+    let lo = values.iter().copied().fold(1.0, f64::min).max(0.0000001) * 0.8;
+    let hi = values.iter().copied().fold(1.0, f64::max) * 1.6;
     let mut chart = ChartBuilder::on(&root)
         .caption(
             "Weak-cover IC and checked graph filtering: cold-process wall",
             ("sans-serif", 22),
         )
         .margin(24)
-        .x_label_area_size(80)
-        .y_label_area_size(70)
-        .build_cartesian_2d(0.0..labels.len().max(1) as f64, (lo..hi).log_scale())?;
+        .x_label_area_size(65)
+        .y_label_area_size(270)
+        .build_cartesian_2d((lo..hi).log_scale(), -1i32..labels.len().max(1) as i32)?;
     chart
         .configure_mesh()
-        .y_desc("wall ratio; lower costs less")
-        .x_labels(labels.len())
-        .x_label_formatter(&|x| labels.get(*x as usize).cloned().unwrap_or_default())
-        .disable_x_mesh()
+        .x_desc("cold process wall ratio (log scale)")
+        .x_labels(6)
+        .y_labels(labels.len() + 2)
+        .y_label_formatter(&|y| {
+            usize::try_from(*y)
+                .ok()
+                .and_then(|i| labels.get(i))
+                .cloned()
+                .unwrap_or_default()
+        })
+        .x_label_formatter(&|x| {
+            if *x < 0.001 || *x >= 1000.0 {
+                format!("{x:.1e}")
+            } else {
+                format!("{x:.3}")
+            }
+        })
+        .disable_mesh()
+        .label_style(("sans-serif", 18))
+        .axis_desc_style(("sans-serif", 19))
         .draw()?;
     chart.draw_series(LineSeries::new(
-        vec![(0.0, 1.0), (labels.len() as f64, 1.0)],
-        BLACK,
+        vec![(1.0, -1), (1.0, labels.len().max(1) as i32)],
+        BLACK.mix(0.45),
     ))?;
     for (case, r) in cases.iter().enumerate() {
         for (pair, name) in names.iter().enumerate() {
-            let x = (case * 3 + pair) as f64 + 0.5;
+            let y = (case * 3 + pair) as i32;
             let v = &r["ratios"][*name]["outer"];
             let color = if r["eligible_local_controlled_comparison"] == true {
                 BLUE
@@ -518,15 +592,17 @@ fn plot(s: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
                 RGBColor(150, 150, 150)
             };
             if let Some(mean) = v["geometric_mean"].as_f64() {
-                chart.draw_series(std::iter::once(Rectangle::new(
-                    [(x - 0.25, lo), (x + 0.25, mean)],
-                    color.filled(),
+                chart.draw_series(std::iter::once(Circle::new((mean, y), 8, color.filled())))?;
+                chart.draw_series(std::iter::once(Text::new(
+                    format!("{mean:.5}"),
+                    (mean * 1.08, y),
+                    ("sans-serif", 17),
                 )))?;
                 if let (Some(a), Some(b)) =
                     (v["bootstrap_95"][0].as_f64(), v["bootstrap_95"][1].as_f64())
                 {
                     chart.draw_series(std::iter::once(PathElement::new(
-                        vec![(x, a), (x, b)],
+                        vec![(a, y), (b, y)],
                         BLACK,
                     )))?;
                 }
@@ -676,6 +752,97 @@ mod tests {
                 false
             );
         }
+    }
+
+    fn mst_fixture() -> (Value, Vec<Value>) {
+        let (mut p, mut rows) = fixture(3, 1_000_003);
+        p["graph_strategy"] = json!("mst");
+        for r in &mut rows {
+            r["graph_strategy"] = json!("mst");
+            if r["record_type"] == "execution" {
+                r["worker"]["graph_strategy"] = json!("mst");
+                if r["worker"]["method"] == "graph" {
+                    r["worker"]["work"]["graph_filter"]["mst"] = json!({"trees":1,"edge_evaluations":3,"infeasible_edge_candidates":0,"normalized_rows":3,"selected_edges":2,"largest_column_degree":3,"largest_active_coefficients":20,"input_nonzeros":10,"output_nonzeros":4,"budget_refusals":0});
+                    r["worker"]["work"]["graph_filter"]["last_report"] =
+                        json!({"pivots":1,"merges":2});
+                    let mut work = r["worker"]["work"].clone();
+                    clean(&mut work);
+                    r["worker"]["signature"] =
+                        json!({"scalar":3,"verified":true,"capped":false,"work":work});
+                }
+            }
+        }
+        (p, rows)
+    }
+
+    #[test]
+    fn mst_identity_and_counter_tampering_cannot_qualify() {
+        let (p, rows) = mst_fixture();
+        for v in [Value::Null, json!(42), json!("unknown")] {
+            let mut invalid = p.clone();
+            invalid["graph_strategy"] = v;
+            assert!(analyze(&invalid, rows.clone(), 0).is_err());
+        }
+        assert_eq!(
+            analyze(&p, rows.clone(), 0).unwrap()["allows_later_frozen_scale_trial"],
+            true
+        );
+        for damage in 0..4 {
+            let mut r = rows.clone();
+            match damage {
+                0 => r[1]["graph_strategy"] = json!("pivot"),
+                1 => r[4]["worker"]["work"]["graph_filter"]["mst"] = Value::Null,
+                2 => {
+                    r[4]["worker"]["work"]["graph_filter"]["mst"]["edge_evaluations"] =
+                        json!(1_000_001)
+                }
+                _ => r[4]["worker"]["work"]["graph_filter"]["mst"]["normalized_rows"] = json!(4),
+            }
+            if damage > 0 {
+                let mut work = r[4]["worker"]["work"].clone();
+                clean(&mut work);
+                r[4]["worker"]["signature"] =
+                    json!({"scalar":3,"verified":true,"capped":false,"work":work});
+            }
+            assert_eq!(
+                analyze(&p, r, 0).unwrap()["allows_later_frozen_scale_trial"],
+                false
+            );
+        }
+        let mut undeclared = p.clone();
+        undeclared.as_object_mut().unwrap().remove("graph_strategy");
+        assert_eq!(
+            analyze(&undeclared, rows, 0).unwrap()["allows_later_frozen_scale_trial"],
+            false
+        );
+    }
+
+    #[test]
+    fn a_reported_mst_resource_refusal_can_recover_but_never_pass_projection_gate() {
+        let (p, mut rows) = mst_fixture();
+        for r in &mut rows {
+            if r["record_type"] == "execution" && r["worker"]["method"] == "graph" {
+                let g = &mut r["worker"]["work"]["graph_filter"];
+                g["projected"] = json!(0);
+                g["refusals"] = json!(1);
+                g["fallback_solves"] = json!(1);
+                g["output_rows"] = json!(0);
+                g["replayed_rows"] = json!(0);
+                g["mst"]["budget_refusals"] = json!(1);
+                g["mst"]["largest_column_degree"] = json!(65);
+                let mut work = r["worker"]["work"].clone();
+                clean(&mut work);
+                r["worker"]["signature"] =
+                    json!({"scalar":3,"verified":true,"capped":false,"work":work});
+            }
+        }
+        let s = analyze(&p, rows, 0).unwrap();
+        assert_eq!(s["strata"][0]["eligible_local_controlled_comparison"], true);
+        assert_eq!(
+            s["strata"][0]["nontrivial_graph_projection_in_all_measured_arms"],
+            false
+        );
+        assert_eq!(s["allows_later_frozen_scale_trial"], false);
     }
     #[test]
     fn false_valid_flag_or_placeholder_cannot_hide_wrong_scalar() {

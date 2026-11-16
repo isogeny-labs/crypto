@@ -1,3 +1,72 @@
+# Current checkpoint: MST SOURCE CHECKS PASS,23NOTRUN
+
+Actualnativeproductionbuild+publicworkerexampletestPASS.10filter/17sieve+graph
+(2ignored)/19cover(1ignored)/1example;allnative/analyzerbuilds+strictClippyPASS.
+Analyzer46executions36distinct10dupPASS;newanalyzerreplays20/21/22BYTEEXACT.
+Standalone10tests/buildClippyPASS(initialtuplealiaslintretained);nativeinitial
+analyzercollapsibleiflintfixed/logretained. NewgenericMSTsrcnative637lines, additive
+API&CLI,originaloptions/functions/serializeddefaultskept,proxyguard/no speedclaim.
+SOURCE/PREFLIGHTREADY:76-filevalidation/cover-mst-source.sha256. Amend18 +
+cover-mst-validation-plan.json: p1009seed263,1nativeICthen1MSTgraph,0warm/noAA/
+rho/ratios/CI;900each1900wholeCPU0/8GiB/no retry,incidence/sharedboth. MUSTpublish
+cleanSOURCEbeforeSOLEcreate-newwrappercall to
+/workspace/ic-local-runs/local-cover-mst-validation-20261116-23.
+23NOdata/no processesactive. Afterexitoriginalcopiedanalyzer/hashes/fullflow/report.
+Requireactualbothgrouprecoveries+nontrivialacceptedMSTprojectionno fallback;
+refusalretained andfailscriterion, nochanged22gate. GoalACTIVE/localworks.
+
+22completeCENSORpublished1abc1f671/aaebotffintegrated&PNGsrestored/hashespass.
+25/36complete3/5roundsallscalarsvalid,8graph516->387/no fallback. Fullsummary13765B,
+raw350106BLOCAL, compactflow/report2pagesinGit;allCIsnull/ineligible/no parity.
+CurrentCOUNTEDcostgapreview:existingjv_cover_ic_vs_rho_bitops.rs +jv_bitops +
+docs/units/BITOPS.md read. Currentgenericgraphmodularhelpersbypasshooks; wall is
+onlypracticaldiagnostic, cannotprimarycountedcostclaim. Futureaccountingpointer,
+NOnewcode/protocolselectedthereyet. KBnew2queriesunavailable/tmp/ic-graph-bitops-*.
+NextCI>=08:47absentevent/newsourceevent. PR4288same/automerge/requiredgatesunconfirmed.
+No stopgoal/subagents/ledgeredits. Historymanifestsunaltered.
+
+# Current checkpoint: native MST port compiling;23not run
+
+Stage22 FINISHED/PUBLISHED1abc1f671, artifact-onlyaaeffintegrated/exact22PNGsrestored/hashpass.
+22exit124/3600.002s,36planned26starts25complete6warm19measure3correctrounds,
+inflightmeasurement3/graph_b,10unattempted. All25completedscalarvalid;8graph516->387/
+387replays/no fallback. Eligibilityfalse/allCIsnull/followupfalse/parityfalse. Full13765B
+originalsummary/compactflow/progress/reports in study;350106BraworiginalLOCALonly.
+BothPDFpagesinspected, presentation-onlyRustaxesfixpreservesoriginalplot+summary.
+PR4288bodyactual22censor. Nevercomposepartialratiosasgain/parity. GoalACTIVE/localworks.
+
+MST standalone10testsPASS(5old+5new,576rowspaces3primes/64exhaustive4nodeMST/caps/
+witness/nonunits). Actualstandalonebuild/ClippyPASS afterinheritedduplicate_keytuplealias;
+initiallintlogretained. /workspace/ic-mst-prototype remainsreferencebutactualnativefiles
+nowPORTEDANDDIRTYINROOT. Genericnewsrc/cryptanalysis/large_prime_filter_mst.rs637lines;
+parentpubexports+tuplealias; additivejv_sieve::run_cover_sieve_dlp_on_with_mst_filter;
+protectedtarget/MST/proxyguard/chosenrowsreplay; optionalstats/zero-skipkeepoldreport;
+explicit--mst-graph +planstrategyworkerbinding; wrapperarchivesnewmodule.
+No mathspeedclaimfromproxy. SourcesMST_FILTER_REVIEW.md.
+
+NativeCargolibtest compilation session91887 STARTED~08:19, stillCompilecrypto at08:28.
+DO NOT duplicatebuild/cancelwithoutreason. Aftercompletion run remaininglibfilters
+jv_sieve+jv_cover, thenlib/exampleClippy BEFOREproductionexamplebuild+test. No scientific
+jobactive. StandaloneprotoCargo test3+derivedTypedsourcealreadyvalid butnativepending.
+
+NativeANALYZERDONE:46executionsPASS(36distinct/10importeddup),actualbuild/ClippyPASS;
+initialcollapsible-iflintfixed/logretained. Newanalyzer reproduces20/21/22summariesBYTEEXACT
+in/tmp/ic-stage{20,21,22}-mst-backcompat; no scientificdatarewrites. Nativeplotreadablehorizontal.
+
+CONDITIONALnextstage23selectedprospectively AFTERallnativechecks+cleanpublishedsource:
+AMENDMENT_18_MST_FILTER.md / cover-mst-validation-plan.json: p1009freshseed263,
+exact2freshworkersICthenMSTgraph/1round0warm/noAA,rho,ratios,CI;900each1900whole,
+CPU0/8GiB/noretry;incidence/sharedboth. Requirebothactualfullrecoveries+nontrivial
+acceptedMSTgraph/no fallbackbeforeANYnewtimingcomparison. 23NOTRUN, source未published.
+Needfinalsourcechecks, manifestvalidation/cover-mst-source.sha256 includeNEWmodule+review+
+AMEND18+plan, commit/push SOURCE BEFOREsolewrappercall tocreate-new
+/workspace/ic-local-runs/local-cover-mst-validation-20261116-23.
+ThisdoesNOTpass22failedgate. Parentfullsuiteknownfailures/interruptedremain,noglobalpass.
+
+CIlast07:57:28on811f: appreview/migratesuccess,requiredgate/size/artifacts/reviewunconfirmed;
+NEXT>=08:47absentevent. PR4288same/automerge,nomanualmerge. No stopgoal/no subagents.
+Historicalmanifestsunchanged. AllnewclaimsPCCunverified/no admittedrows/keyledgermutations.
+
 # Current checkpoint: Stage22 FINISHED CENSORED, MST still UNCOMPILED
 
 22source23b4c1a70, /workspace/ic-local-runs/local-cover-comparison-20261116-22

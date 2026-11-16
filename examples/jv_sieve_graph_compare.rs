@@ -44,6 +44,8 @@ struct Args {
     validation_only: bool,
     #[arg(long)]
     incidence_shared: bool,
+    #[arg(long)]
+    mst_graph: bool,
     #[arg(long, default_value_t = 0)]
     worker_timeout_seconds: u64,
 }
@@ -108,6 +110,7 @@ fn solve_worker(
     method: &str,
     seed: u64,
     keep: usize,
+    mst: bool,
 ) -> Result<Value, String> {
     if !is_prime_u64(curve.p)
         || !is_prime_u64(curve.l)
@@ -165,17 +168,31 @@ fn solve_worker(
             retained_percent: keep,
             ..Default::default()
         };
-        let (report, scalar) = sieve::run_cover_sieve_dlp_on_with_filter(
-            &spec,
-            seed,
-            0,
-            1.0,
-            Some(64),
-            1.25,
-            None,
-            false,
-            (method == "graph").then_some(&options),
-        );
+        let (report, scalar) = if mst {
+            sieve::run_cover_sieve_dlp_on_with_mst_filter(
+                &spec,
+                seed,
+                0,
+                1.0,
+                Some(64),
+                1.25,
+                None,
+                false,
+                (method == "graph").then_some(&options),
+            )
+        } else {
+            sieve::run_cover_sieve_dlp_on_with_filter(
+                &spec,
+                seed,
+                0,
+                1.0,
+                Some(64),
+                1.25,
+                None,
+                false,
+                (method == "graph").then_some(&options),
+            )
+        };
         let verified = report.solved;
         let capped = report.exhausted;
         (
@@ -192,6 +209,7 @@ fn solve_worker(
     without_times(&mut semantic_work);
     Ok(
         json!({"method":method,"solver_answer_placeholder":0,"recovered_scalar":scalar,
+        "graph_strategy":if mst {"mst"}else{"pivot"},
         "verified":verified,"capped":capped,"inner_wall_ns":elapsed,"work":work,
         "signature":{"scalar":scalar,"verified":verified,"capped":capped,"work":semantic_work}}),
     )
@@ -210,7 +228,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let curve = serde_json::from_reader(File::open(
             args.fixture.as_ref().ok_or("worker fixture required")?,
         )?)?;
-        let result = solve_worker(&curve, method, args.walk_seed, args.retained_percent)?;
+        let result = solve_worker(
+            &curve,
+            method,
+            args.walk_seed,
+            args.retained_percent,
+            args.mst_graph,
+        )?;
         println!("{}", serde_json::to_string(&result)?);
         return Ok(());
     }
@@ -282,6 +306,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "retained_percent":args.retained_percent,"rho_options":rho_options(spec.l),
             "validation_only":args.validation_only,"worker_timeout_seconds":args.worker_timeout_seconds,
             "capacity_model_m9":sieve::relations_estimate(p,9),
+            "graph_strategy":if args.mst_graph {"mst"}else{"pivot"},
             "sieve_recipe":if args.validation_only || args.incidence_shared {"incidence_shared"}else{"historical_default"}});
             let mut fixture = base.clone();
             fixture["record_type"] = json!("fixture");
@@ -339,6 +364,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 "--retained-percent",
                                 &args.retained_percent.to_string(),
                             ]);
+                        if args.mst_graph {
+                            command.arg("--mst-graph");
+                        }
                         for (key, _) in std::env::vars_os()
                             .filter(|(key, _)| key.to_string_lossy().starts_with("JV_"))
                         {
@@ -401,7 +429,7 @@ mod tests {
         };
         let serialized = serde_json::to_value(&curve).unwrap();
         assert!(serialized.get("d").is_none() && serialized.get("expected_scalar").is_none());
-        let got = solve_worker(&curve, "rho", 3, 75).unwrap();
+        let got = solve_worker(&curve, "rho", 3, 75, false).unwrap();
         assert_eq!(got["recovered_scalar"], spec.d);
         assert_eq!(got["verified"], true);
         assert_eq!(got["work"]["run"]["correct"], false); // no planted answer supplied

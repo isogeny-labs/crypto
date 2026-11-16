@@ -1866,6 +1866,61 @@ pub fn run_cover_sieve_dlp_on_with_filter(
     trace: bool,
     graph_options: Option<&SieveGraphOptions>,
 ) -> (SieveDlpReport, Option<u64>) {
+    run_cover_sieve_dlp_on_with_filter_mode(
+        spec,
+        seed,
+        rho_runs,
+        rho_s_ref,
+        stop,
+        margin,
+        m_override,
+        trace,
+        graph_options,
+        false,
+    )
+}
+
+/// Additive opt-in MST mode; original API/options/default reports stay intact.
+/// Its dimension/nonzero guard is a work proxy, not a wall-time guarantee.
+#[allow(clippy::too_many_arguments)]
+pub fn run_cover_sieve_dlp_on_with_mst_filter(
+    spec: &Spec,
+    seed: u64,
+    rho_runs: usize,
+    rho_s_ref: f64,
+    stop: Option<usize>,
+    margin: f64,
+    m_override: Option<usize>,
+    trace: bool,
+    graph_options: Option<&SieveGraphOptions>,
+) -> (SieveDlpReport, Option<u64>) {
+    run_cover_sieve_dlp_on_with_filter_mode(
+        spec,
+        seed,
+        rho_runs,
+        rho_s_ref,
+        stop,
+        margin,
+        m_override,
+        trace,
+        graph_options,
+        true,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_cover_sieve_dlp_on_with_filter_mode(
+    spec: &Spec,
+    seed: u64,
+    rho_runs: usize,
+    rho_s_ref: f64,
+    stop: Option<usize>,
+    margin: f64,
+    m_override: Option<usize>,
+    trace: bool,
+    graph_options: Option<&SieveGraphOptions>,
+    mst: bool,
+) -> (SieveDlpReport, Option<u64>) {
     use super::jv_bitops::{enter, Phase};
     let start = Instant::now();
     // Opt-in: JV_FB_LINE=n moves the instance to the best of n factor-base
@@ -2252,7 +2307,11 @@ pub fn run_cover_sieve_dlp_on_with_filter(
         sel.extend(usable.iter().map(|r| mapped(r)));
         let before = la_ops;
         let projection = graph_options.and_then(|options| {
-            graph_filter::project(&sel, l, options, rep.graph_filter.as_mut().unwrap())
+            if mst {
+                graph_filter::project_mst(&sel, l, options, rep.graph_filter.as_mut().unwrap())
+            } else {
+                graph_filter::project(&sel, l, options, rep.graph_filter.as_mut().unwrap())
+            }
         });
         let verified_scalar = |dd: Option<u64>| {
             let _verify = enter(Phase::Verification);

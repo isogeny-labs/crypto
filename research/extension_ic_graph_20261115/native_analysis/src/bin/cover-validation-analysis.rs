@@ -23,6 +23,9 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
         .filter(|s| s.len() == 40 && s.bytes().all(|c| c.is_ascii_hexdigit()))
         .ok_or("source SHA")?;
     if plan["driver_kind"] != "cover-sieve-validation"
+        || plan
+            .get("graph_strategy")
+            .is_some_and(|v| v.as_str().is_none_or(|s| !["pivot", "mst"].contains(&s)))
         || plan["rounds"] != 1
         || plan["warmup_rounds"] != 0
         || plan["worker_timeout_seconds"] != 900
@@ -59,6 +62,10 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
     let mut raw_count = 0;
     for row in rows {
         if row["schema"] != "cover.sieve.graph-validation/v1"
+            || (plan.get("graph_strategy").is_some()
+                && row["graph_strategy"] != plan["graph_strategy"])
+            || (plan.get("graph_strategy").is_none()
+                && row.get("graph_strategy").is_some_and(|v| v != "pivot"))
             || row["source_revision"] != source
             || row["validation_only"] != true
             || row["worker_timeout_seconds"] != 900
@@ -147,6 +154,8 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
             let mut semantic = work.clone();
             clean(&mut semantic);
             valid = r["valid"] == true
+                && (plan.get("graph_strategy").is_none()
+                    || w["graph_strategy"] == plan["graph_strategy"])
                 && r["child_exit"] == 0
                 && w["method"] == method
                 && w["solver_answer_placeholder"] == 0
@@ -166,6 +175,8 @@ fn analyze(plan: &Value, rows: Vec<Value>, bad_lines: usize) -> Result<Value, St
             if method == "graph" {
                 let g = &work["graph_filter"];
                 valid &= valid_graph(g);
+                valid &= (plan["graph_strategy"] == "mst") == !g["mst"].is_null();
+                valid &= plan["graph_strategy"] != "mst" || w["graph_strategy"] == "mst";
                 exercised = g["projected"].as_u64().is_some_and(|v| v > 0)
                     && g["fallback_solves"] == 0
                     && g["output_rows"].as_u64() < g["input_rows"].as_u64();
@@ -260,6 +271,35 @@ mod tests {
         assert_eq!(s["full_recovery_validation_passed"], true);
         assert_eq!(s["comparative_eligibility"], false);
         assert_eq!(s["rho_parity"], false);
+    }
+    #[test]
+    fn explicit_mst_validation_binds_worker_identity_and_counters() {
+        let (mut p, mut rows) = fixture();
+        p["graph_strategy"] = json!("mst");
+        for r in &mut rows {
+            r["graph_strategy"] = json!("mst");
+            if r["record_type"] == "execution" {
+                r["worker"]["graph_strategy"] = json!("mst");
+                if r["worker"]["method"] == "graph" {
+                    r["worker"]["work"]["graph_filter"]["mst"] = json!({"trees":1,"edge_evaluations":3,"infeasible_edge_candidates":0,"normalized_rows":3,"selected_edges":2,"largest_column_degree":3,"largest_active_coefficients":20,"input_nonzeros":10,"output_nonzeros":4,"budget_refusals":0});
+                    r["worker"]["work"]["graph_filter"]["last_report"] =
+                        json!({"pivots":1,"merges":2});
+                    let mut work = r["worker"]["work"].clone();
+                    clean(&mut work);
+                    r["worker"]["signature"] =
+                        json!({"scalar":3,"verified":true,"capped":false,"work":work});
+                }
+            }
+        }
+        assert_eq!(
+            analyze(&p, rows.clone(), 0).unwrap()["full_recovery_validation_passed"],
+            true
+        );
+        rows[4]["worker"]["graph_strategy"] = json!("pivot");
+        assert_eq!(
+            analyze(&p, rows, 0).unwrap()["full_recovery_validation_passed"],
+            false
+        );
     }
     #[test]
     fn wrong_scalar_fake_mode_and_fallback_never_qualify() {

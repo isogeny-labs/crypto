@@ -195,7 +195,8 @@ impl WorkRow {
     }
 }
 
-fn duplicate_key(row: &PartialRelation) -> (Vec<(u32, u64)>, Vec<(u64, u64)>, u64) {
+type RelationKey = (Vec<(u32, u64)>, Vec<(u64, u64)>, u64);
+fn duplicate_key(row: &PartialRelation) -> RelationKey {
     (row.small.clone(), row.large.clone(), row.rhs)
 }
 
@@ -487,3 +488,7 @@ mod tests {
         );
     }
 }
+
+#[path = "large_prime_filter_mst.rs"]
+mod mst;
+pub use mst::{filter_large_primes_mst, MstAttempt, MstLimits, MstStats};

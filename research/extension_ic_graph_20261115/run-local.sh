@@ -69,6 +69,7 @@ cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
   src/cryptanalysis/jv_sieve.rs src/cryptanalysis/jv_sieve_graph.rs \
   src/cryptanalysis/jv_rho_strong.rs src/cryptanalysis/jv_isogeny_walk.rs \
   src/cryptanalysis/large_prime_filter.rs \
+  src/cryptanalysis/large_prime_filter_mst.rs \
   research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \
   research/pencil_large_prime_20261029/src/sparse.rs research/extension_ic_graph_20261115 \
@@ -89,6 +90,9 @@ argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" \
 if [[ "$driver_kind" == cover-sieve-graph || "$driver_kind" == cover-sieve-validation ]]; then
   keep_percent=$(jq -er .retained_percent "$run_dir/runtime-plan.json")
   argv+=(--retained-percent "$keep_percent")
+  if [[ $(jq -r '.graph_strategy // "pivot"' "$run_dir/runtime-plan.json") == mst ]]; then
+    argv+=(--mst-graph)
+  fi
   if [[ $(jq -r '.sieve_recipe // "historical_default"' "$run_dir/runtime-plan.json") == incidence_shared ]]; then
     argv+=(--incidence-shared)
   fi
