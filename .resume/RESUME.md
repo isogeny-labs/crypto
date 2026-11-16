@@ -1,4 +1,60 @@
-# Current checkpoint:29FINISHED, publish then RREF arithmetic coverage (16 November13:53Z)
+# Current checkpoint:30SOURCE READY, NOT RUN (16 November14:28Z)
+
+Native checks finished: adapter3/3, sieve25pass/2existingignored, sampler2/2,
+public-input1/1, productiontwoexamples andlibrary/twoexamplesstrictClippyPASS.
+Standalonecounterqualifier13checks/build/ClippyPASS. FivefrozenrootsourcehashesPASS.
+No activecompiler/scientificjob. No30rundir/call/data yet. Nextfreshsource/build
+manifests,commit/pushcleanSOURCE/spec, thensole60secCPU0/1GiBreplay perAmendment25
+andrun-rref-counter-local.sh. Source/input/prepostcustody/copiedqualifier/report
+required. Userlocal/Runpod authorizationpersists; checkpointuploadunavailable,
+preservecurrentgatefailure andlocal+Gitcheckpoints. GoalACTIVE.
+
+# Previous checkpoint:30selected; counted RREF native checks active (16 November14:18Z)
+
+29PUBLISHED0fcdf7cc53aca5ad74e2c961cfcf785456165221/PRactualscalar+gapupdated.
+Artifactbot56b327155FFintegrated/exactignored29PNGrestored/hashPASS,neverreadd.
+CurrentHEAD56b327155+DIRTYcountedRREFcode/replay/analyzer/protocol/docs/journal/
+lessonO-81fdaf761e20. No30scientificcall/data/rundir yet. GoalACTIVE/no stopgoal/subagents.
+
+NEWCountedRelationSystem wrapper src/cryptanalysis/jv_counted_linear.rs,
+pubexportfromtwo_large_prime; newclassifiedhook_muls in jv_bitops. Generic
+RelationSystem/residual_walk unchanged. Delegatesinsert, exactproducts=legacyopsdelta;
+adds=delta-(cols+1)ifindependent/else delta; existinginv_modhooksnotchargedagain.
+2LPfullrunneruseswrapper. Testhand11M5A2I; wideordinary/Shouppaths preservevalues/
+legacyops, batchfield/scalar/other classification. Replayexample jv_relation_counter_replay
+readsimmutable29matrix andstopsatdeterminedtarget; parsing/mappingoutsidecounterinterval.
+Native scans/fixedfactor setup remainexplicitlyunpriced; no primarytotal/composition.
+
+Finallibrary/twoexamplesstrictClippy PASS; initialNoPriceconversion/unusedFile errors
+retained/fixed. Root5filesfrozensince14:08; /tmp/ic-rref-counted-root-source-before-tests.sha256
+PASS. Queued session84549 nativeadapter3,fullsieve,uniform,publicinputtest/prodbuild
+STILLRUNNING; checkvalidation/rref-counted-{adapter-tests,sieve-tests,uniform-tests,
+public-input-tests,example-build}.log. DO NOT editrootfileswhilecompilerreads/timemeasure.
+Standalone rref-counter-analysis13tests(12shared+1newhand/tamper)/build/strictClippyPASS.
+RREF_COUNTED_ADAPTER_REVIEW.md recordscontract/sourcebasis. KB/Conductorabsent
+receipts/tmp/ic-rref-accounting-{kb-search1,kb-search2,conductor}.log.
+
+SELECTEDProspectiveAmendment25/rref-counter-replay-plan.json/run-rref-counter-local.sh/
+rref-counter-report.typ: immutable29inputSHA2560f035fbd976dd7575206427fa28057502778742410059494f7a0d280e4967de0
+(1020695B),originalsourceaf48df0d30dccce461370cc8e787a45c2640134d,
+p1009,l263807419983680297,target397,398columns/rank398,legacyM7711970,
+scalar147253026768918773. 1run0warm/60sec/CPU0/1GiB/noretry. RequireModrMullegacy,
+ModrAdd=legacy-rank*(cols+1),Inv=rank/zeroOtherforeign/exactreprice/samevalues.
+No newrelation/descent/fullDLP, no primaryratio/rho/fullprice/crossruncomposition.
+Afterfinalnativechecks: freshsource/buildmanifest,COMMIT/PUSHcleanSOURCE/spec
+BEFOREsolecall /workspace/ic-local-runs/local-recorded-rref-counter-20261116-30.
+Thenoriginalcopiedanalyzer/raw/inputproofLOCALif>64KiB/summary/flow/hash/report/
+viewallpages/exactbenchcopies/publication. No30call/data yet.
+
+Nextalgorithmwork aftercounterclosure: adaptive/streamingLPcollection toavoid
+29fixedspaceoversupply(1122rows/rank398),NOTselectedyet. Complete strongest-rho
+pricing/nativecoverage remainsopen. No longspeculation loops; tools/action/
+commentary<=60s. CIlastaf48at13:38appreview+migrateSUCCESS/othersEMPTY,
+requiredgatesreviewunconfirmed;next>=14:28absentevent/newsourcepublication.
+PR4288regular/automerge/no manualmerge. Userlocal/Runpod authpersists/S3upload
+stillunavailable; don'taskcredentials. AllclaimsPCCunverified.
+
+# Previous checkpoint:29FINISHED, publish then RREF arithmetic coverage (16 November13:53Z)
 
 Sourceaf48df0d30dccce461370cc8e787a45c2640134d PUBLISHEDBEFOREsole29call.
 Run /workspace/ic-local-runs/local-cover-two-lp-dlp-validation-20261116-29

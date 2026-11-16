@@ -22,6 +22,9 @@ pub use dlp::{
     run_two_large_prime_dlp_on, ProtectedTargetProjection, TwoLargePrimeDlpOptions,
     VerifiedDescentRelation,
 };
+#[path = "jv_counted_linear.rs"]
+mod counted_linear;
+pub use counted_linear::CountedRelationSystem;
 
 /// Distinct roots of a nonzero polynomial of degree <= 2, or refusal.
 /// Repeated roots are refused, rather than silently treated as simple roots.

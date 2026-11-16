@@ -1,9 +1,11 @@
 //! Affine descent and a protected target column for adapted two-LP IC.
 use super::{
-    filter_and_replay, FilteredTwoLargePrimeRelations, TwoLargePrimeRelation, TwoLargePrimeSieve,
+    filter_and_replay, CountedRelationSystem, FilteredTwoLargePrimeRelations,
+    TwoLargePrimeRelation, TwoLargePrimeSieve,
 };
 use crate::cryptanalysis::gaudry_cubic::am;
 use crate::cryptanalysis::gaudry_cubic::sm;
+use crate::cryptanalysis::jv_bitops::{self as work, Phase};
 use crate::cryptanalysis::jv_cover::{factor_base, nagao_decompose, opts_for, EllE};
 use crate::cryptanalysis::jv_cover::{verify_dec, Ctx, Dec6, Spec};
 use crate::cryptanalysis::jv_sieve::{
@@ -11,10 +13,6 @@ use crate::cryptanalysis::jv_sieve::{
     shared_for_b, Counters, FpRing,
 };
 use crate::cryptanalysis::large_prime_filter::{LargePrimeFilterOptions, PartialRelation};
-use crate::cryptanalysis::{
-    jv_bitops::{self as work, Phase},
-    residual_walk::RelationSystem,
-};
 use rand::{rngs::StdRng, SeedableRng};
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -235,7 +233,7 @@ pub fn run_two_large_prime_dlp_on(
                     }
                     Ok(projection) => {
                         let columns = sieve.small + 1;
-                        let mut system = RelationSystem::new(spec.l, columns);
+                        let mut system = CountedRelationSystem::new(spec.l, columns);
                         for row in &projection.projection.rows {
                             let mut dense = vec![0u64; columns];
                             work::words(columns as u64);

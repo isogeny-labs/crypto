@@ -424,6 +424,15 @@ pub fn hook_mul(m: u64) {
     }
 }
 
+/// `n` reduced products, classified exactly like [`hook_mul`].
+/// Used when a kernel already maintains an exact arithmetic-operation count.
+#[inline(always)]
+pub fn hook_muls(m: u64, n: u64) {
+    if n != 0 && enabled() {
+        slow(m, Kind::FieldMul, Kind::ModrMul, n);
+    }
+}
+
 /// An addition, subtraction or negation mod `m`.
 #[inline(always)]
 pub fn hook_add(m: u64) {
