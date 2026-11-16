@@ -65,6 +65,13 @@ jobs:
             '{schema:"trace-runpod-checkpoint/v1",source_revision:$source,source_manifest_sha256:$closure,protocol_sha256:$protocol,gate_exit:$status,checkpoint_state:$state}' > "$RUNNER_TEMP/checkpoint-receipt.json"
           printf 'TRACE_CHECKPOINT_RECEIPT='
           jq -c . "$RUNNER_TEMP/checkpoint-receipt.json"
+          if test "$status" -ne 0; then
+            openssl cms -encrypt -binary -aes256 -in "$RUNNER_TEMP/checkpoint.private.log" \
+              -outform DER -out "$RUNNER_TEMP/checkpoint-log.cms" research/trace_incidence_20261116/runpod/upload-recipient.pem
+            printf 'TRACE_CHECKPOINT_PRIVATE_LOG_CIPHERTEXT='
+            base64 -w0 "$RUNNER_TEMP/checkpoint-log.cms"
+            printf '\n'
+          fi
           exit "$status"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -99,7 +106,7 @@ jobs:
           base64 -w0 "$RUNNER_TEMP/result-upload.cms"
           printf '\n'
       - name: Promote completed Runpod archives to immutable CAS
-        if: hashFiles('research/trace_incidence_20261116/runpod/CUSTODY_PROMOTION.json') != ''
+        if: always() && hashFiles('research/trace_incidence_20261116/runpod/CUSTODY_PROMOTION.json') != ''
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
