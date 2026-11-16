@@ -39,4 +39,4 @@ out={'schema':'ghs.trace-minus14.carrier-pgl2-orbits/v1',
 path=Path(__file__).resolve().parent/'CARRIER_ORBITS.json'
 assert not path.exists(),'refusing to overwrite receipt'
 path.write_text(json.dumps(out,indent=2,sort_keys=True,default=int)+'\n')
-print(json.dumps({'covered_models':12,'orbit_sizes':[len(r['models']) for r in orbits]},sort_keys=True))
+print(json.dumps({'covered_models':12,'orbit_sizes':[len(r['models']) for r in orbits]},sort_keys=True,default=int))
