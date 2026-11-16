@@ -1,1 +1,0 @@
-Complete immutable packets, including omitted compiled test binary and full proposed worker reference, are in S3_RECEIPT.json. Verify archive SHA-256 and bytes, extract, then run sha256sum -c SHA256SUMS at archive root. Original manifests describe the complete archived packets. Production assembly remains uncompiled.
