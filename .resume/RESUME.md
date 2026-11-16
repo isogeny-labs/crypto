@@ -1,3 +1,146 @@
+# Resume: mathematical 10x hyperelliptic IC goal
+
+## Goal
+Establish a mathematical breakthrough giving >=10x complete IC speedup for genus2 and above.
+This remains active and unachieved. Current branch research/hec-principal-relations-20261114,
+worktree /Users/adamburan/pq-work/hec-followups. PRs4096 and4170 are open;4170 is currently CLEAN.
+
+## Lead / hypothesis
+Exact principal-divisor identity from interpolation through g+1 rational places yields <=2g+1
+entry relation rows. This is known Riemann-Roch mathematics, not novelty; screen its end-to-end
+cost and rank against best-native controls before pursuing any breakthrough claim.
+
+## Spec
+research/hec_relation_math_20261114/DERIVATION.md, committed13930db391 before implementation.
+Eleven round-eight instances at seeds20260916..20260920; include both target descents, all solve
+retries, catalogue construction and final verification. Four Fast/Hybrid x reference/direct
+controls plus one-step walk. Candidate cap1million trials,16solves,10000descentsteps.
+
+## State
+Experimental code interpolation.rs and example principal_relations implemented. Release tests
+passed two tests including18 gated solves across six instances, all generated principal identities
+and target descents checked. Debug gate and build initiated; collect before experiment.
+No >=10x result established. Conductor T-5922 reserved paths; progress endpoint later hung.
+
+## Next steps
+Run recorded HEC_GATE=1 pilot first (all accepted rows group-checked); then run normal pilot.
+Example binary /Users/adamburan/pq-work/hec-followup-target/release/examples/principal_relations.
+Use benchrec run and preserve gate output and measurement output separately. Summarize against
+best-control complete time, retain capped/rank-failure rows. Extend sizes only with a cost case.
+Write source-linked report/graphs/PDF and benchmark record. Keep goal active if any gate misses.
+
+## Runs in flight
+All five recorded mathematical pilots are terminal. Final release library/example tests are
+being collected in the current session. Do not restart completed pilots. Current source and
+latest raw results are summarized in research/hec_anchor_relations_20261114/STATUS.md.
+
+## Stop and success conditions
+Local CPU only; no cloud spend authorized. A pilot or a known-method reproduction is not goal
+completion. >=10x requires held-out growing-size per-genus ladder, independent replay, baseline
+ratchet and mathematical novelty review. Preserve the full objective on null/negative evidence.
+
+## Open questions
+Will short rows retain enough rank and target connectivity? Does a one-step walk give the same
+gain more cheaply? Is there any mechanism beyond known interpolation that survives prior art?
+
+## 2026-11-15 04:54 UTC: next mathematical lead
+Principal pilot finished:55 gated candidate runs and330 paired solves all checked, but unrestricted
+principal rows lose at every row to best-native controls. At g2p4001:123ms vs5.3ms one-step walk.
+Next source ee98ca8b1d: table_factor.rs and table_oracle implement exact cubic and quartic root
+lookup via projective cubing/Cardano/Ferrari, p>3, p<=1million. PROTOCOL.md at
+research/hec_table_oracle_20261114/ freezes lemma and gates before code (c8a30320a6).
+Two release tests passed (all monic degree1..4 atp5,7,11,13 compared to independent root division,
+plus48000 randomized/constructed cases across8primes). Next is component measurement; table
+construction and O(p) memory must be charged. This is NOT an end-to-end10x result.
+Conductor MCP authentication failed; CLI check+claim worked for separate disjoint task T-5932.
+
+## Table pipeline gate
+The table pipeline preserves catalogue, trials, relations, rank retries, pivot hash, pivots,
+row operations, modular multiplications and k on220matched configurations. Genus2 builds only
+square roots (8p bytes), using square recurrence; genus3/4 builds inverse/cube/projective tables.
+Three release tests passed (including exhaustive/randomized oracle checks). Ready for new
+end-to-end record, eight controls and four table choices on eleveninstances x fiveseeds. Every
+cold setup, catalogue and verification remains inside total time. Component cold10.4x atg3p401
+is a component result only, with g2p503 regression in the initial all-degree table setup.
+
+## Anchor screen
+New protocol/source research/hec_anchor_relations_20261114/ (target-seeded H, <=2 off-anchor,
+weighted forest, signed-cycle proof). Twelve gated solves passed, plus planted arbitrary-gain
+forest invariants. Next: recorded55-case full gate and55-case timed pilot, compare to strongest
+native AND table baselines. Tables/caches/descents/forest/verification all charged cold.
+Goal remainsactive: no >=10x complete gain established. User requests skipping further repeated
+coordination. Work remains in task T-5941's already-claimed paths.
+
+## Signed-orbit pilot and packaging
+Source88a969080d integrates Gray-code norm updates, one batch anchor-difference inversion,
+bounded dense affine forest and incremental dense anchor elimination. Genus2 tuple family is
+shuffled without replacement. Original Horner catalogue retained on both sides by explicit
+pre-timing amendment. All55 group gate cases pass (15115raw,1290projected identities), and
+all110 interleaved cold solves pass. Per-size five-seed median gain vs frozen table controls
+1.27..2.94x, exploratory L0 macOS. Producer assertions [pcc:unverified].
+Five records now closed with raw hashes and shared report/plots in
+benchmarks/20261114-hec-anchor-forest. Source-linked report visually inspected, two pages.
+PR4274 is open ready for review, stacked on research/hec-followups-20261114. All12 release
+library tests and13 research-example tests passed;2dense tests also passed in debug. Current
+Lean recheck compiled Algebra.lean and Forest.lean; outputs retained in the anchor run directory.
+Checkpoint20261115T060823Z-2c7378556b09 uploaded successfully. Artifact migration commitf385e46524
+was fast-forwarded locally; the report PNG now has an artifact-store manifest. Next: finish
+current-head CI and S3 custody checks; preserve
+independent replay, external comparison, held-out scaling and >=10x as outstanding research.
+Do not mark the goal complete based on this engineering/algebraic reuse pilot.
+
+## Compact high-coefficient quotient gate
+Previous goal turn was progress: signed-orbit code,55group gates,110cold solves,PR4274 and
+green CI/S3 custody on868eec5948. Current successor protocolCOMPACT-PROTOCOL.md committed
+1a115ad302 before implementation. Sourceb2fddfd8b2 retains exact signed relation stream and
+uses bounded coefficient arrays plus high norm coefficients only. Two kernel tests compare
+22128exhaustive and8000random (h,Q) pairs to reference/full Newton norm division; all10example
+tests passed, including integrated reference/compact group solves. [pcc:unverified]
+Record20261115T0625Z-hec-compact-orbit is open. Next commands: benchrec run HEC_GATE=1
+hec-followup-target/release/compact_bench to compact-run/gates.txt; require110 completed
+reference/compact solves, identical14field fingerprints and55fully checked compact cases.
+Only then run normal harness for165interleaved cold solves against frozen table control.
+Do not change earlier closed raw records or their report; use a separate compact addendum.
+Goal remains full mathematical>=10x, with independent replay/held-out scaling outstanding.
+
+## Compact pilot terminal result
+Gate110reference/compact runs passed (55compact group gates,15115raw/1290projected checks).
+All165timed cases passed. Reference-orbit/compact median total ratios0.83..1.32, including
+g2p101 loss; frozen-table/compact ratios1.22..2.98. [pcc:unverified]
+Record20261115T0625Z-hec-compact-orbit is closed, with compact-run raw files, standalone
+COMPACT-REPORT.pdf/compact.svg, and reproducible summarize_compact.jq/render_compact.py.
+12library+10anchor tests passed release;2compact tests passed debug (57.58seconds).
+Stop equivalent arithmetic rewrites. Do not call this a mathematical breakthrough.
+Next: held-out dense coefficient families and growing-size ladder under a fresh frozen protocol,
+all native/table controls, bounded instance selection and per-arm caps; preserve rank failures.
+No experiment is running. Current PR4274 must be extended with this commit and CI followed.
+
+---
+
+# Resume: crypto @ claude/index-calculus-gpu-optimization-otouqv (round 5: GPU m = 3 with incremental-gauss-echelon)
+
+
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
+
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
+
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
+
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
+
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
+
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
+
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
+
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.
 # Publish Root archive/source-data successor
 
 ## What was done
@@ -12,7 +155,6 @@ Successor required CI/review, fullscientificNEW28/oldgloballedger; Consumerc045 
 ## Errors
 Deleted old head caused one refused publisher attempt; full failure remains77ebba. No source, ledger prefix or scientific acceptance criterion was changed to publish the successor. [pcc:unverified]
 
----
 # Prior Root PR merged externally during source preparation
 
 pcc/claims/PCC-20261116-77ebba.json: local source6e77 has complete source governance531e88, but publisher lookup finds the old head absent and attempts no push. PR4366 was externally merged at02:28:20, after empty refresh8fa. Genuine merge966648 is fetched and its tree equals oldd3 exactly. Every failed publication byte is preserved. [pcc:unverified]
@@ -801,25 +943,18 @@ GitHub3877/1523/3904 bodies actuallyupdated; rootsettlement pcc/claims/PCC-20261
 
 # Resume: Chained ECDLP Transfers — 2026-11-13T23:29:21.914982+00:00
 
-## Goal
 Continue DLP-preserving transfers,chained Jacobian maps,prime-field descent and admitted computational comparisons acrosscrypto/cryptanalysis/lockedautoresearcher. Continueaftereachrung. [pcc:unverified]
 
-## Lead / hypothesis
 Actualthree F223 Jacobians now solveall15publicICcases;currenttestingchecks class-inputsolver/affinelog cancellation andsame-outputFastSourceChain. Nextsame-origin compatibility/completecostcoverage/completeodddegreecoordinates areopen;correctnessisnotcostevidence. [pcc:unverified]
 
-## Spec
 Consumerprospective98c6f0/2aee BEFOREcode;scientific1816c3b99cb69e2072a7f0a246bdeb98b9f005e8 normallypublished;nativee869bd/written1e65f0/twofaithfulbindings/57total/reportd1027f. Strictci_new_target_ic729+self730/ninephasepairs/82wholeJSONexceptdeclaredwalls/bothoriginal2declgates/2bindings. Originalroot3d scientificpin unchanged. [pcc:unverified]
 
-## State
 Rootbote563da1b1734d353b751868f8f57cb3fac6f570c afternormal4125274f. Genuine43d6ba/babda6 12wholecaptures+12indices+wholePDF25objects13S3+12Git;43525890255/132231419911 actual13remote replays/exactFF15paths/all3455guard07+dirtybytes+PDFlinktypes preserved/hold07released. FutureFFfreezeNEWguard08. Originalfixture restored1ea795/67ef1d/2293097bytesSHA8970667e/originalverify0/sameoriginalbinarytargetedpass. Fullrootretry03 remains124/1800s/2137guards0/unknowntotals;633ab0 twoexact101failures occur atDiagnosticSessionClock initialization,mandatory/proc/self/ns/time and/proc/self/timens_offsets absent. No unchangedwhole retry. [pcc:unverified]
 
-## Next steps
 Collectcurrent730full/native.exit/guard.exit/driver phases andfouractualcontrols;fetchALL14source1816workflows/190native57canonicaldigests,wholeAPI/logs/sourcecopies;checkpointinGitHubPR1523/root3877/queue3904. ThenoriginalS3uploaderCIroute withtrustedpinnedtool andno keyexport;nativecommonorigin/costcoverage/completebeta coordinates. Preserveallfailuresandgenuinewholedata. [pcc:unverified]
 
-## Runs in flight
 Routineboundedcleanphysicalindependentfull:bash /workspace/scratch/ct69-new-target-IC-full-01.sh;source1816/original3d,730guards/2100sbound/freshoutsidecache. Raw/log/exits at /workspace/scratch/ct69-new-target-IC-full-01. Own14sourceCI auditpending;no paidbenchmark oradmittedperformancerun. [pcc:unverified]
 
-## Stop and success conditions
 Currentfullrequiresnine native+tee0/0/oneunfiltered/82wholeJSONexceptdeclaredrawwalls/bothoriginal2declgates/2canonicalbindings/all730guards0/fouractual2nooutput/restored. Nativefailure/timeout retainedanddiagnosed. PerformanceonlyafterORIGINALS3gate/livebudget/capacity/isolation/completecosts/strongestrefs;rootglobal/mainledger/signing/reviews/conflict/geometry/vault/KB gapsareseparate. Continuewhileusefulauthorizedworkavailable. [pcc:unverified]
 
 
@@ -839,7 +974,6 @@ Starting ordinary originalrootlibraryretry03:bash /workspace/scratch/ct68-root-l
 
 Routineunitretryneedsnative0/all2137guards0/no filters orignores. Timeout/errorisretainedandnextfailurediagnosed,notglobalgreen. PerformanceexperimentsremainblockedbyoriginalS3checkpoint/livebudget/capacity/countercoverage;neverinfercostadvantagefromcorrectness. [pcc:unverified]
 
-## Open questions
 Actualgeometric/formalbridges/completebeta coordinates/allmapcosts/strongestmatchedICrho/mainledger/signing/reviews/conflict/vault8edec422locked/KBecdbunavailable. KeepqueueandGitHubcheckpointcurrent. [pcc:unverified]
 
 
@@ -3590,24 +3724,12 @@ Stop each stage at600s and the focused scientific window at3600s. No paid comput
 # Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
 
 
-# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
-Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
-Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
-Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
-(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
-research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
-Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
-Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
-RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
-Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
 
-Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
-Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
 <<<<<<< HEAD
 - Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
@@ -3719,6 +3841,4 @@ Branch on the quadratic character of each separator, adding X_c = n_j·z_c² wit
 All preceding resume content is preserved; no unrelated worker is started by this task. The following task-specific sections describe this branch and its actual next run.
 
 New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Exact-branch publication/checkpoint authorization was confirmed by the user on2026-11-06. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
-Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
-close benchrec record, write REPORT + figure + PDF, update PR.
 >>>>>>> theirs

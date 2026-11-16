@@ -1,0 +1,11 @@
+# Construct two actual F631 degree-13 primary 3-torsion groups
+
+Input is UNIQUE arithmetic-compatible case p631/c49 from preceding frozen96casejointcohort. This is selection by preregistered compatibility flags, not a randomly representative curve or10xworkloadclaim. PUBLIC/CERT/WEIL copied from committed cohort sources599554daec20/5bdc312b6490; N237185924,ell59296481. No oldkernel/alpha/pointtable used. This gate fixesp631explicitly, not a generalfieldport.
+
+Adapt the original 13-dimensional extension arithmetic by changing baseprime127→631 and extensionorder reciprocalq accordingly. Discover first irreducible t13+t+c, c1..630; exact irreducibility check. q63113fitsu128andq≡3mod4.32seeded field associativity/distributivity/inverse/Frobenius cases plus exact irreducibility and actual group checks; this is not an independent arithmetic implementation or all-input formalverification.
+
+Recompute #J(Fp13)from actualL by exactNewtonidentities AND companionmatrixdeterminant, check reciprocalcoefficients and ell divisor, remove full3adicfactor. Use same seed2026111501301/16attempts/32xdraws, randomdegreeoneclass, verify annihilation by extensionorder, removecofactor and reduce3depth, project by fresh BezoutFrobeniusprimaryprojectors. Require two27pointgroups, validorder3/Frobenius stability,729pairclosure checks each, intersectiononlyzero,729distinct validorder3sums. Corruptmonicleadingcoefficientmustreject. Dumpcompletekernelsandfieldmodulus in write-once run/.
+
+No explicit Weilpairingvalues are computed. Coprime nonselfreciprocal primaries imply isotropy by Frobenius-invariant pairing: a primary can pair only with its reciprocal. This is a readable standard mathematical argument, not an executed pairingtable or Leanformalization. No normalization, quotientgeometry, transfermap or DLP is constructed. Kerneldata do not establish target-Jacobian existence/model or10x.
+
+All source/lockeddeps/publicinput/Weil/cert/binaryhash committed and freshS3checkpoint/gate BEFORE scientificrun. Once-onlyRUN.txt/stderr/exit,run/, stopfirstfailure and retain, no silentretune orrerun withoutamendment. Bounds/protocol unchanged fromoriginalkernelbuilder except registeredprime/source and strongerclosurecontrols. No cloud/timing/exponentclaim; candidatekernelconstructionarithmetic itself must be charged later. Genus2/4and fullobjectiveopen.

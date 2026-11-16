@@ -1,0 +1,16 @@
+[package]
+name="hec-jetfreeprod631"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="check-jetfreeprod631"
+path="main.rs"
+[[bin]]
+name="jetfreeprod631"
+path="production.rs"
+[[bin]]
+name="compare-jetfree631"
+path="collector.rs"
