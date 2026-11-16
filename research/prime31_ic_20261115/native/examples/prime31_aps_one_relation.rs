@@ -98,6 +98,85 @@ fn source_sized(q:(u64,u64),seed:u64,ar:&mut Arithmetic,count:usize)
     }
     Ok((out,identity,duplicated))
 }
+
+// Experimental faster cold source for the same *published* APS algebraic
+// one-relation oracle: independent seed/step labels then a public additive
+// random walk. The finite 64-step table is built and charged for EACH round,
+// rather than shared across targets. No target log, group join, or hidden
+// scalar enters the algebraic search. Source points are correlated, so its
+// observed success probability must be measured, not assumed.
+fn source_walk_sized(q:(u64,u64),seed:u64,ar:&mut Arithmetic,count:usize)
+    ->Result<([Vec<Labelled>;3],u64,u64),String>{
+    const STEPS:usize=64;
+    let mut rng=seed^0x5741_4c4b_5f53_5445_u64;
+    let mut steps=Vec::with_capacity(STEPS);
+    for _ in 0..STEPS {
+        let jump=loop {
+            let a=prng(&mut rng)%N;
+            let b=prng(&mut rng)%N;
+            if a==0 && b==0 {continue;}
+            let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+            let bq=ar.scalar(PRIME31,b,Some(q));
+            if let Some(pt)=ar.add(PRIME31,ag,bq) {
+                break Labelled{pt,a,b};
+            }
+        };
+        steps.push(jump);
+    }
+    let mut out:[Vec<Labelled>;3]=std::array::from_fn(|_|Vec::with_capacity(count));
+    let mut xs=HashSet::with_capacity(3*count);
+    let mut identity=0u64;
+    let mut duplicated=0u64;
+    for part in &mut out {
+        let mut cur=loop {
+            let a=prng(&mut rng)%N;
+            let b=prng(&mut rng)%N;
+            if a==0 && b==0 {continue;}
+            let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+            let bq=ar.scalar(PRIME31,b,Some(q));
+            if let Some(pt)=ar.add(PRIME31,ag,bq) {
+                break Labelled{pt,a,b};
+            }
+            identity+=1;
+        };
+        let mut transitions=0usize;
+        while part.len()<count {
+            transitions+=1;
+            if transitions>count.saturating_mul(96).saturating_add(2_048) {
+                return Err("walk failed to produce enough distinct public abscissae".into());
+            }
+            if xs.insert(cur.pt.0) {
+                part.push(cur);
+            } else {
+                duplicated+=1;
+            }
+            if part.len()==count {break;}
+            let s=steps[(prng(&mut rng) as usize)&(STEPS-1)];
+            let a=addn(cur.a,s.a);
+            let b=addn(cur.b,s.b);
+            if let Some(pt)=ar.add(PRIME31,Some(cur.pt),Some(s.pt)) {
+                cur=Labelled{pt,a,b};
+            } else {
+                // No affine abscissa for the identity: count and reseed using
+                // public scalars, preserving correct labels in all cases.
+                identity+=1;
+                cur=loop {
+                    let a=prng(&mut rng)%N;
+                    let b=prng(&mut rng)%N;
+                    if a==0 && b==0 {continue;}
+                    let ag=ar.scalar(PRIME31,a,Some(PRIME31.g));
+                    let bq=ar.scalar(PRIME31,b,Some(q));
+                    if let Some(pt)=ar.add(PRIME31,ag,bq) {
+                        break Labelled{pt,a,b};
+                    }
+                    identity+=1;
+                };
+            }
+        }
+    }
+    Ok((out,identity,duplicated))
+}
+
 // S3(X,Y,U)= a U^2 + b U + c on the original prime31 curve.
 fn s3_coeff(x:u64,y:u64)->(u64,u64,u64) {
     let sum=addp(x,y);
@@ -253,6 +332,10 @@ fn json_solution(s:&Option<Solution>)->serde_json::Value {
 }
 fn execute_sized(compare:bool,round_limit:usize,q:(u64,u64),count:usize)
     ->Result<serde_json::Value,String> {
+    execute_sized_mode(compare,round_limit,q,count,false)
+}
+fn execute_sized_mode(compare:bool,round_limit:usize,q:(u64,u64),count:usize,walk:bool)
+    ->Result<serde_json::Value,String> {
     if count<2 || count>8_192 || round_limit==0 || round_limit>64 {
         return Err("inadmissible labelled-list count or trial cap".into());
     }
@@ -266,7 +349,13 @@ fn execute_sized(compare:bool,round_limit:usize,q:(u64,u64),count:usize)
     for round in 0..round_limit {
         let seed=SEED.wrapping_add((round as u64).wrapping_mul(0xd1b5_4a32_d192_ed03));
         let source_start=Instant::now();
-        let (parts,identities,duplicate_x)=source_sized(q,seed,&mut arithmetic,count)?;
+        let start_additions=arithmetic.counts.group_additions;
+        let (parts,identities,duplicate_x)=if walk {
+            source_walk_sized(q,seed,&mut arithmetic,count)?
+        } else {
+            source_sized(q,seed,&mut arithmetic,count)?
+        };
+        let source_additions=arithmetic.counts.group_additions-start_additions;
         let source_ns=source_start.elapsed().as_nanos();
         let alg_start=Instant::now();
         let additions_before=arithmetic.counts.group_additions;
@@ -302,6 +391,8 @@ fn execute_sized(compare:bool,round_limit:usize,q:(u64,u64),count:usize)
         attempts.push(json!({
             "round":round,"public_seed":format!("{seed:016x}"),
             "points_per_partition":count,"precompute_labels_ns":source_ns,
+            "public_label_source":if walk {"public_additive_walk"} else {"independent_two_scalars"},
+            "source_point_generation_group_additions":source_additions,
             "rejected_identity":identities,"rejected_global_duplicate_x":duplicate_x,
             "algebraic_S3_pair_roots_ns":alg_ns,"algebraic_visited_pairs":stats.pair_s3,
             "algebraic_field_square_roots":stats.s3_sqrt,
@@ -504,6 +595,89 @@ fn fresh_size_confirmation()->Result<serde_json::Value,String>{
         "cases_detail":results
     }))
 }
+
+fn walk_source_confirmation()->Result<serde_json::Value,String>{
+    // Fresh public target panel distinct from both historical --holdouts
+    // and --size-confirm; caller-side secrets remain outside execute_sized_mode.
+    const CASES:usize=24;
+    let mut rng=0x5741_4c4b_5f32_3431_u64;
+    let mut used=HashSet::new();
+    let mut verifier=Arithmetic::default();
+    let mut cases=Vec::with_capacity(CASES);
+    let mut sums=[0u128;3];
+    let mut setups=[0u128;3];
+    let mut pairs=[0u64;3];
+    let mut successes=[0usize;3];
+    for case in 0..CASES {
+        let known=loop {
+            let k=prng(&mut rng)%N;
+            if k>1 && used.insert(k) {break k;}
+        };
+        let q=verifier.scalar(PRIME31,known,Some(PRIME31.g))
+            .ok_or("fresh walk target is identity")?;
+        let order:[(usize,&str,bool);3]=if case%2==0 {
+            [(0,"independent",false),(1,"walk",true),(2,"walk_repeat",true)]
+        } else {
+            [(1,"walk",true),(2,"walk_repeat",true),(0,"independent",false)]
+        };
+        let mut outcomes=Vec::new();
+        for (position,(arm,label,walk)) in order.iter().enumerate() {
+            let v=execute_sized_mode(false,ROUNDS,q,T,*walk)?;
+            let attempts=v["attempts"].as_array().ok_or("walk no attempts")?;
+            let last=attempts.last().ok_or("walk no last attempt")?;
+            let log=last.pointer("/solution/log").and_then(|x|x.as_u64());
+            let solved=v["complete_target_scalar_recovered"].as_bool()==Some(true);
+            if solved && (log!=Some(known) ||
+                verifier.scalar(PRIME31,log.unwrap(),Some(PRIME31.g))!=Some(q)){
+                return Err(format!("walk arm {label} wrong scalar on case {case}"));
+            }
+            let cost=v["cold_rust_wall_ns"].as_u64().ok_or("walk missing wall")?;
+            let setup=attempts.iter().map(|a|
+                a["precompute_labels_ns"].as_u64().unwrap_or(0) as u128).sum::<u128>();
+            let queries=attempts.iter().map(|a|
+                a["algebraic_visited_pairs"].as_u64().unwrap_or(0)).sum::<u64>();
+            let group_ops=attempts.iter().map(|a|
+                a["source_point_generation_group_additions"].as_u64().unwrap_or(0))
+                .sum::<u64>();
+            sums[*arm]+=u128::from(cost);
+            setups[*arm]+=setup;
+            pairs[*arm]+=queries;
+            if solved {successes[*arm]+=1;}
+            outcomes.push(json!({
+                "arm":label,"position":position,"public_target":q,
+                "complete_target_scalar_recovered":solved,"verified_log":log,
+                "rounds":attempts.len(),"cold_wall_ns":cost,
+                "paid_source_setup_ns":setup.to_string(),
+                "algebraic_pair_quadratics":queries,
+                "source_group_additions":group_ops,
+                "unresolved_within_three_rounds":!solved,
+                "attempts":attempts
+            }));
+        }
+        cases.push(json!({
+            "case":case,"public_target":q,
+            "known_answer_caller_verification_only":known,
+            "outcomes":outcomes
+        }));
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]",
+        "experimental_status":"producer-development Rust paired complete-solver panel, not independent EKS L2/PCC",
+        "classification":"APS 2018 one-relation index-calculus methodology; still generic pair-MITM equivalent",
+        "p":P,"n":N,"cofactor":1,"T":T,"round_cap":ROUNDS,
+        "fresh_public_targets":CASES,
+        "arms":["independent","walk","walk_repeat"],
+        "successes":successes,
+        "cold_total_ns":sums.map(|v|v.to_string()),
+        "source_setup_total_ns":setups.map(|v|v.to_string()),
+        "algebraic_S3_pair_queries":pairs,
+        "all_success_gate":successes.iter().all(|&v|v==CASES),
+        "paired_design":"alternate control-walk-walk and walk-walk-control, each cold, all retries paid",
+        "scientific_limit":"no independent PCC; no mature external IC frontier matched run; source distributions differ",
+        "cases_detail":cases
+    }))
+}
+
 fn heldout_twelve()->Result<serde_json::Value,String>{
     // Caller-side fixture generation; the scalar is never passed to execute().
     // These known answers are verified only after the complete algebraic solve.
@@ -560,6 +734,11 @@ fn heldout_twelve()->Result<serde_json::Value,String>{
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--walk-confirm" {
+        let result=walk_source_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--size-confirm" {
         let result=fresh_size_confirmation()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
@@ -582,7 +761,7 @@ fn main()->Result<(),String> {
         [] => false,
         [a] if a=="--one" => false,
         [a] if a=="--compare" => true,
-        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep|--size-confirm".into())
+        _ => return Err("usage: prime31_aps_one_relation --one|--compare|--holdouts|--size-sweep|--size-confirm|--walk-confirm".into())
     };
     let v=execute(compare,ROUNDS,PUBLIC_Q)?;
     println!("{}",serde_json::to_string_pretty(&v).map_err(|e|e.to_string())?);
@@ -628,6 +807,24 @@ mod tests {
         let trial=execute_sized(false,1,PUBLIC_Q,128).unwrap();
         assert_eq!(trial["points_per_partition"].as_u64(),Some(128));
         assert!(trial["attempts"].as_array().is_some());
+    }
+    #[test]
+    fn walk_labels_replay_to_public_points() {
+        let mut arithmetic=Arithmetic::default();
+        check_curve(PRIME31,&mut arithmetic).unwrap();
+        let (parts,_identities,duplicates)=
+            source_walk_sized(PUBLIC_Q,SEED,&mut arithmetic,128).unwrap();
+        assert_eq!(parts.iter().map(Vec::len).sum::<usize>(),384);
+        let xs:HashSet<_>=parts.iter().flat_map(|part|part.iter().map(|v|v.pt.0))
+            .collect();
+        assert_eq!(xs.len(),384);
+        assert!(duplicates<128);
+        for row in parts.iter().flat_map(|part|part.iter()) {
+            let ag=arithmetic.scalar(PRIME31,row.a,Some(PRIME31.g));
+            let bq=arithmetic.scalar(PRIME31,row.b,Some(PUBLIC_Q));
+            assert_eq!(arithmetic.add(PRIME31,ag,bq),Some(row.pt));
+            assert!(arithmetic.on_curve(PRIME31,Some(row.pt)));
+        }
     }
     #[test]
     fn one_relation_congruence() {
