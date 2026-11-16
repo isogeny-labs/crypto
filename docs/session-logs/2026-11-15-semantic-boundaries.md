@@ -55,3 +55,17 @@ Follow current-head full validation CI, sync the owner artifact source to consum
 
 ### Errors
 The first local validation run lacked audit_runs/curve_id and raw inputs; materialized the tracked helpers and retained the original log. Local store retrieval returned403 and the report cannot be revalidated from absent bytes. No credential or policy change. A first sparse staging command omitted two native docs; staged them explicitly in a second ordinary commit before PR1618 creation. [pcc:unverified]
+
+## 2026-11-16T03:36Z - draft-tier CI recovery
+
+### What was done
+Initial PR4393 parse job43798786418 rejected57 workflows outside the existing draft gate. The local complete workflow inventory found58. Used the repository draft_tier_gate.py transformation and checked each parsed result against its expected structure before atomically writing. Each change adds only ready_for_review and the draft condition; commands and inputs remain equal. The pinned historical copies are untouched. The complete check now reports0 workflows outside the gate. Receipt: docs/audits/2026-11-16-draft-tier-repair.json.
+
+### Decisions made
+Repair the actual CI failure without adding fast-tier exemptions or changing execution on ready PRs or push events. Retain the earlier generated-step receipt as the separate prior transformation.
+
+### Open threads
+Current-head hosted checks and owner artifact-source consumer synchronization.
+
+### Errors
+The initial parse failure was an existing workflow policy drift, not a malformed YAML change. The failed run is retained; no rerun is used as a substitute for this patch. [pcc:unverified]

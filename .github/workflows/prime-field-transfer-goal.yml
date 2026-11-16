@@ -1,6 +1,7 @@
 name: Prime-field transfer goal correctness
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime_field_transfer_goal_20261116/**'
       - '.github/workflows/prime-field-transfer-goal.yml'
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   native-correctness:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

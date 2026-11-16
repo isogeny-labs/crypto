@@ -13,6 +13,7 @@ name: Gröbner baseline re-benchmark
 # The paths below mirror `python3 tools/gb_baseline.py paths`.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'src/cryptanalysis/groebner_f4.rs'
       - 'src/cryptanalysis/groebner_cache.rs'
@@ -81,6 +82,7 @@ concurrency:
 
 jobs:
   rebench:
+    if: ${{ !github.event.pull_request.draft }}
     # Same runner routing as the other benchmark workflows: the EKS pool when
     # this workflow is listed in CRYPTO_EKS(_HIGHMEM)_WORKFLOWS, else hosted.
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-highmem' || (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
@@ -115,7 +117,9 @@ jobs:
   refresh:
     # Only main (or a manual run) rewrites the committed report and baseline.
     needs: rebench
-    if: github.event_name != 'pull_request'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name != 'pull_request')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
