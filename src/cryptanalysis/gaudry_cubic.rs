@@ -3756,6 +3756,8 @@ pub enum Solver {
     PreparedSymmetricPairOnly,
     /// Same prepared pair equations with inversion-free pseudo-remainder GCD steps.
     PseudoRemainderPairOnly,
+    /// Pseudo-remainder pair finder with guarded delayed coefficient products.
+    DelayedPseudoRemainderPairOnly,
     /// The existing hybrid triple scan, using the symmetric S3 pair oracle.
     SymmetricMeetInTheMiddle,
 }
@@ -3919,6 +3921,9 @@ fn run_gaudry_impl(
     let prepared_pair = match solver {
         Solver::PreparedSymmetricPairOnly => Some(prepared::PreparedSymmetricPair::new(inst)),
         Solver::PseudoRemainderPairOnly => Some(prepared::PreparedSymmetricPair::new_pseudo(inst)),
+        Solver::DelayedPseudoRemainderPairOnly => {
+            Some(prepared::PreparedSymmetricPair::new_delayed_pseudo(inst))
+        }
         _ => None,
     };
     let precompute_muls = curve.field.muls();
@@ -4145,7 +4150,9 @@ fn run_gaudry_impl(
                 rep.pair_tests = stats.calls;
                 decs
             }
-            Solver::PreparedSymmetricPairOnly | Solver::PseudoRemainderPairOnly => {
+            Solver::PreparedSymmetricPairOnly
+            | Solver::PseudoRemainderPairOnly
+            | Solver::DelayedPseudoRemainderPairOnly => {
                 let stats = rep
                     .symmetric_pair_stats
                     .get_or_insert_with(SymmetricPairStats::default);
@@ -4182,7 +4189,10 @@ fn run_gaudry_impl(
                 | Solver::F4KrylovDelayed => subspace_triple_oracle(inst, base, &r, &mut rng).0,
                 Solver::SymmetricPairOnly
                 | Solver::PreparedSymmetricPairOnly
-                | Solver::PseudoRemainderPairOnly => weil_s3_pair_test(inst, base, &r, &mut rng).0,
+                | Solver::PseudoRemainderPairOnly
+                | Solver::DelayedPseudoRemainderPairOnly => {
+                    weil_s3_pair_test(inst, base, &r, &mut rng).0
+                }
                 Solver::SymmetricMeetInTheMiddle => {
                     subspace_triple_oracle(inst, base, &r, &mut rng).0
                 }
@@ -4197,6 +4207,7 @@ fn run_gaudry_impl(
                 Solver::SymmetricPairOnly
                     | Solver::PreparedSymmetricPairOnly
                     | Solver::PseudoRemainderPairOnly
+                    | Solver::DelayedPseudoRemainderPairOnly
             ) {
                 decs != other
             } else {

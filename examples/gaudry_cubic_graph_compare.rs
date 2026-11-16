@@ -59,6 +59,7 @@ enum Oracle {
     SymmetricPair,
     PreparedPair,
     PseudoPair,
+    DelayedPseudoPair,
     SymmetricMitm,
 }
 
@@ -91,6 +92,7 @@ impl Oracle {
             Self::SymmetricPair => Solver::SymmetricPairOnly,
             Self::PreparedPair => Solver::PreparedSymmetricPairOnly,
             Self::PseudoPair => Solver::PseudoRemainderPairOnly,
+            Self::DelayedPseudoPair => Solver::DelayedPseudoRemainderPairOnly,
             Self::SymmetricMitm => Solver::SymmetricMeetInTheMiddle,
         }
     }

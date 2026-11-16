@@ -1,6 +1,41 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (02:55Z, 16 November)
+## Current checkpoint (03:24Z, 16 November)
+
+STAGE17IMPLEMENTED,NOTTIMED. ExplicitDelayedPseudoRemainderPairOnly/CLI
+delayed-pseudo-pairdoesguardedPoly5convolution inu64sum<2^43,p<2^20,
+normalizedcoefficients,degree<=4; fallbackoldscalaroutsideguard. Sameperproduct
+mul/addhooksandsemanticcount. Pseudoremainders/rootRNG/sampler/rho/graphunchanged.
+Newboundary/fallback/differentialtestsandfullsemantic/prefixcontrolsintegrated.
+
+Libraryrelease46cubictestsPASS(session41998finished);capturedvalidation/delayed-poly-library-tests.log.
+Actualexamplesbuild/all5tests/ClippyPASS(session11154finished),alllogscaptured
+validation/delayed-poly-*. Nocompileractive. Nativeanalysis9main+3component
+testsPASS,actualbuild/ClippyPASS; addsoptionalpaired_semantic_oraclesrejecting
+changed/missingcountsandmisdeclaredpairs. Old16summaryreproducesBYTE-EXACT.
+Logs capturedvalidation/delayed-poly-*. DoNOTduplicatejobs.
+
+FrozenAMENDMENT_12_DELAYED_POLYNOMIALS.md+delayed-pseudo-pair-plan.json:
+p127/523/1039,seeds157/163/167,oracleorderdelayed-pseudo,prepared,pseudo,
+810exec135warm675measure,3directpairs,extraexactsemanticpseudo/delayedcontrol.
+SameCPU0/8GiB/900s/no-retries/startmarkers/coldwall. New44filesourcehashmanifest
+validation/delayed-poly-source.sha256created/checked. OLDfrozenhashesuntouched.
+PrimaryreviewofficialLinboxFFLASfgemvlines226–324SHA9d2b4579...unchanged,
+fullURL/hash/amathguardinAmendment12. KBstatus+2queriesandConductorunavailable.
+No noveltyclaim. Plannednewdir/workspace/ic-local-runs/local-delayed-pseudo-pair-20261116-17UNSTARTED.
+ALLchecksdone;needcommit/pushsource/specBEFOREwrapper. No17datayet.
+
+Prior16evidence/source/browsingPUBLISHEDf33d904b7,883f2ce1c,e6c8a7d1e;
+PR4288title/bodyupdatedactualresults. Autoartifactcommit9db04b5caffintegrated:
+only3report-pagePNGmovedtomanifest/.gitignore. PreservedoriginalPNGsinlocal16
+custodyandrestoredignoredlocalcopies,allbotmanifest/presentationhashesmatch.
+Sparseffprunedtargetbenchdirectory;ONLYexacttargetrestoredusinggitrestore
+--ignore-skip-worktree-bits, nobroadsparseapply. Currentuncommittedworkis17code/
+protocol/analysis/log/resume. No stage17data. CIlaststatus02:26emptyfor7bab;
+nextallowed03:16,review02:39empty. Mainadvancing,fetchedbeforelogs;known
+newAGENTSrulereadandpanelrationale. GoalACTIVE; no stop_goal or permissionask.
+
+## Previous checkpoint (02:55Z, superseded pending states)
 
 STAGE16FINISHED: sourcef33d904b7b7b61250152559caac37b7ce62694fdpublished
 samePR4288beforecall. /workspace/ic-local-runs/local-pseudo-pair-20261116-16

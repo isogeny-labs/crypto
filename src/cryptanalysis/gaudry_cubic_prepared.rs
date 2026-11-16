@@ -79,6 +79,35 @@ impl Poly5 {
         self
     }
 
+    fn mul_delayed(self, rhs: Self, ring: &PolyRing) -> Self {
+        if self.len == 0 || rhs.len == 0 {
+            return Self::new(&[]);
+        }
+        let len = self.len + rhs.len - 1;
+        assert!(len <= 5, "S3 polynomial workspace degree exceeded");
+        if !(2..1 << 20).contains(&ring.p)
+            || self.c[..self.len].iter().any(|&c| c >= ring.p)
+            || rhs.c[..rhs.len].iter().any(|&c| c >= ring.p)
+        {
+            return self.mul(rhs, ring);
+        }
+        // At most five normalized products: sum < 5 * 2^40 < 2^43.
+        let mut out = Self { c: [0; 5], len };
+        ring.count((self.len * rhs.len) as u64);
+        for i in 0..self.len {
+            for j in 0..rhs.len {
+                super::super::jv_bitops::hook_mul(ring.p);
+                super::super::jv_bitops::hook_add(ring.p);
+                out.c[i + j] += self.c[i] * rhs.c[j];
+            }
+        }
+        for c in &mut out.c[..len] {
+            *c %= ring.p;
+        }
+        out.trim();
+        out
+    }
+
     fn gcd(self, rhs: Self, ring: &PolyRing) -> Self {
         self.gcd_with_remainders(rhs, ring, false)
     }
@@ -141,6 +170,7 @@ pub(super) struct PreparedSymmetricPair {
     a2: E3,
     b4: E3,
     pseudo_remainders: bool,
+    delayed_products: bool,
 }
 
 impl PreparedSymmetricPair {
@@ -151,6 +181,7 @@ impl PreparedSymmetricPair {
             a2: f.scale(&inst.curve.a, 2),
             b4: f.scale(&inst.curve.b, 4),
             pseudo_remainders: false,
+            delayed_products: false,
         }
     }
 
@@ -158,6 +189,13 @@ impl PreparedSymmetricPair {
         Self {
             pseudo_remainders: true,
             ..Self::new(inst)
+        }
+    }
+
+    pub fn new_delayed_pseudo(inst: &Instance3) -> Self {
+        Self {
+            delayed_products: true,
+            ..Self::new_pseudo(inst)
         }
     }
 
@@ -184,7 +222,14 @@ impl PreparedSymmetricPair {
         let u: [Poly5; 3] = std::array::from_fn(|k| Poly5::new(&[uc.0[k], us.0[k]]));
         let v: [Poly5; 3] = std::array::from_fn(|k| Poly5::new(&[vc.0[k], vs.0[k], x2.0[k]]));
         let ring = PolyRing::new(f.p);
-        let eliminant = u[1].mul(v[2], &ring).sub(u[2].mul(v[1], &ring), &ring);
+        let mul = |a: Poly5, b: Poly5| {
+            if self.delayed_products {
+                a.mul_delayed(b, &ring)
+            } else {
+                a.mul(b, &ring)
+            }
+        };
+        let eliminant = mul(u[1], v[2]).sub(mul(u[2], v[1]), &ring);
         if eliminant.len == 0 {
             stats.degenerate_scans += 1;
             return (
@@ -194,10 +239,9 @@ impl PreparedSymmetricPair {
         }
         stats.cubic_eliminations += 1;
         let pivot = if u[1].len > 0 { 1 } else { 2 };
-        let compatibility = v[pivot]
-            .mul(v[pivot], &ring)
-            .sub(u[pivot].mul(u[0], &ring).mul(v[pivot], &ring), &ring)
-            .add(u[pivot].mul(u[pivot], &ring).mul(v[0], &ring), &ring);
+        let compatibility = mul(v[pivot], v[pivot])
+            .sub(mul(mul(u[pivot], u[0]), v[pivot]), &ring)
+            .add(mul(mul(u[pivot], u[pivot]), v[0]), &ring);
         let common = if self.pseudo_remainders {
             eliminant.gcd_with_remainders(compatibility, &ring, true)
         } else {
@@ -258,6 +302,7 @@ mod tests {
             let base = SubspaceBase::build(&inst, &mut rng);
             let prepared = PreparedSymmetricPair::new(&inst);
             let pseudo = PreparedSymmetricPair::new_pseudo(&inst);
+            let delayed = PreparedSymmetricPair::new_delayed_pseudo(&inst);
             let mut points = Vec::new();
             if !inst.curve.g.inf {
                 for d in 1..inst.curve.n {
@@ -274,6 +319,7 @@ mod tests {
                 let mut a = StdRng::seed_from_u64(37);
                 let mut b = a.clone();
                 let mut c = a.clone();
+                let mut d = a.clone();
                 let got = prepared
                     .pair_test(
                         &inst,
@@ -292,15 +338,30 @@ mod tests {
                 )
                 .0;
                 assert_eq!(got, expected, "point={point:?}");
-                let fraction_free = pseudo
-                    .pair_test(
-                        &inst,
-                        &base,
-                        &point,
-                        &mut c,
-                        &mut SymmetricPairStats::default(),
-                    )
-                    .0;
+                let (fraction_free, pseudo_cost) = pseudo.pair_test(
+                    &inst,
+                    &base,
+                    &point,
+                    &mut c,
+                    &mut SymmetricPairStats::default(),
+                );
+                let (delayed_found, delayed_cost) = delayed.pair_test(
+                    &inst,
+                    &base,
+                    &point,
+                    &mut d,
+                    &mut SymmetricPairStats::default(),
+                );
+                assert_eq!(delayed_found, fraction_free, "delayed point={point:?}");
+                assert_eq!(
+                    delayed_cost, pseudo_cost,
+                    "semantic products point={point:?}"
+                );
+                assert_eq!(
+                    c.clone().gen::<u64>(),
+                    d.gen::<u64>(),
+                    "delayed root RNG stream changed"
+                );
                 assert_eq!(fraction_free, expected, "pseudo point={point:?}");
                 assert_eq!(
                     a.clone().gen::<u64>(),
@@ -363,6 +424,8 @@ mod tests {
                 let baseline = run_gaudry_with_sampler(&inst, &base, 3, &opts, backend, sampler);
                 opts.solver = Solver::PseudoRemainderPairOnly;
                 let candidate = run_gaudry_with_sampler(&inst, &base, 3, &opts, backend, sampler);
+                opts.solver = Solver::DelayedPseudoRemainderPairOnly;
+                let delayed = run_gaudry_with_sampler(&inst, &base, 3, &opts, backend, sampler);
                 assert_eq!(baseline.correct, Some(true));
                 assert_eq!(candidate.correct, Some(true));
                 assert_eq!(baseline.recovered_scalar, candidate.recovered_scalar);
@@ -371,6 +434,49 @@ mod tests {
                 assert_eq!(baseline.group_ops, candidate.group_ops);
                 assert_eq!(baseline.decompositions, candidate.decompositions);
                 assert_eq!(baseline.lp_histogram, candidate.lp_histogram);
+                assert_eq!(delayed.correct, Some(true));
+                assert_eq!(delayed.lp_input_digest, candidate.lp_input_digest);
+                assert_eq!(delayed.residuals, candidate.residuals);
+                assert_eq!(delayed.group_ops, candidate.group_ops);
+                assert_eq!(delayed.recovered_scalar, candidate.recovered_scalar);
+                assert_eq!(delayed.oracle_fp_muls, candidate.oracle_fp_muls);
+            }
+        }
+    }
+
+    #[test]
+    fn delayed_products_match_scalar_at_bounds_and_outside_the_guard() {
+        let mut rng = StdRng::seed_from_u64(20261117);
+        for p in [2, 7, 127, 1039, 1_048_573, 1_048_583] {
+            let ring = PolyRing::new(p);
+            let mut cases = vec![
+                (Poly5::new(&[p - 1; 3]), Poly5::new(&[p - 1; 3])),
+                (Poly5::new(&[p + 1, p + 2]), Poly5::new(&[1, p - 1])),
+            ];
+            for a_len in 0..=5 {
+                for b_len in 0..=5 {
+                    if a_len > 0 && b_len > 0 && a_len + b_len > 6 {
+                        continue;
+                    }
+                    for _ in 0..12 {
+                        let a = Poly5::new(
+                            &(0..a_len).map(|_| rng.gen_range(0..p)).collect::<Vec<_>>(),
+                        );
+                        let b = Poly5::new(
+                            &(0..b_len).map(|_| rng.gen_range(0..p)).collect::<Vec<_>>(),
+                        );
+                        cases.push((a, b));
+                    }
+                }
+            }
+            for (a, b) in cases {
+                let before = ring.muls.get();
+                let scalar = a.mul(b, &ring);
+                let scalar_work = ring.muls.get() - before;
+                let before = ring.muls.get();
+                let delayed = a.mul_delayed(b, &ring);
+                assert_eq!(scalar, delayed, "p={p}, a={a:?}, b={b:?}");
+                assert_eq!(scalar_work, ring.muls.get() - before);
             }
         }
     }

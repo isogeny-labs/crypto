@@ -238,6 +238,19 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
     {
         problems.push("start-event count/order differs from frozen schedule".to_owned());
     }
+    if !plan["paired_semantic_oracles"].is_null() {
+        let semantic = plan["paired_semantic_oracles"]
+            .as_array()
+            .ok_or("invalid semantic oracle pairs")?;
+        for pair in semantic {
+            if !plan["paired_oracles"]
+                .as_array()
+                .is_some_and(|pairs| pairs.contains(pair))
+            {
+                return Err("semantic oracle pair must also declare stream equality".into());
+            }
+        }
+    }
     if let Some(pairs) = plan["paired_oracles"].as_array() {
         for pair in pairs {
             let reference = pair[0].as_str().ok_or("invalid paired oracle")?;
@@ -266,6 +279,18 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
                     .is_none_or(|other| stream(row) != stream(other))
                 {
                     problems.push(format!("paired oracle stream mismatch {key:?}"));
+                }
+                if plan["paired_semantic_oracles"]
+                    .as_array()
+                    .is_some_and(|pairs| pairs.contains(pair))
+                {
+                    let reference_work = row["report"]["oracle_fp_muls"].as_u64();
+                    let candidate_work = executions
+                        .get(&candidate_key)
+                        .and_then(|other| other["report"]["oracle_fp_muls"].as_u64());
+                    if reference_work.is_none() || reference_work != candidate_work {
+                        problems.push(format!("paired oracle semantic product mismatch {key:?}"));
+                    }
                 }
             }
         }
@@ -548,6 +573,7 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
             "SymmetricPairOnly" => "Symmetric pair",
             "PreparedSymmetricPairOnly" => "Prepared pair",
             "PseudoRemainderPairOnly" => "Pseudo pair",
+            "DelayedPseudoRemainderPairOnly" => "Delayed pseudo pair",
             "F4Krylov" => "F4 sparse FGLM",
             "F4KrylovDelayed" => "F4 delayed graph",
             "F4Groebner" => "Native F4",
@@ -828,6 +854,56 @@ mod tests {
             s["strata"][1]["eligible_local_controlled_comparison"],
             false
         );
+    }
+
+    #[test]
+    fn semantic_ablation_rejects_changed_or_missing_product_counts() {
+        let (mut p, mut rows) = fixture();
+        p["oracles"] = json!(["PairOnly", "DelayedPseudoRemainderPairOnly"]);
+        p["paired_oracles"] = json!([["PairOnly", "DelayedPseudoRemainderPairOnly"]]);
+        p["paired_semantic_oracles"] = p["paired_oracles"].clone();
+        let mut candidate = rows.clone();
+        for row in &mut candidate {
+            row["oracle_block"] = json!("DelayedPseudoRemainderPairOnly");
+        }
+        rows.extend(candidate);
+        assert!(analyze(&p, rows.clone(), 0).unwrap()["global_problems"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        for missing in [false, true] {
+            let mut tampered = rows.clone();
+            for row in &mut tampered {
+                if row["oracle_block"] == "DelayedPseudoRemainderPairOnly"
+                    && !row["arm"].as_str().unwrap().starts_with("rho_")
+                {
+                    if missing {
+                        row["report"]
+                            .as_object_mut()
+                            .unwrap()
+                            .remove("oracle_fp_muls");
+                    } else {
+                        row["report"]["oracle_fp_muls"] = json!(999999);
+                    }
+                }
+            }
+            let s = analyze(&p, tampered, 0).unwrap();
+            assert!(s["global_problems"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|reason| reason
+                    .as_str()
+                    .unwrap()
+                    .contains("semantic product mismatch")));
+            assert!(s["strata"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|s| s["eligible_local_controlled_comparison"] == false));
+        }
+        p["paired_semantic_oracles"] = json!([["PairOnly", "missing"]]);
+        assert!(analyze(&p, rows, 0).is_err());
     }
 
     #[test]
