@@ -45,3 +45,23 @@ First observed GitHub Actions run [43869362412](https://github.com/isogeny-labs/
 For a proposed S9 algebraic extractor, explicitly build the original ideal on E and the rational factor-base constraints; certify each returned solution in the original ideal, handle zero denominators/infinity, measure both positive and negative natural targets, and count *independent useful signed relations* rather than ordered decomposition multiplicities. Then recover complete, previously unknown prime31 scalars with all setup, failed calls, certificate checks, linear algebra and target replay charged. Compare complete equal-output oracle calls with PKM/APS, native F4/certified quotient, and mature external msolve/Magma F4 when accessible, and use matched optimized rho for security context. A cut-off F4 run is **undetermined**, not slower completed solution.
 
 References: [APS 2018](https://doi.org/10.1016/j.ffa.2018.01.009), [PKM 2016](https://doi.org/10.1007/978-3-662-49387-8_1), [FPPR symmetry work](https://doi.org/10.1186/s40736-015-0012-6), [PR #4391](https://github.com/isogeny-labs/crypto/pull/4391), [PR #4373](https://github.com/isogeny-labs/crypto/pull/4373), [PR #4349](https://github.com/isogeny-labs/crypto/pull/4349). Research-KB access is unavailable to this GitHub connector runtime; code search and primary publication pages are a bounded fallback, not an exhaustive absence audit.
+
+
+## Executed exact-source development benchmark — PASS, 2026-11-16 12:48 UTC [pcc:unverified]
+
+**[GitHub Actions run 43869660129](https://github.com/isogeny-labs/crypto/actions/runs/43869660129), job 133307150870, completed SUCCESS** on the repaired Rust source commit `39e8877b89fa5697ccc30909655dea1222b7beb8` (the code change from prior failed run was only the S3 coefficient-index unit test assertion). Rust 1.100 release focused library, prior Rust S3/F4 correctness controls, **12/12 example unit tests**, the new factorized-root test, and the actual `--factorized-s3-confirm` completed. The full original source-printed JSON, with GitHub timestamp prefixes only removed, is frozen in [S3_FACTORIZED_COORDINATE_MATCHED_CI_20261116.json](S3_FACTORIZED_COORDINATE_MATCHED_CI_20261116.json); all 24 caller-generated public Q and all 72 complete arm transcripts, including the single failed/continued initial round, are retained.
+
+| Full cold single-target Rust, sum of 24 different Q | Old S3 coefficients + x-fibre | New chord-factorized S3 | New A/A repeat |
+| --- | ---: | ---: | ---: |
+| Verified complete logs | 24/24 | **24/24** | **24/24** |
+| Fully cold wall | 133.238445 ms | **111.633604 ms** | 110.292700 ms |
+| Public Jacobian-labelled source cost | 54.272100 ms | 54.309344 ms | 53.648462 ms |
+| S3 relation-search stage incl. verification | 71.150922 ms | **49.550447 ms** | 48.902912 ms |
+| Actually visited S3 pair roots/quadratics | 684,672 | 684,672 | 684,672 |
+| Total attempted labelled rounds | 25 | 25 | 25 |
+
+Complete new/old cold-cost ratio **0.8378483**; **16.215% less wall** or **1.1935x faster** on this same-host development panel, with **24/24 paired target wins**. The candidate A/A aggregate drift is **1.2012%**. All signed relation indices, signs, alpha/beta, recovered k, round count, collisions, square roots, batch-inversion counts and actually visited pairs were exactly equal across the three arms; no target known-answer leaks into the solver. The preregistered exploratory gate **PASSES**. A descriptive 20,000-resample paired nonparametric bootstrap of the 24 cost ratios-of-sums produced approx **0.802–0.880** percentile endpoints (not externally calibrated and not an independent-PCC interval).
+
+The setup cost is essentially unchanged, isolating the saving to the S3 arithmetic stage (71.151 → 49.550 ms). This engineering measurement does not change the algorithm's **generic-decomposition** classification: its finite pair support is still enumerated; there is no non-generic exponent claim, mature external APS/PKM/CAS matched price or optimized rho victory.
+
+**Decision:** keep this as a measured source-specific *candidate* for the existing complete Rust APS-style solver. Do **not** silently change the incumbent/default or promote to a leaderboard on one panel. Per frozen protocol, execute a separate prospective 24-Q public target set with the same three arms and acceptance gates, then seek independent source/PCC replay before ratcheting. Do not rewrite the initial failed-test record; it was a test-only coefficient-index bug, corrected before this passing run.
