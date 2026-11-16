@@ -1,0 +1,37 @@
+{
+    "apiVersion": "snapshot.storage.k8s.io/v1",
+    "kind": "VolumeSnapshotContent",
+    "metadata": {
+        "creationTimestamp": "2026-10-21T06:05:24Z",
+        "finalizers": [
+            "snapshot.storage.kubernetes.io/volumesnapshotcontent-bound-protection"
+        ],
+        "generation": 1,
+        "name": "snapcontent-b585e48b-2173-424c-9729-2105e6639ea2",
+        "resourceVersion": "720372",
+        "uid": "a5b071c5-2254-4692-972e-784c745dd533"
+    },
+    "spec": {
+        "deletionPolicy": "Retain",
+        "driver": "ebs.csi.aws.com",
+        "source": {
+            "volumeHandle": "vol-04b494ddb024a528d"
+        },
+        "sourceVolumeMode": "Filesystem",
+        "volumeSnapshotClassName": "isolab-ebs-checkpoints",
+        "volumeSnapshotRef": {
+            "apiVersion": "snapshot.storage.k8s.io/v1",
+            "kind": "VolumeSnapshot",
+            "name": "ecbench-criu-qualification-v3",
+            "namespace": "isolab-recovery-system",
+            "resourceVersion": "720144",
+            "uid": "b585e48b-2173-424c-9729-2105e6639ea2"
+        }
+    },
+    "status": {
+        "creationTime": 1792562725216000000,
+        "readyToUse": true,
+        "restoreSize": 4294967296,
+        "snapshotHandle": "snap-0ead1fd75c8add942"
+    }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "software.mock-check/v1",
+  "exit": 0,
+  "tests": 14,
+  "source_sha256": {
+    "assemble.py": "40f234f45dc14d5e4ec37e814c01e8c6ca2222e82c49bfee3f695cdbcb5034d4",
+    "test_assemble.py": "476aa74240399b15ac15e5e8edc65b86cd7b2a5f7288aaad48f8bde99c019bbf",
+    "binding.draft.json": "d9c3310a026d0422dfc78ebc876b4c657d0634b88e4f213e93e782de3d323ccf"
+  },
+  "bindings_unchanged": true,
+  "docker_calls": 0,
+  "container_actions": 0,
+  "builds": 0,
+  "limitations": [
+    "workflow tests use mock Docker responses and mocked root-owned IID metadata",
+    "real subprocess signal, sudo, daemon and storage-driver behavior not exercised",
+    "independent source review pending"
+  ]
+}

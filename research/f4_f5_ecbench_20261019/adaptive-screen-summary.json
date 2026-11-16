@@ -1,0 +1,69 @@
+{
+  "gate_passed": true,
+  "local_measured_replays_identical": 8,
+  "local_pipeline_records_verified": 16,
+  "local_warmup_records": 8,
+  "native_timing_claim": false,
+  "schema": "boolean-adaptive-screen/v1",
+  "scope": "L0 work/correctness only; fresh full native and ecbench confirmation remains mandatory",
+  "wide_controls": [
+    {
+      "arm": "solve-f4",
+      "n": 17,
+      "original_roots_and_counters_equal": true
+    },
+    {
+      "arm": "solve-f5",
+      "n": 17,
+      "original_roots_and_counters_equal": true
+    },
+    {
+      "arm": "solve-f4",
+      "n": 23,
+      "original_roots_and_counters_equal": true
+    },
+    {
+      "arm": "solve-f5",
+      "n": 23,
+      "original_roots_and_counters_equal": true
+    }
+  ],
+  "work_rows": [
+    {
+      "adaptive_word_xors": 2062875,
+      "baseline_word_xors": 3355654,
+      "engine": "f4",
+      "failed_policy_word_xors": 15190651,
+      "n": 17,
+      "query_counts_and_answer_equal": true,
+      "solver_calls": 2398
+    },
+    {
+      "adaptive_word_xors": 2058669,
+      "baseline_word_xors": 3350611,
+      "engine": "f5",
+      "failed_policy_word_xors": 15107801,
+      "n": 17,
+      "query_counts_and_answer_equal": true,
+      "solver_calls": 2398
+    },
+    {
+      "adaptive_word_xors": 62421379,
+      "baseline_word_xors": 79417986,
+      "engine": "f4",
+      "failed_policy_word_xors": 3000248688,
+      "n": 23,
+      "query_counts_and_answer_equal": true,
+      "solver_calls": 135075
+    },
+    {
+      "adaptive_word_xors": 62338849,
+      "baseline_word_xors": 79343067,
+      "engine": "f5",
+      "failed_policy_word_xors": 2994993068,
+      "n": 23,
+      "query_counts_and_answer_equal": true,
+      "solver_calls": 135075
+    }
+  ]
+}

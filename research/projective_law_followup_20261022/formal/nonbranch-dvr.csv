@@ -1,0 +1,16 @@
+item,status,scope,assumptions,source_sha256,dependency_or_gate
+subtract_pointPreEval_mem,checked,arbitrary rational point evaluation,field K,0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,multivariable polynomial induction
+pointIdeal_eq_coordinateIdeal,checked,affine rational point ideal,field K and y²=f(a),0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,evaluation kernel
+maximalIdeal_coordinates,checked,affine point localization,field K and y²=f(a),0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,localization of point ideal
+stalk_relation,checked,affine point localization,field K and y²=f(a),0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,curve relation and difference quotient
+stalkYPlusY_unit,checked,affine point localization,field K and y²=f(a) and 2y≠0,0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,residue 2y
+maximalIdeal_eq_span_x,checked,principal local maximal ideal,field K and y²=f(a) and 2y≠0,0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,unit y+y0
+affine_ybar_sub_y_ne_zero,checked,nonzero affine element,field K,0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,outer polynomial degree two versus one
+stalkXSubA_ne_zero,checked,nonzero local generator,separable quintic and y²=f(a) and 2y≠0,0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,domain and relation
+point_local_dvr,checked,actual affine localization,separable quintic and y²=f(a) and 2y≠0,0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,principal maximal ideal and domain
+projective_point_dvr,checked,actual weighted-Proj point stalk,separable quintic and y²=f(a) and 2y≠0,0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f,checked stalk ring equivalence
+char2_separable_y_nonzero_sufficiency,refuted,arbitrary characteristic 2 points,separability and y≠0,,F2 f=X5+X3+1 at (0 1) has both partials zero
+char2_pointwise_derivative_branch,open,points with f'(a)≠0 in characteristic 2,pointwise Jacobian condition,,alternate uniformizer y-y0
+common22_formula_norm_transport,open,proof-side common 2+2 expression,actual projective DVR,,map numerator and factors into stalk
+global_principal_divisor_Pic0,open,global genus-two divisor law,all local multiplicities,,sum finite and infinity orders
+compiled_Rust_semantics,open,compiled complete law,formal global law,,link Rust branches to proof-side hypotheses

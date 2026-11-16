@@ -5,6 +5,15 @@ factors eight of nine integers and resolves thirteen of fourteen timeout
 fields. Only the 444-bit P-256 block-876 cofactor remains. The text and
 dated results below describe R01 and are preserved as historical evidence.
 
+**Latest collection status, reviewed 2026-10-26:**
+[R08](rounds/R08-20261025/README.md) finished its two-hour allocation with
+10,441,117 raw relation rows and no new factor. Read the
+[explanation, graph and PDF](rounds/R08-20261025/reports/completion-20261026T2122Z/REPORT.md)
+for the different denominators and why raw rows are not a completion
+percentage. The [submitted filtering experiment](../../../backlog/XP-20261026-nist-p256-checkpoint-filter/README.md)
+will replay the older control before filtering the larger checkpoint.
+It is blocked on input publication and setup; no new task or worker is running.
+
 Run `nist-factor-continuation-20261021T1424Z`, 2026-10-21.
 **Six of nine distinct target integers have complete proven-prime
 factorizations. Three retain composite cofactors.** This resolves eleven

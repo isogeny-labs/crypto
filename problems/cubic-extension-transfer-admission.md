@@ -9,7 +9,7 @@
 ## Problem
 
 The completed Sage prototype cannot yet be admitted as a native, reproducible
-performance result because storage publication, native integration, matched
+performance result because native integration, matched
 accounting, formalization, and the repository's release/replay gates are open.
 The separate universal one-extra-isogeny coverage conjecture and universal
 exceptional-chart handling also remain unresolved. A PR importing evidence
@@ -23,12 +23,16 @@ does not settle those research questions.
 - **Recorded finite conclusion:** some gated sources need two total
   degree-three steps in this transverse construction. This does not refute
   one extra step after torsion preparation.
-- **Missing access:** no observed-ready S3 credentials; five original files
-  await upload and readback. The publication manifest does not claim remote
-  availability.
-- **Tool status:** Rust 1.99.1 is now installed and standalone native tests
-  pass. The root release-test command was attempted but the partial import
-  checkout has no Cargo.toml. Conductor and Lean/Lake remain unavailable.
+- **Access/publication:** the supplied lab-account AWS identity now passes the
+  S3 checkpoint gate, and all five original artifacts are uploaded unchanged
+  with fresh-cache size/hash verification. The direct AWS lab bridge still
+  denies its required `codebuild:BatchGetBuilds` action; no worker was submitted.
+- **Tool status:** Rust 1.99.1 is installed and prior standalone native tests
+  pass. The old partial import lacked Cargo.toml; the current continuation uses
+  a proper sparse clone. Root release compilation failed under 4-GiB and 12-GiB
+  virtual ceilings before tests ran; all attempts are retained in the
+  [validation record](../research/cubic_extension_transfer_20261025/native_end_to_end/access/20261028-local-validation.json).
+  Conductor and Lean/Lake remain unavailable.
   CLI access is available; the earlier authentication warning was caused by
   sandbox network denial. No root release-test pass is claimed.
 - **Missing implementation:** native forward construction and complete inverse
@@ -43,8 +47,11 @@ does not settle those research questions.
 
 ## What would unblock it
 
-- [ ] Upload the five original files unchanged and verify remote readback
-  against PUBLICATION.json; hydrate and replay every referenced input.
+- [x] Upload the five original files unchanged, verify remote readback against
+  PUBLICATION.json and hydrate all five. See the
+  [receipt](../research/cubic_extension_transfer_20261025/ARTIFACT_PUBLICATION_RECEIPT.json).
+- [ ] Replay every referenced input in the native execution path; byte
+  verification alone does not validate the algorithms or complete the map.
 - [ ] Preserve all mathematical contracts and fixtures in a native
   implementation; pass source/target equality and exceptional-case controls.
 - [ ] Run the required release and touched tests at the PR head and resolve
@@ -58,7 +65,7 @@ does not settle those research questions.
 
 ## Next discriminating step
 
-First publish and rehydrate the exact frozen input files, then perform a
+The exact frozen files are now published and hydrated. Next perform a
 native exact-fixture replay of the p=157 source, both three-isogenies and
 the target subgroup. Matching all recorded answers validates that fixture;
 a mismatch blocks further timing until corrected. Only after fixture parity

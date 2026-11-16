@@ -1,0 +1,11 @@
+name = "p1_tame_reciprocity_audit"
+version = "0.1.0"
+defaultTargets = ["P1TameReciprocityAudit"]
+
+[[require]]
+name = "elliptic_finite_place_projection_audit"
+path = "../../elliptic_finite_place_projection_audit_20261116/lean"
+
+[[lean_lib]]
+name = "P1TameReciprocityAudit"
+roots = ["P1Base", "P1Imports", "P1Laws", "P1Evaluation", "P1FiniteGenerators", "P1InfinityGenerators", "P1Product", "P1Factorization", "P1Global", "P1Controls", "P1Certificate"]

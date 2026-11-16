@@ -1,0 +1,66 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "fb-cost-model native rerun: K1 n=17 l=3, gated ridge pick vs gated hand-rule pick, binary-subspace explicit basis",
+  "description": "Frozen by experiments/fb-cost-model-curves-eks/PROTOCOL_NATIVE.md. Only the factor-base basis differs between the two IC arms. Reference and A/A control are the same strong rho. Measurement of a factor-base choice, no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261029
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "ic-rule",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=3,basis=1;2;4",
+          "oracle": "descent-algebraic:m=3",
+          "solver": "f4-f2",
+          "max_trials": "3000000"
+        }
+      }
+    },
+    {
+      "name": "ic-ridge",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=3,basis=56361;92585;106355",
+          "oracle": "descent-algebraic:m=3",
+          "solver": "f4-f2",
+          "max_trials": "3000000"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261029,
+    "isolation_required": "L2",
+    "timeout_seconds": 900
+  }
+}

@@ -19,6 +19,11 @@ Parameters:
   ProjectName:
     Type: String
     Default: isolab-experiment-launcher
+  ImageRepository:
+    Type: String
+    Default: isolab/tasks
+    Description: Existing private ECR repository for per-commit experiment images
+    AllowedPattern: '[a-z0-9]+([._/-][a-z0-9]+)*'
   GitHubSubject:
     Type: String
     Description: Exact GitHub OIDC subject, restricted to the trusted default branch
@@ -119,7 +124,7 @@ Resources:
       Description: Submit audited L2 Kubernetes jobs; measured work runs on EKS
       ServiceRole: !GetAtt LauncherRole.Arn
       ConcurrentBuildLimit: 2
-      TimeoutInMinutes: 70
+      TimeoutInMinutes: 100
       QueuedTimeoutInMinutes: 10
       Artifacts: {Type: NO_ARTIFACTS}
       Source:
@@ -175,6 +180,28 @@ Resources:
               - Effect: Allow
                 Action: s3:GetObject
                 Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/launcher/*
+              # Failure diagnosis may read only hash manifests and sanitized
+              # gate/identity receipts. Raw records, stdout and stderr remain
+              # outside the GitHub role's object-read boundary.
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource:
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/SHA256SUMS
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/job-exit.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/build-info.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/binary.sha256
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/input-spec.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/l2-gate.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/audit.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/control-comparison.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/owner-run-check.json
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/*/owner-replay-check.json
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Effect: Allow
+                Action: [ecr:BatchCheckLayerAvailability, ecr:InitiateLayerUpload, ecr:UploadLayerPart, ecr:CompleteLayerUpload, ecr:PutImage, ecr:BatchGetImage, ecr:DescribeImages]
+                Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ImageRepository}
 Outputs:
   ProjectName:
     Value: !Ref Project
@@ -182,3 +209,5 @@ Outputs:
     Value: !GetAtt GitHubRole.Arn
   LauncherRoleArn:
     Value: !GetAtt LauncherRole.Arn
+  ImageRepositoryUri:
+    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/${ImageRepository}

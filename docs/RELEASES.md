@@ -139,6 +139,15 @@ as a dry run and stop short of publishing. Merge-queue runs use the same
 local-diff classifier, so records-only package changes cannot silently skip
 the corresponding archive lane.
 
+Since #2578 (`02f2bb3a4c`: pull requests run only the merge set) the dry run above
+runs on pushes to `main` and on `workflow_dispatch`, not on pull requests. A real
+Windows build of `isogeny` is estimated at over an hour (Linux gnu needs 36
+minutes; no Windows run has finished), so the Windows legs have caps of 60
+(`rust`) and 120 (`isogeny`) minutes; both are estimates (see
+`docs/validation/VALIDATION_BACKLOG_20261011.md`, section 3.3).
+`gh workflow run release.yml --ref <branch>` exercises the full legs without
+publishing, because the `release` job requires `refs/heads/main`.
+
 The `release` job requires all four build jobs, so a failure publishes
 nothing rather than a partial set. The matrix is `fail-fast: false`, so one
 platform breaking still tells you about the other three in the same run.

@@ -36,8 +36,8 @@ use crate::certificate::{
     CostTable, Evidence, SubgroupPreservation, TransferType,
 };
 use crate::cost::{
-    jacobian_can_carry, min_genus_to_carry, price_jacobian_route, weil_bits_per_genus,
-    ConstructionCost,
+    jacobian_can_carry, log2_rho_with_class, min_genus_to_carry, price_jacobian_route,
+    weil_bits_per_genus, ConstructionCost,
 };
 use crate::ctx::{jmap, Ctx, Spec};
 use crate::spec::{planted_scalar, random_binary_point};
@@ -205,7 +205,7 @@ fn trace_costs(ctx: &Ctx, n: u32, l: u32, n_rel: u32) -> CostTable {
     } else {
         2
     };
-    let dest = m.log2_rho_elliptic(log2_r, f64::from(l)) - 0.5 * (class as f64).log2();
+    let dest = log2_rho_with_class(m, log2_r, f64::from(l), class);
     let verify = (1.5 * log2_r).log2() + m.log2_elliptic_op(f64::from(n));
     let rows = vec![
         CostRow::absent("map_construction", CostStatus::NotApplicable, "none: the descent is a Frobenius iteration"),
@@ -215,7 +215,7 @@ fn trace_costs(ctx: &Ctx, n: u32, l: u32, n_rel: u32) -> CostTable {
         CostRow::modeled(
             "destination_solve_unsplit",
             dest,
-            format!("rho on E(F_(2^{l})): 0.5 log2 r + log2 sqrt(pi/4) + log2(10 M({l})) - 0.5 log2({class}) (equivalence class of the destination curve)"),
+            format!("rho on E(F_(2^{l})): 0.5 log2 r + log2 sqrt(pi/4) + log2(10 M({l})) - 0.5 log2({class}/2) (equivalence class c = {class} of the destination curve, negation included; the model reference sqrt(pi r/4) is the c = 2 case)"),
         ),
         CostRow::modeled("descent_back_mapping", verify, "the logarithm is unchanged (homomorphism); one scalar multiplication on E verifies it"),
     ];

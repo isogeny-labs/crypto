@@ -1,0 +1,53 @@
+import Validity
+set_option autoImplicit false
+namespace MumfordValidityControls
+open Polynomial MumfordNormalization MumfordValidity
+
+theorem quadratic_formula : T 2 (2:ℚ) 3 ((X+1)^2)=(X+2)^2 := by
+ simp only [T,affine,pow_comp,add_comp,X_comp,one_comp]
+ norm_num [C_ofNat]
+ ring_nf
+ norm_num [← map_mul,← map_pow,← map_add]
+
+theorem quadratic_monic : ((X+1)^2 : ℚ[X]).Monic := by
+ change (((X+1)^2 : ℚ[X]).leadingCoeff)=1
+ rw [leadingCoeff_pow]
+ have h : (X+1 : ℚ[X]).leadingCoeff=1 := by
+  simpa using (leadingCoeff_linear (a:=(1:ℚ)) (b:=1) (by norm_num))
+ rw [h,one_pow]
+
+theorem quadratic_preserved_monic : (T ((X+1)^2 : ℚ[X]).natDegree (2:ℚ) 3 ((X+1)^2)).Monic :=
+ monic_transport 2 3 (by norm_num) _ quadratic_monic
+
+theorem wrong_scale_leading : (((X+1)^2 : ℚ[X]).comp (affine 2 3)).leadingCoeff=4 := by
+ rw [leadingCoeff_comp]
+ · rw [quadratic_monic,affine_leading 2 3 (by norm_num)]
+   norm_num [natDegree_pow,natDegree_X_add_C]
+ · rw [affine_natDegree 2 3 (by norm_num)]; norm_num
+
+theorem wrong_scale_rejected : ¬(((X+1)^2 : ℚ[X]).comp (affine 2 3)).Monic := by
+ change ¬ _=1
+ rw [wrong_scale_leading]
+ norm_num
+
+theorem identity_valid (f : ℚ[X]) : Valid f 1 0 := by
+ simp [Valid]
+
+theorem identity_transport (f : ℚ[X]) : Valid (T 6 (2:ℚ) 3 f) (T 0 2 3 1) (T 3 2 3 0) := by
+ simpa using valid_transport 2 3 (by norm_num) f 1 0 (identity_valid f)
+
+theorem fixed_valid : Valid (X^5+1 : ℚ[X]) X 1 := by
+ refine ⟨monic_X,by simp,by simp,?_⟩
+ exact ⟨X^4,by ring⟩
+
+theorem fixed_transport : Valid (T 6 (2:ℚ) 3 (X^5+1)) (T 1 2 3 X) (T 3 2 3 1) := by
+ simpa using valid_transport 2 3 (by norm_num) (X^5+1) X 1 fixed_valid
+
+theorem equal_degree_rejected : ¬Valid (X^5+1 : ℚ[X]) X X := by
+ intro h
+ exact (lt_irrefl X.degree) h.2.2.1
+
+theorem nonmonic_rejected : ¬(C (2:ℚ)*X).Monic := by
+ change ¬ _=1
+ simp
+end MumfordValidityControls

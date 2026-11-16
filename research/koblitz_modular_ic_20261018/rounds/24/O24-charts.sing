@@ -1,0 +1,60 @@
+// Exact local charts on the retained degree-8-by-2 source tower.
+option(redSB);
+ring o=2,(q,y,l,t),dp;
+poly E0=q+1+(1+t)*t^3*q^2;
+ideal EB=std(ideal(E0));
+poly cp=1+t+t^4*q+t^6*q^2;
+poly rp=1+t^2*q+t^5*q^2;
+poly b=t^3*q^3*rp*cp;
+poly c=t^2*q^2*cp;
+poly A=1+c;
+poly delta=b+c*A^3;
+poly Delta=b^3*delta;
+poly C=b^4*(b^2+A^2*b+c*A^4);
+poly d=Delta/t^11;poly e=C/t^14;
+if(Delta!=t^11*d || C!=t^14*e){ERROR("tower coefficient division failed");}
+print("O24_COEFFICIENT_UNIT_VALUES");
+subst(subst(d,t,0),q,1);subst(subst(e,t,0),q,1);subst(subst(A,t,0),q,1);
+if(subst(subst(d,t,0),q,1)!=1 || subst(subst(e,t,0),q,1)!=1 || subst(subst(A,t,0),q,1)!=1){ERROR("wrong O coefficient units");}
+poly F=b*c^7+b^2*c^5+b*c^6+b^2*c^4+c^6+b^5+b^4*c+b^3*c^2+b^2*c^3;
+print("O24_ORIGINAL_TATE_RESIDUAL");reduce(F,EB);
+if(reduce(F,EB)!=0){ERROR("wrong Tate coordinate chart");}
+// u=1/(t^2*q), v=1/(t^3*q); clear denominators in E, b and c.
+poly cubic=q+t^3*q^2+1+t^4*q^2;
+print("O24_CUBIC_CHART_RESIDUAL");reduce(cubic,EB);
+if(reduce(cubic,EB)!=0){ERROR("wrong elliptic infinity chart");}
+print("O24_ORIGINAL_BASE_COORDINATE_RESIDUALS");
+reduce(c+t^2*q*(1+t*q*rp),EB);reduce(b+t^3*q^2*rp*(1+t*q*rp),EB);
+if(reduce(c+t^2*q*(1+t*q*rp),EB)!=0 || reduce(b+t^3*q^2*rp*(1+t*q*rp),EB)!=0){ERROR("original base coordinate recovery failed");}
+poly H0=t^10*y^8+t^3*d*y^2+A^2*d*y+e;
+poly L0=l^2+A*l+t^3*y+b;
+poly tower0=(t^3*y)^8+Delta*(t^3*y)^2+A^2*Delta*(t^3*y)+C;
+if(tower0!=t^14*H0){ERROR("unramified tower identity failed");}
+matrix J0[3][3]=diff(E0,q),diff(E0,y),diff(E0,l),diff(H0,q),diff(H0,y),diff(H0,l),diff(L0,q),diff(L0,y),diff(L0,l);
+poly jac0=det(J0);
+int j;
+for(j=0;j<=1;j++){
+ map p=o,1,1,j,0;
+ print("O24_E1_RESIDUE_"+string(j));p(E0);p(H0);p(L0);p(jac0);
+ if(p(E0)!=0 || p(H0)!=0 || p(L0)!=0 || p(jac0)!=1){ERROR("unramified source chart not regular at asserted point");}
+}
+ring s=2,(q,x,l,w),dp;
+map tr=o,q,0,l,w^7*x^2;
+poly ts=w^7*x^2;poly zs=w^11*x^3;
+poly Es=tr(E0);poly bs=tr(b);poly cs=tr(c);poly As=tr(A);
+poly ds=tr(d);poly es=tr(e);
+poly Hs=1+As^2*ds*x+w^11*ds*x^4+w^10*es*x^4;
+poly Ls=l^2+As*l+zs+bs;
+poly towers=zs^8+tr(Delta)*zs^2+As^2*tr(Delta)*zs+tr(C);
+print("O24_E7_TOWER_RESIDUAL");towers-w^88*x^24*Hs;
+if(towers!=w^88*x^24*Hs){ERROR("tame source tower identity failed");}
+print("O24_TORIC_INVERSE_CLEARED_RESIDUALS");zs^2-w*ts^3;ts^11-x*zs^7;
+if(zs^2!=w*ts^3 || ts^11!=x*zs^7){ERROR("tame chart rational inverse failed");}
+matrix Js[3][3]=diff(Es,q),diff(Es,x),diff(Es,l),diff(Hs,q),diff(Hs,x),diff(Hs,l),diff(Ls,q),diff(Ls,x),diff(Ls,l);
+poly jacs=det(Js);
+for(j=0;j<=1;j++){
+ map p=s,1,1,j,0;
+ print("O24_E7_RESIDUE_"+string(j));p(Es);p(Hs);p(Ls);p(jacs);
+ if(p(Es)!=0 || p(Hs)!=0 || p(Ls)!=0 || p(jacs)!=1){ERROR("tame source chart not regular at asserted point");}
+}
+print("O24_CHARTS_ALL_CHECKS_PASS");quit;

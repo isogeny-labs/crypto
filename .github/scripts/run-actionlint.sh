@@ -14,4 +14,5 @@ printf '%s  %s\n' \
   8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8 \
   "$archive" | sha256sum --check --status
 tar -xzf "$archive" -C "$ci_lint_temp" actionlint
-"$ci_lint_temp/actionlint" -color -shellcheck='' -pyflakes='' "$@"
+"$ci_lint_temp/actionlint" -config-file .github/actionlint.yaml \
+  -color -shellcheck='' -pyflakes='' "$@"

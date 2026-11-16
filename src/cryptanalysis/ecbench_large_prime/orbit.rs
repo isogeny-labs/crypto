@@ -75,6 +75,14 @@ impl LambdaPowers {
         }
         let r = instance.r;
         let n = instance.n;
+        // `r as i64` below and `... + 2 + r` overflow for r >= 2^63, and the
+        // batch filter refuses such a modulus anyway; say so here, clearly,
+        // instead of failing later or wrapping.
+        if r >= 1u64 << 63 {
+            return Err(format!(
+                "orbit quotient needs a subgroup order r < 2^63 (the filter's modulus bound), got r = {r}"
+            ));
+        }
         let lambda = (&koblitz.lambda % BigUint::from(r))
             .to_u64()
             .ok_or("lambda does not fit a word")?;

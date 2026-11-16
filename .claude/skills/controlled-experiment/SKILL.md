@@ -160,6 +160,12 @@ revealed about the target.
 
 ## 4. Run
 
+- Route supported x86 experiments through the shared
+  [isolab-eks](../isolab-eks/SKILL.md) skill by default (AGENTS.md §9a).
+  Preserve this protocol's controls and workload in the request; use its AWS
+  authentication, L2/S3 verification and separate CRIU/EBS recovery contract.
+  A missing supported workload or image is a reported integration gap, not
+  permission to substitute the deployment's validation fixture.
 - Native code per `AGENTS.md` (Rust), with the seed for every row derived as
   the protocol says and recorded in the output.
 - Emit raw per-sample rows (JSON lines or CSV), not just summaries, so the
@@ -220,3 +226,22 @@ Lead with the table. For each target × metric:
 - [ ] verdicts use the fixed wording; scope sentence present; A/A spread reported
 - [ ] superseded claims corrected in place, with date
 - [ ] a `review-run` record by another runner cited, or its absence stated
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope controlled-experiment`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope controlled-experiment --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope controlled-experiment --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `controlled-experiment` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

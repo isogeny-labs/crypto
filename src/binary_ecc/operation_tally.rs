@@ -15,15 +15,22 @@ thread_local! {
     static TALLIES: RefCell<Vec<BTreeMap<String,u64>>> = const { RefCell::new(Vec::new()) };
 }
 
-pub(crate) fn tick(m: u32, operation: &str) {
+pub(crate) fn tick_n(m: u32, operation: &str, count: u64) {
+    if count == 0 {
+        return;
+    }
     if ACTIVE.load(Ordering::Relaxed) == 0 {
         return;
     }
     TALLIES.with(|stack| {
         if let Some(tally) = stack.borrow_mut().last_mut() {
-            *tally.entry(format!("f2m{m}_{operation}")).or_default() += 1;
+            *tally.entry(format!("f2m{m}_{operation}")).or_default() += count;
         }
     });
+}
+
+pub(crate) fn tick(m: u32, operation: &str) {
+    tick_n(m, operation, 1);
 }
 
 pub struct OperationTally {
@@ -62,5 +69,49 @@ impl Drop for OperationTally {
             });
             ACTIVE.fetch_sub(1, Ordering::Relaxed);
         }
+    }
+}
+
+/// Bounded field callers refuse the allocating optional tally path. Any live
+/// borrow also refuses admission: tick() needs an exclusive borrow even when
+/// this thread's stack is empty. The probe never changes stack or tally contents.
+pub(crate) fn current_thread_active_or_borrowed() -> bool {
+    TALLIES.with(|stack| match stack.try_borrow_mut() {
+        Ok(stack) => !stack.is_empty(),
+        Err(_) => true,
+    })
+}
+
+#[cfg(test)]
+mod bounded_field_tally_guard_tests {
+    use super::*;
+    #[test]
+    fn shared_and_mutable_empty_stack_borrows_refuse_without_mutation() {
+        TALLIES.with(|stack| {
+            assert!(stack.borrow().is_empty());
+            assert!(!current_thread_active_or_borrowed());
+            let shared = stack.borrow();
+            assert!(current_thread_active_or_borrowed());
+            assert!(shared.is_empty());
+            drop(shared);
+            let exclusive = stack.borrow_mut();
+            assert!(current_thread_active_or_borrowed());
+            assert!(exclusive.is_empty());
+            drop(exclusive);
+            assert!(!current_thread_active_or_borrowed());
+            assert!(stack.borrow().is_empty());
+        });
+    }
+    #[test]
+    fn active_tally_probe_preserves_existing_entries() {
+        let tally = OperationTally::begin();
+        tick(3, "add");
+        let before = TALLIES.with(|stack| stack.borrow().clone());
+        assert!(current_thread_active_or_borrowed());
+        TALLIES.with(|stack| assert_eq!(*stack.borrow(), before));
+        let result = tally.finish();
+        assert_eq!(result.len(), 1);
+        assert_eq!(result.get("f2m3_add"), Some(&1));
+        assert!(!current_thread_active_or_borrowed());
     }
 }

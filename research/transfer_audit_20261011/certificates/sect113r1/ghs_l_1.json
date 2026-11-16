@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation only: E is not defined over a proper subfield",
     "equivalence_class_size": 2,
     "log2_cost_of_one_group_operation": 14.132,
-    "log2_group_operations": 55.326,
+    "log2_group_operations": 55.826,
     "log2_r": 112.0,
-    "log2_total": 69.458,
-    "log2_total_without_automorphisms": 69.958
+    "log2_total": 69.958,
+    "log2_total_negation_only": 69.958
   },
   "candidate": {
     "id": "ghs:l=1",
@@ -30,8 +30,8 @@
   ],
   "costs": {
     "destination_solver": "RhoOnJacobian",
-    "log2_baseline": 69.458,
-    "log2_cost_ratio": 254.14,
+    "log2_baseline": 69.958,
+    "log2_cost_ratio": 253.64,
     "log2_total": 323.598,
     "repo_ratio_log2": -253.64,
     "rows": [
@@ -142,6 +142,10 @@
       "trace": "-122610772499221213"
     }
   },
+  "evaluation": {
+    "reason": "the priced total is 253.6 bits above the matched baseline (a lower bound: the unpriced phases only add cost)",
+    "status": "excluded"
+  },
   "executed": null,
   "invariants": {
     "a_in_subfield": false,
@@ -156,7 +160,7 @@
         113
       ],
       "best_case_destination_can_carry_r": true,
-      "best_case_log2_cost_ratio": 56.992,
+      "best_case_log2_cost_ratio": 56.492,
       "best_case_route_log2_total": 126.45,
       "genus_lower_bound_log2": 28.0,
       "min_magic_number_at_least_2": 29,
@@ -167,8 +171,9 @@
     "crosscheck_jacobian_transfers": {
       "delta_bits": 0.0,
       "file": "docs/curves/jacobian-transfers.json",
-      "note": "the repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
+      "note": "a wiring check of the frozen formulas, not independent validation: this tool calls the repository's cost functions, so agreement shows the inputs were passed through, not that the formulas are right. The repository total is search + transfer + destination; this total also carries construction and one verification, both negligible against the destination at these sizes",
       "repo_log2_total": 323.598,
+      "reported_total_is_lower_by_class_discount_bits": null,
       "route_kind": "ghs_weil_descent",
       "this_log2_total": 323.598,
       "within_0_002_bits": true
@@ -221,7 +226,7 @@
     "Galbraith-Hess-Smart 2002; Hess, LMS J. Comput. Math. 7 (2004) (as cited in src/cryptanalysis/ghs_descent.rs)",
     "docs/GHS_TRANSPORT.md; tests/sect113r1_ghs_evidence.rs"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [
       {
@@ -237,11 +242,11 @@
     "method": "none",
     "status": "not_evaluated"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
     "subgroup preservation is NotEvaluated: the transfer is not shown to carry <G>",
     "the map is not constructed (existence or construction missing)",
-    "priced route costs 2^254.1 times the matched baseline or more"
+    "priced route costs 2^253.6 times the matched baseline or more"
   ]
 }

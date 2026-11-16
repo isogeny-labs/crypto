@@ -1,0 +1,43 @@
+{
+ "note": "Blind-spot item 01. Replay is a sampled exact replay (282 of 945 rows, every arm at 24 and 40 bits; see the certificate scalars_scope). The rho reference covers the torsion headline cell; the README GLS rows ic-gls-neg/rho-neg and ic-gls-psi/rho-neg are not against the strongest available rho (rho-reference.json kind_by_family).",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "7e89f0e39de1b56dbac701129312f4d122bd441add10090501894dd20fe70ba5"
+ },
+ "rho_reference": {
+  "band_arm": "ic-c2",
+  "binary_or_process": "One process per curve: each torsion-b40-i{0..5}.jsonl came from a single invocation of the card-built binary target/blindspots-01/card-NN/b01 run with --arms 'ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7' (cards 05, 06, 07). Every card built that binary with the same rustc command from examples/blindspots_01_fp2_gaudry.rs sha256 0629a73c7ff443e70c6ce16c0872b98a5aebc5a71d25f7bff60156c8693ff559, verified at each receipt's commit; the file now lives byte-identically at research/blindspots_20261018/instruments/blindspots_01_fp2_gaudry.rs. The binary's own sha256 was not recorded (each card deletes it).",
+  "descriptor": {
+   "path": "rho-reference.json",
+   "sha256": "b5e958e022135b7f58036c64e0edaded0606a4d78f9c711264f8f65cc4f0961f"
+  },
+  "gae_band": {
+   "0": {
+    "ic": 21186871.024305556,
+    "rho": 410948.9166666667
+   },
+   "0.1": {
+    "ic": 21383961.549305554,
+    "rho": 533765.7020833333
+   },
+   "1": {
+    "ic": 23157776.274305552,
+    "rho": 1639116.7708333333
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "PROTOCOL.md 'Decision rule (frozen)': matched rho of the family, rho-neg (Van Oorschot-Wiener on {P, -P}, r-adding walk, 16 jumps below 2^30 and 32 above, distinguished points with floor(log2 r / 4) bits, one addition a walk start, short-cycle escape by doubling, answer verified) for ic-a, ic-b, ic-c1, ic-c2, ic-gls-neg; rho-psi for ic-gls-psi",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "scope": "Headline cell: torsion family (cofactor 4, 6 curves), log2#E = 40, best IC arms ic-b and ic-c2 against matched rho-neg, 2 IC targets and 8 rho targets a curve.",
+  "strongest_available": true,
+  "unit": "GAE (group-addition equivalents). IC: counted F_p multiplication equivalents (inversion = 4) divided by c_add, the measured mult-eq of one affine addition on the same curve (24 at inv-cost 4). Rho: counted group additions plus doublings, 1 GAE each. Unpriced native operations of every arm priced at w GAE each (w = 0, 0.1, 1)."
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "0499f894faea21bda374a2f3288de3af8c4baf4e34cca1e59ae5e32c8c829bc0"
+ }
+}

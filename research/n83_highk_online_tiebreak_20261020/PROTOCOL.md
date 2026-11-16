@@ -1,0 +1,201 @@
+# N83 five-base online tie-break, conditional on the sealed 192-point screen
+
+This extension measures the five exact N83 factor bases on 1,536 new public
+points if the 192-point Tier 1 screen is fully admitted but its corrected
+selector returns `BOUNDED_UNKNOWN`. It increases paired precision while
+preserving the current screen and its archived decision. The extension is a
+secondary factor-base ranking study; a fresh one-target IC/rho holdout is the
+next primary gate for a selected candidate.
+
+## Trigger and identity
+
+Dispatch only after independent local aggregation of
+`research/n83_highk_online_distribution_20261020` reports
+`admission_status: PASS`, `status: BOUNDED_UNKNOWN`, and
+`selected_candidate_id: null`. Bind the extension dispatch to the SHA-256 of
+that immutable aggregate and its archive. A failed/noisy/capped screen does
+not trigger this tie-break; retain its disposition and repair that gate first.
+Use `check_trigger.py` on the locally replayed aggregate and raw archive to
+seal their hashes in `n83.online-tiebreak-trigger/v1`. The dispatch must
+recheck those bytes and the trigger receipt before any timed child.
+
+Use `EC1N83Ckb1a1haacb69ee9f37`: `y² + xy = x³ + x² + 1` over
+`F₂[z]/(z⁸³ + z⁷ + z⁴ + z² + 1)`, subgroup order
+`8569786107849059`. The executed IC source is commit
+`e7634a81c22b60ad37e5d6bdb817a3b84867ae86`, file SHA-256
+`4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507`.
+Retain the exact five candidate manifests, base dumps, layout flags and IDs
+from the sealed screen, in its table order:
+
+| Arm | Usable points | Columns | Candidate ID |
+| --- | ---: | ---: | --- |
+| K3072 root11 | 509,952 | 3,072 | `IC1N83Ckb1a1fb509952PDP4rootRCguidedLAgaussTDdirectISO0h2e63425c7f7e` |
+| K3500 root4 | 581,000 | 3,500 | `IC1N83Ckb1a1fb581000PDP4rootRCguidedLAgaussTDdirectISO0hd41c74f97eea` |
+| K3300 wide3 | 547,800 | 3,300 | `IC1N83Ckb1a1fb547800PDP4rootRCguidedLAgaussTDdirectISO0h8d1e886f8586` |
+| K4300 wide3 | 713,800 | 4,300 | `IC1N83Ckb1a1fb713800PDP4rootRCguidedLAgaussTDdirectISO0h394bfa10df77` |
+| K4405 wide3 | 731,230 | 4,405 | `IC1N83Ckb1a1fb731230PDP4rootRCguidedLAgaussTDdirectISO0h2f81ad5da3e7` |
+
+## Fresh secondary screen
+
+Freeze 1,536 distinct public points using the domain
+`n83-online-tiebreak-screen1536-20261020-v1` and the scalar rule
+`1 + LE(SHA256(domain || u32le(index))) mod (r - 1)` for indices 0–1,535.
+Save public-point and answer streams, their byte hashes, and a point-level
+exclusion audit against all prior N83 target streams, including the running
+screen's 192 points and reserved eight-point holdout. Answer sidecars stay
+outside timed input. Split the new points into ordered blocks 0–767 and
+768–1,535.
+
+The frozen public stream SHA-256 is
+`41b160dc56fadb0e8beec4c86bfee47457c6ade8290dd17cfa30c728787d5582`;
+its answer sidecar SHA-256 is
+`f17dcdfbf14b06c1cc708c8d0f362bf45c3b299156221be6eb9c1e281fb71bc7`.
+The [exclusion audit](fresh_exclusion_audit.json) found zero shared points
+against 31,800 distinct earlier public targets. The new stream itself has
+1,536 distinct subgroup points.
+
+On one frozen Tier 1 cloud allocation, run each of the five IC arms once per
+block with empty setup caches. Use table order in block 0 and reverse table
+order in block 1. Each child builds the exact base, index and logs, then
+processes its block's public points. Preserve every per-point online
+interval, exclusive target phase costs, recovered scalar, four-point
+relation, base hash, failed attempt, and resource receipt. Shared preparation
+and the 1,536-target count must be reported separately; do not divide a
+process wall time by 1,536 to represent a single-target solve.
+
+Run three identically seeded rho A/A calibration children before and after
+each IC child, using the same frozen calibration point and seed as the
+192-point screen. Require the before/after median spread, divided by their
+mean, to be at most 20% for every child. The extension compares IC methods
+on the same points; it does not run rho on every secondary-screen point.
+The later primary holdout must solve its one public point with rho under the
+same resource envelope.
+
+Require identical source and binary hashes, exact candidate/base hashes,
+target-stream hashes, CPU affinity and cgroup envelope in both blocks. Pin
+four visible CPUs and at least four CPUs of quota, a cgroup memory limit of
+at least 24 GiB plus 256 MiB, and a 24 GiB child RSS cap. Retain exposed
+topology, provider machine ID, memory peak, calibration times, CPU steal,
+throttling, memory-limit denials, OOM and every child exit. Require zero
+steal, throttling, denial and OOM for admission. Child caps are 900 seconds
+for K3072, 1,200 for K3500/K3300, and 1,500 for K4300/K4405. A capped or
+unverified child leaves the entire selector `BOUNDED_UNKNOWN`.
+
+For each of the ten unordered candidate pairs, count per-point wins and
+losses from their 1,536 online intervals; drop exact ties from that pair's
+binomial count. Use an exact two-sided sign test with Bonferroni threshold
+`0.05/10 = 0.005`. Select a unique arm only if it wins more often than every
+other arm with each corrected p-value below 0.005 and has the smallest
+geometric mean interval. Record all pairwise counts, p-values, geometric
+means, medians, paired log differences and cold-process costs. Otherwise
+record `selected_candidate_id: null` and `BOUNDED_UNKNOWN`.
+
+## Cost, archive and next gate
+
+Use a RunPod class costing no more than $0.20/hour. Before allocation,
+combine the provider-confirmed charge for all earlier campaign Pods with a
+conservative reservation for this Pod; dispatch only when the sum is at
+most the owner's $5 campaign ceiling. Freeze its provider stop time and
+producer cap in the dispatch: at most four hours from allocation to provider
+stop and 3.5 hours for timed production, leaving at least 30 minutes for
+verification, archive transfer and stop.
+After the first allocated Pod exposed cgroup v2, the conditional allocator
+was narrowed to the observed RTX 3070 class at at most $0.13/hour, so its
+four-hour worst-case reservation is $0.52. The v2 adapter reads native
+`cpu.stat`, `cpu.max`, `memory.current`, `memory.peak`, `memory.max`, and
+`memory.events`; the verifier checks those counters and zero throttling/OOM
+deltas. The v1 adapter remains supported on hosts exposing those paths.
+The allocation must not overlap another timed N83 run. Store the raw tree,
+archive SHA-256, provider snapshot and termination receipt. Independently
+replay every base, relation and scalar and recompute the selector from the
+archived bytes before promoting a result.
+
+The conditional Pod implementation is `allocate_runpod.py`,
+`runpod_runner.py`, `launch_on_pod.sh`, and `watch_runpod.py`. The controller runs
+`check_trigger.py` against the
+locally replayed aggregate and archive immediately before allocation and
+again immediately before dispatch. Its `n83.online-tiebreak-runpod-snapshot/v1`
+records the provider's single Pod, UTC creation and stop times, price,
+machine and CPU allocation, the conservative earlier campaign spend, the $5
+combined cap, pinned source HEAD, and trigger receipt/aggregate/archive
+SHA-256 values. The matching `n83.online-tiebreak-runpod-allocation/v1`
+contains the same Pod fields, snapshot SHA-256, and trigger hashes. Copy the
+frozen tie-break package to the pinned `e7634a8` checkout, validate the
+fixture there, then run the launcher with the allocation and trigger under
+the recorded four-CPU affinity. The runner rejects a changed trigger,
+checkout, price, affinity, or cgroup envelope before it starts a timed child.
+The snapshot must confirm the preceding distribution Pod is terminated.
+The budget verifier charges the frozen $3.57 earlier upper bound plus
+the preceding Pod's allocation-to-recorded-termination interval at
+$0.19/hour, a $0.05 reserve for the failed partial-response allocation,
+a further $0.05 reserve for the cgroup-v2 preflight failure, and the new
+Pod's entire created-to-stop reservation. Both failed allocations' provider
+responses and absent-Pod receipts are copied into the snapshot folder and
+bound by SHA-256. The first failed allocation's conservative start is the
+preceding Pod's recorded termination, before the attempted mutation; the
+second allocation has its provider creation timestamp. The resulting upper
+bound is $4.27714 before the new four-hour reservation and $4.79714 after it.
+The allocator takes the key through a hidden terminal prompt and keeps it
+out of files, shell arguments, Pod inputs and result archives. It requires
+the watchdog's prior termination receipt, queries the provider for the
+absence of that Pod, reserves the worst-case new charge before creating a
+Pod, reads back a delayed provider creation timestamp, and retires any
+allocation whose post-create validation or persistence fails. A lost mutation
+response triggers a provider name lookup and retirement before the allocator
+can return.
+The watcher uses the same hidden prompt, verifies the transferred archive
+hash, calls `podStop` and the provider's `Void` `podTerminate` mutation,
+and records an absent-Pod receipt before the next allocation.
+
+After `DONE`, transfer `results/` and `raw_results.tar.gz`, verify the
+Pod-side SHA-256, stop and terminate the Pod, and retain the provider charge
+and termination receipt. Run `aggregate_runpod.py` with the snapshot, raw
+archive, extracted results, pinned source HEAD, and the same prior aggregate
+and archive used for dispatch. It checks archive bytes before and after
+independent replay, provider identity and spend, exact trigger bytes, each
+target's scalar and four-point sum, resource receipts, and the selector.
+Keep `BOUNDED_UNKNOWN` if any replay or Tier 1 admission gate fails.
+
+The executed screen and its independent replay are recorded in
+`results/runpod_20261020/RESULT.md`. The Pod remained reachable beyond its
+requested stop time; its provider-absence receipt was recorded at
+`2026-10-20T15:58:56.317004Z`. The campaign's conservative upper spend then
+exceeded the approved $5 cap. The current allocator fails closed after that
+receipt. Historical snapshot verification uses the SHA-pinned
+`evidence/allocate_runpod_at_dispatch.py` bytes, retaining exact replay of
+the earlier allocation. A future cloud protocol must persist an external
+watchdog across agent turns and verify actual provider absence at the budget
+deadline rather than relying on the requested stop timestamp.
+
+## Conditional one-target confirmation
+
+If and only if independent local replay of this tie-break records one
+`selected_candidate_id`, the primary confirmation uses the already sealed
+distribution holdout fixture (`holdout_targets_sha256 =
+e7dcb0fe5779f847d381017b3cb5fb7dd46b6a4a7e834611d200d7cbd6244f68`).
+Point `p00` is the primary previously unseen target; point `p01` supplies
+the reverse-order Tier 1 pair. Run IC then same-point rho on `p00`, and rho
+then same-point IC on `p01`, with three frozen calibration children before
+and after each pair. Charge each target's online IC interval from its first
+target-dependent query through scalar recovery and check, and rho from its
+first target-dependent walk through scalar recovery and check; keep cold IC
+setup and fixture construction separate. Replay both scalars and four-point
+group sums independently, preserve every failed child and resource receipt,
+and report each point's `rho_online_ms / IC_online_ms` separately. The `p00`
+ratio is the headline one-target result; `p01` checks order sensitivity.
+
+The confirmation may use a fresh Tier 1 RunPod only after the screen Pod has
+an absent-Pod receipt. Conservatively charge its full $0.52 four-hour
+reservation even if it terminates early, then reserve at most 80 minutes
+at $0.13/hour for an RTX 3070 instance, four frozen CPUs, at least 27 GB
+memory, a 65-minute producer cap, and 15 minutes for verification, transfer
+and provider termination. The resulting combined cap is below $5. A null
+tie-break selector leaves the confirmation undispatched and its result
+unknown.
+
+If the extension selects an arm, freeze fresh one-target public points and
+run an independently replayed Tier 1 IC/rho holdout in alternating order.
+Include complete cold and exclusive online costs, same-point scalar checks,
+A/A controls and every failed run. The screen alone selects a candidate for
+that holdout; a verified one-target result and comparison scope are needed
+before reporting a factor-base winner.

@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Split-graph F4 comparison</title><style>
+body{font:16px/1.5 system-ui,sans-serif;color:#172b38;max-width:1150px;margin:32px auto;padding:0 20px}
+h1{line-height:1.15}a{color:#126b66}img{width:100%;height:auto}label{display:inline-block;margin:12px 24px 12px 0}
+select{padding:7px;font:inherit}table{border-collapse:collapse;width:100%;font-size:13px}td,th{border-bottom:1px solid #ccd7dd;padding:8px;text-align:left}th{background:#eaf2f3}td:first-child{max-width:260px;overflow-wrap:anywhere}.scroll{overflow:auto}
+.status{border-left:4px solid #126b66;padding:10px 18px;background:#eef6f5}[hidden]{display:none!important}
+</style><main><h1>Split-graph factor bases: measured F4 degree</h1>
+<p>Run <code>run-20261031T201044Z</code> · two summands · prime fields · stock neogb F4.</p>
+<p class="status">Complete toy audit: zero mismatches. Original extraction: <strong>14,194/14,220 verified; 26 capped</strong>.
+Separate offline saved-basis verification: <strong>14,220/14,220</strong>, with no CAS reruns.
+The original extraction caps remain in the record.</p>
+<p>The graph secant encoding lowers observed handled degree. Charging all four signs increases reduced rows versus its own dense encoding. Complete field cost per usable relation and timing speedup are unknown.</p>
+<nav><a href="RESULTS.md">Result report</a> · <a href="reports/report.pdf">Illustrated PDF</a> ·
+<a href="results-summary.json">Native aggregate JSON</a> · <a href="protocol.json">Frozen protocol</a> ·
+<a href="REPRODUCE.md">Reproduce</a> · <a href="review/DATA.md">Independent review</a></nav>
+<img src="reports/comparison.svg" alt="Toy degrees 3,4,6,6; branch-summed rows2102,2522,736,706; larger degree comparison and construction attempts">
+<h2>Complete populations and all-branch counters</h2>
+<p>Degree entries give target counts at each degree. Handled degree means max(input-generator degree, maximum selected-pair LCM degree). It differs from homogeneous delta and sugar degree. SAT coverage for an incomplete original group is also incomplete; the separate saved-basis proof is explicitly selectable below.</p>
+<label>Verification record <select id="stage"><option value="v1_recorded_status">Original extraction (26 caps retained)</option><option value="saved_basis_v2_verified">Separate exact saved-basis proof</option></select></label>
+<label>Field <select id="field"><option value="all">All fields</option><option>17</option><option>83</option><option>101</option><option>127</option></select></label>
+<div class="scroll"><table><thead><tr><th>Curve</th><th>Graph d</th><th>Arm / control</th><th>Handled degree</th><th>Reduced rows, all branches</th><th>Peak columns</th><th>SAT targets</th><th>Unknown cases</th></tr></thead><tbody><tr data-p="17" data-stage="v1_recorded_status"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>candidate-dense </td><td>6: 18 targets</td><td>736</td><td>21</td><td>18/18</td><td>0</td></tr>
+<tr data-p="17" data-stage="v1_recorded_status"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>candidate-secant </td><td>3: 18 targets</td><td>2102</td><td>16</td><td>18/18</td><td>0</td></tr>
+<tr data-p="17" data-stage="v1_recorded_status"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>control-dense </td><td>6: 18 targets</td><td>706</td><td>21</td><td>16/18</td><td>0</td></tr>
+<tr data-p="17" data-stage="v1_recorded_status"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>control-secant </td><td>4: 18 targets</td><td>2522</td><td>28</td><td>16/18</td><td>0</td></tr>
+<tr data-p="17" data-stage="saved_basis_v2_verified"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>candidate-dense </td><td>6: 18 targets</td><td>736</td><td>21</td><td>18/18</td><td>0</td></tr>
+<tr data-p="17" data-stage="saved_basis_v2_verified"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>candidate-secant </td><td>3: 18 targets</td><td>2102</td><td>16</td><td>18/18</td><td>0</td></tr>
+<tr data-p="17" data-stage="saved_basis_v2_verified"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>control-dense </td><td>6: 18 targets</td><td>706</td><td>21</td><td>16/18</td><td>0</td></tr>
+<tr data-p="17" data-stage="saved_basis_v2_verified"><td>icv1-fp5-tm1-a77cc6af</td><td>2</td><td>control-secant </td><td>4: 18 targets</td><td>2522</td><td>28</td><td>16/18</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>candidate-dense candidate</td><td>8: 138 targets</td><td>10740</td><td>33</td><td>58/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>candidate-secant candidate</td><td>4: 138 targets</td><td>29304</td><td>28</td><td>58/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-dense low-x</td><td>8: 138 targets</td><td>10652</td><td>33</td><td>52/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-dense hash-x</td><td>8: 138 targets</td><td>10726</td><td>33</td><td>64/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-secant low-x</td><td>6: 138 targets</td><td>42136</td><td>42</td><td>52/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-secant hash-x</td><td>6: 138 targets</td><td>42324</td><td>42</td><td>64/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>candidate-dense candidate</td><td>8: 138 targets</td><td>10740</td><td>33</td><td>58/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>candidate-secant candidate</td><td>4: 138 targets</td><td>29304</td><td>28</td><td>58/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-dense low-x</td><td>8: 138 targets</td><td>10652</td><td>33</td><td>52/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-dense hash-x</td><td>8: 138 targets</td><td>10726</td><td>33</td><td>64/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-secant low-x</td><td>6: 138 targets</td><td>42136</td><td>42</td><td>52/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>3</td><td>control-secant hash-x</td><td>6: 138 targets</td><td>42324</td><td>42</td><td>64/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>candidate-dense candidate</td><td>10: 138 targets</td><td>14988</td><td>45</td><td>92/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>candidate-secant candidate</td><td>5: 138 targets</td><td>42412</td><td>40</td><td>92/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-dense low-x</td><td>10: 138 targets</td><td>14892</td><td>45</td><td>86/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-dense hash-x</td><td>10: 138 targets</td><td>14962</td><td>45</td><td>98/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-secant low-x</td><td>8: 138 targets</td><td>61548</td><td>60</td><td>86/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-secant hash-x</td><td>8: 138 targets</td><td>57204</td><td>79</td><td>98/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>candidate-dense candidate</td><td>10: 138 targets</td><td>14988</td><td>45</td><td>92/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>candidate-secant candidate</td><td>5: 138 targets</td><td>42412</td><td>40</td><td>92/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-dense low-x</td><td>10: 138 targets</td><td>14892</td><td>45</td><td>86/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-dense hash-x</td><td>10: 138 targets</td><td>14962</td><td>45</td><td>98/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-secant low-x</td><td>8: 138 targets</td><td>61548</td><td>60</td><td>86/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>4</td><td>control-secant hash-x</td><td>8: 138 targets</td><td>57204</td><td>79</td><td>98/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>candidate-dense candidate</td><td>12: 138 targets</td><td>18984</td><td>57</td><td>118/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>candidate-secant candidate</td><td>6: 132 targets, unknown: 6 targets</td><td>unknown</td><td>unknown</td><td>112/138</td><td>12</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-dense low-x</td><td>12: 138 targets</td><td>18800</td><td>57</td><td>108/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-dense hash-x</td><td>12: 138 targets</td><td>18976</td><td>57</td><td>112/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-secant low-x</td><td>10: 134 targets, unknown: 4 targets</td><td>unknown</td><td>unknown</td><td>104/138</td><td>6</td></tr>
+<tr data-p="127" data-stage="v1_recorded_status"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-secant hash-x</td><td>10: 134 targets, unknown: 4 targets</td><td>unknown</td><td>unknown</td><td>108/138</td><td>8</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>candidate-dense candidate</td><td>12: 138 targets</td><td>18984</td><td>57</td><td>118/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>candidate-secant candidate</td><td>6: 138 targets</td><td>55506</td><td>52</td><td>118/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-dense low-x</td><td>12: 138 targets</td><td>18800</td><td>57</td><td>108/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-dense hash-x</td><td>12: 138 targets</td><td>18976</td><td>57</td><td>112/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-secant low-x</td><td>10: 138 targets</td><td>72552</td><td>94</td><td>108/138</td><td>0</td></tr>
+<tr data-p="127" data-stage="saved_basis_v2_verified"><td>icv1-fp7-tm11-1cabae54</td><td>5</td><td>control-secant hash-x</td><td>10: 138 targets</td><td>74104</td><td>144</td><td>112/138</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>candidate-dense candidate</td><td>8: 96 targets</td><td>7258</td><td>33</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>candidate-secant candidate</td><td>4: 96 targets</td><td>20152</td><td>28</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-dense hash-x</td><td>8: 96 targets</td><td>7360</td><td>33</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-dense low-x</td><td>8: 96 targets</td><td>7346</td><td>33</td><td>50/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-secant hash-x</td><td>6: 96 targets</td><td>29796</td><td>42</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-secant low-x</td><td>6: 96 targets</td><td>29726</td><td>42</td><td>50/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>candidate-dense candidate</td><td>8: 96 targets</td><td>7258</td><td>33</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>candidate-secant candidate</td><td>4: 96 targets</td><td>20152</td><td>28</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-dense hash-x</td><td>8: 96 targets</td><td>7360</td><td>33</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-dense low-x</td><td>8: 96 targets</td><td>7346</td><td>33</td><td>50/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-secant hash-x</td><td>6: 96 targets</td><td>29796</td><td>42</td><td>56/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>3</td><td>control-secant low-x</td><td>6: 96 targets</td><td>29726</td><td>42</td><td>50/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>candidate-dense candidate</td><td>10: 96 targets</td><td>10146</td><td>45</td><td>82/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>candidate-secant candidate</td><td>5: 96 targets</td><td>29660</td><td>40</td><td>82/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-dense low-x</td><td>10: 96 targets</td><td>10138</td><td>45</td><td>78/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-dense hash-x</td><td>10: 96 targets</td><td>10014</td><td>45</td><td>72/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-secant low-x</td><td>8: 96 targets</td><td>40744</td><td>58</td><td>78/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-secant hash-x</td><td>8: 96 targets</td><td>40270</td><td>75</td><td>72/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>candidate-dense candidate</td><td>10: 96 targets</td><td>10146</td><td>45</td><td>82/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>candidate-secant candidate</td><td>5: 96 targets</td><td>29660</td><td>40</td><td>82/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-dense low-x</td><td>10: 96 targets</td><td>10138</td><td>45</td><td>78/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-dense hash-x</td><td>10: 96 targets</td><td>10014</td><td>45</td><td>72/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-secant low-x</td><td>8: 96 targets</td><td>40744</td><td>58</td><td>78/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>4</td><td>control-secant hash-x</td><td>8: 96 targets</td><td>40270</td><td>75</td><td>72/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>candidate-dense candidate</td><td>12: 96 targets</td><td>12686</td><td>57</td><td>92/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>candidate-secant candidate</td><td>6: 96 targets</td><td>38314</td><td>52</td><td>92/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-dense low-x</td><td>12: 96 targets</td><td>12756</td><td>57</td><td>90/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-dense hash-x</td><td>12: 96 targets</td><td>12664</td><td>57</td><td>90/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-secant low-x</td><td>10: 96 targets</td><td>61162</td><td>94</td><td>90/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="v1_recorded_status"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-secant hash-x</td><td>10: 96 targets</td><td>52540</td><td>144</td><td>90/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>candidate-dense candidate</td><td>12: 96 targets</td><td>12686</td><td>57</td><td>92/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>candidate-secant candidate</td><td>6: 96 targets</td><td>38314</td><td>52</td><td>92/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-dense low-x</td><td>12: 96 targets</td><td>12756</td><td>57</td><td>90/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-dense hash-x</td><td>12: 96 targets</td><td>12664</td><td>57</td><td>90/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-secant low-x</td><td>10: 96 targets</td><td>61162</td><td>94</td><td>90/96</td><td>0</td></tr>
+<tr data-p="101" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-b172aa85</td><td>5</td><td>control-secant hash-x</td><td>10: 96 targets</td><td>52540</td><td>144</td><td>90/96</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>candidate-dense candidate</td><td>8: 78 targets</td><td>6006</td><td>33</td><td>54/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>candidate-secant candidate</td><td>4: 78 targets</td><td>16382</td><td>28</td><td>54/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-dense low-x</td><td>8: 78 targets</td><td>5960</td><td>33</td><td>56/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-dense hash-x</td><td>8: 78 targets</td><td>5972</td><td>33</td><td>58/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-secant low-x</td><td>6: 78 targets</td><td>24210</td><td>42</td><td>56/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-secant hash-x</td><td>6: 78 targets</td><td>24252</td><td>42</td><td>58/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>candidate-dense candidate</td><td>8: 78 targets</td><td>6006</td><td>33</td><td>54/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>candidate-secant candidate</td><td>4: 78 targets</td><td>16382</td><td>28</td><td>54/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-dense low-x</td><td>8: 78 targets</td><td>5960</td><td>33</td><td>56/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-dense hash-x</td><td>8: 78 targets</td><td>5972</td><td>33</td><td>58/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-secant low-x</td><td>6: 78 targets</td><td>24210</td><td>42</td><td>56/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>3</td><td>control-secant hash-x</td><td>6: 78 targets</td><td>24252</td><td>42</td><td>58/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>candidate-dense candidate</td><td>10: 78 targets</td><td>8112</td><td>45</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>candidate-secant candidate</td><td>5: 78 targets</td><td>23960</td><td>40</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-dense low-x</td><td>10: 78 targets</td><td>8206</td><td>45</td><td>72/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-dense hash-x</td><td>10: 78 targets</td><td>8200</td><td>45</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-secant low-x</td><td>8: 78 targets</td><td>33808</td><td>79</td><td>72/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-secant hash-x</td><td>8: 78 targets</td><td>33488</td><td>58</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>candidate-dense candidate</td><td>10: 78 targets</td><td>8112</td><td>45</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>candidate-secant candidate</td><td>5: 78 targets</td><td>23960</td><td>40</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-dense low-x</td><td>10: 78 targets</td><td>8206</td><td>45</td><td>72/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-dense hash-x</td><td>10: 78 targets</td><td>8200</td><td>45</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-secant low-x</td><td>8: 78 targets</td><td>33808</td><td>79</td><td>72/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>4</td><td>control-secant hash-x</td><td>8: 78 targets</td><td>33488</td><td>58</td><td>68/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>candidate-dense candidate</td><td>12: 78 targets</td><td>10134</td><td>57</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>candidate-secant candidate</td><td>6: 78 targets</td><td>31276</td><td>52</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-dense low-x</td><td>12: 78 targets</td><td>10152</td><td>57</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-dense hash-x</td><td>12: 78 targets</td><td>10212</td><td>57</td><td>78/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-secant low-x</td><td>10: 78 targets</td><td>43598</td><td>108</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="v1_recorded_status"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-secant hash-x</td><td>10: 78 targets</td><td>43328</td><td>106</td><td>78/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>candidate-dense candidate</td><td>12: 78 targets</td><td>10134</td><td>57</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>candidate-secant candidate</td><td>6: 78 targets</td><td>31276</td><td>52</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-dense low-x</td><td>12: 78 targets</td><td>10152</td><td>57</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-dense hash-x</td><td>12: 78 targets</td><td>10212</td><td>57</td><td>78/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-secant low-x</td><td>10: 78 targets</td><td>43598</td><td>108</td><td>76/78</td><td>0</td></tr>
+<tr data-p="83" data-stage="saved_basis_v2_verified"><td>icv1-fp7-t5-de12415d</td><td>5</td><td>control-secant hash-x</td><td>10: 78 targets</td><td>43328</td><td>106</td><td>78/78</td><td>0</td></tr></tbody></table></div><p>Exact finite populations; no sampling interval or timing inference.
+The original protocol and frozen analysis retain their censored cases. The post-data verifier establishes finite-field root-set equality, not operational uncapped relation discovery, ideal multiplicities or a complete cost claim. No priced-pipeline leaderboard row is promoted.</p></main>
+<script>const stage=document.getElementById('stage'),field=document.getElementById('field');
+function filter(){for(const r of document.querySelectorAll('tbody tr'))r.hidden=r.dataset.stage!==stage.value||(field.value!=='all'&&r.dataset.p!==field.value)}
+stage.addEventListener('change',filter);field.addEventListener('change',filter);filter();</script></html>

@@ -1,0 +1,16 @@
+--- a/research/pencil_large_prime_20261029/src/native_solver.rs
++++ b/research/pencil_large_prime_20261029/src/native_solver.rs
+@@ -1329,12 +1329,12 @@
+         candidate_lambdas += candidates.len();
+         for lambda in candidates {
+             let points = measured(observer, &s, &mut phases, "candidate_verification", || {
+-                let (quotient, w) = complement(d, lambda, h, p);
+                 let roots = &buckets[lambda as usize];
+                 meter::collection(1, 0, 0, 1);
+                 if roots.len() != 3 {
+                     return None;
+                 }
++                let (quotient, w) = complement(d, lambda, h, p);
+                 let mut sum = Divisor::O;
+                 let mut points = Vec::with_capacity(3);
+                 for &x in roots {

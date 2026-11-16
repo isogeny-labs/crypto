@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation and the 2^1-Frobenius: E is defined over F_(2^1), so classes have size 2*131/1 = 262 (upper bound on the speedup)",
     "equivalence_class_size": 262,
     "log2_cost_of_one_group_operation": 14.47,
-    "log2_group_operations": 60.31,
+    "log2_group_operations": 60.81,
     "log2_r": 129.0,
-    "log2_total": 74.78,
-    "log2_total_without_automorphisms": 78.796
+    "log2_total": 75.28,
+    "log2_total_negation_only": 78.796
   },
   "candidate": {
     "id": "ghs:l=1",
@@ -40,10 +40,10 @@
   ],
   "costs": {
     "destination_solver": "RhoOnSubfieldCurve",
-    "log2_baseline": 74.78,
+    "log2_baseline": 75.28,
     "log2_cost_ratio": -7.632,
-    "log2_total": 67.148,
-    "repo_ratio_log2": 11.648,
+    "log2_total": 67.648,
+    "repo_ratio_log2": 11.148,
     "rows": [
       {
         "formula": "none: the descent is a Frobenius iteration",
@@ -70,8 +70,8 @@
         "status": "not_applicable"
       },
       {
-        "formula": "rho on E(F_(2^1)): 0.5 log2 r + log2 sqrt(pi/4) + log2(10 M(1)) - 0.5 log2(2) (equivalence class of the destination curve)",
-        "log2": 67.148,
+        "formula": "rho on E(F_(2^1)): 0.5 log2 r + log2 sqrt(pi/4) + log2(10 M(1)) - 0.5 log2(2/2) (equivalence class c = 2 of the destination curve, negation included; the model reference sqrt(pi r/4) is the c = 2 case)",
+        "log2": 67.648,
         "phase": "destination_solve_unsplit",
         "status": "modeled"
       },
@@ -85,7 +85,7 @@
     "solvers_considered": [
       [
         "RhoOnSubfieldCurve",
-        67.148
+        67.648
       ]
     ],
     "total_is_lower_bound": false,
@@ -144,6 +144,10 @@
       "trace": "-22283658519494248867"
     }
   },
+  "evaluation": {
+    "reason": "the subgroup is not carried (subgroup preservation refuted): the route solves a different problem or does not exist, so there is no attack cost to compare with the baseline",
+    "status": "excluded"
+  },
   "executed": {
     "api": "ghs_transport::trace_transport + ghs_descent::trace_map",
     "base_degree": 1,
@@ -160,6 +164,7 @@
       "image_is_identity": true,
       "image_order_is_r": false,
       "kernel_meets_subgroup": true,
+      "map_evaluation_errors": 0,
       "r_is_prime": true,
       "scalar_equivariance_passed": 3,
       "scalar_equivariance_total": 3,
@@ -177,7 +182,7 @@
         131
       ],
       "best_case_destination_can_carry_r": true,
-      "best_case_log2_cost_ratio": 299.564,
+      "best_case_log2_cost_ratio": 299.064,
       "best_case_route_log2_total": 374.344,
       "genus_lower_bound_log2": 130.0,
       "min_magic_number_at_least_2": 131,
@@ -215,7 +220,7 @@
   },
   "notes": [],
   "obligations": {
-    "computational_advantage": "refuted",
+    "computational_advantage": "not_applicable",
     "existence": "supported",
     "explicit_construction": "supported",
     "map_correctness": "supported",
@@ -228,7 +233,7 @@
     "Galbraith-Hess-Smart 2002; Hess, LMS J. Comput. Math. 7 (2004) (as cited in src/cryptanalysis/ghs_descent.rs)",
     "docs/GHS_TRANSPORT.md; tests/sect113r1_ghs_evidence.rs"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [
       {
@@ -254,6 +259,7 @@
         "image_is_identity": true,
         "image_order_is_r": false,
         "kernel_meets_subgroup": true,
+        "map_evaluation_errors": 0,
         "r_is_prime": true,
         "scalar_equivariance_passed": 3,
         "scalar_equivariance_total": 3,
@@ -266,9 +272,10 @@
     "method": "executed: ghs_transport::trace_transport + generic checker",
     "status": "refuted"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
-    "subgroup preservation is Refuted: the transfer is not shown to carry <G>"
+    "subgroup preservation is Refuted: the transfer is not shown to carry <G>",
+    "priced route is 7.6 bits below the matched baseline, inside the 8-bit margin of the frozen model: a formula-marginal lead, not a weakness"
   ]
 }

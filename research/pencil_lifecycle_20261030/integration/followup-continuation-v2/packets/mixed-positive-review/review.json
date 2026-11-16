@@ -1,0 +1,65 @@
+{
+  "schema": "research.formal-component-review/v1",
+  "reviewer": "invariants_branches",
+  "producer": "kummer_transitions",
+  "producer_manifest_sha256": "24d020bbaa130b308c70efd942a1dd49eda67672662855e723f5b50d9f64a27d",
+  "producer_source_sha256": "6a4000a97bea9d66fa10666178a5a0c0e32333e5cd2142b9f470b0c57d91f1e3",
+  "scope": "positive shared-support distinct-other mixed field composition",
+  "claims": [
+    {
+      "name": "source branch order and derived positive ordinate equality",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "name": "characteristic2 and zero-y exclusions derived",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "name": "distinct support implies nonzero second genericK",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "name": "conditional output nonzero weights and normalized validity",
+      "judgment": "supported_within_scope"
+    }
+  ],
+  "fresh_checks": {
+    "module": 0,
+    "producer_controls": 0,
+    "readback": 0,
+    "reviewer_controls": 0
+  },
+  "axiom_declarations": 7,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "reviewer_controls": [
+    "full unit-weight F5 source theorem invocation",
+    "characteristic2 equality selects cancellation",
+    "characteristic2 positive-only assumptions imply contradiction"
+  ],
+  "reviewer_failures_retained": [
+    "preparation manifest-wrapper assumption",
+    "reviewer1 missing ZMod import",
+    "reviewer2 missing Fact prime5 instance"
+  ],
+  "blocking_discrepancies": [],
+  "exclusions": [
+    "UInt64 correspondence",
+    "compiler and counters",
+    "divisor-class sum",
+    "tripling",
+    "whole walk"
+  ],
+  "independence": {
+    "authored_current_composition": false,
+    "authored_Doubling_dependency": true,
+    "dependency_has_separate_independent_review": true,
+    "producer_mutated": false,
+    "transitive_dependency_binary_rechecker": false
+  },
+  "scientific_execution": false,
+  "cost_ratio": null
+}

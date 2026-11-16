@@ -1,0 +1,33 @@
+{
+  "schema": "pencil-historical-price-contract/v1",
+  "status": "extracted_contract_not_new_measurement",
+  "square_per_multiply": [
+    0,
+    0.5,
+    1
+  ],
+  "inversion_per_multiply": [
+    1,
+    10,
+    100,
+    1000
+  ],
+  "native_GAE_per_logical": [
+    0,
+    0.1,
+    1
+  ],
+  "cells": 36,
+  "representative": {
+    "square_per_multiply": 0.5,
+    "inversion_per_multiply": 10,
+    "native_GAE_per_logical": 0.1
+  },
+  "source_addition_unit": "U=M_source_add+square*S_source_add+inversion*I_source_add; per matched workload",
+  "original_factor_base_formula": "(M+square*S+inversion*I)/U + native*(field_adds+bit_ops+sum(native fields ending _uncharged))",
+  "original_pencil_formula": "(group_M+base_M_expanded-base_I*(bitlength(p-2)+popcount(p-2))+square*group_S+inversion*(group_I+base_I))/U + native*(group_field_adds+group_bit_ops+base_adds+scalar_adds+scalar_muls+scalar_inversions+solver_row_updates+solver_index_ops+solver_node_order_ops+order_extra_ops)",
+  "original_scalar_weights": "All declared scalar adds/muls/inversions enter logical sum at same native GAE coefficient, not base-field M/I weights. Original pencil raw scalar_muls include inverse exponentiation; original rho scalar inverse is atomic. Preserve historical result as historical, do not silently alter it.",
+  "new_symmetric_scalar_model": "Existing scalar_ledger normalizes expanded pencil inverse multiplications to atomic inverse events. Under inherited logical grid each atomic scalar add/negation,mul,inverse gets native GAE weight. This corrects semantic comparability and must be named/versioned as amendment, not presented as unchanged historical arithmetic. No new favorable scalar-I weight introduced.",
+  "supplemental_unpriced": "Allocation calls/requested bytes, RSS, CPU time, wall time, infrastructure resources have no historical GAE weight. Keep separate observations. No invented conversion to GAE.",
+  "aggregation": "Ratio of sums of complete candidate/reference GAE on exactly matched workload/stream cells, with completeness denominators. No mean-of-ratios substitution. Failure/cap candidate ratio null; do not infer cohort ratio from survivors."
+}

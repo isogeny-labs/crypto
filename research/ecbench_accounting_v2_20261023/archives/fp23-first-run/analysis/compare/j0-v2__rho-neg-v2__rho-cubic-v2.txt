@@ -1,0 +1,15 @@
+ops (ok): rho-cubic-v2 / rho-neg-v2 = 0.7000 [0.505, 1.043] (cluster) over 24 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); wall: admitted median 0.7980 [0.687, 1.084]
+measurement quality: 40 / 100; paired attempts 24, verified 24, admitted 0; levels {"L1": 24}; p95 foreign busy 22.20%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2
+| curve | log2 r | workloads | rho-cubic-v2 / rho-neg-v2 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp23-tm110-8df20cbc | 20.00 | 6 | 0.7000 | [0.5050, 1.0426] | cluster |
+
+| workload | curve | log2 r | rho-neg-v2 mean S | rho-cubic-v2 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W1017eb37e8be | icv1-fp23-tm110-8df20cbc | 20.00 | 1.2815 | 0.6597 | 0.5148 |
+| W14ee0ae3e0eb | icv1-fp23-tm110-8df20cbc | 20.00 | 0.8630 | 0.8096 | 0.9380 |
+| W36d70e9060f4 | icv1-fp23-tm110-8df20cbc | 20.00 | 1.1797 | 0.7712 | 0.6538 |
+| W5e8ee9654264 | icv1-fp23-tm110-8df20cbc | 20.00 | 0.6492 | 0.9756 | 1.5028 |
+| W66a7ef93f986 | icv1-fp23-tm110-8df20cbc | 20.00 | 1.5622 | 0.7895 | 0.5054 |
+| W9c37aa13521d | icv1-fp23-tm110-8df20cbc | 20.00 | 1.1045 | 0.6423 | 0.5816 |

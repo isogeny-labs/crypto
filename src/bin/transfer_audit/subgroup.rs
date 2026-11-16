@@ -98,6 +98,9 @@ pub struct SubgroupReport {
     pub additivity_total: usize,
     pub scalar_equivariance_passed: usize,
     pub scalar_equivariance_total: usize,
+    /// Sample evaluations on which the map itself failed (not counted as
+    /// passes or as refutations).
+    pub map_evaluation_errors: usize,
     pub failures: Vec<String>,
 }
 
@@ -115,10 +118,12 @@ pub struct SubgroupInputs<'a, S: Group, D: Group> {
     pub scalars: &'a [BigUint],
 }
 
-/// Run the certificate.  `Verified` only if every check passes;
-/// `Refuted` when the map is defined but loses the subgroup or is not a
-/// homomorphism; `NotEvaluated` when the premise (a generator of prime
-/// order `r`) or the map itself fails to evaluate.
+/// Run the certificate.  `Verified` only if every check passes and at least
+/// one homomorphism test (additivity or scalar equivariance) ran;
+/// `Refuted` when the map is defined but loses the subgroup or a test finds it
+/// is not a homomorphism; `NotEvaluated` when the premise (a generator of prime
+/// order `r`) does not hold, the map fails to evaluate on a sample, or no
+/// homomorphism test was run.
 pub fn check_subgroup_preservation<S: Group, D: Group>(
     inp: &SubgroupInputs<S, D>,
 ) -> SubgroupReport {
@@ -133,6 +138,7 @@ pub fn check_subgroup_preservation<S: Group, D: Group>(
         additivity_total: 0,
         scalar_equivariance_passed: 0,
         scalar_equivariance_total: 0,
+        map_evaluation_errors: 0,
         failures: Vec::new(),
     };
     if !inp.r_is_prime {
@@ -171,6 +177,13 @@ pub fn check_subgroup_preservation<S: Group, D: Group>(
         );
     }
 
+    // A homomorphism test that finds the two sides different refutes the
+    // map; one whose map cannot be evaluated at the sample proves nothing
+    // either way, so it counts as an evaluation error and not as a failure
+    // of the claim.
+    let mut mismatches = 0usize;
+    let mut errors = 0usize;
+
     // Additivity on consecutive pairs of samples (cyclically).
     let n = inp.samples.len();
     if n >= 2 {
@@ -184,11 +197,15 @@ pub fn check_subgroup_preservation<S: Group, D: Group>(
                     if inp.dst.add(&fa, &fb) == fs {
                         rep.additivity_passed += 1;
                     } else {
+                        mismatches += 1;
                         rep.failures
                             .push(format!("phi(a+b) != phi(a)+phi(b) on sample pair {i}"));
                     }
                 }
-                _ => rep.failures.push(format!("map failed on sample pair {i}")),
+                _ => {
+                    errors += 1;
+                    rep.failures.push(format!("map failed on sample pair {i}"));
+                }
             }
         }
     }
@@ -198,25 +215,37 @@ pub fn check_subgroup_preservation<S: Group, D: Group>(
         let kg = inp.src.mul(k, inp.g);
         match (inp.map)(&kg) {
             Ok(v) if v == inp.dst.mul(k, &image) => rep.scalar_equivariance_passed += 1,
-            Ok(_) => rep
-                .failures
-                .push("phi([k]G) != [k]phi(G) for a sampled k".into()),
-            Err(e) => rep.failures.push(format!("map failed on [k]G: {e}")),
+            Ok(_) => {
+                mismatches += 1;
+                rep.failures
+                    .push("phi([k]G) != [k]phi(G) for a sampled k".into());
+            }
+            Err(e) => {
+                errors += 1;
+                rep.failures.push(format!("map failed on [k]G: {e}"));
+            }
         }
     }
+    rep.map_evaluation_errors = errors;
 
-    let homomorphism_ok = rep.additivity_passed == rep.additivity_total
-        && rep.scalar_equivariance_passed == rep.scalar_equivariance_total;
-    rep.status = if rep.image_order_is_r && !rep.kernel_meets_subgroup && homomorphism_ok {
-        Evidence::Verified
-    } else {
+    let generator_ok = rep.image_order_is_r && !rep.kernel_meets_subgroup;
+    let tests_run = rep.additivity_total + rep.scalar_equivariance_total;
+    rep.status = if !generator_ok || mismatches > 0 {
+        // The map is defined on G and either loses the subgroup or visibly
+        // is not a homomorphism.
         Evidence::Refuted
-    };
-    // A zero scalar or an empty sample set cannot refute: they are not run.
-    if inp.scalars.is_empty() && inp.samples.len() < 2 && rep.status == Evidence::Verified {
+    } else if errors > 0 {
+        // The map could not be evaluated where it was tested.
+        Evidence::NotEvaluated
+    } else if tests_run == 0 {
+        // The image order alone does not show a homomorphism: nothing was
+        // tested, so nothing is verified.
         rep.failures
-            .push("no homomorphism samples supplied: image order only".into());
-    }
+            .push("no homomorphism samples supplied: image order only, not verified".into());
+        Evidence::NotEvaluated
+    } else {
+        Evidence::Verified
+    };
     rep
 }
 
@@ -306,5 +335,77 @@ mod tests {
             scalars: &[],
         });
         assert_eq!(rep.status, Evidence::NotEvaluated);
+    }
+
+    fn z15_inputs<'a>(
+        f: &'a dyn Fn(&u64) -> Result<u64, String>,
+        g: &'a ZMod,
+        samples: &'a [u64],
+        scalars: &'a [BigUint],
+    ) -> SubgroupInputs<'a, ZMod, ZMod> {
+        SubgroupInputs {
+            src: g,
+            dst: g,
+            map: f,
+            g: &3u64,
+            r: Box::leak(Box::new(BigUint::from(5u8))),
+            r_is_prime: true,
+            samples,
+            scalars,
+        }
+    }
+
+    /// With no samples and no scalars nothing tests the homomorphism property
+    /// and the image order alone verifies nothing: `NotEvaluated`, not
+    /// `Verified` (it used to be `Verified` with a note in `failures`).
+    #[test]
+    fn no_homomorphism_samples_is_not_verified() {
+        let g = ZMod(15);
+        let f = |x: &u64| Ok::<u64, String>(*x);
+        let rep = check_subgroup_preservation(&z15_inputs(&f, &g, &[], &[]));
+        assert!(rep.image_order_is_r && !rep.kernel_meets_subgroup);
+        assert_eq!(rep.status, Evidence::NotEvaluated);
+        assert!(rep
+            .failures
+            .iter()
+            .any(|m| m.contains("no homomorphism samples")));
+        // One sample is too few for a pair; still nothing tested.
+        let rep = check_subgroup_preservation(&z15_inputs(&f, &g, &[1], &[]));
+        assert_eq!(rep.status, Evidence::NotEvaluated);
+        // A single scalar is a test.
+        let scalars = [big(2)];
+        let rep = check_subgroup_preservation(&z15_inputs(&f, &g, &[], &scalars));
+        assert_eq!(rep.status, Evidence::Verified);
+    }
+
+    /// A map that cannot be evaluated at a sample is not a counterexample to
+    /// the homomorphism property: `NotEvaluated`, not `Refuted`.  A genuine
+    /// mismatch still refutes, even when another sample errors.
+    #[test]
+    fn a_map_evaluation_error_is_not_a_refutation() {
+        let g = ZMod(15);
+        let samples = [1u64, 2, 7, 11];
+        let scalars = [big(2)];
+        // Undefined at 7, the identity elsewhere.
+        let f = |x: &u64| {
+            if *x == 7 {
+                Err("undefined at 7".to_string())
+            } else {
+                Ok(*x)
+            }
+        };
+        let rep = check_subgroup_preservation(&z15_inputs(&f, &g, &samples, &scalars));
+        assert_eq!(rep.status, Evidence::NotEvaluated, "{:?}", rep.failures);
+        assert!(rep.map_evaluation_errors > 0);
+        // Undefined at 7 and not additive at 11.
+        let h = |x: &u64| match *x {
+            7 => Err("undefined at 7".to_string()),
+            11 => Ok(0),
+            3 => Ok(3),
+            v => Ok(v),
+        };
+        let rep = check_subgroup_preservation(&z15_inputs(&h, &g, &samples, &scalars));
+        assert_eq!(rep.status, Evidence::Refuted, "{:?}", rep.failures);
+        assert!(rep.map_evaluation_errors > 0);
     }
 }

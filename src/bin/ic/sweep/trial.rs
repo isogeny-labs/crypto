@@ -126,7 +126,8 @@ pub struct TrialArgs {
     #[arg(long, default_value_t = 0)]
     pub timeout_seconds: u64,
     /// Safety net: stop and report `exhausted` once this process's peak
-    /// resident memory passes this many MiB; 0 means no limit.
+    /// resident memory passes this many MiB; 0 means no limit.  Needs
+    /// `getrusage`, so it is ignored (with a warning) on Windows.
     #[arg(long, default_value_t = 0)]
     pub max_rss_mb: u64,
 }
@@ -586,25 +587,46 @@ pub fn run_trial(config: &TrialConfig) -> TrialRecord {
     }
 }
 
-/// This process's peak resident memory in MiB.  `ru_maxrss` is bytes on
-/// macOS and KiB on Linux.  `0` means the measurement is unavailable: the
-/// libc `getrusage` binding exists only on Unix, so the Windows release
-/// build cannot call it (the same gating `experiment.rs` uses).
-fn peak_rss_mb() -> u64 {
-    #[cfg(any(target_os = "macos", target_os = "linux"))]
+/// Whether this build can measure peak resident memory at all.  The libc
+/// `getrusage` binding exists on every Unix target and not on Windows, so the
+/// memory safety net (`--max-rss-mb`) is only real where this is `true`.
+const RSS_NET_AVAILABLE: bool = cfg!(unix);
+
+/// This process's peak resident memory in MiB, or `None` when it cannot be
+/// measured: the target has no `getrusage` (Windows), or the call failed.
+/// `ru_maxrss` is bytes on macOS and KiB on the other Unix targets.
+fn peak_rss_mb() -> Option<u64> {
+    #[cfg(unix)]
     {
         // SAFETY: `rusage` is plain old data and `getrusage` only writes to it.
         let mut usage: libc::rusage = unsafe { std::mem::zeroed() };
         if unsafe { libc::getrusage(libc::RUSAGE_SELF, &mut usage) } == 0 {
             let raw = usage.ru_maxrss.max(0) as u64;
-            return if cfg!(target_os = "macos") {
+            return Some(if cfg!(target_os = "macos") {
                 raw / (1024 * 1024)
             } else {
                 raw / 1024
-            };
+            });
         }
     }
-    0
+    None
+}
+
+/// Says, once per process, that `--max-rss-mb` cannot be enforced here.  On a
+/// target without `getrusage` the memory net would otherwise be off without a
+/// word, and only the wall-clock net would hold.  Silent where the net works,
+/// and when the caller asked for no memory limit.
+pub(crate) fn warn_if_rss_net_unavailable(max_rss_mb: u64) {
+    static WARNED: std::sync::Once = std::sync::Once::new();
+    if max_rss_mb > 0 && !RSS_NET_AVAILABLE {
+        WARNED.call_once(|| {
+            eprintln!(
+                "ic: warning: --max-rss-mb {max_rss_mb} is not enforced on this platform \
+                 (no getrusage), so the memory safety net is unavailable; only \
+                 --timeout-seconds applies"
+            );
+        });
+    }
 }
 
 fn envelope(record: &TrialRecord) -> Value {
@@ -616,11 +638,16 @@ fn envelope(record: &TrialRecord) -> Value {
     })
 }
 
-/// Stops a runaway trial from inside, so the limits hold on every host
-/// (`ps` is not always available and macOS does not enforce `RLIMIT_AS`).
+/// Stops a runaway trial from inside, so the wall-clock limit holds on every
+/// host and the memory limit on every Unix host (`ps` is not always available
+/// and macOS does not enforce `RLIMIT_AS`).  Where memory cannot be measured
+/// the memory limit is off, and `warn_if_rss_net_unavailable` says so.
 /// The record it prints is the same shape the normal path prints, class
 /// `exhausted`: a budget was hit, which is not "no solution" and not a score.
 fn arm_watchdog(config: &TrialConfig, timeout_seconds: u64, max_rss_mb: u64) {
+    warn_if_rss_net_unavailable(max_rss_mb);
+    // No measurement, no memory net: do not poll for one.
+    let max_rss_mb = if RSS_NET_AVAILABLE { max_rss_mb } else { 0 };
     if timeout_seconds == 0 && max_rss_mb == 0 {
         return;
     }
@@ -630,7 +657,7 @@ fn arm_watchdog(config: &TrialConfig, timeout_seconds: u64, max_rss_mb: u64) {
         std::thread::sleep(std::time::Duration::from_millis(100));
         let why = if timeout_seconds > 0 && started.elapsed().as_secs() >= timeout_seconds {
             Some(format!("wall-clock limit of {timeout_seconds} s reached"))
-        } else if max_rss_mb > 0 && peak_rss_mb() >= max_rss_mb {
+        } else if max_rss_mb > 0 && peak_rss_mb().is_some_and(|rss| rss >= max_rss_mb) {
             Some(format!("peak memory passed {max_rss_mb} MiB"))
         } else {
             None

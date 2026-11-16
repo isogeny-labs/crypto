@@ -1,0 +1,41 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\title{N6 source correction and weighted-to-affine coefficient bridge}
+\author{Source-bound review packet}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+The pinned author Magma file at commit \texttt{ec98e115ed359c8b7facf559eb0d9f240703f6f5}
+assigns \texttt{WW1:=W1\string^2} before multiplying \texttt{N6} by \texttt{WW1}.
+The Rust runtime likewise calls its weighted doubling variant with the squared-$w$
+flag. The earlier claim of an author-code $W^1$ discrepancy was an alias-reading
+error. The retained $p=739$, $W=3$ mismatch is a synthetic $W^1$ mutation
+control. Raw certificates, field names, and collector cost rows are unchanged.
+
+The published article defines $(Q,R,S,T,Z,W)=(qz^2,rz^4,sz^3w,tz^5w,z,w)$
+and prints affine doubling coefficients $A,B,C$ in Eq.~(7). The five new Lean
+theorems prove the following polynomial equalities over every commutative ring:
+\begin{center}\begin{tabular}{ccc}\toprule
+coefficient & pinned $W^2$ scaling & synthetic $W^1$ defect \\\midrule
+$A$ & $z^{11}w^3 A_{\rm affine}$ & $z^{11}w^2(w-1)rs(2r-3q^2-a_3)$ \\
+$B$ & $z^{10}w^2 B_{\rm affine}$ & $0$ \\
+$C$ & $z^9w^3 C_{\rm affine}$ & $z^9w^2(w-1)t(2r-3q^2-a_3)$ \\\bottomrule
+\end{tabular}\end{center}
+\begin{center}\includegraphics[width=0.86\textwidth]{scaling-weights.pdf}\end{center}
+The proof log lists only \texttt{propext} and \texttt{Quot.sound}. The validator
+checks the full pinned author-file SHA-256
+\texttt{7416a7fffaafff371738e7498a6795057372e1c477e0079297eebf2347c2e72a}
+and Rust SHA-256
+\texttt{5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0}.
+This is a coefficient-level source and polynomial bridge; it does not prove
+complete Magma/Rust equivalence, compiled-code semantics, or the smooth-projective/
+$\operatorname{Pic}^0$ class law. See the CSV, Lean source, log, and validator
+beside this PDF.
+
+Sources: \href{https://github.com/ozbayelif/jac-on-jac/blob/ec98e115ed359c8b7facf559eb0d9f240703f6f5/jac-on-jac.m#L2506-L2512}{pinned author Magma file};
+\href{https://link.springer.com/article/10.1007/s13389-024-00351-7}{published article}.
+\end{document}

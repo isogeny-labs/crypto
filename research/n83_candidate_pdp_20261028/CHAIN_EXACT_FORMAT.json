@@ -1,0 +1,45 @@
+{
+  "schema": "n83.chain-exact-format/v1",
+  "scope": "84 unchanged binary/Koblitz m3..9 original/baseline/spike40 systems; original-top exact regularity via overlap proof with native checked hypotheses; independent review pending",
+  "files": {
+    "inputs/<key>/input.json": "Exact previous metadata",
+    "inputs/<key>/system.sing": "Exact previous complete Singular source",
+    "certificates/global.json": "Rabin proof; full83 Moore inverse; all83 cyclic selector-window inverse pairs for each base; all83 first/middle cubic embedding coefficient hashes",
+    "certificates/controls.json": "44 independent mixed-degree tiny Hilbert controls (36 admissible,8 outside hypotheses); augmented and truncated Hilbert functions, kernel differences, exhaustive support formula",
+    "certificates/<key>.json": "Reused strict source parser output plus overlap proof parameters; original disjoint bound retained as prior_disjoint_upper_bound; exact dreg from matching projection and overlap upper",
+    "certificates/partial-summary-NNN.json": "Immutable cumulative snapshot after NNN cases; every snapshot retained",
+    "certificates/summary.json": "All84 case results or explicit errors; unknown exact values are null",
+    "replay.json": "Fresh-process recomputation summary hash and acceptance",
+    "instrument": "Pinned native executable",
+    "development-validation/": "Unit, build, Lean, controls and pre-freeze logs",
+    "status.json": "Producer/replay exit codes",
+    "terminal.json": "Batch status and diagnostic times",
+    "manifest.sha256": "Every raw file except manifest itself; verify before/after restored replay",
+    "protocol-chain-exact.json": "Frozen source/binary/case/base identities, limits and analysis"
+  },
+  "encodings": {
+    "field": "Unsigned DECIMAL strings represent coefficients by bits in K=F2[z]/(z^83+z^45+z^2+z+1); parse exact integers",
+    "modulus_hex": "HEX bit polynomial includes leading degree83 bit",
+    "matrix": "Rows are weight_i^(2^k), all83 embeddings. Cyclic window start uses rows start..start+ell-1 modulo83; inverse is stored and both products checked.",
+    "coordinate_equation_coefficients": "83 decimal K scalars combine source coordinate equations r=0..82 in a single chain group",
+    "coefficient_u128le_sha256": "SHA256 of verified coefficients as16-byte little-endian integers in lexicographic Cartesian product order; for quadratic embedding proofs order is abstract product basis1,z,...,z^82",
+    "blocks": "start_zero_based and width specify original variables; Singular v(i) is one-based",
+    "chain_equation": "Zero-based S3 group; its coordinate r has one-based I[83*k+r+1]",
+    "top_counts": "Number of canonical highest-degree monomials in each coordinate; every actual coefficient checked and expected support count matched",
+    "p0_scale": "c_k=t^(2^k-1) for nonzero t; P_k+c_k*P_0 equals stored original-quadratic combination",
+    "lower_retained_variables": "Projection retains first27 base selectors plus all83(m-2) intermediate variables",
+    "upper_bound": "n(m-2)+ell+1 under conditions n>=2ell,n>=ell+2, same independent F2-linear selector weights; written algebraic bridge in CHAIN_EXACT_DESIGN.md",
+    "hashes": "SHA256 over exact file/line bytes; source_line_sha256 excludes line-ending newline",
+    "old_fields": "selected_chain_equations_zero_based and selected_variables_zero_based preserve the prior disjoint proof only. They are not the new overlap calculation."
+  },
+  "claims_not_made": [
+    "Full original Hilbert functions at n83",
+    "Full Lean algebraic theorem",
+    "Independent scientific review",
+    "FFD/LFD or affine solving degree",
+    "Elite-base performance improvement",
+    "Timing comparison",
+    "Prime-field transfer"
+  ],
+  "replay": "Extract complete raw archive to a fresh root; sha256sum -c manifest.sha256; instrument replay ROOT; recheck manifest. Never run producer into an existing root."
+}

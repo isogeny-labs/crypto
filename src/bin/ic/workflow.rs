@@ -59,7 +59,6 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
 };
 use crypto_lib::cryptanalysis::koblitz_sparse_la::SparseSolveOptions;
 use num_bigint::BigUint;
-use num_traits::Zero;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -1032,43 +1031,18 @@ fn with_tier(mut summary: Value, pair: Option<&PairSumTable>) -> Value {
 /// one, so it is a fair central estimate rather than a bound in either
 /// direction.
 fn probe_budget(c: &KoblitzCurve, fb: &FrobeniusFactorBase, p: &WorkflowParams) -> ProbeBudget {
-    let points = fb.points.len() as u128;
     // The same condition `CollectionReport` reports under.
     let scans_summands = p.summands == 3 && p.solver == Solver::PairTable;
-    let summands_scanned = if scans_summands {
-        let window = p
-            .collection_window
-            .map(u128::from)
-            .unwrap_or(points)
-            .min(points);
-        (p.collection.unit_trials as u128)
-            .saturating_mul(p.collection.units as u128)
-            .saturating_mul(window)
-            .min(u64::MAX as u128) as u64
-    } else {
-        0
-    };
-
-    // Multisets of `m` summands from the base: the largest set of
-    // points one probe can hit, and the denominator of the floor.
-    let m = u32::from(p.descent_summands.unwrap_or(p.summands));
-    let mut reachable = BigUint::from(1u32);
-    for i in 0..m {
-        reachable *= BigUint::from(points + i as u128);
-        reachable /= BigUint::from(i + 1);
-    }
-    let per_target = if reachable.is_zero() {
-        0u64
-    } else {
-        let probes = &c.subgroup_order / reachable;
-        probes.to_u64_digits().first().copied().unwrap_or(0).max(1)
-    };
-    let descent_probes = per_target.saturating_mul(p.targets.len() as u64);
-
-    ProbeBudget {
-        summands_scanned,
-        descent_probes,
-    }
+    ProbeBudget::for_run(
+        c,
+        fb.points.len(),
+        scans_summands,
+        p.collection_window,
+        p.collection.unit_trials,
+        p.collection.units,
+        p.descent_summands.unwrap_or(p.summands),
+        p.targets.len(),
+    )
 }
 
 pub(crate) fn build_pair_table(
@@ -2033,14 +2007,18 @@ pub fn run(args: WorkflowArgs, quiet: bool) -> Result<Value, String> {
                 // only, not the construction of the target.
                 let t = Instant::now();
                 super::progress::line(format_args!("[4/4] target {i}: descent started"));
+                super::progress::inputs(format_args!("[4/4] target {i}"), c.generator(), Some(&q));
                 let outcome = solver.as_ref().and_then(|s| {
                     if super::progress::enabled() {
-                        let report = s.solve_report_with_progress(&q, &mut |trial, outcome| {
-                            super::progress::line(format_args!(
-                                "[4/4] target {i}, trial {trial}/{}: {}",
-                                ic.max_trials,
-                                super::progress::outcome(outcome)
-                            ));
+                        // Include the target index on every line: independent
+                        // descents may finish concurrently.
+                        let report = s.solve_report_with_trace(&q, &|trace| {
+                            super::progress::query(
+                                format_args!("[4/4] target {i}, trial"),
+                                trace,
+                                ic.max_trials as u64,
+                                &fb,
+                            );
                         });
                         report.log.clone().map(|d| (d, report))
                     } else {
@@ -2348,13 +2326,13 @@ fn collect_unit(
             "[2/4] unit {unit:05}: starting {} probes",
             work.count
         ));
-        collector.collect_aimed_with_progress(work, aim, &|trial, outcome| {
-            super::progress::line(format_args!(
-                "[2/4] unit {unit:05}, trial {}/{} (probe {trial}): {}",
-                trial - work.start + 1,
-                work.count,
-                super::progress::outcome(outcome)
-            ));
+        collector.collect_aimed_with_trace(work, aim, &|trace| {
+            super::progress::query(
+                format_args!("[2/4] unit {unit:05}, probe"),
+                trace,
+                work.start.saturating_add(work.count),
+                collector.factor_base(),
+            );
         })
     } else {
         collector.collect_aimed(work, aim)

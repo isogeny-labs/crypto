@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation only",
     "equivalence_class_size": 2,
     "log2_cost_of_one_group_operation": 15.344,
-    "log2_group_operations": 95.326,
+    "log2_group_operations": 95.826,
     "log2_r": 192.0,
-    "log2_total": 110.67,
-    "log2_total_without_automorphisms": 111.17
+    "log2_total": 111.17,
+    "log2_total_negation_only": 111.17
   },
   "candidate": {
     "id": "cover:genus_sweep",
@@ -35,8 +35,8 @@
   ],
   "costs": {
     "destination_solver": "RhoOnJacobian",
-    "log2_baseline": 110.67,
-    "log2_cost_ratio": 4.542,
+    "log2_baseline": 111.17,
+    "log2_cost_ratio": 4.042,
     "log2_total": 115.212,
     "repo_ratio_log2": -4.042,
     "rows": [
@@ -147,6 +147,10 @@
       "trace": "31607402316713927207482677199"
     }
   },
+  "evaluation": {
+    "reason": "the price is a formula sweep or heuristic estimate for a map that is not constructed for this curve",
+    "status": "not_evaluable"
+  },
   "executed": null,
   "invariants": {
     "cheapest_genus": 2,
@@ -158,7 +162,7 @@
         "ic_exponent_2_minus_2_over_g": 1.0,
         "ic_leading_log2": 192.0,
         "ic_total_log2": 213.971,
-        "log2_cost_ratio_to_baseline": 4.542,
+        "log2_cost_ratio_to_baseline": 4.042,
         "log2_total_best_solver": 115.212,
         "rho_leading_log2": 96.0,
         "rho_on_jacobian_log2": 115.212
@@ -169,7 +173,7 @@
         "ic_exponent_2_minus_2_over_g": 1.333,
         "ic_leading_log2": 256.0,
         "ic_total_log2": 279.596,
-        "log2_cost_ratio_to_baseline": 5.582,
+        "log2_cost_ratio_to_baseline": 5.082,
         "log2_total_best_solver": 116.252,
         "rho_leading_log2": 96.0,
         "rho_on_jacobian_log2": 116.252
@@ -180,7 +184,7 @@
         "ic_exponent_2_minus_2_over_g": 1.5,
         "ic_leading_log2": 288.0,
         "ic_total_log2": 313.176,
-        "log2_cost_ratio_to_baseline": 6.332,
+        "log2_cost_ratio_to_baseline": 5.832,
         "log2_total_best_solver": 117.002,
         "rho_leading_log2": 96.0,
         "rho_on_jacobian_log2": 117.002
@@ -191,7 +195,7 @@
         "ic_exponent_2_minus_2_over_g": 1.6,
         "ic_leading_log2": 307.2,
         "ic_total_log2": 333.738,
-        "log2_cost_ratio_to_baseline": 7.051,
+        "log2_cost_ratio_to_baseline": 6.551,
         "log2_total_best_solver": 117.721,
         "rho_leading_log2": 96.0,
         "rho_on_jacobian_log2": 117.721
@@ -202,7 +206,7 @@
         "ic_exponent_2_minus_2_over_g": 1.667,
         "ic_leading_log2": 320.0,
         "ic_total_log2": 347.596,
-        "log2_cost_ratio_to_baseline": 7.583,
+        "log2_cost_ratio_to_baseline": 7.083,
         "log2_total_best_solver": 118.253,
         "rho_leading_log2": 96.0,
         "rho_on_jacobian_log2": 118.253
@@ -213,7 +217,7 @@
         "ic_exponent_2_minus_2_over_g": 1.714,
         "ic_leading_log2": 329.143,
         "ic_total_log2": 357.694,
-        "log2_cost_ratio_to_baseline": 8.093,
+        "log2_cost_ratio_to_baseline": 7.593,
         "log2_total_best_solver": 118.763,
         "rho_leading_log2": 96.0,
         "rho_on_jacobian_log2": 118.763
@@ -224,7 +228,7 @@
         "ic_exponent_2_minus_2_over_g": 1.75,
         "ic_leading_log2": 336.0,
         "ic_total_log2": 365.378,
-        "log2_cost_ratio_to_baseline": 8.534,
+        "log2_cost_ratio_to_baseline": 8.034,
         "log2_total_best_solver": 119.204,
         "rho_leading_log2": 96.0,
         "rho_on_jacobian_log2": 119.204
@@ -247,10 +251,10 @@
     "type": "pullback into a genus-g Jacobian over the same field"
   },
   "notes": [
-    "price = best case: construction priced at zero, so the true cost is higher"
+    "price = best case: construction priced at zero and rho on the image granted the curve's own equivalence class, so the true cost is higher"
   ],
   "obligations": {
-    "computational_advantage": "refuted",
+    "computational_advantage": "unknown",
     "existence": "unknown",
     "explicit_construction": "unknown",
     "map_correctness": "unknown",
@@ -262,7 +266,7 @@
     "crypto-autoresearcher ledger/proposals/IDEA-20261009-275a14.yaml (dominated by KR-IC-a4dd54, KR-IC-5ea2f8)",
     "src/cryptanalysis/jacobian_transfer/cost.rs (Gaudry; Gaudry-Thome-Theriault-Diem)"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [],
     "argument": "no cover is constructed for g other than 2 (prime) or 3 (binary); the sweep prices the destination only",
@@ -272,11 +276,11 @@
     "method": "none",
     "status": "not_evaluated"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
     "subgroup preservation is NotEvaluated: the transfer is not shown to carry <G>",
     "the map is not constructed (existence or construction missing)",
-    "priced route costs 2^4.5 times the matched baseline or more"
+    "priced route costs 2^4.0 times the matched baseline or more"
   ]
 }

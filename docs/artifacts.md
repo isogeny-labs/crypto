@@ -48,6 +48,13 @@ outside the data trees name by path, and generated files regenerated on most
 PRs (`docs/browser/data.json`, the large `docs/curves/` registries,
 `docs/curves/cover-links.yaml`).
 
+PDFs stay in Git (owner decision, 2026-10-26): `policy.keep` holds `*.pdf`,
+so a report PDF of any size is committed directly, never pushed to the store,
+and `check` never flags one. The 10 MiB `large-files` gate still applies to
+them. PDFs moved to the store before this rule keep their manifests until
+someone restores them with `pull` and commits the file in place of the
+pointer.
+
 `artifacts.py plan [PATH ...]` lists the tracked files the policy would move;
 `artifacts.py check BASE [HEAD]` is the PR gate: it fails on added or modified
 tracked files that belong in the store.

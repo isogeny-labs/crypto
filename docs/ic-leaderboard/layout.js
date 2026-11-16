@@ -40,7 +40,7 @@
   const footer = root.querySelector(':scope > footer');
   const nav = root.querySelector('.site-nav');
   nav.append(link('Curve library', libraryURL));
-  root.before(link('Skip to ranked results', '#board-A', 'skip-link'));
+  root.before(link('Skip to ranked results', '#board', 'skip-link'));
 
   header.querySelector('.eyebrow').textContent = 'Research / Index calculus';
   const originalVerdict = header.querySelector('.verdict');
@@ -57,7 +57,7 @@
   intro.after(notice);
   const actions = element('div', 'header-actions');
   actions.append(link('Browse the curve library →', libraryURL, 'primary-link'),
-    link('View ranked results', '#board-A'));
+    link('View ranked results', '#board'));
   notice.after(actions);
   header.querySelectorAll('.fact').forEach(fact => {
     const description = fact.querySelector('p');
@@ -74,7 +74,9 @@
 
   const pageNav = element('nav', 'page-nav');
   pageNav.setAttribute('aria-label', 'On this page');
-  for (const [label, href] of [['Ranked results', '#board-A'], ['Research notes', '#research-notes'],
+  for (const [label, href] of [['Ranked results', '#board'], ['Batch diagnostics', '#batch'],
+    ['Progress over time', '#progress'],
+    ['Research notes', '#research-notes'],
     ['Methods & accounting', '#methods'], ['Curve records', '#curves']]) pageNav.append(link(label, href));
   header.after(pageNav);
   const main = element('main', 'leaderboard-content');
@@ -89,8 +91,69 @@
       'Lower cold-cost ratios are closer to the matched reference. A ratio of 1× means equal cost.'));
     board.append(details);
   }
+  const rankedSections = ['board-A', 'board-B', 'batch'].map(id => document.getElementById(id)).filter(Boolean);
+  const rankedRows = rankedSections.flatMap(section =>
+    Array.from(section.querySelectorAll('tbody tr'))
+      .map(row => ({section, row, slug: row.querySelector('.slug')?.textContent.toLowerCase()}))
+      .filter(entry => entry.slug));
+  if (rankedRows.length) {
+    const pricedCurves = new Set(rankedRows.map(entry => entry.slug)).size;
+    const search = element('div', 'curve-search');
+    const label = element('label', '', 'Find a priced curve by ICV1 name');
+    const input = element('input');
+    input.id = 'ranked-curve-search';
+    input.type = 'search';
+    input.autocomplete = 'off';
+    input.placeholder = 'icv1-f2m53…';
+    label.htmlFor = input.id;
+    const count = element('span', 'curve-search-count');
+    count.setAttribute('role', 'status');
+    count.setAttribute('aria-live', 'polite');
+    const hint = element('small', 'curve-search-hint',
+      'Tables A and B use cold one-target rho; their overview chart stays complete when you search. ' +
+      'Table C is a historical 32-target batch diagnostic. Compare ratios within each table. ' +
+      'Base sizes and recipes come from frozen runs; factor-base identities may be unreconciled.');
+    const empty = element('p', 'curve-search-empty');
+    empty.append('No priced curve matches. ', link('Search the full curve library →', libraryURL));
+    const update = () => {
+      const query = input.value.trim().toLowerCase();
+      let shownRows = 0;
+      const shownCurves = new Set();
+      for (const {row, slug} of rankedRows) {
+        row.hidden = !slug.includes(query);
+        if (!row.hidden) {
+          shownRows++;
+          shownCurves.add(slug);
+        }
+      }
+      for (const section of rankedSections) {
+        section.hidden = Boolean(query) && !rankedRows.some(entry => entry.section === section && !entry.row.hidden);
+        for (const table of section.querySelectorAll('table')) {
+          let group = null;
+          let groupHasMatch = false;
+          for (const row of table.tBodies[0].rows) {
+            if (!row.querySelector('.slug')) {
+              if (group) group.hidden = !groupHasMatch;
+              group = row;
+              groupHasMatch = false;
+            } else if (!row.hidden) {
+              groupHasMatch = true;
+            }
+          }
+          if (group) group.hidden = !groupHasMatch;
+        }
+      }
+      count.textContent = `Showing ${shownCurves.size} of ${pricedCurves} priced curves ` +
+        `(${shownRows} regime row${shownRows === 1 ? '' : 's'})`;
+      empty.hidden = shownRows !== 0;
+    };
+    input.addEventListener('input', update);
+    search.append(label, input, count, hint, empty);
+    board.querySelector('h2').after(search);
+    update();
+  }
   main.append(board);
-  for (const id of ['board-A', 'board-B']) {
+  for (const id of ['board-A', 'board-B', 'batch']) {
     const section = document.getElementById(id);
     if (!section) continue;
     main.append(section);
@@ -113,8 +176,16 @@
     const table = section.querySelector('table');
     if (!table) continue;
     const columns = Array.from(table.tHead.rows[0].cells);
-    const compact = new Set(['curve', 'log₂ r', 'm', '|F|', '× ref', 'validation']);
+    const ratioIndex = columns.findIndex(cell => ['IC / rho', '× ref'].includes(cell.textContent.trim()));
+    const baseIndex = columns.findIndex(cell => cell.textContent.trim() === '|F|');
+    const recipeIndex = columns.findIndex(cell => cell.textContent.trim() === 'recipe');
+    const compact = new Set(['curve', 'log₂ r', 'm', '|F|', 'IC / rho', '× ref', 'validation']);
+    if (id === 'board-B') {
+      compact.add('IC ops');
+      compact.add('rho ops');
+    }
     const extra = columns.map((cell, i) => compact.has(cell.textContent.trim()) ? -1 : i).filter(i => i >= 0);
+    if (baseIndex >= 0) columns[baseIndex].textContent = 'Base size / recipe';
     for (const row of table.rows) {
       if (row.cells.length !== columns.length) continue; // preserve family labels
       extra.forEach(i => row.cells[i].classList.add('extra-column'));
@@ -124,8 +195,10 @@
       if (slug) {
         const metadata = Array.from(curve.childNodes).filter(node => node !== slug);
         curve.append(disclosure('Sources & base', metadata, 'cell-detail'));
+        const recipe = recipeIndex >= 0 ? row.cells[recipeIndex].textContent.trim() : '';
+        if (baseIndex >= 0 && recipe) row.cells[baseIndex].append(element('small', 'base-recipe', recipe));
       }
-      const ratioCell = row.cells[columns.findIndex(cell => cell.textContent.trim() === '× ref')];
+      const ratioCell = ratioIndex >= 0 ? row.cells[ratioIndex] : null;
       if (ratioCell) {
         const extraNotes = Array.from(ratioCell.querySelectorAll(':scope > .muted'))
           .filter(note => !/^\s*\[/.test(note.textContent)); // keep the cold interval beside its ratio
@@ -144,11 +217,19 @@
     toggle.setAttribute('aria-controls', `${id}-table`);
     table.id = `${id}-table`;
     label.append(toggle, 'Show all columns');
-    toggle.addEventListener('change', () => section.classList.toggle('all-columns', toggle.checked));
-    controls.append(label, element('span', 'muted', 'Cold cost · setup included'));
+    toggle.addEventListener('change', () => {
+      section.classList.toggle('all-columns', toggle.checked);
+      if (baseIndex >= 0) columns[baseIndex].textContent = toggle.checked ? '|F|' : 'Base size / recipe';
+    });
+    controls.append(label, element('span', 'muted',
+      id === 'batch' ? 'Historical 32-target batch diagnostic' : 'Cold cost · setup included'));
     table.closest('.scroll').before(controls);
     section.classList.add('ranked-table');
   }
+  const batch = document.getElementById('batch');
+  if (batch) main.append(batch);
+  const progress = document.getElementById('progress');
+  if (progress) main.append(progress);
 
   const notes = group('research-notes', 'Research notes',
     'Component studies, audits and historical comparisons. Each entry retains its own scope, validation status and evidence.');
@@ -156,7 +237,7 @@
     'Recipes, phase costs and decomposition methods behind the measurements.');
   const methodIds = new Set(['recipes', 'steps', 'pdp']);
   for (const section of originalSections) {
-    if (['board', 'board-A', 'board-B', 'curves'].includes(section.id)) continue;
+    if (['board', 'board-A', 'board-B', 'batch', 'progress', 'curves'].includes(section.id)) continue;
     const heading = section.querySelector('h2');
     const title = heading?.textContent || section.id;
     const item = disclosure(title, [section], 'study-detail');

@@ -1,0 +1,213 @@
+{
+  "card_id": "CARD-ic-improve-20261026-4",
+  "card_path": "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-4.yaml",
+  "card_sha256": "64c23fa18b5066402b65efc9f470a05b677ce2d15939412556794b6c9375cf23",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_exhaustive_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.422,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-clean",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.422,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import os,sys; sys.exit(1 if any(os.path.exists(p) for p in ['research/ic_planner_exhaustive_20261026/sessions/R-p37', 'research/ic_planner_exhaustive_20261026/sessions/R-p37.audit.json']) else 0)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.015,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sessions-absent",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.015,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-record",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "97335d550e7f6a943d4f80090e635fbcdd5fca5810692fcd673ff92dede7df6e",
+      "stdout_tail": [
+        "Filesystem      Size  Used Avail Use% Mounted on",
+        "/dev/vda        252G   36G  3.6G  91% /"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.023,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "disk-before-run-r-p37",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.023,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 85.032,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "quiet-before-run-r-p37",
+      "index": 5,
+      "outputs": {},
+      "seconds": 85.032,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_planner_exhaustive_20261026/specs/R-p37.json",
+        "--out",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37",
+        "--cpus",
+        "auto",
+        "--wait",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 990.104,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-r-p37",
+      "index": 6,
+      "outputs": {
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37/host.json": "1ab24a48350c5a998d5ff43f06ec12b1c067f7e7eb9f010f62420d040d69ebe7",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37/plan.json": "1450d2159ae80774f3969d1057dee692bec348a5583799f3ee40850754fcaa25",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37/records.jsonl": "e2bc9f13aa86ce94e71c5224f725834918837baa0d2fe900f686ebc0a933b710",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37/session.json": "be59c2c920bbdbe21f27fdeb262caa97986ce981e6c228e4a02af12679cec8f4",
+        "research/ic_planner_exhaustive_20261026/sessions/R-p37/spec.json": "3ccc5b279ec09f41747401a0abb3209c55f9122578325b0e97474bfcb457a3bc"
+      },
+      "seconds": 990.104,
+      "stderr_sha256": "ff562b06a8e39c0c4f46b6b6738a5dd50775c167b5f4ea69a83c7b61ed39a7cd",
+      "stderr_tail": [
+        "session ECBS1h513420c0eb69 complete -> research/ic_planner_exhaustive_20261026/sessions/R-p37 (512 records: {\"verified\": 512})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "616d0a05fff94d3a9c578511de960873340f3067",
+  "dirty_after": [
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-4.disk-start.stdout",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-4.run-r-p37.stderr",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-4.run-r-p37.stdout",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p37/host.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p37/plan.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p37/records.jsonl",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p37/session.json",
+    "research/ic_planner_exhaustive_20261026/sessions/R-p37/spec.json"
+  ],
+  "dirty_before": [
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-10.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-11.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-12a.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-12b.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-4.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-5.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-6.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-7.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-8.yaml",
+    "research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-9.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

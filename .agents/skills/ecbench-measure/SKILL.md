@@ -48,8 +48,9 @@ Copy `docs/ecbench/specs/smoke-prime.json` and edit it. Rules:
 
 Once the spec is frozen, steps 3 and 4 go through the model tiers (AGENTS.md
 "Model tiers"). The main session dispatches `experiment-director` in compile
-mode to write the task card (build, `ecbench run`, `ecbench verify`: exact
-argv, spec sha256, `OUT_DIR` as `must_not_exist`, timeouts, stop conditions;
+mode to write the task card (EKS request validation and submission by default:
+exact argv, request/spec/image identity, fresh receipt directory, timeouts and
+stop conditions from the `isolab-eks` submission reference;
 `python3 tools/task_card.py lint` must print `CARD OK`), relays the text
 `python3 tools/task_card.py prompt <card>` prints verbatim to
 `executor-mechanical`, which runs it with `tools/task_card.py run`, then dispatches `experiment-director` in
@@ -59,6 +60,18 @@ measurement, audit, compare, tabulate and land steps stay as written; compare,
 the §5a band and the decision stay with the reasoning tier.
 
 ## 3. Run
+
+Use [isolab-eks](../isolab-eks/SKILL.md) for supported x86 experiments by default
+(AGENTS.md §9a). Freeze this spec into the EKS request and use an image built
+from the tested source commit. The launcher runs ecbench and verifies L2,
+native replay, A/A controls and S3 hashes; fetch its session for steps 4–7.
+Use the caller's existing AWS credentials through MCP or the portable bridge.
+Do not silently fall back to a local run when capacity, credentials or the
+required image are unavailable. Keep the requested experiment pending with the
+specific blocker. Requested resume uses the separate CRIU/EBS contract.
+
+The commands below are for an explicitly requested local run or for reproduction
+on an approved host. They are not an alternative to EKS admission:
 
 ```bash
 cargo build --release --bin ecbench
@@ -76,11 +89,25 @@ cargo build --release --bin ecbench
 - Never run builds, tests or other agents' jobs during a timed session. Wrap your
   own heavy work in `python3 tools/isolated_bench.py busy -- CMD`, which takes the
   same lock.
-- A busy host is refused. Wait, or pass `--allow-busy` and accept runs below L2.
+- A busy host is refused. Wait. `--allow-busy` is only for an explicitly requested
+  diagnostic that accepts below-L2 records; it cannot satisfy an L2 experiment.
 - `OUT_DIR` must not exist; it is claimed atomically under the lock. Never delete
   or edit a session. Ctrl-C or a SIGTERM stops a session cleanly: the child is
   killed, evicted threads are restored and the session is marked `interrupted`. An
   interrupted session stays as evidence; start a new directory.
+- **Local runs in a Claude Code cloud session** (only when explicitly requested).
+  The container keeps processes alive only while a turn is active; a detached or
+  background job dies when the session goes idle, and the host can be replaced
+  with its disk. research/cheon_ecbench_wide_20261106 lost two whole-spec
+  sessions and an hour of chunks this way. So:
+  - split the spec into sessions of well under an hour (for example one per
+    size; a bound may be fitted over several complete sessions with no filter);
+  - commit and push each session and its audit as soon as it is audited;
+  - stay in the turn while sessions run;
+  - send anything longer to EKS.
+
+  Amend the frozen protocol before changing the split, and keep every killed
+  session as interrupted evidence.
 
 ## 4. Audit
 
@@ -193,3 +220,22 @@ In a sparse checkout (`scripts/sparse-checkout.sh status`,
 work as usual. An earlier session you replay or compare against (`--b-dir`)
 may sit under an excluded directory: `scripts/sparse-checkout.sh add --path`
 it first. Off disk is not absent.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope ecbench-measure`. Apply the
+   adopted lessons; treat candidates as hypotheses this run can test.
+2. **While acting**: resolve a blocker yourself within your authority
+   (diagnose the cause, try the documented remedy, then a materially different
+   approach) before escalating; AGENTS.md "Persistent scientific research loop".
+   Persistence grants no extra execution or spending authority.
+3. **After acting**: record the outcome with evidence,
+   `python3 tools/lessons.py outcome --scope ecbench-measure --task "..." --result success|partial|fail|blocked --evidence <receipt|commit|job> [--applied L-...]`,
+   and `lessons.py test --lesson L-... --outcome confirm|refute --evidence ...`
+   for each lesson you applied. A surprise that would change what the next run
+   does becomes `lessons.py add --scope ecbench-measure --trigger "..." --action "..." --evidence ...`.
+4. **Adapt**: when a lesson scoped to `ecbench-measure` is adopted (two distinct
+   confirmations), propose the edit to this file in a PR that cites the lesson
+   id; when one is refuted twice more than confirmed, it retires itself.

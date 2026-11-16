@@ -24,7 +24,7 @@ use crate::certificate::{
     CostStatus, CostTable, Evidence, SubgroupPreservation, TransferType,
 };
 use crate::cost::{log2_l13, LFS_C, LNFS_C, MILLER_MULTS_PER_BIT};
-use crate::ctx::{jmap, Ctx, Spec};
+use crate::ctx::{jmap, Ctx, PriceBasis, Spec};
 use crate::verdict::MapBasis;
 
 /// Largest `k` tried by direct search (`curve_traits` uses the same bound).
@@ -43,6 +43,18 @@ pub struct Embedding {
 /// with `r | q^k - 1` is exact (the scan is ascending); beyond it the order
 /// comes from a complete factorization of `r - 1`, else only a lower bound.
 pub fn embedding_degree(q: &BigUint, r: &BigUint, fx: &Factoring) -> Embedding {
+    // `ord_r(q)` does not exist when r divides q.  Without this guard the
+    // scan below finds nothing, the order routine is handed `q mod r = 0`
+    // and the result is the bogus k = r - 1 (a "complete" answer).
+    if (q % r).is_zero() {
+        return Embedding {
+            exact: None,
+            lower_bound: None,
+            method:
+                "undefined: r divides q (the anomalous case r = q), so q is not a unit modulo r"
+                    .into(),
+        };
+    }
     if let Some(k) = order_at_most(q, r, SEARCH_LIMIT) {
         return Embedding {
             exact: Some(BigUint::from(k)),
@@ -74,6 +86,13 @@ pub fn candidates(ctx: &Ctx) -> Result<Vec<Certificate>, String> {
     let r = &inst.r;
     let log2_q = inst.field_bits();
     let log2_r = inst.log2_r();
+    // The antecedent comes first: the embedding degree `ord_r(q)` is
+    // undefined when r divides q (r = q is Smart's anomalous case), and the
+    // pairing route does not apply.
+    let r_coprime_q = !(&q % r).is_zero();
+    if !r_coprime_q {
+        return Ok(vec![undefined_embedding(ctx)]);
+    }
     let emb = embedding_degree(&q, r, ctx.fx);
     // Cross-check against the repository's trait record.
     let trait_degree = ctx.traits.embedding.degree.clone();
@@ -162,7 +181,6 @@ pub fn candidates(ctx: &Ctx) -> Result<Vec<Certificate>, String> {
         ("RhoInSubgroupOfFqk".into(), round3(rho_f)),
     ];
 
-    let r_coprime_q = !(&q % r).is_zero();
     let antecedents = vec![
         Check::new("r_prime", CheckResult::Pass, "validated"),
         Check::new(
@@ -235,6 +253,9 @@ pub fn candidates(ctx: &Ctx) -> Result<Vec<Certificate>, String> {
     s.class_invariant = true;
     if fav_ratio < 0.0 && cons_ratio.is_some_and(|r| r >= 0.0) {
         s.lead_override = Some(crate::certificate::LeadClass::FormulaMarginal);
+        // The band has ends on both sides of the baseline: the formula
+        // cannot decide, so the route is neither refuted nor a weakness.
+        s.price_basis = PriceBasis::Straddles;
     }
     s.existence = if emb.exact.is_some() {
         "supported"
@@ -277,6 +298,12 @@ pub fn candidates(ctx: &Ctx) -> Result<Vec<Certificate>, String> {
         ("class_invariant", json!("the embedding degree depends only on q and r, which every curve of the isogeny class shares")),
         ("lfs_c", json!(LFS_C)),
     ]);
+    s.notes.push(format!(
+        "reading of the verdict: it is relative. It compares the conservative price of a discrete logarithm in F_(q^k) (2^{:.1} operations: generic NFS constant, o(1) dropped, weighted by the field-multiplication cost) with the matched rho on <G> (2^{:.1}). `class-weak` means the first is below the second by at least the {:.0}-bit model margin, i.e. a conservative pairing price below rho under this model; it does not say the curve is weak at any absolute security level, and `no weakness found in scope` does not say it is strong",
+        cons_total.unwrap_or(f64::NAN),
+        ctx.base.log2_total,
+        ctx.model.advantage_margin_bits
+    ));
     s.open_obligations = vec![
         "implement a generic Tate pairing and execute it on the generator (only k = 2 supersingular exists in mov_attack.rs)".into(),
         "replace the L[1/3] lower bound by a priced index-calculus pipeline for F_(q^k) (quasi-polynomial algorithms for small characteristic are not modeled)".into(),
@@ -292,6 +319,68 @@ pub fn candidates(ctx: &Ctx) -> Result<Vec<Certificate>, String> {
         "src/cryptanalysis/curve_traits (embedding degree record)".into(),
     ];
     Ok(vec![ctx.finish(s)])
+}
+
+/// `r` divides `q` (the anomalous case `r = q`): the embedding degree
+/// `ord_r(q)` is undefined, the Tate pairing route does not apply, and the
+/// certificate says so without pricing a route that does not exist.
+fn undefined_embedding(ctx: &Ctx) -> Certificate {
+    let costs = CostTable::unpriced(
+        ctx.base.log2_total,
+        "embedding degree undefined: r divides q, so there is no Tate-pairing route into F_(q^k)^*",
+    );
+    let mut s = Spec::new(
+        TransferType::PairingTransfer,
+        "pairing:tate_mov_frey_ruck",
+        "Tate/Weil pairing into F_(q^k)^*, k = embedding degree of r",
+        costs,
+    );
+    s.map = map_value(
+        "e_r(G, -): <G> -> mu_r subset F_(q^k)^*",
+        "E(F_q)[r]",
+        "none",
+        json!({"embedding_degree": null, "embedding_degree_lower_bound": null}),
+        "n/a",
+        Construction::NotApplicable,
+        "none: r divides q, so mu_r is trivial in characteristic dividing r",
+    );
+    s.subgroup = SubgroupPreservation {
+        status: Evidence::NotApplicable,
+        method: "none".into(),
+        argument: "r divides q: the order of q modulo r is undefined and there are no r-th roots of unity to map into; the anomalous case is the domain of Smart's p-adic attack, which this tool does not cover".into(),
+        image_order: None,
+        kernel_meets_subgroup: None,
+        antecedents: vec![Check::new(
+            "r_does_not_divide_q",
+            CheckResult::Fail,
+            "r divides q, so the embedding degree is undefined",
+        )],
+        executed: None,
+    };
+    s.existence = "not_applicable";
+    s.explicit_construction = "not_applicable";
+    s.map_correctness = "not_applicable";
+    s.scaling_support = "not_applicable";
+    s.advantage = Some("not_applicable");
+    s.checks = vec![Check::new(
+        "anomalous_curve",
+        if ctx.traits.anomalous {
+            CheckResult::Fail
+        } else {
+            CheckResult::NotRun
+        },
+        "#E = q puts the curve in the scope of Smart's attack, which this tool does not cover",
+    )];
+    s.invariants = jmap(vec![
+        ("embedding_degree", json!(null)),
+        ("embedding_degree_lower_bound", json!(null)),
+        (
+            "embedding_method",
+            json!("undefined: r divides q (checked before ord_r(q) is computed)"),
+        ),
+    ]);
+    s.references = vec!["Smart 1999; Semaev 1998; Satoh-Araki 1998 (anomalous curves)".into()];
+    ctx.finish(s)
 }
 
 #[cfg(test)]
@@ -377,5 +466,99 @@ mod tests {
         assert!((&rm1 % &k).is_zero());
         assert!(q.modpow(&k, &r).is_one());
         assert!(k > BigUint::from(SEARCH_LIMIT));
+    }
+
+    /// `ord_r(q)` does not exist when r divides q.  The guard returns "no
+    /// answer" instead of the bogus k = r - 1 the order routine produced
+    /// from `q mod r = 0`.
+    #[test]
+    fn embedding_degree_is_undefined_when_r_divides_q() {
+        for (q, r) in [(11u32, 11u32), (25, 5), (1009, 1009)] {
+            let emb = embedding_degree(&BigUint::from(q), &BigUint::from(r), &fx());
+            assert_eq!((&emb.exact, emb.lower_bound), (&None, None), "q={q} r={r}");
+            assert!(emb.method.starts_with("undefined"), "{}", emb.method);
+        }
+    }
+
+    /// An anomalous curve (#E = p, so r = q = p) over a small prime field:
+    /// the whole pairing candidate is the unpriced `not_applicable`
+    /// certificate, decided before any embedding degree is computed.
+    #[test]
+    fn an_anomalous_curve_gets_the_not_applicable_pairing_certificate() {
+        use crate::certificate::{RouteStatus, Verdict};
+        use crate::spec::Instance;
+        use crypto_lib::cryptanalysis::curve_traits::{
+            GeneratorCoords, Model, RegistryCurve, Representation, Source,
+        };
+        use num_bigint::BigInt;
+        use std::collections::BTreeMap;
+
+        let p = 1009u64;
+        let pb = BigUint::from(p);
+        let legendre = |v: u64| BigUint::from(v).modpow(&BigUint::from((p - 1) / 2), &pb);
+        let rhs = |a: u64, b: u64, x: u64| (x * x % p * x + a * x + b) % p;
+        let order = |a: u64, b: u64| {
+            1 + (0..p)
+                .map(|x| {
+                    let v = rhs(a, b, x);
+                    if v == 0 {
+                        1
+                    } else if legendre(v).is_one() {
+                        2
+                    } else {
+                        0
+                    }
+                })
+                .sum::<u64>()
+        };
+        let (a, b) = (0..p)
+            .flat_map(|a| (1..p).map(move |b| (a, b)))
+            .find(|&(a, b)| !(4 * a * a % p * a + 27 * b * b).is_multiple_of(p) && order(a, b) == p)
+            .expect("a curve with #E = p exists over F_1009");
+        let (x, y) = (0..p)
+            .find_map(|x| {
+                let v = rhs(a, b, x);
+                (0..p).find(|y| y * y % p == v).map(|y| (x, y))
+            })
+            .unwrap();
+        let rc = RegistryCurve {
+            slug: "toy-anomalous-p1009".into(),
+            family: "weierstrass".into(),
+            model: Model::Prime {
+                p: pb.clone(),
+                a: BigUint::from(a),
+                b: BigUint::from(b),
+            },
+            trace: BigInt::from(1),
+            order: pb.clone(),
+            end: None,
+            representations: vec![Representation {
+                generator: GeneratorCoords::Affine(BigUint::from(x), BigUint::from(y)),
+                subgroup_order: pb.clone(),
+                cofactor: BigUint::one(),
+            }],
+            levels: BTreeMap::new(),
+            source: Source {
+                kind: "registry".into(),
+                path: None,
+                curve_uid: None,
+                registered: false,
+            },
+        };
+        let inst = Instance::from_registry_curve("toy-anomalous", rc).unwrap();
+        let model = crypto_lib::cryptanalysis::jacobian_transfer::cost::CostModel::default();
+        let f = fx();
+        let ctx = Ctx::new(&inst, &model, &f, 7).unwrap();
+        assert!(ctx.traits.anomalous);
+        let certs = candidates(&ctx).unwrap();
+        assert_eq!(certs.len(), 1);
+        let c = &certs[0];
+        assert_eq!(c.subgroup_preservation.status, Evidence::NotApplicable);
+        assert_eq!(c.verdict, Verdict::NoWeaknessFoundInScope);
+        assert_eq!(c.evaluation.status, RouteStatus::Excluded);
+        assert_eq!(c.obligations.computational_advantage, "not_applicable");
+        assert!(c.costs.log2_total.is_none());
+        assert!(!c.carried);
+        assert_eq!(c.invariants["embedding_degree"], serde_json::Value::Null);
     }
 }

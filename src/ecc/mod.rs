@@ -2,6 +2,7 @@
 //! key generation, ECDSA, and ECDH over secp256k1 / P-256.
 
 pub mod barrett_ecdsa;
+pub mod certicom;
 pub mod cryptopro_b_chain_consts;
 pub mod cryptopro_b_chain_set;
 pub mod cryptopro_b_field;
@@ -22,6 +23,7 @@ mod f25519;
 pub mod field;
 pub mod gost_3410_2012;
 pub mod keys;
+mod mont_vt;
 pub mod p256_field;
 pub mod p256_point;
 pub mod p521_field;

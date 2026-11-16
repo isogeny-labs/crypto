@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="559" viewBox="0 0 760 559" font-family="Helvetica, Arial, sans-serif">
+<rect width="760" height="559" fill="#ffffff"/>
+<text x="16" y="22" font-size="15" font-weight="700" fill="#1f2328">ecbench exec: the cost of one measured child</text>
+<text x="16" y="40" font-size="11" fill="#59636e">before 1b74250e9 · after 0f5d9c272 (#2184) · after-aa (same binary) · main 004b792b7 · head 645666691 (this PR); solves identical across binaries</text>
+<text x="16" y="66" font-size="13" font-weight="600" fill="#1f2328">A. Instructions per measured child (Callgrind, whole process)</text>
+<line x1="136.0" y1="80" x2="136.0" y2="242" stroke="#d8dee4"/>
+<text x="136.0" y="255" font-size="10" fill="#59636e" text-anchor="middle">1.0M</text>
+<line x1="315.3" y1="80" x2="315.3" y2="242" stroke="#d8dee4"/>
+<text x="315.3" y="255" font-size="10" fill="#59636e" text-anchor="middle">10.0M</text>
+<line x1="494.7" y1="80" x2="494.7" y2="242" stroke="#d8dee4"/>
+<text x="494.7" y="255" font-size="10" fill="#59636e" text-anchor="middle">100.0M</text>
+<line x1="674.0" y1="80" x2="674.0" y2="242" stroke="#d8dee4"/>
+<text x="674.0" y="255" font-size="10" fill="#59636e" text-anchor="middle">1G</text>
+<text x="674" y="268" font-size="10" fill="#59636e" text-anchor="end">instructions (log scale)</text>
+<text x="16" y="106.0" font-size="11" fill="#1f2328">rho.negation</text>
+<rect x="136.0" y="81" width="410.6" height="9" fill="#8c959f"/>
+<text x="550.6" y="89" font-size="9" fill="#59636e">before 194.7M</text>
+<rect x="136.0" y="92" width="112.9" height="9" fill="#54aeff"/>
+<text x="252.9" y="100" font-size="9" fill="#59636e">after 4.3M</text>
+<rect x="136.0" y="103" width="119.6" height="9" fill="#d4a72c"/>
+<text x="259.6" y="111" font-size="9" fill="#59636e">main 4.6M</text>
+<rect x="136.0" y="114" width="119.6" height="9" fill="#0969da"/>
+<text x="259.6" y="122" font-size="9" fill="#59636e">head 4.6M</text>
+<text x="16" y="160.0" font-size="11" fill="#1f2328">bsgs.negation</text>
+<rect x="136.0" y="135" width="410.4" height="9" fill="#8c959f"/>
+<text x="550.4" y="143" font-size="9" fill="#59636e">before 194.2M</text>
+<rect x="136.0" y="146" width="98.3" height="9" fill="#54aeff"/>
+<text x="238.3" y="154" font-size="9" fill="#59636e">after 3.5M</text>
+<rect x="136.0" y="157" width="105.7" height="9" fill="#d4a72c"/>
+<text x="245.7" y="165" font-size="9" fill="#59636e">main 3.9M</text>
+<rect x="136.0" y="168" width="105.8" height="9" fill="#0969da"/>
+<text x="245.8" y="176" font-size="9" fill="#59636e">head 3.9M</text>
+<text x="16" y="214.0" font-size="11" fill="#1f2328">ic.pipeline</text>
+<rect x="136.0" y="189" width="422.9" height="9" fill="#8c959f"/>
+<text x="562.9" y="197" font-size="9" fill="#59636e">before 228.1M</text>
+<rect x="136.0" y="200" width="283.2" height="9" fill="#54aeff"/>
+<text x="423.2" y="208" font-size="9" fill="#59636e">after 38.0M</text>
+<rect x="136.0" y="211" width="399.7" height="9" fill="#d4a72c"/>
+<text x="539.7" y="219" font-size="9" fill="#59636e">main 169.5M</text>
+<rect x="136.0" y="222" width="178.3" height="9" fill="#0969da"/>
+<text x="318.3" y="230" font-size="9" fill="#59636e">head 9.9M</text>
+<text x="16" y="286" font-size="13" font-weight="600" fill="#1f2328">B. Wall time per child, spawn to exit: median, 95% interval (bootstrap over 30 rounds)</text>
+<line x1="136.0" y1="300" x2="136.0" y2="495" stroke="#d8dee4"/>
+<text x="136.0" y="508" font-size="10" fill="#59636e" text-anchor="middle">1 ms</text>
+<line x1="217.0" y1="300" x2="217.0" y2="495" stroke="#d8dee4"/>
+<text x="217.0" y="508" font-size="10" fill="#59636e" text-anchor="middle">2 ms</text>
+<line x1="324.0" y1="300" x2="324.0" y2="495" stroke="#d8dee4"/>
+<text x="324.0" y="508" font-size="10" fill="#59636e" text-anchor="middle">5 ms</text>
+<line x1="405.0" y1="300" x2="405.0" y2="495" stroke="#d8dee4"/>
+<text x="405.0" y="508" font-size="10" fill="#59636e" text-anchor="middle">10 ms</text>
+<line x1="486.0" y1="300" x2="486.0" y2="495" stroke="#d8dee4"/>
+<text x="486.0" y="508" font-size="10" fill="#59636e" text-anchor="middle">20 ms</text>
+<line x1="593.0" y1="300" x2="593.0" y2="495" stroke="#d8dee4"/>
+<text x="593.0" y="508" font-size="10" fill="#59636e" text-anchor="middle">50 ms</text>
+<line x1="674.0" y1="300" x2="674.0" y2="495" stroke="#d8dee4"/>
+<text x="674.0" y="508" font-size="10" fill="#59636e" text-anchor="middle">100 ms</text>
+<text x="674" y="521" font-size="10" fill="#59636e" text-anchor="end">milliseconds (log scale)</text>
+<text x="16" y="331.5" font-size="11" fill="#1f2328">all 18 inputs</text>
+<rect x="136.0" y="301" width="422.5" height="9" fill="#8c959f"/>
+<line x1="557.0" y1="305.5" x2="561.0" y2="305.5" stroke="#1f2328" stroke-width="1"/>
+<text x="562.5" y="309" font-size="9" fill="#59636e">before 37.20 ms</text>
+<rect x="136.0" y="312" width="125.4" height="9" fill="#54aeff"/>
+<line x1="258.9" y1="316.5" x2="263.5" y2="316.5" stroke="#1f2328" stroke-width="1"/>
+<text x="265.4" y="320" font-size="9" fill="#59636e">after 2.92 ms</text>
+<rect x="136.0" y="323" width="125.7" height="9" fill="#9ecbff"/>
+<line x1="260.0" y1="327.5" x2="264.3" y2="327.5" stroke="#1f2328" stroke-width="1"/>
+<text x="265.7" y="331" font-size="9" fill="#59636e">after-aa 2.93 ms</text>
+<rect x="136.0" y="334" width="141.3" height="9" fill="#d4a72c"/>
+<line x1="275.4" y1="338.5" x2="279.4" y2="338.5" stroke="#1f2328" stroke-width="1"/>
+<text x="281.3" y="342" font-size="9" fill="#59636e">main 3.35 ms</text>
+<rect x="136.0" y="345" width="140.2" height="9" fill="#0969da"/>
+<line x1="274.9" y1="349.5" x2="278.6" y2="349.5" stroke="#1f2328" stroke-width="1"/>
+<text x="280.2" y="353" font-size="9" fill="#59636e">head 3.32 ms</text>
+<text x="16" y="396.5" font-size="11" fill="#1f2328">ic.pipeline (001)</text>
+<rect x="136.0" y="366" width="445.2" height="9" fill="#8c959f"/>
+<line x1="575.6" y1="370.5" x2="585.4" y2="370.5" stroke="#1f2328" stroke-width="1"/>
+<text x="585.2" y="374" font-size="9" fill="#59636e">before 45.18 ms</text>
+<rect x="136.0" y="377" width="250.6" height="9" fill="#54aeff"/>
+<line x1="381.1" y1="381.5" x2="396.5" y2="381.5" stroke="#1f2328" stroke-width="1"/>
+<text x="390.6" y="385" font-size="9" fill="#59636e">after 8.54 ms</text>
+<rect x="136.0" y="388" width="251.7" height="9" fill="#9ecbff"/>
+<line x1="384.9" y1="392.5" x2="394.8" y2="392.5" stroke="#1f2328" stroke-width="1"/>
+<text x="391.7" y="396" font-size="9" fill="#59636e">after-aa 8.62 ms</text>
+<rect x="136.0" y="399" width="403.6" height="9" fill="#d4a72c"/>
+<line x1="535.2" y1="403.5" x2="543.3" y2="403.5" stroke="#1f2328" stroke-width="1"/>
+<text x="543.6" y="407" font-size="9" fill="#59636e">main 31.65 ms</text>
+<rect x="136.0" y="410" width="178.5" height="9" fill="#0969da"/>
+<line x1="311.3" y1="414.5" x2="319.6" y2="414.5" stroke="#1f2328" stroke-width="1"/>
+<text x="318.5" y="418" font-size="9" fill="#59636e">head 4.61 ms</text>
+<text x="16" y="461.5" font-size="11" fill="#1f2328">ic.pipeline (010)</text>
+<rect x="136.0" y="431" width="444.4" height="9" fill="#8c959f"/>
+<line x1="572.4" y1="435.5" x2="590.9" y2="435.5" stroke="#1f2328" stroke-width="1"/>
+<text x="584.4" y="439" font-size="9" fill="#59636e">before 44.89 ms</text>
+<rect x="136.0" y="442" width="249.7" height="9" fill="#54aeff"/>
+<line x1="378.1" y1="446.5" x2="388.7" y2="446.5" stroke="#1f2328" stroke-width="1"/>
+<text x="389.7" y="450" font-size="9" fill="#59636e">after 8.48 ms</text>
+<rect x="136.0" y="453" width="251.9" height="9" fill="#9ecbff"/>
+<line x1="381.4" y1="457.5" x2="394.8" y2="457.5" stroke="#1f2328" stroke-width="1"/>
+<text x="391.9" y="461" font-size="9" fill="#59636e">after-aa 8.64 ms</text>
+<rect x="136.0" y="464" width="400.5" height="9" fill="#d4a72c"/>
+<line x1="532.4" y1="468.5" x2="543.2" y2="468.5" stroke="#1f2328" stroke-width="1"/>
+<text x="540.5" y="472" font-size="9" fill="#59636e">main 30.82 ms</text>
+<rect x="136.0" y="475" width="170.8" height="9" fill="#0969da"/>
+<line x1="302.8" y1="479.5" x2="313.4" y2="479.5" stroke="#1f2328" stroke-width="1"/>
+<text x="310.8" y="483" font-size="9" fill="#59636e">head 4.31 ms</text>
+<text x="16" y="547" font-size="10" fill="#59636e">smoke-prime.json, 20-bit curve; shared 4-vCPU Xeon VM, L0, wall descriptive; data: callgrind/totals.tsv, wall/wall.json</text>
+</svg>

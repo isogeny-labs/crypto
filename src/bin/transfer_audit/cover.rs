@@ -28,8 +28,10 @@ use crate::certificate::{
     map_value, round3, Certificate, Check, CheckResult, Construction, CostTable, Evidence,
     SubgroupPreservation, TransferType,
 };
-use crate::cost::{ic_leading_exponent, price_jacobian_route, ConstructionCost};
-use crate::ctx::{jmap, Ctx, Spec};
+use crate::cost::{
+    class_discount_bits, ic_leading_exponent, price_jacobian_route, ConstructionCost,
+};
+use crate::ctx::{jmap, Ctx, PriceBasis, Spec};
 use crate::spec::{planted_scalar, random_binary_point};
 use crate::subgroup::{check_subgroup_preservation, BinaryEc, BinaryJac, SubgroupInputs};
 use crate::verdict::MapBasis;
@@ -123,6 +125,10 @@ fn binary_cover(ctx: &Ctx) -> Result<Certificate, String> {
         f64::from(n).log2() + ctx.model.log2_field_mult(f64::from(n)),
         "d = sqrt(b) = b^(2^(n-1)): at most n field multiplications".into(),
     );
+    // H is defined over the subfield F_(2^d) that gives E its Frobenius class
+    // (a, b and d = sqrt(b) all lie there), and phi^* commutes with that
+    // Frobenius, so rho on the image walks the same class as the baseline.
+    rt.image_class = ctx.base.class_size;
     let costs = price_jacobian_route(ctx.model, &rt);
     let mut s = Spec::new(
         TransferType::GenusCover,
@@ -192,6 +198,14 @@ fn binary_cover(ctx: &Ctx) -> Result<Certificate, String> {
     s.notes.push(
         "structure exists and the subgroup is carried (verified), but the destination is a genus-3 Jacobian over the same field: the exponent is (4/3) log2 q against rho's 0.5 log2 r".into(),
     );
+    s.notes.push(if ctx.base.class_size > 2 {
+        format!(
+            "rho on the Jacobian image is priced with the same equivalence class as the baseline (c = {}: the cover is defined over the subfield that gives E its Frobenius class, which commutes with phi^*); the total under the frozen model alone, without that discount, is costs.log2_total_frozen_model and is what the cross-check against docs/curves/jacobian-transfers.json compares",
+            ctx.base.class_size
+        )
+    } else {
+        "the baseline has no equivalence class beyond negation (c = 2), so rho on the image gets no discount and the total equals the frozen model's".to_string()
+    });
     s.references = vec![
         "docs/curves/COVERS.md (ordinary binary models)".into(),
         "src/binary_ecc/cover_transfer.rs".into(),
@@ -412,6 +426,9 @@ fn genus_sweep(ctx: &Ctx) -> Certificate {
         let mut rt = ctx.route(lg, fb);
         rt.construction =
             ConstructionCost::Priced(0.0, "best case: construction priced at zero".into());
+        // Best case for the attacker: a cover defined over the subfield that
+        // gives E its class keeps that class on the image.
+        rt.image_class = ctx.base.class_size;
         let t = price_jacobian_route(ctx.model, &rt);
         let exp = ic_leading_exponent(f64::from(g));
         let ic_leading = exp * fb;
@@ -427,7 +444,9 @@ fn genus_sweep(ctx: &Ctx) -> Certificate {
             "ic_leading_log2": round3(ic_leading),
             "rho_leading_log2": round3(rho_leading),
             "ic_total_log2": ic_total.map(round3),
-            "rho_on_jacobian_log2": round3(ctx.model.log2_rho_jacobian(log2_r, lg, fb)),
+            "rho_on_jacobian_log2": round3(
+                ctx.model.log2_rho_jacobian(log2_r, lg, fb) - class_discount_bits(ctx.base.class_size)
+            ),
             "log2_total_best_solver": t.log2_total,
             "best_solver": t.destination_solver,
             "log2_cost_ratio_to_baseline": t.log2_cost_ratio,
@@ -481,8 +500,10 @@ fn genus_sweep(ctx: &Ctx) -> Certificate {
         ("cheapest_genus", json!(g_best)),
         ("reproduces", json!("IDEA-20261009-275a14: genus-g covers of E over F_p cost p^(2 - 2/g) >= p, worse than rho; this is a check of that statement under the frozen model, not a new result")),
     ]);
-    s.notes
-        .push("price = best case: construction priced at zero, so the true cost is higher".into());
+    s.notes.push(
+        "price = best case: construction priced at zero and rho on the image granted the curve's own equivalence class, so the true cost is higher".into(),
+    );
+    s.price_basis = PriceBasis::Hypothetical;
     s.references = vec![
         "crypto-autoresearcher ledger/proposals/IDEA-20261009-275a14.yaml (dominated by KR-IC-a4dd54, KR-IC-5ea2f8)".into(),
         "src/cryptanalysis/jacobian_transfer/cost.rs (Gaudry; Gaudry-Thome-Theriault-Diem)".into(),

@@ -1,0 +1,15 @@
+digraph replay {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", color="#24374b", fillcolor="#edf4fb",
+        fontname="DejaVu Sans", fontsize=12, margin="0.15,0.10"];
+  edge [color="#355a80", arrowsize=0.7];
+  input [label="Existing native producer JSON\nThree fixed public curves · twelve arms"];
+  bind [label="Strict schema and fixture binding\nCanonical model + ICV1 · subgroup/order checks"];
+  base [label="Separate affine curve arithmetic\nCheck each labelled point: R = uG + vQ\nCheck partitions and orbit-label certificate"];
+  witness [label="Replay supplied signed witnesses\nPoint sum = infinity · recompute A and B\nRequire B nonzero · check recovered dG = Q"];
+  output [label="Native replay receipt\nInput SHA-256 · checked attempts and witnesses", fillcolor="#e6f4eb"];
+  limits [label="Explicitly NOT certified\nEvery solver root · RNG / draws\nDeadlines · operation costs", fillcolor="#fff2dc", color="#a36b22"];
+  input -> bind -> base -> witness -> output;
+  input -> limits [style=dashed, color="#a36b22", label=" diagnostic metadata ", fontname="DejaVu Sans", fontsize=10];
+  { rank=same; base; limits; }
+}

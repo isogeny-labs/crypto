@@ -5,7 +5,9 @@ kube=(kubectl --kubeconfig "$KUBECONFIG" --context "$ISOLAB_KUBE_CONTEXT" --requ
 aws eks describe-cluster --name "$ISOLAB_CLUSTER" --region "$AWS_REGION" --query cluster.status --output text | grep -qx ACTIVE
 "${kube[@]}" auth can-i create jobs.batch --namespace isolab | grep -qx yes
 "${kube[@]}" -n kube-system get deployment karpenter -o json | jq -e '.status.readyReplicas>=1' >/dev/null
-"${kube[@]}" get nodepool cpu-spot -o json | jq -e '. as $pool | any(.status.conditions[]; .type=="Ready" and .status=="True" and .observedGeneration==$pool.metadata.generation)' >/dev/null
-"${kube[@]}" get ec2nodeclass cpu -o json | jq -e 'any(.status.conditions[]; .type=="Ready" and .status=="True")' >/dev/null
+for resource in nodepool/cpu-spot nodepool/cpu-l2-spot ec2nodeclass/cpu ec2nodeclass/cpu-l2; do
+  "${kube[@]}" get "$resource" -o json | jq -e '. as $resource | any(.status.conditions[];
+    .type=="Ready" and .status=="True" and .observedGeneration==$resource.metadata.generation)' >/dev/null
+done
 aws s3api list-objects-v2 --bucket "$ISOLAB_BUCKET" --prefix runs/ --max-keys 1 --no-paginate --output json >/dev/null
 printf '{"schema":"isolab.eks.readiness/v1","ready":true,"checks":["eks_active","job_create_permission","karpenter_available","nodepool_ready","nodeclass_ready","s3_list"],"capacity_guaranteed":false}\n'

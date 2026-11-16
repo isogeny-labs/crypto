@@ -43,6 +43,15 @@
             "type": "command"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel)/scripts/relay.py\" --runtime codex session-start'",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
@@ -52,6 +61,15 @@
             "command": "conductor hook checkpoint --harness codex",
             "timeout": 30,
             "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'exec python3 \"$(git rev-parse --show-toplevel)/scripts/relay.py\" --runtime codex snapshot'",
+            "timeout": 20
           }
         ]
       }

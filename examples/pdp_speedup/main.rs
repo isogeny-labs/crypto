@@ -15,6 +15,7 @@
 
 mod algebra;
 mod arms;
+#[allow(dead_code)]
 mod bitslice;
 mod bskernel;
 mod bspairs;

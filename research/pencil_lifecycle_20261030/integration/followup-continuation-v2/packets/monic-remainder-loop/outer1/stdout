@@ -1,0 +1,16 @@
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Outer.lean:24:5: error: Tactic `contradiction` failed
+
+case neg
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+b : List UInt64
+hp : 0 < p.toNat
+hb : p.toNat < 2 ^ 31
+hbs : Canon p b
+r out : List UInt64
+hrs : Canon p r
+hr : ¬r = []
+hl : ¬b.length ≤ r.length
+ho : some r = some out
+⊢ Canon p out ∧ (wordsPoly p b ∣ wordsPoly p out ↔ wordsPoly p b ∣ wordsPoly p r)
+/var/tmp/pencil-monic-remainder-loop-20261031-v1/Outer.lean:25:3: error: No goals to be solved

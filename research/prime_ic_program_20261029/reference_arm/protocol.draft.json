@@ -1,0 +1,1032 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "DRAFT-prime-ic-published-reference-arm-20261029",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/prime_ic_program_20261029/reference_arm",
+  "authors": [
+    "prime IC program prep workflow, reference-arm track (draft, not frozen)"
+  ],
+  "links": {
+    "readme": "research/prime_ic_program_20261029/reference_arm/README.md",
+    "protocol_prose": "research/prime_ic_program_20261029/reference_arm/PROTOCOL.md",
+    "implementation_spec": "research/prime_ic_program_20261029/reference_arm/IMPLEMENTATION.md",
+    "desk_review": "research/ic_sweeper_20261024/README.md section 2.5 and P4b",
+    "track_rule": "docs/ic/SWEEPER.md, Tracks (owner decision 2026-10-24)",
+    "incumbent_evidence": "research/prime_base_oracle_tuning_20261029/README.md; docs/ic/LEADERBOARD.md Table B",
+    "prior_msolve_measurement": "crypto-autoresearcher:src/crypto_autoresearcher/index_calculus/README.md section 2",
+    "status_note": "DRAFT. Nothing here is frozen. Every field marked FILL-AT-FREEZE must be replaced, the spec files written, the analysis script hashed and the record frozen with tools/experiment_protocol.py freeze before any data is taken."
+  },
+  "question": "On the repository's prime-field instruments (ecbench ic.pipeline, counted GAE per sqrt(r), the AGENTS.md section 5a band at 0, 0.1 and 1 GAE per native operation), what does the published naive Semaev index calculus cost: the small-abscissa factor base {P : x(P) in V}, V the N smallest abscissae carrying a point, decomposition by solving <S_(m+1)(x_1..x_m, x_R), F_V(x_1), ..., F_V(x_m)> with F_V = prod_(c in V)(x - c) in msolve over F_p, cold whole solve? How far is it from matched rho.negation, and where does it sit relative to the Table B incumbent on the same base and the same trial stream?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every reference-arm run recovers the planted logarithm, and on every trial point the msolve engine returns exactly the decompositions the exhaustive grid engine returns on the same system (relation-stream identity).",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Distance remaining: the published reference arm (pub-m2-tuned) costs X times matched rho.negation at each measured size and band weight, with a 95% cluster-bootstrap interval; reported as distance, not as a pass/fail gate.",
+      "class": "comparative",
+      "decided_by": [
+        "C-pub-rho"
+      ],
+      "if_supported": "the published-IC reference is established on this instrument at these sizes; later algebraic-track prime candidates are ranked against it",
+      "if_not_supported": "the arm is not established (an instrument check failed); no published-IC reference exists yet"
+    },
+    {
+      "id": "C3",
+      "text": "Context only unless the owner rules otherwise: on the same factor base and the same walked trial stream, the Table B incumbent (pair-table oracle) and the published reference differ only in the decomposition oracle; their band-ranked order is reported.",
+      "class": "comparative",
+      "decided_by": [
+        "C-pub-inc"
+      ],
+      "if_supported": "a descriptive statement of the incumbent's position relative to published IC at matched (p, base, m); not an improvement claim for either arm, because docs/ic/SWEEPER.md keeps the table track unranked against the algebraic track",
+      "if_not_supported": "the order flips inside the band and is reported as unresolved"
+    },
+    {
+      "id": "C4",
+      "text": "Fitted exponent alpha of the published arm's priced cost in r, per band weight, over the measured sizes (ecbench bound fit, 95% interval).",
+      "class": "heuristic_estimate",
+      "decided_by": []
+    },
+    {
+      "id": "C5",
+      "text": "Engine comparison required by AGENTS.md section 15: the in-house f4_fp engine against msolve on byte-identical decomposition systems, same host, single thread, outputs checked equal.",
+      "class": "comparative",
+      "decided_by": [
+        "C-engine"
+      ],
+      "if_supported": "ratio our/msolve per size with A/A spread, reported as win or loss",
+      "if_not_supported": "outputs disagree: the f4_fp engine is void for this study"
+    },
+    {
+      "id": "C6",
+      "text": "Any statement that index calculus beats Pollard rho, that the incumbent beats published IC as a counted IC improvement, or anything about deployed curves.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "At matched base size the published arm's group-operation count is close to the incumbent's (the same walked trial stream and the same hit law), while its msolve work per trial makes it far more expensive at w >= 0.1.",
+      "mechanism": "Both arms see the same trial points on the same base; the incumbent pays a pair table once and a lookup per trial, the published arm pays one Groebner solve per trial whose cost grows like |V|^3.8 at m = 2 in the autoresearcher's msolve measurement.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "s_w01",
+          "direction": "higher",
+          "minimum_effect": "pub-m2 / inc paired ratio of summed S at w = 0.1 with lower 95% bound above 2 at every size >= 16 bits",
+          "provenance": {
+            "written_at": "2026-10-29",
+            "data_seen": [
+              {
+                "path": "crypto-autoresearcher:src/crypto_autoresearcher/index_calculus/README.md",
+                "measured": "msolve per-target time vs |F| at p = 62401 (m = 2 small_x exponent 3.80 [3.73, 3.88]; 0.120 s at |F| = 104, 3.55 s at |F| = 258)"
+              },
+              {
+                "path": "docs/ic/LEADERBOARD.md",
+                "measured": "Table B prime rows: IC/rho 5.47x to 13.5x at 9.7 to 23.4 bits"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P2",
+          "metric": "s_w0",
+          "direction": "equal_within",
+          "minimum_effect": "pub-m2 / inc paired ratio at w = 0 within [0.5, 2] at every size (both arms are dominated by the shared walk at w = 0)",
+          "provenance": {
+            "written_at": "2026-10-29",
+            "data_seen": [
+              {
+                "path": "docs/ic/leaderboard.json",
+                "measured": "20-bit Table B recipe: 6195.7 mean trials, 10972 mean total GAE, factor_base phase S 2.68 of 10.72"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "statement": "The published arm's distance to matched rho grows with size at every band weight above 0.",
+      "mechanism": "Yokoyama, Yasuda, Takahashi and Kogure (JMC 2020) bound this presentation from below (repository paraphrase research/ecdlp_autolab/yokoyama_lower_bound.md); research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md section 3.7 shows m <= 3 cannot beat r^(1/2).",
+      "predictions": [
+        {
+          "id": "P3",
+          "metric": "alpha_w01",
+          "direction": "higher",
+          "minimum_effect": "fitted alpha of pub-m2-tuned at w = 0.1 above rho-neg's alpha with non-overlapping 95% intervals",
+          "provenance": {
+            "written_at": "2026-10-29",
+            "data_seen": [
+              {
+                "path": "docs/ic/LEADERBOARD.md",
+                "measured": "bitop/v1 prime ladder: rho-neg alpha 0.504 [0.449, 0.575] at 33-40 bits; ic-pair-rule 0.646 [0.629, 0.659]"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "matched Pollard rho with the negation map, rho.negation, same workloads and targets",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "taskq/deploy/eks-karpenter/build-bundle",
+            "SOURCE_DIR",
+            "COMMIT",
+            "OUTPUT_DIR"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation repeated under a second arm name",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "inc",
+      "role": "baseline",
+      "description": "Table B incumbent recipe at this size: ic.pipeline, prime-abscissa:size=N_inc(b), mitm:negation_folded=1, targets=walk. Table track (reference only per docs/ic/SWEEPER.md). N_inc(b) FILL-AT-FREEZE from docs/ic/leaderboard.json (roster curves) or research/prime_base_oracle_tuning_20261029 (holdout curves: 45 at 20 bits pending second-host replay, 162 at 24 bits)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N_inc(b)",
+        "oracle": "mitm:negation_folded=1",
+        "targets": "walk",
+        "max_trials": "FILL-AT-FREEZE"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "pub-m2",
+      "role": "candidate",
+      "description": "published naive Semaev IC at the incumbent's base: the same prime-abscissa base and walk, decomposition by the full S_3 system with membership F_V in msolve (rational parametrisation, -P 1), roots of the eliminating polynomial found in Rust and counted, every hit lifted and re-added on the ledger",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {
+          "msolve": "pinned static build, sha256 FILL-AT-FREEZE, flags -t 1 -c 0 -P 1 -v 2"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "ECBENCH_MSOLVE": "/usr/local/bin/msolve"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N_inc(b)",
+        "oracle": "semaev-naive:m=2,mode=full",
+        "solver": "msolve:recover=param",
+        "targets": "walk",
+        "max_trials": "FILL-AT-FREEZE"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "pub-m2-tuned",
+      "role": "candidate",
+      "description": "the same published arm at the base size N_pub(b) chosen on the train panel (minimax regret across the band, ties to the smaller N), so the published arm is not judged at the incumbent's optimum",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "ECBENCH_MSOLVE": "/usr/local/bin/msolve"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N_pub(b)",
+        "oracle": "semaev-naive:m=2,mode=full",
+        "solver": "msolve:recover=param",
+        "targets": "walk"
+      },
+      "same_instrument_as": "pub-m2"
+    },
+    {
+      "id": "pub-m2-aa",
+      "role": "control_aa",
+      "description": "pub-m2 repeated under a second arm name on a 25% target subset: counted values must be identical, wall within the A/A spread",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "ECBENCH_MSOLVE": "/usr/local/bin/msolve"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "same_as": "pub-m2"
+      },
+      "same_instrument_as": "pub-m2"
+    },
+    {
+      "id": "pub-m2-pos",
+      "role": "control_positive",
+      "description": "detection check through the same oracle code path: ecbench oracle-check (new subcommand) runs semaev-naive:m=2 with the msolve engine on planted points P_i +/- P_j (indices drawn from the protocol-derived seed) over the same base as pub-m2; every planted point must decompose, and the planted pair must be among the returned solutions",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "ECBENCH_MSOLVE": "/usr/local/bin/msolve"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "command": "ecbench oracle-check --curve <panel curve> --factor-base prime-abscissa:size=N_inc(b) --oracle semaev-naive:m=2,mode=full --solver msolve:recover=param --planted 1000 --seed FILL-AT-FREEZE"
+      },
+      "same_instrument_as": "pub-m2"
+    },
+    {
+      "id": "pub-m2-grid",
+      "role": "control_negative",
+      "description": "the same oracle and system decided by the counted exhaustive grid over V^m (engine fp-grid): relation yield must be identical to pub-m2, so any yield difference indicts the msolve engine",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N_inc(b)",
+        "oracle": "semaev-naive:m=2,mode=full",
+        "solver": "fp-grid",
+        "targets": "walk"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "pub-m2-f4fp",
+      "role": "candidate",
+      "description": "the same oracle with the in-house f4_fp engine, for the AGENTS.md section 15 engine comparison only; never the reference",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N_inc(b)",
+        "oracle": "semaev-naive:m=2,mode=full",
+        "solver": "f4-fp",
+        "targets": "walk"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "pub-m3-tuned",
+      "role": "candidate",
+      "description": "published arm at m = 3 (full S_4 by the two-quadratic resultant, membership F_V on three variables), base size N_pub3(b) from the train panel, sizes 10-18 bits",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "ECBENCH_MSOLVE": "/usr/local/bin/msolve"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N_pub3(b)",
+        "oracle": "semaev-naive:m=3,mode=full",
+        "solver": "msolve:recover=param",
+        "targets": "walk"
+      },
+      "same_instrument_as": "pub-m2"
+    },
+    {
+      "id": "inc-m3",
+      "role": "baseline",
+      "description": "m = 3 context arm on the same base: rootfind-subtract:m=3 (unclassified track per docs/ic/SWEEPER.md), never ranked as an IC result",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=N_pub3(b)",
+        "oracle": "rootfind-subtract:m=3",
+        "targets": "walk"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa-pub",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "pub-m2-pos",
+      "expected_detection": "1000/1000 planted points decompose with the planted pair among the solutions (any miss voids the arm); in addition, inside the main sessions, every trial index at which inc's exhaustive pair table found a decomposition on the shared walk must be a hit for pub-m2 (comparison C-hits)",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "pub-m2-grid",
+      "null_population": {
+        "description": "trial points at which the exhaustive grid over V^m finds no decomposition; msolve must return no solution ([-1]) on every one (zero false positives), and pub-m2 and pub-m2-grid must emit byte-identical relation streams",
+        "generator": "the shared walked trial stream of each pub-m2 execution, classified by the fp-grid engine on the same system",
+        "n": 1000,
+        "why_n": "at least 1000 non-decomposing trial points per size (every size >= 12 bits yields more than this per execution); a zero false-positive count over 1000 bounds the rate below 0.3% (one-sided 95%)",
+        "matched_on": [
+          "curve",
+          "factor base",
+          "system presentation",
+          "trial point"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "ic.pipeline"
+        ]
+      },
+      {
+        "name": "decomposition oracle",
+        "levels": [
+          "mitm:negation_folded=1",
+          "semaev-naive",
+          "rootfind-subtract:m=3"
+        ]
+      },
+      {
+        "name": "system engine",
+        "levels": [
+          "msolve",
+          "fp-grid",
+          "f4-fp"
+        ]
+      },
+      {
+        "name": "factor base size",
+        "levels": [
+          "N_inc(b)",
+          "N_pub(b)",
+          "N_pub3(b)"
+        ]
+      },
+      {
+        "name": "summands",
+        "levels": [
+          "2",
+          "3"
+        ]
+      },
+      {
+        "name": "size_bits",
+        "levels": [
+          "10",
+          "12",
+          "14",
+          "16",
+          "18",
+          "20",
+          "22",
+          "24"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "panel T: prime_roster bits 10..24 (Table B curves); panel H: prime_search bits 20 and 24, seed 20261018202 (the 2026-10-29 tuning holdout curves); panel train: prime_search seeds FILL-AT-FREEZE from the protocol hash",
+        "how": "frozen spec workloads; curve slugs checked with ecbench plan before freeze"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "target_seed FILL-AT-FREEZE (derived from protocol hash), public targets",
+        "how": "same target set for every arm on a curve"
+      },
+      {
+        "name": "walk_seed",
+        "treatment": "fixed",
+        "value": "the harness's algorithm seed per (target, round), shared by all arms",
+        "how": "ecbench plan derives algorithm_seed per execution from measurement.seed independently of arm, so inc and pub-m2 see the same walked trial stream"
+      },
+      {
+        "name": "factor_base_identity",
+        "treatment": "fixed",
+        "value": "FB1h id per (curve, size)",
+        "how": "the same prime-abscissa spec gives the same FB1h id in inc and pub-m2; checked from records"
+      },
+      {
+        "name": "msolve_binary",
+        "treatment": "fixed",
+        "value": "sha256 FILL-AT-FREEZE",
+        "how": "the oracle refuses to run when the binary at ECBENCH_MSOLVE does not hash to the pinned value; the hash is written to every record"
+      },
+      {
+        "name": "msolve_separating_form",
+        "treatment": "randomized",
+        "how": "coefficients drawn from ChaCha seeded by (algorithm_seed, trial index, retry); deterministic for replay"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "msolve -t 1, RAYON_NUM_THREADS=1, one execution per CPU"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "measurement.order alternate within each round"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "cpu model, kernel, isolation level, steal and PSI per record; wall metrics compared only within one host"
+      },
+      {
+        "name": "spot_preemption",
+        "treatment": "measured",
+        "how": "a preempted execution is re-run fresh (infrastructure retry); counted values are host independent, its wall time is discarded"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-pub-rho",
+        "arms": [
+          "pub-m2-tuned",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "reason": "distance remaining of published IC"
+      },
+      {
+        "id": "C-pub-inc",
+        "arms": [
+          "pub-m2",
+          "inc"
+        ],
+        "differs_in": [
+          "decomposition oracle"
+        ],
+        "design": "one_factor",
+        "reason": "same base, same walk; table track vs algebraic track: context only"
+      },
+      {
+        "id": "C-pub-tuned",
+        "arms": [
+          "pub-m2-tuned",
+          "pub-m2"
+        ],
+        "differs_in": [
+          "factor base size"
+        ],
+        "design": "one_factor",
+        "reason": null
+      },
+      {
+        "id": "C-hits",
+        "arms": [
+          "pub-m2",
+          "inc"
+        ],
+        "differs_in": [
+          "decomposition oracle"
+        ],
+        "design": "absolute",
+        "threshold": "identical set of hit trial indices",
+        "reason": "positive control"
+      },
+      {
+        "id": "C-grid",
+        "arms": [
+          "pub-m2",
+          "pub-m2-grid"
+        ],
+        "differs_in": [
+          "system engine"
+        ],
+        "design": "absolute",
+        "threshold": "byte-identical relation streams",
+        "reason": "negative control on yield"
+      },
+      {
+        "id": "C-engine",
+        "arms": [
+          "pub-m2-f4fp",
+          "pub-m2"
+        ],
+        "differs_in": [
+          "system engine"
+        ],
+        "design": "one_factor",
+        "reason": "AGENTS.md section 15"
+      },
+      {
+        "id": "C-m3-rho",
+        "arms": [
+          "pub-m3-tuned",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "reason": "m = 3 distance remaining"
+      },
+      {
+        "id": "C-m3-inc",
+        "arms": [
+          "pub-m3-tuned",
+          "inc-m3"
+        ],
+        "differs_in": [
+          "decomposition oracle"
+        ],
+        "design": "one_factor",
+        "reason": "context only"
+      },
+      {
+        "id": "C-aa-pub",
+        "arms": [
+          "pub-m2",
+          "pub-m2-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": null
+      },
+      {
+        "id": "C-aa-rho",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": null
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false,
+    "transfer_obligations": []
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "protocol_hash_sha256",
+      "seeds": [],
+      "nonce": null,
+      "note": "train curve seeds, target_seed and measurement.seed are the first 8 bytes of sha256(protocol_sha256 || panel || bits || role), computed by tools/experiment_protocol.py seeds at freeze; the panel-H curve seed 20261018202 is fixed on purpose to reuse the tuning holdout curves"
+    },
+    "instance_sampling": {
+      "rule": "panel T and H curves are fixed; train curves are fresh prime_search curves; targets drawn by the spec's public target law, the same for every arm",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "tools/experiment_protocol.py blind on the export before ecbench compare/band are read; labels unmasked after the decision table is written",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 10,
+    "replicates": 2,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "targets per curve 48 at <= 18 bits, 24 at 20, 12 at 22, 8 at 24 (pub-m2 at 24 bits: 4, preflight-gated); 2 rounds. The 2026-10-29 tuning holdout resolved a 0.818 ratio to [0.773, 0.866] with 96 pairs; the predicted pub/rho and pub/inc effects at w >= 0.1 are one to three orders of magnitude, so the interval width is not the binding constraint. The three band weights are read jointly (ecbench band --ranks), not as separate tests."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 177000,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s_w0",
+        "name": "S at w = 0",
+        "unit": "ecbench.gae / sqrt(r)",
+        "kind": "counted",
+        "definition": "cold whole solve, every phase charged (factor base, oracle setup, relations, linear algebra, verify), unpriced native work at 0",
+        "source": "ecbench band / compare --weight 0",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "s_w01",
+        "name": "S at w = 0.1",
+        "unit": "ecbench.gae / sqrt(r)",
+        "kind": "derived",
+        "definition": "G - C + 0.1 (U + n_C) over sqrt(r) (src/cryptanalysis/ecbench/band.rs); U includes the msolve multiply-adds and every *_uncharged counter of every arm, rho included",
+        "source": "ecbench band / compare --weight 0.1",
+        "formula": "priced_gae(w) / sqrt(r)",
+        "aggregation": "paired_ratio",
+        "resolution": "0.1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "s_w1",
+        "name": "S at w = 1",
+        "unit": "ecbench.gae / sqrt(r)",
+        "kind": "derived",
+        "definition": "as s_w01 at w = 1",
+        "source": "ecbench band / compare --weight 1",
+        "formula": "priced_gae(w) / sqrt(r)",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "alpha_w01",
+        "name": "fitted exponent at w = 0.1",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "slope of log priced cost against log r over the measured sizes",
+        "source": "ecbench bound fit",
+        "formula": "least squares on per-size means",
+        "aggregation": "per_row",
+        "resolution": null,
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "msolve_muladds_per_trial",
+        "name": "msolve F_p multiply-adds per trial",
+        "unit": "F_p multiply-adds",
+        "kind": "counted",
+        "definition": "patched-msolve linear-algebra and FGLM multiply-adds summed over calls, divided by targets_tried",
+        "source": "records solver.ops / counters.targets_tried",
+        "formula": "solver.ops / targets_tried",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "hit_rate",
+        "name": "decomposition hit rate",
+        "unit": "relations per trial",
+        "kind": "rate",
+        "definition": "relations_found / targets_tried",
+        "source": "records counters",
+        "aggregation": "mean",
+        "resolution": null,
+        "uncertainty": "clopper_pearson_ci95"
+      },
+      {
+        "id": "msolve_internal_seconds",
+        "name": "msolve internal elapsed time",
+        "unit": "s",
+        "kind": "timed",
+        "definition": "sum of msolve -v 2 overall(elapsed) over calls; process start-up excluded per AGENTS.md section 15",
+        "source": "records solver.wall_ns",
+        "aggregation": "median",
+        "resolution": "0.01 s per call as printed",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "solve_wall_seconds",
+        "name": "solve wall time",
+        "unit": "s",
+        "kind": "timed",
+        "definition": "harness solve interval including msolve process start-up",
+        "source": "records time.solve_wall_ns",
+        "aggregation": "median",
+        "resolution": "1 us",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "peak_rss",
+        "name": "peak RSS",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "runner peak RSS of the execution, children included",
+        "source": "records resources",
+        "aggregation": "max",
+        "resolution": null,
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "targets_tried",
+      "relations_found",
+      "matrix_rank",
+      "solver_calls",
+      "solver_ops",
+      "solver_budget_exceeded",
+      "msolve_rows_reduced",
+      "msolve_zero_reductions",
+      "msolve_f4_rounds",
+      "msolve_separating_retries",
+      "semaev_membership_fp_mults_uncharged",
+      "semaev_system_fp_mults_uncharged",
+      "semaev_rootfind_fp_mults_uncharged",
+      "semaev_grid_fp_mults_uncharged"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "msolve_sha256",
+      "msolve_source_revision",
+      "image_digest",
+      "isolation.level",
+      "steal_ticks",
+      "psi",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "route": "isolab-eks via isolab_k8s_benchmark (audited ecbench contract)",
+      "instance_type": "FILL-AT-FREEZE (one x86 family for the whole study)",
+      "cpus_per_execution": 1,
+      "memory_per_execution": "2Gi, revised by preflight peak RSS",
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 21600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design per panel and size as in sample_size.note; stop when every planned execution has a record",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "preflight gate: before the main sessions, run 4 targets x 1 round per size; if the measured pub-m2 per-solve time at a size exceeds 2 h, that size runs 4 targets x 1 round and its rows are labelled descriptive (no interval claimed)",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "any C-hits or C-grid mismatch, any msolve self-test failure, or any non-identical replay voids every pub-* record of that session",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "an execution that hits timeout_seconds is censored, recorded, and never re-run with a larger timeout",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admission (all must hold, else the arm is not established): every pub-* run verifies; C-hits and C-grid identical; msolve self-test passes at the session's p; ecbench verify --replay identical; C-aa-pub counted ratio exactly 1.000 and C-aa-rho exactly 1.000. Then C2 reports, per size and weight, sum S_pub-m2-tuned / sum S_rho-neg with its 95% cluster-bootstrap interval as the distance remaining. C3 reports ecbench band --ranks order of pub-m2 and inc: 'inc cheaper across band', 'pub cheaper across band', or 'unresolved' if the order flips between w = 0 and w = 1; it is context and is not an improvement verdict for either arm unless the owner rules that the table track may be ranked against the algebraic track. C5 reports f4_fp/msolve per size as win or loss only when outputs are equal on every system.",
+    "comparison_ids": [
+      "C-pub-rho",
+      "C-pub-inc",
+      "C-engine",
+      "C-hits",
+      "C-grid"
+    ],
+    "threshold": "no pass/fail threshold on C-pub-rho (distance remaining); order statements only where they hold at w = 0, 0.1 and 1",
+    "statistic": "ratio of summed S over matched (target, round) pairs (ecbench compare --weight W)",
+    "interval": "cluster bootstrap over targets, 95%, 4000 resamples",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "ratio of summed S per weight; fitted exponent difference",
+    "verdict_vocabulary": [
+      "established",
+      "not_established",
+      "inc_cheaper_across_band",
+      "pub_cheaper_across_band",
+      "unresolved_in_band",
+      "invalid_measurement",
+      "descriptive_only"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/prime_ic_program_20261029/reference_arm/analysis.sh (to be written before freeze; thin shell over ecbench compare, band, bound fit)",
+      "sha256": null
+    },
+    "inputs": [
+      "sessions/*/records.jsonl"
+    ],
+    "outputs": [
+      "analysis/compare-*.json",
+      "analysis/band-*.md",
+      "analysis/bound-*.json"
+    ],
+    "blinded": true,
+    "frozen_before_data": false
+  },
+  "inadmissible": [
+    "changing N, sizes, targets, seeds, unit, band weights or accounting after seeing results",
+    "pricing msolve work by host wall time inside S, or leaving it out of the band",
+    "counting msolve process start-up or input parsing as algorithm work, or as zero work in the wall metric without saying so",
+    "reporting pub/inc as an improvement or regression of either arm while the cross-track ruling is open",
+    "quoting the w = 0 ratio alone for any arm with unpriced solver work",
+    "using a msolve build whose hash differs from the pinned one, or one that has not passed the self-test at the session's p",
+    "dropping censored executions from the means"
+  ],
+  "amendments": [],
+  "invalidation_rules": [
+    "a record whose msolve_sha256 differs from the pinned value",
+    "a replay that is not identical",
+    "a pub-* record from a session in which any C-hits or C-grid check failed"
+  ],
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "S per arm vs bits at w = 0, 0.1, 1 with intervals",
+      "pub/rho distance remaining vs bits",
+      "msolve multiply-adds per trial vs base size"
+    ],
+    "report_dir": "research/prime_ic_program_20261029/reference_arm/reports"
+  },
+  "literature": [
+    {
+      "ref": "I. Semaev, Summation polynomials and the discrete logarithm problem on elliptic curves, ePrint 2004/031",
+      "provenance": "internal",
+      "claim": "the small-abscissa base and S_(m+1) decomposition (as cited in research/notes/ecdlp-general/RESEARCH_ECDLP_STATE_OF_THE_ART.md)",
+      "verified_by": null
+    },
+    {
+      "ref": "K. Yokoyama, M. Yasuda, Y. Takahashi, J. Kogure, Complexity bounds on Semaev's naive index calculus method for ECDLP, J. Math. Cryptol. 14 (2020) 460-485, doi 10.1515/jmc-2019-0029",
+      "provenance": "internal",
+      "claim": "lower bound for the ideal <S_(m+1), F(x_1..x_m)>; repository paraphrase in research/ecdlp_autolab/yokoyama_lower_bound.md, not checked against the full text",
+      "verified_by": null
+    },
+    {
+      "ref": "C. Petit, M. Kosters, A. Messeng, Algebraic approaches for the elliptic curve discrete logarithm problem over prime fields, PKC 2016, LNCS 9615",
+      "provenance": "internal",
+      "claim": "factor bases from compositions of low-degree maps; the second published arm (pkm-semaev on prime-kummer) per research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md",
+      "verified_by": null
+    },
+    {
+      "ref": "J.-C. Faugere, P. Gaudry, L. Huot, G. Renault, Using symmetries in the index calculus for elliptic curves discrete logarithm, J. Cryptology 2014",
+      "provenance": "internal",
+      "claim": "S_m symmetrisation and 2-torsion invariants, published for F_(q^n); its F_p use here is a derived extension arm",
+      "verified_by": null
+    }
+  ],
+  "extensions": {
+    "draft_status": "DRAFT - not frozen; FILL-AT-FREEZE fields open",
+    "ecbench_specs": "specs/{train,T,H}-P<b>.json to be written at freeze",
+    "phase2_arms": "pub-pkm (pkm-semaev:engine=msolve on prime-kummer, Kummer panel curves of research/prime_base_oracle_tuning_20261029 sessions kummer-P22/24); pub-m2-sym (derived F_p S_m symmetrisation); pub-m4-chain feasibility probe at <= 12 bits",
+    "estimated_total_seconds_basis": "derived, not measured: README.md section 6 (autoresearcher msolve fit, x1 host factor); replace with preflight before freeze"
+  },
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

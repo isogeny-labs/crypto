@@ -3,6 +3,7 @@
   "remote": "s3://setec-astronomy-artifacts/store",
   "policy": {
     "keep": [
+      "*.pdf",
       "docs/browser/data.json",
       "docs/curves/cover-transfer-assessments.json",
       "docs/curves/covers.json",
@@ -14,6 +15,7 @@
       "docs/curves/cover-links.yaml",
       "docs/ic/boundary_targets.json",
       "docs/ic/leaderboard.json",
+      "pcc/ledger.jsonl",
       "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
       "docs/ic/runs/ic-boundary-ledger-round5-headline-2026-09-22.json",
       "docs/performance-gains/summary.png",
@@ -21,6 +23,10 @@
       "experiments/31_jv_cover_stop_ccov_oracle.json",
       "experiments/koblitz_isogeny_class_walk.json",
       "experiments/koblitz_isogeny_cost_sweep.json",
+      "research/ecbench_jacobians_transfers_20261025/sessions/genus2/records.jsonl",
+      "research/ecbench_jacobians_transfers_20261025/sessions/ghs/records.jsonl",
+      "research/ecbench_jacobians_transfers_20261025/sessions/prime/records.jsonl",
+      "research/ecbench_jacobians_transfers_20261025/sessions/quartic/records.jsonl",
       "research/ecbench_n37_k8_k16_20261004/sessions/mac_arm64_l0_01/records.jsonl",
       "research/ecbench_n37_online_ir_20261004/RAW-CALLGRIND.zip",
       "research/ecbench_n37_online_ir_20261004/sessions/mac_arm64_l0_01/records.jsonl",
@@ -29,6 +35,7 @@
       "research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stderr",
       "research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout",
       "research/hyperelliptic_ecbench_20261024/sessions/r16/records.jsonl",
+      "research/ic_acct3_hec_ecbench_20261021/sessions/g2-p41/records.jsonl",
       "research/ic_candidate_tournament_20260915/goal_20260924/reference-qualification/RESULTS.json",
       "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
       "research/ic_planner_validation_20261020/REPORT.pdf",
@@ -73,7 +80,8 @@
       "src/cryptanalysis/curve_aliases.json",
       "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/routes.csv",
       "research/weil_descent_angles_20261018/results/H1-hsweep-run-20261018T2240Z/hsweep.csv",
-      "research/weil_descent_angles_20261018/results/H2-glue-run-20261018T2240Z/glue.csv"
+      "research/weil_descent_angles_20261018/results/H2-glue-run-20261018T2240Z/glue.csv",
+      "benchmarks/progress/progress.json"
     ]
   }
 }

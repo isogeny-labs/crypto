@@ -30,6 +30,7 @@ use crypto_lib::ecc::curve::CurveParams;
 use crypto_lib::ecc::point::Point;
 
 use crate::certificate::{round3, Check, CheckResult};
+use crate::cost::log2_rho_with_class;
 
 /// The curve arithmetic of an instance.
 pub enum Ops {
@@ -183,6 +184,12 @@ impl Instance {
 pub fn load_registered(registry_text: &str, wanted: &str) -> Result<Instance, String> {
     let doc: Value =
         serde_json::from_str(registry_text).map_err(|e| format!("registry JSON: {e}"))?;
+    load_registered_from(&doc, wanted)
+}
+
+/// [`load_registered`] on an already parsed registry (a sweep over many
+/// curves parses the 17 MB file once).
+pub fn load_registered_from(doc: &Value, wanted: &str) -> Result<Instance, String> {
     let curves = doc["curves"].as_array().ok_or("registry has no curves")?;
     let wanted_lc = wanted.to_ascii_lowercase();
     let hit = curves.iter().find(|c| {
@@ -532,11 +539,19 @@ pub fn rho_class_size(inst: &Instance, traits: &CurveTraits) -> (u64, String) {
 pub struct Baseline {
     pub class_size: u64,
     pub class_reason: String,
+    /// `log2` of rho with the curve's equivalence class (negation included).
     pub log2_total: f64,
+    /// `log2` of the cost model's own reference `sqrt(pi r / 4)`: negation
+    /// only.  (Named before Amendment 3, when it was believed to be rho
+    /// without automorphisms; the name is kept for the Rust field only.)
     pub log2_no_automorphisms: f64,
     pub log2_op_cost: f64,
 }
 
+/// Pollard rho on `<G>` with an equivalence class of `class_size` elements
+/// (negation included): `sqrt(pi r / (2c))` group operations.  The class
+/// enters as `sqrt(c / 2)` against the cost model's `sqrt(pi r / 4)`; see
+/// [`crate::cost::class_discount_bits`].
 pub fn baseline(model: &CostModel, inst: &Instance, class_size: u64, reason: String) -> Baseline {
     let log2_r = inst.log2_r();
     let fb = inst.field_bits();
@@ -544,7 +559,7 @@ pub fn baseline(model: &CostModel, inst: &Instance, class_size: u64, reason: Str
     Baseline {
         class_size,
         class_reason: reason,
-        log2_total: no_aut - 0.5 * (class_size as f64).log2(),
+        log2_total: log2_rho_with_class(model, log2_r, fb, class_size),
         log2_no_automorphisms: no_aut,
         log2_op_cost: model.log2_elliptic_op(fb),
     }
@@ -554,14 +569,14 @@ impl Baseline {
     pub fn value(&self, log2_r: f64) -> Value {
         json!({
             "algorithm": "Pollard rho on <G>",
-            "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+            "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
             "log2_r": round3(log2_r),
             "equivalence_class_size": self.class_size,
             "equivalence_class_reason": self.class_reason,
             "log2_group_operations": round3(self.log2_total - self.log2_op_cost),
             "log2_cost_of_one_group_operation": round3(self.log2_op_cost),
             "log2_total": round3(self.log2_total),
-            "log2_total_without_automorphisms": round3(self.log2_no_automorphisms),
+            "log2_total_negation_only": round3(self.log2_no_automorphisms),
         })
     }
 }
@@ -613,13 +628,34 @@ mod tests {
         assert!(err.starts_with("INVALID_INSTANCE"), "{err}");
     }
 
+    /// Negation is counted once.  The cost model's `sqrt(pi r / 4)` is rho
+    /// with negation (`c = 2`), so a curve with negation only has exactly
+    /// that baseline, and a class of `c = 14` (negation and a 7-fold
+    /// Frobenius) lowers it by `0.5 log2(14 / 2) = 0.5 log2 7`, not by
+    /// `0.5 log2 14` (certificate v1).
     #[test]
-    fn baseline_divides_by_the_square_root_of_the_class() {
+    fn baseline_counts_negation_once() {
         let inst = toy_koblitz("t7", 1, &BigUint::from(Z7), 1).unwrap();
         let model = CostModel::default();
         let b2 = baseline(&model, &inst, 2, "negation".into());
         let b14 = baseline(&model, &inst, 14, "negation+frobenius".into());
         assert!((b2.log2_total - b14.log2_total - 0.5 * 7f64.log2()).abs() < 1e-9);
-        assert!((b2.log2_no_automorphisms - b2.log2_total - 0.5).abs() < 1e-9);
+        assert!((b2.log2_no_automorphisms - b2.log2_total).abs() < 1e-12);
+        // sqrt(pi r / 4) for c = 2, from the closed form.  The model's constant
+        // log2 sqrt(pi/4) is stored as -0.1736147, 6.4e-4 above the exact value
+        // (RESULTS section 8), hence the tolerance.
+        let r = inst.log2_r();
+        let expect = 0.5 * r
+            + 0.5 * (std::f64::consts::PI / 4.0).log2()
+            + model.log2_elliptic_op(inst.field_bits());
+        assert!(
+            (b2.log2_total - expect).abs() < 1e-3,
+            "{} {}",
+            b2.log2_total,
+            expect
+        );
+        let v = b2.value(r);
+        assert!(v.get("log2_total_without_automorphisms").is_none());
+        assert_eq!(v["log2_total_negation_only"], v["log2_total"]);
     }
 }

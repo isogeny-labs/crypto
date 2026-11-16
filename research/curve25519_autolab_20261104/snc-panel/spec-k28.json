@@ -1,0 +1,127 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "SNC-1/SNC-2 shared panel k = 28: lazy certification and the two-seed target walk vs the C = 2 incumbent and rho-neg, five fresh family curves",
+ "description": "research/curve25519_autolab_20261104/snc-panel: Stage 1 of records SNC-1 and SNC-2 (ideas/SYNTHESIS-NC-20261108.md), frozen before data (PROTOCOL.md). C = 2 index-calculus arms on a size-2 base; public synthetic targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "inc-lazy",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run,lazy=1",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj-lazy",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 8,
+  "seed": 20261138,
+  "timeout_seconds": 3600,
+  "warmup": 1
+ },
+ "workloads": {
+  "curves": [
+   {
+    "a": 178687587,
+    "b": 13872414,
+    "gx": 89478497,
+    "gy": 121408824,
+    "group_order": 268464472,
+    "p": 268434581,
+    "r": 33558059,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 268215858,
+    "b": 39365730,
+    "gx": 283,
+    "gy": 18229649,
+    "group_order": 268452472,
+    "p": 268434557,
+    "r": 33556559,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 268066962,
+    "b": 85749650,
+    "gx": 354,
+    "gy": 37168132,
+    "group_order": 268438712,
+    "p": 268434461,
+    "r": 33554839,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 176974979,
+    "b": 188574103,
+    "gx": 178957077,
+    "gy": 33226997,
+    "group_order": 268455688,
+    "p": 268434389,
+    "r": 33556961,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 265839570,
+    "b": 266541725,
+    "gx": 936,
+    "gy": 70189180,
+    "group_order": 268438648,
+    "p": 268434269,
+    "r": 33554831,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261148,
+  "targets_per_curve": 12
+ }
+}

@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | inc | 32/32 | 2.513 | 2.752 | 4.899 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | rho-neg | 32/32 | 0.844 | 0.927 | 1.671 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wsum2r-b120-n2 | 32/32 | 6.017 | 6.967 | 15.515 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wsum2r-b160-n2 | 32/32 | 6.270 | 7.076 | 14.331 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wsum2r-b30-n2 | 32/32 | 27.880 | 33.435 | 83.428 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wsum2r-b45-n2 | 32/32 | 10.876 | 13.012 | 32.238 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wsum2r-b60-n2 | 32/32 | 8.045 | 9.588 | 23.473 | — |
+| icv1-fp32-tm109914-36f5bc82 | 29.00 | wsum2r-b90-n2 | 32/32 | 7.170 | 8.459 | 20.065 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-tm109914-36f5bc82 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wsum2r-b120-n2 | inc < wsum2r-b120-n2 |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wsum2r-b160-n2 | inc < wsum2r-b160-n2 |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wsum2r-b30-n2 | inc < wsum2r-b30-n2 |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wsum2r-b45-n2 | inc < wsum2r-b45-n2 |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wsum2r-b60-n2 | inc < wsum2r-b60-n2 |
+| icv1-fp32-tm109914-36f5bc82 | inc vs wsum2r-b90-n2 | inc < wsum2r-b90-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wsum2r-b120-n2 | rho-neg < wsum2r-b120-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wsum2r-b160-n2 | rho-neg < wsum2r-b160-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wsum2r-b30-n2 | rho-neg < wsum2r-b30-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wsum2r-b45-n2 | rho-neg < wsum2r-b45-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wsum2r-b60-n2 | rho-neg < wsum2r-b60-n2 |
+| icv1-fp32-tm109914-36f5bc82 | rho-neg vs wsum2r-b90-n2 | rho-neg < wsum2r-b90-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b120-n2 vs wsum2r-b160-n2 | unresolved inside the band |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b120-n2 vs wsum2r-b30-n2 | wsum2r-b120-n2 < wsum2r-b30-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b120-n2 vs wsum2r-b45-n2 | wsum2r-b120-n2 < wsum2r-b45-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b120-n2 vs wsum2r-b60-n2 | wsum2r-b120-n2 < wsum2r-b60-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b120-n2 vs wsum2r-b90-n2 | wsum2r-b120-n2 < wsum2r-b90-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b160-n2 vs wsum2r-b30-n2 | wsum2r-b160-n2 < wsum2r-b30-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b160-n2 vs wsum2r-b45-n2 | wsum2r-b160-n2 < wsum2r-b45-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b160-n2 vs wsum2r-b60-n2 | wsum2r-b160-n2 < wsum2r-b60-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b160-n2 vs wsum2r-b90-n2 | wsum2r-b160-n2 < wsum2r-b90-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b30-n2 vs wsum2r-b45-n2 | wsum2r-b45-n2 < wsum2r-b30-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b30-n2 vs wsum2r-b60-n2 | wsum2r-b60-n2 < wsum2r-b30-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b30-n2 vs wsum2r-b90-n2 | wsum2r-b90-n2 < wsum2r-b30-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b45-n2 vs wsum2r-b60-n2 | wsum2r-b60-n2 < wsum2r-b45-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b45-n2 vs wsum2r-b90-n2 | wsum2r-b90-n2 < wsum2r-b45-n2 |
+| icv1-fp32-tm109914-36f5bc82 | wsum2r-b60-n2 vs wsum2r-b90-n2 | wsum2r-b90-n2 < wsum2r-b60-n2 |

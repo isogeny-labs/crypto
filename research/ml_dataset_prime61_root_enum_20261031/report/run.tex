@@ -1,0 +1,34 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\begin{document}
+\section*{Prime61 root and enumeration pilot}
+The frozen four-cell $n=61,m=2$ prime-field plan completed on modulus
+$2^{61}-1=2305843009213693951$. Both bounded enumeration cells produced
+verified method artifacts; both root cells reached their predeclared timeout.
+All four attempts were retained and exported. Independent ECDLP scalar solves: 0.
+
+\subsection*{Outcome counts (two twists per method)}
+\noindent\begin{tabular}{lrr}
+Method & Verified artifact & Timeout\\\hline
+Root & 0 & 2\\
+Enumerate & 2 & 0
+\end{tabular}
+
+\vspace{1em}\noindent\textbf{Root timeouts:}\quad\rule{2in}{10pt}\quad 2/2\\[8pt]
+\textbf{Enumeration verified:}\quad\rule{2in}{10pt}\quad 2/2
+
+\subsection*{Evidence and limits}
+The independent audit checked archive hashes, native manifests, modulus,
+method, twist and status for all four cells. The pinned official export checker
+reported zero findings: four planned and attempted, two completed and two
+censored. Fresh S3 reads and hash checks independently sampled archive indices
+0 and 3; producer readback receipts cover all four archives. The frozen
+protocol and plan preceded all attempts. Native work limits were 30 seconds per
+cell, 90 seconds per outer call, 2 GiB memory and 64 MiB trace.
+
+This bounded pilot establishes method-artifact and custody evidence for these
+four cells. It does not compare method speed or determine an exact fall degree.
+The machine-readable report and evidence links are in \texttt{report/run.md}.
+\end{document}

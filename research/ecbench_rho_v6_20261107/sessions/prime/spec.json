@@ -1,0 +1,86 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho jumps in G only (rho.negation_v6) against rho.negation_v5, prime ladder",
+  "description": "Does dropping the Q ladder (jumps in G only, the target entering through the start stride) lower rho.negation_v5? Incumbent rho.negation_v5 with an A/A control, interleaved on the curves of the v5 study. Counted GAE; local L0 host.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 18,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 22,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 64,
+    "target_seed": 20261114
+  },
+  "arms": [
+    {
+      "name": "incumbent",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_v5"
+      }
+    },
+    {
+      "name": "candidate",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v6"
+      }
+    },
+    {
+      "name": "incumbent-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_v5"
+      }
+    },
+    {
+      "name": "plain-v5",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain_v5"
+      }
+    },
+    {
+      "name": "plain-v6",
+      "role": "candidate",
+      "method": {
+        "id": "rho.plain_v6"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261114,
+    "isolation_required": "L0",
+    "timeout_seconds": 300
+  }
+}

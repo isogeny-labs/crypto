@@ -1,0 +1,194 @@
+{
+  "change_set": {
+    "execute_recommendation": "do_not_execute_under_source-only/no-IAM authorization",
+    "execution_status": "AVAILABLE",
+    "id": "arn:aws:cloudformation:us-east-2:104186811093:changeSet/pencil-source-20261029T2340Z/7a351943-9891-4488-b85d-3df5dc174b01",
+    "project_details": [
+      {
+        "ChangeSource": "DirectModification",
+        "Evaluation": "Dynamic",
+        "Target": {
+          "AfterValue": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+          "Attribute": "Properties",
+          "AttributeChangeType": "Modify",
+          "BeforeValue": "FhkDu4kbpsBNUbxuDW16EYHRfTX3OQZe",
+          "Name": "SourceVersion",
+          "Path": "/Properties/SourceVersion",
+          "RequiresRecreation": "Conditionally"
+        }
+      },
+      {
+        "ChangeSource": "DirectModification",
+        "Evaluation": "Dynamic",
+        "Target": {
+          "AfterValue": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip",
+          "Attribute": "Properties",
+          "AttributeChangeType": "Modify",
+          "BeforeValue": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/8342118dc5dd243ce9a3a2057e74e092de8b6170563df9459c9afc2c9c6f1bc9.zip",
+          "Name": "Source",
+          "Path": "/Properties/Source/Location",
+          "RequiresRecreation": "Conditionally"
+        }
+      }
+    ],
+    "status": "CREATE_COMPLETE",
+    "trigger_policy_change": [
+      {
+        "Action": "Modify",
+        "AfterContext": "{\"Properties\":{\"PolicyDocument\":{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"codebuild:StartBuild\",\"codebuild:BatchGetBuilds\",\"codebuild:StopBuild\"],\"Resource\":[\"{{changeSet:KNOWN_AFTER_APPLY}}\",\"arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:*\"],\"Effect\":\"Allow\"},{\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-requests/*\",\"Effect\":\"Allow\"},{\"Action\":[\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":[\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-runtime/*\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/state.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/benchmark-result.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/computation-result.json\"],\"Effect\":\"Allow\"}]},\"Roles\":[\"isolab-remote-launcher-GitHubRole-FaCZneVBkF6D\"],\"PolicyName\":\"isolab-recovery-trigger\"}}",
+        "BeforeContext": "{\"Properties\":{\"PolicyDocument\":{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"codebuild:StartBuild\",\"codebuild:BatchGetBuilds\",\"codebuild:StopBuild\"],\"Resource\":[\"arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller\",\"arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:*\"],\"Effect\":\"Allow\"},{\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-requests/*\",\"Effect\":\"Allow\"},{\"Action\":[\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":[\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-runtime/*\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/state.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/benchmark-result.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/computation-result.json\"],\"Effect\":\"Allow\"}]},\"Roles\":[\"isolab-remote-launcher-GitHubRole-FaCZneVBkF6D\"],\"PolicyName\":\"isolab-recovery-trigger\"}}",
+        "Details": [
+          {
+            "ChangeSource": "DirectModification",
+            "Evaluation": "Static",
+            "Target": {
+              "AfterValue": "{{changeSet:KNOWN_AFTER_APPLY}}",
+              "Attribute": "Properties",
+              "AttributeChangeType": "Modify",
+              "BeforeValue": "arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller",
+              "Name": "PolicyDocument",
+              "Path": "/Properties/PolicyDocument/Statement/1/Resource/1",
+              "RequiresRecreation": "Never"
+            }
+          }
+        ],
+        "LogicalResourceId": "TriggerPolicy",
+        "PhysicalResourceId": "isola-Trigg-eZXkKAgyTPPI",
+        "Replacement": "False",
+        "ResourceType": "AWS::IAM::Policy",
+        "Scope": [
+          "Properties"
+        ]
+      }
+    ]
+  },
+  "cloud_actions_performed": [
+    "read-only batch-get-projects",
+    "read-only get-role-policy",
+    "read-only describe-change-set --include-property-values"
+  ],
+  "created_utc": "2026-10-29T23:43:15.302846+00:00",
+  "mutations_performed": [],
+  "narrow_route": {
+    "allowed_project_differences": [
+      "source.location",
+      "sourceVersion"
+    ],
+    "api": "codebuild:UpdateProject",
+    "cloudformation_drift": "Intentional: stack LauncherKey and LauncherVersion parameters remain old while live Project source.location and sourceVersion become new. Record this explicitly; any later stack update can revert the direct change unless reconciled under separately reviewed scope.",
+    "command": [
+      "aws",
+      "codebuild",
+      "update-project",
+      "--cli-input-json",
+      "file:///tmp/pencil-controller-source-only-route-20261029/update-project-input.json",
+      "--output",
+      "json"
+    ],
+    "input": {
+      "name": "isolab-recovery-controller",
+      "source": {
+        "buildspec": "resume/buildspec.yml",
+        "insecureSsl": false,
+        "location": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip",
+        "type": "S3"
+      },
+      "sourceVersion": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg"
+    },
+    "input_file": "/tmp/pencil-controller-source-only-route-20261029/update-project-input.json",
+    "required_unchanged_readback": [
+      "all other CodeBuild project fields",
+      "inline IAM policy isolab-recovery-trigger"
+    ]
+  },
+  "project_before": {
+    "arn": "arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller",
+    "name": "isolab-recovery-controller",
+    "source": {
+      "buildspec": "resume/buildspec.yml",
+      "insecureSsl": false,
+      "location": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/8342118dc5dd243ce9a3a2057e74e092de8b6170563df9459c9afc2c9c6f1bc9.zip",
+      "type": "S3"
+    },
+    "sourceVersion": "FhkDu4kbpsBNUbxuDW16EYHRfTX3OQZe"
+  },
+  "record_type": "isolab_controller_source_only_route_review/v1",
+  "trigger_policy_before": {
+    "Statement": [
+      {
+        "Action": [
+          "codebuild:StartBuild",
+          "codebuild:BatchGetBuilds",
+          "codebuild:StopBuild"
+        ],
+        "Effect": "Allow",
+        "Resource": [
+          "arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller",
+          "arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:*"
+        ]
+      },
+      {
+        "Action": "s3:PutObject",
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-requests/*"
+      },
+      {
+        "Action": [
+          "s3:GetObject",
+          "s3:GetObjectVersion"
+        ],
+        "Effect": "Allow",
+        "Resource": [
+          "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-runtime/*",
+          "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/state.json",
+          "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/benchmark-result.json",
+          "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/computation-result.json"
+        ]
+      }
+    ],
+    "Version": "2012-10-17"
+  },
+  "trigger_policy_before_canonical_sha256": "432e550aee8fe387f278423f2bd152383b9ea6b19c14831ea0be6d388e382f67",
+  "trigger_policy_resolved_after_reasoning": {
+    "project_arn_from_fixed_name": "arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller",
+    "project_name_fixed_in_template": "isolab-recovery-controller",
+    "qualification": "Static derivation from fixed Project.Name; CloudFormation itself reports KNOWN_AFTER_APPLY and would process TriggerPolicy as Modify, so this is not sufficient to execute within a no-IAM-change authorization.",
+    "resolved_after_canonical_sha256": "432e550aee8fe387f278423f2bd152383b9ea6b19c14831ea0be6d388e382f67",
+    "resolved_after_policy_body": {
+      "Statement": [
+        {
+          "Action": [
+            "codebuild:StartBuild",
+            "codebuild:BatchGetBuilds",
+            "codebuild:StopBuild"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller",
+            "arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:*"
+          ]
+        },
+        {
+          "Action": "s3:PutObject",
+          "Effect": "Allow",
+          "Resource": "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-requests/*"
+        },
+        {
+          "Action": [
+            "s3:GetObject",
+            "s3:GetObjectVersion"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-runtime/*",
+            "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/state.json",
+            "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/benchmark-result.json",
+            "arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/computation-result.json"
+          ]
+        }
+      ],
+      "Version": "2012-10-17"
+    },
+    "semantic_equality_to_before": true
+  }
+}

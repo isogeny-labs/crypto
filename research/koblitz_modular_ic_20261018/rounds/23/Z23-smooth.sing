@@ -1,0 +1,54 @@
+// Append to original prefix and saved saturated closure. Jacobian rows are
+// differentiated in the ORIGINAL four-variable ring before specialization.
+LIB "primdec.lib";
+poly F=b*c7+b2*c5+b*c6+b2*c4+c6+b5+b4*c+b3*c2+b2*c3;
+if(source[8]!=F){ERROR("Tate row does not match saved closure");}
+matrix originalJac=jacob(source);
+ring zz=(2,a),(n,l),lp;
+minpoly=a5+a4+a3+a2+1;
+map sp=r,n,l,a4,a4+a3+1;
+matrix dj=sp(originalJac);
+print("ORIGINAL_JACOBIAN_DIMENSIONS");nrows(dj);ncols(dj);
+if(ncols(dj)!=4 && nrows(dj)==4){dj=transpose(dj);}
+if(ncols(dj)!=4){ERROR("wrong source Jacobian orientation");}
+ideal closedFiber=std(sp(source));
+ideal keepResidue=std(ideal(l2+(a4+a3)*l+(a2+1),n+(a4+a2+1)*l+(a3+a2)));
+ideal vanishResidue=std(ideal(l2+(a4+a3)*l+(a2+1),n+(a4+a2+1)*l+a));
+proc sourceMinor(matrix D,ideal P)
+{
+ matrix M[3][3];int i;int j;int omitted;int col;int targetCol;poly d;
+ for(i=1;i<=nrows(D);i++){
+  for(j=i+1;j<=nrows(D);j++){
+   if(i!=8 && j!=8){
+   for(omitted=1;omitted<=4;omitted++){
+    targetCol=0;
+    for(col=1;col<=4;col++){
+     if(col!=omitted){
+     targetCol=targetCol+1;
+     M[1,targetCol]=reduce(D[8,col],P);
+     M[2,targetCol]=reduce(D[i,col],P);
+     M[3,targetCol]=reduce(D[j,col],P);
+     }
+    }
+    d=reduce(det(M),P);
+    if(d!=0){
+     print("NONZERO_SOURCE_MINOR_ROWS_8_I_J_OMITTED_COLUMN");i;j;omitted;
+     print("MINOR_REDUCTION_AND_UNIT_IDEAL");d;std(P+ideal(d));
+     if(std(P+ideal(d))[1]!=1){ERROR("nonzero residue was not a unit");}
+     return(1);
+    }
+   }
+   }
+  }
+ }
+ return(0);
+}
+print("BEGIN_Z23_SOURCE_SMOOTH");
+print("KEEP_CLOSED_FIBER_INCLUSION");reduce(closedFiber,keepResidue);
+print("VANISH_CLOSED_FIBER_INCLUSION");reduce(closedFiber,vanishResidue);
+if(size(reduce(closedFiber,keepResidue))!=0 || size(reduce(closedFiber,vanishResidue))!=0){ERROR("residues not on actual closure");}
+print("KEEP_SOURCE_SMOOTHNESS");int goodKeep=sourceMinor(dj,keepResidue);
+print("VANISH_SOURCE_SMOOTHNESS");int goodVanish=sourceMinor(dj,vanishResidue);
+print("SOURCE_RANK_THREE_RESULTS");goodKeep;goodVanish;
+if(goodKeep!=1 || goodVanish!=1){ERROR("proper source smoothness not established");}
+print("Z23_SOURCE_SMOOTH_ALL_CHECKS_PASS");print("END_Z23_SOURCE_SMOOTH");quit;

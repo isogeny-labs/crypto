@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="390" viewBox="0 0 900 390" role="img" aria-labelledby="title desc">
+  <title id="title">Full-D18 input custody and bounded execution gate</title>
+  <desc id="desc">The committed producer manifest and two fresh S3 objects converge on a native verifier. The host-capacity gate is currently failed, so the worker and natural query have not run.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, sans-serif; fill: #183044; }
+    .heading { font-size: 20px; font-weight: 700; }
+    .label { font-size: 15px; font-weight: 600; }
+    .detail { font-size: 12px; }
+    .box { fill: #eef6fb; stroke: #37769b; stroke-width: 2; rx: 9; }
+    .gate { fill: #fff0e8; stroke: #c45d32; stroke-width: 2; rx: 9; }
+    .pending { fill: #f3f4f6; stroke: #77808b; stroke-width: 2; stroke-dasharray: 6 5; rx: 9; }
+    .line { stroke: #37769b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+    .blocked { stroke: #c45d32; stroke-width: 2.5; fill: none; marker-end: url(#arrowOrange); stroke-dasharray: 6 5; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#37769b"/></marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#c45d32"/></marker>
+  </defs>
+  <text x="35" y="37" class="heading">Primary N83 full-D18 custody and execution</text>
+  <rect x="35" y="65" width="260" height="66" class="box"/>
+  <text x="52" y="90" class="label">Committed producer manifest</text>
+  <text x="52" y="111" class="detail">SHA-256 1d3650ea… · 1,469 bytes</text>
+  <rect x="35" y="151" width="260" height="66" class="box"/>
+  <text x="52" y="176" class="label">Fresh S3 custody wrapper</text>
+  <text x="52" y="197" class="detail">SHA-256 1b93351f… · 1,311 bytes</text>
+  <rect x="35" y="237" width="260" height="66" class="box"/>
+  <text x="52" y="262" class="label">Fresh S3 factor-base object</text>
+  <text x="52" y="283" class="detail">SHA-256 eaef94ef… · 5,418,738 rows</text>
+  <path d="M295 98 L365 98 L365 177 L414 177" class="line"/>
+  <path d="M295 184 L414 184" class="line"/>
+  <path d="M295 270 L365 270 L365 191 L414 191" class="line"/>
+  <rect x="415" y="145" width="205" height="80" class="box"/>
+  <text x="433" y="173" class="label">Native verifier</text>
+  <text x="433" y="195" class="detail">Hash + wrapper bindings</text>
+  <text x="433" y="211" class="detail">Group/row replay if SAT</text>
+  <path d="M620 184 L667 184" class="line"/>
+  <rect x="668" y="145" width="197" height="80" class="gate"/>
+  <text x="685" y="172" class="label">Capacity gate: FAIL</text>
+  <text x="685" y="194" class="detail">Load 55.95 &gt; 24</text>
+  <text x="685" y="211" class="detail">Swapouts increased</text>
+  <path d="M765 225 L765 268" class="blocked"/>
+  <rect x="642" y="270" width="223" height="72" class="pending"/>
+  <text x="660" y="298" class="label">Worker + natural query</text>
+  <text x="660" y="321" class="detail">Not launched at this preflight</text>
+  <text x="35" y="359" class="detail">Source: PREFLIGHT.md · frozen protocol: PROTOCOL.md · status: INPUT_CUSTODY_PASS / CAPACITY_GATE_FAIL</text>
+</svg>

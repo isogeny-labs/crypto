@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation only: E is not defined over a proper subfield",
     "equivalence_class_size": 2,
     "log2_cost_of_one_group_operation": 14.97,
-    "log2_group_operations": 80.326,
+    "log2_group_operations": 80.826,
     "log2_r": 162.0,
-    "log2_total": 95.296,
-    "log2_total_without_automorphisms": 95.796
+    "log2_total": 95.796,
+    "log2_total_negation_only": 95.796
   },
   "candidate": {
     "id": "isogeny:ghs_extension:l=1",
@@ -25,8 +25,8 @@
   ],
   "costs": {
     "destination_solver": "HyperellipticIndexCalculus",
-    "log2_baseline": 95.296,
-    "log2_cost_ratio": 86.7,
+    "log2_baseline": 95.796,
+    "log2_cost_ratio": 86.2,
     "log2_total": 181.996,
     "repo_ratio_log2": -86.2,
     "rows": [
@@ -137,6 +137,10 @@
       "trace": "-6224022517221266226059365"
     }
   },
+  "evaluation": {
+    "reason": "the price is a formula sweep or heuristic estimate for a map that is not constructed for this curve",
+    "status": "not_evaluable"
+  },
   "executed": null,
   "invariants": {
     "base_degree": 1,
@@ -174,7 +178,7 @@
     "heuristic row, priced for the record; the totals use the repository's isogeny_extension_estimates"
   ],
   "obligations": {
-    "computational_advantage": "refuted",
+    "computational_advantage": "unknown",
     "existence": "unknown",
     "explicit_construction": "unknown",
     "map_correctness": "unknown",
@@ -188,7 +192,7 @@
   "references": [
     "jacobian_transfer::binary::isogeny_extension_estimates (Galbraith-Hess-Smart)"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [],
     "argument": "no isogenous curve is exhibited, so neither the isogeny nor the descent map exists to certify; the class-wide bound on achievable magic numbers is in the GHS candidate of the same tower",
@@ -198,11 +202,11 @@
     "method": "none",
     "status": "not_evaluated"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
     "subgroup preservation is NotEvaluated: the transfer is not shown to carry <G>",
     "the map is not constructed (existence or construction missing)",
-    "priced route costs 2^86.7 times the matched baseline or more"
+    "priced route costs 2^86.2 times the matched baseline or more"
   ]
 }

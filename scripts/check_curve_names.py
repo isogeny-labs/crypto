@@ -13,6 +13,9 @@ The lint fails on
    or HTML outside a fenced code block;
 2. an `icv1-…` slug in tracked Markdown or HTML that the registry does
    not hold;
+2a. a standard-panel-shaped alias (`K0-23`, `B23a`, `P36a`) that is not
+   a `panel_alias` of the registry, in `docs/ic/` or in a research
+   directory dated on or after the panel freeze (docs/ic/STANDARD_PANEL.md);
 3. with `--diff BASE`: a retired name on a line the branch adds to a
    Markdown, HTML, Rust, Python or YAML file, or a file the branch adds
    whose name uses a retired curve stem.
@@ -51,6 +54,8 @@ SELF = {"docs/curves/ICV1.md", "docs/curves/README.md", "scripts/check_curve_nam
         "scripts/build_curve_registry.py", "scripts/curve_id.py",
         "src/cryptanalysis/curve_id.rs", "src/cryptanalysis/curve_aliases.json", "tests/curve_id.rs",
         "examples/curve_id_generated.rs",
+        # ecdb flags registry aliases that are retired forms (is_retired_name).
+        "ecdb/src/math.rs",
         # Generated alias tables: their "also called" column lists the
         # legacy spellings on purpose.
         "docs/ic-leaderboard.html", "docs/ic/LEADERBOARD.md"}
@@ -78,6 +83,12 @@ ARCHIVED_LABELS = {
             "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
         },
     },
+    "research/ideas_execution_20261018/oracle_integration/PROTOCOL.md": {
+        "sha256": "799dfb71a8aa125c699415c52a31076923d9d2a2ae752af06e014b0ebcdc7530",
+        "labels": {
+            "K_0/GF(2^7)": "icv1-f2m7-t13-616700dd",
+        },
+    },
     # Two unregistered curve IDs are retained in this frozen Certicom
     # experiment and its generated mirrors. Permit only these exact bytes;
     # new prose or regenerated artifacts must resolve through the registry.
@@ -89,11 +100,9 @@ ARCHIVED_LABELS = {
             "icv1-fp131-t29529377007934231835-9681b699",
         },
     },
-    "docs/index-calculus-scoreboard.html": {
-        "sha256": "077fccd9976e95c53015bd94afb3b95af70abdfe792d36b9e2d6dfe055950e00",
-        "labels": {},
-        "slugs": {"icv1-fp30-t49927-d70f5de2"},
-    },
+    # The scoreboard page is no longer listed: it changes with every dashboard
+    # update, so a byte pin on it went stale, and its one unregistered slug
+    # (the fp30 curve) is now in the registry and resolves there.
     "research/certicom131_ic_program_20261020/README.md": {
         "sha256": "ea6d90006f2bf0d208609c19de030eec1e653bed54288ffbb9efce9b9264c02c",
         "labels": {},
@@ -150,6 +159,21 @@ STEM = re.compile(EDGE_L + r"(k[01]n\d{1,3}|bench-\d+bit|generated-\d+bit-\d+"
                   r"|random-binary-n\d+-b[0-9a-f]+)" + EDGE_R)
 SUBFIELD = re.compile(r"E_\{(\d+),(\d+)\}/GF\((?:2\^(\d+)|(\d+))\)(?:\s+over\s+GF\(2\^(\d+)\))?")
 SLUG = re.compile(r"icv1-(?:f2m\d+|fp\d+(?:k\d+)?)-tm?\d+-[0-9a-f]{8}")
+# Standard-panel aliases (docs/ic/STANDARD_PANEL.md).  Text written before
+# the freeze used P35a, P45a, ... as local instance labels, so the rule binds
+# docs/ic/ and research directories dated on or after it.
+PANEL_TEXT = re.compile(r"(?<![A-Za-z0-9_./-])(K[01]-\d{2,3}|[BP]\d{2,3}[a-z])(?![A-Za-z0-9_-])")
+PANEL_FROZEN = 20261110
+PANEL_RESEARCH_DATE = re.compile(r"^research/[^/]*?(\d{8})[^/]*/")
+
+
+def panel_scoped(rel: str) -> bool:
+    if rel == "docs/ic/STANDARD_PANEL.md":  # the spec: off-panel aliases are its examples
+        return False
+    if rel.startswith(("docs/ic/", "docs/ic-")):
+        return True
+    m = PANEL_RESEARCH_DATE.match(rel)
+    return bool(m) and int(m.group(1)) >= PANEL_FROZEN
 RETIRED_FILE = re.compile(r"(?:^|/)(k[01]n\d+|bench-\d+bit|generated-\d+bit-\d+"
                           r"|random-binary-n\d+-b[0-9a-f]+)[-_.]")
 
@@ -219,8 +243,11 @@ class Resolver:
         self.reg = cid.load_registry()
         self.by_alias: dict[str, dict] = {}
         self.slugs = set()
+        self.panel = set()
         for c in self.reg["curves"]:
             self.slugs.add(c["slug"])
+            if c.get("panel_alias"):
+                self.panel.add(cid.normalise_alias(c["panel_alias"]))
             for a in c["aliases"] + c["standard_names"] + [c["slug"]]:
                 self.by_alias[cid.normalise_alias(a)] = c
 
@@ -317,15 +344,36 @@ def lint(res: Resolver, pins: dict[str, set[str]], fix: bool) -> list[str]:
                     and not allow_archived_slugs):
                 line = text.count("\n", 0, m.start()) + 1
                 problems.append(f"{rel}:{line}: {m.group(0)} is not in docs/curves/registry.json")
+        if panel_scoped(rel):
+            spans = fence_mask(text, rel)
+            for m in PANEL_TEXT.finditer(text):
+                if cid.normalise_alias(m.group(1)) not in res.panel and not in_spans(m.start(), spans):
+                    line = text.count("\n", 0, m.start()) + 1
+                    problems.append(f"{rel}:{line}: {m.group(1)!r} is not a standard-panel alias "
+                                    "(docs/ic/standard_panel.json)")
     if fix:
         print(f"rewrote {changed} files", file=sys.stderr)
     return problems
 
 
-def lint_diff(base: str, res: Resolver) -> list[str]:
+def lint_diff(base: str, res: Resolver, pins: dict[str, set[str]] | None = None) -> list[str]:
     problems = []
+    exemptions = {}
+
+    def frozen(rel: str) -> bool:
+        if rel not in exemptions:
+            # Use the normal linter's existing frozen-evidence contract. Read
+            # complete current contents before applying a hash-bound exemption.
+            if exempt(rel, "", {}):
+                exemptions[rel] = True
+            else:
+                path = REPO / rel
+                exemptions[rel] = bool(pins and path.is_file() and
+                                       exempt(rel, path.read_text(errors="ignore"), pins))
+        return exemptions[rel]
+
     for rel in git("diff", "--name-only", "--diff-filter=A", f"{base}...HEAD").split():
-        if RETIRED_FILE.search(rel):
+        if RETIRED_FILE.search(rel) and not frozen(rel):
             problems.append(f"{rel}: new file named by a retired curve stem; name it by the slug")
     diff = git("diff", "-U0", f"{base}...HEAD", "--", *DIFF_TEXT)
     archived_text = {rel: (REPO / rel).read_text() for rel in ARCHIVED_LABELS
@@ -336,7 +384,7 @@ def lint_diff(base: str, res: Resolver) -> list[str]:
             rel = raw[6:] if raw.startswith("+++ b/") else None
         elif raw.startswith("@@"):
             line = int(re.search(r"\+(\d+)", raw).group(1))
-        elif raw.startswith("+") and rel and rel not in SELF:
+        elif raw.startswith("+") and rel and not frozen(rel):
             for _, _, found, repl in find_retired(raw[1:], "added.txt", res):
                 if archived_label(rel, archived_text.get(rel, ""), found, repl):
                     continue
@@ -352,12 +400,17 @@ def main() -> int:
     ap.add_argument("--diff", metavar="BASE", help="also lint what HEAD adds over BASE")
     args = ap.parse_args()
     res = Resolver()
-    problems = lint(res, pinned_hashes(), args.fix)
+    pins = pinned_hashes()
+    problems = lint(res, pins, args.fix)
     if not cid.ALIAS_MAP.exists() or cid.ALIAS_MAP.read_text() != cid.alias_map_text(res.reg):
         problems.append("src/cryptanalysis/curve_aliases.json does not match docs/curves/registry.json; "
                         "run scripts/build_curve_registry.py")
+    if (not cid.REGISTRY_INDEX.exists()
+            or cid.REGISTRY_INDEX.read_text() != cid.registry_index_text(cid.REGISTRY.read_text())):
+        problems.append("src/cryptanalysis/ecbench/registry_index.txt does not match docs/curves/registry.json; "
+                        "run scripts/build_curve_registry.py")
     if args.diff:
-        problems += lint_diff(args.diff, res)
+        problems += lint_diff(args.diff, res, pins)
     for p in problems:
         print(p)
     print(f"curve names: {len(problems)} problem(s)", file=sys.stderr)

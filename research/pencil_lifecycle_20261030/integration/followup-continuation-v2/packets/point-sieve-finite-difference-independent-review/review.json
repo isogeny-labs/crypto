@@ -1,0 +1,57 @@
+{
+  "schema": "pencil.component-independent-review/v1",
+  "decision": "accepted_scoped_component",
+  "producer_commit": "c8db18e2c57e898d8b9a9b5097ada06254b32f08",
+  "reviewer": "root/first_information",
+  "independence": "Did not author candidate/proofs; previously proposed recurrence direction and inspected baseline; nonblind advisory context disclosed.",
+  "candidate_sha256": "01f98400f6f44977c09907b1b6753a6b03f0ad186d5e67372b493ac3e91d1e79",
+  "proof_sha256": "d475d7f1b724d6d27fff478b25433331ad76bf422e8b236ff7bfdec871f89b42",
+  "native": {
+    "producer_pairs": 6398,
+    "reviewer_pairs": 12,
+    "total_pairs": 6410,
+    "producer_sequences": 20207,
+    "producer_values": 134067,
+    "boundary_transitions": 32,
+    "wrong_recurrence_controls": 3,
+    "reviewer_wrong_counter_and_bucket_controls": 2,
+    "reviewer_branch_hits": [
+      67,
+      49,
+      8,
+      2,
+      6
+    ],
+    "status": "passed",
+    "elapsed_seconds": 18.283624481991865,
+    "input_unchanged": true,
+    "receipt_sha256": "f673eba2cca4c433cb552ab1510dd39c7e52f1b3b1ef216a9a20451319c82772"
+  },
+  "lean": {
+    "producer_declarations": 18,
+    "reviewer_declarations": 3,
+    "dependency_files": 28797,
+    "status": "passed",
+    "elapsed_seconds": 15.864751351997256,
+    "expected_false_rejected": true,
+    "malformed_axiom_inventories_rejected": 3,
+    "receipt_sha256": "b99ce9167e0f720aecfb2b2a8136431b93a3544ddabc5c620490dc0629b07daa"
+  },
+  "source_findings": [
+    "Exact14 extracted native function bodies match original; meter and tracked_set bytes match. ArithmeticCounts Serialize derive omitted; Divisor is a field wrapper without curve-constructor semantics.",
+    "Candidate updates recurrence before both possible continues, using captured current ux/vx, and intentionally performs final unused update.",
+    "Active slices ignore inactive padded array tails. Candidate bound is canonical active coefficients,degree<=2,0<p<=2^63 for addition; full sieve keeps original algebraic/prime/complement preconditions.",
+    "For k=2degree+1, new_base_muls=old_base_muls-k*p; new_base_adds=old_base_adds+3*p+2-k*p; new_collection_visits=old_collection_visits-k*(p-1); all other actual recorded Ops/meter fields equal in paired checks.",
+    "Native zero slope/all-lambda/exceptional/nonrational branches exercised. Full tuple/Vec equality preserves bucket order and scalar fields.",
+    "Lean proves ring recurrence and ordered fold plus separate canonical UInt64 add refinement; it does not compose a whole iterative UInt64 or compiled Rust proof."
+  ],
+  "limitations": [
+    "Review uses exact source extraction, not full-crate integration or scientific cohort.",
+    "Reviewer changed-bucket negative adds an element; no separate equal-cardinality permutation control was run. Exact Vec comparison source was inspected.",
+    "New Option/bounds decisions from get/first/unwrap_or need classification in finite cost source inventory; scalar copies follow existing peval read convention. No all-instruction or current pricing admission.",
+    "Shared dependency pre/post hashes do not exclude transient concurrent changes."
+  ],
+  "candidate_integration_gate": "Component source accepted for proposed integration and later independent integration review; no runtime or scientific approval.",
+  "scientific_execution": false,
+  "new_price_ratios": null
+}

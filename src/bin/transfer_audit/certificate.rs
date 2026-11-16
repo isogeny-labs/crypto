@@ -10,8 +10,13 @@
 use serde::Serialize;
 use serde_json::{json, Map, Value};
 
-pub const SCHEMA: &str = "transfer-audit/certificate/v1";
-pub const TOOL: &str = "transfer-audit/1";
+/// v2 (Amendment 3): adds `evaluation`, `costs.log2_total_frozen_model`,
+/// renames `baseline.log2_total_without_automorphisms` to
+/// `log2_total_negation_only` (the cost model's reference already includes
+/// negation), and redefines `obligations.computational_advantage` (see
+/// [`crate::ctx::judge`]).  v1 certificates are not readable as v2.
+pub const SCHEMA: &str = "transfer-audit/certificate/v2";
+pub const TOOL: &str = "transfer-audit/2";
 
 /// Status of the subgroup-preservation obligation.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -131,6 +136,33 @@ impl TransferType {
     }
 }
 
+/// Whether a candidate route was evaluated far enough for its verdict to
+/// carry information.  A field of the certificate, not a verdict label:
+/// `no weakness found in scope` is the verdict of all three, and this says
+/// which kind of "no weakness" it is.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RouteStatus {
+    /// The route was constructed or covered by a checked theorem, priced
+    /// completely and compared with the matched baseline (the comparison may
+    /// still be inconclusive: a marginal lead or a straddling band).
+    Evaluated,
+    /// The route cannot yield a weakness: it does not carry `<G>` (or does
+    /// not exist for this curve), or its price, a lower bound where phases
+    /// are unpriced, is not below the matched baseline.
+    Excluded,
+    /// The route may exist but the repository cannot construct or price it
+    /// far enough to decide; the verdict is vacuous for this candidate.
+    NotEvaluable,
+}
+
+/// [`RouteStatus`] with the reason, in words.
+#[derive(Clone, Debug, Serialize)]
+pub struct Evaluation {
+    pub status: RouteStatus,
+    pub reason: String,
+}
+
 /// How the map itself exists in this run.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 pub enum Construction {
@@ -232,9 +264,17 @@ pub struct CostTable {
     pub log2_baseline: f64,
     /// `log2(route / baseline)`: positive means the route costs more.
     pub log2_cost_ratio: Option<f64>,
-    /// `reference - total` against rho without automorphisms, the sign and
-    /// reference of `docs/curves/jacobian-transfers.json`.
+    /// `reference - total` against the cost model's own rho reference
+    /// (`sqrt(pi r / 4)`: negation only), the sign and reference of
+    /// `docs/curves/jacobian-transfers.json`.
     pub repo_ratio_log2: Option<f64>,
+    /// Present only when `log2_total` carries an equivalence-class discount
+    /// on rho in the destination that the frozen model does not have (the
+    /// Frobenius class of a cover image): the total under the frozen model
+    /// alone, which is what the cross-check against the repository's
+    /// `jacobian-transfers.json` compares.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub log2_total_frozen_model: Option<f64>,
 }
 
 impl CostTable {
@@ -257,6 +297,7 @@ impl CostTable {
             log2_baseline: round3(log2_baseline),
             log2_cost_ratio: priced.then(|| round3(total - log2_baseline)),
             repo_ratio_log2: priced.then(|| round3(log2_reference_no_aut - total)),
+            log2_total_frozen_model: None,
         }
     }
 
@@ -275,6 +316,7 @@ impl CostTable {
             log2_baseline: round3(log2_baseline),
             log2_cost_ratio: None,
             repo_ratio_log2: None,
+            log2_total_frozen_model: None,
         }
     }
 }
@@ -335,6 +377,9 @@ pub struct Certificate {
     pub lead_class: LeadClass,
     pub verdict: Verdict,
     pub verdict_basis: Vec<String>,
+    /// Whether this candidate was evaluated, excluded or not evaluable (a
+    /// field, never a verdict label).
+    pub evaluation: Evaluation,
     pub checks: Vec<Check>,
     pub invariants: Map<String, Value>,
     pub executed: Option<Value>,
@@ -439,5 +484,27 @@ mod tests {
             5.0,
         );
         assert_eq!(none.log2_total, None);
+        // The frozen-model total is absent unless a class discount was applied.
+        assert_eq!(none.log2_total_frozen_model, None);
+        let v = serde_json::to_value(&none).unwrap();
+        assert!(v.get("log2_total_frozen_model").is_none());
+    }
+
+    /// The excluded / not-evaluable distinction is a field with a closed
+    /// vocabulary, not a new verdict label.
+    #[test]
+    fn route_status_vocabulary_is_closed() {
+        for (s, label) in [
+            (RouteStatus::Evaluated, "evaluated"),
+            (RouteStatus::Excluded, "excluded"),
+            (RouteStatus::NotEvaluable, "not_evaluable"),
+        ] {
+            assert_eq!(
+                serde_json::to_value(s).unwrap(),
+                Value::String(label.into())
+            );
+        }
+        assert_eq!(SCHEMA, "transfer-audit/certificate/v2");
+        assert_eq!(TOOL, "transfer-audit/2");
     }
 }

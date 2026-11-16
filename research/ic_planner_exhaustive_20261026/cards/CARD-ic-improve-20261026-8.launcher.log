@@ -1,0 +1,26 @@
+card: CARD-ic-improve-20261026-8 (sha256 127592f73341f8088229996b94e7375ad3f2da0ca4f73823c483286e24926789)
+commit: d60caaad9d9fe7d7a153450303dc6ddfd34bd47e
+receipt: research/ic_planner_exhaustive_20261026/cards/CARD-ic-improve-20261026-8.receipt.json sha256 b51e2aac8a9f577e7c217fde8dc43b143aa63c77a65f8b1e93228cd631920f2c
+status: completed
+command 1 (git-clean): ["python3", "-c", "import subprocess,sys; out=subprocess.run(['git','status','--porcelain','--untracked-files=all','--',':(exclude)research/ic_planner_exhaustive_20261026/cards'],capture_output=True,text=True).stdout; sys.exit(1 if out.strip() else 0)"] exit 0 (0.394 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (sessions-absent): ["python3", "-c", "import os,sys; sys.exit(1 if any(os.path.exists(p) for p in ['research/ic_planner_exhaustive_20261026/sessions/K-k61', 'research/ic_planner_exhaustive_20261026/sessions/K-k61.audit.json']) else 0)"] exit 0 (0.016 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (disk-record): ["df", "-h", "/"] exit 0 (0.003 s) succeeded
+  stdout sha256 54666e512c0995f215a71a2ff51b5a27676d7392bd2d915b667daa434b2c329f; last 2 lines:
+    Filesystem      Size  Used Avail Use% Mounted on
+    /dev/vda        252G   36G  3.6G  92% /
+command 4 (disk-before-run-k-k61): ["python3", "-c", "import shutil,sys; sys.exit(0 if shutil.disk_usage('/').free >= 1000000000 else 1)"] exit 0 (0.027 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (quiet-before-run-k-k61): ["python3", "-c", "import re, sys, time\nstart = time.time()\nheld = 0\nwhile True:\n    value = float(re.search(r'some avg10=([0-9.]+)', open('/proc/pressure/cpu').read()).group(1))\n    if value <= 1.0:\n        held += 1\n    else:\n        held = 0\n    if held >= 6:\n        sys.exit(0)\n    if time.time() - start >= 1800:\n        sys.exit(1)\n    time.sleep(5)\n"] exit 0 (45.032 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 6 (run-k-k61): ["./target/release/ecbench", "run", "--spec", "research/ic_planner_exhaustive_20261026/specs/K-k61.json", "--out", "research/ic_planner_exhaustive_20261026/sessions/K-k61", "--cpus", "auto", "--wait", "--quiet"] exit 0 (2136.027 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    session ECBS1h6b5c12391d8b complete -> research/ic_planner_exhaustive_20261026/sessions/K-k61 (128 records: {"verified": 128})
+  output research/ic_planner_exhaustive_20261026/sessions/K-k61/session.json: eac86ce881eb5554d992e6a455385a9f38ff47e4c8d1775a1c1d1ea347ad410c
+  output research/ic_planner_exhaustive_20261026/sessions/K-k61/plan.json: a3151da3b7a819aa5ab031c63928eaf3ba617cdd994cd6926bf4e5c7ac06cec2
+  output research/ic_planner_exhaustive_20261026/sessions/K-k61/spec.json: d7ca96b275afbbb855e0086af8f576f1d573953ebe0e604004fbb6049c47c0c2
+  output research/ic_planner_exhaustive_20261026/sessions/K-k61/host.json: 9dd8ce65c462a27308fd8ba9943b97b3c2f349320a72fb845a80f605142c2e52
+  output research/ic_planner_exhaustive_20261026/sessions/K-k61/records.jsonl: f5788b16c5dbad3e783152f59e5673c9b2e2bae99528d4bdf5a4f3e3006d675b
+exit 0

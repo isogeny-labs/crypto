@@ -1,0 +1,963 @@
+{
+  "schema": "incidence-analysis/v1",
+  "primary_sha256": "673446cffe380d2d0c81e89875749b222ffff50e3f1c85bb4e47162386f9051a",
+  "native_control_sha256": "d886be38f20420d9fdc485ee2f509a141a67b5fe597d998f2d4111a1cd25b55d",
+  "scope": "Derived exploratory comparisons, no new timings. Native C++ pair baseline versus Python-FLINT elimination, same public fixtures; implementation languages differ.",
+  "cost_scope": "Pool+oracle includes all computation in initialized processes. Cold primary adds separate process/import/serialization CPU. Seeded retry uses persistent process scope and explicit failed pools.",
+  "summary": [
+    {
+      "B": 8,
+      "arm": "horner",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.0003866099297426607,
+      "median_pool_plus_oracle_cpu_seconds": 0.001997774700693634,
+      "median_cold_process_plus_pool_cpu_seconds": 0.06353775077169549,
+      "median_paired_oracle_slowdown_vs_native_pairs": 61.106689838868,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 1.2468733438010497
+    },
+    {
+      "B": 8,
+      "arm": "blocked",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.0007229822906135717,
+      "median_pool_plus_oracle_cpu_seconds": 0.0023676116587561333,
+      "median_cold_process_plus_pool_cpu_seconds": 0.06485197772038592,
+      "median_paired_oracle_slowdown_vs_native_pairs": 118.35856037625756,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 1.4589641621851603
+    },
+    {
+      "B": 16,
+      "arm": "horner",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.0013614418559322033,
+      "median_pool_plus_oracle_cpu_seconds": 0.005108313567796688,
+      "median_cold_process_plus_pool_cpu_seconds": 0.06435405144011341,
+      "median_paired_oracle_slowdown_vs_native_pairs": 88.9997529407544,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 1.345253655400017
+    },
+    {
+      "B": 16,
+      "arm": "blocked",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.002828965344827586,
+      "median_pool_plus_oracle_cpu_seconds": 0.006569592172413812,
+      "median_cold_process_plus_pool_cpu_seconds": 0.06632592141190541,
+      "median_paired_oracle_slowdown_vs_native_pairs": 194.07758026065483,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 1.7609010550267161
+    },
+    {
+      "B": 32,
+      "arm": "horner",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.006282660692307692,
+      "median_pool_plus_oracle_cpu_seconds": 0.015648197882575775,
+      "median_cold_process_plus_pool_cpu_seconds": 0.07666608721978034,
+      "median_paired_oracle_slowdown_vs_native_pairs": 145.19662662299862,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 1.676062509101126
+    },
+    {
+      "B": 32,
+      "arm": "blocked",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.011491719000000001,
+      "median_pool_plus_oracle_cpu_seconds": 0.02070405728571429,
+      "median_cold_process_plus_pool_cpu_seconds": 0.08216417350000009,
+      "median_paired_oracle_slowdown_vs_native_pairs": 245.729765861622,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 2.243123805829681
+    },
+    {
+      "B": 64,
+      "arm": "horner",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.04196335041666667,
+      "median_pool_plus_oracle_cpu_seconds": 0.06329434191666684,
+      "median_cold_process_plus_pool_cpu_seconds": 0.12223897524999978,
+      "median_paired_oracle_slowdown_vs_native_pairs": 269.10663211957404,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 2.9290687591231284
+    },
+    {
+      "B": 64,
+      "arm": "blocked",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.059497465250000006,
+      "median_pool_plus_oracle_cpu_seconds": 0.08123229124999999,
+      "median_cold_process_plus_pool_cpu_seconds": 0.14273688075000018,
+      "median_paired_oracle_slowdown_vs_native_pairs": 369.75256658276385,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 3.7286057181487298
+    },
+    {
+      "B": 128,
+      "arm": "horner",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.42824012899999997,
+      "median_pool_plus_oracle_cpu_seconds": 0.4808091175000002,
+      "median_cold_process_plus_pool_cpu_seconds": 0.5393419024999981,
+      "median_paired_oracle_slowdown_vs_native_pairs": 589.15252952643,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 9.143353342322042
+    },
+    {
+      "B": 128,
+      "arm": "blocked",
+      "cases": 12,
+      "median_oracle_cpu_seconds": 0.353280375,
+      "median_pool_plus_oracle_cpu_seconds": 0.40822848100000003,
+      "median_cold_process_plus_pool_cpu_seconds": 0.4693928119999997,
+      "median_paired_oracle_slowdown_vs_native_pairs": 493.05619625699535,
+      "median_paired_pool_plus_oracle_slowdown_vs_native_pairs": 7.642637008875528
+    }
+  ],
+  "seed_order_retry": [
+    {
+      "B": 8,
+      "curve": 0,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b008_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0004242420740740741,
+      "charged_pool_generation_cpu_seconds": 0.0015111489999999894,
+      "charged_pool_plus_oracle_cpu_seconds": 0.0019353910740740636,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 0,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b008_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0008570687021276596,
+      "charged_pool_generation_cpu_seconds": 0.0015111489999999894,
+      "charged_pool_plus_oracle_cpu_seconds": 0.002368217702127649,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 0,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b008_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 7.713728941413126e-06,
+      "charged_pool_generation_cpu_seconds": 0.0015111489999999894,
+      "charged_pool_plus_oracle_cpu_seconds": 0.0015188627289414026,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 1,
+      "arm": "horner",
+      "status": "censored_after_four_pools",
+      "attempts": [
+        {
+          "fixture_id": "b008_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s2",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s3",
+          "status": "none"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.001534944730578457,
+      "charged_pool_generation_cpu_seconds": 0.006748568999999982,
+      "charged_pool_plus_oracle_cpu_seconds": 0.008283513730578439,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 1,
+      "arm": "blocked",
+      "status": "censored_after_four_pools",
+      "attempts": [
+        {
+          "fixture_id": "b008_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s2",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s3",
+          "status": "none"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.002743959933582101,
+      "charged_pool_generation_cpu_seconds": 0.006748568999999982,
+      "charged_pool_plus_oracle_cpu_seconds": 0.009492528933582083,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 1,
+      "arm": "cpp-pair",
+      "status": "censored_after_four_pools",
+      "attempts": [
+        {
+          "fixture_id": "b008_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s2",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c1_natural_s3",
+          "status": "none"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 2.4529175314017787e-05,
+      "charged_pool_generation_cpu_seconds": 0.006748568999999982,
+      "charged_pool_plus_oracle_cpu_seconds": 0.006773098175314,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 2,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b008_c2_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c2_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c2_natural_s2",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0011535046871153777,
+      "charged_pool_generation_cpu_seconds": 0.004246041000000034,
+      "charged_pool_plus_oracle_cpu_seconds": 0.005399545687115412,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 2,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b008_c2_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c2_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c2_natural_s2",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0021148613241791783,
+      "charged_pool_generation_cpu_seconds": 0.004246041000000034,
+      "charged_pool_plus_oracle_cpu_seconds": 0.006360902324179212,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 8,
+      "curve": 2,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b008_c2_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c2_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b008_c2_natural_s2",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 1.840535647132422e-05,
+      "charged_pool_generation_cpu_seconds": 0.004246041000000034,
+      "charged_pool_plus_oracle_cpu_seconds": 0.0042644463564713575,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 0,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0014109785789473686,
+      "charged_pool_generation_cpu_seconds": 0.0036216650000000516,
+      "charged_pool_plus_oracle_cpu_seconds": 0.00503264357894742,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 0,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0028319853448275857,
+      "charged_pool_generation_cpu_seconds": 0.0036216650000000516,
+      "charged_pool_plus_oracle_cpu_seconds": 0.006453650344827637,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 0,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 1.5412341278681223e-05,
+      "charged_pool_generation_cpu_seconds": 0.0036216650000000516,
+      "charged_pool_plus_oracle_cpu_seconds": 0.003637077341278733,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 1,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b016_c1_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0026303815456989246,
+      "charged_pool_generation_cpu_seconds": 0.007472851999999808,
+      "charged_pool_plus_oracle_cpu_seconds": 0.010103233545698732,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 1,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b016_c1_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.005539000844827586,
+      "charged_pool_generation_cpu_seconds": 0.007472851999999808,
+      "charged_pool_plus_oracle_cpu_seconds": 0.013011852844827393,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 1,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b016_c1_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 3.1858941809688227e-05,
+      "charged_pool_generation_cpu_seconds": 0.007472851999999808,
+      "charged_pool_plus_oracle_cpu_seconds": 0.007504710941809496,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 2,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0013594808983050848,
+      "charged_pool_generation_cpu_seconds": 0.003697837000000037,
+      "charged_pool_plus_oracle_cpu_seconds": 0.005057317898305122,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 2,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.002745768966666667,
+      "charged_pool_generation_cpu_seconds": 0.003697837000000037,
+      "charged_pool_plus_oracle_cpu_seconds": 0.006443605966666704,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 16,
+      "curve": 2,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b016_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 1.3298774740810556e-05,
+      "charged_pool_generation_cpu_seconds": 0.003697837000000037,
+      "charged_pool_plus_oracle_cpu_seconds": 0.003711135774740848,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 0,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.006463982769230769,
+      "charged_pool_generation_cpu_seconds": 0.00892008600000005,
+      "charged_pool_plus_oracle_cpu_seconds": 0.015384068769230819,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 0,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.012182920857142858,
+      "charged_pool_generation_cpu_seconds": 0.00892008600000005,
+      "charged_pool_plus_oracle_cpu_seconds": 0.021103006857142906,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 0,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 1.9962832338578404e-05,
+      "charged_pool_generation_cpu_seconds": 0.00892008600000005,
+      "charged_pool_plus_oracle_cpu_seconds": 0.008940048832338628,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 1,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c1_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0063308501538461535,
+      "charged_pool_generation_cpu_seconds": 0.009473024999999913,
+      "charged_pool_plus_oracle_cpu_seconds": 0.015803875153846066,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 1,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c1_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.011844512428571426,
+      "charged_pool_generation_cpu_seconds": 0.009473024999999913,
+      "charged_pool_plus_oracle_cpu_seconds": 0.02131753742857134,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 1,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c1_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 4.539880597014925e-05,
+      "charged_pool_generation_cpu_seconds": 0.009473024999999913,
+      "charged_pool_plus_oracle_cpu_seconds": 0.009518423805970061,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 2,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.00623447123076923,
+      "charged_pool_generation_cpu_seconds": 0.011822526,
+      "charged_pool_plus_oracle_cpu_seconds": 0.01805699723076923,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 2,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.012554537857142858,
+      "charged_pool_generation_cpu_seconds": 0.011822526,
+      "charged_pool_plus_oracle_cpu_seconds": 0.024377063857142858,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 32,
+      "curve": 2,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b032_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 4.5625156445556946e-05,
+      "charged_pool_generation_cpu_seconds": 0.011822526,
+      "charged_pool_plus_oracle_cpu_seconds": 0.011868151156445557,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 0,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.039941394666666664,
+      "charged_pool_generation_cpu_seconds": 0.021264905,
+      "charged_pool_plus_oracle_cpu_seconds": 0.061206299666666665,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 0,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0581622545,
+      "charged_pool_generation_cpu_seconds": 0.021264905,
+      "charged_pool_plus_oracle_cpu_seconds": 0.07942715950000001,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 0,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c0_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 7.324148296593185e-05,
+      "charged_pool_generation_cpu_seconds": 0.021264905,
+      "charged_pool_plus_oracle_cpu_seconds": 0.021338146482965933,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 1,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b064_c1_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b064_c1_natural_s2",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.12507736916666667,
+      "charged_pool_generation_cpu_seconds": 0.06477861200000024,
+      "charged_pool_plus_oracle_cpu_seconds": 0.1898559811666669,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 1,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b064_c1_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b064_c1_natural_s2",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.1744560335,
+      "charged_pool_generation_cpu_seconds": 0.06477861200000024,
+      "charged_pool_plus_oracle_cpu_seconds": 0.23923464550000023,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 1,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b064_c1_natural_s1",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b064_c1_natural_s2",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0004892394417465979,
+      "charged_pool_generation_cpu_seconds": 0.06477861200000024,
+      "charged_pool_plus_oracle_cpu_seconds": 0.06526785144174684,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 2,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.03996339399999999,
+      "charged_pool_generation_cpu_seconds": 0.0216401209999999,
+      "charged_pool_plus_oracle_cpu_seconds": 0.061603514999999893,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 2,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.063368703,
+      "charged_pool_generation_cpu_seconds": 0.0216401209999999,
+      "charged_pool_plus_oracle_cpu_seconds": 0.0850088239999999,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 64,
+      "curve": 2,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b064_c2_natural_s0",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.00011965148861646234,
+      "charged_pool_generation_cpu_seconds": 0.0216401209999999,
+      "charged_pool_plus_oracle_cpu_seconds": 0.021759772488616363,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 0,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c0_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c0_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.894020907,
+      "charged_pool_generation_cpu_seconds": 0.10498264599999985,
+      "charged_pool_plus_oracle_cpu_seconds": 0.9990035529999999,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 0,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c0_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c0_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.725506681,
+      "charged_pool_generation_cpu_seconds": 0.10498264599999985,
+      "charged_pool_plus_oracle_cpu_seconds": 0.8304893269999999,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 0,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c0_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c0_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0012608201368523948,
+      "charged_pool_generation_cpu_seconds": 0.10498264599999985,
+      "charged_pool_plus_oracle_cpu_seconds": 0.10624346613685225,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 1,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c1_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.857689311,
+      "charged_pool_generation_cpu_seconds": 0.10700303,
+      "charged_pool_plus_oracle_cpu_seconds": 0.964692341,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 1,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c1_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.7023810429999999,
+      "charged_pool_generation_cpu_seconds": 0.10700303,
+      "charged_pool_plus_oracle_cpu_seconds": 0.8093840729999999,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 1,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c1_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c1_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0013516780733748121,
+      "charged_pool_generation_cpu_seconds": 0.10700303,
+      "charged_pool_plus_oracle_cpu_seconds": 0.10835470807337481,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 2,
+      "arm": "horner",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c2_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c2_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.8878770739999999,
+      "charged_pool_generation_cpu_seconds": 0.10551381299999951,
+      "charged_pool_plus_oracle_cpu_seconds": 0.9933908869999994,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 2,
+      "arm": "blocked",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c2_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c2_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.7060639209999999,
+      "charged_pool_generation_cpu_seconds": 0.10551381299999951,
+      "charged_pool_plus_oracle_cpu_seconds": 0.8115777339999994,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    },
+    {
+      "B": 128,
+      "curve": 2,
+      "arm": "cpp-pair",
+      "status": "informative_relation",
+      "attempts": [
+        {
+          "fixture_id": "b128_c2_natural_s0",
+          "status": "none"
+        },
+        {
+          "fixture_id": "b128_c2_natural_s1",
+          "status": "relation"
+        }
+      ],
+      "charged_oracle_cpu_seconds": 0.0013050096450617284,
+      "charged_pool_generation_cpu_seconds": 0.10551381299999951,
+      "charged_pool_plus_oracle_cpu_seconds": 0.10681882264506123,
+      "interpretation": "Finite success cost only for informative_relation; all-miss row is a spent-work lower bound, not an unsatisfiability claim."
+    }
+  ]
+}

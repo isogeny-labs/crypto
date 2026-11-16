@@ -1,0 +1,16 @@
+K<w> := GF(512);
+k<a> := GF(8);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..8]]>;
+E := EllipticCurve([K|1,0,0,0,fromint(32)]);
+C,h := WeilDescent(E,k,fromint(218) : HyperellipticImage := false);
+assert Genus(C) eq 3;
+phi := CanonicalMap(C);
+Q,hyp := CanonicalImage(C,phi);
+print "canonical_hyperelliptic", hyp;
+print "canonical_model", Q;
+print "canonical_smooth", IsNonsingular(Q);
+print "canonical_genus", Genus(Q);
+print "points_q", #RationalPoints(Q);
+print "points_q2", #RationalPoints(BaseChange(Q,2));
+print "points_q3", #RationalPoints(BaseChange(Q,3));

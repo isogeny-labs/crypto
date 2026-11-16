@@ -41,7 +41,35 @@ use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use std::fmt;
 
+/// Word-sized fast path.  Wider primes are supported with a cached
+/// Miller–Rabin test in [`HyperellipticCurveP::validate`]; this constant is
+/// the bound below which the deterministic word-sized test is used.
 pub const MAX_CHECKED_PRIME_BITS: u32 = 64;
+
+/// Cached Miller–Rabin primality for moduli wider than one word.
+///
+/// The checked Jacobian arithmetic re-validates its curve on every call, so
+/// a wide `p` needs a memoised test rather than a fresh Miller–Rabin run per
+/// group operation.  The cache is thread-local and holds the last modulus
+/// tested on that thread, which covers the single-instance use the
+/// cryptanalysis engines make of it.
+fn wide_primality_cached(p: &BigUint) -> bool {
+    use std::cell::RefCell;
+    thread_local! {
+        static CACHE: RefCell<Option<(Vec<u32>, bool)>> = const { RefCell::new(None) };
+    }
+    let key = p.to_u32_digits();
+    CACHE.with(|cache| {
+        if let Some((cached, value)) = cache.borrow().as_ref() {
+            if cached == &key {
+                return *value;
+            }
+        }
+        let value = crate::cryptanalysis::curve_traits::arith::is_prime(p);
+        *cache.borrow_mut() = Some((key, value));
+        value
+    })
+}
 pub const MAX_POINT_ENUMERATION_PRIME: u64 = 1_000_000;
 pub const MAX_QUADRATIC_POINT_COUNT_PRIME: u64 = 4_096;
 
@@ -201,13 +229,16 @@ impl HyperellipticCurveP {
     pub fn validate(&self) -> Result<(), PrimeHyperellipticError> {
         // Counted in the current phase and in the validation subset.
         let _validating = ops::validating();
-        if self.p.bits() > u64::BITS as u64 {
-            return Err(PrimeHyperellipticError::UnsupportedPrimeModulusSize {
-                maximum_bits: MAX_CHECKED_PRIME_BITS,
-            });
-        }
-        let p_u64 = self.p.to_u64_digits().first().copied().unwrap_or(0);
-        if p_u64 == 2 || !is_prime_u64(p_u64) {
+        let prime = if self.p.bits() <= u64::BITS as u64 {
+            let p_u64 = self.p.to_u64_digits().first().copied().unwrap_or(0);
+            p_u64 != 2 && is_prime_u64(p_u64)
+        } else {
+            // Wider moduli take a Miller-Rabin test once per thread and
+            // modulus; the checked arithmetic calls `validate` on every
+            // group operation, so an uncached wide test would dominate.
+            self.p != BigUint::from(2u32) && wide_primality_cached(&self.p)
+        };
+        if !prime {
             return Err(PrimeHyperellipticError::ModulusNotOddPrime);
         }
         if self.f.p != self.p {
@@ -568,6 +599,53 @@ impl MumfordDivisorP {
     pub fn add(&self, other: &Self, curve: &HyperellipticCurveP) -> Self {
         self.checked_add(other, curve)
             .expect("invalid divisor in Cantor addition")
+    }
+
+    /// Internal fast addition for callers that already validated the curve
+    /// and both operands.  [`Self::add`] re-checks the prime, squarefreeness
+    /// and both divisor equations on every call; a relation walk does that
+    /// once per trial.  This path keeps the exact-division checks inside
+    /// composition and reduction and skips the repeated domain validation.
+    pub fn add_fast(&self, other: &Self, curve: &HyperellipticCurveP) -> Self {
+        if self.is_identity() {
+            return other.clone();
+        }
+        if other.is_identity() {
+            return self.clone();
+        }
+        self.cantor_compose_checked(other, curve)
+            .expect("Cantor composition on validated operands")
+            .reduce_checked(curve)
+            .expect("Cantor reduction on validated operands")
+    }
+
+    /// Internal fast doubling.
+    pub fn double_fast(&self, curve: &HyperellipticCurveP) -> Self {
+        self.add_fast(self, curve)
+    }
+
+    /// Internal fast negation: `(u, −v mod u)`.
+    pub fn neg_fast(&self, _curve: &HyperellipticCurveP) -> Self {
+        Self {
+            u: self.u.clone(),
+            v: self.v.neg().rem(&self.u),
+        }
+    }
+
+    /// Internal fast scalar multiplication through [`Self::add_fast`].
+    pub fn scalar_mul_fast(&self, k: &BigUint, curve: &HyperellipticCurveP) -> Self {
+        if k.is_zero() {
+            return Self::identity(curve.p.clone());
+        }
+        let bits = k.bits();
+        let mut result = Self::identity(curve.p.clone());
+        for i in (0..bits).rev() {
+            result = result.double_fast(curve);
+            if k.bit(i) {
+                result = result.add_fast(self, curve);
+            }
+        }
+        result
     }
 
     pub fn checked_double(
@@ -1374,13 +1452,17 @@ mod tests {
             HyperellipticCurveP::try_new(pseudoprime, over_pseudoprime, 2).unwrap_err(),
             PrimeHyperellipticError::ModulusNotOddPrime
         );
+        // 2^64 + 13 is prime; wider moduli are supported through the cached
+        // Miller-Rabin path.
         let oversized = (BigUint::one() << 64usize) + BigUint::from(13u32);
         let over_oversized = quintic(vec![1, 1, 0, 0, 0, 1], &oversized);
+        HyperellipticCurveP::try_new(oversized.clone(), over_oversized, 2)
+            .expect("wide prime modulus");
+        let wide_composite = oversized * BigUint::from(3u32);
+        let over_wide_composite = quintic(vec![1, 1, 0, 0, 0, 1], &wide_composite);
         assert_eq!(
-            HyperellipticCurveP::try_new(oversized, over_oversized, 2).unwrap_err(),
-            PrimeHyperellipticError::UnsupportedPrimeModulusSize {
-                maximum_bits: MAX_CHECKED_PRIME_BITS
-            }
+            HyperellipticCurveP::try_new(wide_composite, over_wide_composite, 2).unwrap_err(),
+            PrimeHyperellipticError::ModulusNotOddPrime
         );
 
         let wrong_field = quintic(vec![1, 1, 0, 0, 0, 1], &BigUint::from(7u32));

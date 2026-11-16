@@ -1,0 +1,700 @@
+UNCOMPILED AND UNTESTED.  Design draft, 2026-10-29 (hash-table floor of the prime relation trial).
+Nothing here has been built, run or measured.  Do not merge without `cargo fmt --check`,
+`cargo clippy --all-targets -D warnings`, `cargo test` (the three new tests below) and the
+paired protocol in README.md.
+
+Base: isogeny-labs/crypto branch lead/ic-wide-ext-20261028 (PR #2806, stacked on #2783),
+head db02dd4f10e2ad4eccbf420b90bf4a406258a990.  It does NOT apply to main 7ffaab06b, which
+lacks the lane touch loop and `collect_and_solve_relations_touching`.
+Checked only by `patch -p1 --dry-run` against the four base files fetched from that head and
+`rustfmt --check` on ic_boundary.rs, plugins.rs and stages.rs (parses; formatted).
+
+What it does: an opt-in oracle parameter `mitm-prime-batch:m=2,layout=lines` (default `map`,
+every recorded run) puts the batched pair table and the relation guard in line tables
+(eight u64 words per 64-byte line, home line a pure function of the key) and turns the lane
+round's touch loop into software prefetches (prefetcht0 on x86-64; the old demand read
+elsewhere).  Default-layout code paths are unchanged apart from one enum match per guard call
+and one `Option` check per table get.  Intended to keep every record bit-identical outside timing.
+Apply with: git apply patch.diff  (or patch -p1 < patch.diff)
+
+diff --git a/src/cryptanalysis/ic_boundary.rs b/src/cryptanalysis/ic_boundary.rs
+--- a/src/cryptanalysis/ic_boundary.rs
++++ b/src/cryptanalysis/ic_boundary.rs
+@@ -6133,6 +6133,242 @@
+     (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 20) as usize & mask
+ }
+ 
++// ── Line tables: open addressing with exposed slots ────────────────
++//
++// Lead ICP-prime-ic-constant-engineering, hash-table floor.  The guard
++// and the batched pair table are std hash maps, whose slot addresses are
++// private, so the lane round can only "touch" them with full demand
++// lookups.  A line table puts each key's home in one 64-byte line of
++// eight words, scanned in order and spilling to the next line only when
++// full; the home line is a pure function of the key, so the round can
++// issue a software prefetch for it and do nothing else.  No deletions
++// ever happen, so a lookup may stop at the first empty word.
++
++/// Eight words, one cache line.  Word `0` is an empty slot.
++#[derive(Clone, Copy, Default)]
++#[repr(C, align(64))]
++struct Line([u64; 8]);
++
++/// Lines a table needs so that `keys` entries fill it at most 3/4.
++fn lines_for(keys: usize) -> usize {
++    (keys.saturating_mul(4) / 3 / 8 + 1).next_power_of_two()
++}
++
++/// Bring the line at `lines[index]` towards L1.  A hint only: it reads,
++/// writes and decides nothing.  Off x86-64 it falls back to the demand
++/// read the old touch made, so other targets keep the overlapped load.
++#[inline(always)]
++#[allow(unused_unsafe)]
++fn prefetch_line(lines: &[Line], index: usize) {
++    #[cfg(target_arch = "x86_64")]
++    {
++        use core::arch::x86_64::{_mm_prefetch, _MM_HINT_T0};
++        let p = lines.as_ptr().wrapping_add(index).cast::<i8>();
++        // SAFETY: `prefetcht0` has no architectural effect and never
++        // faults, whatever the address; SSE is in the x86-64 baseline.
++        unsafe { _mm_prefetch::<_MM_HINT_T0>(p) };
++    }
++    #[cfg(not(target_arch = "x86_64"))]
++    {
++        std::hint::black_box(lines[index].0[0]);
++    }
++}
++
++/// **The relation guard as a line table of point keys.**  `insert`
++/// answers exactly what `FastMap::insert(key, ()).is_some()` answers;
++/// the key `0` (the identity's, never a guarded target in practice) is
++/// kept in a flag so that `0` can mark an empty word.
++struct GuardSet {
++    lines: Vec<Line>,
++    mask: usize,
++    len: usize,
++    has_zero: bool,
++}
++
++impl GuardSet {
++    fn with_capacity(keys: usize) -> Self {
++        let n = lines_for(keys);
++        Self {
++            lines: vec![Line::default(); n],
++            mask: n - 1,
++            len: 0,
++            has_zero: false,
++        }
++    }
++
++    /// The home line: high bits of a multiplier other than [`mix`]'s
++    /// (the walk's jump index reads `mix`), so the two stay unrelated.
++    #[inline]
++    fn home(&self, key: u64) -> usize {
++        (key.wrapping_mul(0xC2B2_AE3D_27D4_EB4F) >> 32) as usize & self.mask
++    }
++
++    #[inline]
++    fn prefetch(&self, key: u64) {
++        prefetch_line(&self.lines, self.home(key));
++    }
++
++    /// Insert `key`; `true` when it was already present.
++    #[inline]
++    fn insert(&mut self, key: u64) -> bool {
++        if key == 0 {
++            return std::mem::replace(&mut self.has_zero, true);
++        }
++        let mut l = self.home(key);
++        loop {
++            let line = &mut self.lines[l].0;
++            if let Some(w) = line.iter_mut().find(|w| **w == key || **w == 0) {
++                if *w == key {
++                    return true;
++                }
++                *w = key;
++                break;
++            }
++            l = (l + 1) & self.mask;
++        }
++        self.len += 1;
++        if self.len * 4 > self.lines.len() * 8 * 3 {
++            self.grow();
++        }
++        false
++    }
++
++    /// Double the lines and re-place every key.  Membership is all the
++    /// set answers, so the new placement changes no answer.
++    fn grow(&mut self) {
++        let n = self.lines.len() * 2;
++        let old = std::mem::replace(&mut self.lines, vec![Line::default(); n]);
++        self.mask = n - 1;
++        for line in &old {
++            for &w in line.0.iter().filter(|w| **w != 0) {
++                let mut l = self.home(w);
++                'place: loop {
++                    for s in self.lines[l].0.iter_mut() {
++                        if *s == 0 {
++                            *s = w;
++                            break 'place;
++                        }
++                    }
++                    l = (l + 1) & self.mask;
++                }
++            }
++        }
++    }
++}
++
++/// The relation loop's guard: the std map every recorded run used, or
++/// the line table (`layout=lines`).  Both answer the same membership.
++enum Guard {
++    Map(FastMap<()>),
++    Lines(GuardSet),
++}
++
++impl Guard {
++    fn new(lines: bool, capacity: usize) -> Self {
++        if lines {
++            Guard::Lines(GuardSet::with_capacity(capacity))
++        } else {
++            Guard::Map(fast_map(capacity))
++        }
++    }
++
++    /// `true` when `key` was already present.
++    #[inline]
++    fn insert(&mut self, key: u64) -> bool {
++        match self {
++            Guard::Map(m) => m.insert(key, ()).is_some(),
++            Guard::Lines(s) => s.insert(key),
++        }
++    }
++
++    /// Uncounted: the map's demand read, or the line table's prefetch.
++    #[inline]
++    fn touch(&self, key: u64) {
++        match self {
++            Guard::Map(m) => {
++                std::hint::black_box(m.contains_key(&key));
++            }
++            Guard::Lines(s) => s.prefetch(key),
++        }
++    }
++}
++
++/// **The batched pair table as a line table of [`PackedPairTable`]
++/// words** (key `x + 1 < 2^32` high, witness `(i, j)` in 16 bits each
++/// low), for `p < 2^32` and at most `2^16` base points.  Filled in the
++/// builder's emission order with insert-if-absent, so every key keeps
++/// the first pair that reached it, as `entry(key).or_insert(..)` does.
++struct FlatPairIndex {
++    lines: Vec<Line>,
++    mask: usize,
++    len: usize,
++    slots: usize,
++}
++
++impl FlatPairIndex {
++    /// Sized once for at most `entries` keys (the builders' `|F_x|² + 1`
++    /// bound), at most 3/4 full, so it never grows.
++    fn with_capacity(entries: usize) -> Self {
++        let n = lines_for(entries);
++        Self {
++            lines: vec![Line::default(); n],
++            mask: n - 1,
++            len: 0,
++            slots: 8 * n,
++        }
++    }
++
++    #[inline]
++    fn home(&self, key: u64) -> usize {
++        (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 32) as usize & self.mask
++    }
++
++    #[inline]
++    fn prefetch(&self, key: u64) {
++        prefetch_line(&self.lines, self.home(key));
++    }
++
++    /// `true` when `key` was new and now holds `(i, j)`.
++    fn insert_if_absent(&mut self, key: u64, i: u32, j: u32) -> bool {
++        debug_assert!(key != 0 && key <= u64::from(u32::MAX) && i < 1 << 16 && j < 1 << 16);
++        assert!(self.len < self.slots, "flat pair index sized too small");
++        let word = key << 32 | u64::from(i) << 16 | u64::from(j);
++        let mut l = self.home(key);
++        loop {
++            for s in self.lines[l].0.iter_mut() {
++                if *s == 0 {
++                    *s = word;
++                    self.len += 1;
++                    return true;
++                }
++                if *s >> 32 == key {
++                    return false;
++                }
++            }
++            l = (l + 1) & self.mask;
++        }
++    }
++
++    #[inline]
++    fn get(&self, key: u64) -> Option<(u32, u32)> {
++        if key == 0 || key > u64::from(u32::MAX) {
++            return None;
++        }
++        let mut l = self.home(key);
++        loop {
++            for &s in &self.lines[l].0 {
++                if s == 0 {
++                    return None;
++                }
++                if s >> 32 == key {
++                    return Some((((s >> 16) & 0xffff) as u32, (s & 0xffff) as u32));
++                }
++            }
++            l = (l + 1) & self.mask;
++        }
++    }
++}
++
+ /// A table of all pair sums of a base, keyed by the sum's abscissa so
+ /// `S` and `−S` share one entry; the probe checks which it found.
+ pub struct PairTable {
+@@ -6145,6 +6381,10 @@
+     /// The packed form of the cache-blocked layout, when keys fit 32 bits
+     /// and indices 16 ([`PackedPairTable`]); `parts` is then empty.
+     packed: Option<PackedPairTable>,
++    /// The line-table form of the batched table
++    /// ([`Self::build_negation_folded_prime_batch_lines`]); `map` is then
++    /// empty.  `None` for every other builder.
++    flat: Option<FlatPairIndex>,
+     /// `full` (every `i ≤ j`) or `negation_folded` (one pair per orbit
+     /// under negation).
+     pub kind: &'static str,
+@@ -6195,6 +6435,7 @@
+             parts: Vec::new(),
+             part_shift: 0,
+             packed: None,
++            flat: None,
+             build_ops: ops,
+             build_wall_ns: start.elapsed().as_nanos() as u64,
+             insert_attempts: attempts,
+@@ -6240,6 +6481,7 @@
+             parts: Vec::new(),
+             part_shift: 0,
+             packed: None,
++            flat: None,
+             build_ops: ops,
+             build_wall_ns: start.elapsed().as_nanos() as u64,
+             insert_attempts: attempts,
+@@ -6271,6 +6513,45 @@
+             parts: Vec::new(),
+             part_shift: 0,
+             packed: None,
++            flat: None,
++            build_ops: ops,
++            build_wall_ns: start.elapsed().as_nanos() as u64,
++            insert_attempts: attempts,
++            index_lookups: a as u64,
++        })
++    }
++
++    /// [`Self::build_negation_folded_prime_batch`] into a line table
++    /// ([`FlatPairIndex`]) when keys fit 32 bits and indices 16; the
++    /// same sums in the same order, the same kept witness per key, the
++    /// same `kind`, `entries`, `insert_attempts` and counted operations,
++    /// so every probe answers as the map's would.  Larger fields fall
++    /// back to the map builder.  The probe side can then prefetch.
++    pub fn build_negation_folded_prime_batch_lines(
++        g: &PrimeCurve,
++        fb: &FactorBase<PrimePoint>,
++    ) -> Result<Self, String> {
++        if g.p > u64::from(u32::MAX) || fb.points.len() > 1 << 16 {
++            return Self::build_negation_folded_prime_batch(g, fb);
++        }
++        let start = Instant::now();
++        let mut ops = GroupOps::default();
++        let a = fb.abscissa_list.len();
++        let mut attempts = 0u64;
++        let mut flat = FlatPairIndex::with_capacity(a.pow(2) + 1);
++        let mut entries = 0u64;
++        for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
++            entries += u64::from(flat.insert_if_absent(key, i, j));
++            attempts += 1;
++        })?;
++        Ok(Self {
++            kind: "negation_folded_prime_batch",
++            entries,
++            map: fast_map(0),
++            parts: Vec::new(),
++            part_shift: 0,
++            packed: None,
++            flat: Some(flat),
+             build_ops: ops,
+             build_wall_ns: start.elapsed().as_nanos() as u64,
+             insert_attempts: attempts,
+@@ -6314,6 +6595,7 @@
+                 parts: Vec::new(),
+                 part_shift: 0,
+                 packed: Some(packed),
++                flat: None,
+                 build_ops: ops,
+                 build_wall_ns: start.elapsed().as_nanos() as u64,
+                 insert_attempts,
+@@ -6381,6 +6663,7 @@
+             parts,
+             part_shift,
+             packed: None,
++            flat: None,
+             build_ops: ops,
+             build_wall_ns: start.elapsed().as_nanos() as u64,
+             insert_attempts: attempts,
+@@ -6390,7 +6673,9 @@
+ 
+     /// The witness stored under a key, in whichever layout the table has.
+     fn get(&self, key: u64) -> Option<(u32, u32)> {
+-        if let Some(packed) = &self.packed {
++        if let Some(flat) = &self.flat {
++            flat.get(key)
++        } else if let Some(packed) = &self.packed {
+             packed.get(key)
+         } else if self.parts.is_empty() {
+             self.map.get(&key).copied()
+@@ -6415,8 +6700,16 @@
+     /// pair summing to `±target`; one probe, at most one addition.
+     /// Read the slot [`Self::probe`] would read for `target`, uncounted:
+     /// a prefetch for a caller that knows its next targets.
++    /// The line table is prefetched, not read; every other layout keeps
++    /// the demand read.
+     pub fn touch<G: CountedGroup>(&self, g: &G, target: &G::Elt) {
+-        std::hint::black_box(self.get(g.key(target) >> 1));
++        let key = g.key(target) >> 1;
++        match &self.flat {
++            Some(flat) => flat.prefetch(key),
++            None => {
++                std::hint::black_box(self.get(key));
++            }
++        }
+     }
+ 
+     pub fn probe<G: CountedGroup>(
+@@ -7570,6 +7863,7 @@
+         None,
+         oracle,
+         |_| {},
++        false,
+     )
+ }
+ 
+@@ -7577,6 +7871,8 @@
+ /// what the oracle will read for a target: the lane walks call it for a
+ /// whole round of prepared targets before taking the first, so the
+ /// round's cache misses overlap.  It decides and counts nothing.
++/// `line_guard` keeps the relation guard in a [`GuardSet`] (prefetched
++/// by the same round loop) instead of the std map; it changes no answer.
+ #[allow(clippy::too_many_arguments)]
+ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver + ?Sized>(
+     g: &G,
+@@ -7593,10 +7889,11 @@
+     completion: CompletionRule,
+     oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+     touch: impl Fn(&G::Elt),
++    line_guard: bool,
+ ) -> PipelineOutcome {
+     collect_and_solve_relations_scaled(
+         g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
+-        None, oracle, touch,
++        None, oracle, touch, line_guard,
+     )
+ }
+ 
+@@ -7621,6 +7918,7 @@
+     mut scale: Option<&mut CoeffScale>,
+     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+     touch: impl Fn(&G::Elt),
++    line_guard: bool,
+ ) -> PipelineOutcome {
+     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
+     let mut rel = PhaseCost::default();
+@@ -7710,7 +8008,7 @@
+     let mut walk_fresh = true;
+     let segment_cap = ((r as f64).sqrt() * 4.0) as u64 + 65_536;
+     let mut segment_steps = 0u64;
+-    let mut seen: FastMap<()> = fast_map(if guarded { 1 << 12 } else { 0 });
++    let mut seen = Guard::new(line_guard, if guarded { 1 << 12 } else { 0 });
+     let (mut walk_steps, mut walk_restarts, mut repeats_skipped, mut guard_probes, mut walk_jumps) =
+         (0u64, 0u64, 0u64, 0u64, 0u64);
+     let lane_config = match targets {
+@@ -7914,9 +8212,11 @@
+             // before taking its first target: the reads are independent,
+             // so their cache misses overlap instead of falling one per
+             // trial.  Uncounted reads; everything below decides as before.
++            // With `line_guard` and a line-table oracle these are software
++            // prefetches of the two home lines, with no dependent load.
+             for &(_, point, _, _) in &lane_queue {
+                 if guarded {
+-                    std::hint::black_box(seen.contains_key(&g.key(&point)));
++                    seen.touch(g.key(&point));
+                 }
+                 touch(&point);
+             }
+@@ -8057,7 +8357,7 @@
+         // pin the logarithm by collision rather than by relation.
+         if guarded {
+             guard_probes += 1;
+-            if seen.insert(g.key(&point), ()).is_some() {
++            if seen.insert(g.key(&point)) {
+                 repeats_skipped += 1;
+                 if let Some(index) = lane_id {
+                     lanes[index].fresh = true;
+@@ -12340,6 +12640,124 @@
+         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+     }
+ 
++    /// The line guard answers every insert as the std map does, across
++    /// growth, repeats and the zero key.
++    #[test]
++    fn guard_set_answers_as_the_std_map() {
++        let mut rng = StdRng::seed_from_u64(20261029);
++        for capacity in [0usize, 1, 7, 1 << 12] {
++            let mut map: FastMap<()> = fast_map(capacity);
++            let mut set = GuardSet::with_capacity(capacity);
++            for step in 0..200_000u64 {
++                // Small keys repeat often; zero is among them.
++                let key = if step % 3 == 0 {
++                    rng.gen_range(0..4096u64)
++                } else {
++                    rng.gen::<u64>()
++                };
++                assert_eq!(
++                    set.insert(key),
++                    map.insert(key, ()).is_some(),
++                    "capacity {capacity}, step {step}, key {key}"
++                );
++            }
++            assert_eq!(set.len + usize::from(set.has_zero), map.len());
++        }
++    }
++
++    /// The line-table batched pair table keeps the map builder's witness
++    /// for every key, misses where it misses, and reports the same build.
++    #[test]
++    fn prime_batch_lines_table_matches_the_map_table() {
++        let inst = prime_instance_for(20, 59297);
++        let fb = prime_factor_base(&inst, 600);
++        let map = PairTable::build_negation_folded_prime_batch(&inst.curve, &fb).unwrap();
++        let lines = PairTable::build_negation_folded_prime_batch_lines(&inst.curve, &fb).unwrap();
++        assert!(lines.flat.is_some() && map.flat.is_none());
++        assert_eq!(lines.kind, map.kind);
++        assert_eq!(lines.entries, map.entries);
++        assert_eq!(lines.insert_attempts, map.insert_attempts);
++        assert_eq!(lines.index_lookups, map.index_lookups);
++        assert_eq!(lines.build_ops, map.build_ops);
++        for key in 0..=inst.curve.p + 1 {
++            assert_eq!(lines.get(key), map.map.get(&key).copied(), "key {key}");
++        }
++    }
++
++    /// `layout=lines` (line-table pair index, line guard, prefetching
++    /// touch) decides exactly as the std-map layout: the same targets in
++    /// the same order, the same relations, counters and answer.
++    #[test]
++    fn line_tables_leave_the_relation_stream_unchanged() {
++        let inst = prime_instance_for(20, 59297);
++        let curve = &inst.curve;
++        let generator = inst.generator_point();
++        let mut setup = GroupOps::default();
++        let target = curve.mul(&mut setup, generator, 4321);
++        let fb = prime_factor_base(&inst, 64);
++        let map = PairTable::build_negation_folded_prime_batch(curve, &fb).unwrap();
++        let lines = PairTable::build_negation_folded_prime_batch_lines(curve, &fb).unwrap();
++        for (label, source) in [
++            ("walk", TargetSource::Walk),
++            (
++                "b16",
++                TargetSource::WalkPrimeLanes {
++                    lanes: 16,
++                    batched: true,
++                },
++            ),
++            (
++                "b32",
++                TargetSource::WalkPrimeLanes {
++                    lanes: 32,
++                    batched: true,
++                },
++            ),
++        ] {
++            let run = |table: &PairTable, line_guard: bool| {
++                let mut stream = Vec::new();
++                let mut matrix = IncrementalGauss::new(fb.columns + 1, inst.r);
++                let outcome = collect_and_solve_relations_touching(
++                    curve,
++                    generator,
++                    target,
++                    inst.r,
++                    inst.cofactor,
++                    &fb,
++                    20261029,
++                    1 << 22,
++                    source,
++                    RestartPool::Lazy,
++                    &mut matrix,
++                    CompletionRule::TargetPinned,
++                    |ops, ctr, point, a, b| {
++                        stream.push((point, a, b));
++                        decompose_mitm(curve, &fb, table, 2, ops, ctr, point)
++                            .map(|s| vec![Relation::Summands(s)])
++                            .unwrap_or_default()
++                    },
++                    |point| table.touch(curve, point),
++                    line_guard,
++                );
++                (stream, outcome)
++            };
++            let (s0, o0) = run(&map, false);
++            let (s1, o1) = run(&lines, true);
++            assert_eq!(s0, s1, "{label}");
++            assert_eq!(o0.recovered, o1.recovered, "{label}");
++            assert_eq!(o0.verified, o1.verified, "{label}");
++            assert_eq!(o0.trials, o1.trials, "{label}");
++            assert_eq!(o0.relations_found, o1.relations_found, "{label}");
++            assert_eq!(o0.relations.native, o1.relations.native, "{label}");
++            assert_eq!(
++                o0.relations.work_native, o1.relations.work_native,
++                "{label}"
++            );
++            assert_eq!(o0.relations.group_ops, o1.relations.group_ops, "{label}");
++            assert_eq!(o0.counters.lookups, o1.counters.lookups, "{label}");
++        }
++    }
++
+     #[test]
+     fn prime_blocked_table_matches_batch_table_across_blocks_and_parts() {
+         let inst = prime_instance_for(20, 59297);
+@@ -13353,6 +13771,7 @@
+                     .unwrap_or_default()
+             },
+             |_| {},
++            false,
+         );
+         Coupled {
+             outcome,
+diff --git a/src/cryptanalysis/ic_framework/mod.rs b/src/cryptanalysis/ic_framework/mod.rs
+--- a/src/cryptanalysis/ic_framework/mod.rs
++++ b/src/cryptanalysis/ic_framework/mod.rs
+@@ -606,6 +606,7 @@
+         // rows through the same call.
+         // The touch reads while no decomposition runs, so one RefCell
+         // lends the oracle to both closures in turn.
++        let line_guard = oracle.line_guard();
+         let oracle_cell = std::cell::RefCell::new(&mut *oracle);
+         collect_and_solve_relations_touching(
+             ctx.group,
+@@ -626,6 +627,7 @@
+                     .decompose_relations(ctx, &fb, ops, counters, point, a, b)
+             },
+             |point| oracle_cell.borrow().touch(ctx, point),
++            line_guard,
+         )
+     };
+     for (name, value) in oracle.relation_counters() {
+diff --git a/src/cryptanalysis/ic_framework/plugins.rs b/src/cryptanalysis/ic_framework/plugins.rs
+--- a/src/cryptanalysis/ic_framework/plugins.rs
++++ b/src/cryptanalysis/ic_framework/plugins.rs
+@@ -2134,6 +2134,9 @@
+ /// cache-sized pieces ([`PairTable::build_negation_folded_prime_blocked`]).
+ pub struct PrimeBatchMitmOracle {
+     blocked: bool,
++    /// `layout=lines`: the table in a line table, the guard too, and the
++    /// lane round's touch as software prefetches (batched table only).
++    lines: bool,
+     table: Option<PairTable>,
+ }
+ 
+@@ -2141,6 +2144,7 @@
+     pub fn new() -> Self {
+         Self {
+             blocked: false,
++            lines: false,
+             table: None,
+         }
+     }
+@@ -2148,6 +2152,7 @@
+     pub fn blocked() -> Self {
+         Self {
+             blocked: true,
++            lines: false,
+             table: None,
+         }
+     }
+@@ -2188,7 +2193,17 @@
+     }
+ 
+     fn parameters(&self) -> &[(&str, &str)] {
+-        &[("m", "must be 2")]
++        if self.blocked {
++            &[("m", "must be 2")]
++        } else {
++            &[
++                ("m", "must be 2"),
++                (
++                    "layout",
++                    "map (default, every recorded run) or lines (prefetchable line tables; same answers)",
++                ),
++            ]
++        }
+     }
+ 
+     fn prepare(
+@@ -2198,11 +2213,19 @@
+         params: &Params,
+         ops: &mut GroupOps,
+     ) -> Result<(), String> {
+-        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m") {
++        let allowed = |key: &String| key == "m" || (!self.blocked && key == "layout");
++        if params.u64_or("m", 2)? != 2 || !params.0.keys().all(allowed) {
+             return Err(format!("{} accepts only m=2", self.name_str()));
+         }
++        self.lines = match params.get("layout") {
++            None | Some("map") => false,
++            Some("lines") => true,
++            Some(other) => return Err(format!("unknown layout `{other}`; use map or lines")),
++        };
+         let table = if self.blocked {
+             PairTable::build_negation_folded_prime_blocked(ctx.group, fb)?
++        } else if self.lines {
++            PairTable::build_negation_folded_prime_batch_lines(ctx.group, fb)?
+         } else {
+             PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
+         };
+@@ -2236,6 +2259,10 @@
+             table.touch(ctx.group, point);
+         }
+     }
++
++    fn line_guard(&self) -> bool {
++        self.lines
++    }
+ }
+ 
+ /// **Single-large-prime residual sweep** (lead `ICP-residual-partial-relations`).
+diff --git a/src/cryptanalysis/ic_framework/stages.rs b/src/cryptanalysis/ic_framework/stages.rs
+--- a/src/cryptanalysis/ic_framework/stages.rs
++++ b/src/cryptanalysis/ic_framework/stages.rs
+@@ -235,6 +235,12 @@
+     /// knows several targets ahead can overlap their cache misses.  The
+     /// default does nothing; it never changes a result or a counter.
+     fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
++    /// Whether the relation loop should keep its repeat guard in the
++    /// prefetchable line table rather than the std map.  A layout choice
++    /// only: both guards answer the same membership.  Default `false`.
++    fn line_guard(&self) -> bool {
++        false
++    }
+     /// Work performed by `prepare` that only `bitop/v1` prices (table
+     /// insert attempts, canonicalisation tables), by `ecbench::work`
+     /// counter name; kept out of `setup_native` so committed records

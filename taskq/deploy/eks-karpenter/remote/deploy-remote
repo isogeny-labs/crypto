@@ -19,7 +19,7 @@ mkdir "$package/bin" "$package/remote"
 install -m755 "$ISOLAB_MCP_BIN" "$package/bin/isolab-eks-mcp"
 install -m755 "$here/../submit-job" "$package/bin/submit-job"
 install -m755 "$(command -v kubectl)" "$package/bin/kubectl"
-install -m755 "$here/validate-request" "$here/check-ready" "$here/run-request" "$package/remote/"
+install -m755 "$here/validate-request" "$here/check-ready" "$here/run-request" "$here/verify-build" "$package/remote/"
 cp "$here/buildspec.yml" "$package/remote/"
 (cd "$package" && sha256sum bin/* remote/* > SHA256SUMS && zip -q -X -r launcher.zip bin remote SHA256SUMS)
 digest=$(sha256sum "$package/launcher.zip" | cut -d ' ' -f1)

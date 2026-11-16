@@ -1,0 +1,61 @@
+import GraphAlgebra
+set_option autoImplicit false
+namespace GraphFind
+open SignedGraphAlgebra
+variable {K : Type*} [CommRing K] {n : Nat}
+structure State (K : Type*) (n : Nat) where
+ parent : Fin n → Fin n
+ pot : Fin n → Potential K
+
+def ident : Potential K := ⟨1,0,0⟩
+def compress (s : State K n) (x root : Fin n) (p : Potential K) : State K n :=
+ ⟨fun y=>if y=x then root else s.parent y,fun y=>if y=x then p else s.pot y⟩
+def Represents (s : State K n) (v : Fin n → K) (k : K) : Prop :=
+ ∀x,v x=eval (s.pot x) (v (s.parent x)) k
+def Forest (s : State K n) (rank : Fin n → Nat) : Prop :=
+ ∀x,s.parent x=x ∨ rank (s.parent x)<rank x
+
+-- The recursive call mutates s to t BEFORE p is read at x.
+inductive Run : State K n → Fin n → State K n → Fin n → Potential K → Prop
+ | root (s : State K n) (x : Fin n) (h : s.parent x=x) : Run s x s x ident
+ | step (s t : State K n) (x r : Fin n) (q : Potential K)
+   (hne : s.parent x≠x) (rec : Run s (s.parent x) t r q) :
+   Run s x (compress t x r (compose (t.pot x) q)) r (compose (t.pot x) q)
+
+-- All equations are in one invariant so the recursion supplies its own frame.
+theorem run_preserves (s t : State K n) (x r : Fin n) (p : Potential K)
+ (run : Run s x t r p) (rank : Fin n → Nat) (v : Fin n → K) (k : K)
+ (hf : Forest s rank) (hv : Represents s v k) :
+ Forest t rank ∧ Represents t v k ∧ t.parent r=r ∧
+ v x=eval p (v r) k ∧ rank r≤rank x ∧
+ ∀y,rank x<rank y → t.parent y=s.parent y ∧ t.pot y=s.pot y := by
+ induction run with
+ | root s x h =>
+   refine ⟨hf,hv,h,?_,le_rfl,?_⟩
+   · simp [ident,eval]
+   · intro y hy; exact ⟨rfl,rfl⟩
+ | step s t x r q hne rec ih =>
+   have hdown : rank (s.parent x)<rank x := (hf x).resolve_left hne
+   obtain ⟨htf,htv,hroot,he,hrank,hframe⟩:=ih hf hv
+   have hxframe:=hframe x hdown
+   have hrx : rank r<rank x := lt_of_le_of_lt hrank hdown
+   have hrne : r≠x := by intro h; subst r; exact (Nat.lt_irrefl _ hrx)
+   have hvalue : v x=eval (compose (t.pot x) q) (v r) k := by
+     rw [compression,←he,←hxframe.1]
+     exact htv x
+   refine ⟨?_,?_,?_,hvalue,Nat.le_of_lt hrx,?_⟩
+   · intro y
+     by_cases hy : y=x
+     · subst y
+       exact Or.inr (by simpa [compress] using hrx)
+     · simpa [compress,hy] using htf y
+   · intro y
+     by_cases hy : y=x
+     · subst y; simpa [compress] using hvalue
+     · simpa [compress,hy] using htv y
+   · simpa [compress,hrne] using hroot
+   · intro y hy
+     have hyx : y≠x := by intro h; subst y; exact Nat.lt_irrefl _ hy
+     have hp : rank (s.parent x)<rank y := lt_trans hdown hy
+     simpa [compress,hyx] using hframe y hp
+end GraphFind

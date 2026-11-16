@@ -8,6 +8,21 @@
 //! orbit_large_prime_bench summarize --in DIR --out DIR
 //! ```
 //!
+//! Options of `cell` added by the 2026-10-26 addendum
+//! (`research/orbit_aware_large_prime_20261011/PROTOCOL_ADDENDUM_20261026.md`):
+//!
+//! * `--arm dlp_orbit_post`: decompositions are accepted on the plain column
+//!   count (the stream of `dlp`) and the orbit map is applied afterwards.
+//! * `--modulus-seed K`: the same abstract curve over the K-th seeded random
+//!   irreducible modulus (the realisation series).
+//! * `--cutoffs 50,100,200`: also report the pipeline state at those trial
+//!   cutoffs, and the trial at which the verified rank first reaches 50, 75,
+//!   90 and 100 percent of S+1 (the cap-free metric); the run length is
+//!   `--trials`.
+//!
+//! Every cell hashes its accepted decompositions (`report.filter_pipeline.stream`)
+//! so two arms can be shown to have seen the same relation stream.
+//!
 //! `cell` runs exactly one (curve, arm, seed) in this process, so the peak
 //! resident set size it records belongs to that cell alone, and writes one
 //! JSON receipt.  `summarize` reads every receipt in a directory and writes
@@ -20,12 +35,17 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::ecbench_large_prime::{
-    process_cpu_ns, solve, LargePrimeGraph, SolveConfig,
+    process_cpu_ns, solve_with_options, LargePrimeGraph, SolveConfig, SolveOptions,
+    TrajectoryRequest,
 };
 use crypto_lib::cryptanalysis::glv_gaudry::peak_rss_bytes;
 use crypto_lib::cryptanalysis::ic_boundary::{koblitz_instance, BinaryInstance};
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
 use serde_json::{json, Value};
+
+#[path = "../tests/common/orbit_support.rs"]
+mod orbit_support;
+use orbit_support::{instance_with_modulus, random_modulus, SplitMix};
 
 const SCHEMA: &str = "orbit-lp-cell/v1";
 
@@ -45,27 +65,26 @@ fn num(args: &[String], name: &str) -> Result<u64, String> {
         .map_err(|e| format!("{name}: {e}"))
 }
 
-struct SplitMix(u64);
-
-impl SplitMix {
-    fn next(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut z = self.0;
-        z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        z ^ (z >> 31)
-    }
-}
-
 /// The Koblitz curve K_a / F_{2^n} (a in {0,1}) whose largest prime factor
 /// of the group order is the biggest admitted subgroup, and a planted target.
-fn case(n: u32) -> Result<(BinaryInstance, FastPoint, u64), String> {
+///
+/// With `modulus_seed` the same abstract curve is represented over the K-th
+/// seeded random irreducible modulus (the realisation series): same group,
+/// `r` and cofactor, but the prefix window `x < 2^env` is a different
+/// `F_2`-subspace of the field.
+fn case(n: u32, modulus_seed: Option<u64>) -> Result<(BinaryInstance, FastPoint, u64), String> {
     let candidates = [koblitz_instance(1, n), koblitz_instance(0, n)];
     let inst = candidates
         .into_iter()
         .flatten()
         .max_by_key(|i| i.r)
         .ok_or_else(|| format!("no Koblitz curve with a usable prime subgroup at n={n}"))?;
+    let inst = match modulus_seed {
+        None => inst,
+        Some(k) => {
+            instance_with_modulus(inst.a, n, random_modulus(n, k), inst.group_order, inst.r)?
+        }
+    };
     let mut rng = SplitMix(0x6f72_6269_745f_6c70 ^ u64::from(n));
     let planted = 1 + rng.next() % (inst.r - 1);
     let target = inst.fast.mul_u64(inst.generator, planted);
@@ -77,6 +96,7 @@ fn arm_config(arm: &str) -> Result<(LargePrimeGraph, u8), String> {
         "none" => (LargePrimeGraph::Filter, 0),
         "dlp" => (LargePrimeGraph::Filter, 2),
         "dlp_orbit" => (LargePrimeGraph::FilterOrbit, 2),
+        "dlp_orbit_post" => (LargePrimeGraph::FilterOrbitPostCollect, 2),
         "dlp_orbit_absorb" => (LargePrimeGraph::FilterOrbitAbsorb, 2),
         "dlp_online" => (LargePrimeGraph::Online, 2),
         other => return Err(format!("unknown arm `{other}`")),
@@ -91,9 +111,23 @@ fn cell(args: &[String]) -> Result<(), String> {
     let out = PathBuf::from(need(args, "--out")?);
     let series = arg(args, "--series").unwrap_or_else(|| "primary".into());
     let (graph, max_lp) = arm_config(&arm)?;
+    let modulus_seed = arg(args, "--modulus-seed")
+        .map(|v| v.parse::<u64>().map_err(|e| format!("--modulus-seed: {e}")))
+        .transpose()?;
+    let cutoffs: Vec<u64> = match arg(args, "--cutoffs") {
+        Some(list) => list
+            .split(',')
+            .map(|v| {
+                v.trim()
+                    .parse::<u64>()
+                    .map_err(|e| format!("--cutoffs: {e}"))
+            })
+            .collect::<Result<_, _>>()?,
+        None => Vec::new(),
+    };
     let wall = Instant::now();
     let cpu0 = process_cpu_ns();
-    let (inst, target, planted) = case(n)?;
+    let (inst, target, planted) = case(n, modulus_seed)?;
     let cpu_instance = process_cpu_ns().saturating_sub(cpu0);
     let summands = match need(args, "--summands")?.as_str() {
         "n-1" => n - 1,
@@ -110,13 +144,26 @@ fn cell(args: &[String]) -> Result<(), String> {
         large_prime_graph: graph,
     };
     let max_trials = config.max_trials;
-    let report = solve(&inst, target, config)?;
+    // The accepted-decomposition stream is hashed in every cell so that two
+    // arms can be shown to have seen the same relation stream.
+    let options = SolveOptions {
+        stream_digest: graph.uses_filter(),
+        trajectory: (!cutoffs.is_empty()).then_some(TrajectoryRequest { cutoffs }),
+        ..Default::default()
+    };
+    let report = solve_with_options(&inst, target, config, options)?;
     let cpu_total = process_cpu_ns().saturating_sub(cpu0);
+    let modulus_mask = inst
+        .irreducible
+        .low_terms
+        .iter()
+        .fold(1u64 << n, |m, &t| m | (1u64 << t));
     let receipt = json!({
         "schema": SCHEMA,
         "n": n,
         "curve": { "a": inst.a, "b": inst.b, "name": inst.name, "group_order": inst.group_order,
-                   "r": inst.r, "cofactor": inst.cofactor },
+                   "r": inst.r, "cofactor": inst.cofactor,
+                   "modulus_mask": modulus_mask, "modulus_seed": modulus_seed },
         "series": series,
         "arm": arm,
         "rep": rep,
@@ -146,7 +193,7 @@ fn cell(args: &[String]) -> Result<(), String> {
 /// are importable by `ic`.
 fn manifest(args: &[String]) -> Result<(), String> {
     let n = num(args, "--n")? as u32;
-    let (inst, target, planted) = case(n)?;
+    let (inst, target, planted) = case(n, None)?;
     if inst.a != 1 {
         return Err(format!(
             "n={n} selects a=0, which the corpus importer does not accept"
@@ -189,8 +236,13 @@ fn at<'a>(v: &'a Value, path: &str) -> Option<&'a Value> {
     path.split('.').try_fold(v, |cur, key| cur.get(key))
 }
 
-fn u(v: &Value, path: &str) -> u64 {
-    at(v, path).and_then(Value::as_u64).unwrap_or(0)
+/// A required unsigned integer field.  A missing or non-integer field is an
+/// error, not a zero: an absent integrity counter must not read as "0
+/// failures".
+fn req(v: &Value, path: &str) -> Result<u64, String> {
+    at(v, path)
+        .and_then(Value::as_u64)
+        .ok_or_else(|| format!("missing or non-integer field `{path}`"))
 }
 
 /// One receipt.
@@ -233,46 +285,51 @@ impl Cell {
         if v["schema"] != SCHEMA {
             return Err("not an orbit-lp cell receipt".into());
         }
-        let ns = |p: &str| u(v, p) as f64 / 1e9;
+        // Every counter, and above all every integrity counter (replay and
+        // audit failures), is required: a receipt that lacks one is an
+        // error, never a zero.
+        let ns = |p: &str| -> Result<f64, String> { Ok(req(v, p)? as f64 / 1e9) };
         let orbit = at(v, "report.factor_base.orbit").filter(|o| !o.is_null());
-        let pc = |i: usize| {
+        let pc = |i: usize| -> Result<u64, String> {
             at(v, "report.filter_pipeline.partials_by_class")
                 .and_then(|a| a.get(i))
                 .and_then(Value::as_u64)
-                .unwrap_or(0)
+                .ok_or_else(|| format!("missing partials_by_class[{i}]"))
         };
+        let orbit_field =
+            |name: &str| -> Result<Option<u64>, String> { orbit.map(|o| req(o, name)).transpose() };
         Ok(Self {
             series: v["series"].as_str().unwrap_or("primary").to_string(),
-            n: u(v, "n") as u32,
+            n: req(v, "n")? as u32,
             arm: v["arm"].as_str().unwrap_or("?").to_string(),
-            rep: u(v, "rep"),
-            seed: u(v, "seed"),
-            a: u(v, "curve.a"),
-            r: u(v, "curve.r"),
-            cofactor: u(v, "curve.cofactor"),
-            trials: u(v, "report.counters.trials"),
-            partial: [pc(0), pc(1), pc(2)],
-            complete: u(v, "report.filter_pipeline.complete_relations"),
-            verified: u(v, "report.filter_pipeline.replays_verified"),
-            failed_linear: u(v, "report.filter_pipeline.replay_failed_linear"),
-            failed_curve: u(v, "report.filter_pipeline.replay_failed_curve"),
-            audit_failed: u(v, "report.filter_pipeline.partial_audit_failed"),
-            independent: u(v, "report.filter_pipeline.independent_verified"),
-            rank: u(v, "report.filter_pipeline.rank"),
-            small_columns: u(v, "report.factor_base.small_columns"),
-            cycles_closed: u(v, "report.filter_pipeline.filter.cycles_closed"),
-            online_cpu: ns("report.filter_pipeline.cpu_ns.collect")
-                + ns("report.filter_pipeline.cpu_ns.filter")
-                + ns("report.filter_pipeline.cpu_ns.replay"),
-            setup_cpu: ns("report.filter_pipeline.cpu_ns.setup"),
-            audit_cpu: ns("report.filter_pipeline.cpu_ns.audit"),
-            rss_mb: u(v, "peak_rss_bytes") as f64 / 1048576.0,
-            states: u(v, "report.mitm.left_states") + u(v, "report.mitm.right_states"),
+            rep: req(v, "rep")?,
+            seed: req(v, "seed")?,
+            a: req(v, "curve.a")?,
+            r: req(v, "curve.r")?,
+            cofactor: req(v, "curve.cofactor")?,
+            trials: req(v, "report.counters.trials")?,
+            partial: [pc(0)?, pc(1)?, pc(2)?],
+            complete: req(v, "report.filter_pipeline.complete_relations")?,
+            verified: req(v, "report.filter_pipeline.replays_verified")?,
+            failed_linear: req(v, "report.filter_pipeline.replay_failed_linear")?,
+            failed_curve: req(v, "report.filter_pipeline.replay_failed_curve")?,
+            audit_failed: req(v, "report.filter_pipeline.partial_audit_failed")?,
+            independent: req(v, "report.filter_pipeline.independent_verified")?,
+            rank: req(v, "report.filter_pipeline.rank")?,
+            small_columns: req(v, "report.factor_base.small_columns")?,
+            cycles_closed: req(v, "report.filter_pipeline.filter.cycles_closed")?,
+            online_cpu: ns("report.filter_pipeline.cpu_ns.collect")?
+                + ns("report.filter_pipeline.cpu_ns.filter")?
+                + ns("report.filter_pipeline.cpu_ns.replay")?,
+            setup_cpu: ns("report.filter_pipeline.cpu_ns.setup")?,
+            audit_cpu: ns("report.filter_pipeline.cpu_ns.audit")?,
+            rss_mb: req(v, "peak_rss_bytes")? as f64 / 1048576.0,
+            states: req(v, "report.mitm.left_states")? + req(v, "report.mitm.right_states")?,
             recovered_ok: v["recovered_matches_planted"].as_bool(),
-            large_points: orbit.map(|o| u(o, "large_points")),
-            large_orbits: orbit.map(|o| u(o, "large_orbits")),
-            merged: orbit.map(|o| u(o, "merged_points")),
-            absorbed: orbit.map(|o| u(o, "absorbed_into_small")),
+            large_points: orbit_field("large_points")?,
+            large_orbits: orbit_field("large_orbits")?,
+            merged: orbit_field("merged_points")?,
+            absorbed: orbit_field("absorbed_into_small")?,
             file: file.to_string(),
         })
     }

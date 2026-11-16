@@ -1,14 +1,14 @@
 {
   "baseline": {
     "algorithm": "Pollard rho on <G>",
-    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
     "equivalence_class_reason": "negation only: E is not defined over a proper subfield",
     "equivalence_class_size": 2,
     "log2_cost_of_one_group_operation": 14.132,
-    "log2_group_operations": 55.326,
+    "log2_group_operations": 55.826,
     "log2_r": 112.0,
-    "log2_total": 69.458,
-    "log2_total_without_automorphisms": 69.958
+    "log2_total": 69.958,
+    "log2_total_negation_only": 69.958
   },
   "candidate": {
     "id": "isogeny:explicit_degree5",
@@ -25,10 +25,10 @@
   ],
   "costs": {
     "destination_solver": "RhoOnIsogenousCurve",
-    "log2_baseline": 69.458,
+    "log2_baseline": 69.958,
     "log2_cost_ratio": 0.0,
-    "log2_total": 69.458,
-    "repo_ratio_log2": 0.5,
+    "log2_total": 69.958,
+    "repo_ratio_log2": 0.0,
     "rows": [
       {
         "formula": "kernel-polynomial search for the degree-5 edges is not priced here",
@@ -56,7 +56,7 @@
       },
       {
         "formula": "Pollard rho on the same r over the same field: every class member has the same order, so the matched baseline is unchanged (identity path)",
-        "log2": 69.458,
+        "log2": 69.958,
         "phase": "destination_solve_unsplit",
         "status": "modeled"
       },
@@ -70,7 +70,7 @@
     "solvers_considered": [
       [
         "RhoOnIsogenousCurve",
-        69.458
+        69.958
       ]
     ],
     "total_is_lower_bound": true,
@@ -128,6 +128,10 @@
       "r_log2": 112.0,
       "trace": "-122610772499221213"
     }
+  },
+  "evaluation": {
+    "reason": "the price is the identity path (the matched baseline plus one edge, by construction): it says nothing about the representatives that were not searched, and the search for a cheaper one is not priced",
+    "status": "not_evaluable"
   },
   "executed": {
     "edges": [
@@ -195,7 +199,7 @@
     "transport along these edges is verified; the destination is rho on a curve of the same order, so the cost row equals the baseline: structure exists, no speedup"
   ],
   "obligations": {
-    "computational_advantage": "refuted",
+    "computational_advantage": "unknown",
     "existence": "supported",
     "explicit_construction": "supported",
     "map_correctness": "supported",
@@ -207,7 +211,7 @@
     "src/cryptanalysis/sect113r1_audit.rs (the repository's separate, size-based sect113r1 verdict is outside this tool's scope)",
     "tests/sect113r1_ghs_evidence.rs"
   ],
-  "schema": "transfer-audit/certificate/v1",
+  "schema": "transfer-audit/certificate/v2",
   "subgroup_preservation": {
     "antecedents": [],
     "argument": "for each degree-5 edge the generator's image lies on the nonsingular codomain with exact order r, the planted target is carried forward and pulled back, and the dual composition is [5]",
@@ -243,7 +247,7 @@
     "method": "replay: sect113r1_audit::run_audit (executed in this process)",
     "status": "verified"
   },
-  "tool": "transfer-audit/1",
+  "tool": "transfer-audit/2",
   "verdict": "no weakness found in scope",
   "verdict_basis": [
     "priced route costs 2^0.0 times the matched baseline or more"

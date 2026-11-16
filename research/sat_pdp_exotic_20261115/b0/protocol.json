@@ -1,0 +1,403 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "B0-PDP-SAT-BASELINE-20261115",
+ "version": 1,
+ "created": "2026-11-15",
+ "repository": "crypto",
+ "study_dir": "research/sat_pdp_exotic_20261115/b0",
+ "authors": [
+  "Claude ECDLP research lane (cloud session, owner-set goal 2026-11-15)"
+ ],
+ "links": {
+  "plan": "research/sat_pdp_exotic_20261115/PLAN.md",
+  "protocol_prose": "research/sat_pdp_exotic_20261115/b0/PROTOCOL.md",
+  "instrument": "examples/b0_pdp_sat_baseline.rs",
+  "new_solver": "examples/pdp_lin_cdcl.rs",
+  "external_arms": "tools/b0-ext-solvers/src/main.rs",
+  "cms_patch": "third_party/cryptominisat-rs-patches/0001-stats-limits-nosqlite-cstdint.patch",
+  "survey": "research/notes/index-calculus/RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md",
+  "incumbent_measurement": "research/notes/index-calculus/RESEARCH_SAT_SEMAEV.md",
+  "pricing_band": "research/sat_pdp_pricing_band_20261111/README.md"
+ },
+ "question": "On uniform m = 3 point-decomposition targets for y^2 + xy = x^3 + x^2 + 1 over F_{2^n}, n = 3l - 1, subspace base of dimension l, how many conflicts does each SAT arm spend relative to the exact pairs-and-solve oracle (R = conflicts / T_enum, T_enum = 2^l (2^l + 1) / 2) and to the triple count (R3 = conflicts / C(2^l, 3)) at l = 7..10; does the new field-product-gate solver hold R near 1 while the incumbent holds R3 near 1; and does any arm's conflict count fall below the oracle's pair count on a refutation.",
+ "claims": [
+  {
+   "id": "B1",
+   "text": "The incumbent native CDCL+XOR arm on symmetrised S'4 spends about one conflict per candidate triple: median R3 in [0.9, 1.3] at every rung l = 7..10 with no downward trend.",
+   "class": "comparative",
+   "decided_by": [
+    "C-negative",
+    "C-aa",
+    "C-positive"
+   ],
+   "if_supported": "The survey's reading is re-measured with this instrument and frozen as the baseline every candidate is read against.",
+   "if_not_supported": "The instrument differs from the October one or the survey's reading is wrong; the difference is explained before anything else runs."
+  },
+  {
+   "id": "B2",
+   "text": "The new solver (lin) spends about one conflict per (x1 <= x2, t-root): median R in [1.0, 1.7] at every rung, trending to about 1.5 (half the pairs' quadratics in t have two roots, each root's x3 failing separately), i.e. about 2^l/4.5 times fewer conflicts than the incumbent; lin-nolex is 1.5-2x lin.",
+   "class": "comparative",
+   "decided_by": [
+    "C-negative",
+    "C-positive"
+   ],
+   "if_supported": "A measured conflict-count improvement over every existing SAT implementation in the repository on this family, by the factor 2^l/3; the solver reaches the pair oracle's count.",
+   "if_not_supported": "The linearisation does not deliver the predicted count; the gate or branch design is inspected."
+  },
+  {
+   "id": "B3",
+   "text": "No SAT arm's conflict count falls below the oracle's pair count on any uniform refutation (R >= 1 on every uniform UNSAT target, every arm, every rung).",
+   "class": "comparative",
+   "decided_by": [
+    "C-negative"
+   ],
+   "if_supported": "Clause learning does not prune more than one pair per conflict on this formulation; the pairs-and-solve count is the ceiling of the SAT route here, as the survey's section 3 predicts.",
+   "if_not_supported": "A conflict excluded several pairs; the learnt clause is extracted and the mechanism is studied (this is the survey's falsifier firing if R3 < 0.5 at two consecutive rungs l >= 8)."
+  },
+  {
+   "id": "B4",
+   "text": "CryptoMiniSat (XOR-DIMACS, 1 thread) and CaDiCaL (CNF) are within [0.5, 5]x and [1, 3]x of the incumbent's median R3 respectively, or censored.",
+   "class": "comparative",
+   "decided_by": [
+    "C-negative"
+   ],
+   "if_supported": "External solvers confirm the incumbent is representative of CDCL on this system.",
+   "if_not_supported": "An external solver differs by more than a constant; its rung is studied."
+  },
+  {
+   "id": "B5",
+   "text": "The repository's chained-S3 encoder with x1,x2 branch priority (chain-p12) spends median R between 100 and 300 at l = 7.",
+   "class": "comparative",
+   "decided_by": [
+    "C-negative"
+   ],
+   "if_supported": "The existing chain implementation is two orders of magnitude behind the new solver on the same system, isolating the product-gate linearisation as the mechanism.",
+   "if_not_supported": "The chain encoder behaves differently at l = 7 than at l = 5; recorded."
+  }
+ ],
+ "arms": [
+  {
+   "id": "oracle",
+   "role": "reference",
+   "description": "SubspaceOracle::low_order(l, 1).decompose: pairs-and-solve; verdict and T_enum for every target; R = 1 by construction."
+  },
+  {
+   "id": "native",
+   "role": "incumbent",
+   "description": "sat.rs CDCL + Gauss-Jordan XOR on encode_semaev_s4_with(Native, break_symmetry = true)."
+  },
+  {
+   "id": "native-aa",
+   "role": "aa_control",
+   "description": "native with scramble_saved_phases(seed ^ 0xA5A55A5A ^ idx)."
+  },
+  {
+   "id": "cms",
+   "role": "external_reference",
+   "description": "CryptoMiniSat 5.8.0 (crates.io + third_party patch) on to_dimacs_xor of the native encoding, 1 thread, set_max_confl = budget."
+  },
+  {
+   "id": "cadical",
+   "role": "external_control",
+   "description": "CaDiCaL 3.0.1 via cadical-sys 0.8.0 on to_dimacs of the Cnf encoding, limit conflicts = budget."
+  },
+  {
+   "id": "chain-p12",
+   "role": "existing_chain",
+   "description": "binary_semaev_chain_sat::ChainedS3Encoding, m = 3, constrain_summands(0..2^l), order_all_summands, branch priority x1,x2 bits; both identity patterns; l <= 7 only."
+  },
+  {
+   "id": "lin",
+   "role": "candidate",
+   "description": "examples/pdp_lin_cdcl.rs ChainInstance::build(n, l, irr, x_r, b = 1, lex = true): CDCL + XOR engine with field-product gates; priority on the l low bits of x1 and x2."
+  },
+  {
+   "id": "lin-nolex",
+   "role": "candidate_control",
+   "description": "lin with lex = false."
+  }
+ ],
+ "controls": {
+  "negative": {
+   "present": true,
+   "arm": "uniform targets",
+   "comparison": "C-negative",
+   "description": "16 uniform targets per rung: random abscissa of a curve point with x_R >= 2^l; verdict from the oracle."
+  },
+  "positive": {
+   "present": true,
+   "arm": "planted targets",
+   "comparison": "C-positive",
+   "expected_detection": "Every arm returns SAT on every planted target within budget and the decoded abscissae lie in the subspace and satisfy S'4 (symmetrised_s4_eval = 0); a miss invalidates that arm at that rung."
+  },
+  "aa": {
+   "present": true,
+   "comparison": "C-aa",
+   "description": "native vs native-aa; median relative conflict spread on refutations is the noise floor (l = 6 check: 0.004)."
+  }
+ },
+ "variable_ledger": {
+  "independent": [
+   {
+    "name": "l",
+    "levels": [
+     7,
+     8,
+     9,
+     10
+    ]
+   },
+   {
+    "name": "arm",
+    "levels": [
+     "oracle",
+     "native",
+     "native-aa",
+     "cms",
+     "cadical",
+     "chain-p12",
+     "lin",
+     "lin-nolex"
+    ]
+   },
+   {
+    "name": "kind",
+    "levels": [
+     "uniform",
+     "planted"
+    ]
+   }
+  ],
+  "factors": [
+   {
+    "name": "curve, n = 3l - 1, irreducible (find_irreducible_sparse)",
+    "treatment": "fixed"
+   },
+   {
+    "name": "targets (seed 20261115 ^ (n << 32) ^ (l << 16); 16 uniform then 4 planted)",
+    "treatment": "fixed"
+   },
+   {
+    "name": "conflict budget (4e6 for l <= 9, 1.6e7 at l = 10)",
+    "treatment": "fixed"
+   },
+   {
+    "name": "threads (1 per arm)",
+    "treatment": "fixed"
+   },
+   {
+    "name": "symmetry breaking (lex on in every SAT arm except lin-nolex)",
+    "treatment": "fixed"
+   },
+   {
+    "name": "arm order within a target (oracle, native, chain-p12, lin, lin-nolex, native-aa, cms, cadical)",
+    "treatment": "fixed",
+    "note": "harmless for counted metrics; declared for wall time"
+   },
+   {
+    "name": "host (shared cloud container, L0)",
+    "treatment": "measured",
+    "note": "counted metrics are host-independent; wall time is descriptive only"
+   },
+   {
+    "name": "instrument commit and binary sha256",
+    "treatment": "fixed",
+    "note": "recorded in the bench record"
+   }
+  ],
+  "comparisons": [
+   {
+    "id": "C-negative",
+    "design": "one_factor",
+    "factor": "arm",
+    "metric": "R, R3 medians over decided uniform targets per rung"
+   },
+   {
+    "id": "C-positive",
+    "design": "absolute",
+    "metric": "planted targets SAT and model check per arm per rung"
+   },
+   {
+    "id": "C-aa",
+    "design": "aa",
+    "metric": "relative conflict spread native vs native-aa"
+   }
+  ]
+ },
+ "randomization": {
+  "arm_order": "fixed",
+  "arm_order_reason": "counted metrics; wall time descriptive",
+  "seed_derivation": {
+   "method": "derived",
+   "base_seed": 20261115,
+   "rule": "StdRng::seed_from_u64(seed ^ (n << 32) ^ (l << 16)); uniform targets drawn first, then planted; A/A phase seed = seed ^ 0xA5A55A5A ^ idx"
+  }
+ },
+ "sample_size": {
+  "instances": 16,
+  "replicates": 1,
+  "warmups": 0,
+  "note": "16 uniform + 4 planted per rung; medians; counted metrics are deterministic per (target, arm) so replicates measure nothing"
+ },
+ "metrics": {
+  "primary": [
+   {
+    "id": "R",
+    "name": "conflicts over oracle pairs",
+    "unit": "dimensionless",
+    "kind": "counted",
+    "definition": "conflicts / (2^l (2^l + 1) / 2), median over decided uniform targets"
+   },
+   {
+    "id": "R3",
+    "name": "conflicts over triples",
+    "unit": "dimensionless",
+    "kind": "counted",
+    "definition": "conflicts / C(2^l, 3), median over decided uniform targets"
+   }
+  ],
+  "secondary": [
+   "decisions",
+   "propagations",
+   "xor_propagations",
+   "learnt_priority_width histogram (lin)",
+   "gate_linearisations (lin)",
+   "wall_ms (descriptive)",
+   "n_vars, n_clauses, n_xors"
+  ]
+ },
+ "measurement": {
+  "isolation_required": "L0 for counted metrics; L2 before any wall-time claim",
+  "warmups": 0,
+  "order": "sequential per target",
+  "counters": [
+   "conflicts",
+   "decisions",
+   "propagations",
+   "oracle pairs"
+  ],
+  "record": [
+   "one JSON line per target: b0.pdp.sat.target/v1",
+   "instrument commit, binary sha256, ext-solver sha256",
+   "protocol freeze hashes"
+  ]
+ },
+ "execution": {
+  "backend": "local cloud container (counted metrics)",
+  "note": "An isolab-eks L2 repeat is required before any wall-time or S row; not part of this protocol's claims."
+ },
+ "stopping_rules": [
+  {
+   "rule": "Fixed grid: l in {7, 8, 9, 10}, 20 targets each, every arm except chain-p12 (l = 7 only) and cms/cadical (l <= 9; at l = 10 only if the l = 9 rung finished inside 6 h wall). [AM1: cms and cadical at l = 7 only; rungs may run concurrently on the frozen binaries.] [AM3: at l = 10 only oracle, lin, lin-nolex; native arms censored by construction.]",
+   "kind": "fixed_n",
+   "preregistered": true
+  },
+  {
+   "rule": "Conflict budget per target per arm as in the ledger; a budgeted-out solve is censored and never re-run with more budget.",
+   "kind": "budget",
+   "preregistered": true
+  }
+ ],
+ "invalidation_rules": [
+  "A SAT model failing the S'4 or subspace check invalidates that arm's rung.",
+  "A verdict disagreement with the oracle invalidates the disagreeing arm's rung until explained.",
+  "A planted miss within budget invalidates that arm's rung."
+ ],
+ "decision_rule": {
+  "text": "B1, B2, B4, B5 are read from the rung medians against their stated intervals; B3 from the per-target minimum of R over uniform refutations. Each is reported supported / not supported per rung; no rank is given between cms and cadical. No S row and no rho comparison are produced by this protocol; the distance to rho is carried by the plan's later L2 measurement."
+ },
+ "analysis_plan": {
+  "script": {
+   "path": "research/sat_pdp_exotic_20261115/b0/analyze.py"
+  },
+  "inputs": [
+   "rows/l*.jsonl"
+  ],
+  "outputs": [
+   "ANALYSIS.json",
+   "table.md",
+   "figures/*.svg"
+  ],
+  "blinded": false,
+  "frozen_before_data": true
+ },
+ "reporting": {
+  "export_schema": "experiment.export/v1",
+  "graphs": [
+   "median R and R3 per arm against l, with 2^l/3 and 1 reference lines",
+   "per-target R scatter per arm at each rung",
+   "lin learnt-clause priority-width histogram"
+  ],
+  "report_dir": "research/sat_pdp_exotic_20261115/b0"
+ },
+ "inadmissible": [
+  "Changing budget, seeds, target counts, symmetry-breaking setting, encoding or rung list after the freeze.",
+  "Re-running a censored target with a larger budget.",
+  "Reading a planted target as a row.",
+  "Reading wall time on the shared host as a cost or as evidence against rho.",
+  "Calling any count here an S value or a rho comparison."
+ ],
+ "literature": [
+  {
+   "ref": "research/notes/index-calculus/RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md",
+   "provenance": "internal",
+   "claim": "Every SAT/SMT/WDSat back end spends about one conflict per candidate tuple; falsifier < 0.5 T at two consecutive l >= 8.",
+   "verified_by": "Repository read 2026-11-15."
+  },
+  {
+   "ref": "research/notes/index-calculus/RESEARCH_SAT_SEMAEV.md",
+   "provenance": "internal",
+   "claim": "Native CDCL+XOR: 0.97-1.02 conflicts per sorted triple, l = 5..8.",
+   "verified_by": "Repository read 2026-11-15; reproduced by the l = 5, 6 instrument checks (R3 1.16, 1.10)."
+  },
+  {
+   "ref": "research/sat_pdp_pricing_band_20261111/README.md",
+   "provenance": "internal",
+   "claim": "The sub-rho SAT reading does not survive pricing conflicts (7.3x and 51x rho at 0.1 and 1 GAE).",
+   "verified_by": "Repository read 2026-11-15."
+  }
+ ],
+ "amendments": [
+  {
+   "id": "AM1-external-arms-l7-only",
+   "filed": "2026-11-15T04:50Z",
+   "filed_before_affected_data": true,
+   "scope": "stopping rule 1 only; no budget, seed, target, encoding or metric change",
+   "reason": "The l = 7 row run measured about 25 minutes of wall for one CryptoMiniSat refutation (target 0) on this host; at l >= 8 the external arms would need more than 24 h per rung, which the session cannot afford. The external references' role (B4) is served by the l = 5, 6 checks and the l = 7 rung.",
+   "change": "cms and cadical are run at l = 7 only (as chain-p12 already was). Rungs l = 8, 9, 10 run the arms oracle, native, native-aa, lin, lin-nolex. Rungs may run concurrently on the same frozen binaries (sha256 in rows/binaries.sha256); counted metrics are unaffected, wall columns were already descriptive only.",
+   "consequence_noted": "With the frozen 4e6 budget the incumbent native arm is expected to be censored at l = 9 (C(512, 3) = 22.2M) and l = 10 (1.6e7 < 178M); B1 is then read on l = 7, 8 only and the censoring is reported as such."
+  },
+  {
+   "id": "AM2-chain-p12-stopped-after-one-target",
+   "filed": "2026-11-15T04:50Z",
+   "filed_before_affected_data": false,
+   "scope": "stopping rule 1 (chain-p12 arm) and analyze.py row loading; no budget, seed, target, encoding or metric change",
+   "reason": "In the l = 7 row run the chain-p12 arm hit its 4e6 conflict budget on target 0 after 1282 s wall (R > 484, outside the predicted 100-300), making the rung about 11 h; the bench record cannot close before the rung ends and an open record fails the repository's records check for every PR. The arm's role (B5) is answered by that censored target together with the l = 5 check.",
+   "change": "The l = 7 run was stopped after its first complete target (all eight arms); that row is kept unchanged as rows/l7-run1-chain-p12-partial.jsonl. The rung is rerun with the arms oracle, native, lin, lin-nolex, native-aa, cms, cadical into rows/l7.jsonl. analyze.py merges files of the same rung by (l, idx), asserting the same target, so chain-p12 at l = 7 is reported as 1 target (censored) and B5 reads 'not supported, censored'. Counted metrics of the other arms are deterministic per (target, arm) and unaffected by the restart.",
+   "data_affected": "chain-p12 at l = 7: 1 of 20 targets instead of 20. No other arm or rung."
+  },
+  {
+   "id": "AM3-l10-incumbent-arms-dropped",
+   "filed": "2026-11-15T06:00Z",
+   "filed_before_affected_data": true,
+   "scope": "stopping rule 1 at l = 10 only; no budget, seed, target, encoding or metric change",
+   "reason": "At l = 10 the frozen budget (1.6e7 conflicts) is below the incumbent's deterministic cost (about one conflict per triple, C(1024, 3) = 1.78e8), so native and native-aa are censored by construction; observing that would cost about 40 machine-hours on this host and add no information. B1 is read on l = 7, 8 (l = 9 is censored for the same reason, at 4e6 < 2.2e7, and is run as frozen).",
+   "change": "l = 10 runs oracle, lin, lin-nolex. native and native-aa at l = 10 are reported as 'censored by construction (budget below C(2^l, 3))'.",
+   "data_affected": "native, native-aa at l = 10: not run. No other arm or rung."
+  },
+  {
+   "id": "AM4-rung-reruns-after-session-kill",
+   "filed": "2026-11-15T06:05Z",
+   "filed_before_affected_data": true,
+   "scope": "execution only; no budget, seed, target, arm, encoding or metric change",
+   "reason": "The session harness limits a background command to 2 h; the l = 7 rerun and the l = 8 run were started under it and will be stopped before their 20 targets finish.",
+   "change": "When a rung's process ends with fewer than 20 rows, a detached watcher reruns the rung with the identical frozen binary (sha256 in rows/binaries.sha256), identical arguments and budget, writing to rows/l<l>-run<k>.jsonl; analyze.py merges files of a rung by target (AM2), asserting the same x_R. Counted metrics are deterministic per (target, arm) and duplicates are identical, as the l = 7 target-0 check showed (all six arms equal to the conflict). Rungs l = 9 and l = 10 are started by the same watcher after l = 8 completes.",
+   "data_affected": "None; some targets are computed twice."
+  }
+ ],
+ "freeze": {
+  "status": "frozen",
+  "method": "FREEZE.sha256 in the study directory lists sha256 of PROTOCOL.md and protocol.json; the commit that adds FREEZE.sha256 is the freeze commit and precedes every row.",
+  "filed_before_affected_data": true
+ }
+}

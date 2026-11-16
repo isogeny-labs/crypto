@@ -32,7 +32,7 @@ use crate::certificate::{
 use crate::cost::{
     jacobian_can_carry, price_jacobian_route, ConstructionCost, VELU_MULTS_PER_KERNEL_POINT,
 };
-use crate::ctx::{jmap, Ctx, Spec};
+use crate::ctx::{jmap, Ctx, PriceBasis, Spec};
 use crate::verdict::MapBasis;
 
 const SECT113R1_SLUG: &str = "icv1-f2m113-tm122610772499221213-97df4ac6";
@@ -101,12 +101,13 @@ fn class_invariants(ctx: &Ctx) -> Certificate {
         .iter()
         .all(|l| !(&inst.r % *l).eq(&num_bigint::BigUint::default()));
     let cm = t.frobenius.cm_disc.clone();
-    let end_maximal = t.endomorphism.maximal == Some(true)
-        && matches!(
-            t.endomorphism.status,
-            crypto_lib::cryptanalysis::curve_traits::Status::Proved
-                | crypto_lib::cryptanalysis::curve_traits::Status::Probable
-        );
+    use crypto_lib::cryptanalysis::curve_traits::Status;
+    let end_status = t.endomorphism.status;
+    let end_maximal = t.endomorphism.maximal == Some(true);
+    // `Probable` is exact only if every Miller-Rabin probable prime in the
+    // discriminant's factorization is prime; only `Proved` earns a PASS.
+    let end_proved = end_maximal && end_status == Status::Proved;
+    let end_probable = end_maximal && end_status == Status::Probable;
     let cm_small = cm
         .as_deref()
         .and_then(|d| d.parse::<i64>().ok())
@@ -156,6 +157,7 @@ fn class_invariants(ctx: &Ctx) -> Certificate {
     s.carried = all_coprime;
     s.map_basis = MapBasis::Existence;
     s.at_isogenous_representative = true;
+    s.price_basis = PriceBasis::IdentityPath;
     s.existence = "supported";
     s.explicit_construction = "unknown";
     s.map_correctness = "unknown";
@@ -183,11 +185,16 @@ fn class_invariants(ctx: &Ctx) -> Certificate {
         ),
         Check::new(
             "end_ring_conductor_f_E",
-            if end_maximal { CheckResult::Pass } else { CheckResult::Indeterminate },
-            if end_maximal {
+            if end_proved { CheckResult::Pass } else { CheckResult::Indeterminate },
+            if end_proved {
                 format!(
-                    "End(E) = O_K is established (status {:?}): f_E = 1, so E is on the crater of every volcano and no isogeny can lower f_E; conductor gap g = f_pi / f_E = f_pi ({} bits). Moves go down the volcano, away from the maximal order",
-                    t.endomorphism.status, t.frobenius.conductor_bits
+                    "End(E) = O_K is proved (trait record status Proved): f_E = 1, so E is on the crater of every volcano and no isogeny can lower f_E; conductor gap g = f_pi / f_E = f_pi ({} bits). Moves go down the volcano, away from the maximal order",
+                    t.frobenius.conductor_bits
+                )
+            } else if end_probable {
+                format!(
+                    "End(E) = O_K holds under trait record status Probable only: it is exact if every Miller-Rabin probable prime (bases 2..53, above 3.3e24) in the factorization of the discriminant is prime, and it is not proved here. If it holds, f_E = 1 and no isogeny can lower f_E (conductor gap g = f_pi, {} bits); the statement is conditional on it",
+                    t.frobenius.conductor_bits
                 )
             } else {
                 "no End(E) certificate: f_E, D_E and the vertical degree are INDETERMINATE, never copied from f_pi (audit-curve)".to_string()
@@ -221,6 +228,7 @@ fn class_invariants(ctx: &Ctx) -> Certificate {
         ),
         ("ordinary", json!(t.ordinary)),
         ("anomalous", json!(t.anomalous)),
+        ("end_ring_status", json!(end_status)),
         (
             "order_check",
             serde_json::to_value(&t.order_check).unwrap_or(Value::Null),
@@ -343,6 +351,7 @@ fn ghs_extension(ctx: &Ctx) -> Result<Vec<Certificate>, String> {
         s.carried = plausible && carries;
         s.map_basis = MapBasis::Existence;
         s.at_isogenous_representative = true;
+        s.price_basis = PriceBasis::Hypothetical;
         s.existence = "unknown";
         s.explicit_construction = "unknown";
         s.map_correctness = "unknown";
@@ -450,6 +459,7 @@ fn explicit_degree5_replay(ctx: &Ctx) -> Result<Certificate, String> {
     s.carried = all_ok;
     s.map_basis = MapBasis::Executed;
     s.at_isogenous_representative = true;
+    s.price_basis = PriceBasis::IdentityPath;
     s.existence = "supported";
     s.explicit_construction = "supported";
     s.map_correctness = "supported";

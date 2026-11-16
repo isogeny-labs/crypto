@@ -4,6 +4,11 @@
 # peak RSS is its own. Run after `cargo build --release -j2 --example
 # orbit_large_prime_bench` with CARGO_TARGET_DIR set.
 set -u
+# pipefail: the cell is piped through `tail -1`; without it the pipeline's status is
+# that of `tail`, so a crashed or timed-out cell never reached the `|| echo FAILED`
+# below and failures.txt could not record anything (review finding F, 2026-10-26;
+# harmless in the merged run, which has all 250 cells).
+set -o pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 TARGET="${CARGO_TARGET_DIR:-$HOME/cargo-target}"
 BIN="$TARGET/release/examples/orbit_large_prime_bench"

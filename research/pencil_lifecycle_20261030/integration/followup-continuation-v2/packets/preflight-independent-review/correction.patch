@@ -1,0 +1,71 @@
+--- a/src/cryptanalysis/ecbench/host.rs
++++ b/src/cryptanalysis/ecbench/host.rs
+@@ -664,13 +664,18 @@
+ /// Recompute the class id from a capsule's stable facts; an audit
+ /// compares it with the stored one.
+ pub fn recompute_class(c: &HostCapsule) -> Result<String, String> {
+-    // Each id recomputes under the definition it was made with.
++    recompute_class_identity(c).map(|(id, _)| id)
++}
++
++/// Recompute both producer identity fields; this authenticates no host or custody.
++/// Preserve the historical version selection used by recompute_class.
++pub(crate) fn recompute_class_identity(c: &HostCapsule) -> Result<(String, String), String> {
+     if c.env_class_id.starts_with("ECBENV1h") {
+-        Ok(short_id("ECBENV1", &class_view_v1(&c.stable))?.0)
++        short_id("ECBENV1", &class_view_v1(&c.stable))
+     } else if c.env_class_id.starts_with("ECBENV3h") {
+-        Ok(short_id("ECBENV3", &class_view_v3(&c.stable))?.0)
++        short_id("ECBENV3", &class_view_v3(&c.stable))
+     } else {
+-        Ok(short_id("ECBENV2", &class_view_v2(&c.stable))?.0)
++        short_id("ECBENV2", &class_view_v2(&c.stable))
+     }
+ }
+ 
+--- a/src/cryptanalysis/ecbench/diagnostic_preflight.rs
++++ b/src/cryptanalysis/ecbench/diagnostic_preflight.rs
+@@ -88,10 +88,12 @@
+     core::parse(a.spec, 32 * 1024 * 1024)?; // reject duplicate keys before typed parsing
+     let spec = Spec::from_json(std::str::from_utf8(a.spec).map_err(|e| e.to_string())?)?;
+     let (spec_id, spec_sha) = short_id("ECS1", &spec.identity_view())?;
++    let (env_class_id, env_class_sha256) = super::host::recompute_class_identity(&host)?;
+     if host.schema != "ecbench.host/v1"
+         || host.build.binary_sha256 != session.binary_sha256
+         || host.env_class_id != session.env_class_id
+-        || super::host::recompute_class(&host)? != host.env_class_id
++        || env_class_id != host.env_class_id
++        || env_class_sha256 != host.env_class_sha256
+     {
+         return Err("host schema/build/environment mismatch".into());
+     }
+@@ -249,8 +251,8 @@
+         }
+     }
+     fn host_fixture() -> HostCapsule {
+-        let mut h:HostCapsule=serde_json::from_value(json!({"schema":"ecbench.host/v1","env_class_id":"ECBENV3hfixture","env_class_sha256":"synthetic-unused-full-digest","stable":{"os":"linux","arch":"aarch64","features":[],"logical_cpus":1,"numa_nodes":1,"topology":{"cpus":[],"nodes":[]},"perf_levels":[],"cpu_settings":{},"virtualization":{}},"build":{"binary_sha256":"d".repeat(64),"debug_assertions":true,"target_os":"linux","target_arch":"aarch64","build_env":{}},"captured_unix_ms":42})).unwrap();
+-        h.env_class_id = host::recompute_class(&h).unwrap();
++        let mut h:HostCapsule=serde_json::from_value(json!({"schema":"ecbench.host/v1","env_class_id":"ECBENV3hfixture","env_class_sha256":"pending-derivation","stable":{"os":"linux","arch":"aarch64","features":[],"logical_cpus":1,"numa_nodes":1,"topology":{"cpus":[],"nodes":[]},"perf_levels":[],"cpu_settings":{},"virtualization":{}},"build":{"binary_sha256":"d".repeat(64),"debug_assertions":true,"target_os":"linux","target_arch":"aarch64","build_env":{}},"captured_unix_ms":42})).unwrap();
++        (h.env_class_id, h.env_class_sha256) = host::recompute_class_identity(&h).unwrap();
+         h
+     }
+     // Mutation occurs before ALL derived byte hashes/identities/contexts are built.
+@@ -263,6 +265,10 @@
+         let mut session_binary = Some("d".repeat(64));
+         match mutation {
+             "host_schema" => h.schema = "invalid".into(),
++            "host_class_full_digest" => {
++                let replacement = if h.env_class_sha256.ends_with('0') { "1" } else { "0" };
++                h.env_class_sha256.replace_range(63..64, replacement);
++            },
+             "host_binary" => h.build.binary_sha256 = Some("a".repeat(64)),
+             "session_binary" => session_binary = Some("a".repeat(64)),
+             "class_recompute" => h.stable.logical_cpus = 2,
+@@ -367,6 +373,7 @@
+         let d = Data::load();
+         for m in [
+             "host_schema",
++            "host_class_full_digest",
+             "host_binary",
+             "session_binary",
+             "class_recompute",

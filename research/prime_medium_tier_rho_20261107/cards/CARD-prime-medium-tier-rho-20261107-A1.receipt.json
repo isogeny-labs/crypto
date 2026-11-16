@@ -1,0 +1,2501 @@
+{
+  "card_id": "CARD-prime-medium-tier-rho-20261107-A1",
+  "card_path": "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.yaml",
+  "card_sha256": "19e81acee8f9484000e8f5867408336081f212fa47b0025e8c88267fe25062b0",
+  "commands": [
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.704,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 1,
+      "outputs": {},
+      "seconds": 4.704,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "97993784b88a886baf37cfe29f2ef1ee4f4bcd76e4cafbd6b5aa54dceaab31a3",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261107T230739Z-5b566039d3bb/ (0 unpushed commit(s), 0 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.208,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.208,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "704cca8f4253c98e5702b989bf8dceb05516a3bbe56c2374a173a4bf29e14c23",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/prime_medium_tier_rho_20261107/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "target/release/examples/prime_medium_tier_rho_rfit"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.077,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "frozen-ecbench-sha",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.077,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "912bc0d67e12d9b7cb49bcf393ccfc70716c18c5b62b7b6d48137dccc8c70a71",
+      "stdout_tail": [
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9  /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "7457cb7ce67a6eff8137606150779c8f268450857595c140903d3b5697210768  target/release/examples/prime_medium_tier_rho_rfit"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/check_session_complete.sh",
+        "prime-medium-rho-20261107-j1",
+        "research/prime_medium_tier_rho_20261107/receipts/J1",
+        "1680"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.401,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "admit-j1",
+      "index": 5,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J1/admission.json": "8e9758689ba25da73495bd716667d7623531d1f4ba2cbc894318de244024d217"
+      },
+      "seconds": 8.401,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8e9758689ba25da73495bd716667d7623531d1f4ba2cbc894318de244024d217",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"prime-medium-rho/session-admission/v1\",",
+        "  \"job_name\": \"prime-medium-rho-20261107-j1\",",
+        "  \"job_uid\": \"81ceb5ce-b43e-4f8e-a3aa-3bf31bca2a63\",",
+        "  \"pod_uid\": \"56afc57e-277a-469b-8264-03c95633e371\",",
+        "  \"results_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j1/56afc57e-277a-469b-8264-03c95633e371/\",",
+        "  \"job_exit_code\": 42,",
+        "  \"expected_executions\": 1680,",
+        "  \"audit_records\": 1680,",
+        "  \"audit_replays\": 1440,",
+        "  \"l2_accepted\": false,",
+        "  \"l2_below_l2\": 1,",
+        "  \"admitted_for_counts\": true",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/fetch_session.sh",
+        "J1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.131,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fetch-j1",
+      "index": 6,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J1/records.jsonl": "e50cb6213210cde19df013b5697e81fe5e9e5650b6df5ada5e93f7a69ea7a0f6"
+      },
+      "seconds": 2.131,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "62d3bdb4b7732bd2b7e017cf3a035ae7346958aa3bcedd58a8edc590c6067b51",
+      "stdout_tail": [
+        "fetched J1 from s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j1/56afc57e-277a-469b-8264-03c95633e371/",
+        "records.jsonl sha256 e50cb6213210cde19df013b5697e81fe5e9e5650b6df5ada5e93f7a69ea7a0f6"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/fetch_session.sh",
+        "J2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.54,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fetch-j2",
+      "index": 7,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J2/records.jsonl": "d9b91213ec3f0af3fed8a1c997e5861fd1a1dc4fe36cfbb67cd9d8abee28d6d2"
+      },
+      "seconds": 1.54,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "448af189982c3f7e9ab444685dbd431e3e12325c1ca6dd2f97f422cd93fd7eb3",
+      "stdout_tail": [
+        "fetched J2 from s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j2/1c33cf16-ab53-419a-86f9-e4d59b9d08ae/",
+        "records.jsonl sha256 d9b91213ec3f0af3fed8a1c997e5861fd1a1dc4fe36cfbb67cd9d8abee28d6d2"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/fetch_session.sh",
+        "J3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.559,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fetch-j3",
+      "index": 8,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J3/records.jsonl": "cc6be07568d8e8eeec937ac636e5925bd9237836948067db4f625ae1a3a0a4ae"
+      },
+      "seconds": 1.559,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e20c92217d26487d51496fccc8bb28d7800669d8302bf0ffeee09f4bb59f7317",
+      "stdout_tail": [
+        "fetched J3 from s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j3/219601d2-9e79-470c-9fd9-280530fd360f/",
+        "records.jsonl sha256 cc6be07568d8e8eeec937ac636e5925bd9237836948067db4f625ae1a3a0a4ae"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/fetch_session.sh",
+        "J4"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.584,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fetch-j4",
+      "index": 9,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J4/records.jsonl": "e645b4b9f6c4ed648db7bae84cf0a82ea767ea1d62c6853eec97fda09d4dffbf"
+      },
+      "seconds": 1.584,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ad37350cd19d711c52ab8265717719910098a46d4bbbb8876c719e342e1a3af2",
+      "stdout_tail": [
+        "fetched J4 from s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j4/6c891815-afca-495a-86b0-06736d3622cf/",
+        "records.jsonl sha256 e645b4b9f6c4ed648db7bae84cf0a82ea767ea1d62c6853eec97fda09d4dffbf"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/fetch_session.sh",
+        "J5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.781,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fetch-j5",
+      "index": 10,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J5/records.jsonl": "f0a4b301af8dc27bf0aad2374cac7a9bf2ce1c477dcdc29fc64d193500e78adf"
+      },
+      "seconds": 1.781,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f9d9571b7864e7a6449f037f069d8872994493878d572c50c276571aacba379b",
+      "stdout_tail": [
+        "fetched J5 from s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j5/ba6247ab-b09f-4ac7-b1fc-30bec3672c43/",
+        "records.jsonl sha256 f0a4b301af8dc27bf0aad2374cac7a9bf2ce1c477dcdc29fc64d193500e78adf"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/prime_medium_tier_rho_20261107/fetch_session.sh",
+        "J6"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.392,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fetch-j6",
+      "index": 11,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J6/records.jsonl": "2a77a1d67660f1fe5dc76a2c8db7bd8f8041889ea162f97a0a6f7133439b8bee"
+      },
+      "seconds": 1.392,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0f4cf66ae68d7dc0a6738f2aa5585d120e81d5fe5e17eaa170d0195286867a2a",
+      "stdout_tail": [
+        "fetched J6 from s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j6/0ab86855-193c-4bba-b47c-90249590ea47/",
+        "records.jsonl sha256 2a77a1d67660f1fe5dc76a2c8db7bd8f8041889ea162f97a0a6f7133439b8bee"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J1",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_tier_rho_20261107/sessions/J1.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 152.486,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-j1",
+      "index": 12,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J1.audit.json": "2fbac521a33ba21fcd2d37da9274aad0d011c8c058203be271ccaf10156b4131"
+      },
+      "seconds": 152.486,
+      "stderr_sha256": "539825b7169d8225ed71c3dc725f68a12c671406ca0cc0df9875ffd6d0f5b95d",
+      "stderr_tail": [
+        "receipt sha256 2fbac521a33ba21fcd2d37da9274aad0d011c8c058203be271ccaf10156b4131",
+        "audit OK: 1680 records, 1680 verified, 1440 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "2fbac521a33ba21fcd2d37da9274aad0d011c8c058203be271ccaf10156b4131",
+      "stdout_tail": [
+        "      \"seq\": 1679,",
+        "      \"record_id\": \"ECR1he3fb8833b203\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 1440,",
+        "  \"files\": {",
+        "    \"host.json\": \"5f858f068ffd9f85044cf2456c2aa9aebaf2ca6b522a9b904a21867d18f8ad46\",",
+        "    \"plan.json\": \"441582a215e86f0345fc361d7c6ce4f586b3ef7f8928cab79a48455bb5c8d999\",",
+        "    \"records.jsonl\": \"e50cb6213210cde19df013b5697e81fe5e9e5650b6df5ada5e93f7a69ea7a0f6\",",
+        "    \"session.json\": \"0e54979323a2123938460dccfbca2fb1567ce8f960be2547d3527e72726e7ece\",",
+        "    \"spec.json\": \"5d41b87e148fc7cd91a37149a05c471d9f5e5f7d6ef2f1e833a5b7e274630115\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hfe10f980aacd\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h3937d921311d\",",
+        "  \"audited_unix_ms\": 1794093034955",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J2",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_tier_rho_20261107/sessions/J2.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 577.326,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-j2",
+      "index": 13,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J2.audit.json": "302d1859a3dc4f2bb949437249de94a45bedb40237f5562c73cce0ae15836b0d"
+      },
+      "seconds": 577.326,
+      "stderr_sha256": "1d8747379d63de53e26608b60a4e2d4905cc8e105d8e119a15a47aea18063af7",
+      "stderr_tail": [
+        "receipt sha256 302d1859a3dc4f2bb949437249de94a45bedb40237f5562c73cce0ae15836b0d",
+        "audit OK: 560 records, 560 verified, 480 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "302d1859a3dc4f2bb949437249de94a45bedb40237f5562c73cce0ae15836b0d",
+      "stdout_tail": [
+        "      \"seq\": 559,",
+        "      \"record_id\": \"ECR1hb355dff4fa37\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 480,",
+        "  \"files\": {",
+        "    \"host.json\": \"ef0904c8d0152a12288b8c728ac8b5e45f2a09970643b4f933f90f9bcb7c7b13\",",
+        "    \"plan.json\": \"8ebd5f4fc0cc909c9240d6bcfc43fd36bbd87b898df2e2af0a956ab9ba4f2812\",",
+        "    \"records.jsonl\": \"d9b91213ec3f0af3fed8a1c997e5861fd1a1dc4fe36cfbb67cd9d8abee28d6d2\",",
+        "    \"session.json\": \"80b86e42e0b353e18ddc8e77ba8f9eef7772cf20b89bc405df3cd0f5a3edbf58\",",
+        "    \"spec.json\": \"c4d00d174db057b199b6e6a2d42f95c832fb1d01df4174e1e778eaa34e10934b\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hfe10f980aacd\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h3937d921311d\",",
+        "  \"audited_unix_ms\": 1794093612304",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J3",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_tier_rho_20261107/sessions/J3.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 589.304,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-j3",
+      "index": 14,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J3.audit.json": "075c5d45610a2c812363d2d3606aac6685a2442bd24817976375cd974157090e"
+      },
+      "seconds": 589.304,
+      "stderr_sha256": "a4225ea112e330d106b11092635cee429c5804bab1c47af102c0c98e70b379d2",
+      "stderr_tail": [
+        "receipt sha256 075c5d45610a2c812363d2d3606aac6685a2442bd24817976375cd974157090e",
+        "audit OK: 140 records, 140 verified, 120 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "075c5d45610a2c812363d2d3606aac6685a2442bd24817976375cd974157090e",
+      "stdout_tail": [
+        "      \"seq\": 139,",
+        "      \"record_id\": \"ECR1hc08a24b4ed80\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 120,",
+        "  \"files\": {",
+        "    \"host.json\": \"224f8ecdbdb5a9fb8428a93c3ae918f0cbe56806341fb1854e7e617191b67dd2\",",
+        "    \"plan.json\": \"0439943bcad72ca73aa161c51a1fb2307403098a8a3bbb3d4998e6bcc5c49ff1\",",
+        "    \"records.jsonl\": \"cc6be07568d8e8eeec937ac636e5925bd9237836948067db4f625ae1a3a0a4ae\",",
+        "    \"session.json\": \"2e05195771bc118a79033442818b343f25e9664fc4e160acf7a5cf1bf84b3242\",",
+        "    \"spec.json\": \"0f9344b81dc27f98605c579f963c8b20ac4dc094d7ba8cbddd0b8af9467c8d44\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hfe10f980aacd\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h3937d921311d\",",
+        "  \"audited_unix_ms\": 1794094201617",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J4",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_tier_rho_20261107/sessions/J4.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 608.957,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-j4",
+      "index": 15,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J4.audit.json": "37e9222b3a9bf7b5ca4b62143dac24d00fc849758f1b651e92f57c3c424cd6c9"
+      },
+      "seconds": 608.957,
+      "stderr_sha256": "8a08f97a01eb2c471c4ad818e2164bedd98f6aa9699f0038e7f2688fe8390a49",
+      "stderr_tail": [
+        "receipt sha256 37e9222b3a9bf7b5ca4b62143dac24d00fc849758f1b651e92f57c3c424cd6c9",
+        "audit OK: 140 records, 140 verified, 120 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "37e9222b3a9bf7b5ca4b62143dac24d00fc849758f1b651e92f57c3c424cd6c9",
+      "stdout_tail": [
+        "      \"seq\": 139,",
+        "      \"record_id\": \"ECR1h12e545958b72\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 120,",
+        "  \"files\": {",
+        "    \"host.json\": \"a0aab9c305b50856f82e471614e5953b55b51f6df0a42824ce3eed563f430045\",",
+        "    \"plan.json\": \"bf358f94b5793f301de2a6c392e2318e96795cf7705254ecf0bad3faaaa70ef5\",",
+        "    \"records.jsonl\": \"e645b4b9f6c4ed648db7bae84cf0a82ea767ea1d62c6853eec97fda09d4dffbf\",",
+        "    \"session.json\": \"ca871800513775eca1af35f79392463e824fc1285021418994ce3af77814f2f7\",",
+        "    \"spec.json\": \"d2445538f7188eae55dd7788b9142cf06e8ec4c246850db6185d935fca37b9f0\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hfe10f980aacd\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h3937d921311d\",",
+        "  \"audited_unix_ms\": 1794094810575",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J5",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_tier_rho_20261107/sessions/J5.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 730.559,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-j5",
+      "index": 16,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J5.audit.json": "4b71b26cea338a9e5aaf8e666fc8c194ebd263e05709cfeb3a2a4f8809f961b4"
+      },
+      "seconds": 730.559,
+      "stderr_sha256": "c2ff2ad64c4672a223eb2ccf76cf79f6bdb11ae91804064f42ba7588f1935bea",
+      "stderr_tail": [
+        "receipt sha256 4b71b26cea338a9e5aaf8e666fc8c194ebd263e05709cfeb3a2a4f8809f961b4",
+        "audit OK: 140 records, 140 verified, 120 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "4b71b26cea338a9e5aaf8e666fc8c194ebd263e05709cfeb3a2a4f8809f961b4",
+      "stdout_tail": [
+        "      \"seq\": 139,",
+        "      \"record_id\": \"ECR1hbe1b20e88fc2\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 120,",
+        "  \"files\": {",
+        "    \"host.json\": \"1e3818676437a84117b9f8ea18baf931db31514b00c77374688efb9979410976\",",
+        "    \"plan.json\": \"89ab3127a40c65bdb18e2c0943035c367086b2efaefbf5b17b907af54a35fe1d\",",
+        "    \"records.jsonl\": \"f0a4b301af8dc27bf0aad2374cac7a9bf2ce1c477dcdc29fc64d193500e78adf\",",
+        "    \"session.json\": \"0d1bf71d56050c6b4c608b9cd39ffe287c8ae5f735ab4444de1540f988d69007\",",
+        "    \"spec.json\": \"77315bbea70310c56fc3363616cbe12aa0289e699eddc644fe14894136e8e890\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hfe10f980aacd\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h3937d921311d\",",
+        "  \"audited_unix_ms\": 1794095541134",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J6",
+        "--replay-all",
+        "--out",
+        "research/prime_medium_tier_rho_20261107/sessions/J6.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 653.651,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-j6",
+      "index": 17,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J6.audit.json": "d3e68ba50a16e2f01348f3c5e55d23425b9a7a1029c5867fa13390af4b220e2c"
+      },
+      "seconds": 653.651,
+      "stderr_sha256": "6a37d587cd4224cd14ac5cd9ff7f7abafc6de55449a68e0b6c3967463728e6be",
+      "stderr_tail": [
+        "receipt sha256 d3e68ba50a16e2f01348f3c5e55d23425b9a7a1029c5867fa13390af4b220e2c",
+        "audit OK: 140 records, 140 verified, 120 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "d3e68ba50a16e2f01348f3c5e55d23425b9a7a1029c5867fa13390af4b220e2c",
+      "stdout_tail": [
+        "      \"seq\": 139,",
+        "      \"record_id\": \"ECR1h9cd7ed0da20f\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"all\",",
+        "  \"replay_candidates\": 120,",
+        "  \"files\": {",
+        "    \"host.json\": \"11d25828bc0c5452352b5e0ff016cfde842eba42d677c8a7ab6eefa3c6aceba6\",",
+        "    \"plan.json\": \"3dc288555bfb0a760859f832dedfcebc31fe6f1e9a1dd18d654c17262250e33e\",",
+        "    \"records.jsonl\": \"2a77a1d67660f1fe5dc76a2c8db7bd8f8041889ea162f97a0a6f7133439b8bee\",",
+        "    \"session.json\": \"e03746ed97abb8859a649337aebc044067e6de55767934387e5efd1fac53691e\",",
+        "    \"spec.json\": \"14e9efc8f2d9776a9d9611bd8ee27fe931a0277e6508e15025c8188e90bdb9ed\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hfe10f980aacd\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h3937d921311d\",",
+        "  \"audited_unix_ms\": 1794096194787",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "table",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.513,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-j1",
+      "index": 18,
+      "outputs": {},
+      "seconds": 0.513,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "48f586e1f7e42b71439cb623b267fded6360c147508ffd968137a15c2b411113",
+      "stdout_tail": [
+        "| ECBS1h881c1908f874 | rho-neg-aa | rho.negation | icv1-fp41-tm405553-81153b6e | 40.44 | 48/48 | 0.959 | [0.860, 1.070] | 0.886 | 1.082 | 1.082 | 1.000 | yes | 124.248 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-neg-aa | rho.negation | icv1-fp41-tm886935-baa24912 | 40.81 | 48/48 | 0.923 | [0.752, 1.131] | 0.886 | 1.041 | 1.041 | 1.000 | yes | 126.982 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-plain | rho.plain | icv1-fp33-t65189-eee04389 | 32.37 | 48/48 | 1.246 | [0.948, 1.637] | 1.253 | 0.994 | 1.406 | 1.235 | no | 7.828 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-plain | rho.plain | icv1-fp33-tm43469-ac81a6df | 32.74 | 48/48 | 1.262 | [1.084, 1.469] | 1.253 | 1.007 | 1.424 | 1.315 | no | 8.437 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-plain | rho.plain | icv1-fp37-tm218953-61268c9f | 36.03 | 48/48 | 1.288 | [1.098, 1.510] | 1.253 | 1.028 | 1.453 | 1.308 | no | 31.658 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-plain | rho.plain | icv1-fp37-t160405-998ed0ab | 36.43 | 48/48 | 1.151 | [0.971, 1.365] | 1.253 | 0.919 | 1.299 | 1.293 | no | 32.438 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-plain | rho.plain | icv1-fp41-tm405553-81153b6e | 40.44 | 48/48 | 1.186 | [0.955, 1.471] | 1.253 | 0.946 | 1.338 | 1.236 | no | 136.748 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-plain | rho.plain | icv1-fp41-tm886935-baa24912 | 40.81 | 48/48 | 1.227 | [1.052, 1.432] | 1.253 | 0.979 | 1.385 | 1.330 | no | 186.421 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | bsgs-neg | bsgs.negation | icv1-fp33-t65189-eee04389 | 32.37 | 48/48 | 1.054 | [0.893, 1.245] | 1.000 | 1.054 | 1.190 | 1.045 | yes | 7.102 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | bsgs-neg | bsgs.negation | icv1-fp33-tm43469-ac81a6df | 32.74 | 48/48 | 0.829 | [0.630, 1.090] | 1.000 | 0.829 | 0.935 | 0.864 | yes | 7.243 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | bsgs-neg | bsgs.negation | icv1-fp37-tm218953-61268c9f | 36.03 | 48/48 | 1.138 | [0.923, 1.402] | 1.000 | 1.138 | 1.284 | 1.155 | yes | 32.857 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | bsgs-neg | bsgs.negation | icv1-fp37-t160405-998ed0ab | 36.43 | 48/48 | 0.947 | [0.721, 1.244] | 1.000 | 0.947 | 1.069 | 1.064 | yes | 31.092 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | bsgs-neg | bsgs.negation | icv1-fp41-tm405553-81153b6e | 40.44 | 48/48 | 0.843 | [0.661, 1.077] | 1.000 | 0.843 | 0.952 | 0.879 | yes | 119.620 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | bsgs-neg | bsgs.negation | icv1-fp41-tm886935-baa24912 | 40.81 | 48/48 | 1.058 | [0.839, 1.334] | 1.000 | 1.058 | 1.194 | 1.147 | yes | 187.990 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-neg-v2 | rho.negation_v2 | icv1-fp33-t65189-eee04389 | 32.37 | 48/48 | 1.035 | [0.870, 1.230] | 0.886 | 1.168 | 1.168 | 1.026 | yes | 7.101 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-neg-v2 | rho.negation_v2 | icv1-fp33-tm43469-ac81a6df | 32.74 | 48/48 | 0.863 | [0.705, 1.057] | 0.886 | 0.974 | 0.974 | 0.900 | yes | 5.945 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-neg-v2 | rho.negation_v2 | icv1-fp37-tm218953-61268c9f | 36.03 | 48/48 | 1.026 | [0.870, 1.209] | 0.886 | 1.158 | 1.158 | 1.042 | yes | 30.527 | L1\u00d71 L2\u00d747 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-neg-v2 | rho.negation_v2 | icv1-fp37-t160405-998ed0ab | 36.43 | 48/48 | 0.966 | [0.742, 1.257] | 0.886 | 1.089 | 1.089 | 1.085 | yes | 26.229 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-neg-v2 | rho.negation_v2 | icv1-fp41-tm405553-81153b6e | 40.44 | 48/48 | 0.977 | [0.827, 1.154] | 0.886 | 1.103 | 1.103 | 1.019 | yes | 133.440 | L2\u00d748 | \u2013 |",
+        "| ECBS1h881c1908f874 | rho-neg-v2 | rho.negation_v2 | icv1-fp41-tm886935-baa24912 | 40.81 | 48/48 | 0.868 | [0.681, 1.106] | 0.886 | 0.979 | 0.979 | 0.941 | yes | 117.800 | L2\u00d748 | \u2013 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "table",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.203,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-j2",
+      "index": 19,
+      "outputs": {},
+      "seconds": 0.203,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e098a6a5c12372a6b85ee9e0c89ba53cb7d0d750dfd2277526f80119a55c32d8",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1h577690f38604 | rho-neg | rho.negation | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 48/48 | 1.105 | [0.976, 1.250] | 0.886 | 1.246 | 1.246 | 1.000 | yes | 623.323 | L1\u00d73 L2\u00d745 | \u2013 |",
+        "| ECBS1h577690f38604 | rho-neg | rho.negation | icv1-fp45-t1999407-5563cb34 | 44.53 | 48/48 | 0.921 | [0.808, 1.051] | 0.886 | 1.040 | 1.040 | 1.000 | yes | 534.913 | L1\u00d73 L2\u00d745 | \u2013 |",
+        "| ECBS1h577690f38604 | rho-neg-aa | rho.negation | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 48/48 | 1.105 | [0.976, 1.250] | 0.886 | 1.246 | 1.246 | 1.000 | yes | 623.073 | L1\u00d72 L2\u00d746 | \u2013 |",
+        "| ECBS1h577690f38604 | rho-neg-aa | rho.negation | icv1-fp45-t1999407-5563cb34 | 44.53 | 48/48 | 0.921 | [0.808, 1.051] | 0.886 | 1.040 | 1.040 | 1.000 | yes | 533.491 | L2\u00d748 | \u2013 |",
+        "| ECBS1h577690f38604 | rho-plain | rho.plain | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 48/48 | 1.187 | [1.013, 1.391] | 1.253 | 0.947 | 1.340 | 1.075 | no | 597.469 | L1\u00d72 L2\u00d746 | \u2013 |",
+        "| ECBS1h577690f38604 | rho-plain | rho.plain | icv1-fp45-t1999407-5563cb34 | 44.53 | 48/48 | 1.418 | [1.212, 1.659] | 1.253 | 1.131 | 1.600 | 1.539 | no | 778.005 | L1\u00d72 L2\u00d746 | \u2013 |",
+        "| ECBS1h577690f38604 | bsgs-neg | bsgs.negation | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 48/48 | 0.989 | [0.752, 1.300] | 1.000 | 0.989 | 1.116 | 0.895 | yes | 828.239 | L1\u00d71 L2\u00d747 | \u2013 |",
+        "| ECBS1h577690f38604 | bsgs-neg | bsgs.negation | icv1-fp45-t1999407-5563cb34 | 44.53 | 48/48 | 1.042 | [0.803, 1.352] | 1.000 | 1.042 | 1.176 | 1.131 | yes | 725.087 | L2\u00d748 | \u2013 |",
+        "| ECBS1h577690f38604 | rho-neg-v2 | rho.negation_v2 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 48/48 | 1.040 | [0.858, 1.262] | 0.886 | 1.174 | 1.174 | 0.942 | yes | 599.075 | L1\u00d71 L2\u00d747 | \u2013 |",
+        "| ECBS1h577690f38604 | rho-neg-v2 | rho.negation_v2 | icv1-fp45-t1999407-5563cb34 | 44.53 | 48/48 | 0.917 | [0.714, 1.178] | 0.886 | 1.035 | 1.035 | 0.995 | yes | 520.498 | L2\u00d748 | \u2013 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "table",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.041,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-j3",
+      "index": 20,
+      "outputs": {},
+      "seconds": 0.041,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "16232967b1f20f5dce09b3b00e8455ea1ecdea8d2eae969b0151220f65ebc4d4",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1he7f3f85340ea | rho-neg | rho.negation | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 1.002 | [0.844, 1.190] indicative | 0.886 | 1.131 | 1.131 | 1.000 | yes | 2406.341 | L1\u00d711 L2\u00d713 | \u2013 |",
+        "| ECBS1he7f3f85340ea | rho-neg-aa | rho.negation | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 1.002 | [0.844, 1.190] indicative | 0.886 | 1.131 | 1.131 | 1.000 | yes | 2412.611 | L1\u00d711 L2\u00d713 | \u2013 |",
+        "| ECBS1he7f3f85340ea | rho-plain | rho.plain | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 1.355 | [1.063, 1.727] indicative | 1.253 | 1.081 | 1.529 | 1.352 | no | 3127.258 | L1\u00d714 L2\u00d710 | \u2013 |",
+        "| ECBS1he7f3f85340ea | bsgs-neg | bsgs.negation | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 1.039 | [0.533, 2.027] indicative | 1.000 | 1.039 | 1.172 | 1.036 | yes | 3609.000 | L1\u00d710 L2\u00d714 | \u2013 |",
+        "| ECBS1he7f3f85340ea | rho-neg-v2 | rho.negation_v2 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 0.887 | [0.598, 1.314] indicative | 0.886 | 1.001 | 1.001 | 0.885 | yes | 1737.863 | L1\u00d79 L2\u00d715 | \u2013 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "table",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J4"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.047,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-j4",
+      "index": 21,
+      "outputs": {},
+      "seconds": 0.047,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1aa06430851a3217f5bd4f320b82ce9d64e561d4b73df6aa86cc5f0081e39fca",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1h267ee2c9e742 | rho-neg | rho.negation | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 0.976 | [0.779, 1.222] indicative | 0.886 | 1.101 | 1.101 | 1.000 | yes | 2118.051 | L1\u00d73 L2\u00d721 | \u2013 |",
+        "| ECBS1h267ee2c9e742 | rho-neg-aa | rho.negation | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 0.976 | [0.779, 1.222] indicative | 0.886 | 1.101 | 1.101 | 1.000 | yes | 2118.930 | L1\u00d77 L2\u00d717 | \u2013 |",
+        "| ECBS1h267ee2c9e742 | rho-plain | rho.plain | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 1.379 | [0.761, 2.500] indicative | 1.253 | 1.101 | 1.557 | 1.414 | no | 2674.089 | L1\u00d713 L2\u00d711 | \u2013 |",
+        "| ECBS1h267ee2c9e742 | bsgs-neg | bsgs.negation | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 1.104 | [0.635, 1.917] indicative | 1.000 | 1.104 | 1.245 | 1.131 | yes | 3740.126 | L1\u00d78 L2\u00d716 | \u2013 |",
+        "| ECBS1h267ee2c9e742 | rho-neg-v2 | rho.negation_v2 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 24/24 | 0.963 | [0.720, 1.287] indicative | 0.886 | 1.086 | 1.086 | 0.987 | yes | 1887.678 | L1\u00d79 L2\u00d715 | \u2013 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "table",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.044,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-j5",
+      "index": 22,
+      "outputs": {},
+      "seconds": 0.044,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b0197c17c6f02e6bd28f32838d6272ffd25f8fbd76091c685f10106ddc11d672",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1hfa2e81023676 | rho-neg | rho.negation | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.962 | [0.680, 1.361] indicative | 0.886 | 1.085 | 1.085 | 1.000 | yes | 2772.331 | L1\u00d712 L2\u00d712 | \u2013 |",
+        "| ECBS1hfa2e81023676 | rho-neg-aa | rho.negation | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.962 | [0.680, 1.361] indicative | 0.886 | 1.085 | 1.085 | 1.000 | yes | 2774.814 | L1\u00d710 L2\u00d714 | \u2013 |",
+        "| ECBS1hfa2e81023676 | rho-plain | rho.plain | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 1.599 | [1.234, 2.074] indicative | 1.253 | 1.276 | 1.805 | 1.663 | no | 5095.992 | L1\u00d716 L2\u00d78 | \u2013 |",
+        "| ECBS1hfa2e81023676 | bsgs-neg | bsgs.negation | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.913 | [0.532, 1.568] indicative | 1.000 | 0.913 | 1.030 | 0.950 | yes | 3392.475 | L1\u00d712 L2\u00d712 | \u2013 |",
+        "| ECBS1hfa2e81023676 | rho-neg-v2 | rho.negation_v2 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.919 | [0.668, 1.264] indicative | 0.886 | 1.037 | 1.037 | 0.956 | yes | 3010.250 | L1\u00d710 L2\u00d714 | \u2013 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "table",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J6"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.042,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "table-j6",
+      "index": 23,
+      "outputs": {},
+      "seconds": 0.042,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2aab9a23217b62103f50ec80f99aadcaa91689869c2949ab37806222c784e2be",
+      "stdout_tail": [
+        "| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |",
+        "|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|",
+        "| ECBS1h437b6c69de79 | rho-neg | rho.negation | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.938 | [0.621, 1.416] indicative | 0.886 | 1.059 | 1.059 | 1.000 | yes | 2508.876 | L1\u00d79 L2\u00d715 | \u2013 |",
+        "| ECBS1h437b6c69de79 | rho-neg-aa | rho.negation | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.938 | [0.621, 1.416] indicative | 0.886 | 1.059 | 1.059 | 1.000 | yes | 2515.441 | L1\u00d78 L2\u00d716 | \u2013 |",
+        "| ECBS1h437b6c69de79 | rho-plain | rho.plain | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 1.142 | [0.812, 1.607] indicative | 1.253 | 0.911 | 1.289 | 1.217 | no | 2998.992 | L1\u00d712 L2\u00d712 | \u2013 |",
+        "| ECBS1h437b6c69de79 | bsgs-neg | bsgs.negation | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.830 | [0.576, 1.195] indicative | 1.000 | 0.830 | 0.936 | 0.884 | yes | 2861.695 | L1\u00d73 L2\u00d721 | \u2013 |",
+        "| ECBS1h437b6c69de79 | rho-neg-v2 | rho.negation_v2 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 24/24 | 0.795 | [0.538, 1.175] indicative | 0.886 | 0.897 | 0.897 | 0.848 | yes | 2880.199 | L1\u00d74 L2\u00d720 | \u2013 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "band",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J1",
+        "--json",
+        "research/prime_medium_tier_rho_20261107/analysis/band-J1.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.474,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "band-j1",
+      "index": 24,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/analysis/band-J1.json": "400378c32d8936d32f8c3a01715d1d9366430cb0144585e9924f0bf087414b15"
+      },
+      "seconds": 0.474,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "633de8380cfe356dd132870bc56ad4960fbe1c178e6f01d0d82020b1eadc10ed",
+      "stdout_tail": [
+        "| icv1-fp37-tm218953-61268c9f | 36.03 | bsgs-neg | 48/48 | 1.138 | 1.251 | 2.275 | \u2014 |",
+        "| icv1-fp37-tm218953-61268c9f | 36.03 | rho-neg | 48/48 | 0.985 | 1.083 | 1.968 | \u2014 |",
+        "| icv1-fp37-tm218953-61268c9f | 36.03 | rho-neg-aa | 48/48 | 0.985 | 1.083 | 1.968 | \u2014 |",
+        "| icv1-fp37-tm218953-61268c9f | 36.03 | rho-neg-v2 | 48/48 | 1.026 | 1.129 | 2.054 | \u2014 |",
+        "| icv1-fp37-tm218953-61268c9f | 36.03 | rho-plain | 48/48 | 1.288 | 1.288 | 1.288 | \u2014 |",
+        "| icv1-fp37-t160405-998ed0ab | 36.43 | bsgs-neg | 48/48 | 0.947 | 1.042 | 1.894 | \u2014 |",
+        "| icv1-fp37-t160405-998ed0ab | 36.43 | rho-neg | 48/48 | 0.890 | 0.979 | 1.779 | \u2014 |",
+        "| icv1-fp37-t160405-998ed0ab | 36.43 | rho-neg-aa | 48/48 | 0.890 | 0.979 | 1.779 | \u2014 |",
+        "| icv1-fp37-t160405-998ed0ab | 36.43 | rho-neg-v2 | 48/48 | 0.966 | 1.062 | 1.933 | \u2014 |",
+        "| icv1-fp37-t160405-998ed0ab | 36.43 | rho-plain | 48/48 | 1.151 | 1.151 | 1.151 | \u2014 |",
+        "| icv1-fp41-tm405553-81153b6e | 40.44 | bsgs-neg | 48/48 | 0.843 | 0.928 | 1.687 | \u2014 |",
+        "| icv1-fp41-tm405553-81153b6e | 40.44 | rho-neg | 48/48 | 0.959 | 1.055 | 1.918 | \u2014 |",
+        "| icv1-fp41-tm405553-81153b6e | 40.44 | rho-neg-aa | 48/48 | 0.959 | 1.055 | 1.918 | \u2014 |",
+        "| icv1-fp41-tm405553-81153b6e | 40.44 | rho-neg-v2 | 48/48 | 0.977 | 1.075 | 1.956 | \u2014 |",
+        "| icv1-fp41-tm405553-81153b6e | 40.44 | rho-plain | 48/48 | 1.186 | 1.186 | 1.186 | \u2014 |",
+        "| icv1-fp41-tm886935-baa24912 | 40.81 | bsgs-neg | 48/48 | 1.058 | 1.164 | 2.116 | \u2014 |",
+        "| icv1-fp41-tm886935-baa24912 | 40.81 | rho-neg | 48/48 | 0.923 | 1.015 | 1.845 | \u2014 |",
+        "| icv1-fp41-tm886935-baa24912 | 40.81 | rho-neg-aa | 48/48 | 0.923 | 1.015 | 1.845 | \u2014 |",
+        "| icv1-fp41-tm886935-baa24912 | 40.81 | rho-neg-v2 | 48/48 | 0.868 | 0.955 | 1.737 | \u2014 |",
+        "| icv1-fp41-tm886935-baa24912 | 40.81 | rho-plain | 48/48 | 1.227 | 1.227 | 1.227 | \u2014 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "band",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J2",
+        "--json",
+        "research/prime_medium_tier_rho_20261107/analysis/band-J2.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.16,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "band-j2",
+      "index": 25,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/analysis/band-J2.json": "55d153ac0bfbf8ce0a9ecc246e0025b17a5759ea2c37f574f6cc52118a60a0cc"
+      },
+      "seconds": 0.16,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "9a071f5ff6ef633bdf46d00b2621f145907cd86993c14d397ae23de12ea9eb1f",
+      "stdout_tail": [
+        "| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |",
+        "|:--|--:|:--|--:|--:|--:|--:|:--|",
+        "| icv1-fp45-t1999407-5563cb34 | 44.53 | bsgs-neg | 48/48 | 1.042 | 1.146 | 2.084 | \u2014 |",
+        "| icv1-fp45-t1999407-5563cb34 | 44.53 | rho-neg | 48/48 | 0.921 | 1.014 | 1.843 | \u2014 |",
+        "| icv1-fp45-t1999407-5563cb34 | 44.53 | rho-neg-aa | 48/48 | 0.921 | 1.014 | 1.843 | \u2014 |",
+        "| icv1-fp45-t1999407-5563cb34 | 44.53 | rho-neg-v2 | 48/48 | 0.917 | 1.009 | 1.835 | \u2014 |",
+        "| icv1-fp45-t1999407-5563cb34 | 44.53 | rho-plain | 48/48 | 1.418 | 1.418 | 1.418 | \u2014 |",
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | bsgs-neg | 48/48 | 0.989 | 1.088 | 1.978 | \u2014 |",
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | rho-neg | 48/48 | 1.105 | 1.215 | 2.209 | \u2014 |",
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | rho-neg-aa | 48/48 | 1.105 | 1.215 | 2.209 | \u2014 |",
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | rho-neg-v2 | 48/48 | 1.040 | 1.144 | 2.081 | \u2014 |",
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | rho-plain | 48/48 | 1.187 | 1.187 | 1.187 | \u2014 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "band",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J3",
+        "--json",
+        "research/prime_medium_tier_rho_20261107/analysis/band-J3.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.043,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "band-j3",
+      "index": 26,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/analysis/band-J3.json": "bb96ddb4b8e1c259800a6e55379db19cbbc1701d4307cfdca297824146c42bbe"
+      },
+      "seconds": 0.043,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7be542fcfd710c2a3d4c416eb2a7774f4d404b51c1a3aaf249fffb6743ebc106",
+      "stdout_tail": [
+        "| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |",
+        "|:--|--:|:--|--:|--:|--:|--:|:--|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | bsgs-neg | 24/24 | 1.039 | 1.143 | 2.078 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-neg | 24/24 | 1.002 | 1.103 | 2.005 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-neg-aa | 24/24 | 1.002 | 1.103 | 2.005 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-neg-v2 | 24/24 | 0.887 | 0.975 | 1.774 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-plain | 24/24 | 1.355 | 1.355 | 1.355 | \u2014 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "band",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J4",
+        "--json",
+        "research/prime_medium_tier_rho_20261107/analysis/band-J4.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.044,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "band-j4",
+      "index": 27,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/analysis/band-J4.json": "41aa6f5073bf0fd684e11bdd3a75403eba1e43d4045d8a6cb3b20b98e7803b17"
+      },
+      "seconds": 0.044,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "88b78525a5c5414cf236a0f094adec0599e9cb0db90e6bbcb0c2817f6236e5f8",
+      "stdout_tail": [
+        "| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |",
+        "|:--|--:|:--|--:|--:|--:|--:|:--|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | bsgs-neg | 24/24 | 1.104 | 1.214 | 2.207 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-neg | 24/24 | 0.976 | 1.073 | 1.951 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-neg-aa | 24/24 | 0.976 | 1.073 | 1.951 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-neg-v2 | 24/24 | 0.963 | 1.059 | 1.926 | \u2014 |",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | rho-plain | 24/24 | 1.379 | 1.379 | 1.379 | \u2014 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "band",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J5",
+        "--json",
+        "research/prime_medium_tier_rho_20261107/analysis/band-J5.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.044,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "band-j5",
+      "index": 28,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/analysis/band-J5.json": "94b6378dbf0bdbbd6ad03dcbfef97b69993b0a79ad83850980f262e0bad52a74"
+      },
+      "seconds": 0.044,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "af936be651c1c386344377a461d7a58fa102846ca81dcfea9b2fcd4ebad11a89",
+      "stdout_tail": [
+        "| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |",
+        "|:--|--:|:--|--:|--:|--:|--:|:--|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | bsgs-neg | 24/24 | 0.913 | 1.004 | 1.826 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-neg | 24/24 | 0.962 | 1.058 | 1.923 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-neg-aa | 24/24 | 0.962 | 1.058 | 1.923 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-neg-v2 | 24/24 | 0.919 | 1.011 | 1.838 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-plain | 24/24 | 1.599 | 1.599 | 1.599 | \u2014 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "band",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J6",
+        "--json",
+        "research/prime_medium_tier_rho_20261107/analysis/band-J6.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.042,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "band-j6",
+      "index": 29,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/analysis/band-J6.json": "2ca84df92cc13e5f715c963062b3de4ac3cd691d5c5e76865e1aff6003fe1ed1"
+      },
+      "seconds": 0.042,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b23a3541b3708ec1adbfb6cf5505be9ec541c325eefab8934afeb4ff2ca51173",
+      "stdout_tail": [
+        "| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |",
+        "|:--|--:|:--|--:|--:|--:|--:|:--|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | bsgs-neg | 24/24 | 0.830 | 0.913 | 1.659 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-neg | 24/24 | 0.938 | 1.032 | 1.876 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-neg-aa | 24/24 | 0.938 | 1.032 | 1.876 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-neg-v2 | 24/24 | 0.795 | 0.875 | 1.591 | \u2014 |",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | rho-plain | 24/24 | 1.142 | 1.142 | 1.142 | \u2014 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J1",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-plain",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.141,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j1-rho-plain",
+      "index": 30,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-plain.json": "8702be54b325273c04ed57d562cd6e375be92723a589667323c990f7ddcf546c"
+      },
+      "seconds": 1.141,
+      "stderr_sha256": "175b31744ce90e65be560dbbe2276f3804f24b71c0eb8528a379c3aff817ef5a",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-plain.json"
+      ],
+      "stdout_sha256": "5dfab82fca2374be50f4367b1a3c9b6ce98060322cc88e7618b0b0da7becf2ba",
+      "stdout_tail": [
+        "| W7e2c445e227d | icv1-fp41-tm886935-baa24912 | 40.81 | 0.9891 | 1.2831 | 1.2972 |",
+        "| W8106a1925866 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9028 | 0.9541 | 1.0568 |",
+        "| W8520f476e005 | icv1-fp41-tm886935-baa24912 | 40.81 | 1.2307 | 1.2238 | 0.9943 |",
+        "| W8c53f10158dc | icv1-fp41-tm886935-baa24912 | 40.81 | 1.0780 | 0.8367 | 0.7762 |",
+        "| W9a931b172747 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.8774 | 1.1596 | 1.3216 |",
+        "| W9c5111fb7ee8 | icv1-fp33-t65189-eee04389 | 32.37 | 1.1437 | 1.6445 | 1.4380 |",
+        "| Wa0632dfab95e | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.0503 | 1.0621 | 1.0113 |",
+        "| Wa90fe282a972 | icv1-fp37-tm218953-61268c9f | 36.03 | 1.3004 | 1.2279 | 0.9442 |",
+        "| Wb046537566b6 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.7526 | 1.4035 | 1.8648 |",
+        "| Wb34fc5d9ed2d | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9525 | 1.5213 | 1.5971 |",
+        "| Wb7a033999e2c | icv1-fp33-t65189-eee04389 | 32.37 | 1.2623 | 1.2604 | 0.9985 |",
+        "| Wbe554557e63c | icv1-fp33-t65189-eee04389 | 32.37 | 0.8969 | 1.4320 | 1.5966 |",
+        "| Wc50e85d87298 | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.7907 | 1.6253 | 2.0554 |",
+        "| Wc6d5d1afae0e | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9184 | 1.2091 | 1.3164 |",
+        "| We619f943db72 | icv1-fp41-tm405553-81153b6e | 40.44 | 0.8767 | 1.3623 | 1.5540 |",
+        "| Weed30955eeeb | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9876 | 1.1295 | 1.1437 |",
+        "| Wf0386653406d | icv1-fp41-tm405553-81153b6e | 40.44 | 1.1984 | 1.0688 | 0.8919 |",
+        "| Wf1ab69919a96 | icv1-fp41-tm886935-baa24912 | 40.81 | 0.6639 | 1.2648 | 1.9051 |",
+        "| Wf488fd4c4aee | icv1-fp33-t65189-eee04389 | 32.37 | 0.9090 | 1.5665 | 1.7233 |",
+        "| Wf84345f8d7e2 | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.3256 | 1.1495 | 0.8671 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J1",
+        "--a",
+        "rho-neg",
+        "--b",
+        "bsgs-neg",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.049,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j1-bsgs-neg",
+      "index": 31,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__bsgs-neg.json": "925675dad3a305534e3596090bcfc25b3737195bee1404d9343a1149c1abbd0a"
+      },
+      "seconds": 1.049,
+      "stderr_sha256": "db57bc24ed4af2fc5f1f107728761d93a0ad082ca488ab7f4a383459c192a738",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__bsgs-neg.json"
+      ],
+      "stdout_sha256": "03110c38da39fb0cec7fd31b9f6b73ca95e65b1a8980bfecd888b9cecc3963ce",
+      "stdout_tail": [
+        "| W7e2c445e227d | icv1-fp41-tm886935-baa24912 | 40.81 | 0.9891 | 0.6932 | 0.7009 |",
+        "| W8106a1925866 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9028 | 0.5252 | 0.5818 |",
+        "| W8520f476e005 | icv1-fp41-tm886935-baa24912 | 40.81 | 1.2307 | 1.3993 | 1.1370 |",
+        "| W8c53f10158dc | icv1-fp41-tm886935-baa24912 | 40.81 | 1.0780 | 0.8308 | 0.7707 |",
+        "| W9a931b172747 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.8774 | 0.7629 | 0.8696 |",
+        "| W9c5111fb7ee8 | icv1-fp33-t65189-eee04389 | 32.37 | 1.1437 | 1.3997 | 1.2239 |",
+        "| Wa0632dfab95e | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.0503 | 0.5472 | 0.5210 |",
+        "| Wa90fe282a972 | icv1-fp37-tm218953-61268c9f | 36.03 | 1.3004 | 0.9715 | 0.7470 |",
+        "| Wb046537566b6 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.7526 | 0.5926 | 0.7873 |",
+        "| Wb34fc5d9ed2d | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9525 | 1.2357 | 1.2973 |",
+        "| Wb7a033999e2c | icv1-fp33-t65189-eee04389 | 32.37 | 1.2623 | 0.9062 | 0.7179 |",
+        "| Wbe554557e63c | icv1-fp33-t65189-eee04389 | 32.37 | 0.8969 | 1.1713 | 1.3059 |",
+        "| Wc50e85d87298 | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.7907 | 0.9501 | 1.2015 |",
+        "| Wc6d5d1afae0e | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9184 | 1.1457 | 1.2474 |",
+        "| We619f943db72 | icv1-fp41-tm405553-81153b6e | 40.44 | 0.8767 | 0.8494 | 0.9689 |",
+        "| Weed30955eeeb | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9876 | 0.8779 | 0.8890 |",
+        "| Wf0386653406d | icv1-fp41-tm405553-81153b6e | 40.44 | 1.1984 | 0.7224 | 0.6028 |",
+        "| Wf1ab69919a96 | icv1-fp41-tm886935-baa24912 | 40.81 | 0.6639 | 0.8445 | 1.2721 |",
+        "| Wf488fd4c4aee | icv1-fp33-t65189-eee04389 | 32.37 | 0.9090 | 1.2678 | 1.3946 |",
+        "| Wf84345f8d7e2 | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.3256 | 0.6997 | 0.5279 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J1",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-v2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.16,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j1-rho-neg-v2",
+      "index": 32,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-neg-v2.json": "a6cd18842f95feb5a977f6ce250a4d3961e905611d016de2dcc7018b4dbd9bbf"
+      },
+      "seconds": 1.16,
+      "stderr_sha256": "94e6521240df1e09fa601da9d7d2515e2c9965391a7f12a24c588c8af28fcf11",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-neg-v2.json"
+      ],
+      "stdout_sha256": "7ef0dfaadf8f38c2ad84443e0da18efbcdda1426846aba4e271fe7032f30d9a2",
+      "stdout_tail": [
+        "| W7e2c445e227d | icv1-fp41-tm886935-baa24912 | 40.81 | 0.9891 | 0.6245 | 0.6314 |",
+        "| W8106a1925866 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9028 | 1.2035 | 1.3331 |",
+        "| W8520f476e005 | icv1-fp41-tm886935-baa24912 | 40.81 | 1.2307 | 0.8335 | 0.6772 |",
+        "| W8c53f10158dc | icv1-fp41-tm886935-baa24912 | 40.81 | 1.0780 | 0.8096 | 0.7510 |",
+        "| W9a931b172747 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.8774 | 0.7043 | 0.8028 |",
+        "| W9c5111fb7ee8 | icv1-fp33-t65189-eee04389 | 32.37 | 1.1437 | 1.1530 | 1.0082 |",
+        "| Wa0632dfab95e | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.0503 | 1.0208 | 0.9719 |",
+        "| Wa90fe282a972 | icv1-fp37-tm218953-61268c9f | 36.03 | 1.3004 | 1.3817 | 1.0625 |",
+        "| Wb046537566b6 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.7526 | 0.9282 | 1.2332 |",
+        "| Wb34fc5d9ed2d | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9525 | 0.9681 | 1.0164 |",
+        "| Wb7a033999e2c | icv1-fp33-t65189-eee04389 | 32.37 | 1.2623 | 1.0209 | 0.8088 |",
+        "| Wbe554557e63c | icv1-fp33-t65189-eee04389 | 32.37 | 0.8969 | 0.9352 | 1.0427 |",
+        "| Wc50e85d87298 | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.7907 | 0.8113 | 1.0261 |",
+        "| Wc6d5d1afae0e | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9184 | 0.5305 | 0.5776 |",
+        "| We619f943db72 | icv1-fp41-tm405553-81153b6e | 40.44 | 0.8767 | 0.8988 | 1.0252 |",
+        "| Weed30955eeeb | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9876 | 0.5724 | 0.5796 |",
+        "| Wf0386653406d | icv1-fp41-tm405553-81153b6e | 40.44 | 1.1984 | 1.1473 | 0.9574 |",
+        "| Wf1ab69919a96 | icv1-fp41-tm886935-baa24912 | 40.81 | 0.6639 | 1.1810 | 1.7789 |",
+        "| Wf488fd4c4aee | icv1-fp33-t65189-eee04389 | 32.37 | 0.9090 | 1.0748 | 1.1824 |",
+        "| Wf84345f8d7e2 | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.3256 | 1.1474 | 0.8655 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J1",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.081,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j1-rho-neg-aa",
+      "index": 33,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-neg-aa.json": "2417c7c230dd99846d6f1dbec7bd7dcd0a09177076e71f0b16d311b58f0fbe05"
+      },
+      "seconds": 1.081,
+      "stderr_sha256": "1e6bad7a9555506879057a291b8b1a6d04e12644ab00d1450bcd2af216303618",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-neg-aa.json"
+      ],
+      "stdout_sha256": "0aec66e976e1a7c6171f2ab7ecdd83593d1542e277e1748c6434589b859eb07b",
+      "stdout_tail": [
+        "| W7e2c445e227d | icv1-fp41-tm886935-baa24912 | 40.81 | 0.9891 | 0.9891 | 1.0000 |",
+        "| W8106a1925866 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9028 | 0.9028 | 1.0000 |",
+        "| W8520f476e005 | icv1-fp41-tm886935-baa24912 | 40.81 | 1.2307 | 1.2307 | 1.0000 |",
+        "| W8c53f10158dc | icv1-fp41-tm886935-baa24912 | 40.81 | 1.0780 | 1.0780 | 1.0000 |",
+        "| W9a931b172747 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.8774 | 0.8774 | 1.0000 |",
+        "| W9c5111fb7ee8 | icv1-fp33-t65189-eee04389 | 32.37 | 1.1437 | 1.1437 | 1.0000 |",
+        "| Wa0632dfab95e | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.0503 | 1.0503 | 1.0000 |",
+        "| Wa90fe282a972 | icv1-fp37-tm218953-61268c9f | 36.03 | 1.3004 | 1.3004 | 1.0000 |",
+        "| Wb046537566b6 | icv1-fp37-t160405-998ed0ab | 36.43 | 0.7526 | 0.7526 | 1.0000 |",
+        "| Wb34fc5d9ed2d | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9525 | 0.9525 | 1.0000 |",
+        "| Wb7a033999e2c | icv1-fp33-t65189-eee04389 | 32.37 | 1.2623 | 1.2623 | 1.0000 |",
+        "| Wbe554557e63c | icv1-fp33-t65189-eee04389 | 32.37 | 0.8969 | 0.8969 | 1.0000 |",
+        "| Wc50e85d87298 | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.7907 | 0.7907 | 1.0000 |",
+        "| Wc6d5d1afae0e | icv1-fp33-tm43469-ac81a6df | 32.74 | 0.9184 | 0.9184 | 1.0000 |",
+        "| We619f943db72 | icv1-fp41-tm405553-81153b6e | 40.44 | 0.8767 | 0.8767 | 1.0000 |",
+        "| Weed30955eeeb | icv1-fp37-t160405-998ed0ab | 36.43 | 0.9876 | 0.9876 | 1.0000 |",
+        "| Wf0386653406d | icv1-fp41-tm405553-81153b6e | 40.44 | 1.1984 | 1.1984 | 1.0000 |",
+        "| Wf1ab69919a96 | icv1-fp41-tm886935-baa24912 | 40.81 | 0.6639 | 0.6639 | 1.0000 |",
+        "| Wf488fd4c4aee | icv1-fp33-t65189-eee04389 | 32.37 | 0.9090 | 0.9090 | 1.0000 |",
+        "| Wf84345f8d7e2 | icv1-fp33-tm43469-ac81a6df | 32.74 | 1.3256 | 1.3256 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J2",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-plain",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.394,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j2-rho-plain",
+      "index": 34,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-plain.json": "dc49d9967d659a558e875c72235eb48ec583aee5a51c9183d69e5bf578517f98"
+      },
+      "seconds": 0.394,
+      "stderr_sha256": "24d5858edcda5295438e3a0e1bc759ee589c43ee2416fd2a62cf191e77f118e6",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-plain.json"
+      ],
+      "stdout_sha256": "7bb043a9d9dcab3471141763e7adb61e6498ae8972e854e839d0a5651b68b923",
+      "stdout_tail": [
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 8 | 1.0747 | [0.8467, 1.3642] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-plain mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W0d2c00abb95d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.1065 | 1.3799 | 1.2471 |",
+        "| W0fa9016fa3f7 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9634 | 1.1270 | 1.1698 |",
+        "| W169d90cd868d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0307 | 1.8095 | 1.7556 |",
+        "| W1e29ef415f95 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9757 | 1.6296 | 1.6703 |",
+        "| W3cab34347f85 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8629 | 0.8995 | 1.0424 |",
+        "| W3cd27cb0c06d | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9118 | 1.2518 | 1.3728 |",
+        "| W3f78f987c9f4 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0321 | 0.9027 | 0.8746 |",
+        "| W63628ee63ffa | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.2482 | 1.1601 | 0.9294 |",
+        "| W6a0059227f05 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7040 | 1.5533 | 2.2064 |",
+        "| W796ad5849cba | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7684 | 1.2911 | 1.6803 |",
+        "| W87733569973b | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8558 | 1.4098 | 1.6474 |",
+        "| Wa80f4deedf79 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.9821 | 1.3908 | 1.4161 |",
+        "| Wb59dacf10eed | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3080 | 1.0543 | 0.8060 |",
+        "| Wd221f9b3144c | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0608 | 1.6111 | 1.5187 |",
+        "| Wedb865d8e94f | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3158 | 1.0264 | 0.7800 |",
+        "| Wff15cc4a7aa5 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0822 | 1.3460 | 1.2437 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J2",
+        "--a",
+        "rho-neg",
+        "--b",
+        "bsgs-neg",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.418,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j2-bsgs-neg",
+      "index": 35,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__bsgs-neg.json": "6645f3682dd1e535939a288beb969ea4910a2e1d698d3947b754ad326cd7fdbc"
+      },
+      "seconds": 0.418,
+      "stderr_sha256": "17ec207dc60b87f36914f3c431e1628dc43f8d4ce54d9b473dd15030502397a5",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__bsgs-neg.json"
+      ],
+      "stdout_sha256": "ec1f7b4815d8138604eafc9a382361b1d2f115be20c0feaf6ca5c1bdc9a77ecf",
+      "stdout_tail": [
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 8 | 0.8951 | [0.6471, 1.2382] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | bsgs-neg mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W0d2c00abb95d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.1065 | 1.3805 | 1.2476 |",
+        "| W0fa9016fa3f7 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9634 | 0.7943 | 0.8244 |",
+        "| W169d90cd868d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0307 | 1.4466 | 1.4036 |",
+        "| W1e29ef415f95 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9757 | 1.2810 | 1.3129 |",
+        "| W3cab34347f85 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8629 | 0.8797 | 1.0195 |",
+        "| W3cd27cb0c06d | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9118 | 1.2353 | 1.3548 |",
+        "| W3f78f987c9f4 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0321 | 1.2885 | 1.2485 |",
+        "| W63628ee63ffa | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.2482 | 0.6055 | 0.4851 |",
+        "| W6a0059227f05 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7040 | 1.2870 | 1.8282 |",
+        "| W796ad5849cba | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7684 | 0.6913 | 0.8997 |",
+        "| W87733569973b | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8558 | 0.9752 | 1.1396 |",
+        "| Wa80f4deedf79 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.9821 | 1.1210 | 1.1414 |",
+        "| Wb59dacf10eed | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3080 | 1.2854 | 0.9827 |",
+        "| Wd221f9b3144c | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0608 | 0.5540 | 0.5222 |",
+        "| Wedb865d8e94f | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3158 | 0.8946 | 0.6799 |",
+        "| Wff15cc4a7aa5 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0822 | 0.5258 | 0.4858 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J2",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-v2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.448,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j2-rho-neg-v2",
+      "index": 36,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-neg-v2.json": "4e1a5e76c8ff6ec9d4473ae2796f61110963b92bc65bac87429dd75f8bcddaf8"
+      },
+      "seconds": 0.448,
+      "stderr_sha256": "e3d5e224cc5bb6cc982127fb0087d09dff6b82280beb6f2e1d994cda6f5672f1",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-neg-v2.json"
+      ],
+      "stdout_sha256": "4551eb1241bf6fa7b8a19d57c03f2bcd632e240e30f90654f7315bc02fb8823b",
+      "stdout_tail": [
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 8 | 0.9416 | [0.7673, 1.1556] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-v2 mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W0d2c00abb95d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.1065 | 1.3125 | 1.1862 |",
+        "| W0fa9016fa3f7 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9634 | 1.2113 | 1.2572 |",
+        "| W169d90cd868d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0307 | 0.9097 | 0.8826 |",
+        "| W1e29ef415f95 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9757 | 1.2692 | 1.3009 |",
+        "| W3cab34347f85 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8629 | 0.7434 | 0.8616 |",
+        "| W3cd27cb0c06d | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9118 | 0.5280 | 0.5790 |",
+        "| W3f78f987c9f4 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0321 | 1.0804 | 1.0468 |",
+        "| W63628ee63ffa | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.2482 | 0.8608 | 0.6896 |",
+        "| W6a0059227f05 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7040 | 0.5584 | 0.7932 |",
+        "| W796ad5849cba | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7684 | 0.7936 | 1.0328 |",
+        "| W87733569973b | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8558 | 1.2512 | 1.4621 |",
+        "| Wa80f4deedf79 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.9821 | 1.0880 | 1.1078 |",
+        "| Wb59dacf10eed | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3080 | 1.1679 | 0.8929 |",
+        "| Wd221f9b3144c | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0608 | 0.6796 | 0.6406 |",
+        "| Wedb865d8e94f | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3158 | 1.1300 | 0.8588 |",
+        "| Wff15cc4a7aa5 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0822 | 1.0738 | 0.9923 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J2",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.42,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j2-rho-neg-aa",
+      "index": 37,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-neg-aa.json": "3706c77e972499adb8e142b1a0f67659e33547cc12ba8cdbe6941bfcaa6736c5"
+      },
+      "seconds": 0.42,
+      "stderr_sha256": "17650fa39284b03255d142bd78da2fea68aeaa25776c114890b1e3b80a6990fe",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J2/comparisons/rho-neg__rho-neg-aa.json"
+      ],
+      "stdout_sha256": "98053c46156532bd8d184a8d28e75bb5443ad8b53381c55814bcf1e4a7ecda0f",
+      "stdout_tail": [
+        "| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 8 | 1.0000 | [1.0000, 1.0000] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-aa mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W0d2c00abb95d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.1065 | 1.1065 | 1.0000 |",
+        "| W0fa9016fa3f7 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9634 | 0.9634 | 1.0000 |",
+        "| W169d90cd868d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0307 | 1.0307 | 1.0000 |",
+        "| W1e29ef415f95 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9757 | 0.9757 | 1.0000 |",
+        "| W3cab34347f85 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8629 | 0.8629 | 1.0000 |",
+        "| W3cd27cb0c06d | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9118 | 0.9118 | 1.0000 |",
+        "| W3f78f987c9f4 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0321 | 1.0321 | 1.0000 |",
+        "| W63628ee63ffa | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.2482 | 1.2482 | 1.0000 |",
+        "| W6a0059227f05 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7040 | 0.7040 | 1.0000 |",
+        "| W796ad5849cba | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7684 | 0.7684 | 1.0000 |",
+        "| W87733569973b | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8558 | 0.8558 | 1.0000 |",
+        "| Wa80f4deedf79 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.9821 | 0.9821 | 1.0000 |",
+        "| Wb59dacf10eed | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3080 | 1.3080 | 1.0000 |",
+        "| Wd221f9b3144c | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0608 | 1.0608 | 1.0000 |",
+        "| Wedb865d8e94f | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3158 | 1.3158 | 1.0000 |",
+        "| Wff15cc4a7aa5 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0822 | 1.0822 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J3",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-plain",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.081,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j3-rho-plain",
+      "index": 38,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-plain.json": "72c6e8fe2160154ad9faad9b572c0d96c0a81215bff8b3b9f691629dae36d89a"
+      },
+      "seconds": 0.081,
+      "stderr_sha256": "0a456a793c1fc17feb5c9550c560259aca5d185ef6382fc9cbce0a67b49832ee",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-plain.json"
+      ],
+      "stdout_sha256": "c3879b85129aabda4f7f180d2dfc4c8658c908be09fff11c2c935d0e344a5bd0",
+      "stdout_tail": [
+        "ops (ok): rho-plain / rho-neg = 1.3515 [0.909, 2.009] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.3515, w=0.1: 1.2287, w=1: 0.6758): unresolved inside the band; wall: admitted ns/GAE rho-plain/rho-neg 0.9486 [0.940, 0.957], bias-corrected 0.9528 [0.945, 0.961] (A/A 0.9955, includes arm A), outside noise; end-to-end wall 1.0424 [0.567, 1.917]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 57 / 100; paired attempts 24, verified 24, admitted 5; levels {\"L1\": 19, \"L2\": 5}; p95 foreign busy 0.33%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 1.97, top run 8% of total; unpriced: canonicalisations_uncharged=460157567",
+        "arm rho-plain: verified 24/24 (0 censored); max/median S 1.69, top run 7% of total; unpriced: none",
+        "| curve | log2 r | workloads | rho-plain / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.3515 | [0.9093, 2.0088] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-plain mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W083aa423c82d | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8437 | 1.6407 | 1.9445 |",
+        "| W0b94780ff2c4 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0467 | 1.2167 | 1.1624 |",
+        "| W564f70d9fbd8 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0336 | 1.1895 | 1.1509 |",
+        "| W6153c7edee00 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0857 | 1.3723 | 1.2640 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J3",
+        "--a",
+        "rho-neg",
+        "--b",
+        "bsgs-neg",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.085,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j3-bsgs-neg",
+      "index": 39,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__bsgs-neg.json": "31e3a5396a845320d638ec65aae2f38ff53020402c49fde15c52d3c519711164"
+      },
+      "seconds": 0.085,
+      "stderr_sha256": "a39b44d507058476782c542d73eec85457ad81e1c09c3a8f8fe794644e8deafb",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__bsgs-neg.json"
+      ],
+      "stdout_sha256": "48d6ece60dc65329d728704d38d6c2845aa20473b0b426726d2dfcec685fd289",
+      "stdout_tail": [
+        "ops (ok): bsgs-neg / rho-neg = 1.0363 [0.576, 1.863] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0363, w=0.1: 1.0363, w=1: 1.0363): bsgs-neg > rho-neg at every weight; wall: admitted ns/GAE bsgs-neg/rho-neg 1.2554 [1.184, 1.331], bias-corrected 1.2610 [1.189, 1.337] (A/A 0.9955, includes arm A), outside noise; end-to-end wall 1.4210 [0.703, 2.873]; ns/GAE of rho-neg, bsgs-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 61 / 100; paired attempts 24, verified 24, admitted 8; levels {\"L1\": 16, \"L2\": 8}; p95 foreign busy 0.52%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 1.97, top run 8% of total; unpriced: canonicalisations_uncharged=460157567",
+        "arm bsgs-neg: verified 24/24 (0 censored); max/median S 1.47, top run 6% of total; unpriced: inserts_uncharged=229528824, lookups_uncharged=247350090",
+        "| curve | log2 r | workloads | bsgs-neg / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.0363 | [0.5763, 1.8635] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | bsgs-neg mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W083aa423c82d | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8437 | 0.7081 | 0.8393 |",
+        "| W0b94780ff2c4 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0467 | 0.6261 | 0.5981 |",
+        "| W564f70d9fbd8 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0336 | 1.3242 | 1.2812 |",
+        "| W6153c7edee00 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0857 | 1.4969 | 1.3787 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J3",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-v2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.083,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j3-rho-neg-v2",
+      "index": 40,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-neg-v2.json": "dfce638b236a42403f9b86dc371b0e4013017f3ee9fdb9d920bd9e4cd9ce78d1"
+      },
+      "seconds": 0.083,
+      "stderr_sha256": "e1bbe631397118c2fe5b663b2cff79e51af9476d5ec1879e60b7cce94fefdd6f",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-neg-v2.json"
+      ],
+      "stdout_sha256": "a775f152647c274ddf3084b01062a091cb8a27ca8f11ccd73ce043d91f3b1699",
+      "stdout_tail": [
+        "ops (ok): rho-neg-v2 / rho-neg = 0.8846 [0.511, 1.533] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.8846, w=0.1: 0.8847, w=1: 0.8848): rho-neg-v2 < rho-neg at every weight; wall: admitted ns/GAE rho-neg-v2/rho-neg 1.0002 [0.992, 1.008], bias-corrected 1.0046 [0.996, 1.013] (A/A 0.9955, includes arm A), within noise; end-to-end wall 1.0237 [0.399, 2.624]; ns/GAE of rho-neg, rho-neg-v2 is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 61 / 100; paired attempts 24, verified 24, admitted 8; levels {\"L1\": 16, \"L2\": 8}; p95 foreign busy 0.83%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 1.97, top run 8% of total; unpriced: canonicalisations_uncharged=460157567",
+        "arm rho-neg-v2: verified 24/24 (0 censored); max/median S 2.50, top run 9% of total; unpriced: canonicalisations_uncharged=407065222, distinguished_point_table_inserts_uncharged=95874, distinguished_point_table_queries_uncharged=95907",
+        "| curve | log2 r | workloads | rho-neg-v2 / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 0.8846 | [0.5106, 1.5327] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-v2 mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W083aa423c82d | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8437 | 1.1362 | 1.3466 |",
+        "| W0b94780ff2c4 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0467 | 0.8115 | 0.7753 |",
+        "| W564f70d9fbd8 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0336 | 0.9747 | 0.9430 |",
+        "| W6153c7edee00 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0857 | 0.6246 | 0.5753 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J3",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.081,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j3-rho-neg-aa",
+      "index": 41,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-neg-aa.json": "144ba80ef52d0a01857dc44038dc5eabe4e3a7bb6b6ef66d8d743d1bf2dd1a71"
+      },
+      "seconds": 0.081,
+      "stderr_sha256": "e5ff370ed85d66907d39b56601175dd07ecdba79c99e553aba10fc2fc212a587",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J3/comparisons/rho-neg__rho-neg-aa.json"
+      ],
+      "stdout_sha256": "30c1f73159c22df14425790629b06419f3ba8ff4f62f8b7ee58309700ce45299",
+      "stdout_tail": [
+        "ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 0.9955 [0.991, 1.000], an A/A control (nothing to correct); end-to-end wall 0.9955 [0.991, 1.000]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 63 / 100; paired attempts 24, verified 24, admitted 9; levels {\"L1\": 15, \"L2\": 9}; p95 foreign busy 0.54%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 1.97, top run 8% of total; unpriced: canonicalisations_uncharged=460157567",
+        "arm rho-neg-aa: verified 24/24 (0 censored); max/median S 1.97, top run 8% of total; unpriced: canonicalisations_uncharged=460157567",
+        "| curve | log2 r | workloads | rho-neg-aa / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.0000 | [1.0000, 1.0000] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-aa mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W083aa423c82d | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8437 | 0.8437 | 1.0000 |",
+        "| W0b94780ff2c4 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0467 | 1.0467 | 1.0000 |",
+        "| W564f70d9fbd8 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0336 | 1.0336 | 1.0000 |",
+        "| W6153c7edee00 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.0857 | 1.0857 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J4",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-plain",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.093,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j4-rho-plain",
+      "index": 42,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-plain.json": "cf8c5f7b3340a9717645f1e41df96cd40220ebd468c0721a6c95e49fae1879a9"
+      },
+      "seconds": 0.093,
+      "stderr_sha256": "53d11440b130db80966a84c641b56ae103efcb93b50e2ed33f0b448f41494ca9",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-plain.json"
+      ],
+      "stdout_sha256": "18210133b21435cf0969bdd570362a54699b3f295ce5d1f9190845d3e4623101",
+      "stdout_tail": [
+        "ops (ok): rho-plain / rho-neg = 1.4139 [0.688, 2.906] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.4139, w=0.1: 1.2854, w=1: 0.7070): unresolved inside the band; wall: admitted ns/GAE rho-plain/rho-neg 0.9538 [0.945, 0.962], bias-corrected 0.9551 [0.947, 0.964] (A/A 0.9986, includes arm A), outside noise; end-to-end wall 1.0091 [0.516, 1.972]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 63 / 100; paired attempts 24, verified 24, admitted 9; levels {\"L1\": 15, \"L2\": 9}; p95 foreign busy 0.34%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.13, top run 8% of total; unpriced: canonicalisations_uncharged=447871879",
+        "arm rho-plain: verified 24/24 (0 censored); max/median S 3.29, top run 11% of total; unpriced: none",
+        "| curve | log2 r | workloads | rho-plain / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.4139 | [0.6880, 2.9057] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-plain mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W58f361e18cbf | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9845 | 0.8400 | 0.8532 |",
+        "| W6d043f4973dc | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8276 | 2.0654 | 2.4955 |",
+        "| Wa0edbed91337 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9320 | 1.1956 | 1.2829 |",
+        "| Wcd0026d0cfda | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.1585 | 1.4169 | 1.2230 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J4",
+        "--a",
+        "rho-neg",
+        "--b",
+        "bsgs-neg",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.09,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j4-bsgs-neg",
+      "index": 43,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__bsgs-neg.json": "2a8636c5d9d333c5fa9d6ab98914bf1b210f8d489a371fc3cd207e43810e794b"
+      },
+      "seconds": 0.09,
+      "stderr_sha256": "7ad8bea0fdb79591f4e35ebb1b9bbc8b398523f7fda6b957eed9fa79a05815bb",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__bsgs-neg.json"
+      ],
+      "stdout_sha256": "a1178b72ececbe5fd8e111f0e59b684c55b5bf305505dad495323f9230fc4256",
+      "stdout_tail": [
+        "ops (ok): bsgs-neg / rho-neg = 1.1311 [0.538, 2.379] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.1311, w=0.1: 1.1311, w=1: 1.1311): bsgs-neg > rho-neg at every weight; wall: admitted ns/GAE bsgs-neg/rho-neg 1.2066 [1.178, 1.236], bias-corrected 1.2083 [1.179, 1.238] (A/A 0.9986, includes arm A), outside noise; end-to-end wall 1.5577 [1.023, 2.372]; ns/GAE of rho-neg, bsgs-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 70 / 100; paired attempts 24, verified 24, admitted 14; levels {\"L1\": 10, \"L2\": 14}; p95 foreign busy 0.00%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.13, top run 8% of total; unpriced: canonicalisations_uncharged=447871879",
+        "arm bsgs-neg: verified 24/24 (0 censored); max/median S 1.36, top run 6% of total; unpriced: inserts_uncharged=229528824, lookups_uncharged=277057152",
+        "| curve | log2 r | workloads | bsgs-neg / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.1311 | [0.5377, 2.3794] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | bsgs-neg mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W58f361e18cbf | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9845 | 0.8043 | 0.8170 |",
+        "| W6d043f4973dc | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8276 | 1.3789 | 1.6660 |",
+        "| Wa0edbed91337 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9320 | 1.4861 | 1.5945 |",
+        "| Wcd0026d0cfda | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.1585 | 0.7449 | 0.6430 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J4",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-v2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.084,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j4-rho-neg-v2",
+      "index": 44,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-neg-v2.json": "363db892b9444cb543c04824824ff3856b97d7a78293d9a0237a0ce34c967e0d"
+      },
+      "seconds": 0.084,
+      "stderr_sha256": "d10a384e406910ac389f9224c1f6b6866998b2b6b325304d7ae71d6ef5371af0",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-neg-v2.json"
+      ],
+      "stdout_sha256": "c5115059ed3ef5640f8092913f7170a8b6c3e3cd31e7f2d9c020f356ff2ced6a",
+      "stdout_tail": [
+        "ops (ok): rho-neg-v2 / rho-neg = 0.9866 [0.664, 1.466] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9866, w=0.1: 0.9867, w=1: 0.9869): rho-neg-v2 < rho-neg at every weight; wall: admitted ns/GAE rho-neg-v2/rho-neg 1.0051 [1.000, 1.010], bias-corrected 1.0065 [1.002, 1.011] (A/A 0.9986, includes arm A), outside noise; end-to-end wall 0.8425 [0.539, 1.316]; ns/GAE of rho-neg, rho-neg-v2 is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 67 / 100; paired attempts 24, verified 24, admitted 12; levels {\"L1\": 12, \"L2\": 12}; p95 foreign busy 0.00%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.13, top run 8% of total; unpriced: canonicalisations_uncharged=447871879",
+        "arm rho-neg-v2: verified 24/24 (0 censored); max/median S 2.58, top run 9% of total; unpriced: canonicalisations_uncharged=441882043, distinguished_point_table_inserts_uncharged=104192, distinguished_point_table_queries_uncharged=104227",
+        "| curve | log2 r | workloads | rho-neg-v2 / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 0.9866 | [0.6641, 1.4658] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-v2 mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W58f361e18cbf | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9845 | 0.7035 | 0.7145 |",
+        "| W6d043f4973dc | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8276 | 1.0485 | 1.2668 |",
+        "| Wa0edbed91337 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9320 | 1.0890 | 1.1685 |",
+        "| Wcd0026d0cfda | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.1585 | 1.0095 | 0.8714 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J4",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.083,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j4-rho-neg-aa",
+      "index": 45,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-neg-aa.json": "0c5d1f47875cad1a6c3b8ee91278e403e59fa5b9fe824cdaaad2ef08304d668c"
+      },
+      "seconds": 0.083,
+      "stderr_sha256": "994e7423953b95d712773bc140fe9b30ac423b241fa716d5b5e57124919f203c",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J4/comparisons/rho-neg__rho-neg-aa.json"
+      ],
+      "stdout_sha256": "33c9e26967cf43cbde88b543943b3e55aa9a2ce24e1c84feaee4cfbd290694d7",
+      "stdout_tail": [
+        "ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 0.9986 [0.997, 1.001], an A/A control (nothing to correct); end-to-end wall 0.9986 [0.997, 1.001]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 70 / 100; paired attempts 24, verified 24, admitted 14; levels {\"L1\": 10, \"L2\": 14}; p95 foreign busy 0.00%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.13, top run 8% of total; unpriced: canonicalisations_uncharged=447871879",
+        "arm rho-neg-aa: verified 24/24 (0 censored); max/median S 2.13, top run 8% of total; unpriced: canonicalisations_uncharged=447871879",
+        "| curve | log2 r | workloads | rho-neg-aa / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm10234315-a355a6d8 | 48.38 | 4 | 1.0000 | [1.0000, 1.0000] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-aa mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W58f361e18cbf | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9845 | 0.9845 | 1.0000 |",
+        "| W6d043f4973dc | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.8276 | 0.8276 | 1.0000 |",
+        "| Wa0edbed91337 | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 0.9320 | 0.9320 | 1.0000 |",
+        "| Wcd0026d0cfda | icv1-fp49-tm10234315-a355a6d8 | 48.38 | 1.1585 | 1.1585 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J5",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-plain",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.077,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j5-rho-plain",
+      "index": 46,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-plain.json": "5511ee40f4684aab6b9d2eea92165ff6f0d3b692fae9b153009670d87a0387f6"
+      },
+      "seconds": 0.077,
+      "stderr_sha256": "9c4c47ba535249f93779f8fd71f688e306b6d632d54817e0510fb7f555b0bbe9",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-plain.json"
+      ],
+      "stdout_sha256": "8237c360669680ab4a6fc9c214dbb777cba11ec89527fc40fbb55d28ef96e412",
+      "stdout_tail": [
+        "ops (ok): rho-plain / rho-neg = 1.6633 [0.986, 2.805] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.6633, w=0.1: 1.5121, w=1: 0.8316): unresolved inside the band; wall: admitted ns/GAE rho-plain/rho-neg 0.9532 [0.951, 0.955], bias-corrected 0.9518 [0.948, 0.956] (A/A 1.0015, includes arm A), outside noise; end-to-end wall 0.7334 [0.403, 1.335]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 57 / 100; paired attempts 24, verified 24, admitted 5; levels {\"L1\": 19, \"L2\": 5}; p95 foreign busy 0.58%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.07, top run 8% of total; unpriced: canonicalisations_uncharged=546593711",
+        "arm rho-plain: verified 24/24 (0 censored); max/median S 1.55, top run 7% of total; unpriced: none",
+        "| curve | log2 r | workloads | rho-plain / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 1.6633 | [0.9864, 2.8047] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-plain mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W348eeec04d72 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.6605 | 1.7664 | 2.6743 |",
+        "| W6fb9018c1ab2 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.0920 | 1.8190 | 1.6657 |",
+        "| W714d1f703e68 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9768 | 1.5694 | 1.6066 |",
+        "| Wd695b34db4f0 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.1169 | 1.2425 | 1.1125 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J5",
+        "--a",
+        "rho-neg",
+        "--b",
+        "bsgs-neg",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.072,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j5-bsgs-neg",
+      "index": 47,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__bsgs-neg.json": "be5f538eb534fca656a2ac6ce70e6a1ffd2c547089ea705d895bc6ad2fdf5395"
+      },
+      "seconds": 0.072,
+      "stderr_sha256": "3faeb4ca2851d47b70911559b67252bdb47840afd8a0721705fdc12e26c08e0c",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__bsgs-neg.json"
+      ],
+      "stdout_sha256": "949515604343edc377fee09749e52d5126e14e10e4c8dee218ab80380e5e4987",
+      "stdout_tail": [
+        "ops (ok): bsgs-neg / rho-neg = 0.9495 [0.511, 1.764] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9495, w=0.1: 0.9495, w=1: 0.9495): bsgs-neg < rho-neg at every weight; wall: descriptive (ns/GAE 1.2505, not a result: 20 of 24 pairs did not reach L2; 4 admitted pairs; at least 5 are needed); ns/GAE of rho-neg, bsgs-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 45 / 100; paired attempts 24, verified 24, admitted 4; levels {\"L1\": 20, \"L2\": 4}; p95 foreign busy 0.52%, p95 run queue 0.00%",
+        "quality notes: no admitted A/A interval; calibration bonus unavailable",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.07, top run 8% of total; unpriced: canonicalisations_uncharged=546593711",
+        "arm bsgs-neg: verified 24/24 (0 censored); max/median S 1.59, top run 6% of total; unpriced: inserts_uncharged=284226888, lookups_uncharged=234790266",
+        "| curve | log2 r | workloads | bsgs-neg / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 0.9495 | [0.5111, 1.7642] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | bsgs-neg mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W348eeec04d72 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.6605 | 0.9512 | 1.4401 |",
+        "| W6fb9018c1ab2 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.0920 | 0.6379 | 0.5841 |",
+        "| W714d1f703e68 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9768 | 0.7284 | 0.7456 |",
+        "| Wd695b34db4f0 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.1169 | 1.3347 | 1.1950 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J5",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-v2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.078,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j5-rho-neg-v2",
+      "index": 48,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-neg-v2.json": "58e66572e2032d2c2724ebd99a3c457118ed99fe9d45ae8215a6d11be904b33e"
+      },
+      "seconds": 0.078,
+      "stderr_sha256": "6d1505c0658fe6e6762527a7d46080a2bad96001f8c8e272ffbbbaca5e986dfb",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-neg-v2.json"
+      ],
+      "stdout_sha256": "548205ccd0ff9edba1b7629b1bb00b8ee553e0f4685276d84b73532e4d565c63",
+      "stdout_tail": [
+        "ops (ok): rho-neg-v2 / rho-neg = 0.9556 [0.513, 1.779] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9556, w=0.1: 0.9556, w=1: 0.9558): rho-neg-v2 < rho-neg at every weight; wall: admitted ns/GAE rho-neg-v2/rho-neg 1.0091 [1.002, 1.016], bias-corrected 1.0076 [1.000, 1.015] (A/A 1.0015, includes arm A), outside noise; end-to-end wall 1.3879 [0.531, 3.625]; ns/GAE of rho-neg, rho-neg-v2 is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 60 / 100; paired attempts 24, verified 24, admitted 7; levels {\"L1\": 17, \"L2\": 7}; p95 foreign busy 0.67%, p95 run queue 0.00%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.07, top run 8% of total; unpriced: canonicalisations_uncharged=546593711",
+        "arm rho-neg-v2: verified 24/24 (0 censored); max/median S 1.87, top run 8% of total; unpriced: canonicalisations_uncharged=522323420, distinguished_point_table_inserts_uncharged=123596, distinguished_point_table_queries_uncharged=123626",
+        "| curve | log2 r | workloads | rho-neg-v2 / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 0.9556 | [0.5134, 1.7787] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-v2 mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W348eeec04d72 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.6605 | 1.0669 | 1.6152 |",
+        "| W6fb9018c1ab2 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.0920 | 0.8746 | 0.8009 |",
+        "| W714d1f703e68 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9768 | 1.0572 | 1.0823 |",
+        "| Wd695b34db4f0 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.1169 | 0.6768 | 0.6060 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J5",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.098,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j5-rho-neg-aa",
+      "index": 49,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-neg-aa.json": "db3ec321ffd187509a281f4338d63f67744bf041db89f39ef3f892ab8312e823"
+      },
+      "seconds": 0.098,
+      "stderr_sha256": "183b1a2c736c7f0362627b7ab121f6c0ab21d4a402a7e4f71db57c1e2c205542",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J5/comparisons/rho-neg__rho-neg-aa.json"
+      ],
+      "stdout_sha256": "1b38e73a08a49c21335ce7af069d394f123e52e625ecde0d9fdb56913c563040",
+      "stdout_tail": [
+        "ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 1.0015 [0.998, 1.005], an A/A control (nothing to correct); end-to-end wall 1.0015 [0.998, 1.005]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 63 / 100; paired attempts 24, verified 24, admitted 9; levels {\"L1\": 15, \"L2\": 9}; p95 foreign busy 0.67%, p95 run queue 0.01%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.07, top run 8% of total; unpriced: canonicalisations_uncharged=546593711",
+        "arm rho-neg-aa: verified 24/24 (0 censored); max/median S 2.07, top run 8% of total; unpriced: canonicalisations_uncharged=546593711",
+        "| curve | log2 r | workloads | rho-neg-aa / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 1.0000 | [1.0000, 1.0000] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-aa mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W348eeec04d72 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.6605 | 0.6605 | 1.0000 |",
+        "| W6fb9018c1ab2 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.0920 | 1.0920 | 1.0000 |",
+        "| W714d1f703e68 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9768 | 0.9768 | 1.0000 |",
+        "| Wd695b34db4f0 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.1169 | 1.1169 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J6",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-plain",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.077,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j6-rho-plain",
+      "index": 50,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-plain.json": "f49b507874718db68a1cf05b3d791382d59457a27b189db1d33653e117297e64"
+      },
+      "seconds": 0.077,
+      "stderr_sha256": "d2f734ff06c6347ccf874ca6ed92a624fb5dde6072284aadb8c0bdc11fd2f5de",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-plain.json"
+      ],
+      "stdout_sha256": "bf8468b7402262a5901f64ebb7906d52cc9603ecbc750e1180998ebae69da832",
+      "stdout_tail": [
+        "ops (ok): rho-plain / rho-neg = 1.2175 [0.737, 2.011] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.2175, w=0.1: 1.1068, w=1: 0.6087): unresolved inside the band; wall: admitted ns/GAE rho-plain/rho-neg 0.9489 [0.947, 0.951], bias-corrected 0.9481 [0.945, 0.951] (A/A 1.0009, includes arm A), outside noise; end-to-end wall 1.3770 [0.763, 2.486]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 63 / 100; paired attempts 24, verified 24, admitted 9; levels {\"L1\": 15, \"L2\": 9}; p95 foreign busy 0.28%, p95 run queue 0.02%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.19, top run 8% of total; unpriced: canonicalisations_uncharged=533251575",
+        "arm rho-plain: verified 24/24 (0 censored); max/median S 1.94, top run 8% of total; unpriced: none",
+        "| curve | log2 r | workloads | rho-plain / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 1.2175 | [0.7372, 2.0105] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-plain mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W30cdbd3ef0c7 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9807 | 0.7851 | 0.8006 |",
+        "| W441085a4f96a | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7614 | 1.2246 | 1.6084 |",
+        "| W6c7c5de941e8 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.2650 | 1.3437 | 1.0622 |",
+        "| Wd3125b7a7dba | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7453 | 1.2149 | 1.6301 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J6",
+        "--a",
+        "rho-neg",
+        "--b",
+        "bsgs-neg",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.08,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j6-bsgs-neg",
+      "index": 51,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__bsgs-neg.json": "d18323844abc569063b53deea4b44d1bfe160904b501942ffc199d5c8cbf4b95"
+      },
+      "seconds": 0.08,
+      "stderr_sha256": "1fe276fee42600cd2805fb4c8af8cb37a5c7b3b84edff1317dd66d53b5699733",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__bsgs-neg.json"
+      ],
+      "stdout_sha256": "250c0f4408bc5bf54cc53e0984978a88a0689458ffa20798a1b5e0dd21adbeaa",
+      "stdout_tail": [
+        "ops (ok): bsgs-neg / rho-neg = 0.8844 [0.551, 1.420] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.8844, w=0.1: 0.8844, w=1: 0.8844): bsgs-neg < rho-neg at every weight; wall: admitted ns/GAE bsgs-neg/rho-neg 1.2709 [1.250, 1.292], bias-corrected 1.2697 [1.249, 1.291] (A/A 1.0009, includes arm A), outside noise; end-to-end wall 1.7716 [1.270, 2.471]; ns/GAE of rho-neg, bsgs-neg is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 70 / 100; paired attempts 24, verified 24, admitted 14; levels {\"L1\": 10, \"L2\": 14}; p95 foreign busy 0.28%, p95 run queue 0.01%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.19, top run 8% of total; unpriced: canonicalisations_uncharged=533251575",
+        "arm bsgs-neg: verified 24/24 (0 censored); max/median S 1.48, top run 6% of total; unpriced: inserts_uncharged=284226888, lookups_uncharged=187385136",
+        "| curve | log2 r | workloads | bsgs-neg / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 0.8844 | [0.5510, 1.4196] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | bsgs-neg mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W30cdbd3ef0c7 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9807 | 1.1114 | 1.1332 |",
+        "| W441085a4f96a | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7614 | 0.7058 | 0.9270 |",
+        "| W6c7c5de941e8 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.2650 | 0.7758 | 0.6133 |",
+        "| Wd3125b7a7dba | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7453 | 0.7256 | 0.9736 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J6",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-v2",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.079,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j6-rho-neg-v2",
+      "index": 52,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-neg-v2.json": "ac55680584228982f78edecc696b56e561264a526b6fb97f7b402bc10b2c5968"
+      },
+      "seconds": 0.079,
+      "stderr_sha256": "b38c0b8a1a8b68eb3b257bccc8bbb900351a8dafa7458125b2837d2a947005a7",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-neg-v2.json"
+      ],
+      "stdout_sha256": "738eb2f55d25a17283f5b0e5c4b066e5f58c4cb85e3491fca53da226ecef5147",
+      "stdout_tail": [
+        "ops (ok): rho-neg-v2 / rho-neg = 0.8477 [0.414, 1.734] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.8477, w=0.1: 0.8478, w=1: 0.8479): rho-neg-v2 < rho-neg at every weight; wall: admitted ns/GAE rho-neg-v2/rho-neg 1.0059 [1.003, 1.008], bias-corrected 1.0050 [1.001, 1.009] (A/A 1.0009, includes arm A), outside noise; end-to-end wall 1.4464 [0.888, 2.356]; ns/GAE of rho-neg, rho-neg-v2 is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 68 / 100; paired attempts 24, verified 24, admitted 13; levels {\"L1\": 11, \"L2\": 13}; p95 foreign busy 0.34%, p95 run queue 0.02%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.19, top run 8% of total; unpriced: canonicalisations_uncharged=533251575",
+        "arm rho-neg-v2: verified 24/24 (0 censored); max/median S 1.40, top run 7% of total; unpriced: canonicalisations_uncharged=452049855, distinguished_point_table_inserts_uncharged=106145, distinguished_point_table_queries_uncharged=106178",
+        "| curve | log2 r | workloads | rho-neg-v2 / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 0.8477 | [0.4145, 1.7339] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-v2 mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W30cdbd3ef0c7 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9807 | 0.9724 | 0.9916 |",
+        "| W441085a4f96a | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7614 | 0.9292 | 1.2204 |",
+        "| W6c7c5de941e8 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.2650 | 0.5493 | 0.4342 |",
+        "| Wd3125b7a7dba | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7453 | 0.7301 | 0.9796 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/frozenbin/x/ecbench",
+        "compare",
+        "--dir",
+        "research/prime_medium_tier_rho_20261107/sessions/J6",
+        "--a",
+        "rho-neg",
+        "--b",
+        "rho-neg-aa",
+        "--save"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.099,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "compare-j6-rho-neg-aa",
+      "index": 53,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-neg-aa.json": "5bec5af3f1283909def9bd0afc723315944b74f672b9e7b8c844aa5155013d4f"
+      },
+      "seconds": 0.099,
+      "stderr_sha256": "34d38423c72283ac7d3a5d646419718f30335707c6edf24d7c5a74583e22d3c9",
+      "stderr_tail": [
+        "saved research/prime_medium_tier_rho_20261107/sessions/J6/comparisons/rho-neg__rho-neg-aa.json"
+      ],
+      "stdout_sha256": "ba5a4d2a180a5b7e1175a9964c969939375cf1504f30d15fb50c9abb94f6b992",
+      "stdout_tail": [
+        "ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 3) over 24 pairs on 4 workloads, 1 curve(s), INDICATIVE: fewer than 5 workloads, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 1.0009 [0.998, 1.004], an A/A control (nothing to correct); end-to-end wall 1.0009 [0.998, 1.004]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)",
+        "measurement quality: 67 / 100; paired attempts 24, verified 24, admitted 12; levels {\"L1\": 12, \"L2\": 12}; p95 foreign busy 0.28%, p95 run queue 0.01%",
+        "arm rho-neg: verified 24/24 (0 censored); max/median S 2.19, top run 8% of total; unpriced: canonicalisations_uncharged=533251575",
+        "arm rho-neg-aa: verified 24/24 (0 censored); max/median S 2.19, top run 8% of total; unpriced: canonicalisations_uncharged=533251575",
+        "| curve | log2 r | workloads | rho-neg-aa / rho-neg | 95% interval | interval |",
+        "|---|---:|---:|---:|---|---|",
+        "| icv1-fp49-tm34125029-11a5de23 | 49.00 | 4 | 1.0000 | [1.0000, 1.0000] | linearised_t |",
+        "",
+        "| workload | curve | log2 r | rho-neg mean S | rho-neg-aa mean S | ratio |",
+        "|---|---|---:|---:|---:|---:|",
+        "| W30cdbd3ef0c7 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.9807 | 0.9807 | 1.0000 |",
+        "| W441085a4f96a | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7614 | 0.7614 | 1.0000 |",
+        "| W6c7c5de941e8 | icv1-fp49-tm34125029-11a5de23 | 49.00 | 1.2650 | 1.2650 | 1.0000 |",
+        "| Wd3125b7a7dba | icv1-fp49-tm34125029-11a5de23 | 49.00 | 0.7453 | 0.7453 | 1.0000 |"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 53,
+  "commit": "5b566039d3bb745b204dac1a61492162deeb5ffb",
+  "dirty_after": [],
+  "dirty_before": [
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-6.assessment.yaml",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-A1.yaml",
+    "research/prime_medium_tier_rho_20261107/fetch_session.sh",
+    "research/prime_medium_tier_rho_20261107/record_bounds.sh"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,43 @@
+ops (ok): ic-b1 / ic-b64 = 0.7405 [0.737, 0.744] (linearised_t, df 31) over 128 pairs on 32 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.7405, w=0.1: n/a, w=1: n/a): unrankable (uncounted unpriced work); wall: admitted ns/GAE ic-b1/ic-b64 1.0221 [0.849, 1.230], bias-corrected 1.0164 [0.840, 1.229] (A/A 1.0056, includes arm A), within noise; end-to-end wall 0.7569 [0.629, 0.911]; ns/GAE of ic-b64, ic-b1 is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 128, verified 128, admitted 0; levels {"L0": 128}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm ic-b64: verified 128/128 (0 censored); max/median S 1.00, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=380928, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=315069, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=2537820, pair_filter_probes_uncharged=37695, vector_declined_lanes_uncharged=uncounted
+arm ic-b1: verified 128/128 (0 censored); max/median S 1.07, top run 1% of total; unpriced: field_arithmetic_uncharged=uncounted, frobenius_maps_uncharged=380928, hash_and_allocation_uncharged=uncounted, la_row_ops_uncharged=14066, modular_combination_uncharged=uncounted, pair_bucket_reads_uncharged=437104, pair_filter_probes_uncharged=6362, vector_declined_lanes_uncharged=uncounted
+| curve | log2 r | workloads | ic-b1 / ic-b64 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m19-t797-b6cf2467 | 17.00 | 32 | 0.7405 | [0.7374, 0.7437] | linearised_t |
+
+| workload | curve | log2 r | ic-b64 mean S | ic-b1 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W04dc09c96b64 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6194 | 274.9052 | 0.7299 |
+| W275e5a40bf84 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 283.0618 | 0.7516 |
+| W28764392338a | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6319 | 275.8147 | 0.7323 |
+| W34e942bdcdf9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4702 | 281.6154 | 0.7480 |
+| W37caef33acf1 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5759 | 274.9059 | 0.7300 |
+| W39b65efa3537 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5441 | 278.5008 | 0.7396 |
+| W4c9c39a19223 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5158 | 280.3743 | 0.7447 |
+| W52b57a940f71 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6567 | 278.5043 | 0.7394 |
+| W55d5fa774e1e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6367 | 276.7207 | 0.7347 |
+| W561e7f951026 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7245 | 278.5402 | 0.7394 |
+| W5874fabbe0f1 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5420 | 275.3199 | 0.7312 |
+| W67c754843634 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5455 | 278.4981 | 0.7396 |
+| W6a3f54af3eae | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6671 | 281.7115 | 0.7479 |
+| W845c0c01f882 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5552 | 283.5304 | 0.7530 |
+| W866579fbd92b | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.7791 | 279.4379 | 0.7416 |
+| W8794da23d18d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5448 | 275.3309 | 0.7312 |
+| W8c00090ce95f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5911 | 274.8797 | 0.7299 |
+| W8dbc90c05ace | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5856 | 276.2065 | 0.7334 |
+| W903fa611153e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4916 | 276.2507 | 0.7338 |
+| W916437ae5228 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5683 | 279.8781 | 0.7432 |
+| W92f7b96aa2da | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5026 | 278.5077 | 0.7397 |
+| Wa0ac4757b2ad | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6091 | 283.9947 | 0.7541 |
+| Wa4467c780295 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5185 | 279.8436 | 0.7432 |
+| Waa8dabb4ea1d | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5876 | 276.7117 | 0.7348 |
+| Wb4792e82c500 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6291 | 287.5931 | 0.7636 |
+| Wb55a289b1b58 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.4909 | 281.6804 | 0.7482 |
+| Wb9565fe79765 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5310 | 276.2445 | 0.7337 |
+| Wba900ac81694 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6084 | 284.4184 | 0.7552 |
+| Wc1cbf83f36c9 | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6270 | 276.2618 | 0.7335 |
+| Wcb07d3656adc | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5593 | 280.3335 | 0.7445 |
+| Weda39558ff0e | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.5165 | 275.7518 | 0.7324 |
+| Wf84fd913b05f | icv1-f2m19-t797-b6cf2467 | 17.00 | 376.6160 | 278.5520 | 0.7396 |
