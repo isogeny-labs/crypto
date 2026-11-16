@@ -2,14 +2,23 @@
 
 ## Current reduction and revised scaling plan
 
+The [public-target interface](reports/target-circuit-v2/REPORT.md) joins six
+distinct raw members in a1059-variable/1089-equation quadratic system,
+with complete Edwards addition and a signed raw-index row decoder. Controls
+cover24024 toy pair/target assignments, actual cancellation/identity
+intermediates and1059 rejected variable mutations. Standard BSGS recovers
+eighteen fixed actual j,t labels using14600 baby entries. The next gate is
+root discovery with charged work and useful yield; checking known witnesses
+supplies no solver bound. PCC-20261116-4679b0. [pcc:unverified]
+
 The [quadratic membership interface](reports/membership-circuit-v1/REPORT.md)
 now compiles public parameters into a140-variable/142-equation membership
 system or a159-variable/161-equation signed cofactor-image system. Fixed
 native controls cover6962 small-field candidate/selector assignments,18
 actual signed images and159 rejected single-variable mutations. Three
 separate numeric selector endpoints leave compiler and actual-field/map
-formalization open. Public-target aggregation and normalized indexing are
-next. PCC-20261116-688961,645f28 andc45ab0. [pcc:unverified]
+formalization open. Its frozen report predates the target interface above.
+PCC-20261116-688961,645f28 andc45ab0. [pcc:unverified]
 
 The [many-coset construction](reports/many-cosets-v1/REPORT.md) now supplies
 conditional cardinality/admissibility and complete q-power membership
