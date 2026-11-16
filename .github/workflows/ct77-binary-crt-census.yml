@@ -1,6 +1,7 @@
 name: CT77 exhaustive binary reductions and source-compatible CRT gate
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct77/**'
       - '.github/workflows/ct77-binary-crt-census.yml'
@@ -9,6 +10,7 @@ permissions:
   contents: read
 jobs:
   ct77-census:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

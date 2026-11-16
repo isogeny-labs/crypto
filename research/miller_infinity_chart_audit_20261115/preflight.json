@@ -1,0 +1,130 @@
+{
+  "schema": "miller-infinity-chart-preflight/v1",
+  "build_snapshots": 15,
+  "failed_build_states": [
+    "miller-chart-build01.exit",
+    "miller-chart-build03.exit",
+    "miller-chart-build04.exit",
+    "miller-chart-build07.exit",
+    "miller-chart-build08.exit",
+    "miller-chart-build10.exit",
+    "miller-chart-build12.exit",
+    "miller-chart-build13.exit"
+  ],
+  "successful_builds": [
+    "02",
+    "05",
+    "06",
+    "09",
+    "11",
+    "14",
+    "15"
+  ],
+  "API_probe_exit": 0,
+  "final_build": "15, full project build logs no warnings/errors; one inherited frozen-auditor String.mk deprecation",
+  "gate": {
+    "archive": "research/miller_infinity_chart_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_miller_infinity_chart_audit_20261115_lean/audit.log",
+        "bytes": 12379,
+        "sha256": "60e78fb88e39e786751db53cc9fce2a005d5a1029f27d2a606a690926df956db"
+      },
+      {
+        "member": "research_miller_infinity_chart_audit_20261115_lean/build.log",
+        "bytes": 5449,
+        "sha256": "a8be3fa41d8f56c07ee5c7f3b5a3b9ac1584666f1b47c4d5dd85e826ad71e8b8"
+      },
+      {
+        "member": "research_miller_infinity_chart_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_miller_infinity_chart_audit_20261115_lean/source-build.log",
+        "bytes": 5449,
+        "sha256": "66bf5a7dee4b93ae780cb1ef5b04187c22b47bfdca81ebb982669f490eb7d668"
+      },
+      {
+        "member": "research_miller_infinity_chart_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 129,
+    "failing": 0,
+    "trusted_native": 0,
+    "inherited_audit_tool_deprecation_warnings": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/miller_infinity_chart_audit_20261115/evidence/attempts.tar.xz",
+    "files": 290,
+    "unique_objects": 69,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "exact_reused_modules": [
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/lean/DiscreteValuation.lean",
+      "bytes": 2448,
+      "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/lean/FieldValuation.lean",
+      "bytes": 3643,
+      "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/lean/MillerFunctions.lean",
+      "bytes": 4605,
+      "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/lean/NormDegree.lean",
+      "bytes": 4835,
+      "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/lean/Normalization.lean",
+      "bytes": 5458,
+      "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/lean/ResidueNormalization.lean",
+      "bytes": 2544,
+      "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+    },
+    {
+      "path": "research/miller_norm_valuation_audit_20261115/lean/ValuationCertificate.lean",
+      "bytes": 2235,
+      "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+    }
+  ],
+  "new_modules": 9,
+  "actual_chart_origin_localization_DVR_and_inverse_proved": true,
+  "actual_full_function_field_fraction_ring_proved": true,
+  "actual_official_adic_equals_norm_degree": true,
+  "actual_local_residue_field_evaluation": true,
+  "mathlib_projective_Scheme_localRing_comparison": false,
+  "full_finitepoint_principal_divisor_or_pairing": false,
+  "full14_completion": false,
+  "independent_implementation_or_physicalhost_validation": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}

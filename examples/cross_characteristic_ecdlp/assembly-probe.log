@@ -1,0 +1,10 @@
+AddSubgroup.addOrderOf_mk.{u_1} {G : Type u_1} [AddGroup G] {H : AddSubgroup G} (a : G) (ha : a ∈ H) :
+  addOrderOf ⟨a, ha⟩ = addOrderOf a
+AddSubgroup.forall_zmultiples.{u_1} {G : Type u_1} [AddGroup G] {x : G} {p : ↥(AddSubgroup.zmultiples x) → Prop} :
+  (∀ (g : ↥(AddSubgroup.zmultiples x)), p g) ↔ ∀ (m : ℤ), p ⟨m • x, ⋯⟩
+addEquivOfAddOrderOfEq.{u_2, u_3} {G : Type u_2} {G' : Type u_3} [AddGroup G] [AddGroup G'] {g : G}
+  (hg : ∀ (x : G), x ∈ AddSubgroup.zmultiples g) {g' : G'} (hg' : ∀ (x : G'), x ∈ AddSubgroup.zmultiples g')
+  (h : addOrderOf g = addOrderOf g') : G ≃+ G'
+addEquivOfAddOrderOfEq_apply_gen.{u_2, u_3} {G : Type u_2} {G' : Type u_3} [AddGroup G] [AddGroup G'] {g : G}
+  (hg : ∀ (x : G), x ∈ AddSubgroup.zmultiples g) {g' : G'} (hg' : ∀ (x : G'), x ∈ AddSubgroup.zmultiples g')
+  (h : addOrderOf g = addOrderOf g') : (addEquivOfAddOrderOfEq hg hg' h) g = g'

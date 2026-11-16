@@ -1,0 +1,138 @@
+--- a/acceptance_negative_controls.py
++++ b/acceptance_negative_controls.py
+@@ -8,7 +8,7 @@
+   identity=dict(source_revision='a'*40,source_sha256='b'*64,workload_id=fixture['target']['workload_id'],run_id='observed')
+   identity[field]='c'*len(identity[field])
+   with tempfile.TemporaryDirectory() as tmp:
+-   p=Path(tmp)/'trace.jsonl';p.write_text(json.dumps(dict(kind='ObservedHeader',data=dict(identity=identity,native={})))+'\n')
++   p=Path(tmp)/'trace.jsonl';p.write_text(json.dumps(dict(sequence=0,event=dict(kind='ObservedHeader',data=dict(identity=identity,native={}))))+'\n')
+    with self.assertRaisesRegex(AssertionError,'trace source identity mismatch'):
+     trace_identity(p,fixture,'a'*40,'b'*64,'observed')
+  def test_changed_revision(self):self.check_rejected('source_revision')
+--- a/admission-draft.json
++++ b/admission-draft.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": "signed-kummer-combined-admission/v1",
+   "released": false,
+-  "workspace": "/var/tmp/pencil-signed-kummer-combined-v2-20261111",
++  "workspace": "/var/tmp/pencil-signed-kummer-combined-v3-20261111",
+   "donor_workspace": "/var/tmp/pencil-root-materialize-t1953-20261109",
+   "absolute_deadline": "2026-11-11T12:00:00Z",
+   "total_seconds": 2400,
+@@ -62,18 +62,18 @@
+   "packet_files": {
+     "driver-inputs.json": "f16a0ffc365bf63ee5b931a157d0ec77eb497ddf0b5f2fbebefdc9a11a96a172",
+     "expected-source-manifest.json": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+-    "commands.json": "be73946bea8cc591fb37c6b88202ca9698f7934c8fd126b2277db115db50ff61",
++    "commands.json": "c8c5077eaaaf9aff18b1675de7064539bf8e313f9691ff6d24baacf45899c5d3",
+     "stage_driver.py": "3a072cbfd03fac4149bbebdc969ef33173b67f1e35fa248e83cdc96ef9f64564",
+-    "materialize.py": "087a3a31491a4ed0abff0e730e29cef46aab6461398b6c650555c778b2f79e78",
++    "materialize.py": "9db7f1aa799f03bd1bd2769606301791252bf5feb08732c03239c19b801a5885",
+     "durable-launcher.py": "aa6cd5159603e0d32e0637f154c513d64df43a3de12b9b18a79662d3a9852535",
+-    "durable_io.py": "f225a6e232e27cded358b96f6867734e7c49d9904bed24aaa496cea88111c4ba",
++    "durable_io.py": "a987021a32f4cf1000aa07f594257deec14c0dabc30fb3ed1d2832b724e868a5",
+     "durable-worker.py": "8db5ec046ecb249f050b3d3b4e06e042f7b427eaabf3a022550fab8385da9203",
+-    "panel_acceptance.py": "afa728704e1559ddcdaffa705960e2e1dcda694a7c322b63a47dd433a7d7be33",
++    "panel_acceptance.py": "bf4d3244c691f64f971bbc8e1ec3dea5e78d5857741fb9b2348967238c06bcb5",
+     "overlays.json": "636f528a373fc7937a46a6dce2d80533246a85ce043a6e33900b876ba76c35a8",
+-    "acceptance_negative_controls.py": "e2964a1d88d6332a79f5245a753a52fddff2cb66d3ded94f3d8d27a840f733cf"
++    "acceptance_negative_controls.py": "32195d0a3be4a54cf2db62c3a3ca67ee16f153a300e793f71979424740f511d0"
+   },
+-  "durable_run": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v2-20261111",
+-  "unit": "pencil-signed-kummer-combined-v2-20261111.service",
++  "durable_run": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v3-20261111",
++  "unit": "pencil-signed-kummer-combined-v3-20261111.service",
+   "uid": 1000,
+   "gid": 1000,
+   "toolchain": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+--- a/commands.json
++++ b/commands.json
+@@ -1,15 +1,15 @@
+ {
+   "status": "prospective_not_released",
+-  "working_directory": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/source",
++  "working_directory": "/var/tmp/pencil-signed-kummer-combined-v3-20261111/source",
+   "build_env": {
+     "PATH": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+     "LANG": "C.UTF-8",
+     "LC_ALL": "C.UTF-8",
+     "CARGO_BUILD_JOBS": "1",
+     "RUST_TEST_THREADS": "1",
+-    "CARGO_HOME": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/cargo-home",
+-    "CARGO_TARGET_DIR": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/target",
+-    "TMPDIR": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/tmp",
++    "CARGO_HOME": "/var/tmp/pencil-signed-kummer-combined-v3-20261111/cache/cargo-home",
++    "CARGO_TARGET_DIR": "/var/tmp/pencil-signed-kummer-combined-v3-20261111/cache/target",
++    "TMPDIR": "/var/tmp/pencil-signed-kummer-combined-v3-20261111/cache/tmp",
+     "RUSTC": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+     "QUAL_SOURCE_REVISION": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+     "QUAL_SOURCE_SHA256": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871"
+@@ -45,7 +45,7 @@
+   "materialization_argv": [
+     "/usr/bin/python3",
+     "-B",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v2-20261111/materialize.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v3-20261111/materialize.py"
+   ],
+   "phase_clock_start": "build deadline starts before materialization and all input/hash/cache verification",
+   "build_artifact_selection": {
+@@ -53,8 +53,8 @@
+     "target_name": "crypto_lib",
+     "target_kind_contains": "lib",
+     "profile_test": true,
+-    "target_src_path": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/source/src/lib.rs",
+-    "unique_executable_under": "/var/tmp/pencil-signed-kummer-combined-v2-20261111/cache/target/",
++    "target_src_path": "/var/tmp/pencil-signed-kummer-combined-v3-20261111/source/src/lib.rs",
++    "unique_executable_under": "/var/tmp/pencil-signed-kummer-combined-v3-20261111/cache/target/",
+     "require_build_finished_success": true,
+     "record_binary_sha256_before_execution": true
+   },
+@@ -88,7 +88,7 @@
+     "2395s",
+     "/usr/bin/python3",
+     "-B",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v2-20261111/durable-launcher.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v3-20261111/durable-launcher.py"
+   ],
+   "source_identity_semantics": "source_revision is canonical29861base; source_sha256 binds the complete staged candidate source manifest, including all overlays. Original native7986123f digest remains provenance only.",
+   "driver_tests": [
+--- a/durable_io.py
++++ b/durable_io.py
+@@ -81,9 +81,9 @@
+     assert a['fresh_cache_manifest']['sha256'] and a['fresh_cache_manifest']['path']
+     assert a['source_manifest_sha256']==hashlib.sha256((p/'expected-source-manifest.json').read_bytes()).hexdigest()
+     assert a['immutable_manifest']['sha256']=='c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2'
+-    assert a['workspace']=='/var/tmp/pencil-signed-kummer-combined-v2-20261111'
+-    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v2-20261111'
+-    assert a['unit']=='pencil-signed-kummer-combined-v2-20261111.service'
++    assert a['workspace']=='/var/tmp/pencil-signed-kummer-combined-v3-20261111'
++    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v3-20261111'
++    assert a['unit']=='pencil-signed-kummer-combined-v3-20261111.service'
+     assert a['limits']=={'target_stop_threshold_bytes':6*1024**3,'workspace_stop_threshold_bytes':8*1024**3,'logs_stop_threshold_bytes':256*1024**2,'minimum_free_bytes':6*1024**3,'durable_metadata_stop_bytes':64*1024**2,'durable_total_stop_bytes':384*1024**2,'supervisor_permit_seconds':10}
+     return a
+ 
+--- a/materialize.py
++++ b/materialize.py
+@@ -10,7 +10,7 @@
+ assert time.monotonic()<END and END-time.monotonic()<=1800
+ ABS=datetime.datetime.fromisoformat(A['absolute_deadline'].replace('Z','+00:00')).timestamp()
+ W=Path(A['workspace']);DONOR=Path(A['donor_workspace']);SOURCE=W/'source';CACHE=W/'cache'
+-assert str(W)=='/var/tmp/pencil-signed-kummer-combined-v2-20261111'
++assert str(W)=='/var/tmp/pencil-signed-kummer-combined-v3-20261111'
+ assert str(DONOR)=='/var/tmp/pencil-root-materialize-t1953-20261109'
+ assert W.is_dir() and not W.is_symlink()
+ assert {x.name for x in W.iterdir()}=={'workspace-owner.json'},'existing staged attempt; do not overwrite'
+--- a/panel_acceptance.py
++++ b/panel_acceptance.py
+@@ -7,7 +7,9 @@
+  assert len(re.findall(r'test result: ok\. 1 passed; 0 failed; 0 ignored; 0 measured;',text))==1,'exact nonzero passing test'
+ def trace_identity(path,fixture,revision,source_sha256,run_id):
+  lines=Path(path).read_text().splitlines(); assert lines,'missing observed header'
+- header=json.loads(lines[0]); assert header['kind']=='ObservedHeader'
++ record=json.loads(lines[0]); assert set(record)=={'sequence','event'},'record envelope mismatch'
++ assert type(record['sequence']) is int and record['sequence']==0,'initial sequence mismatch'
++ header=record['event']; assert header['kind']=='ObservedHeader'
+  identity=header['data']['identity']
+  assert identity==dict(source_revision=revision,source_sha256=source_sha256,workload_id=fixture['target']['workload_id'],run_id=run_id),'trace source identity mismatch'
+  target=fixture['target'];cases=target['cases'];p=target['p']

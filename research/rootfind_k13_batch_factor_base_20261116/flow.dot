@@ -1,0 +1,13 @@
+digraph lifts {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.7", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fb", color="#37577a", fontname="Helvetica"];
+  span [label="Ordered polynomial-basis\nabscissae (2^d, including zero)"];
+  old [label="Legacy\nindividual inverse for each nonzero x"];
+  batched [label="Opt-in candidate\nzero-tolerant batch inversion"];
+  lift [label="Shared Artin-Schreier lift\nand ordered point lowering"];
+  compare [label="Exact factor-base and\ncolumn-order comparison", fillcolor="#e5f5e8", color="#28724a"];
+  ledger [label="Production accounting and\nL2 comparison still required", fillcolor="#fff1d7", color="#aa6a19"];
+  span -> old -> lift;
+  span -> batched -> lift;
+  lift -> compare -> ledger;
+}
