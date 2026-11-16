@@ -1780,10 +1780,10 @@ fn execute_factorized_unequal(q:(u64,u64),sizes:[usize;3],round_limit:usize)
     }))
 }
 
-fn factorized_s3_confirmation()->Result<serde_json::Value,String>{
+fn factorized_s3_confirmation_seed(target_seed:u64)->Result<serde_json::Value,String>{
     const CASES:usize=24;
     const PROFILE:[usize;3]=[384,384,16_384];
-    let mut rng=0x4633_4348_4f52_4430u64;
+    let mut rng=target_seed;
     let mut used=HashSet::new();
     let mut verifier=Arithmetic::default();
     check_curve(PRIME31,&mut verifier)?;
@@ -1871,7 +1871,7 @@ fn factorized_s3_confirmation()->Result<serde_json::Value,String>{
         "classification":"generic decomposition: published APS one-relation with MITM equivalent pair enumeration",
         "p":P,"n":N,"cofactor":1,"profile":PROFILE,
         "cases":CASES,"round_cap":6,
-        "public_seed":"0x463343484f524430",
+        "public_seed":format!("{target_seed:#018x}"),
         "arms":["old_S3_coefficient_xfibre","new_factorized_xfibre","new_factorized_repeat"],
         "complete_cold_per_target":true,
         "all_failed_rounds_charged":true,
@@ -1889,10 +1889,41 @@ fn factorized_s3_confirmation()->Result<serde_json::Value,String>{
     }))
 }
 
+
+fn factorized_s3_fresh_confirmation()->Result<serde_json::Value,String>{
+    // Caller-only known answers. Verify the preregistered fresh panel
+    // does not repeat the exploratory public Q scalars before a single
+    // solver call; no k crosses the executor boundary.
+    let mut prior_rng=0x4633_4348_4f52_4430u64;
+    let mut prior=HashSet::new();
+    while prior.len()<24{
+        let k=prng(&mut prior_rng)%N;
+        if k>1{prior.insert(k);}
+    }
+    let mut fresh_rng=0x5333_5f43_4f4e_4631u64;
+    let mut fresh=HashSet::new();
+    while fresh.len()<24{
+        let k=prng(&mut fresh_rng)%N;
+        if k>1{fresh.insert(k);}
+    }
+    if !prior.is_disjoint(&fresh) {
+        return Err("fresh S3 panel overlaps exploratory known answers".into());
+    }
+    let mut report=factorized_s3_confirmation_seed(0x5333_5f43_4f4e_4631u64)?;
+    report["panel"]=json!("independent prospectively seeded 24-Q confirmation");
+    report["overlap_with_prior_24_Q"]=json!(0u64);
+    Ok(report)
+}
+
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==1 && args[0]=="--factorized-s3-fresh" {
+        let result=factorized_s3_fresh_confirmation()?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--factorized-s3-confirm" {
-        let result=factorized_s3_confirmation()?;
+        let result=factorized_s3_confirmation_seed(0x4633_4348_4f52_4430u64)?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
         return Ok(());
     }
