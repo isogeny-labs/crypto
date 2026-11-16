@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T22:45:33Z",
+ "id": "PCC-20261116-3a64de",
+ "kind": "statement",
+ "producer": {
+  "commit": "a3823af14643aca006e088355abd7cf07800e044",
+  "model": "",
+  "session": "codex-20261116-nist-formal-map"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/formal_identity.cpp",
+    "sha256": "11622ea555b928389614065eb8e953e592e0bd3a0e1aabb7fed00ac2f0eba961"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-formal-identity.sh",
+    "sha256": "d6865f56f4c75843ac9caf5ee7fa71e07ea315041da330622ac5c0dd194640f1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/formal-identity-v1/newton-cubic.identity.json",
+    "sha256": "85b4db5f636d0d67313efa4e8b1698cc1c484fb2bcf1f064e0db5b855f5bfdb1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The generic cubic Newton trace formula passes32 derived-point evaluations and an added-one corruption control in identity.certificate/v1 field2^61-1. This limited-field structural receipt does not verify P192 arithmetic or the global correspondence. Producer-unverified."
+}
