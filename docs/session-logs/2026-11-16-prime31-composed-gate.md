@@ -39,3 +39,22 @@ The canonical `docs/session-logs/2026-11-16.md` was checked via GitHub but its c
 
 ### Errors (what went wrong, how it was handled)
 - No source build was available locally; compilation must be established by GitHub Actions exact source execution.
+
+## 22:54 UTC — complete source-exact CI and independent arithmetic
+
+### What was done (commands, files, features)
+- New [source-specific Actions #43974039411](https://github.com/isogeny-labs/crypto/actions/runs/43974039411), job 133673292302, **SUCCESS** (40/40 library and 22/22 focused example tests); all 144/144 six-arm Rust complete cold logarithms recovered and scalar-verified for 24 distinct public Q.
+- Independent arbitrary-precision affine elliptic-curve replay of downloaded [raw artifact](https://github.com/isogeny-labs/crypto/actions/runs/43974039411/artifacts/14280322388): 24 public `[k]G=Q`, 144 solver `[log]G=Q`, 96 APS signed congruences, stage/cold sums and 24-case paired wins all recomputed without discrepancy; 25,000 paired-target bootstrap resamples, seed 0x20261116.
+- Committed detailed [report](../research/prime31_ic_20261115/native/APS_COMPOSED_WIN4_PUBLICY_24Q_RESULT_20261116.md) and machine-readable [audit](../research/prime31_ic_20261115/native/APS_COMPOSED_WIN4_PUBLICY_24Q_AUDIT_20261116.json) to the existing PR #4454 and updated its description.
+
+### Decisions made (and why)
+- Frozen results: binary APS 77.615866ms, window4 APS 76.218073ms, composed APS 74.433895ms (AA 74.136036ms), rho32 79.833260ms, rho64 90.267704ms; 24/24 each. Composed/binary = 0.9590036 (22/24 wins), **fails predeclared <=0.95 engineering gate**. Composed/rho32=0.932367 but 13/24 paired wins and bootstrap ratio 95% CI 0.7023–1.2270; no robust strongest-rho win.
+- All APS S3 transcripts match; original arms each call 18,432 square roots and composed/AA call zero. This is source arithmetic engineering, not a new non-generic algorithm.
+- Continue with same-host isolated 96-Q tuned Wiener–Zuccherato rho comparison and blinded S9 f-from-R algebraic extractor; preserve failed gate in exact report. No PCC signed/leaderboard claim.
+
+### Open threads (unfinished, pick up next time)
+- Independently signed replay and benchmark on identical host against optimized WZ rho and fastest external PKM/APS. Validate any additional SIMD S3 oracle change against exact root/witness transcript.
+- Complete nonenumerative S9 target-conditioned factor polynomial extraction (B4/B8 then natural Dickson B31) and end-to-end rank32 recovery.
+
+### Errors (what went wrong, how it was handled)
+- No source compile error or failed cold call. The **engineering result misses the prospectively fixed >=5% gate** despite full correct CI; report the loss accurately rather than treating successful CI as passing the scientific performance threshold.
