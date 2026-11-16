@@ -19,34 +19,23 @@
 
 Total: 282128592 Ir (deterministic, simulated; not cycles).
 
-#table(columns: 5,
-  [*\#*],  [*self %*],  [*Ir*],  [*function*],  [*object*],
-  [1],  [7.69],  [21686318],  [#raw("0x00000000000a0fe0")],  [libc.so.6],
-  [2],  [6.66],  [18794660],  [#raw("0x0000000000163280")],  [libc.so.6],
-  [3],  [5.33],  [15029305],  [#raw("full_trace_zero_backend::binary_ecc::f2m::fold_words_clmul_hw")],  [trace-fast-baseline-v1],
-  [4],  [4.25],  [11989178],  [#raw("free")],  [libc.so.6],
-  [5],  [4.16],  [11732070],  [#raw("full_trace_zero_backend::binary_ecc::f2m::mul_words_hw")],  [trace-fast-baseline-v1],
-  [6],  [4.02],  [11353123],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [trace-fast-baseline-v1],
-  [7],  [3.49],  [9832592],  [#raw("<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mul")],  [trace-fast-baseline-v1],
-  [8],  [3.04],  [8572995],  [#raw("<serde_json::value::Value as serde_core::de::Deserialize>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>'2")],  [null],
-  [9],  [2.81],  [7937299],  [#raw("malloc")],  [libc.so.6],
-  [10],  [2.58],  [7290377],  [#raw("0x00000000000a02e0")],  [libc.so.6],
-  [11],  [2.43],  [6864031],  [#raw("full_trace_zero_backend::binary_ecc::f2m::reduce_words")],  [trace-fast-baseline-v1],
-  [12],  [2.29],  [6458320],  [#raw("0x000000000009ebd0")],  [libc.so.6],
-  [13],  [2.17],  [6117938],  [#raw("full_trace_zero_backend::binary_ecc::f2m::reduce_words")],  [null],
-  [14],  [1.85],  [5210925],  [#raw("<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::add")],  [trace-fast-baseline-v1],
-  [15],  [1.71],  [4824886],  [#raw("full_trace_zero_backend::binary_ecc::operation_tally::tick_n")],  [trace-fast-baseline-v1],
-  [16],  [1.66],  [4684384],  [#raw("0x0000000000162880")],  [libc.so.6],
-  [17],  [1.46],  [4109700],  [#raw("<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mask_in_place")],  [trace-fast-baseline-v1],
-  [18],  [1.39],  [3931479],  [#raw("<serde_json::value::Value as serde_core::de::Deserialize>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>'2")],  [null],
-  [19],  [1.39],  [3910690],  [#raw("<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mul::{closure#0}")],  [trace-fast-baseline-v1],
-  [20],  [1.37],  [3877931],  [#raw("<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square_k_times::{closure#0}")],  [trace-fast-baseline-v1],
-  [21],  [1.19],  [3356093],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [22],  [1.13],  [3183488],  [#raw("<std::hash::random::DefaultHasher as core::hash::Hasher>::write")],  [null],
-  [23],  [1.12],  [3158965],  [#raw("0x000000000009eaf0")],  [libc.so.6],
-  [24],  [1.08],  [3059428],  [#raw("core::str::converts::from_utf8")],  [null],
-  [25],  [1.03],  [2905084],  [#raw("full_trace_zero_backend::binary_ecc::f2m::mul_words_into")],  [trace-fast-baseline-v1],
+#table(columns: (auto, auto, auto, 1fr),
+ [*Rank*], [*self %*], [*Ir*], [*function*],
+[1], [7.69], [21,686,318], [#raw("0x00000000000a0fe0")],
+[2], [6.66], [18,794,660], [#raw("0x0000000000163280")],
+[3], [5.33], [15,029,305], [#raw("backend::binary_ecc::f2m::fold_words_clmul_hw")],
+[4], [4.25], [11,989,178], [#raw("free")],
+[5], [4.16], [11,732,070], [#raw("backend::binary_ecc::f2m::mul_words_hw")],
+[6], [4.02], [11,353,123], [#raw("backend::cryptanalysis::trace_zero_linearized::decompose_trace_z\nero_linearized")],
+[7], [3.49], [9,832,592], [#raw("<backend::binary_ecc::f2m::F2mElement>::mul")],
+[8], [3.04], [8,572,995], [#raw("<serde_json::value::Value as\nserde_core::de::Deserialize>::deserialize::<&mut\nserde_json::de::Deserializer<serde_json::read::SliceRead>>'2")],
+[9], [2.81], [7,937,299], [#raw("malloc")],
+[10], [2.58], [7,290,377], [#raw("0x00000000000a02e0")],
+[11], [2.43], [6,864,031], [#raw("backend::binary_ecc::f2m::reduce_words")],
+[12], [2.29], [6,458,320], [#raw("0x000000000009ebd0")],
 )
+
+Top12 recorded entries; backend:: abbreviates full_trace_zero_backend::. Complete symbols, file/DSO attribution and all entries remain in hotspots.json. Profile self percentages are discovery attribution, not an end-to-end phase comparison [pcc:unverified].
 
 == Files
 

@@ -19,34 +19,23 @@
 
 Total: 59701801 Ir (deterministic, simulated; not cycles).
 
-#table(columns: 5,
-  [*\#*],  [*self %*],  [*Ir*],  [*function*],  [*object*],
-  [1],  [12.63],  [7541609],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [trace-tuned-baseline],
-  [2],  [10.61],  [6336186],  [#raw("full_trace_zero_backend::binary_ecc::f2m::fold_words_clmul_hw")],  [trace-tuned-baseline],
-  [3],  [4.82],  [2877133],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [4],  [4.5],  [2684144],  [#raw("<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square_k_times::{closure#0}")],  [trace-tuned-baseline],
-  [5],  [3.69],  [2204001],  [#raw("full_trace_zero_backend::binary_ecc::f2m::reduce_words")],  [trace-tuned-baseline],
-  [6],  [3.52],  [2098799],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [7],  [3.29],  [1964433],  [#raw("full_trace_zero_backend::binary_ecc::f2m::reduce_words")],  [null],
-  [8],  [3.23],  [1931160],  [#raw("full_trace_zero_backend::binary_ecc::f2m::mul_words_hw")],  [trace-tuned-baseline],
-  [9],  [2.44],  [1455166],  [#raw("free")],  [libc.so.6],
-  [10],  [1.97],  [1176855],  [#raw("0x00000000000a0fe0")],  [libc.so.6],
-  [11],  [1.53],  [914227],  [#raw("malloc")],  [libc.so.6],
-  [12],  [1.46],  [873240],  [#raw("<alloc::string::String as core::iter::traits::collect::FromIterator<char>>::from_iter::<core::iter::adapters::filter::Filter<core::str::iter::Chars, <full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex::{closure#0}>>")],  [null],
-  [13],  [1.41],  [840213],  [#raw("<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::square")],  [null],
-  [14],  [1.36],  [813010],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [15],  [1.3],  [775502],  [#raw("<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square_k_times")],  [trace-tuned-baseline],
-  [16],  [1.27],  [760973],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [17],  [1.19],  [711926],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [18],  [1.14],  [679798],  [#raw("<num_bigint::biguint::BigUint as num_traits::Num>::from_str_radix")],  [trace-tuned-baseline],
-  [19],  [1],  [595586],  [#raw("0x0000000000162880")],  [libc.so.6],
-  [20],  [0.99],  [591673],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [21],  [0.88],  [525390],  [#raw("full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized")],  [null],
-  [22],  [0.86],  [511434],  [#raw("<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::square")],  [trace-tuned-baseline],
-  [23],  [0.84],  [499785],  [#raw("<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::residuals")],  [trace-tuned-baseline],
-  [24],  [0.8],  [478192],  [#raw("full_trace_zero_backend::binary_ecc::f2m::mul_words_into")],  [trace-tuned-baseline],
-  [25],  [0.77],  [459475],  [#raw("core::str::converts::from_utf8")],  [null],
+#table(columns: (auto, auto, auto, 1fr),
+ [*Rank*], [*self %*], [*Ir*], [*function*],
+[1], [12.63], [7,541,609], [#raw("backend::cryptanalysis::trace_zero_linearized::decompose_trace_z\nero_linearized")],
+[2], [10.61], [6,336,186], [#raw("backend::binary_ecc::f2m::fold_words_clmul_hw")],
+[3], [4.82], [2,877,133], [#raw("backend::cryptanalysis::trace_zero_linearized::decompose_trace_z\nero_linearized")],
+[4], [4.50], [2,684,144], [#raw("<backend::binary_ecc::f2m::F2mElement>::square_k_times::{closure\n#0}")],
+[5], [3.69], [2,204,001], [#raw("backend::binary_ecc::f2m::reduce_words")],
+[6], [3.52], [2,098,799], [#raw("backend::cryptanalysis::trace_zero_linearized::decompose_trace_z\nero_linearized")],
+[7], [3.29], [1,964,433], [#raw("backend::binary_ecc::f2m::reduce_words")],
+[8], [3.23], [1,931,160], [#raw("backend::binary_ecc::f2m::mul_words_hw")],
+[9], [2.44], [1,455,166], [#raw("free")],
+[10], [1.97], [1,176,855], [#raw("0x00000000000a0fe0")],
+[11], [1.53], [914,227], [#raw("malloc")],
+[12], [1.46], [873,240], [#raw("<alloc::string::String as core::iter::traits::collect::FromItera\ntor<char>>::from_iter::<core::iter::adapters::filter::Filter<cor\ne::str::iter::Chars,\n<backend::binary_ecc::f2m::F2mElement>::from_hex::{closure#0}>>")],
 )
+
+Top12 recorded entries; backend:: abbreviates full_trace_zero_backend::. Complete symbols, file/DSO attribution and all entries remain in hotspots.json. Profile self percentages are discovery attribution, not an end-to-end phase comparison [pcc:unverified].
 
 == Files
 
