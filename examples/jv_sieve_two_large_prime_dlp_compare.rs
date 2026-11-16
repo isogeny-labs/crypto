@@ -6,7 +6,10 @@ use crypto_lib::cryptanalysis::{
     jv_cover::{self as cover, EllE, Fq3, PtE6, Spec, E2, E6},
     jv_sieve::{
         self as sieve,
-        two_large_prime::{run_two_large_prime_dlp_on, TwoLargePrimeDlpOptions},
+        two_large_prime::{
+            run_two_large_prime_dlp_on, run_two_large_prime_dlp_on_with_structural_gate,
+            TwoLargePrimeDlpOptions,
+        },
     },
     residual_walk::is_prime_u64,
 };
@@ -44,6 +47,8 @@ struct Args {
     b_count: Option<u128>,
     #[arg(long)]
     collection_rank_stride: Option<usize>,
+    #[arg(long)]
+    structural_rank_gate: bool,
     #[arg(long, default_value_t = 8192)]
     max_descent_residuals: u64,
     #[arg(long, default_value_t = 32)]
@@ -129,6 +134,9 @@ impl PublicCurve {
 }
 
 fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, String> {
+    if args.structural_rank_gate && method != "two-lp" {
+        return Err("structural rank gate is only defined for two-lp".into());
+    }
     curve.validate()?;
     if method == "rho" {
         use crypto_lib::cryptanalysis::jv_rho_strong::StrongOpts;
@@ -159,7 +167,11 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
         let spec=cover::spec_from_curve(curve.p,alpha,curve.l,g,q,0).ok_or("public transfer failed")?;
         let (report,scalar)=match method{
             "ic"=>{let(r,d)=sieve::run_cover_sieve_dlp_on_with_filter(&spec,args.seed,0,1.0,Some(64),1.25,None,false,None);(serde_json::to_value(r).map_err(|e|e.to_string())?,d)},
-            "two-lp"=>run_two_large_prime_dlp_on(&spec,args.seed,TwoLargePrimeDlpOptions{small_percent:args.small_percent,b_count:args.b_count,collection_rank_stride:args.collection_rank_stride,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents})?,
+            "two-lp"=>{
+                let options=TwoLargePrimeDlpOptions{small_percent:args.small_percent,b_count:args.b_count,collection_rank_stride:args.collection_rank_stride,max_descent_residuals:args.max_descent_residuals,max_accepted_descents:args.max_accepted_descents};
+                if args.structural_rank_gate {run_two_large_prime_dlp_on_with_structural_gate(&spec,args.seed,options)?}
+                else {run_two_large_prime_dlp_on(&spec,args.seed,options)?}
+            },
             _=>return Err("method must be ic, two-lp or rho".into()),
         };
         drop(model);
@@ -169,13 +181,16 @@ fn worker(curve: &PublicCurve, args: &Args, method: &str) -> Result<Value, Strin
         let phase_rows:Vec<_>=Phase::IC.iter().map(|&phase|{let t=tally.phase(phase);json!({"phase":phase.name(),"primitives":work::prims_json(t),"diagnostic_priced_bitops":work::price(t,&widths).expect("known widths").to_string()})}).collect();
         let other=work::snapshot_other();let other_delta:Vec<_>=other.iter().zip(other_before).map(|(&a,b)|a.checked_sub(b)).collect();
         let uniforms=work::uniform_snapshot().since(&uniforms_before).ok_or("uniform counter regression")?;
-        let native=json!({"schema":"cover.two-large-prime.dlp-work/v1","complete":false,"total_bitops":null,"comparative_eligibility":false,
+        let mut native=json!({"schema":"cover.two-large-prime.dlp-work/v1","complete":false,"total_bitops":null,"comparative_eligibility":false,
             "phases":phase_rows,"observed_primitives":work::prims_json(&tally.sum(&Phase::IC)),"uniform_sampling":work::uniform_json(&uniforms.sum(&Phase::IC).ok_or("uniform overflow")?),
             "foreign_hook_calls":work::foreign(),"other_modulus_ops":other_delta,
             "known_uncounted":["native containers/normalization/scheduling","PRNG internals and other sampling paths","incremental RREF scans/fixed-factor internals","cohort hashing/serialization"],
             "excluded_harness_primitives":work::prims_json(tally.phase(Phase::Harness)),
             "excluded_harness_uniform_events":work::uniform_json(&uniforms.phases[Phase::Harness as usize]),
             "excluded":"public instance generation/domain checks and legacy report unit calibration; calibration is excluded from IC primitive subtotal but included in process wall; no reusable attack precomputation supplied"});
+        if args.structural_rank_gate {
+            native["known_uncounted"].as_array_mut().expect("gap array").push(json!("structural rank gate native bookkeeping beyond counted state/parent events"));
+        }
         work::enable(false);
         Ok(json!({"schema":"cover.two-large-prime.dlp-worker/v1","source_revision":args.source_revision,"method":method,"seed":args.seed,
             "public":curve,"solver_answer_placeholder":0,"actual_scalar":scalar,"verified":verified,"capped":scalar.is_none(),"inner_wall_ns":elapsed,"work":report,"work_native":native}))
@@ -256,6 +271,7 @@ mod tests {
             small_percent: 75,
             b_count: None,
             collection_rank_stride: None,
+            structural_rank_gate: false,
             max_descent_residuals: 8192,
             max_accepted_descents: 32,
             rho_batch: 1,

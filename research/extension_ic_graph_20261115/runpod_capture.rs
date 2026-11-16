@@ -51,7 +51,9 @@ fn execute(state: Arc<Mutex<State>>) {
         if !unpack.success() {
             return Ok((90, false));
         }
-        let script = if task.join("run-portfolio-task.sh").is_file() {
+        let script = if task.join("run-task.sh").is_file() {
+            "run-task.sh"
+        } else if task.join("run-portfolio-task.sh").is_file() {
             "run-portfolio-task.sh"
         } else {
             "run-rho-native-task.sh"

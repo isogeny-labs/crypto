@@ -1,3 +1,53 @@
+# Current checkpoint:35SOURCE READY; ownRunpodCPUready/NOTDISPATCHED
+
+GoalACTIVE/RustgraphICintegrationandRunpodmeasurementsuntilrho parity; no subagents.
+UserRunpodbackendauthorizationpersists; allscientificcodeRust. Don'taskprofile/key.
+34published3cc53e0d1/PRactualresultupdated/PCCc57d97+8b685eunverified; sourcea06
+precededsole34call. All6sameactualscalar89981502037382902, incomplete/unrankable
+subtotals documentedbelow.34ownpodcy2tbnhzgtwr6ecollected/hashthenGraphQLterminated/
+lookupnull17:07:01Z(afterlegacyRESTproxy403),noactive34. Allold32/33ownpodsdeleted.
+
+NEWOWN35POD0e3b53r1g9y4qr allocatedviaapi.runpod.io/v2/pods,CPU4vCPU8GiBcpu3c
+0.12USDh,pinnedofficialRustimage.2700s localDELETEguardianwithGraphQLfallbackactive.
+Healthready/startedfalse17:30. PrivateauthONLYpointer/tmp/ic-runpod-auth-location:
+pod35.id/task35-header/task35-token,APIheaderNEVERprint/passintoPod/repo/logs.
+No35scientificdispatch/dataYET. Deadlinevalidation/runpod35-allocation.json;
+newtasksrequire>=2110sremainingbeforemeasurement. Startsourcepublication/packagepromptly.
+Initialv2create422unsupportedcommandfieldbeforeallocation;correctcmdfieldthen201,
+safevalidationerrorretained. Bootstrapprocps/nonloginbash/absoluteRustcompiler.
+
+35Amendment30/structural-gate-plan.json p1009FRESHseed347; samebinary/publicinput
+baseline rankstop75/stride128/fullp² andopt-in--structural-rank-gate. Exactoriginal
+sources/descents/endpoint/checkpointscheduleidentity,independentBFS+denseLPrankallgate
+prefixes,permittedfullcheckpointequality,allprimitivephasechangesmustequalomitted
+checkpointvectorspluschargedknowngatewords. Exactrank/affinetarget/ellipticverification
+stillmandatory. Onecoldround0warm/retry,900worker1900whole2700runner8GiB.
+Componentonly;noT0bestIC/T1rho,total/band/ratiosnull,nativeDSU+othergapsremain.
+
+AllsourcechecksFINISHED:strictlibrary/exampleClippyPASS,30sieve testsPASS/2existing
+ignored,3exampletestsPASS,productionexamplebuildPASS(job81217completeexit0).
+Productionhelper4standalonecontrols;independentqualifier19tests/Clippy/buildPASS;
+actualtwo-armtransportandold33collisionnegativecontrolPASS;Rustcaptureauth/once
+controlandwarnings-deniedcompilePASS.280source/buildmanifestsPASS,5rootfrozen
+hashesunchanged. SourcePCC3c284f+6489baunverified. No compileractive.
+
+NEXTcommit/pushcleansource/spec/manifests/receiptsBEFOREprepare-structural-gate-runpod.sh
+NEW35stage,uploadimmutablebundle/POSTrunONCE. GenericRustcaptureacceptsrun-task.sh;
+preparerpackagesnewtaskunderthatname. Wrapperstdout.summaryvsworkerrawseparate.
+GETstatus/artifactswithPRIVATEtask35-headeronly. Neverredispatchonnetworkdoubt.
+Collectexactarchiveafterfinished+ready;verifyportablepre/preworker/post/qualified+
+sourcehashcustodythenimmediateDELETEown35viaofficialv2andconfirmabsence(orGraphQL
+fallback). Setprivatepod-ID.deletedsoidleDELETEguardianinert. Missinganalysislog
+mustnotabortcleanup. Keepallfailed/censoredrecordsandcriteriaunchanged.
+
+Thenrenderstructural-gate-render+structural-gate-report.typ;inspectallfinalPDFpages,
+exactPDF/SVG/150dpiPNGbenchmarkcopies,originalraw>64KiBLOCALhashbound/source/binaries.
+PublishactualPCC/result/lesson/journal/PR. No manualmerge/CIbypass. Current3ccCIread
+17:14workflows/statusEMPTY/unconfirmed. Keepgoalactive/nextimprovementafterresult.
+S3checkpointgateabsentAWS/tokenretained; userexplicitRunpoddirectionauthorizes
+backendcontinuationwithpublishedsource/immutablecustody, noS3uploadclaim.
+Maintain<=60seccommentary/concreteactionloops,avoidlengthyspeculation.
+
 # Current checkpoint:34COMPLETE/COLLECTED/TERMINATED; graph-gate root checks running
 
 GoalACTIVE:Rust elliptic graphIC/extension-field relationfinder integration and

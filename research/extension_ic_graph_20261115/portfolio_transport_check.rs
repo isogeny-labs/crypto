@@ -32,10 +32,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
     if !(2..=3).contains(&args.len()) {
-        return Err("usage: portfolio-transport-check WRAPPER [--expect-failure]".into());
+        return Err(
+            "usage: portfolio-transport-check WRAPPER [--expect-failure|--structural]".into(),
+        );
     }
     let negative = args.get(2).is_some_and(|s| s == "--expect-failure");
-    if args.len() == 3 && !negative {
+    let structural = args.get(2).is_some_and(|s| s == "--structural");
+    if args.len() == 3 && !negative && !structural {
         return Err("unknown control option".into());
     }
     let wrapper = fs::canonicalize(Path::new(&args[1]))?;
@@ -53,7 +56,17 @@ fn main() -> Result<(), Box<dyn Error>> {
         .ok_or("CPU affinity")?
         .trim();
     let cpu = allowed.split([',', '-']).next().ok_or("CPU")?;
-    let plan=format!("{{\"pinned_cpu\":\"{cpu}\",\"source_revision\":\"{}\",\"memory_gib\":8,\"p\":1009,\"seed\":337,\"fixture_timeout_seconds\":10,\"worker_timeout_seconds\":10,\"small_percent\":75,\"b_count\":1018081,\"collection_rank_stride\":128,\"max_descent_residuals\":8192,\"max_accepted_descents\":32,\"mode_order\":[\"ic\",\"rank-stop\",\"rho-plain-1\",\"rho-negation-1\",\"rho-plain-16\",\"rho-negation-16\"]}}","a".repeat(40));
+    let modes: &[&str] = if structural {
+        &["rank-stop", "structural-gate"]
+    } else {
+        &MODES
+    };
+    let modes_json = modes
+        .iter()
+        .map(|m| format!("\"{m}\""))
+        .collect::<Vec<_>>()
+        .join(",");
+    let plan=format!("{{\"pinned_cpu\":\"{cpu}\",\"source_revision\":\"{}\",\"memory_gib\":8,\"p\":1009,\"seed\":347,\"fixture_timeout_seconds\":10,\"worker_timeout_seconds\":10,\"small_percent\":75,\"b_count\":1018081,\"collection_rank_stride\":128,\"max_descent_residuals\":8192,\"max_accepted_descents\":32,\"mode_order\":[{modes_json}]}}","a".repeat(40));
     fs::write(run.join("runtime-plan.json"), plan)?;
     let status = Command::new("bash")
         .arg(wrapper)
@@ -67,7 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         )
         .into());
     }
-    for mode in MODES {
+    for mode in modes {
         let raw = fs::read_to_string(run.join(format!("{mode}.raw.json")))?;
         let exit = fs::read_to_string(run.join(format!("{mode}.exit-code.txt")))?;
         if negative {
@@ -91,6 +104,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         "transport-only {} control passed",
         if negative {
             "old-wrapper rejection"
+        } else if structural {
+            "new-wrapper two-arm capture"
         } else {
             "new-wrapper six-arm capture"
         }

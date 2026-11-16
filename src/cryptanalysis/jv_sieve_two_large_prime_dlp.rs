@@ -18,6 +18,17 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashSet;
 
+#[path = "jv_large_prime_rank_bound.rs"]
+mod structural_rank_bound;
+use structural_rank_bound::{BoundSnapshot, StructuralRankBound};
+
+fn structural_snapshot(s: &BoundSnapshot) -> Value {
+    json!({"sources":s.sources,"vertices":s.vertices,"components":s.components,
+        "anchored_components":s.anchored_components,"large_rank_lower_bound":s.large_rank_lower_bound,
+        "small_rank_upper_bound":s.small_rank_upper_bound,"find_calls":s.find_calls,
+        "parent_probes":s.parent_probes,"successful_unions":s.successful_unions})
+}
+
 #[derive(Clone, Copy, Debug, Serialize)]
 pub struct TwoLargePrimeDlpOptions {
     pub small_percent: usize,
@@ -92,6 +103,29 @@ pub fn run_two_large_prime_dlp_on(
     seed: u64,
     options: TwoLargePrimeDlpOptions,
 ) -> Result<(Value, Option<u64>), String> {
+    run_two_large_prime_dlp_impl(spec, seed, options, false)
+}
+
+/// Optional graph bound defers exact rank checkpoints until enough
+/// small-only equations are structurally possible. Exact rank, affine
+/// target determination and elliptic verification are still required.
+pub fn run_two_large_prime_dlp_on_with_structural_gate(
+    spec: &Spec,
+    seed: u64,
+    options: TwoLargePrimeDlpOptions,
+) -> Result<(Value, Option<u64>), String> {
+    if options.collection_rank_stride.is_none() {
+        return Err("structural gate requires exact rank checkpoints".into());
+    }
+    run_two_large_prime_dlp_impl(spec, seed, options, true)
+}
+
+fn run_two_large_prime_dlp_impl(
+    spec: &Spec,
+    seed: u64,
+    options: TwoLargePrimeDlpOptions,
+    structural_gate: bool,
+) -> Result<(Value, Option<u64>), String> {
     if !(101..=1511).contains(&spec.p)
         || !(3..1u64 << 63).contains(&spec.l)
         || !crate::cryptanalysis::residual_walk::is_prime_u64(spec.p)
@@ -135,6 +169,18 @@ pub fn run_two_large_prime_dlp_on(
     let mut next_rank_check = rank_target.max(1);
     let mut rank_checks = Vec::new();
     let mut rank_ready = false;
+    let mut gate_words = 0;
+    let mut gate = if structural_gate {
+        let _la = work::enter(Phase::LinearAlgebra);
+        // Three initialized dense state arrays; other native allocation and
+        // scheduling work remains in the explicit incomplete-coverage gap.
+        gate_words = 3 * spec.p;
+        work::words(gate_words);
+        Some(StructuralRankBound::new(spec.p as usize, spec.l)?)
+    } else {
+        None
+    };
+    let mut gate_checks = Vec::new();
     {
         let _g = work::enter(Phase::Relations);
         let scramble = coprime_scramble(b_space(sieve.setup()), &mut enum_rng);
@@ -198,6 +244,18 @@ pub fn run_two_large_prime_dlp_on(
                         work::probe(key_words);
                         seen.insert(r.full().terms.clone());
                         histogram[r.partial().large.len()] += 1;
+                        if let Some(gate) = gate.as_mut() {
+                            let _la = work::enter(Phase::LinearAlgebra);
+                            let probes_before = gate.snapshot().parent_probes;
+                            gate.add_row(r.partial().rhs, &r.partial().large)?;
+                            let probes = gate.snapshot().parent_probes - probes_before;
+                            // Known lower bound: read each support identity and
+                            // coefficient, and every parent probe actually made.
+                            // Do not call this a complete native bookkeeping price.
+                            let words = 2 * r.partial().large.len() as u64 + probes;
+                            work::words(words);
+                            gate_words += words;
+                        }
                         relations.push(r);
                     }
                 }
@@ -210,6 +268,21 @@ pub fn run_two_large_prime_dlp_on(
             if let Some(stride) = options.collection_rank_stride {
                 if relations.len() >= next_rank_check {
                     let _la = work::enter(Phase::LinearAlgebra);
+                    if let Some(gate) = gate.as_ref() {
+                        let state = gate.snapshot();
+                        work::words(1);
+                        gate_words += 1;
+                        let permits_exact_check = state.small_rank_upper_bound >= rank_target;
+                        gate_checks.push(json!({"b_count":bs,"source_rows":relations.len(),"rank_target":rank_target,
+                            "permits_exact_check":permits_exact_check,"state":structural_snapshot(&state)}));
+                        if !permits_exact_check {
+                            // Keep the baseline's source-stride schedule. This
+                            // skips a doomed checkpoint without changing when
+                            // later checks consume the original relation stream.
+                            next_rank_check = relations.len().saturating_add(stride);
+                            continue 'collect;
+                        }
+                    }
                     let before = work::snapshot();
                     let projection = match sieve.filter_checked(
                         &ctx,
@@ -367,6 +440,12 @@ pub fn run_two_large_prime_dlp_on(
         output["collection_rank_checks"] = json!(rank_checks);
         output["collection_rank_ready"] = json!(rank_ready);
         output["collection_rank_target"] = json!(rank_target);
+    }
+    if let Some(gate) = gate {
+        output["collection_structural_gate"] = json!({"schema":"two-large-prime.structural-rank-gate/v1",
+            "checks":gate_checks,"final_state":structural_snapshot(&gate.snapshot()),"charged_word_events_lower_bound":gate_words,
+            "word_event_scope":"dense state initialization, support identity/coefficient reads, parent probes and checkpoint bound reads",
+            "native_bookkeeping_complete":false,"known_uncounted":"DSU scalar updates, comparisons and allocation/scheduling beyond counted state events"});
     }
     Ok((output, scalar))
 }

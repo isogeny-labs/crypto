@@ -19,8 +19,8 @@ use std::collections::HashMap;
 #[path = "jv_sieve_two_large_prime_dlp.rs"]
 mod dlp;
 pub use dlp::{
-    run_two_large_prime_dlp_on, ProtectedTargetProjection, TwoLargePrimeDlpOptions,
-    VerifiedDescentRelation,
+    run_two_large_prime_dlp_on, run_two_large_prime_dlp_on_with_structural_gate,
+    ProtectedTargetProjection, TwoLargePrimeDlpOptions, VerifiedDescentRelation,
 };
 #[path = "jv_counted_linear.rs"]
 mod counted_linear;
