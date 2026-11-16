@@ -1,0 +1,33 @@
+name: CT98 oriented differential certificate (bounded)
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct98/**'
+      - '.github/workflows/ct98-oriented-differential.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct98/**'
+      - '.github/workflows/ct98-oriented-differential.yml'
+  workflow_dispatch:
+jobs:
+  oriented-certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned algebra package
+        run: python3 -m pip install --disable-pip-version-check sympy==1.14.0
+      - name: Replay both producers at normal and optimized settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct98
+          python3 -B "$D/ct98_oriented_certificate.py" >/tmp/ct98-py.json
+          python3 -O -B "$D/ct98_oriented_certificate.py" >/tmp/ct98-opt.json
+          node "$D/ct98_oriented_independent.js" >/tmp/ct98-js.json
+          node --no-opt "$D/ct98_oriented_independent.js" >/tmp/ct98-jsopt.json
+          cmp /tmp/ct98-py.json /tmp/ct98-opt.json
+          cmp /tmp/ct98-py.json /tmp/ct98-js.json
+          cmp /tmp/ct98-py.json /tmp/ct98-jsopt.json
+          printf '%s  %s\n' 3ccef4ce62b4631553ec52a0bbd3f2b21b04db0dc30b22794c655b42e5c049b3 /tmp/ct98-py.json | sha256sum -c
+          grep -F '"scalar_independent_transfer":false' /tmp/ct98-py.json
