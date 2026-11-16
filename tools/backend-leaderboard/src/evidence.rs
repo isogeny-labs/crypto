@@ -48,10 +48,24 @@ pub struct Curve {
     pub family: String,
     pub field_degree: Option<u32>,
     pub field_bits: Option<u32>,
-    #[serde(with = "crate::canonical::compat_u128")]
-    pub r: u128,
+    pub r: Order,
     #[serde(flatten)]
     pub rest: BTreeMap<String, Value>,
+}
+
+/// A subgroup order as the records write it (`compat_u128`: a JSON number
+/// while it fits a `u64`, a decimal string above).  The harness reads it as
+/// `ExactScalar`; the shared `band.rs` only calls [`Order::to_f64`].  Orders
+/// past `2^128` (the three-word Koblitz class) are not read here.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Order(#[serde(with = "crate::canonical::compat_u128")] pub u128);
+
+impl Order {
+    /// The nearest `f64`, `v as f64` exactly as the harness computes it.
+    pub fn to_f64(self) -> f64 {
+        self.0 as f64
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

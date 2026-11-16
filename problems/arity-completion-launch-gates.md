@@ -148,8 +148,8 @@ What would unblock it (owner decisions, none taken):
   prime tower's per-cell infrastructure retry limit before the next attempt.
 
 Results so far (exact, every file matched its SHA256SUMS): ten Koblitz m = 2
-negative controls (chain-s3 4/4 proved_unsat on each of k0n23, k1n29, k0n31,
-k0n37, k0n41; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
+negative controls (chain-s3 4/4 proved_unsat on each of icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5,
+icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
 prime-tower controls under protocol v2 (D 6, 7, 4); kummer-m5-t2 D = 6;
 kummer-m5-t3 capped at 8 GiB (inconclusive_cap). Verdicts await each study's
 `analyze.py` and the director's assessment.
@@ -210,3 +210,31 @@ icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a; chain-s3-orbit 4/4 
   `retries.max_attempts` = 2. Running it again needs an owner decision. The
   cpu-spot limit raise (`launch/criu/nodepool-change-20261107/patch-cpu-spot.sh`)
   still needs an operator.
+
+## 2026-11-15: cubic-extension symbolic graph comparison
+
+The same checkpoint/command-image access dependency also affects the native
+Rust integration at `research/extension_ic_graph_20261115/` on branch
+`feat/extension-ic-graph-elimination`. Its frozen cohort and holdouts are in
+`protocol.json`; the requested baseline/candidate measurements remain pending.
+[pcc:unverified]
+
+Observed in this Codex workspace: no `aws` executable, no checkpoint upload
+environment token or token file, and the checkpoint gate reports
+`no way to upload` / `cannot upload, so nothing was checkpointed` (raw output:
+`research/extension_ic_graph_20261115/validation/checkpoint-gate.log`). GitHub
+workflow metadata is readable; Actions permissions/variables endpoints returned
+HTTP 403. No workload was dispatched. [pcc:unverified]
+
+The next action is to use an existing authenticated lab runner/profile, pass
+checkpoint/publication/pool gates, and build a digest-pinned command image
+carrying `gaudry_cubic_graph_compare`. The maintained GitHub fixture image's
+`ecbench` executable does not itself expose this new comparison example.
+The frozen limit is USD 5, four CPUs, 8 GiB, 900 seconds and zero automatic
+retries. Local unit checks are not the requested EKS comparison. The user has
+been asked for an existing runner/profile location, not credential text.
+[pcc:unverified]
+
+This addition does not change the older arity/dreg findings or assert anything
+about their current credentials. Recheck when this session receives a configured
+runner/profile or checkpoint transport. The shared obstruction remains open.
