@@ -1,3 +1,63 @@
+# Prior Root PR merged externally during source preparation
+
+## What was done
+pcc/claims/PCC-20261116-77ebba.json: local source6e77 has complete source governance531e88, but publisher lookup finds the old head absent and attempts no push. PR4366 was externally merged at02:28:20, after empty refresh8fa. Genuine merge966648 is fetched and its tree equals oldd3 exactly. Every failed publication byte is preserved. [pcc:unverified]
+
+## Decisions made
+Use a new owned successor branch and ordinarily merge genuine966648, preserving all local/source/ledger history. Parent branch now genuinely advanced to966648; do not call its mutable ref exactc019. Publish a fresh exact source tag and ready PR against that immediate parent after original governance. No force, rechain, old-branch resurrection or empty rerun. [pcc:unverified]
+
+## Open threads
+Root successor publication/required CI; Consumerc045 historical native unit CI reports success and whole artifact is being collected. Full historical LP/EKS/scientificNEW28 remain open. [pcc:unverified]
+
+## Errors
+Normal publisher error was an empty expected-head response after legitimate external branch deletion. No actual push occurred. The old PR's external merge is not attributed to this session or treated as a successful current-source PCC repair. [pcc:unverified]
+
+---
+# Exact archive hydration and historical workflow data address
+
+## What was done
+pcc/claims/PCC-20261116-821559.json:12 metadata controls0; actual full oldb55 data claim replays1/2/1 before/historical-view/after source restoration with unchanged verifier. Original22 tests,62 canaries,8 old address controls and new workflow actionlint/wiring0. Whole fixture/source/logs preserved; historical data are unsigned not_covered, not current-source execution evidence. [pcc:unverified]
+
+## Decisions made
+Publish the exact missing archive loader input plus a narrow transactional historical workflow data address. Capture actual current source separately and restore before tests/signing publication, always retaining both versions. Do not pin the mutable active workflow again. Global fresh required CI, not local metadata controls, decides whether the PCC gap is fixed. [pcc:unverified]
+
+## Open threads
+Source governance/publication and required CI; all scientific NEW28/old shared-main ledger reconciliation and Consumer full historical LP implementation/EKS admission remain separate. Consumerb7 original02 and prior LP development succeedfeca94; c045 new historical units next03:33UTC. [pcc:unverified]
+
+## Errors
+First workflow generator assertion stopped before writing; original workflow remained exact. All earlier required PCC failures2af6d7 remain retained. No original verifier/keyring/claim or scientific source is rewritten. [pcc:unverified]
+
+---
+# Required PCC still needs whole archival input
+
+## What was done
+pcc/claims/PCC-20261116-2af6d7.json: currentd3 runs43784446458 and43787110213 have successful original data pulls, historical address preparation,62 canaries and prefix checks; verify-all fails on old3baf4e/99baab's whole original archive after genuine bot532 made it store-backed. Both whole logs are retained. The prior historical alias and two other store subjects are fixed at their narrow scope. [pcc:unverified]
+
+## Decisions made
+Keep PR4366 open without merge; preserve all current original verifier, keyring, claims and raw archive bytes. Do not retry unchanged. Need exact additional archive hydration before verification, while retaining the directly pinned older workflow source as historical data. Continue Consumer unblocked implementation. [pcc:unverified]
+
+## Open threads
+Required PCC archive/source-version address compatibility, full scientific NEW28 and historical shared-main ledger issue; Consumer source prerequisites and strict LP historical adapter continue. Other observed current-head workflow outcomes are successful, but do not override PCC failure. [pcc:unverified]
+
+## Errors
+The first address-preparation fix omitted the archive that became store-backed during genuine metadata integration. No scientific or signed claim is promoted. [pcc:unverified]
+
+---
+# Publish genuine metadata integration and PCC evidence preparation
+
+## What was done
+pcc/claims/PCC-20261116-c44e88.json: sourced3bb7bdc00d3 published normally with both real merge parents and a new exact source tag. Actual original sidecar custody remains0e8d86; source preparationb55dd4 and scoped governance2bdca5 are retained. [pcc:unverified]
+
+## Decisions made
+Track actual final-head required CI after the ordinary50-minute cadence, about02:00UTC. Update PR4366 and queue3904 with exact source and narrow result; do not merge before actual required checks/review. [pcc:unverified]
+
+## Open threads
+Fresh PCC CI/data-address problem; Consumer66d2 cold original-fixture preparation and fresh unit CI; strict historical LP pipeline/CI03, fullNEW28/EKS admission and main-ledger/reference/global bridges. [pcc:unverified]
+
+## Errors
+Staging failure73cc72 preserved. Broad benchrec stays1; no new CI success or signed standing is inferred. [pcc:unverified]
+
+---
 # Integrate genuine metadata bot and publish unchanged-verifier evidence preparation
 
 ## What was done
@@ -2490,3 +2550,9 @@ Rootmirror02publication and genuineNEW27 preparation; repeat all58919hash/177lin
 ## Errors
 
 Oldproblem-indexinstruction prose lackedtags and a historicalscratch staging-list filename was reused. No mathematical or native result changed. [pcc:unverified]
+
+## Historical workflow data-address controls
+pcc/claims/PCC-20261116-067d85.json: all11 metadata controls0 with unchanged original attestation verifier; historical old bytes remain unsigned data, current Git workflow is held whole and restored, all misuse controls reject. Whole source/fixtures/logs retained. Need final gate/sign data staging, restore idempotence after legitimate signing-ledger commit, archive hydration and actual required CI before merge. [pcc:unverified]
+
+## Source-address report
+pcc/claims/PCC-20261116-80b1fb.json: one-page37628-byte report rendered and inspected; source/current vs historical unsigned bytes and current restoration are explicit. Required final-head CI and scientific/EKS scope remain open. [pcc:unverified]
