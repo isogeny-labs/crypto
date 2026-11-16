@@ -1,5 +1,5 @@
-# Prospective report publication
+# Report custody
 
-The new self-contained validator report is171195 bytes, SHA256`c355a3414f75b2796d24ee9c48824de46e58c583d9bc4ab7212e651fc7630f6e`. Its destination is the repository's existing content-addressed artifact store. The initial candidate commit supplies the data bytes to the trusted artifact-autofix workflow; the manifest is a locator, not a claim that upload already succeeded.
+The self-contained validator report remains Git-tracked under the existing artifact policy: JSON below 1 MiB is not selected for migration. Its 171,195 bytes have SHA256 `c355a3414f75b2796d24ee9c48824de46e58c583d9bc4ab7212e651fc7630f6e`. Trusted publication run 43817399144 selected no data files, so no upload or remote replay is claimed.
 
-The trusted base tool uploads and independently replays remote bytes before its pointer-only commit removes the Git payload. The report must be hydrated before the validation gate runs. The workflow declaration derives its pull prefix from the new manifest. Publication is pending until that trusted migration commit and current-head CI complete. Original reports and stored objects are unchanged.
+The numeric-fidelity guard checks this committed report against the preserved original using exact decimal parsing. Original reports, prior binding manifests and stored objects are unchanged.
