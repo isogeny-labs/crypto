@@ -1,0 +1,54 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T22:43:16Z",
+ "id": "PCC-20261115-2deca4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "b8cd452f3f52d8ad32aa77813f44a6b385567033",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "31f8241f51991a632b42c0957f5495d0eace615edb920aa8b67bc0f094b4dc5a",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+   "theorem": "Curve25519TorusArithmetic.divisor"
+  },
+  {
+   "decl_sha256": "1ce3813d039bce38a8a86438bc6c6b1eb43c1c195ad6379522fadeaefc8e6e9a",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+   "theorem": "Curve25519TorusArithmetic.admissible_positive"
+  },
+  {
+   "decl_sha256": "bb5f8c28967e0eb5fb83b1d20c6db221a4677a4a4b10917c020d2f740c43b0f1",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+   "theorem": "Curve25519TorusArithmetic.correction_lt_one"
+  },
+  {
+   "decl_sha256": "4da5b6a3aa89fbc3b9346016043c0bc67b20734ac2874e9164decc6cb5af9cae",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+   "theorem": "Curve25519TorusArithmetic.class_lower_bound"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean/gate-v1/audit.log",
+    "sha256": "c8378d63c7902b9294870227eef9dd06ed703c21f88d87675dd88d7bde4ea7fc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean/gate-v1/status",
+    "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Concrete Lean Core arithmetic only: M divides p+1; 28M is smaller than p+1; K*W0 is smaller than p+1-28M; and (M-1)/2 exceeds 2^52, for p=2^255-19, M=60824497*213156431, L=4M, W0=16L(L-1)(L-2)(L-3), K=2^28. Producer proof-gate passed four declarations with no trusted native exceptions; this does not prove the geometric energy lemma, any solver bound or a new attack exponent."
+}
