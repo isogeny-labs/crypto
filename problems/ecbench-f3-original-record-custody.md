@@ -1,6 +1,6 @@
 # F3 original record custody
 
-Status: original 24-record object unrecovered; proposed disposition awaits owner approval.
+Status: exact defective-session disposition approved and active; original 24-record object recovery remains open.
 
 The unchanged smoke-k0n61 session capsule declares 24 records and binds SHA256 `2aa97366f892f7d1a2f4c887e9e5543397ff6d047016048932efaace40e92843`. Its original artifact manifest instead binds the 16-record object `5c937b749f9bb20f6541b19c9ed9e21c16f2392e103ee3b47e0995a272c629fb`. A fresh native audit reports exactly records_hash, record_count, status_counts and last_seq. Each of the 16 retained records passes its per-record checks; the complete capsule fails. [pcc:unverified]
 

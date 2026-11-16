@@ -10260,8 +10260,6 @@ fn sat_decompose_union_s4(
     }
 }
 
-/// Hard limits for an experimental five- or six-summand chained-S3 SAT
-/// decomposition. The variable cap is checked before a SAT solver is built;
 /// Hard limits for an experimental four- to six-summand chained-S3 SAT
 /// decomposition. The variable cap is checked before any SAT model is built;
 /// the conflict and model caps cover all intermediate-identity patterns.
@@ -12817,14 +12815,13 @@ fn koblitz_index_calculus_dlp_observed(
             | DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
-    ) && (!(5..=6).contains(&opts.m))
-        && (!(4..=6).contains(&opts.m)
-            || !fb.uses_ambient_basis()
-            || opts.chain_s3_limits.max_variables == 0
-            || opts.chain_s3_limits.max_domain_clauses == 0
-            || opts.chain_s3_limits.max_models == 0
-            || opts.chain_s3_limits.conflict_budget == 0
-            || opts.relation_batch_size != 1)
+    ) && (!(4..=6).contains(&opts.m)
+        || !fb.uses_ambient_basis()
+        || opts.chain_s3_limits.max_variables == 0
+        || opts.chain_s3_limits.max_domain_clauses == 0
+        || opts.chain_s3_limits.max_models == 0
+        || opts.chain_s3_limits.conflict_budget == 0
+        || opts.relation_batch_size != 1)
     {
         report.sat_unknowns = 1;
         return Some(report);
@@ -19664,6 +19661,75 @@ mod tests {
         );
         assert!(found.is_none() && stats.exhausted && !stats.refuted);
         assert_eq!(stats.patterns_attempted, 0);
+    }
+
+    #[test]
+    fn chained_s3_preflight_caps_apply_to_every_supported_strategy_and_summand_count() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
+        let target = kc.mul(kc.generator(), &BigUint::from(3u32));
+        let restricted = build_frobenius_factor_base(&kc, 0).unwrap();
+        assert!(!restricted.uses_ambient_basis());
+        let strategies = [
+            DecompositionStrategy::ChainedS3,
+            DecompositionStrategy::ChainedS3Karatsuba,
+            DecompositionStrategy::ChainedS3ShallowKaratsuba,
+            DecompositionStrategy::ChainedS3FrobeniusOrbit,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba,
+        ];
+        for strategy in strategies {
+            for m in 4..=6 {
+                for stopped_by in 0..6 {
+                    let mut limits = ChainS3Limits {
+                        max_variables: 2_000,
+                        max_domain_clauses: 10_000,
+                        max_models: 128,
+                        conflict_budget: 500_000,
+                    };
+                    match stopped_by {
+                        0 => limits.max_variables = 0,
+                        1 => limits.max_domain_clauses = 0,
+                        2 => limits.max_models = 0,
+                        3 => limits.conflict_budget = 0,
+                        _ => {}
+                    }
+                    let opts = KoblitzIcOptions {
+                        m,
+                        strategy,
+                        max_trials: 1,
+                        allow_direct_relation: false,
+                        relation_batch_size: if stopped_by == 4 { 2 } else { 1 },
+                        chain_s3_limits: limits,
+                        ..KoblitzIcOptions::default()
+                    };
+                    let report = koblitz_index_calculus_dlp_with_factor_base(
+                        &kc,
+                        &target,
+                        if stopped_by == 5 { &restricted } else { &fb },
+                        &opts,
+                    )
+                    .unwrap();
+                    assert_eq!(
+                        (
+                            report.trials,
+                            report.sat_calls,
+                            report.linear_solve_attempts,
+                            report.relations,
+                            report.sat_unknowns
+                        ),
+                        (0, 0, 0, 0, 1),
+                        "strategy={strategy:?}, m={m}, stopped_by={stopped_by}: {report:?}"
+                    );
+                    assert!(report.log.is_none());
+                    assert!(report.attempt_records.is_empty());
+                }
+            }
+        }
     }
 
     #[test]
