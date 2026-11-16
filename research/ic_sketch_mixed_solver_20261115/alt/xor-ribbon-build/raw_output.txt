@@ -1,0 +1,101 @@
+generators on curve: p24 G=(2,5412647) ok, p28 G=(1,1) ok
+
+==================== p24: p=16777199 |F|=128 ====================
+factor base: 128 abscissae from 279 prime candidates scanned (largest x=1801)
+pair keys: group adds=16256 emitted=16256 distinct x=16232 (dup/collisions=24) build_s=0.00
+queries (random on-curve x): 8000000, exact hits=15558 => measured hit_rate=1.944750e-3; model keys/((p+1)/2)=1.935007e-3
+exact std HashMap<u32,u32>: est bytes=294928 bits/key=145.36; packed-ideal bits/key=24 (ceil log2 p + value bits 15)
+exact HashMap lookup: 9.5 ns/lookup (hits 15558); bucket probes/lookup ~1 (SwissTable group)
+-- construction success (seeds 0..100) --
+xor8: first-attempt success 95/100; mean attempts to success 1.040
+xor16: first-attempt success 95/100; mean attempts to success 1.040
+ribbon w=64 eps=0.02: first-attempt success 4/100; mean attempts ~25.000
+ribbon w=64 eps=0.05: first-attempt success 78/100; mean attempts ~1.282
+ribbon w=64 eps=0.08: first-attempt success 99/100; mean attempts ~1.010
+ribbon w=64 eps=0.10: first-attempt success 99/100; mean attempts ~1.010
+ribbon w=64 eps=0.15: first-attempt success 100/100; mean attempts ~1.000
+-- structures at f=8 and f=16 (3 independent builds each; FPR over 7984442 non-member queries) --
+xor8: bits/key=9.856 (1.23*f=9.840) FPR=3.9002e-3 (theory 2^-8=3.9062e-3, FP count 93423) probes/lookup=3 (+3 hash positions, 1 hash) 5.4 ns/lookup
+ribbon8 eps=0.10: bits/key=8.800 (=(1+eps)f=8.800) FPR=3.8810e-3 (theory 3.9062e-3, FP count 92964) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 44.5 ns/lookup
+ribbon8 eps=0.15: bits/key=9.200 (=(1+eps)f=9.200) FPR=3.8733e-3 (theory 3.9062e-3, FP count 92779) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 39.7 ns/lookup
+bloom (k=8, m=1.4427 f n): bits/key=11.542 FPR=3.8773e-3 (theory ~3.9062e-3) mean reads/negative lookup=1.99 25.1 ns/lookup
+xor16: bits/key=19.712 (1.23*f=19.680) FPR=1.5572e-5 (theory 2^-16=1.5259e-5, FP count 373) probes/lookup=3 (+3 hash positions, 1 hash) 3.6 ns/lookup
+ribbon16 eps=0.10: bits/key=17.600 (=(1+eps)f=17.600) FPR=1.5488e-5 (theory 1.5259e-5, FP count 371) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 40.1 ns/lookup
+ribbon16 eps=0.15: bits/key=18.399 (=(1+eps)f=18.400) FPR=1.3693e-5 (theory 1.5259e-5, FP count 328) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 39.6 ns/lookup
+bloom (k=16, m=1.4427 f n): bits/key=23.083 FPR=1.7451e-5 (theory ~1.5259e-5) mean reads/negative lookup=2.00 25.1 ns/lookup
+
+==================== p24: p=16777199 |F|=512 ====================
+factor base: 512 abscissae from 1079 prime candidates scanned (largest x=8669)
+pair keys: group adds=261632 emitted=261632 distinct x=257607 (dup/collisions=4025) build_s=0.06
+queries (random on-curve x): 8000000, exact hits=245252 => measured hit_rate=3.065650e-2; model keys/((p+1)/2)=3.070918e-2
+exact std HashMap<u32,u32>: est bytes=4718608 bits/key=146.54; packed-ideal bits/key=24 (ceil log2 p + value bits 19)
+exact HashMap lookup: 14.7 ns/lookup (hits 245252); bucket probes/lookup ~1 (SwissTable group)
+-- construction success (seeds 0..25) --
+xor8: first-attempt success 25/25; mean attempts to success 1.000
+xor16: first-attempt success 25/25; mean attempts to success 1.000
+ribbon w=64 eps=0.02: first-attempt success 0/25; mean attempts ~25.000
+ribbon w=64 eps=0.05: first-attempt success 0/25; mean attempts ~25.000
+ribbon w=64 eps=0.08: first-attempt success 18/25; mean attempts ~1.389
+ribbon w=64 eps=0.10: first-attempt success 24/25; mean attempts ~1.042
+ribbon w=64 eps=0.15: first-attempt success 25/25; mean attempts ~1.000
+-- structures at f=8 and f=16 (3 independent builds each; FPR over 7754748 non-member queries) --
+xor8: bits/key=9.841 (1.23*f=9.840) FPR=3.8973e-3 (theory 2^-8=3.9062e-3, FP count 90668) probes/lookup=3 (+3 hash positions, 1 hash) 7.8 ns/lookup
+ribbon8 eps=0.10: bits/key=8.800 (=(1+eps)f=8.800) FPR=3.9027e-3 (theory 3.9062e-3, FP count 90794) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 44.0 ns/lookup
+ribbon8 eps=0.15: bits/key=9.200 (=(1+eps)f=9.200) FPR=3.8864e-3 (theory 3.9062e-3, FP count 90415) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 43.8 ns/lookup
+bloom (k=8, m=1.4427 f n): bits/key=11.542 FPR=3.8947e-3 (theory ~3.9062e-3) mean reads/negative lookup=1.99 32.5 ns/lookup
+xor16: bits/key=19.682 (1.23*f=19.680) FPR=1.5646e-5 (theory 2^-16=1.5259e-5, FP count 364) probes/lookup=3 (+3 hash positions, 1 hash) 8.0 ns/lookup
+ribbon16 eps=0.10: bits/key=17.600 (=(1+eps)f=17.600) FPR=1.6033e-5 (theory 1.5259e-5, FP count 373) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 44.9 ns/lookup
+ribbon16 eps=0.15: bits/key=18.400 (=(1+eps)f=18.400) FPR=1.3067e-5 (theory 1.5259e-5, FP count 304) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 44.9 ns/lookup
+bloom (k=16, m=1.4427 f n): bits/key=23.083 FPR=1.5603e-5 (theory ~1.5259e-5) mean reads/negative lookup=2.00 35.7 ns/lookup
+
+==================== p28: p=268435399 |F|=323 ====================
+factor base: 323 abscissae from 621 prime candidates scanned (largest x=4591)
+pair keys: group adds=104006 emitted=104006 distinct x=103984 (dup/collisions=22) build_s=0.03
+queries (random on-curve x): 8000000, exact hits=6194 => measured hit_rate=7.742500e-4; model keys/((p+1)/2)=7.747413e-4
+exact std HashMap<u32,u32>: est bytes=1179664 bits/key=90.76; packed-ideal bits/key=28 (ceil log2 p + value bits 19)
+exact HashMap lookup: 17.0 ns/lookup (hits 6194); bucket probes/lookup ~1 (SwissTable group)
+-- construction success (seeds 0..100) --
+xor8: first-attempt success 100/100; mean attempts to success 1.000
+xor16: first-attempt success 100/100; mean attempts to success 1.000
+ribbon w=64 eps=0.02: first-attempt success 0/100; mean attempts ~100.000
+ribbon w=64 eps=0.05: first-attempt success 24/100; mean attempts ~4.167
+ribbon w=64 eps=0.08: first-attempt success 86/100; mean attempts ~1.163
+ribbon w=64 eps=0.10: first-attempt success 98/100; mean attempts ~1.020
+ribbon w=64 eps=0.15: first-attempt success 100/100; mean attempts ~1.000
+-- structures at f=8 and f=16 (3 independent builds each; FPR over 7993806 non-member queries) --
+xor8: bits/key=9.843 (1.23*f=9.840) FPR=3.9004e-3 (theory 2^-8=3.9062e-3, FP count 93538) probes/lookup=3 (+3 hash positions, 1 hash) 4.1 ns/lookup
+ribbon8 eps=0.10: bits/key=8.800 (=(1+eps)f=8.800) FPR=3.9086e-3 (theory 3.9062e-3, FP count 93733) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 47.7 ns/lookup
+ribbon8 eps=0.15: bits/key=9.200 (=(1+eps)f=9.200) FPR=3.9109e-3 (theory 3.9062e-3, FP count 93789) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 45.8 ns/lookup
+bloom (k=8, m=1.4427 f n): bits/key=11.542 FPR=3.9092e-3 (theory ~3.9062e-3) mean reads/negative lookup=1.99 33.8 ns/lookup
+xor16: bits/key=19.685 (1.23*f=19.680) FPR=1.5846e-5 (theory 2^-16=1.5259e-5, FP count 380) probes/lookup=3 (+3 hash positions, 1 hash) 3.8 ns/lookup
+ribbon16 eps=0.10: bits/key=17.600 (=(1+eps)f=17.600) FPR=1.6137e-5 (theory 1.5259e-5, FP count 387) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 39.5 ns/lookup
+ribbon16 eps=0.15: bits/key=18.400 (=(1+eps)f=18.400) FPR=1.3427e-5 (theory 1.5259e-5, FP count 322) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 39.5 ns/lookup
+bloom (k=16, m=1.4427 f n): bits/key=23.083 FPR=1.6513e-5 (theory ~1.5259e-5) mean reads/negative lookup=2.00 35.2 ns/lookup
+
+==================== p28: p=268435399 |F|=1024 ====================
+factor base: 1024 abscissae from 2044 prime candidates scanned (largest x=17827)
+pair keys: group adds=1047552 emitted=1047552 distinct x=1043444 (dup/collisions=4108) build_s=0.28
+queries (random on-curve x): 8000000, exact hits=61957 => measured hit_rate=7.744625e-3; model keys/((p+1)/2)=7.774265e-3
+exact std HashMap<u32,u32>: est bytes=18874384 bits/key=144.71; packed-ideal bits/key=28 (ceil log2 p + value bits 21)
+exact HashMap lookup: 20.7 ns/lookup (hits 61957); bucket probes/lookup ~1 (SwissTable group)
+-- construction success (seeds 0..25) --
+xor8: first-attempt success 25/25; mean attempts to success 1.000
+xor16: first-attempt success 25/25; mean attempts to success 1.000
+ribbon w=64 eps=0.02: first-attempt success 0/25; mean attempts ~25.000
+ribbon w=64 eps=0.05: first-attempt success 0/25; mean attempts ~25.000
+ribbon w=64 eps=0.08: first-attempt success 6/25; mean attempts ~4.167
+ribbon w=64 eps=0.10: first-attempt success 21/25; mean attempts ~1.190
+ribbon w=64 eps=0.15: first-attempt success 25/25; mean attempts ~1.000
+-- structures at f=8 and f=16 (3 independent builds each; FPR over 7938043 non-member queries) --
+xor8: bits/key=9.840 (1.23*f=9.840) FPR=3.9043e-3 (theory 2^-8=3.9062e-3, FP count 92977) probes/lookup=3 (+3 hash positions, 1 hash) 9.7 ns/lookup
+ribbon8 eps=0.10: bits/key=8.800 (=(1+eps)f=8.800) FPR=3.8899e-3 (theory 3.9062e-3, FP count 92634) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 43.9 ns/lookup
+ribbon8 eps=0.15: bits/key=9.200 (=(1+eps)f=9.200) FPR=3.8824e-3 (theory 3.9062e-3, FP count 92457) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 43.9 ns/lookup
+bloom (k=8, m=1.4427 f n): bits/key=11.542 FPR=3.9114e-3 (theory ~3.9062e-3) mean reads/negative lookup=1.99 41.9 ns/lookup
+xor16: bits/key=19.681 (1.23*f=19.680) FPR=1.5705e-5 (theory 2^-16=1.5259e-5, FP count 374) probes/lookup=3 (+3 hash positions, 1 hash) 9.5 ns/lookup
+ribbon16 eps=0.10: bits/key=17.600 (=(1+eps)f=17.600) FPR=1.4445e-5 (theory 1.5259e-5, FP count 344) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 43.9 ns/lookup
+ribbon16 eps=0.15: bits/key=18.400 (=(1+eps)f=18.400) FPR=1.5243e-5 (theory 1.5259e-5, FP count 363) slot reads/lookup(avg popcount)=32.5 within <=64-slot window (<=2 cache lines) 43.1 ns/lookup
+bloom (k=16, m=1.4427 f n): bits/key=23.083 FPR=1.4949e-5 (theory ~1.5259e-5) mean reads/negative lookup=2.00 44.7 ns/lookup
+
+real	1m13.242s
+user	1m11.617s
+sys	0m0.160s
