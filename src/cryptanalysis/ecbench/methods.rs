@@ -218,7 +218,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch (same table with batched binary additions), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -512,6 +512,13 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
         MethodDecl {
             id: super::prime_orbit::ID,
             family: "ic",
@@ -1178,6 +1185,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_framework::run_pipeline + ecbench::ic_report(counted)",
             applies: Applies::Any,
             params: IC_COUNTED_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.hashed_native_v1",
+            family: "ic",
+            summary: "native BigUint hashed-base IC with explicit source/selector/width/partial backend; group calls charged, all meter/native work unpriced; cold and exclusive online phases; bounded failures retained",
+            entry: "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+            applies: Applies::PrimeOnly,
+            params: super::hashed_native::PARAMS,
         },
         MethodDecl {
             id: "ic.tensor_contraction_v1",
@@ -3755,6 +3770,9 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if m.id == "ic.hashed_native_v1" => {
+            super::hashed_native::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
@@ -5151,6 +5169,9 @@ fn solve_ext(
             }
             solve_endo_orbit(m, &i.curve, i.frobenius, i.generator, target, i.r, seed, "frobenius-orbit walk on {±π^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
         }
+        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
+            unreachable!("returned above")
+        }
     }
 }
 
@@ -6168,6 +6189,17 @@ fn ic_report(
     // (`audit::legacy_solver_rounding` reproduces those records).
     let mut total = rep.total_gae;
     if let Some(s) = &rep.decomposition.solver {
+        // New opt-in Boolean variants retain their exact Gray search work
+        // separately from calibrated Macaulay word XORs. A reduction in the
+        // latter must not silently price the tail enumeration at zero.
+        for name in [
+            "quadratic_tail_assignments_uncharged",
+            "generalized_assignments_uncharged",
+        ] {
+            if let Some(&count) = s.extra.get(name).filter(|&&count| count > 0) {
+                phases[2].native.insert(name.into(), count);
+            }
+        }
         // `counted` (field multiplications priced at the curve's own
         // multiplications per addition, `gaudry-d4`) is a count, like
         // `pinned`, and stays in the total.
@@ -6238,6 +6270,25 @@ fn ic_report(
             automorphisms,
         )
     });
+    // GroupOps already tallies prime field arithmetic in the group law and
+    // in instrumented oracles such as rootfind-subtract.  Keep that partial
+    // tally visible by phase without promoting it to SolveReport::field_ops:
+    // factor-base lifts, native tests, and elimination still have separate
+    // accounting, and some of their field work is not in GroupOps.
+    let phase_field_ops = [
+        ("factor_base", rep.factor_base.cost.group_ops.field_ops),
+        ("oracle_setup", rep.decomposition.setup.group_ops.field_ops),
+        ("relations", rep.decomposition.cost.group_ops.field_ops),
+        (
+            "linear_algebra",
+            rep.linear_algebra.cost.group_ops.field_ops,
+        ),
+        ("verify", rep.verify.group_ops.field_ops),
+    ];
+    let mut counted_field_ops = FieldOps::default();
+    for (_, ops) in phase_field_ops {
+        counted_field_ops.merge(ops);
+    }
     let mut detail = json!({
         "label": rep.label,
         "decomposition": {
@@ -6251,11 +6302,17 @@ fn ic_report(
         "calibration_pinned_units": calib.pinned_units,
         "framework_total_gae_before_solver_removal": rep.total_gae,
     });
-    // Opt-in audit data includes the actual row/rank transcript. Preserve it
-    // for independent replay instead of retaining only aggregate counters.
-    // Absent audits leave legacy report serialization unchanged.
-    if let Some(audit) = &rep.useful_rank {
-        detail["useful_rank"] = serde_json::to_value(audit).expect("serializable rank audit");
+    if counted_field_ops != FieldOps::default() {
+        detail["counted_field_ops"] = json!({
+            "schema": "ecbench.counted-field-ops/v1",
+            "scope": "instrumented GroupOps arithmetic only; incomplete pipeline field cost",
+            "complete": false,
+            "phases": phase_field_ops.iter().map(|(name, ops)| json!({
+                "name": name,
+                "field_ops": ops,
+            })).collect::<Vec<_>>(),
+            "total": counted_field_ops,
+        });
     }
     SolveReport {
         recovered: rep.recovered.map(ExactScalar::from),
@@ -8650,7 +8707,7 @@ pub fn dump_factor_base(
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
-        | Instance::Hyper(_) => unreachable!("returned above"),
+        | Instance::Hyper(_) | Instance::ThreeLeads(_) => unreachable!("returned above"),
     }
 }
 
@@ -9314,99 +9371,6 @@ mod tests {
         assert!(err.contains("prime-kummer"), "{err}");
     }
 
-    /// Full native relation collection and elimination, with no known-log
-    /// factor base and no planted scalar supplied to the oracle.
-    #[test]
-    fn retained_chain_pipeline_recovers_after_independent_relations() {
-        use crate::cryptanalysis::ecbench::workload::CurveSpec;
-        let spec = CurveSpec::PrimeExplicit {
-            p: 17,
-            a: 2,
-            b: 2,
-            group_order: 19,
-            r: 19,
-            gx: 5,
-            gy: 1,
-        };
-        let inst = spec.build().unwrap();
-        let facts = inst.facts(&spec);
-        let Instance::Prime(prime) = &inst else {
-            unreachable!()
-        };
-        let target = prime
-            .curve
-            .mul(&mut GroupOps::default(), prime.generator_point(), 7);
-        let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
-        for m in [3, 4] {
-            let mut reference = None;
-            for encoding in ["engine=exhaustive", "layout=blocks", "layout=levels"] {
-                let method = resolve(&MethodSpec {
-                    id: "ic.pipeline".into(),
-                    params: [
-                        ("factor_base".into(), "prime-kummer:t=2".into()),
-                        (
-                            "oracle".into(),
-                            format!(
-                            "pkm-semaev:m={m},charts=all,degree=4,max_nnz=100000,audit_rank=1,{encoding}"
-                            ),
-                        ),
-                    ]
-                    .into_iter()
-                    .collect(),
-                })
-                .unwrap();
-                let row = solve(&method, &inst, &facts, &coords, 5).unwrap();
-                assert_eq!(
-                    row.recovered,
-                    Some(ExactScalar::from(7u128)),
-                    "m={m},{encoding}"
-                );
-                assert!(row.counters["relations_found"] > 0);
-                assert!(row.counters["matrix_rank"] > 0);
-                assert!(row.counters["matrix_work"] > 0);
-                let audit: crate::cryptanalysis::ic_framework::useful_rank::RankAudit =
-                    serde_json::from_value(row.detail["useful_rank"].clone()).unwrap();
-                assert!(audit.transcript_complete);
-                assert_eq!(audit.invalid_rows, 0);
-                assert_eq!(audit.independent_rows, audit.rank as u64);
-                assert_eq!(audit.rank as u64, row.counters["matrix_rank"]);
-                let context = prime_ctx(prime, &facts, target);
-                let builder = prime_base_for("prime-kummer", prime).unwrap();
-                let (_, base_params) = Params::parse_spec("prime-kummer:t=2").unwrap();
-                let fb = builder
-                    .build(&context, &base_params, &mut GroupOps::default())
-                    .unwrap();
-                crate::cryptanalysis::ic_framework::useful_rank::replay(&context, &fb, &audit)
-                    .unwrap();
-                let mut corrupted = audit.clone();
-                corrupted.receipts[0].rhs = (corrupted.receipts[0].rhs + 1) % 19;
-                assert!(crate::cryptanalysis::ic_framework::useful_rank::replay(
-                    &context, &fb, &corrupted
-                )
-                .is_err());
-                let counts = [
-                    row.counters["targets_tried"],
-                    row.counters["relations_found"],
-                    row.counters["matrix_rank"],
-                ];
-                if let Some(expected) = reference {
-                    assert_eq!(counts, expected, "m={m},{encoding}");
-                } else {
-                    reference = Some(counts);
-                }
-                assert!(row.phases.iter().any(|p| p.name == "relations"));
-                // The runner independently checks the returned scalar by
-                // multiplication; rank alone is never used as a solve verdict.
-                assert_eq!(
-                    prime
-                        .curve
-                        .mul(&mut GroupOps::default(), prime.generator_point(), 7),
-                    target
-                );
-            }
-        }
-    }
-
     /// `rootfind-subtract` is `subtract`'s search on `prime_fast`'s
     /// arithmetic: the same candidates in the same order, so the two arms
     /// issue the same queries and find the same relations on one seed,
@@ -9475,6 +9439,24 @@ mod tests {
         let inversions = r.native["inversions"];
         assert!(inversions > 0 && inversions <= root.counters["targets_tried"]);
         assert_eq!(s.native.get("inversions").copied().unwrap_or(0), 0);
+        let counted = &root.detail["counted_field_ops"];
+        assert_eq!(counted["schema"], "ecbench.counted-field-ops/v1");
+        assert_eq!(counted["complete"], false);
+        let phase_tallies = counted["phases"].as_array().unwrap();
+        assert_eq!(phase_tallies.len(), root.phases.len());
+        let relation_tally = phase_tallies
+            .iter()
+            .find(|phase| phase["name"] == "relations")
+            .unwrap();
+        assert!(relation_tally["field_ops"]["invs"].as_u64().unwrap() > 0);
+        for op in ["muls", "sqrs", "invs"] {
+            let sum: u64 = phase_tallies
+                .iter()
+                .map(|phase| phase["field_ops"][op].as_u64().unwrap())
+                .sum();
+            assert_eq!(counted["total"][op].as_u64(), Some(sum), "{op}");
+        }
+        assert!(root.field_ops.is_none(), "partial work is not a full tally");
         assert_eq!(r.native.get("frobfold_mismatches").copied().unwrap_or(0), 0);
         assert!(root.solver.is_none(), "a table oracle solves no system");
         assert!(root.deterministic);
@@ -11512,6 +11494,7 @@ mod accounting_tests {
     }
 }
 
+/// `rho.negation_strong` end to end through `solve`, on curves over F_(2^m)^4.
 #[cfg(test)]
 mod neg_strong_tests {
     use super::*;

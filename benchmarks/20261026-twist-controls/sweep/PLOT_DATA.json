@@ -1,0 +1,232 @@
+{
+  "schema": "twist.recorded-plot-data/v1",
+  "run": "sweep-20261026-v1",
+  "audit_path": "research/twist_routes_1_3_20261021/execution-v3/sweep-audit-20261026-v1/AUDIT.json",
+  "audit_sha256": "f0abfc5df79adc6d4e41a3ab65330015968c603fccd3ef48264f435783b89986",
+  "counts": [
+    {
+      "arm": "bits-control",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 30
+    },
+    {
+      "arm": "direct-aa",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 50
+    },
+    {
+      "arm": "direct-chain",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 50
+    },
+    {
+      "arm": "factored-control",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 29
+    },
+    {
+      "arm": "first-pair-invariant",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 59
+    },
+    {
+      "arm": "frobenius-block",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 49
+    },
+    {
+      "arm": "hybrid-eight",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 60
+    },
+    {
+      "arm": "ordinary-prefix-order",
+      "requested": 60,
+      "attempted": 60,
+      "accepted": 49
+    }
+  ],
+  "distributions": [
+    {
+      "candidate": "frobenius-block",
+      "control": "direct-chain",
+      "requested_pairs": 60,
+      "accepted_pairs": 49,
+      "fewer_instruction_pairs": 3,
+      "ratios_min": 0.9977105760957379,
+      "ratios_median": 1.004284844472854,
+      "ratios_max": 1.2379535918123157,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.9977105760957379,
+      "ratio_median": 1.004284844472854,
+      "ratio_max": 1.2379535918123157
+    },
+    {
+      "candidate": "frobenius-block",
+      "control": "ordinary-prefix-order",
+      "requested_pairs": 60,
+      "accepted_pairs": 48,
+      "fewer_instruction_pairs": 5,
+      "ratios_min": 0.9976993626877297,
+      "ratios_median": 1.0031164415185945,
+      "ratios_max": 1.0186786997666135,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.9976993626877297,
+      "ratio_median": 1.0031164415185945,
+      "ratio_max": 1.0186786997666135
+    },
+    {
+      "candidate": "frobenius-block",
+      "control": "factored-control",
+      "requested_pairs": 60,
+      "accepted_pairs": 29,
+      "fewer_instruction_pairs": 29,
+      "ratios_min": 0.0032048932444792675,
+      "ratios_median": 0.014523798140259541,
+      "ratios_max": 0.0536223157870608,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.0032048932444792675,
+      "ratio_median": 0.014523798140259541,
+      "ratio_max": 0.0536223157870608
+    },
+    {
+      "candidate": "frobenius-block",
+      "control": "bits-control",
+      "requested_pairs": 60,
+      "accepted_pairs": 30,
+      "fewer_instruction_pairs": 30,
+      "ratios_min": 0.012313136102427381,
+      "ratios_median": 0.025099087688840917,
+      "ratios_max": 0.14052003431812243,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.012313136102427381,
+      "ratio_median": 0.025099087688840917,
+      "ratio_max": 0.14052003431812243
+    },
+    {
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "requested_pairs": 60,
+      "accepted_pairs": 50,
+      "fewer_instruction_pairs": 44,
+      "ratios_min": 0.12158772978500558,
+      "ratios_median": 0.8368941504552896,
+      "ratios_max": 1.0134615654014036,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.12158772978500558,
+      "ratio_median": 0.8368941504552896,
+      "ratio_max": 1.0134615654014036
+    },
+    {
+      "candidate": "hybrid-eight",
+      "control": "ordinary-prefix-order",
+      "requested_pairs": 60,
+      "accepted_pairs": 49,
+      "fewer_instruction_pairs": 43,
+      "ratios_min": 0.10489446693573114,
+      "ratios_median": 0.8388983329325224,
+      "ratios_max": 1.017732417052944,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.10489446693573114,
+      "ratio_median": 0.8388983329325224,
+      "ratio_max": 1.017732417052944
+    },
+    {
+      "candidate": "hybrid-eight",
+      "control": "factored-control",
+      "requested_pairs": 60,
+      "accepted_pairs": 29,
+      "fewer_instruction_pairs": 29,
+      "ratios_min": 0.002726077979214388,
+      "ratios_median": 0.013248120640024473,
+      "ratios_max": 0.053759084699480444,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.002726077979214388,
+      "ratio_median": 0.013248120640024473,
+      "ratio_max": 0.053759084699480444
+    },
+    {
+      "candidate": "hybrid-eight",
+      "control": "bits-control",
+      "requested_pairs": 60,
+      "accepted_pairs": 30,
+      "fewer_instruction_pairs": 30,
+      "ratios_min": 0.011297380191820415,
+      "ratios_median": 0.020945767345331837,
+      "ratios_max": 0.14060085347337062,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.011297380191820415,
+      "ratio_median": 0.020945767345331837,
+      "ratio_max": 0.14060085347337062
+    },
+    {
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "requested_pairs": 60,
+      "accepted_pairs": 50,
+      "fewer_instruction_pairs": 50,
+      "ratios_min": 0.20855069449325025,
+      "ratios_median": 0.6454838132286411,
+      "ratios_max": 0.7780594777257351,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.20855069449325025,
+      "ratio_median": 0.6454838132286411,
+      "ratio_max": 0.7780594777257351
+    },
+    {
+      "candidate": "first-pair-invariant",
+      "control": "ordinary-prefix-order",
+      "requested_pairs": 60,
+      "accepted_pairs": 49,
+      "fewer_instruction_pairs": 49,
+      "ratios_min": 0.18130884848147374,
+      "ratios_median": 0.6462834103080627,
+      "ratios_max": 0.7753688017755066,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.18130884848147374,
+      "ratio_median": 0.6462834103080627,
+      "ratio_max": 0.7753688017755066
+    },
+    {
+      "candidate": "first-pair-invariant",
+      "control": "factored-control",
+      "requested_pairs": 60,
+      "accepted_pairs": 29,
+      "fewer_instruction_pairs": 29,
+      "ratios_min": 0.0020845059553994028,
+      "ratios_median": 0.009819934895654194,
+      "ratios_max": 0.04037974233818239,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.0020845059553994028,
+      "ratio_median": 0.009819934895654194,
+      "ratio_max": 0.04037974233818239
+    },
+    {
+      "candidate": "first-pair-invariant",
+      "control": "bits-control",
+      "requested_pairs": 60,
+      "accepted_pairs": 30,
+      "fewer_instruction_pairs": 30,
+      "ratios_min": 0.008252644808369652,
+      "ratios_median": 0.016163899806342634,
+      "ratios_max": 0.10593532412464485,
+      "descriptive_correlated_training_configurations": true,
+      "ratio_min": 0.008252644808369652,
+      "ratio_median": 0.016163899806342634,
+      "ratio_max": 0.10593532412464485
+    }
+  ],
+  "unit": "Callgrind simulated guest instructions Ir",
+  "uncertainty": "Descriptive min/median/max across correlated settings; no confidence intervals or independent-host replication.",
+  "graphs": [
+    "COUNTS",
+    "RATIOS"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "command": [
+    "/home/ec2-user/.cargo/bin/rustc",
+    "--edition",
+    "2021",
+    "-O",
+    "-C",
+    "overflow-checks=yes",
+    "--emit=link,dep-info",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/check.rs",
+    "-o",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/validation-01/check"
+  ],
+  "compile_exit": 0,
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "check_exit": 0,
+  "input_hashes": {
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/check.rs": "43a0cd46f1aeabaec5ab69000302bb136f66621c001a2a3581c86338a3884391",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-dyadic-source/lib.rs": "a890262e30f2aafcfe5b2d1df0712b44031973edd46d275ff727cc82b1c39360",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-joint-window/lib.rs": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-value-division/lib.rs": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-polynomial/lib.rs": "2097908ea896d0d4558ad05000620a61663f3c7231d50caf7ad7b1feaa9ebc96",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/polynomial.rs": "a9d6489b7f20bc513258a134f0cac899d94f38b7590bb452c9759377113f019a",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/lib.rs": "c404f030e692dcf27c0dbe8d2cfb8f8bb6010c523a161bd3e7500ba882748a24",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/division.rs": "bfc0bf9cd0091d3c6d66922f88c15a355b9c19a0ac3607b1d6b6acb4ac30f971",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-standalone-source/lib.rs": "52feace2e3a5e3c07e6f0d6ec28ac8655b2b615fb895ca79be82e66d660a9c23",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-half-gcd/residual.rs": "95a55a569f70b0022d121bcf09e290b059a815d90e43aaf9ef31be56daf998b4",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-half-gcd/polynomial.rs": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-orbit-local-terms/local.rs": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/class-checks.rs": "84596afba11de210b481e610d5494b733a2e045952ab5adc49d32398b9535120",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/schedule.rs": "798f6644ddc8bce48a302c58da3f4f26ad7fedb67458796b898e0e37cf010074",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/allocation.rs": "2a2512253ef3fded26c291d1595aca7d0cb65ca32096eda4f8d349c034a25f3b",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/class-source.rs": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/schedule-checks.rs": "f97a3c39d562d7e4b2690060ff372ac1c590619e14001cecc106a5d50f0422b1",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-normalized-division/division.rs": "59e21806b41b34bdb415a0363354655b6bd5000f25230eaad8d8eb612dd32c9d",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-compiled-division/division.rs": "b334a0339e6e4a5f50a1c7586480f5e6a8a1ed9099044123659f024c99960c19",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-shared-powers/division.rs": "0e04bb7109e9cddfdb64c1fbe4cec1da2b60bf7708b116604ebfa45e6a5740b9",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-compiled-division/schedule.rs": "d1663c5183b61295408165d254ab98230958b606e95b41085cb05c0791da50d4",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-recycled-powers/liveness-checks.rs": "7606d268a5a8d9de973996f207e10ced675d93cdec7da08466c89579a68da442",
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-shared-powers/schedule.rs": "ea19cd40c4eea112ae98ffba834a346887b93787f705b2b4363ab33411ed391f"
+  },
+  "stdout_sha256": "ea4f840aeb89d8a03b336522f16926f20be71c8f0535270979ac2099a333cd57"
+}
