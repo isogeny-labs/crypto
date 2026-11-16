@@ -260,3 +260,30 @@ then audit the denominator partition and combine receipts.
 ### Errors
 
 None in source preparation.
+
+## 2026-11-15 23:40 America/Los_Angeles
+
+### What was done
+
+Committed sparse and linear-square completion sources at `6b863a236f75`.
+All four counted runs finished. Sparse arms had the expected branch
+assignment counts and zero hits (39.039/39.537 CPU s). Linear arms had the
+expected logical assignment counts, including all-zero polynomial fallbacks,
+and zero hits (1.901/1.837 CPU s). Wrote the bounded result note.
+
+### Decisions made
+
+The fixed trace-`+22` carrier now has receipts for every expected normalized
+degree-seven denominator class. Audit the mathematical partition and every
+receipt before drawing a complete fixed-carrier conclusion. This is not
+an attack-cost result or a vulnerable-family claim.
+
+### Open threads
+
+Write the denominator-partition theorem, Lean arithmetic checks, receipt
+manifest/audit, and prior-work scope check. If the complete exclusion holds,
+move to a different carrier or degree in Howe's 4–26 window.
+
+### Errors
+
+None in these four counted runs.
