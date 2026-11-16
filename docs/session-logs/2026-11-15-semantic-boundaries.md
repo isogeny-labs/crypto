@@ -69,3 +69,19 @@ Current-head hosted checks and owner artifact-source consumer synchronization.
 
 ### Errors
 The initial parse failure was an existing workflow policy drift, not a malformed YAML change. The failed run is retained; no rerun is used as a substitute for this patch. [pcc:unverified]
+
+## 2026-11-16T03:40Z - artifact manifest path validation
+
+### What was done
+The ongoing semantic audit reproduced accepted parent traversal in manifest entries using an owned disposable local remote. The new path control fails before the change. The same source now rejects non-basename names, malformed SHA256/byte metadata, symbolic manifest files and manifest directories resolving outside the checkout before hydration. Existing8204 entries have0 invalid names and0 invalid metadata, so the stricter parser changes no frozen manifest.
+
+### Decisions made
+Validate the manifest at its read boundary, before parallel writes; keep the hash/length verification and tracked-file preservation. No remote artifact was altered. Receipt: docs/audits/2026-11-16-artifact-path-validation.json.
+
+### Open threads
+Final46 artifact controls, parity/generator replay, current-head CI and owner-source consumer sync.
+
+### Errors
+Old code accepted relative parent paths and a symlinked parent could redirect writes. Reproductions were confined to temporary directories. [pcc:unverified]
+
+Final replay:46 artifact tests pass; parity21, generated workflow check and draft-tier check pass. The pinned original inputs remain byte-equal. [pcc:unverified]

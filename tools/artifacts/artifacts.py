@@ -193,13 +193,27 @@ def read_text_or_index(p: Path) -> str | None:
 
 def read_manifest(d: Path) -> dict[str, dict]:
     p = d / MANIFEST
+    if p.is_symlink():
+        die(f"{p}: invalid manifest entry source: symbolic link")
     text = read_text_or_index(p)
     if text is None:
         return {}
     data = json.loads(text)
-    if data.get("schema") != MANIFEST_SCHEMA:
-        die(f"{p}: unknown schema {data.get('schema')!r}")
-    return data["files"]
+    if not isinstance(data, dict) or data.get("schema") != MANIFEST_SCHEMA:
+        die(f"{p}: unknown manifest schema")
+    files = data.get("files")
+    if not isinstance(files, dict):
+        die(f"{p}: invalid manifest entry mapping")
+    for name, entry in files.items():
+        if (not isinstance(name, str) or name in ("", ".", "..") or Path(name).name != name
+                or any(c in name for c in ("/", "\\", "\0"))
+                or not isinstance(entry, dict)
+                or not isinstance(entry.get("sha256"), str)
+                or len(entry["sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in entry["sha256"])
+                or type(entry.get("bytes")) is not int or entry["bytes"] < 0):
+            die(f"{p}: invalid manifest entry {name!r}")
+    return files
 
 
 def write_manifest(d: Path, files: dict[str, dict]) -> None:
@@ -259,6 +273,8 @@ def selected(root: Path, paths: list[Path]) -> list[tuple[Path, str, dict]]:
             die(f"{raw}: outside the repository")
     out = []
     for d in all_manifests(root):
+        if not d.resolve().is_relative_to(root.resolve()):
+            die(f"{d}: manifest directory outside the repository")
         drel = rel(root, d)
         # A manifest can only hold entries for a path at or below its directory,
         # or for a directory below a requested prefix.
