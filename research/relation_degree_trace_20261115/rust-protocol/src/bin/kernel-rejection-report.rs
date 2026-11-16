@@ -30,7 +30,16 @@ fn main() -> Result<()> {
     {
         return Err("isolation did not admit".into());
     }
-    if !["legacy", "ordered", "cached", "both"].contains(&args[5].as_str()) {
+    if ![
+        "legacy",
+        "ordered",
+        "cached",
+        "both",
+        "both_updates",
+        "both_updates_sum",
+    ]
+    .contains(&args[5].as_str())
+    {
         return Err("known kernel".into());
     }
     let s: Value = serde_json::from_slice(&fs::read(raw.join("summary.json"))?)?;

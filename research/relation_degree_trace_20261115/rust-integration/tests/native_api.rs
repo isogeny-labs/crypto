@@ -46,6 +46,8 @@ fn exact_kernel_choices_keep_full_root_proof_acceptance() {
         algebra::replay::NativeKernels::Ordered,
         algebra::replay::NativeKernels::Cached,
         algebra::replay::NativeKernels::Both,
+        algebra::replay::NativeKernels::BothUpdates,
+        algebra::replay::NativeKernels::BothUpdatesSum,
     ] {
         let (wire, _) = algebra::replay::produce_native_for_rust_with_kernels(
             &system,

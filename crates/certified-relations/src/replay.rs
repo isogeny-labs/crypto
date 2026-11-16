@@ -146,6 +146,8 @@ pub enum NativeKernels {
     Ordered,
     Cached,
     Both,
+    BothUpdates,
+    BothUpdatesSum,
 }
 impl NativeKernels {
     fn bits(self) -> u8 {
@@ -154,6 +156,8 @@ impl NativeKernels {
             Self::Ordered => 1,
             Self::Cached => 2,
             Self::Both => 3,
+            Self::BothUpdates => 7,
+            Self::BothUpdatesSum => 15,
         }
     }
 }
@@ -632,6 +636,8 @@ mod tests {
                     NativeKernels::Ordered,
                     NativeKernels::Cached,
                     NativeKernels::Both,
+                    NativeKernels::BothUpdates,
+                    NativeKernels::BothUpdatesSum,
                 ] {
                     let (wire, metadata) =
                         produce_native_for_rust_with_kernels(&system, kind, kernels)

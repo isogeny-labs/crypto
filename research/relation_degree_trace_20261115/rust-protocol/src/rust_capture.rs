@@ -44,6 +44,12 @@ pub(super) struct Paths {
     kernel_cached: Option<PathBuf>,
     #[serde(default)]
     kernel_both: Option<PathBuf>,
+    #[serde(default)]
+    update_baseline: Option<PathBuf>,
+    #[serde(default)]
+    update_in_place: Option<PathBuf>,
+    #[serde(default)]
+    update_fastsum: Option<PathBuf>,
     mature: PathBuf,
     singular: PathBuf,
     msolve: PathBuf,
@@ -92,10 +98,12 @@ fn comparisons_at(samples: &[Value], routes: &[&str], at: usize) -> Option<Vec<V
     Some(costs.iter().zip(routes).enumerate().filter(|(i,_)|*i!=at).map(|(_, (c,name))|json!({"control":name,"full_cost_single_call_ratio":*c as f64/candidate})).collect())
 }
 fn kernel_candidate(samples: &[Value]) -> Option<usize> {
-    if samples.len() != 23 {
-        return None;
-    }
-    (20..23)
+    let eligible = match samples.len() {
+        23 => 20..23,
+        26 => 24..26,
+        _ => return None,
+    };
+    eligible
         .map(|i| Some((samples[i]["paid_wall_ns"].as_u64().filter(|n| *n > 0)?, i)))
         .collect::<Option<Vec<_>>>()?
         .into_iter()
@@ -103,7 +111,7 @@ fn kernel_candidate(samples: &[Value]) -> Option<usize> {
         .map(|(_, i)| i)
 }
 fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
-    if routes.len() != 23 {
+    if routes.len() != 23 && routes.len() != 26 {
         return Value::Null;
     }
     let mut chosen = Value::Null;
@@ -118,15 +126,23 @@ fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
         let Some(rows) = comparisons_at(samples, routes, at) else {
             continue;
         };
-        if (19..23)
-            .zip(["legacy", "ordered", "cached", "both"])
-            .any(|(i, mode)| {
-                samples[i]["answer"]["kernel_mode"] != mode
-                    || samples[i]["answer"]["completion_exports"] != 0
-                    || samples[i]["answer"]["root_api"] != true
-                    || samples[i]["answer"]["native_product_criterion"] != true
-            })
-        {
+        if [
+            (19, "legacy"),
+            (20, "ordered"),
+            (21, "cached"),
+            (22, "both"),
+            (23, "both"),
+            (24, "both_updates"),
+            (25, "both_updates_sum"),
+        ]
+        .into_iter()
+        .filter(|(i, _)| *i < routes.len())
+        .any(|(i, mode)| {
+            samples[i]["answer"]["kernel_mode"] != mode
+                || samples[i]["answer"]["completion_exports"] != 0
+                || samples[i]["answer"]["root_api"] != true
+                || samples[i]["answer"]["native_product_criterion"] != true
+        }) {
             continue;
         }
         if [16, 17, 18]
@@ -147,7 +163,7 @@ fn selected_kernel(cases: &[Value], routes: &[&str]) -> Value {
             .iter()
             .filter_map(|v| v["full_cost_single_call_ratio"].as_f64())
             .collect();
-        if ratios.len() != 22 {
+        if ratios.len() != routes.len() - 1 {
             continue;
         }
         let score = ratios[1].min(ratios[2]);
@@ -216,12 +232,26 @@ pub(super) fn run_export(prepared: &Path, out: &Path, config: &Path) -> Result<(
 pub(super) fn run_kernels(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
     run_impl(prepared, out, config, 3)
 }
+pub(super) fn run_updates(prepared: &Path, out: &Path, config: &Path) -> Result<()> {
+    run_impl(prepared, out, config, 4)
+}
 fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<()> {
     let config_bytes = fs::read(config)?;
     let paths: Paths = serde_json::from_slice(&config_bytes)?;
     let m31 = mode >= 1;
     let exports = mode >= 2;
-    let kernels = mode == 3;
+    let kernels = mode >= 3;
+    let updates = mode == 4;
+    if [
+        &paths.update_baseline,
+        &paths.update_in_place,
+        &paths.update_fastsum,
+    ]
+    .into_iter()
+    .any(|p| p.is_some() != updates)
+    {
+        return Err("exact three update paths required in26 mode".into());
+    }
     if m31 != paths.m31.is_some()
         || [
             &paths.export_both,
@@ -258,6 +288,9 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("root-kernel-ordered", &paths.kernel_ordered),
         ("root-kernel-cached", &paths.kernel_cached),
         ("root-kernel-both", &paths.kernel_both),
+        ("root-update-baseline", &paths.update_baseline),
+        ("root-update-in-place", &paths.update_in_place),
+        ("root-update-fastsum", &paths.update_fastsum),
     ] {
         if let Some(exe) = exe {
             routes.push(name);
@@ -306,6 +339,9 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
         ("kernel_ordered", &paths.kernel_ordered),
         ("kernel_cached", &paths.kernel_cached),
         ("kernel_both", &paths.kernel_both),
+        ("update_baseline", &paths.update_baseline),
+        ("update_in_place", &paths.update_in_place),
+        ("update_fastsum", &paths.update_fastsum),
     ] {
         if let Some(path) = path {
             identities.insert(name.into(), json!({"path":path,"sha256":file_hash(path)?}));
@@ -315,7 +351,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     write_new(&out.join("config.json"), &config_bytes)?;
     save(
         &out.join("pre-call.json"),
-        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if kernels{"EXACT_KERNEL_PAID_SCREEN_PROTOCOL.md"}else if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
+        &json!({"identities":identities,"manifest_sha256":file_hash(&prepared.join("manifest.json"))?,"config_sha256":hash(&config_bytes),"mode":manifest["mode"],"cpu":paths.cpu,"isolation":"L0","checkpoint":"waived by user","protocol":if updates{"UPDATE_PAID_SCREEN_PROTOCOL.md"}else if kernels{"EXACT_KERNEL_PAID_SCREEN_PROTOCOL.md"}else if exports{"NATIVE_EXPORT_PAID_SCREEN_PROTOCOL.md"}else if m31{"M31_PAID_SCREEN_PROTOCOL.md"}else{"RUST_CONSUMER_PAID_SCREEN_PROTOCOL.md"}}),
     )?;
     let mut r = Runner {
         worker: paths.worker.clone(),
@@ -480,7 +516,7 @@ fn run_impl(prepared: &Path, out: &Path, config: &Path, mode: usize) -> Result<(
     };
     save(
         &out.join("summary.json"),
-        &json!({"schema":if kernels{"exact-kernel-paid-screen/v1"}else if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"selected_kernel":kernel_selection,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
+        &json!({"schema":if updates{"exact-update-paid-screen/v1"}else if kernels{"exact-kernel-paid-screen/v1"}else if exports{"native-export-paid-screen/v1"}else if m31{"m31-paid-screen/v1"}else{"rust-consumer-paid-screen/v1"},"mode":manifest["mode"],"identities_unchanged":unchanged,"selected_followup_family":family,"selected_kernel":kernel_selection,"cases":cases,"scope":"unsigned L0; actual-root2x2 cells, all controls and paid recovery"}),
     )?;
     if !unchanged {
         return Err("changed executable identities".into());
@@ -573,6 +609,75 @@ mod tests {
         let mut bad = rows;
         bad[22]["answer"]["constructor"]["subset_succeeded"] = json!(false);
         assert!(selected_kernel(&[json!({"id":"fallback","samples":bad})], &routes).is_null());
+    }
+
+    fn update_fixture() -> (Vec<&'static str>, Vec<Value>) {
+        let (mut routes, mut rows) = kernel_fixture();
+        for row in &mut rows {
+            row["paid_wall_ns"] = json!(10);
+        }
+        rows[1]["paid_wall_ns"] = json!(40);
+        rows[2]["paid_wall_ns"] = json!(40);
+        for (name, mode, cost) in [
+            ("root-update-baseline", "both", 3),
+            ("root-update-in-place", "both_updates", 2),
+            ("root-update-fastsum", "both_updates_sum", 1),
+        ] {
+            routes.push(name);
+            let mut row = rows[22].clone();
+            row["pipeline"] = json!(name);
+            row["answer"]["kernel_mode"] = json!(mode);
+            row["paid_wall_ns"] = json!(cost);
+            rows.push(row);
+        }
+        (routes, rows)
+    }
+    #[test]
+    fn update_selection_can_choose_each_ablation_without_ties_or_matched_control() {
+        let (routes, rows) = update_fixture();
+        let select = |r: Vec<Value>| selected_kernel(&[json!({"id":"case","samples":r})], &routes);
+        assert_eq!(select(rows.clone())["kernel"], "both_updates_sum");
+        let mut changed = rows.clone();
+        changed[24]["paid_wall_ns"] = json!(1);
+        changed[25]["paid_wall_ns"] = json!(2);
+        assert_eq!(select(changed.clone())["kernel"], "both_updates");
+        assert_eq!(comparisons_at(&changed, &routes, 24).unwrap().len(), 25);
+        changed[25]["paid_wall_ns"] = json!(1);
+        assert!(select(changed).is_null());
+        for i in [22, 23] {
+            let mut bad = rows.clone();
+            bad[i]["paid_wall_ns"] = json!(1);
+            assert!(select(bad).is_null());
+        }
+    }
+    #[test]
+    fn update_selection_requires_all26_outputs_modes_and_full_fast_path() {
+        let (routes, rows) = update_fixture();
+        let select = |r: Vec<Value>| selected_kernel(&[json!({"id":"case","samples":r})], &routes);
+        for i in 0..26 {
+            let mut bad = rows.clone();
+            bad[i]["status"] = json!("failed");
+            assert!(select(bad).is_null());
+        }
+        for i in 19..26 {
+            let mut bad = rows.clone();
+            bad[i]["answer"]["kernel_mode"] = Value::Null;
+            assert!(select(bad).is_null());
+        }
+        for key in ["root_api", "native_product_criterion"] {
+            let mut bad = rows.clone();
+            bad[25]["answer"][key] = json!(false);
+            assert!(select(bad).is_null());
+        }
+        let mut bad = rows.clone();
+        bad[25]["used_recovery"] = json!(true);
+        assert!(select(bad).is_null());
+        let mut bad = rows.clone();
+        bad[25]["answer"]["constructor"]["subset_succeeded"] = json!(false);
+        assert!(select(bad).is_null());
+        let mut bad = rows;
+        bad[2]["paid_wall_ns"] = json!(14);
+        assert!(select(bad).is_null());
     }
     fn comparisons(samples: &[Value]) -> Option<Vec<Value>> {
         comparisons_for(samples, &ROUTES)
@@ -705,6 +810,9 @@ mod tests {
             kernel_ordered: None,
             kernel_cached: None,
             kernel_both: None,
+            update_baseline: None,
+            update_in_place: None,
+            update_fastsum: None,
             mature: "m".into(),
             singular: "s".into(),
             msolve: "ms".into(),

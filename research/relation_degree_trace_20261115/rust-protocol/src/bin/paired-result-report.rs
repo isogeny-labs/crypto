@@ -94,7 +94,15 @@ fn includes_one(s: &Statistics) -> bool {
     s.percentile_95[0] <= 1. && s.percentile_95[1] >= 1.
 }
 fn check_kernel_mode(answer: &Value, expected: &str) -> Result<()> {
-    if !["legacy", "ordered", "cached", "both"].contains(&expected)
+    if ![
+        "legacy",
+        "ordered",
+        "cached",
+        "both",
+        "both_updates",
+        "both_updates_sum",
+    ]
+    .contains(&expected)
         || answer["kernel_mode"] != expected
     {
         return Err("candidate kernel variant does not match protocol".into());
@@ -103,7 +111,14 @@ fn check_kernel_mode(answer: &Value, expected: &str) -> Result<()> {
 }
 #[test]
 fn kernel_guard_rejects_missing_wrong_and_unknown_modes() {
-    for mode in ["legacy", "ordered", "cached", "both"] {
+    for mode in [
+        "legacy",
+        "ordered",
+        "cached",
+        "both",
+        "both_updates",
+        "both_updates_sum",
+    ] {
         assert!(check_kernel_mode(&json!({"kernel_mode":mode}), mode).is_ok());
         assert!(check_kernel_mode(&json!({}), mode).is_err());
         assert!(check_kernel_mode(&json!({"kernel_mode":"other"}), mode).is_err());

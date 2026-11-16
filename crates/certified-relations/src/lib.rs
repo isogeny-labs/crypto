@@ -21,7 +21,7 @@ fn native_kernel_bits() -> u8 {
     NATIVE_KERNELS.with(|v| v.get())
 }
 fn with_native_kernel_bits<T>(bits: u8, work: impl FnOnce() -> T) -> T {
-    assert!(bits <= 3);
+    assert!(bits <= 15);
     struct Restore(u8);
     impl Drop for Restore {
         fn drop(&mut self) {
@@ -191,6 +191,36 @@ fn difference(a: &Mono, b: &Mono) -> Mono {
     a.iter().zip(b).map(|(x, y)| x - y).collect()
 }
 fn axpy<K: Ord + Clone>(a: &mut BTreeMap<K, u64>, b: &BTreeMap<K, u64>, scale: u64, p: u64) {
+    let bits = native_kernel_bits();
+    if bits & 4 != 0 {
+        axpy_in_place(a,b,scale,p,bits & 8 != 0)
+    } else {
+        axpy_legacy(a,b,scale,p)
+    }
+}
+fn sum_mod(a:u64,b:u64,p:u64)->u64 {
+    const M:u64=(1u64<<31)-1;
+    if p==M && (a|b)<=M {
+        let s=a+b;
+        let t=(s&M)+(s>>31);
+        if t>=M {t-M} else {t}
+    } else {((a as u128+b as u128)%p as u128) as u64}
+}
+fn axpy_in_place<K:Ord+Clone>(a:&mut BTreeMap<K,u64>,b:&BTreeMap<K,u64>,scale:u64,p:u64,fast_sum:bool){
+    for (m,c) in b {
+        #[cfg(feature="count-field-ops")]
+        COUNTERS.with(|cell| {let mut c=cell.get();c.coefficient_updates+=1;cell.set(c);});
+        if let Some(value)=a.get_mut(m) {
+            let product=mul(*c,scale,p);
+            *value=if fast_sum {sum_mod(*value,product,p)} else {((*value as u128+product as u128)%p as u128) as u64};
+            if *value==0 {a.remove(m);}
+        } else {
+            let value=mul(*c,scale,p);
+            if value!=0 {a.insert(m.clone(),value);}
+        }
+    }
+}
+fn axpy_legacy<K: Ord + Clone>(a: &mut BTreeMap<K, u64>, b: &BTreeMap<K, u64>, scale: u64, p: u64) {
     for (m, c) in b {
         #[cfg(feature = "count-field-ops")]
         COUNTERS.with(|cell| {
@@ -1578,6 +1608,38 @@ mod tests {
             reset_counters();let cached=normal_form_cached(target,&basis,p);let after=serde_json::to_value(counters()).unwrap();
             assert_eq!(old,cached);assert_eq!(before,after);
         }}
+    }
+
+    #[test]
+    fn bounded_sum_matches_full_width_expression() {
+        let boundary=[0,1,2,2147483645,2147483646,2147483647,2147483648,9007199254740880,u64::MAX];
+        for p in [2,3,2147483647,9007199254740881,u64::MAX] {
+            for a in boundary {for b in boundary {assert_eq!(sum_mod(a,b,p),((a as u128+b as u128)%p as u128) as u64);}}
+        }
+        let mut state=0x35ac91f217u64;
+        for i in 0..65536 {
+            state=state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);let a=if i%2==0 {state&2147483647}else{state};
+            state=state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);let b=if i%2==0 {state&2147483647}else{state};
+            for p in [2147483647,9007199254740881] {assert_eq!(sum_mod(a,b,p),((a as u128+b as u128)%p as u128) as u64);}
+        }
+        assert!(std::panic::catch_unwind(||sum_mod(1,1,0)).is_err());
+    }
+    #[test]
+    fn native_updates_preserve_maps_proofs_and_field_counters() {
+        let values=[0,1,2,2147483646,2147483647,9007199254740880,u64::MAX];
+        for p in [2,3,2147483647,9007199254740881,u64::MAX] {
+            for x in values {for y in values {for scale in values {
+                let a=BTreeMap::from([(vec![0,0,0],x),(vec![1,0,0],y),(vec![0,1,0],0)]);
+                let b=BTreeMap::from([(vec![0,0,0],y),(vec![1,0,0],x),(vec![0,0,1],x)]);
+                reset_counters();let mut expected=a.clone();axpy_legacy(&mut expected,&b,scale,p);let counts=serde_json::to_value(counters()).unwrap();
+                for bits in [7,15] {
+                    reset_counters();let mut actual=a.clone();with_native_kernel_bits(bits,||axpy(&mut actual,&b,scale,p));assert_eq!(actual,expected);assert_eq!(serde_json::to_value(counters()).unwrap(),counts);
+                    let mut proof:Proof=a.iter().map(|(m,c)|((2,m.clone()),*c)).collect();let proof_b:Proof=b.iter().map(|(m,c)|((2,m.clone()),*c)).collect();with_native_kernel_bits(bits,||axpy(&mut proof,&proof_b,scale,p));assert_eq!(proof,expected.iter().map(|(m,c)|((2,m.clone()),*c)).collect());
+                    let mut empty=BTreeMap::new();with_native_kernel_bits(bits,||axpy(&mut empty,&b,scale,p));let mut old_empty=BTreeMap::new();axpy_legacy(&mut old_empty,&b,scale,p);assert_eq!(empty,old_empty);
+                    let mut unchanged=a.clone();with_native_kernel_bits(bits,||axpy(&mut unchanged,&BTreeMap::new(),scale,p));assert_eq!(unchanged,a);
+                }
+            }}}
+        }
     }
 
 }
