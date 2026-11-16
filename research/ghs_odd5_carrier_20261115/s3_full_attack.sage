@@ -83,7 +83,11 @@ for aa in range(1,20001):
  if row is None:continue
  rows.append(row);rhs.append(int(h*aa%r))
  if len(rows)>=n and matrix(GF(r),rows).rank()==n:break
-else:raise RuntimeError('relation rank not reached within 20000 walk steps')
+else:
+ print(json.dumps({'phase':'relation_rank_cap','factor_base_size':n,'rational_points':len(pts),
+                   'attempts':attempts,'accepted':len(rows),
+                   'rank':int(matrix(GF(r),rows).rank()) if rows else 0},sort_keys=True),flush=True)
+ raise RuntimeError('relation rank not reached within 20000 walk steps')
 M=matrix(GF(r),rows);logs=M.solve_right(vector(GF(r),rhs))
 assert all(int(logs[i]) * G==h*base[i] for i in range(n))
 timing['relations_and_la_cpu_s']=(time.process_time_ns()-start)/1e9
