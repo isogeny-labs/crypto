@@ -122,3 +122,9 @@ registered as PCC-20261116-a777e8, with unsigned standing. [pcc:unverified]
 Raw development output and distinct pre/post manifests are in `development/`.
 No new candidate timings or speed ratios exist. The existing closed Runpod
 results remain separate and unchanged.
+
+Pre-data launch correction: use `launch-v2.sh`, `bootstrap-v2.sh`, `job-v2.sh`,
+`SOURCES_v2.sha256` and the `trace-incidence-accelerated-checkpoint-v2.yml`
+workflow. `AMENDMENT_v2.json` records the sparse-checkout correction and explicit
+standalone lockfile pin. The first launch snapshot and its manifest remain
+unchanged; scientific kernels and all development evidence are unchanged.
