@@ -1,0 +1,11 @@
+# Exact source guards and coefficient-span certificates
+
+Fix the low r bits of each source x,y to gx,gy, and leave the remaining d-r bits free. All 2^(2r) guards are disjoint and cover D×D. Write the separator as u0 plus its low k free bits. Expand the original binary S3 as a field-valued Boolean polynomial, reducing each Boolean variable square to itself and combining equal monomials. The square of a field-valued polynomial is obtained by squaring its coefficients because characteristic two removes cross terms and Boolean monomials are idempotent.
+
+If a field-coordinate dual vector annihilates every nonconstant monomial coefficient but pairs to one with the constant, no Boolean assignment in that guard can be a root. Membership of the constant in the coefficient span is only necessary; passing guards remain unresolved. Only rejection of every guard proves the whole separator cell empty. No source ordering, repetition, zero, torsion or ghost point-lift branch is dropped.
+
+For r=0,B=1, the s0*t0*e0 coefficient is one, so the unguarded test must always pass. Shallow guards change the affine coefficient map and may remove this blindness; the measurable prediction is some actual-field guard exclusions without false exclusion. A failure should lead to a different representation preserving source products, not a longer identical run.
+
+The independent tiny oracle directly evaluates the original S3 at every x,y,u. It verifies polynomial values, guard disjointness/coverage, all actual roots, every rejection and the r=0 blind control over odd/even binary extensions. Actual GF83 tests keep two known source-pair roots and two fixed exposed random cells. Depths 0/1/2, widths 2/4 are frozen. A maximum 100000 terms and 90-second process cap fail closed. Memory 4 GiB, one core, full reporting charged; actual global root counts are never asserted. This is a necessary-filter correctness/profile experiment, not a release benchmark.
+
+Single-agent adversarial review checks offset constants, variable-group bit numbering, Boolean cancellation, field reduction, dual witnesses and all guards. Monomial relaxation and guarded branching are established; novelty is not claimed. The full F4/F5/F6 gate and all requested field families remain unchanged.

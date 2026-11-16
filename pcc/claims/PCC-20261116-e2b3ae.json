@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T09:16:25Z",
+ "id": "PCC-20261116-e2b3ae",
+ "kind": "execution",
+ "producer": {
+  "commit": "c26d3bc61689c055c0e435f88e7258f4eefecbe2",
+  "model": "codex",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-artifact-control-file-custody.json",
+    "sha256": "e7b0eb9ab87253c29a296a19dffd1d1da1e54bf34d8a35210475e11588b222ac"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-artifact-case-alias-custody.json",
+    "sha256": "158c84e0df342cfdf27393b08a08cd9c42bbbfe34637d2c33c61cc5576d3ce13"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Disposable file-remote artifact controls and the existing manifest inventory",
+ "statement": "The retained artifact controls report control-file replacement and case-alias replacement before their respective fixes, and acceptance of the unchanged existing manifest inventory after the source guards."
+}

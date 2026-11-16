@@ -1,0 +1,50 @@
+{
+  "schema": "independent-recorded-evidence-review/v1",
+  "created_utc": "2026-11-14T03:01:51.881724+00:00",
+  "results": {
+    "quartic-cell-controls-20261114-v1": {
+      "status": "passed",
+      "wall_seconds": 0.2729309120001062,
+      "peak_process_rss_kib": 72260,
+      "raw_sha256": "810da9303da2e1e351f5af0d5eefd139ec6c92d1f4b172739b64fd9d3d42fe37",
+      "predicates": 13353,
+      "cells": 24,
+      "direct_parameter_states": 3840,
+      "corrupted_certificate_rejected": true
+    },
+    "quartic-cell-profile-20261114-v1": {
+      "status": "passed",
+      "wall_seconds": 0.462721676000001,
+      "peak_process_rss_kib": 153400,
+      "raw_sha256": "4956ae773f5cba7d5970c0a58fd27836c26f8ce705610d6e6a1283e0b3819830",
+      "predicates": 596,
+      "raw_parameter_bits": 166,
+      "relaxed_rank": 93,
+      "relaxed_nullity": 73,
+      "first_symmetric_coefficient": 55740,
+      "literal_constant_and_columns": 167,
+      "branches": [
+        {
+          "shift": 0,
+          "stored_rows": 415,
+          "rank": 73,
+          "nullity": 0,
+          "inconsistent": true,
+          "contradiction_replayed": true
+        },
+        {
+          "shift": 55740,
+          "stored_rows": 415,
+          "rank": 73,
+          "nullity": 0,
+          "inconsistent": true,
+          "contradiction_replayed": true
+        }
+      ],
+      "verification": "Recorded row combinations, particular, full independent free-coordinate kernel and contradictions only; no elimination/search rerun"
+    }
+  },
+  "scientific_algorithm_rerun": false,
+  "qualified_speedup": false,
+  "global_original_roots_complete": false
+}

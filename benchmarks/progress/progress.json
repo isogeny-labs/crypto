@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0058Z-ic-gpu-ipc-split-a100",
+  "latest_record": "20261116T0800Z-catalog-candidate-b2",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 12,
     "invalid": 4,
-    "measured": 203,
+    "measured": 207,
     "open": 0
   },
   "repo": "crypto",
@@ -32296,6 +32296,79 @@
       ],
       "problem": "rho:prime_medium_tier_bound",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 183.13312383300217,
+      "latest": 19.01348345799488,
+      "latest_derived": {
+        "improvement_vs_first_percent": 89.6177,
+        "improvement_vs_previous_percent": 4.9919
+      },
+      "metric": "catalog_generation_wall",
+      "points": [
+        {
+          "commit": "6b7dca5838c3",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1,
+          "record": "20261116T0800Z-catalog-baseline-a1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "baseline-a1: complete document and independent semantic digest pass; unisolated local software control; source and input hashes frozen in code commit",
+          "value": 183.13312383300217
+        },
+        {
+          "commit": "6b7dca5838c3",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 10.9992,
+            "improvement_vs_previous_percent": 10.9992
+          },
+          "n": 1,
+          "record": "20261116T0800Z-catalog-baseline-a2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "baseline-a2: complete document and independent semantic digest pass; unisolated local software control; source and input hashes frozen in code commit",
+          "value": 162.9898612919933
+        },
+        {
+          "commit": "6b7dca5838c3",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 89.0722,
+            "improvement_vs_previous_percent": 87.7216
+          },
+          "n": 1,
+          "record": "20261116T0800Z-catalog-candidate-b1",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "candidate-b1: complete document and independent semantic digest pass; unisolated local software control; source and input hashes frozen in code commit",
+          "value": 20.012492750000092
+        },
+        {
+          "commit": "6b7dca5838c3",
+          "date": "2026-11-16",
+          "derived": {
+            "improvement_vs_first_percent": 89.6177,
+            "improvement_vs_previous_percent": 4.9919
+          },
+          "n": 1,
+          "record": "20261116T0800Z-catalog-candidate-b2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "candidate-b2: complete document and independent semantic digest pass; unisolated local software control; source and input hashes frozen in code commit",
+          "value": 19.01348345799488
+        }
+      ],
+      "problem": "software:lab-browser-fixed-catalog-20261116",
+      "unit": "wall_s"
     },
     {
       "better": "higher",
