@@ -1,4 +1,36 @@
-# Current checkpoint:25SOURCE READY,25NOTRUN (16 November10:33Z)
+# Current checkpoint:25FINISHED, publish then next coverage (16 November10:42Z)
+
+25source2c5e02b34cb2d56dc392cd3b1f57d706d0d7b24a PUBLISHED beforeSOLEcall.
+Run /workspace/ic-local-runs/local-cover-subcounts-validation-20261116-25
+exit0/59.361s/2starts2complete. Both actualscalar102559623889752301/native+outer
+groupreplay. Pivot525->394/394witnessreplays/0fallback/foreign0/OTHER0.
+ORIGINALcopiedRustanalyzer global[]/detail+endpointTRUE;completeFALSE,totalNULL,
+comparativeFALSE/followupFALSE. Exactraw52524B/fullsummary39727B inGit+local.
+96source/preposthashesPASS. Final1PDFpagevisuallyinspected/exactbenchPDF/SVG/
+150dpiPNGhashPASS. Study local-cover-subcounts-validation-20261116-25;
+bench20261116-cover-subcounts-diagnostic. No livejobs/compilers.
+
+ACTUALOBSERVATIONS: Originalsolver525rows4721nnz /364321367580bitops;
+projectedsolver394rows12982nnz /666381953262bitops. Filter806228620,
+replay869597544, unallocatedLA1039744BOTH. OneWiedemanncall/arm.
+ExtraOBSERVEDLAwork lies inDENSERprojectedsolve, notmainlyfilter/witnessreplay.
+Mapping/output0meansNOHOOKS/completecostUNKNOWN. Fullobservedsubtotals
+3935679644920nativeIC/4239416056766graphIC, incomplete/NOratio/ranking.
+Don'tcompose24/25costs orcallprimaryrho parity. Nextworkcoverage/scalar/native
+RNGandstrongestRhoprices; anyfilteroptimizationmustcontrolfill.
+
+NEXTpublish25packet/updatePRactualresult BEFOREnextcode/selectedexperiment.
+No nextalgorithm/scientificprotocolselectedyet. GoalACTIVE/localusable/no stopgoal.
+Valgrind3.28.0INSTALLEDand/bin/truesmokePASS,/workspace/ic-local-tools/valgrind-install;
+NOcrypto instructionaudit run. Native25sourcechecks19sieve(twoignored)/1worker/
+26analyzer,actualbuilds+strictClippyPASS;21/23/24summaryreplaysBYTEEXACT.
+CurrentHEAD2c5e+DIRTY25packet/journal/resume. RawValgrindlogtrailing-space3lines
+preserved;sourcecheckexcludedONLYthatlog,cmpwithlocaloriginalpassed.
+CIlast2c5e10:35 appreviewSUCCESS/migrateINPROGRESS, otherlistsEMPTY,
+requiredgatesreviewUNCONFIRMED;NEXT>=11:25absentevent/newpublication.
+PR4288same/regular/automerge/no manualmerge. AllclaimsPCCunverified.
+
+# Previous checkpoint:25SOURCE READY,25NOTRUN (16 November10:33Z)
 
 Native final subcount checks ALLPASS:19sieve/graph(twoexistingignored),1executed
 publicworker;actualproduction/analyzerbuilds,library/example/analyzerstrictClippy;
