@@ -1,0 +1,512 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "inc",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        10.868684294628851,
+        11.141327911690308,
+        13.595120465243431
+      ],
+      "charged_sum": 1007381.0,
+      "native_sum": 252704,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "ksum3-n35",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        8.90557343374811,
+        9.670273268491997,
+        16.552571781186934
+      ],
+      "charged_sum": 825427.0,
+      "native_sum": 708774,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "ksum3-n49",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        15.477863690333251,
+        15.89078653958071,
+        19.607092182807826
+      ],
+      "charged_sum": 1434590.0,
+      "native_sum": 382724,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "ksum3-n70",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        40.181422726289,
+        40.459656150318274,
+        42.96375696658176
+      ],
+      "charged_sum": 3724278.0,
+      "native_sum": 257885,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "ksum3-n98",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        107.93160942429036,
+        108.21130584354225,
+        110.72857361680924
+      ],
+      "charged_sum": 10003810.0,
+      "native_sum": 259241,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "ksum4-n11",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        15.547884626872793,
+        18.450239499576465,
+        44.57143335390955
+      ],
+      "charged_sum": 1441080.0,
+      "native_sum": 2690093,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "ksum4-n15",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        6.665486073199712,
+        7.48416892119099,
+        14.852314553112494
+      ],
+      "charged_sum": 617801.0,
+      "native_sum": 758809,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "ksum4-n29",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        36.33718699786559,
+        36.47329949882021,
+        37.6983120074119
+      ],
+      "charged_sum": 3367969.0,
+      "native_sum": 126158,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "mitmbatch-n203",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        15.813111850748232,
+        17.271728876744262,
+        30.399282110708576
+      ],
+      "charged_sum": 1465663.0,
+      "native_sum": 1351942,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "mitmblocked-n203",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        15.813111850748232,
+        17.271728876744262,
+        30.399282110708576
+      ],
+      "charged_sum": 1465663.0,
+      "native_sum": 1351942,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "log2_r": 25.000145189047025,
+      "arm": "rho-neg",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        0.9831306317862503,
+        1.0749497655807225,
+        1.9013219697309738
+      ],
+      "charged_sum": 91123.0,
+      "native_sum": 85104,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "ksum3-n35",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "ksum3-n49",
+      "verdict": "inc < ksum3-n49"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "ksum3-n70",
+      "verdict": "inc < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "ksum3-n98",
+      "verdict": "inc < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "ksum4-n11",
+      "verdict": "inc < ksum4-n11"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "ksum4-n15",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "ksum4-n29",
+      "verdict": "inc < ksum4-n29"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "mitmbatch-n203",
+      "verdict": "inc < mitmbatch-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "mitmblocked-n203",
+      "verdict": "inc < mitmblocked-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "ksum3-n49",
+      "verdict": "ksum3-n35 < ksum3-n49"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "ksum3-n70",
+      "verdict": "ksum3-n35 < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "ksum3-n98",
+      "verdict": "ksum3-n35 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "ksum4-n11",
+      "verdict": "ksum3-n35 < ksum4-n11"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "ksum4-n15",
+      "verdict": "ksum4-n15 < ksum3-n35"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "ksum4-n29",
+      "verdict": "ksum3-n35 < ksum4-n29"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "mitmbatch-n203",
+      "verdict": "ksum3-n35 < mitmbatch-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "mitmblocked-n203",
+      "verdict": "ksum3-n35 < mitmblocked-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n35",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum3-n35"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "ksum3-n70",
+      "verdict": "ksum3-n49 < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "ksum3-n98",
+      "verdict": "ksum3-n49 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "ksum4-n11",
+      "verdict": "ksum3-n49 < ksum4-n11"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "ksum4-n15",
+      "verdict": "ksum4-n15 < ksum3-n49"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "ksum4-n29",
+      "verdict": "ksum3-n49 < ksum4-n29"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "mitmbatch-n203",
+      "verdict": "ksum3-n49 < mitmbatch-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "mitmblocked-n203",
+      "verdict": "ksum3-n49 < mitmblocked-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n49",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum3-n49"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n70",
+      "b": "ksum3-n98",
+      "verdict": "ksum3-n70 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n70",
+      "b": "ksum4-n11",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n70",
+      "b": "ksum4-n15",
+      "verdict": "ksum4-n15 < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n70",
+      "b": "ksum4-n29",
+      "verdict": "ksum4-n29 < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n70",
+      "b": "mitmbatch-n203",
+      "verdict": "mitmbatch-n203 < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n70",
+      "b": "mitmblocked-n203",
+      "verdict": "mitmblocked-n203 < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n70",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum3-n70"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n98",
+      "b": "ksum4-n11",
+      "verdict": "ksum4-n11 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n98",
+      "b": "ksum4-n15",
+      "verdict": "ksum4-n15 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n98",
+      "b": "ksum4-n29",
+      "verdict": "ksum4-n29 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n98",
+      "b": "mitmbatch-n203",
+      "verdict": "mitmbatch-n203 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n98",
+      "b": "mitmblocked-n203",
+      "verdict": "mitmblocked-n203 < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum3-n98",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum3-n98"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n11",
+      "b": "ksum4-n15",
+      "verdict": "ksum4-n15 < ksum4-n11"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n11",
+      "b": "ksum4-n29",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n11",
+      "b": "mitmbatch-n203",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n11",
+      "b": "mitmblocked-n203",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n11",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n11"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n15",
+      "b": "ksum4-n29",
+      "verdict": "ksum4-n15 < ksum4-n29"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n15",
+      "b": "mitmbatch-n203",
+      "verdict": "ksum4-n15 < mitmbatch-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n15",
+      "b": "mitmblocked-n203",
+      "verdict": "ksum4-n15 < mitmblocked-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n15",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n15"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n29",
+      "b": "mitmbatch-n203",
+      "verdict": "mitmbatch-n203 < ksum4-n29"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n29",
+      "b": "mitmblocked-n203",
+      "verdict": "mitmblocked-n203 < ksum4-n29"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "ksum4-n29",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum4-n29"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "mitmbatch-n203",
+      "b": "mitmblocked-n203",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "mitmbatch-n203",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmbatch-n203"
+    },
+    {
+      "curve": "icv1-fp28-tm27314-a41e3b62",
+      "a": "mitmblocked-n203",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmblocked-n203"
+    }
+  ]
+}

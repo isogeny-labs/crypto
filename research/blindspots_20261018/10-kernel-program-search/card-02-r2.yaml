@@ -1,0 +1,47 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-10-02-r2
+experiment_id: BLINDSPOT-10
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-02-r2.json
+binds:
+  - {path: examples/blindspots_10_kernel_search.rs, sha256: f69bbce49c64a6ff05670fa07ea615ce913f3eb35a5f94597220ca7f363fdb80}
+commands:
+  - id: make-bin-dir
+    argv: ["mkdir", "-p", "target/blindspots-10/card-02-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-10/card-02-r2/b10", "examples/blindspots_10_kernel_search.rs"]
+    timeout_seconds: 40
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw-r2/card-02-r2-build.stdout.log
+    stderr: research/blindspots_20261018/10-kernel-program-search/raw-r2/card-02-r2-build.stderr.log
+  - id: search-n31-p-a
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-10/card-02-r2/b10", "search", "--n", "31", "--ell", "9", "--arm", "p", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state-1", "--budget", "256", "--max-new", "128"]
+    timeout_seconds: 400
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-p-a.stdout.log
+    stderr: research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-p-a.stderr.log
+    outputs: [research/blindspots_20261018/10-kernel-program-search/raw-r2/state-1/n31-p.jsonl]
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-10/card-02-r2/b10"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-10/card-02-r2"]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-10
+background: false
+write_scope:
+  - research/blindspots_20261018/10-kernel-program-search/raw-r2/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

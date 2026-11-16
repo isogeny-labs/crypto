@@ -1,0 +1,281 @@
+{
+  "card_id": "CARD-BLINDSPOT-09-06-r2",
+  "card_path": "research/blindspots_20261018/09-learned-f4-policy/card-06-r2.yaml",
+  "card_sha256": "d05c605dfca95f3ce9390d8962a04b28f72f9bb3a1c645d3db2a68c2e8af3142",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-09/card-06-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-09/card-06-r2/b09",
+        "examples/blindspots_09_learned_f4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.097,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 9.097,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-06-r2/b09",
+        "fit",
+        "--n",
+        "19",
+        "--ell",
+        "4",
+        "--m",
+        "3",
+        "--seed",
+        "20261018",
+        "--out",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2-c06",
+        "--samples",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.samples.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.samples.8,research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.samples.16,research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.samples.24"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.235,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fit-19-4-3-c06",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2-c06.model": "12cae1e32d19fa3e919f45b2f9bee7ddd587d0f4ae5cd7b417c8f253dbb61bd3"
+      },
+      "seconds": 0.235,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7f08860d72f5a7a6926d004642b14e532af7189ab562ec3e07a5ab3aeecbce4c",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"mode\":\"fit\",\"cell\":\"19-4-3\",\"pair_samples\":96063,\"pos_rate\":0.143968,\"recall_at_tau\":0.9801,\"sel_rate_at_tau\":0.5132,\"precision_at_tau\":0.2749,\"row_samples\":9600,\"ridge_r2\":0.3816,\"order_wins\":[5, 0, 0, 27, 0],\"order_matrices\":32,\"order_best_xors\":21754105268,\"order_default_xors\":22104319032}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-09/card-06-r2/b09",
+        "eval",
+        "--n",
+        "19",
+        "--ell",
+        "4",
+        "--m",
+        "3",
+        "--seed",
+        "20261018",
+        "--role",
+        "test",
+        "--from",
+        "8",
+        "--to",
+        "16",
+        "--arms",
+        "a,b50,b25,c,d,p,r50,r25",
+        "--model",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2-c06.model",
+        "--trace",
+        "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.trace.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.trace.8,research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.trace.16,research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2.trace.24",
+        "--cap",
+        "10000000000",
+        "--rel-cap",
+        "1.5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 166.738,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "eval-19-4-3-test-08-16",
+      "index": 4,
+      "outputs": {},
+      "seconds": 166.738,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e0a8ba1946b40611157787293b24692e09232d6591822575dd8a03db55629dba",
+      "stdout_tail": [
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":13,\"arm\":\"d\",\"x_r\":240480,\"solutions\":0,\"outcome\":\"cap_touch\",\"check\":true,\"touches\":7930827324,\"xors\":7876163732,\"mat_words\":54663592,\"rows\":132811,\"steps\":15,\"pairs\":17689,\"field_pairs\":4301,\"deferred\":24111,\"policy_ops\":368808,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":37724,\"cols_max\":35710,\"divisor_tests\":76019103,\"label_xors\":0,\"basis_hash\":0,\"basis_len\":0,\"nstd\":0,\"pairs_left\":3932,\"peak_matrix_mb\":160,\"wall_ms\":9645,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":13,\"arm\":\"p\",\"x_r\":240480,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":5318087292,\"xors\":5291751106,\"mat_words\":26336186,\"rows\":62197,\"steps\":7,\"pairs\":9025,\"field_pairs\":4103,\"deferred\":0,\"policy_ops\":499808,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":39262,\"cols_max\":36127,\"divisor_tests\":14810038,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":795,\"peak_matrix_mb\":169,\"wall_ms\":4976,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":13,\"arm\":\"r50\",\"x_r\":240480,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":797644052,\"xors\":787355231,\"mat_words\":10288821,\"rows\":70052,\"steps\":38,\"pairs\":6572,\"field_pairs\":2588,\"deferred\":9134,\"policy_ops\":439116,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":20173,\"cols_max\":19947,\"divisor_tests\":16987783,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":5522,\"peak_matrix_mb\":48,\"wall_ms\":951,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":13,\"arm\":\"r25\",\"x_r\":240480,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1901542430,\"xors\":1872060686,\"mat_words\":29481744,\"rows\":140335,\"steps\":83,\"pairs\":5663,\"field_pairs\":2281,\"deferred\":23696,\"policy_ops\":762938,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":35715,\"cols_max\":35557,\"divisor_tests\":38616608,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":4445,\"peak_matrix_mb\":151,\"wall_ms\":1706,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"a\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":3349503836,\"xors\":3323688180,\"mat_words\":25815656,\"rows\":60917,\"steps\":7,\"pairs\":7239,\"field_pairs\":4212,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":39051,\"cols_max\":35568,\"divisor_tests\":9531697,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":664,\"peak_matrix_mb\":165,\"wall_ms\":2253,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"b50\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1560902297,\"xors\":1537596694,\"mat_words\":23305603,\"rows\":72514,\"steps\":39,\"pairs\":5352,\"field_pairs\":1996,\"deferred\":7325,\"policy_ops\":1229576,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":36233,\"cols_max\":34857,\"divisor_tests\":12088764,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":2784,\"peak_matrix_mb\":150,\"wall_ms\":1065,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"b25\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1300961065,\"xors\":1279886610,\"mat_words\":21074455,\"rows\":91138,\"steps\":76,\"pairs\":4244,\"field_pairs\":923,\"deferred\":15383,\"policy_ops\":1694758,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":33499,\"cols_max\":33195,\"divisor_tests\":17598145,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3801,\"peak_matrix_mb\":132,\"wall_ms\":852,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"c\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2707011622,\"xors\":2681746657,\"mat_words\":25264965,\"rows\":60374,\"steps\":7,\"pairs\":7239,\"field_pairs\":4212,\"deferred\":0,\"policy_ops\":715214,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":38614,\"cols_max\":35131,\"divisor_tests\":9442474,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":664,\"peak_matrix_mb\":161,\"wall_ms\":2225,\"rss_kb\":266980}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"d\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"cap_touch\",\"check\":true,\"touches\":5041822020,\"xors\":5011805389,\"mat_words\":30016631,\"rows\":66661,\"steps\":10,\"pairs\":12803,\"field_pairs\":2951,\"deferred\":18532,\"policy_ops\":274288,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":40062,\"cols_max\":35652,\"divisor_tests\":59206791,\"label_xors\":0,\"basis_hash\":0,\"basis_len\":0,\"nstd\":0,\"pairs_left\":6519,\"peak_matrix_mb\":170,\"wall_ms\":5415,\"rss_kb\":267300}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"p\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":3715070677,\"xors\":3689254152,\"mat_words\":25816525,\"rows\":60917,\"steps\":7,\"pairs\":7239,\"field_pairs\":4212,\"deferred\":0,\"policy_ops\":433065,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":39062,\"cols_max\":35579,\"divisor_tests\":9528025,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":664,\"peak_matrix_mb\":165,\"wall_ms\":3151,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"r50\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":562543665,\"xors\":552414173,\"mat_words\":10129492,\"rows\":67974,\"steps\":41,\"pairs\":4399,\"field_pairs\":2524,\"deferred\":6904,\"policy_ops\":333455,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":20399,\"cols_max\":19577,\"divisor_tests\":12137030,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":2188,\"peak_matrix_mb\":47,\"wall_ms\":631,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":14,\"arm\":\"r25\",\"x_r\":363968,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":502103693,\"xors\":480283577,\"mat_words\":21820116,\"rows\":126465,\"steps\":82,\"pairs\":3669,\"field_pairs\":2257,\"deferred\":17650,\"policy_ops\":544696,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":28318,\"cols_max\":27968,\"divisor_tests\":21668034,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3132,\"peak_matrix_mb\":94,\"wall_ms\":494,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"a\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":3248796260,\"xors\":3222731393,\"mat_words\":26064867,\"rows\":60981,\"steps\":7,\"pairs\":7136,\"field_pairs\":4209,\"deferred\":0,\"policy_ops\":0,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":39281,\"cols_max\":35792,\"divisor_tests\":9551532,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":664,\"peak_matrix_mb\":167,\"wall_ms\":2443,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"b50\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1506326914,\"xors\":1482696776,\"mat_words\":23630138,\"rows\":73841,\"steps\":41,\"pairs\":5309,\"field_pairs\":2004,\"deferred\":7292,\"policy_ops\":1223028,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":36514,\"cols_max\":35132,\"divisor_tests\":12410867,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3924,\"peak_matrix_mb\":152,\"wall_ms\":1276,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"b25\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":1223337520,\"xors\":1200005989,\"mat_words\":23331531,\"rows\":95532,\"steps\":79,\"pairs\":4194,\"field_pairs\":936,\"deferred\":15266,\"policy_ops\":1680802,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":35596,\"cols_max\":35275,\"divisor_tests\":18573748,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":5024,\"peak_matrix_mb\":149,\"wall_ms\":939,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"c\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":2484047294,\"xors\":2458361520,\"mat_words\":25685774,\"rows\":60721,\"steps\":7,\"pairs\":7136,\"field_pairs\":4209,\"deferred\":0,\"policy_ops\":709204,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":38930,\"cols_max\":35441,\"divisor_tests\":9527453,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":664,\"peak_matrix_mb\":164,\"wall_ms\":2290,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"d\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"cap_touch\",\"check\":true,\"touches\":4967823844,\"xors\":4938363464,\"mat_words\":29460380,\"rows\":65448,\"steps\":10,\"pairs\":12001,\"field_pairs\":2813,\"deferred\":17680,\"policy_ops\":259952,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":38847,\"cols_max\":35764,\"divisor_tests\":57951608,\"label_xors\":0,\"basis_hash\":0,\"basis_len\":0,\"nstd\":0,\"pairs_left\":7621,\"peak_matrix_mb\":165,\"wall_ms\":5644,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"p\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":3654422848,\"xors\":3628231862,\"mat_words\":26190986,\"rows\":61135,\"steps\":7,\"pairs\":7136,\"field_pairs\":4209,\"deferred\":0,\"policy_ops\":429503,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":39347,\"cols_max\":35858,\"divisor_tests\":9585634,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":664,\"peak_matrix_mb\":168,\"wall_ms\":3184,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"r50\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":569848574,\"xors\":559114372,\"mat_words\":10734202,\"rows\":64959,\"steps\":39,\"pairs\":4348,\"field_pairs\":2516,\"deferred\":6844,\"policy_ops\":329982,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":21459,\"cols_max\":20662,\"divisor_tests\":10786464,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":2851,\"peak_matrix_mb\":52,\"wall_ms\":687,\"rss_kb\":267076}",
+        "{\"tool\":\"b09\",\"cell\":\"19-4-3\",\"role\":\"test\",\"idx\":15,\"arm\":\"r25\",\"x_r\":409063,\"solutions\":0,\"outcome\":\"unsat\",\"check\":true,\"touches\":455162024,\"xors\":435664650,\"mat_words\":19497374,\"rows\":123721,\"steps\":80,\"pairs\":3556,\"field_pairs\":2263,\"deferred\":17329,\"policy_ops\":534610,\"solving_degree\":4,\"degree_reached\":4,\"rows_max\":25395,\"cols_max\":25077,\"divisor_tests\":20662083,\"label_xors\":0,\"basis_hash\":1,\"basis_len\":1,\"nstd\":0,\"pairs_left\":3218,\"peak_matrix_mb\":75,\"wall_ms\":609,\"rss_kb\":267076}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-09/card-06-r2/b09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-09/card-06-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "64b87d52adda37a574b062a1ca67abbc5813d5a4",
+  "dirty_after": [
+    "papers/ic-negative-results/EVIDENCE.md",
+    "papers/ic-negative-results/Makefile",
+    "papers/ic-negative-results/evidence/ledger.full",
+    "papers/ic-negative-results/evidence/ledger.list",
+    "papers/ic-negative-results/evidence/ledger.tex",
+    "papers/ic-negative-results/evidence/make_ledger.sh",
+    "papers/ic-negative-results/ic_negative_results.tex",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-06-r2-build.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/card-06-r2-build.stdout.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-19-4-3-test-08-16-r2.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/eval-19-4-3-test-08-16-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3-c06-r2.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/fit-19-4-3-c06-r2.stderr.log",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-19-4-3-r2-c06.model",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-19-r2-build.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-19-r2-build.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-19-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-b-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-b-b.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n37-b.jsonl"
+  ],
+  "dirty_before": [
+    "papers/ic-negative-results/EVIDENCE.md",
+    "papers/ic-negative-results/evidence/ledger.full",
+    "papers/ic-negative-results/evidence/ledger.list",
+    "papers/ic-negative-results/evidence/ledger.tex",
+    "papers/ic-negative-results/evidence/make_ledger.sh",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-19-r2-build.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/card-19-r2-build.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-19-r2.json",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-b-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n37-b-b.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n37-b.jsonl"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

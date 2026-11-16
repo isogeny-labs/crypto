@@ -10,7 +10,12 @@
 //! vector is the zero polynomial.
 //!
 //! Every coefficient product is counted as one `M` (schoolbook products are
-//! counted in bulk), matching the round-4 unit.  [`mul`] follows the field's
+//! counted in bulk), matching the round-4 unit.  Additions are tallied only
+//! by a field built with [`PrimeField::counted_with_adds`]: every
+//! [`PrimeField::add`], [`PrimeField::sub`] and [`PrimeField::neg`], plus
+//! the `la·lb − (la + lb − 1)` accumulations of a schoolbook product (the
+//! `t − 1` additions of an output coefficient with `t` terms; the lazy
+//! `u128` accumulation and its periodic reductions stay inside `M`).  [`mul`] follows the field's
 //! [`PolyMul`]: Karatsuba (`O(n^{1.585})`, the round-4 arithmetic), or the
 //! three-prime NTT of [`super::ntt`] (`O(n log n)` word multiplications,
 //! counted as described there) from [`NTT_THRESHOLD`] coefficients on.
@@ -129,6 +134,9 @@ pub fn mul_schoolbook<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> 
         return Vec::new();
     }
     f.count_muls((a.len() * b.len()) as u64);
+    // An output coefficient with t terms needs t − 1 additions; summed over
+    // all outputs that is la·lb − (la + lb − 1).
+    f.count_adds((a.len() * b.len() - (a.len() + b.len() - 1)) as u64);
     let p = f.p() as u128;
     let fold = f.fold();
     let mut acc = vec![0u128; a.len() + b.len() - 1];

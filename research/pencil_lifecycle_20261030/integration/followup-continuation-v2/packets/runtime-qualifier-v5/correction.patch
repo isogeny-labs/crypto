@@ -1,0 +1,10 @@
+--- v4/supervise.py
++++ v5/supervise.py
+@@ -214,6 +214,7 @@
+   rc,raw,_=cli('logs-'+case,'logs',owned);require(rc==0,'logs failed')
+   # Docker logs may put stderr on client's stderr. Read both preserved channels.
+   err=(out/f'{seq:03d}-logs-{case}'/'stderr').read_bytes();raw=gate_line(raw,case,nonce);combined=raw+err
++  require(b'software.preexec-pids/v1' not in combined,'duplicate gate receipt schema after first line')
+   if needle:require(needle.encode() in combined,'expected rejection absent');require(b'ecbench.diagnostic_preflight_file_report/v1' not in combined,'negative control success JSON')
+   else:require(strict(raw)==strict((FIX/'expected-report.json').read_bytes()),'positive report mismatch')
+   rc,diff,_=cli('diff-'+case,'diff',owned);require(rc==0 and not diff.strip(),'unexpected writable-layer change')

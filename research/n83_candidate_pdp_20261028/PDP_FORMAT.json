@@ -1,0 +1,19 @@
+{
+ "schema":"n83.paired-pdp-layout/v1",
+ "root":"pdp-r1 raw run directory",
+ "arms":["baseline","spike40"],
+ "curve_families":["koblitz","binary","prime"],
+ "cases":"48 per arm: family-m{2..9}-{planted,natural}",
+ "inputs":"ARM/inputs/inputs.json contains typed identities, weights, target, witness, source SHA256 and full-base manifest SHA256; each case has matching input.json and literal UTF-8 system.sing",
+ "variable_blocks":"m blocks of27 Boolean base selectors, followed by m-2 intermediates;83 Boolean coordinates each for binary curves, one prime-field coordinate each for prime",
+ "coordinate_mapping":"input.coordinate_bit_positions[j] defines the weight2^position of selectorj; binary addition is XOR, prime addition is modulo p",
+ "equations":"Chained S3 constraints followed by all Boolean selector equations; original generator list retained. Intermediates in prime have no Boolean field equation.",
+ "catalog":"ARM/catalog/index.json binds exact source hashes and per-case equations.jsonl with byte offsets, original expression, supports and degree histograms. Prime source stays symbolic; no invented expanded term count.",
+ "first_fall":"ARM/first-fall/CASE.json carries explicit binary polynomial-combination witness or prime degree-four coefficient minor, lower-bound argument and source hash. first_fall_degree:null is unknown, not zero.",
+ "closure":"ARM/closure/CASE/result.json plus operations.jsonl record exact ordinary-degree-two closure modulo Boolean field equations; raw degree bounds are preserved before reduction. LFD=2 requires a lower witness and unit or exhaustive affine-completion upper certificate.",
+ "replay":"ARM/replay/*.log retains fresh-process producer verification; ARM/status/*.json records exit codes. Producer replay is not independent research review.",
+ "paired_summary":"paired-summary.json has48 matched rows, identical target and witness checks, source-specific fields for both arms. Regularity and solving_degree remain null in this stage.",
+ "unknowns":"null means unmeasured, unsupported or uncertified as explained by status. Never read a plateau, timeout or final basis degree as global LFD or regularity.",
+ "other_files":"instruments/ contains exact executables; protocol-pdp.json, host.txt, controls, terminal.json and manifest.sha256 retain provenance and every raw artifact.",
+ "reconstruct":"Extract the content-addressed paired-runs archive into a fresh directory and run sha256sum -c manifest.sha256. Source archive and publication metadata are separate immutable objects."
+}

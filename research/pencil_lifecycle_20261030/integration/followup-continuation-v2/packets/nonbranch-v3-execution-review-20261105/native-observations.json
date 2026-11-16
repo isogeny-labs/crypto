@@ -1,0 +1,412 @@
+{
+  "observed_utc": "2026-11-05T18:21:15.919204+00:00",
+  "status": "native_failed_attempt_consistent_partial_producer_compile",
+  "archive_commit": "a51006010dd6beca644de066745fe0c94917145d",
+  "source_commit": "79588ee0ee629dd9d247957bf8d6402bc6a6f855",
+  "pre_post_dict_equal": true,
+  "files": 16736,
+  "bytes": 3111892318,
+  "fresh_native_corpus_rehash_by_reviewer": false,
+  "phase_receipts": {
+    "pre": {
+      "checked_dependency_bytes": 3111892318,
+      "checked_dependency_files": 16736,
+      "commands": [],
+      "compiler_invocations": 0,
+      "dependency_bytes_declared": 3111892318,
+      "dependency_files_declared": 16736,
+      "elapsed_seconds": 152.62771470600273,
+      "errors": [],
+      "hash_progress": {
+        "checked_bytes": 3111892318,
+        "checked_files": 16736,
+        "current_bytes_read": 5444,
+        "current_path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105/freeze.json",
+        "declared_bytes": 3111892318,
+        "declared_files": 16736,
+        "elapsed_seconds": 149.48127023399866,
+        "last_checked_path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedRingGraded.lean",
+        "phase": "pre",
+        "recorded_utc_seconds": 1793901707.8117578,
+        "stage": "runtime_support"
+      },
+      "independent_binary_kernel_rechecker": false,
+      "machine_review_complete": false,
+      "pending_signals": [],
+      "phase": "pre",
+      "post_custody_required": true,
+      "scientific_execution": false,
+      "status": "passed",
+      "trust": "Pinned shared caches; pre/post checks do not exclude transient concurrent changes.",
+      "workspace": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105"
+    },
+    "compiler": {
+      "checked_dependency_bytes": 0,
+      "checked_dependency_files": 0,
+      "commands": [
+        {
+          "argv": [
+            "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Nonbranch.olean",
+            "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Nonbranch.lean"
+          ],
+          "end_seconds": 246.21672322999802,
+          "exit": 0,
+          "expected_exit": 0,
+          "module": "Nonbranch",
+          "pgid": 959772,
+          "pid": 959772,
+          "reaped": true,
+          "remaining_group": [],
+          "start_seconds": 0.26260709499183577
+        },
+        {
+          "argv": [
+            "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.olean",
+            "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean"
+          ],
+          "end_seconds": 303.1925872360007,
+          "exit": 1,
+          "expected_exit": 0,
+          "module": "IndependentControls",
+          "pgid": 965075,
+          "pid": 965075,
+          "reaped": true,
+          "remaining_group": [],
+          "start_seconds": 246.25818978498864
+        }
+      ],
+      "compiler_invocations": 2,
+      "dependency_bytes_declared": 3111892318,
+      "dependency_files_declared": 16736,
+      "elapsed_seconds": 303.26343018899206,
+      "errors": [
+        "AssertionError({'module': 'IndependentControls', 'argv': ['/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean', '-j1', '-M3500', '-s16384', '-o', '/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.olean', '/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean'], 'expected_exit': 0, 'pid': 965075, 'pgid': 965075, 'reaped': True, 'start_seconds': 246.25818978498864, 'exit': 1, 'end_seconds': 303.1925872360007, 'remaining_group': []})"
+      ],
+      "hash_progress": {
+        "checked_bytes": 0,
+        "checked_files": 0,
+        "current_bytes_read": 934792,
+        "current_path": "/lib64/ld-linux-x86-64.so.2",
+        "declared_bytes": 3111892318,
+        "declared_files": 16736,
+        "elapsed_seconds": 299.9935448319884,
+        "phase": "compiler",
+        "recorded_utc_seconds": 1793902011.268345,
+        "stage": "compiler"
+      },
+      "independent_binary_kernel_rechecker": false,
+      "machine_review_complete": false,
+      "pending_signals": [],
+      "phase": "compiler",
+      "post_custody_required": true,
+      "scientific_execution": false,
+      "status": "failed",
+      "trust": "Pinned shared caches; pre/post checks do not exclude transient concurrent changes.",
+      "workspace": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105"
+    },
+    "post": {
+      "checked_dependency_bytes": 3111892318,
+      "checked_dependency_files": 16736,
+      "commands": [],
+      "compiler_invocations": 0,
+      "dependency_bytes_declared": 3111892318,
+      "dependency_files_declared": 16736,
+      "elapsed_seconds": 125.00391033399501,
+      "errors": [],
+      "hash_progress": {
+        "checked_bytes": 3111892318,
+        "checked_files": 16736,
+        "current_bytes_read": 5444,
+        "current_path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105/freeze.json",
+        "declared_bytes": 3111892318,
+        "declared_files": 16736,
+        "elapsed_seconds": 122.57349399800296,
+        "last_checked_path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedRingGraded.lean",
+        "phase": "post",
+        "recorded_utc_seconds": 1793902137.493435,
+        "stage": "runtime_support"
+      },
+      "independent_binary_kernel_rechecker": false,
+      "machine_review_complete": false,
+      "pending_signals": [],
+      "phase": "post",
+      "post_custody_required": true,
+      "scientific_execution": false,
+      "status": "passed",
+      "trust": "Pinned shared caches; pre/post checks do not exclude transient concurrent changes.",
+      "workspace": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105"
+    }
+  },
+  "outer_completion": {
+    "costs_are_worker_wall_not_cpu": true,
+    "elapsed_seconds": 582.3239518530027,
+    "machine_review_complete": false,
+    "phases": [
+      {
+        "argv": [
+          "sudo",
+          "-n",
+          "systemd-run",
+          "--unit=pencil-nonbranch-t1651-v3-pre",
+          "--wait",
+          "--property=User=ec2-user",
+          "--property=WorkingDirectory=/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105",
+          "--property=CPUQuota=100%",
+          "--property=MemoryMax=8G",
+          "--property=MemorySwapMax=0",
+          "--property=TasksMax=128",
+          "--property=KillMode=control-group",
+          "--property=OOMPolicy=stop",
+          "--property=RuntimeMaxSec=885",
+          "--property=TimeoutStopSec=5s",
+          "--property=SendSIGKILL=yes",
+          "--property=StandardOutput=file:/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pre.stdout",
+          "--property=StandardError=file:/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pre.stderr",
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=5s",
+          "880s",
+          "/usr/bin/python3",
+          "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105/replay.py",
+          "pre",
+          "dfde7d96367f321f0d4446c205290622c545f3d4364d7796c392d632391267eb"
+        ],
+        "elapsed_seconds": 153.25004817899026,
+        "errors": [],
+        "invocation_id": "7ede70b5c93c4de7a86703d888b0bf61",
+        "native_receipt_present": true,
+        "passed": true,
+        "phase": "pre",
+        "receipt_error": null,
+        "returncode": 0,
+        "systemd_stderr": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pre-systemd.stderr",
+        "systemd_stdout": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pre-systemd.stdout",
+        "terminal_owner_confirmed": true,
+        "wait_timeout": false
+      },
+      {
+        "argv": [
+          "sudo",
+          "-n",
+          "systemd-run",
+          "--unit=pencil-nonbranch-t1651-v3-compiler",
+          "--wait",
+          "--property=User=ec2-user",
+          "--property=WorkingDirectory=/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105",
+          "--property=CPUQuota=100%",
+          "--property=MemoryMax=8G",
+          "--property=MemorySwapMax=0",
+          "--property=TasksMax=128",
+          "--property=KillMode=control-group",
+          "--property=OOMPolicy=stop",
+          "--property=RuntimeMaxSec=585",
+          "--property=TimeoutStopSec=5s",
+          "--property=SendSIGKILL=yes",
+          "--property=StandardOutput=file:/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/compiler.stdout",
+          "--property=StandardError=file:/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/compiler.stderr",
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=5s",
+          "580s",
+          "/usr/bin/python3",
+          "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105/replay.py",
+          "compiler",
+          "dfde7d96367f321f0d4446c205290622c545f3d4364d7796c392d632391267eb"
+        ],
+        "elapsed_seconds": 303.57818326300185,
+        "errors": [],
+        "invocation_id": "e331d7da60eb49b8b3417758d2dbb488",
+        "native_receipt_present": true,
+        "passed": false,
+        "phase": "compiler",
+        "receipt_error": null,
+        "returncode": 1,
+        "systemd_stderr": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/compiler-systemd.stderr",
+        "systemd_stdout": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/compiler-systemd.stdout",
+        "terminal_owner_confirmed": true,
+        "wait_timeout": false
+      },
+      {
+        "argv": [
+          "sudo",
+          "-n",
+          "systemd-run",
+          "--unit=pencil-nonbranch-t1651-v3-post",
+          "--wait",
+          "--property=User=ec2-user",
+          "--property=WorkingDirectory=/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105",
+          "--property=CPUQuota=100%",
+          "--property=MemoryMax=8G",
+          "--property=MemorySwapMax=0",
+          "--property=TasksMax=128",
+          "--property=KillMode=control-group",
+          "--property=OOMPolicy=stop",
+          "--property=RuntimeMaxSec=885",
+          "--property=TimeoutStopSec=5s",
+          "--property=SendSIGKILL=yes",
+          "--property=StandardOutput=file:/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/post.stdout",
+          "--property=StandardError=file:/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/post.stderr",
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=5s",
+          "880s",
+          "/usr/bin/python3",
+          "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/nonbranch-replay-continuation-v3-20261105/replay.py",
+          "post",
+          "dfde7d96367f321f0d4446c205290622c545f3d4364d7796c392d632391267eb"
+        ],
+        "elapsed_seconds": 125.37535215300159,
+        "errors": [],
+        "invocation_id": "4b37d9fbd31c42d0a498e138e60ad559",
+        "native_receipt_present": true,
+        "passed": true,
+        "phase": "post",
+        "receipt_error": null,
+        "returncode": 0,
+        "systemd_stderr": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/post-systemd.stderr",
+        "systemd_stdout": "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/post-systemd.stdout",
+        "terminal_owner_confirmed": true,
+        "wait_timeout": false
+      }
+    ],
+    "status": "failed"
+  },
+  "input_hashes": {
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/pre-runtime.json": {
+      "sha256": "50deff8e0f56507416bbff5b4ab85d64c52df36d09b1e13ea3b3ef4f2ed6c86f",
+      "bytes": 1321
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/post-progress.json": {
+      "sha256": "992c965ec73bae069910cd1b52139c77b4a3856ee14d36092b0e3110b3d9db2d",
+      "bytes": 608
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/pre-receipt.json": {
+      "sha256": "d1f3f55516ac71e77221f91acb550ec5dfee26f4d9489896a3586a6c1ad9f9bd",
+      "bytes": 1243
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/pre-hashes.json": {
+      "sha256": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad",
+      "bytes": 4822983
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/compiler-receipt.json": {
+      "sha256": "c9605450e7c23ff52788a6b88325336559ababc9080928b59bf7c0aca675bc62",
+      "bytes": 2392
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/commands.json": {
+      "sha256": "e28e16177d3934da3b617479dca23e782f8c1620f47e3b386a4ecd438bfa7d25",
+      "bytes": 961
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/pre-progress.json": {
+      "sha256": "c26c832ad3b697e2b109253e255e98e3795748a9750b542fb4b574e9edccd6d5",
+      "bytes": 607
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/compiler-progress.json": {
+      "sha256": "3e2b3df417a47296fc4837430e9b632dcec8775e97b58bd0425cd091a13571fa",
+      "bytes": 297
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/campaign-start.json": {
+      "sha256": "ffa5f3956cb2fd666b0d250e563a2dab4703439e07044daf6f2109c534432778",
+      "bytes": 88
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/post-receipt.json": {
+      "sha256": "f8baf02b68c6a5f7ec5efb1997d6277645424661d082d5161e10dfc25ce5e3d8",
+      "bytes": 1244
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/post-hashes.json": {
+      "sha256": "bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad",
+      "bytes": 4822983
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/post-runtime.json": {
+      "sha256": "50deff8e0f56507416bbff5b4ab85d64c52df36d09b1e13ea3b3ef4f2ed6c86f",
+      "bytes": 1321
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Nonbranch.stdout": {
+      "sha256": "28b76587b81e20430684a3c110957e01e5363c7f05a05a599417897be68775d4",
+      "bytes": 786
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.stdout": {
+      "sha256": "e4753267c54a7f4b5b6b4e288f86b79cd7088985bcad9eb64db456bd83974011",
+      "bytes": 3989
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Nonbranch.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/IndependentControls.lean": {
+      "sha256": "6dda751467447446311323393a0a985ae93f2440e700289914bcd0037e1476d7",
+      "bytes": 6441
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/ExpectedFailure.lean": {
+      "sha256": "d734382f5c0fdc1d3846ec0cc07d2c9ea1eb951cd47576fef6d67cf410059165",
+      "bytes": 134
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Readback.lean": {
+      "sha256": "1cf95c5e60a634a8817b2dbb948c887bd7f1044630676f1089eb5dac5f14c8b2",
+      "bytes": 1542
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105/Nonbranch.lean": {
+      "sha256": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1",
+      "bytes": 8362
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pencil-nonbranch-t1651-v3-post.service-manager-terminal.json": {
+      "sha256": "3869a97e8b3d058f2ba4159ec4b6a33b60a3df816be13a9782d1c9228a6028a7",
+      "bytes": 4312
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pre-outer-exit.json": {
+      "sha256": "986bf8e78c5773910896c2389174bba13f8513984e4f617f9e20ca0d9fd8f837",
+      "bytes": 1637
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/completion.json": {
+      "sha256": "61a0a0cfc80a1f46714e249bf0792b516c4af419e98b321c3436a94dacabec5e",
+      "bytes": 5101
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/post-command.json": {
+      "sha256": "3ffbb465c8fa1ccb4b7756c46b961c84331be82f93a8cf84c6abdd734d773af6",
+      "bytes": 1210
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/compiler-outer-exit.json": {
+      "sha256": "74dd007a6847e228ba5ed1908204003d1460741fc69a7d3067da4155a114a7c4",
+      "bytes": 1673
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pencil-nonbranch-t1651-v3-pre.service-manager-terminal.json": {
+      "sha256": "a1faefc79c98d259ac5cb9bb2d58e48bc604c6f8145d7d251d3623bf68bbaeff",
+      "bytes": 4305
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/post-outer-exit.json": {
+      "sha256": "5a171115a00d718b2dc1487ea0ac0a65d7a4ad4713a8af1cf062117d68108981",
+      "bytes": 1644
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/pre-command.json": {
+      "sha256": "b7388dab96325ede88c08244280b5500c0c0897a695bec0034d6d7fe3f3c152e",
+      "bytes": 1206
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/compiler-command.json": {
+      "sha256": "85433b60a754bce334a5a4fd99fbb90cfb4ef7d63078e45f4e1824bb3e3a307b",
+      "bytes": 1226
+    },
+    "/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105.outer/admission.json": {
+      "sha256": "121e3f413533ec2b6db9309eade3e3e6c31342fb62b5201d513f3d823f12f08e",
+      "bytes": 398
+    }
+  },
+  "missing_readback_and_negative_outputs": true,
+  "no_axiom_audit_output": true,
+  "archive_manifest_entries_verified": 55,
+  "raw_artifact_bindings_verified": 46,
+  "remote_archive_download_independently_repeated": false,
+  "archive_identity": "fef9f053bf8b823dc314f3671252b1e123e35f2ebe51c97d44b47d83b6809a8d"
+}

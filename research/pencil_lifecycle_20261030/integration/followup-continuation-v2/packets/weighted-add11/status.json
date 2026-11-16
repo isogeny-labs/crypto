@@ -1,0 +1,65 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "claim_scope": "weighted nonzero-input distinct add11 field-value normalized validity",
+  "source_sha256": "c2204c1e6fcd903c5a67f5a70fe94f9302411ea97e3150f194423f3cd10e3aec",
+  "declarations": [
+    "cross_difference",
+    "normalized_distinct_cross",
+    "normalized_coefficients",
+    "preserves_mumford",
+    "distinct_guard"
+  ],
+  "compile_stages": {
+    "attempt1": 1,
+    "attempt2": 0,
+    "attempt3": 0,
+    "controls1": 0,
+    "readback1": 0
+  },
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "independent_review": "pending",
+  "hypotheses": [
+    "arbitrary field K",
+    "all four input weights nonzero",
+    "normalized affine x coordinates distinct",
+    "each normalized degree-one support divides common f minus y squared"
+  ],
+  "conclusions": [
+    "literal field output weights z,w nonzero",
+    "four normalized output coefficients equal affine interpolation coefficients",
+    "normalized monic output support divides f minus normalized v squared",
+    "distinct normalized x implies unequal source cross coordinates, excluding inverse/doubling guards"
+  ],
+  "machine_boundary": {
+    "required_external_conditions": [
+      "odd prime5<=p<2^31",
+      "all eight input words canonical (<p)",
+      "Field.n=1",
+      "tables=None",
+      "normal execution and sufficient counter headroom"
+    ],
+    "sufficient_primitive_overflow_bounds": "canonical modular operands multiply below2^62; addition/subtraction intermediates below2^32; these arithmetic bounds are not the completed Add11 word-refinement theorem",
+    "not_proved": [
+      "actual UInt64 expression/pow correspondence",
+      "counter or compiler semantics",
+      "Rust Jacobian::valid refinement",
+      "divisor-class addition semantics",
+      "nonidentity dispatcher or whole-walk closure"
+    ]
+  },
+  "controls": [
+    "full nonunit-weight rational instance with nonzero interpolation slope",
+    "unit-weight specialization",
+    "zero input z preserves zero output z",
+    "different raw x values can have equal normalized x and zero output w"
+  ],
+  "failures_preserved": [
+    "attempt1 used reserved Lean keyword by as a local name; parse failure and resulting dependent errors/sorry diagnostics retained; final successful readback contains no sorryAx"
+  ],
+  "scientific_execution": false,
+  "cost_ratio": null
+}

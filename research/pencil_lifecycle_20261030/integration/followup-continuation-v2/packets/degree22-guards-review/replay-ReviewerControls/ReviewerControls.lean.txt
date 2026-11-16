@@ -1,0 +1,18 @@
+import Guard22
+import WordMixed
+open Degree22Guards
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+-- Full nonvacuous permitted B-zero context; support q/r equal via identical inputs.
+example : ¬(doubleB (0:ℚ) 0 1 0=0 ∧ (1:ℚ)=0) := by
+ exact double_identity_excluded 0 0 1 0 1 1 1 1 1 0
+  (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+example : doubleB (0:ℚ) 0 1 0=0 := by norm_num [doubleB]
+-- Direct helper identity remains reachable.
+example : doubleB (0:ℚ) 0 0 0=0 ∧ (0:ℚ)=0 := by norm_num [doubleB]
+-- Standalone scalar implication needs characteristic premise.
+example : doubleB (0:ZMod 2) 0 0 1=0 ∧ (1:ZMod 2)≠0 := by decide
+-- Zero weights make crossed inverse/equality simultaneous, excluding equal-arm entry.
+example : let s : ℚ := 2
+ let t : ℚ := 3
+ s*0^3*0= (7:ℚ)*0^3*0 ∧ t*0^5*0=(11:ℚ)*0^5*0 ∧
+ s*0^3*0= -((7:ℚ)*0^3*0) ∧ t*0^5*0= -((11:ℚ)*0^5*0) := by norm_num

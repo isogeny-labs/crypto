@@ -1,0 +1,11 @@
+name = "sidon_rho_counterfamily_audit"
+version = "0.1.0"
+defaultTargets = ["SidonRhoCounterfamilyAudit"]
+
+[[require]]
+name = "general_two_step_collision_audit"
+path = "../../general_two_step_collision_audit_20261114/lean"
+
+[[lean_lib]]
+name = "SidonRhoCounterfamilyAudit"
+roots = ["SidonTable", "SlowCollision", "SidonCounterfamily"]

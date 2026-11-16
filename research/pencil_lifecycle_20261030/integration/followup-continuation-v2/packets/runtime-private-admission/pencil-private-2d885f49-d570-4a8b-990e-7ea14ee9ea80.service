@@ -1,0 +1,30 @@
+[Unit]
+Description=pencil-private-2d885f49-d570-4a8b-990e-7ea14ee9ea80-ba15f0b8639110811082258591d7ca6de39d01277c24c562fe525cb8086ddb5d
+[Service]
+Type=exec
+ExitType=main
+RemainAfterExit=yes
+Restart=no
+KillMode=control-group
+SendSIGKILL=yes
+TimeoutStopSec=5s
+TimeoutStartSec=10s
+RuntimeMaxSec=590s
+RuntimeRandomizedExtraSec=0
+CPUQuota=200%
+MemoryMax=2147483648
+MemorySwapMax=0
+TasksMax=256
+Delegate=yes
+PrivateNetwork=yes
+PrivateMounts=yes
+ProtectSystem=strict
+ReadWritePaths=/var/tmp/ppr-2d885f49-d570-4a8b-990e-7ea14ee9ea80 /sys/fs/cgroup
+InaccessiblePaths=-/run/docker.sock -/var/run/docker.sock -/var/lib/docker
+TemporaryFileSystem=/run/containerd:ro,size=4096,mode=0700
+UMask=0077
+StandardOutput=null
+StandardError=null
+LimitCORE=0
+NoNewPrivileges=yes
+ExecStart=/usr/bin/python3 -I /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-supervisor-v2/supervise.py --worker /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-admission/assembly-binding.draft.json

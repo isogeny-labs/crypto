@@ -1,0 +1,18 @@
+{
+  "description": "Multi-target IC (icbest) over the best multi-target rho of the mt_fieldops harness, per (bits, T) cell. Counted: v5 primary rule at I = 10 M, h = 0 / 0.1 / 1 GAE per hash-table or native operation, median of 22 per-configuration ratios with bootstrap 95% interval. Timed: mt_timed solve-phase wall time, median of 4 configurations with bootstrap 95% interval. Numbers copied from the sources' tables.",
+  "sources": [
+    {"path": "research/mt_fieldops_v5_20261112/RESULTS.md", "blob": "ded46dd6a4f67cbf14f0d2411e777692e123074c", "table": "Table (I = 10 M, primary rule)"},
+    {"path": "research/mt_timed_20261112/RESULTS.md", "blob": "666099996b049f5bd2813c52f11ecb21abdfe0b2", "table": "Result (solve-phase wall time)"}
+  ],
+  "rows": [
+    {"bits": 24, "T": 1024,  "h0": [1.146, 1.138, 1.152], "h01": [1.054, 1.046, 1.062], "h1": [0.748, 0.742, 0.755], "wall": [0.778, 0.765, 0.922]},
+    {"bits": 24, "T": 4096,  "h0": [1.095, 1.089, 1.096], "h01": [1.028, 1.022, 1.031], "h1": [0.765, 0.761, 0.768], "wall": [0.792, 0.753, 0.821]},
+    {"bits": 24, "T": 16384, "h0": [1.063, 1.060, 1.064], "h01": [1.020, 1.016, 1.022], "h1": [0.799, 0.796, 0.802], "wall": [0.829, 0.811, 0.872]},
+    {"bits": 28, "T": 1024,  "h0": [1.139, 1.131, 1.151], "h01": [1.029, 1.020, 1.040], "h1": [0.731, 0.724, 0.736], "wall": [0.932, 0.869, 0.967]},
+    {"bits": 28, "T": 4096,  "h0": [1.136, 1.127, 1.142], "h01": [1.035, 1.029, 1.037], "h1": [0.731, 0.724, 0.736], "wall": [1.053, 0.987, 1.101]},
+    {"bits": 28, "T": 16384, "h0": [1.096, 1.090, 1.100], "h01": [1.015, 1.010, 1.018], "h1": [0.739, 0.735, 0.743], "wall": [1.007, 0.954, 1.193]},
+    {"bits": 32, "T": 1024,  "h0": [1.159, 1.143, 1.173], "h01": [1.037, 1.024, 1.052], "h1": [0.728, 0.717, 0.735], "wall": [1.114, 1.049, 1.211]},
+    {"bits": 32, "T": 4096,  "h0": [1.130, 1.126, 1.138], "h01": [1.014, 1.010, 1.021], "h1": [0.717, 0.710, 0.718], "wall": [1.203, 1.116, 1.303]},
+    {"bits": 32, "T": 16384, "h0": [1.101, 1.097, 1.108], "h01": [0.998, 0.992, 1.005], "h1": [0.713, 0.711, 0.716], "wall": [1.289, 1.269, 1.319]}
+  ]
+}

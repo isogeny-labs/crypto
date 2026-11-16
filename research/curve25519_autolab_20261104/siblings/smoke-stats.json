@@ -1,0 +1,111 @@
+{
+ "r": 131111,
+ "sqrt_r": 362.0925296108717,
+ "arms": {
+  "rho-neg": {
+   "n": 24,
+   "bitops_per_sqrt_r": 37710.226576636225,
+   "gae_per_sqrt_r": 1.337250270956143,
+   "steps_per_sqrt_r": 0.8568251886704621,
+   "S": {
+    "0.0": 1.3372502709561422,
+    "0.1": 1.4278003301778444,
+    "1.0": 2.2427508631731543
+   }
+  },
+  "tw2cj-lazy": {
+   "n": 24,
+   "bitops_per_sqrt_r": 71081.34264555645,
+   "gae_per_sqrt_r": 2.5336525656924835,
+   "stored_points_per_sqrt_r": 1.7446047119840016,
+   "stored_se": 0.0996837922376738,
+   "setup_adds": 127.875,
+   "tw_walk_adds": 631.7083333333334,
+   "sib_second_points": 0,
+   "bitops_phase_per_sqrt_r": {
+    "factor_base": 5307.328494363669,
+    "oracle_setup": 63466.981836650426,
+    "relations": 0.0,
+    "linear_algebra": 472.800419782148,
+    "verify": 1834.23189476021
+   },
+   "S": {
+    "0.0": 2.5336525656924835,
+    "0.1": 2.718699649482568,
+    "1.0": 4.384123403593329
+   }
+  },
+  "tw2cj-lazy-sib8": {
+   "n": 24,
+   "bitops_per_sqrt_r": 163419.02965223917,
+   "gae_per_sqrt_r": 5.681098517950673,
+   "stored_points_per_sqrt_r": 1.6639393269104057,
+   "stored_se": 0.1009894827648576,
+   "setup_adds": 1586.9166666666667,
+   "tw_walk_adds": 304.3333333333333,
+   "tw_sib_parents": 38.041666666666664,
+   "tw_sib_pairs": 304.3333333333333,
+   "tw_walk_invs": 304.3333333333333,
+   "tw_walk_muls": 645.4166666666666,
+   "tw_walk_sqrs": 607.375,
+   "tw_sib_resolutions": 6,
+   "tw_sib_degenerate": 0,
+   "sib_second_points": 303.0416666666667,
+   "bitops_phase_per_sqrt_r": {
+    "factor_base": 5307.328494363669,
+    "oracle_setup": 155811.0967583263,
+    "relations": 0.0,
+    "linear_algebra": 466.37250478897965,
+    "verify": 1834.23189476021
+   },
+   "S": {
+    "0.0": 5.681098517950673,
+    "0.1": 5.941678781144905,
+    "1.0": 8.286901149893007
+   }
+  }
+ },
+ "ratios": {
+  "bitops sib8/tw2cj-lazy": [
+   2.299042527476162,
+   2.130726342950179,
+   2.470147924347676
+  ],
+  "bitops sib8/rho-neg": [
+   4.333546745473208,
+   3.790395241159221,
+   4.977189692877394
+  ],
+  "bitops tw2cj-lazy/rho-neg": [
+   1.8849354432040368,
+   1.5974357261943972,
+   2.2249520069896365
+  ],
+  "stored sib8/tw2cj-lazy": [
+   0.9537629443968075,
+   0.801968242468152,
+   1.1149121554063706
+  ]
+ },
+ "post_hoc_decomposition_bitops_per_sqrt_r": {
+  "tw2cj-lazy": {
+   "pool_or_jump_setup": 15190.93063287227,
+   "walk_additions_and_pairs": 46301.8090560554,
+   "second_points": 0.0,
+   "sign_resolutions": 0.0,
+   "table_inserts": 139.5683769587201,
+   "oracle_setup_total": 63466.981836650426,
+   "walk_phase_total": 46441.37743301412
+  },
+  "tw2cj-lazy-sib8": {
+   "pool_or_jump_setup": 122309.42290062542,
+   "walk_additions_and_pairs": 22306.471429683308,
+   "second_points": 8787.636418292082,
+   "sign_resolutions": 439.7770928086523,
+   "table_inserts": 133.11514615283247,
+   "oracle_setup_total": 155811.0967583263,
+   "walk_phase_total": 31667.000086936874
+  }
+ },
+ "post_hoc_walk_only_ratio_sib8_over_tw2cj_lazy": 0.6818703888060289
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "formal-source-fidelity-review/v1",
+  "task": "T-1700",
+  "prior_task": "T-1695",
+  "created_utc": "2026-11-05T19:24:18.720389+00:00",
+  "producer_commit": "a649d5a6f84b38a4824f07e6755c37062820bfcc",
+  "source_sha256": "6e5184515935a57858ecd2db37a486e9e2beed06ddfb8398e48eea931ffeba11",
+  "preread_plan_sha256": "f6b5015ce49e0b4e12a0052bf6699653a5f058a9fb3357a565f01139ac95ac84",
+  "status": "source_fidelity_supported_kernel_unverified",
+  "independence": "Reviewer did not author candidate; prior derivation and transport source known. Preserved preread plan predates successor inspection.",
+  "checks": [
+    {
+      "declaration": "branch_scalar / branch_affine_eval",
+      "finding": "Actual affine quotient evaluation sends constants to themselves and xbar to a. Ring-hom extensionality identifies polynomial evaluation at a."
+    },
+    {
+      "declaration": "rho_unit_iff",
+      "finding": "The inverse branch equivalence preserves units. IsLocalization.AtPrime.isUnit_to_map_iff identifies units with the prime complement; branchIdeal is definitionally the kernel of branchEval. No arbitrary unit premise is supplied."
+    },
+    {
+      "declaration": "polynomial_germ_unit_iff",
+      "finding": "Combines actual evaluator transport, localization units and polynomial residue evaluation. This establishes the residual-unit bridge."
+    },
+    {
+      "declaration": "polynomial_germ_order",
+      "finding": "Requires g nonzero. Uses exact mathlib quotient by (X-C a)^rootMultiplicity, whose evaluation is nonzero, and the actual X-C a stalk order 2. AddValuation.map_pow is additive nsmul, then nsmul_eq_mul converts to ENat multiplication."
+    },
+    {
+      "declaration": "polynomial_germ_order_nat",
+      "finding": "Retains a non-top conjunct before toNat and derives the finite Nat value. Does not mask zero-germ infinity."
+    },
+    {
+      "declaration": "support_base_multiplicity_sum",
+      "finding": "Derives all three support polynomials nonzero by contradiction with finite stalk sum. Substitutes generic valuations, takes toNat only on finite natural casts, and cancels the factor 2 to obtain sum 1."
+    }
+  ],
+  "attacks": [
+    {
+      "case": "Zero polynomial",
+      "finding": "Excluded by hg in generic order statements; zero factors excluded by proof in support theorem."
+    },
+    {
+      "case": "Constant nonzero / higher powers",
+      "finding": "Derivation gives valuation 0 for units and 2m for (X-C a)^m. No unsupported restriction to simple roots of g."
+    },
+    {
+      "case": "Residual root",
+      "finding": "Excluded using eval_divByMonic_pow_rootMultiplicity_ne_zero, not by assumption."
+    },
+    {
+      "case": "Singular branch",
+      "finding": "Derivative nonzero remains explicit for order claims; unit criterion itself does not need smoothness."
+    },
+    {
+      "case": "Infinity and casts",
+      "finding": "ENat equality is established first. toNat result includes non-top, and support arithmetic is over finite casts."
+    },
+    {
+      "case": "Characteristic two",
+      "finding": "Local formula does not claim a separable double cover or distinct conjugates. Those interpretations remain outside scope."
+    },
+    {
+      "case": "Source specialization",
+      "finding": "New support theorem is generic in a polynomial norm premise. Exact coefficientData source theorem can be composed with it, but this file does not add a dedicated source-specific wrapper."
+    }
+  ],
+  "compiler_invoked": false,
+  "fresh_axiom_readback": false,
+  "full_import_closure_bound": false,
+  "remaining": [
+    "Exact compilation and independent seven-name axiom readback with complete import bindings.",
+    "Optional direct coefficientData specialization of support_base_multiplicity_sum.",
+    "Global divisor and infinity components remain separate."
+  ],
+  "knowledge": "Primary local mathlib polynomial/localization/additive-valuation APIs and branch-DVR definitions; KB unavailable as recorded in preread plan."
+}

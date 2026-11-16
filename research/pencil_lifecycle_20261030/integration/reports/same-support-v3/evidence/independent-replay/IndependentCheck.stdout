@@ -1,0 +1,46 @@
+SameSupportCandidate.weighted_valid_inputs_exclude_same_support_error.{u_1} {K : Type u_1} [Field K] [DecidableEq K]
+  (f : Polynomial K) (q1 r1 s1 t1 z1 w1 q2 r2 s2 t2 z2 w2 : K) (hz1 : z1 ≠ 0) (hz2 : z2 ≠ 0) (hw1 : w1 ≠ 0)
+  (hw2 : w2 ≠ 0) (hodd : 2 ≠ 0)
+  (valid1 :
+    Polynomial.X ^ 2 + Polynomial.C (q1 / z1 ^ 2) * Polynomial.X + Polynomial.C (r1 / z1 ^ 4) ∣
+      f - (Polynomial.C (s1 / (z1 ^ 3 * w1)) * Polynomial.X + Polynomial.C (t1 / (z1 ^ 5 * w1))) ^ 2)
+  (valid2 :
+    Polynomial.X ^ 2 + Polynomial.C (q2 / z2 ^ 2) * Polynomial.X + Polynomial.C (r2 / z2 ^ 4) ∣
+      f - (Polynomial.C (s2 / (z2 ^ 3 * w2)) * Polynomial.X + Polynomial.C (t2 / (z2 ^ 5 * w2))) ^ 2)
+  (hQ : q1 * z2 ^ 2 = q2 * z1 ^ 2) (hR : r1 * z2 ^ 4 = r2 * z1 ^ 4) :
+  ProjectiveLawRuntime.classifySameU22 (s1 * z2 ^ 3 * w2) (t1 * z2 ^ 5 * w2) (s2 * z1 ^ 3 * w1) (t2 * z1 ^ 5 * w1) ≠
+    ProjectiveLawRuntime.Branch22Prelude.sameUMixedZeroSlope
+'SameSupportCandidate.weighted_valid_inputs_exclude_same_support_error' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+SameSupportCandidate.cross_scale.{u_1} {K : Type u_1} [Field K] (x z1 z2 w1 w2 : K) (n : ℕ) (hz1 : z1 ≠ 0)
+  (hw1 : w1 ≠ 0) : x * z2 ^ n * w2 = (z1 * z2) ^ n * (w1 * w2) * (x / (z1 ^ n * w1))
+'SameSupportCandidate.cross_scale' depends on axioms: [propext, Classical.choice, Quot.sound]
+SameSupportCandidate.validity_coefficients.{u_1} {K : Type u_1} [Field K] (f : Polynomial K) (q r s1 t1 s2 t2 : K)
+  (valid1 :
+    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+      f - (Polynomial.C s1 * Polynomial.X + Polynomial.C t1) ^ 2)
+  (valid2 :
+    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+      f - (Polynomial.C s2 * Polynomial.X + Polynomial.C t2) ^ 2)
+  (hs : s1 = s2) : (t2 - t1) * (s1 + s2) = 0 ∧ (t2 - t1) * (t2 + t1) = 0
+'SameSupportCandidate.validity_coefficients' depends on axioms: [propext, Classical.choice, Quot.sound]
+SameSupportCandidate.valid_inputs_exclude_same_support_error.{u_1} {K : Type u_1} [Field K] [DecidableEq K]
+  (f : Polynomial K) (q r s1 t1 s2 t2 : K) (hodd : 2 ≠ 0)
+  (valid1 :
+    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+      f - (Polynomial.C s1 * Polynomial.X + Polynomial.C t1) ^ 2)
+  (valid2 :
+    Polynomial.X ^ 2 + Polynomial.C q * Polynomial.X + Polynomial.C r ∣
+      f - (Polynomial.C s2 * Polynomial.X + Polynomial.C t2) ^ 2) :
+  ProjectiveLawRuntime.classifySameU22 s1 t1 s2 t2 ≠ ProjectiveLawRuntime.Branch22Prelude.sameUMixedZeroSlope
+'SameSupportCandidate.valid_inputs_exclude_same_support_error' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ProjectiveLawRuntime.classifySameU22_ne_zeroSlope.{u_1} {K : Type u_1} [Field K] [DecidableEq K] (s₁ t₁ s₂ t₂ : K)
+  (hodd : 2 ≠ 0) (hx : (t₂ - t₁) * (s₁ + s₂) = 0) (hc : (t₂ - t₁) * (t₂ + t₁) = 0) :
+  ProjectiveLawRuntime.classifySameU22 s₁ t₁ s₂ t₂ ≠ ProjectiveLawRuntime.Branch22Prelude.sameUMixedZeroSlope
+'ProjectiveLawRuntime.classifySameU22_ne_zeroSlope' depends on axioms: [propext, Classical.choice, Quot.sound]
+ProjectiveLawBoundary.same_u_zero_slope_delta_is_inverse.{u_1} {K : Type u_1} [Field K] (s t₁ t₂ : K) (hodd : 2 ≠ 0)
+  (hneq : t₂ ≠ t₁) (hx : (t₂ - t₁) * (2 * s) = 0) (hc : (t₂ - t₁) * (t₂ + t₁) = 0) : s = 0 ∧ t₂ = -t₁
+'ProjectiveLawBoundary.same_u_zero_slope_delta_is_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]

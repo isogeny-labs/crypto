@@ -1,0 +1,13 @@
+{
+  "schema": "quartic-affine-cell-inputs/v1",
+  "actual_fixture": "research/advance/instances/n83-d18-m5-T001-offset0.json",
+  "historical_profile": "research/advance/n83_five_divisor_profile.json",
+  "cell_rule": "First historical profile row only; h=0x4208336d0d441df79c400,k=0; no replacement",
+  "strata": ["unshifted H", "H(X+b), b=e1(H) fixed admitted constant in V"],
+  "raw_parameter_order": "r bits0..82, s bits83..165",
+  "expected_relaxation": {"rank":93,"nullity":73},
+  "small_controls": {"fields":[[3,11],[4,19]],"domain_dimensions":[1,2],"h":[0,1,4],"k":[0,1],"target":[0,1],"curve_A":0,"curve_B":1,"direct_parameter_states":3840},
+  "budgets": {"raw_columns":166,"reduced_columns":100,"rows_per_stage":500,"predicates":200000,"seconds":90,"memory_mb":4096,"cores":1},
+  "artifacts": ["raw-controls.json.gz","raw-profile.json.gz"],
+  "claim_scope": "Exact conditional coefficient parameter families only; no original/global all-root completeness or speed claim"
+}

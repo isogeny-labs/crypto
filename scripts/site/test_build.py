@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import os
 import re
 import tempfile
@@ -138,6 +139,7 @@ class BuildTests(unittest.TestCase):
         # same data, every point must have a row in the "every plotted point"
         # table, and the file's `updated` date is never older than its
         # newest point.
+        import html
         import json
 
         page = read(os.path.join(ROOT, "docs", "index-calculus-scoreboard.html"))
@@ -148,13 +150,27 @@ class BuildTests(unittest.TestCase):
 
         table = re.search(r"<summary>Every plotted point as a table</summary>(.*?)</details>", page, re.S)
         self.assertIsNotNone(table, "the progress panel has no plotted-point table")
-        rows = table.group(1)
+        rows = re.findall(r"<tr><td>.*?</tr>", table.group(1), re.S)
+        self.assertEqual(len(rows), sum(len(series["points"]) for series in timeline["series"]))
         newest = None
         for series in timeline["series"]:
             for point in series["points"]:
                 newest = max(newest or point["date"], point["date"])
-                anchor = re.escape(point["anchor"])
-                self.assertRegex(rows, rf'<tr><td>{point["date"]}</td>.*?href="{anchor}".*?</tr>', f"no table row for the {point['date']} point anchored at {point['anchor']} in series {series['id']}")
+                matching = [row for row in rows
+                            if row.startswith(f'<tr><td>{point["date"]}</td>')
+                            and f'<td>{series["label"]}<br>' in html.unescape(row)
+                            and f'<td>{point["label"]}<br>' in html.unescape(row)
+                            and f'href="{point["anchor"]}"' in html.unescape(row)]
+                self.assertEqual(len(matching), 1, f"missing or duplicate table row for {series['id']}: {point['label']}")
+                row = matching[0]
+                shown_value = re.search(r'<td class="n">([^<]+)&times;', row)
+                self.assertIsNotNone(shown_value)
+                self.assertEqual(float(shown_value.group(1)), point["value"])
+                for text in (point["detail"], point["reference"], point["class"], series["note"]):
+                    self.assertIn(text, html.unescape(row))
+                if "unit" in point:
+                    self.assertIn(point["unit"], html.unescape(row))
+                self.assertIn(f'href="{point["source"]}"', html.unescape(row))
         self.assertGreaterEqual(timeline["updated"], newest, "progress-timeline.json `updated` is older than its newest point")
 
     def test_leaderboard_absolute_operations_and_history_match_frozen_sources(self):
@@ -514,15 +530,83 @@ class BuildTests(unittest.TestCase):
         # tree. The workflow that runs them is path-filtered, so a document
         # it does not list can change without the pins running, and the page
         # drifts from what it cites until the next site edit. Keep every
-        # document a pin reads in both the pull_request and push filters.
+        # document a pin reads in both filters. PRs validate the site with
+        # read-only permissions; the publish job excludes PR events.
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
         cited = ("ecc2k130/LAMBDA-PROJECTIVE.md", "ecc2k130/aws/README.md")
-        for trigger in ("pull_request", "push"):
+        self.assertNotRegex(workflow, r"(?m)^  pull_request_target:")
+        self.assertRegex(workflow, r"(?m)^  pull_request:")
+        permissions = re.search(r"^permissions:\n((?:  .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(permissions)
+        self.assertIn("contents: read", permissions.group(1))
+        self.assertNotIn("write", permissions.group(1))
+        test_job = re.search(r"^  test:\n((?:    .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(test_job)
+        self.assertNotRegex(test_job.group(1), r"actions/(?:deploy-pages|upload-pages-artifact)@")
+        publish = re.search(r"^  publish:\n((?:    .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(publish)
+
+        def runs(job, context):
+            # YAML folding and optional expression wrappers must not change
+            # what this security boundary tests: PRs validate, never publish.
+            condition = re.search(r"^    if:[ \t]*(.*)$", job, re.M)
+            self.assertIsNotNone(condition, "job has no scheduling condition")
+            expression = condition.group(1).strip()
+            if expression in (">", ">-", "|", "|-"):
+                chunks = []
+                for line in job[condition.end():].splitlines():
+                    if not line.strip():
+                        continue
+                    if not line.startswith("      "):
+                        break
+                    chunks.append(line.strip())
+                expression = " ".join(chunks)
+            if expression.startswith("${{") and expression.endswith("}}"):
+                expression = expression[3:-2].strip()
+            for key, value in context.items():
+                expression = expression.replace(key, repr(value))
+            expression = expression.replace("&&", " and ").replace("||", " or ")
+            expression = re.sub(r"!(?!=)", " not ", expression).strip()
+            tree = ast.parse(expression, mode="eval")
+            allowed = (
+                ast.Expression, ast.BoolOp, ast.UnaryOp, ast.Compare,
+                ast.And, ast.Or, ast.Not, ast.Eq, ast.NotEq, ast.Constant,
+            )
+            self.assertTrue(all(isinstance(node, allowed) for node in ast.walk(tree)))
+            return eval(compile(tree, "<workflow condition>", "eval"), {"__builtins__": {}})
+
+        for event in ("pull_request", "pull_request_target", "push", "schedule",
+                      "release", "workflow_dispatch", "merge_group"):
+            for draft in (False, True):
+                for ref in ("refs/heads/main", "refs/heads/feature"):
+                    for connection_check in (False, True):
+                        context = {
+                            "github.event_name": event,
+                            "github.event.pull_request.draft": draft,
+                            "github.ref": ref,
+                            "inputs.source_connection_check": connection_check,
+                        }
+                        with self.subTest(**context):
+                            self.assertIs(
+                                runs(test_job.group(1), context),
+                                event == "pull_request" and not draft,
+                            )
+                            self.assertIs(
+                                runs(publish.group(1), context),
+                                not draft and not connection_check and (
+                                    event in ("schedule", "workflow_dispatch")
+                                    or (event == "push" and ref == "refs/heads/main")
+                                ),
+                            )
+        self.assertRegex(workflow, r"(?m)^  workflow_dispatch:")
+        for trigger in ("push", "pull_request"):
             # The trigger's block is everything indented deeper than its key,
             # up to the next key at the same depth (the triggers are adjacent,
             # with no blank line between them) or the next top-level key.
             match = re.search(r"^  %s:\n((?:    .*\n|\n)*)" % trigger, workflow, re.M)
             self.assertIsNotNone(match, "no %s trigger in the status workflow" % trigger)
+            if trigger == "push":
+                self.assertIn("branches: [main]", match.group(1))
             paths = re.findall(r'-\s+"([^"]+)"', match.group(1))
             self.assertIn("docs/ecc2k130-status/**", paths, trigger)
             for doc in cited:
@@ -913,14 +997,27 @@ class BuildTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("build_lab_browser", os.path.join(ROOT, "scripts", "build_lab_browser.py"))
         builder = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(builder)
-        fresh = builder.build()
-        committed = read(os.path.join(ROOT, "docs", "browser", "data.json"))
         source = builder.RepositoryInputs(ROOT)
-        # Mention statistics are volatile (see builder.comparable); the rest
-        # must match a fresh build exactly.
-        self.assertEqual(builder.comparable(json.loads(committed)), builder.comparable(fresh), "docs/browser/data.json is stale; run python3 scripts/build_lab_browser.py")
-
+        committed = read(os.path.join(ROOT, "docs", "browser", "data.json"))
         data = json.loads(committed)
+        if data.get("native_campaign"):
+            # The native producer checks every generated byte and its pinned
+            # historical inputs. Do not recompute native sessions in Python.
+            import subprocess
+
+            result = subprocess.run(
+                ["cargo", "+1.98.0", "run", "--release", "--locked", "--manifest-path",
+                 "research/ecbench_open_questions_20261014/native-publish/Cargo.toml", "--", "--check"],
+                cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True, timeout=180,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout[-12000:])
+        else:
+            fresh = builder.build()
+            # Historical mention statistics are volatile; all other fields
+            # still have to match their own producer exactly.
+            self.assertEqual(builder.comparable(data), builder.comparable(fresh), "docs/browser/data.json is stale; run python3 scripts/build_lab_browser.py")
+
         registry = json.loads(read(os.path.join(ROOT, "docs", "curves", "registry.json")))
         slugs = {c["slug"] for c in data["curves"]}
         self.assertEqual(slugs, {c["slug"] for c in registry["curves"]}, "every registered curve and no other")
@@ -997,9 +1094,11 @@ class WorkflowTests(unittest.TestCase):
 
     def test_site_sources_trigger_the_workflow(self):
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
-        for path in ('"docs/site/**"', '"scripts/site/**"', '"docs/index-calculus-scoreboard.html"', '"docs/browser/**"', '"docs/backend-leaderboard/**"', '"scripts/build_lab_browser.py"'):
-            # Once for pull_request, once for push.
-            self.assertEqual(workflow.count(path), 2, path)
+        push = re.search(r"^  push:\n((?:    .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(push, "site changes need a main-push publication trigger")
+        paths = re.findall(r'^\s+-\s+"([^"]+)"', push.group(1), re.M)
+        for path in ('docs/site/**', 'scripts/site/**', 'docs/index-calculus-scoreboard.html', 'docs/browser/**', 'docs/backend-leaderboard/**', 'scripts/build_lab_browser.py'):
+            self.assertIn(path, paths)
 
 
 if __name__ == "__main__":

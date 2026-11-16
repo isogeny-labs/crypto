@@ -1,0 +1,39 @@
+import S3Completion
+import StructuralAudit
+import FrobeniusCore
+import MultiplicityControl
+import DegreeControl
+
+#print axioms TheoremAudit.S3_repeated_identity
+#print axioms TheoremAudit.S3_repeated_factor
+#print axioms TheoremAudit.S3_repeated_root_iff
+#print axioms TheoremAudit.S3_two_torsion_no_root
+#print axioms TheoremAudit.pointX_neg
+#print axioms TheoremAudit.pointX_double
+#print axioms TheoremAudit.S3_repeated_mathlib_iff
+#print axioms TheoremAudit.S3_signed_zero_sum_iff
+#print axioms TheoremAudit.zero_sum_pointX_iff
+#print axioms TheoremAudit.S3_pointX_iff
+#print axioms TheoremAudit.S3_zero_iff_exists_points
+#print axioms TheoremAudit.cyclic_restriction_trivial
+#print axioms TheoremAudit.sum_confined
+#print axioms TheoremAudit.outside_subgroup_not_smooth
+#print axioms TheoremAudit.branch_collision_mass
+#print axioms TheoremAudit.minus_one_embedding_order
+#print axioms TheoremAudit.trace_zero_prime_embedding_degree
+#print axioms TheoremAudit.two_subgroup_embedding_degree
+#print axioms TheoremAudit.stable_branch_locus_excludes_diem
+#print axioms TheoremAudit.short_branch_locus_stable
+#print axioms TheoremAudit.triangular_iterate
+#print axioms TheoremAudit.geometric_sum_identity
+#print axioms TheoremAudit.triangular_iterate_identity_iff
+#print axioms TheoremAudit.unipotent_not_identity
+#print axioms TheoremAudit.double_root_quotient_dimension
+#print axioms TheoremAudit.double_root_support_size
+#print axioms TheoremAudit.double_root_multiplicity_mass
+#print axioms TheoremAudit.control_X0_in_degree3_span
+#print axioms TheoremAudit.control_X1_in_degree3_span
+#print axioms TheoremAudit.control_variables_are_gb
+#print axioms TheoremAudit.control_degree3_rows_suffice
+#print axioms TheoremAudit.control_all_rows_degree_le_three
+#print axioms TheoremAudit.control_degree2_rejected

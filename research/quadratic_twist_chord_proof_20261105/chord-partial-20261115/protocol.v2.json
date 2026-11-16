@@ -1,0 +1,1246 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-chord-partial-20261115",
+  "version": 2,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_chord_proof_20261105/chord-partial-20261115",
+  "authors": [
+    "producer"
+  ],
+  "question": "Does exact early-zero Euclid stopping restore diagonal coverage and improve named chord Bezout-degree admission/cold original recovery while retaining the full strongest-source frontier?",
+  "claims": [
+    {
+      "id": "row-degree-frontier",
+      "text": "Named partial chord degree/rank frontier with actual original-source scalar recovery; null retained",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Intrinsic regularity, original S3 pullback degree, total cost and speed are outside scope",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "produce-A",
+      "role": "candidate",
+      "description": "produce-A over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "audit-A",
+      "role": "reference",
+      "description": "audit-A over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "produce-B",
+      "role": "control_aa",
+      "description": "produce-B over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "audit-B",
+      "role": "control_aa",
+      "description": "audit-B over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "audit-positive",
+      "role": "control_positive",
+      "description": "audit-positive over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "compare-baseline",
+      "role": "candidate",
+      "description": "compare-baseline with exact pinned earlier baseline; no baseline answers feed solver",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-source",
+      "role": "control_negative",
+      "description": "mutate-source over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "reject-source over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-map",
+      "role": "control_negative",
+      "description": "mutate-map over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-map",
+      "role": "control_negative",
+      "description": "reject-map over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-missing-case",
+      "role": "control_negative",
+      "description": "mutate-missing-case over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-missing-case",
+      "role": "control_negative",
+      "description": "reject-missing-case over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-cap",
+      "role": "control_negative",
+      "description": "mutate-cap over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-cap",
+      "role": "control_negative",
+      "description": "reject-cap over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-columns",
+      "role": "control_negative",
+      "description": "mutate-columns over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-columns",
+      "role": "control_negative",
+      "description": "reject-columns over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-rank",
+      "role": "control_negative",
+      "description": "mutate-rank over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-rank",
+      "role": "control_negative",
+      "description": "reject-rank over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-missing-failed-query",
+      "role": "control_negative",
+      "description": "mutate-missing-failed-query over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-missing-failed-query",
+      "role": "control_negative",
+      "description": "reject-missing-failed-query over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-witness",
+      "role": "control_negative",
+      "description": "mutate-witness over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-witness",
+      "role": "control_negative",
+      "description": "reject-witness over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-root",
+      "role": "control_negative",
+      "description": "mutate-root over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-root",
+      "role": "control_negative",
+      "description": "reject-root over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-log",
+      "role": "control_negative",
+      "description": "mutate-log over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-log",
+      "role": "control_negative",
+      "description": "reject-log over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-scalar",
+      "role": "control_negative",
+      "description": "mutate-scalar over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-scalar",
+      "role": "control_negative",
+      "description": "reject-scalar over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-row",
+      "role": "control_negative",
+      "description": "mutate-row over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-row",
+      "role": "control_negative",
+      "description": "reject-row over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-diagonal",
+      "role": "control_negative",
+      "description": "mutate-diagonal over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-diagonal",
+      "role": "control_negative",
+      "description": "reject-diagonal over complete declared3024 configuration bundle",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "mutate-baseline-binding",
+      "role": "control_negative",
+      "description": "mutate-baseline-binding with exact pinned earlier baseline; no baseline answers feed solver",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 3024
+      }
+    },
+    {
+      "id": "reject-baseline-binding",
+      "role": "control_negative",
+      "description": "reject-baseline-binding with exact pinned earlier baseline; no baseline answers feed solver",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+        "build": null,
+        "binary_sha256": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25",
+        "threads": 1,
+        "flags": {
+          "binary": "auditor",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 3024
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "audit-positive",
+      "expected_detection": "Fresh independent audit accepts exact full partial/cold-recovery bundle",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-source",
+      "null_population": {
+        "description": "All13 original semantic mutations plus one exact baseline-byte binding mutation",
+        "generator": "Native C++ mutation modes in frozen order",
+        "n": 14,
+        "why_n": "Complete declared main and comparison corruption coverage, not statistical sampling",
+        "matched_on": [
+          "same original bundle",
+          "all untargeted fields",
+          "rehash rule"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "bounded C++ chord solver",
+          "independent Rust pair/polynomial/scalar reference"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "fixture",
+        "treatment": "fixed",
+        "value": "E37(7,19),T37(28,33),r19 actual finite route",
+        "how": "Native independent field/group route checks"
+      },
+      {
+        "name": "policy_encoding_cap",
+        "treatment": "fixed",
+        "value": "336 ordered policies x caps0..8, partial distinct/diagonal branches",
+        "how": "Complete nested native loops, unchanged after data"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "A",
+          "B"
+        ],
+        "how": "Fresh full executions"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "produce-A",
+          "audit-A",
+          "produce-B",
+          "audit-B",
+          "audit-positive",
+          "compare-baseline",
+          "mutate-source",
+          "reject-source",
+          "mutate-map",
+          "reject-map",
+          "mutate-missing-case",
+          "reject-missing-case",
+          "mutate-cap",
+          "reject-cap",
+          "mutate-columns",
+          "reject-columns",
+          "mutate-rank",
+          "reject-rank",
+          "mutate-missing-failed-query",
+          "reject-missing-failed-query",
+          "mutate-witness",
+          "reject-witness",
+          "mutate-root",
+          "reject-root",
+          "mutate-log",
+          "reject-log",
+          "mutate-scalar",
+          "reject-scalar",
+          "mutate-row",
+          "reject-row",
+          "mutate-diagonal",
+          "reject-diagonal",
+          "mutate-baseline-binding",
+          "reject-baseline-binding"
+        ],
+        "how": "Fixed dependency order, no timing metric"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "audit-A",
+          "audit-B",
+          "audit-positive",
+          "reject-source",
+          "reject-map",
+          "reject-missing-case",
+          "reject-cap",
+          "reject-columns",
+          "reject-rank",
+          "reject-missing-failed-query",
+          "reject-witness",
+          "reject-root",
+          "reject-log",
+          "reject-scalar",
+          "reject-row",
+          "reject-diagonal",
+          "reject-baseline-binding"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exact original full population replay,13 main false payloads and false baseline binding reject101/no receipt; previous diagonal requirement retained"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "produce-A",
+          "produce-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "domain": "actual cyclic r19 source and twist subgroups only",
+        "check": "19 point/inverse images and361 addition pairs; every recovered scalar verified on original E/P"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Full finite declared bundle, no independent challenge/statistical significance interpretation; prior geometry data known, new partial solver unseen."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 10,
+      "threads": 1,
+      "estimated_total_seconds": 300,
+      "measured_on": "Unmeasured pre-data engineering estimate300s for entire declared bundle; actual600s per stage and3600s outer limits control completion, not an asserted timing result"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "original_recoveries",
+        "name": "original_recoveries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Actual original scalar checks, repeated target workloads",
+        "source": "*.receipt.json original_recoveries",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "blocked_setups",
+        "name": "blocked_setups",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Cold rank-deficient setups, retained",
+        "source": "*.receipt.json blocked_setups",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "partial_branch_queries",
+        "name": "partial_branch_queries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "One certified/one unknown diagnostic query",
+        "source": "*.receipt.json partial_branch_queries",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "unmatched_actual_degree_rank_pairs",
+        "name": "unmatched_actual_degree_rank_pairs",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Strict unmatched actual expanded-degree/useful-rank pairs",
+        "source": "*.receipt.json unmatched_actual_degree_rank_pairs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "strongest_source_frontier_extensions",
+        "name": "strongest_source_frontier_extensions",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Undominated strict degree/rank records against all eligible source policies/caps",
+        "source": "*.receipt.json strongest_source_frontier_extensions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "new_recoveries_same_policy_and_cap",
+        "name": "new_recoveries_same_policy_and_cap",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "New recoveries versus pinned first instrument at identical policy/cap",
+        "source": "comparison.json new_recoveries_same_policy_and_cap",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "lost_recoveries_same_policy_and_cap",
+        "name": "lost_recoveries_same_policy_and_cap",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Losses retained at identical policy/cap",
+        "source": "comparison.json lost_recoveries_same_policy_and_cap",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "diagnostic_rank_gain_cells",
+        "name": "diagnostic_rank_gain_cells",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Strict useful-rank gains under identical policy/query/cap",
+        "source": "comparison.json diagnostic_rank_gain_cells",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "diagnostic_rank_loss_cells",
+        "name": "diagnostic_rank_loss_cells",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Strict useful-rank losses retained",
+        "source": "comparison.json diagnostic_rank_loss_cells",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "original_recoveries",
+      "blocked_setups",
+      "partial_branch_queries",
+      "unmatched_actual_degree_rank_pairs",
+      "strongest_source_frontier_extensions",
+      "new_recoveries_same_policy_and_cap",
+      "lost_recoveries_same_policy_and_cap",
+      "diagnostic_rank_gain_cells",
+      "diagnostic_rank_loss_cells"
+    ],
+    "record": [
+      "actual source commit",
+      "binary hashes",
+      "commands",
+      "all exits/logs/raw/false payloads",
+      "checkpoint head",
+      "declared caps"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "placement": {
+      "outer_seconds": 3600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Complete34 declared native processes or stop on first unexpected failure/inapplicable control/mismatch; preserve all original failed instrument data",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Exact full replay/controls first; report finite strongest-source frontier extensions or honest null; no speed/general conclusion",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "All13 main false payloads and false baseline binding reject101/no receipt; exact full replay first, instrument comparison secondary/unblinded and strongest-source null preserved",
+    "statistic": "Exact finite degree/rank Pareto dominance after actual cold recovery",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact defects, no statistical effect size",
+    "verdict_vocabulary": [
+      "finite_frontier_extension_unsigned",
+      "finite_null_unsigned",
+      "invalid",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "auditor-v2/audit.rs",
+      "sha256": "9a5e73d00fe6c4a40842c1afebae349d2cb496b0156e0ec68fcbe800c0e553c1"
+    },
+    "inputs": [
+      "A.json",
+      "B.json",
+      "all thirteen false payloads",
+      "exact native source/protocol pins",
+      "Pinned earlier A.json d6c259..."
+    ],
+    "outputs": [
+      "A.receipt.json",
+      "B.receipt.json",
+      "positive.receipt.json",
+      "all exits/logs",
+      "comparison.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Native source/twist/matched/pullback recovery and partial degree/rank frontier counts",
+      "Native comparison improvement/loss by identical policy/cap, role and minimum named degree"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Use reference pair enumeration to supply candidate stopping/roots",
+    "Admit an uncertified branch root",
+    "Hide diagonal/O/failed branches or blocked setups",
+    "Read target scalar labels in recovery",
+    "Call chord expanded degree original S3 pullback degree or intrinsic regularity",
+    "Free log/setup caching between cold targets",
+    "Select favorable policy/cap prefix",
+    "Upload denied raw archives or use credentials/paid resources"
+  ],
+  "literature": [
+    {
+      "ref": "../Chord.lean and parent chord preflight ALGORITHM.md",
+      "provenance": "internal",
+      "claim": "Source-only chord/remainder formulas, distinct/diagonal obligations; no fresh Lean claim"
+    },
+    {
+      "ref": "https://arxiv.org/abs/1503.08001v2 sections2/4/5",
+      "provenance": "retrieved",
+      "claim": "Named solving degree separated from intrinsic regularity and first fall"
+    },
+    {
+      "ref": "../../quadratic_twist_evidence_20261021/lean-cm8-37/CM8ThirtySeven.lean",
+      "provenance": "internal",
+      "claim": "Actual historical F37 subgroup map/inverse only"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "existing-gcd-stop",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": true,
+      "reason": "First instrument completed positive replays but diagonal mutation inapplicable; avoid unnecessary witness for zero remainder",
+      "changes": [
+        "New separately named/versioned sources and dataset schema, no original source/data changes",
+        "Stop with existing gcd multipliers when remainder zero, all original witness/bound/reduction/root/diagonal checks retained",
+        "Entire original policy/cap/target scope repeated; source baseline gets same correction",
+        "Add exact unblinded baseline comparison and changed-baseline rejection"
+      ],
+      "supersedes_fields": [
+        "arms",
+        "analysis_plan",
+        "extensions"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "9326bd66d99ac4f1855deaed6d91d2d817c4e2b1bee6aa044c76339c55d43206",
+    "commit": "b3aa71b33331f567e9b7d3f7b3eb53d1bc06e5cd",
+    "frozen_at": "2026-11-15T05:28:16Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "checkpoint": "Explicit user-selected connected GitHub exact published source with fresh<=60s receipt, clean branch; no S3 claim",
+    "canonical_tool_commit": "0ca36c9d5b49f2fcba56f79a51456a715b7aae5e",
+    "modes": [
+      "source",
+      "map",
+      "missing-case",
+      "cap",
+      "columns",
+      "rank",
+      "missing-failed-query",
+      "witness",
+      "root",
+      "log",
+      "scalar",
+      "row",
+      "diagonal"
+    ],
+    "configurations": 3024,
+    "diagnostic_cells": 57456,
+    "original_target_attempts": 54432,
+    "coefficient_field": 19,
+    "curve_field": 37,
+    "degree_scope": "Expanded Bezout witness in stated chord generators, not original S3 pullback or matrix degree",
+    "binary_pins": {
+      "producer": "20036dffbfe3cbd20c0fcc4d59cea12abdfba3a80205d16e8bdc620a93ab4fc0",
+      "auditor": "d96687e52c030a2080eb7e976d1e84e943de3974385b96ee56cbe843f5e01c25"
+    },
+    "fixture_source_data_seen": "Historical F37 source/twist and completed geometry known; no new chord solver paths executed",
+    "resource_window": "Same focused<=3600s window beginning05:20Z2026-11-15; original v1 run complete, no processes in flight",
+    "baseline_sha256": "d6c259263d09593082fd49d840dcac17371a8e42df9a64ceab4a4d218bb1779b",
+    "baseline_control_plan_passed": false,
+    "baseline_status": "First semantic replay passed, last mandatory diagonal mutation inapplicable; whole plan not accepted"
+  }
+}

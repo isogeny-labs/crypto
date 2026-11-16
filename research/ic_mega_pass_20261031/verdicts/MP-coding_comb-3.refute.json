@@ -1,0 +1,9 @@
+{
+ "idea_id": "MP-coding_comb-3",
+ "skeptic_lens": "mathematical refutation",
+ "verdict": "refuted",
+ "confidence": 0.93,
+ "reason": "(1) Identity kill: for any true tuple S4^Z(x)=0 mod p, so floor(S4^Z/p) mod q = p^{-1}*S4^Z(x mod q) mod q exactly -- a deterministic function of the candidate's own residues mod q, true for every tuple with S4==0 mod p. There is no fixed target value, so the 'filter' accepts every candidate (pruning ratio 1); it is a consequence of membership, not a constraint independent of it. Checking it still requires the full S4 mod p membership test, so the algorithm is group-op/list-merge plus S4 membership => CGK/generic bound applies; at best constant factor, actually zero gain. (2) Measured: p=16789567, y^2=x^3+3x+7, n=2e4 (true sums R=P1+P2+P3 and random), MI(carry mod q; top-2-bit halves of x1,x2) vs shuffle null mean+-sd: true q3 0.00063 vs 0.00116+-0.00025, q5 0.00148 vs 0.00214+-0.00041, q7 0.00156 vs 0.00154+-0.00033; random q3 0.00132 vs 0.00107+-0.00019, q5 0.00172 vs 0.00227+-0.00042, q7 0.00325 vs 0.00322+-0.00038. All within 2 sigma of null, far below 0.05 bit prediction. (3) Representation dependence is not non-generic use: integer lift mod q is unrelated to group law (p,q coprime, CRT independence), so carry is equidistributed by Weil/equidistribution of polynomial values; BCJ needs a sum-consistent (homomorphic) filter which this is not. Scope: kills carry-mod-q filters on S_m for prime p; does not touch representations with genuine homomorphic filters (scalar reps, hal-02427655, closed_known).",
+ "fix": "",
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-coding_comb-3.refute.json"
+}

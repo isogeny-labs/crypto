@@ -1,0 +1,28 @@
+\documentclass[10pt]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\begin{document}
+\section*{Repeated-support tripling: weighted field branch}
+\textbf{Result.} Six compiled declarations connect the source repeated-support guards to the exact six-field tripling output and normalized Mumford validity. The final theorem uses original point/divisor validity and source guards; it assumes no intermediate or output validity and no nonzero derivative.
+
+\begin{center}\fbox{Original valid weighted point and divisor}\par $\downarrow$\par
+\fbox{Outer $K=0$, cancellation false, other support equal}\par $\downarrow$\par
+\fbox{$2\ne0$, $y\ne0$, $k=8y^3\ne0$, repeated normalized support}\par $\downarrow$\par
+\fbox{Exact weighted source normalization}\par $\downarrow$\par
+\fbox{Hermite identity and valid reduced output}\end{center}
+
+\textbf{Assumptions.} An arbitrary field, the monic quintic $f(T)=T^5+a_3T^3+a_2T^2+a_1T+a_0$, original normalized degree-one and degree-two divisibility, four nonzero representation weights, outer raw $K=0$, cancellation comparison false, and equal cross-scaled other coordinate. The positive ordinate alternative is derived. The equal-coordinate condition gives normalized support $(T-x)^2$; cancellation failure excludes characteristic two and zero original ordinate.
+
+\textbf{Construction.} Put $m=f'(x)/(2y)$ and $A=(10x^3+3a_3x+a_2-m^2)/(2y)$. Define $h(T)=A(T-x)^2+m(T-x)+y$, $q=3x-A^2$, and $r=a_3-2A(m-2Ax)+3x(q-x)$. The checked polynomial identity is
+\[f-h^2=(T-x)^3(T^2+qT+r),\]
+under the original point equation. The output ordinate is
+\[v=(Aq-(m-2Ax))T+Ar-(y-mx+Ax^2).\]
+Since $h+v=A(T^2+qT+r)$, the reduced support divides $f-v^2$.
+
+\textbf{Source correspondence.} rawOutput reproduces triple lines285--345 of the retained Rust source, including its fp, fpp, k, aa, bb, cc and six returned fields. raw\_normalizes proves their weighted normalization equals the construction above and that both returned weights are nonzero. source\_repeated\_preserves connects this to mixed dispatcher lines828--878. The source returns a degree-two result unconditionally on this selected path.
+
+\textbf{Validation.} Main attempt4 and separate readback pass; all six declarations use only propext, Classical.choice and Quot.sound. Full nonunit rational fixtures invoke the original-input theorem for $f=T^5-T+1$ and $f=T^5+1$ at normalized $(0,1)$ with repeated support. The second has zero first and second derivatives and produces normalized $(q,r,s,t)=(0,0,0,-1)$. Additional controls check zero-ordinate cancellation and invalid original-point rejection. Receipts and exact source hashes accompany the report.
+
+\textbf{Preserved attempts and boundary.} The first proof attempt lacked a noncomputable annotation and used an over-specific zero rewrite. Fixture attempts retained rational-coefficient simplification failures before explicit polynomial coefficient identities were supplied. Literal UInt64 correspondence remains a next component: constants8 and10 need canonical-residue reduction and no-overflow bounds, especially at p=5 and p=7. This packet proves field values, not counters, compiler execution, divisor-class addition or complete walker closure. No measurement or scientific trial was run; cost ratio is null. Independent source review follows sealing.
+\end{document}
