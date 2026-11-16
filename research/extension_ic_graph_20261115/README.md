@@ -363,3 +363,14 @@ Known native integer prices and explicit unpriced events remain separate;
 complete costs and comparative eligibility remain unknown/false. The full
 raw is retained exactly in authorized local custody with its hash; complete
 summary and native flow excerpt are published. [pcc:unverified]
+
+The [adapted two-large-prime component](local-cover-two-lp-component-20261116-28/report.pdf)
+now connects the existing univariate finder to actual omitted-point graph
+vertices. On the same 300000B values/148948lines and375-point small base,
+full-smooth relations give rank29; adapted2LP plus graph gives rank114, with
+all114certificates replayed. The source relations are checked in the
+Jacobian and the Rust qualifier independently checks modular rank/replay.
+The new public jv_sieve::two_large_prime API emits standard SparseRel rows
+with certificates. Complete costs and full scalar-recovery integration remain
+open; this is an equation-yield observation without a speed/rho verdict.
+[pcc:unverified]

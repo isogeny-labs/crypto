@@ -1,4 +1,30 @@
-# Current checkpoint:28SOURCE READY, NOTRUN (16 November12:45Z)
+# Current checkpoint:28FINISHED, publish packet then target integration (16 November12:50Z)
+
+Sourced2c2e7f947ce1ea549c74532424207e7c8c8879d publishedBEFOREsole28call.
+Run /workspace/ic-local-runs/local-cover-two-lp-component-20261116-28 exits0/46.497s,
+2starts2complete. p1009seed293/m9/75%smallbase:fullbase500/small375/300000uniqueB/
+148948orderedlines,cohortdigestf5c0015aebd3ab5482ff104ddb5eafef003fab91450b94ece745b1f49dc60300.
+Smooth29inputs/29rows/rank29/261nnz;2LP229inputs(29zero,93one,107twoLP)/116LPvertices/
+31peeled/84pivots/168merges/85cycles/0fillrefusals ->114rows/rank114/2183nnz,all114replayed.
+Originalcopiedqualifier binding/replay/price/flowTRUE,nontrivial2LPTRUE;completeFALSE,
+totalNULL,comparative/fullDLP/rhoFALSE. Partialprimitivesubtotals1729950841332vs1743212955422,
+NOprice/speedratio. Rankincrease85equationsonmatchedreducedbasecohortonly.
+All145source/preposthashPASS. Originalsummary12146B+smoothraw17548BexactGit;
+2LPraw112999BLOCALexact/hashbound. SinglePDFpagevisuallyinspected/exactbench
+PDF/SVG/150dpiPNGhashPASS;originalsalsoLOCAL. No activecompiler/scientificjob.
+
+NEXTcommit/push28packet/updatePRactualresult BEFOREnextimplementation, thenintegrate
+verifieddescent/targetrows intoactualLPgraphelimination andsolve/replayactualscalar.
+Needmorebasisrelationsthanrank114for375smallpoints;fullBspacep²=1018081atdegree9,
+but NOnewprotocol/budget/parameters selected yet. Do not treat fixedcohort114asfullbasis
+orDLPprogresscostclaim. ComponentcurrentAPIhomogeneousonly; target/descentintegration
+isnewwork needingrecordedselection/sourcechecks/newprotocol. Usergoalactive/localusable.
+No stopgoal/subagents. PR4288regular/automerge/no manualmerge. CIlastd2read12:47:
+appreview+migrateSUCCESS/otherlistsEMPTY/requiredgatesreviewUNCONFIRMED;next>=13:37
+absentevent/newsourcepublication. LastHEADd2+DIRTY28packet/journal/resume. S3gateunavailable,
+userlocalauthorizationpersists. Preservefrozenprotocols/raw/failedlintlogs/oldnegativefindings.
+
+# Previous checkpoint:28SOURCE READY, NOTRUN (16 November12:45Z)
 
 ALLfinalnativechecksPASS:21sieve(twoignored),12generic/MSTfilter,1executedpublicworker,
 actualnewprobe/oldworkerbuilds,library/twoexamplesstrictClippy;qualifier12tests/build/
