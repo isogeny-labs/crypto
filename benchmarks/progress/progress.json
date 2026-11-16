@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261116T0059Z-humbert-genus5-la-solver",
+  "latest_record": "20261116T0712Z-humbert-genus5-levers",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 14,
     "invalid": 4,
-    "measured": 206,
+    "measured": 207,
     "open": 1
   },
   "repo": "crypto",
@@ -8496,6 +8496,29 @@
     },
     {
       "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "counted_mismatches_flagged_vs_base",
+      "points": [
+        {
+          "commit": "7236ede46b6d",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 75,
+          "record": "20261116T0712Z-humbert-genus5-levers",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Genus-5 cover IC: REL_FAST + LA_THREADS=4 on the dlpf50_l1 incumbent, identical counted fields (75/75), paired t_ic 0.184/0.182/0.170x at q=16001/24001/32003 (L0, unverified); relations 0.042x, LA 0.29x; safe clique removal ends the dlpx loop but excess gives no gain; 135/135 runs pass e2e",
+          "value": 0.0
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
       "first": 1.21,
       "latest": 1.21,
       "latest_derived": {
@@ -8539,6 +8562,56 @@
           "spread": null,
           "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
           "value": 1.031
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.0,
+      "latest": 2.0,
+      "latest_derived": {},
+      "metric": "dlpxs_precheck_violations",
+      "points": [
+        {
+          "commit": "7236ede46b6d",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 45,
+          "record": "20261116T0712Z-humbert-genus5-levers",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Genus-5 cover IC: REL_FAST + LA_THREADS=4 on the dlpf50_l1 incumbent, identical counted fields (75/75), paired t_ic 0.184/0.182/0.170x at q=16001/24001/32003 (L0, unverified); relations 0.042x, LA 0.29x; safe clique removal ends the dlpx loop but excess gives no gain; 135/135 runs pass e2e",
+          "value": 2.0
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.072,
+      "latest": 0.072,
+      "latest_derived": {
+        "value_over_reference": 0.072
+      },
+      "metric": "ic_over_rho_comb_q32003",
+      "points": [
+        {
+          "commit": "7236ede46b6d",
+          "date": "2026-11-16",
+          "derived": {
+            "value_over_reference": 0.072
+          },
+          "n": 5,
+          "record": "20261116T0712Z-humbert-genus5-levers",
+          "reference": 1.0,
+          "reference_kind": "unmatched_rho",
+          "spread": null,
+          "summary": "Genus-5 cover IC: REL_FAST + LA_THREADS=4 on the dlpf50_l1 incumbent, identical counted fields (75/75), paired t_ic 0.184/0.182/0.170x at q=16001/24001/32003 (L0, unverified); relations 0.042x, LA 0.29x; safe clique removal ends the dlpx loop but excess gives no gain; 135/135 runs pass e2e",
+          "value": 0.072
         }
       ],
       "problem": "ic:humbert-genus5-toy",
@@ -8815,6 +8888,32 @@
       "unit": "ratio"
     },
     {
+      "better": "lower",
+      "first": 0.17,
+      "latest": 0.17,
+      "latest_derived": {},
+      "metric": "t_ic_comb_over_base_q32003",
+      "points": [
+        {
+          "commit": "7236ede46b6d",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 5,
+          "record": "20261116T0712Z-humbert-genus5-levers",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.163,
+            0.192
+          ],
+          "summary": "Genus-5 cover IC: REL_FAST + LA_THREADS=4 on the dlpf50_l1 incumbent, identical counted fields (75/75), paired t_ic 0.184/0.182/0.170x at q=16001/24001/32003 (L0, unverified); relations 0.042x, LA 0.29x; safe clique removal ends the dlpx loop but excess gives no gain; 135/135 runs pass e2e",
+          "value": 0.17
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
       "better": "higher",
       "first": 2.416,
       "latest": 2.416,
@@ -8858,6 +8957,58 @@
           "spread": null,
           "summary": "Genus-5 cover IC: one scalar Lanczos solve replaces two Wiedemann solves; counted LA 0.203x, dlpf t_ic 1.89/2.16/2.42x faster at q=16001/24001/32003 (L0, unverified); excess+clique removal (dlpx) falsified; 120/120 runs pass e2e. 34 of the q=24001 rows come from the killed launcher in 20261116T0532Z-humbert-genus5-la-solver-q24001-killed-launch.json (censored)",
           "value": 0.193
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.292,
+      "latest": 0.292,
+      "latest_derived": {},
+      "metric": "t_la_la4_over_base_median",
+      "points": [
+        {
+          "commit": "7236ede46b6d",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 15,
+          "record": "20261116T0712Z-humbert-genus5-levers",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.277,
+            0.35
+          ],
+          "summary": "Genus-5 cover IC: REL_FAST + LA_THREADS=4 on the dlpf50_l1 incumbent, identical counted fields (75/75), paired t_ic 0.184/0.182/0.170x at q=16001/24001/32003 (L0, unverified); relations 0.042x, LA 0.29x; safe clique removal ends the dlpx loop but excess gives no gain; 135/135 runs pass e2e",
+          "value": 0.292
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.042,
+      "latest": 0.042,
+      "latest_derived": {},
+      "metric": "t_rel_rel_over_base_median",
+      "points": [
+        {
+          "commit": "7236ede46b6d",
+          "date": "2026-11-16",
+          "derived": {},
+          "n": 15,
+          "record": "20261116T0712Z-humbert-genus5-levers",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.038,
+            0.049
+          ],
+          "summary": "Genus-5 cover IC: REL_FAST + LA_THREADS=4 on the dlpf50_l1 incumbent, identical counted fields (75/75), paired t_ic 0.184/0.182/0.170x at q=16001/24001/32003 (L0, unverified); relations 0.042x, LA 0.29x; safe clique removal ends the dlpx loop but excess gives no gain; 135/135 runs pass e2e",
+          "value": 0.042
         }
       ],
       "problem": "ic:humbert-genus5-toy",

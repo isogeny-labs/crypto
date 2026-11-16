@@ -134,7 +134,7 @@ sel = [d for d in ph if d["tag"] in ("base", "comb", "lp_comb", "dlpxs05")]
 bottom = [0.0] * len(sel)
 for k, c in zip(keys, ["#bbbbbb", "#1f77b4", "#8c564b", "#ff7f0e", "#2ca02c"]):
     v = [d[k] for d in sel]; ax.bar(range(len(sel)), v, bottom=bottom, color=c, label=k); bottom = [a + b for a, b in zip(bottom, v)]
-ax.set_xticks(range(len(sel))); ax.set_xticklabels(labs, fontsize=6); ax.set_yscale("log"); ax.set_ylabel("median s (L0)"); ax.legend(fontsize=7)
+ax.set_xticks(range(len(sel))); ax.set_xticklabels(labs, fontsize=6); ax.set_ylabel("median s (L0)"); ax.legend(fontsize=7)
 ax.set_title("Phase medians"); fig.tight_layout(); [fig.savefig(os.path.join(FIG, f"levers_phases.{e}"), dpi=200) for e in ("svg", "png")]; plt.close(fig)
 fig, ax = plt.subplots(figsize=(6.4, 3.4))
 for t, c in [("base", "#7f7f7f"), ("comb", "#2ca02c"), ("lp_comb", "#9467bd")]:

@@ -18,7 +18,9 @@ Smoke q16001 s1: counted fields equal v5; dlpf t_ic 24.2 s -> 4.7 s with REL_FAS
 Campaign under bench record benchmarks/records/<stamp>-humbert-genus5-levers.json.
 S3 checkpoint unavailable (no AWS identity); the branch push is the durable copy.
 
+## Done (2026-11-16T08:00Z)
+Campaign complete: 135/135 solved, counted identity 75/75. Report and PDF in levers_20261116/,
+benchmarks/20261116-humbert-genus5-levers, record closed as measured.
+
 ## Next
-After each q commit rows. Then summarize (python, levers_20261116/analyze_v6.py), figures,
-REPORT.typ/pdf, benchmarks/20261116-humbert-genus5-levers, benchrec close, session log, push,
-update PR #4065 body.
+Leads: re-balance factor base under cheap relations; setup speed; matched 4-thread rho; L2 rerun.

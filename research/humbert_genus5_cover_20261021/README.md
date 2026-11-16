@@ -88,3 +88,14 @@ wall time, unverified assertion [pcc:unverified], not a leaderboard row.
   and so on (17 087 extensions and 2637 s at q = 24001 seed 5).
 - Next step (proposed): relation collection is now 62% of dlpf's time; then block Lanczos on 4 cores;
   then an L2 rerun with a replay certificate so dlpf50_l1 can reach the leaderboard.
+
+## Three levers on dlpf50_l1 (2026-11-16, `levers_20261116/`)
+
+Faster relation arithmetic (`HUMBERT_REL_FAST`), threaded Krylov iterations (`HUMBERT_LA_THREADS`)
+and safe clique removal (`HUMBERT_CLIQUE_SAFE`) were built and independently verified in workflow
+`wf_ff8cffdd-dad`, then merged behind flags. The campaign was 135 runs under a protocol frozen
+before data: all solved, and the counted fields are identical to the flag-free incumbent on all
+75 flagged runs. Paired median t_ic comb/base was 0.184, 0.182 and 0.170 at q = 16001, 24001 and
+32003. The relation phase ran at 0.042× and the LA phase at 0.29× [pcc:unverified] (L0). With
+relations cheap, lp ties dlpf, and excess with safe clique removal gives no measurable gain.
+Report: `levers_20261116/REPORT.pdf`.
