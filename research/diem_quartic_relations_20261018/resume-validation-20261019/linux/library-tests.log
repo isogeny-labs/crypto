@@ -1,0 +1,25 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-w2a-diem-relations)
+warning: variable does not need to be mutable
+    --> src/cryptanalysis/diem_quartic.rs:2617:9
+     |
+2617 |     let mut start_walker = |i: usize, rng: &mut SplitMix64, px: &mut Vec<K>, py: &mut Vec<K>, wa: &mut Vec<u64>, wb: &mut Vec<u64>...
+     |         ----^^^^^^^^^^^^
+     |         |
+     |         help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `crypto` (lib test) generated 1 warning (run `cargo fix --lib -p crypto --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 6m 01s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-565bcb20cb4d5bb4)
+
+running 6 tests
+test cryptanalysis::diem_quartic::tests::full_cell_k8 ... ok
+test cryptanalysis::diem_quartic::tests::instance_k8 ... ok
+test cryptanalysis::diem_quartic::tests::kfast_matches_kf ... ok
+test cryptanalysis::diem_quartic::tests::mont_and_bm ... ok
+test cryptanalysis::diem_quartic::tests::rho_k8_k10 ... ok
+test cryptanalysis::diem_quartic::tests::slp_dlp_cells_k10 ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 4514 filtered out; finished in 0.13s
+

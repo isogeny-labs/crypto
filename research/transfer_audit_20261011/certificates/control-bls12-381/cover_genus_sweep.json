@@ -1,0 +1,287 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / (2c)) elliptic group operations for an equivalence class of c elements, negation included. The cost model's sqrt(pi r / 4) (jacobian_transfer::cost) is the c = 2 case, so a class enters as sqrt(c / 2); certificate v1 divided that reference by sqrt(c), counted negation twice and sat 0.5 bit low (Amendment 3). isogeny_degree_search::rho_reference uses sqrt(pi r / 2) (no equivalence class), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation and the order-3 endomorphism of j = 0 (p = 1 mod 3): classes of size 6",
+    "equivalence_class_size": 6,
+    "log2_cost_of_one_group_operation": 16.909,
+    "log2_group_operations": 126.462,
+    "log2_r": 254.857,
+    "log2_total": 143.372,
+    "log2_total_negation_only": 144.164
+  },
+  "candidate": {
+    "id": "cover:genus_sweep",
+    "label": "hypothetical genus-g covers over the curve's own field, g = 2..8 (pricing check)",
+    "transfer_type": "genus_cover"
+  },
+  "carried": false,
+  "checks": [
+    {
+      "evidence": "(2 - 2/g) log2 q > 0.5 log2 r for g = 2..8: the leading term of double-large-prime index calculus is at least log2 q while rho needs 0.5 log2 r <= 0.5 log2 q + 1",
+      "name": "ic_exponent_exceeds_rho_exponent_for_every_genus",
+      "result": "PASS"
+    },
+    {
+      "evidence": "the double-large-prime total g! q + g^2 q^(2-2/g) Jacobian operations (frozen model) exceeds the matched rho for g = 2..8",
+      "name": "index_calculus_total_above_baseline_for_every_genus",
+      "result": "PASS"
+    },
+    {
+      "evidence": "the best destination solver over each genus costs more than the matched baseline",
+      "name": "priced_route_above_baseline_for_every_genus",
+      "result": "PASS"
+    }
+  ],
+  "costs": {
+    "destination_solver": "RhoOnJacobian",
+    "log2_baseline": 143.372,
+    "log2_cost_ratio": 4.042,
+    "log2_total": 147.414,
+    "log2_total_frozen_model": 148.206,
+    "repo_ratio_log2": -3.25,
+    "rows": [
+      {
+        "formula": "best case: construction priced at zero",
+        "log2": 0.0,
+        "phase": "map_construction",
+        "status": "modeled"
+      },
+      {
+        "formula": "g elliptic operations over the source field: log2 g + log2(10 * M(source_bits)); a lower bound, the conorm-norm formulas are not implemented",
+        "log2": 17.909,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "the cheapest destination solver is not index calculus on the Jacobian",
+        "log2": null,
+        "phase": "relation_collection",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "see relation_collection",
+        "log2": null,
+        "phase": "linear_algebra",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "RhoOnJacobian: CostModel::jacobian_destination; phases not split by the model; rho on the image discounted by 0.792 bits = 0.5 log2(c/2) for its equivalence class c = 6 (the map is defined over the subfield that gives E its class, so the class lifts to the image)",
+        "log2": 147.414,
+        "phase": "destination_solve_unsplit",
+        "status": "modeled"
+      },
+      {
+        "formula": "the discrete logarithm of the image is the logarithm of the source (homomorphism), so recovery is free; one scalar multiplication on E verifies it: log2(1.5 log2 r) + log2(op)",
+        "log2": 25.488,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnJacobian",
+        147.414
+      ],
+      [
+        "HyperellipticIndexCalculus",
+        404.237
+      ],
+      [
+        "EngeGaudrySmoothness",
+        773.071
+      ]
+    ],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "prime",
+    "field": {
+      "a": "0",
+      "b": "4",
+      "degree": 1,
+      "kind": "prime",
+      "log2_size": 380.701,
+      "model": "y^2=x^3+a*x+b",
+      "p": "4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787"
+    },
+    "instance_checks": [
+      {
+        "evidence": "p passes Miller-Rabin (Probable), 4a^3+27b^2 != 0 mod p",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2 = x^3+ax+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Probable); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "BLS12-381",
+    "registered": true,
+    "slug": "icv1-fp381-tm15132376222941642751-961de9ba",
+    "subgroup": {
+      "cofactor": "76329603384216526031706109802092473003",
+      "generator": [
+        "0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb",
+        "0x8b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"
+      ],
+      "order": "4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129030796414117214202539",
+      "r": "52435875175126190479447740508185965837690552500527637822603658699938581184513",
+      "r_log2": 254.857,
+      "trace": "-15132376222941642751"
+    }
+  },
+  "evaluation": {
+    "reason": "the price is a formula sweep or heuristic estimate for a map that is not constructed for this curve",
+    "status": "not_evaluable"
+  },
+  "executed": null,
+  "invariants": {
+    "cheapest_genus": 2,
+    "reproduces": "IDEA-20261009-275a14: genus-g covers of E over F_p cost p^(2 - 2/g) >= p, worse than rho; this is a check of that statement under the frozen model, not a new result",
+    "sweep": [
+      {
+        "best_solver": "RhoOnJacobian",
+        "genus": 2,
+        "ic_exponent_2_minus_2_over_g": 1.0,
+        "ic_leading_log2": 380.701,
+        "ic_total_log2": 404.237,
+        "log2_cost_ratio_to_baseline": 4.042,
+        "log2_total_best_solver": 147.414,
+        "rho_leading_log2": 127.429,
+        "rho_on_jacobian_log2": 147.414
+      },
+      {
+        "best_solver": "RhoOnJacobian",
+        "genus": 3,
+        "ic_exponent_2_minus_2_over_g": 1.333,
+        "ic_leading_log2": 507.601,
+        "ic_total_log2": 532.762,
+        "log2_cost_ratio_to_baseline": 5.082,
+        "log2_total_best_solver": 148.454,
+        "rho_leading_log2": 127.429,
+        "rho_on_jacobian_log2": 148.454
+      },
+      {
+        "best_solver": "RhoOnJacobian",
+        "genus": 4,
+        "ic_exponent_2_minus_2_over_g": 1.5,
+        "ic_leading_log2": 571.051,
+        "ic_total_log2": 597.792,
+        "log2_cost_ratio_to_baseline": 5.832,
+        "log2_total_best_solver": 149.204,
+        "rho_leading_log2": 127.429,
+        "rho_on_jacobian_log2": 149.204
+      },
+      {
+        "best_solver": "RhoOnJacobian",
+        "genus": 5,
+        "ic_exponent_2_minus_2_over_g": 1.6,
+        "ic_leading_log2": 609.121,
+        "ic_total_log2": 637.224,
+        "log2_cost_ratio_to_baseline": 6.55,
+        "log2_total_best_solver": 149.922,
+        "rho_leading_log2": 127.429,
+        "rho_on_jacobian_log2": 149.922
+      },
+      {
+        "best_solver": "RhoOnJacobian",
+        "genus": 6,
+        "ic_exponent_2_minus_2_over_g": 1.667,
+        "ic_leading_log2": 634.501,
+        "ic_total_log2": 663.662,
+        "log2_cost_ratio_to_baseline": 7.082,
+        "log2_total_best_solver": 150.454,
+        "rho_leading_log2": 127.429,
+        "rho_on_jacobian_log2": 150.454
+      },
+      {
+        "best_solver": "RhoOnJacobian",
+        "genus": 7,
+        "ic_exponent_2_minus_2_over_g": 1.714,
+        "ic_leading_log2": 652.63,
+        "ic_total_log2": 682.746,
+        "log2_cost_ratio_to_baseline": 7.592,
+        "log2_total_best_solver": 150.964,
+        "rho_leading_log2": 127.429,
+        "rho_on_jacobian_log2": 150.964
+      },
+      {
+        "best_solver": "RhoOnJacobian",
+        "genus": 8,
+        "ic_exponent_2_minus_2_over_g": 1.75,
+        "ic_leading_log2": 666.226,
+        "ic_total_log2": 697.169,
+        "log2_cost_ratio_to_baseline": 8.034,
+        "log2_total_best_solver": 151.406,
+        "rho_leading_log2": 127.429,
+        "rho_on_jacobian_log2": 151.406
+      }
+    ]
+  },
+  "lead_class": "not_carried",
+  "map": {
+    "construction_status": "not evaluated",
+    "degrees": {
+      "genus_range": [
+        2,
+        8
+      ]
+    },
+    "destination": "Jac(C)(F_q), g = 2..8",
+    "explicit_formulas": "none: formula sweep, not a construction",
+    "field_of_definition": "F_q",
+    "source": "E(F_q)",
+    "type": "pullback into a genus-g Jacobian over the same field"
+  },
+  "notes": [
+    "price = best case: construction priced at zero and rho on the image granted the curve's own equivalence class, so the true cost is higher"
+  ],
+  "obligations": {
+    "computational_advantage": "unknown",
+    "existence": "unknown",
+    "explicit_construction": "unknown",
+    "map_correctness": "unknown",
+    "scaling_support": "unknown",
+    "subgroup_preservation": "unknown"
+  },
+  "open_obligations": [],
+  "references": [
+    "crypto-autoresearcher ledger/proposals/IDEA-20261009-275a14.yaml (dominated by KR-IC-a4dd54, KR-IC-5ea2f8)",
+    "src/cryptanalysis/jacobian_transfer/cost.rs (Gaudry; Gaudry-Thome-Theriault-Diem)"
+  ],
+  "schema": "transfer-audit/certificate/v2",
+  "subgroup_preservation": {
+    "antecedents": [],
+    "argument": "no cover is constructed for g other than 2 (prime) or 3 (binary); the sweep prices the destination only",
+    "executed": null,
+    "image_order": null,
+    "kernel_meets_subgroup": null,
+    "method": "none",
+    "status": "not_evaluated"
+  },
+  "tool": "transfer-audit/2",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "subgroup preservation is NotEvaluated: the transfer is not shown to carry <G>",
+    "the map is not constructed (existence or construction missing)",
+    "priced route costs 2^4.0 times the matched baseline or more"
+  ]
+}

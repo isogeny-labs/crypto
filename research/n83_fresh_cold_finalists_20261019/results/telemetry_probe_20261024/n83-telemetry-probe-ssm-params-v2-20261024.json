@@ -1,0 +1,8 @@
+{
+  "commands": [
+    "set -u\nprintf %s IyEvYmluL2Jhc2gKc2V0IC1ldW8gcGlwZWZhaWwKY2c9JChhd2sgLUY6ICckMT09IjAiIHtwcmludCAkM30nIC9wcm9jL3NlbGYvY2dyb3VwKQpwYXRoPSIvc3lzL2ZzL2Nncm91cCR7Y2d9IgpwcmludGYgJ0NHUk9VUD0lc1xuUEFUSD0lc1xuJyAiJGNnIiAiJHBhdGgiCmlmIHRlc3QgLWUgIiRwYXRoL2NwdS5tYXgiOyB0aGVuIHByaW50ZiAnQ1BVX01BWD0nOyBjYXQgIiRwYXRoL2NwdS5tYXgiOyBlbHNlIGVjaG8gQ1BVX01BWD1NSVNTSU5HOyBmaQppZiB0ZXN0IC1lICIkcGF0aC9jcHUuc3RhdCI7IHRoZW4gZWNobyBDUFVfU1RBVF9CRUdJTjsgY2F0ICIkcGF0aC9jcHUuc3RhdCI7IGVjaG8gQ1BVX1NUQVRfRU5EOyBlbHNlIGVjaG8gQ1BVX1NUQVQ9TUlTU0lORzsgZmkKaWYgdGVzdCAtZSAiJHBhdGgvbWVtb3J5LmV2ZW50cyI7IHRoZW4gZWNobyBNRU1PUllfRVZFTlRTX0JFR0lOOyBjYXQgIiRwYXRoL21lbW9yeS5ldmVudHMiOyBlY2hvIE1FTU9SWV9FVkVOVFNfRU5EOyBlbHNlIGVjaG8gTUVNT1JZX0VWRU5UUz1NSVNTSU5HOyBmaQo= | base64 -d > /tmp/n83-metric-inner.sh\nchmod 700 /tmp/n83-metric-inner.sh\necho ACCOUNTING_BEGIN\nsystemd-run --wait --pipe --collect --unit=n83-metric-v2-accounting --property=CPUAccounting=yes --property=MemoryAccounting=yes /bin/bash /tmp/n83-metric-inner.sh\necho ACCOUNTING_EXIT:$?\necho QUOTA1600_BEGIN\nsystemd-run --wait --pipe --collect --unit=n83-metric-v2-quota1600 --property=CPUAccounting=yes --property=MemoryAccounting=yes --property=CPUQuota=1600% /bin/bash /tmp/n83-metric-inner.sh\necho QUOTA1600_EXIT:$?\necho PROBE_V2_END\n"
+  ],
+  "executionTimeout": [
+    "180"
+  ]
+}

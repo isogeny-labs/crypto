@@ -1,0 +1,716 @@
+{
+  "assignments_checked": 0,
+  "complete_v4_normal_forms": false,
+  "contains_one": false,
+  "exhaustive_affine_completion": null,
+  "independent_review": false,
+  "inherited_last_fall_lower_bound": 4,
+  "input_binding": {
+    "arm": "original-koblitz",
+    "complete_v3_rank": 36159,
+    "dataset": "original",
+    "directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/inputs/original-koblitz/koblitz-m3-planted",
+    "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+    "family": "koblitz",
+    "id": "koblitz-m3-planted",
+    "input_json_sha256": "a124fa0bf4db31742b52fc220866d9e50e9beb5510ff62183edd6e7fe1ab2cd9",
+    "key": "original-koblitz-m3-planted",
+    "parent_files": {
+      "basis.rows.u64le": {
+        "bytes": 3011772444,
+        "sha256": "4df85d6b6b11262708d07529f2e9a50fdc9248c96fa4339ee9c10c5d119e895c"
+      },
+      "closure_state.json": {
+        "bytes": 244,
+        "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+      },
+      "operations.jsonl": {
+        "bytes": 14558582,
+        "sha256": "f2c62409a85b04d40515672176bc45dbe9067cf4b032e2075b95b7a5ea5accfa"
+      },
+      "result.json": {
+        "bytes": 39330,
+        "sha256": "e275306a70612b0828d3c8ce3d23d29a49f1fad5e47d21260e8e33706909d468"
+      }
+    },
+    "parent_state": {
+      "complete": false,
+      "max_operations": 131072,
+      "max_rows": 32768,
+      "next_source": {
+        "parent": 13674,
+        "variable": 2
+      },
+      "pending_candidates": 3442,
+      "processed_candidates": 46416,
+      "rank": 32768,
+      "stop_reason": "row_cap"
+    },
+    "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-planted",
+    "propagation_case": {
+      "arm": "original-koblitz",
+      "complete_v3_rank": 36159,
+      "dataset": "original",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/inputs/original-koblitz/koblitz-m3-planted",
+      "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+      "family": "koblitz",
+      "id": "koblitz-m3-planted",
+      "input_json_sha256": "a124fa0bf4db31742b52fc220866d9e50e9beb5510ff62183edd6e7fe1ab2cd9",
+      "key": "original-koblitz-m3-planted",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "4df85d6b6b11262708d07529f2e9a50fdc9248c96fa4339ee9c10c5d119e895c"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 14558582,
+          "sha256": "f2c62409a85b04d40515672176bc45dbe9067cf4b032e2075b95b7a5ea5accfa"
+        },
+        "result.json": {
+          "bytes": 39330,
+          "sha256": "e275306a70612b0828d3c8ce3d23d29a49f1fad5e47d21260e8e33706909d468"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-planted",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "04d17461be1c22f8785454ea2189b9c479e44c8a4fbc7fee7364da766b99670c"
+        },
+        "result.json": {
+          "bytes": 40441,
+          "sha256": "b3b834a5b180c22024620e30b299a5280253e2b1e07acb61ff5cf4b114f797eb"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5588059,
+          "sha256": "17198818cd13fd51ae5b184ad69deed1b1bceafe515dad14add43883ef52a5ea"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "679f9bdcd500d067bb50fb3dc223d03a183114046cf74cc5c150c1e7153c7bc9"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-planted",
+      "system_sha256": "0283370eaec54fc4da455ed371acd7573e61950e44253c10022258a893d6724d",
+      "target_kind": "planted",
+      "v2": {
+        "operations_sha256": "b2cb475ea0eb846200aa12cd39cef960086e2845d9ecbd78c4386c5d0ec22409",
+        "result_sha256": "ff811f3f19e79be4245607bfa66b9c2295accd3f2f45abc3b3dfcb193423a634",
+        "rows_sha256": "ecaa6ab8dc107ab9e7a07e5c437d88b6fe0f8f52189f08afc362150bf735a534"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/v2/original-koblitz/koblitz-m3-planted",
+      "witness_case": {
+        "arm": "original-koblitz",
+        "complete_v3_rank": 36159,
+        "dataset": "original",
+        "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/original-koblitz/koblitz-m3-planted",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "family": "koblitz",
+        "id": "koblitz-m3-planted",
+        "input_json_sha256": "a124fa0bf4db31742b52fc220866d9e50e9beb5510ff62183edd6e7fe1ab2cd9",
+        "key": "original-koblitz-m3-planted",
+        "parent_files": {
+          "basis.rows.u64le": {
+            "bytes": 3011772444,
+            "sha256": "4df85d6b6b11262708d07529f2e9a50fdc9248c96fa4339ee9c10c5d119e895c"
+          },
+          "closure_state.json": {
+            "bytes": 244,
+            "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+          },
+          "operations.jsonl": {
+            "bytes": 14558582,
+            "sha256": "f2c62409a85b04d40515672176bc45dbe9067cf4b032e2075b95b7a5ea5accfa"
+          },
+          "result.json": {
+            "bytes": 39330,
+            "sha256": "e275306a70612b0828d3c8ce3d23d29a49f1fad5e47d21260e8e33706909d468"
+          }
+        },
+        "parent_state": {
+          "complete": false,
+          "max_operations": 131072,
+          "max_rows": 32768,
+          "next_source": {
+            "parent": 13674,
+            "variable": 2
+          },
+          "pending_candidates": 3442,
+          "processed_candidates": 46416,
+          "rank": 32768,
+          "stop_reason": "row_cap"
+        },
+        "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-planted",
+        "suffix_files": {
+          "closure_state.json": {
+            "bytes": 208,
+            "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+          },
+          "continuation.json": {
+            "bytes": 981,
+            "sha256": "04d17461be1c22f8785454ea2189b9c479e44c8a4fbc7fee7364da766b99670c"
+          },
+          "result.json": {
+            "bytes": 40441,
+            "sha256": "b3b834a5b180c22024620e30b299a5280253e2b1e07acb61ff5cf4b114f797eb"
+          },
+          "suffix.operations.jsonl": {
+            "bytes": 5588059,
+            "sha256": "17198818cd13fd51ae5b184ad69deed1b1bceafe515dad14add43883ef52a5ea"
+          },
+          "suffix.rows.u64le": {
+            "bytes": 311673636,
+            "sha256": "679f9bdcd500d067bb50fb3dc223d03a183114046cf74cc5c150c1e7153c7bc9"
+          }
+        },
+        "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-planted",
+        "system_sha256": "0283370eaec54fc4da455ed371acd7573e61950e44253c10022258a893d6724d",
+        "target_kind": "planted",
+        "v2": {
+          "operations_sha256": "b2cb475ea0eb846200aa12cd39cef960086e2845d9ecbd78c4386c5d0ec22409",
+          "result_sha256": "ff811f3f19e79be4245607bfa66b9c2295accd3f2f45abc3b3dfcb193423a634",
+          "rows_sha256": "ecaa6ab8dc107ab9e7a07e5c437d88b6fe0f8f52189f08afc362150bf735a534"
+        },
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/original-koblitz/koblitz-m3-planted"
+      },
+      "witness_files": {
+        "U.normal.fieldpoly": {
+          "bytes": 5697139,
+          "sha256": "e7827d93b29e941ac1a7a841a3033d0fc45965c20ee2ce2bed19f622ee96b998"
+        },
+        "U.ordinary.fieldpoly": {
+          "bytes": 7235545,
+          "sha256": "a8fbd79cefbd117aadfc1599a17ac42cf64020126230747a395b3e009c2c9779"
+        },
+        "X0.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "762f30ac2361f924701877e2198f0e0aa69a197ae55c41eda3e5eed42e2a6cc3"
+        },
+        "X0.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "4652152363056bd3edc66e63afc9ed31ef88710a5701362bc756458803c26775"
+        },
+        "X1.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "1a35acb73212472232ba0380566bf903244a3f3d4480047ed1f1a9e64533ffd2"
+        },
+        "X1.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "e2503ce40b3e551e635f96c4dacb1bde5434b1bcee019bd8fc541b5155db8d86"
+        },
+        "candidates.jsonl": {
+          "bytes": 95557,
+          "sha256": "262ed2551b7ded36db0dbef28e5de5b30d2381756d408a293982ae546273383a"
+        },
+        "candidates.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "f40a377e9ef1b1a000cd78bcede43cc133d122a553c953795b3edfc88a94e0cf"
+        },
+        "family.json": {
+          "bytes": 13368,
+          "sha256": "78e3039f3dd6460d408264551ca9e3ab28a816d9d0eb22e7a19b7f7e5acf0410"
+        },
+        "partial-083.json": {
+          "bytes": 91,
+          "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+        },
+        "partial-166.json": {
+          "bytes": 93,
+          "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+        },
+        "partial-249.json": {
+          "bytes": 93,
+          "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+        },
+        "remainders.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "ec841d4b22fd7fd892f12a6928b4510e575a2e948e3b0cacab102f7db3ea9330"
+        },
+        "result.json": {
+          "bytes": 20491,
+          "sha256": "d7fc11d317bbcb42b0389c0d62311f7dad2ceba3a39146598ffad6c145a7a5d3"
+        },
+        "source.fieldpoly": {
+          "bytes": 1501129,
+          "sha256": "fc856e6708ce157da3eba42411cef2d533e45f2e44947ae5a538ea86f4ac4382"
+        }
+      },
+      "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/original-koblitz-m3-planted"
+    },
+    "propagation_files": {
+      "added.rows.u64le": {
+        "bytes": 22886132,
+        "sha256": "d0288e1018f0aece77db898e1dc871f3d00cc413412741fadf7c5b13beeaa107"
+      },
+      "affine.json": {
+        "bytes": 1629,
+        "sha256": "13775189aef5a6e0888a7036ccea4049b60fc88807b57b3382c770a9bdc7bd87"
+      },
+      "operations.jsonl": {
+        "bytes": 113608,
+        "sha256": "58f25d427c5feea0683fc933d5ec211cd583de0d80e3d58c9e8227b5e2adce0c"
+      },
+      "pending.json": {
+        "bytes": 3,
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "progress.jsonl": {
+        "bytes": 470,
+        "sha256": "b66c3c38818319cc2b0a2a6fe400362ebd14c2ccd866d46bfbd4c17729233b8a"
+      },
+      "propagation.json": {
+        "bytes": 1045,
+        "sha256": "503262f3593a4e50e81331b580d76b471e2d128ae2b131cf2d695114e800cd09"
+      },
+      "result.json": {
+        "bytes": 9732,
+        "sha256": "d222e45d7b5f5e371073d478b2c9ae9f5ab30d7d90d854270b0ae0a39d754ecf"
+      },
+      "state.json": {
+        "bytes": 453,
+        "sha256": "2613d59c8efc4355fad3e6db1f7ef74d0dd62e749951e2a7ff0849d56c1decad"
+      }
+    },
+    "propagationdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/cases/original-koblitz-m3-planted",
+    "suffix_files": {
+      "closure_state.json": {
+        "bytes": 208,
+        "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+      },
+      "continuation.json": {
+        "bytes": 981,
+        "sha256": "04d17461be1c22f8785454ea2189b9c479e44c8a4fbc7fee7364da766b99670c"
+      },
+      "result.json": {
+        "bytes": 40441,
+        "sha256": "b3b834a5b180c22024620e30b299a5280253e2b1e07acb61ff5cf4b114f797eb"
+      },
+      "suffix.operations.jsonl": {
+        "bytes": 5588059,
+        "sha256": "17198818cd13fd51ae5b184ad69deed1b1bceafe515dad14add43883ef52a5ea"
+      },
+      "suffix.rows.u64le": {
+        "bytes": 311673636,
+        "sha256": "679f9bdcd500d067bb50fb3dc223d03a183114046cf74cc5c150c1e7153c7bc9"
+      }
+    },
+    "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-planted",
+    "system_sha256": "0283370eaec54fc4da455ed371acd7573e61950e44253c10022258a893d6724d",
+    "target_kind": "planted",
+    "v2": {
+      "operations_sha256": "b2cb475ea0eb846200aa12cd39cef960086e2845d9ecbd78c4386c5d0ec22409",
+      "result_sha256": "ff811f3f19e79be4245607bfa66b9c2295accd3f2f45abc3b3dfcb193423a634",
+      "rows_sha256": "ecaa6ab8dc107ab9e7a07e5c437d88b6fe0f8f52189f08afc362150bf735a534"
+    },
+    "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/v2/original-koblitz/koblitz-m3-planted",
+    "witness_case": {
+      "arm": "original-koblitz",
+      "complete_v3_rank": 36159,
+      "dataset": "original",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/original-koblitz/koblitz-m3-planted",
+      "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+      "family": "koblitz",
+      "id": "koblitz-m3-planted",
+      "input_json_sha256": "a124fa0bf4db31742b52fc220866d9e50e9beb5510ff62183edd6e7fe1ab2cd9",
+      "key": "original-koblitz-m3-planted",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "4df85d6b6b11262708d07529f2e9a50fdc9248c96fa4339ee9c10c5d119e895c"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 14558582,
+          "sha256": "f2c62409a85b04d40515672176bc45dbe9067cf4b032e2075b95b7a5ea5accfa"
+        },
+        "result.json": {
+          "bytes": 39330,
+          "sha256": "e275306a70612b0828d3c8ce3d23d29a49f1fad5e47d21260e8e33706909d468"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-planted",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "04d17461be1c22f8785454ea2189b9c479e44c8a4fbc7fee7364da766b99670c"
+        },
+        "result.json": {
+          "bytes": 40441,
+          "sha256": "b3b834a5b180c22024620e30b299a5280253e2b1e07acb61ff5cf4b114f797eb"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5588059,
+          "sha256": "17198818cd13fd51ae5b184ad69deed1b1bceafe515dad14add43883ef52a5ea"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "679f9bdcd500d067bb50fb3dc223d03a183114046cf74cc5c150c1e7153c7bc9"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-planted",
+      "system_sha256": "0283370eaec54fc4da455ed371acd7573e61950e44253c10022258a893d6724d",
+      "target_kind": "planted",
+      "v2": {
+        "operations_sha256": "b2cb475ea0eb846200aa12cd39cef960086e2845d9ecbd78c4386c5d0ec22409",
+        "result_sha256": "ff811f3f19e79be4245607bfa66b9c2295accd3f2f45abc3b3dfcb193423a634",
+        "rows_sha256": "ecaa6ab8dc107ab9e7a07e5c437d88b6fe0f8f52189f08afc362150bf735a534"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/original-koblitz/koblitz-m3-planted"
+    },
+    "witness_files": {
+      "U.normal.fieldpoly": {
+        "bytes": 5697139,
+        "sha256": "e7827d93b29e941ac1a7a841a3033d0fc45965c20ee2ce2bed19f622ee96b998"
+      },
+      "U.ordinary.fieldpoly": {
+        "bytes": 7235545,
+        "sha256": "a8fbd79cefbd117aadfc1599a17ac42cf64020126230747a395b3e009c2c9779"
+      },
+      "X0.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "762f30ac2361f924701877e2198f0e0aa69a197ae55c41eda3e5eed42e2a6cc3"
+      },
+      "X0.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "4652152363056bd3edc66e63afc9ed31ef88710a5701362bc756458803c26775"
+      },
+      "X1.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "1a35acb73212472232ba0380566bf903244a3f3d4480047ed1f1a9e64533ffd2"
+      },
+      "X1.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "e2503ce40b3e551e635f96c4dacb1bde5434b1bcee019bd8fc541b5155db8d86"
+      },
+      "candidates.jsonl": {
+        "bytes": 95557,
+        "sha256": "262ed2551b7ded36db0dbef28e5de5b30d2381756d408a293982ae546273383a"
+      },
+      "candidates.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "f40a377e9ef1b1a000cd78bcede43cc133d122a553c953795b3edfc88a94e0cf"
+      },
+      "family.json": {
+        "bytes": 13368,
+        "sha256": "78e3039f3dd6460d408264551ca9e3ab28a816d9d0eb22e7a19b7f7e5acf0410"
+      },
+      "partial-083.json": {
+        "bytes": 91,
+        "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+      },
+      "partial-166.json": {
+        "bytes": 93,
+        "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+      },
+      "partial-249.json": {
+        "bytes": 93,
+        "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+      },
+      "remainders.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "ec841d4b22fd7fd892f12a6928b4510e575a2e948e3b0cacab102f7db3ea9330"
+      },
+      "result.json": {
+        "bytes": 20491,
+        "sha256": "d7fc11d317bbcb42b0389c0d62311f7dad2ceba3a39146598ffad6c145a7a5d3"
+      },
+      "source.fieldpoly": {
+        "bytes": 1501129,
+        "sha256": "fc856e6708ce157da3eba42411cef2d533e45f2e44947ae5a538ea86f4ac4382"
+      }
+    },
+    "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/original-koblitz-m3-planted"
+  },
+  "key": "original-koblitz-m3-planted",
+  "last_fall_degree": null,
+  "last_fall_lower_bound": 4,
+  "last_fall_upper_bound": null,
+  "linear_rank": 1,
+  "membership_degree_bound": 4,
+  "propagation_parent_result_sha256": "d222e45d7b5f5e371073d478b2c9ae9f5ab30d7d90d854270b0ae0a39d754ecf",
+  "schema": "n83.degree-four-quartic/v1",
+  "state": {
+    "added_rows": 4301,
+    "added_rows_by_degree": [
+      0,
+      0,
+      0,
+      0,
+      4301
+    ],
+    "attempted_products": 4302,
+    "blocked_candidate": {
+      "quartic_nonzeros": 562555,
+      "record_bytes": 2342148,
+      "reduction_complete": true,
+      "remainder_sha256": "763f350dcd4af5009d2fa6a72bbe1f6a06706d1be89c142a9d15062a8c1df78b",
+      "source_kind": "initial_added",
+      "source_row": 36227,
+      "stop_reason": "basis_payload_cap",
+      "variable": 17,
+      "xor_basis_rows": [
+        40669,
+        38677,
+        38455,
+        38206,
+        36476,
+        40676,
+        38436,
+        37969,
+        37720,
+        37471,
+        37222,
+        36976,
+        36727,
+        36478,
+        40706,
+        37967,
+        37718,
+        37469,
+        37220,
+        36971,
+        36729,
+        40705,
+        37966,
+        37717,
+        37468,
+        36721,
+        36472,
+        37218,
+        36969,
+        36720,
+        40454,
+        39707,
+        38960,
+        38711,
+        38213,
+        37964,
+        36719,
+        40407,
+        40204,
+        38461,
+        36718,
+        38958,
+        38709,
+        38460,
+        38211,
+        37713,
+        37215,
+        36717,
+        36468,
+        39455,
+        39206,
+        38957,
+        38708,
+        38210,
+        36716,
+        36467,
+        39454,
+        39205,
+        38458,
+        37711,
+        36715,
+        38472,
+        38223,
+        37227,
+        36978,
+        39155,
+        37211,
+        36962,
+        38221,
+        37474,
+        36735,
+        38454,
+        37722,
+        37473,
+        36733,
+        38453,
+        37724,
+        37478,
+        36980,
+        36731,
+        38203,
+        37727,
+        37234,
+        36985,
+        36736,
+        37480,
+        37232,
+        36983,
+        36734,
+        36485,
+        37703,
+        36981,
+        37700,
+        37453,
+        37204,
+        36807,
+        36558,
+        37452,
+        37040,
+        40656,
+        40654,
+        40677,
+        40696,
+        40694,
+        40659,
+        40689,
+        40453,
+        40405,
+        40403,
+        40400,
+        40428,
+        40444,
+        40440,
+        40402,
+        40406,
+        40441,
+        40150,
+        40179,
+        40193,
+        40192,
+        40191,
+        40159,
+        39953,
+        39930,
+        39948,
+        39946,
+        39944,
+        39908,
+        40190,
+        39703,
+        39700,
+        39699,
+        39697,
+        39696,
+        39694,
+        39655,
+        39906,
+        39657,
+        39453,
+        39432,
+        39451,
+        39450,
+        39447,
+        39446,
+        39406,
+        39443,
+        39430,
+        39203,
+        39202,
+        39201,
+        39199,
+        39198,
+        39197,
+        39196,
+        39195,
+        39184,
+        38952,
+        38949,
+        38946,
+        38935,
+        38945,
+        38965,
+        38717,
+        38701,
+        38700,
+        38699,
+        38696,
+        38716,
+        38967,
+        38468,
+        38469,
+        38452,
+        38450,
+        38447,
+        38721,
+        38200,
+        38198,
+        38226,
+        38476,
+        37952,
+        37950,
+        38225,
+        37732,
+        37981,
+        37554,
+        37451,
+        37305,
+        37698,
+        37233,
+        37697,
+        37449,
+        37947,
+        37948,
+        36701,
+        40702,
+        40688,
+        40653,
+        40678,
+        40708
+      ]
+    },
+    "complete_v3_rows": 36159,
+    "complete_v4_normal_forms": false,
+    "completed_products": 4301,
+    "initial_rows": 36408,
+    "max_new_basis_payload_bytes": 2147483648,
+    "max_new_rows": 16384,
+    "max_product_attempts": 131072,
+    "max_quartic_nonzeros": 1048576,
+    "new_basis_payload_bytes": 2146237564,
+    "next_source": [
+      36227,
+      17,
+      "initial_added"
+    ],
+    "peak_quartic_nonzeros": 739766,
+    "pending_products": 5916919,
+    "rank": 40709,
+    "stop_reason": "basis_payload_cap",
+    "zero_remainders": 0
+  },
+  "upper_bound_argument": "No global upper certificate. Neither complete V4 nor a cap implies a global upper or lower5.",
+  "working_degree": 4
+}

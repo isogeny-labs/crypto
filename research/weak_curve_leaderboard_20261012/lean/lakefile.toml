@@ -1,0 +1,26 @@
+name = "weak_curve_leaderboard"
+version = "0.1.0"
+defaultTargets = ["PrimeExamples", "OakleyOrders", "OakleyPrimality", "MinimalPairingField", "RelationSupport", "WeightedSupport"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "d13f23b723b8a846827a245b89c10fc7d3f11612"
+
+[[lean_lib]]
+name = "PrimeExamples"
+
+[[lean_lib]]
+name = "OakleyOrders"
+
+[[lean_lib]]
+name = "OakleyPrimality"
+
+[[lean_lib]]
+name = "MinimalPairingField"
+
+[[lean_lib]]
+name = "RelationSupport"
+
+[[lean_lib]]
+name = "WeightedSupport"

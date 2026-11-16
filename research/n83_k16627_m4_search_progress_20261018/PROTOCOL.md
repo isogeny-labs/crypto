@@ -1,0 +1,21 @@
+# N83 K=16,627 post-root SAT progress control
+
+**Status:** frozen before solver edits and execution. The root-phase arm returned `Fixpoint` in 185.023 ms and then reached its 1,800-second outer wall cap without `sat_returned` (exit 124, no OOM, 2,661,863,424-byte peak). Preserve both earlier arms unchanged. This is a diagnostic, not a new factor-base selection or speed claim.
+
+## Question and exact input
+
+On the exact primary `icv1-f2m83-tm6151469093347-debefd74` curve, `public_x_hash` seed `2026100801`, use the retained K=16,627 signed-Frobenius base with compressed-object BLAKE3 `1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d` and point-set BLAKE3 `564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0`. Recompute the seven x values from stored indices `[0,166,332,498]`, retain the previous affine/distinct/group/rank/tamper preflight, and require the same full m=4 orbit model: 201,598 variables, 5,915,238 clauses, 3,901 XOR rows. Separate input/model failures from bounded search outcomes.
+
+Determine whether the post-root wall is spent in an individual propagation call, in repeated CDCL decisions/conflicts, or in another completed solver phase. Do not infer the phase from CPU use, missing stdout, or the external timeout alone.
+
+## Native instrumentation
+
+Keep the existing `propagate_root()` entry/return checkpoints and solver state. Add an optional, diagnostic-only `Arc` of atomic progress counters to the native Rust SAT solver. At completed boundaries record decisions, conflicts and restarts; set a current-phase code immediately before and after clause propagation, XOR propagation, conflict analysis and decision selection. Use relaxed atomics because these counters are observational, not solver synchronization. A separate native worker sampler wakes every 10 seconds during `solve()`, reads those atomics and cgroup current memory, and fsyncs an append-only progress JSONL in a new output directory. Every record carries monotone sequence, elapsed wall, source commit, object and point-set digests, current phase and completed counters. Record a first sample before entering `solve()` and a final sample if it returns. The phase and counters in one concurrent sample are individually valid atomic reads, not a guaranteed simultaneous snapshot. Never read the mutable non-atomic `SolverStats` concurrently.
+
+The sampler must neither control branching nor claim a completed conflict from a partial propagation. Preserve the uninstrumented solver as the comparison control on small native SAT and chained-field fixtures: direct and instrumented solve must agree on SAT/UNSAT, model bits, original-field checks and checked group lift. Retain the sampler overhead on those fixtures separately; do not call this degree-83 diagnostic a speed comparison.
+
+## Envelope and outcome rules
+
+Freeze source and six-file snapshot before execution; check exact input hashes, tests and an offline arm64 release build in `rust:1.93.1-bookworm@sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31`. Run one CPU, hard 4 GiB, zero swap, no network, read-only root and a fresh output directory. Keep 100,000 conflicts, one model and a 1,800-second outer wall cap from process start. Preserve raw phase and progress JSONL, stdout/stderr, binary digest, container exit/OOM/peak, exact UTC interval and failed attempts. A missing solver result at the cap is `UNKNOWN_wall_cap`; conflicts and models are known only to the last completed progress sample, with later work unknown. Do not replace this result with UNSAT, zero yield or a full IC total. The dependent unpinned arm requires a checked SAT positive result.
+
+If the last stable samples show many completed conflicts/decisions, freeze a separate search-policy candidate and compare matched work, natural rows, useful rank and full cold cost. If one clause or XOR propagation phase persists across samples, add a bounded inner-phase counter under a new protocol before changing the solver. If SAT returns, verify the original field, exact seven x blocks, group lift, rank one and tamper rejection, then freeze the unpinned/natural controls. The root-phase study and this diagnostic alone select no base for m=2, 3 or 4.

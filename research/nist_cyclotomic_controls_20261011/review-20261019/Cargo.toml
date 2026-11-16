@@ -1,0 +1,14 @@
+[package]
+name = "nist-controls-retained-replay"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "nist-controls-retained-replay"
+path = "replay.rs"
+
+[dependencies]
+serde_json = { version = "=1.0.151", features = ["float_roundtrip"] }

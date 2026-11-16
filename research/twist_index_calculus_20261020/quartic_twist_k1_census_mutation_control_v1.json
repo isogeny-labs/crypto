@@ -1,0 +1,20 @@
+{
+  "auditor_exit_code": 101,
+  "mutated_sha256": "d010926af5ddf89b694ab02c4c34cf7a21fc8b8f9ae2c53f6ee24bcf94fa830e",
+  "mutation": {
+    "after": 1,
+    "before": 0,
+    "field": "k1_signed_relations",
+    "query_index": 0
+  },
+  "original": "research/twist_index_calculus_20261020/quartic_twist_k1_census_p73_seed0_v1.json",
+  "original_sha256": "2c49e75469b6d8a13ba33a3e9575435e79f9749107118a2a01a581e8e0698366",
+  "status": "pass",
+  "stderr_excerpt": [
+    "thread 'main' (3459240) panicked at examples/quartic_twist_k1_census_audit.rs:210:9:",
+    "assertion `left == right` failed: count at query 0",
+    "  left: 1",
+    " right: 0",
+    "note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace"
+  ]
+}

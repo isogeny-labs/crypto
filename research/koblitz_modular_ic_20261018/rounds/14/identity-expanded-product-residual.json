@@ -1,0 +1,179 @@
+{
+  "id": "IDC1h03d3915318caf0b2",
+  "independence": "native issuer plus128 extra checks;source-bound universal Lean theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound14.lean",
+    "sha256": "fb2eb88db9c24bbede2191f9f0682f9fb380e3f9c6475a4213b4af480ea00df7"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610210100,
+  "statement": {
+    "degree_bound": 2,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "h",
+              "op": "var"
+            },
+            {
+              "args": "out",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": "B",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "expanded-product-residual",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "h",
+                      "op": "var"
+                    },
+                    {
+                      "args": "out",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "a",
+                          "op": "var"
+                        },
+                        {
+                          "args": "b",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "a",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": "A",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": "b",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": "A",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": "B",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound14.product_form_residual",
+    "variables": [
+      "h",
+      "out",
+      "a",
+      "b",
+      "A",
+      "B"
+    ]
+  },
+  "value_digest": "90bcae910a7e3d84021b00607ec288502e88b73de89927b01d720a9f0e57f657"
+}

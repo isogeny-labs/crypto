@@ -1,0 +1,57 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T03:29:37Z",
+ "id": "PCC-20261116-1aecf2",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6c123eb24953a6791ec066dc84d23fb0c19be634",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1a1c84099f0c5d3225d2b3096592cf12b7df8f8413906801f9da7dae763f1be6",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.membership_polynomial_degree"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/CosetInstance/DegreeObstruction.lean",
+    "sha256": "9c226e828717d997bfc229a2c2736672d3473aa77c1f8634888010b76ca955db"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/CosetInstance.lean",
+    "sha256": "85a0d7971510d5f0f1ff441ac7c0fab2f12f8008ada1c77f2496c4c7db75ef67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/lakefile.toml",
+    "sha256": "259c1d02f63977947d8a6adfaf71543464da146bb7e86d5e6b50d32b70512275"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/lake-manifest.json",
+    "sha256": "434f6ca2bd398320b66eff450c062ba4cff89d1392760b9139125dc5695b64aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+ "statement": "Assuming a field and h of exact order 12965132697890207, any nonzero univariate polynomial vanishing at every encoded member of the 20633 by 213156431 index family has natural degree at least 4398056640823. This applies Mathlib root counting to the conditional injection; no sparse-circuit, solver-runtime or attack-cost lower bound is established."
+}

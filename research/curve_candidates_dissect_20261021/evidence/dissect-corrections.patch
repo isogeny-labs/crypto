@@ -1,0 +1,22 @@
+--- a/dissect/traits/torsion_extension.py
++++ b/dissect/traits/torsion_extension.py
+@@ -35,7 +35,7 @@
+     if torsion_cyclic is None:
+         return None, None
+     if card % l**2 != 0 or torsion_cyclic:
+-        k2 = l
++        k2 *= l
+     return k2, k1
+ 
+ 
+--- a/dissect/traits/trace_factorization.py
++++ b/dissect/traits/trace_factorization.py
+@@ -25,7 +25,7 @@
+             f.timeout_message() if f.timeout() else len(list(set(f.factorization())))
+         )
+         curve_results = {
+-            "trace": curve.trace(),
++            "trace": trace,
+             "trace_factorization": f.factorization(),
+             "number_of_factors": num_of_factors,
+         }

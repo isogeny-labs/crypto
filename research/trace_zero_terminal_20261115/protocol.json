@@ -1,0 +1,650 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "TZT-20261115-terminal-domains",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/trace_zero_terminal_20261115",
+  "question": "Do identity-first search, actual target-tail domains, correlated tails or constant-residual S3 decide original and distinct-x holdout relations, against a charged exact classical reference?",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "Every Found result replays and every Refuted result agrees with an independent complete pair-table known answer.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "completion",
+      "text": "Report exact valid completion and native counted-work differences on the complete frozen panel and distinct-x holdouts; no population or timing claim.",
+      "class": "comparative",
+      "decided_by": [
+        "order",
+        "tail",
+        "correlation",
+        "slicing",
+        "classical"
+      ]
+    },
+    {
+      "id": "speed",
+      "text": "Natural-target full ECDLP performance and asymptotic speed are not established.",
+      "class": "out_of_scope",
+      "decided_by": []
+    },
+    {
+      "id": "nontrivial",
+      "text": "Every new distinct-x planted target is nonidentity and outside its actual base, constructed from three distinct x values before candidate data; successful tuples replay in the original group.",
+      "class": "exact_computation",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "constants",
+      "role": "baseline",
+      "description": "constants complete production finite-base oracle, original group replay and charged setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_terminal_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "constants",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      }
+    },
+    {
+      "id": "identity-first",
+      "role": "candidate",
+      "description": "identity-first complete production finite-base oracle, original group replay and charged setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_terminal_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "identity-first",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "constants"
+    },
+    {
+      "id": "tail-domain",
+      "role": "candidate",
+      "description": "tail-domain complete production finite-base oracle, original group replay and charged setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_terminal_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "tail-domain",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "constants"
+    },
+    {
+      "id": "tail-pairs",
+      "role": "candidate",
+      "description": "tail-pairs complete production finite-base oracle, original group replay and charged setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_terminal_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "tail-pairs",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "constants"
+    },
+    {
+      "id": "sliced",
+      "role": "candidate",
+      "description": "sliced complete production finite-base oracle, original group replay and charged setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_terminal_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "sliced",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "constants"
+    },
+    {
+      "id": "sliced-aa",
+      "role": "control_aa",
+      "description": "sliced-aa complete production finite-base oracle, original group replay and charged setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_terminal_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "sliced-aa",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "constants"
+    },
+    {
+      "id": "pair-table",
+      "role": "reference",
+      "description": "pair-table complete production finite-base oracle, original group replay and charged setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_terminal_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "pair-table",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "constants"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Positive/cancellation cases embedded in every arm; every n5 engineering pilot must Found with original-group replay. Distinct-x nonidentity targets outside the base are new held-out positives; every cap retained, not a detector success."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "An independently refuted n5 signed-base control is embedded in every arm, and uniform_scalar_below_order targets in the stated generated subgroup are common to all arms. This is a paired encoding comparison, not a claim of unusual target structure."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "strategy",
+        "levels": [
+          "constants",
+          "identity-first",
+          "tail-domain",
+          "tail-pairs",
+          "sliced",
+          "pair-table"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "55c9827dda5a903b5386087e6118170c959809aa9246b695524ec55b277dc664",
+        "how": "One native executable and actual production arithmetic/SAT modules; code and binary hashes pinned before affected data."
+      },
+      {
+        "name": "instances",
+        "treatment": "fixed",
+        "how": "All33 original cases plus16 heldouts at n83/131,d6/8; serialized49-case manifest before new solver data."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Rotate seven arms by instance index+replicate, preserve every row."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Single-threaded native solver; one CPU allocation and2GiB process address-space ceiling for the proposed local exception."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Shared development environment recorded; no timing metric. A750ms safety fuse can censor rows, assessed with A/A; no isolation claim."
+      },
+      {
+        "name": "cache_and_layout",
+        "treatment": "measured",
+        "how": "Fresh Solver per call; field-table caches shared and arm order interleaved. No warmup discarded."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "how": "No retry; flushed JSONL prefix retained. Global600-second guard; unattempted rows reported separately."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Compiled deterministic summary is hashed before affected data, with no adaptive sample selection or population inference."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "order",
+        "arms": [
+          "constants",
+          "identity-first"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "tail",
+        "arms": [
+          "constants",
+          "tail-domain"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "correlation",
+        "arms": [
+          "tail-domain",
+          "tail-pairs"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "slicing",
+        "arms": [
+          "tail-pairs",
+          "sliced"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "classical",
+        "arms": [
+          "pair-table",
+          "sliced"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "sliced",
+          "sliced-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Deterministic rotation i+replicate avoids putting one arm first throughout.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Original33 fixed cases plus n83/131,d6/8 by two distinct-x planted targets, full-width uniform target and cancellation. Native seed202611150500+100*n+10*d+kind_index, pinned StdRng; prepare uses no candidate solver."
+    },
+    "instance_sampling": {
+      "rule": "Original33 fixed cases plus n83/131,d6/8 by two distinct-x planted targets, full-width uniform target and cancellation. Native seed202611150500+100*n+10*d+kind_index, pinned StdRng; prepare uses no candidate solver.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive finite panel only; deterministic Rust summary and decision rules frozen before affected data, arm labels retained for reproducibility. No adaptive interpretation or population test.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 49,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 5,
+      "correction": "other",
+      "passes": true,
+      "note": "Exact complete fixed-panel simultaneous tabulation only, no population p-values or rejection; all contrasts shown, repeated targets not independent."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.056398516,
+      "per_sample_seconds": 0.008230265,
+      "threads": 1,
+      "estimated_total_seconds": 5.702360306,
+      "measured_on": "35-call CPU0 engineering pilot. Max call planning bound, no timing-performance evidence;600second outer cap unchanged."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "decided",
+        "name": "Valid decided oracle query",
+        "unit": "queries",
+        "kind": "counted",
+        "definition": "One for Found with original-group replay or Refuted matching independent truth; zero for Inconclusive; wrong answers invalidate. Includes the complete oracle call, but counts neither setup field operations nor time.",
+        "source": "rows.jsonl decided",
+        "aggregation": "sum",
+        "resolution": "1 query",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "conflicts",
+        "name": "SAT conflicts",
+        "unit": "conflicts",
+        "kind": "counted",
+        "definition": "Cumulative solver conflicts over attempted identity patterns; capped rows remain censored, never imputed as completed.",
+        "source": "rows.jsonl conflicts",
+        "aggregation": "distribution",
+        "resolution": "1 conflict",
+        "uncertainty": "range"
+      },
+      {
+        "id": "peak_variables",
+        "name": "Peak SAT variables",
+        "unit": "variables",
+        "kind": "exact",
+        "definition": "Maximum allocated SAT variables in the query; a circuit-size count, not a runtime proxy.",
+        "source": "rows.jsonl peak_variables",
+        "aggregation": "distribution",
+        "resolution": "1 variable",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "group_ops",
+        "name": "Native group additions and doublings",
+        "unit": "group operations",
+        "kind": "counted",
+        "definition": "Thread-local actual additions+doublings across preprocessing, solve, admission, lifts and final replay. Field/ANF construction, non-group inversions, Frobenius squaring and SAT work uncharged; no full-cost claim.",
+        "source": "rows.jsonl group_ops",
+        "aggregation": "distribution",
+        "resolution": "1 group addition or doubling",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [
+      "decided",
+      "conflicts",
+      "peak_variables"
+    ],
+    "record": [
+      "binary_sha256",
+      "kernel",
+      "cpu_model",
+      "threads",
+      "instance",
+      "seed",
+      "replicate",
+      "arm",
+      "truth",
+      "verification",
+      "outcome",
+      "reason",
+      "group_ops",
+      "all_group_ops"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "state": "explicit_user_exception_authorized",
+      "cpus": 1,
+      "max_address_space_bytes": 2147483648,
+      "cloud_spend_usd": 0
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed49 instances x7 arms x2 repetitions=686 primary rows; separate35-call engineering pilot.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop on any invalid Found/Refuted result, preserving all rows.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Global600-second guard,2000 conflicts and750ms safety fuse per oracle query;2GiB process ceiling; no retries.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Exact complete-panel and distinct-x holdout completion tables, paired-repeat spread and sliced A/A discrepancies; all caps retained. No population, timing or scaling inference. Charged classical setup is not amortized over targets.",
+    "comparison_ids": [
+      "order",
+      "tail",
+      "correlation",
+      "slicing",
+      "classical"
+    ],
+    "statistic": "Exact valid completion counts and paired outcome table",
+    "interval": "Range over the two paired repeats plus certified A/A discrepancies; no population confidence interval",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Difference in valid decided queries on the identical finite panel",
+    "verdict_vocabulary": [
+      "descriptive_difference",
+      "within_aa_discrepancy",
+      "inconclusive",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/src/lib.rs",
+      "sha256": "5049a1084d7d32ee0474b88d62f8091acedc7fac744090fbce048f036d80f525"
+    },
+    "inputs": [
+      "rows.jsonl"
+    ],
+    "outputs": [
+      "summary.json",
+      "export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "No timing, scaling, population, full-DLP or challenge-recovery claim.",
+    "UNKNOWN is not UNSAT; no row deletion, adaptive seeds or comparison of unpaired favorable subsets.",
+    "Native group counters exclude field/ANF, non-group inversions and SAT work; they are not a complete cost unit."
+  ],
+  "literature": [
+    {
+      "ref": "Kosters-Yeo arXiv1503.08001",
+      "provenance": "retrieved",
+      "claim": "Linear trace equations may assist solving; first fall degree is not solving degree."
+    },
+    {
+      "ref": "crypto-autoresearcher knowledge/leads/ecdlp/ic-binary/LEAD-ICB-decomposition-encoding-and-sat.yaml",
+      "provenance": "retrieved",
+      "claim": "Existing encoding/basis effects and measured limits; no novelty or scale claim."
+    },
+    {
+      "ref": "research/trace_zero_leads_20261109/README.md",
+      "provenance": "internal",
+      "claim": "Prior certified-domain and restricted-q implementation, explicit UNKNOWN controls and exact scope."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "7883b155e9c7015e213d879c21a3c4fd0aa79145b408cc00f1adf54e913a2c94",
+    "commit": "3827643341debd85404333b090bd2fbfec6f3472",
+    "frozen_at": "2026-11-15T05:42:18Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "workload_path": "workload.json",
+    "workload_sha256": "2ff154647ea14ebd1c470981df17c1e3d9208368d4ac9ea64e32f7031c463682",
+    "planned_rows": 686,
+    "authorization": "User2026-11-15 accepted capped local steps and then requested keep going; same1CPU/2GiB/600second local EKS/S3 exception per panel, no paid resources/retries.",
+    "preflight": "35calls,one per arm/n5/7/9/83/131, target3base0; all valid,n5allFound replay. Separate analysis smoke on pilot serialization; outer600seconds includes pilot,freeze and primary.",
+    "geometry": "Actual finite bases and complete signed identity handling; no global scheme chart or novelty claim.",
+    "input_preparation": "Native exact input/truth preparation was capped separately at1CPU/2GiB/600seconds and executes no candidate solver."
+  }
+}

@@ -1,0 +1,544 @@
+## E0 rho on the chain (round 1 rho arm, negation map, 64 multipliers)
+## fitted exponent d log2(cost) / d b, every solve a point
+## paired ratios (geomean over curves 0-2 of per-curve cost ratio)
+## per-size geometric mean over curves 0-2 (whole cost; relation; LA)
+fit	r1:basic	10..18 1.9078	10..20 1.9078	12..21 1.9617	12..22 1.9617	16..21 1.9903	16..22 1.9903
+fit	r1:ic1lp	10..18 1.4447	10..20 1.4495	12..21 1.4584	12..22 1.4584	16..21 1.4632	16..22 1.4632
+fit	r1:ic2lp	10..18 1.3835	10..20 1.3972	12..21 1.4154	12..22 1.4154	16..21 1.4349	16..22 1.4349
+fit	r1:rho	10..18 1.4696	10..20 1.4824	12..21 1.4720	12..22 1.4720	16..21 1.3911	16..22 1.3911
+fit	r2a:main:bfslz	10..18 1.3547	10..20 1.3547	12..21 1.3753	12..22 1.3753	16..21 1.3925	16..22 1.3925
+fit	r2a:main:bfssgelz	10..18 1.3817	10..20 1.3817	12..21 1.4121	12..22 1.4121	16..21 1.4312	16..22 1.4312
+fit	r2a:main:bfssgewd	10..18 1.3725	10..20 1.3868	12..21 1.4101	12..22 1.4101	16..21 1.4237	16..22 1.4237
+fit	r2a:main:bfswd	10..18 1.3593	10..20 1.3593	12..21 1.3824	12..22 1.3824	16..21 1.3990	16..22 1.3990
+fit	r2a:main:inc	10..18 1.3835	10..20 1.3972	12..21 1.4187	12..22 1.4187	16..21 1.4357	16..22 1.4357
+fit	r2a:main:lpsgelz	10..18 1.3727	10..20 1.3881	12..21 1.4122	12..22 1.4122	16..21 1.4294	16..22 1.4294
+fit	r2a:main:lpsgewd	10..18 1.3634	10..20 1.3790	12..21 1.4061	12..22 1.4061	16..21 1.4213	16..22 1.4213
+fit	r2a:main:sgelz	10..18 1.4104	10..20 1.4104	12..21 1.4438	12..22 1.4438	16..21 1.4663	16..22 1.4663
+fit	r2a:main:sgewd	10..18 1.4032	10..20 1.4211	12..21 1.4481	12..22 1.4481	16..21 1.4687	16..22 1.4687
+fit	r2a:main:wied	10..18 1.3906	10..20 1.4051	12..21 1.4258	12..22 1.4258	16..21 1.4443	16..22 1.4443
+fit	r2a:tuned:inc	10..18 1.3628	10..20 1.3720	12..21 1.3870	12..22 1.3870	16..21 1.3999	16..22 1.3999
+fit	r2a:tuned:lpsgewd	10..18 1.3472	10..20 1.3563	12..21 1.3711	12..22 1.3711	16..21 1.3811	16..22 1.3811
+fit	r2b:main:lpsgebw2	10..18 1.3849	10..20 1.3945	12..21 1.3978	12..22 1.3978	16..21 1.4145	16..22 1.4145
+fit	r2b:main:lpsgebw3	10..18 1.3867	10..20 1.3966	12..21 1.3999	12..22 1.3999	16..21 1.4170	16..22 1.4170
+fit	r2b:main:lpsgewd	10..18 1.3942	10..20 1.4031	12..21 1.4061	12..22 1.4061	16..21 1.4213	16..22 1.4213
+fit	r2b:sched:lpsgebw2	10..18 1.4357	10..20 1.4342	12..21 1.4313	12..22 1.4313	16..21 1.4231	16..22 1.4231
+fit	r2b:sched:lpsgewd	10..18 1.4452	10..20 1.4400	12..21 1.4358	12..22 1.4358	16..21 1.4203	16..22 1.4203
+fit	r3:r2:lpsgebw2	10..18 1.4315	10..20 1.4322	12..21 1.4312	12..22 1.4311	16..21 1.4293	16..22 1.4296
+fit	r3:r2:lpsgebw2+R1	10..18 1.4503	10..20 1.4404	12..21 1.4346	12..22 1.4301	16..21 1.4120	16..22 1.4088
+fit	r3:sched:lpsgebw2	10..18 1.4357	10..20 1.4342	12..21 1.4313	12..22 1.4288	16..21 1.4231	16..22 1.4193
+fit	r3:sched:lpsgebw2+R1	10..18 1.4739	10..20 1.4604	12..21 1.4519	12..22 1.4439	16..21 1.4199	16..22 1.4112
+fit	r3:sched:lpsgebw2+R1s	10..18 NA	10..20 NA	12..21 NA	12..22 NA	16..21 NA	16..22 NA
+fit	r4:c4:lpsgebw2o100c	10..18 1.3624	10..20 1.4006	12..21 1.4105	12..22 1.4196	16..21 1.4656	16..22 1.4659
+fit	r4:c4:lpsgebw2o100c+C1	10..18 1.3599	10..20 1.3888	12..21 1.3953	12..22 1.4004	16..21 1.4191	16..22 1.4198
+fit	r4:c4:lpsgebw2o100c+C1C2	10..18 1.3599	10..20 1.3872	12..21 1.3929	12..22 1.3971	16..21 1.4127	16..22 1.4125
+fit	r4:c4:lpsgebw2o100c+C2	10..18 1.3625	10..20 1.3998	12..21 1.4092	12..22 1.4177	16..21 1.4622	16..22 1.4620
+fit	r4:r2:lpsgebw2	10..18 1.4503	10..20 1.4404	12..21 1.4346	12..22 1.4301	16..21 1.4120	16..22 1.4088
+fit	r4:r2:lpsgebw2+C1	10..18 1.4474	10..20 1.4299	12..21 1.4221	12..22 1.4151	16..21 1.3745	16..22 1.3734
+fit	r4:r2:lpsgebw2o70c	10..18 1.4095	10..20 1.4183	12..21 1.4194	12..22 1.4205	16..21 1.4301	16..22 1.4284
+fit	r4:r2:lpsgebw2o70c+C1	10..18 1.4051	10..20 1.4081	12..21 1.4082	12..22 1.4076	16..21 1.3936	16..22 1.3957
+fit	r4:w:lpsgebw2	10..18 1.4139	10..20 1.4168	12..21 1.4147	12..22 1.4133	16..21 1.4117	16..22 1.4084
+fit	r4:w:lpsgebw2+C1	10..18 1.4045	10..20 1.4020	12..21 1.3986	12..22 1.3952	16..21 1.3742	16..22 1.3729
+fit	r4:w:lpsgebw2+C1C2	10..18 1.4030	10..20 1.3998	12..21 1.3960	12..22 1.3921	16..21 1.3696	16..22 1.3679
+fit	r4:w:lpsgebw2+C2	10..18 1.4129	10..20 1.4154	12..21 1.4131	12..22 1.4114	16..21 1.4092	16..22 1.4056
+gm	r1:basic	10	3.9243e+06	NA	NA
+gm	r1:basic	11	1.2211e+07	NA	NA
+gm	r1:basic	12	4.1559e+07	NA	NA
+gm	r1:basic	13	1.4812e+08	NA	NA
+gm	r1:basic	14	5.7895e+08	NA	NA
+gm	r1:basic	15	2.2840e+09	NA	NA
+gm	r1:basic	16	8.9131e+09	NA	NA
+gm	r1:basic	17	3.5462e+10	NA	NA
+gm	r1:basic	18	1.4069e+11	NA	NA
+gm	r1:ic1lp	10	3.0637e+06	NA	NA
+gm	r1:ic1lp	11	8.0482e+06	NA	NA
+gm	r1:ic1lp	12	2.1152e+07	NA	NA
+gm	r1:ic1lp	13	5.7632e+07	NA	NA
+gm	r1:ic1lp	14	1.6092e+08	NA	NA
+gm	r1:ic1lp	15	4.3197e+08	NA	NA
+gm	r1:ic1lp	16	1.1809e+09	NA	NA
+gm	r1:ic1lp	17	3.3268e+09	NA	NA
+gm	r1:ic1lp	18	9.0242e+09	NA	NA
+gm	r1:ic1lp	19	2.4979e+10	NA	NA
+gm	r1:ic1lp	20	6.8671e+10	NA	NA
+gm	r1:ic2lp	10	2.4328e+06	NA	NA
+gm	r1:ic2lp	11	5.7625e+06	NA	NA
+gm	r1:ic2lp	12	1.4616e+07	NA	NA
+gm	r1:ic2lp	13	3.7458e+07	NA	NA
+gm	r1:ic2lp	14	9.9875e+07	NA	NA
+gm	r1:ic2lp	15	2.6032e+08	NA	NA
+gm	r1:ic2lp	16	6.9333e+08	NA	NA
+gm	r1:ic2lp	17	1.8861e+09	NA	NA
+gm	r1:ic2lp	18	4.9968e+09	NA	NA
+gm	r1:ic2lp	19	1.3550e+10	NA	NA
+gm	r1:ic2lp	20	3.7367e+10	NA	NA
+gm	r1:rho	10	8.4339e+05	NA	NA
+gm	r1:rho	11	2.3797e+06	NA	NA
+gm	r1:rho	12	7.2064e+06	NA	NA
+gm	r1:rho	13	1.4421e+07	NA	NA
+gm	r1:rho	14	6.9600e+07	NA	NA
+gm	r1:rho	15	1.5261e+08	NA	NA
+gm	r1:rho	16	6.1770e+08	NA	NA
+gm	r1:rho	17	8.2992e+08	NA	NA
+gm	r1:rho	18	2.7058e+09	NA	NA
+gm	r1:rho	19	1.5060e+10	NA	NA
+gm	r1:rho	20	1.9914e+10	NA	NA
+gm	r2a:main:bfslz	10	2.3791e+06	1.7658e+06	6.1329e+05
+gm	r2a:main:bfslz	11	5.5715e+06	3.9660e+06	1.6036e+06
+gm	r2a:main:bfslz	12	1.3821e+07	9.2636e+06	4.5563e+06
+gm	r2a:main:bfslz	13	3.5105e+07	2.2376e+07	1.2727e+07
+gm	r2a:main:bfslz	14	9.0599e+07	5.5718e+07	3.4880e+07
+gm	r2a:main:bfslz	15	2.3219e+08	1.3511e+08	9.7066e+07
+gm	r2a:main:bfslz	16	6.0566e+08	3.3128e+08	2.7437e+08
+gm	r2a:main:bfslz	17	1.6176e+09	8.5143e+08	7.6613e+08
+gm	r2a:main:bfslz	18	4.1741e+09	2.0659e+09	2.1082e+09
+gm	r2a:main:bfssgelz	10	1.8892e+06	1.7658e+06	1.2309e+05
+gm	r2a:main:bfssgelz	11	4.4126e+06	3.9660e+06	4.4560e+05
+gm	r2a:main:bfssgelz	12	1.0833e+07	9.2636e+06	1.5661e+06
+gm	r2a:main:bfssgelz	13	2.8128e+07	2.2376e+07	5.7475e+06
+gm	r2a:main:bfssgelz	14	7.3749e+07	5.5718e+07	1.8031e+07
+gm	r2a:main:bfssgelz	15	1.9340e+08	1.3511e+08	5.8271e+07
+gm	r2a:main:bfssgelz	16	5.2190e+08	3.3128e+08	1.9060e+08
+gm	r2a:main:bfssgelz	17	1.4403e+09	8.5143e+08	5.8885e+08
+gm	r2a:main:bfssgelz	18	3.7954e+09	2.0659e+09	1.7295e+09
+gm	r2a:main:bfssgewd	10	1.8712e+06	1.7658e+06	1.0511e+05
+gm	r2a:main:bfssgewd	11	4.3442e+06	3.9660e+06	3.7746e+05
+gm	r2a:main:bfssgewd	12	1.0595e+07	9.2636e+06	1.3291e+06
+gm	r2a:main:bfssgewd	13	2.7292e+07	2.2376e+07	4.9132e+06
+gm	r2a:main:bfssgewd	14	7.1207e+07	5.5718e+07	1.5488e+07
+gm	r2a:main:bfssgewd	15	1.8552e+08	1.3511e+08	5.0389e+07
+gm	r2a:main:bfssgewd	16	4.9662e+08	3.3128e+08	1.6533e+08
+gm	r2a:main:bfssgewd	17	1.3640e+09	8.5143e+08	5.1258e+08
+gm	r2a:main:bfssgewd	18	3.5768e+09	2.0659e+09	1.5109e+09
+gm	r2a:main:bfssgewd	19	9.6499e+09	5.2715e+09	4.3784e+09
+gm	r2a:main:bfssgewd	20	2.5948e+10	1.3250e+10	1.2697e+10
+gm	r2a:main:bfswd	10	2.1399e+06	1.7658e+06	3.7378e+05
+gm	r2a:main:bfswd	11	4.9960e+06	3.9660e+06	1.0275e+06
+gm	r2a:main:bfswd	12	1.2325e+07	9.2636e+06	3.0587e+06
+gm	r2a:main:bfswd	13	3.1477e+07	2.2376e+07	9.0961e+06
+gm	r2a:main:bfswd	14	8.1661e+07	5.5718e+07	2.5944e+07
+gm	r2a:main:bfswd	15	2.1001e+08	1.3511e+08	7.4895e+07
+gm	r2a:main:bfswd	16	5.5070e+08	3.3128e+08	2.1941e+08
+gm	r2a:main:bfswd	17	1.4817e+09	8.5143e+08	6.3029e+08
+gm	r2a:main:bfswd	18	3.8302e+09	2.0659e+09	1.7643e+09
+gm	r2a:main:inc	10	2.4328e+06	1.7658e+06	6.6652e+05
+gm	r2a:main:inc	11	5.7625e+06	3.9660e+06	1.7945e+06
+gm	r2a:main:inc	12	1.4616e+07	9.2636e+06	5.3493e+06
+gm	r2a:main:inc	13	3.7458e+07	2.2376e+07	1.5078e+07
+gm	r2a:main:inc	14	9.9875e+07	5.5718e+07	4.4153e+07
+gm	r2a:main:inc	15	2.6032e+08	1.3511e+08	1.2515e+08
+gm	r2a:main:inc	16	6.9333e+08	3.3128e+08	3.6205e+08
+gm	r2a:main:inc	17	1.8861e+09	8.5143e+08	1.0347e+09
+gm	r2a:main:inc	18	4.9968e+09	2.0659e+09	2.9309e+09
+gm	r2a:main:inc	19	1.3550e+10	5.2715e+09	8.2785e+09
+gm	r2a:main:inc	20	3.7367e+10	1.3250e+10	2.4115e+10
+gm	r2a:main:inc	21	1.0033e+11	3.3209e+10	6.7117e+10
+gm	r2a:main:lpsgelz	10	1.8632e+06	1.7658e+06	9.7272e+04
+gm	r2a:main:lpsgelz	11	4.3323e+06	3.9660e+06	3.6570e+05
+gm	r2a:main:lpsgelz	12	1.0516e+07	9.2636e+06	1.2512e+06
+gm	r2a:main:lpsgelz	13	2.7205e+07	2.2376e+07	4.8267e+06
+gm	r2a:main:lpsgelz	14	7.1041e+07	5.5718e+07	1.5321e+07
+gm	r2a:main:lpsgelz	15	1.8481e+08	1.3511e+08	4.9683e+07
+gm	r2a:main:lpsgelz	16	4.9281e+08	3.3128e+08	1.6152e+08
+gm	r2a:main:lpsgelz	17	1.3577e+09	8.5143e+08	5.0625e+08
+gm	r2a:main:lpsgelz	18	3.5732e+09	2.0659e+09	1.5073e+09
+gm	r2a:main:lpsgelz	19	9.6901e+09	5.2715e+09	4.4185e+09
+gm	r2a:main:lpsgelz	20	2.6141e+10	1.3250e+10	1.2890e+10
+gm	r2a:main:lpsgewd	10	1.8498e+06	1.7658e+06	8.3954e+04
+gm	r2a:main:lpsgewd	11	4.2788e+06	3.9660e+06	3.1231e+05
+gm	r2a:main:lpsgewd	12	1.0322e+07	9.2636e+06	1.0577e+06
+gm	r2a:main:lpsgewd	13	2.6505e+07	2.2376e+07	4.1272e+06
+gm	r2a:main:lpsgewd	14	6.8871e+07	5.5718e+07	1.3151e+07
+gm	r2a:main:lpsgewd	15	1.7791e+08	1.3511e+08	4.2786e+07
+gm	r2a:main:lpsgewd	16	4.7093e+08	3.3128e+08	1.3964e+08
+gm	r2a:main:lpsgewd	17	1.2899e+09	8.5143e+08	4.3843e+08
+gm	r2a:main:lpsgewd	18	3.3725e+09	2.0659e+09	1.3066e+09
+gm	r2a:main:lpsgewd	19	9.1004e+09	5.2715e+09	3.8289e+09
+gm	r2a:main:lpsgewd	20	2.4407e+10	1.3250e+10	1.1157e+10
+gm	r2a:main:lpsgewd	21	6.5376e+10	3.3209e+10	3.2167e+10
+gm	r2a:main:sgelz	10	1.9177e+06	1.7658e+06	1.5124e+05
+gm	r2a:main:sgelz	11	4.5439e+06	3.9660e+06	5.7588e+05
+gm	r2a:main:sgelz	12	1.1295e+07	9.2636e+06	2.0283e+06
+gm	r2a:main:sgelz	13	2.9773e+07	2.2376e+07	7.3932e+06
+gm	r2a:main:sgelz	14	8.0162e+07	5.5718e+07	2.4443e+07
+gm	r2a:main:sgelz	15	2.1337e+08	1.3511e+08	7.8192e+07
+gm	r2a:main:sgelz	16	5.9186e+08	3.3128e+08	2.6057e+08
+gm	r2a:main:sgelz	17	1.6648e+09	8.5143e+08	8.1336e+08
+gm	r2a:main:sgelz	18	4.5186e+09	2.0659e+09	2.4526e+09
+gm	r2a:main:sgewd	10	1.8934e+06	1.7658e+06	1.2695e+05
+gm	r2a:main:sgewd	11	4.4616e+06	3.9660e+06	4.9342e+05
+gm	r2a:main:sgewd	12	1.1018e+07	9.2636e+06	1.7516e+06
+gm	r2a:main:sgewd	13	2.8814e+07	2.2376e+07	6.4340e+06
+gm	r2a:main:sgewd	14	7.7314e+07	5.5718e+07	2.1595e+07
+gm	r2a:main:sgewd	15	2.0484e+08	1.3511e+08	6.9657e+07
+gm	r2a:main:sgewd	16	5.6477e+08	3.3128e+08	2.3348e+08
+gm	r2a:main:sgewd	17	1.5850e+09	8.5143e+08	7.3353e+08
+gm	r2a:main:sgewd	18	4.2932e+09	2.0659e+09	2.2272e+09
+gm	r2a:main:sgewd	19	1.1883e+10	5.2715e+09	6.6116e+09
+gm	r2a:main:sgewd	20	3.3492e+10	1.3250e+10	2.0240e+10
+gm	r2a:main:wied	10	2.1774e+06	1.7658e+06	4.0984e+05
+gm	r2a:main:wied	11	5.1792e+06	3.9660e+06	1.2102e+06
+gm	r2a:main:wied	12	1.2990e+07	9.2636e+06	3.7222e+06
+gm	r2a:main:wied	13	3.3410e+07	2.2376e+07	1.1031e+07
+gm	r2a:main:wied	14	8.9978e+07	5.5718e+07	3.4257e+07
+gm	r2a:main:wied	15	2.3588e+08	1.3511e+08	1.0070e+08
+gm	r2a:main:wied	16	6.3390e+08	3.3128e+08	3.0261e+08
+gm	r2a:main:wied	17	1.7410e+09	8.5143e+08	8.8960e+08
+gm	r2a:main:wied	18	4.6326e+09	2.0659e+09	2.5667e+09
+gm	r2a:main:wied	19	1.2650e+10	5.2715e+09	7.3780e+09
+gm	r2a:main:wied	20	3.5098e+10	1.3250e+10	2.1847e+10
+gm	r2a:tuned:inc	10	2.4304e+06	2.0400e+06	3.9003e+05
+gm	r2a:tuned:inc	11	5.9233e+06	4.7884e+06	1.1339e+06
+gm	r2a:tuned:inc	12	1.4724e+07	1.1635e+07	3.0881e+06
+gm	r2a:tuned:inc	13	3.8296e+07	2.8691e+07	9.6019e+06
+gm	r2a:tuned:inc	14	9.9176e+07	7.2254e+07	2.6915e+07
+gm	r2a:tuned:inc	15	2.5217e+08	1.7612e+08	7.6050e+07
+gm	r2a:tuned:inc	16	6.5543e+08	4.3743e+08	2.1799e+08
+gm	r2a:tuned:inc	17	1.7643e+09	1.1343e+09	6.2983e+08
+gm	r2a:tuned:inc	18	4.5187e+09	2.7701e+09	1.7486e+09
+gm	r2a:tuned:inc	19	1.2106e+10	7.1112e+09	4.9948e+09
+gm	r2a:tuned:inc	20	3.1756e+10	1.7931e+10	1.3823e+10
+gm	r2a:tuned:inc	21	8.4675e+10	4.5176e+10	3.9497e+10
+gm	r2a:tuned:lpsgewd	10	2.1131e+06	2.0400e+06	7.3050e+04
+gm	r2a:tuned:lpsgewd	11	5.0578e+06	4.7884e+06	2.6908e+05
+gm	r2a:tuned:lpsgewd	12	1.2429e+07	1.1635e+07	7.9193e+05
+gm	r2a:tuned:lpsgewd	13	3.1735e+07	2.8691e+07	3.0439e+06
+gm	r2a:tuned:lpsgewd	14	8.1806e+07	7.2254e+07	9.5517e+06
+gm	r2a:tuned:lpsgewd	15	2.0596e+08	1.7612e+08	2.9838e+07
+gm	r2a:tuned:lpsgewd	16	5.3088e+08	4.3743e+08	9.3454e+07
+gm	r2a:tuned:lpsgewd	17	1.4122e+09	1.1343e+09	2.7788e+08
+gm	r2a:tuned:lpsgewd	18	3.5918e+09	2.7701e+09	8.2162e+08
+gm	r2a:tuned:lpsgewd	19	9.4658e+09	7.1112e+09	2.3545e+09
+gm	r2a:tuned:lpsgewd	20	2.4610e+10	1.7931e+10	6.6789e+09
+gm	r2a:tuned:lpsgewd	21	6.4019e+10	4.5176e+10	1.8842e+10
+gm	r2b:main:lpsgebw2	12	1.0268e+07	9.2636e+06	1.0034e+06
+gm	r2b:main:lpsgebw2	13	2.6178e+07	2.2376e+07	3.7999e+06
+gm	r2b:main:lpsgebw2	14	6.7652e+07	5.5718e+07	1.1932e+07
+gm	r2b:main:lpsgebw2	15	1.7361e+08	1.3511e+08	3.8480e+07
+gm	r2b:main:lpsgebw2	16	4.5597e+08	3.3128e+08	1.2468e+08
+gm	r2b:main:lpsgebw2	17	1.2417e+09	8.5143e+08	3.9026e+08
+gm	r2b:main:lpsgebw2	18	3.2270e+09	2.0659e+09	1.1611e+09
+gm	r2b:main:lpsgebw2	19	8.6746e+09	5.2715e+09	3.4030e+09
+gm	r2b:main:lpsgebw2	20	2.3179e+10	1.3250e+10	9.9286e+09
+gm	r2b:main:lpsgebw2	21	6.1796e+10	3.3209e+10	2.8587e+10
+gm	r2b:main:lpsgebw3	12	1.0372e+07	9.2636e+06	1.1074e+06
+gm	r2b:main:lpsgebw3	13	2.6478e+07	2.2376e+07	4.1000e+06
+gm	r2b:main:lpsgebw3	14	6.8467e+07	5.5718e+07	1.2747e+07
+gm	r2b:main:lpsgebw3	15	1.7594e+08	1.3511e+08	4.0812e+07
+gm	r2b:main:lpsgebw3	16	4.6275e+08	3.3128e+08	1.3146e+08
+gm	r2b:main:lpsgebw3	17	1.2619e+09	8.5143e+08	4.1050e+08
+gm	r2b:main:lpsgebw3	18	3.2858e+09	2.0659e+09	1.2199e+09
+gm	r2b:main:lpsgebw3	19	8.8473e+09	5.2715e+09	3.5757e+09
+gm	r2b:main:lpsgebw3	20	2.3694e+10	1.3250e+10	1.0444e+10
+gm	r2b:main:lpsgebw3	21	6.3246e+10	3.3209e+10	3.0038e+10
+gm	r2b:main:lpsgewd	12	1.0322e+07	9.2636e+06	1.0577e+06
+gm	r2b:main:lpsgewd	13	2.6505e+07	2.2376e+07	4.1272e+06
+gm	r2b:main:lpsgewd	14	6.8871e+07	5.5718e+07	1.3151e+07
+gm	r2b:main:lpsgewd	15	1.7791e+08	1.3511e+08	4.2786e+07
+gm	r2b:main:lpsgewd	16	4.7093e+08	3.3128e+08	1.3964e+08
+gm	r2b:main:lpsgewd	17	1.2899e+09	8.5143e+08	4.3843e+08
+gm	r2b:main:lpsgewd	18	3.3725e+09	2.0659e+09	1.3066e+09
+gm	r2b:main:lpsgewd	19	9.1004e+09	5.2715e+09	3.8289e+09
+gm	r2b:main:lpsgewd	20	2.4407e+10	1.3250e+10	1.1157e+10
+gm	r2b:main:lpsgewd	21	6.5376e+10	3.3209e+10	3.2167e+10
+gm	r2b:sched:lpsgebw2	12	8.4810e+06	7.2144e+06	1.2649e+06
+gm	r2b:sched:lpsgebw2	13	2.1749e+07	1.7159e+07	4.5888e+06
+gm	r2b:sched:lpsgebw2	14	5.8655e+07	4.4380e+07	1.4272e+07
+gm	r2b:sched:lpsgebw2	15	1.5877e+08	1.1118e+08	4.7577e+07
+gm	r2b:sched:lpsgebw2	16	4.3537e+08	2.8800e+08	1.4736e+08
+gm	r2b:sched:lpsgebw2	17	1.2094e+09	7.8395e+08	4.2546e+08
+gm	r2b:sched:lpsgebw2	18	3.2264e+09	2.0298e+09	1.1966e+09
+gm	r2b:sched:lpsgebw2	19	8.6894e+09	5.5416e+09	3.1478e+09
+gm	r2b:sched:lpsgebw2	20	2.3062e+10	1.4952e+10	8.1102e+09
+gm	r2b:sched:lpsgebw2	21	6.0720e+10	4.0290e+10	2.0430e+10
+gm	r2b:sched:lpsgewd	12	8.5670e+06	7.2144e+06	1.3509e+06
+gm	r2b:sched:lpsgewd	13	2.2239e+07	1.7159e+07	5.0777e+06
+gm	r2b:sched:lpsgewd	14	6.0436e+07	4.4380e+07	1.6052e+07
+gm	r2b:sched:lpsgewd	15	1.6543e+08	1.1118e+08	5.4242e+07
+gm	r2b:sched:lpsgewd	16	4.5717e+08	2.8800e+08	1.6916e+08
+gm	r2b:sched:lpsgewd	17	1.2743e+09	7.8395e+08	4.9036e+08
+gm	r2b:sched:lpsgewd	18	3.3755e+09	2.0298e+09	1.3457e+09
+gm	r2b:sched:lpsgewd	19	9.0824e+09	5.5416e+09	3.5408e+09
+gm	r2b:sched:lpsgewd	20	2.4064e+10	1.4952e+10	9.1120e+09
+gm	r2b:sched:lpsgewd	21	6.3290e+10	4.0290e+10	2.3000e+10
+gm	r3:r2:lpsgebw2	12	8.8519e+06	7.7544e+06	1.0968e+06
+gm	r3:r2:lpsgebw2	13	2.3463e+07	1.9185e+07	4.2779e+06
+gm	r3:r2:lpsgebw2	14	6.3451e+07	5.0757e+07	1.2691e+07
+gm	r3:r2:lpsgebw2	15	1.6868e+08	1.3062e+08	3.8051e+07
+gm	r3:r2:lpsgebw2	16	4.5876e+08	3.4423e+08	1.1453e+08
+gm	r3:r2:lpsgebw2	17	1.2730e+09	9.5550e+08	3.1743e+08
+gm	r3:r2:lpsgebw2	18	3.3596e+09	2.5185e+09	8.4111e+08
+gm	r3:r2:lpsgebw2	19	9.1519e+09	7.0051e+09	2.1468e+09
+gm	r3:r2:lpsgebw2	20	2.4517e+10	1.9216e+10	5.3006e+09
+gm	r3:r2:lpsgebw2	21	6.5390e+10	5.2616e+10	1.2773e+10
+gm	r3:r2:lpsgebw2	22	1.7781e+11	1.4785e+11	2.9962e+10
+gm	r3:r2:lpsgebw2+R1	12	4.9556e+06	3.8582e+06	1.0968e+06
+gm	r3:r2:lpsgebw2+R1	13	1.3695e+07	9.4162e+06	4.2779e+06
+gm	r3:r2:lpsgebw2+R1	14	3.7438e+07	2.4745e+07	1.2691e+07
+gm	r3:r2:lpsgebw2+R1	15	1.0122e+08	6.3160e+07	3.8051e+07
+gm	r3:r2:lpsgebw2+R1	16	2.7973e+08	1.6520e+08	1.1453e+08
+gm	r3:r2:lpsgebw2+R1	17	7.7535e+08	4.5790e+08	3.1743e+08
+gm	r3:r2:lpsgebw2+R1	18	2.0422e+09	1.2011e+09	8.4111e+08
+gm	r3:r2:lpsgebw2+R1	19	5.4746e+09	3.3278e+09	2.1468e+09
+gm	r3:r2:lpsgebw2+R1	20	1.4407e+10	9.1061e+09	5.3006e+09
+gm	r3:r2:lpsgebw2+R1	21	3.7579e+10	2.4806e+10	1.2773e+10
+gm	r3:r2:lpsgebw2+R1	22	9.9669e+10	6.9707e+10	2.9962e+10
+gm	r3:sched:lpsgebw2	12	8.4810e+06	7.2144e+06	1.2649e+06
+gm	r3:sched:lpsgebw2	13	2.1749e+07	1.7159e+07	4.5888e+06
+gm	r3:sched:lpsgebw2	14	5.8655e+07	4.4380e+07	1.4272e+07
+gm	r3:sched:lpsgebw2	15	1.5877e+08	1.1118e+08	4.7577e+07
+gm	r3:sched:lpsgebw2	16	4.3537e+08	2.8800e+08	1.4736e+08
+gm	r3:sched:lpsgebw2	17	1.2094e+09	7.8395e+08	4.2546e+08
+gm	r3:sched:lpsgebw2	18	3.2264e+09	2.0298e+09	1.1966e+09
+gm	r3:sched:lpsgebw2	19	8.6894e+09	5.5416e+09	3.1478e+09
+gm	r3:sched:lpsgebw2	20	2.3062e+10	1.4952e+10	8.1102e+09
+gm	r3:sched:lpsgebw2	21	6.0720e+10	4.0290e+10	2.0430e+10
+gm	r3:sched:lpsgebw2	22	1.6141e+11	1.1148e+11	4.9924e+10
+gm	r3:sched:lpsgebw2+R1	12	4.8642e+06	3.5979e+06	1.2649e+06
+gm	r3:sched:lpsgebw2+R1	13	1.3025e+07	8.4349e+06	4.5888e+06
+gm	r3:sched:lpsgebw2+R1	14	3.5936e+07	2.1661e+07	1.4272e+07
+gm	r3:sched:lpsgebw2+R1	15	1.0136e+08	5.3775e+07	4.7577e+07
+gm	r3:sched:lpsgebw2+R1	16	2.8564e+08	1.3827e+08	1.4736e+08
+gm	r3:sched:lpsgebw2+R1	17	8.0120e+08	3.7573e+08	4.2546e+08
+gm	r3:sched:lpsgebw2+R1	18	2.1647e+09	9.6808e+08	1.1966e+09
+gm	r3:sched:lpsgebw2+R1	19	5.7805e+09	2.6327e+09	3.1478e+09
+gm	r3:sched:lpsgebw2+R1	20	1.5196e+10	7.0861e+09	8.1102e+09
+gm	r3:sched:lpsgebw2+R1	21	3.9425e+10	1.8995e+10	2.0430e+10
+gm	r3:sched:lpsgebw2+R1	22	1.0249e+11	5.2563e+10	4.9924e+10
+gm	r3:sched:lpsgebw2+R1s	14	3.4926e+07	2.1350e+07	1.3576e+07
+gm	r3:sched:lpsgebw2+R1s	16	2.8153e+08	1.3745e+08	1.4408e+08
+gm	r4:c4:lpsgebw2o100c	12	6.8745e+06	6.4478e+06	4.2612e+05
+gm	r4:c4:lpsgebw2o100c	13	1.3226e+07	1.1541e+07	1.6792e+06
+gm	r4:c4:lpsgebw2o100c	14	3.1126e+07	2.4947e+07	6.1726e+06
+gm	r4:c4:lpsgebw2o100c	15	8.1662e+07	5.7850e+07	2.3808e+07
+gm	r4:c4:lpsgebw2o100c	16	2.2459e+08	1.4779e+08	7.6792e+07
+gm	r4:c4:lpsgebw2o100c	17	6.5324e+08	4.1208e+08	2.4116e+08
+gm	r4:c4:lpsgebw2o100c	18	1.7778e+09	1.1243e+09	6.5338e+08
+gm	r4:c4:lpsgebw2o100c	19	4.9374e+09	3.2713e+09	1.6661e+09
+gm	r4:c4:lpsgebw2o100c	20	1.3441e+10	9.4686e+09	3.9721e+09
+gm	r4:c4:lpsgebw2o100c	21	3.6554e+10	2.7642e+10	8.9118e+09
+gm	r4:c4:lpsgebw2o100c	22	1.0275e+11	8.3803e+10	1.8949e+10
+gm	r4:c4:lpsgebw2o100c+C1	12	5.4493e+06	5.0226e+06	4.2612e+05
+gm	r4:c4:lpsgebw2o100c+C1	13	1.1856e+07	1.0171e+07	1.6792e+06
+gm	r4:c4:lpsgebw2o100c+C1	14	2.4197e+07	1.8019e+07	6.1726e+06
+gm	r4:c4:lpsgebw2o100c+C1	15	6.5110e+07	4.1298e+07	2.3808e+07
+gm	r4:c4:lpsgebw2o100c+C1	16	2.0356e+08	1.2676e+08	7.6792e+07
+gm	r4:c4:lpsgebw2o100c+C1	17	5.2251e+08	2.8135e+08	2.4116e+08
+gm	r4:c4:lpsgebw2o100c+C1	18	1.4216e+09	7.6816e+08	6.5338e+08
+gm	r4:c4:lpsgebw2o100c+C1	19	3.8636e+09	2.1975e+09	1.6661e+09
+gm	r4:c4:lpsgebw2o100c+C1	20	1.0275e+10	6.3024e+09	3.9721e+09
+gm	r4:c4:lpsgebw2o100c+C1	21	2.7290e+10	1.8378e+10	8.9118e+09
+gm	r4:c4:lpsgebw2o100c+C1	22	7.3489e+10	5.4540e+10	1.8949e+10
+gm	r4:c4:lpsgebw2o100c+C1C2	12	5.2317e+06	4.8050e+06	4.2612e+05
+gm	r4:c4:lpsgebw2o100c+C1C2	13	1.1414e+07	9.7300e+06	1.6792e+06
+gm	r4:c4:lpsgebw2o100c+C1C2	14	2.3162e+07	1.6984e+07	6.1726e+06
+gm	r4:c4:lpsgebw2o100c+C1C2	15	6.2462e+07	3.8650e+07	2.3808e+07
+gm	r4:c4:lpsgebw2o100c+C1C2	16	1.9634e+08	1.1954e+08	7.6792e+07
+gm	r4:c4:lpsgebw2o100c+C1C2	17	5.0221e+08	2.6105e+08	2.4116e+08
+gm	r4:c4:lpsgebw2o100c+C1C2	18	1.3628e+09	7.0940e+08	6.5338e+08
+gm	r4:c4:lpsgebw2o100c+C1C2	19	3.6895e+09	2.0234e+09	1.6661e+09
+gm	r4:c4:lpsgebw2o100c+C1C2	20	9.7560e+09	5.7838e+09	3.9721e+09
+gm	r4:c4:lpsgebw2o100c+C1C2	21	2.5725e+10	1.6813e+10	8.9118e+09
+gm	r4:c4:lpsgebw2o100c+C1C2	22	6.8722e+10	4.9773e+10	1.8949e+10
+gm	r4:c4:lpsgebw2o100c+C2	12	6.6568e+06	6.2301e+06	4.2612e+05
+gm	r4:c4:lpsgebw2o100c+C2	13	1.2784e+07	1.1100e+07	1.6792e+06
+gm	r4:c4:lpsgebw2o100c+C2	14	3.0091e+07	2.3912e+07	6.1726e+06
+gm	r4:c4:lpsgebw2o100c+C2	15	7.9015e+07	5.5202e+07	2.3808e+07
+gm	r4:c4:lpsgebw2o100c+C2	16	2.1737e+08	1.4057e+08	7.6792e+07
+gm	r4:c4:lpsgebw2o100c+C2	17	6.3295e+08	3.9178e+08	2.4116e+08
+gm	r4:c4:lpsgebw2o100c+C2	18	1.7190e+09	1.0656e+09	6.5338e+08
+gm	r4:c4:lpsgebw2o100c+C2	19	4.7633e+09	3.0972e+09	1.6661e+09
+gm	r4:c4:lpsgebw2o100c+C2	20	1.2922e+10	8.9500e+09	3.9721e+09
+gm	r4:c4:lpsgebw2o100c+C2	21	3.4988e+10	2.6076e+10	8.9118e+09
+gm	r4:c4:lpsgebw2o100c+C2	22	9.7986e+10	7.9037e+10	1.8949e+10
+gm	r4:r2:lpsgebw2	12	4.9556e+06	3.8582e+06	1.0968e+06
+gm	r4:r2:lpsgebw2	13	1.3695e+07	9.4162e+06	4.2779e+06
+gm	r4:r2:lpsgebw2	14	3.7438e+07	2.4745e+07	1.2691e+07
+gm	r4:r2:lpsgebw2	15	1.0122e+08	6.3160e+07	3.8051e+07
+gm	r4:r2:lpsgebw2	16	2.7973e+08	1.6520e+08	1.1453e+08
+gm	r4:r2:lpsgebw2	17	7.7535e+08	4.5790e+08	3.1743e+08
+gm	r4:r2:lpsgebw2	18	2.0422e+09	1.2011e+09	8.4111e+08
+gm	r4:r2:lpsgebw2	19	5.4746e+09	3.3278e+09	2.1468e+09
+gm	r4:r2:lpsgebw2	20	1.4407e+10	9.1061e+09	5.3006e+09
+gm	r4:r2:lpsgebw2	21	3.7579e+10	2.4806e+10	1.2773e+10
+gm	r4:r2:lpsgebw2	22	9.9669e+10	6.9707e+10	2.9962e+10
+gm	r4:r2:lpsgebw2+C1	12	3.9660e+06	2.8686e+06	1.0968e+06
+gm	r4:r2:lpsgebw2+C1	13	1.2480e+07	8.2021e+06	4.2779e+06
+gm	r4:r2:lpsgebw2+C1	14	3.0209e+07	1.7516e+07	1.2691e+07
+gm	r4:r2:lpsgebw2+C1	15	8.2711e+07	4.4652e+07	3.8051e+07
+gm	r4:r2:lpsgebw2+C1	16	2.5598e+08	1.4145e+08	1.1453e+08
+gm	r4:r2:lpsgebw2+C1	17	6.2944e+08	3.1199e+08	3.1743e+08
+gm	r4:r2:lpsgebw2+C1	18	1.6609e+09	8.1977e+08	8.4111e+08
+gm	r4:r2:lpsgebw2+C1	19	4.3817e+09	2.2349e+09	2.1468e+09
+gm	r4:r2:lpsgebw2+C1	20	1.1361e+10	6.0608e+09	5.3006e+09
+gm	r4:r2:lpsgebw2+C1	21	2.9266e+10	1.6493e+10	1.2773e+10
+gm	r4:r2:lpsgebw2+C1	22	7.5325e+10	4.5363e+10	2.9962e+10
+gm	r4:r2:lpsgebw2o70c	12	5.4438e+06	5.0425e+06	3.9841e+05
+gm	r4:r2:lpsgebw2o70c	13	1.3639e+07	1.1794e+07	1.8434e+06
+gm	r4:r2:lpsgebw2o70c	14	3.5809e+07	2.9801e+07	6.0012e+06
+gm	r4:r2:lpsgebw2o70c	15	9.4478e+07	7.4286e+07	2.0174e+07
+gm	r4:r2:lpsgebw2o70c	16	2.5409e+08	1.9002e+08	6.4073e+07
+gm	r4:r2:lpsgebw2o70c	17	7.0533e+08	5.1740e+08	1.8789e+08
+gm	r4:r2:lpsgebw2o70c	18	1.8625e+09	1.3359e+09	5.2659e+08
+gm	r4:r2:lpsgebw2o70c	19	5.0911e+09	3.6499e+09	1.4412e+09
+gm	r4:r2:lpsgebw2o70c	20	1.3644e+10	9.8700e+09	3.7744e+09
+gm	r4:r2:lpsgebw2o70c	21	3.6241e+10	2.6622e+10	9.6189e+09
+gm	r4:r2:lpsgebw2o70c	22	9.7618e+10	7.4191e+10	2.3426e+10
+gm	r4:r2:lpsgebw2o70c+C1	12	4.1428e+06	3.7414e+06	3.9841e+05
+gm	r4:r2:lpsgebw2o70c+C1	13	1.2111e+07	1.0266e+07	1.8434e+06
+gm	r4:r2:lpsgebw2o70c+C1	14	2.7089e+07	2.1081e+07	6.0012e+06
+gm	r4:r2:lpsgebw2o70c+C1	15	7.2698e+07	5.2508e+07	2.0174e+07
+gm	r4:r2:lpsgebw2o70c+C1	16	2.2676e+08	1.6269e+08	6.4073e+07
+gm	r4:r2:lpsgebw2o70c+C1	17	5.4043e+08	3.5251e+08	1.8789e+08
+gm	r4:r2:lpsgebw2o70c+C1	18	1.4384e+09	9.1179e+08	5.2659e+08
+gm	r4:r2:lpsgebw2o70c+C1	19	3.8924e+09	2.4512e+09	1.4412e+09
+gm	r4:r2:lpsgebw2o70c+C1	20	1.0344e+10	6.5693e+09	3.7744e+09
+gm	r4:r2:lpsgebw2o70c+C1	21	2.7318e+10	1.7700e+10	9.6189e+09
+gm	r4:r2:lpsgebw2o70c+C1	22	7.1708e+10	4.8281e+10	2.3426e+10
+gm	r4:w:lpsgebw2	12	5.9419e+06	4.8352e+06	1.1023e+06
+gm	r4:w:lpsgebw2	13	1.4670e+07	1.0496e+07	4.1739e+06
+gm	r4:w:lpsgebw2	14	3.8511e+07	2.5732e+07	1.2767e+07
+gm	r4:w:lpsgebw2	15	1.0211e+08	6.3664e+07	3.8439e+07
+gm	r4:w:lpsgebw2	16	2.8063e+08	1.6663e+08	1.1400e+08
+gm	r4:w:lpsgebw2	17	7.7167e+08	4.5685e+08	3.1481e+08
+gm	r4:w:lpsgebw2	18	2.0492e+09	1.2023e+09	8.4682e+08
+gm	r4:w:lpsgebw2	19	5.4958e+09	3.3423e+09	2.1535e+09
+gm	r4:w:lpsgebw2	20	1.4412e+10	9.0841e+09	5.3275e+09
+gm	r4:w:lpsgebw2	21	3.7540e+10	2.4774e+10	1.2766e+10
+gm	r4:w:lpsgebw2	22	9.9555e+10	6.9653e+10	2.9902e+10
+gm	r4:w:lpsgebw2+C1	12	4.9336e+06	3.8270e+06	1.1023e+06
+gm	r4:w:lpsgebw2+C1	13	1.3432e+07	9.2576e+06	4.1739e+06
+gm	r4:w:lpsgebw2+C1	14	3.1329e+07	1.8552e+07	1.2767e+07
+gm	r4:w:lpsgebw2+C1	15	8.3812e+07	4.5367e+07	3.8439e+07
+gm	r4:w:lpsgebw2+C1	16	2.5686e+08	1.4286e+08	1.1400e+08
+gm	r4:w:lpsgebw2+C1	17	6.2662e+08	3.1181e+08	3.1481e+08
+gm	r4:w:lpsgebw2+C1	18	1.6682e+09	8.2138e+08	8.4682e+08
+gm	r4:w:lpsgebw2+C1	19	4.3985e+09	2.2451e+09	2.1535e+09
+gm	r4:w:lpsgebw2+C1	20	1.1374e+10	6.0465e+09	5.3275e+09
+gm	r4:w:lpsgebw2+C1	21	2.9238e+10	1.6471e+10	1.2766e+10
+gm	r4:w:lpsgebw2+C1	22	7.5233e+10	4.5331e+10	2.9902e+10
+gm	r4:w:lpsgebw2+C1C2	12	4.7789e+06	3.6723e+06	1.1023e+06
+gm	r4:w:lpsgebw2+C1C2	13	1.3033e+07	8.8580e+06	4.1739e+06
+gm	r4:w:lpsgebw2+C1C2	14	3.0256e+07	1.7479e+07	1.2767e+07
+gm	r4:w:lpsgebw2+C1C2	15	8.0886e+07	4.2441e+07	3.8439e+07
+gm	r4:w:lpsgebw2+C1C2	16	2.4870e+08	1.3470e+08	1.1400e+08
+gm	r4:w:lpsgebw2+C1C2	17	6.0410e+08	2.8929e+08	3.1481e+08
+gm	r4:w:lpsgebw2+C1C2	18	1.6053e+09	7.5852e+08	8.4682e+08
+gm	r4:w:lpsgebw2+C1C2	19	4.2207e+09	2.0672e+09	2.1535e+09
+gm	r4:w:lpsgebw2+C1C2	20	1.0877e+10	5.5490e+09	5.3275e+09
+gm	r4:w:lpsgebw2+C1C2	21	2.7834e+10	1.5068e+10	1.2766e+10
+gm	r4:w:lpsgebw2+C1C2	22	7.1271e+10	4.1369e+10	2.9902e+10
+gm	r4:w:lpsgebw2+C2	12	5.7872e+06	4.6805e+06	1.1023e+06
+gm	r4:w:lpsgebw2+C2	13	1.4270e+07	1.0096e+07	4.1739e+06
+gm	r4:w:lpsgebw2+C2	14	3.7437e+07	2.4659e+07	1.2767e+07
+gm	r4:w:lpsgebw2+C2	15	9.9184e+07	6.0738e+07	3.8439e+07
+gm	r4:w:lpsgebw2+C2	16	2.7247e+08	1.5847e+08	1.1400e+08
+gm	r4:w:lpsgebw2+C2	17	7.4915e+08	4.3434e+08	3.1481e+08
+gm	r4:w:lpsgebw2+C2	18	1.9863e+09	1.1395e+09	8.4682e+08
+gm	r4:w:lpsgebw2+C2	19	5.3179e+09	3.1644e+09	2.1535e+09
+gm	r4:w:lpsgebw2+C2	20	1.3914e+10	8.5866e+09	5.3275e+09
+gm	r4:w:lpsgebw2+C2	21	3.6137e+10	2.3371e+10	1.2766e+10
+gm	r4:w:lpsgebw2+C2	22	9.5593e+10	6.5691e+10	2.9902e+10
+pair	C4/TL	12	0.4209
+pair	C4/TL	13	0.3597
+pair	C4/TL	14	0.2831
+pair	C4/TL	15	0.3033
+pair	C4/TL	16	0.3698
+pair	C4/TL	17	0.3556
+pair	C4/TL	18	0.3794
+pair	C4/TL	19	0.3898
+pair	C4/TL	20	0.3964
+pair	C4/TL	21	0.4018
+pair	C4/r1:ic2lp	12	0.3579
+pair	C4/r1:ic2lp	13	0.3047
+pair	C4/r1:ic2lp	14	0.2319
+pair	C4/r1:ic2lp	15	0.2399
+pair	C4/r1:ic2lp	16	0.2832
+pair	C4/r1:ic2lp	17	0.2663
+pair	C4/r1:ic2lp	18	0.2727
+pair	C4/r1:ic2lp	19	0.2723
+pair	C4/r1:ic2lp	20	0.2611
+pair	C4/r1:ic2lp	21	NA
+pair	C4/r4:r2:lpsgebw2	12	1.0557
+pair	C4/r4:r2:lpsgebw2	13	0.8335
+pair	C4/r4:r2:lpsgebw2	14	0.6187
+pair	C4/r4:r2:lpsgebw2	15	0.6171
+pair	C4/r4:r2:lpsgebw2	16	0.7019
+pair	C4/r4:r2:lpsgebw2	17	0.6477
+pair	C4/r4:r2:lpsgebw2	18	0.6673
+pair	C4/r4:r2:lpsgebw2	19	0.6739
+pair	C4/r4:r2:lpsgebw2	20	0.6772
+pair	C4/r4:r2:lpsgebw2	21	0.6845
+pair	C4/r4:r2:lpsgebw2	22	0.6895
+pair	r1:ic2lp/r1:ic1lp	10	0.7941
+pair	r1:ic2lp/r1:ic1lp	11	0.7160
+pair	r1:ic2lp/r1:ic1lp	12	0.6910
+pair	r1:ic2lp/r1:ic1lp	13	0.6499
+pair	r1:ic2lp/r1:ic1lp	14	0.6206
+pair	r1:ic2lp/r1:ic1lp	15	0.6026
+pair	r1:ic2lp/r1:ic1lp	16	0.5871
+pair	r1:ic2lp/r1:ic1lp	17	0.5669
+pair	r1:ic2lp/r1:ic1lp	18	0.5537
+pair	r1:ic2lp/r1:ic1lp	19	0.5425
+pair	r1:ic2lp/r1:ic1lp	20	0.5441
+pair	r1:ic2lp/r1:ic1lp	21	NA
+pair	r2b:main:lpsgebw2/TL	12	0.8261
+pair	r2b:main:lpsgebw2/TL	13	0.8249
+pair	r2b:main:lpsgebw2/TL	14	0.8270
+pair	r2b:main:lpsgebw2/TL	15	0.8429
+pair	r2b:main:lpsgebw2/TL	16	0.8589
+pair	r2b:main:lpsgebw2/TL	17	0.8793
+pair	r2b:main:lpsgebw2/TL	18	0.8984
+pair	r2b:main:lpsgebw2/TL	19	0.9164
+pair	r2b:main:lpsgebw2/TL	20	0.9418
+pair	r2b:main:lpsgebw2/TL	21	0.9653
+pair	r2b:sched:lpsgebw2/TL	12	0.6823
+pair	r2b:sched:lpsgebw2/TL	13	0.6854
+pair	r2b:sched:lpsgebw2/TL	14	0.7170
+pair	r2b:sched:lpsgebw2/TL	15	0.7709
+pair	r2b:sched:lpsgebw2/TL	16	0.8201
+pair	r2b:sched:lpsgebw2/TL	17	0.8564
+pair	r2b:sched:lpsgebw2/TL	18	0.8983
+pair	r2b:sched:lpsgebw2/TL	19	0.9180
+pair	r2b:sched:lpsgebw2/TL	20	0.9371
+pair	r2b:sched:lpsgebw2/TL	21	0.9485
+pair	r2b:sched:lpsgewd/TL	12	0.6893
+pair	r2b:sched:lpsgewd/TL	13	0.7008
+pair	r2b:sched:lpsgewd/TL	14	0.7388
+pair	r2b:sched:lpsgewd/TL	15	0.8032
+pair	r2b:sched:lpsgewd/TL	16	0.8612
+pair	r2b:sched:lpsgewd/TL	17	0.9024
+pair	r2b:sched:lpsgewd/TL	18	0.9398
+pair	r2b:sched:lpsgewd/TL	19	0.9595
+pair	r2b:sched:lpsgewd/TL	20	0.9778
+pair	r2b:sched:lpsgewd/TL	21	0.9886
+pair	r3:r2:lpsgebw2+R1/TL	12	0.3987
+pair	r3:r2:lpsgebw2+R1/TL	13	0.4315
+pair	r3:r2:lpsgebw2+R1/TL	14	0.4576
+pair	r3:r2:lpsgebw2+R1/TL	15	0.4915
+pair	r3:r2:lpsgebw2+R1/TL	16	0.5269
+pair	r3:r2:lpsgebw2+R1/TL	17	0.5491
+pair	r3:r2:lpsgebw2+R1/TL	18	0.5686
+pair	r3:r2:lpsgebw2+R1/TL	19	0.5784
+pair	r3:r2:lpsgebw2+R1/TL	20	0.5854
+pair	r3:r2:lpsgebw2+R1/TL	21	0.5870
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	12	0.8154
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	13	0.9582
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	14	0.8406
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	15	0.8160
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	16	0.8962
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	17	0.7856
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	18	0.7673
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	19	0.7580
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	20	0.7476
+pair	r4:r2:lpsgebw2+C1/r3:sched:lpsgebw2+R1	21	0.7423
+rho	10	8.4339e+05	C4/rho NA
+rho	11	2.3797e+06	C4/rho NA
+rho	12	7.2064e+06	C4/rho 0.7260
+rho	13	1.4421e+07	C4/rho 0.7915
+rho	14	6.9600e+07	C4/rho 0.3328
+rho	15	1.5261e+08	C4/rho 0.4093
+rho	16	6.1770e+08	C4/rho 0.3179
+rho	17	8.2992e+08	C4/rho 0.6051
+rho	18	2.7058e+09	C4/rho 0.5037
+rho	19	1.5060e+10	C4/rho 0.2450
+rho	20	1.9914e+10	C4/rho 0.4899

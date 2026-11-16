@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# Launch the frozen one-target IC/rho panel on four independent EKS Spot Jobs.
+set -euo pipefail
+[[ $# == 2 ]] || { echo 'Usage: run-ic-sweep SOURCE_REVISION BUILD_JSON' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+source_revision=$1
+build=$2
+: "${GH_TOKEN:?}" "${GITHUB_REPOSITORY:?}" "${GITHUB_RUN_ID:?}" "${GITHUB_RUN_ATTEMPT:?}"
+: "${GITHUB_SHA:?}" "${GITHUB_SERVER_URL:?}" "${RUNNER_TEMP:?}"
+: "${ISOLAB_SWEEP_INSTANCE_TYPE:?}" "${ISOLAB_SWEEP_SECONDS:?}" "${ISOLAB_SWEEP_RESUMABLE:?}"
+: "${ISOLAB_SWEEP_CHECKPOINT_SECONDS:?}" "${ISOLAB_SWEEP_MAX_RESTORES:?}"
+[[ "$source_revision" =~ ^[a-f0-9]{40}$ && -f "$build" ]]
+[[ "$ISOLAB_SWEEP_SECONDS" =~ ^[1-9][0-9]{0,3}$ && "$ISOLAB_SWEEP_SECONDS" -le 1800 ]]
+[[ "$ISOLAB_SWEEP_RESUMABLE" == true || "$ISOLAB_SWEEP_RESUMABLE" == false ]]
+if [[ "$ISOLAB_SWEEP_RESUMABLE" == true ]]; then
+  [[ "$ISOLAB_SWEEP_SECONDS" -ge 180 && "$ISOLAB_SWEEP_INSTANCE_TYPE" == c8a.2xlarge ]]
+  [[ "$ISOLAB_SWEEP_CHECKPOINT_SECONDS" =~ ^[0-9]{2,3}$ && "$ISOLAB_SWEEP_CHECKPOINT_SECONDS" -ge 30 && "$ISOLAB_SWEEP_CHECKPOINT_SECONDS" -le 900 ]]
+  [[ "$ISOLAB_SWEEP_MAX_RESTORES" =~ ^[1-5]$ ]]
+  [[ -f "$RUNNER_TEMP/isolab-recovery-image.json" ]]
+  "$here/resume/fetch-client" "$RUNNER_TEMP/isolab-recovery-client"
+  client="$RUNNER_TEMP/isolab-recovery-client/isolab-eks-recovery"
+fi
+root="$RUNNER_TEMP/isolab-sweep"
+mkdir -p "$root"
+printf '| Curve bits | Outcome | Result path |\n| ---: | --- | --- |\n' >> "$GITHUB_STEP_SUMMARY"
+failed=0
+for bits in 20 24 28 32; do
+  out="$root/n$bits"
+  mkdir -p "$out"
+  spec_path="taskq/deploy/eks-karpenter/specs/ic-size-sweep/n$bits.json"
+  # CRIU may pause a 32-bit round during its EBS checkpoint. The separately
+  # frozen resumable fixture keeps the same curve/arms and budgets that pause.
+  if [[ "$ISOLAB_SWEEP_RESUMABLE" == true && "$bits" == 32 ]]; then
+    spec_path="taskq/deploy/eks-karpenter/specs/ic-size-sweep/n32-resumable.json"
+  fi
+  # The tested commit owns the spec, even when the workflow file is newer.
+  if ! curl --fail --silent --show-error \
+    -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' \
+    "${GITHUB_API_URL:-https://api.github.com}/repos/$GITHUB_REPOSITORY/contents/$spec_path?ref=$source_revision" \
+    | jq -er .content | tr -d '\n' | base64 -d > "$out/spec.json"; then
+    printf '| %s | Spec fetch failed | `%s` |\n' "$bits" "$out" >> "$GITHUB_STEP_SUMMARY"
+    failed=1
+    continue
+  fi
+  if ! jq -e --argjson bits "$bits" '.schema=="ecbench.spec/v1" and (.workloads.targets_per_curve==1) and (.workloads.curves|length==1) and (.workloads.curves[0].bits==$bits)' "$out/spec.json" >/dev/null; then
+    printf '| %s | Spec mismatch | `%s` |\n' "$bits" "$out" >> "$GITHUB_STEP_SUMMARY"
+    failed=1
+    continue
+  fi
+  name="gh-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-n$bits"
+  if [[ "$ISOLAB_SWEEP_RESUMABLE" == true ]]; then
+    jq -n --slurpfile spec "$out/spec.json" --slurpfile build "$build" \
+      --slurpfile runtime "$RUNNER_TEMP/isolab-recovery-image.json" \
+      --arg name "$name" --arg instance "$ISOLAB_SWEEP_INSTANCE_TYPE" \
+      --argjson deadline "$(($(date -u +%s)+ISOLAB_SWEEP_SECONDS))" \
+      --argjson interval "$ISOLAB_SWEEP_CHECKPOINT_SECONDS" --argjson restores "$ISOLAB_SWEEP_MAX_RESTORES" \
+      '{schema:"isolab.eks.resumable/v1",run_name:$name,deadline_unix_seconds:$deadline,build:$build[0],runtime_image_uri:$runtime[0].runtime_image_uri,
+        spec:$spec[0],instance_type:$instance,checkpoint_interval_seconds:$interval,max_restores:$restores}' > "$out/request.json"
+    if "$client" validate "$out/request.json" && \
+       "$client" submit "$out/request.json" "$out/results" && \
+       "$client" wait "$out/request.json" "$out/results"; then
+      state=$(jq -r '.state.phase' "$out/results/result.json")
+    else
+      state=failed
+      failed=1
+    fi
+  else
+    jq -n --slurpfile spec "$out/spec.json" --slurpfile build "$build" \
+      --arg name "$name" --arg instance "$ISOLAB_SWEEP_INSTANCE_TYPE" \
+      --argjson seconds "$ISOLAB_SWEEP_SECONDS" --arg rev "$source_revision" --arg workflow "$GITHUB_SHA" \
+      --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+      '{schema:"isolab.eks.request/v1",job:{job_name:$name,instance_type:$instance,seconds:$seconds,spec:$spec[0],build:$build[0]},
+        provenance:{harness:"github-actions",source_revision:$rev,workflow_revision:$workflow,run_url:$url}}' > "$out/request.json"
+    if "$here/remote/validate-request" "$out/request.json" >/dev/null && \
+       ISOLAB_CLIENT_OUTPUT="$out/results" "$here/remote/launch-remote" "$out/request.json"; then
+      state=$(jq -r '.state' "$out/results/result.json")
+    else
+      state=failed
+      failed=1
+    fi
+  fi
+  printf '| %s | %s | `%s` |\n' "$bits" "$state" "$out" >> "$GITHUB_STEP_SUMMARY"
+done
+exit "$failed"

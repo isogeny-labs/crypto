@@ -1,0 +1,235 @@
+diff --git a/examples/n83_chain_xcnf_control.rs b/examples/n83_chain_xcnf_control.rs
+index 4a7650795..78238726b 100644
+--- a/examples/n83_chain_xcnf_control.rs
++++ b/examples/n83_chain_xcnf_control.rs
+@@ -156,7 +156,24 @@ fn run(path: &str, output: &str) -> Result<Value> {
+     }))
+ }
+ 
+-fn run_natural(path: &str, output: &str) -> Result<Value> {
++fn expand_orbit_xs(representatives: &[BigUint], curve: &KoblitzCurve) -> Result<Vec<BigUint>> {
++    let mut values = Vec::with_capacity(representatives.len() * 83);
++    for representative in representatives {
++        let mut x = F2mElement::from_biguint(representative, 83);
++        for _ in 0..83 {
++            values.push(x.to_biguint());
++            x = x.square_k_times(1, &curve.curve.irreducible);
++        }
++    }
++    values.sort_unstable();
++    values.dedup();
++    if values.len() != representatives.len() * 83 {
++        return Err("orbit x-domain closure is not disjoint and full".into());
++    }
++    Ok(values)
++}
++
++fn run_natural(path: &str, output: &str, coordinate: bool) -> Result<Value> {
+     let started = Instant::now();
+     let raw = fs::read(path)?;
+     let input: Value = serde_json::from_slice(&raw)?;
+@@ -230,22 +247,43 @@ fn run_natural(path: &str, output: &str) -> Result<Value> {
+         150_000,
+     )
+     .map_err(|error| format!("circuit build: {error:?}"))?;
+-    let size = enc
+-        .constrain_frobenius_orbit_domains(&domains, 150_000, 12_000_000)
+-        .map_err(|error| format!("domain build: {error:?}"))?;
+-    let expected_clauses = if role == "gray_pool" {
+-        183_314
++    let domain_clauses = if coordinate {
++        let small_xs = expand_orbit_xs(&domains[0], &curve)?;
++        let residual_xs = expand_orbit_xs(&domains[3], &curve)?;
++        let xdomains = vec![
++            small_xs.clone(),
++            small_xs.clone(),
++            small_xs,
++            residual_xs.clone(),
++            residual_xs,
++        ];
++        enc.constrain_coordinate_domains(&xdomains, 12_000_000)
++            .map_err(|error| format!("coordinate domain build: {error:?}"))?
+     } else {
+-        269_830
++        let size = enc
++            .constrain_frobenius_orbit_domains(&domains, 150_000, 12_000_000)
++            .map_err(|error| format!("orbit domain build: {error:?}"))?;
++        let expected_clauses = if role == "gray_pool" {
++            183_314
++        } else {
++            269_830
++        };
++        if size.clauses != expected_clauses {
++            return Err("natural domain clause count differs from hosted pilot".into());
++        }
++        size.clauses
+     };
+-    let expected_variables = if role == "gray_pool" { 95_068 } else { 97_080 };
+-    if size.clauses != expected_clauses {
+-        return Err("natural domain clause count differs from hosted pilot".into());
+-    }
+     enc.order_first_pair(150_000)
+         .map_err(|error| format!("first-pair order: {error:?}"))?;
+-    if enc.solver.n_vars() != expected_variables || enc.solver.n_xors() != 4_980 {
+-        return Err("natural formula shape differs from hosted pilot".into());
++    if coordinate {
++        if enc.solver.n_vars() != 84_825 {
++            return Err("coordinate formula variable count differs".into());
++        }
++    } else {
++        let expected_variables = if role == "gray_pool" { 95_068 } else { 97_080 };
++        if enc.solver.n_vars() != expected_variables || enc.solver.n_xors() != 4_980 {
++            return Err("natural formula shape differs from hosted pilot".into());
++        }
+     }
+     let xcnf = to_dimacs_xor(&enc.solver);
+     let mut file = OpenOptions::new()
+@@ -258,6 +296,7 @@ fn run_natural(path: &str, output: &str) -> Result<Value> {
+         "schema":"n83.k600-natural-xcnf-export/v1",
+         "scope":"frozen_ordinary_first_query_stage_only",
+         "status":"EXPORTED_NATURAL_XCNF",
++        "encoding":if coordinate { "coordinate_trie" } else { "frobenius_orbit" },
+         "role":role, "trial":0,
+         "plan_sha256":NATURAL_PLAN_SHA256,
+         "input_blake3":blake3::hash(&raw).to_hex().to_string(),
+@@ -267,7 +306,7 @@ fn run_natural(path: &str, output: &str) -> Result<Value> {
+         "query_point":[query_x.to_biguint().to_string(),query_y.to_biguint().to_string()],
+         "identity_mask":0, "order_first_pair":true,
+         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
+-        "xors":enc.solver.n_xors(), "domain_clauses":size.clauses,
++        "xors":enc.solver.n_xors(), "domain_clauses":domain_clauses,
+         "xcnf_bytes":xcnf.len(),
+         "xcnf_blake3":blake3::hash(xcnf.as_bytes()).to_hex().to_string(),
+         "build_export_wall_ms_L0":started.elapsed().as_secs_f64()*1000.0,
+@@ -281,10 +320,12 @@ fn main() -> Result<()> {
+     let args: Vec<String> = std::env::args().collect();
+     let result = match args.as_slice() {
+         [_, path, output] => run(path, output)?,
+-        [_, mode, path, output] if mode == "--natural" => run_natural(path, output)?,
++        [_, mode, path, output] if mode == "--natural" => run_natural(path, output, false)?,
++        [_, mode, path, output] if mode == "--natural-coordinate" =>
++            run_natural(path, output, true)?,
+         _ => {
+             return Err(
+-                "usage: n83_chain_xcnf_control [--natural] DOMAINS_JSON FRESH_OUTPUT_XCNF".into(),
++                "usage: n83_chain_xcnf_control [--natural|--natural-coordinate] DOMAINS_JSON FRESH_OUTPUT_XCNF".into(),
+             )
+         }
+     };
+diff --git a/src/cryptanalysis/binary_semaev_chain_sat.rs b/src/cryptanalysis/binary_semaev_chain_sat.rs
+index 377946897..1caeb3b5b 100644
+--- a/src/cryptanalysis/binary_semaev_chain_sat.rs
++++ b/src/cryptanalysis/binary_semaev_chain_sat.rs
+@@ -363,6 +363,45 @@ impl ChainedS3Encoding {
+         Ok(required)
+     }
+ 
++    /// Give each summand its own exact finite x-coordinate domain. This
++    /// reuses the missing-prefix trie without orbit-selector or phase wires;
++    /// callers must enumerate the complete desired x-domain beforehand.
++    /// The preflight is atomic and leaves the solver unchanged on a cap.
++    pub fn constrain_coordinate_domains(
++        &mut self,
++        codes_by_summand: &[Vec<BigUint>],
++        max_domain_clauses: usize,
++    ) -> Result<usize, ChainBuildError> {
++        if self.domain_installed || codes_by_summand.len() != self.m {
++            return Err(ChainBuildError::Unsupported);
++        }
++        let mut sorted_domains = Vec::with_capacity(self.m);
++        let mut required = 0usize;
++        for codes in codes_by_summand {
++            let clauses =
++                finite_domain_clause_count(codes, self.n, 1).ok_or(ChainBuildError::Unsupported)?;
++            required = required
++                .checked_add(clauses)
++                .ok_or(ChainBuildError::Unsupported)?;
++            let mut sorted = codes.clone();
++            sorted.sort_unstable();
++            sorted.dedup();
++            sorted_domains.push(sorted);
++        }
++        if required > max_domain_clauses {
++            return Err(ChainBuildError::DomainClauseCap {
++                required,
++                maximum: max_domain_clauses,
++            });
++        }
++        self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
++        for (block, codes) in self.blocks[..self.m].iter().zip(&sorted_domains) {
++            add_coordinate_domain(&mut self.solver, block, codes, self.n as usize);
++        }
++        self.domain_installed = true;
++        Ok(required)
++    }
++
+     /// Install the exact union of all binary-Frobenius phases of the given
+     /// representative x-coordinates. One-hot representative selection and
+     /// a bounded binary phase are linked to each summand by native XOR rows.
+@@ -1184,4 +1223,66 @@ mod tests {
+         assert_eq!(equal.solver.solve(), SolveResult::Sat);
+         assert!(equal.verify_model());
+     }
++
++    #[test]
++    fn heterogeneous_coordinate_domains_preserve_exact_sum_and_atomic_cap() {
++        let kc = KoblitzCurve::new(0, 7).unwrap();
++        let BinaryPoint::Affine { x, .. } = kc.generator() else {
++            panic!("generator is affine");
++        };
++        let point_x = x.to_biguint();
++        let other = (0u8..128)
++            .map(BigUint::from)
++            .find(|candidate| candidate != &point_x)
++            .unwrap();
++        let domains = vec![vec![point_x.clone()], vec![other.clone(), point_x.clone()]];
++        let required = finite_domain_clause_count(&domains[0], 7, 1).unwrap()
++            + finite_domain_clause_count(&domains[1], 7, 1).unwrap();
++        let mut enc =
++            ChainedS3Encoding::build(2, &kc.curve.irreducible, &kc.curve.b, None, 0, 2_000)
++                .unwrap();
++        let before = (
++            enc.solver.n_vars(),
++            enc.solver.n_clauses(),
++            enc.solver.n_xors(),
++        );
++        assert_eq!(
++            enc.constrain_coordinate_domains(&domains, required - 1),
++            Err(ChainBuildError::DomainClauseCap {
++                required,
++                maximum: required - 1,
++            })
++        );
++        assert_eq!(
++            (
++                enc.solver.n_vars(),
++                enc.solver.n_clauses(),
++                enc.solver.n_xors()
++            ),
++            before
++        );
++        assert_eq!(
++            enc.constrain_coordinate_domains(&domains, required),
++            Ok(required)
++        );
++        assert_eq!(enc.solver.n_vars(), before.0);
++        assert_eq!(enc.solver.n_clauses() - before.1, required);
++        assert_eq!(enc.solver.n_xors(), before.2);
++        assert_eq!(
++            enc.order_first_pair(2_000),
++            Err(ChainBuildError::Unsupported)
++        );
++        assert_eq!(enc.solver.solve(), SolveResult::Sat);
++        assert!(enc.verify_model());
++        assert_eq!(enc.decode_summands()[0].to_biguint(), point_x);
++        assert_eq!(enc.decode_summands()[1].to_biguint(), point_x);
++
++        let mut disjoint =
++            ChainedS3Encoding::build(2, &kc.curve.irreducible, &kc.curve.b, None, 0, 2_000)
++                .unwrap();
++        disjoint
++            .constrain_coordinate_domains(&[vec![point_x], vec![other]], required)
++            .unwrap();
++        assert_eq!(disjoint.solver.solve(), SolveResult::Unsat);
++    }
+ }

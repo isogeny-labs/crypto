@@ -1,0 +1,133 @@
+{
+  "kind": "selected-skipped-source-record/v1",
+  "source_commit": "43e01b10e0e5ec6bb74a1cd24f283ef006da586d",
+  "repository": "https://github.com/aburan28/crypto",
+  "source_files": [
+    {
+      "path": "research/nist_seed_provenance_20261016/census/summary.json",
+      "git_blob": "50e20dd89ecc58a5922d357bdfa446c1749c0e5f"
+    },
+    {
+      "path": "research/nist_seed_provenance_20261016/census/orders_891607927.txt",
+      "git_blob": "3856e50fe4604231ccad2febb0fae0b56f95e8b4"
+    },
+    {
+      "path": "research/nist_seed_provenance_20261016/census/orders_871696354.txt",
+      "git_blob": "b1a5ef2cd940e42d7f3d786301a77fb9d38f8214"
+    },
+    {
+      "path": "research/nist_seed_provenance_20261016/README.md",
+      "git_blob": "cc2e07b2c6c3e4744164cfe91c0270dc345b00ca"
+    },
+    {
+      "path": "docs/curves/standards/parameters.json",
+      "git_blob": "a036c6bcc2b3fc332c60494c87226466d990b2d7"
+    },
+    {
+      "path": "docs/curves/standards/registry.json",
+      "git_blob": "ab7a73960c461405a2b0eb94689ef00c23c461be"
+    },
+    {
+      "path": "src/cryptanalysis/nist_seed_provenance.rs",
+      "git_blob": "8a75bbdbacd86bfb9b38e71dfada94ccda95576b"
+    }
+  ],
+  "cohorts": [
+    {
+      "run": "srand48(871696354)",
+      "p_bits": 256,
+      "candidates": 960,
+      "accepted": [
+        876,
+        1842
+      ],
+      "n_longer_than_p": [],
+      "only_twist_prime": [
+        81,
+        276,
+        1049,
+        1383
+      ]
+    },
+    {
+      "run": "srand48(891607927)",
+      "p_bits": 224,
+      "candidates": 3545,
+      "accepted": [
+        777,
+        1485,
+        5736,
+        7026
+      ],
+      "n_longer_than_p": [
+        77,
+        2232,
+        2328,
+        2938,
+        2954,
+        3191,
+        3199,
+        5861
+      ],
+      "only_twist_prime": [
+        546,
+        1547,
+        1708,
+        1839,
+        2181,
+        2497,
+        3007,
+        3232,
+        3392,
+        3848,
+        4700,
+        5119,
+        5263,
+        6406,
+        6861,
+        6912
+      ]
+    }
+  ],
+  "exact_order_rows": {
+    "224": [
+      {
+        "candidate": 777,
+        "curve_order": "26959946667150639794667015087019626772004636449709276710155965861059",
+        "twist_order": "26959946667150639794667015087019634575111196070343339576864166736705"
+      },
+      {
+        "candidate": 1485,
+        "curve_order": "26959946667150639794667015087019630513412936534849010933930420795721",
+        "twist_order": "26959946667150639794667015087019630833702895985203605353089711802043"
+      },
+      {
+        "candidate": 5736,
+        "curve_order": "26959946667150639794667015087019627449002316305930334921237593633353",
+        "twist_order": "26959946667150639794667015087019633898113516214122281365782538964411"
+      },
+      {
+        "candidate": 7026,
+        "curve_order": "26959946667150639794667015087019625940457807714424391721682722368061",
+        "twist_order": "26959946667150639794667015087019635406658024805628224565337410229703"
+      }
+    ],
+    "256": [
+      {
+        "candidate": 876,
+        "curve_order": "115792089210356248762697446949407573529980276179566407717841077783673421468943",
+        "twist_order": "115792089210356248762697446949407573530192010651014220673226184834060774238961"
+      },
+      {
+        "candidate": 1842,
+        "curve_order": "115792089210356248762697446949407573529996955224135760342422259061068512044369",
+        "twist_order": "115792089210356248762697446949407573530175331606444868048645003556665683663535"
+      }
+    ]
+  },
+  "interpretation_limits": [
+    "Accepted means passing the recorded known checks, not a verified historical acceptance decision.",
+    "Skipped means earlier eligible candidate not published; it does not by itself establish why.",
+    "This source review and the six-curve diagnostic are exploratory, not a preregistered statistical test."
+  ]
+}

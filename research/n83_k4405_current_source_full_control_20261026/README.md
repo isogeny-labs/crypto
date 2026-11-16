@@ -28,7 +28,7 @@ recorded 3,746 immediately free 16 KiB pages and 1,551,744 pages occupied
 by the compressor; the child remained live. The agent sent
 SIGTERM to the child process group to protect concurrent jobs. The
 post-stop `vm.swapusage` reading retained in
-[`manual_abort.json`](evidence-01/manual_abort.json) was above 12 GiB.
+[`manual_abort.json`](evidence-01/manual_abort.json) was `used = 12092.38M`.
 The available telemetry does not isolate which concurrent process caused
 each swapped page, and compressed/swapped pages make child RSS an incomplete
 host-pressure gate.
@@ -36,17 +36,22 @@ host-pressure gate.
 The versioned [`runner_v1.py`](evidence-01/runner_v1.py) matches the executed
 wrapper byte for byte. Its config, terminal receipt, samples, empty producer
 output and file hashes are in [`evidence-01`](evidence-01/). Run
-`python3 audit.py` here to check that bundle; it returns
+`cargo run --release --locked --bin n83_k4405_audit` from the repository root
+to check that bundle; it returns
 `PASS_BOUNDED_HOST_SWAP_ABORT_RECEIPT`. A producer summary, base dump,
 relation matrix and target receipt were not emitted before the stop.
+The [source-linked visual report](reports/run-20261026T2210Z/README.md)
+plots the retained resource samples and embeds the graph in a PDF.
 
-The current [`run.py`](run.py) is a revised guard for a later attempt. It
-requires at most 2 GiB host swap at admission and stops if swap crosses
-that threshold during execution, in addition to the existing wall, child
-RSS and host-free gates. Its preflight currently rejects this host with
-more than 11 GiB swap in use. This change prevents repeating the same
-high-memory launch while the host remains unsuitable; it does not
-reclassify the interrupted result.
+The native `n83_k4405_audit --preflight --binary PATH` command checks the
+archived producer source, exact binary, earlier public fixture, host free
+memory and host swap before a later attempt. Admission requires at least
+50% host free memory and at most 2,048 MiB swap in use. It reports
+`HOST_ADMISSION_BLOCKED` with exit code 2 when either host gate fails. This
+is an admission check; a later producer launch needs its own runtime stop
+guard and terminal receipt. The active Python launcher was removed because
+it could leave a worker running if telemetry failed and mishandled relative
+output paths.
 
 The next full-process K4405 control needs a 64 GiB-class host with a
 working provider stop guard or a cleared local memory envelope. Once rank,

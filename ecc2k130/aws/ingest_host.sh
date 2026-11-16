@@ -5,24 +5,22 @@
 # The store is a derived view for the public dashboard -- `dp/` is the corpus
 # and merge.py is what searches it -- so this host may be replaced at any time
 # and a fresh one simply resumes from `dp_ingest_progress`. That is the whole
-# reason a replacement is the deployment mechanism: the running ingest host has
-# no key pair, no instance profile and no SSM agent (by design: it needs no
-# inbound access), so the way to change the code it runs is to launch a new one
-# and stop the old.
+# reason a replacement is the deployment mechanism: the host has no key pair
+# or SSM agent (it needs no inbound access), so the way to change the code it
+# runs is to launch a new one and stop the old.
 #
-# It needs to reach RDS, which is private to the VPC and admits only a handful
-# of security groups, so the instance joins the same security group as the
-# walker. Credentials come from the `ecc2k130-ingest` instance profile: read
+# It needs to reach RDS, whose security group admits only a handful of source
+# groups or addresses, so the instance joins the same group as a prior
+# successful ingest host or a running walker. Credentials come from the
+# `ecc2k130-ingest` instance profile: read
 # `dp/`, write `logs/` and the status bucket's status.json, read the rho-dp
-# secret, put metrics in one namespace, and nothing else. If that profile does
-# not exist the script falls back to static keys in user-data, the way infra.sh
-# does for the GPU fleet -- which is worse, because user-data is readable by
-# anything on the box and by any principal that can describe the instance, so
-# prefer creating the profile (see INGEST_PROFILE below).
+# secret, put metrics in one namespace, and nothing else. A replica launch
+# requires that profile; no credential is copied into EC2 user-data.
 #
 # Usage:
-#   WORKER_AWS_ACCESS_KEY_ID=... WORKER_AWS_SECRET_ACCESS_KEY=... \
-#     ./ingest_host.sh up            # launch a new ingest host
+#   AWS_PROFILE=ecc2k130 INGEST_ROLE=publisher ./ingest_host.sh up
+#   AWS_PROFILE=ecc2k130 INGEST_ROLE=worker ./ingest_host.sh up
+#   ./ingest_host.sh preflight       # resolve the existing VPC placement, no writes
 #   ./ingest_host.sh status          # which hosts are running, and how far behind
 #   ./ingest_host.sh retire <id>     # stop a superseded host
 set -euo pipefail
@@ -39,20 +37,128 @@ STATUS_BUCKET=${ECC_STATUS_BUCKET:-ecc2k130-status-$ACCOUNT}
 TYPE=${INGEST_TYPE:-c7g.large}
 THREADS=${INGEST_THREADS:-6}
 NAME=rho-dp-ingest
-# Same group the walker uses; sg-...-rds admits it, and nothing else about
-# this host is reachable from outside the VPC.
-SG=${INGEST_SG:-$(aws ec2 describe-instances \
-    --filters "Name=tag:Name,Values=rho-ecc2k-walker" "Name=instance-state-name,Values=running" \
-    --query 'Reservations[0].Instances[0].SecurityGroups[0].GroupId' --output text)}
-SUBNET=${INGEST_SUBNET:-$(aws ec2 describe-instances \
-    --filters "Name=tag:Name,Values=rho-ecc2k-walker" "Name=instance-state-name,Values=running" \
-    --query 'Reservations[0].Instances[0].SubnetId' --output text)}
+ROLE=${INGEST_ROLE:-publisher}
+PAID_SERVICE=${INGEST_CAIRN_SERVICE:-0}
+PERIOD_SECONDS=${INGEST_PERIOD_SECONDS:-600}
+case "$ROLE" in
+publisher) WORKER_ONLY=0 ;;
+worker) WORKER_ONLY=1 ;;
+*) echo "INGEST_ROLE must be publisher or worker" >&2; exit 2 ;;
+esac
+case "$PAID_SERVICE" in
+0|1) ;;
+*) echo "INGEST_CAIRN_SERVICE must be 0 or 1" >&2; exit 2 ;;
+esac
+
+check_paid_service() {
+    [ "$PAID_SERVICE" = 1 ] || return 0
+    if [ ! -f "${INGEST_OPERATOR_PATH:-}" ]; then
+        echo "INGEST_CAIRN_SERVICE=1 requires INGEST_OPERATOR_PATH to Cairn operator.py" >&2
+        return 1
+    fi
+    if ! [[ "$PERIOD_SECONDS" =~ ^[0-9]+$ ]] || [ "$PERIOD_SECONDS" -lt 2 ]; then
+        echo "INGEST_PERIOD_SECONDS must be an integer >= 2" >&2
+        return 1
+    fi
+    local versioning
+    versioning=$(aws s3api get-bucket-versioning --bucket "$BUCKET" --query Status --output text)
+    if [ "$versioning" != Enabled ]; then
+        echo "paid-service receipts require source bucket versioning; $BUCKET is $versioning" >&2
+        return 1
+    fi
+}
+
+# A quiet walker fleet has no running walker to copy network placement from.
+# The last stopped ingest host is still an authoritative template for the
+# security group that RDS admits and for the subnet it used successfully.
+placement() {
+    local field=$1 value
+    value=$(aws ec2 describe-instances \
+        --filters "Name=tag:Name,Values=rho-ecc2k-walker" "Name=instance-state-name,Values=running" \
+        --query "Reservations[0].Instances[0].$field" --output text)
+    if [ -z "$value" ] || [ "$value" = None ]; then
+        value=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=$NAME" "Name=instance-state-name,Values=pending,running,stopping,stopped" \
+            --query "Reservations[0].Instances[0].$field" --output text)
+    fi
+    if [ -z "$value" ] || [ "$value" = None ]; then
+        echo "cannot resolve $field; set INGEST_SG and INGEST_SUBNET explicitly" >&2
+        return 1
+    fi
+    echo "$value"
+}
+
+if [ "${1:-up}" != status ] && [ "${1:-up}" != retire ]; then
+    SG=${INGEST_SG:-$(placement 'SecurityGroups[0].GroupId')}
+    SUBNET=${INGEST_SUBNET:-$(placement SubnetId)}
+fi
+
+# The Mac LaunchAgent can be the live status publisher even when every EC2
+# ingest host is stopped. An older copy ignores the new object locks; fail
+# before uploading code or launching an instance while it is active.
+check_local_ingester() {
+    local installed="$HOME/Library/Application Support/ECC2K130/ingest/dp_ingest.py" state
+    if ! command -v launchctl >/dev/null 2>&1; then
+        return 0
+    fi
+    state=$(launchctl print "gui/$(id -u)/com.adamburan.ecc2k130-dp-ingest" 2>/dev/null || true)
+    if [[ "$state" != *'state = running'* ]]; then
+        return 0
+    fi
+    if [ ! -f "$installed" ] ||
+       [ "$(sha256sum "$installed" | cut -d' ' -f1)" != "$(sha256sum dp_ingest.py | cut -d' ' -f1)" ]; then
+        echo "active local DP LaunchAgent runs a different ingester copy; stop or update it before launching replicas" >&2
+        return 1
+    fi
+    if [ "$ROLE" = publisher ]; then
+        echo "local DP LaunchAgent already publishes status; stop it before launching another publisher" >&2
+        return 1
+    fi
+}
+
+check_ec2_publisher() {
+    local existing
+    [ "$ROLE" = publisher ] || return 0
+    existing=$(aws ec2 describe-instances \
+        --filters "Name=tag:Name,Values=$NAME" "Name=tag:IngestRole,Values=publisher" \
+                  "Name=instance-state-name,Values=pending,running" \
+        --query 'Reservations[].Instances[].InstanceId' --output text)
+    if [ -n "$existing" ] && [ "$existing" != None ]; then
+        echo "EC2 publisher $existing already exists; launch workers or retire it first" >&2
+        return 1
+    fi
+}
+
+if [ "${1:-up}" = preflight ] || [ "${1:-up}" = up ]; then
+    check_local_ingester
+    check_ec2_publisher
+    check_paid_service
+fi
 
 case "${1:-up}" in
+preflight)
+    VERSIONING=$(aws s3api get-bucket-versioning --bucket "$BUCKET" --query Status --output text)
+    echo "account=$ACCOUNT region=$REGION role=$ROLE instance_type=$TYPE security_group=$SG subnet=$SUBNET"
+    echo "source=s3://$BUCKET/dp/ status=s3://$STATUS_BUCKET/status.json"
+    echo "cairn_service=$PAID_SERVICE period_seconds=$PERIOD_SECONDS"
+    echo "source_versioning=$VERSIONING"
+    if [ "$VERSIONING" != Enabled ]; then
+        echo "source bucket versioning is disabled; later receipt replay requires immutable object keys" >&2
+    fi
+    # JMESPath uses literal backticks for its string values.
+    # shellcheck disable=SC2016
+    aws ec2 describe-instances \
+        --filters "Name=tag:Name,Values=$NAME" "Name=instance-state-name,Values=pending,running" \
+        --query 'Reservations[].Instances[].[InstanceId,State.Name,Tags[?Key==`IngestRole`]|[0].Value]' \
+        --output table
+    exit 0
+    ;;
 status)
+    # JMESPath uses literal backticks for its string values.
+    # shellcheck disable=SC2016
     aws ec2 describe-instances \
         --filters "Name=tag:Name,Values=$NAME" "Name=instance-state-name,Values=pending,running,stopping,stopped" \
-        --query 'Reservations[].Instances[].[InstanceId,State.Name,InstanceType,LaunchTime,Tags[?Key==`IngestVersion`]|[0].Value]' \
+        --query 'Reservations[].Instances[].[InstanceId,State.Name,InstanceType,LaunchTime,Tags[?Key==`IngestVersion`]|[0].Value,Tags[?Key==`IngestRole`]|[0].Value]' \
         --output table
     echo "last lines of each host's journal copy:"
     for p in $(aws s3 ls "s3://$BUCKET/logs/" | awk '{print $2}' | grep '^rho-ingest' || true); do
@@ -69,35 +175,17 @@ retire)
     exit 0
     ;;
 up) ;;
-*) echo "usage: $0 [up|status|retire <instance-id>]" >&2; exit 1 ;;
+*) echo "usage: $0 [preflight|up|status|retire <instance-id>]" >&2; exit 1 ;;
 esac
 
 PROFILE=${INGEST_PROFILE:-ecc2k130-ingest}
-if aws iam get-instance-profile --instance-profile-name "$PROFILE" >/dev/null 2>&1; then
-    echo "using instance profile $PROFILE"
-else
-    echo "no instance profile $PROFILE; falling back to static keys in user-data" >&2
-    PROFILE=""
-fi
-
-KEY=${WORKER_AWS_ACCESS_KEY_ID:-}
-SECRET=${WORKER_AWS_SECRET_ACCESS_KEY:-}
-if [ -z "$PROFILE" ] && [ -z "$KEY" ]; then
-    read -r KEY SECRET < <(python3 - <<'PY'
-import configparser, os, pathlib
-c = configparser.ConfigParser()
-c.read(os.path.expanduser("~/.aws/credentials"))
-p = os.environ.get("AWS_PROFILE", "default")
-if p not in c or c[p].get("aws_session_token"):
-    raise SystemExit("set WORKER_AWS_ACCESS_KEY_ID / WORKER_AWS_SECRET_ACCESS_KEY "
-                     "to static keys; temporary credentials expire under the host")
-print(c[p]["aws_access_key_id"], c[p]["aws_secret_access_key"])
-PY
-)
-fi
-if [ -z "$PROFILE" ] && { [ -z "$KEY" ] || [ -z "$SECRET" ]; }; then
-    echo "no instance profile and no static credentials for the host" >&2
+if ! aws iam get-instance-profile --instance-profile-name "$PROFILE" >/dev/null 2>&1; then
+    echo "instance profile $PROFILE is unavailable; refusing to put static credentials in user-data" >&2
     exit 1
+fi
+echo "using instance profile $PROFILE"
+if [ "$PAID_SERVICE" = 0 ]; then
+    echo "Cairn period evidence is disabled; this host cannot support a service-period claim" >&2
 fi
 
 AMI=${INGEST_AMI:-$(aws ec2 describe-images --owners 099720109477 \
@@ -111,17 +199,19 @@ SHA=$(sha256sum dp_ingest.py | cut -c1-16)
 aws s3 cp dp_ingest.py "s3://$BUCKET/ingest/$SHA/dp_ingest.py" --only-show-errors
 echo "published ingest $SHA"
 
-CREDS=""
-if [ -z "$PROFILE" ]; then
-    CREDS=$(cat <<EOF
-cat > /root/.aws/credentials <<'AWSCREDS'
-[default]
-aws_access_key_id=$KEY
-aws_secret_access_key=$SECRET
-AWSCREDS
-chmod 600 /root/.aws/credentials
-EOF
-)
+EXEC_START="/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py --bucket $BUCKET --status-bucket $STATUS_BUCKET --threads $THREADS --metric-namespace ECC2K130/Ingest"
+STOP_POST=
+EVIDENCE_SHIP=
+OPERATOR_SHA=
+if [ "$PAID_SERVICE" = 1 ]; then
+    OPERATOR_SHA=$(sha256sum "$INGEST_OPERATOR_PATH" | cut -c1-16)
+    aws s3 cp "$INGEST_OPERATOR_PATH" "s3://$BUCKET/ingest/$SHA/operator-$OPERATOR_SHA.py" --only-show-errors
+    # `operator.py` in the ingester's module directory shadows Python's
+    # standard-library operator module, including during venv/pip startup.
+    EXEC_START="/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/cairn_ingest_operator.py --replica-id %H --evidence-dir /var/lib/rho-ingest/evidence --status-url https://$STATUS_BUCKET.s3.$REGION.amazonaws.com/status.json --period-seconds $PERIOD_SECONDS -- /opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py --replica-id %H --bucket $BUCKET --status-bucket $STATUS_BUCKET --threads $THREADS --metric-namespace ECC2K130/Ingest"
+    STOP_POST=ExecStopPost=/usr/local/bin/rho-ingest-logship
+    EVIDENCE_SHIP="aws s3 sync /var/lib/rho-ingest/evidence/ s3://$BUCKET/logs/rho-ingest-\${IID}/evidence/ --exclude current-period.json --exclude operator.lock --exclude '*.tmp' --only-show-errors"
+    echo "published Cairn operator $OPERATOR_SHA; period ${PERIOD_SECONDS}s"
 fi
 
 USERDATA=$(mktemp)
@@ -132,7 +222,6 @@ set -uo pipefail
 exec > >(tee -a /var/log/rho-ingest-boot.log) 2>&1
 export AWS_DEFAULT_REGION=$REGION
 install -d -m 700 /root/.aws
-$CREDS
 printf '[default]\nregion=$REGION\n' > /root/.aws/config
 
 apt-get update -q
@@ -147,6 +236,13 @@ aws s3 cp "s3://$BUCKET/ingest/$SHA/dp_ingest.py" /opt/rho-ingest/dp_ingest.py
 got=\$(sha256sum /opt/rho-ingest/dp_ingest.py | cut -c1-16)
 [ "\$got" = "$SHA" ] || { echo "ingest digest \$got != $SHA; refusing to run"; exit 1; }
 
+if [ "$PAID_SERVICE" = 1 ]; then
+    aws s3 cp "s3://$BUCKET/ingest/$SHA/operator-$OPERATOR_SHA.py" /opt/rho-ingest/cairn_ingest_operator.py
+    got=\$(sha256sum /opt/rho-ingest/cairn_ingest_operator.py | cut -c1-16)
+    [ "\$got" = "$OPERATOR_SHA" ] || { echo "Cairn operator digest \$got != $OPERATOR_SHA; refusing to run"; exit 1; }
+    install -d -m 700 /var/lib/rho-ingest/evidence
+fi
+
 cat > /etc/systemd/system/rho-ingest.service <<'UNIT'
 [Unit]
 Description=ECC2K-130 distinguished-point ingest
@@ -159,9 +255,9 @@ Environment=AWS_DEFAULT_REGION=$REGION
 Environment=RHO_CAMPAIGN=ecc2k-130
 Environment=RHO_DB_HOST=$(aws rds describe-db-instances --db-instance-identifier rho-dp --query 'DBInstances[0].Endpoint.Address' --output text)
 Environment=RHO_DB_SECRET=rho/dp-rds
-ExecStart=/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py \\
-    --bucket $BUCKET --status-bucket $STATUS_BUCKET \\
-    --threads $THREADS --metric-namespace ECC2K130/Ingest
+Environment=RHO_INGEST_WORKER_ONLY=$WORKER_ONLY
+ExecStart=$EXEC_START
+$STOP_POST
 Restart=always
 RestartSec=15
 
@@ -171,9 +267,13 @@ UNIT
 
 cat > /usr/local/bin/rho-ingest-logship <<'SHIP'
 #!/bin/bash
-IID=\$(curl -s -m 2 -H "X-aws-ec2-metadata-token: \$(curl -s -m 2 -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 120')" http://169.254.169.254/latest/meta-data/instance-id)
-journalctl -u rho-ingest -n 4000 --no-pager > /tmp/ingest.log 2>/dev/null
+set -euo pipefail
+token=\$(curl -fsS -m 2 -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 120')
+IID=\$(curl -fsS -m 2 -H "X-aws-ec2-metadata-token: \$token" http://169.254.169.254/latest/meta-data/instance-id)
+[[ "\$IID" =~ ^i-[0-9a-f]+$ ]] || { echo 'cannot identify this EC2 instance' >&2; exit 1; }
+journalctl -u rho-ingest -n 4000 --no-pager > /tmp/ingest.log 2>/dev/null || true
 aws s3 cp /tmp/ingest.log "s3://$BUCKET/logs/rho-ingest-\${IID}/ingest.log" --only-show-errors
+$EVIDENCE_SHIP
 SHIP
 chmod +x /usr/local/bin/rho-ingest-logship
 cat > /etc/systemd/system/rho-ingest-logship.service <<'UNIT'
@@ -200,16 +300,14 @@ systemctl enable --now rho-ingest-logship.timer
 echo "ingest $SHA started \$(date -u)"
 EOF
 
-PROFILE_ARG=()
-[ -n "$PROFILE" ] && PROFILE_ARG=(--iam-instance-profile "Name=$PROFILE")
-
 IID=$(aws ec2 run-instances --image-id "$AMI" --instance-type "$TYPE" \
-    --subnet-id "$SUBNET" --security-group-ids "$SG" "${PROFILE_ARG[@]}" \
+    --subnet-id "$SUBNET" --security-group-ids "$SG" \
+    --iam-instance-profile "Name=$PROFILE" \
     --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=30,VolumeType=gp3,DeleteOnTermination=true}' \
     --metadata-options 'HttpTokens=required,HttpEndpoint=enabled' \
     --user-data "file://$USERDATA" \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$NAME},{Key=Project,Value=ecc2k-130},{Key=Role,Value=rho-ingest},{Key=IngestVersion,Value=$SHA},{Key=CostGuardExempt,Value=true}]" \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$NAME},{Key=Project,Value=ecc2k-130},{Key=Role,Value=rho-ingest},{Key=IngestRole,Value=$ROLE},{Key=IngestVersion,Value=$SHA},{Key=CairnService,Value=$PAID_SERVICE},{Key=CostGuardExempt,Value=true}]" \
     --query 'Instances[0].InstanceId' --output text)
-echo "launched $IID ($TYPE, ingest $SHA)"
+echo "launched $IID ($TYPE, $ROLE replica, ingest $SHA)"
 echo "watch: aws s3 cp s3://$BUCKET/logs/rho-ingest-$IID/ingest.log - | tail"
 echo "when it is drained, retire the old host: $0 retire <old-instance-id>"

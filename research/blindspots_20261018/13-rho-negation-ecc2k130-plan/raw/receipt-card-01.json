@@ -1,0 +1,353 @@
+{
+  "card_id": "CARD-BLINDSPOT-13-01",
+  "card_path": "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/card-01.yaml",
+  "card_sha256": "efe62caab62fd45277a07a922436c4929c5626d103ff7f8dbc36dbf7f7f26a1a",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw",
+        "target/blindspots-13/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-13/card-01/b13",
+        "examples/blindspots_13_rho_negation.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.053,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 7.053,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-13/card-01/b13",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.711,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 3.711,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2eee1ad359ba4afccb0cb7c51aa2898f64259927c01b510b3934c1df77406c59",
+      "stdout_tail": [
+        "  per4     solved 6/6 censored 0/6 mean ops/sqrt(N) 1.443 bad 0",
+        "  per8     solved 6/6 censored 0/6 mean ops/sqrt(N) 1.122 bad 0",
+        "  per16    solved 6/6 censored 0/6 mean ops/sqrt(N) 1.550 bad 0",
+        "  per32    solved 2/6 censored 4/6 mean ops/sqrt(N) 2.258 bad 0",
+        "  per64    solved 0/6 censored 6/6 mean ops/sqrt(N) 2.507 bad 0",
+        "  laper16  solved 6/6 censored 0/6 mean ops/sqrt(N) 0.918 bad 0",
+        "  laper32  solved 6/6 censored 0/6 mean ops/sqrt(N) 0.974 bad 0",
+        "  laper64  solved 6/6 censored 0/6 mean ops/sqrt(N) 1.088 bad 0",
+        "PASS positive control (absorption): no-escape arm censored on 6/6 targets at r=16",
+        "PASS positive control (baseline): baseline solved 6/6",
+        "PASS positive control (detecting arms): windows of 4, 8, 16 and the three look-ahead+periodic arms solved at least 5 of 6 at r=16 (a window of k sees only cycles of length <= k, so the window of 2 is a 2-cycle-only rule like min-of-2 and dbl, which longer fruitless cycles absorb at r=16; windows of 32 and 64 lose to re-entry; those are not asserted, they are the effect under measurement)",
+        "  r=2048 base     solved 6/6",
+        "  r=2048 dbl      solved 6/6",
+        "  r=2048 min2     solved 6/6",
+        "  r=2048 la       solved 6/6",
+        "  r=2048 per16    solved 6/6",
+        "  r=2048 laper16  solved 6/6",
+        "PASS positive control (r = 2048): baseline, doubling escape, min-of-2, look-ahead, window 16 and look-ahead+16 solved at least 5 of 6 at r=2048",
+        "PASS ideal-map control: points/classes mean steps = 1.295 over 200 targets at 2^30 (sqrt2 = 1.414)",
+        "selftest OK in 3.7s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-13/card-01/b13",
+        "ctl",
+        "--bits",
+        "40",
+        "--targets",
+        "512",
+        "--out",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b40.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.367,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "ctl-40",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b40.jsonl": "998a78005683b9bd084b67f05679b49340438fa09525ac32c797c26d3f447539"
+      },
+      "seconds": 8.367,
+      "stderr_sha256": "a551ba70d4876c2319c7c6412447aeacefe97ec003829aea53a2afbf5960c181",
+      "stderr_tail": [
+        "ctl bits=40: 512 targets x 2 arms in 8.4s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-13/card-01/b13",
+        "ctl",
+        "--bits",
+        "44",
+        "--targets",
+        "512",
+        "--out",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b44.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 32.08,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "ctl-44",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/ctl-b44.jsonl": "5b0ffc92b786433d0c1af35497aa8159790d8de8940dbf800e1e0eaa136e6d35"
+      },
+      "seconds": 32.08,
+      "stderr_sha256": "27537aebf797a2d8985aeca48c88ea3d1e8ec8d4f58df033ef4b2cec29fca56e",
+      "stderr_tail": [
+        "ctl bits=44: 512 targets x 2 arms in 32.1s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-13/card-01/b13",
+        "sweep",
+        "--bits",
+        "40",
+        "--t0",
+        "0",
+        "--t1",
+        "64",
+        "--rs",
+        "16,32,128,2048",
+        "--arms",
+        "base,none,dbl,min2,la,per2,per4,per8,per16,per32,per64,laper16,laper32,laper64",
+        "--seed-offset",
+        "7000000",
+        "--out",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 78.955,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sweep",
+      "index": 6,
+      "outputs": {
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64.jsonl": "72f7e198f7b07a7f63264f1eb83ff0c285cb7f80a211f08d8a1a02467645f53f"
+      },
+      "seconds": 78.955,
+      "stderr_sha256": "c96a5b2040a6e5e1651786b75d9bee20254ed4a2d831b07c937d114fb6965a5b",
+      "stderr_tail": [
+        "sweep bits=40 targets 0..64 arms [\"base\", \"none\", \"dbl\", \"min2\", \"la\", \"per2\", \"per4\", \"per8\", \"per16\", \"per32\", \"per64\", \"laper16\", \"laper32\", \"laper64\"] rs [16, 32, 128, 2048]: 3584 records in 79.0s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-13/card-01/b13",
+        "sweep",
+        "--bits",
+        "40",
+        "--t0",
+        "0",
+        "--t1",
+        "64",
+        "--rs",
+        "16,32,128,2048",
+        "--arms",
+        "baseb",
+        "--seed-offset",
+        "9000011",
+        "--out",
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64-baseb.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 3.776,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sweep-baseb",
+      "index": 7,
+      "outputs": {
+        "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64-baseb.jsonl": "23c3a5a11896ebf00459bc809864ac67ac87a86a199373ad441b04daca1db358"
+      },
+      "seconds": 3.776,
+      "stderr_sha256": "6f14f6e1c18c6902353f23d84f8cf2d2259cda2dee17530df4ae5af5302027aa",
+      "stderr_tail": [
+        "sweep bits=40 targets 0..64 arms [\"baseb\"] rs [16, 32, 128, 2048]: 256 records in 3.8s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-13/card-01/b13"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-13/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "aa53efefef31cce12ca6ece3f27de35521cc7c58",
+  "dirty_after": [
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-01-sweep-baseb.stderr.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-01-sweep.stderr.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b40-r16_32_128_2048-t00-64-baseb.jsonl"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

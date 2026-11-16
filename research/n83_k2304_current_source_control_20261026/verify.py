@@ -6,7 +6,6 @@ import argparse
 import json
 from pathlib import Path
 
-from research.n83_crossfamily_current_20261025 import run as panel
 from research.n83_k2304_current_source_control_20261026 import run
 from research.n83_k4405_linux_replay_20261026.verify import (
     candidate_digest, check, one_jsonl, read, replay_target, sha,
@@ -15,6 +14,21 @@ from research.n83_k4405_linux_replay_20261026.verify import (
 
 ROOT = Path(__file__).resolve().parents[2]
 PREFIX = ROOT / "research/n83_k2304_current_source_prefix_20261025/prefix_receipt.json"
+EXECUTED_SOURCE = Path(__file__).resolve().with_name(
+    "koblitz_orbit_dlp_fast.executed-20261026.rs")
+EXECUTED_FLAGS = {
+    "KIC_INDEXED4_FIXED31": "0", "KIC_INDEXED5_FIXED30": "0",
+    "KIC_INDEXED5_ID30": "0", "KIC_INDEXED5_LOAD75": "1",
+    "KIC_INDEXED_ROOT4": "0", "KIC_INDEXED_ROOT5": "1",
+    "KIC_INDEX_ROOT_BATCH": "1", "KIC_PACKED_ROOT_TABLE": "1",
+    "KIC_PACKED_ROOT_TABLE_DENSE": "0",
+    "KIC_PACKED_ROOT_TABLE_LOAD75": "0", "KIC_RANK_THREADS": "4",
+    "KIC_ROOT_BLOOM": "0", "KIC_ROOT_ONLY11": "1",
+    "KIC_ROOT_ONLY21": "0", "KIC_ROOT_ONLY22": "0",
+    "KIC_SPARSE_CANONICAL": "1", "KIC_STATE26": "0",
+    "KIC_STATE28": "0", "KIC_SYMMETRIC_S3": "1",
+    "KIC_TARGET_CANCEL": "1", "KIC_TARGET_THREADS": "2",
+}
 
 
 def verify(output: Path, binary: Path) -> dict:
@@ -23,7 +37,7 @@ def verify(output: Path, binary: Path) -> dict:
     check(config["schema"] == "n83.k2304-current-source-local-control/v1" and
           receipt["schema"] == "n83.k2304-current-source-local-receipt/v1" and
           config["runner_sha256"] == sha(Path(run.__file__)) and
-          config["source_sha256"] == run.SOURCE_SHA256 == sha(run.SOURCE) and
+          config["source_sha256"] == run.SOURCE_SHA256 == sha(EXECUTED_SOURCE) and
           config["binary_sha256"] == run.BINARY_SHA256 == sha(binary) and
           config["candidate_manifest_sha256"] == sha(run.CANDIDATE) and
           config["public_targets_sha256"] == sha(run.PUBLIC) and
@@ -34,11 +48,9 @@ def verify(output: Path, binary: Path) -> dict:
           prefix["status"] == "PASS_EXACT_BASE_IDENTITY" and
           prefix["current_ic_source_sha256"] == run.SOURCE_SHA256,
           "candidate or prefix identity differs")
-    expected = panel.ic_environment(output, "root11_dynamic", "k2304")
-    expected.pop("PATH")
     check({k: v for k, v in config["algorithm_flags"].items()
            if k != "KIC_DUMP_BASE"} ==
-          {k: v for k, v in expected.items() if k != "KIC_DUMP_BASE"} and
+          EXECUTED_FLAGS and
           Path(config["algorithm_flags"]["KIC_DUMP_BASE"]).name == "base_dump.jsonl" and
           Path(config["command"][0]).name == binary.name.split(".")[0] ==
           "koblitz_orbit_dlp_fast" and

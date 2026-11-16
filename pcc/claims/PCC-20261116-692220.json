@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:51:29Z",
+ "id": "PCC-20261116-692220",
+ "kind": "statement",
+ "producer": {
+  "commit": "2d54889ac1032d59fe8b5410ad26ff705cec5bd7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-coordinate-compile-failure-03/actual-first-coordinate-compile.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-coordinate-compile-failure-03/entire-first-coordinate-compile.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-coordinate-compile-failure-03/entire-first-coordinate-compile.stdout",
+    "sha256": "a5cfdd4b5be09b0a397357b23cd3a5bead81474f09698e9e57b523d8d530e05e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-coordinate-compile-failure-03/entire-first-coordinate-source.lean.txt",
+    "sha256": "d66d17014666d27db769fc986340be299e5f8a20080c3a6fa4f084fe3b2cc75c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-coordinate-compile-failure-03/entire-first-wrong-Consumer-root-caller.txt",
+    "sha256": "ca890528b3221666865031b056759cbde787b9b2df5208de6fbc40356933cfc2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-coordinate-compile-failure-03/whole-first-wrong-Consumer-root/research_chained_jacobian_transfers_20261110_lean_CubicNormDescent_lean/build.log",
+    "sha256": "0b079ce2c0771796ff5df66b6816bf274fabf64c0af678c7f8866535a42cae45"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-coordinate-compile-failure-03/whole-first-wrong-Consumer-root/research_chained_jacobian_transfers_20261110_lean_CubicNormDescent_lean/status",
+    "sha256": "0c6532fbd1cb7b97b6781811241a4e7dcaebf0e3ff758f7054a3038de5d2281f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Cubic coefficient-model first compile fails1 on two unsolved finite-residue equality goals (Fin numeral value and multiplication association), whole exact source/stdout/stderr/exit retained with emitted sorryAx from erroneous dependencies; no complete-module acceptance. Earlier first Consumer-gate call also fails1 because its original configured repository root is Consumer, while the target was named as a Root-relative path; its complete actual build diagnostic/caller preserved. Correction uses a byte-identical actual source copy in a fresh Consumer-contained ignored proof directory, never edits either original gate, and preserves old copies. Interim8-theorem source does pass both unchanged original gates/0 trusted at its exact older scope, while current extended arithmetic-model source remains unaccepted until fresh audits. No native full population, geometry/cost promotion or paid launch."
+}

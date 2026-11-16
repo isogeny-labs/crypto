@@ -1,0 +1,123 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "bitop ladder train panel: 39-bit a=-3 prime-order curve",
+ "description": "research/bitop_ladder_20261019/PROTOCOL.md, frozen 2026-10-19. Counts only (bitop/v1); public synthetic curve; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 549755813723,
+    "a": 549755813720,
+    "b": 91,
+    "group_order": 549755036827,
+    "r": 549755036827,
+    "gx": 2,
+    "gy": 340115438864
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 20261019100,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "pair-N617",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=617",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N873",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=873",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N1235",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1235",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N1746",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1746",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N2469",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2469",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N3492",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=3492",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N4939",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4939",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019101,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

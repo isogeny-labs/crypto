@@ -1,0 +1,73 @@
+\section{How an improvement is measured}\label{sec:measure}
+
+The measurement contract is set out in full in the programme
+record~\cite{icprogram2026} (\S3 there). This section gives only what is
+needed to read the ledger.
+
+\paragraph{Unit.} The common unit is
+$S=\text{(total group-addition equivalents, GAE)}/\sqrt r$, with floor
+$S_{\mathrm{floor}}=\sqrt{\pi/(2A)}$. An addition or doubling is one GAE.
+Native work is converted at pinned calibration ratios
+(\art{docs/ic/calibration.json}) where a conversion exists. Such work
+includes table lookups, row operations, Artin--Schreier solves and solver
+word XORs. Where no conversion exists, the work is recorded as unpriced and
+the cost is a lower bound. Some families use their own counted unit: $\FF_q$
+or $\FF_p$ multiplications for genus three and $k=4$, or a batched affine
+addition for the Koblitz rule. A ratio is comparable only within one unit.
+
+\paragraph{Boundaries.} Every number in this paper is stated on one of four
+boundaries:
+\begin{itemize}
+\item \emph{stage}: one oracle call, one solver run, one set-up phase;
+\item \emph{complete}: a verified discrete logarithm with the stated phases;
+\item \emph{cold}: one previously unseen target, every table built inside
+  the cost;
+\item \emph{online}: one target after reusable preparation, which is
+  excluded.
+\end{itemize}
+The success criterion's ratchet is defined on the complete or cold boundary.
+A stage improvement is reported as a stage improvement. It becomes a
+pipeline improvement only once it moves end-to-end cost.
+
+\paragraph{Records.} Measurements are made with the native harness
+\emph{ecbench} (\art{src/cryptanalysis/ecbench/}) or a study's own frozen
+driver. Each execution appends a sealed record, and every answer is checked
+as $[k]G=Q$ outside the solver. \texttt{ecbench verify} re-executes measured
+records and requires identical operation counts; the SHA-256 of its receipt
+is the replay certificate. Wall time is admitted only at the isolation
+level its specification requires (default L2: quiet host, zero steal). Below
+that level it is descriptive.
+
+\paragraph{The pricing band.} Almost no cost is complete, the rho baselines
+included. Since 15 October, every cross-method comparison prices each arm's
+unpriced native work alike at $w\in\{0,0.1,1\}$ GAE per operation. It ranks
+two arms only if their order holds at all three weights (\art{AGENTS.md}
+\S5a).
+
+\paragraph{Change classes.} Every change is classed as one of:
+\begin{itemize}
+\item \cls{advance}: an exponent or crossover moves under complete
+  accounting;
+\item \cls{engineering}: a constant moves;
+\item \cls{relabelling}: the headline count fell while total cost rose;
+\item \cls{accounting}: the numbers changed but the algorithm did not.
+\end{itemize}
+Against the index-calculus incumbent, the ledger also uses the verdicts of
+\texttt{ecbench}'s challenge protocol. A change \emph{improves the exponent}
+(Ie) or \emph{the constant} (Ic), is engineering on one stage (E),
+\emph{trades} (T), or \emph{regresses} (R). An Ie verdict against the
+incumbent is not an \cls{advance} against rho unless the exponent crosses
+rho's.
+
+\paragraph{The validation gate.} Since 19 October no row may enter the
+index-calculus leaderboard or \art{benchmarks/README.md} without three
+pieces of evidence, named by the evidence directory's \texttt{VALIDATION.json}
+(\art{docs/VALIDATION_GATE.md}):
+\begin{enumerate}
+\item an independent replay certificate with verified scalars;
+\item an independent validator report that recomputes the headline numbers;
+\item a matched rho reference: the strongest available, in the same unit
+  and the same binary, priced across the band.
+\end{enumerate}
+Rows recorded before the gate render as ``unvalidated (pre-gate)''.
+\S\ref{sec:gate} gives the state of every IC row.

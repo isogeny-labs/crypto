@@ -1,0 +1,16 @@
+✖ [1312/1313] Building ExteriorWitness (2.7s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/exterior-witness-lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/exterior-witness-lean/ExteriorWitness.lean -o /workspace/audit/exterior-witness-lean/.lake/build/lib/lean/ExteriorWitness.olean -i /workspace/audit/exterior-witness-lean/.lake/build/lib/lean/ExteriorWitness.ilean -c /workspace/audit/exterior-witness-lean/.lake/build/ir/ExteriorWitness.c --setup /workspace/audit/exterior-witness-lean/.lake/build/ir/ExteriorWitness.setup.json --json
+error: ExteriorWitness.lean:28:68: failed to synthesize
+  Decidable (evenSlot4 0 0 ∧ evenSlot4 2 1)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+info: ExteriorWitness.lean:55:0: 'ExteriorWitness.source_normalizer' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:56:0: 'ExteriorWitness.witness_slots_allowed' depends on axioms: [sorryAx]
+info: ExteriorWitness.lean:57:0: 'ExteriorWitness.witness_has_passive_axis' does not depend on any axioms
+info: ExteriorWitness.lean:58:0: 'ExteriorWitness.local_node_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:59:0: 'ExteriorWitness.crossing_linear_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:60:0: 'ExteriorWitness.passive_product_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ExteriorWitness.lean:61:0: 'ExteriorWitness.passive_product_nonzero' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- ExteriorWitness
+error: build failed

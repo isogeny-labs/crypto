@@ -1,6 +1,7 @@
 name: NIST RTX PRO 6000 tournament
 on:
   push:
+    branches: [main]
     paths:
       - 'research/nist_gpu_arithmetic_20260926/RUN_GPU'
 concurrency:
@@ -8,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   modal-rtxpro6000:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|nist-rtxpro6000-run.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|nist-rtxpro6000-run.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 240
     env:
       MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
@@ -18,6 +19,7 @@ jobs:
       - name: Check Modal credentials
         id: creds
         run: |
+          set -o pipefail
           if [ -n "$MODAL_TOKEN_ID" ] && [ -n "$MODAL_TOKEN_SECRET" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
@@ -30,11 +32,15 @@ jobs:
       - name: Device validation
         if: steps.creds.outputs.available == 'true'
         working-directory: gpu/nist
-        run: modal run modal_app.py::validate 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/validate.log
+        run: |
+          set -o pipefail
+          modal run modal_app.py::validate 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/validate.log
       - name: RTX PRO tournament
         if: steps.creds.outputs.available == 'true'
         working-directory: gpu/nist
-        run: modal run modal_app.py::tune --repeats 3 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/tune.log
+        run: |
+          set -o pipefail
+          modal run modal_app.py::tune --repeats 3 2>&1 | tee ../../research/nist_gpu_arithmetic_20260926/tune.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:

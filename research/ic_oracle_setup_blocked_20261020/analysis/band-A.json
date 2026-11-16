@@ -1,0 +1,740 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "batch-1024",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        31.850864479222793,
+        35.020607858339865,
+        63.54829827039348
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "batch-2048",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        71.81580409781978,
+        73.38761265063152,
+        87.5338896259371
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "batch-4096",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        260.0114780710156,
+        260.8426501586871,
+        268.32319894773224
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "batch-8192",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        1026.1393738630504,
+        1026.6319776612959,
+        1031.0654118455052
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "blocked-1024",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        31.850864479222793,
+        35.020607858339865,
+        63.54829827039348
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "blocked-2048",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        71.81580409781978,
+        73.38761265063152,
+        87.5338896259371
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "blocked-4096",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        260.0114780710156,
+        260.8426501586871,
+        268.32319894773224
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "blocked-4096-aa",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        260.0114780710156,
+        260.8426501586871,
+        268.32319894773224
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "blocked-8192",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        1026.1393738630504,
+        1026.6319776612959,
+        1031.0654118455052
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "rho-neg",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        0.9664936675732191,
+        1.0625344370099485,
+        1.926901361940509
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "scalar-1024",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        31.850864479222793,
+        35.020607858339865,
+        63.54829827039348
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "scalar-2048",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        71.81580409781978,
+        73.38761265063152,
+        87.5338896259371
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "scalar-4096",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        260.0114780710156,
+        260.8426501586871,
+        268.32319894773224
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "scalar-8192",
+      "runs": 40,
+      "verified": 40,
+      "mean_s": [
+        1026.1393738630504,
+        1026.6319776612959,
+        1031.0654118455052
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "batch-2048",
+      "verdict": "batch-1024 < batch-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "batch-4096",
+      "verdict": "batch-1024 < batch-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "batch-8192",
+      "verdict": "batch-1024 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "blocked-1024",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "blocked-2048",
+      "verdict": "batch-1024 < blocked-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "blocked-4096",
+      "verdict": "batch-1024 < blocked-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "blocked-4096-aa",
+      "verdict": "batch-1024 < blocked-4096-aa"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "blocked-8192",
+      "verdict": "batch-1024 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-1024"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "scalar-1024",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "scalar-2048",
+      "verdict": "batch-1024 < scalar-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "scalar-4096",
+      "verdict": "batch-1024 < scalar-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-1024",
+      "b": "scalar-8192",
+      "verdict": "batch-1024 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "batch-4096",
+      "verdict": "batch-2048 < batch-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "batch-8192",
+      "verdict": "batch-2048 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "blocked-1024",
+      "verdict": "blocked-1024 < batch-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "blocked-2048",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "blocked-4096",
+      "verdict": "batch-2048 < blocked-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "blocked-4096-aa",
+      "verdict": "batch-2048 < blocked-4096-aa"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "blocked-8192",
+      "verdict": "batch-2048 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "scalar-1024",
+      "verdict": "scalar-1024 < batch-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "scalar-2048",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "scalar-4096",
+      "verdict": "batch-2048 < scalar-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-2048",
+      "b": "scalar-8192",
+      "verdict": "batch-2048 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "batch-8192",
+      "verdict": "batch-4096 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "blocked-1024",
+      "verdict": "blocked-1024 < batch-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "blocked-2048",
+      "verdict": "blocked-2048 < batch-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "blocked-4096",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "blocked-4096-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "blocked-8192",
+      "verdict": "batch-4096 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "scalar-1024",
+      "verdict": "scalar-1024 < batch-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "scalar-2048",
+      "verdict": "scalar-2048 < batch-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "scalar-4096",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-4096",
+      "b": "scalar-8192",
+      "verdict": "batch-4096 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "blocked-1024",
+      "verdict": "blocked-1024 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "blocked-2048",
+      "verdict": "blocked-2048 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "blocked-4096",
+      "verdict": "blocked-4096 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "blocked-4096-aa",
+      "verdict": "blocked-4096-aa < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "blocked-8192",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "scalar-1024",
+      "verdict": "scalar-1024 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "scalar-2048",
+      "verdict": "scalar-2048 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "scalar-4096",
+      "verdict": "scalar-4096 < batch-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-8192",
+      "b": "scalar-8192",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "blocked-2048",
+      "verdict": "blocked-1024 < blocked-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "blocked-4096",
+      "verdict": "blocked-1024 < blocked-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "blocked-4096-aa",
+      "verdict": "blocked-1024 < blocked-4096-aa"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "blocked-8192",
+      "verdict": "blocked-1024 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "rho-neg",
+      "verdict": "rho-neg < blocked-1024"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "scalar-1024",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "scalar-2048",
+      "verdict": "blocked-1024 < scalar-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "scalar-4096",
+      "verdict": "blocked-1024 < scalar-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-1024",
+      "b": "scalar-8192",
+      "verdict": "blocked-1024 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "blocked-4096",
+      "verdict": "blocked-2048 < blocked-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "blocked-4096-aa",
+      "verdict": "blocked-2048 < blocked-4096-aa"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "blocked-8192",
+      "verdict": "blocked-2048 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "rho-neg",
+      "verdict": "rho-neg < blocked-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "scalar-1024",
+      "verdict": "scalar-1024 < blocked-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "scalar-2048",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "scalar-4096",
+      "verdict": "blocked-2048 < scalar-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-2048",
+      "b": "scalar-8192",
+      "verdict": "blocked-2048 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096",
+      "b": "blocked-4096-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096",
+      "b": "blocked-8192",
+      "verdict": "blocked-4096 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096",
+      "b": "rho-neg",
+      "verdict": "rho-neg < blocked-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096",
+      "b": "scalar-1024",
+      "verdict": "scalar-1024 < blocked-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096",
+      "b": "scalar-2048",
+      "verdict": "scalar-2048 < blocked-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096",
+      "b": "scalar-4096",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096",
+      "b": "scalar-8192",
+      "verdict": "blocked-4096 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096-aa",
+      "b": "blocked-8192",
+      "verdict": "blocked-4096-aa < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096-aa",
+      "b": "rho-neg",
+      "verdict": "rho-neg < blocked-4096-aa"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096-aa",
+      "b": "scalar-1024",
+      "verdict": "scalar-1024 < blocked-4096-aa"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096-aa",
+      "b": "scalar-2048",
+      "verdict": "scalar-2048 < blocked-4096-aa"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096-aa",
+      "b": "scalar-4096",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-4096-aa",
+      "b": "scalar-8192",
+      "verdict": "blocked-4096-aa < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-8192",
+      "b": "rho-neg",
+      "verdict": "rho-neg < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-8192",
+      "b": "scalar-1024",
+      "verdict": "scalar-1024 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-8192",
+      "b": "scalar-2048",
+      "verdict": "scalar-2048 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-8192",
+      "b": "scalar-4096",
+      "verdict": "scalar-4096 < blocked-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-8192",
+      "b": "scalar-8192",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "rho-neg",
+      "b": "scalar-1024",
+      "verdict": "rho-neg < scalar-1024"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "rho-neg",
+      "b": "scalar-2048",
+      "verdict": "rho-neg < scalar-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "rho-neg",
+      "b": "scalar-4096",
+      "verdict": "rho-neg < scalar-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "rho-neg",
+      "b": "scalar-8192",
+      "verdict": "rho-neg < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "scalar-1024",
+      "b": "scalar-2048",
+      "verdict": "scalar-1024 < scalar-2048"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "scalar-1024",
+      "b": "scalar-4096",
+      "verdict": "scalar-1024 < scalar-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "scalar-1024",
+      "b": "scalar-8192",
+      "verdict": "scalar-1024 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "scalar-2048",
+      "b": "scalar-4096",
+      "verdict": "scalar-2048 < scalar-4096"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "scalar-2048",
+      "b": "scalar-8192",
+      "verdict": "scalar-2048 < scalar-8192"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "scalar-4096",
+      "b": "scalar-8192",
+      "verdict": "scalar-4096 < scalar-8192"
+    }
+  ]
+}

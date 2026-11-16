@@ -69,8 +69,15 @@ immediately after sealing the allocation receipt. It reads the live Pod
 identity, rate and provider creation time, then writes `watchdog_ready.json`.
 Copy that file to `/tmp/n83_fixed31_watchdog_ready.json` on the Pod before
 starting `launch_on_pod.sh`; the launcher checks its allocation hash, Pod ID,
-freshness and five-minute retirement margin. The controller transfers the raw
-archive on producer completion or at the margin, verifies its checksum,
+freshness and five-minute retirement margin. Before compilation, the launcher
+arms an independent Pod-side deletion task against the same allocation and
+readiness receipts. That task requests Pod
+deletion at `stop_after_utc` if the external controller has stopped. RunPod's
+`terminateAfter` creation field is not an enforced expiry; the two deletion
+paths reduce spend risk but cannot guarantee an account billing ceiling if
+both lose provider access. The Pod guard's archived `ARMED` receipt is a
+provider-custody admission gate. The controller transfers the raw archive on
+producer completion or at the margin, verifies its checksum,
 issues the provider termination mutation even if transfer or verification
 failed, and records `provider_post_terminate.json` after the Pod is absent.
 It retires the Pod at least five minutes before the 10-hour provider deadline.

@@ -1,0 +1,94 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "generator-effect E4, curve c8: gstd and four random generators",
+ "description": "E4 of research/generator_effect_ic_20261019 (E0_E4.md, E4 PROTOCOL, frozen before this run). Curve c8, 24-bit a=-3 prime order; workloads = 5 generators (gstd, grand1-4) x 2000 planted_shared targets; arms prime-abscissa and known-log scalars=random at B=220, mitm negation_folded m=2.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 10584193,
+    "a": 10584190,
+    "b": 5641052,
+    "group_order": 10580503,
+    "r": 10580503,
+    "gx": 3,
+    "gy": 3376584
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 10584193,
+    "a": 10584190,
+    "b": 5641052,
+    "group_order": 10580503,
+    "r": 10580503,
+    "gx": 2997394,
+    "gy": 2905912
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 10584193,
+    "a": 10584190,
+    "b": 5641052,
+    "group_order": 10580503,
+    "r": 10580503,
+    "gx": 7334375,
+    "gy": 5146456
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 10584193,
+    "a": 10584190,
+    "b": 5641052,
+    "group_order": 10580503,
+    "r": 10580503,
+    "gx": 9325846,
+    "gy": 7478791
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 10584193,
+    "a": 10584190,
+    "b": 5641052,
+    "group_order": 10580503,
+    "r": 10580503,
+    "gx": 6840459,
+    "gy": 8330767
+   }
+  ],
+  "targets_per_curve": 2000,
+  "target_seed": 20261019,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "ic-abscissa",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=220",
+     "oracle": "mitm:negation_folded=1,m=2"
+    }
+   }
+  },
+  {
+   "name": "ic-knownlog-random",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=220,scalars=random",
+     "oracle": "mitm:negation_folded=1,m=2"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019,
+  "isolation_required": "L0",
+  "timeout_seconds": 600
+ }
+}

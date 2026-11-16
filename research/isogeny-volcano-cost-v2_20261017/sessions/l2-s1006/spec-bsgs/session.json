@@ -1,0 +1,158 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hcbb201501cf4",
+  "label": "isogeny volcano: BSGS exactness",
+  "spec_id": "ECS1hde72daeeb498",
+  "spec_sha256": "de72daeeb498c9a54a39a88407c2b2705589a02853f767825b7ccb28f8c61a6f",
+  "env_class_id": "ECBENV2ha20a995299c2",
+  "host_sha256": "284f4f98d8829f5be57c7a1ab161a13fa4bddf11e0ecbad35fefb882efc7caf0",
+  "plan_sha256": "b5da6ad6cc80c2eac7b8202faa61108137dc2faba547e292b3c64da6aabfa765",
+  "binary_sha256": "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+  "git_commit": "d4ed77ce0607cc2ba79baaf1b26305eff98c07c9",
+  "git_dirty": false,
+  "options": {
+    "cpus": "inherit",
+    "lock_path": "/tmp/crypto-bench-g3.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 3,
+    "reserved": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "node": 0,
+    "request": "inherit",
+    "unreserved_siblings": [],
+    "observed": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "preflight": {
+    "quiet": false,
+    "reasons": [
+      "CPU 3 was busy 1.990s of the 2.0s settle",
+      "PSI cpu some avg10 57.70 > 5.00"
+    ],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "0": 0.05,
+      "1": 0.04,
+      "2": 0.05,
+      "3": 1.99
+    },
+    "before": {
+      "unix_ms": 1792236536112,
+      "loadavg": [
+        4.0,
+        4.2998046875,
+        4.76123046875
+      ],
+      "psi_cpu_some_avg10": 52.77,
+      "psi_cpu_some_total_us": 6972895563,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 134183,
+          "idle": 741972,
+          "steal": 4018
+        },
+        "1": {
+          "busy": 134895,
+          "idle": 736661,
+          "steal": 3883
+        },
+        "2": {
+          "busy": 125516,
+          "idle": 744047,
+          "steal": 3913
+        },
+        "3": {
+          "busy": 821923,
+          "idle": 45179,
+          "steal": 8861
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1792236538113,
+      "loadavg": [
+        4.0,
+        4.2998046875,
+        4.76123046875
+      ],
+      "psi_cpu_some_avg10": 57.7,
+      "psi_cpu_some_total_us": 6974849108,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 134188,
+          "idle": 742167,
+          "steal": 4019
+        },
+        "1": {
+          "busy": 134899,
+          "idle": 736856,
+          "steal": 3884
+        },
+        "2": {
+          "busy": 125521,
+          "idle": 744241,
+          "steal": 3913
+        },
+        "3": {
+          "busy": 822122,
+          "idle": 45179,
+          "steal": 8862
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 0,
+    "failed_user_threads": 50,
+    "failed_kernel_threads": 69
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    0,
+    1,
+    2
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792236538121,
+  "finished_unix_ms": 1792236796808,
+  "status": "complete",
+  "executions_planned": 1024,
+  "records_written": 1024,
+  "records_sha256": "db8cfb835cbcd11e3a9e8f729de2e1aefa5249d0dfa2e7b2c33850a85bde3f81",
+  "status_counts": {
+    "verified": 1024
+  }
+}

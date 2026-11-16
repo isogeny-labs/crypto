@@ -1,7 +1,7 @@
 # XP-20261015-shape-g1-frozen-cells: goal G1 on its frozen cells
 
-**Status: blocked** on PR #1892 (open; the card is ready only on a merged
-commit) and on memory. Funding 250,000.
+**Status: blocked** on memory. PR #1892 merged on 2026-10-15 (`3c0646ba9`),
+and the card pins that merge commit. Funding 250,000.
 
 ## Question
 
@@ -24,8 +24,7 @@ and the prior here is a null.
 
 ## Prerequisites
 
-- PR #1892 merged; pin its merge commit (the card pins the branch head
-  `f12cb92` until then).
+- PR #1892's merge commit `3c0646ba9` (pinned; merged 2026-10-15).
 - A host per cell: degree-7 matrices need 47–50 GB at `(13, 5)` and more at
   `(17, 6)` and `(19, 7)` (35 and 40 unknowns; `C(35, 6) ≈ 1.6·10⁶`,
   `C(40, 6) ≈ 3.8·10⁶` degree-6 columns). Size each from a timed probe.

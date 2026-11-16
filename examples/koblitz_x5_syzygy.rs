@@ -23,7 +23,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
 use crypto_lib::cryptanalysis::koblitz_symmetrised::{
     build_chained_symmetrised_system, random_subspace_containing_one_in,
 };
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, mask_low64, F2BoolMono, F2BoolPoly};
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -58,11 +58,11 @@ fn left_kernel(
             }
         }
         for m in mults {
-            let p = e.mul_mono(F2BoolMono::from_mask(m));
+            let p = e.mul_mono(F2BoolMono::from_mask(mask_from64(m)));
             if p.is_zero() {
                 continue;
             }
-            rows.push((i, m, p.terms.iter().map(|t| t.mask).collect()));
+            rows.push((i, m, p.terms.iter().map(|t| mask_low64(t.mask)).collect()));
         }
     }
     let mut colidx: HashMap<u64, usize> = HashMap::new();
@@ -136,7 +136,7 @@ fn quad_rank(eqs: &[F2BoolPoly]) -> (usize, usize) {
             e.terms
                 .iter()
                 .filter(|t| t.mask.count_ones() == 2)
-                .map(|t| t.mask)
+                .map(|t| mask_low64(t.mask))
                 .collect()
         })
         .collect();

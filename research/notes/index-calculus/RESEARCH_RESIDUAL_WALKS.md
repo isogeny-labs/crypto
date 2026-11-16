@@ -2470,6 +2470,21 @@ Renault symmetries on curves with rational torsion.  Any of them would be
 registered as `engineering`: none changes `r∞`, which caps a plain `k = 4`
 method at `1.6–3×` better than rho however cheap the solve gets.
 
+**Addendum (2026-10-19): the same instances with #1792's solver options.**
+Sparsest pivots, the chain eigen step along `e₁` and shape replay (F4Remake),
+added for the `D₄` oracle in #1792, apply to this plain system unchanged.  On
+residuals 0–12 of this section's stream (`p = 269`, seed 1; residuals 0–3 are
+the four above, and the committed solver reproduces their counts exactly),
+paired, arm order rotated, every solve equal to the meet-in-the-middle oracle:
+`C₄ = 1.675·10¹¹` with sparsest pivots and chains (`7.22×` below the committed
+solver), `8.69·10¹⁰ ≈ 2^{36.3}` with replay as well (`13.9×`, 12 replayed
+residuals, the one fallback charged).  Sparsest pivots alone give `3.93×`
+(4 residuals).  Elimination and normal forms no longer dominate: the
+characteristic polynomial (`4.97·10¹⁰`, `0.72·D³`) is now `57 %` of `C₄`.
+On §11.16's formula `n*` moves `4 log₂ 13.9 ≈ 15` bits earlier, to about
+`2^{134}` at `r∞ = 0.34` (derived, not measured).  Study:
+`research/s5_plain_c4_options_20261019/`.
+
 ### 11.18 Pre-registration: measuring `r∞`, the one claim that puts `k = 4` below rho
 
 **Written before the measurement exists.**  §11.16 derived that a plain `k = 4`

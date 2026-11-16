@@ -1,0 +1,202 @@
+{
+  "id": "IDC1hea9f559dcc2b81fc",
+  "independence": "native issuance plus extra-point checking; separate Lean kernel proof with scope stated explicitly",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": null,
+  "schema": "identity.certificate/v1",
+  "seed": 2026101803,
+  "statement": {
+    "degree_bound": 4,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "a",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": "w",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "b",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": {
+                "args": [
+                  {
+                    "args": "b",
+                    "op": "var"
+                  },
+                  {
+                    "args": "w",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              "op": "neg"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "cm-norm integer lift",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "a",
+                      "op": "var"
+                    },
+                    {
+                      "args": "a",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": {
+                    "args": [
+                      {
+                        "args": "a",
+                        "op": "var"
+                      },
+                      {
+                        "args": "b",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": 2,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "b",
+                      "op": "var"
+                    },
+                    {
+                      "args": "b",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": "b",
+                    "op": "var"
+                  },
+                  {
+                    "args": "b",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "w",
+                            "op": "var"
+                          },
+                          {
+                            "args": "w",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": "w",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  {
+                    "args": 2,
+                    "op": "const"
+                  }
+                ],
+                "op": "add"
+              }
+            ],
+            "op": "mul"
+          },
+          "op": "neg"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "round03 exact algebra; scopes and Lean declarations in PROOF_MAP.md",
+    "variables": [
+      "a",
+      "b",
+      "w"
+    ]
+  },
+  "value_digest": "a0b56b5002ad20c66a5c2c6a7fb5ce1546639c031c46d4900dbd4602378af530"
+}

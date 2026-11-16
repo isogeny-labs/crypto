@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title1 desc1">
+<title id="title1">One goal, two ways to find relations</title><desc id="desc1">Both methods collect equations, then recover the discrete log with sparse linear algebra.</desc>
+<defs>
+<marker id="a1ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#192b3b"/></marker>
+<marker id="a1blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2864ad"/></marker>
+<marker id="a1green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#087d68"/></marker>
+<marker id="a1purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7555a5"/></marker>
+<marker id="a1muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#586879"/></marker>
+</defs><style>
+text{font-family:DejaVu Sans,Arial,sans-serif;fill:#192b3b} .math{font-family:DejaVu Sans,Arial,sans-serif;font-weight:500}
+</style>
+<rect x="0" y="0" width="1440" height="940" rx="0" fill="#f7f6f2" stroke="none" stroke-width="1.5" />
+<text x="56" y="48" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.7" >ELLIPTIC CURVES · JACOBIANS · INDEX CALCULUS</text>
+<text x="56" y="101" font-size="36" font-weight="700" text-anchor="start" style="fill:#192b3b"  >One goal, two ways to find relations</text>
+<text x="56" y="140" font-size="20" font-weight="400" text-anchor="start" style="fill:#586879"  >Both methods collect equations, then recover the discrete log with sparse linear algebra.</text>
+<text x="1382" y="48" font-size="15" font-weight="400" text-anchor="end" style="fill:#586879"  >01 / 04</text>
+<rect x="56" y="174" width="1328" height="94" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="84" y="211" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1.4" >THE TARGET</text>
+<text x="84" y="247" font-size="29" font-weight="600" text-anchor="start" style="fill:#192b3b"  >Q = kP</text>
+<text x="337" y="211" font-size="22" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Unknown: k modulo the subgroup order n</text>
+<text x="337" y="246" font-size="19" font-weight="400" text-anchor="start" style="fill:#586879"  >P and Q are points or divisor classes, depending on the group.</text>
+<text x="294" y="309" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.7" >1  CHOOSE A FACTOR BASE</text>
+<text x="710" y="309" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.7" >2  COLLECT RELATIONS</text>
+<text x="1151" y="309" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="0.7" >3  SAVE EQUATIONS</text>
+<rect x="56" y="334" width="205" height="164" rx="18" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" />
+<text x="78" y="373" font-size="17" font-weight="700" text-anchor="start" style="fill:#2864ad"  >ELLIPTIC</text>
+<text x="78" y="416" font-size="23" font-weight="500" text-anchor="start" style="fill:#2864ad"  >E(𝔽q)</text>
+<text x="78" y="456" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >group elements</text>
+<rect x="286" y="334" width="350" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="310" y="388" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Selected points Fⱼ</text>
+<text x="310" y="423" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >with restricted coordinates</text>
+<rect x="688" y="334" width="410" height="164" rx="18" fill="#edf3fc" stroke="#2864ad" stroke-width="1.5" />
+<text x="712" y="388" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Solve for a point decomposition</text>
+<text x="712" y="423" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >using summation polynomials</text>
+<rect x="1148" y="334" width="236" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="1170" y="388" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >R = Σ eⱼFⱼ</text>
+<text x="1170" y="423" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Check lifts and signs</text>
+<path d="M645 416 L677 416" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<path d="M1107 416 L1137 416" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<rect x="56" y="545" width="205" height="164" rx="18" fill="#eaf6f1" stroke="#087d68" stroke-width="1.5" />
+<text x="78" y="584" font-size="17" font-weight="700" text-anchor="start" style="fill:#087d68"  >HYPERELLIPTIC</text>
+<text x="78" y="627" font-size="23" font-weight="500" text-anchor="start" style="fill:#087d68"  >Jac(C)(𝔽q)</text>
+<text x="78" y="667" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >group elements</text>
+<rect x="286" y="545" width="350" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="310" y="599" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Selected prime-divisor classes</text>
+<text x="310" y="634" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >often from rational points</text>
+<rect x="688" y="545" width="410" height="164" rx="18" fill="#eaf6f1" stroke="#087d68" stroke-width="1.5" />
+<text x="712" y="599" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Factor a divisor’s polynomial</text>
+<text x="712" y="634" font-size="20" font-weight="400" text-anchor="start" style="fill:#192b3b"  >and test factor-base membership</text>
+<rect x="1148" y="545" width="236" height="164" rx="18" fill="white" stroke="#d9dfe5" stroke-width="1.5" />
+<text x="1170" y="599" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >D = Σ eⱼFⱼ</text>
+<text x="1170" y="634" font-size="18" font-weight="400" text-anchor="start" style="fill:#192b3b"  >Merge partial rows</text>
+<path d="M645 627 L677 627" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<path d="M1107 627 L1137 627" fill="none" stroke="#586879" stroke-width="2.5" marker-end="url(#a1muted)" />
+<path d="M1267 506 L1267 528 L1399 528 L1399 753 L1230 753" fill="none" stroke="#2864ad" stroke-width="2" />
+<path d="M1230 753 L1200 753" fill="none" stroke="#2864ad" stroke-width="2.5" marker-end="url(#a1blue)" />
+<path d="M1267 717 L1267 753 L1230 753" fill="none" stroke="#087d68" stroke-width="2" />
+<rect x="286" y="744" width="914" height="114" rx="18" fill="white" stroke="#192b3b" stroke-width="1.5" />
+<text x="314" y="781" font-size="14" font-weight="600" text-anchor="start" style="fill:#586879" letter-spacing="1" >SAME LINEAR-ALGEBRA STAGE</text>
+<text x="314" y="826" font-size="26" font-weight="500" text-anchor="start" style="fill:#192b3b"  >aᵢ + bᵢk = Σ eᵢⱼℓⱼ   (mod n)</text>
+<path d="M860 812 L932 812" fill="none" stroke="#192b3b" stroke-width="2.5" marker-end="url(#a1ink)" />
+<text x="958" y="824" font-size="26" font-weight="600" text-anchor="start" style="fill:#192b3b"  >recover k</text>
+<text x="56" y="791" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  >Write R = aP + bQ.</text>
+<text x="56" y="822" font-size="17" font-weight="400" text-anchor="start" style="fill:#586879"  >ℓⱼ: log of Fⱼ to base P.</text>
+<path d="M56 886 L1384 886" fill="none" stroke="#d9dfe5" stroke-width="1" />
+<text x="56" y="918" font-size="15" font-weight="400" text-anchor="start" style="fill:#586879"  >The factor base is chosen in, or projected to, the target prime-order component.  Σ means a group sum.</text>
+</svg>

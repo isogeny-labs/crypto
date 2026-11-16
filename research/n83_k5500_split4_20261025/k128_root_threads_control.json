@@ -1,0 +1,54 @@
+{
+  "k": 128,
+  "matched_fields": [
+    "source_sha256",
+    "binary_sha256",
+    "base_hash",
+    "factor_base_points",
+    "regular_states",
+    "root_table_entries",
+    "state_digest_blake3",
+    "table_digest_blake3",
+    "overflow_digest_blake3"
+  ],
+  "results": {
+    "1": {
+      "base_hash": "0d49fb3973e6cde8fc8dedb531c0f48e0bc00d077accfdc674fb4bab45c7e593",
+      "binary_sha256": "1595a6881bdc223265a63176fd616bc846553299fd33f4f91a4f67c3e4459814",
+      "factor_base_points": 21248,
+      "index_build_ms": 344.681416,
+      "overflow_digest_blake3": "83ab2e261c1c0db915960402fa89aed0bad95325653222d89f073f1fcd32b782",
+      "regular_states": 680000,
+      "root_table_entries": 1359488,
+      "root_threads": 1,
+      "setup_total_ms": 545.223625,
+      "source_sha256": "1c741f92a932e452b8210a8c080200ffa6d2511a605721ab156564e0663874ab",
+      "state_digest_blake3": "8ff4de15e941ea6d1b6f526338382d06eb9e223d792a3c1cc6503efda1c75d60",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2c8972519e47070bc1183b146c1a965aa74fc9945d6011f53812dc20b32d8d40",
+      "table_digest_blake3": "e2b028bf3a915e47167f21acbd5ecd13b0bd91321028fe68614c700604e4d62f"
+    },
+    "4": {
+      "base_hash": "0d49fb3973e6cde8fc8dedb531c0f48e0bc00d077accfdc674fb4bab45c7e593",
+      "binary_sha256": "1595a6881bdc223265a63176fd616bc846553299fd33f4f91a4f67c3e4459814",
+      "factor_base_points": 21248,
+      "index_build_ms": 280.107209,
+      "overflow_digest_blake3": "83ab2e261c1c0db915960402fa89aed0bad95325653222d89f073f1fcd32b782",
+      "regular_states": 680000,
+      "root_table_entries": 1359488,
+      "root_threads": 4,
+      "setup_total_ms": 477.343833,
+      "source_sha256": "1c741f92a932e452b8210a8c080200ffa6d2511a605721ab156564e0663874ab",
+      "state_digest_blake3": "8ff4de15e941ea6d1b6f526338382d06eb9e223d792a3c1cc6503efda1c75d60",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "d422e7d6c08ffa232ccf13158269dc629ea20c8f8d91d7f2066c08dfe9e91cef",
+      "table_digest_blake3": "e2b028bf3a915e47167f21acbd5ecd13b0bd91321028fe68614c700604e4d62f"
+    }
+  },
+  "schema": "n83.k128-split4-current-source-root-threads/v1",
+  "scope": "local correctness and exploratory timing diagnostic on a shared macOS host",
+  "split_at": 64,
+  "status": "PASS_EXACT_SERIAL_PARALLEL_INDEX",
+  "target_fixture_sha256": "2c068d2f659588edcdbaa685fc73bb146e2bfee3be123d377d537658f8021c6d",
+  "timing_condition": "concurrent K5500 serial index diagnostic on the same host; no tier speedup claim"
+}

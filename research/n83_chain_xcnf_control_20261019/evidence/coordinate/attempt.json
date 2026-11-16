@@ -1,0 +1,38 @@
+{
+  "schema": "n83.k600-coordinate-domain-capacity-attempt/v1",
+  "status": "BOUNDED_NEGATIVE_CAPACITY",
+  "baseline_commit": "70c53654997125e61ac078b9e3ec09b923766b49",
+  "source_patch_sha256": "b4e79f2a29b0558f0a96589f7250b4881ce2e43f320b67dc94eeca2c4890dca7",
+  "scope": "exact expanded signed-Frobenius x-domains using missing-prefix coordinate clauses",
+  "query_point": ["3547082699798970859000627", "6877207017147849837699235"],
+  "same_domain_inputs_as": "natural_protocol.json",
+  "gray": {
+    "status": "EXPORTED_OVERSIZE_XCNF",
+    "variables": 84825,
+    "cnf_clauses": 11297732,
+    "domain_clauses": 11049398,
+    "xor_rows": 1660,
+    "xcnf_bytes": 2342336502,
+    "xcnf_sha256": "3da161af44200910dc3e03142a140002c5da08d04aee3f73cc5585e0efe55214",
+    "build_export_wall_ms_L0": 16538.770125,
+    "local_raw_path": "/Volumes/SSD990-2/tmp/n83_chain_xcnf_target/coordinate_gray.xcnf",
+    "external_solver_run": null
+  },
+  "hash": {
+    "status": "DomainClauseCap",
+    "required_domain_clauses": 16559758,
+    "domain_clause_cap": 12000000,
+    "xcnf_bytes": null,
+    "external_solver_run": null
+  },
+  "first_local_output_attempt": {
+    "status": "PRODUCER_FAILURE_storage",
+    "path": "/private/tmp/n83_chain_xcnf_control_20261019/coordinate_raw/gray_pool.xcnf",
+    "bytes_written": 0,
+    "observed_error": "Os { code: 28, kind: StorageFull, message: No space left on device }",
+    "raw_stderr_retained": false
+  },
+  "focused_release_test": "PASS",
+  "candidate_id": null,
+  "selected_best_total_runtime": null
+}

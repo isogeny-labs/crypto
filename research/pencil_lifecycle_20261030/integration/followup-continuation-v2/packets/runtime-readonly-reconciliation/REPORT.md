@@ -1,0 +1,9 @@
+# Read-only assembly reconciliation helper
+
+The observed launcher failure comes from parsing empty output as JSON. On installed util-linux 2.37.4, losetup --json --associated DISK returned exit 0 with empty stdout; adding --list returned a JSON object containing an empty loopdevices list. The local manual defines --json for --list output. A separate helper now requests list mode explicitly and rejects empty bytes.
+
+Checks. Fifteen mocked controls pass: valid empty JSON, attached devices, null/wrong/duplicate shapes, stopped and collected unit states, owner and invocation joins, worker completion and explicit teardown booleans. The helper verifies the original source and binding hashes, saved successful completion, root-owned receipt custody and unchanged retained disk custody. It takes two observations of the stopped unit, empty cgroup, associated-device list and entire loop inventory. An unrelated loop conservatively leaves this specific recovery unresolved.
+
+Boundaries. The helper has no mount, unmount, daemon, build, service mutation or qualification path. It emits a new observation on stdout and preserves the original failed launcher receipt. Independent source review accepted the exact helper and replayed all 15 controls. One published bounded read-only invocation by root is the next step. The retained disk hash comes from the worker under unchanged metadata custody; disk contents are not rehashed by this helper. An observation does not authorize qualification.
+
+Validation limits. One producer invocation used a 30-second outer timeout plus 3-second kill reserve, 512 MiB address space and 25-second child timeout. Proposed read-only operation bounds are 30 seconds total, 5 seconds or remaining time per query, with an external 33-second cutoff. No assembly retry or scientific trajectory was run for this packet.

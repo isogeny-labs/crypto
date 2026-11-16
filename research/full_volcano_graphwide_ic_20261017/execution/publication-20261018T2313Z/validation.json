@@ -1,0 +1,82 @@
+{
+  "verified_utc": "2026-10-19T00:53:01.100993+00:00",
+  "archive": {
+    "path": "/workspace/volcano_REPAIRED_7937vertices_all51strata_20261019.tar.xz",
+    "bytes": 73208632,
+    "sha256": "b8a63f09ca0bfa8de76adf22dd17db5cac95b9623f17068334c8b12b1f0f90a1",
+    "staging": {
+      "mode": "link-sessions",
+      "linked_files": 39695,
+      "linked_payload_bytes": 997080749,
+      "omitted_empty_wal_reader_caches": [
+        "ledger.sqlite-wal",
+        "ledger.sqlite-shm"
+      ],
+      "scope": "File payload bytes, not measured filesystem allocation."
+    }
+  },
+  "fresh_extraction": "PASS",
+  "every_manifest_entry": "PASS",
+  "exact_file_population": "PASS",
+  "only_regular_files_and_directories": "PASS",
+  "manifest_entries": 79462,
+  "manifest_sha256": "979d4bf017f6fffe25786bb5d069893913767ae349481c992220415cf0501e45",
+  "manifest_check_log_sha256": "0e1e8cd44674c3569cc3a9c54c213db4251211a7cd3573d50c9fcaa142f92542",
+  "frozen_archived_source_binary_queue_hashes": {
+    "campaign/driver.rs": "4be4a900afee3f7256c634b9af45bc0c9f65ad134073dbdcaaff99634cf4ec8d",
+    "campaign/ecbench": "35d89073f4d666b094c213a1d31b0c819b63600123e067c111af3c947d7609a9",
+    "bin/volcano-ic-driver": "b8b489c7225c64ed492ffce39286c995f5ca820960956cf706c0d3110f5bdd2d",
+    "campaign/queue.jsonl": "45e277bede6017c30a49405096afefab3d34a18553ecd6b1a79238f2b9559728"
+  },
+  "outer_repack": "Not rechecked for this publication; unchanged staging/archive implementation has separate actual production copy/extract/repack evidence in publication-20261018T1835Z.",
+  "scope": "File/byte validation and existing native receipt binding, not fresh independent solver replay or qualified runtime.",
+  "native_inventory_summary": "PASS; existing seal/hash/receipt binding, not fresh independent solver replay",
+  "file_handling_tests": "7 passed on merged checkout; both actual copy/link CLI fixture bytes identical",
+  "report": "All3 pages visually inspected, no clipping; SVG/source/PDF and150dpiPNG retained",
+  "viewer": "Native hashes/populations, Node UI, real Chromium desktop/floor/mobile pass; all3 screenshots visually inspected",
+  "source": "Frozen ROOT driver/source/binaries/queue unchanged. Current repository copy inherits base drop(emit) deletion and is not used for campaign. Later imported-head library result recorded separately; no byte-equivalence or independent replay claim.",
+  "remote": "Names/bytes/parents read back; no remote whole-file content hash",
+  "subsequent_release_library": {
+    "run": {
+      "source_head": "39ebf63386db3f04cc55caf2864e9f5e5bc130e4",
+      "started_utc": "2026-10-19T00:58:21.932829+00:00",
+      "argv": [
+        "/workspace/toolchains/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "--",
+        "--test-threads=1"
+      ],
+      "target_dir": "/workspace/volcano_validation_39eb_20261019/target",
+      "scope": "Required current-head release library validation, serial tests, unchanged assertions/ignores/limits; isolated new target preserves frozen old dependency caches. Timed campaign remains cleanly stopped.",
+      "finished_utc": "2026-10-19T01:41:05.621331+00:00",
+      "exit_code": 0
+    },
+    "source_head": "39ebf63386db3f04cc55caf2864e9f5e5bc130e4",
+    "result_lines": [
+      "test result: ok. 4396 passed; 0 failed; 118 ignored; 0 measured; 0 filtered out; finished in 1511.46s"
+    ],
+    "source_scope": "Library validation of imported head; not frozen-worker binary equivalence, independent solver replay, performance qualification or completion of the original experiment.",
+    "log_sha256": "af2b387600a39a6fc619cbe3bd0fa29450784e6283b07b9920f1c35a0e07157c",
+    "environment": {
+      "rustc": "/workspace/toolchains/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+      "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "cargo_target": "/workspace/volcano_validation_39eb_20261019/target",
+      "build_jobs": 2,
+      "rayon_threads": 1,
+      "test_threads": 1,
+      "openssl_lib": "/usr/lib/x86_64-linux-gnu",
+      "openssl_include": "/usr/include",
+      "timed_worker": "Clean stop remains in place; no heavy overlap authorized",
+      "source_head": "39ebf63386db3f04cc55caf2864e9f5e5bc130e4"
+    },
+    "test_binary": {
+      "path": "/workspace/volcano_validation_39eb_20261019/target/release/deps/crypto_lib-565bcb20cb4d5bb4",
+      "bytes": 103389344,
+      "sha256": "71fcd94896f23ce4b0a2fa50c22813d4db5969afbb7035e49856dfc0db081aad"
+    }
+  },
+  "conductor": "Attempted before editing; command not on PATH, no connected conductor tool and .conductor/WORKFLOW.md is not tracked. No reservation-check pass claimed."
+}

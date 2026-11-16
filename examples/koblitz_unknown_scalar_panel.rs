@@ -308,6 +308,7 @@ fn ic_event_json(event: &KoblitzIcEvent) -> Value {
         KoblitzIcEvent::FactorBaseReady { points, orbits } => {
             json!({"event":"factor_base_ready","points":points,"orbits":orbits})
         }
+        KoblitzIcEvent::PairTableStarted => json!({"event":"pair_table_started"}),
         KoblitzIcEvent::PairTableReady { entries } => {
             json!({"event":"pair_table_ready","entries":entries})
         }
@@ -320,6 +321,24 @@ fn ic_event_json(event: &KoblitzIcEvent) -> Value {
             trials,
         } => json!({
             "event":"relation_progress","collected":collected,"wanted":wanted,"trials":trials
+        }),
+        KoblitzIcEvent::RelationBatchStarted {
+            first_trial,
+            trials,
+        } => json!({
+            "event":"relation_batch_started","first_trial":first_trial,"trials":trials
+        }),
+        KoblitzIcEvent::RelationQueryStarted {
+            trial,
+            coefficient_a,
+            coefficient_b,
+            target_x,
+            target_y,
+            target_infinity,
+        } => json!({
+            "event":"relation_query_started","trial":trial,
+            "coefficient_a":coefficient_a,"coefficient_b":coefficient_b,
+            "target_x":target_x,"target_y":target_y,"target_infinity":target_infinity
         }),
         KoblitzIcEvent::RelationAttemptFinished {
             trial,
@@ -740,6 +759,25 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn query_event_preserves_replay_coordinates() {
+        let event = super::KoblitzIcEvent::RelationQueryStarted {
+            trial: 7,
+            coefficient_a: "11".into(),
+            coefficient_b: "13".into(),
+            target_x: "17".into(),
+            target_y: "19".into(),
+            target_infinity: false,
+        };
+        assert_eq!(
+            super::ic_event_json(&event),
+            serde_json::json!({
+                "event":"relation_query_started", "trial":7,
+                "coefficient_a":"11", "coefficient_b":"13", "target_x":"17",
+                "target_y":"19", "target_infinity":false
+            })
+        );
+    }
     use super::*;
 
     #[test]

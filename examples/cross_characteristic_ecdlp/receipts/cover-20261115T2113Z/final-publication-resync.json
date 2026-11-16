@@ -1,0 +1,59 @@
+{
+  "schema": "producer.final-publication-resync/v1",
+  "validated_parent": "c40b39826f0b8378d939b624e78a68ae870208a1",
+  "unpublished_archive_commit": "ce6235287",
+  "publication_parent": "14b075f4ed3e32f2589892d48a6f119669722028",
+  "parent_ledger_rows": 1097,
+  "parent_ledger_sha256": "3e2db4881efcb3aa459f5ec8faf364879cb58080bf8403ed3c33862c655631ce",
+  "parent_prefix_preserved": true,
+  "new_registration_events": [
+    {
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1097,
+      "prev": "ffa7a91d4bb86bb54ee16a694fcd0b3179416102567ab7a90fb479d7b221b11c",
+      "type": "claim",
+      "at": "2026-11-15T22:15:24Z",
+      "body": {
+        "claim_id": "PCC-20261115-1148a8",
+        "claim_sha256": "db774e1f056e7ca836d2059fd85a7bd74aade36a2b96786d71ee68f61f89dc5d",
+        "path": "pcc/claims/PCC-20261115-1148a8.json"
+      },
+      "hash": "c72e370160303a495102535030157b1ee4e873d2b25241c03c34664bb60eee8a"
+    },
+    {
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1098,
+      "prev": "c72e370160303a495102535030157b1ee4e873d2b25241c03c34664bb60eee8a",
+      "type": "claim",
+      "at": "2026-11-15T22:15:24Z",
+      "body": {
+        "claim_id": "PCC-20261115-97a477",
+        "claim_sha256": "51894938b1ded4e3c63c98ec797040b2e9463c9c55303dcef1eb5a9a168bd287",
+        "path": "pcc/claims/PCC-20261115-97a477.json"
+      },
+      "hash": "7f9ef8cb312468436d4c6ee2e9db324ed2bc9db8ab8733da2d7c4cffd3a44428"
+    }
+  ],
+  "unchanged_pinned_inputs": [
+    "examples/cross_characteristic_ecdlp/CrossCharacteristicExample.lean",
+    "examples/cross_characteristic_ecdlp/CrossCharacteristicTwo.lean",
+    "examples/cross_characteristic_ecdlp/CrossCharacteristicLarger.lean",
+    "examples/cross_characteristic_ecdlp/CoverDecodeExample.lean",
+    "examples/cross_characteristic_ecdlp/CoverIntegralLift.lean",
+    "examples/cross_characteristic_ecdlp/AxiomAudit.lean",
+    "examples/cross_characteristic_ecdlp/lakefile.toml",
+    "examples/cross_characteristic_ecdlp/lake-manifest.json",
+    "examples/cross_characteristic_ecdlp/lean-toolchain",
+    "examples/cross_characteristic_ecdlp/identity_receipts.cpp",
+    "examples/cross_characteristic_ecdlp/cover-report.md",
+    "examples/cross_characteristic_ecdlp/cover-report.html",
+    "examples/cross_characteristic_ecdlp/cover-report.pdf",
+    "examples/cross_characteristic_ecdlp/cover-transfer.svg",
+    "examples/cross_characteristic_ecdlp/cover-transfer.png",
+    "tools/lean/proof-gate.sh",
+    "tools/lean/AuditAxioms.lean",
+    "tools/lean/trusted-native.txt",
+    "tools/pcc/pcc.py"
+  ],
+  "explanation": "Prior unpublished registration bytes survive in unpublished-ledger-c40b3982.snapshot and the local archive branch. The claim files are byte-identical. New publication registration events were appended using tools/pcc/pcc.py append_entry to the already-published current ledger. No published frozen ledger history was selected, merged or rechained; inherited automatic-merge violations remain unresolved. No further Lean rerun is claimed after this byte-identical synchronization."
+}

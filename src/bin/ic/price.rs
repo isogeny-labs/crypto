@@ -65,7 +65,7 @@
 //! Each repetition rebuilds both arms from nothing, the index calculus
 //! first.  The parameter file must name exactly one target.
 use std::collections::BTreeMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use clap::Args;
@@ -81,7 +81,8 @@ use crypto_lib::cryptanalysis::koblitz_fast::{
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     projected_signed_orbit_count, CollectedRelation, ColumnCoverage, DecompositionStrategy,
-    FactorBaseLogSolver, IndividualLogSolver, KoblitzCurve, RelationCollector, RelationWorkUnit,
+    FactorBaseLogSolver, IndividualLogSolver, KoblitzCurve, LogTableReport, RelationCollector,
+    RelationWorkUnit,
 };
 use crypto_lib::hash::sha256::sha256;
 use num_bigint::BigUint;
@@ -154,6 +155,13 @@ pub struct PriceArgs {
     /// follows the floor and the lanes.
     #[arg(long, requires = "single_target")]
     pub rho_dp_bits: Option<u32>,
+    /// Read the factor-base log table from this shared store (by curve,
+    /// generator and factor base) instead of collecting and solving it.
+    /// A hit is re-verified and makes the run amortized, not cold: the
+    /// report says so and moves the cold figures to `*_store` fields.
+    /// A miss computes the table as usual; the store is never written.
+    #[arg(long)]
+    pub log_store: Option<PathBuf>,
 }
 
 /// Exclusive phase clocks: every nanosecond between two laps belongs to
@@ -306,11 +314,22 @@ struct Pass {
     factor_base_orbits: Option<Vec<Value>>,
 }
 
+#[cfg(test)]
 fn one_pass(p: &workflow::WorkflowParams, targets: &[Target]) -> Result<Pass, String> {
     one_pass_with(p, PassTargets::Batch(targets))
 }
 
+#[cfg(test)]
 fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Result<Pass, String> {
+    one_pass_stored(p, targets, None)
+}
+
+/// [`one_pass_with`], first looking the log table up in `store`.
+fn one_pass_stored(
+    p: &workflow::WorkflowParams,
+    targets: PassTargets<'_>,
+    store: Option<&Path>,
+) -> Result<Pass, String> {
     let mut clock = Clock::start();
     let c = experiment::curve(
         p.curve.degree,
@@ -349,109 +368,169 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
         }
     }
 
-    // Build, at the tier the workflow's own probe budget selects.
+    // Build, at the tier the workflow's own probe budget selects.  Under
+    // `KIC_FREE_RELATIONS=1` the build also hands back the pairs of base
+    // points whose sums share a key, and the relations they make (four
+    // base points summing to `O`, no probe) join the system first; the
+    // harvest and its resolution are charged to the build.
+    let free_on = std::env::var("KIC_FREE_RELATIONS").as_deref() == Ok("1");
+    let mut free = crypto_lib::cryptanalysis::koblitz_index_calculus::FreeRelations::default();
     let pair = if ic.strategy == DecompositionStrategy::PairTable {
-        Some(workflow::build_pair_table(&c, &fb, p).ok_or("field too wide for the pair table")?)
+        if free_on {
+            let (table, dups) = workflow::build_pair_table_harvest(&c, &fb, p)
+                .ok_or("field too wide for the pair table")?;
+            if let Some(dups) = dups {
+                free = table.free_relations(&dups);
+            }
+            Some(table)
+        } else {
+            Some(
+                workflow::build_pair_table(&c, &fb, p)
+                    .ok_or("field too wide for the pair table")?,
+            )
+        }
     } else {
         None
     };
     clock.lap("build");
 
-    // Collect the planned units, aimed as the workflow aims them.
-    let work = |unit: usize| RelationWorkUnit {
-        seed: p.seed,
-        start: unit as u64 * p.collection.unit_trials,
-        count: p.collection.unit_trials,
-    };
-    let mut units: BTreeMap<usize, (Vec<CollectedRelation>, u64, u64)> = BTreeMap::new();
-    {
-        let collector = RelationCollector::with_pair_table(&c, &fb, &ic, pair.as_ref())
-            .ok_or("factor base cannot decompose with this summand count")?;
-        let mut coverage = if p.collection_aim {
-            Some(ColumnCoverage::new(&c, &fb).ok_or("factor base has no projected columns")?)
-        } else {
-            None
-        };
-        clock.lap("collect_setup");
-        for u in 0..p.collection.units {
-            let aim = coverage
-                .as_ref()
-                .map(|cov| cov.missing_points())
-                .filter(|pts| !pts.is_empty());
-            let (relations, report) = collector.collect_aimed(work(u), aim.as_deref());
-            if let Some(cov) = coverage.as_mut() {
-                cov.add(&relations);
-            }
-            units.insert(
-                u,
-                (relations, report.trials as u64, report.summands_scanned),
-            );
+    // A stored table, re-verified column by column, replaces collection
+    // and linear algebra; the pass then reports itself as amortized.
+    let stored = match store {
+        Some(dir) => {
+            let hit = super::log_store::lookup(dir, &c, &fb)?;
+            clock.lap("verify");
+            Some((hit, dir))
         }
-    }
-    clock.lap("collect");
-
-    // Logs: verify, solve, and extend until determined.
-    let merged: Vec<CollectedRelation> = units
-        .values()
-        .flat_map(|(rels, _, _)| rels.iter().cloned())
-        .collect();
-    let mut solver =
-        FactorBaseLogSolver::new(&c, &fb, &ic).ok_or("factor base has no projected columns")?;
-    clock.lap("logs_setup");
-    solver.push(&merged);
-    clock.lap("verify");
-    let mut outcome = solver.try_solve();
-    clock.lap("la");
-    let mut extended = 0usize;
-    if outcome.is_none() {
-        let collector = RelationCollector::with_pair_table(&c, &fb, &ic, pair.as_ref())
-            .ok_or("factor base cannot decompose with this summand count")?;
-        let mut extend_coverage = if p.collection_aim {
-            let mut cov =
-                ColumnCoverage::new(&c, &fb).ok_or("factor base has no projected columns")?;
-            cov.add(&merged);
-            Some(cov)
-        } else {
-            None
-        };
-        clock.lap("collect_setup");
-        while outcome.is_none() {
-            let next = units.keys().max().map_or(0, |m| m + 1);
-            if next >= p.collection.max_units {
-                break;
-            }
-            let aim = extend_coverage
-                .as_ref()
-                .map(|cov| cov.missing_points())
-                .filter(|pts| !pts.is_empty());
-            let (relations, report) = collector.collect_aimed(work(next), aim.as_deref());
-            if let Some(cov) = extend_coverage.as_mut() {
-                cov.add(&relations);
+        None => None,
+    };
+    let (table, units, extended, final_report, log_table) = match stored {
+        Some((Some((table, _, key, path)), _)) => {
+            let report = LogTableReport {
+                columns: table.len(),
+                verified: true,
+                ..LogTableReport::default()
+            };
+            let units: BTreeMap<usize, (Vec<CollectedRelation>, u64, u64)> = BTreeMap::new();
+            let provenance = super::log_store::provenance("store", Some(&key), Some(&path));
+            (table, units, 0usize, report, Some(provenance))
+        }
+        miss => {
+            // Collect the planned units, aimed as the workflow aims them.
+            let work = |unit: usize| RelationWorkUnit {
+                seed: p.seed,
+                start: unit as u64 * p.collection.unit_trials,
+                count: p.collection.unit_trials,
+            };
+            let mut units: BTreeMap<usize, (Vec<CollectedRelation>, u64, u64)> = BTreeMap::new();
+            {
+                let collector = RelationCollector::with_pair_table(&c, &fb, &ic, pair.as_ref())
+                    .ok_or("factor base cannot decompose with this summand count")?;
+                let mut coverage = if p.collection_aim {
+                    Some(
+                        ColumnCoverage::new(&c, &fb)
+                            .ok_or("factor base has no projected columns")?,
+                    )
+                } else {
+                    None
+                };
+                clock.lap("collect_setup");
+                if let Some(cov) = coverage.as_mut() {
+                    cov.add(&free.relations);
+                }
+                for u in 0..p.collection.units {
+                    let aim = coverage
+                        .as_ref()
+                        .map(|cov| cov.missing_points())
+                        .filter(|pts| !pts.is_empty());
+                    let (relations, report) = collector.collect_aimed(work(u), aim.as_deref());
+                    if let Some(cov) = coverage.as_mut() {
+                        cov.add(&relations);
+                    }
+                    units.insert(
+                        u,
+                        (relations, report.trials as u64, report.summands_scanned),
+                    );
+                }
             }
             clock.lap("collect");
-            solver.push(&relations);
+
+            // Logs: verify, solve, and extend until determined.
+            let merged: Vec<CollectedRelation> = free
+                .relations
+                .iter()
+                .cloned()
+                .chain(units.values().flat_map(|(rels, _, _)| rels.iter().cloned()))
+                .collect();
+            let mut solver = FactorBaseLogSolver::new(&c, &fb, &ic)
+                .ok_or("factor base has no projected columns")?;
+            clock.lap("logs_setup");
+            solver.push(&merged);
             clock.lap("verify");
-            units.insert(
-                next,
-                (relations, report.trials as u64, report.summands_scanned),
-            );
-            extended += 1;
-            outcome = solver.try_solve();
+            let mut outcome = solver.try_solve();
             clock.lap("la");
-        }
-    }
-    let final_report = solver.report();
-    let table = match outcome {
-        Some((table, report)) if report.verified => table,
-        _ => {
-            return Err(format!(
-                "relations from {} units did not determine every one of {} columns",
-                units.len(),
-                final_report.columns
-            ))
+            let mut extended = 0usize;
+            if outcome.is_none() {
+                let collector = RelationCollector::with_pair_table(&c, &fb, &ic, pair.as_ref())
+                    .ok_or("factor base cannot decompose with this summand count")?;
+                let mut extend_coverage = if p.collection_aim {
+                    let mut cov = ColumnCoverage::new(&c, &fb)
+                        .ok_or("factor base has no projected columns")?;
+                    cov.add(&merged);
+                    Some(cov)
+                } else {
+                    None
+                };
+                clock.lap("collect_setup");
+                while outcome.is_none() {
+                    let next = units.keys().max().map_or(0, |m| m + 1);
+                    if next >= p.collection.max_units {
+                        break;
+                    }
+                    let aim = extend_coverage
+                        .as_ref()
+                        .map(|cov| cov.missing_points())
+                        .filter(|pts| !pts.is_empty());
+                    let (relations, report) = collector.collect_aimed(work(next), aim.as_deref());
+                    if let Some(cov) = extend_coverage.as_mut() {
+                        cov.add(&relations);
+                    }
+                    clock.lap("collect");
+                    solver.push(&relations);
+                    clock.lap("verify");
+                    units.insert(
+                        next,
+                        (relations, report.trials as u64, report.summands_scanned),
+                    );
+                    extended += 1;
+                    outcome = solver.try_solve();
+                    clock.lap("la");
+                }
+            }
+            let final_report = solver.report();
+            let table = match outcome {
+                Some((table, report)) if report.verified => table,
+                _ => {
+                    return Err(format!(
+                        "relations from {} units did not determine every one of {} columns",
+                        units.len(),
+                        final_report.columns
+                    ))
+                }
+            };
+            clock.lap("other");
+            let log_table = match miss {
+                Some((_, dir)) => {
+                    let key = super::log_store::key_for(&c, &fb)?;
+                    let mut v = super::log_store::provenance("computed", Some(&key), None);
+                    v["store_miss"] = json!(dir.display().to_string());
+                    Some(v)
+                }
+                None => None,
+            };
+            (table, units, extended, final_report, log_table)
         }
     };
-    clock.lap("other");
 
     // Descent, then the final check the workflow makes.
     let descent = IndividualLogSolver::new(&c, &fb, &table, &ic, pair.as_ref())
@@ -535,7 +614,16 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
         .iter()
         .map(|(u, (rels, tr, sc))| json!([u, rels.len(), tr, sc]))
         .collect();
-    let counts = json!({
+    let free_counts = free_on.then(|| {
+        json!({
+            "raw_pairs": free.raw_pairs,
+            "same_row_own_orbit": free.same_row_own_orbit,
+            "unresolved": free.unresolved,
+            "trivial_or_repeated": free.trivial_or_repeated,
+            "relations_made": free.relations.len(),
+        })
+    });
+    let mut counts = json!({
         "select": {
             "points": fb.points.len(),
             "signed_orbits": fb.signed_orbits.len(),
@@ -569,6 +657,12 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
             "trials_total": trials.iter().sum::<usize>(),
         },
     });
+    if let Some(f) = free_counts {
+        counts["free_relations"] = f;
+    }
+    if let Some(lt) = log_table {
+        counts["log_table"] = lt;
+    }
     Ok(Pass {
         ns: clock.ns,
         counts,
@@ -719,8 +813,9 @@ fn single_rep(
     target: &Target,
     shape: RhoShape,
     strict: bool,
+    store: Option<&Path>,
 ) -> Result<SingleRep, String> {
-    let pass = one_pass_with(p, PassTargets::Online { target, strict })?;
+    let pass = one_pass_stored(p, PassTargets::Online { target, strict }, store)?;
     let started = Instant::now();
     let inst = koblitz_instance(p.curve.curve_a, p.curve.degree)
         .ok_or("no single-word Koblitz instance for this curve")?;
@@ -807,7 +902,7 @@ fn run_single(
     let mut i = 0usize;
     while i < planned {
         let before = bench.measure(inst);
-        let rep = single_rep(p, c, target, shape, strict)?;
+        let rep = single_rep(p, c, target, shape, strict, args.log_store.as_deref())?;
         let after = bench.measure(inst);
         let unit = (before + after) / 2.0;
         let online = rep
@@ -1032,7 +1127,7 @@ fn run_single(
         "columns": columns,
         "column_convention": "representative",
     });
-    Ok(json!({
+    let mut report = json!({
         "schema_version": 1,
         "operation": "price_single_target",
         "status": status,
@@ -1069,7 +1164,66 @@ fn run_single(
         "identity_inputs": identity_inputs,
         "commit": super::git_commit(),
         "binary_blake3": super::binary_hash(),
-    }))
+    });
+    mark_store(
+        &mut report,
+        &["median"],
+        &[
+            ("s_ic_cold", "s_ic_store"),
+            ("cold_ratio_ic_over_rho", "store_ratio_ic_over_rho"),
+        ],
+    );
+    Ok(with_scan_probes(report))
+}
+
+/// The report with R04's in-scan stage totals added, in a build that has
+/// them (`--features scan-probes`); the report as it is otherwise.
+fn with_scan_probes(report: Value) -> Value {
+    #[cfg(feature = "scan-probes")]
+    {
+        let mut report = report;
+        report["scan_probes"] =
+            crypto_lib::cryptanalysis::koblitz_index_calculus::scan_probes::snapshot();
+        report
+    }
+    #[cfg(not(feature = "scan-probes"))]
+    {
+        report
+    }
+}
+
+/// Where the log table of a report's passes came from, made explicit.
+///
+/// With a store hit, collection and linear algebra were not paid in this
+/// run, so every figure named cold under `path` is moved to its `*_store`
+/// name and the cold field is set to null: an amortized cost never sits
+/// under a cold name.  Reports a run without `--log-store` gives are left
+/// untouched.  Returns whether the table came from the store.
+fn mark_store(report: &mut Value, path: &[&str], renames: &[(&str, &str)]) -> bool {
+    let log_table = {
+        let counts = &report["counts"];
+        counts
+            .get("log_table")
+            .or_else(|| counts.get("pass").and_then(|p| p.get("log_table")))
+            .cloned()
+    };
+    let Some(log_table) = log_table else {
+        return false;
+    };
+    let from_store = log_table["log_table_source"] == "store";
+    report["log_table"] = log_table;
+    if from_store {
+        let mut node = &mut *report;
+        for key in path {
+            node = &mut node[*key];
+        }
+        for (cold, store) in renames {
+            let v = node[*cold].take();
+            node[*store] = v;
+        }
+        report["cost_basis"] = json!("amortized");
+    }
+    from_store
 }
 
 /// Canonical-step and Bailey-step prices, in the unit, measured in
@@ -1197,7 +1351,7 @@ pub fn run(args: PriceArgs, quiet: bool) -> Result<Value, String> {
     let mut i = 0usize;
     while i < planned {
         let before = bench.measure(&inst);
-        let pass = one_pass(&p, &targets)?;
+        let pass = one_pass_stored(&p, PassTargets::Batch(&targets), args.log_store.as_deref())?;
         let after = bench.measure(&inst);
         let unit = (before + after) / 2.0;
         let total_ns: u128 = pass.ns.values().sum();
@@ -1316,6 +1470,7 @@ pub fn run(args: PriceArgs, quiet: bool) -> Result<Value, String> {
         "floor": {"per_target_k": floor_k, "batch_law": super::rho::batch_law(k)},
         "commit": super::git_commit(),
     });
+    let from_store = mark_store(&mut report, &["median"], &[("s_cold", "s_store")]);
 
     if let Some(seed) = args.rho_seed {
         let prices = step_prices(&inst, &mut bench, args.price_rounds)?;
@@ -1381,7 +1536,13 @@ pub fn run(args: PriceArgs, quiet: bool) -> Result<Value, String> {
                 "s_priced": s_cold_counted * step,
                 "all_verified": ok,
             });
-            report["ratios"]["cold_ic_over_single_rho"] = json!(s_cold / (s_cold_counted * step));
+            let ratio = s_cold / (s_cold_counted * step);
+            if from_store {
+                report["ratios"]["store_ic_over_single_rho"] = json!(ratio);
+                report["ratios"]["cold_ic_over_single_rho"] = Value::Null;
+            } else {
+                report["ratios"]["cold_ic_over_single_rho"] = json!(ratio);
+            }
             if !ok {
                 report["status"] = json!("failed");
             }
@@ -1443,6 +1604,80 @@ mod tests {
         )
     }
 
+    /// A stored table skips collection and linear algebra, gives the same
+    /// answers, and the pass says it was amortized; a miss computes cold.
+    #[test]
+    fn a_store_hit_skips_collection_and_is_reported_as_amortized() {
+        let p = params(2, 3);
+        let t = targets(&p);
+        let c = experiment::curve(17, 1, 1, 1).expect("curve");
+        let FactorBaseSource::Spec { spec } = &p.factor_base else {
+            unreachable!()
+        };
+        let fb = experiment::materialize(&c, spec).expect("base");
+        let dir = std::env::temp_dir().join(format!(
+            "ic-price-store-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        // A miss: computed, cold, and nothing written.
+        let cold = one_pass_stored(&p, PassTargets::Batch(&t), Some(&dir)).expect("cold pass");
+        assert!(cold.all_verified);
+        assert_eq!(cold.counts["log_table"]["log_table_source"], "computed");
+        assert_eq!(
+            cold.counts["log_table"]["precomputation_paid_in_this_run"],
+            true
+        );
+        assert!(cold.counts["collect"]["trials"].as_u64().unwrap() > 0);
+        assert!(!dir.exists() || std::fs::read_dir(&dir).unwrap().next().is_none());
+        // The default pass carries no log_table field at all.
+        let plain = one_pass(&p, &t).expect("plain pass");
+        assert!(plain.counts.get("log_table").is_none());
+
+        let ic = experiment::ic_options(p.solver, p.summands, p.max_trials, p.seed);
+        let (table, _) =
+            crypto_lib::cryptanalysis::koblitz_index_calculus::solve_factor_base_logs(&c, &fb, &ic)
+                .expect("table");
+        let doc = super::super::log_store::stored_doc(&c, spec, &fb, p.summands, p.solver, &table)
+            .expect("doc");
+        super::super::log_store::insert(&dir, &c, &fb, &doc).expect("insert");
+
+        let warm = one_pass_stored(&p, PassTargets::Batch(&t), Some(&dir)).expect("store pass");
+        assert!(warm.all_verified);
+        assert_eq!(warm.recovered, cold.recovered);
+        let lt = &warm.counts["log_table"];
+        assert_eq!(lt["log_table_source"], "store");
+        assert_eq!(lt["precomputation_paid_in_this_run"], false);
+        assert_eq!(lt["cost_basis"], "amortized");
+        assert_eq!(lt["key"].as_str().map(str::len), Some(64));
+        assert_eq!(warm.counts["collect"]["trials"], 0);
+        assert_eq!(warm.counts["collect"]["units"], 0);
+        assert!(!warm.ns.contains_key("collect") && !warm.ns.contains_key("la"));
+
+        // The report moves the cold figure to its store name.
+        let mut report = json!({"counts": warm.counts, "median": {"s_cold": 1.5}});
+        assert!(mark_store(
+            &mut report,
+            &["median"],
+            &[("s_cold", "s_store")]
+        ));
+        assert_eq!(report["median"]["s_cold"], Value::Null);
+        assert_eq!(report["median"]["s_store"], 1.5);
+        assert_eq!(report["cost_basis"], "amortized");
+        let mut plain_report = json!({"counts": plain.counts, "median": {"s_cold": 1.5}});
+        assert!(!mark_store(
+            &mut plain_report,
+            &["median"],
+            &[("s_cold", "s_store")]
+        ));
+        assert_eq!(plain_report["median"]["s_cold"], 1.5);
+        assert!(plain_report.get("log_table").is_none());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
     #[test]
     fn a_single_target_pass_splits_its_online_interval_exactly() {
         let c = experiment::curve(17, 1, 1, 1).expect("curve");
@@ -1455,8 +1690,8 @@ mod tests {
                 lanes,
                 dp_bits: ParallelRho::default_dp_bits(&inst, lanes),
             };
-            let first = single_rep(&p, &c, &target, shape, false).expect("a repetition");
-            let second = single_rep(&p, &c, &target, shape, false).expect("a repetition");
+            let first = single_rep(&p, &c, &target, shape, false, None).expect("a repetition");
+            let second = single_rep(&p, &c, &target, shape, false, None).expect("a repetition");
             for rep in [&first, &second] {
                 let online = rep.pass.online.as_ref().expect("an online interval");
                 assert!(online.verified && rep.rho.verified, "m = {descent}");
@@ -1549,6 +1784,128 @@ mod tests {
                 assert!(first.ns.contains_key(phase), "{phase} was not clocked");
             }
             assert_eq!(first.counts["descent"]["summands"], json!(descent));
+        }
+    }
+
+    /// **`ic.koblitz_descent_v2` is this current pipeline.** On the committed rule v8
+    /// `k0n41` recipe with three seeds, ecbench's library pipeline
+    /// (`ecbench::koblitz_descent::run_top`, the method's code) and this
+    /// file's single-target pass give the same logarithm, the same
+    /// collection trials, relations, summands scanned and units, the same
+    /// table and the same descent trials — and both give the numbers this
+    /// pass gave before the operation counters were added to the
+    /// arithmetic (`ic price --single-target` on the unmodified binary,
+    /// recorded 2026-10-26), so counting changed no result.
+    #[test]
+    fn the_ecbench_koblitz_descent_pipeline_is_this_pass() {
+        use crypto_lib::cryptanalysis::ecbench::koblitz_descent::{self, DescentParams};
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/research/ic_tool_program/rule/v8/runs/k0n41/T01.params.json"
+        );
+        // seed → (trials, summands scanned, relations, units, descent trials)
+        // from the unmodified binary.
+        let before: [(u64, [u64; 5]); 3] = [
+            (201, [9968, 2_017_897, 86, 16, 49737]),
+            (202, [11837, 2_426_585, 80, 19, 1083]),
+            (203, [10591, 2_017_897, 82, 17, 65897]),
+        ];
+        for (seed, want) in before {
+            let mut p = workflow::load_params(std::path::Path::new(path)).expect("k0n41 params");
+            p.seed = seed;
+            p.factor_base = serde_json::from_value(json!({
+                "mode": "spec", "spec": {"kind": "subgroup_orbits", "points": 6560, "seed": seed}
+            }))
+            .expect("factor base");
+            let c = experiment::curve(41, 0, 1, 1).expect("curve");
+            let (q, expected, record) =
+                workflow::resolve_target(&c, &p.targets[0]).expect("target");
+            let target = Target {
+                q: q.clone(),
+                expected,
+                record,
+            };
+            let pass = one_pass_with(
+                &p,
+                PassTargets::Online {
+                    target: &target,
+                    strict: false,
+                },
+            )
+            .expect("ic price pass");
+            let dp = DescentParams {
+                summands: p.summands,
+                descent_summands: p.descent_summands.unwrap_or(p.summands),
+                collection_aim: p.collection_aim,
+                collection_window: p.collection_window,
+                factor_base_points: 6560,
+                seed,
+                unit_trials: p.collection.unit_trials,
+                units: p.collection.units,
+                max_units: p.collection.max_units,
+                max_trials: p.max_trials,
+            };
+            let out = koblitz_descent::run_top(&c, &q, &dp).expect("ecbench pipeline");
+            let k = &pass.counts;
+            let got = [
+                out.counts.trials,
+                out.counts.summands_scanned,
+                out.counts.relations_collected as u64,
+                out.counts.units as u64,
+                out.counts.descent_trials as u64,
+            ];
+            let price = [
+                k["collect"]["trials"].as_u64().unwrap(),
+                k["collect"]["summands_scanned"].as_u64().unwrap(),
+                k["collect"]["relations_collected"].as_u64().unwrap(),
+                k["collect"]["units"].as_u64().unwrap(),
+                k["descent"]["trials_total"].as_u64().unwrap(),
+            ];
+            assert_eq!(got, price, "seed {seed}: ecbench pipeline vs ic price pass");
+            assert_eq!(
+                price, want,
+                "seed {seed}: ic price pass vs the unmodified binary"
+            );
+            assert_eq!(
+                pass.recovered,
+                vec![out.recovered.as_ref().map(ToString::to_string)],
+                "seed {seed}"
+            );
+            assert_eq!(
+                out.recovered.as_ref().map(ToString::to_string).as_deref(),
+                Some("291928610698"),
+                "seed {seed}"
+            );
+            assert!(pass.all_verified && out.verified, "seed {seed}");
+            let per_unit: Vec<Value> = out
+                .counts
+                .per_unit
+                .iter()
+                .map(|u| json!([u[0], u[1], u[2], u[3]]))
+                .collect();
+            assert_eq!(
+                json!(per_unit),
+                k["collect"]["per_unit_index_relations_trials_summands"],
+                "seed {seed}"
+            );
+            assert_eq!(
+                json!(out.counts.pair_table_entries),
+                k["build"]["stored_pairs"]
+            );
+            assert_eq!(json!(out.counts.pair_table_tier), k["build"]["tier"]);
+            assert_eq!(json!(out.counts.columns), k["select"]["columns"]);
+            assert_eq!(
+                json!(out.counts.relations_accepted),
+                k["logs"]["relations_accepted"]
+            );
+            assert_eq!(
+                json!(out.counts.solve_attempts),
+                k["logs"]["solve_attempts"]
+            );
+            assert_eq!(
+                serde_json::to_value(out.counts.selection).unwrap(),
+                k["select"]["selection_cost"]
+            );
         }
     }
 }

@@ -1,0 +1,118 @@
+{
+  "instructions": [
+    {
+      "n": 41,
+      "arms": [
+        {
+          "n": 41,
+          "arm": "baseline",
+          "ir": 244684552,
+          "walk_steps": 346339,
+          "ir_per_step": 706.4885906582857,
+          "output_digest": "81d42835fcf8f9ff"
+        },
+        {
+          "n": 41,
+          "arm": "candidate",
+          "ir": 235163781,
+          "walk_steps": 346339,
+          "ir_per_step": 678.9988450622078,
+          "output_digest": "81d42835fcf8f9ff"
+        }
+      ],
+      "identical": true,
+      "baseline_over_candidate": 1.0404857030258414
+    },
+    {
+      "n": 53,
+      "arms": [
+        {
+          "n": 53,
+          "arm": "baseline",
+          "ir": 2145944102,
+          "walk_steps": 3034474,
+          "ir_per_step": 707.1881657249329,
+          "output_digest": "50acd17588d6deba"
+        },
+        {
+          "n": 53,
+          "arm": "candidate",
+          "ir": 2062553397,
+          "walk_steps": 3034474,
+          "ir_per_step": 679.7070586203738,
+          "output_digest": "50acd17588d6deba"
+        }
+      ],
+      "identical": true,
+      "baseline_over_candidate": 1.040430810238073
+    }
+  ],
+  "identity": [
+    {
+      "n": 41,
+      "rows": 16,
+      "identical": true,
+      "all_recovered": true,
+      "digest": "830030111fbec7f7"
+    },
+    {
+      "n": 53,
+      "rows": 16,
+      "identical": true,
+      "all_recovered": true,
+      "digest": "0a19bc1d03936511"
+    },
+    {
+      "n": 61,
+      "rows": 4,
+      "identical": true,
+      "all_recovered": true,
+      "digest": "cf6d881093a6e080"
+    }
+  ],
+  "native_time": {
+    "cells": [
+      {
+        "slug": "icv1-f2m53-tm56619371-dac20a85",
+        "aa_spread": 0.0700551400894216,
+        "baseline_ns": {
+          "median": 110.57209124217245,
+          "min": 104.03523707897975,
+          "max": 113.80794529793302,
+          "n": 5
+        },
+        "candidate_ns": {
+          "median": 98.9828675414586,
+          "min": 98.78316868096415,
+          "max": 111.71127813255279,
+          "n": 5
+        },
+        "identical": true,
+        "ratio": 1.1170831275004207
+      },
+      {
+        "slug": "icv1-f2m61-t158598901-ab42b6c5",
+        "aa_spread": 0.14442668378624113,
+        "baseline_ns": {
+          "median": 117.09157620475348,
+          "min": 107.59939435508608,
+          "max": 121.59868356269972,
+          "n": 5
+        },
+        "candidate_ns": {
+          "median": 108.82569910618989,
+          "min": 100.38271699257855,
+          "max": 115.3603111867177,
+          "n": 5
+        },
+        "identical": true,
+        "ratio": 1.075955194098941
+      }
+    ],
+    "isolation": {
+      "runs": 32,
+      "contended": [],
+      "nonzero_exit": 0
+    }
+  }
+}

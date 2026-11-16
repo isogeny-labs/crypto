@@ -1,5 +1,11 @@
 # Isogeny walk: user guide
 
+For a resumable **complete-class census** on supported ordinary prime-field
+inputs, use [`crypto isogeny class`](../../tools/volcano-cli/README.md). It
+computes exact expected populations, preserves every selected-degree kernel,
+and distinguishes a complete component from the entire vertex class. The
+bounded walker documented below remains useful for other fields and sizes.
+
 `isogeny_walk` explores the isogeny class of a prime-field elliptic curve
 (P-256, P-224, P-192, or any short Weierstrass curve you give it).
 
@@ -65,6 +71,13 @@ $B verify --curve p256 --dir runs/p256-2k     # independent replay
 ```
 
 `walk` writes three files into `--out`:
+
+The command also prints the exact `walk.json` summary to stdout, so
+`isogeny_walk walk ... > summary.json` and `crax --json isogeny-walk walk ...`
+return the enumerated curve and edge counts without parsing stderr. Progress
+and S3 publication diagnostics remain on stderr. The saved route file remains
+the input to `verify` and to checked IC transport; the stdout summary does
+not replace route verification.
 
 | file | contents |
 |:--|:--|

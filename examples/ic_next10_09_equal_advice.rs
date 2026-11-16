@@ -619,11 +619,13 @@ fn mode_bl(args: &[String]) {
         for (index, &(qx, qy)) in targets.iter().enumerate() {
             let mut tstream = Stream::new(&format!("ic-next10-09-online|{n}|{a}|{seed}|{index}"));
             let started = Instant::now();
+            let online_start_ns = process_started.elapsed().as_nanos() as u64;
             let mut steps = 0u64;
             let mut walks = 0u64;
             let mut misses = 0u64;
             let mut abandoned = 0u64;
             let mut result = None;
+            let mut recovery_check_ms = 0.0_f64;
             let budget = 400 * walk_len.max(1);
             'outer: while steps < budget {
                 walks += 1;
@@ -640,12 +642,17 @@ fn mode_bl(args: &[String]) {
                             // [u]G + [v]Q = [ut]G  =>  d = (ut - u) / v.
                             if lane.v != 0 {
                                 let d = mulmod((ut + r - lane.u) % r, powmod(lane.v, r - 2, r), r);
-                                if s.fast.scalar_mul(s.generator, &BigUint::from(d))
-                                    == Some((qx, qy))
-                                {
+                                // Exclusive recovery check: time only the final [d]G=?Q.
+                                let verify_started = Instant::now();
+                                let verified = s.fast.scalar_mul(s.generator, &BigUint::from(d))
+                                    == Some((qx, qy));
+                                let verify_ms = verify_started.elapsed().as_secs_f64() * 1000.0;
+                                if verified {
+                                    recovery_check_ms = verify_ms;
                                     result = Some(d);
                                     break 'outer;
                                 }
+                                recovery_check_ms += verify_ms;
                             }
                         }
                         misses += 1;
@@ -666,6 +673,9 @@ fn mode_bl(args: &[String]) {
                 }
             }
             let elapsed = started.elapsed().as_secs_f64() * 1000.0;
+            let online_stop_ns = process_started.elapsed().as_nanos() as u64;
+            // Walk+collision is the online interval minus exclusive recovery checks.
+            let walk_and_collision_ms = (elapsed - recovery_check_ms).max(0.0);
             steps_all.push(steps);
             ms_all.push(elapsed);
             let record = json!({
@@ -674,8 +684,16 @@ fn mode_bl(args: &[String]) {
                 "dp_bits":dp_bits, "online_steps":steps, "walks":walks,
                 "dp_misses":misses, "abandoned":abandoned,
                 "solved":result.is_some(), "recovered_scalar":result,
-                "online_ms":elapsed, "online_map_seed":online_map_seed,
+                "online_ms":elapsed,
+                "walk_and_collision_ms":walk_and_collision_ms,
+                "recovery_check_ms":recovery_check_ms,
+                "online_start_event":"bl_online_walk_begin",
+                "online_stop_event":"bl_recovery_check_end",
+                "online_start_ns":online_start_ns,
+                "online_stop_ns":online_stop_ns,
+                "online_map_seed":online_map_seed,
                 "budget_steps":budget,
+                "published_q":[qx, qy],
             });
             writeln!(out, "{record}").unwrap();
         }

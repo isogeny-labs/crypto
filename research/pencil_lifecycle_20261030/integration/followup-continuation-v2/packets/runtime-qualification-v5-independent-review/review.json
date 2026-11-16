@@ -1,0 +1,48 @@
+{
+  "schema": "software.runtime-qualification-postreview/v1",
+  "decision": "accept_scoped_Q0_Q4_qualification_and_stopped_disposition",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independent": true,
+  "owner": "24806e07-13ac-4791-92da-12dd595ae9e4",
+  "qualification_complete": true,
+  "scientific_execution_admitted": false,
+  "scope": "Fixed software Q0-Q4 on retained exact image with held gate and descriptor token publication; stopped daemon/cgroup and detached storage at recorded observation.",
+  "inputs_sha256": "e36c48dcf769a20a8b334ac560ee59fc7314aad39188a3350a2971753350d85f",
+  "image_id": "sha256:3a2bb98af4743c888d969c9df00f0769a64e3704e57e97e937769d384e3c8409",
+  "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+  "current_disk_sha256_from_worker": "f38930c6e068ab0e18cae8b6881bbb3a3087ad5b4ddb1775a4ec53785d214a95",
+  "closure_sha256": "35131ba7384558c933b9928b4978d65e92ba1497137c75a4d913d9f9829e4e22",
+  "native_qualifier_receipt_sha256": "494def93178331fdf856e30d672210d5152f3c8da503b682be9884cf37ee2c04",
+  "native_supervisor_receipt_sha256": "aca0f21f9b07e2d5fe061ea1df5b5396366823d09c2b127ad2a7fecacc65047e",
+  "elapsed_seconds": {
+    "inner": 6.383614638005383,
+    "outer": 39.18695094701252
+  },
+  "accepted": [
+    "Q0 native image metadata/static ELF/file inventory checks; runtime inventory independently compared to bound context.",
+    "Q1 exact expected static preflight report exit0; Q2 wrongrequesthash exit2 and Q3 wrongownerdigest exit125 with expected rejection text.",
+    "Allthree descriptor prepublication/confirmed records, rootowned0444nonce tokenhashes, hostcontainer/PID/cgroup and gate PID1/pids1 observations match.",
+    "Container inspection preserves readonlyroot, networknone, dropALL, nonewprivileges,512MiB/1CPU/pids1, privatecgroup parent; allthree diffs empty and four ownedremovals successful.",
+    "Q4 fixture/gate unchanged checked bynative supervisor; currentfixture hashes match originalmanifest.",
+    "Nativecompletedstate success joins invocation; finalqualified_stopped agrees with stopped/cgroupabsent/loopempty/stablecustody readbacks."
+  ],
+  "limitations": [
+    "Effective PID limit observed after container start and before each tested exec; no earlier or continuous-enforcement proof.",
+    "Disk digest inherited from completedworker; reviewer did not rehash4GiB. Read-only debugfs extraction preserved stat; no mount/daemon/runtime rerun.",
+    "Q1 is static_inventory_only, owner_authentication_verified=false and software_bindings_complete=false; no scientificcohort execution or timing qualification.",
+    "Prior v3 temporarydirectory and v4 releasecp failures remain retained, with their charges unchanged."
+  ],
+  "remaining_gates": [
+    "authenticated_owner_custody",
+    "budget_and_deadline_enforcement",
+    "prospective_protocol_review_and_freeze",
+    "image_qualification_and_publication",
+    "timing_qualification",
+    "prior_p739_reuse_applicability"
+  ],
+  "next_artifact_steps": [
+    "Publish nativeattempt, independentreview and descriptor evidence with exact hashes; archive/store data perpolicy.",
+    "Preserve currentdisk custody and boundedretention; any further runtimeuse requires reviewed exactbindings/accounting.",
+    "Distinguish fulfilled fixedimagequalification from downstream authenticatedowner/protocol/timing/p739applicability and cohortadmission."
+  ]
+}

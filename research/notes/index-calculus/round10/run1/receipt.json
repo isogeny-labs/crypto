@@ -1,0 +1,322 @@
+{
+  "card_id": "CARD-HEIC-ROUND10-1",
+  "card_path": "research/notes/index-calculus/round10/CARD-HEIC-ROUND10-1.yaml",
+  "card_sha256": "9f36d9506a605dba5c1109d74441d657c27cf6c7e33e399fe34c158643183dba",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-mkdir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--wait",
+        "--cpus",
+        "3",
+        "--max-other-cpu",
+        "1.0",
+        "--out",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/isolated_bench.jsonl",
+        "--label",
+        "R10",
+        "--",
+        "sh",
+        "-c",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/mix_bin > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt 2>&1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1016.545,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-rho",
+      "index": 2,
+      "outputs": {},
+      "seconds": 1016.545,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "wc",
+        "-l",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-lines",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0404ac07759dfeea96b4218ebd216f53d7a9b72850bfd9b592cea5140dca9475",
+      "stdout_tail": [
+        "27 /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "1,20p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-lines-1-20",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "46bb58bc84c00a96b0d0cad14cd6a1313cae7f1cf26de36af07019b504794949",
+      "stdout_tail": [
+        "Round ten. DP rho walk cost by arm (S_walk = mean walk group ops / sqrt(N), 40 seeds from 0xc0ffee).",
+        " g    p         N   plain    fold plain+mix fold+mix   fold/pl   mix f/pl  ok",
+        " 2   41      1321   1.390   0.962     1.183    0.952     0.692      0.805   y",
+        " 2   61      1399   1.273   0.874     1.283    0.749     0.686      0.583   y",
+        " 2  101      4663   1.287   0.992     1.481    0.911     0.771      0.615   y",
+        " 2  151      7949   1.421   0.951     1.387    1.007     0.669      0.726   y",
+        " 2  211     11813   1.333   1.042     1.509    0.959     0.782      0.635   y",
+        " 2  251     61667   1.246   1.085     1.361    1.324     0.870      0.972   y",
+        " 3   23      6299   1.159   1.028     1.258    0.933     0.887      0.742   y",
+        " 3   31      7333   1.047   0.895     1.124    1.051     0.854      0.935   y",
+        " 3   41      6679   1.314   0.952     1.316    1.065     0.724      0.810   y",
+        " 3   61    124459   1.477   1.181     1.333    1.279     0.800      0.960   y",
+        " 3  101    364747   1.407   1.362     1.406    0.800     0.968      0.569   y",
+        " 3  151   1180351   1.706   0.953     1.676    1.517     0.559      0.905   y",
+        " 3  211   4620611   1.820   2.148     1.696    1.951     1.180      1.150   y",
+        " 4   17      5639   1.422   1.049     1.331    0.873     0.737      0.655   y",
+        " 4   23     30223   1.233   1.075     1.531    0.946     0.872      0.618   y",
+        " 4   31    239753   1.303   1.489     1.368    1.434     1.143      1.048   y",
+        " 4   41    333041   1.344   1.011     1.380    0.937     0.752      0.679   y",
+        " 4   61  16790591   2.100   2.162     2.240    3.112     1.030      1.390   y"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "21,40p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-lines-21-40",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1c3591a84825d5706dee48c1887536b569b65480eb2075978fba98ca109a3c5c",
+      "stdout_tail": [
+        "",
+        "H1 (mixed plain S_walk, N >= 1e5, 7 rows): median 1.406 (<= 1.45), two largest [\"2.240\", \"1.696\"] (<= 1.55) -> FALSIFIED",
+        "H2 (mixed fold/plain walk ops, N >= 1e5): median 0.960 -> FALSIFIED (> 0.80)",
+        "H3 (control, N <= 6e4, 10 rows): |median mixed - median old| plain S_walk = 0.023 -> HOLDS (< 0.15)",
+        "H4 (every run verified): HOLDS",
+        "Max fruitless share, fold+mix: 6.0%",
+        "Ideal S_walk: plain 1.2533, folded 0.8862."
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "41,60p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-lines-41-60",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "61,80p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-lines-61-80",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sed",
+        "-n",
+        "81,100p",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-lines-81-100",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "tail",
+        "-n",
+        "1",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/isolated_bench.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r10-record",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d1de00c269c6af1ed5e2ad1a46e466c2e6a0ea60e4dbd7737040f5aa147c6f2c",
+      "stdout_tail": [
+        "{\"host\": {\"cpu_model\": \"Intel(R) Xeon(R) Processor @ 2.80GHz\", \"kernel\": \"6.18.44-fc-v139\", \"logical_cpus\": 4, \"machine\": \"x86_64\", \"python\": \"3.11.17\"}, \"label\": \"R10\", \"left_on_reserved\": {\"kernel_threads\": 28, \"user_threads\": []}, \"mode\": \"run\", \"preflight\": {\"conditions\": {\"loadavg\": [0.77, 2.06, 2.02], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.91, \"avg300\": 0.2, \"avg60\": 0.31, \"total\": 7853428.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792357250.1703997}, \"settle\": {\"other_cpu_seconds\": 0.26, \"seconds\": 2.0, \"top\": {\"6[81]\": 0.01, \"claude[125]\": 0.24, \"rcu_preempt[15]\": 0.01}}}, \"reserved_cpus\": [3], \"run\": {\"after\": {\"loadavg\": [1.44, 1.15, 1.4], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 8088463.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792358264.6515837}, \"before\": {\"loadavg\": [0.77, 2.06, 2.02], \"psi_cpu\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.91, \"avg300\": 0.2, \"avg60\": 0.31, \"total\": 7853428.0}}, \"psi_memory\": {\"full\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}, \"some\": {\"avg10\": 0.0, \"avg300\": 0.0, \"avg60\": 0.0, \"total\": 0.0}}, \"unix_time\": 1792357250.1814525}, \"command\": [\"sh\", \"-c\", \"/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/mix_bin > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r10/attempt1/R10.txt 2>&1\"], \"contended\": false, \"cpus\": [3], \"exit_status\": 0, \"involuntary_switches\": 1357, \"major_faults\": 0, \"max_rss_kib\": 13648, \"minor_faults\": 2603, \"other_cpu_seconds\": 19.82, \"other_top\": {\"6[81]\": 0.08, \"claude[125]\": 18.15, \"environment-man[88]\": 0.83, \"kcompactd0[46]\": 0.06, \"kworker/0:1-mm_percpu_wq[11]\": 0.03, \"kworker/1:0-mm_percpu_wq[1240]\": 0.03, \"kworker/3:2-mm_percpu_wq[86]\": 0.06, \"process_api[1]\": 0.53}, \"system_seconds\": 0.029578999999999998, \"user_seconds\": 1006.863629, \"voluntary_switches\": 4, \"wall_seconds\": 1014.469688443}, \"schema\": \"isolated-bench/1\", \"threads_moved\": 53}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "0768e22b4924bf33f1270d49b14b51d995dbb6d7",
+  "dirty_after": [
+    "research/notes/index-calculus/round10/CARD-HEIC-ROUND10-1.yaml",
+    "research/notes/index-calculus/round10/run1/cmd1.stderr",
+    "research/notes/index-calculus/round10/run1/cmd1.stdout",
+    "research/notes/index-calculus/round10/run1/cmd2.stderr",
+    "research/notes/index-calculus/round10/run1/cmd2.stdout",
+    "research/notes/index-calculus/round10/run1/cmd3.stdout",
+    "research/notes/index-calculus/round10/run1/cmd4.stdout",
+    "research/notes/index-calculus/round10/run1/cmd5.stdout",
+    "research/notes/index-calculus/round10/run1/cmd6.stdout",
+    "research/notes/index-calculus/round10/run1/cmd7.stdout",
+    "research/notes/index-calculus/round10/run1/cmd8.stdout",
+    "research/notes/index-calculus/round10/run1/cmd9.stdout"
+  ],
+  "dirty_before": [
+    "research/notes/index-calculus/round10/CARD-HEIC-ROUND10-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

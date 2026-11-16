@@ -1,0 +1,357 @@
+{
+  "a": 0,
+  "arm_wall_s": 600.0,
+  "experiment": "R6.1 end-to-end through ic_framework::run_pipeline (the ic bench pipeline)",
+  "h": 4,
+  "instance": "icv1-f2m13-t181-515ee569",
+  "max_trials": 20000,
+  "n": 13,
+  "node_budget": 4096,
+  "planted": 1571,
+  "r": 2003,
+  "rho_floor_S_derived": 0.8862269254527579,
+  "rows": [
+    {
+      "S": 659.4239166727077,
+      "arm": "chained-m4",
+      "call_outcomes": {
+        "found": 13
+      },
+      "columns": 12,
+      "ell": 5,
+      "exhausted": false,
+      "extra": null,
+      "full_report": {
+        "decomposition": {
+          "cost": {
+            "gae": 29492.41059,
+            "group_ops": {
+              "adds": 523,
+              "doubles": 238,
+              "scalar_mults": 26
+            },
+            "native": {
+              "canonicalisations": 0,
+              "direct_relations_skipped": 0,
+              "frobfold_mismatches": 0,
+              "inversions": 0,
+              "lift_failures": 0,
+              "lookups": 0,
+              "relations": 13,
+              "repeated_targets_skipped": 0,
+              "s4_hits": 0,
+              "s4_pairs": 0,
+              "solver_budget_exceeded": 0,
+              "solver_calls": 13,
+              "solver_ops": 12470163,
+              "sqrt_solves": 0,
+              "target_guard_probes": 13,
+              "trials": 13,
+              "unliftable_systems": 0
+            },
+            "wall_ns": 215643387
+          },
+          "description": "chained x-frame descent: 3 S3 links over the base's subspace, inherited-f4 (Macaulay cap 3, 4096 reduction calls)",
+          "gae_before_solver": 761.155038,
+          "hit_rate": 1.0,
+          "name": "chained-x",
+          "relations_found": 13,
+          "setup": {
+            "gae": 0.0,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {},
+            "wall_ns": 356651
+          },
+          "solver": {
+            "budget_exceeded": 0,
+            "calls": 13,
+            "degree_over_bound": null,
+            "extra": {
+              "oversize": 0,
+              "reductions": 1571,
+              "splits": 722
+            },
+            "gae": 28731.255552,
+            "name": "chained-x inherited-f4 (cap 3, budget 4096)",
+            "ns_per_op": 0.2551931136,
+            "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+            "ops": 12470163,
+            "peak_bytes": 0,
+            "priced_by": "pinned",
+            "semi_regular_degree": 11,
+            "solving_degree_max": 0,
+            "solving_degree_mean": null,
+            "wall_ns": 215387648
+          },
+          "summands": 4,
+          "system": {
+            "degrees": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "n_equations": 39,
+            "n_vars": 46,
+            "semi_regular_degree": 11
+          },
+          "targets_tried": 13
+        },
+        "exhausted": false,
+        "factor_base": {
+          "abscissae": 16,
+          "columns": 12,
+          "cost": {
+            "gae": 2.094081,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "abscissae_scanned": 0,
+              "as_solves": 0,
+              "cofactor_multiplications": 16,
+              "derived_counts": 1,
+              "frobenius_coordinate_squarings": 624,
+              "frobenius_maps": 31
+            },
+            "wall_ns": 748131
+          },
+          "description": "F_x random V",
+          "name": "r6-fixed-subspace",
+          "points_per_column": 2.5833333333333335,
+          "signed_points": 31
+        },
+        "group_order": 8012,
+        "instance": "icv1-f2m13-t181-515ee569",
+        "label": "r6-fixed-subspace + chained-x[m=4,node_budget=4096,trace=1] + — + random",
+        "linear_algebra": {
+          "cost": {
+            "gae": 3.9388650000000003,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "columns": 13,
+              "pinned_by_repeated_row": 0,
+              "rank": 13,
+              "repeated_column_rows": 0,
+              "row_ops": 233,
+              "rows": 13,
+              "single_column_rows": 0,
+              "two_column_rows": 3
+            },
+            "wall_ns": 43933
+          },
+          "dependent": 0,
+          "name": "incremental-gauss",
+          "rank": 13,
+          "rows": 13,
+          "work": 233,
+          "work_unit": "row_ops"
+        },
+        "log2_r": 10.967946705812707,
+        "r": 2003,
+        "recovered": 1571,
+        "rho_s": null,
+        "s": 659.4239166727077,
+        "s_over_rho": null,
+        "spec": {
+          "factor_base": "r6-fixed-subspace",
+          "factor_base_params": {},
+          "linalg": "",
+          "max_trials": 20000,
+          "oracle": "chained-x",
+          "oracle_params": {
+            "m": "4",
+            "node_budget": "4096",
+            "trace": "1"
+          },
+          "seed": 123212651130,
+          "solver": null,
+          "solver_budget_seconds": 0,
+          "solver_params": {},
+          "targets": "Random"
+        },
+        "total_gae": 29512.443536,
+        "verified": true,
+        "verify": {
+          "gae": 14.0,
+          "group_ops": {
+            "adds": 4,
+            "doubles": 10,
+            "scalar_mults": 1
+          },
+          "native": {},
+          "wall_ns": 1949
+        },
+        "wall_seconds": 0.216089122
+      },
+      "hit_rate": 1.0,
+      "instance": "icv1-f2m13-t181-515ee569",
+      "label": "r6-fixed-subspace + chained-x[m=4,node_budget=4096,trace=1] + — + random",
+      "m": 4,
+      "per_call": [
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 125,
+          "splits": 57,
+          "wall_ms_contended": 18.551654,
+          "word_xors": 984128
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 202,
+          "splits": 90,
+          "wall_ms_contended": 26.327315,
+          "word_xors": 1405809
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 242,
+          "splits": 106,
+          "wall_ms_contended": 29.730365,
+          "word_xors": 1588275
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 65,
+          "splits": 31,
+          "wall_ms_contended": 8.985319,
+          "word_xors": 584393
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 144,
+          "splits": 67,
+          "wall_ms_contended": 20.899972,
+          "word_xors": 1065701
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 42,
+          "splits": 22,
+          "wall_ms_contended": 6.981351,
+          "word_xors": 521732
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 18,
+          "splits": 12,
+          "wall_ms_contended": 4.886258,
+          "word_xors": 403532
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 46,
+          "splits": 23,
+          "wall_ms_contended": 7.734314,
+          "word_xors": 550475
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 112,
+          "splits": 52,
+          "wall_ms_contended": 15.654955,
+          "word_xors": 930430
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 41,
+          "splits": 22,
+          "wall_ms_contended": 7.877668,
+          "word_xors": 524504
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 313,
+          "splits": 138,
+          "wall_ms_contended": 37.728054,
+          "word_xors": 2022925
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 106,
+          "splits": 49,
+          "wall_ms_contended": 14.79607,
+          "word_xors": 937825
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 115,
+          "splits": 53,
+          "wall_ms_contended": 15.234353,
+          "word_xors": 950434
+        }
+      ],
+      "r": 2003,
+      "reductions_total": 1571,
+      "relations_found": 13,
+      "solver_budget_exceeded": 0,
+      "solver_calls": 13,
+      "solver_ops": 12470163,
+      "targets_tried": 13,
+      "total_gae": 29512.443536,
+      "verified": true,
+      "wall_s_contended": 0.216089122,
+      "wall_truncated": false
+    }
+  ],
+  "seed": 123212651130,
+  "v_seed": 370935120
+}

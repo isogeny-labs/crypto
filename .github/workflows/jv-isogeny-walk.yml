@@ -3,8 +3,11 @@ name: JV isogeny end-to-end
 # The full p=101 sieve is deliberately outside the fast PR library gate.
 # Keep its original assertions in a bounded, independently visible run.
 on:
-  schedule:
-    - cron: "17 8 * * 0"
+  push:
+    branches: [main]
+    paths:
+      - 'src/cryptanalysis/jv_isogeny_walk.rs'
+      - '.github/workflows/jv-isogeny-walk.yml'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +19,7 @@ concurrency:
 
 jobs:
   end-to-end:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|jv-isogeny-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4

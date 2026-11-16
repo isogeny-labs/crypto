@@ -737,7 +737,7 @@ pub struct Jv4CostE {
     pub decompositions: usize,
 }
 
-fn polys_of(comps: &[HashMap<[u8; 5], u64>; 5], p: u64) -> Vec<f4_fp::Poly> {
+pub(crate) fn polys_of(comps: &[HashMap<[u8; 5], u64>; 5], p: u64) -> Vec<f4_fp::Poly> {
     let mut polys: Vec<f4_fp::Poly> = comps
         .iter()
         .map(|c| {
@@ -765,7 +765,7 @@ pub fn jv4_options(max_degree: u32, budget_secs: f64) -> F4Options {
 
 /// Signs and the `T`-component of a candidate index quadruple by group
 /// arithmetic: `R − Σ s_i P_i ∈ {O, T}` for one of the sixteen sign vectors.
-fn resolve(curve: &Ed5, base: &[PtE], r: &PtE, idx: [usize; 4]) -> Option<QuadE> {
+pub(crate) fn resolve(curve: &Ed5, base: &[PtE], r: &PtE, idx: [usize; 4]) -> Option<QuadE> {
     let t = curve.t();
     for mask in 0..16u32 {
         let mut acc = *r;
@@ -1798,5 +1798,89 @@ mod tests {
         assert!(c.two_torsion_in_subgroup <= 16 * c.quadruples);
         assert_eq!(c.saturated_in_subgroup, 16 * c.quadruples);
         assert_eq!(c.saturated_distinct % 16, 0);
+    }
+}
+
+#[cfg(test)]
+mod weighted_probe {
+    //! Feasibility probe (not a result): the decision cost of one residual
+    //! under f4_fp (grevlex), the Macaulay solve unweighted, and the Macaulay
+    //! solve with weights (1, 2, 3, 4, 2) on (e1, e2, e3, e4, pi).
+    use super::*;
+    use crate::cryptanalysis::gaudry_quartic::{solve_system_w_inner, QuarticSolve};
+
+    fn wdeg(m: &[u8; 5], w: &[u8; 5]) -> u32 {
+        m.iter().zip(w).map(|(&a, &b)| a as u32 * b as u32).sum()
+    }
+
+    #[test]
+    #[ignore]
+    fn weighted_probe() {
+        let p: u64 = std::env::var("PROBE_P")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(271);
+        let seed = 2u64;
+        let inst = generate_instance_edwards(p, seed);
+        let curve = &inst.curve;
+        let f = &curve.f;
+        let mut rng = StdRng::seed_from_u64(seed ^ 0xED02);
+        let _base = factor_base(curve, &mut rng);
+        let pre = SymmetrisedS5Ed::precompute(curve, &mut rng);
+        for t in 0..3 {
+            let r = random_point(curve, &mut rng);
+            let comps = pre.weil_restrict(f, &r.y);
+            let mut sys: Vec<HashMap<[u8; 5], u64>> = comps.to_vec();
+            let mut pe = HashMap::new();
+            pe.insert([0u8, 0, 0, 0, 2], 1u64);
+            pe.insert([0u8, 0, 0, 1, 0], p - 1);
+            sys.push(pe);
+            for w in [[1u8, 1, 1, 1, 1], [1u8, 2, 3, 4, 2]] {
+                let degs: Vec<u32> = sys
+                    .iter()
+                    .map(|c| c.keys().map(|m| wdeg(m, &w)).max().unwrap_or(0))
+                    .collect();
+                println!("target {t} weights {w:?} equation degrees {degs:?}");
+            }
+            let rep = f4_fp::solve(&polys_of(&comps, p), 5, p, &jv4_options(24, 120.0));
+            println!(
+                "target {t} f4_fp: field_ops {} degree {} rows {} cols {} verdict {:?}",
+                rep.field_ops,
+                rep.solving_degree,
+                rep.max_rows,
+                rep.max_cols,
+                matches!(rep.verdict, Verdict::Inconsistent)
+            );
+            for (w, range) in [
+                ([1u8, 1, 1, 1, 1], 4u8..=11),
+                ([1u8, 2, 3, 4, 2], 16u8..=40),
+            ] {
+                for d in range {
+                    let mut st = QuarticSolve::default();
+                    let t0 = Instant::now();
+                    let res = solve_system_w_inner::<5>(
+                        &sys, &w, false, false, false, 0, d, p, &mut rng, &mut st, false, None,
+                        None,
+                    );
+                    println!(
+                        "target {t} weights {w:?} D {d}: rows {} cols {} pivots {} echelon_muls {} total_muls {} ms {:.0} outcome {:?} sols {:?}",
+                        st.rows,
+                        st.cols,
+                        st.pivots,
+                        st.echelon_muls,
+                        st.total_muls,
+                        t0.elapsed().as_secs_f64() * 1e3,
+                        st.outcome,
+                        res.as_ref().ok().and_then(|o| o.as_ref().map(|v| v.len()))
+                    );
+                    if st.outcome.contains("inconsistent")
+                        || st.outcome == "solved"
+                        || st.cols > 40_000
+                    {
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

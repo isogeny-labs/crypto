@@ -1,0 +1,181 @@
+warning: due to multiple output types requested, the explicitly specified output file name will be adapted for each output type
+
+error[E0428]: the name `direct_checks` is defined multiple times
+ --> direct-checks.rs:1:1
+  |
+1 | fn direct_checks(){let(mut second_equalities,mut factor_equalities,mut endpoint_checks)=(0,0,0);
+  | ^^^^^^^^^^^^^^^^^^
+  | |
+  | `direct_checks` redefined here
+  | previous definition of the value `direct_checks` here
+  |
+  = note: `direct_checks` must be defined only once in the value namespace of this module
+
+error[E0592]: duplicate definitions with name `recover_direct_phase_image`
+  --> direct-adapter.rs:36:18
+   |
+36 | ...es{fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{Re...
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |       |
+   |       duplicate definitions for `recover_direct_phase_image`
+   |       other definition for `recover_direct_phase_image`
+
+error[E0592]: duplicate definitions with name `recover_direct_phase_image`
+ --> direct-adapter.rs:2:2
+  |
+2 |  fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{
+  |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |  |
+  |  duplicate definitions for `recover_direct_phase_image`
+  |  other definition for `recover_direct_phase_image`
+
+error[E0599]: no method named `recover_direct` found for struct `StreamModes` in the current scope
+  --> triple-checks.rs:23:127
+   |
+23 | ...with(|c|c.set((0,0,0,0)));let old=modes.recover_direct(&source,curve,bp,target,&[1,2,3,4],cap,&extra,128).unwrap();let old_counts...
+   |                                            ^^^^^^^^^^^^^^ method not found in `StreamModes`
+   |
+  ::: streamed.rs:27:1
+   |
+27 | struct StreamModes{r:u64,m:usize,zeta:u64,block:usize}
+   | ------------------ method `recover_direct` not found for this struct
+
+error[E0034]: multiple applicable items in scope
+  --> direct-adapter.rs:36:298
+   |
+36 | ...veryModes::from_modes(self)?.recover_direct_phase_image(source,curve,base,target,radii,cap,extra,max_calls,power_slots)}}
+   |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ multiple `recover_direct_phase_image` found
+   |
+note: candidate #1 is defined in an impl for the type `RecoveryModes<'_>`
+  --> direct-adapter.rs:2:2
+   |
+ 2 |  fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `RecoveryModes<'_>`
+  --> direct-adapter.rs:2:2
+   |
+ 2 |  fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> direct-checks.rs:29:268
+   |
+29 | ...et((0,0,0,0)));let new=modes.recover_direct_phase_image(&source,curve,bp,target,&[1,2,3,4],cap,&extra,128,slots).unwrap();assert_...
+   |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ multiple `recover_direct_phase_image` found
+   |
+note: candidate #1 is defined in an impl for the type `StreamModes`
+  --> direct-adapter.rs:36:18
+   |
+36 | ...es{fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{Re...
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `StreamModes`
+  --> direct-adapter.rs:36:18
+   |
+36 | ...es{fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{Re...
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+  --> direct-checks.rs:33:28
+   |
+33 |  for k in 1..r{let q=modes.recover_direct_phase_image(&source,curve,bp,multiple(curve,bp,k),&[1,2],64,&extra,1,1024).unwrap();assert...
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^ multiple `recover_direct_phase_image` found
+   |
+note: candidate #1 is defined in an impl for the type `StreamModes`
+  --> direct-adapter.rs:36:18
+   |
+36 | ...es{fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{Re...
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `StreamModes`
+  --> direct-adapter.rs:36:18
+   |
+36 | ...es{fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usize,extra:&[u64],max_calls:usize,power_slots:usize)->Result<(Option<u64>,PullStats,&'static str),Error>{Re...
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `recover_direct` found for reference `&RecoveryModes<'_>` in the current scope
+ --> opposite-adapter.rs:7:116
+  |
+7 | ...dii[0]+radii[1]!=self.r {return self.recover_direct(source,curve,base,target,radii,cap,extra,max_calls)}
+  |                                         ^^^^^^^^^^^^^^ method not found in `&RecoveryModes<'_>`
+
+error[E0599]: no method named `recover_direct` found for struct `StreamModes` in the current scope
+  --> opposite-checks.rs:20:63
+   |
+20 |   for k in 0..r{let target=multiple(curve,bp,k);let old=modes.recover_direct(&source,curve,bp,target,&[1,r-1,2,3],cap,&extra,128).un...
+   |                                                               ^^^^^^^^^^^^^^ method not found in `StreamModes`
+   |
+  ::: streamed.rs:27:1
+   |
+27 | struct StreamModes{r:u64,m:usize,zeta:u64,block:usize}
+   | ------------------ method `recover_direct` not found for this struct
+
+error[E0599]: no method named `recover_direct` found for struct `StreamModes` in the current scope
+  --> opposite-checks.rs:21:73
+   |
+21 |   for k in [0,1,17,140,280]{let target=multiple(curve,bp,k);let a=modes.recover_direct(&source,curve,bp,target,&[1,2,3,4],cap,&extra...
+   |                                                                         ^^^^^^^^^^^^^^ method not found in `StreamModes`
+   |
+  ::: streamed.rs:27:1
+   |
+27 | struct StreamModes{r:u64,m:usize,zeta:u64,block:usize}
+   | ------------------ method `recover_direct` not found for this struct
+
+error[E0599]: no method named `recover_direct` found for struct `StreamModes` in the current scope
+  --> doubled-checks.rs:21:63
+   |
+21 |   for k in 0..r{let target=multiple(curve,bp,k);let old=modes.recover_direct(&source,curve,bp,target,&[1,r-1,2,3],cap,&extra,128).un...
+   |                                                               ^^^^^^^^^^^^^^ method not found in `StreamModes`
+   |
+  ::: streamed.rs:27:1
+   |
+27 | struct StreamModes{r:u64,m:usize,zeta:u64,block:usize}
+   | ------------------ method `recover_direct` not found for this struct
+
+error[E0599]: no method named `recover_direct` found for struct `StreamModes` in the current scope
+  --> doubled-checks.rs:25:120
+   |
+25 | ...rget=multiple(curve,bp,k);let old=modes.recover_direct(&source,curve,bp,target,&[1,2,3,4],cap,&extra,128).unwrap();let new=modes....
+   |                                            ^^^^^^^^^^^^^^ method not found in `StreamModes`
+   |
+  ::: streamed.rs:27:1
+   |
+27 | struct StreamModes{r:u64,m:usize,zeta:u64,block:usize}
+   | ------------------ method `recover_direct` not found for this struct
+
+warning: variable does not need to be mutable
+  --> driver.rs:27:9
+   |
+27 |     let mut inv=pow(prefix[steps],r-2,r);if mul(inv,prefix[steps],r)!=1{return Err(Error::Arithmetic)}let mut ids=ds;
+   |         ----^^^
+   |         |
+   |         help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+  --> progression.rs:21:38
+   |
+21 |   let mut delta=prefix[self.d+1];let mut inv=pow(prefix[n],r-2,r);if mul(inv,prefix[n],r)!=1{return Err(Error::Arithmetic)}
+   |                                      ----^^^
+   |                                      |
+   |                                      help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> streamed.rs:19:18
+   |
+19 |   if steps>0{let mut inv=pow(prefix[steps],self.r-2,self.r);if mul(inv,prefix[steps],self.r)!=1{return Err(Error::Arithmetic)}
+   |                  ----^^^
+   |                  |
+   |                  help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> context.rs:18:18
+   |
+18 |   if steps>0{let mut inv=pow(prefix[steps],self.r-2,self.r);if mul(inv,prefix[steps],self.r)!=1{return Err(Error::Arithmetic)}
+   |                  ----^^^
+   |                  |
+   |                  help: remove this `mut`
+
+error: aborting due to 12 previous errors; 5 warnings emitted
+
+Some errors have detailed explanations: E0034, E0428, E0592, E0599.
+For more information about an error, try `rustc --explain E0034`.

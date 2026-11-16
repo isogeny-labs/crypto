@@ -1,0 +1,23 @@
+{
+  "schema": "pencil-administrative-change-receipt/v1",
+  "observed_utc": "2026-10-29T23:35:05Z",
+  "authority": "explicit_user_approval",
+  "question_item_id": ["request_user_input_async", "call_9923900bc777410b80b32ae8a2f7d55c", 0],
+  "role": "isolab-remote-launcher-GitHubRole-FaCZneVBkF6D",
+  "action": "iam:UpdateAssumeRolePolicy",
+  "changed_field": "Statement[0].Condition.StringEquals[token.actions.githubusercontent.com:sub]",
+  "before": "repo:aburan28/crypto:ref:refs/heads/main",
+  "after": "repo:isogeny-labs/crypto:ref:refs/heads/main",
+  "before_canonical_sha256": "000ea4d17cb86c64a4e0427db218c6bbb88a67234ece5c64332b5aeebc7ca978",
+  "after_canonical_sha256": "385fe548aa33b146d7d7fc317f1512dc54315fb38496b209f19755f032f02e59",
+  "canonicalization": "jq -S -c, including terminal newline",
+  "reviewed_policy_matches_immediate_preapply_policy": true,
+  "live_readback_matches_proposed_policy": true,
+  "restoring_changed_subject_recovers_exact_original_policy": true,
+  "permissions_policy_changed": false,
+  "rbac_changed": false,
+  "controller_or_runtime_published": false,
+  "job_submitted": false,
+  "oidc_workflow_execution_verified": false,
+  "scope": "Trust subject correction only; live IAM readback is not proof of a successful publisher workflow or experiment"
+}

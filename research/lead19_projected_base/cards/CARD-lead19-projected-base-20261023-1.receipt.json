@@ -1,0 +1,192 @@
+{
+  "card_id": "CARD-lead19-projected-base-20261023-1",
+  "card_path": "research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-1.yaml",
+  "card_sha256": "3d655e8f6376fe93ac94c03f179191d06db12532a746b448b3c3f364d32def9b",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "ic"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.205,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 1,
+      "outputs": {
+        "target/release/ic": "373c0f1d02abc29465c4d434754f5e9c732e3ff82bcb836364d1655ca2d1e2ec"
+      },
+      "seconds": 0.205,
+      "stderr_sha256": "c9ef3b68d69664e1d157e575848e4f6146e26ad39b9aa75897123cb92d2ce4bd",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.14s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ic",
+        "boundary",
+        "--regime",
+        "char2",
+        "--char2-degrees",
+        "15,18,21,24,27",
+        "--repeats",
+        "5",
+        "--seed",
+        "123212651130",
+        "--s4-max-degree",
+        "0",
+        "--base-arms",
+        "raw,projected,subgroup",
+        "--out",
+        "research/lead19_projected_base/char2.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 36.864,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-char2",
+      "index": 2,
+      "outputs": {},
+      "seconds": 36.864,
+      "stderr_sha256": "b3f9dda5d372f24345f0974b6976d118b065d71da1b8e9bdf866cbcde8b40c64",
+      "stderr_tail": [
+        "  char2: searching a curve over GF(2^15)",
+        "  char2: icv1-f2m15-t131-ed7256f0 r=2^14.0 rho S=2.03 best IC S=9.9",
+        "  char2: searching a curve over GF(2^18)",
+        "  char2: icv1-f2m18-t393-d2c04152 r=2^15.0 rho S=1.96 best IC S=8.5",
+        "  char2: searching a curve over GF(2^21)",
+        "  char2: icv1-f2m21-t2591-de54d72e r=2^20.0 rho S=1.32 best IC S=7.6",
+        "  char2: searching a curve over GF(2^24)",
+        "  char2: icv1-f2m24-tm3047-2d0c0e8c r=2^21.0 rho S=1.23 best IC S=6.0",
+        "  char2: searching a curve over GF(2^27)",
+        "  char2: icv1-f2m27-t12543-569dca8b r=2^24.4 rho S=1.08 best IC S=7.5"
+      ],
+      "stdout_sha256": "e85e6619fe90f243a01b043057336cbb1762262b7c7be60a5d8666320f094818",
+      "stdout_tail": [
+        "| char2 | mitm_m2_negfold_walk_subgroup_balanced | total | 0.463 | 0.977 | 0.425 | 5 |",
+        "| char2 | mitm_m2_negfold_walk_subgroup_balanced | trials | 0.552 | 0.952 | 0.471 | 5 |",
+        "| char2 | mitm_m3 | factor_base | 0.578 | 0.953 | 0.541 | 5 |",
+        "| char2 | mitm_m3 | linear_algebra | 0.708 | 0.961 | 0.651 | 5 |",
+        "| char2 | mitm_m3 | relations | 0.637 | 0.977 | 0.565 | 5 |",
+        "| char2 | mitm_m3 | total | 0.621 | 0.985 | 0.559 | 5 |",
+        "| char2 | mitm_m3 | trials | 0.362 | 0.936 | 0.312 | 5 |",
+        "| char2 | mitm_m3_negfold | factor_base | 0.528 | 0.956 | 0.494 | 5 |",
+        "| char2 | mitm_m3_negfold | linear_algebra | 0.708 | 0.961 | 0.651 | 5 |",
+        "| char2 | mitm_m3_negfold | relations | 0.637 | 0.977 | 0.565 | 5 |",
+        "| char2 | mitm_m3_negfold | total | 0.615 | 0.983 | 0.552 | 5 |",
+        "| char2 | mitm_m3_negfold | trials | 0.362 | 0.936 | 0.312 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | factor_base | 0.528 | 0.956 | 0.494 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | linear_algebra | 0.683 | 0.947 | 0.640 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | relations | 0.665 | 0.981 | 0.595 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | total | 0.633 | 0.982 | 0.572 | 5 |",
+        "| char2 | mitm_m3_negfold_walk | trials | 0.326 | 0.923 | 0.280 | 5 |",
+        "| char2 | rho_reference | total | 0.406 | 0.999 | 0.364 | 5 |",
+        "",
+        "Report saved: research/lead19_projected_base/char2.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ic",
+        "boundary",
+        "--regime",
+        "prime",
+        "--prime-bits",
+        "24",
+        "--repeats",
+        "5",
+        "--seed",
+        "123212651130",
+        "--s4-max-degree",
+        "0",
+        "--base-arms",
+        "raw,projected,subgroup",
+        "--out",
+        "research/lead19_projected_base/prime24.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 21.526,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-prime24",
+      "index": 3,
+      "outputs": {},
+      "seconds": 21.526,
+      "stderr_sha256": "84c9f4a9b3b9e7b492a12765c1628124bba24668f6a95a7cc4e127c02a381f0d",
+      "stderr_tail": [
+        "  prime: 24-bit instance",
+        "  prime: icv1-fp24-t1577-77336155 r=2^23.4 rho S=1.03 best IC S=12.7"
+      ],
+      "stdout_sha256": "cc222cf5f7f26a91b7410dd9408e29e8f2feb8d6cc3140d3d1c46b96d025b5ae",
+      "stdout_tail": [
+        "| regime | instance | log\u2082 r | variant | m | \\|F\\| | K | table | targets | trials | yield/ceiling | y/c exact | S | S rho | rho walk | vs rho | vs floor | FB | rel | LA | ok |",
+        "|:--|:--|--:|:--|--:|--:|--:|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | semaev_s3_roots_m2 | 2 | 512 | 256 | none | random | 10982 | 1.03 | 1.03 | 4830 | 1.03 | 0.90 | 4696\u00d7 | 5450\u00d7 | 0.45 | 4830 | 0.01 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | direct_subtraction_m2 | 2 | 512 | 256 | none | random | 10982 | 1.03 | 1.03 | 1925 | 1.03 | 0.90 | 1872\u00d7 | 2173\u00d7 | 0.45 | 1925 | 0.01 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2 | 2 | 512 | 256 | full | random | 10982 | 1.03 | 1.03 | 255.8 | 1.03 | 0.90 | 248.8\u00d7 | 288.7\u00d7 | 40.2 | 215.6 | 0.01 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m3 | 3 | 512 | 256 | full | random | 265 | 0.87 | 0.87 | 56.8 | 1.03 | 0.90 | 55.2\u00d7 | 64.1\u00d7 | 40.2 | 16.1 | 0.49 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold | 2 | 512 | 256 | negation_folded | random | 10982 | 1.03 | 1.03 | 236.0 | 1.03 | 0.90 | 229.5\u00d7 | 266.3\u00d7 | 20.4 | 215.6 | 0.01 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk | 2 | 512 | 256 | negation_folded | walk | 12889 | 0.97 | 0.97 | 24.9 | 1.03 | 0.90 | 24.2\u00d7 | 28.1\u00d7 | 20.4 | 4.51 | 0.01 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m3_negfold | 3 | 512 | 256 | negation_folded | random | 265 | 0.87 | 0.87 | 37.0 | 1.03 | 0.90 | 35.9\u00d7 | 41.7\u00d7 | 20.4 | 16.1 | 0.49 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m3_negfold_walk | 3 | 512 | 256 | negation_folded | walk | 259 | 0.87 | 0.87 | 32.0 | 1.03 | 0.90 | 31.1\u00d7 | 36.1\u00d7 | 20.4 | 11.1 | 0.52 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_balanced | 2 | 222 | 111 | negation_folded | walk | 30982 | 1.01 | 1.01 | 14.3 | 1.03 | 0.90 | 13.9\u00d7 | 16.1\u00d7 | 3.95 | 10.3 | 0.00 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_projected | 2 | 512 | 256 | negation_folded | walk | 12889 | 0.97 | 0.97 | 24.9 | 1.03 | 0.90 | 24.2\u00d7 | 28.1\u00d7 | 20.4 | 4.51 | 0.01 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_subgroup | 2 | 512 | 256 | negation_folded | walk | 12889 | 0.97 | 0.97 | 24.9 | 1.03 | 0.90 | 24.2\u00d7 | 28.1\u00d7 | 20.4 | 4.51 | 0.01 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_projected_balanced | 2 | 222 | 111 | negation_folded | walk | 30982 | 1.01 | 1.01 | 14.3 | 1.03 | 0.90 | 13.9\u00d7 | 16.1\u00d7 | 3.95 | 10.3 | 0.00 | \u2713 |",
+        "| prime | icv1-fp24-t1577-77336155 | 23.4 | mitm_m2_negfold_walk_subgroup_balanced | 2 | 222 | 111 | negation_folded | walk | 30982 | 1.01 | 1.01 | 14.3 | 1.03 | 0.90 | 13.9\u00d7 | 16.1\u00d7 | 3.95 | 10.3 | 0.00 | \u2713 |",
+        "",
+        "| regime | variant | phase | \u03b1 (ops \u221d r^\u03b1) | R\u00b2 | \u03b1 vs #E | points |",
+        "|:--|:--|:--|--:|--:|--:|--:|",
+        "",
+        "Report saved: research/lead19_projected_base/prime24.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 3,
+  "commit": "6783523a3b75266db669d6138decdf142d14e16d",
+  "dirty_after": [
+    "research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-1.yaml",
+    "research/lead19_projected_base/char2.json",
+    "research/lead19_projected_base/prime24.json",
+    "research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-1.run-char2.stderr",
+    "research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-1.run-char2.stdout",
+    "research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-1.run-prime24.stderr",
+    "research/lead19_projected_base/receipts/CARD-lead19-projected-base-20261023-1.run-prime24.stdout"
+  ],
+  "dirty_before": [
+    "research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

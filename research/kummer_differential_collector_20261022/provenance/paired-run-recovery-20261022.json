@@ -1,0 +1,46 @@
+{
+  "schema": "kummer-paired-run-recovery/v1",
+  "status": "transcript_recovered_binary_reproduced",
+  "scope": "Execution provenance recovered after host migration; this is not a new measurement or a full execution-proof-chain attestation.",
+  "source_transcript": {
+    "thread_id": "01a16204-db0d-7a00-9953-fcb3922b8ba0",
+    "relative_path": "sessions/2026/10/22/rollout-2026-10-22T05-10-47-01a16204-db0d-7a00-9953-fcb3922b8ba0.jsonl",
+    "sha256": "56eb5413216ba8ec333abfbaaa559d2340d0cf02da3e97ce9f4905eedba69b9d",
+    "line_number": 6932,
+    "event_ordinal": 6931,
+    "event_id": "exec-763d2748-4098-426d-bc66-58ad0ac59c30",
+    "event_line_sha256": "f540ae9cad95fe8b0f4602dd4766e768fbb644904f85f2e5779cc57729dde7be"
+  },
+  "execution": {
+    "command": "research/kummer_differential_collector_20261022/target/release/paired_uncached",
+    "working_directory": "/home/ec2-user/crypto-kummer-followup",
+    "completed_utc": "2026-10-22T07:35:52.725Z",
+    "duration_seconds": 1507.197243106,
+    "started_utc_derived": "2026-10-22T07:10:45.527Z",
+    "exit_code": 0,
+    "combined_output": "completed=1260 solved=1260\npaired_rho=1260\n"
+  },
+  "binary_rebuild": {
+    "command": "cargo build --release --locked --offline --bin paired_uncached",
+    "working_directory": "/home/ec2-user/crypto-kummer-followup/research/kummer_differential_collector_20261022",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+    "retained_executable_sha256": "87d724fd89fa8d22c225eb0fae742c64d0c4d9378b7d4721752d0be9eb137b92",
+    "rebuilt_executable_sha256": "87d724fd89fa8d22c225eb0fae742c64d0c4d9378b7d4721752d0be9eb137b92",
+    "byte_identical": true,
+    "source_sha256": {
+      "research/kummer_differential_collector_20261022/Cargo.toml": "e17e66d5ae238a262a012c13ae251a61897f52a62eee47f95b1ffc2225b8e449",
+      "research/kummer_differential_collector_20261022/Cargo.lock": "a5a64ccba7b25a82029d3e0ff28ba049ed25012fa6e1e9b0838f18b29d41c7b7",
+      "research/kummer_differential_collector_20261022/src/main_uncached.rs": "c77fd8369c6b4905ea321f44c75ef865998bc3db1b4cebb0c1668b3549d710fa",
+      "research/kummer_differential_collector_20261022/src/bin/paired_uncached.rs": "3434196b6b37abfd9af749b41c5616dccf19d21d46a10616829867edb533ec6b",
+      "research/five_leads_e2e_20261019/native/lib.rs": "83d31952cfb7db131784cd87cfb0ec73c8fd87db23e7407d01cc978a6436b15b",
+      "src/cryptanalysis/three_leads.rs": "d354a3912db6ea6af70019920708610fe848a232119b0949d8a7c968aedf6354",
+      "src/cryptanalysis/three_leads_followup.rs": "4bff68d135a539163bc9d728cb523c214d1e03dd094546bf0b25c732f478d18f"
+    }
+  },
+  "limits": [
+    "The migrated transcript retains combined output, not separate stdout and stderr streams.",
+    "The run did not record a standalone environment snapshot, CPU time, or isolation level.",
+    "A byte-identical rebuild binds the retained executable to the saved source on this host; it is not an independent proof that every recorded operation count is correct."
+  ]
+}

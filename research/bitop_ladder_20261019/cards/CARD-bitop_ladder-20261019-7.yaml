@@ -1,0 +1,38 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-bitop-ladder-20261019-7
+experiment_id: bitop_ladder_20261019
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f
+receipt: research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-7.receipt.json
+binds:
+  - {path: research/bitop_ladder_20261019/PROTOCOL.md, sha256: 867247a2528d1ddd0fbdbee7c031e86ae6e2ad268bfc5c93dc4bac5b8958aeff}
+  - {path: research/bitop_ladder_20261019/run_sessions.sh, sha256: 31f4061ab352c1d02b597394adbd3095102e916a6b4077fa81a5281d145910e7}
+  - {path: research/bitop_ladder_20261019/params.json, sha256: bb0e341ff8406210157d51e611deedaebba09221497866ba916893608a4bd7ec}
+  - {path: research/bitop_ladder_20261019/specs/holdout-P39.json, sha256: 86300a717b64e11beefbd1377ebfe416b6742314b640340f51c86edfd9e6e6db}
+  - {path: research/bitop_ladder_20261019/specs/holdout-P40.json, sha256: 7d7253708dbf3922042645b21ed568a37cc4091c5381c1b79f7ea803aee08784}
+  - {path: target/release/ecbench, sha256: 372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a}
+must_not_exist:
+  - research/bitop_ladder_20261019/sessions/holdout-P39
+  - research/bitop_ladder_20261019/sessions/holdout-P40
+commands:
+  - id: holdout-panel
+    cwd: research/bitop_ladder_20261019
+    argv:
+      - ./run_sessions.sh
+      - specs/holdout-P39.json
+      - specs/holdout-P40.json
+    timeout_seconds: 7000
+    success_exit_codes: [0]
+    stdout: research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-7.run.stdout
+    outputs:
+      - research/bitop_ladder_20261019/sessions/holdout-P39/verify.json
+      - research/bitop_ladder_20261019/sessions/holdout-P40/verify.json
+bus_address: executor-mechanical-bitop-ladder
+background: true
+write_scope:
+  - research/bitop_ladder_20261019/
+stop_when:
+  - The holdout-panel command exits with a status other than 0.
+  - Any path listed under must_not_exist already exists before the command starts.

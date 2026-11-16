@@ -1,0 +1,205 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1hf9f7109066d0",
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1ha5b853b315eb",
+    "arm": "rho-reference",
+    "method_id": "ECM1h0de59de796c1",
+    "method": "rho.negation_v2",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 2.0204841763165837,
+    "mean_ratio_to_floor": 2.27987225200177,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 2.074623623699129,
+      "max_s": 2.5034080469688864,
+      "max_over_median": 1.2066805845511481,
+      "top_run_share": 0.30975348338692393,
+      "top_run_id": "ECM1h0de59de796c1W1e45c040285fR5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "canonicalisations_uncharged": 637,
+      "distinguished_point_table_inserts_uncharged": 52,
+      "distinguished_point_table_queries_uncharged": 56
+    }
+  },
+  "b": {
+    "session_id": "ECBS1ha5b853b315eb",
+    "arm": "orbit-affine-o8-r1_5",
+    "method_id": "ECM1hc358c9da8f61",
+    "method": "ic.prime_orbit_relations_v1",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 10.944830682855322,
+    "mean_ratio_to_floor": 12.3499189299217,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 11.009798019714376,
+      "max_s": 11.477562845099566,
+      "max_over_median": 1.042486231313926,
+      "top_run_share": 0.26216857934309457,
+      "top_run_id": "ECM1hc358c9da8f61W1e45c040285fR4",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "factor_base_draws_uncharged": 72
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "W1e45c040285f",
+      "slug": "icv1-fp14-tm143-59641cfe",
+      "r": 13327,
+      "floor_s": 0.8862269254527579,
+      "pairs": 4,
+      "a_mean_s": 2.0204841763165837,
+      "b_mean_s": 10.944830682855322,
+      "ratio_b_over_a": 5.416934619506968,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-fp14-tm143-59641cfe",
+      "log2_r": 13.70206443587828,
+      "workloads": 1,
+      "pairs": 4,
+      "ratio_b_over_a": 5.416934619506968,
+      "ci95": [
+        3.3892871745118933,
+        8.657625973000927
+      ],
+      "ci_method": "within_t",
+      "indicative": true,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        4.3076923076923075,
+        7.174515235457065
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 5.416934619506968,
+    "ci95": [
+      3.3892871745118933,
+      8.657625973000927
+    ],
+    "ci_method": "within_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000,
+    "workloads": 1,
+    "dof": 3.0,
+    "indicative": true,
+    "interval_scope": "within_workload",
+    "ci95_bootstrap": [
+      4.3076923076923075,
+      7.174515235457065
+    ],
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 0,
+    "verified_only_ratio": 5.416934619506968,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        5.416934619506968,
+        5.023523573200993,
+        3.0548271752085823
+      ],
+      "order": "orbit-affine-o8-r1_5 > rho-reference at every weight",
+      "pairs": 4,
+      "note": "point ratios of totals; rank only where the order holds at every weight"
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "4 of 4 pairs did not reach L2",
+      "0 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L2",
+    "pairs": 4,
+    "pairs_below_level": 4,
+    "median_ratio": 2.0883747003603514,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 0.36940050511693295,
+    "ns_per_gae_a": 518.8638799571276,
+    "ns_per_gae_b": 191.6685793430946,
+    "ns_per_gae_upper_bound_arms": [
+      "rho-reference",
+      "orbit-affine-o8-r1_5"
+    ],
+    "method_call_wall_ratio": 1.4377390644301895,
+    "method_call_wall_ci95": [
+      0.911033921914534,
+      2.2689535127787646
+    ],
+    "method_call_wall_ci95_bootstrap": [
+      1.1546454958440455,
+      1.8558463282459632
+    ],
+    "process_wall_ratio": 1.3767981494176504,
+    "process_wall_ci95": [
+      0.7356120554856447,
+      2.576865251329284
+    ],
+    "process_wall_ci95_bootstrap": [
+      0.9910898790432742,
+      1.8638298771832087
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 4,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 4
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": 0.0,
+    "contention_observed_runs": 0,
+    "notes": [
+      "no admitted A/A interval; calibration bonus unavailable",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (ok): orbit-affine-o8-r1_5 / rho-reference = 5.4169 [3.389, 8.658] (within_t, df 3) over 4 pairs on 1 workloads, 1 curve(s), INDICATIVE: one workload, the interval does not generalise to other targets, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 5.4169, w=0.1: 5.0235, w=1: 3.0548): orbit-affine-o8-r1_5 > rho-reference at every weight; heavy tail in rho-reference: top run is 31% of the arm's total S (max/median 1.2); more runs needed; heavy tail in orbit-affine-o8-r1_5: top run is 26% of the arm's total S (max/median 1.0); more runs needed; wall: descriptive (ns/GAE 0.3694, not a result: 4 of 4 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-reference, orbit-affine-o8-r1_5 is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1h68760cd9bc2f",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

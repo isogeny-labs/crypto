@@ -1,0 +1,35 @@
+{
+  "schema": "n83.natural-query-sequence-diagram/v1",
+  "run_id": "run-20261018T2052Z",
+  "scope": "L0 descriptive wall values; different workloads; n=1 per arm",
+  "control_axis_seconds": [0, 80],
+  "arms": [
+    {
+      "name": "P2 preflight",
+      "worker_process_wall_seconds": 43.737230985,
+      "status": "PREFLIGHT_ONLY",
+      "source": "../../spot-arms/p2-preflight/run/summary.json"
+    },
+    {
+      "name": "A1 selectors supplied",
+      "worker_process_wall_seconds": 60.034319247,
+      "status": "PASS_SELECTOR_ONLY_WITNESS",
+      "source": "../../spot-arms/a1-selector-only-v2/worker.json"
+    },
+    {
+      "name": "B natural query",
+      "worker_process_wall_seconds": 1790.010187444,
+      "status": "UNKNOWN_budget",
+      "source": "../../spot-arms/b-natural-v2/run/cap.json"
+    },
+    {
+      "name": "A2 selectors supplied",
+      "worker_process_wall_seconds": 68.854539019,
+      "status": "PASS_SELECTOR_ONLY_WITNESS",
+      "source": "../../spot-arms/a2-selector-only-v2/worker.json"
+    }
+  ],
+  "a2_gap_after_b_seconds": 14548,
+  "natural_relation_receipt": null,
+  "speed_ratio": null
+}

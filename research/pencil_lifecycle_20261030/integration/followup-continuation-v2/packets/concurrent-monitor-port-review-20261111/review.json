@@ -1,0 +1,41 @@
+{
+  "schema": "research.independent-helper-source-review/v1",
+  "task": "T-2187",
+  "reviewer": "root/mode_source_review",
+  "recorded_utc": "2026-11-11T03:11:54.664985+00:00",
+  "subject_packet": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v8-20261111",
+  "subject_manifest_sha256": "daaddc95e4b502a9a7ac44373363ce02e452d90f9a7f89fada1e18bcf34800cc",
+  "shared_files": {
+    "concurrent_tree.py": "94f07575c3f5ef1524250044d8fe8be2542719a7dcf4725d8a858af5318277ea",
+    "concurrent_traversal_control.py": "f3270b9580fe5b2b6081303c2bb04a4ea6f62c3237e210a404c45b963443b5c0"
+  },
+  "status": "source_review_pass_native_control_unrun",
+  "findings_addressed": [
+    "Original directorycontrol stopped beforelstat and didnot exerciseactualscandir/onerror; producer added deterministic deletion immediatelybefore realdescent.",
+    "Intentionalnegative fixtures couldrace productionmonitor; producer movedcontrol inlinebefore materialization/monitor and removesfixture.",
+    "Globalos.scandir wrapper broke shutil.rmtree integerFD traversal; producer now passes integerdescriptors unchanged."
+  ],
+  "checks": [
+    "ENOENT-only suppression requires allowlistedmutablelocation orknownatomictemp and confirmedsecondlstatabsence.",
+    "Directoryandfiletypechecks rejectsymlinks/specialfiles; permissionerrors and immutablemissingpaths remainfatal.",
+    "Inlinecontrol usesfixedtinyfixture;1MiB finalcheck and30second postreturnacceptance, existinghardphase/systemdbounds.",
+    "No mathematical/exportercontrolsource changes; porthelpers exactlymatchreviewedbytes."
+  ],
+  "source_only": true,
+  "native_control_executed": false,
+  "ported_packets": [
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/exporter-v4-qualification-v4-20261111",
+      "manifest_sha256": "33b5ca7e842b8dcef79df8ea6f696762dfd60781d49946db9adee6b481da9ad0",
+      "worker_sha256": "29f09a48816e225d106a7f7050628e68566be283d7d27273537c619bf21b3af9",
+      "admission_sha256": "bf9b25e2ef00223c750d55e7932c10eb95c20ce27f06cf9c844b79548bde9b49"
+    },
+    {
+      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-production-two-bin-build-v2-20261111",
+      "manifest_sha256": "66efb6141790d9b0de3b77761d68c4a9e08421d62591451da6f0fb9840985eb7",
+      "worker_sha256": "80d607cd0aaeae81b81df3ddbc2247b2cc19de63ee3611b3920beef31e594170",
+      "admission_sha256": "099818641a65840b3880c16133feb1900613060d830b0eae2bf589d3bd0cb05f"
+    }
+  ],
+  "pcc_standing": "unverified"
+}

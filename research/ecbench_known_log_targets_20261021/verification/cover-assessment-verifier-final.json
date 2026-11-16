@@ -1,0 +1,62 @@
+{
+  "root": "/workspace/crypto",
+  "problem_count": 0,
+  "problems": [],
+  "counts": {
+    "registry_rows": 2575,
+    "cover_report_rows": 2575,
+    "graph_curve_nodes": 2575,
+    "maps": 2575,
+    "unique_covers": 2573,
+    "representations": 982,
+    "unique_ec1": 982,
+    "shared_covers": 2
+  },
+  "construction_counts": {
+    "binary_cubic_pullback_v1": 165,
+    "prime_quadratic_pullback_v1": 2410
+  },
+  "arithmetic_checks": {
+    "binary": 165,
+    "prime": 1086,
+    "extension": 1324,
+    "normalized_target": 30
+  },
+  "profile_counts": {
+    "map": 4,
+    "subgroup": 2,
+    "exact_overlays": 4
+  },
+  "typed_binding_counts": {
+    "fields": 510,
+    "jacobians": 2573,
+    "maps": 2575
+  },
+  "effective_status_counts": {
+    "map_claims": {
+      "unknown": 16114,
+      "supported": 8415,
+      "refuted": 2575,
+      "not_applicable": 3796
+    },
+    "map_full_transfer_pipeline": {
+      "unknown": 0,
+      "supported": 0,
+      "refuted": 2575,
+      "not_applicable": 0
+    },
+    "subgroup_claims": {
+      "unknown": 10942,
+      "supported": 2806,
+      "refuted": 0,
+      "not_applicable": 0
+    },
+    "all": {
+      "unknown": 27056,
+      "supported": 11221,
+      "refuted": 5150,
+      "not_applicable": 3796
+    }
+  },
+  "scope_note": "Checks the complete v2 membership ledger, explicit field/Jacobian/map bindings, graph/content joins, and cover formulas over every declared field. It does not independently prove odd p primality, extension-modulus irreducibility, EC1 subgroup orders, or transfer advantage."
+}

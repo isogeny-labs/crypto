@@ -1,0 +1,2 @@
+# Prospective build-isolation review
+Source-only comparison: immutable original wrapper versus amendment; exact commit/root checks, dirty/untracked including ignored inventory, external dependencies and Cargo configuration, cache ownership/time caps, failure receipts. Distinguish mandatory source input binding/lease from optional full checkout/read-only chmod choices. No build, Git checkout or mutation of shared sources/cache. Freeze before code inspection.

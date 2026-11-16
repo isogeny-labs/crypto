@@ -1,0 +1,66 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{parskip}
+\title{Published complete genus-2 law: source and provenance audit}
+\author{Review packet --- 2026-10-25}
+\date{}
+\begin{document}
+\maketitle
+\noindent\textbf{Question.} Does the measured Rust arithmetic path implement
+the published complete, inversion-free weighted genus-2 law? This is a source
+audit of an existing arm, not a fresh arithmetic or DLP experiment.
+
+\noindent\textbf{Source.} E. Ozbay Gurler and H. Hisil,
+\href{https://link.springer.com/article/10.1007/s13389-024-00351-7}
+{\emph{Complete group law for genus 2 Jacobians on Jacobian coordinates}},
+J. Cryptogr. Eng. 14 (2024), sections 3--4. The printed law covers
+$y^2=x^5+a_3x^3+a_2x^2+a_1x+a_0$ in odd characteristic. Its section 4
+prints weighted Eqs. (13)--(21), and refers to Hisil--Costello and
+Hu--Lin--Zhao for several common and earlier degenerate branches.
+
+\noindent\textbf{Observed implementation.} The source-audited dispatcher
+\texttt{projective\_law\_gate.rs} implements identity, 1+1, 1+2, and 2+2
+branches in weighted coordinates. Its SHA-256 is\\
+\texttt{5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0}.
+The attached CSV records each predicate, function, equation, output type,
+and exact source line. The weighted arithmetic functions do not call field
+inversion; setup and optional affine normalization do. The wrapper collector
+normalizes every addition, whereas the retained-state collector normalizes
+at the split relation boundary. Their frozen costs include those inversions.
+
+\begin{center}
+\includegraphics[width=0.91\textwidth]{branch-map.png}
+\end{center}
+
+\noindent\textbf{Finite checks and costs.} The 21-model arithmetic gate has
+zero unresolved cases in its exercised weighted branch sets. An additional
+42-model proof audit compares 1,224,000 weighted additions to independent
+Cantor arithmetic with zero mismatches, plus exact branch polynomials and
+written divisor arguments. The frozen 1,260-target collector arms each
+verified all source scalars. At the report's representative operation price,
+wrapper/rho is 3.7938 and retained-state/rho is 4.1793. These are operation
+price ratios, not isolated wall-time ratios.
+
+\noindent\textbf{Corrected N6 source attribution.} The pinned author
+Magma file at commit \texttt{ec98e115} (full hash in the companion audit)
+sets \texttt{WW1:=W1\string^2} before its \texttt{N6} assignment multiplies
+by \texttt{WW1}. The prior audit mistook this alias for \texttt{W1}.
+Thus the author code and Rust both use $W^2$ in this intermediate.
+The exact $p=739$, $W=3$ fixture tests a synthetic $W^1$ mutation,
+which disagrees with independent Cantor; its historical raw field names
+are retained. The article defines the same weighted coordinates in
+Section 4 and its affine doubling coefficients in Eq.~(7), but does not
+print this particular $N6$ line. Full compiled Rust-to-published-law
+semantics and the projective/Pic$^0$ bridge remain open. Frozen costs
+are unchanged.
+
+\noindent\textbf{Reproduction.} Read \texttt{SOURCE\_AUDIT.md} and
+\texttt{branch-map.csv} beside this PDF. The gate and reports are in the parent
+study directory; their native inputs, raw records, validators, and source
+hashes are linked from that Markdown report. Render this PDF with
+\texttt{tectonic SOURCE\_AUDIT.tex} after generating the diagram from
+\texttt{branch-map.dot} with Graphviz.
+\end{document}

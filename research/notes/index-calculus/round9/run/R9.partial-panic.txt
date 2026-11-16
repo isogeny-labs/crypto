@@ -1,0 +1,20 @@
+Round nine. DP rho on divisors vs on ±-classes, 40 seeds per row from 0xc0ffee; counted group operations, means per run.
+ g    p         N  walk plain   walk fold   ratio fruitless  S_walk p  S_walk f  S ratio  ok
+ 2   41      1321          51          35   0.692      3.4%     1.390     0.962    0.953   y
+ 2   61      1399          48          33   0.686      2.8%     1.273     0.874    0.954   y
+ 2  101      4663          88          68   0.771      2.5%     1.287     0.992    0.946   y
+ 2  151      7949         127          85   0.669      3.6%     1.421     0.951    0.898   y
+ 2  211     11813         145         113   0.782      2.9%     1.333     1.042    0.927   y
+ 2  251     61667         309         269   0.870      2.7%     1.246     1.085    0.933   y
+ 3   23      6299          92          82   0.887      2.9%     1.159     1.028    0.972   y
+
+thread 'main' (8496) panicked at src/prime_hyperelliptic/curve.rs:192:36:
+invalid odd-degree hyperelliptic curve: CurvePolynomialNotSquarefree
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::result::unwrap_failed
+   3: crypto_lib::cryptanalysis::hyperelliptic_ic_bench::thread_curve
+   4: crypto_lib::cryptanalysis::hyperelliptic_ic_bench::thread_instance
+   5: hyperelliptic_rho_negation::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

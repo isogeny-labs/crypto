@@ -50,7 +50,9 @@ image = (
     )
 )
 volume = modal.Volume.from_name("ecc2k130-jobs", create_if_missing=True)
-app = modal.App("ecc2k130-job")
+# ECC_MODAL_APP names the app, so a long job can run under a name of its own:
+# account-wide cleanups that stop every "ecc2k130-job" app then leave it alone.
+app = modal.App(os.environ.get("ECC_MODAL_APP", "ecc2k130-job"))
 
 
 # The verification phase of a job re-walks device reports and files a million

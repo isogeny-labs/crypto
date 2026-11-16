@@ -8,10 +8,10 @@ This is round 2, item 03 ([`../RULES.md`](../RULES.md)). The protocol is [`PROTO
 
 ## Verdict
 
-**ADVANCES at the constant level under the protocol's rule. On pipeline systems the gate never fires, so in production it is a no-op.**
+**Historical protocol result:** the gated fall-row arm beat InheritedF4 on selected barrel systems. **R10 re-rate:** the round-1 equivariant pass is cheaper on the same barrel systems; this gate is about 1.25× / 1.34× slower at n = 11 / 13. Production pipeline systems remain unaffected because the gate does not fire. See [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
 
 - **The bar is met.**
-  - No test cell regresses.
+  - Under the original G0 comparator, no test cell regressed. R10 compares barrel arms with the best measured prior configuration and finds this gate slower at n = 11 / 13.
   - Every cell where the gate fires advances:
 
     | barrel n | I/G [95 % CI] |

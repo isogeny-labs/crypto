@@ -1,0 +1,19 @@
+#!/bin/bash
+# Test double for tools/test_profile.sh: prints output in the format of ncu
+# (columns and report names as of Nsight 2025.x / driver 580) so the parsers in
+# tools/profile.sh can be checked without a GPU.  Every value is invented: it is
+# not a measurement of any GPU or kernel.
+if [ "$1" = --version ]; then printf 'NVIDIA (R) Nsight Compute Command Line Profiler\nCopyright (c) 2018-2025 NVIDIA Corporation\nVersion %s (build 36398880) (public-release)\n' "${STUB_NCU_VERSION:-2025.3.1.0}"; exit 0; fi
+if [ "$1" = -i ]; then
+  case "$*" in
+    *raw*) cat << 'CSV'
+"ID","Process ID","Process Name","Host Name","Kernel Name","Context","Stream","Block Size","Grid Size","Device","CC","gpu__time_duration.sum","sm__throughput.avg.pct_of_peak_sustained_elapsed","gpu__compute_memory_throughput.avg.pct_of_peak_sustained_elapsed","dram__throughput.avg.pct_of_peak_sustained_elapsed","sm__warps_active.avg.pct_of_peak_sustained_active","sm__maximum_warps_per_active_cycle_pct","smsp__issue_active.avg.pct_of_peak_sustained_active","smsp__inst_executed.sum","launch__registers_per_thread","launch__occupancy_limit_registers","l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum","l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum","sm__cycles_elapsed.avg.per_second","smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio","smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio","smsp__average_warps_issue_stalled_wait_per_issue_active.ratio","smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio","sm__inst_executed_pipe_alu.avg.pct_of_peak_sustained_active","sm__inst_executed_pipe_fma.avg.pct_of_peak_sustained_active"
+"","","","","","","","","","","","nsecond","%","%","%","%","%","%","inst","register/thread","block","sector","sector","hertz","","","","","%","%"
+"0","4242","ecc2k130","gpu-host","eccWalkKernel<32, true>(unsigned int*, const unsigned int*, int)","1","7","(256, 1, 1)","(1088, 1, 1)","0","12.0","1,234,567","91.3","22.4","3.1","48.7","50","88.9","2,101,445,632","128","2","1,024","2,048","2,401,000,000","0.41","1.92","0.88","0.35","71.2","64.0"
+CSV
+;;
+    *details*) echo "  eccWalkKernel ... Section: GPU Speed Of Light Throughput";;
+  esac; exit 0; fi
+[ -n "$STUB_NCU_PERM" ] && { echo "==ERROR== ERR_NVGPUCTRPERM - The user does not have permission to access NVIDIA GPU Performance Counters" >&2; exit 1; }
+o=""; prev=""; for a in "$@"; do [ "$prev" = -o ] && o=$a; prev=$a; done
+echo "==PROF== Connected to process 4242"; echo rep > "$o.ncu-rep"; echo "==PROF== Report: $o.ncu-rep"

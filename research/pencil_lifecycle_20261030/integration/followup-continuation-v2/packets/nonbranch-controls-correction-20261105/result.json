@@ -1,0 +1,50 @@
+{
+  "schema": "pencil.source-correction/v1",
+  "claim_standing": "pcc:unverified",
+  "status": "proposed_uncompiled",
+  "source_archive_commit": "a51006010d",
+  "original_sha256": "6dda751467447446311323393a0a985ae93f2440e700289914bcd0037e1476d7",
+  "candidate_sha256": "448d5ab601e955b93a9071d6b5f932b38850f5728c9cf2c3fc3eb5b3742bb35d",
+  "changes": [
+    {
+      "original_lines": "19",
+      "diagnostic": "invalid simp theorem residual; unsolved goal",
+      "proposal": "qualify ActualNonbranchNorm.residual",
+      "status": "source_only_uncompiled"
+    },
+    {
+      "original_lines": "21-36",
+      "diagnostic": "polynomial constant expressions remain in ring goals",
+      "proposal": "simp only [Polynomial.C_ofNat] after norm_num, before ring",
+      "status": "source_only_uncompiled"
+    },
+    {
+      "original_lines": "74",
+      "diagnostic": "unknown tactic at argument continuation",
+      "proposal": "indent continuation under exact expression",
+      "status": "source_only_uncompiled"
+    },
+    {
+      "original_lines": "120-121",
+      "diagnostic": "MulHomClass synthesis and product/sum mismatch",
+      "proposal": "qualify AddValuation.map_mul",
+      "status": "source_only_uncompiled"
+    }
+  ],
+  "compiler_invocations": 0,
+  "new_attempt_authorized": false,
+  "prior_attempts": 3,
+  "attempt_ceiling": 3,
+  "mathematical_statements_preserved": true,
+  "requires": [
+    "independent source review",
+    "distinct prospective execution amendment before any replay"
+  ],
+  "task": "T-1671",
+  "sources_checked": [
+    "native IndependentControls.stdout from V3 archive",
+    "pinned Mathlib/Algebra/Polynomial/Basic.lean:451 C_ofNat",
+    "pinned Mathlib/RingTheory/Valuation/Basic.lean:1160 AddValuation.map_mul"
+  ],
+  "knowledge_base": "Not loaded; diagnostic-only correction of exact pinned source, no new mechanism or novelty claim."
+}

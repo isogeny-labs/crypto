@@ -1,0 +1,35 @@
+../evidence/moment-draft-006.lean.txt:205:2: error: Type mismatch: After simplification, term
+  VBound.add (hP n) (VBound.neg (hQ n))
+ has type
+  VBound (↑n) (P.coeff n + -Q.coeff n)
+but is expected to have type
+  VBound (↑n) ((P + -Q).coeff n)
+../evidence/moment-draft-006.lean.txt:250:48: error: No goals to be solved
+../evidence/moment-draft-006.lean.txt:250:5: error: unsolved goals
+P : ℚ[X]
+hP : WeightedPolynomial P
+h0 : P.coeff 0 = 1
+z : ℤ
+n : ℕ
+hn : n < 1
+hn0 : n = 0
+⊢ (P - 1).coeff n = 0
+../evidence/moment-draft-006.lean.txt:251:2: error: Type mismatch: After simplification, term
+  hh
+ has type
+  VBound (↑1) (eval (↑z) P - 1)
+but is expected to have type
+  OneModTwo (eval (↑z) P)
+../evidence/moment-draft-006.lean.txt:275:56: error: unsolved goals
+P : ℚ[X]
+hP : WeightedPolynomial P
+h0 : P.coeff 0 = 1
+k : ℕ
+z : ℤ
+he : VBound (↑k) (eval (↑z) (P * inverseTrunc P k - 1))
+hunit : OneModTwo (eval (↑z) P)
+hne : eval (↑z) P ≠ 0
+hv : padicValRat 2 (eval (↑z) P) = 0
+hh : VBound (↑k) (eval (↑z) (P * inverseTrunc P k - 1) / eval (↑z) P)
+⊢ -(eval (↑z) P * eval (↑z) (inverseTrunc P k) - 1) = 1 - eval (↑z) P * eval (↑z) (inverseTrunc P k)
+../evidence/moment-draft-006.lean.txt:278:14: error: Unexpected term `VBound.neg hh`; expected single reference to variable

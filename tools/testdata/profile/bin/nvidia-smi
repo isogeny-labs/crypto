@@ -1,0 +1,26 @@
+#!/bin/bash
+# Test double for tools/test_profile.sh: prints output in the format of nvidia-smi
+# (columns and report names as of Nsight 2025.x / driver 580) so the parsers in
+# tools/profile.sh can be checked without a GPU.  Every value is invented: it is
+# not a measurement of any GPU or kernel.
+gpu=all
+for arg in "$@"; do case "$arg" in --id=*) gpu=${arg#--id=} ;; esac; done
+case "$*" in
+  *--version*) echo "NVIDIA-SMI version  : 580.95.05"; exit 0;;
+  *-lms*)
+    [ "${STUB_SMI_EMPTY:-0}" = 1 ] && exit 1
+    i=0
+    while true; do
+      i=$((i+1)); c=$((2400 + (i % 3) * 100))
+      if [ "$gpu" = all ] || [ "$gpu" = 0 ]; then
+        echo "2026/10/20 19:00:0$((i%10)).000, 0, $c, 14001, 412.5, $((60 + i % 5)), 99, 12, P0, 0x0000000000000000"
+        [ $i = 7 ] && echo "2026/10/20 19:00:07.000, 0, 2100, 14001, 600.0, 83, 99, 12, P0, 0x0000000000000004"
+      fi
+      if [ "$gpu" = all ] || [ "$gpu" = 1 ]; then
+        echo "2026/10/20 19:00:0$((i%10)).000, 1, 900, 14001, 100.0, 50, 10, 12, P0, 0x0000000000000000"
+      fi
+      sleep 0.05
+    done ;;
+  *clocks_event_reasons.active*--format=csv,noheader) echo "0x0000000000000000";;
+  *--query-gpu=index,name*) echo "0, NVIDIA RTX PRO 6000 Blackwell Server Edition, 580.95.05, 12.0, 2617, 14001, 600.00, 97887, Enabled";;
+esac

@@ -1,0 +1,26 @@
+diff --git a/experiments/joint-smallroot-native/tests/guard_qualification.cpp b/experiments/joint-smallroot-native/tests/guard_qualification.cpp
+index 79437cd15..edb72205b 100644
+--- a/experiments/joint-smallroot-native/tests/guard_qualification.cpp
++++ b/experiments/joint-smallroot-native/tests/guard_qualification.cpp
+@@ -392,6 +392,11 @@ int main(int argc, char **argv) {
+             "wait_status=" + std::to_string(r.wait_status) +
+                 "\ncensored=" + (r.censored ? "true" : "false") +
+                 "\nproduction_wall_ns=" + std::to_string(r.wall_ns) + "\n");
++      WaitUsage competitor_wait;
++      if (which == "Q3") {
++        competitor_wait = wait_child_usage(competitor);
++        write(out / "competitor.wait4", wait_usage_fields(competitor_wait));
++      }
+       bool clean = cleanup(out, group);
+       if (which == "Q2" || which == "Q3") {
+         auto primary_id = fields(read(out / "worker/primary.identity"));
+@@ -409,8 +414,7 @@ int main(int argc, char **argv) {
+         pass = WIFEXITED(r.wait_status) && WEXITSTATUS(r.wait_status) == 0 &&
+                !r.censored && clean && fs::exists(out / "worker/primary.ready");
+       else if (which == "Q3") {
+-        auto waited = wait_child_usage(competitor);
+-        write(out / "competitor.wait4", wait_usage_fields(waited));
++        const auto &waited = competitor_wait;
+         pass = r.censored && elapsed >= 1800000000000LL && clean &&
+                waited.reaped && WIFEXITED(waited.status) &&
+                WEXITSTATUS(waited.status) == 0 &&

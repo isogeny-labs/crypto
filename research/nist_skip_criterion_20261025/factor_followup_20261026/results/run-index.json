@@ -1,0 +1,412 @@
+{
+  "kind": "native-four-target-run-index/v1",
+  "source_commit_before_followup": "dd5a729d790f693ed5e628f1ec7d8c696c39e951",
+  "input_table": "../inputs/historical.tsv",
+  "protocol": "FACTORING_PROTOCOL.md",
+  "no_discrete_log_experiment": true,
+  "environment": {
+    "cpu_quota_cores": 4,
+    "memory_limit_gib": 16,
+    "isolation": "local research process; no performance isolation tier claimed",
+    "native_prefix": "/workspace/tools/sage_skeleton_env",
+    "pari": "2.17.3",
+    "gmp": "6.3.0",
+    "gmp_ecm": "7.0.6",
+    "compiler": "GCC/G++ 14.2",
+    "msieve_source": "https://github.com/radii/msieve/tree/c8727d91305bdbe0972d160ef0ce61dd02ce9193",
+    "yafu_source": "https://github.com/bbuhrow/yafu/tree/c7d90283972820f99b3b4920bfc1eff05c1f6342",
+    "performance_claim": false,
+    "independent_host_replay": false,
+    "cargo_check": "unavailable",
+    "conductor_check": "unavailable"
+  },
+  "runs": [
+    {
+      "id": "batch-001",
+      "state": "completed",
+      "launcher": "run.sh",
+      "method": "GMP-ECM, two workers over four targets",
+      "parameters": {
+        "requested_curves_per_target": 64,
+        "B1": 1000000,
+        "watchdog_seconds_per_target": 900
+      },
+      "outcomes": [
+        {
+          "target": "p239-2491/plus",
+          "completed_curves": 64,
+          "exit_status": 0,
+          "factor_found": false
+        },
+        {
+          "target": "p384-2688/disc",
+          "completed_curves": 61,
+          "exit_status": 14,
+          "factor_found": true
+        },
+        {
+          "target": "p521-1136/minus",
+          "completed_curves": 29,
+          "exit_status": 14,
+          "factor_found": true
+        },
+        {
+          "target": "p521-1136/plus",
+          "completed_curves": 64,
+          "exit_status": 6,
+          "factor_found": true,
+          "complete": false
+        }
+      ],
+      "raw": "runs/batch-001/",
+      "report": "reports/run-batch-001/REPORT.md"
+    },
+    {
+      "id": "refine-001",
+      "state": "completed",
+      "method": "Native exact-product refinement and independent PARI prime/product verification",
+      "outcomes": [
+        {
+          "target": "p239-2491/plus",
+          "verifier_exit": 1,
+          "complete": false
+        },
+        {
+          "target": "p384-2688/disc",
+          "verifier_exit": 0,
+          "complete": true
+        },
+        {
+          "target": "p521-1136/minus",
+          "verifier_exit": 0,
+          "complete": true
+        },
+        {
+          "target": "p521-1136/plus",
+          "verifier_exit": 1,
+          "complete": false
+        }
+      ],
+      "raw": "runs/refine-001/",
+      "report": "reports/run-refine-001/REPORT.md"
+    },
+    {
+      "id": "followon-002",
+      "state": "completed",
+      "launcher": "run_followon.sh",
+      "arms": [
+        {
+          "method": "Msieve SIQS",
+          "target": "p239-2491/plus",
+          "threads": 1,
+          "watchdog_seconds": 1800,
+          "exit_status": 0,
+          "proposed_factors_found": true
+        },
+        {
+          "method": "GMP-ECM",
+          "target": "p521-1136/plus reduced C125",
+          "requested_curves": 256,
+          "completed_curves": 256,
+          "B1": 3000000,
+          "watchdog_seconds": 1800,
+          "exit_status": 0,
+          "factor_found": false
+        }
+      ],
+      "raw": "runs/followon-002/",
+      "report": "reports/run-followon-002/REPORT.md"
+    },
+    {
+      "id": "p239-proof-002",
+      "state": "completed",
+      "method": "Native Msieve-output refinement and pre-existing independent prime/product verifier",
+      "target": "p239-2491/plus",
+      "verifier_exit": 0,
+      "complete": true,
+      "raw": "runs/p239-proof-002/",
+      "report": "reports/run-p239-proof-002/REPORT.md"
+    },
+    {
+      "id": "full21-features-003",
+      "state": "completed",
+      "program": "../native/extend_features.cpp",
+      "rows": 21,
+      "features_per_row": 1118,
+      "complete_records": 83,
+      "admitted_complete_families": [
+        "minus",
+        "twist",
+        "disc"
+      ],
+      "excluded_complete_family": "plus",
+      "raw": "runs/full21-features-003/",
+      "report": "reports/run-full21-features-003/REPORT.md"
+    },
+    {
+      "id": "smoothness-004",
+      "state": "completed",
+      "method": "GMP-ECM P-1 and P+1",
+      "target": "P521 n+1 reduced C125",
+      "arms": [
+        {
+          "method": "P-1",
+          "runs": 1,
+          "B1": 10000000,
+          "watchdog_seconds": 300,
+          "exit_status": 0,
+          "factor_found": false
+        },
+        {
+          "method": "P+1",
+          "runs": 4,
+          "B1": 3000000,
+          "watchdog_seconds": 300,
+          "exit_status": 0,
+          "factor_found": false
+        }
+      ],
+      "raw": "runs/smoothness-004/",
+      "report": "reports/run-smoothness-004/REPORT.md"
+    },
+    {
+      "id": "full21-search-005",
+      "state": "completed",
+      "program": "../native/search.cpp",
+      "rows": 21,
+      "features_per_row": 1118,
+      "fixed_count_label_assignments": 4480,
+      "structural_best_exact_conjunction_tests": 3,
+      "generation_best_exact_conjunction_tests": 2,
+      "seed_bit_best_exact_conjunction_tests": 2,
+      "raw": "runs/full21-search-005/",
+      "report": "reports/run-full21-search-005/REPORT.md"
+    },
+    {
+      "id": "yafu-ecm-006",
+      "state": "failed admission",
+      "exit_status": 0,
+      "target_evaluated": false,
+      "reason": "YAFU selected stdin batch mode, but stdin was empty",
+      "raw": "runs/yafu-ecm-006/",
+      "report": "reports/run-yafu-ecm-006/REPORT.md"
+    },
+    {
+      "id": "yafu-nfs-007",
+      "state": "failed admission",
+      "exit_status": 0,
+      "target_evaluated": false,
+      "reason": "YAFU selected stdin batch mode, but stdin was empty",
+      "raw": "runs/yafu-nfs-007/",
+      "report": "reports/run-yafu-nfs-007/REPORT.md"
+    },
+    {
+      "id": "yafu-ecm-008",
+      "state": "watchdog timeout",
+      "launcher": "run_yafu.sh",
+      "expression": "ecm(@,1024)",
+      "stdin": "validated C125 residual",
+      "target_evaluated": true,
+      "parameters": {
+        "threads": 2,
+        "requested_curves": 1024,
+        "B1": 11000000,
+        "B2": 1100000000,
+        "seed": 20261026,
+        "watchdog_seconds": 1800
+      },
+      "complete": false,
+      "raw": "runs/yafu-ecm-008/",
+      "report": "reports/run-yafu-ecm-008/REPORT.md",
+      "exit_status": 124,
+      "last_printed_counter": 704,
+      "last_confirmed_end_counter": 688,
+      "interrupted_batch": "partial; not counted as a completed batch",
+      "factor_found": false
+    },
+    {
+      "id": "yafu-nfs-009",
+      "state": "native watchdog timeout; later outer-launcher error",
+      "launcher": "run_yafu.sh",
+      "expression": "nfs(@)",
+      "stdin": "validated C125 residual",
+      "target_evaluated": true,
+      "parameters": {
+        "configured_threads": 2,
+        "reported_poly_workers": 1,
+        "seed": 20261027,
+        "watchdog_seconds": 3600
+      },
+      "complete": false,
+      "raw": "runs/yafu-nfs-009/",
+      "report": "reports/run-yafu-nfs-009/REPORT.md",
+      "exit_status": 124,
+      "outer_launcher_exit_status": null,
+      "outer_launcher_error": "unterminated quote after launcher file was edited during wait",
+      "factor_found": false,
+      "progress_reused_by": "yafu-nfs-012"
+    },
+    {
+      "id": "factor-summary-010",
+      "state": "completed",
+      "program": "summarize_factors.cpp",
+      "rows": 21,
+      "complete_records_reproved": 83,
+      "missing_record": "p521-1136/plus",
+      "missing_value_encoding": "NA",
+      "exit_status": 0,
+      "raw": "runs/factor-summary-010/",
+      "report": "reports/run-factor-summary-010/REPORT.md"
+    },
+    {
+      "id": "yafu-ecm-011",
+      "state": "completed",
+      "launcher": "run_yafu.sh",
+      "expression": "ecm(@,320)",
+      "stdin": "validated C125 residual",
+      "target_evaluated": true,
+      "parameters": {
+        "threads": 2,
+        "requested_curves": 320,
+        "B1": 11000000,
+        "B2": 11000000000,
+        "seed": 20261028,
+        "watchdog_seconds": 3600
+      },
+      "progress_display_correction": "The upstream progress label hard-codes B2=100*B1; the explicit B2 flag flows to STAGE2_MAX and factor.log records 11B.",
+      "complete": false,
+      "raw": "runs/yafu-ecm-011/",
+      "report": "reports/run-yafu-ecm-011/REPORT.md",
+      "exit_status": 0,
+      "completed_curves": 320,
+      "factor_found": false
+    },
+    {
+      "id": "yafu-nfs-012",
+      "state": "requested stop to reallocate threads and try adaptive filtering",
+      "launcher": "immutable copy of run_nfs_resume.sh with NIST_FACTOR_BASE",
+      "source_run": "yafu-nfs-009",
+      "complete_saved_polynomials_checked": 361,
+      "discarded_partial_polynomials": 0,
+      "residual_bits": 414,
+      "poly_finalization_exit": 0,
+      "parameters": {
+        "threads": 2,
+        "seed": 20261029,
+        "poly_watchdog_seconds": 900,
+        "nfs_watchdog_seconds": 10800,
+        "configured_relation_target": 24200000
+      },
+      "complete": false,
+      "raw": "runs/yafu-nfs-012/",
+      "report": "reports/run-yafu-nfs-012/REPORT.md",
+      "exit_status": 1,
+      "factor_found": false,
+      "selected_job_separately_checked": true,
+      "stop_record": "runs/yafu-nfs-012/child-stop-reason.json"
+    },
+    {
+      "id": "poly-controls-013",
+      "state": "completed",
+      "program": "check_polynomials.cpp",
+      "public_synthetic_integer": "15",
+      "positive_exit": 0,
+      "wrong_root_exit": 1,
+      "partial_trailing_exit": 0,
+      "partial_blocks_explicitly_discarded": 1,
+      "raw": "runs/poly-controls-013/",
+      "report": "reports/run-poly-controls-013/REPORT.md"
+    },
+    {
+      "id": "yafu-nfs-014",
+      "state": "completed",
+      "launcher": "immutable copy of run_nfs_continue.sh",
+      "source_run": "yafu-nfs-012",
+      "copied_merged_relations": 2313299,
+      "parameters": {
+        "threads": 4,
+        "seed": 20261030,
+        "watchdog_seconds": 14400,
+        "minimum_relations_first_filter": 1000000,
+        "filter_target_bump_percent": 50
+      },
+      "complete": true,
+      "raw": "runs/yafu-nfs-014/",
+      "report": "reports/run-yafu-nfs-014-final/REPORT.md",
+      "progress_snapshots": [
+        {
+          "id": "001-at-1430",
+          "report": "reports/run-yafu-nfs-014-snapshot/REPORT.md",
+          "native_run_still_running": true,
+          "complete_factorization": false
+        },
+        {
+          "id": "002",
+          "started_utc": "2026-10-26T16:08:13Z",
+          "native_run_still_running": true,
+          "raw_relations_reported": 17831805,
+          "unique_after_duplicate_removal_reported": 14715396,
+          "archive": "evidence/backend-progress-002.tar.zst",
+          "manifest": "evidence/backend-manifest-002.json",
+          "delivery": "evidence/backend-progress-002-delivery.json",
+          "report": "reports/run-yafu-nfs-014-progress-002/REPORT.md",
+          "final_exit_status": null,
+          "complete_factorization": false
+        }
+      ],
+      "started_utc": "2026-10-26T14:24:58Z",
+      "completed_utc": "2026-10-26T17:32:47Z",
+      "exit_status": 0,
+      "factor_found": true,
+      "completion_scope": "native residual split; separate full original-target prime/product admission015",
+      "final_raw_relations_reported": 26716780,
+      "reduced_matrix_rows": 709365,
+      "reduced_matrix_columns": 709592,
+      "dependencies_reported": 31,
+      "final_relation_and_matrix_scratch_retained": false,
+      "cleanup_audit": "evidence/success-cleanup-audit.json"
+    },
+    {
+      "id": "p521-plus-proof-015",
+      "state": "completed",
+      "launcher": "run_plus_admission.sh",
+      "refinement_exit": 0,
+      "admission_exit": 0,
+      "full_original_target_recomputed": true,
+      "all_primes_proved": true,
+      "full_product_equal": true,
+      "complete": true,
+      "largest_prime_bits": 270,
+      "raw": "runs/p521-plus-proof-015/",
+      "canonical_record": "results/curve-20-plus.json",
+      "report": "reports/run-p521-plus-proof-015/REPORT.md"
+    },
+    {
+      "id": "full84-replay-016",
+      "state": "completed",
+      "completed_utc": "2026-10-26T17:53:12Z",
+      "launcher": "run_full84_replay.sh",
+      "protocol": "FULL84_REPLAY_PROTOCOL.md",
+      "source_before_run": "a7114968c980bcb3ee37db071657b758585d47ed",
+      "controls_exit": 0,
+      "features_exit": 0,
+      "summary_exit": 0,
+      "search_exit": 0,
+      "rows": 21,
+      "features_per_row": 1127,
+      "complete_factor_records": 84,
+      "fixed_count_label_assignments": 4480,
+      "structural_exact_cnf_tests": 3,
+      "generation_exact_cnf_tests": 2,
+      "generation_short_rule_as_good_count": 1973,
+      "raw": "runs/full84-replay-016/",
+      "report": "reports/run-full84-replay-016/REPORT.md"
+    }
+  ],
+  "final_archive": {
+    "path": "evidence/final-native-003.tar.zst",
+    "manifest": "evidence/final-manifest-003.json",
+    "readback": "evidence/final-native-003-delivery.json",
+    "all_223_listed_member_hashes_verified": true
+  }
+}

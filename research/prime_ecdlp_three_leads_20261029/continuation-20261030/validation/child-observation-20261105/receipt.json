@@ -1,0 +1,95 @@
+{
+  "schema": "pkm.local-child-observation-check/v1",
+  "recorded_utc": "2026-11-05T13:13:48.505494+00:00",
+  "source_commit": "f543e03aa4fe6eaeccecd37c68bb4a06dae8479d",
+  "source_objects": {
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/child_observation.rs": "d39d3df9c47650be21d3386df5a2ac3fd8cc129e",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/child_fixture.rs": "e09448fbe7a7866d2510c8d0706dba4400045de7",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/attempt_driver.rs": "5b670a3d484bd34a094e29be52b2d12dbf19c670",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs": "0d4acf23d34597507ecd2518e372d31f494eac51"
+  },
+  "all4_inputs_clean_and_equal": true,
+  "commands": "validate.sh (committed exact recipe); guards4objects and all tracked cleanliness before each phase",
+  "recipe_sha256": "f336e4dd84eef7135a8dada4271b097ae87a0595dc567c53db3a202745bd87bb",
+  "runtime": "local managed Linux software-validation environment, no scientific isolation/timing tier claimed",
+  "source_and_fixture_toolchain": "rustc1.99.1 logged in phase-captures.json; standalonerustc/clippy-driver, no Cargo/Lean build",
+  "passed": 18,
+  "new_child_controls": 7,
+  "existing_driver_record_controls": 11,
+  "failed": 0,
+  "ignored": 0,
+  "phases": {
+    "toolchain": {
+      "exit": 0,
+      "started": "2026-11-05T13:10:52Z",
+      "finished": "2026-11-05T13:10:53Z"
+    },
+    "fixture-build": {
+      "exit": 0,
+      "started": "2026-11-05T13:10:54Z",
+      "finished": "2026-11-05T13:10:55Z"
+    },
+    "test-build": {
+      "exit": 0,
+      "started": "2026-11-05T13:10:56Z",
+      "finished": "2026-11-05T13:10:57Z"
+    },
+    "tests": {
+      "exit": 0,
+      "started": "2026-11-05T13:11:00Z",
+      "finished": "2026-11-05T13:11:00Z"
+    },
+    "clippy": {
+      "exit": 0,
+      "started": "2026-11-05T13:11:02Z",
+      "finished": "2026-11-05T13:11:04Z"
+    },
+    "fixture-clippy": {
+      "exit": 0,
+      "started": "2026-11-05T13:11:05Z",
+      "finished": "2026-11-05T13:11:05Z"
+    },
+    "format": {
+      "exit": 0,
+      "started": "2026-11-05T13:11:07Z",
+      "finished": "2026-11-05T13:11:07Z"
+    }
+  },
+  "supervisor_exit": 0,
+  "supervisor_finished": "2026-11-05T13:11:07Z",
+  "binaries": [
+    {
+      "path": "/workspace/pkm-child-observation-20261105/native/fixture",
+      "bytes": 4557472,
+      "sha256": "e99d325502704ddd5f5f9ed0e31ef30d3f980a97da466ec8ce1622519b1836d4"
+    },
+    {
+      "path": "/workspace/pkm-child-observation-20261105/native/tests",
+      "bytes": 7582496,
+      "sha256": "0afc134fc86facbabbee9b9466d5bf7ae557c9311927d0d319feb9a04b319b54"
+    },
+    {
+      "path": "/workspace/pkm-child-observation-20261105/native/clippy-tests",
+      "bytes": 7582392,
+      "sha256": "999cb43aef91f39c31e68eeebf077851a0aad42899775eb135e7f07ff1564705"
+    },
+    {
+      "path": "/workspace/pkm-child-observation-20261105/native/clippy-fixture",
+      "bytes": 4557472,
+      "sha256": "ab23df66627e10bf50b2344fbe5b6406958dad4d7191de4e8c68b7836a019602"
+    }
+  ],
+  "captures": "phase-captures.json; each raw_utf8 reconstructs exact raw hash/byte length, no altered raw logs",
+  "scope": "actual native dummy root-child exit/reap/stop/pending/publication/sidecar controls only; library wraps already spawned child and starts none",
+  "important_limits": [
+    "stop requested is not proof of causal exit reason or a reap",
+    "zero exit is not curve/scalar/count validation",
+    "root observation is not descendant cleanup/deadline or a source/binary/command attestation",
+    "reap/code/stop observations are not durably serialized by the existing outcome-label-only record",
+    "explicit cleanup-handle transfer is not resume and does not preserve monitor metadata",
+    "no production CLI/gate/qualified runtime or interruption/resume route; no prices or scientific panel"
+  ],
+  "Cargo_and_formal_input_changes": false,
+  "aggregate_validation": "unchanged FAIL:inheritedstrictlint2/legacyPCC13/runtimeclock2/capped6168suite/currentmainledgerprefixfork",
+  "pcc_standing": "unverified producer observation"
+}

@@ -1,0 +1,19 @@
+{
+  "schema":"prime61.pari-environment/v1",
+  "version":"PARI/GP 2.15.2, Debian bookworm 2.15.2-1, GMP 6.3 runtime",
+  "installation":"Debian packages extracted with dpkg-deb into a workspace-local root; no system installation",
+  "packages":[
+    {"url":"https://deb.debian.org/debian/pool/main/p/pari/pari-gp_2.15.2-1_amd64.deb","sha256":"a9e75f6781f35af3044e4e3a726e01fde598343d1a380e3124a7466880bf5d27"},
+    {"url":"https://deb.debian.org/debian/pool/main/p/pari/libpari-gmp-tls8_2.15.2-1_amd64.deb","sha256":"7ca79d18ca40588ebd4a4e88b52c2a5a076b049e6e10b88ab42f4a294ade79bd"}
+  ],
+  "commands":[
+    "LD_LIBRARY_PATH=/workspace/prime61-pari/root/usr/lib/x86_64-linux-gnu timeout 300 /workspace/prime61-pari/root/usr/bin/gp -q -f -s 256M research/prime61_disk_extend_20261018/class_relations.gp",
+    "LD_LIBRARY_PATH=/workspace/prime61-pari/root/usr/lib/x86_64-linux-gnu timeout 300 /workspace/prime61-pari/root/usr/bin/gp -q -f -s 256M research/prime61_disk_extend_20261018/verify_relations.gp",
+    "LD_LIBRARY_PATH=/workspace/prime61-pari/root/usr/lib/x86_64-linux-gnu timeout 300 /workspace/prime61-pari/root/usr/bin/gp -q -f -s 256M research/prime61_isogeny_20261016/class_order_certificate.gp"
+  ],
+  "initial_stack_bytes":268435456,
+  "maximum_stack_bytes":1073741824,
+  "whole_class_number_oracle_used":false,
+  "independent_library_verification":false,
+  "independent_host":false
+}

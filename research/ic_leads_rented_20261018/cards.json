@@ -1,0 +1,147 @@
+{
+ "note": "Planning estimates (derived, not measured), prices queried 2026-10-18 21:13Z from RunPod GraphQL (secure cloud). p_decision is the card's own stated chance of reaching its decision rule's non-inconclusive rows; it is a judgment, not a measurement.",
+ "cards": [
+  {
+   "id": "P6",
+   "name": "cross-host F4 counter drift (owner's Mac)",
+   "card": "../inherited_f4_replay_determinism_20261018/cross_host/README.md",
+   "host": "owner's Apple-silicon Mac",
+   "usd_per_h": 0,
+   "hours": 1.0,
+   "cost": 0,
+   "cost_lo": 0,
+   "cost_hi": 0,
+   "cap": 0,
+   "p_decision": 0.8
+  },
+  {
+   "id": "P5",
+   "name": "K conversion at degree 4 with perf (owner's Linux)",
+   "card": "k_conversion_perf/LAUNCH.md",
+   "host": "owner's Linux host with PMU, paranoid <= 2",
+   "usd_per_h": 0,
+   "hours": 18.5,
+   "cost": 0,
+   "cost_lo": 0,
+   "cost_hi": 0,
+   "cap": 0,
+   "p_decision": 0.8
+  },
+  {
+   "id": "P1",
+   "name": "closure A3: decisive A1 count at (4,6) [running]",
+   "card": "closure_a3/LAUNCH.md",
+   "host": "cpu3m-32-256 (running since 21:50Z)",
+   "usd_per_h": 1.76,
+   "hours": 5.5,
+   "cost": 9.7,
+   "cost_lo": 7.0,
+   "cost_hi": 10.6,
+   "cap": 15.84,
+   "p_decision": 0.8
+  },
+  {
+   "id": "P7",
+   "name": "closure C1: degree 5 at (19,7), draw 0 [running]",
+   "card": "closure_c1/LAUNCH.md",
+   "host": "cpu3m-64-512 (running since 21:50Z)",
+   "usd_per_h": 3.52,
+   "hours": 5.0,
+   "cost": 17.6,
+   "cost_lo": 9.5,
+   "cost_hi": 43.0,
+   "cap": 56.32,
+   "p_decision": 0.6
+  },
+  {
+   "id": "P4",
+   "name": "equal-advice BL rho vs IC at n=73, 83",
+   "card": "equal_advice_wide/LAUNCH.md",
+   "host": "cpu3g-32-128",
+   "usd_per_h": 1.28,
+   "hours": 7.5,
+   "cost": 9.6,
+   "cost_lo": 6.9,
+   "cost_hi": 11.5,
+   "cap": 17.92,
+   "p_decision": 0.6
+  },
+  {
+   "id": "P4-min",
+   "name": "equal-advice, n=83 only (minimal)",
+   "card": "equal_advice_wide/LAUNCH.md",
+   "host": "cpu3g-32-128",
+   "usd_per_h": 1.28,
+   "hours": 3.5,
+   "cost": 4.5,
+   "cost_lo": 2.8,
+   "cost_hi": 5.9,
+   "cap": 7.68,
+   "p_decision": 0.6
+  },
+  {
+   "id": "P2-min",
+   "name": "PKM msolve -t16, m3_t7 target 0 only (minimal)",
+   "card": "pkm_msolve_mt/LAUNCH.md",
+   "host": "cpu3m-16-128",
+   "usd_per_h": 0.88,
+   "hours": 6.6,
+   "cost": 5.8,
+   "cost_lo": 2.0,
+   "cost_hi": 5.8,
+   "cap": 6.6,
+   "p_decision": 0.3
+  },
+  {
+   "id": "P2a",
+   "name": "PKM msolve -t16, m3_t7 both targets (N=21)",
+   "card": "pkm_msolve_mt/LAUNCH.md",
+   "host": "cpu3m-32-256",
+   "usd_per_h": 1.76,
+   "hours": 22.5,
+   "cost": 39.6,
+   "cost_lo": 10.6,
+   "cost_hi": 40.5,
+   "cap": 46.73,
+   "p_decision": 0.5
+  },
+  {
+   "id": "P2b",
+   "name": "PKM msolve -t16, m3_t8 both targets (N=24)",
+   "card": "pkm_msolve_mt/LAUNCH.md",
+   "host": "cpu3m-32-256",
+   "usd_per_h": 1.76,
+   "hours": 22.5,
+   "cost": 39.6,
+   "cost_lo": 10.6,
+   "cost_hi": 40.5,
+   "cap": 46.73,
+   "p_decision": 0.35
+  },
+  {
+   "id": "P3",
+   "name": "PKM native f4_fp_tower, 192 GB cell",
+   "card": "pkm_f4_tower/LAUNCH.md",
+   "host": "cpu3m-32-256",
+   "usd_per_h": 1.76,
+   "hours": 60,
+   "cost": 106,
+   "cost_lo": 49,
+   "cost_hi": 211,
+   "cap": 220,
+   "p_decision": 0.6
+  }
+ ],
+ "done": [
+  {
+   "id": "P0",
+   "name": "PMU probe",
+   "card": "pmu_probe/README.md",
+   "host": "cpu3c-2-4",
+   "usd_per_h": 0.06,
+   "hours": 0.06,
+   "cost": 0.004,
+   "result": "unsupported: perf_event_paranoid 4, EPERM"
+  }
+ ]
+}

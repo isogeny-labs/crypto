@@ -1,0 +1,158 @@
+{
+  "schema": "ic_linalg_pipeline.analysis/v1",
+  "session_id": "ECBS1h0c4c69816435",
+  "measured_runs": 24,
+  "unverified": 0,
+  "arms": [
+    {
+      "arm": "cado-16384",
+      "runs": 8,
+      "verified": 8,
+      "levels": {
+        "L1": 8
+      },
+      "S_w0_mean": 4109.03554644996,
+      "S_w1_mean": 4146.590244984873,
+      "uncharged_mean": 2461182.625,
+      "linalg": "sparse-cado",
+      "factor_base": "prime-abscissa:size=16384",
+      "row_ops": {
+        "n": 8,
+        "min": 799079,
+        "median": 879739,
+        "max": 1070778
+      },
+      "rows": {
+        "n": 8,
+        "min": 73418,
+        "median": 83750,
+        "max": 105564
+      },
+      "relations_trials": {
+        "n": 8,
+        "min": 623806,
+        "median": 712930,
+        "max": 900264
+      },
+      "wall_ms_mean": {
+        "oracle_setup": 192973.0369635,
+        "relations": 917.19155125,
+        "linear_algebra": 6117.269374875
+      }
+    },
+    {
+      "arm": "dense-16384",
+      "runs": 8,
+      "verified": 8,
+      "levels": {
+        "L1": 8
+      },
+      "S_w0_mean": 4109.03554644996,
+      "S_w1_mean": 4141.941748208873,
+      "uncharged_mean": 2156539,
+      "linalg": "incremental-gauss-full-rank",
+      "factor_base": "prime-abscissa:size=16384",
+      "row_ops": {
+        "n": 8,
+        "min": 524899,
+        "median": 598159,
+        "max": 723061
+      },
+      "rows": {
+        "n": 8,
+        "min": 73418,
+        "median": 83750,
+        "max": 105564
+      },
+      "relations_trials": {
+        "n": 8,
+        "min": 623806,
+        "median": 712930,
+        "max": 900264
+      },
+      "wall_ms_mean": {
+        "oracle_setup": 194625.426699125,
+        "relations": 1145.51405,
+        "linear_algebra": 22087.902647375
+      }
+    },
+    {
+      "arm": "rho-neg",
+      "runs": 8,
+      "verified": 8,
+      "levels": {
+        "L2": 8
+      },
+      "S_w0_mean": 1.0135907231047783,
+      "S_w1_mean": 2.0211256091377168,
+      "uncharged_mean": 66029.75
+    }
+  ],
+  "per_size": [
+    {
+      "N": 16384,
+      "cado_vs_dense_S": {
+        "a": "dense-16384",
+        "b": "cado-16384",
+        "pairs": 8,
+        "S_ratio": {
+          "w0": 1,
+          "w0_1": 1.0001130381343222,
+          "w1": 1.001122298926104
+        },
+        "S_pair_ratio_w1": {
+          "n": 8,
+          "min": 1.0010118321999741,
+          "median": 1.001065614217942,
+          "max": 1.0013077931526861
+        }
+      },
+      "cado_vs_dense_la": {
+        "a": "dense-16384",
+        "b": "cado-16384",
+        "pairs": 8,
+        "la_wall_ratio_sum": 0.2769511199200254,
+        "la_wall_pair_ratio": {
+          "n": 8,
+          "min": 0.23002570783898138,
+          "median": 0.2661683200227417,
+          "max": 0.31689994372811015
+        },
+        "row_ops_ratio_sum": 1.496574011797649
+      },
+      "dense_vs_rho_S": {
+        "a": "rho-neg",
+        "b": "dense-16384",
+        "pairs": 8,
+        "S_ratio": {
+          "w0": 4053.9395761865057,
+          "w0_1": 3690.355388773867,
+          "w1": 2049.3242624222503
+        },
+        "S_pair_ratio_w1": {
+          "n": 8,
+          "min": 965.9730143056263,
+          "median": 3147.5935827635444,
+          "max": 8009.2141741564765
+        }
+      },
+      "cado_vs_rho_S": {
+        "a": "rho-neg",
+        "b": "cado-16384",
+        "pairs": 8,
+        "S_ratio": {
+          "w0": 4053.9395761865057,
+          "w0_1": 3690.7725396620003,
+          "w1": 2051.6242168412055
+        },
+        "S_pair_ratio_w1": {
+          "n": 8,
+          "min": 966.9504169058067,
+          "median": 3150.94770323764,
+          "max": 8018.612995432446
+        }
+      }
+    }
+  ],
+  "aa_control": null
+}

@@ -22,6 +22,7 @@
 //! cargo run --release --example koblitz_x5_syzygy_split -- --json experiments/29_koblitz_x5_syzygy_split.json > experiments/29_koblitz_x5_syzygy_split.log
 //! ```
 
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
@@ -407,7 +408,7 @@ fn analyse(name: &str, raw: &[F2BoolPoly], nv: usize) -> Arm {
     let t0 = Instant::now();
     let eqs: Vec<Poly> = raw
         .iter()
-        .map(|p| canon(p.terms.iter().map(|t| t.mask).collect()))
+        .map(|p| canon(p.terms.iter().map(|t| mask_low64(t.mask)).collect()))
         .filter(|p| !p.is_empty())
         .collect();
     let degs: Vec<u32> = eqs.iter().map(deg).collect();
@@ -583,7 +584,7 @@ fn analyse(name: &str, raw: &[F2BoolPoly], nv: usize) -> Arm {
             .flat_map(|&l| {
                 raw[l * per..(l + 1) * per]
                     .iter()
-                    .map(|p| canon(p.terms.iter().map(|t| t.mask).collect()))
+                    .map(|p| canon(p.terms.iter().map(|t| mask_low64(t.mask)).collect()))
             })
             .filter(|p: &Poly| !p.is_empty())
             .collect()

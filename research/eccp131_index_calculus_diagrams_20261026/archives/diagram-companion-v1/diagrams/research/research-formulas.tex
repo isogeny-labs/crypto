@@ -1,0 +1,242 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb}
+\begin{document}
+\section*{Relations as a module over the target prime field}
+\[
+G_n=\langle P\rangle\cong\mathbb{Z}/n\mathbb{Z},\qquad Q=[k]P,\quad n\ \mathrm{prime}
+\]
+\[
+R_i=[a_i]P+[b_i]Q=\sum_j e_{ij}F_j
+\]
+\[
+[D_i]=[a_i]P+[b_i]Q=\sum_j e_{ij}F_j
+\]
+\[
+M\lambda=\mathbf{a}+k\mathbf{b}\quad (\mathrm{mod}\ n),\qquad M\in\mathbb{F}_n^{r\times s}
+\]
+\[
+\mathbf{w}^{\top}M=0
+\]
+\[
+\mathbf{w}^{\top}\mathbf{a}+k\mathbf{w}^{\top}\mathbf{b}=0
+\]
+\[
+k=-\frac{\mathbf{w}^{\top}\mathbf{a}}{\mathbf{w}^{\top}\mathbf{b}}
+\]
+\section*{Divisor smoothness: factorization and support}
+\[
+C/\mathbb{F}_q:\ y^2=f(x),\quad \deg f=2g+1,\quad f\ \mathrm{squarefree},\quad\operatorname{char}\mathbb{F}_q\ne2
+\]
+\[
+D=(u,v),\quad u\mid(f-v^2)
+\]
+\[
+\deg v<\deg u\leq g
+\]
+\[
+u=\prod_j u_j
+\]
+\[
+d_j=\deg u_j
+\]
+\[
+F_j=[\mathfrak{p}_j-d_j\infty]
+\]
+\[
+\deg\mathfrak{p}_j=d_j
+\]
+\[
+[D]=\sum_j[\mathfrak{p}_j-d_j\infty]\ ;\qquad D\ \mathrm{is\ smooth\ when\ all}\ F_j\in\mathcal{F}
+\]
+\[
+\Pr[D\ \mathcal{F}\mathrm{-smooth}]\approx\frac{1}{g!}\left(\frac{B}{q}\right)^g
+\]
+\section*{Summation polynomials and Weil restriction}
+\[
+E/K:\ y^2=x^3+ax+b,\qquad K=\mathbb{F}_{q^d},\quad \mathcal{F}=\{\pm P:x(P)\in\mathbb{F}_q\}
+\]
+\[
+R=\sum_{i=1}^{m}\epsilon_iP_i
+\]
+\[
+S_{m+1}(x_1,\ldots,x_m,x_R)=0
+\]
+\[
+\deg_{x_i}S_{m+1}=2^{m-1}\quad(m\geq2)
+\]
+\[
+S_{m+1}=\sum_{\nu=0}^{d-1}s_\nu(x_1,\ldots,x_m)\omega^\nu
+\]
+\[
+s_0=\cdots=s_{d-1}=0
+\]
+\[
+\widetilde{O}(q^{2-2/d}),\qquad d\geq3\ \mathrm{fixed}
+\]
+\[
+a,b,x_R,x_i\in\mathbb{F}_q\ \Longrightarrow\ s_1=\cdots=s_{d-1}\equiv0
+\]
+\section*{Covers, norm maps and elliptic factors}
+\[
+C_2:\ Y^2=X^6+aX^2+b
+\]
+\[
+E:\ y^2=x^3+ax+b
+\]
+\[
+J_2=\operatorname{Jac}(C_2)\sim E\times\widetilde{E}
+\]
+\[
+\widetilde{E}:\ v^2=bu^3+au^2+1
+\]
+\[
+\operatorname{Pic}^0(E)\cong E,\qquad Q=[k]P
+\]
+\[
+f_2^*Q=[k]f_2^*P
+\]
+\[
+f_2^*
+\]
+\[
+f_{2*}
+\]
+\[
+f_{2*}\circ f_2^*=[2]\quad\Longrightarrow\quad\ker f_2^*\cap E[n]=\{O\}\ \ (n\ \mathrm{odd})
+\]
+\[
+u(X)=X^2-x_P,\qquad v(X)=y_P
+\]
+\[
+f_2^*[P-O]=[f_2^{-1}(P)-(\infty_++\infty_-)]
+\]
+\[
+C_3:\ W^4=X^3+aX+b,\quad f_3(X,W)=(X,W^2)
+\]
+\[
+\operatorname{Jac}(C_3)\sim E\times\operatorname{Prym}(C_3/E)
+\]
+\section*{Frobenius decomposes the extension-field groups}
+\[
+\pi=\operatorname{Frob}_p,\quad t=p+1-n,\quad |E(\mathbb{F}_p)|=n\ \mathrm{prime}
+\]
+\[
+N_2=nn^{\prime},\qquad n^{\prime}=p+1+t
+\]
+\[
+e_+=\frac{1+\pi}{2},\qquad e_-=\frac{1-\pi}{2}
+\]
+\[
+E(\mathbb{F}_{p^2})\cong E(\mathbb{F}_p)\times E^{\prime}(\mathbb{F}_p)
+\]
+\[
+e_+E^{\prime}(\mathbb{F}_p)=\{O\}
+\]
+\[
+N_3=nM_3,\quad M_3=p^2-p+1+(p+1)t+t^2
+\]
+\[
+T_3=1+\pi+\pi^2,\qquad \rho_3=[3^{-1}\ (\mathrm{mod}\ n)]T_3
+\]
+\[
+E(\mathbb{F}_{p^3})\cong E(\mathbb{F}_p)\times\ker T_3
+\]
+\[
+\{P\in E(\mathbb{F}_{p^3}):x(P)\in\mathbb{F}_p\}=E(\mathbb{F}_p)\setminus\{O\}
+\]
+\[
+R=\sum_j e_jB_j\quad\Longrightarrow\quad R=\sum_j e_j\rho_d(B_j),\quad R\in E(\mathbb{F}_p),\ d=2,3
+\]
+\section*{Complexity regimes: ambient group or target subgroup?}
+\[
+\widetilde O(q^{2-2/g})=\widetilde O(q)
+\]
+\[
+\widetilde O(q^{4/3})
+\]
+\[
+\widetilde O(q)
+\]
+\section*{Worked extraction: three rows can determine k—or fail}
+\[
+E/\mathbb{F}_{571}:y^2=x^3+508x+137,\quad |E|=557,\quad P=(517,168)
+\]
+\[
+M\lambda=\mathbf{a}+k\mathbf{b}\quad(\mathrm{mod}\ 557)
+\]
+\[
+\mathbf{w}^{\top}=(-1,-1,1),\quad \mathbf{w}^{\top}M=0
+\]
+\[
+k=-\frac{\mathbf{w}^{\top}\mathbf{a}}{\mathbf{w}^{\top}\mathbf{b}}
+\]
+\section*{Partial relations: cancel the large-prime columns}
+\[
+R_i=[a_i]P+[b_i]Q=\sum_j e_{ij}F_j+\sum_\ell A_{i\ell}L_\ell
+\]
+\[
+L_1
+\]
+\[
+L_2
+\]
+\[
+L_3
+\]
+\[
+R_1=F_1+L_1-L_2
+\]
+\[
+R_2=F_2+L_2-L_3
+\]
+\[
+R_3=F_3+L_3-L_1
+\]
+\[
+\mathbf{z}^{\top}A=0,\quad \mathbf{z}=(1,1,1)
+\]
+\[
+R_1+R_2+R_3=F_1+F_2+F_3
+\]
+\[
+[363]P+[7]Q=F_1+F_2+F_3\quad(\mathrm{toy\ order}\ 557)
+\]
+\section*{Fiber smoothness is a structured distribution}
+\[
+f:C_2\longrightarrow E,\quad (X,Y)\longmapsto(X^2,Y),\qquad u_P(X)=X^2-x_P
+\]
+\[
+B_\pm=(\pm r,y_P),\qquad r^2=x_P
+\]
+\[
+f^{-1}(Q)=\{A_+,A_-\},\quad \pi(A_+)=A_-
+\]
+\[
+[A_++A_- - (\infty_++\infty_-)]\in J(\mathbb{F}_p)
+\]
+\[
+\Pr_E=\frac{B}{2(n-1)}
+\]
+\[
+\Pr_J=\frac{B^2/2-B}{|J(\mathbb{F}_p)|}
+\]
+\[
+\rho_C=[2^{-1}\ (\mathrm{mod}\ n)]f_*,\qquad\rho_C f^*=\mathrm{id}
+\]
+\[
+\rho_C[B_+-\infty_+]+\rho_C[B_- -\infty_-]=[2^{-1}]P+[2^{-1}]P=P
+\]
+\section*{From more roots to less total work}
+\[
+T=T_{\mathrm{setup}}+T_{\mathrm{collect}}+T_{\mathrm{filter}}+T_{\mathrm{LA}}+T_{\mathrm{indiv}}
+\]
+\[
+c_{\mathrm{eff}}=\frac{c_{\mathrm{trial}}}{p_{\mathrm{valid}}\eta},\qquad T_{\mathrm{collect}}\approx R_{\mathrm{req}}c_{\mathrm{eff}}
+\]
+\[
+T_{\mathrm{LA}}\sim s\,C_{\mathrm{mv}},\qquad C_{\mathrm{mv}}\sim r\overline{w}\,c_n
+\]
+\[
+\mathrm{memory}\sim O(r\overline{w}+s)\ \mathrm{field\ entries}
+\]
+\end{document}

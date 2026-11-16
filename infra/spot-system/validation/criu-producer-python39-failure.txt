@@ -1,0 +1,18 @@
+Full original bytes: raw-evidence.tar.gz → criu-producer-python39-failure.txt (SHA-256 in raw-evidence.json).
+
+ERROR: test_symlink_components_cannot_supply_checkpoint_bytes (test_criu_local.LocalCriuTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-spot-system/infra/spot-system/test_criu_local.py", line 36, in test_symlink_components_cannot_supply_checkpoint_bytes
+    criu_local.atomic_json(root/'manifest.json', {'schema':'spot.criu-local/v1','committed':True,
+  File "/home/ec2-user/crypto-spot-system/infra/spot-system/criu_local.py", line 36, in atomic_json
+    with temporary.open('w', opener=lambda p, f: os.open(p, f, 0o600)) as f:
+TypeError: open() got an unexpected keyword argument 'opener'
+
+----------------------------------------------------------------------
+Ran 46 tests in 14.008s
+
+FAILED (errors=3)
+{"pid": 123, "state": "not-the-registered-live-process"}
+Hooks prepared in /tmp/tmptgpw4rv5. Review Codex /hooks to trust the exact definitions.
+Hooks prepared in /tmp/tmptgpw4rv5. Review Codex /hooks to trust the exact definitions.

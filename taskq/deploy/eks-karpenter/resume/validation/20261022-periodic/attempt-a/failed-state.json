@@ -1,0 +1,88 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "ecbench-periodic-20261022-a",
+    "deadline_unix_seconds": 1792649832,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:5f8809b2531682312e6763518f882edfcb3bbf2cdf0c953851983a9e4364db1f",
+    "spec": {
+      "arms": [
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg",
+          "role": "reference"
+        },
+        {
+          "method": {
+            "id": "rho.plain"
+          },
+          "name": "rho-plain",
+          "role": "baseline"
+        },
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg-aa",
+          "role": "control"
+        }
+      ],
+      "description": "Isolation and correctness validation after a computation-only restore; independent fresh warmup and A/A. No algorithm speed claim.",
+      "label": "Periodic CRIU checkpoint rotation and distinct fresh L2 epoch qualification",
+      "measurement": {
+        "isolation_required": "L2",
+        "order": "alternate",
+        "rounds": 600,
+        "seed": 1,
+        "timeout_seconds": 120,
+        "warmup": 1
+      },
+      "schema": "ecbench.spec/v1",
+      "workloads": {
+        "curves": [
+          {
+            "bits": 32,
+            "kind": "prime_search",
+            "seed": 59297
+          }
+        ],
+        "target_seed": 20261002,
+        "targets_per_curve": 2
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 30,
+    "max_restores": 2
+  },
+  "request_sha256": "4a582fc38d14b443a7894b51cdc9705ab2e3df0bbefb9f7682c6ef3279740378",
+  "owner_build": "isolab-recovery-controller:3ef33101-6dd1-4260-a5b5-1256d5e61d5f",
+  "phase": "failed",
+  "attempt": 0,
+  "restores": 0,
+  "next_generation": 1,
+  "checkpoint_generation": 1,
+  "current_pod_uid": "e6e82af7-e9c4-4de0-9687-89a45199c773",
+  "current_instance": "i-0178c2e19a4e5868e",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [],
+  "generations": [],
+  "last_checkpoint_at": 1792646280,
+  "selected_generation": null,
+  "failure": "dump did not leave complete tree stopped",
+  "benchmark_job": null,
+  "benchmark_uid": null,
+  "benchmark_manifest": null,
+  "benchmark_create_attempted": false
+}

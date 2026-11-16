@@ -52,7 +52,7 @@ claims it rests on, for P-224.
 
 | # | claim in the supplied text | status for P-224 | evidence |
 |:--|:--|:--|:--|
-| 1a | `b` is bound to a SHA-1 seed, so a grind is the only freedom | **holds.** `SEED → c` (X9.62 A.3.3.1) gives FIPS 186-4's printed `c` and `b²c ≡ −27` for all five NIST curves | MEASURED `run/seeds.json` |
+| 1a | `b` is bound to a SHA-1 seed, so a grind is the only freedom | **holds** (2026-10-16: no longer the open question it was; the P-224 seed is block 7026 of drand48 output after `srand48(891607927)`, 1998-04-03, so the freedom was a start time and a choice among accepted candidates, about 30 bits; see `research/nist_seed_provenance_20261016/`). `SEED → c` (X9.62 A.3.3.1) gives FIPS 186-4's printed `c` and `b²c ≡ −27` for all five NIST curves | MEASURED `run/seeds.json` |
 | 1b | the b-residue KS profile came back null | **was P-256 only, at `q ≤ 10⁵`**, not the `10⁶` its module doc describes. P-224 is now null at every bound (table below) | MEASURED `run/b_residues.json` |
 | 1c | statistical probes on `b` are the right kind of test | **partly.** The KS test sees only classes that bias `b mod q`. A cheaply testable class defined any other way is invisible to it | DERIVED, PROTOCOL §4 |
 | 1d | the Solinas-correlation experiment came back null | **P-256 only; not a test on `b`; miscalibrated.** It tests bit correlations of the P-256 reduction map. Its z uses `√(E(1−E)/n)` with `E = p_r p_c`, not the independence variance `√(p_r(1−p_r)p_c(1−p_c)/n)`. That deflates every `z` by ≈ √3: the recorded max 2.46 over 131,072 pairs sits far below the ≈ 4.5 a calibrated null gives. Rescaled (≈ 4.3) it is still below its 6.1 threshold, so the null probably survives with less power than claimed. Not rerun here | code read `src/cryptanalysis/solinas_correlations.rs`, PRIOR `RESEARCH_P256.md` |
@@ -130,6 +130,15 @@ ePrint 2014/571) show how much freedom a seed procedure leaves a designer. The
 seed preimages remain unpublished: the 2023 Valsorda bounty reports no recovery
 in the sources checked.
 
+*Update 2026-10-16:* that sentence is out of date. The bounty was claimed on
+2026-10-15. The P-224 seed is block 7026 of `(int)(drand48() * 256)` output
+after `srand48(891607927)` (1998-04-03 12:52:07 UTC), and three earlier
+candidates in the same run that pass every known check were skipped for an
+unknown reason. Hypothesis 1's grind scenario is closed beyond about 30 bits
+of selection (`research/nist_seed_provenance_20261016/`,
+`src/cryptanalysis/nist_seed_provenance.rs`). Hypothesis 2 (the PKM /
+smooth `p − 1` lead) is unaffected.
+
 # Requirement status
 
 | item | status |
@@ -140,6 +149,8 @@ in the sources checked.
 | class number of `D_K` | open |
 | PKM cost at P-224 tower depth | open (not attempted; needs its own protocol) |
 | hypothesis 4 | not testable |
+
+**Later evidence (2026-10-22):** the "class number of `D_K`" row above is no longer open in the sense of "no estimate": `research/p224_class_number_20261022/` gives `h(D_K) ≈ 3.5185 × 10^32 = 2^108.117` for P-224 (GRH-conditional interval 2^108.10 to 2^108.14, with a named assumed constant; heuristic and proved parts labelled there), and the exact 2-rank 6 with Rédei 4-rank 0, so `h = 64·m` with `m` odd. The exact value of `h` is still not computed. The frozen rows above are unchanged.
 
 # Reproduce
 
@@ -183,3 +194,7 @@ deterministic.
   Petit–Kosters–Messeng method*, CTCrypt 2024.
 - Valsorda, [NIST curve seeds bounty](https://words.filippo.io/seeds-bounty/),
   2023.
+
+## Related
+
+- [Auxiliary curves explainer](auxiliary-curves-explainer.html)

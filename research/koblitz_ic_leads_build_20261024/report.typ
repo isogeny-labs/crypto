@@ -1,0 +1,11 @@
+#set document(title: "Leads L1–L4 for Koblitz-curve index calculus, built and measured (2026-10-24)")
+#set page(paper: "a4", margin: (x: 2cm, y: 2cm), numbering: "1")
+#set text(font: ("Libertinus Serif", "New Computer Modern", "DejaVu Sans"), size: 10pt)
+#show heading.where(level: 1): set text(size: 15pt)
+#show heading.where(level: 2): set text(size: 12.5pt)
+#show link: set text(fill: rgb("#1f5fa8"))
+#show raw: set text(size: 8.5pt)
+#set table(stroke: 0.4pt + rgb("#bbbbbb"), inset: 4pt)
+#show table: set text(size: 8.5pt)
+#let horizontalrule = line(length: 100%, stroke: 0.4pt)
+#include "body.typ"

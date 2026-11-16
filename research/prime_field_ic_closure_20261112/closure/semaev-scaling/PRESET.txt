@@ -1,0 +1,8 @@
+Preset written before any data (2026-11-12). [pcc:unverified]
+Route: Semaev S_{m+1} decomposition on E/GF(p), factor base V = {P : x(P) < 2^s}, s = ceil(log2 p / m), m in {3,4}.
+Total cost model: C = |V| relations x (1/P_succ) trials x Q (per-query decomposition cost) + setup.
+Oracles measured: (O1) MITM/table enumeration (best generic oracle), (O2) bit-encoded Boolean Macaulay
+(Groebner linear-algebra proxy, D_solve), (O3) APS vanishing-polynomial Groebner via sympy (small p).
+Kill: for every oracle, fitted log2(C)/log2(p) slope >= 0.5 + 0.05 margin  => route killed.
+Confirm-alive: any oracle with fitted slope upper bound < 0.5.
+Arity bridge (PDP_ARITY_CORRECTION.md): needs a < m/2 and e < m/2 - 1 (m=3: e<0.5; m=4: e<1), e measured in units of s.

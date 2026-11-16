@@ -97,6 +97,15 @@ raw receipts, and archives them even when a stage fails. The dispatch output
 and source bundle both belong outside the repository. Stage and collect require
 the configured RunPod key and SSH public-key access to the account's Pods.
 
+### Lower-cost RunPod Tier 1 allocation
+
+The [Ada 2000 allocation protocol](RUNPOD_ADA2000_PROTOCOL.md) retains this
+sealed workload and the two-machine verification gate with a $0.25/hour
+per-Pod rate ceiling and $3.10 six-hour projection cap. It is a separate
+hardware profile in `allocate_runpod.py`; the original RTX 4090 profile
+remains unchanged. This profile needs separate spend approval and an
+authenticated local controller before `--execute`.
+
 ### AWS Spot Tier 1 alternative
 
 `plan_aws_spot.py` checks an exact-source, two-instance Tier 1 alternative

@@ -1,0 +1,34 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.73in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\title{Local orders at a simple finite branch of weighted Proj}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This packet records a conditional geometry proof. It adds no target experiment or cost ratio. The editable graph, gate CSV, Lean source, and compiler log are beside this PDF.
+
+\section*{Checked statement}
+For a field $K$, quintic $f$, and rational $a$ with $f(a)=0$ and $f'(a)\ne0$, the structure-sheaf stalk of the actual weighted-Proj curve at the finite branch point is a discrete valuation ring. Under the checked stalk isomorphism with the affine branch localization, the pullback of $y$ has order one and the pullback of $x-a$ has order two.
+
+\begin{center}
+\setlength{\fboxsep}{9pt}
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+Rational simple branch on actual weighted $\operatorname{Proj}$\par\vspace{4pt}
+$\Downarrow$ checked structure-sheaf stalk isomorphism\par\vspace{4pt}
+Affine branch localization, a DVR with $y^2=(x-a)q$ and $q$ a unit\par\vspace{4pt}
+$\Downarrow$ checked local valuation transport\par\vspace{4pt}
+$\operatorname{ord}(y)=1,\qquad\operatorname{ord}(x-a)=2$
+\end{minipage}}
+\end{center}
+
+The DVR criterion is discussed in the \href{https://stacks.math.columbia.edu/tag/00PD}{Stacks Project, Lemma 10.119.7}. The checked transport uses the finite-branch stalk isomorphism and the repository's affine branch-domain and local-valuation lemmas. The four Lean theorem names and source bindings are in \texttt{finite-branch-dvr.csv}.
+
+\section*{Verification and remaining gates}
+Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero. All four theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Lean source SHA-256:\par\smallskip\noindent{\scriptsize\texttt{181f480366672eadf9fa0e08fac1786f467789d71f677ea858aadac6252cb35f}}.
+
+The proof does not establish every numerator factorization or nonbranch zero multiplicity, a global principal divisor, a $\mathrm{Pic}^0$ class equation, or semantics for every compiled Rust branch. The frozen 1,260-target rows and matched-rho cost ratios are unchanged.
+\end{document}

@@ -1,0 +1,382 @@
+{
+  "id": "IDC1h7a01e3d29f1f37ab",
+  "independence": "native issuance and extra checking; exact Lean coverage separated",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound04.lean",
+    "sha256": "dd6466228c1ccbb86717ef967056a5ad66ceea77f3e42bebc2bbf011077a3489"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 2026101804,
+  "statement": {
+    "degree_bound": 2,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "q",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "e",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "r",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "q",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "f",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "r",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "c",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "q",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "g",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "r",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "d",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "q",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "h",
+                  "op": "var"
+                },
+                {
+                  "args": {
+                    "args": "r",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": {
+                    "args": [
+                      {
+                        "args": "a",
+                        "op": "var"
+                      },
+                      {
+                        "args": "b",
+                        "op": "var"
+                      },
+                      {
+                        "args": "c",
+                        "op": "var"
+                      },
+                      {
+                        "args": "d",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  "op": "neg"
+                },
+                {
+                  "args": {
+                    "args": "q",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": {
+                    "args": [
+                      {
+                        "args": "e",
+                        "op": "var"
+                      },
+                      {
+                        "args": "f",
+                        "op": "var"
+                      },
+                      {
+                        "args": "g",
+                        "op": "var"
+                      },
+                      {
+                        "args": "h",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  "op": "neg"
+                },
+                {
+                  "args": {
+                    "args": "r",
+                    "op": "var"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "polarization-pullback",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "a",
+              "op": "var"
+            },
+            {
+              "args": "e",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "b",
+              "op": "var"
+            },
+            {
+              "args": "f",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "c",
+              "op": "var"
+            },
+            {
+              "args": "g",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "d",
+              "op": "var"
+            },
+            {
+              "args": "h",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": "c",
+                  "op": "var"
+                },
+                {
+                  "args": "d",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "e",
+                  "op": "var"
+                },
+                {
+                  "args": "f",
+                  "op": "var"
+                },
+                {
+                  "args": "g",
+                  "op": "var"
+                },
+                {
+                  "args": "h",
+                  "op": "var"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": 5,
+              "op": "const"
+            },
+            {
+              "args": "q",
+              "op": "var"
+            },
+            {
+              "args": "r",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "round04 PROOF_MAP.md, exact universal integer identity; characteristic-two bridges stated separately",
+    "variables": [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "q",
+      "r"
+    ]
+  },
+  "value_digest": "c08d7e9b39b7f075a98e48e01ca1e863da34b41a13cc9c0c4390522a8298e3c6"
+}

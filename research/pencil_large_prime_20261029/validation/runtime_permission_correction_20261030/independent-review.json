@@ -1,0 +1,51 @@
+{
+  "boundaries": {
+    "cloud_experiment_launched_by_review": false,
+    "controller_end_to_end_recovery_verified": false,
+    "scientific_qualification": false,
+    "solver_executed_by_review": false,
+    "statement": "This review verifies only the identified executable-mode correction and immutable image/readback evidence. It does not certify a future controller run, CRIU recovery, timings, or mathematical results."
+  },
+  "checks": {
+    "all_other_modes_types_uid_gid_equal": true,
+    "instrument_bytes_identical": true,
+    "old_new_runtime_bytes_identical": true,
+    "only_runtime_inventory_change": "/opt/isolab/recovery/isolab-criu-progress mode 0700 to 0755",
+    "receipt_manifest_sha256_check": true,
+    "recipe_exactly_from_old_digest_plus_copy_chmod_progress": true,
+    "registry_readback_digest_active": true,
+    "stopped_container_never_started": true,
+    "stopped_extracted_ecbench": {
+      "gid": 0,
+      "mode": "0755",
+      "sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+      "uid": 0
+    },
+    "stopped_extracted_progress": {
+      "gid": 0,
+      "mode": "0755",
+      "sha256": "144db760cf6d59103380f59f7855625459a1927e0cacd3a444512ba8ca097dd4",
+      "uid": 0
+    },
+    "stopped_extracted_supervisor": {
+      "gid": 0,
+      "mode": "0700",
+      "sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+      "uid": 0
+    },
+    "uid1000_no_network_readonly_capdrop_help": {
+      "exit_code": 1,
+      "interpretation": "exec permission defect is corrected and native argument handling is reached before any workload loading",
+      "stderr": "isolab-criu-progress: Usage: isolab-criu-progress /absolute/ecbench INPUT_SPEC OUTPUT_DIRECTORY"
+    }
+  },
+  "created_utc": "2026-10-30T00:13:24Z",
+  "new_runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+  "previous_runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:4201400427fcdba18fe88cfda6cd7f46b12db15fcc371ee56166d0fca5f5caa3",
+  "reviewed_receipt": {
+    "path": "/home/ec2-user/pencil-controller-review-20261029/runtime-permission-review-20261030/receipt.json",
+    "sha256": "a22c525366e684e73c4559c4db6083d995109af7ccf04451baf1846a103b2a39"
+  },
+  "schema": "pencil.runtime-permission-correction-review/v1",
+  "verdict": "pass_metadata_correction_for_identified_eacces"
+}

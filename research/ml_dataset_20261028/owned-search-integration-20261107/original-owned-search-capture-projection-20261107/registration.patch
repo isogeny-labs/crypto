@@ -1,0 +1,10 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -3,6 +3,7 @@
+ use provenance::boolean_equations as equations;
+ use provenance::{checked_model, signed_lift, Admission, CheckedMap, Error, Quote};
+ use std::mem::size_of;
++#[path="capture_projection.rs"] pub(in crate::ml_dataset::solvers) mod capture_projection;
+ mod sparse {
+     pub use super::equations::{Charge, Monomial, Polynomial};
+     pub trait Owner {fn reserve(&mut self,q:Charge)->Result<(),()>;fn check(&mut self)->Result<(),()>;}

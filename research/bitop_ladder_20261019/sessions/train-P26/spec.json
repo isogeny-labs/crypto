@@ -1,0 +1,195 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "bitop ladder train panel: 26-bit a=-3 prime-order curve",
+ "description": "research/bitop_ladder_20261019/PROTOCOL.md, frozen 2026-10-19. Counts only (bitop/v1); public synthetic curve; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 67108859,
+    "a": 67108856,
+    "b": 30,
+    "group_order": 67102963,
+    "r": 67102963,
+    "gx": 1,
+    "gy": 1596053
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261019100,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "pair-N32",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N45",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=45",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N63",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=63",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N89",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=89",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N126",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=126",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N179",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=179",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "pair-N252",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=252",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "rf3-N8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "rootfind-subtract:m=3",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "rf3-N16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=16",
+     "oracle": "rootfind-subtract:m=3",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "rf3-N32",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "oracle": "rootfind-subtract:m=3",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "rf3-N64",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=64",
+     "oracle": "rootfind-subtract:m=3",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "rf3-N128",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "rootfind-subtract:m=3",
+     "max_trials": "1000000000000"
+    }
+   }
+  },
+  {
+   "name": "rf3-N256",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=256",
+     "oracle": "rootfind-subtract:m=3",
+     "max_trials": "1000000000000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019101,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

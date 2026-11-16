@@ -1,0 +1,19 @@
+compile mode. Write a frozen command card for executor-mechanical. Save the dispatch text verbatim to /home/user/crypto/research/eigen_seta_ifma_20261018/DISPATCH-1.txt as the preregistration (no external spec exists), and the card to /home/user/crypto/research/eigen_seta_ifma_20261018/CARD-1.md. Reply with the card path, its sha256, and any specification_errors.
+
+Measurement (decided): Eigen-Séta KEM wall/CPU time, eigenx main vs the AVX-512 IFMA field-multiplier branch, same host, sequential, nothing else running.
+
+Binaries (already built; do not rebuild); record their sha256 at compile time:
+- arm `base`   = /tmp/eigenx-base/release/examples/bench_kem   (eigenx main 580b633; worktree /tmp/claude-0/-home-user/a00b6ebe-ce34-59ef-a640-978ac116ab30/scratchpad/eigenx-base)
+- arm `ifma`   = /tmp/eigenx-target/release/examples/bench_kem (branch claude/eigenx-scheme-assessment-0z5d0u at 0a8da40 in /home/user/eigenx, default flags; IFMA path selected at run time)
+- arm `native` = /tmp/eigenx-target-native/release/examples/bench_kem (same source, RUSTFLAGS='-C target-cpu=native')
+Usage: bench_kem <SET> <keys> <trials> <jobs>; prints tab-separated records to stdout.
+
+Run ID: run-20261018T0320Z-ifma. Output dir: /home/user/crypto/research/eigen_seta_ifma_20261018/records/run-20261018T0320Z-ifma/ (must not exist before). Write records/RUN_ID with the run id.
+Steps:
+0. Precondition: argv [pgrep, -c, -f, "[c]allgrind|[m]emcheck|[v]algrind|[d]udect|[c]argo"]; success = exit 1 and printed 0; otherwise stop and report, no wait, no retry.
+1. test ! -e outdir; mkdir -p outdir; write RUN_ID.
+2. sha256sum of the three binaries into outdir/binaries.sha256 (stop if any differs from the compile-time hashes).
+3. Append to outdir/host.txt, one call each: lscpu; nproc; uname -a; rustc --version; date -u +%Y-%m-%dT%H:%MZ; uptime; git -C /home/user/eigenx rev-parse HEAD; git -C <base worktree> rev-parse HEAD (mismatch with 0a8da40… / 580b633… is recorded, not a stop).
+4. ONE background Bash command (run_in_background, timeout 7200000 ms) running, strictly sequentially, for (SET,keys,trials) in (L1,3,5), (L3,2,3), (L5,1,3) and for ARM in base, ifma, native: `timeout 3600 <binary> SET keys trials 1 > outdir/<ARM>_<SET>.tsv 2> outdir/<ARM>_<SET>.err; printf '%s\n' "<ARM> <SET> $?" >> outdir/exit_status.txt`, then `touch outdir/DONE` as its last action. A non-zero exit (124 included) is recorded and the next run proceeds; no retries. Completion signal: the harness notification for that background command; then check `test -f outdir/DONE` (stop if missing).
+5. uptime appended to host.txt.
+Shell redirection is permitted. relay.stdout_tail_lines: none; relay the files RUN_ID, binaries.sha256, host.txt, exit_status.txt, and whether DONE exists. The executor computes and interprets nothing.

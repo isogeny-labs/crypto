@@ -1,0 +1,189 @@
+{
+  "schema": "ic.relation-pruning.report/v1",
+  "input_schema": "ic.relation-pruning.input/v1",
+  "look": 1,
+  "checkpoint_trials": 1000,
+  "familywise_alpha": 0.05,
+  "per_bound_alpha": 0.0006944444444444445,
+  "incumbent": "incumbent",
+  "candidates": [
+    {
+      "candidate_id": "bad_support",
+      "decision": "prune_structural",
+      "reasons": [
+        "every observed episode has a deterministic rank ceiling below target"
+      ],
+      "episodes": 2,
+      "terminal_episodes": 2,
+      "full_rank_successes": 0,
+      "full_rank_success": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.9813661001875018
+      },
+      "trials": 2000,
+      "relation_hit_trials": 8,
+      "verified_relations": 8,
+      "independent_relations": 8,
+      "relation_hit_rate": {
+        "estimate": 0.004,
+        "lower": 0.0,
+        "upper": 0.04862495258577311
+      },
+      "verified_relations_per_trial": 0.004,
+      "independent_relations_per_trial": 0.004,
+      "rank_utility": 1.0,
+      "mean_factor_coverage": 1.0,
+      "min_factor_coverage": 1.0,
+      "mean_normalised_hit_entropy": 1.0,
+      "mean_dead_columns": 0.0,
+      "charged_cost": 19100,
+      "charged_cost_per_trial": 9.55,
+      "episode_reports": [
+        {
+          "episode_id": "seed-00",
+          "decision": "stop_structural",
+          "reason": "the frozen factor-base construction cannot reach target rank",
+          "relation_hit_interval": {
+            "estimate": 0.004,
+            "lower": 0.0,
+            "upper": 0.06710921316705665
+          },
+          "optimistic_future_relations": null
+        },
+        {
+          "episode_id": "seed-01",
+          "decision": "stop_structural",
+          "reason": "the frozen factor-base construction cannot reach target rank",
+          "relation_hit_interval": {
+            "estimate": 0.004,
+            "lower": 0.0,
+            "upper": 0.06710921316705665
+          },
+          "optimistic_future_relations": null
+        }
+      ]
+    },
+    {
+      "candidate_id": "incumbent",
+      "decision": "keep",
+      "reasons": [
+        "no hard candidate-level pruning gate fired"
+      ],
+      "episodes": 2,
+      "terminal_episodes": 2,
+      "full_rank_successes": 2,
+      "full_rank_success": {
+        "estimate": 1.0,
+        "lower": 0.018633899812497468,
+        "upper": 1.0
+      },
+      "trials": 2000,
+      "relation_hit_trials": 9,
+      "verified_relations": 9,
+      "independent_relations": 8,
+      "relation_hit_rate": {
+        "estimate": 0.0045,
+        "lower": 0.0,
+        "upper": 0.0491249525857731
+      },
+      "verified_relations_per_trial": 0.0045,
+      "independent_relations_per_trial": 0.004,
+      "rank_utility": 0.8888888888888888,
+      "mean_factor_coverage": 1.0,
+      "min_factor_coverage": 1.0,
+      "mean_normalised_hit_entropy": 0.9804820237218406,
+      "mean_dead_columns": 0.0,
+      "charged_cost": 20100,
+      "charged_cost_per_trial": 10.05,
+      "episode_reports": [
+        {
+          "episode_id": "seed-00",
+          "decision": "full_rank",
+          "reason": "target rank and independent verification passed",
+          "relation_hit_interval": {
+            "estimate": 0.004,
+            "lower": 0.0,
+            "upper": 0.06710921316705665
+          },
+          "optimistic_future_relations": 0
+        },
+        {
+          "episode_id": "seed-01",
+          "decision": "full_rank",
+          "reason": "target rank and independent verification passed",
+          "relation_hit_interval": {
+            "estimate": 0.005,
+            "lower": 0.0,
+            "upper": 0.06810921316705665
+          },
+          "optimistic_future_relations": 0
+        }
+      ]
+    },
+    {
+      "candidate_id": "low_yield",
+      "decision": "insufficient_evidence",
+      "reasons": [
+        "0 terminal episodes observed; 2 required"
+      ],
+      "episodes": 2,
+      "terminal_episodes": 0,
+      "full_rank_successes": 0,
+      "full_rank_success": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 1.0
+      },
+      "trials": 2000,
+      "relation_hit_trials": 0,
+      "verified_relations": 0,
+      "independent_relations": 0,
+      "relation_hit_rate": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.044624952585773106
+      },
+      "verified_relations_per_trial": 0.0,
+      "independent_relations_per_trial": 0.0,
+      "rank_utility": 0.0,
+      "mean_factor_coverage": 0.0,
+      "min_factor_coverage": 0.0,
+      "mean_normalised_hit_entropy": null,
+      "mean_dead_columns": null,
+      "charged_cost": 24100,
+      "charged_cost_per_trial": 12.05,
+      "episode_reports": [
+        {
+          "episode_id": "seed-00",
+          "decision": "stop_futile",
+          "reason": "even the alpha-budgeted optimistic relation count cannot close the remaining rank",
+          "relation_hit_interval": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.06310921316705664
+          },
+          "optimistic_future_relations": 26
+        },
+        {
+          "episode_id": "seed-01",
+          "decision": "stop_futile",
+          "reason": "even the alpha-budgeted optimistic relation count cannot close the remaining rank",
+          "relation_hit_interval": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.06310921316705664
+          },
+          "optimistic_future_relations": 26
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    "checkpoint schedule, candidate slots, episode slots and thresholds were frozen before observing this panel",
+    "within an episode, capped relation counts are independent bounded draws with a stationary mean for the futility projection",
+    "terminal full-rank outcomes are independent across episode seeds; pairing across candidates is allowed",
+    "every counted relation passed independent group verification and every rank was computed over the subgroup scalar field",
+    "rank utility, factor coverage, entropy and cost are diagnostics and never trigger a v1 hard prune"
+  ]
+}

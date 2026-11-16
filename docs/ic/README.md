@@ -6,6 +6,13 @@ known-answer or public hash-derived Koblitz targets. The `fixed` command also
 accepts explicit K_0 curve parameters and points through degree 131, with durable
 pair tables, relations and precomputation. See [Fixed parameters](FIXED_PARAMETERS.md).
 The older inspection command uses imported points for mathematical validation.
+macOS users can install `ic` and `crax` from the release DMG; see
+[macOS install and update](MACOS_INSTALL.md).
+
+**Hyperelliptic front door:** [`hecx`](HECX.md) inspects, estimates and
+solves HECDLP instances over prime and binary fields, for arbitrary genus,
+coefficients and subgroup orders, with prime- and binary-field
+index-calculus engines plus Pohlig–Hellman.
 
 **Factor-base encyclopedia:** [factor-base-encyclopedia/README.md](factor-base-encyclopedia/README.md) describes every factor base tried here and in crypto-autoresearcher (definition, existence, build cost, oracle, measured results, verdict), starting with the PKM Kummer-coset (P-224 shape) and isogeny-chain (P-192 shape) towers; PDF in the same directory.
 
@@ -25,6 +32,22 @@ reports, and launches the public-synthetic `koblitz_rank_fixture` /
 `koblitz_rho_fixture` producers for the priority Koblitz `vs_rho` rungs.
 
 ## Commands
+
+For embedding and downstream Rust plug-ins, see the
+[extension and hardening guide](../rust-extension-hardening.md) and
+[`ic_custom_pipeline`](../../examples/ic_custom_pipeline.rs). Its application-owned
+registries and matrix factory require no edits to this executable.
+
+Factor-base generation is a plug-in stage: `ic bench --list` lists the
+compiled-in builders and their parameters. Choose one with, for example,
+`ic bench --bits 16 --factor-base prime-abscissa:size=24 --oracle mitm -v`.
+Builders implement `FactorBaseBuilder` in
+`src/cryptanalysis/ic_framework/stages.rs`; implementations and registration
+examples are in `src/cryptanalysis/ic_framework/plugins.rs` and
+`src/bin/ic/bench.rs`. This is a native Rust extension interface, not a
+runtime shared-library or executable loader. `ic search --spec-out PATH`
+writes a recipe for `ic run --factor-base PATH` and `ic logs --factor-base PATH`;
+`ic workflow` also accepts an explicit recipe in its parameter file.
 
     cargo build --release --bin ic
     ./target/release/ic --help
@@ -590,9 +613,69 @@ The control that the counts are the workflow's own is
 `research/ic_exponent_20260926/control.py`, which compares a price
 report with `ic workflow`'s report and relation files, field by field.
 
+### SECG curves and `ic prime`
+
+`ic list` names **every SECG curve in the repository's standards database**
+(`docs/curves/standards/parameters.json`, read by
+`src/cryptanalysis/secg_standards.rs`): `secp112r1` … `secp521r1` and
+`sect113r1` … `sect571r1`, including `sect113r1`, `sect113r2`, `sect163r1`,
+`sect163r2` and `secp160k1/r1/r2`. `ic inspect --curve sect113r1` (or `ic
+sect113r1`) checks the order, the modulus or reduction polynomial,
+nonsingularity, that the generator is on the curve and that `[r]G = O`; the
+cardinality check is reported as not implemented for these curves.
+`secp192r1` is also `p192`, `nist-p192`, `p-192`.
+
+`search`, `run`, `logs`, `solve` and `workflow` are binary Koblitz pipelines.
+`ic prime` is the one factor-base measurement that covers every SECG curve:
+it builds the **small-x** factor base (the points with the smallest abscissae
+`x = 0, 1, 2, …` on the curve, both signs) and reports the probability that a
+random subgroup element is a signed sum of two base points, **exactly**. A base
+of `B` abscissae has `B²` pair-sum abscissae if none coincide, a target is
+covered when its abscissa is one, and the yield is `2·D/(n − 1)` for `D`
+distinct sum abscissae and `n` the order of the prime-order subgroup. `ic prime`
+computes `D` from every pair sum, checks it by Monte Carlo on random subgroup
+elements, and plants decompositions that must be detected and recovered.
+
+    ic prime --size 4096                       # P-192: exact yield 2^-167.0, 0 collisions
+    ic prime --curve sect113r1 --size 4096     # binary, cofactor 2
+    ic prime --curve sect163r2 --size 4096
+    ic prime --curve secp160r1 --size 4096     # prime, 160 bits
+    ic prime --curve sect571r1 --size 4096 --trials 100000
+    ic prime --curve toy:20,7,4 --size 512     # toy prime with cofactor 4: exact count against Monte Carlo hits
+    ic prime --curve toy-binary:17,7,4 --size 128   # toy binary curve, cofactor 4
+
+Fields: primes up to 521 bits (3, 4, 6 or 9 limbs of Montgomery arithmetic;
+Tonelli–Shanks when `p ≡ 1 mod 4`) and binary fields up to degree 571 (2, 3, 4,
+5, 7 or 9 limbs). The base is capped at 8192 abscissae and lower where the
+pair-sum keys would not fit in memory (`secp521r1`, `sect571k1/r1` stop at 4096).
+
+**Cofactor.** Every SECG binary curve has `h = 2` or `4`, and `secp112r2`,
+`secp128r2` have `h = 4`. A relation is a relation in the subgroup `⟨G⟩`, so
+each small-x point `P` enters the base as `[h]P` and a target is `[h]` of a
+uniform point; the yield is over that subgroup. `--raw-samples N` samples the
+share of raw small-x pair sums (no `[h]`) that lands in `⟨G⟩`: 1/h on nine of
+ten curves measured, which is the factor the raw variant loses.
+
+**Cost of a trial.** `--s3-trials N` decides `N` random subgroup targets by
+solving Semaev's `S₃(x₁, x₂, X) = 0` for `x₂` at every base abscissa (a
+quadratic each), checks every decision against the pair-sum table, plants
+decompositions that must be found, and times it against the table lookup and
+against Pollard rho on the same machine:
+
+    ic prime --curve sect163r2 --size 4096 --trials 1000 --s3-trials 20
+
+At `B = 4096` a target costs 5.4 ms on `sect113r1`, 9.6 ms on `sect163r2` and
+42 ms on `secp160r1`; collecting `B + 1` relations that way is 52, 77 and 79 bits
+slower than rho (52 to 280 bits over the 33 curves).
+
+On P-192 the yield is `2B²/(n − 1)`, from 2⁻¹⁷⁵ (`B = 256`) to 2⁻¹⁶⁵
+(`B = 8192`). Two-point sums only; linear algebra and descent are not measured.
+Measurements and limits: `research/prime_small_x_p192_20261014/REPORT.pdf`
+(P-192) and `research/secg_small_x_20261014/REPORT.pdf` (all SECG curves).
+
 ### Choosing a factor base
 
-Five families are recipes (`ic search --family`): `factor`, `divisor`
+Five families are recipes, and `greedy` is a sixth that is opt-in (`ic search --family`): `factor`, `divisor`
 and `union` are linear — an invariant subspace, a divisor of `x^e − 1`,
 or a union of Frobenius translates of a seed span — and `subgroup` is
 not. The linear families exist because the algebraic oracles need them:
@@ -610,6 +693,29 @@ uses no logarithm: `[h]P` is in the subgroup whatever `P` is.
 
 Use it with the pair-table solver. `groebner` and `sat` need a linear
 domain and will refuse.
+
+`greedy` (opt-in, not part of `--family all`) chooses the signed Frobenius
+orbits instead of drawing them: at each step it adds the orbit that covers
+the most new subgroup targets as a sum of two base points. At equal columns
+and equal points it covered up to 18% more targets than random orbits where
+coverage was partial (`K₀/2¹³`, `K₀/2¹⁵`, `K₁/2¹⁷`), and cut the expected
+trials at the best column count by 8–18%; the gain vanishes once coverage
+saturates. Use it with the pair-table solver, like `subgroup`. Up to
+`r = 2²²` it scans the enumerated orbits (every orbit up to `r = 2¹⁷`, a
+sample of 64 per step above that, which keeps less of the gain). Above `2²²`
+a sampled selector takes over: it draws candidate orbits and tracks covered
+sums in a hashed set, with no enumeration, capped at 8192 points per base.
+Its measured advantage over random orbits shrinks as the subgroup grows (about
+1.09 at `r = 2¹⁶`, 1.04 at `2²¹`, 1.012 at `2²⁷·⁸`, and 1.000 at `2³⁹`), so past
+`r ≈ 2²⁸` use `subgroup`. Measurements and limits:
+`research/greedy_factor_base_yield_20261014/REPORT.pdf`; the end-to-end
+`search → run → logs → solve → workflow` record is
+`research/greedy_factor_base_yield_20261014/e2e/E2E.md`.
+
+A greedy selection is saved **frozen**: `ic search --spec-out` and the
+workflow's select stage write `{"kind":"explicit_orbits","abscissae":[…]}`
+(inside `pruned` where pruning applied) in place of the `greedy_coverage`
+recipe, so a recipe rebuilds in milliseconds instead of re-running the scan.
 
 **How big?** With a subgroup base the work per target falls as
 `r/|F|²` — four times cheaper per doubling — while the pair table grows
@@ -1165,6 +1271,60 @@ bounded observation, not a global optimum, scaling claim, or challenge result.
 
 ## Reports and resource accounting
 
+Use repeated `--verbose` (or `-v`, `-vv`, `-vvv`) for live output:
+
+| level | output |
+| --- | --- |
+| none | existing stage summaries and final report |
+| `-v` | live setup, successful relation equations, matrix/rank and verification milestones; unsuccessful attempts are omitted |
+| `-vv` | `-v` plus generator/target and factor-base witness coordinates; `bench` also lists its materialized factor base |
+| `-vvv` | `-vv` plus every completed unsuccessful attempt and `run` batch starts |
+
+`run`, `logs`, `solve`, `workflow`, and `bench` support these live equation
+levels. Other subcommands retain their existing command-specific output.
+
+```sh
+ic run --degree 9 --solver enumerate --verbose
+ic workflow --params params.json --dir run-directory --verbose
+ic logs --degree 9 --database logs.json --verbose
+ic solve --degree 9 --logs logs.json --known-log 53 --verbose
+ic bench --bits 16 --factor-base prime-abscissa:size=24 --oracle mitm -v
+ic run --degree 9 --solver enumerate --batch 1 -vvv | tee ic.log
+```
+
+Relation lines show the actual probe coefficients and witness, for example
+`R = [a]G + [b]Q = F[i] + F[j] + …`, with decimal coefficients replacing
+`a` and `b`. `G` is the generator, `Q` the target, and `F[i]` is point `i`
+of this run's materialized factor base, including repeated summands.
+Target-independent collection (`logs` and workflow units) prints
+`R = [a]G`. A found witness is labelled **pending verification**, separately
+from relation admission and final scalar or column-log certification.
+At `-vv`, binary coordinates are hexadecimal polynomial-basis field elements;
+bench points use the selected group's native debug representation.
+
+Parallel `run` batches report their outcomes in trial order
+after the batch completes; use `--batch 1` for one attempt at a time.
+Workflow collection reports probes as workers finish, so their one-based,
+global probe IDs can appear out of order. Workflow descent and `solve` use
+the same relation filter at each verbosity. `logs` reports equations as
+collection workers finish, as well as collection batches, coefficient rank,
+and the start and completion of linear algebra and column verification.
+Each trace line is flushed immediately, including when piped to `tee`.
+`bench` uses the same live setup/query hooks for every factor-base plug-in.
+Its query index counts completed oracle calls; the final trial count also
+includes generated trials rejected by the collector's guards.
+Merged large-prime relations print their own coefficients and a congruence
+over projected column logarithms, rather than a false point-sum equation
+for the current probe. The residual collector reports setup and its final
+rank, and explicitly says per-query equations are unavailable for its
+different pair-difference query law.
+Verbose logging adds I/O work; use ordinary or JSON output for measurements.
+
+The flag is global and can appear before or after the subcommand. `--json`
+takes precedence over `--verbose` and suppresses the trace. Progress text
+does not enter saved reports or change the query stream, solver limits,
+or verification gates.
+
 Add --json for machine-readable output or --out PATH to save the JSON
 report while retaining the human progress display. Output files are
 created exclusively: an existing path is never overwritten.
@@ -1345,6 +1505,13 @@ validates the actual fixed parameters and persists the factor base.
 pair tables, precomputed logarithms, direct target equations and the complete
 small-curve example. This CPU Python workflow accepts full-width coordinates;
 the existing Rust symbolic engine remains limited to degree 63.
+
+For ECC2K-130 specifically, `ic ecc2k130 --dir runs/ecc2k130` supplies the
+profile, the `collect` stage, live stderr progress and a
+`runs/ecc2k130/relations.jsonl` export; the default pair budget completes the
+6,728,946-candidate table in one run. `tail -f` that file to watch verified
+relations land. See the live-relations section of
+[Fixed parameters](FIXED_PARAMETERS.md).
 
 ### Learned solver and budget selector
 

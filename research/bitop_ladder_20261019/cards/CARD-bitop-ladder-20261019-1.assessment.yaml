@@ -1,0 +1,11 @@
+card_id: CARD-bitop-ladder-20261019-1
+relay_verbatim: not_applicable_no_receipt
+outcome: stopped
+stopped_at_step: train-panel
+recommendation: rerun_after_infrastructure_fix
+reasons:
+  - "No receipt exists (cards/CARD-bitop-ladder-20261019-1.receipt.json absent) and no run.stdout; the executor reported status killed, summary 'stopped after reaching its background time limit', i.e. the harness limit, not the card's 21600 s timeout or a failing command."
+  - "The remainder was re-run unchanged from the frozen specs by cards 2 and 3 (PROTOCOL.md Deviation 1); sessions/ now holds train-P16..P40, each with verify.json ok: true."
+  - "Two sessions came from this card's interrupted run and are complete: sessions/train-P36/verify.json sha256 bb15e36efd2655d561214663dde01d25715fea7461ac6b674fdb5d9ea84142af and sessions/train-P37/verify.json sha256 15fdce3426ac0ae65d75932e6c8941c631c94e45812435ab35a9c8de1d9248bc (ok true, session_status complete, 32 of 32 records verified, spec.json byte-identical to specs/train-P36.json and train-P37.json). No receipt records their digests."
+  - "The card's yaml (cards/CARD-bitop_ladder-20261019-1.yaml) binds the pre-Deviation-1 PROTOCOL.md and now fails lint; it must not be relayed again."
+interpretation: not_assessed

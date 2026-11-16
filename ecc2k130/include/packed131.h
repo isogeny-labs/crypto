@@ -34,6 +34,50 @@
 #else
 #define ECC_USE_CLMAD_INSN 0
 #endif
+/* ECC_PACKED_CLMAD_SELF=1: issue every product CLMAD in the in-place
+   accumulate form `clmad r, r, y, r` on a copy r = x, which yields
+   lo/hi(x*y) ^ x, and cancel the x with one XOR on the logic pipe.
+   benchmarks/clmad-pairs measured that form at 1.98 lane-CLMADs per SM-clock
+   on the RTX PRO 6000 for a complete two-way Karatsuba product, against 1.67
+   for the same product with a zero addend; streams of one opcode run at 1.68
+   in every form, so the gain needs .lo and .hi mixed, as every product is.
+   Bit-identical by construction; the host path is unchanged. */
+#include <cstdint>
+#ifndef ECC_PACKED_CLMAD_SELF
+#define ECC_PACKED_CLMAD_SELF 0
+#endif
+#if ECC_PACKED_CLMAD_SELF != 0 && ECC_PACKED_CLMAD_SELF != 1
+#error "ECC_PACKED_CLMAD_SELF must be 0 or 1"
+#endif
+#if ECC_PACKED_CLMAD_SELF && !ECC_PACKED_CLMAD
+#error "ECC_PACKED_CLMAD_SELF requires ECC_PACKED_CLMAD"
+#endif
+/* Defined wherever the inline-asm product paths below were: the same guard
+   as the original asm, so no architecture slice gains or loses a path. */
+#if ECC_PACKED_CLMAD && defined(__CUDA_ARCH__)
+__device__ __forceinline__ uint64_t clmadProdLo(uint64_t x, uint64_t y) {
+    uint64_t r;
+#if ECC_PACKED_CLMAD_SELF
+    r = x;
+    asm("clmad.lo.u64 %0, %0, %1, %0;" : "+l"(r) : "l"(y));
+    r ^= x;
+#else
+    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(r) : "l"(x), "l"(y));
+#endif
+    return r;
+}
+__device__ __forceinline__ uint64_t clmadProdHi(uint64_t x, uint64_t y) {
+    uint64_t r;
+#if ECC_PACKED_CLMAD_SELF
+    r = x;
+    asm("clmad.hi.u64 %0, %0, %1, %0;" : "+l"(r) : "l"(y));
+    r ^= x;
+#else
+    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(r) : "l"(x), "l"(y));
+#endif
+    return r;
+}
+#endif
 #ifndef ECC_PACKED_TOP_CLMAD
 #define ECC_PACKED_TOP_CLMAD 0
 #endif
@@ -222,8 +266,8 @@ ECC_HD void clmul64(uint32_t r[4], const uint32_t a[2], const uint32_t b[2]) {
     const uint64_t aa = uint64_t(a[0]) | (uint64_t(a[1]) << 32);
     const uint64_t bb = uint64_t(b[0]) | (uint64_t(b[1]) << 32);
     uint64_t lo, hi;
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(lo) : "l"(aa), "l"(bb));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(hi) : "l"(aa), "l"(bb));
+    lo = clmadProdLo(aa, bb);
+    hi = clmadProdHi(aa, bb);
     r[0] = uint32_t(lo); r[1] = uint32_t(lo >> 32);
     r[2] = uint32_t(hi); r[3] = uint32_t(hi >> 32);
 #else
@@ -268,12 +312,12 @@ ECC_HD void clmul128(uint32_t r[8], const uint32_t a[4], const uint32_t b[4]) {
     const uint64_t b1 = uint64_t(b[2]) | (uint64_t(b[3]) << 32);
     const uint64_t as = a0 ^ a1, bs = b0 ^ b1;
     uint64_t l0, h0, m0, l1, h1, m1;
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(l0) : "l"(a0), "l"(b0));
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(h0) : "l"(a1), "l"(b1));
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(m0) : "l"(as), "l"(bs));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(l1) : "l"(a0), "l"(b0));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(h1) : "l"(a1), "l"(b1));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(m1) : "l"(as), "l"(bs));
+    l0 = clmadProdLo(a0, b0);
+    h0 = clmadProdLo(a1, b1);
+    m0 = clmadProdLo(as, bs);
+    l1 = clmadProdHi(a0, b0);
+    h1 = clmadProdHi(a1, b1);
+    m1 = clmadProdHi(as, bs);
     foldKarat128(r, l0, l1, h0, h1, m0, m1);
 #else
     uint32_t lo[4], hi[4], mid[4], as[2], bs[2];
@@ -511,18 +555,18 @@ ECC_HD void product131Pair(const P131 &a, const P131 &b, const P131 &c,
     const uint64_t c0 = uint64_t(c.v[0]) | (uint64_t(c.v[1]) << 32);
     const uint64_t c1 = uint64_t(c.v[2]) | (uint64_t(c.v[3]) << 32);
     const uint64_t as = a0 ^ a1, bs = b0 ^ b1, cs = c0 ^ c1;
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(blo_l) : "l"(a0), "l"(b0));
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(clo_l) : "l"(a0), "l"(c0));
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(bhi_l) : "l"(a1), "l"(b1));
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(chi_l) : "l"(a1), "l"(c1));
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(bmid_l) : "l"(as), "l"(bs));
-    asm("clmad.lo.u64 %0, %1, %2, 0;" : "=l"(cmid_l) : "l"(as), "l"(cs));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(blo_h) : "l"(a0), "l"(b0));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(clo_h) : "l"(a0), "l"(c0));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(bhi_h) : "l"(a1), "l"(b1));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(chi_h) : "l"(a1), "l"(c1));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(bmid_h) : "l"(as), "l"(bs));
-    asm("clmad.hi.u64 %0, %1, %2, 0;" : "=l"(cmid_h) : "l"(as), "l"(cs));
+    blo_l = clmadProdLo(a0, b0);
+    clo_l = clmadProdLo(a0, c0);
+    bhi_l = clmadProdLo(a1, b1);
+    chi_l = clmadProdLo(a1, c1);
+    bmid_l = clmadProdLo(as, bs);
+    cmid_l = clmadProdLo(as, cs);
+    blo_h = clmadProdHi(a0, b0);
+    clo_h = clmadProdHi(a0, c0);
+    bhi_h = clmadProdHi(a1, b1);
+    chi_h = clmadProdHi(a1, c1);
+    bmid_h = clmadProdHi(as, bs);
+    cmid_h = clmadProdHi(as, cs);
 #else
     uint32_t blo[4], bhi[4], bmid[4], clo[4], chi[4], cmid[4], bb[2], cc[2], asw[2];
     clmul64(blo, a.v, b.v);

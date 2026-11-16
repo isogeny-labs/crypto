@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">N83 K=16,627 complete-witness control</title>
+  <desc id="desc">The exact base, group preflight, full orbit model and seven-block pinning completed. The SAT solver call reached the 1800-second wall cap without returning. Natural-query comparison was not attempted.</desc>
+  <rect width="1200" height="620" fill="#f7f9fc"/>
+  <text x="60" y="57" font-family="DejaVu Sans, sans-serif" font-size="27" font-weight="700" fill="#152238">N83 retained base · complete four-summand witness</text>
+  <text x="60" y="87" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#42536b">Exact K=16,627 signed-Frobenius object · one CPU · hard 4 GiB · source commit f68b9a94ad</text>
+
+  <g font-family="DejaVu Sans, sans-serif">
+    <rect x="60" y="128" width="245" height="185" rx="14" fill="#e8f6ee" stroke="#238052" stroke-width="2"/>
+    <text x="80" y="160" font-size="18" font-weight="700" fill="#175a38">Base + group preflight</text>
+    <text x="80" y="191" font-size="15" fill="#244737">39.999 s elapsed</text>
+    <text x="80" y="217" font-size="14" fill="#244737">2,760,082 points imported</text>
+    <text x="80" y="243" font-size="14" fill="#244737">Rank after insert: 1</text>
+    <text x="80" y="269" font-size="14" fill="#244737">R+G tamper rejected</text>
+    <text x="80" y="295" font-size="12" fill="#367453">Checked before SAT</text>
+
+    <line x1="314" y1="220" x2="346" y2="220" stroke="#6f8096" stroke-width="3"/>
+    <polygon points="346,220 336,214 336,226" fill="#6f8096"/>
+
+    <rect x="355" y="128" width="245" height="185" rx="14" fill="#e8f6ee" stroke="#238052" stroke-width="2"/>
+    <text x="375" y="160" font-size="18" font-weight="700" fill="#175a38">Full orbit model</text>
+    <text x="375" y="191" font-size="15" fill="#244737">40.252 s elapsed</text>
+    <text x="375" y="217" font-size="14" fill="#244737">201,598 variables</text>
+    <text x="375" y="243" font-size="14" fill="#244737">5,915,238 clauses</text>
+    <text x="375" y="269" font-size="14" fill="#244737">3,901 XOR rows</text>
+    <text x="375" y="295" font-size="12" fill="#367453">Seven x blocks fixed/checked next</text>
+
+    <line x1="609" y1="220" x2="641" y2="220" stroke="#6f8096" stroke-width="3"/>
+    <polygon points="641,220 631,214 631,226" fill="#6f8096"/>
+
+    <rect x="650" y="128" width="245" height="185" rx="14" fill="#fff0d9" stroke="#bc6d12" stroke-width="2"/>
+    <text x="670" y="160" font-size="18" font-weight="700" fill="#8a4b0b">SAT solver call</text>
+    <text x="670" y="191" font-size="15" fill="#70450f">Entered at 40.267 s</text>
+    <text x="670" y="217" font-size="14" fill="#70450f">UNKNOWN wall cap: 1,800 s</text>
+    <text x="670" y="243" font-size="14" fill="#70450f">No solver-return receipt</text>
+    <text x="670" y="269" font-size="14" fill="#70450f">Conflicts / models unknown</text>
+    <text x="670" y="295" font-size="12" fill="#996222">Propagation vs search unresolved</text>
+
+    <line x1="904" y1="220" x2="936" y2="220" stroke="#6f8096" stroke-width="3"/>
+    <polygon points="936,220 926,214 926,226" fill="#6f8096"/>
+
+    <rect x="945" y="128" width="195" height="185" rx="14" fill="#edf0f5" stroke="#8592a4" stroke-width="2"/>
+    <text x="965" y="160" font-size="18" font-weight="700" fill="#354860">Unpinned arm</text>
+    <text x="965" y="191" font-size="15" fill="#4a5a6e">Not attempted</text>
+    <text x="965" y="224" font-size="13" fill="#4a5a6e">Positive SAT/model</text>
+    <text x="965" y="245" font-size="13" fill="#4a5a6e">prerequisite unverified</text>
+    <text x="965" y="282" font-size="12" fill="#647185">Natural yield/rank open</text>
+
+    <rect x="60" y="355" width="1080" height="135" rx="14" fill="#e9f1fc" stroke="#4278b4" stroke-width="2"/>
+    <text x="82" y="390" font-size="19" font-weight="700" fill="#204d80">Next discriminator: split the solver call</text>
+    <text x="82" y="421" font-size="15" fill="#294e76">Sync a root-propagation completion record, then completed conflict checkpoints on the same exact object.</text>
+    <text x="82" y="450" font-size="15" fill="#294e76">A checked full SAT assignment and group lift are still required before the unpinned arm.</text>
+    <text x="82" y="477" font-size="12" fill="#55759a">No natural relation panel, useful-rank comparison or complete IC total was produced.</text>
+    <text x="60" y="551" font-size="12" fill="#60728a">Source: PROTOCOL.md, positive/worker.json.phases.jsonl, positive/container-state.json and positive/peak.bytes · shared L0 host</text>
+  </g>
+</svg>

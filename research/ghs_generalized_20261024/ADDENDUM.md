@@ -1,0 +1,7 @@
+# Implementation addendum, 24 October 2026
+
+`PROTOCOL.md` was frozen before the quadratic pilot measurements. The later rational-kernel extension implements single separable isogeny steps of degree 3 and 5 using the previously declared set `{2,3,5,7}`. Degree 10 has a rational order-three kernel and degree 12 an order-five kernel, so these were selected for additional exact-instance checks after inspecting group orders. They are follow-up development controls, not preregistered holdouts; no attack advantage should be inferred from selecting them.
+
+A direct curve and a single isogeny step each map to the same quadratic genus-two constructor. The current finite screens do not construct the general Hess-parameter descent map for every nonzero `c`; their genus and order-polynomial profiles must remain separate from executable-map statuses. No degree-seven step has an end-to-end receipt yet.
+
+The exact target scalar is 37 reduced modulo the prime subgroup order in each example. It prepares the pair and validates recovered answers; neither attack routine receives the scalar as input. Sequential `run_exact.sh` calls on this shared macOS host are L0 measurements with one sample per edge and arm. No CPU affinity, performance isolation, external solver, or GAE conversion was available for a full cross-field cost comparison. Phase field-operation counts and hash/matrix counts remain the portable evidence.

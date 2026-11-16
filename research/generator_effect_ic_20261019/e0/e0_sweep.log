@@ -1,0 +1,341 @@
+    Finished `release` profile [optimized] target(s) in 0.43s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-1ace9a6308c3db1d)
+
+running 3 tests
+E0a c1 B=205 c=1 digest=2c391f9768271306 direct=ok framework=ok
+E0a c1 B=205 c=2176167 digest=2c391f9768271306 direct=ok framework=ok
+E0a c1 B=205 c=796968 digest=2c391f9768271306 direct=ok framework=ok
+E0a c1 B=205 c=2812785 digest=2c391f9768271306 direct=ok framework=ok
+E0a c1 B=205 c=8580036 digest=2c391f9768271306 direct=ok framework=ok
+E0a c2 B=241 c=1 digest=da526e637225c9ce direct=ok framework=ok
+E0a c2 B=241 c=11450909 digest=da526e637225c9ce direct=ok framework=ok
+E0a c2 B=241 c=6784058 digest=da526e637225c9ce direct=ok framework=ok
+E0a c2 B=241 c=9437225 digest=da526e637225c9ce direct=ok framework=ok
+E0a c2 B=241 c=13902852 digest=da526e637225c9ce direct=ok framework=ok
+E0a c3 B=254 c=1 digest=3d3ea27bfcff32b0 direct=ok framework=ok
+E0a c3 B=254 c=13188356 digest=3d3ea27bfcff32b0 direct=ok framework=ok
+E0a c3 B=254 c=5614982 digest=3d3ea27bfcff32b0 direct=ok framework=ok
+E0a c3 B=254 c=7163992 digest=3d3ea27bfcff32b0 direct=ok framework=ok
+E0a c3 B=254 c=16344178 digest=3d3ea27bfcff32b0 direct=ok framework=ok
+E0a c4 B=221 c=1 digest=c1c2ed337a9af2cc direct=ok framework=ok
+E0a c4 B=221 c=1343611 digest=c1c2ed337a9af2cc direct=ok framework=ok
+E0a c4 B=221 c=3322496 digest=c1c2ed337a9af2cc direct=ok framework=ok
+E0a c4 B=221 c=2130670 digest=c1c2ed337a9af2cc direct=ok framework=ok
+E0a c4 B=221 c=10779322 digest=c1c2ed337a9af2cc direct=ok framework=ok
+E0a c5 B=252 c=1 digest=f81fdfa6ece6579d direct=ok framework=ok
+E0a c5 B=252 c=13172065 digest=f81fdfa6ece6579d direct=ok framework=ok
+E0a c5 B=252 c=3248322 digest=f81fdfa6ece6579d direct=ok framework=ok
+E0a c5 B=252 c=14950384 digest=f81fdfa6ece6579d direct=ok framework=ok
+E0a c5 B=252 c=15908296 digest=f81fdfa6ece6579d direct=ok framework=ok
+E0a c6 B=213 c=1 digest=ee7bc94fd8b915a2 direct=ok framework=ok
+E0a c6 B=213 c=2016275 digest=ee7bc94fd8b915a2 direct=ok framework=ok
+E0a c6 B=213 c=5977473 digest=ee7bc94fd8b915a2 direct=ok framework=ok
+E0a c6 B=213 c=1225049 digest=ee7bc94fd8b915a2 direct=ok framework=ok
+E0a c6 B=213 c=9565122 digest=ee7bc94fd8b915a2 direct=ok framework=ok
+test cryptanalysis::ic_boundary::generator_coupling_tests::e0a_abscissa_base_digest_ignores_the_generator ... ok
+E0b c1 Random TargetPinned c=2176167 targets=10431 rows=100 row_digest=c0604492346d75be logs_pinned=59 draws=10439 k'=7745402 dGAE=569 predicted=569 ok
+E0b c1 Random TargetPinned c=8580036 targets=10431 rows=100 row_digest=c0604492346d75be logs_pinned=59 draws=10439 k'=5691552 dGAE=-62 predicted=-62 ok
+E0b c1 Walk TargetPinned c=2176167 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=7745402 dGAE=-7 predicted=-7 ok
+E0b c1 Walk TargetPinned c=8580036 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=5691552 dGAE=-52 predicted=-52 ok
+E0b c1 Stride TargetPinned c=2176167 targets=32067 rows=317 row_digest=1908a96b2c7ac741 logs_pinned=112 draws=2 k'=7745402 dGAE=12 predicted=12 ok
+E0b c1 Stride TargetPinned c=8580036 targets=32067 rows=317 row_digest=1908a96b2c7ac741 logs_pinned=112 draws=2 k'=5691552 dGAE=2 predicted=2 ok
+E0b c1 StrideRenew TargetPinned c=2176167 targets=11267 rows=124 row_digest=a7bcacb84ebe4c91 logs_pinned=63 draws=3 k'=7745402 dGAE=14 predicted=14 ok
+E0b c1 StrideRenew TargetPinned c=8580036 targets=11267 rows=124 row_digest=a7bcacb84ebe4c91 logs_pinned=63 draws=3 k'=5691552 dGAE=-1 predicted=-1 ok
+E0b c1 WalkPrimeFast TargetPinned c=2176167 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=7745402 dGAE=-7 predicted=-7 ok
+E0b c1 WalkPrimeFast TargetPinned c=8580036 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=5691552 dGAE=-52 predicted=-52 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=2176167 targets=4277 rows=44 row_digest=9038b69daa68e4bb logs_pinned=1 draws=22 k'=7745402 dGAE=-5 predicted=-5 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=8580036 targets=4277 rows=44 row_digest=9038b69daa68e4bb logs_pinned=1 draws=22 k'=5691552 dGAE=-44 predicted=-44 ok
+test cryptanalysis::ic_boundary::generator_coupling_tests::e0bc_coupled_seeds_rescale_logs_and_nothing_else ... ok
+E0b c1 Random TargetPinned c=2176167 targets=10431 rows=100 row_digest=c0604492346d75be logs_pinned=59 draws=10439 k'=7745402 dGAE=569 predicted=569 ok
+E0b c1 Random TargetPinned c=796968 targets=10431 rows=100 row_digest=c0604492346d75be logs_pinned=59 draws=10439 k'=932746 dGAE=323 predicted=323 ok
+E0b c1 Random TargetPinned c=2812785 targets=10431 rows=100 row_digest=c0604492346d75be logs_pinned=59 draws=10439 k'=4183859 dGAE=332 predicted=332 ok
+E0b c1 Random TargetPinned c=8580036 targets=10431 rows=100 row_digest=c0604492346d75be logs_pinned=59 draws=10439 k'=5691552 dGAE=-62 predicted=-62 ok
+E0b c1 Random FullRank c=2176167 targets=59010 rows=536 row_digest=df2f7b14fb7916c1 logs_pinned=206 draws=59219 k'=7745402 dGAE=1305 predicted=1305 ok
+E0b c1 Random FullRank c=796968 targets=59010 rows=536 row_digest=df2f7b14fb7916c1 logs_pinned=206 draws=59219 k'=932746 dGAE=-83 predicted=-83 ok
+E0b c1 Random FullRank c=2812785 targets=59010 rows=536 row_digest=df2f7b14fb7916c1 logs_pinned=206 draws=59219 k'=4183859 dGAE=263 predicted=263 ok
+E0b c1 Random FullRank c=8580036 targets=59010 rows=536 row_digest=df2f7b14fb7916c1 logs_pinned=206 draws=59219 k'=5691552 dGAE=-324 predicted=-324 ok
+E0b c1 Walk TargetPinned c=2176167 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=7745402 dGAE=-7 predicted=-7 ok
+E0b c1 Walk TargetPinned c=796968 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=932746 dGAE=-25 predicted=-25 ok
+E0b c1 Walk TargetPinned c=2812785 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=4183859 dGAE=-42 predicted=-42 ok
+E0b c1 Walk TargetPinned c=8580036 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=5691552 dGAE=-52 predicted=-52 ok
+E0b c1 Walk FullRank c=2176167 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=7745402 dGAE=-39 predicted=-39 ok
+E0b c1 Walk FullRank c=796968 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=932746 dGAE=-51 predicted=-51 ok
+E0b c1 Walk FullRank c=2812785 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=4183859 dGAE=-62 predicted=-62 ok
+E0b c1 Walk FullRank c=8580036 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=5691552 dGAE=-106 predicted=-106 ok
+E0b c1 Stride TargetPinned c=2176167 targets=32067 rows=317 row_digest=1908a96b2c7ac741 logs_pinned=112 draws=2 k'=7745402 dGAE=12 predicted=12 ok
+E0b c1 Stride TargetPinned c=796968 targets=32067 rows=317 row_digest=1908a96b2c7ac741 logs_pinned=112 draws=2 k'=932746 dGAE=-5 predicted=-5 ok
+E0b c1 Stride TargetPinned c=2812785 targets=32067 rows=317 row_digest=1908a96b2c7ac741 logs_pinned=112 draws=2 k'=4183859 dGAE=7 predicted=7 ok
+E0b c1 Stride TargetPinned c=8580036 targets=32067 rows=317 row_digest=1908a96b2c7ac741 logs_pinned=112 draws=2 k'=5691552 dGAE=2 predicted=2 ok
+E0b c1 Stride FullRank c=2176167 targets=79073 rows=763 row_digest=e947d876b200f32c logs_pinned=206 draws=2 k'=7745402 dGAE=12 predicted=12 ok
+E0b c1 Stride FullRank c=796968 targets=79073 rows=763 row_digest=e947d876b200f32c logs_pinned=206 draws=2 k'=932746 dGAE=-5 predicted=-5 ok
+E0b c1 Stride FullRank c=2812785 targets=79073 rows=763 row_digest=e947d876b200f32c logs_pinned=206 draws=2 k'=4183859 dGAE=7 predicted=7 ok
+E0b c1 Stride FullRank c=8580036 targets=79073 rows=763 row_digest=e947d876b200f32c logs_pinned=206 draws=2 k'=5691552 dGAE=2 predicted=2 ok
+E0b c1 StrideRenew TargetPinned c=2176167 targets=11267 rows=124 row_digest=a7bcacb84ebe4c91 logs_pinned=63 draws=3 k'=7745402 dGAE=14 predicted=14 ok
+E0b c1 StrideRenew TargetPinned c=796968 targets=11267 rows=124 row_digest=a7bcacb84ebe4c91 logs_pinned=63 draws=3 k'=932746 dGAE=-5 predicted=-5 ok
+E0b c1 StrideRenew TargetPinned c=2812785 targets=11267 rows=124 row_digest=a7bcacb84ebe4c91 logs_pinned=63 draws=3 k'=4183859 dGAE=4 predicted=4 ok
+E0b c1 StrideRenew TargetPinned c=8580036 targets=11267 rows=124 row_digest=a7bcacb84ebe4c91 logs_pinned=63 draws=3 k'=5691552 dGAE=-1 predicted=-1 ok
+E0b c1 StrideRenew FullRank c=2176167 targets=89727 rows=877 row_digest=d13014b3570d1b69 logs_pinned=206 draws=3 k'=7745402 dGAE=14 predicted=14 ok
+E0b c1 StrideRenew FullRank c=796968 targets=89727 rows=877 row_digest=d13014b3570d1b69 logs_pinned=206 draws=3 k'=932746 dGAE=-5 predicted=-5 ok
+E0b c1 StrideRenew FullRank c=2812785 targets=89727 rows=877 row_digest=d13014b3570d1b69 logs_pinned=206 draws=3 k'=4183859 dGAE=4 predicted=4 ok
+E0b c1 StrideRenew FullRank c=8580036 targets=89727 rows=877 row_digest=d13014b3570d1b69 logs_pinned=206 draws=3 k'=5691552 dGAE=-1 predicted=-1 ok
+E0b c1 WalkPrimeFast TargetPinned c=2176167 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=7745402 dGAE=-7 predicted=-7 ok
+E0b c1 WalkPrimeFast TargetPinned c=796968 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=932746 dGAE=-25 predicted=-25 ok
+E0b c1 WalkPrimeFast TargetPinned c=2812785 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=4183859 dGAE=-42 predicted=-42 ok
+E0b c1 WalkPrimeFast TargetPinned c=8580036 targets=12691 rows=120 row_digest=1ea997a697f2f8e2 logs_pinned=72 draws=21 k'=5691552 dGAE=-52 predicted=-52 ok
+E0b c1 WalkPrimeFast FullRank c=2176167 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=7745402 dGAE=-39 predicted=-39 ok
+E0b c1 WalkPrimeFast FullRank c=796968 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=932746 dGAE=-51 predicted=-51 ok
+E0b c1 WalkPrimeFast FullRank c=2812785 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=4183859 dGAE=-62 predicted=-62 ok
+E0b c1 WalkPrimeFast FullRank c=8580036 targets=46496 rows=464 row_digest=cc61b0443f9b459f logs_pinned=206 draws=33 k'=5691552 dGAE=-106 predicted=-106 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=2176167 targets=4277 rows=44 row_digest=9038b69daa68e4bb logs_pinned=1 draws=22 k'=7745402 dGAE=-5 predicted=-5 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=796968 targets=4277 rows=44 row_digest=9038b69daa68e4bb logs_pinned=1 draws=22 k'=932746 dGAE=-20 predicted=-20 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=2812785 targets=4277 rows=44 row_digest=9038b69daa68e4bb logs_pinned=1 draws=22 k'=4183859 dGAE=-35 predicted=-35 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=8580036 targets=4277 rows=44 row_digest=9038b69daa68e4bb logs_pinned=1 draws=22 k'=5691552 dGAE=-44 predicted=-44 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=2176167 targets=63049 rows=655 row_digest=3e5ed18e1ae023b1 logs_pinned=206 draws=36 k'=7745402 dGAE=-32 predicted=-32 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=796968 targets=63049 rows=655 row_digest=3e5ed18e1ae023b1 logs_pinned=206 draws=36 k'=932746 dGAE=-36 predicted=-36 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=2812785 targets=63049 rows=655 row_digest=3e5ed18e1ae023b1 logs_pinned=206 draws=36 k'=4183859 dGAE=-51 predicted=-51 ok
+E0b c1 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=8580036 targets=63049 rows=655 row_digest=3e5ed18e1ae023b1 logs_pinned=206 draws=36 k'=5691552 dGAE=-90 predicted=-90 ok
+E0b c2 Random TargetPinned c=11450909 targets=19049 rows=165 row_digest=ee0ca0944e6a0be9 logs_pinned=111 draws=19057 k'=7010851 dGAE=99 predicted=99 ok
+E0b c2 Random TargetPinned c=6784058 targets=19049 rows=165 row_digest=ee0ca0944e6a0be9 logs_pinned=111 draws=19057 k'=6673775 dGAE=1332 predicted=1332 ok
+E0b c2 Random TargetPinned c=9437225 targets=19049 rows=165 row_digest=ee0ca0944e6a0be9 logs_pinned=111 draws=19057 k'=5260250 dGAE=82 predicted=82 ok
+E0b c2 Random TargetPinned c=13902852 targets=19049 rows=165 row_digest=ee0ca0944e6a0be9 logs_pinned=111 draws=19057 k'=3646788 dGAE=1028 predicted=1028 ok
+E0b c2 Random FullRank c=11450909 targets=129860 rows=1096 row_digest=87f8d742e9672267 logs_pinned=242 draws=130447 k'=7010851 dGAE=-867 predicted=-867 ok
+E0b c2 Random FullRank c=6784058 targets=129860 rows=1096 row_digest=87f8d742e9672267 logs_pinned=242 draws=130447 k'=6673775 dGAE=1211 predicted=1211 ok
+E0b c2 Random FullRank c=9437225 targets=129860 rows=1096 row_digest=87f8d742e9672267 logs_pinned=242 draws=130447 k'=5260250 dGAE=-1843 predicted=-1843 ok
+E0b c2 Random FullRank c=13902852 targets=129860 rows=1096 row_digest=87f8d742e9672267 logs_pinned=242 draws=130447 k'=3646788 dGAE=1585 predicted=1585 ok
+E0b c2 Walk TargetPinned c=11450909 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=7010851 dGAE=34 predicted=34 ok
+E0b c2 Walk TargetPinned c=6784058 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=6673775 dGAE=30 predicted=30 ok
+E0b c2 Walk TargetPinned c=9437225 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=5260250 dGAE=-9 predicted=-9 ok
+E0b c2 Walk TargetPinned c=13902852 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=3646788 dGAE=6 predicted=6 ok
+E0b c2 Walk FullRank c=11450909 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=7010851 dGAE=47 predicted=47 ok
+E0b c2 Walk FullRank c=6784058 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=6673775 dGAE=32 predicted=32 ok
+E0b c2 Walk FullRank c=9437225 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=5260250 dGAE=2 predicted=2 ok
+E0b c2 Walk FullRank c=13902852 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=3646788 dGAE=-2 predicted=-2 ok
+E0b c2 Stride TargetPinned c=11450909 targets=22293 rows=191 row_digest=8d8c95f02a05ca96 logs_pinned=7 draws=2 k'=7010851 dGAE=9 predicted=9 ok
+E0b c2 Stride TargetPinned c=6784058 targets=22293 rows=191 row_digest=8d8c95f02a05ca96 logs_pinned=7 draws=2 k'=6673775 dGAE=9 predicted=9 ok
+E0b c2 Stride TargetPinned c=9437225 targets=22293 rows=191 row_digest=8d8c95f02a05ca96 logs_pinned=7 draws=2 k'=5260250 dGAE=9 predicted=9 ok
+E0b c2 Stride TargetPinned c=13902852 targets=22293 rows=191 row_digest=8d8c95f02a05ca96 logs_pinned=7 draws=2 k'=3646788 dGAE=1 predicted=1 ok
+E0b c2 Stride FullRank c=11450909 targets=81597 rows=661 row_digest=41dd75be9f61a983 logs_pinned=242 draws=2 k'=7010851 dGAE=9 predicted=9 ok
+E0b c2 Stride FullRank c=6784058 targets=81597 rows=661 row_digest=41dd75be9f61a983 logs_pinned=242 draws=2 k'=6673775 dGAE=9 predicted=9 ok
+E0b c2 Stride FullRank c=9437225 targets=81597 rows=661 row_digest=41dd75be9f61a983 logs_pinned=242 draws=2 k'=5260250 dGAE=9 predicted=9 ok
+E0b c2 Stride FullRank c=13902852 targets=81597 rows=661 row_digest=41dd75be9f61a983 logs_pinned=242 draws=2 k'=3646788 dGAE=1 predicted=1 ok
+E0b c2 StrideRenew TargetPinned c=11450909 targets=15959 rows=111 row_digest=174052e47e38c72c logs_pinned=1 draws=3 k'=7010851 dGAE=9 predicted=9 ok
+E0b c2 StrideRenew TargetPinned c=6784058 targets=15959 rows=111 row_digest=174052e47e38c72c logs_pinned=1 draws=3 k'=6673775 dGAE=7 predicted=7 ok
+E0b c2 StrideRenew TargetPinned c=9437225 targets=15959 rows=111 row_digest=174052e47e38c72c logs_pinned=1 draws=3 k'=5260250 dGAE=5 predicted=5 ok
+E0b c2 StrideRenew TargetPinned c=13902852 targets=15959 rows=111 row_digest=174052e47e38c72c logs_pinned=1 draws=3 k'=3646788 dGAE=-4 predicted=-4 ok
+E0b c2 StrideRenew FullRank c=11450909 targets=95249 rows=774 row_digest=cc11164088ed4c55 logs_pinned=242 draws=3 k'=7010851 dGAE=9 predicted=9 ok
+E0b c2 StrideRenew FullRank c=6784058 targets=95249 rows=774 row_digest=cc11164088ed4c55 logs_pinned=242 draws=3 k'=6673775 dGAE=7 predicted=7 ok
+E0b c2 StrideRenew FullRank c=9437225 targets=95249 rows=774 row_digest=cc11164088ed4c55 logs_pinned=242 draws=3 k'=5260250 dGAE=5 predicted=5 ok
+E0b c2 StrideRenew FullRank c=13902852 targets=95249 rows=774 row_digest=cc11164088ed4c55 logs_pinned=242 draws=3 k'=3646788 dGAE=-4 predicted=-4 ok
+E0b c2 WalkPrimeFast TargetPinned c=11450909 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=7010851 dGAE=34 predicted=34 ok
+E0b c2 WalkPrimeFast TargetPinned c=6784058 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=6673775 dGAE=30 predicted=30 ok
+E0b c2 WalkPrimeFast TargetPinned c=9437225 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=5260250 dGAE=-9 predicted=-9 ok
+E0b c2 WalkPrimeFast TargetPinned c=13902852 targets=12350 rows=102 row_digest=1560b66bb2465b6b logs_pinned=1 draws=22 k'=3646788 dGAE=6 predicted=6 ok
+E0b c2 WalkPrimeFast FullRank c=11450909 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=7010851 dGAE=47 predicted=47 ok
+E0b c2 WalkPrimeFast FullRank c=6784058 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=6673775 dGAE=32 predicted=32 ok
+E0b c2 WalkPrimeFast FullRank c=9437225 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=5260250 dGAE=2 predicted=2 ok
+E0b c2 WalkPrimeFast FullRank c=13902852 targets=79891 rows=662 row_digest=fd54f4ca703656b6 logs_pinned=242 draws=33 k'=3646788 dGAE=-2 predicted=-2 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=11450909 targets=13960 rows=115 row_digest=e6875fd28219f7a0 logs_pinned=1 draws=34 k'=7010851 dGAE=44 predicted=44 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=6784058 targets=13960 rows=115 row_digest=e6875fd28219f7a0 logs_pinned=1 draws=34 k'=6673775 dGAE=34 predicted=34 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=9437225 targets=13960 rows=115 row_digest=e6875fd28219f7a0 logs_pinned=1 draws=34 k'=5260250 dGAE=-5 predicted=-5 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=13902852 targets=13960 rows=115 row_digest=e6875fd28219f7a0 logs_pinned=1 draws=34 k'=3646788 dGAE=-4 predicted=-4 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=11450909 targets=90553 rows=748 row_digest=7f13dba95eb47863 logs_pinned=242 draws=36 k'=7010851 dGAE=41 predicted=41 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=6784058 targets=90553 rows=748 row_digest=7f13dba95eb47863 logs_pinned=242 draws=36 k'=6673775 dGAE=28 predicted=28 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=9437225 targets=90553 rows=748 row_digest=7f13dba95eb47863 logs_pinned=242 draws=36 k'=5260250 dGAE=-8 predicted=-8 ok
+E0b c2 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=13902852 targets=90553 rows=748 row_digest=7f13dba95eb47863 logs_pinned=242 draws=36 k'=3646788 dGAE=-8 predicted=-8 ok
+E0b c3 Random TargetPinned c=13188356 targets=19093 rows=153 row_digest=fb012163cd9c4f98 logs_pinned=81 draws=19106 k'=10331043 dGAE=59 predicted=59 ok
+E0b c3 Random TargetPinned c=5614982 targets=19093 rows=153 row_digest=fb012163cd9c4f98 logs_pinned=81 draws=19106 k'=14098470 dGAE=-832 predicted=-832 ok
+E0b c3 Random TargetPinned c=7163992 targets=19093 rows=153 row_digest=fb012163cd9c4f98 logs_pinned=81 draws=19106 k'=12004765 dGAE=-277 predicted=-277 ok
+E0b c3 Random TargetPinned c=16344178 targets=19093 rows=153 row_digest=fb012163cd9c4f98 logs_pinned=81 draws=19106 k'=16137022 dGAE=308 predicted=308 ok
+E0b c3 Random FullRank c=13188356 targets=131639 rows=1030 row_digest=f043dec7a9d2475f logs_pinned=255 draws=132179 k'=10331043 dGAE=1251 predicted=1251 ok
+E0b c3 Random FullRank c=5614982 targets=131639 rows=1030 row_digest=f043dec7a9d2475f logs_pinned=255 draws=132179 k'=14098470 dGAE=1356 predicted=1356 ok
+E0b c3 Random FullRank c=7163992 targets=131639 rows=1030 row_digest=f043dec7a9d2475f logs_pinned=255 draws=132179 k'=12004765 dGAE=-312 predicted=-312 ok
+E0b c3 Random FullRank c=16344178 targets=131639 rows=1030 row_digest=f043dec7a9d2475f logs_pinned=255 draws=132179 k'=16137022 dGAE=2140 predicted=2140 ok
+E0b c3 Walk TargetPinned c=13188356 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=10331043 dGAE=-13 predicted=-13 ok
+E0b c3 Walk TargetPinned c=5614982 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=14098470 dGAE=-3 predicted=-3 ok
+E0b c3 Walk TargetPinned c=7163992 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=12004765 dGAE=-12 predicted=-12 ok
+E0b c3 Walk TargetPinned c=16344178 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=16137022 dGAE=15 predicted=15 ok
+E0b c3 Walk FullRank c=13188356 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=10331043 dGAE=-9 predicted=-9 ok
+E0b c3 Walk FullRank c=5614982 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=14098470 dGAE=1 predicted=1 ok
+E0b c3 Walk FullRank c=7163992 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=12004765 dGAE=-22 predicted=-22 ok
+E0b c3 Walk FullRank c=16344178 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=16137022 dGAE=-2 predicted=-2 ok
+E0b c3 Stride TargetPinned c=13188356 targets=68768 rows=533 row_digest=60b83ca4273fb97c logs_pinned=207 draws=2 k'=10331043 dGAE=4 predicted=4 ok
+E0b c3 Stride TargetPinned c=5614982 targets=68768 rows=533 row_digest=60b83ca4273fb97c logs_pinned=207 draws=2 k'=14098470 dGAE=8 predicted=8 ok
+E0b c3 Stride TargetPinned c=7163992 targets=68768 rows=533 row_digest=60b83ca4273fb97c logs_pinned=207 draws=2 k'=12004765 dGAE=8 predicted=8 ok
+E0b c3 Stride TargetPinned c=16344178 targets=68768 rows=533 row_digest=60b83ca4273fb97c logs_pinned=207 draws=2 k'=16137022 dGAE=6 predicted=6 ok
+E0b c3 Stride FullRank c=13188356 targets=110342 rows=863 row_digest=8dfca0796638f127 logs_pinned=255 draws=2 k'=10331043 dGAE=4 predicted=4 ok
+E0b c3 Stride FullRank c=5614982 targets=110342 rows=863 row_digest=8dfca0796638f127 logs_pinned=255 draws=2 k'=14098470 dGAE=8 predicted=8 ok
+E0b c3 Stride FullRank c=7163992 targets=110342 rows=863 row_digest=8dfca0796638f127 logs_pinned=255 draws=2 k'=12004765 dGAE=8 predicted=8 ok
+E0b c3 Stride FullRank c=16344178 targets=110342 rows=863 row_digest=8dfca0796638f127 logs_pinned=255 draws=2 k'=16137022 dGAE=6 predicted=6 ok
+E0b c3 StrideRenew TargetPinned c=13188356 targets=19133 rows=161 row_digest=3791dc1d11fbe2aa logs_pinned=79 draws=3 k'=10331043 dGAE=4 predicted=4 ok
+E0b c3 StrideRenew TargetPinned c=5614982 targets=19133 rows=161 row_digest=3791dc1d11fbe2aa logs_pinned=79 draws=3 k'=14098470 dGAE=5 predicted=5 ok
+E0b c3 StrideRenew TargetPinned c=7163992 targets=19133 rows=161 row_digest=3791dc1d11fbe2aa logs_pinned=79 draws=3 k'=12004765 dGAE=5 predicted=5 ok
+E0b c3 StrideRenew TargetPinned c=16344178 targets=19133 rows=161 row_digest=3791dc1d11fbe2aa logs_pinned=79 draws=3 k'=16137022 dGAE=-2 predicted=-2 ok
+E0b c3 StrideRenew FullRank c=13188356 targets=83461 rows=637 row_digest=f60da12f140e7d64 logs_pinned=255 draws=3 k'=10331043 dGAE=4 predicted=4 ok
+E0b c3 StrideRenew FullRank c=5614982 targets=83461 rows=637 row_digest=f60da12f140e7d64 logs_pinned=255 draws=3 k'=14098470 dGAE=5 predicted=5 ok
+E0b c3 StrideRenew FullRank c=7163992 targets=83461 rows=637 row_digest=f60da12f140e7d64 logs_pinned=255 draws=3 k'=12004765 dGAE=5 predicted=5 ok
+E0b c3 StrideRenew FullRank c=16344178 targets=83461 rows=637 row_digest=f60da12f140e7d64 logs_pinned=255 draws=3 k'=16137022 dGAE=-2 predicted=-2 ok
+E0b c3 WalkPrimeFast TargetPinned c=13188356 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=10331043 dGAE=-13 predicted=-13 ok
+E0b c3 WalkPrimeFast TargetPinned c=5614982 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=14098470 dGAE=-3 predicted=-3 ok
+E0b c3 WalkPrimeFast TargetPinned c=7163992 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=12004765 dGAE=-12 predicted=-12 ok
+E0b c3 WalkPrimeFast TargetPinned c=16344178 targets=18431 rows=177 row_digest=ce1b61acfdee0f4c logs_pinned=131 draws=29 k'=16137022 dGAE=15 predicted=15 ok
+E0b c3 WalkPrimeFast FullRank c=13188356 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=10331043 dGAE=-9 predicted=-9 ok
+E0b c3 WalkPrimeFast FullRank c=5614982 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=14098470 dGAE=1 predicted=1 ok
+E0b c3 WalkPrimeFast FullRank c=7163992 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=12004765 dGAE=-22 predicted=-22 ok
+E0b c3 WalkPrimeFast FullRank c=16344178 targets=98868 rows=778 row_digest=ddc556a06f6989e7 logs_pinned=255 draws=33 k'=16137022 dGAE=-2 predicted=-2 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=13188356 targets=16892 rows=149 row_digest=3c8f1efc542990a1 logs_pinned=55 draws=31 k'=10331043 dGAE=-16 predicted=-16 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=5614982 targets=16892 rows=149 row_digest=3c8f1efc542990a1 logs_pinned=55 draws=31 k'=14098470 dGAE=-10 predicted=-10 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=7163992 targets=16892 rows=149 row_digest=3c8f1efc542990a1 logs_pinned=55 draws=31 k'=12004765 dGAE=-13 predicted=-13 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=16344178 targets=16892 rows=149 row_digest=3c8f1efc542990a1 logs_pinned=55 draws=31 k'=16137022 dGAE=18 predicted=18 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=13188356 targets=73678 rows=595 row_digest=70c5acdbf0363c84 logs_pinned=255 draws=36 k'=10331043 dGAE=-13 predicted=-13 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=5614982 targets=73678 rows=595 row_digest=70c5acdbf0363c84 logs_pinned=255 draws=36 k'=14098470 dGAE=-6 predicted=-6 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=7163992 targets=73678 rows=595 row_digest=70c5acdbf0363c84 logs_pinned=255 draws=36 k'=12004765 dGAE=-22 predicted=-22 ok
+E0b c3 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=16344178 targets=73678 rows=595 row_digest=70c5acdbf0363c84 logs_pinned=255 draws=36 k'=16137022 dGAE=0 predicted=0 ok
+E0b c4 Random TargetPinned c=1343611 targets=14486 rows=145 row_digest=b347afeb3727a385 logs_pinned=107 draws=14495 k'=10638548 dGAE=351 predicted=351 ok
+E0b c4 Random TargetPinned c=3322496 targets=14486 rows=145 row_digest=b347afeb3727a385 logs_pinned=107 draws=14495 k'=3371302 dGAE=739 predicted=739 ok
+E0b c4 Random TargetPinned c=2130670 targets=14486 rows=145 row_digest=b347afeb3727a385 logs_pinned=107 draws=14495 k'=7056404 dGAE=768 predicted=768 ok
+E0b c4 Random TargetPinned c=10779322 targets=14486 rows=145 row_digest=b347afeb3727a385 logs_pinned=107 draws=14495 k'=2057844 dGAE=814 predicted=814 ok
+E0b c4 Random FullRank c=1343611 targets=79699 rows=725 row_digest=0607358a6caa23d7 logs_pinned=222 draws=80016 k'=10638548 dGAE=108 predicted=108 ok
+E0b c4 Random FullRank c=3322496 targets=79699 rows=725 row_digest=0607358a6caa23d7 logs_pinned=222 draws=80016 k'=3371302 dGAE=488 predicted=488 ok
+E0b c4 Random FullRank c=2130670 targets=79699 rows=725 row_digest=0607358a6caa23d7 logs_pinned=222 draws=80016 k'=7056404 dGAE=901 predicted=901 ok
+E0b c4 Random FullRank c=10779322 targets=79699 rows=725 row_digest=0607358a6caa23d7 logs_pinned=222 draws=80016 k'=2057844 dGAE=1034 predicted=1034 ok
+E0b c4 Walk TargetPinned c=1343611 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=10638548 dGAE=0 predicted=0 ok
+E0b c4 Walk TargetPinned c=3322496 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=3371302 dGAE=-14 predicted=-14 ok
+E0b c4 Walk TargetPinned c=2130670 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=7056404 dGAE=8 predicted=8 ok
+E0b c4 Walk TargetPinned c=10779322 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=2057844 dGAE=12 predicted=12 ok
+E0b c4 Walk FullRank c=1343611 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=10638548 dGAE=-4 predicted=-4 ok
+E0b c4 Walk FullRank c=3322496 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=3371302 dGAE=-11 predicted=-11 ok
+E0b c4 Walk FullRank c=2130670 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=7056404 dGAE=30 predicted=30 ok
+E0b c4 Walk FullRank c=10779322 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=2057844 dGAE=2 predicted=2 ok
+E0b c4 Stride TargetPinned c=1343611 targets=45413 rows=416 row_digest=562c265a6bae864b logs_pinned=216 draws=2 k'=10638548 dGAE=10 predicted=10 ok
+E0b c4 Stride TargetPinned c=3322496 targets=45413 rows=416 row_digest=562c265a6bae864b logs_pinned=216 draws=2 k'=3371302 dGAE=-10 predicted=-10 ok
+E0b c4 Stride TargetPinned c=2130670 targets=45413 rows=416 row_digest=562c265a6bae864b logs_pinned=216 draws=2 k'=7056404 dGAE=7 predicted=7 ok
+E0b c4 Stride TargetPinned c=10779322 targets=45413 rows=416 row_digest=562c265a6bae864b logs_pinned=216 draws=2 k'=2057844 dGAE=0 predicted=0 ok
+E0b c4 Stride FullRank c=1343611 targets=60162 rows=539 row_digest=8415328a54c83553 logs_pinned=222 draws=2 k'=10638548 dGAE=10 predicted=10 ok
+E0b c4 Stride FullRank c=3322496 targets=60162 rows=539 row_digest=8415328a54c83553 logs_pinned=222 draws=2 k'=3371302 dGAE=-10 predicted=-10 ok
+E0b c4 Stride FullRank c=2130670 targets=60162 rows=539 row_digest=8415328a54c83553 logs_pinned=222 draws=2 k'=7056404 dGAE=7 predicted=7 ok
+E0b c4 Stride FullRank c=10779322 targets=60162 rows=539 row_digest=8415328a54c83553 logs_pinned=222 draws=2 k'=2057844 dGAE=0 predicted=0 ok
+E0b c4 StrideRenew TargetPinned c=1343611 targets=16179 rows=141 row_digest=e80c6d853ea364ad logs_pinned=92 draws=3 k'=10638548 dGAE=11 predicted=11 ok
+E0b c4 StrideRenew TargetPinned c=3322496 targets=16179 rows=141 row_digest=e80c6d853ea364ad logs_pinned=92 draws=3 k'=3371302 dGAE=-16 predicted=-16 ok
+E0b c4 StrideRenew TargetPinned c=2130670 targets=16179 rows=141 row_digest=e80c6d853ea364ad logs_pinned=92 draws=3 k'=7056404 dGAE=3 predicted=3 ok
+E0b c4 StrideRenew TargetPinned c=10779322 targets=16179 rows=141 row_digest=e80c6d853ea364ad logs_pinned=92 draws=3 k'=2057844 dGAE=1 predicted=1 ok
+E0b c4 StrideRenew FullRank c=1343611 targets=74044 rows=635 row_digest=ae1cb8f9ee34be16 logs_pinned=222 draws=3 k'=10638548 dGAE=11 predicted=11 ok
+E0b c4 StrideRenew FullRank c=3322496 targets=74044 rows=635 row_digest=ae1cb8f9ee34be16 logs_pinned=222 draws=3 k'=3371302 dGAE=-16 predicted=-16 ok
+E0b c4 StrideRenew FullRank c=2130670 targets=74044 rows=635 row_digest=ae1cb8f9ee34be16 logs_pinned=222 draws=3 k'=7056404 dGAE=3 predicted=3 ok
+E0b c4 StrideRenew FullRank c=10779322 targets=74044 rows=635 row_digest=ae1cb8f9ee34be16 logs_pinned=222 draws=3 k'=2057844 dGAE=1 predicted=1 ok
+E0b c4 WalkPrimeFast TargetPinned c=1343611 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=10638548 dGAE=0 predicted=0 ok
+E0b c4 WalkPrimeFast TargetPinned c=3322496 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=3371302 dGAE=-14 predicted=-14 ok
+E0b c4 WalkPrimeFast TargetPinned c=2130670 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=7056404 dGAE=8 predicted=8 ok
+E0b c4 WalkPrimeFast TargetPinned c=10779322 targets=8954 rows=89 row_digest=54401f7934f42b3a logs_pinned=1 draws=22 k'=2057844 dGAE=12 predicted=12 ok
+E0b c4 WalkPrimeFast FullRank c=1343611 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=10638548 dGAE=-4 predicted=-4 ok
+E0b c4 WalkPrimeFast FullRank c=3322496 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=3371302 dGAE=-11 predicted=-11 ok
+E0b c4 WalkPrimeFast FullRank c=2130670 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=7056404 dGAE=30 predicted=30 ok
+E0b c4 WalkPrimeFast FullRank c=10779322 targets=48416 rows=430 row_digest=1332129402580cb3 logs_pinned=222 draws=33 k'=2057844 dGAE=2 predicted=2 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=1343611 targets=12048 rows=110 row_digest=976d68f182420c30 logs_pinned=1 draws=27 k'=10638548 dGAE=-3 predicted=-3 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=3322496 targets=12048 rows=110 row_digest=976d68f182420c30 logs_pinned=1 draws=27 k'=3371302 dGAE=-6 predicted=-6 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=2130670 targets=12048 rows=110 row_digest=976d68f182420c30 logs_pinned=1 draws=27 k'=7056404 dGAE=3 predicted=3 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=10779322 targets=12048 rows=110 row_digest=976d68f182420c30 logs_pinned=1 draws=27 k'=2057844 dGAE=9 predicted=9 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=1343611 targets=66215 rows=626 row_digest=91e7cfab6c3d9e89 logs_pinned=222 draws=36 k'=10638548 dGAE=-1 predicted=-1 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=3322496 targets=66215 rows=626 row_digest=91e7cfab6c3d9e89 logs_pinned=222 draws=36 k'=3371302 dGAE=-3 predicted=-3 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=2130670 targets=66215 rows=626 row_digest=91e7cfab6c3d9e89 logs_pinned=222 draws=36 k'=7056404 dGAE=29 predicted=29 ok
+E0b c4 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=10779322 targets=66215 rows=626 row_digest=91e7cfab6c3d9e89 logs_pinned=222 draws=36 k'=2057844 dGAE=3 predicted=3 ok
+E0b c5 Random TargetPinned c=13172065 targets=15345 rows=122 row_digest=b859a3cf6cdc01f4 logs_pinned=35 draws=15352 k'=15595138 dGAE=48 predicted=48 ok
+E0b c5 Random TargetPinned c=3248322 targets=15345 rows=122 row_digest=b859a3cf6cdc01f4 logs_pinned=35 draws=15352 k'=9842104 dGAE=198 predicted=198 ok
+E0b c5 Random TargetPinned c=14950384 targets=15345 rows=122 row_digest=b859a3cf6cdc01f4 logs_pinned=35 draws=15352 k'=12233023 dGAE=-29 predicted=-29 ok
+E0b c5 Random TargetPinned c=15908296 targets=15345 rows=122 row_digest=b859a3cf6cdc01f4 logs_pinned=35 draws=15352 k'=8832720 dGAE=-63 predicted=-63 ok
+E0b c5 Random FullRank c=13172065 targets=83342 rows=691 row_digest=25b8adff463a6152 logs_pinned=253 draws=83587 k'=15595138 dGAE=-518 predicted=-518 ok
+E0b c5 Random FullRank c=3248322 targets=83342 rows=691 row_digest=25b8adff463a6152 logs_pinned=253 draws=83587 k'=9842104 dGAE=458 predicted=458 ok
+E0b c5 Random FullRank c=14950384 targets=83342 rows=691 row_digest=25b8adff463a6152 logs_pinned=253 draws=83587 k'=12233023 dGAE=148 predicted=148 ok
+E0b c5 Random FullRank c=15908296 targets=83342 rows=691 row_digest=25b8adff463a6152 logs_pinned=253 draws=83587 k'=8832720 dGAE=1334 predicted=1334 ok
+E0b c5 Walk TargetPinned c=13172065 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=15595138 dGAE=21 predicted=21 ok
+E0b c5 Walk TargetPinned c=3248322 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=9842104 dGAE=7 predicted=7 ok
+E0b c5 Walk TargetPinned c=14950384 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=12233023 dGAE=15 predicted=15 ok
+E0b c5 Walk TargetPinned c=15908296 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=8832720 dGAE=17 predicted=17 ok
+E0b c5 Walk FullRank c=13172065 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=15595138 dGAE=14 predicted=14 ok
+E0b c5 Walk FullRank c=3248322 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=9842104 dGAE=-5 predicted=-5 ok
+E0b c5 Walk FullRank c=14950384 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=12233023 dGAE=-2 predicted=-2 ok
+E0b c5 Walk FullRank c=15908296 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=8832720 dGAE=-3 predicted=-3 ok
+E0b c5 Stride TargetPinned c=13172065 targets=59339 rows=469 row_digest=506893ee0ee32366 logs_pinned=233 draws=2 k'=15595138 dGAE=1 predicted=1 ok
+E0b c5 Stride TargetPinned c=3248322 targets=59339 rows=469 row_digest=506893ee0ee32366 logs_pinned=233 draws=2 k'=9842104 dGAE=3 predicted=3 ok
+E0b c5 Stride TargetPinned c=14950384 targets=59339 rows=469 row_digest=506893ee0ee32366 logs_pinned=233 draws=2 k'=12233023 dGAE=1 predicted=1 ok
+E0b c5 Stride TargetPinned c=15908296 targets=59339 rows=469 row_digest=506893ee0ee32366 logs_pinned=233 draws=2 k'=8832720 dGAE=1 predicted=1 ok
+E0b c5 Stride FullRank c=13172065 targets=83563 rows=656 row_digest=b5c9ecd2c1fb1f57 logs_pinned=253 draws=2 k'=15595138 dGAE=1 predicted=1 ok
+E0b c5 Stride FullRank c=3248322 targets=83563 rows=656 row_digest=b5c9ecd2c1fb1f57 logs_pinned=253 draws=2 k'=9842104 dGAE=3 predicted=3 ok
+E0b c5 Stride FullRank c=14950384 targets=83563 rows=656 row_digest=b5c9ecd2c1fb1f57 logs_pinned=253 draws=2 k'=12233023 dGAE=1 predicted=1 ok
+E0b c5 Stride FullRank c=15908296 targets=83563 rows=656 row_digest=b5c9ecd2c1fb1f57 logs_pinned=253 draws=2 k'=8832720 dGAE=1 predicted=1 ok
+E0b c5 StrideRenew TargetPinned c=13172065 targets=14040 rows=108 row_digest=d93ff296e5367761 logs_pinned=1 draws=3 k'=15595138 dGAE=7 predicted=7 ok
+E0b c5 StrideRenew TargetPinned c=3248322 targets=14040 rows=108 row_digest=d93ff296e5367761 logs_pinned=1 draws=3 k'=9842104 dGAE=-4 predicted=-4 ok
+E0b c5 StrideRenew TargetPinned c=14950384 targets=14040 rows=108 row_digest=d93ff296e5367761 logs_pinned=1 draws=3 k'=12233023 dGAE=1 predicted=1 ok
+E0b c5 StrideRenew TargetPinned c=15908296 targets=14040 rows=108 row_digest=d93ff296e5367761 logs_pinned=1 draws=3 k'=8832720 dGAE=5 predicted=5 ok
+E0b c5 StrideRenew FullRank c=13172065 targets=77922 rows=595 row_digest=25525a0f72e1cdd8 logs_pinned=253 draws=3 k'=15595138 dGAE=7 predicted=7 ok
+E0b c5 StrideRenew FullRank c=3248322 targets=77922 rows=595 row_digest=25525a0f72e1cdd8 logs_pinned=253 draws=3 k'=9842104 dGAE=-4 predicted=-4 ok
+E0b c5 StrideRenew FullRank c=14950384 targets=77922 rows=595 row_digest=25525a0f72e1cdd8 logs_pinned=253 draws=3 k'=12233023 dGAE=1 predicted=1 ok
+E0b c5 StrideRenew FullRank c=15908296 targets=77922 rows=595 row_digest=25525a0f72e1cdd8 logs_pinned=253 draws=3 k'=8832720 dGAE=5 predicted=5 ok
+E0b c5 WalkPrimeFast TargetPinned c=13172065 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=15595138 dGAE=21 predicted=21 ok
+E0b c5 WalkPrimeFast TargetPinned c=3248322 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=9842104 dGAE=7 predicted=7 ok
+E0b c5 WalkPrimeFast TargetPinned c=14950384 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=12233023 dGAE=15 predicted=15 ok
+E0b c5 WalkPrimeFast TargetPinned c=15908296 targets=11469 rows=105 row_digest=6f8a8790d8f95e7e logs_pinned=1 draws=21 k'=8832720 dGAE=17 predicted=17 ok
+E0b c5 WalkPrimeFast FullRank c=13172065 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=15595138 dGAE=14 predicted=14 ok
+E0b c5 WalkPrimeFast FullRank c=3248322 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=9842104 dGAE=-5 predicted=-5 ok
+E0b c5 WalkPrimeFast FullRank c=14950384 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=12233023 dGAE=-2 predicted=-2 ok
+E0b c5 WalkPrimeFast FullRank c=15908296 targets=100824 rows=805 row_digest=d9d963f3d2e62369 logs_pinned=253 draws=33 k'=8832720 dGAE=-3 predicted=-3 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=13172065 targets=18779 rows=148 row_digest=ca27dc066a3bac72 logs_pinned=1 draws=27 k'=15595138 dGAE=14 predicted=14 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=3248322 targets=18779 rows=148 row_digest=ca27dc066a3bac72 logs_pinned=1 draws=27 k'=9842104 dGAE=4 predicted=4 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=14950384 targets=18779 rows=148 row_digest=ca27dc066a3bac72 logs_pinned=1 draws=27 k'=12233023 dGAE=9 predicted=9 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=15908296 targets=18779 rows=148 row_digest=ca27dc066a3bac72 logs_pinned=1 draws=27 k'=8832720 dGAE=17 predicted=17 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=13172065 targets=110600 rows=842 row_digest=cc4dcf421c585193 logs_pinned=253 draws=36 k'=15595138 dGAE=12 predicted=12 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=3248322 targets=110600 rows=842 row_digest=cc4dcf421c585193 logs_pinned=253 draws=36 k'=9842104 dGAE=-14 predicted=-14 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=14950384 targets=110600 rows=842 row_digest=cc4dcf421c585193 logs_pinned=253 draws=36 k'=12233023 dGAE=-9 predicted=-9 ok
+E0b c5 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=15908296 targets=110600 rows=842 row_digest=cc4dcf421c585193 logs_pinned=253 draws=36 k'=8832720 dGAE=-6 predicted=-6 ok
+E0b c6 Random TargetPinned c=2016275 targets=14898 rows=140 row_digest=225e2939dd1e3b1b logs_pinned=87 draws=14916 k'=2335722 dGAE=-17 predicted=-17 ok
+E0b c6 Random TargetPinned c=5977473 targets=14898 rows=140 row_digest=225e2939dd1e3b1b logs_pinned=87 draws=14916 k'=7637362 dGAE=-88 predicted=-88 ok
+E0b c6 Random TargetPinned c=1225049 targets=14898 rows=140 row_digest=225e2939dd1e3b1b logs_pinned=87 draws=14916 k'=2876834 dGAE=-830 predicted=-830 ok
+E0b c6 Random TargetPinned c=9565122 targets=14898 rows=140 row_digest=225e2939dd1e3b1b logs_pinned=87 draws=14916 k'=6954484 dGAE=-527 predicted=-527 ok
+E0b c6 Random FullRank c=2016275 targets=63635 rows=643 row_digest=8732b4a25488a7a1 logs_pinned=214 draws=63864 k'=2335722 dGAE=-385 predicted=-385 ok
+E0b c6 Random FullRank c=5977473 targets=63635 rows=643 row_digest=8732b4a25488a7a1 logs_pinned=214 draws=63864 k'=7637362 dGAE=-1049 predicted=-1049 ok
+E0b c6 Random FullRank c=1225049 targets=63635 rows=643 row_digest=8732b4a25488a7a1 logs_pinned=214 draws=63864 k'=2876834 dGAE=-1328 predicted=-1328 ok
+E0b c6 Random FullRank c=9565122 targets=63635 rows=643 row_digest=8732b4a25488a7a1 logs_pinned=214 draws=63864 k'=6954484 dGAE=-1884 predicted=-1884 ok
+E0b c6 Walk TargetPinned c=2016275 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=2335722 dGAE=-26 predicted=-26 ok
+E0b c6 Walk TargetPinned c=5977473 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=7637362 dGAE=-23 predicted=-23 ok
+E0b c6 Walk TargetPinned c=1225049 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=2876834 dGAE=-29 predicted=-29 ok
+E0b c6 Walk TargetPinned c=9565122 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=6954484 dGAE=-26 predicted=-26 ok
+E0b c6 Walk FullRank c=2016275 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=2335722 dGAE=-36 predicted=-36 ok
+E0b c6 Walk FullRank c=5977473 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=7637362 dGAE=-26 predicted=-26 ok
+E0b c6 Walk FullRank c=1225049 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=2876834 dGAE=-32 predicted=-32 ok
+E0b c6 Walk FullRank c=9565122 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=6954484 dGAE=-20 predicted=-20 ok
+E0b c6 Stride TargetPinned c=2016275 targets=34915 rows=360 row_digest=972be7bd549b7f51 logs_pinned=173 draws=2 k'=2335722 dGAE=-7 predicted=-7 ok
+E0b c6 Stride TargetPinned c=5977473 targets=34915 rows=360 row_digest=972be7bd549b7f51 logs_pinned=173 draws=2 k'=7637362 dGAE=-6 predicted=-6 ok
+E0b c6 Stride TargetPinned c=1225049 targets=34915 rows=360 row_digest=972be7bd549b7f51 logs_pinned=173 draws=2 k'=2876834 dGAE=-13 predicted=-13 ok
+E0b c6 Stride TargetPinned c=9565122 targets=34915 rows=360 row_digest=972be7bd549b7f51 logs_pinned=173 draws=2 k'=6954484 dGAE=-1 predicted=-1 ok
+E0b c6 Stride FullRank c=2016275 targets=62530 rows=617 row_digest=e393066c7bf12683 logs_pinned=214 draws=2 k'=2335722 dGAE=-7 predicted=-7 ok
+E0b c6 Stride FullRank c=5977473 targets=62530 rows=617 row_digest=e393066c7bf12683 logs_pinned=214 draws=2 k'=7637362 dGAE=-6 predicted=-6 ok
+E0b c6 Stride FullRank c=1225049 targets=62530 rows=617 row_digest=e393066c7bf12683 logs_pinned=214 draws=2 k'=2876834 dGAE=-13 predicted=-13 ok
+E0b c6 Stride FullRank c=9565122 targets=62530 rows=617 row_digest=e393066c7bf12683 logs_pinned=214 draws=2 k'=6954484 dGAE=-1 predicted=-1 ok
+E0b c6 StrideRenew TargetPinned c=2016275 targets=13437 rows=130 row_digest=16778c15c9ed5274 logs_pinned=84 draws=3 k'=2335722 dGAE=-3 predicted=-3 ok
+E0b c6 StrideRenew TargetPinned c=5977473 targets=13437 rows=130 row_digest=16778c15c9ed5274 logs_pinned=84 draws=3 k'=7637362 dGAE=-2 predicted=-2 ok
+E0b c6 StrideRenew TargetPinned c=1225049 targets=13437 rows=130 row_digest=16778c15c9ed5274 logs_pinned=84 draws=3 k'=2876834 dGAE=-14 predicted=-14 ok
+E0b c6 StrideRenew TargetPinned c=9565122 targets=13437 rows=130 row_digest=16778c15c9ed5274 logs_pinned=84 draws=3 k'=6954484 dGAE=2 predicted=2 ok
+E0b c6 StrideRenew FullRank c=2016275 targets=73531 rows=732 row_digest=9cb0e733938f1a28 logs_pinned=214 draws=3 k'=2335722 dGAE=-3 predicted=-3 ok
+E0b c6 StrideRenew FullRank c=5977473 targets=73531 rows=732 row_digest=9cb0e733938f1a28 logs_pinned=214 draws=3 k'=7637362 dGAE=-2 predicted=-2 ok
+E0b c6 StrideRenew FullRank c=1225049 targets=73531 rows=732 row_digest=9cb0e733938f1a28 logs_pinned=214 draws=3 k'=2876834 dGAE=-14 predicted=-14 ok
+E0b c6 StrideRenew FullRank c=9565122 targets=73531 rows=732 row_digest=9cb0e733938f1a28 logs_pinned=214 draws=3 k'=6954484 dGAE=2 predicted=2 ok
+E0b c6 WalkPrimeFast TargetPinned c=2016275 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=2335722 dGAE=-26 predicted=-26 ok
+E0b c6 WalkPrimeFast TargetPinned c=5977473 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=7637362 dGAE=-23 predicted=-23 ok
+E0b c6 WalkPrimeFast TargetPinned c=1225049 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=2876834 dGAE=-29 predicted=-29 ok
+E0b c6 WalkPrimeFast TargetPinned c=9565122 targets=12223 rows=120 row_digest=18038e67a92150da logs_pinned=67 draws=28 k'=6954484 dGAE=-26 predicted=-26 ok
+E0b c6 WalkPrimeFast FullRank c=2016275 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=2335722 dGAE=-36 predicted=-36 ok
+E0b c6 WalkPrimeFast FullRank c=5977473 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=7637362 dGAE=-26 predicted=-26 ok
+E0b c6 WalkPrimeFast FullRank c=1225049 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=2876834 dGAE=-32 predicted=-32 ok
+E0b c6 WalkPrimeFast FullRank c=9565122 targets=81372 rows=758 row_digest=830df6d284c48e05 logs_pinned=214 draws=33 k'=6954484 dGAE=-20 predicted=-20 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=2016275 targets=10125 rows=95 row_digest=caf12d6252888eb0 logs_pinned=42 draws=24 k'=2335722 dGAE=-10 predicted=-10 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=5977473 targets=10125 rows=95 row_digest=caf12d6252888eb0 logs_pinned=42 draws=24 k'=7637362 dGAE=2 predicted=2 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=1225049 targets=10125 rows=95 row_digest=caf12d6252888eb0 logs_pinned=42 draws=24 k'=2876834 dGAE=-7 predicted=-7 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } TargetPinned c=9565122 targets=10125 rows=95 row_digest=caf12d6252888eb0 logs_pinned=42 draws=24 k'=6954484 dGAE=3 predicted=3 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=2016275 targets=48085 rows=455 row_digest=29e70d018e62ff7c logs_pinned=214 draws=36 k'=2335722 dGAE=-43 predicted=-43 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=5977473 targets=48085 rows=455 row_digest=29e70d018e62ff7c logs_pinned=214 draws=36 k'=7637362 dGAE=-28 predicted=-28 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=1225049 targets=48085 rows=455 row_digest=29e70d018e62ff7c logs_pinned=214 draws=36 k'=2876834 dGAE=-28 predicted=-28 ok
+E0b c6 WalkPrimeLanes { lanes: 4, batched: true } FullRank c=9565122 targets=48085 rows=455 row_digest=29e70d018e62ff7c logs_pinned=214 draws=36 k'=6954484 dGAE=-18 predicted=-18 ok
+test cryptanalysis::ic_boundary::generator_coupling_tests::e0bc_full_sweep_six_curves ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 4521 filtered out; finished in 39.59s
+
+cargo test --release --lib generator_coupling -- --include-ignored --nocaptur  32.76s user 0.61s system 83% cpu 40.101 total

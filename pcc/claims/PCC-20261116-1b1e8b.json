@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T15:17:28Z",
+ "id": "PCC-20261116-1b1e8b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "575b3cf41082596ebf8757a4974d1a27bdcd0301",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "397ed1a28b97228807cf4d513654e40bc9eca538b37ab996c694cf5b76379e3d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+   "theorem": "CubicBasisInjectivity22303.fixed_expression_without_injectivity"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact generic CommRing characteristic223 coefficient transport/separation and cubic basis injectivity under z^3=3, fixed-expression equivalence without assumed injectivity. Six typed corollaries fully bind old embedding statements with unchanged original extractor; original limited records preserved. Zero-generator counterexample documents cubic-relation dependency. Both original gates37 audited0 trusted, standard foundations only, no field construction/native refinement/Jacobian/cost or signed standing.",
+ "statement": "theorem fixed_expression_without_injectivity {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (a b c : Fin 223) : (encode z (a,b,c))^223=encode z (a,b,c) \u2194 b=0 \u2227 c=0"
+}

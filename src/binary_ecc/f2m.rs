@@ -8,9 +8,10 @@
 //!
 //! - **Addition** = XOR (since `1 + 1 = 0` in `F_2`).
 //! - **Multiplication** = polynomial multiplication then reduction
-//!   mod `m(z)`.  We use the **improved Karatsuba** scheme from
-//!   Putranto et al. §3.1: divide-and-conquer with three half-size
-//!   multiplications, then combine via two MODSHIFT operations.
+//!   mod `m(z)`. Hardware carryless multiplication uses three products
+//!   for two-word operands and six for three-word operands; the general
+//!   path uses word-level schoolbook. An independent improved-Karatsuba
+//!   reference is retained for cross-checking.
 //! - **Squaring** = bit-spread (each bit `b_i` of input goes to
 //!   bit `2i` of output, others = 0) followed by reduction.  Much
 //!   cheaper than general multiplication for binary fields.
@@ -343,6 +344,7 @@ impl F2mElement {
 
     /// `self + other` = bitwise XOR.
     pub fn add(&self, other: &Self) -> Self {
+        super::operation_tally::tick(self.m, "add");
         debug_assert_eq!(self.m, other.m);
         let mut out = self.clone();
         for (a, b) in out.bits.iter_mut().zip(other.bits.iter()) {
@@ -353,6 +355,7 @@ impl F2mElement {
 
     /// `self += other` in place (XOR), without allocating.
     pub fn add_assign(&mut self, other: &Self) {
+        super::operation_tally::tick(self.m, "add");
         debug_assert_eq!(self.m, other.m);
         for (a, b) in self.bits.iter_mut().zip(other.bits.iter()) {
             *a ^= *b;
@@ -457,6 +460,7 @@ impl F2mElement {
     /// Bit-for-bit equal to [`Self::schoolbook_mul`] and
     /// [`Self::karatsuba_mul`], which are kept as independent references.
     pub fn mul(&self, other: &Self, irreducible: &IrreduciblePoly) -> Self {
+        super::operation_tally::tick(self.m, "mul");
         debug_assert_eq!(self.m, other.m);
         let m = self.m;
         let nw = self.bits.len().max(other.bits.len());
@@ -475,6 +479,7 @@ impl F2mElement {
     /// goes to bit `2i` of the result, other bits zero.  Then
     /// reduce mod `m(z)`.
     pub fn square(&self, irreducible: &IrreduciblePoly) -> Self {
+        super::operation_tally::tick(self.m, "square");
         let m = self.m;
         let nw = self.bits.len();
         let mut out = Self::zero(m);
@@ -497,9 +502,11 @@ impl F2mElement {
         if k == 0 {
             return acc;
         }
+        super::operation_tally::tick_n(self.m, "square", u64::from(k));
         let nw = acc.bits.len();
         with_scratch(2 * nw + 1, |sq| {
             for _ in 0..k {
+                super::operation_tally::tick(self.m, "square");
                 sq.iter_mut().for_each(|w| *w = 0);
                 for (i, &w) in acc.bits.iter().enumerate() {
                     sq[2 * i] = spread32(w);
@@ -528,6 +535,7 @@ impl F2mElement {
     ///   2. Combine `b_k`'s per the binary expansion of `m − 1`.
     ///   3. Final squaring: result = `(combined)²`.
     pub fn flt_inverse(&self, irreducible: &IrreduciblePoly) -> Option<Self> {
+        super::operation_tally::tick(self.m, "inverse_informational");
         if self.is_zero() {
             return None;
         }
@@ -888,7 +896,7 @@ fn reduce_bitwise(value: &mut [u64], irreducible: &IrreduciblePoly) {
 /// Spread the low 32 bits of `x` so that bit `i` lands at bit `2i`:
 /// squaring in characteristic 2 before reduction.
 #[inline(always)]
-fn spread32(x: u64) -> u64 {
+pub(crate) fn spread32(x: u64) -> u64 {
     let mut x = x & 0xFFFF_FFFF;
     x = (x | (x << 16)) & 0x0000_FFFF_0000_FFFF;
     x = (x | (x << 8)) & 0x00FF_00FF_00FF_00FF;
@@ -968,10 +976,10 @@ fn has_hw_clmul() -> bool {
     }
 }
 
-/// `out ^= a · b` over `F_2[z]`, word-level schoolbook with one
-/// carry-less multiply per pair of limbs.  `out` must hold at least
-/// `a.len() + b.len()` words.
-fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
+/// `out ^= a · b` over `F_2[z]`. Hardware two- and three-word products
+/// use Karatsuba cross terms; other widths use one carry-less multiply
+/// per limb pair. `out` must hold at least `a.len() + b.len()` words.
+pub(crate) fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     debug_assert!(out.len() >= a.len() + b.len());
     #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
     if has_hw_clmul() {
@@ -991,28 +999,60 @@ fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     }
 }
 
+macro_rules! mul_words_hw_body {
+    ($a:ident, $b:ident, $out:ident) => {{
+        let a = $a;
+        let b = $b;
+        let out = $out;
+        if a.len() == 2 && b.len() == 2 {
+            let p0 = clmul64_hw(a[0], b[0]);
+            let p2 = clmul64_hw(a[1], b[1]);
+            let cross = clmul64_hw(a[0] ^ a[1], b[0] ^ b[1]);
+            let p1 = (cross.0 ^ p0.0 ^ p2.0, cross.1 ^ p0.1 ^ p2.1);
+            out[0] ^= p0.0;
+            out[1] ^= p0.1 ^ p1.0;
+            out[2] ^= p1.1 ^ p2.0;
+            out[3] ^= p2.1;
+            return;
+        }
+        if a.len() == 3 && b.len() == 3 {
+            let p0 = clmul64_hw(a[0], b[0]);
+            let p2 = clmul64_hw(a[1], b[1]);
+            let p4 = clmul64_hw(a[2], b[2]);
+            let q01 = clmul64_hw(a[0] ^ a[1], b[0] ^ b[1]);
+            let q12 = clmul64_hw(a[1] ^ a[2], b[1] ^ b[2]);
+            let q02 = clmul64_hw(a[0] ^ a[2], b[0] ^ b[2]);
+            let p1 = (q01.0 ^ p0.0 ^ p2.0, q01.1 ^ p0.1 ^ p2.1);
+            let p3 = (q12.0 ^ p2.0 ^ p4.0, q12.1 ^ p2.1 ^ p4.1);
+            let p2_total = (q02.0 ^ p0.0 ^ p4.0 ^ p2.0, q02.1 ^ p0.1 ^ p4.1 ^ p2.1);
+            out[0] ^= p0.0;
+            out[1] ^= p0.1 ^ p1.0;
+            out[2] ^= p1.1 ^ p2_total.0;
+            out[3] ^= p2_total.1 ^ p3.0;
+            out[4] ^= p3.1 ^ p4.0;
+            out[5] ^= p4.1;
+            return;
+        }
+        for (i, &ai) in a.iter().enumerate() {
+            for (j, &bj) in b.iter().enumerate() {
+                let (lo, hi) = clmul64_hw(ai, bj);
+                out[i + j] ^= lo;
+                out[i + j + 1] ^= hi;
+            }
+        }
+    }};
+}
+
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
-    for (i, &ai) in a.iter().enumerate() {
-        for (j, &bj) in b.iter().enumerate() {
-            let (lo, hi) = clmul64_hw(ai, bj);
-            out[i + j] ^= lo;
-            out[i + j + 1] ^= hi;
-        }
-    }
+    mul_words_hw_body!(a, b, out)
 }
 
 #[cfg(target_arch = "aarch64")]
 #[target_feature(enable = "aes")]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
-    for (i, &ai) in a.iter().enumerate() {
-        for (j, &bj) in b.iter().enumerate() {
-            let (lo, hi) = clmul64_hw(ai, bj);
-            out[i + j] ^= lo;
-            out[i + j + 1] ^= hi;
-        }
-    }
+    mul_words_hw_body!(a, b, out)
 }
 
 /// Reduce `value` modulo `m(z)` in place, a whole word at a time.
@@ -1030,7 +1070,7 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
 /// Every NIST and SECG field satisfies `m − deg r ≥ 64`.  The toy fields
 /// (`m = 8, 16`) and dense tails do not, and take [`reduce_chunked`].
 /// Both are tested against the bit-at-a-time `reduce_bitwise`.
-fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
+pub(crate) fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
     let m = irreducible.degree as usize;
     let terms = &irreducible.low_terms;
     let t_max = terms.iter().copied().max().unwrap_or(0) as usize;
@@ -1289,6 +1329,81 @@ mod tests {
         assert_eq!(sum_sq, sq_sum);
     }
 
+    /// Batching changes scratch-buffer reuse, not the number of field squares.
+    #[test]
+    fn square_k_times_tally_matches_repeated_squaring() {
+        use crate::binary_ecc::operation_tally::OperationTally;
+
+        for irr in [
+            IrreduciblePoly::deg_8(),
+            IrreduciblePoly::deg_16(),
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_127(),
+            IrreduciblePoly::deg_163(),
+        ] {
+            let m = irr.degree;
+            for a in [
+                F2mElement::zero(m),
+                F2mElement::one(m),
+                F2mElement::from_bit_positions(&[0, 3, m - 1], m),
+            ] {
+                for k in [0, 1, 2, 7, m - 1, m, m + 1] {
+                    let tally = OperationTally::begin();
+                    let batched = a.square_k_times(k, &irr);
+                    let batched_counts = tally.finish();
+
+                    let tally = OperationTally::begin();
+                    let mut repeated = a.clone();
+                    for _ in 0..k {
+                        repeated = repeated.square(&irr);
+                    }
+                    let repeated_counts = tally.finish();
+
+                    assert_eq!(batched, repeated, "field degree {m}, k={k}");
+                    assert_eq!(batched_counts, repeated_counts, "degree {m}, k={k}");
+                    if k == 0 {
+                        assert_eq!(batched, a);
+                        assert!(batched_counts.is_empty());
+                    } else {
+                        assert_eq!(batched_counts.len(), 1);
+                        assert_eq!(batched_counts[&format!("f2m{m}_square")], u64::from(k));
+                    }
+                }
+            }
+        }
+    }
+
+    /// Itoh--Tsujii inversion uses m-1 squares, including its batched steps.
+    #[test]
+    fn flt_inverse_tally_includes_all_squarings() {
+        use crate::binary_ecc::operation_tally::OperationTally;
+
+        for irr in [
+            IrreduciblePoly::deg_8(),
+            IrreduciblePoly::deg_16(),
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_127(),
+            IrreduciblePoly::deg_163(),
+        ] {
+            let m = irr.degree;
+            for a in [
+                F2mElement::one(m),
+                F2mElement::from_bit_positions(&[0, 3, m - 1], m),
+            ] {
+                let tally = OperationTally::begin();
+                let inverse = a.flt_inverse(&irr).expect("nonzero field element");
+                let counts = tally.finish();
+
+                assert_eq!(counts[&format!("f2m{m}_square")], u64::from(m - 1));
+                assert_eq!(counts[&format!("f2m{m}_inverse_informational")], 1);
+                assert!(counts[&format!("f2m{m}_mul")] > 0);
+                assert_eq!(counts.len(), 3);
+                // Check the field result outside the inversion's counting window.
+                assert_eq!(a.mul(&inverse, &irr), F2mElement::one(m));
+            }
+        }
+    }
+
     /// `a · a⁻¹ = 1` for non-zero `a`.
     #[test]
     fn flt_inverse_roundtrip() {
@@ -1409,6 +1524,26 @@ mod tests {
                 F2mElement::one(m)
             );
         }
+    }
+
+    #[test]
+    fn operation_tally_counts_batched_squares_and_inversion_internals() {
+        let irr = IrreduciblePoly {
+            degree: 7,
+            low_terms: vec![0, 1],
+        };
+        let a = F2mElement::from_bit_positions(&[0, 1, 3], 7);
+        let tally = super::super::operation_tally::OperationTally::begin();
+        let _ = a.square_k_times(5, &irr);
+        let counts = tally.finish();
+        assert_eq!(counts.get("f2m7_square"), Some(&5));
+
+        let tally = super::super::operation_tally::OperationTally::begin();
+        let _ = a.flt_inverse(&irr).unwrap();
+        let counts = tally.finish();
+        assert_eq!(counts.get("f2m7_inverse_informational"), Some(&1));
+        assert!(counts.get("f2m7_mul").is_some_and(|count| *count > 0));
+        assert!(counts.get("f2m7_square").is_some_and(|count| *count > 1));
     }
 
     /// Inversion round-trips at every field size.
@@ -1582,9 +1717,10 @@ mod tests {
     /// folded down to degree < m.
     #[test]
     fn reduction_works_at_boundary() {
-        let irr = IrreduciblePoly::deg_8(); // x⁸ + x⁴ + x³ + x + 1
-                                            // a = z⁵, b = z⁵.  a·b = z¹⁰ = z² · z⁸ = z² · (z⁴ + z³ + z + 1)
-                                            //                       = z⁶ + z⁵ + z³ + z².
+        // x⁸ + x⁴ + x³ + x + 1
+        let irr = IrreduciblePoly::deg_8();
+        // a = z⁵, b = z⁵.  a·b = z¹⁰ = z² · z⁸ = z² · (z⁴ + z³ + z + 1)
+        //                       = z⁶ + z⁵ + z³ + z².
         let a = F2mElement::from_bit_positions(&[5], 8);
         let b = a.clone();
         let p = a.schoolbook_mul(&b, &irr);
