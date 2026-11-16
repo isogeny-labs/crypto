@@ -157,3 +157,73 @@
 
 - One chained-S3 assertion remains reproducible on this checkout; the
   ecbench timing assertion differed between suite and exact rerun.
+
+## 2026-11-16, checkpoint repair and fixed run
+
+### What was done
+
+- Rechecked Conductor: T-6342 reserved `.resume`, T-6708 reserved the
+  production collector sources, and T-6720 reserved today's shared session
+  log. Claimed the ready T-6342 through Conductor CLI. Preserved the exact
+  14,220-byte incoming resume locally, retained both sides of its merge
+  conflict, removed three marker lines, and placed this branch's complete
+  handoff first. `scripts/checkpoint.sh gate` exited zero; S3 `RESUME.md`
+  matched local bytes at SHA-256 `7126716a0f0e...`. [pcc:unverified]
+- An attempted CLI re-claim of T-6795 omitted its write scope; releasing
+  that attempt cancelled the task. No research artifact was lost. New
+  Conductor T-6803 claimed this study directory before further edits.
+- Executed the source-bound test once at 2026-11-16 13:42:02 UTC, exit 0,
+  one passed. Raw stdout/stderr/meta and whole-process resources are kept.
+  Pushed a second checkpoint after the result arrived. [pcc:unverified]
+
+### Decisions made
+
+- The first-independent operation prediction failed on all three fixed
+  streams. K19 saved target queries but increased modeled additions.
+  Keep the result at its fixed-stream operation scope and do not integrate
+  the candidate policy. [pcc:unverified]
+- Correct-account AWS budget readback remains above both monthly and daily
+  limits, so the L2 F4/F5/F6 panel was not submitted.
+
+### Open threads
+
+- Audit the machine derivation, inspect the visual PDF, commit and publish
+  the result in PR #4421. Keep the frozen panel for a future admitted window.
+- The shared session log remains reserved by T-6720; this work log is the
+  branch handoff until that scope releases.
+
+### Errors
+
+- The earlier incorrect default-profile AWS check was superseded by a
+  correct-account readback. T-6795 was cancelled by the CLI release behavior;
+  T-6803 replaced its study scope.
+
+## 2026-11-16, result validation and visual report
+
+### What was done
+
+- Independently hashed the saved executable, raw stdout/stderr/meta and
+  derived `RESULTS.json` against `RUN_RECORD.json`. Parsed the three raw
+  JSON lines a second way and checked each full-rank arm, addition proxy and
+  candidate-minus-first difference. All checks passed. [pcc:unverified]
+- Generated the editable policy diagram and count chart, built the two-page
+  Typst PDF, rendered and visually inspected both pages, and checked text
+  extraction, PDF metadata and result labels. `pcc lint-prose` found zero
+  issues in the new Markdown; `git diff --check` passed. [pcc:unverified]
+- Checked the canonical IC leaderboard, progress timeline and rendered HTML.
+  This operation-only fixed-stream result has no admitted timing or complete
+  cost comparison to add there. [pcc:unverified]
+
+### Decisions made
+
+- Publish the measured loss and raw evidence in the existing stacked PR.
+  Keep first-independent out of the production collector. [pcc:unverified]
+
+### Open threads
+
+- Commit, push and update PR #4421. Independent reviewer replay and the
+  isolated complete-call F4/F5/F6 panel remain separate gates.
+
+### Errors
+
+- None in the validation step.
