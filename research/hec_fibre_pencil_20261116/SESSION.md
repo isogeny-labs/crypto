@@ -53,3 +53,17 @@ No complete tenfold cost premise yet. Affine component witnesses are not indepen
 
 ### Errors
 No scientific failures; both binaries exit0. Diagnostics intentionally written to curve stderr. Post-run review clarified the projected affine identity to retain the branch-torsion distinction. Original frozen source/outputs unchanged; original THEORY freeze bytes remain preserved separately. Unrelated .resume/RESUME.md excluded.
+
+## Projected affine descent pre-run
+
+### What was done
+Previous turn is progress. Read live Compact descent, table oracle, current theory and current PR head. Held T-6640 checked clear. Implemented a public-divisor affine component descent. Production fibre selection uses only bucket cardinality g+1; the degree bound certifies full regular splitting, so per-parameter norms/gcds are unnecessary. Gate independently constructs every admitted norm and verifies original principal identities and actual-ell projected decomposition. Reference controls preserve unrestricted point-add descent and add an anchor-restricted bounded arm.
+
+### Decisions made
+Fixed six direct-profile inputs, four anchor policies each,2048reference-add cap. No target-support expansion, source solve, timing or count-unit speed ratios. The multiplier certificate is gate-only; its group work/setup is not called free production. External primary access gap remains. KB refreshed query Riemann/sieving/Joux/Vitse at revision9141e386254340a9bdba3036f2bb706a returns source:6b2208c18d3ecd6afd0494c0c44c1a36 and source:917fc55d6e935586e558ed5e5d5c3d5c (crypto:research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md); old extension-field sieve/accounting notes do not imply a gain on this prime-field panel. Current code and explicit derivation drive the gate; no novelty claim.
+
+### Open threads
+Freeze before once-only execution. Preserve candidate noncompletions and bounded reference failures. A complete cost case against Compact remains necessary; tenfold objective stays active. Shared daily log reserved; use this handoff.
+
+### Errors
+Native build outcome recorded in DESCENT-BUILD.*. Unrelated resume edit preserved.
