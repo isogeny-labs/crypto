@@ -1,0 +1,20 @@
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-hyperedge-solve v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_hyperedge_solve_20261116)
+error[E0061]: this function takes 6 arguments but 5 arguments were supplied
+   --> ../hec_table_oracle_20261114/pipeline.rs:134:17
+    |
+134 |                 solve_for_last(&rows, m, ell, params.solver, &mut rep.solve)
+    |                 ^^^^^^^^^^^^^^                               -------------- argument #5 of type `&[u32]` is missing
+    |
+note: function defined here
+   --> /Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic/src/solve.rs:53:8
+    |
+ 53 | pub fn solve_for_last(
+    |        ^^^^^^^^^^^^^^
+help: provide the argument
+    |
+134 |                 solve_for_last(&rows, m, ell, params.solver, /* &[u32] */, &mut rep.solve)
+    |                                                              +++++++++++++
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `hec-hyperedge-solve` (bin "hyperedge-existing-controls") due to 1 previous error

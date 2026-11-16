@@ -31,7 +31,9 @@ concurrency:
 
 jobs:
   scope:
-    if: ${{ !github.event.pull_request.draft }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft)
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -75,7 +77,9 @@ jobs:
 
   check:
     needs: scope
-    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false'))
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
@@ -126,7 +130,9 @@ jobs:
 
   full-library:
     name: Native full library (manual)
-    if: github.event_name == 'workflow_dispatch' && inputs.full_library
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch' && inputs.full_library)
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     permissions:

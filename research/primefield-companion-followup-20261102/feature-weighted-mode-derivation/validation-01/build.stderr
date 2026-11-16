@@ -1,0 +1,123 @@
+warning: variant `ZeroDivisor` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:4:37
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          ----- variant in this enum ^^^^^^^^^^^
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `ResultantClass` is never constructed
+  --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:11:12
+   |
+11 | pub struct ResultantClass { p:u64, representative:u64 }
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `combine`, `square`, `negate`, `is_zero`, and `project` are never used
+  --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:16:9
+   |
+15 | impl ResultantClass{
+   | ------------------- methods in this implementation
+16 |  pub fn combine(self,other:Self)->Result<Self,Error>{if self.p!=other.p{return Err(Error::Domain);}Ok(Self{p:self.p,representative:(...
+   |         ^^^^^^^
+17 |  pub fn square(self)->Self{Self{p:self.p,representative:((self.representative as u128*self.representative as u128)%self.p as u128)as...
+   |         ^^^^^^
+18 |  pub fn negate(self)->Self{Self{p:self.p,representative:(self.p-self.representative)%self.p}}
+   |         ^^^^^^
+19 |  pub fn is_zero(&self)->bool{self.representative==0}
+   |         ^^^^^^^
+20 |  pub fn project(self)->u64{
+   |         ^^^^^^^
+
+warning: type alias `Matrix` is never used
+  --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:26:6
+   |
+26 | type Matrix=[[Vec<u64>;2];2];
+   |      ^^^^^^
+
+warning: struct `Transition` is never constructed
+  --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:28:8
+   |
+28 | struct Transition{m:usize,n:usize,k:Option<usize>,leading:u64}
+   |        ^^^^^^^^^^
+
+warning: struct `Batch` is never constructed
+  --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:29:8
+   |
+29 | struct Batch{matrix:Matrix,a:Vec<u64>,b:Vec<u64>,steps:Vec<Transition>}
+   |        ^^^^^
+
+warning: function `degree` is never used
+  --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:30:4
+   |
+30 | fn degree(a:&[u64])->Option<usize>{if a==[0]{None}else{Some(a.len()-1)}}
+   |    ^^^^^^
+
+warning: function `identity` is never used
+  --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:31:4
+   |
+31 | fn identity()->Matrix{[[vec![1],vec![0]],[vec![0],vec![1]]]}
+   |    ^^^^^^^^
+
+warning: multiple methods are never used
+   --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/polynomial.rs:82:9
+    |
+ 35 | impl Poly{
+    | --------- methods in this implementation
+...
+ 82 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+    |         ^^^^^^
+...
+107 |  fn matrix_mul(&mut self,a:&Matrix,b:&Matrix)->Matrix{
+    |     ^^^^^^^^^^
+...
+110 |  fn matrix_apply(&mut self,m:&Matrix,a:&[u64],b:&[u64])->(Vec<u64>,Vec<u64>){
+    |     ^^^^^^^^^^^^
+...
+114 |  fn step_matrix(&self,q:&[u64])->Matrix{[[vec![0],vec![1]],[vec![1],self.sub(&[0],q)]]}
+    |     ^^^^^^^^^^^
+115 |  fn lifted(&mut self,mut batch:Batch,a:&[u64],b:&[u64],shift:usize)->Result<Batch,Error>{
+    |     ^^^^^^
+...
+122 |  fn half_gcd(&mut self,a:&[u64],b:&[u64])->Result<Batch,Error>{
+    |     ^^^^^^^^
+...
+144 |  pub fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{
+    |         ^^^^^^^^^^^^^^^
+...
+162 |  pub fn image_class(&self,v:u64)->Result<ResultantClass,Error>{if 1u64<<(self.p-1).trailing_zeros()>4{return Err(Error::Domain);}Ok...
+    |         ^^^^^^^^^^^
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+164 |  /// Build only the product polynomial: no retained subproduct tree nodes.
+165 |  pub fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^^^
+...
+170 |  pub fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{let f=self.root_product(roots)?;le...
+    |         ^^^^^^^^^^^^^^^^^^^^
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: struct `GcdResult` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/gcd.rs:2:12
+  |
+2 | pub struct GcdResult{pub polynomial:Vec<u64>,pub half_batches:usize,pub ordinary_steps:usize,pub recorded_transitions:usize}
+  |            ^^^^^^^^^
+
+warning: method `gcd_monic` is never used
+ --> research/primefield-companion-followup-20261102/feature-weighted-mode-derivation/../feature-native-hgcd-roots/gcd.rs:6:9
+  |
+3 | impl Poly{
+  | --------- method in this implementation
+...
+6 |  pub fn gcd_monic(&mut self,a:&[u64],b:&[u64],max_degree:usize)->Result<GcdResult,Error>{
+  |         ^^^^^^^^^
+
+warning: 11 warnings emitted
+

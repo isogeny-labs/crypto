@@ -1,0 +1,85 @@
+{
+  "schema": "nist-native-layer-development/v1",
+  "date": "2026-11-07",
+  "scope": "Credential-free local packaging and existing bounded development controls; no real-field trial.",
+  "native_source_revision": "e1826419b7911c9ae6a66ad91312a3861b292920",
+  "parent_before_publication": "1f3b1765637fee98eeff395dc610a8db7231b597",
+  "source_inventory": "review-evidence/SOURCE.sha256",
+  "source_rechecked_after_base_advance": "review-evidence/source-after-base-advance.stdout",
+  "source_changed": false,
+  "builds": [
+    {
+      "id": "static-v1",
+      "exit": 2,
+      "correction": "Initial explicit static OpenSSL link omitted zlib/zstd; retained failed stdout/stderr."
+    },
+    {
+      "id": "static-v2",
+      "exit": 0,
+      "command": [
+        "bash",
+        "research/nist_skip_criterion_20261025/pilot_qualification_20261107/prepare-layer.sh",
+        "/workspace/nist-pilot-layer-20261107-v2"
+      ],
+      "link_dependencies": "pkg-config --static --libs libcrypto gmpxx gmp plus static PARI, libm and pthread",
+      "warnings": "glibc optional dlopen and name-service paths may still require matching runtime shared support; local controls do not qualify a container image."
+    }
+  ],
+  "binaries": {
+    "journal_check": "91cbfb9f697902d9adc57f439feb3b9e4d5af5156641d2390a9f1ae163f6bf2a",
+    "sampler_resume": "d6f2c027fbe6cacf3ef55fd10407a52690b2064e6487939ec1ed6428242783e7",
+    "journal_tests": "4623a835e2834461ecd11971fb9761d047f683ef34d912fbd2e87cee712f0429"
+  },
+  "observations": {
+    "native_controls": 46,
+    "native_exit": 0,
+    "cli_controls": 7,
+    "cli_exit": 0,
+    "toy_field": 5003,
+    "toy_attempt_cap": 4096,
+    "toy_attempts": 86,
+    "toy_accepted": 3,
+    "byte_identical_recovery_states": 6,
+    "real_field_sampling": 0,
+    "existing_output_refused": true
+  },
+  "dependency_evidence": [
+    "review-evidence/compiler.txt",
+    "review-evidence/pkg-versions.txt",
+    "review-evidence/LIBRARIES.sha256",
+    "review-evidence/LAYER.sha256",
+    "review-evidence/pari-datadir.txt"
+  ],
+  "protocol": {
+    "path": "protocol.json",
+    "status": "draft",
+    "tool_repository": "isogeny-labs/crypto-autoresearcher",
+    "tool_revision": "5f9d6fb501d408f3e8ad6ee89afbbbdadb8b560e",
+    "tool": "tools/experiment_protocol.py",
+    "validation_exit": 0,
+    "findings": 0,
+    "canonical_freeze": false,
+    "seed_nonce": null
+  },
+  "custody": {
+    "payload_location": "/workspace/nist-pilot-layer-20261107-v2/layer",
+    "payload_durable": false,
+    "payload_published": false,
+    "image_digest": null,
+    "s3_upload": false
+  },
+  "admission": {
+    "user_approval": true,
+    "total_dollar_cap_usd": null,
+    "current_shared_budget_balance": null,
+    "live_capacity_readback": false,
+    "local_read_only_sts": "Unable to locate credentials",
+    "checkpoint_uploaded": false,
+    "durable_runtime_adapter_qualified": false,
+    "canonical_export_adapter_qualified": false,
+    "launch_ready": false
+  },
+  "standing": "unverified",
+  "execution_proof": "not_covered",
+  "historical_subjects_modified": false
+}

@@ -1,0 +1,107 @@
+{
+  "evidence": {
+    "child_peak_rss_kib": 22800,
+    "complete_global_root_search": false,
+    "component_ratios": {
+      "cached_over_compressed": 3.639544912424011,
+      "lean_over_compressed": 1.1343508068047876,
+      "reference_over_compressed": 3.831051084134258
+    },
+    "error": null,
+    "external_reviewer": false,
+    "memory_scope": "Sequential child RSS and parent RSS separately, not a cgroup simultaneous high-water mark",
+    "metrics": {
+      "cached": {
+        "aa_spread": 0.05446801359344189,
+        "cold_process_repetitions": 3,
+        "geomean_seconds": 2.2040569288922036,
+        "independent_equations": [
+          -1
+        ],
+        "peak_rss_kib": 19728,
+        "rejected_cells": [
+          32,
+          32,
+          32
+        ],
+        "seconds": [
+          2.265616944998328,
+          2.199524810999719,
+          2.148587643998326
+        ]
+      },
+      "compressed": {
+        "aa_spread": 0.02959596756945926,
+        "cold_process_repetitions": 3,
+        "geomean_seconds": 0.6055858581023134,
+        "independent_equations": [
+          38
+        ],
+        "peak_rss_kib": 20752,
+        "rejected_cells": [
+          32,
+          32,
+          32
+        ],
+        "seconds": [
+          0.6009608520034817,
+          0.5991107050031133,
+          0.6168419659989013
+        ]
+      },
+      "lean": {
+        "aa_spread": 0.018797571052971307,
+        "cold_process_repetitions": 3,
+        "geomean_seconds": 0.6869468067279287,
+        "independent_equations": [
+          -1
+        ],
+        "peak_rss_kib": 22800,
+        "rejected_cells": [
+          32,
+          32,
+          32
+        ],
+        "seconds": [
+          0.6885379160012235,
+          0.6797931479995896,
+          0.6925716080004349
+        ]
+      },
+      "reference": {
+        "aa_spread": 0.05792895474615545,
+        "cold_process_repetitions": 3,
+        "geomean_seconds": 2.3200303582192427,
+        "independent_equations": [
+          -1
+        ],
+        "peak_rss_kib": 21904,
+        "rejected_cells": [
+          32,
+          32,
+          32
+        ],
+        "seconds": [
+          2.3798721130006015,
+          2.2495575929970073,
+          2.332546266999998
+        ]
+      }
+    },
+    "original_root_count_exact": null,
+    "parent_peak_rss_kib": 32584,
+    "qualified_speedup": null,
+    "raw_bytes": 142153,
+    "raw_sha256": "0f2fc11a48937ca8c06b0e8c7f1b97ff4449e497293a171dbd7b3dfd4e9e310a",
+    "release_gate_claim": false,
+    "scope": "Matched32conditionalE2cells, freshprocess repetitions, exposed calibration only; no genuine F4/F5/F6 baseline",
+    "worker_seconds": 17.577309330998105
+  },
+  "experiment_id": "e2-compression-storage-repair-preparation-20261115-v18",
+  "next_actions": [
+    "Choose measured bottleneck versus the strongest cached/lean scalar comparator; design a fresh guarded or batched outer-cell mechanism. Preserve rank-deficient and exceptional contexts; no component ratio certifies the full all-roots release gate."
+  ],
+  "schema": "scientific_result_v1",
+  "status": "passed",
+  "summary": "Matched fresh-process conditional compiler comparison: cache, avoid unused prelinear g9, and compress equivalent quadratic equations before certificate solving."
+}

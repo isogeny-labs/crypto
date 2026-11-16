@@ -1,0 +1,11 @@
+# Repeated fixed base divisor: second-order exact section gate
+
+F97 Fermatquartic X4+Y4−Z4, the exact failed field from prior fieldchart V1/V2. Do not replace curve/field to avoid the failure. Engineering adaptation of divisor multiplicity/Hensel arithmetic, not novelty or speedup claim. Prior rejected source/chart logs remain intact.
+
+Admit first affine origin with nonvertical nonflex tangent, degree2residual disjoint origin and Fy-unit on residual, allowing repeated residual. Assert this registered case residual discriminant0and rational supportQ. Riemann–Roch constraints remain polynomial divisibility by degree2residual, including multiplicity; require rank2/dim8, multiplicationrank18, diagonalrank112/nullity8 and all coefficient/corruption controls. Select ordinary tensor controls away from residual support, preserving other original predicates.
+
+Cancellation on a SQUAREFREE effective cubic E containing Qonce plus two distinct regular off-base rational points: use two Newton steps modulo u³ (starting residual multipleu) so curve residual vanishes to sufficient precision. Compute common numerator gcd with u², preserving fixed-base multiplicity2. Divide fullg before reducing modulo u. Require g=(x−Qx)², independent second-order along-curve limit n''total/2atQ, ordinary quotient limits at otherpoints, all120tensor identities and nonzero projected coordinates. Assert n(Q)=n'curve(Q)=0; first-order-only cancellation produces zero tensors, documenting why removing only the admission guard would be unsound.
+
+Retain480determinant/480ordinary split tensor checks with fresh controls outsidebase. Repeated EFFECTIVE support remains unsupported; this handles repeated FIXED base divisor only. No inverse/classcentering/grouporder/isogeny/DLP extension from this gate. No proof that every quartic can use this chart. Two Newton iterations and larger polynomialmodulus may increase cost; no timing or tenfold claim.
+
+One once-only scientific run with p97 into RUN.txt/RUN.stderr/EXIT-RUN.txt; stop unexpectedfailure, retain output. Build source/lock/binaryhash commit plus S3checkpoint/gate BEFORE execution. No source retune or silent rerun. Wider-prime/source-family/genus2/4and mathematical10xremain open. Prior failed coldcost result unchanged.

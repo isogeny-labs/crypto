@@ -1,0 +1,18 @@
+ideal residueDiag33=std(ideal(T^2+T+1));
+int qDiag33;int rDiag33;int cDiag33;int omitDiag33;int nextDiag33;list pDiag33;list fDiag33;ideal jDiag33;matrix jacDiag33;matrix minorDiag33[3][3];ideal minorsDiag33;number bDiag33;number cValueDiag33;number uDiag33;number vDiag33;int goodDiag33;ideal minorGeneratorsDiag33;
+for(qDiag33=1;qDiag33<=2;qDiag33++){
+ pDiag33=paddingRepresentatives33[qDiag33];bDiag33=pDiag33[1];cValueDiag33=pDiag33[2];
+ uDiag33=(bDiag33+cValueDiag33)/cValueDiag33^2;vDiag33=((bDiag33/cValueDiag33)*uDiag33^3+1)/(uDiag33+1);
+ fDiag33=smallFamily33(uDiag33,pDiag33[4]+bDiag33*T,pDiag33[3]+(1+cValueDiag33)*T,vDiag33);
+ jDiag33=reduce(fDiag33[1],residueDiag33);if(size(jDiag33)!=0){ERROR("LOCAL33_DIAG_SOURCE");}jacDiag33=fDiag33[2];
+ minorsDiag33=0;
+ for(omitDiag33=1;omitDiag33<=4;omitDiag33++){
+  nextDiag33=0;
+  for(rDiag33=1;rDiag33<=4;rDiag33++){if(rDiag33!=omitDiag33){nextDiag33++;for(cDiag33=1;cDiag33<=3;cDiag33++){minorDiag33[nextDiag33,cDiag33]=reduce(jacDiag33[rDiag33,cDiag33],residueDiag33);}}}
+  minorsDiag33[omitDiag33]=reduce(det(minorDiag33),residueDiag33);
+ }
+ minorGeneratorsDiag33=residueDiag33,minorsDiag33;goodDiag33=0;if(std(minorGeneratorsDiag33)[1]==1){goodDiag33=1;}
+ print("LOCAL33_POINT_DIAGNOSTIC q="+string(qDiag33)+" maximal_minors_unit="+string(goodDiag33));print(minorsDiag33);
+ link outDiag33="ASCII:w small-diagnostic-q"+string(qDiag33)+".sing";open(outDiag33);write(outDiag33,"ideal diagnosticMinors33="+string(minorsDiag33)+";");close(outDiag33);
+}
+print("LOCAL33_DIAGNOSTIC_ALL_CHECKS_PASS");quit;
