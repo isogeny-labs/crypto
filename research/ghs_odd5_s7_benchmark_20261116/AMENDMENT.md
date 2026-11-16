@@ -19,3 +19,13 @@ are retained. `s7_attack_v3.sage` changes only JSON conversion: padded zeros
 are Python integers, a factor-base JSON preflight runs before relation
 collection, and both receipts use `default=int`. It retains the same fixed
 instance and mathematical algorithm.
+
+The first matched-rho source combined negation with the order-seven
+Frobenius quotient. It hit its cap on the first target. A diagnostic trace
+showed repeated short cycles with exactly identical `(a,b)` walk coefficients
+at every collision, so none could recover a scalar. This is the known
+fruitless-cycle failure mode of automorphism-quotiented rho, not evidence
+that the target is hard. `s7_rho_v2.sage` preserves the saved source target
+and order-seven Frobenius optimization, removes negation canonicalization,
+and writes one immutable receipt per verified trial. The failed baseline
+stdout/stderr and the diagnostic trace are preserved.
