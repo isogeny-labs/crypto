@@ -55,3 +55,5 @@ comparison, general descent, canonical Tate pairing, general MOV/Frey–Rück,
 and completion of all fourteen items remain open. Verification used the
 same host and prover; independent compiler, parser and physical-host
 assurance remain open. [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389). Remote proof `871c5f4f5c9545a78851dd1475255379c74621ee` and local receipt `3b68eaf20b6faa2c01edf6892089950c955bd49e` share tree `a2297e6d9a1fcb8ec6e451d07b2140015e86dde9`. Anonymous fetch completed and a fresh read matched the exact head, title, body and ready state. All 41 pinsets / 4377 entries match. Current-head CI, review and signing are pending. [pcc:unverified]
