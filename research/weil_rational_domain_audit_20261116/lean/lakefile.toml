@@ -1,0 +1,15 @@
+name = "weil_rational_domain_audit"
+version = "0.1.0"
+defaultTargets = ["WeilRationalDomainAudit"]
+
+[[require]]
+name = "weil_mixed_level_audit"
+path = "../../weil_mixed_level_audit_20261116/lean"
+
+[[require]]
+name = "bk_general_frobenius_audit"
+path = "../../bk_general_frobenius_audit_20261115/lean"
+
+[[lean_lib]]
+name = "WeilRationalDomainAudit"
+roots = ["RationalDomainImports", "RationalDomainCyclic", "RationalDomainNineteen", "RationalDomainTate", "RationalDomainControls", "RationalDomainCertificate"]
