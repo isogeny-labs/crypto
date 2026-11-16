@@ -1,0 +1,1924 @@
++ 00:33:10 pgrep -f 'http.server 8080'
++ 00:33:10 export DEBIAN_FRONTEND=noninteractive
++ 00:33:10 DEBIAN_FRONTEND=noninteractive
++ 00:33:10 apt-get update -qq
+++ 00:33:12 date -u +%FT%TZ
++ 00:33:12 echo '2026-11-15T00:33:12Z boot: apt update exit=0'
++ 00:33:12 apt-get install -y -qq jq curl git
+++ 00:33:14 date -u +%FT%TZ
++ 00:33:14 echo '2026-11-15T00:33:14Z boot: apt base exit=0'
++ 00:33:14 apt-get install -y -qq build-essential pkg-config libssl-dev time
+++ 00:33:17 date -u +%FT%TZ
++ 00:33:17 echo '2026-11-15T00:33:17Z boot: apt build tools exit=0'
+++ 00:33:18 awk -v c=2.08 -v cap=27 -v mx=12 'BEGIN{ if (c+0 <= 0) { print 0; exit } h = int(cap / c); print (h < mx ? h : mx) }'
++ 00:33:18 HRS=12
++ 00:33:18 '[' 12 -gt 0 ']'
++ 00:33:18 DEADLINE_EPOCH=1794745990
++ 00:33:18 sleep 600
+++ 00:33:18 date -u -d @1794745990 +%FT%TZ
+++ 00:33:18 left
++++ 00:33:18 date +%s
++ 00:33:18 log 'pod 5nxsdf6du9au1i mode a start; costPerHr 2.08; limit 12 h; deadline 2026-11-15T12:33:10Z'
+++ 00:33:18 date -u +%FT%TZ
+++ 00:33:18 echo 43192
++ 00:33:18 tee -a /workspace/out/run.log
++ 00:33:18 echo '2026-11-15T00:33:18Z pod 5nxsdf6du9au1i mode a start; costPerHr 2.08; limit 12 h; deadline 2026-11-15T12:33:10Z'
++ 00:33:18 '[' 43192 -gt 120 ']'
++ 00:33:18 grep MemTotal /proc/meminfo
++ 00:33:18 sleep 60
++ 00:33:18 nproc
++ 00:33:18 lscpu
++ 00:33:18 grep 'Model name'
++ 00:33:18 echo 'costPerHr 2.08'
++ 00:33:18 command -v cargo
++ 00:33:18 curl -sSf https://sh.rustup.rs -o /workspace/rustup.sh
++ 00:33:18 sh /workspace/rustup.sh -y --profile minimal
++ 00:33:26 . /root/.cargo/env
+++ 00:33:26 case ":${PATH}:" in
+++ 00:33:26 export PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ 00:33:26 PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ 00:33:26 rustc --version
++ 00:33:26 log 'rust ready'
++ 00:33:26 tee -a /workspace/out/run.log
+++ 00:33:26 date -u +%FT%TZ
++ 00:33:26 echo '2026-11-15T00:33:26Z rust ready'
++ 00:33:26 pack
++ 00:33:26 tar czf /workspace/out.tgz.part -C /workspace out
++ 00:33:26 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:33:26 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:33:26 cut '-d ' -f1
++ 00:33:26 S=research/fall_degree_bounds_20261008
++ 00:33:26 curl -sS -m 120 -o /workspace/source_paths.txt https://raw.githubusercontent.com/isogeny-labs/crypto/43438f5ab6eb6d1844b8d0465c933ad079099326/research/fall_degree_bounds_20261008/e13/source_paths.txt
++ 00:33:26 sha256sum -c -
++ 00:33:26 echo '97b6bbde009ee1e04884041280b1c5dcd9030024d95b940f7e4a12bd9bd28ecd  /workspace/source_paths.txt'
++ 00:33:26 cd /root/src
++ 00:33:26 git init -q .
++ 00:33:26 git remote add origin https://github.com/isogeny-labs/crypto.git
++ 00:33:26 git sparse-checkout init --no-cone
++ 00:33:26 git sparse-checkout set --stdin
++ 00:33:26 git fetch -q --filter=blob:none --depth 1 origin a2be660914e8e485eefd45f2958eb6d18344dadf
++ 00:33:27 git checkout -q FETCH_HEAD
+++ 00:34:00 git rev-parse HEAD
++ 00:34:00 '[' a2be660914e8e485eefd45f2958eb6d18344dadf = a2be660914e8e485eefd45f2958eb6d18344dadf ']'
+++ 00:34:00 sha256sum
++++ 00:34:00 tr '\n' ' '
+++ 00:34:00 cut '-d ' -f1
+++ 00:34:00 git ls-tree -r HEAD -- Cargo.lock Cargo.toml benches benches/pqc_speed.rs benches/pqc_split.rs crates/ecdl-tensor-ic crates/ecdl-tensor-ic/src/bin/ecdldemo.rs crates/ecdl-tensor-ic/src/bin/ecdlscale.rs crates/ecdl-tensor-ic/src/lib.rs crates/hashed-ecdl-tensor docs/curves/cover-catalog.json docs/curves/cover-links.yaml docs/curves/fixed-f8-genus3-order-certificate.json docs/curves/registry.json docs/curves/standards/parameters.json docs/curves/traits.json docs/ecbench/schema.sql docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json docs/ecdlp-audit/ecdlp-audit-plan.schema.json docs/ic/archive-comparison-v1.json docs/ic/archive-comparison-v1.json.sha256 docs/ic/archive-technique-comparison-v2.json docs/ic/archive-technique-comparison-v2.json.sha256 docs/ic/boundary_targets.json docs/ic/calibration.json docs/identity-certificates/schoenhage-10mult.json docs/units/bitop-v1.vectors.json docs/units/bitop-v2.vectors.json examples/dreg_linear_guess.rs examples/hky_crosscheck.rs examples/hky_par.rs examples/hky_window.rs examples/performance_gains_audit.rs experiments/koblitz-n53-compact-cold-20261009/native_replay.rs experiments/koblitz-n53-compact-cold-20261009/native_run.rs experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs isogeny_algos research/aps_measurement_20261029/spec-controls.json research/aps_measurement_20261029/spec-orbit-controls.json research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs research/conductor_gap_cm_orbits_20261015/native/study.rs research/conductor_gap_followups_20261016/native/followups.rs research/conductor_gap_followups_20261016/native/posthoc.rs research/ct_dynamic_audit_20261102/src/main.rs research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json research/dreg_fixed_surplus_20260923/runs research/dreg_invariant_guess_20261029/draws research/dreg_invariant_guess_20261029/runs/S3.d0.b4.jsonl research/dreg_m4_chain_20261006/runs research/ecbench_factor_bases_20261013/sessions/prime20/host.json research/ecbench_factor_bases_20261013/sessions/prime20/plan.json research/ecbench_factor_bases_20261013/sessions/prime20/records.jsonl research/ecbench_factor_bases_20261013/sessions/prime20/session.json research/ecbench_factor_bases_20261013/sessions/prime20/spec.json research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/session.json research/ecbench_rootfind_parity_20261013/sessions/claim-n13-v2/comparisons/rho-strong__ic-c2-frob-counted-m2.json research/f4_linear_algebra_20260914/contract.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json research/fall_degree_bounds_20261008 research/five_leads_e2e_20261019/native research/full_volcano_graphwide_ic_20261017/execution/driver.rs research/full_volcano_graphwide_ic_20261017/execution/summarize.rs research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl research/ic_candidate_tournament_20260915/goal_20260924/prepared-f5-runtime-v1/mathematics.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-f5-v3-control-v1/controls/pipeline.stdout research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/f5-preparation.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-ic-state-v1/sat-preparation.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.anf research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/instance.xor.cnf research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/manifest.json research/ic_candidate_tournament_20260915/goal_20260924/prepared-report-contract-v1/sat-source-check/result.json research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs research/n83_jacobian_projector_20261031/prym-factorization.identity.json research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json research/pencil_large_prime_20261029 research/pencil_large_prime_20261029/src/bin/pencil_symbolic.rs research/pencil_large_prime_20261029/src/lib.rs research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl src src/bin/cryptopro_b_chain_sweep.rs src/bin/cryptopro_b_glv_bench.rs src/bin/curve_cover_check.rs src/bin/curve_cover_check/checker.rs src/bin/curve_cover_check/links.rs src/bin/curve_cover_check/models.rs src/bin/ecc2k_guard.rs src/bin/ecc2k_merge.rs src/bin/ecc2k_status.rs src/bin/ecdlp_audit.rs src/bin/ecdlp_audit/fixed_f8_order.rs src/bin/ecdlp_challenges.rs src/bin/ecdlp_nist.rs src/bin/endo_chain_bench.rs src/bin/factor_base_sweep.rs src/bin/generator_n0.rs src/bin/hyperelliptic_cover.rs src/bin/ic.rs src/bin/icprog/f5_target.rs src/bin/icprog/oracle.rs src/bin/icprog/prepared_f5.rs src/bin/icprog/prepared_sat.rs src/bin/icprog/sat_source.rs src/bin/icx.rs src/bin/isoclass_rho/main.rs src/bin/jacobian_certificate.rs src/bin/jacobian_transfers.rs src/bin/pkm_aux_search.rs src/bin/quartic_ic.rs src/bin/transfer_audit.rs src/bin/volcano_rho.rs src/bin/volcano_stats.rs src/binary_ecc/efd/catalogue.json src/cryptanalysis/algebra_cache.rs src/cryptanalysis/bielliptic_quartic.rs src/cryptanalysis/curve_aliases.json src/cryptanalysis/curve_traits/modular_polynomials.txt src/cryptanalysis/data/phi_j_11.txt src/cryptanalysis/ecbench/full_prices.json src/cryptanalysis/ecbench/koblitz_descent.rs src/cryptanalysis/ecbench/methods.rs src/cryptanalysis/ecbench/registry_index.txt src/cryptanalysis/group_op_count.rs src/cryptanalysis/ic_boundary.rs src/cryptanalysis/ic_framework/explicit_base.rs src/cryptanalysis/ic_framework/linalg.rs src/cryptanalysis/ic_framework/mod.rs src/cryptanalysis/ic_framework/pkm_semaev.rs src/cryptanalysis/ic_framework/plugins.rs src/cryptanalysis/ic_framework/shared_rank.rs src/cryptanalysis/ic_framework/solvers.rs src/cryptanalysis/koblitz_groebner.rs src/cryptanalysis/koblitz_index_calculus.rs src/cryptanalysis/polynomial_reuse.rs src/cryptanalysis/pq_groebner_f2.rs src/cryptanalysis/semaev_leading_form.rs src/cryptopals/data_10.txt src/cryptopals/data_19.txt src/cryptopals/data_20.txt src/cryptopals/data_4.txt src/cryptopals/data_6.txt src/cryptopals/data_7.txt src/cryptopals/data_8.txt src/lib.rs src/main.rs src/ml_dataset/telemetry/checked/policy.json tests/fixtures/ecbench_manifest_small.json tools/factor-base tools/volcano-cli tools/volcano-cli/src/main.rs
++ 00:34:00 TREE=da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff
++ 00:34:00 echo 'tree da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff'
++ 00:34:00 '[' da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff = da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff ']'
++ 00:34:00 log 'source verified a2be660914e8e485eefd45f2958eb6d18344dadf'
++ 00:34:00 tee -a /workspace/out/run.log
+++ 00:34:00 date -u +%FT%TZ
++ 00:34:00 echo '2026-11-15T00:34:00Z source verified a2be660914e8e485eefd45f2958eb6d18344dadf'
++ 00:34:00 pack
++ 00:34:00 tar czf /workspace/out.tgz.part -C /workspace out
++ 00:34:00 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:34:00 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:34:00 cut '-d ' -f1
+++ 00:34:00 cat /sys/fs/cgroup/cpu.max
++ 00:34:00 echo 'cpu.max: max 100000'
+++ 00:34:00 head -1 /proc/pressure/cpu
++ 00:34:00 echo 'cpu.pressure: some avg10=48.98 avg60=50.10 avg300=47.70 total=266697070255'
++ 00:34:01 log 'cpu probe: effective parallelism 19.5 of 32'
+++ 00:34:01 date -u +%FT%TZ
++ 00:34:01 tee -a /workspace/out/run.log
++ 00:34:01 echo '2026-11-15T00:34:01Z cpu probe: effective parallelism 19.5 of 32'
++ 00:34:01 echo 'parallelism 19.5'
++ 00:34:01 pack
++ 00:34:01 tar czf /workspace/out.tgz.part -C /workspace out
++ 00:34:01 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:34:01 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:34:01 cut '-d ' -f1
++ 00:34:01 awk -v x=19.5 'BEGIN{ exit (x+0 < 12) ? 0 : 1 }'
++ 00:34:01 timeout 1500 cargo build --release --example dreg_linear_guess --example hky_par
+++ 00:34:18 left
++++ 00:34:18 date +%s
+++ 00:34:18 echo 43132
++ 00:34:18 '[' 43132 -gt 120 ']'
++ 00:34:18 sleep 60
+++ 00:35:18 left
++++ 00:35:18 date +%s
+++ 00:35:18 echo 43072
++ 00:35:18 '[' 43072 -gt 120 ']'
++ 00:35:18 sleep 60
+++ 00:36:18 left
++++ 00:36:18 date +%s
+++ 00:36:18 echo 43012
++ 00:36:18 '[' 43012 -gt 120 ']'
++ 00:36:18 sleep 60
++ 00:36:25 log 'build done'
+++ 00:36:25 date -u +%FT%TZ
++ 00:36:25 tee -a /workspace/out/run.log
++ 00:36:25 echo '2026-11-15T00:36:25Z build done'
++ 00:36:25 P=/root/src/target/release/examples/dreg_linear_guess
++ 00:36:25 H=/root/src/target/release/examples/hky_par
++ 00:36:25 sha256sum /root/src/target/release/examples/dreg_linear_guess /root/src/target/release/examples/hky_par
++ 00:36:25 log G0
++ 00:36:25 tee -a /workspace/out/run.log
+++ 00:36:25 date -u +%FT%TZ
++ 00:36:25 echo '2026-11-15T00:36:25Z G0'
++ 00:36:25 cargo test --release --lib -- fast_chained_count_matches_the_reference chained_count partial_enlargement
+++ 00:37:18 left
++++ 00:37:18 date +%s
+++ 00:37:18 echo 42952
++ 00:37:18 '[' 42952 -gt 120 ']'
++ 00:37:18 sleep 60
+++ 00:38:18 left
++++ 00:38:18 date +%s
+++ 00:38:18 echo 42892
++ 00:38:18 '[' 42892 -gt 120 ']'
++ 00:38:18 sleep 60
+++ 00:39:18 left
++++ 00:39:18 date +%s
+++ 00:39:18 echo 42832
++ 00:39:18 '[' 42832 -gt 120 ']'
++ 00:39:18 sleep 60
+++ 00:40:18 left
++++ 00:40:18 date +%s
+++ 00:40:18 echo 42772
++ 00:40:18 '[' 42772 -gt 120 ']'
++ 00:40:18 sleep 60
++ 00:40:30 grep -q 'test result: ok. [1-9]' /workspace/out/g0.log
++ 00:40:30 TIMEV=
++ 00:40:30 '[' -x /usr/bin/time ']'
++ 00:40:30 TIMEV='/usr/bin/time -v'
++ 00:40:30 case "${MODE:-}" in
++ 00:40:30 jq -c 'select(.draw==3)' research/fall_degree_bounds_20261008/e10/run-r3-B/out/E_3-21-7.jsonl
++ 00:40:30 sha256sum /workspace/out/d3_input.jsonl
+++ 00:40:30 wc -l
++ 00:40:30 '[' 1 = 1 ']'
++ 00:40:30 kL='{draw,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}'
++ 00:40:30 log GL
++ 00:40:30 tee -a /workspace/out/run.log
+++ 00:40:30 date -u +%FT%TZ
++ 00:40:30 echo '2026-11-15T00:40:30Z GL'
++ 00:40:30 RAYON_NUM_THREADS=32
++ 00:40:30 /root/src/target/release/examples/hky_par ladder /workspace/out/d3_input.jsonl --m 3 --cmax 4
+++ 00:41:18 left
++++ 00:41:18 date +%s
+++ 00:41:18 echo 42712
++ 00:41:18 '[' 42712 -gt 120 ']'
++ 00:41:18 sleep 60
+++ 00:41:49 jq -c '{draw,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}' /workspace/out/gl.jsonl
++ 00:41:49 diff /dev/fd/63 /dev/fd/62
+++ 00:41:49 jq -c '{draw,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}' /workspace/out/d3_input.jsonl
++ 00:41:49 log 'gates passed'
++ 00:41:49 tee -a /workspace/out/run.log
+++ 00:41:49 date -u +%FT%TZ
++ 00:41:49 echo '2026-11-15T00:41:49Z gates passed'
++ 00:41:49 pack
++ 00:41:49 tar czf /workspace/out.tgz.part -C /workspace out
++ 00:41:49 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:41:49 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:41:49 cut '-d ' -f1
++ 00:41:49 log 'start A_3-21-7_d3 (hky_par ladder cmax 5, 32 threads)'
++ 00:41:49 tee -a /workspace/out/run.log
+++ 00:41:49 date -u +%FT%TZ
++ 00:41:49 echo '2026-11-15T00:41:49Z start A_3-21-7_d3 (hky_par ladder cmax 5, 32 threads)'
+++ 00:41:49 date +%s
++ 00:41:49 sA=1794703309
++ 00:41:49 /usr/bin/time -v env RAYON_NUM_THREADS=32 /root/src/target/release/examples/hky_par ladder /workspace/out/d3_input.jsonl --m 3 --cmax 5
+++ 00:42:18 left
++++ 00:42:18 date +%s
+++ 00:42:18 echo 42652
++ 00:42:18 '[' 42652 -gt 120 ']'
++ 00:42:18 sleep 60
++ 00:43:18 pack
++ 00:43:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 00:43:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:43:18 cut '-d ' -f1
++ 00:43:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:43:18 sleep 600
+++ 00:43:18 left
++++ 00:43:18 date +%s
+++ 00:43:18 echo 42592
++ 00:43:18 '[' 42592 -gt 120 ']'
++ 00:43:18 sleep 60
+++ 00:44:18 left
++++ 00:44:18 date +%s
+++ 00:44:18 echo 42532
++ 00:44:18 '[' 42532 -gt 120 ']'
++ 00:44:18 sleep 60
+++ 00:45:18 left
++++ 00:45:18 date +%s
+++ 00:45:18 echo 42472
++ 00:45:18 '[' 42472 -gt 120 ']'
++ 00:45:18 sleep 60
+++ 00:46:18 left
++++ 00:46:18 date +%s
+++ 00:46:18 echo 42412
++ 00:46:18 '[' 42412 -gt 120 ']'
++ 00:46:18 sleep 60
+++ 00:47:18 left
++++ 00:47:18 date +%s
+++ 00:47:18 echo 42352
++ 00:47:18 '[' 42352 -gt 120 ']'
++ 00:47:18 sleep 60
+++ 00:48:18 left
++++ 00:48:18 date +%s
+++ 00:48:18 echo 42292
++ 00:48:18 '[' 42292 -gt 120 ']'
++ 00:48:18 sleep 60
+++ 00:49:18 left
++++ 00:49:18 date +%s
+++ 00:49:18 echo 42232
++ 00:49:18 '[' 42232 -gt 120 ']'
++ 00:49:18 sleep 60
+++ 00:50:18 left
++++ 00:50:18 date +%s
+++ 00:50:18 echo 42172
++ 00:50:18 '[' 42172 -gt 120 ']'
++ 00:50:18 sleep 60
+++ 00:51:18 left
++++ 00:51:18 date +%s
+++ 00:51:18 echo 42112
++ 00:51:18 '[' 42112 -gt 120 ']'
++ 00:51:18 sleep 60
+++ 00:52:18 left
++++ 00:52:18 date +%s
+++ 00:52:18 echo 42052
++ 00:52:18 '[' 42052 -gt 120 ']'
++ 00:52:18 sleep 60
++ 00:53:18 pack
++ 00:53:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 00:53:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:53:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 00:53:18 cut '-d ' -f1
++ 00:53:18 sleep 600
+++ 00:53:18 left
++++ 00:53:18 date +%s
+++ 00:53:18 echo 41992
++ 00:53:18 '[' 41992 -gt 120 ']'
++ 00:53:18 sleep 60
+++ 00:54:18 left
++++ 00:54:18 date +%s
+++ 00:54:18 echo 41932
++ 00:54:18 '[' 41932 -gt 120 ']'
++ 00:54:18 sleep 60
+++ 00:55:18 left
++++ 00:55:18 date +%s
+++ 00:55:18 echo 41872
++ 00:55:18 '[' 41872 -gt 120 ']'
++ 00:55:18 sleep 60
+++ 00:56:18 left
++++ 00:56:18 date +%s
+++ 00:56:18 echo 41812
++ 00:56:18 '[' 41812 -gt 120 ']'
++ 00:56:18 sleep 60
+++ 00:57:18 left
++++ 00:57:18 date +%s
+++ 00:57:18 echo 41752
++ 00:57:18 '[' 41752 -gt 120 ']'
++ 00:57:18 sleep 60
+++ 00:58:18 left
++++ 00:58:18 date +%s
+++ 00:58:18 echo 41692
++ 00:58:18 '[' 41692 -gt 120 ']'
++ 00:58:18 sleep 60
+++ 00:59:18 left
++++ 00:59:18 date +%s
+++ 00:59:18 echo 41632
++ 00:59:18 '[' 41632 -gt 120 ']'
++ 00:59:18 sleep 60
+++ 01:00:18 left
++++ 01:00:18 date +%s
+++ 01:00:18 echo 41572
++ 01:00:18 '[' 41572 -gt 120 ']'
++ 01:00:18 sleep 60
+++ 01:01:19 left
++++ 01:01:19 date +%s
+++ 01:01:19 echo 41511
++ 01:01:19 '[' 41511 -gt 120 ']'
++ 01:01:19 sleep 60
+++ 01:02:19 left
++++ 01:02:19 date +%s
+++ 01:02:19 echo 41451
++ 01:02:19 '[' 41451 -gt 120 ']'
++ 01:02:19 sleep 60
++ 01:03:18 pack
++ 01:03:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 01:03:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:03:18 cut '-d ' -f1
++ 01:03:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:03:18 sleep 600
+++ 01:03:19 left
++++ 01:03:19 date +%s
+++ 01:03:19 echo 41391
++ 01:03:19 '[' 41391 -gt 120 ']'
++ 01:03:19 sleep 60
+++ 01:04:19 left
++++ 01:04:19 date +%s
+++ 01:04:19 echo 41331
++ 01:04:19 '[' 41331 -gt 120 ']'
++ 01:04:19 sleep 60
+++ 01:05:19 left
++++ 01:05:19 date +%s
+++ 01:05:19 echo 41271
++ 01:05:19 '[' 41271 -gt 120 ']'
++ 01:05:19 sleep 60
+++ 01:06:19 left
++++ 01:06:19 date +%s
+++ 01:06:19 echo 41211
++ 01:06:19 '[' 41211 -gt 120 ']'
++ 01:06:19 sleep 60
+++ 01:07:19 left
++++ 01:07:19 date +%s
+++ 01:07:19 echo 41151
++ 01:07:19 '[' 41151 -gt 120 ']'
++ 01:07:19 sleep 60
+++ 01:08:19 left
++++ 01:08:19 date +%s
+++ 01:08:19 echo 41091
++ 01:08:19 '[' 41091 -gt 120 ']'
++ 01:08:19 sleep 60
+++ 01:09:19 left
++++ 01:09:19 date +%s
+++ 01:09:19 echo 41031
++ 01:09:19 '[' 41031 -gt 120 ']'
++ 01:09:19 sleep 60
+++ 01:10:19 left
++++ 01:10:19 date +%s
+++ 01:10:19 echo 40971
++ 01:10:19 '[' 40971 -gt 120 ']'
++ 01:10:19 sleep 60
+++ 01:11:19 left
++++ 01:11:19 date +%s
+++ 01:11:19 echo 40911
++ 01:11:19 '[' 40911 -gt 120 ']'
++ 01:11:19 sleep 60
+++ 01:12:19 left
++++ 01:12:19 date +%s
+++ 01:12:19 echo 40851
++ 01:12:19 '[' 40851 -gt 120 ']'
++ 01:12:19 sleep 60
++ 01:13:18 pack
++ 01:13:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 01:13:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:13:18 cut '-d ' -f1
++ 01:13:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:13:18 sleep 600
+++ 01:13:19 left
++++ 01:13:19 date +%s
+++ 01:13:19 echo 40791
++ 01:13:19 '[' 40791 -gt 120 ']'
++ 01:13:19 sleep 60
+++ 01:14:19 left
++++ 01:14:19 date +%s
+++ 01:14:19 echo 40731
++ 01:14:19 '[' 40731 -gt 120 ']'
++ 01:14:19 sleep 60
+++ 01:15:19 left
++++ 01:15:19 date +%s
+++ 01:15:19 echo 40671
++ 01:15:19 '[' 40671 -gt 120 ']'
++ 01:15:19 sleep 60
+++ 01:16:19 left
++++ 01:16:19 date +%s
+++ 01:16:19 echo 40611
++ 01:16:19 '[' 40611 -gt 120 ']'
++ 01:16:19 sleep 60
+++ 01:17:19 left
++++ 01:17:19 date +%s
+++ 01:17:19 echo 40551
++ 01:17:19 '[' 40551 -gt 120 ']'
++ 01:17:19 sleep 60
+++ 01:18:19 left
++++ 01:18:19 date +%s
+++ 01:18:19 echo 40491
++ 01:18:19 '[' 40491 -gt 120 ']'
++ 01:18:19 sleep 60
+++ 01:19:19 left
++++ 01:19:19 date +%s
+++ 01:19:19 echo 40431
++ 01:19:19 '[' 40431 -gt 120 ']'
++ 01:19:19 sleep 60
+++ 01:20:19 left
++++ 01:20:19 date +%s
+++ 01:20:19 echo 40371
++ 01:20:19 '[' 40371 -gt 120 ']'
++ 01:20:19 sleep 60
+++ 01:21:19 left
++++ 01:21:19 date +%s
+++ 01:21:19 echo 40311
++ 01:21:19 '[' 40311 -gt 120 ']'
++ 01:21:19 sleep 60
+++ 01:22:19 left
++++ 01:22:19 date +%s
+++ 01:22:19 echo 40251
++ 01:22:19 '[' 40251 -gt 120 ']'
++ 01:22:19 sleep 60
++ 01:23:18 pack
++ 01:23:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 01:23:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:23:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:23:18 cut '-d ' -f1
++ 01:23:18 sleep 600
+++ 01:23:19 left
++++ 01:23:19 date +%s
+++ 01:23:19 echo 40191
++ 01:23:19 '[' 40191 -gt 120 ']'
++ 01:23:19 sleep 60
+++ 01:24:19 left
++++ 01:24:19 date +%s
+++ 01:24:19 echo 40131
++ 01:24:19 '[' 40131 -gt 120 ']'
++ 01:24:19 sleep 60
+++ 01:25:19 left
++++ 01:25:19 date +%s
+++ 01:25:19 echo 40071
++ 01:25:19 '[' 40071 -gt 120 ']'
++ 01:25:19 sleep 60
+++ 01:26:19 left
++++ 01:26:19 date +%s
+++ 01:26:19 echo 40011
++ 01:26:19 '[' 40011 -gt 120 ']'
++ 01:26:19 sleep 60
+++ 01:27:19 left
++++ 01:27:19 date +%s
+++ 01:27:19 echo 39951
++ 01:27:19 '[' 39951 -gt 120 ']'
++ 01:27:19 sleep 60
+++ 01:28:19 left
++++ 01:28:19 date +%s
+++ 01:28:19 echo 39891
++ 01:28:19 '[' 39891 -gt 120 ']'
++ 01:28:19 sleep 60
+++ 01:29:19 left
++++ 01:29:19 date +%s
+++ 01:29:19 echo 39831
++ 01:29:19 '[' 39831 -gt 120 ']'
++ 01:29:19 sleep 60
+++ 01:30:19 left
++++ 01:30:19 date +%s
+++ 01:30:19 echo 39771
++ 01:30:19 '[' 39771 -gt 120 ']'
++ 01:30:19 sleep 60
+++ 01:31:19 left
++++ 01:31:19 date +%s
+++ 01:31:19 echo 39711
++ 01:31:19 '[' 39711 -gt 120 ']'
++ 01:31:19 sleep 60
+++ 01:32:19 left
++++ 01:32:19 date +%s
+++ 01:32:20 echo 39650
++ 01:32:20 '[' 39650 -gt 120 ']'
++ 01:32:20 sleep 60
++ 01:33:18 pack
++ 01:33:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 01:33:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:33:18 cut '-d ' -f1
++ 01:33:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:33:18 sleep 600
+++ 01:33:20 left
++++ 01:33:20 date +%s
+++ 01:33:20 echo 39590
++ 01:33:20 '[' 39590 -gt 120 ']'
++ 01:33:20 sleep 60
+++ 01:34:20 left
++++ 01:34:20 date +%s
+++ 01:34:20 echo 39530
++ 01:34:20 '[' 39530 -gt 120 ']'
++ 01:34:20 sleep 60
+++ 01:35:20 left
++++ 01:35:20 date +%s
+++ 01:35:20 echo 39470
++ 01:35:20 '[' 39470 -gt 120 ']'
++ 01:35:20 sleep 60
+++ 01:36:20 left
++++ 01:36:20 date +%s
+++ 01:36:20 echo 39410
++ 01:36:20 '[' 39410 -gt 120 ']'
++ 01:36:20 sleep 60
+++ 01:37:20 left
++++ 01:37:20 date +%s
+++ 01:37:20 echo 39350
++ 01:37:20 '[' 39350 -gt 120 ']'
++ 01:37:20 sleep 60
+++ 01:38:20 left
++++ 01:38:20 date +%s
+++ 01:38:20 echo 39290
++ 01:38:20 '[' 39290 -gt 120 ']'
++ 01:38:20 sleep 60
+++ 01:39:20 left
++++ 01:39:20 date +%s
+++ 01:39:20 echo 39230
++ 01:39:20 '[' 39230 -gt 120 ']'
++ 01:39:20 sleep 60
+++ 01:40:20 left
++++ 01:40:20 date +%s
+++ 01:40:20 echo 39170
++ 01:40:20 '[' 39170 -gt 120 ']'
++ 01:40:20 sleep 60
+++ 01:41:20 left
++++ 01:41:20 date +%s
+++ 01:41:20 echo 39110
++ 01:41:20 '[' 39110 -gt 120 ']'
++ 01:41:20 sleep 60
+++ 01:42:20 left
++++ 01:42:20 date +%s
+++ 01:42:20 echo 39050
++ 01:42:20 '[' 39050 -gt 120 ']'
++ 01:42:20 sleep 60
++ 01:43:18 pack
++ 01:43:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 01:43:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:43:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:43:18 cut '-d ' -f1
++ 01:43:18 sleep 600
+++ 01:43:20 left
++++ 01:43:20 date +%s
+++ 01:43:20 echo 38990
++ 01:43:20 '[' 38990 -gt 120 ']'
++ 01:43:20 sleep 60
+++ 01:44:20 left
++++ 01:44:20 date +%s
+++ 01:44:20 echo 38930
++ 01:44:20 '[' 38930 -gt 120 ']'
++ 01:44:20 sleep 60
+++ 01:45:20 left
++++ 01:45:20 date +%s
+++ 01:45:20 echo 38870
++ 01:45:20 '[' 38870 -gt 120 ']'
++ 01:45:20 sleep 60
+++ 01:46:20 left
++++ 01:46:20 date +%s
+++ 01:46:20 echo 38810
++ 01:46:20 '[' 38810 -gt 120 ']'
++ 01:46:20 sleep 60
+++ 01:47:20 left
++++ 01:47:20 date +%s
+++ 01:47:20 echo 38750
++ 01:47:20 '[' 38750 -gt 120 ']'
++ 01:47:20 sleep 60
+++ 01:48:20 left
++++ 01:48:20 date +%s
+++ 01:48:20 echo 38690
++ 01:48:20 '[' 38690 -gt 120 ']'
++ 01:48:20 sleep 60
+++ 01:49:20 left
++++ 01:49:20 date +%s
+++ 01:49:20 echo 38630
++ 01:49:20 '[' 38630 -gt 120 ']'
++ 01:49:20 sleep 60
+++ 01:50:20 left
++++ 01:50:20 date +%s
+++ 01:50:20 echo 38570
++ 01:50:20 '[' 38570 -gt 120 ']'
++ 01:50:20 sleep 60
+++ 01:51:20 left
++++ 01:51:20 date +%s
+++ 01:51:20 echo 38510
++ 01:51:20 '[' 38510 -gt 120 ']'
++ 01:51:20 sleep 60
+++ 01:52:20 left
++++ 01:52:20 date +%s
+++ 01:52:20 echo 38450
++ 01:52:20 '[' 38450 -gt 120 ']'
++ 01:52:20 sleep 60
++ 01:53:18 pack
++ 01:53:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 01:53:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:53:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 01:53:18 cut '-d ' -f1
++ 01:53:18 sleep 600
+++ 01:53:20 left
++++ 01:53:20 date +%s
+++ 01:53:20 echo 38390
++ 01:53:20 '[' 38390 -gt 120 ']'
++ 01:53:20 sleep 60
+++ 01:54:20 left
++++ 01:54:20 date +%s
+++ 01:54:20 echo 38330
++ 01:54:20 '[' 38330 -gt 120 ']'
++ 01:54:20 sleep 60
+++ 01:55:20 left
++++ 01:55:20 date +%s
+++ 01:55:20 echo 38270
++ 01:55:20 '[' 38270 -gt 120 ']'
++ 01:55:20 sleep 60
+++ 01:56:20 left
++++ 01:56:20 date +%s
+++ 01:56:20 echo 38210
++ 01:56:20 '[' 38210 -gt 120 ']'
++ 01:56:20 sleep 60
+++ 01:57:20 left
++++ 01:57:20 date +%s
+++ 01:57:20 echo 38150
++ 01:57:20 '[' 38150 -gt 120 ']'
++ 01:57:20 sleep 60
+++ 01:58:20 left
++++ 01:58:20 date +%s
+++ 01:58:20 echo 38090
++ 01:58:20 '[' 38090 -gt 120 ']'
++ 01:58:20 sleep 60
+++ 01:59:20 left
++++ 01:59:20 date +%s
+++ 01:59:20 echo 38030
++ 01:59:20 '[' 38030 -gt 120 ']'
++ 01:59:20 sleep 60
+++ 02:00:20 left
++++ 02:00:20 date +%s
+++ 02:00:20 echo 37970
++ 02:00:20 '[' 37970 -gt 120 ']'
++ 02:00:20 sleep 60
+++ 02:01:20 left
++++ 02:01:20 date +%s
+++ 02:01:20 echo 37910
++ 02:01:20 '[' 37910 -gt 120 ']'
++ 02:01:20 sleep 60
+++ 02:02:20 left
++++ 02:02:20 date +%s
+++ 02:02:20 echo 37850
++ 02:02:20 '[' 37850 -gt 120 ']'
++ 02:02:20 sleep 60
++ 02:03:18 pack
++ 02:03:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 02:03:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:03:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:03:18 cut '-d ' -f1
++ 02:03:18 sleep 600
+++ 02:03:20 left
++++ 02:03:20 date +%s
+++ 02:03:20 echo 37790
++ 02:03:20 '[' 37790 -gt 120 ']'
++ 02:03:20 sleep 60
+++ 02:04:20 left
++++ 02:04:20 date +%s
+++ 02:04:20 echo 37730
++ 02:04:20 '[' 37730 -gt 120 ']'
++ 02:04:20 sleep 60
+++ 02:05:20 left
++++ 02:05:20 date +%s
+++ 02:05:20 echo 37670
++ 02:05:20 '[' 37670 -gt 120 ']'
++ 02:05:20 sleep 60
+++ 02:06:20 left
++++ 02:06:20 date +%s
+++ 02:06:20 echo 37610
++ 02:06:20 '[' 37610 -gt 120 ']'
++ 02:06:20 sleep 60
+++ 02:07:20 left
++++ 02:07:20 date +%s
+++ 02:07:20 echo 37550
++ 02:07:20 '[' 37550 -gt 120 ']'
++ 02:07:20 sleep 60
+++ 02:08:20 left
++++ 02:08:20 date +%s
+++ 02:08:20 echo 37490
++ 02:08:20 '[' 37490 -gt 120 ']'
++ 02:08:20 sleep 60
+++ 02:09:20 left
++++ 02:09:20 date +%s
+++ 02:09:20 echo 37430
++ 02:09:20 '[' 37430 -gt 120 ']'
++ 02:09:21 sleep 60
+++ 02:10:21 left
++++ 02:10:21 date +%s
+++ 02:10:21 echo 37369
++ 02:10:21 '[' 37369 -gt 120 ']'
++ 02:10:21 sleep 60
+++ 02:11:21 left
++++ 02:11:21 date +%s
+++ 02:11:21 echo 37309
++ 02:11:21 '[' 37309 -gt 120 ']'
++ 02:11:21 sleep 60
+++ 02:12:21 left
++++ 02:12:21 date +%s
+++ 02:12:21 echo 37249
++ 02:12:21 '[' 37249 -gt 120 ']'
++ 02:12:21 sleep 60
++ 02:13:18 pack
++ 02:13:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 02:13:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:13:18 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:13:18 cut '-d ' -f1
++ 02:13:18 sleep 600
+++ 02:13:21 left
++++ 02:13:21 date +%s
+++ 02:13:21 echo 37189
++ 02:13:21 '[' 37189 -gt 120 ']'
++ 02:13:21 sleep 60
+++ 02:14:21 left
++++ 02:14:21 date +%s
+++ 02:14:21 echo 37129
++ 02:14:21 '[' 37129 -gt 120 ']'
++ 02:14:21 sleep 60
+++ 02:15:21 left
++++ 02:15:21 date +%s
+++ 02:15:21 echo 37069
++ 02:15:21 '[' 37069 -gt 120 ']'
++ 02:15:21 sleep 60
+++ 02:16:21 left
++++ 02:16:21 date +%s
+++ 02:16:21 echo 37009
++ 02:16:21 '[' 37009 -gt 120 ']'
++ 02:16:21 sleep 60
+++ 02:17:21 left
++++ 02:17:21 date +%s
+++ 02:17:21 echo 36949
++ 02:17:21 '[' 36949 -gt 120 ']'
++ 02:17:21 sleep 60
+++ 02:18:21 left
++++ 02:18:21 date +%s
+++ 02:18:21 echo 36889
++ 02:18:21 '[' 36889 -gt 120 ']'
++ 02:18:21 sleep 60
+++ 02:19:21 left
++++ 02:19:21 date +%s
+++ 02:19:21 echo 36829
++ 02:19:21 '[' 36829 -gt 120 ']'
++ 02:19:21 sleep 60
+++ 02:20:21 left
++++ 02:20:21 date +%s
+++ 02:20:21 echo 36769
++ 02:20:21 '[' 36769 -gt 120 ']'
++ 02:20:21 sleep 60
+++ 02:21:21 left
++++ 02:21:21 date +%s
+++ 02:21:21 echo 36709
++ 02:21:21 '[' 36709 -gt 120 ']'
++ 02:21:21 sleep 60
+++ 02:22:21 left
++++ 02:22:21 date +%s
+++ 02:22:21 echo 36649
++ 02:22:21 '[' 36649 -gt 120 ']'
++ 02:22:21 sleep 60
++ 02:23:18 pack
++ 02:23:18 tar czf /workspace/out.tgz.part -C /workspace out
++ 02:23:18 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:23:19 cut '-d ' -f1
++ 02:23:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:23:19 sleep 600
+++ 02:23:21 left
++++ 02:23:21 date +%s
+++ 02:23:21 echo 36589
++ 02:23:21 '[' 36589 -gt 120 ']'
++ 02:23:21 sleep 60
+++ 02:24:21 left
++++ 02:24:21 date +%s
+++ 02:24:21 echo 36529
++ 02:24:21 '[' 36529 -gt 120 ']'
++ 02:24:21 sleep 60
+++ 02:25:21 left
++++ 02:25:21 date +%s
+++ 02:25:21 echo 36469
++ 02:25:21 '[' 36469 -gt 120 ']'
++ 02:25:21 sleep 60
+++ 02:26:21 left
++++ 02:26:21 date +%s
+++ 02:26:21 echo 36409
++ 02:26:21 '[' 36409 -gt 120 ']'
++ 02:26:21 sleep 60
+++ 02:27:21 left
++++ 02:27:21 date +%s
+++ 02:27:21 echo 36349
++ 02:27:21 '[' 36349 -gt 120 ']'
++ 02:27:21 sleep 60
+++ 02:28:21 left
++++ 02:28:21 date +%s
+++ 02:28:21 echo 36289
++ 02:28:21 '[' 36289 -gt 120 ']'
++ 02:28:21 sleep 60
+++ 02:29:21 left
++++ 02:29:21 date +%s
+++ 02:29:21 echo 36229
++ 02:29:21 '[' 36229 -gt 120 ']'
++ 02:29:21 sleep 60
+++ 02:30:21 left
++++ 02:30:21 date +%s
+++ 02:30:21 echo 36169
++ 02:30:21 '[' 36169 -gt 120 ']'
++ 02:30:21 sleep 60
+++ 02:31:21 left
++++ 02:31:21 date +%s
+++ 02:31:21 echo 36109
++ 02:31:21 '[' 36109 -gt 120 ']'
++ 02:31:21 sleep 60
+++ 02:32:21 left
++++ 02:32:21 date +%s
+++ 02:32:21 echo 36049
++ 02:32:21 '[' 36049 -gt 120 ']'
++ 02:32:21 sleep 60
++ 02:33:19 pack
++ 02:33:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 02:33:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:33:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:33:19 cut '-d ' -f1
++ 02:33:19 sleep 600
+++ 02:33:21 left
++++ 02:33:21 date +%s
+++ 02:33:21 echo 35989
++ 02:33:21 '[' 35989 -gt 120 ']'
++ 02:33:21 sleep 60
+++ 02:34:21 left
++++ 02:34:21 date +%s
+++ 02:34:21 echo 35929
++ 02:34:21 '[' 35929 -gt 120 ']'
++ 02:34:21 sleep 60
+++ 02:35:21 left
++++ 02:35:21 date +%s
+++ 02:35:21 echo 35869
++ 02:35:21 '[' 35869 -gt 120 ']'
++ 02:35:21 sleep 60
+++ 02:36:21 left
++++ 02:36:21 date +%s
+++ 02:36:21 echo 35809
++ 02:36:21 '[' 35809 -gt 120 ']'
++ 02:36:21 sleep 60
+++ 02:37:21 left
++++ 02:37:21 date +%s
+++ 02:37:21 echo 35749
++ 02:37:21 '[' 35749 -gt 120 ']'
++ 02:37:21 sleep 60
+++ 02:38:21 left
++++ 02:38:21 date +%s
+++ 02:38:21 echo 35689
++ 02:38:21 '[' 35689 -gt 120 ']'
++ 02:38:21 sleep 60
+++ 02:39:21 left
++++ 02:39:21 date +%s
+++ 02:39:21 echo 35629
++ 02:39:21 '[' 35629 -gt 120 ']'
++ 02:39:21 sleep 60
+++ 02:40:21 left
++++ 02:40:21 date +%s
+++ 02:40:21 echo 35569
++ 02:40:21 '[' 35569 -gt 120 ']'
++ 02:40:21 sleep 60
+++ 02:41:21 left
++++ 02:41:21 date +%s
+++ 02:41:21 echo 35509
++ 02:41:21 '[' 35509 -gt 120 ']'
++ 02:41:21 sleep 60
+++ 02:42:21 left
++++ 02:42:21 date +%s
+++ 02:42:21 echo 35449
++ 02:42:21 '[' 35449 -gt 120 ']'
++ 02:42:21 sleep 60
++ 02:43:19 pack
++ 02:43:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 02:43:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:43:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:43:19 cut '-d ' -f1
++ 02:43:19 sleep 600
+++ 02:43:21 left
++++ 02:43:22 date +%s
+++ 02:43:22 echo 35388
++ 02:43:22 '[' 35388 -gt 120 ']'
++ 02:43:22 sleep 60
+++ 02:44:22 left
++++ 02:44:22 date +%s
+++ 02:44:22 echo 35328
++ 02:44:22 '[' 35328 -gt 120 ']'
++ 02:44:22 sleep 60
+++ 02:45:22 left
++++ 02:45:22 date +%s
+++ 02:45:22 echo 35268
++ 02:45:22 '[' 35268 -gt 120 ']'
++ 02:45:22 sleep 60
+++ 02:46:22 left
++++ 02:46:22 date +%s
+++ 02:46:22 echo 35208
++ 02:46:22 '[' 35208 -gt 120 ']'
++ 02:46:22 sleep 60
+++ 02:47:22 left
++++ 02:47:22 date +%s
+++ 02:47:22 echo 35148
++ 02:47:22 '[' 35148 -gt 120 ']'
++ 02:47:22 sleep 60
+++ 02:48:22 left
++++ 02:48:22 date +%s
+++ 02:48:22 echo 35088
++ 02:48:22 '[' 35088 -gt 120 ']'
++ 02:48:22 sleep 60
+++ 02:49:22 left
++++ 02:49:22 date +%s
+++ 02:49:22 echo 35028
++ 02:49:22 '[' 35028 -gt 120 ']'
++ 02:49:22 sleep 60
+++ 02:50:22 left
++++ 02:50:22 date +%s
+++ 02:50:22 echo 34968
++ 02:50:22 '[' 34968 -gt 120 ']'
++ 02:50:22 sleep 60
+++ 02:51:22 left
++++ 02:51:22 date +%s
+++ 02:51:22 echo 34908
++ 02:51:22 '[' 34908 -gt 120 ']'
++ 02:51:22 sleep 60
+++ 02:52:22 left
++++ 02:52:22 date +%s
+++ 02:52:22 echo 34848
++ 02:52:22 '[' 34848 -gt 120 ']'
++ 02:52:22 sleep 60
++ 02:53:19 pack
++ 02:53:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 02:53:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:53:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 02:53:19 cut '-d ' -f1
++ 02:53:19 sleep 600
+++ 02:53:22 left
++++ 02:53:22 date +%s
+++ 02:53:22 echo 34788
++ 02:53:22 '[' 34788 -gt 120 ']'
++ 02:53:22 sleep 60
+++ 02:54:22 left
++++ 02:54:22 date +%s
+++ 02:54:22 echo 34728
++ 02:54:22 '[' 34728 -gt 120 ']'
++ 02:54:22 sleep 60
+++ 02:55:22 left
++++ 02:55:22 date +%s
+++ 02:55:22 echo 34668
++ 02:55:22 '[' 34668 -gt 120 ']'
++ 02:55:22 sleep 60
+++ 02:56:22 left
++++ 02:56:22 date +%s
+++ 02:56:22 echo 34608
++ 02:56:22 '[' 34608 -gt 120 ']'
++ 02:56:22 sleep 60
+++ 02:57:22 left
++++ 02:57:22 date +%s
+++ 02:57:22 echo 34548
++ 02:57:22 '[' 34548 -gt 120 ']'
++ 02:57:22 sleep 60
+++ 02:58:22 left
++++ 02:58:22 date +%s
+++ 02:58:22 echo 34488
++ 02:58:22 '[' 34488 -gt 120 ']'
++ 02:58:22 sleep 60
+++ 02:59:22 left
++++ 02:59:22 date +%s
+++ 02:59:22 echo 34428
++ 02:59:22 '[' 34428 -gt 120 ']'
++ 02:59:22 sleep 60
+++ 03:00:22 left
++++ 03:00:22 date +%s
+++ 03:00:22 echo 34368
++ 03:00:22 '[' 34368 -gt 120 ']'
++ 03:00:22 sleep 60
+++ 03:01:22 left
++++ 03:01:22 date +%s
+++ 03:01:22 echo 34308
++ 03:01:22 '[' 34308 -gt 120 ']'
++ 03:01:22 sleep 60
+++ 03:02:22 left
++++ 03:02:22 date +%s
+++ 03:02:22 echo 34248
++ 03:02:22 '[' 34248 -gt 120 ']'
++ 03:02:22 sleep 60
++ 03:03:19 pack
++ 03:03:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:03:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:03:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:03:19 cut '-d ' -f1
++ 03:03:19 sleep 600
+++ 03:03:22 left
++++ 03:03:22 date +%s
+++ 03:03:22 echo 34188
++ 03:03:22 '[' 34188 -gt 120 ']'
++ 03:03:22 sleep 60
+++ 03:04:22 left
++++ 03:04:22 date +%s
+++ 03:04:22 echo 34128
++ 03:04:22 '[' 34128 -gt 120 ']'
++ 03:04:22 sleep 60
+++ 03:05:22 left
++++ 03:05:22 date +%s
+++ 03:05:22 echo 34068
++ 03:05:22 '[' 34068 -gt 120 ']'
++ 03:05:22 sleep 60
+++ 03:06:22 left
++++ 03:06:22 date +%s
+++ 03:06:22 echo 34008
++ 03:06:22 '[' 34008 -gt 120 ']'
++ 03:06:22 sleep 60
+++ 03:07:22 left
++++ 03:07:22 date +%s
+++ 03:07:22 echo 33948
++ 03:07:22 '[' 33948 -gt 120 ']'
++ 03:07:22 sleep 60
+++ 03:08:22 left
++++ 03:08:22 date +%s
+++ 03:08:22 echo 33888
++ 03:08:22 '[' 33888 -gt 120 ']'
++ 03:08:22 sleep 60
+++ 03:09:22 left
++++ 03:09:22 date +%s
+++ 03:09:22 echo 33828
++ 03:09:22 '[' 33828 -gt 120 ']'
++ 03:09:22 sleep 60
+++ 03:10:22 left
++++ 03:10:22 date +%s
+++ 03:10:22 echo 33768
++ 03:10:22 '[' 33768 -gt 120 ']'
++ 03:10:22 sleep 60
+++ 03:11:22 left
++++ 03:11:22 date +%s
+++ 03:11:22 echo 33708
++ 03:11:22 '[' 33708 -gt 120 ']'
++ 03:11:22 sleep 60
+++ 03:12:22 left
++++ 03:12:22 date +%s
+++ 03:12:22 echo 33648
++ 03:12:22 '[' 33648 -gt 120 ']'
++ 03:12:22 sleep 60
++ 03:13:19 pack
++ 03:13:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:13:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:13:19 cut '-d ' -f1
++ 03:13:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:13:19 sleep 600
+++ 03:13:22 left
++++ 03:13:22 date +%s
+++ 03:13:22 echo 33588
++ 03:13:22 '[' 33588 -gt 120 ']'
++ 03:13:22 sleep 60
+++ 03:14:22 left
++++ 03:14:22 date +%s
+++ 03:14:22 echo 33528
++ 03:14:22 '[' 33528 -gt 120 ']'
++ 03:14:22 sleep 60
+++ 03:15:22 left
++++ 03:15:22 date +%s
+++ 03:15:22 echo 33468
++ 03:15:22 '[' 33468 -gt 120 ']'
++ 03:15:22 sleep 60
+++ 03:16:22 left
++++ 03:16:22 date +%s
+++ 03:16:22 echo 33408
++ 03:16:22 '[' 33408 -gt 120 ']'
++ 03:16:22 sleep 60
+++ 03:17:22 left
++++ 03:17:22 date +%s
+++ 03:17:22 echo 33348
++ 03:17:22 '[' 33348 -gt 120 ']'
++ 03:17:22 sleep 60
+++ 03:18:22 left
++++ 03:18:22 date +%s
+++ 03:18:22 echo 33288
++ 03:18:22 '[' 33288 -gt 120 ']'
++ 03:18:22 sleep 60
+++ 03:19:22 left
++++ 03:19:22 date +%s
+++ 03:19:22 echo 33228
++ 03:19:23 '[' 33228 -gt 120 ']'
++ 03:19:23 sleep 60
+++ 03:20:23 left
++++ 03:20:23 date +%s
+++ 03:20:23 echo 33167
++ 03:20:23 '[' 33167 -gt 120 ']'
++ 03:20:23 sleep 60
+++ 03:21:23 left
++++ 03:21:23 date +%s
+++ 03:21:23 echo 33107
++ 03:21:23 '[' 33107 -gt 120 ']'
++ 03:21:23 sleep 60
+++ 03:22:23 left
++++ 03:22:23 date +%s
+++ 03:22:23 echo 33047
++ 03:22:23 '[' 33047 -gt 120 ']'
++ 03:22:23 sleep 60
++ 03:23:19 pack
++ 03:23:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:23:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:23:19 cut '-d ' -f1
++ 03:23:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:23:19 sleep 600
+++ 03:23:23 left
++++ 03:23:23 date +%s
+++ 03:23:23 echo 32987
++ 03:23:23 '[' 32987 -gt 120 ']'
++ 03:23:23 sleep 60
+++ 03:24:23 left
++++ 03:24:23 date +%s
+++ 03:24:23 echo 32927
++ 03:24:23 '[' 32927 -gt 120 ']'
++ 03:24:23 sleep 60
+++ 03:25:23 left
++++ 03:25:23 date +%s
+++ 03:25:23 echo 32867
++ 03:25:23 '[' 32867 -gt 120 ']'
++ 03:25:23 sleep 60
+++ 03:26:23 left
++++ 03:26:23 date +%s
+++ 03:26:23 echo 32807
++ 03:26:23 '[' 32807 -gt 120 ']'
++ 03:26:23 sleep 60
+++ 03:27:23 left
++++ 03:27:23 date +%s
+++ 03:27:23 echo 32747
++ 03:27:23 '[' 32747 -gt 120 ']'
++ 03:27:23 sleep 60
+++ 03:28:23 left
++++ 03:28:23 date +%s
+++ 03:28:23 echo 32687
++ 03:28:23 '[' 32687 -gt 120 ']'
++ 03:28:23 sleep 60
+++ 03:29:23 left
++++ 03:29:23 date +%s
+++ 03:29:23 echo 32627
++ 03:29:23 '[' 32627 -gt 120 ']'
++ 03:29:23 sleep 60
+++ 03:30:23 left
++++ 03:30:23 date +%s
+++ 03:30:23 echo 32567
++ 03:30:23 '[' 32567 -gt 120 ']'
++ 03:30:23 sleep 60
+++ 03:31:23 left
++++ 03:31:23 date +%s
+++ 03:31:23 echo 32507
++ 03:31:23 '[' 32507 -gt 120 ']'
++ 03:31:23 sleep 60
+++ 03:32:23 left
++++ 03:32:23 date +%s
+++ 03:32:23 echo 32447
++ 03:32:23 '[' 32447 -gt 120 ']'
++ 03:32:23 sleep 60
++ 03:33:19 pack
++ 03:33:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:33:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:33:19 cut '-d ' -f1
++ 03:33:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:33:19 sleep 600
+++ 03:33:23 left
++++ 03:33:23 date +%s
+++ 03:33:23 echo 32387
++ 03:33:23 '[' 32387 -gt 120 ']'
++ 03:33:23 sleep 60
+++ 03:34:23 left
++++ 03:34:23 date +%s
+++ 03:34:23 echo 32327
++ 03:34:23 '[' 32327 -gt 120 ']'
++ 03:34:23 sleep 60
+++ 03:35:23 left
++++ 03:35:23 date +%s
+++ 03:35:23 echo 32267
++ 03:35:23 '[' 32267 -gt 120 ']'
++ 03:35:23 sleep 60
+++ 03:36:23 left
++++ 03:36:23 date +%s
+++ 03:36:23 echo 32207
++ 03:36:23 '[' 32207 -gt 120 ']'
++ 03:36:23 sleep 60
+++ 03:37:23 left
++++ 03:37:23 date +%s
+++ 03:37:23 echo 32147
++ 03:37:23 '[' 32147 -gt 120 ']'
++ 03:37:23 sleep 60
+++ 03:38:23 left
++++ 03:38:23 date +%s
+++ 03:38:23 echo 32087
++ 03:38:23 '[' 32087 -gt 120 ']'
++ 03:38:23 sleep 60
+++ 03:39:23 left
++++ 03:39:23 date +%s
+++ 03:39:23 echo 32027
++ 03:39:23 '[' 32027 -gt 120 ']'
++ 03:39:23 sleep 60
+++ 03:40:23 left
++++ 03:40:23 date +%s
+++ 03:40:23 echo 31967
++ 03:40:23 '[' 31967 -gt 120 ']'
++ 03:40:23 sleep 60
+++ 03:41:23 left
++++ 03:41:23 date +%s
+++ 03:41:23 echo 31907
++ 03:41:23 '[' 31907 -gt 120 ']'
++ 03:41:23 sleep 60
+++ 03:42:23 left
++++ 03:42:23 date +%s
+++ 03:42:23 echo 31847
++ 03:42:23 '[' 31847 -gt 120 ']'
++ 03:42:23 sleep 60
++ 03:43:19 pack
++ 03:43:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:43:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:43:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:43:19 cut '-d ' -f1
++ 03:43:19 sleep 600
+++ 03:43:23 left
++++ 03:43:23 date +%s
+++ 03:43:23 echo 31787
++ 03:43:23 '[' 31787 -gt 120 ']'
++ 03:43:23 sleep 60
+++ 03:44:23 left
++++ 03:44:23 date +%s
+++ 03:44:23 echo 31727
++ 03:44:23 '[' 31727 -gt 120 ']'
++ 03:44:23 sleep 60
+++ 03:45:23 left
++++ 03:45:23 date +%s
+++ 03:45:23 echo 31667
++ 03:45:23 '[' 31667 -gt 120 ']'
++ 03:45:23 sleep 60
+++ 03:46:23 left
++++ 03:46:23 date +%s
+++ 03:46:23 echo 31607
++ 03:46:23 '[' 31607 -gt 120 ']'
++ 03:46:23 sleep 60
+++ 03:47:23 left
++++ 03:47:23 date +%s
+++ 03:47:23 echo 31547
++ 03:47:23 '[' 31547 -gt 120 ']'
++ 03:47:23 sleep 60
+++ 03:48:23 left
++++ 03:48:23 date +%s
+++ 03:48:23 echo 31487
++ 03:48:23 '[' 31487 -gt 120 ']'
++ 03:48:23 sleep 60
+++ 03:49:23 left
++++ 03:49:23 date +%s
+++ 03:49:23 echo 31427
++ 03:49:23 '[' 31427 -gt 120 ']'
++ 03:49:23 sleep 60
+++ 03:50:23 left
++++ 03:50:23 date +%s
+++ 03:50:23 echo 31367
++ 03:50:23 '[' 31367 -gt 120 ']'
++ 03:50:23 sleep 60
+++ 03:51:23 left
++++ 03:51:23 date +%s
+++ 03:51:23 echo 31307
++ 03:51:23 '[' 31307 -gt 120 ']'
++ 03:51:23 sleep 60
+++ 03:52:23 left
++++ 03:52:23 date +%s
+++ 03:52:23 echo 31247
++ 03:52:23 '[' 31247 -gt 120 ']'
++ 03:52:23 sleep 60
++ 03:53:19 pack
++ 03:53:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 03:53:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:53:19 cut '-d ' -f1
++ 03:53:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 03:53:19 sleep 600
+++ 03:53:23 left
++++ 03:53:23 date +%s
+++ 03:53:23 echo 31187
++ 03:53:23 '[' 31187 -gt 120 ']'
++ 03:53:23 sleep 60
+++ 03:54:23 left
++++ 03:54:24 date +%s
+++ 03:54:24 echo 31126
++ 03:54:24 '[' 31126 -gt 120 ']'
++ 03:54:24 sleep 60
+++ 03:55:24 left
++++ 03:55:24 date +%s
+++ 03:55:24 echo 31066
++ 03:55:24 '[' 31066 -gt 120 ']'
++ 03:55:24 sleep 60
+++ 03:56:24 left
++++ 03:56:24 date +%s
+++ 03:56:24 echo 31006
++ 03:56:24 '[' 31006 -gt 120 ']'
++ 03:56:24 sleep 60
+++ 03:57:24 left
++++ 03:57:24 date +%s
+++ 03:57:24 echo 30946
++ 03:57:24 '[' 30946 -gt 120 ']'
++ 03:57:24 sleep 60
+++ 03:58:24 left
++++ 03:58:24 date +%s
+++ 03:58:24 echo 30886
++ 03:58:24 '[' 30886 -gt 120 ']'
++ 03:58:24 sleep 60
+++ 03:59:24 left
++++ 03:59:24 date +%s
+++ 03:59:24 echo 30826
++ 03:59:24 '[' 30826 -gt 120 ']'
++ 03:59:24 sleep 60
+++ 04:00:24 left
++++ 04:00:24 date +%s
+++ 04:00:24 echo 30766
++ 04:00:24 '[' 30766 -gt 120 ']'
++ 04:00:24 sleep 60
+++ 04:01:24 left
++++ 04:01:24 date +%s
+++ 04:01:24 echo 30706
++ 04:01:24 '[' 30706 -gt 120 ']'
++ 04:01:24 sleep 60
+++ 04:02:24 left
++++ 04:02:24 date +%s
+++ 04:02:24 echo 30646
++ 04:02:24 '[' 30646 -gt 120 ']'
++ 04:02:24 sleep 60
++ 04:03:19 pack
++ 04:03:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:03:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:03:19 cut '-d ' -f1
++ 04:03:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:03:19 sleep 600
+++ 04:03:24 left
++++ 04:03:24 date +%s
+++ 04:03:24 echo 30586
++ 04:03:24 '[' 30586 -gt 120 ']'
++ 04:03:24 sleep 60
+++ 04:04:24 left
++++ 04:04:24 date +%s
+++ 04:04:24 echo 30526
++ 04:04:24 '[' 30526 -gt 120 ']'
++ 04:04:24 sleep 60
+++ 04:05:24 left
++++ 04:05:24 date +%s
+++ 04:05:24 echo 30466
++ 04:05:24 '[' 30466 -gt 120 ']'
++ 04:05:24 sleep 60
+++ 04:06:24 left
++++ 04:06:24 date +%s
+++ 04:06:24 echo 30406
++ 04:06:24 '[' 30406 -gt 120 ']'
++ 04:06:24 sleep 60
+++ 04:07:24 left
++++ 04:07:24 date +%s
+++ 04:07:24 echo 30346
++ 04:07:24 '[' 30346 -gt 120 ']'
++ 04:07:24 sleep 60
+++ 04:08:24 left
++++ 04:08:24 date +%s
+++ 04:08:24 echo 30286
++ 04:08:24 '[' 30286 -gt 120 ']'
++ 04:08:24 sleep 60
+++ 04:09:24 left
++++ 04:09:24 date +%s
+++ 04:09:24 echo 30226
++ 04:09:24 '[' 30226 -gt 120 ']'
++ 04:09:24 sleep 60
+++ 04:10:24 left
++++ 04:10:24 date +%s
+++ 04:10:24 echo 30166
++ 04:10:24 '[' 30166 -gt 120 ']'
++ 04:10:24 sleep 60
+++ 04:11:24 left
++++ 04:11:24 date +%s
+++ 04:11:24 echo 30106
++ 04:11:24 '[' 30106 -gt 120 ']'
++ 04:11:24 sleep 60
+++ 04:12:24 left
++++ 04:12:24 date +%s
+++ 04:12:24 echo 30046
++ 04:12:24 '[' 30046 -gt 120 ']'
++ 04:12:24 sleep 60
++ 04:13:19 pack
++ 04:13:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:13:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:13:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:13:19 cut '-d ' -f1
++ 04:13:19 sleep 600
+++ 04:13:24 left
++++ 04:13:24 date +%s
+++ 04:13:24 echo 29986
++ 04:13:24 '[' 29986 -gt 120 ']'
++ 04:13:24 sleep 60
+++ 04:14:24 left
++++ 04:14:24 date +%s
+++ 04:14:24 echo 29926
++ 04:14:24 '[' 29926 -gt 120 ']'
++ 04:14:24 sleep 60
+++ 04:15:24 left
++++ 04:15:24 date +%s
+++ 04:15:24 echo 29866
++ 04:15:24 '[' 29866 -gt 120 ']'
++ 04:15:24 sleep 60
+++ 04:16:24 left
++++ 04:16:24 date +%s
+++ 04:16:24 echo 29806
++ 04:16:24 '[' 29806 -gt 120 ']'
++ 04:16:24 sleep 60
+++ 04:17:24 left
++++ 04:17:24 date +%s
+++ 04:17:24 echo 29746
++ 04:17:24 '[' 29746 -gt 120 ']'
++ 04:17:24 sleep 60
+++ 04:18:24 left
++++ 04:18:24 date +%s
+++ 04:18:24 echo 29686
++ 04:18:24 '[' 29686 -gt 120 ']'
++ 04:18:24 sleep 60
+++ 04:19:24 left
++++ 04:19:24 date +%s
+++ 04:19:24 echo 29626
++ 04:19:24 '[' 29626 -gt 120 ']'
++ 04:19:24 sleep 60
+++ 04:20:24 left
++++ 04:20:24 date +%s
+++ 04:20:24 echo 29566
++ 04:20:24 '[' 29566 -gt 120 ']'
++ 04:20:24 sleep 60
+++ 04:21:24 left
++++ 04:21:24 date +%s
+++ 04:21:24 echo 29506
++ 04:21:24 '[' 29506 -gt 120 ']'
++ 04:21:24 sleep 60
+++ 04:22:24 left
++++ 04:22:24 date +%s
+++ 04:22:24 echo 29446
++ 04:22:24 '[' 29446 -gt 120 ']'
++ 04:22:24 sleep 60
++ 04:23:19 pack
++ 04:23:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:23:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:23:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:23:19 cut '-d ' -f1
++ 04:23:19 sleep 600
+++ 04:23:24 left
++++ 04:23:24 date +%s
+++ 04:23:24 echo 29386
++ 04:23:24 '[' 29386 -gt 120 ']'
++ 04:23:24 sleep 60
+++ 04:24:24 left
++++ 04:24:24 date +%s
+++ 04:24:24 echo 29326
++ 04:24:24 '[' 29326 -gt 120 ']'
++ 04:24:24 sleep 60
+++ 04:25:24 left
++++ 04:25:24 date +%s
+++ 04:25:24 echo 29266
++ 04:25:24 '[' 29266 -gt 120 ']'
++ 04:25:24 sleep 60
+++ 04:26:24 left
++++ 04:26:24 date +%s
+++ 04:26:24 echo 29206
++ 04:26:24 '[' 29206 -gt 120 ']'
++ 04:26:24 sleep 60
+++ 04:27:24 left
++++ 04:27:24 date +%s
+++ 04:27:24 echo 29146
++ 04:27:24 '[' 29146 -gt 120 ']'
++ 04:27:24 sleep 60
+++ 04:28:24 left
++++ 04:28:24 date +%s
+++ 04:28:24 echo 29086
++ 04:28:24 '[' 29086 -gt 120 ']'
++ 04:28:24 sleep 60
+++ 04:29:24 left
++++ 04:29:24 date +%s
+++ 04:29:24 echo 29026
++ 04:29:24 '[' 29026 -gt 120 ']'
++ 04:29:24 sleep 60
+++ 04:30:24 left
++++ 04:30:24 date +%s
+++ 04:30:24 echo 28966
++ 04:30:24 '[' 28966 -gt 120 ']'
++ 04:30:24 sleep 60
+++ 04:31:24 left
++++ 04:31:24 date +%s
+++ 04:31:24 echo 28906
++ 04:31:25 '[' 28906 -gt 120 ']'
++ 04:31:25 sleep 60
+++ 04:32:25 left
++++ 04:32:25 date +%s
+++ 04:32:25 echo 28845
++ 04:32:25 '[' 28845 -gt 120 ']'
++ 04:32:25 sleep 60
++ 04:33:19 pack
++ 04:33:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:33:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:33:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:33:19 cut '-d ' -f1
++ 04:33:19 sleep 600
+++ 04:33:25 left
++++ 04:33:25 date +%s
+++ 04:33:25 echo 28785
++ 04:33:25 '[' 28785 -gt 120 ']'
++ 04:33:25 sleep 60
+++ 04:34:25 left
++++ 04:34:25 date +%s
+++ 04:34:25 echo 28725
++ 04:34:25 '[' 28725 -gt 120 ']'
++ 04:34:25 sleep 60
+++ 04:35:25 left
++++ 04:35:25 date +%s
+++ 04:35:25 echo 28665
++ 04:35:25 '[' 28665 -gt 120 ']'
++ 04:35:25 sleep 60
+++ 04:36:25 left
++++ 04:36:25 date +%s
+++ 04:36:25 echo 28605
++ 04:36:25 '[' 28605 -gt 120 ']'
++ 04:36:25 sleep 60
+++ 04:37:25 left
++++ 04:37:25 date +%s
+++ 04:37:25 echo 28545
++ 04:37:25 '[' 28545 -gt 120 ']'
++ 04:37:25 sleep 60
+++ 04:38:25 left
++++ 04:38:25 date +%s
+++ 04:38:25 echo 28485
++ 04:38:25 '[' 28485 -gt 120 ']'
++ 04:38:25 sleep 60
+++ 04:39:25 left
++++ 04:39:25 date +%s
+++ 04:39:25 echo 28425
++ 04:39:25 '[' 28425 -gt 120 ']'
++ 04:39:25 sleep 60
+++ 04:40:25 left
++++ 04:40:25 date +%s
+++ 04:40:25 echo 28365
++ 04:40:25 '[' 28365 -gt 120 ']'
++ 04:40:25 sleep 60
+++ 04:41:25 left
++++ 04:41:25 date +%s
+++ 04:41:25 echo 28305
++ 04:41:25 '[' 28305 -gt 120 ']'
++ 04:41:25 sleep 60
+++ 04:42:25 left
++++ 04:42:25 date +%s
+++ 04:42:25 echo 28245
++ 04:42:25 '[' 28245 -gt 120 ']'
++ 04:42:25 sleep 60
++ 04:43:19 pack
++ 04:43:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:43:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:43:19 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:43:19 cut '-d ' -f1
++ 04:43:19 sleep 600
+++ 04:43:25 left
++++ 04:43:25 date +%s
+++ 04:43:25 echo 28185
++ 04:43:25 '[' 28185 -gt 120 ']'
++ 04:43:25 sleep 60
+++ 04:44:25 left
++++ 04:44:25 date +%s
+++ 04:44:25 echo 28125
++ 04:44:25 '[' 28125 -gt 120 ']'
++ 04:44:25 sleep 60
+++ 04:45:25 left
++++ 04:45:25 date +%s
+++ 04:45:25 echo 28065
++ 04:45:25 '[' 28065 -gt 120 ']'
++ 04:45:25 sleep 60
+++ 04:46:25 left
++++ 04:46:25 date +%s
+++ 04:46:25 echo 28005
++ 04:46:25 '[' 28005 -gt 120 ']'
++ 04:46:25 sleep 60
+++ 04:47:25 left
++++ 04:47:25 date +%s
+++ 04:47:25 echo 27945
++ 04:47:25 '[' 27945 -gt 120 ']'
++ 04:47:25 sleep 60
+++ 04:48:25 left
++++ 04:48:25 date +%s
+++ 04:48:25 echo 27885
++ 04:48:25 '[' 27885 -gt 120 ']'
++ 04:48:25 sleep 60
+++ 04:49:25 left
++++ 04:49:25 date +%s
+++ 04:49:25 echo 27825
++ 04:49:25 '[' 27825 -gt 120 ']'
++ 04:49:25 sleep 60
+++ 04:50:25 left
++++ 04:50:25 date +%s
+++ 04:50:25 echo 27765
++ 04:50:25 '[' 27765 -gt 120 ']'
++ 04:50:25 sleep 60
+++ 04:51:25 left
++++ 04:51:25 date +%s
+++ 04:51:25 echo 27705
++ 04:51:25 '[' 27705 -gt 120 ']'
++ 04:51:25 sleep 60
+++ 04:52:25 left
++++ 04:52:25 date +%s
+++ 04:52:25 echo 27645
++ 04:52:25 '[' 27645 -gt 120 ']'
++ 04:52:25 sleep 60
++ 04:53:19 pack
++ 04:53:19 tar czf /workspace/out.tgz.part -C /workspace out
++ 04:53:19 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:53:20 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 04:53:20 cut '-d ' -f1
++ 04:53:20 sleep 600
+++ 04:53:25 left
++++ 04:53:25 date +%s
+++ 04:53:25 echo 27585
++ 04:53:25 '[' 27585 -gt 120 ']'
++ 04:53:25 sleep 60
+++ 04:54:25 left
++++ 04:54:25 date +%s
+++ 04:54:25 echo 27525
++ 04:54:25 '[' 27525 -gt 120 ']'
++ 04:54:25 sleep 60
+++ 04:55:25 left
++++ 04:55:25 date +%s
+++ 04:55:25 echo 27465
++ 04:55:25 '[' 27465 -gt 120 ']'
++ 04:55:25 sleep 60
+++ 04:56:25 left
++++ 04:56:25 date +%s
+++ 04:56:25 echo 27405
++ 04:56:25 '[' 27405 -gt 120 ']'
++ 04:56:25 sleep 60
+++ 04:57:25 left
++++ 04:57:25 date +%s
+++ 04:57:25 echo 27345
++ 04:57:25 '[' 27345 -gt 120 ']'
++ 04:57:25 sleep 60
+++ 04:58:25 left
++++ 04:58:25 date +%s
+++ 04:58:25 echo 27285
++ 04:58:25 '[' 27285 -gt 120 ']'
++ 04:58:25 sleep 60
+++ 04:59:25 left
++++ 04:59:25 date +%s
+++ 04:59:25 echo 27225
++ 04:59:25 '[' 27225 -gt 120 ']'
++ 04:59:25 sleep 60
+++ 05:00:25 left
++++ 05:00:25 date +%s
+++ 05:00:25 echo 27165
++ 05:00:25 '[' 27165 -gt 120 ']'
++ 05:00:25 sleep 60
+++ 05:01:25 left
++++ 05:01:25 date +%s
+++ 05:01:25 echo 27105
++ 05:01:25 '[' 27105 -gt 120 ']'
++ 05:01:25 sleep 60
+++ 05:02:25 left
++++ 05:02:25 date +%s
+++ 05:02:25 echo 27045
++ 05:02:25 '[' 27045 -gt 120 ']'
++ 05:02:25 sleep 60
++ 05:03:20 pack
++ 05:03:20 tar czf /workspace/out.tgz.part -C /workspace out
++ 05:03:20 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:03:20 cut '-d ' -f1
++ 05:03:20 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:03:20 sleep 600
+++ 05:03:26 left
++++ 05:03:26 date +%s
+++ 05:03:26 echo 26984
++ 05:03:26 '[' 26984 -gt 120 ']'
++ 05:03:26 sleep 60
+++ 05:04:26 left
++++ 05:04:26 date +%s
+++ 05:04:26 echo 26924
++ 05:04:26 '[' 26924 -gt 120 ']'
++ 05:04:26 sleep 60
+++ 05:05:26 left
++++ 05:05:26 date +%s
+++ 05:05:26 echo 26864
++ 05:05:26 '[' 26864 -gt 120 ']'
++ 05:05:26 sleep 60
+++ 05:06:26 left
++++ 05:06:26 date +%s
+++ 05:06:26 echo 26804
++ 05:06:26 '[' 26804 -gt 120 ']'
++ 05:06:26 sleep 60
+++ 05:07:26 left
++++ 05:07:26 date +%s
+++ 05:07:26 echo 26744
++ 05:07:26 '[' 26744 -gt 120 ']'
++ 05:07:26 sleep 60
+++ 05:08:26 left
++++ 05:08:26 date +%s
+++ 05:08:26 echo 26684
++ 05:08:26 '[' 26684 -gt 120 ']'
++ 05:08:26 sleep 60
+++ 05:09:26 left
++++ 05:09:26 date +%s
+++ 05:09:26 echo 26624
++ 05:09:26 '[' 26624 -gt 120 ']'
++ 05:09:26 sleep 60
+++ 05:10:26 left
++++ 05:10:26 date +%s
+++ 05:10:26 echo 26564
++ 05:10:26 '[' 26564 -gt 120 ']'
++ 05:10:26 sleep 60
+++ 05:11:26 left
++++ 05:11:26 date +%s
+++ 05:11:26 echo 26504
++ 05:11:26 '[' 26504 -gt 120 ']'
++ 05:11:26 sleep 60
+++ 05:12:26 left
++++ 05:12:26 date +%s
+++ 05:12:26 echo 26444
++ 05:12:26 '[' 26444 -gt 120 ']'
++ 05:12:26 sleep 60
++ 05:13:20 pack
++ 05:13:20 tar czf /workspace/out.tgz.part -C /workspace out
++ 05:13:20 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:13:20 cut '-d ' -f1
++ 05:13:20 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:13:20 sleep 600
+++ 05:13:26 left
++++ 05:13:26 date +%s
+++ 05:13:26 echo 26384
++ 05:13:26 '[' 26384 -gt 120 ']'
++ 05:13:26 sleep 60
+++ 05:14:26 left
++++ 05:14:26 date +%s
+++ 05:14:26 echo 26324
++ 05:14:26 '[' 26324 -gt 120 ']'
++ 05:14:26 sleep 60
+++ 05:15:26 left
++++ 05:15:26 date +%s
+++ 05:15:26 echo 26264
++ 05:15:26 '[' 26264 -gt 120 ']'
++ 05:15:26 sleep 60
+++ 05:16:26 left
++++ 05:16:26 date +%s
+++ 05:16:26 echo 26204
++ 05:16:26 '[' 26204 -gt 120 ']'
++ 05:16:26 sleep 60
+++ 05:17:26 left
++++ 05:17:26 date +%s
+++ 05:17:26 echo 26144
++ 05:17:26 '[' 26144 -gt 120 ']'
++ 05:17:26 sleep 60
+++ 05:18:26 left
++++ 05:18:26 date +%s
+++ 05:18:26 echo 26084
++ 05:18:26 '[' 26084 -gt 120 ']'
++ 05:18:26 sleep 60
+++ 05:19:26 left
++++ 05:19:26 date +%s
+++ 05:19:26 echo 26024
++ 05:19:26 '[' 26024 -gt 120 ']'
++ 05:19:26 sleep 60
+++ 05:20:26 left
++++ 05:20:26 date +%s
+++ 05:20:26 echo 25964
++ 05:20:26 '[' 25964 -gt 120 ']'
++ 05:20:26 sleep 60
+++ 05:21:26 left
++++ 05:21:26 date +%s
+++ 05:21:26 echo 25904
++ 05:21:26 '[' 25904 -gt 120 ']'
++ 05:21:26 sleep 60
+++ 05:22:26 left
++++ 05:22:26 date +%s
+++ 05:22:26 echo 25844
++ 05:22:26 '[' 25844 -gt 120 ']'
++ 05:22:26 sleep 60
++ 05:23:20 pack
++ 05:23:20 tar czf /workspace/out.tgz.part -C /workspace out
++ 05:23:20 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:23:20 cut '-d ' -f1
++ 05:23:20 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:23:20 sleep 600
+++ 05:23:26 left
++++ 05:23:26 date +%s
+++ 05:23:26 echo 25784
++ 05:23:26 '[' 25784 -gt 120 ']'
++ 05:23:26 sleep 60
+++ 05:24:26 left
++++ 05:24:26 date +%s
+++ 05:24:26 echo 25724
++ 05:24:26 '[' 25724 -gt 120 ']'
++ 05:24:26 sleep 60
+++ 05:25:26 left
++++ 05:25:26 date +%s
+++ 05:25:26 echo 25664
++ 05:25:26 '[' 25664 -gt 120 ']'
++ 05:25:26 sleep 60
+++ 05:26:26 left
++++ 05:26:26 date +%s
+++ 05:26:26 echo 25604
++ 05:26:26 '[' 25604 -gt 120 ']'
++ 05:26:26 sleep 60
+++ 05:27:26 left
++++ 05:27:26 date +%s
+++ 05:27:26 echo 25544
++ 05:27:26 '[' 25544 -gt 120 ']'
++ 05:27:26 sleep 60
+++ 05:28:26 left
++++ 05:28:26 date +%s
+++ 05:28:26 echo 25484
++ 05:28:26 '[' 25484 -gt 120 ']'
++ 05:28:26 sleep 60
+++ 05:29:26 left
++++ 05:29:26 date +%s
+++ 05:29:26 echo 25424
++ 05:29:26 '[' 25424 -gt 120 ']'
++ 05:29:26 sleep 60
+++ 05:30:26 left
++++ 05:30:26 date +%s
+++ 05:30:26 echo 25364
++ 05:30:26 '[' 25364 -gt 120 ']'
++ 05:30:26 sleep 60
+++ 05:31:26 left
++++ 05:31:26 date +%s
+++ 05:31:26 echo 25304
++ 05:31:26 '[' 25304 -gt 120 ']'
++ 05:31:26 sleep 60
+++ 05:32:26 left
++++ 05:32:26 date +%s
+++ 05:32:26 echo 25244
++ 05:32:26 '[' 25244 -gt 120 ']'
++ 05:32:26 sleep 60
++ 05:33:20 pack
++ 05:33:20 tar czf /workspace/out.tgz.part -C /workspace out
++ 05:33:20 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:33:20 cut '-d ' -f1
++ 05:33:20 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:33:20 sleep 600
+++ 05:33:26 left
++++ 05:33:26 date +%s
+++ 05:33:26 echo 25184
++ 05:33:26 '[' 25184 -gt 120 ']'
++ 05:33:26 sleep 60
+++ 05:34:26 left
++++ 05:34:26 date +%s
+++ 05:34:26 echo 25124
++ 05:34:26 '[' 25124 -gt 120 ']'
++ 05:34:26 sleep 60
+++ 05:35:26 left
++++ 05:35:27 date +%s
+++ 05:35:27 echo 25063
++ 05:35:27 '[' 25063 -gt 120 ']'
++ 05:35:27 sleep 60
+++ 05:36:27 left
++++ 05:36:27 date +%s
+++ 05:36:27 echo 25003
++ 05:36:27 '[' 25003 -gt 120 ']'
++ 05:36:27 sleep 60
+++ 05:37:27 left
++++ 05:37:27 date +%s
+++ 05:37:27 echo 24943
++ 05:37:27 '[' 24943 -gt 120 ']'
++ 05:37:27 sleep 60
+++ 05:38:27 left
++++ 05:38:27 date +%s
+++ 05:38:27 echo 24883
++ 05:38:27 '[' 24883 -gt 120 ']'
++ 05:38:27 sleep 60
+++ 05:39:27 left
++++ 05:39:27 date +%s
+++ 05:39:27 echo 24823
++ 05:39:27 '[' 24823 -gt 120 ']'
++ 05:39:27 sleep 60
+++ 05:40:27 left
++++ 05:40:27 date +%s
+++ 05:40:27 echo 24763
++ 05:40:27 '[' 24763 -gt 120 ']'
++ 05:40:27 sleep 60
+++ 05:41:27 left
++++ 05:41:27 date +%s
+++ 05:41:27 echo 24703
++ 05:41:27 '[' 24703 -gt 120 ']'
++ 05:41:27 sleep 60
+++ 05:42:27 left
++++ 05:42:27 date +%s
+++ 05:42:27 echo 24643
++ 05:42:27 '[' 24643 -gt 120 ']'
++ 05:42:27 sleep 60
++ 05:43:20 pack
++ 05:43:20 tar czf /workspace/out.tgz.part -C /workspace out
++ 05:43:20 mv -f /workspace/out.tgz.part /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:43:20 sha256sum /workspace/serve/2967eabcbf3379504c446eef7ae351c1/out.tgz
++ 05:43:20 cut '-d ' -f1
++ 05:43:20 sleep 600
+++ 05:43:27 left
++++ 05:43:27 date +%s
+++ 05:43:27 echo 24583
++ 05:43:27 '[' 24583 -gt 120 ']'
++ 05:43:27 sleep 60
+++ 05:44:27 left
++++ 05:44:27 date +%s
+++ 05:44:27 echo 24523
++ 05:44:27 '[' 24523 -gt 120 ']'
++ 05:44:27 sleep 60
+++ 05:45:27 left
++++ 05:45:27 date +%s
+++ 05:45:27 echo 24463
++ 05:45:27 '[' 24463 -gt 120 ']'
++ 05:45:27 sleep 60
+++ 05:46:27 left
++++ 05:46:27 date +%s
+++ 05:46:27 echo 24403
++ 05:46:27 '[' 24403 -gt 120 ']'
++ 05:46:27 sleep 60
+++ 05:47:27 left
++++ 05:47:27 date +%s
+++ 05:47:27 echo 24343
++ 05:47:27 '[' 24343 -gt 120 ']'
++ 05:47:27 sleep 60
+++ 05:48:27 left
++++ 05:48:27 date +%s
+++ 05:48:27 echo 24283
++ 05:48:27 '[' 24283 -gt 120 ']'
++ 05:48:27 sleep 60
+++ 05:49:27 left
++++ 05:49:27 date +%s
+++ 05:49:27 echo 24223
++ 05:49:27 '[' 24223 -gt 120 ']'
++ 05:49:27 sleep 60
+++ 05:50:27 left
++++ 05:50:27 date +%s
+++ 05:50:27 echo 24163
++ 05:50:27 '[' 24163 -gt 120 ']'
++ 05:50:27 sleep 60
+++ 05:51:27 left
++++ 05:51:27 date +%s
+++ 05:51:27 echo 24103
++ 05:51:27 '[' 24103 -gt 120 ']'
++ 05:51:27 sleep 60
+++ 05:52:27 left
++++ 05:52:27 date +%s
+++ 05:52:27 echo 24043
++ 05:52:27 '[' 24043 -gt 120 ']'
++ 05:52:27 sleep 60
++ 05:53:20 pack
++ 05:53:20 tar czf /workspace/out.tgz.part -C /workspace out
