@@ -1,0 +1,126 @@
+{
+  "formal": {
+    "claim_id": "PCC-20261113-39640f",
+    "actual_verdict": {
+      "claim_id": "PCC-20261113-39640f",
+      "claim_sha256": "8dfe336766c167d0fe9abcc476a7dbe9c396fb7d6f0f70948402f9e9d2b775e0",
+      "commit": "f0567d068000e721a39893ff661ef009d53f06a4",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/bk_basefield_census_20261112/lean (TorsionTransport.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        },
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/bk_basefield_census_20261112/lean (CensusBridge.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        },
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/bk_basefield_census_20261112/lean (CensusBridge.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-13T00:50:23Z",
+      "verifier_host": "2d18c814bc7e"
+    },
+    "signed_standing": {
+      "claim_id": "PCC-20261113-39640f",
+      "claim_sha256": "8dfe336766c167d0fe9abcc476a7dbe9c396fb7d6f0f70948402f9e9d2b775e0",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "native": {
+    "claim_id": "PCC-20261113-7dec93",
+    "actual_verdict": {
+      "claim_id": "PCC-20261113-7dec93",
+      "claim_sha256": "cd75160586993d6b7ea8ae9a48ec461701531b455bb51a9ae7f0237147c9fb6e",
+      "commit": "f0567d068000e721a39893ff661ef009d53f06a4",
+      "proofs": [
+        {
+          "kind": "attestation",
+          "notes": [
+            "artifact: unsigned; independence needs a keyring signature"
+          ],
+          "reasons": [],
+          "verdict": "not_covered"
+        }
+      ],
+      "reasons": [
+        "claim kind measurement is not covered: recompute; replay"
+      ],
+      "schema": "pcc.verdict/v1",
+      "verdict": "not_covered",
+      "verified_at": "2026-11-13T00:50:23Z",
+      "verifier_host": "2d18c814bc7e"
+    },
+    "signed_standing": {
+      "claim_id": "PCC-20261113-7dec93",
+      "claim_sha256": "cd75160586993d6b7ea8ae9a48ec461701531b455bb51a9ae7f0237147c9fb6e",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "schema": "bk-basefield-verification/v1",
+  "source_commit": "f0567d068000e721a39893ff661ef009d53f06a4",
+  "source_plan": "sources.json",
+  "formal_source_files": 19,
+  "certificates": [
+    {
+      "project": "research/bk_basefield_census_20261112/lean",
+      "theorem": "BKBasefieldScalingAudit.scaling_audit_certificate",
+      "statement": "theorem scaling_audit_certificate (a b u : K) (hu : u≠0) : (Nat.card (shortCurve a b).Point=Nat.card (shortCurve (u^4*a) (u^6*b)).Point) ∧ (∀ n : ℕ,Nat.card (killedPoints a b n)= Nat.card (killedPoints (u^4*a) (u^6*b) n))",
+      "decl_sha256": "ea805922e38e216481a54a4eb41ed98f399797393c7e791c4775f1c1a58033e3"
+    },
+    {
+      "project": "research/bk_basefield_census_20261112/lean",
+      "theorem": "BKBasefieldScalingAudit.rational_low_torsion_certificate",
+      "statement": "theorem rational_low_torsion_certificate (a b : K) (hd : 4*a^3+27*b^2≠0) (h2 : (2:K)≠0) (h3 : (3:K)≠0) : (Nat.card (killedPoints a b 2)=Fintype.card (twoRoots a b)+1) ∧ (Nat.card (killedPoints a b 3)= (∑ x : xRoots a b,Fintype.card (yRoots a b x))+1)",
+      "decl_sha256": "e7a1c1dfe15f98c695eaf8f24c7f880cf61bfc3936ebe42061d6041589b37f0b"
+    },
+    {
+      "project": "research/bk_basefield_census_20261112/lean",
+      "theorem": "BKBasefieldScalingAudit.geometric_low_torsion_certificate",
+      "statement": "theorem geometric_low_torsion_certificate [IsAlgClosed K] (a b : K) (hd : 4*a^3+27*b^2≠0) (h2 : (2:K)≠0) (h3 : (3:K)≠0) : Nat.card (killedPoints a b 2)=4 ∧ Nat.card (killedPoints a b 3)=9",
+      "decl_sha256": "d1c3672dca7385299f2dfb8ff09b2fae9f6492628d8c1deae56393be72a39ff1"
+    }
+  ],
+  "all_source_and_native_pins_match": true,
+  "gate_declarations": 29,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "reports": [
+    {
+      "path": "reports/run-20261113T0011Z/report.pdf",
+      "bytes": 30149,
+      "sha256": "9ae38e2b0069024d3e2787d5dee7322573b28fb721ec06b392317e2a96c9fb09",
+      "pages": 1,
+      "all_pages_visually_inspected": true
+    },
+    {
+      "path": "reports/run-20261113T0017Z/report.pdf",
+      "bytes": 44062,
+      "sha256": "eb795b92e83a86e564f95a5cc1ef11f249303935f242a74501ddc54912f60bc3",
+      "pages": 2,
+      "all_pages_visually_inspected": true
+    }
+  ],
+  "raw_storage": "LOCAL_CHECKPOINT.json",
+  "raw_remote_availability_verified": false,
+  "independent_host": false,
+  "paid_compute_and_agent_storage_upload": 0
+}

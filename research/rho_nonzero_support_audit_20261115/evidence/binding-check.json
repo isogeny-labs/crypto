@@ -1,0 +1,36 @@
+{
+  "schema": "rho-nonzero-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "rho-nonzero-certificate",
+      "expected_decl_sha256": "29cb895f96ba2ac7281a8b977ab8fe18e9dadb2d4502b638f4003e4a2bfb51b5",
+      "full_characters": 827,
+      "full_decl_sha256": "29cb895f96ba2ac7281a8b977ab8fe18e9dadb2d4502b638f4003e4a2bfb51b5",
+      "full_normalized_signature": "theorem nonzero_support_certificate : (∀ (p : ℕ) [Fact p.Prime], ensembleMean p ≤ nonzeroMean p + 2) ∧ (∀ (p : ℕ) [Fact p.Prime] [Fact (2 < p)], nonzeroMean p = ∑ f : NonzeroEmbedding p, (uniformLaw (NonzeroEmbedding p) f).toReal * ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal * (firstCollision p (fun x => x + (f (h x)).val) 0 : ℝ)) ∧ (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 3 ≤ m → 4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 4 ≤ nonzeroMean p) ∧ (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime, 2 < p ∧ (C : ℝ) * p < (@nonzeroMean p ⟨hp⟩)^2) ∧ (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime, 2 < p → @nonzeroMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧ (∀ (p : ℕ) [Fact p.Prime], finiteMean (fun z : TwoSupport p => if ¬Good z then (1 : ℝ) else 0) = 2 / p) ∧ (Fintype.card (NonzeroSupport 2) = 0 ∧ Fintype.card (NonzeroSupport 3) = 2)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "nonzero_support_certificate",
+        "end_byte": 1182,
+        "file": "/workspace/scratch/rho-nonzero-binding-input01/NonzeroCertificate.lean",
+        "qualified_decl_id": "RhoNonzeroSupportAudit.nonzero_support_certificate",
+        "signature": "theorem nonzero_support_certificate :\n    (∀ (p : ℕ) [Fact p.Prime], ensembleMean p ≤ nonzeroMean p + 2) ∧\n    (∀ (p : ℕ) [Fact p.Prime] [Fact (2 < p)], nonzeroMean p =\n      ∑ f : NonzeroEmbedding p, (uniformLaw (NonzeroEmbedding p) f).toReal *\n        ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal *\n          (firstCollision p (fun x => x + (f (h x)).val) 0 : ℝ)) ∧\n    (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 3 ≤ m →\n      4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 4 ≤ nonzeroMean p) ∧\n    (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime, 2 < p ∧\n      (C : ℝ) * p < (@nonzeroMean p ⟨hp⟩)^2) ∧\n    (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime, 2 < p →\n      @nonzeroMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧\n    (∀ (p : ℕ) [Fact p.Prime], finiteMean (fun z : TwoSupport p =>\n      if ¬Good z then (1 : ℝ) else 0) = 2 / p) ∧\n    (Fintype.card (NonzeroSupport 2) = 0 ∧ Fintype.card (NonzeroSupport 3) = 2)",
+        "start_byte": 183
+      },
+      "recorded_statement": "theorem nonzero_support_certificate : (∀ (p : ℕ) [Fact p.Prime], ensembleMean p ≤ nonzeroMean p + 2) ∧ (∀ (p : ℕ) [Fact p.Prime] [Fact (2 < p)], nonzeroMean p = ∑ f : NonzeroEmbedding p, (uniformLaw (NonzeroEmbedding p) f).toReal * ∑ h : Hash (ZMod p) (Fin 2), (hashLaw fair fair_nonneg fair_sum h).toReal * (firstCollision p (fun x => x + (f (h x)).val) 0 : ℝ)) ∧ (∀ (p : ℕ) [Fact p.Prime] (m : ℕ), 3 ≤ m → 4 * m^2 * (4 * m + 1) ≤ p → (m : ℝ)^2 / 4 ≤ nonzeroMean p) ∧ (∀ C : ℕ, ∃ p : ℕ, ∃ hp : p.Prime, 2 < p ∧ (C : ℝ) * p < (@nonzeroMean p ⟨hp⟩)^2) ∧ (¬∃ K : ℝ, 0 ≤ K ∧ ∀ p : ℕ, ∀ hp : p.Prime, 2 < p → @nonzeroMean p ⟨hp⟩ ≤ K * Real.sqrt p) ∧ (∀ (p : ℕ) [Fact p.Prime], finiteMean (fun z : TwoSupport p => if ¬Good z then (1 : ℝ) else 0) = 2 / p) ∧ (Fintype.card (NonzeroSupport 2) = 0 ∧ Fintype.card (NonzeroSupport 3) = 2)",
+      "recorded_text_sha256": "29cb895f96ba2ac7281a8b977ab8fe18e9dadb2d4502b638f4003e4a2bfb51b5",
+      "source_plan": "research/rho_nonzero_support_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "RhoNonzeroSupportAudit.nonzero_support_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Frozen procedural source/header check, not kernel parser/hash/compiler/physicalhost refinement. Explicit primeFact arguments preserve complete statement; verifier unchanged."
+}

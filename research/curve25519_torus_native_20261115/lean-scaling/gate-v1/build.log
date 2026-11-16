@@ -1,0 +1,16 @@
+⚠ [853/856] Replayed ScalingAudit
+warning: ScalingAudit.lean: imports `Mathlib.Data.Rat.Lemmas` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ScalingAudit.lean: imports `Mathlib.Tactic.Linarith` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ScalingAudit.lean: imports `Mathlib.Tactic.NormNum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+info: ScalingAudit.lean:43:0: 'Curve25519ScalingAudit.four_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ScalingAudit.lean:44:0: 'Curve25519ScalingAudit.four_attained' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ScalingAudit.lean:45:0: 'Curve25519ScalingAudit.six_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ScalingAudit.lean:46:0: 'Curve25519ScalingAudit.six_attained' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ScalingAudit.lean:47:0: 'Curve25519ScalingAudit.six_naive_balance' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ScalingAudit.lean:48:0: 'Curve25519ScalingAudit.numeric_model_below_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [855/856] Replayed ParameterArithmetic
+info: ParameterArithmetic.lean:13:0: 'Curve25519ScalingParameters.sixth_root_lower' does not depend on any axioms
+info: ParameterArithmetic.lean:14:0: 'Curve25519ScalingParameters.sixth_root_upper' does not depend on any axioms
+info: ParameterArithmetic.lean:15:0: 'Curve25519ScalingParameters.current_base_above_sixth_root' does not depend on any axioms
+info: ParameterArithmetic.lean:16:0: 'Curve25519ScalingParameters.current_budget_square_above_order' does not depend on any axioms
+Build completed successfully (856 jobs).

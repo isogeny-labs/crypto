@@ -1392,6 +1392,23 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         .map(|cfg| spec_from(cfg, &args))
         .collect::<Result<Vec<_>, _>>()?;
 
+    // A CUDA worker creates its context before it reads its first request (about 150 ms on an A100).  Start it
+    // now, so that this overlaps the instance build, calibration and the rho reference instead of being waited
+    // for by the first `fes-f2-gpu` call.  Only a configuration that will call it (`descent-algebraic` with that
+    // solver) starts one.
+    let default_solver = crypto_lib::cryptanalysis::ic_framework::solvers::DEFAULT_DESCENT_SOLVER;
+    if specs.iter().any(|s| {
+        s.oracle == "descent-algebraic"
+            && s.solver
+                .as_deref()
+                .unwrap_or(default_solver)
+                .split(':')
+                .next()
+                == Some("fes-f2-gpu")
+    }) {
+        crypto_lib::cryptanalysis::fes_gpu::prewarm_shared_server();
+    }
+
     let (mut regime, degree) = instance_spec;
     let instance = match early_instance {
         Some(i) => i,

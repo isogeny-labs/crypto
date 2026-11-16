@@ -1,0 +1,79 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T23:59:14Z",
+ "id": "PCC-20261111-c2aaaa",
+ "kind": "statement",
+ "producer": {
+  "commit": "ecf190bedaf12fadbe3743136920d464721cd7f2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e60fd7eaebf9d62b4dadf924f7ed0d2a0751702202eea2e03ff2b47078cf39c8",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SuccessorNorms.lean",
+   "theorem": "SuccessorNorms.first_quotient_identity_cleared"
+  },
+  {
+   "decl_sha256": "7461948021e92dc80dba052d981c556845d0c8cf32c3030c62acfc9c6ec4b423",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SuccessorNorms.lean",
+   "theorem": "SuccessorNorms.first_quotient_curve"
+  },
+  {
+   "decl_sha256": "906ab3731c8a3af653d076a79e906208998349f581face689e9642922af1bf04",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SuccessorNorms.lean",
+   "theorem": "SuccessorNorms.reciprocal_quotient_identity_cleared"
+  },
+  {
+   "decl_sha256": "503f66dc6a9ba84a2eaa7245a701ee018018d3d591ed9b9e7b676ef7a74a5272",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SuccessorNorms.lean",
+   "theorem": "SuccessorNorms.reciprocal_quotient_curve_cleared"
+  },
+  {
+   "decl_sha256": "2aa162cf60a4640800e0a01c5dfc945e7c862ff4a8618603ff3dfa36f38e8fac",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SuccessorNorms.lean",
+   "theorem": "SuccessorNorms.reciprocal_quotient_curve_from_inverse"
+  },
+  {
+   "decl_sha256": "d7ea0497e7088aee1c98429982e579d3a0f5698ac27e7c6b5e45cf9b08790ca8",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SuccessorNorms.lean",
+   "theorem": "SuccessorNorms.actual_scale18_coefficients"
+  },
+  {
+   "decl_sha256": "37007fd06cc09d1f95284eb6611382e6dc3a268c52576a104c5b916abafc0011",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SuccessorNorms.lean",
+   "theorem": "SuccessorNorms.exact_shift_and_constant_coefficients"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/ct25-c2-lean-gate-02.txt",
+    "sha256": "6c1ed9d33d5bfbc4bd5fb7bf69f12298070676fb8d51bd60a7fc18948d4aee55"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/ct25-c2-lean-build-02.txt",
+    "sha256": "a118d7572769cd456e0071281291ac16009abfc233e966d8c50c0d8f874a396d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/ct25-c2-lean-audit-02.txt",
+    "sha256": "22a03e63d84c5914c77018de833d76d24d0f1c8a9257f231d49c626b223fac99"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned faithful CT25 preparation:7 Lean cleared polynomial/characteristic101 curve implications and exact C2 quotient shift/scale coefficients. Reciprocal map explicitly requires an inverse x*t=1. Lean4.35.0 gate7/0trusted passes;balanced classes,infinities,group/Picard norms and actual C2 runtime factory remain outside this partial formalization. No C2 norm integration or cost acceptance."
+}

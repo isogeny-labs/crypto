@@ -1,0 +1,40 @@
+#include <gmpxx.h>
+#include <array>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <chrono>
+#include <algorithm>
+#include <stdexcept>
+#include <sstream>
+#include <string>
+#include <utility>
+using I=mpz_class;using Q=mpq_class;constexpr int D=5;unsigned lll_limit=1024;using V=std::array<I,D>;using B=std::array<V,D>;using QV=std::array<Q,D>;using Clock=std::chrono::steady_clock;
+void need(bool x,const char*s){if(!x)throw std::runtime_error(s);}I fd(I x,I y){need(y!=0,"division");if(y<0){x=-x;y=-y;}I q=x/y,r=x%y;return q-(r<0?1:0);}I cd(I x,I y){return -fd(-x,y);}I mod(I x,const I&p){x%=p;if(x<0)x+=p;return x;}I center(I x,const I&p){x=mod(x,p);if(2*x>p)x-=p;return x;}I nearest(const Q&q){return fd(I(2*q.get_num()+q.get_den()),I(2*q.get_den()));}
+struct GS{std::array<QV,D>s{};std::array<QV,D>mu{};QV norm{};};GS gram(const B&b){GS g;for(int i=0;i<D;i++){for(int t=0;t<D;t++)g.s[i][t]=Q(b[i][t]);for(int j=0;j<i;j++){need(g.norm[j]>0,"rank");Q dot=0;for(int t=0;t<D;t++)dot+=Q(b[i][t])*g.s[j][t];g.mu[i][j]=dot/g.norm[j];for(int t=0;t<D;t++)g.s[i][t]-=g.mu[i][j]*g.s[j][t];}for(int t=0;t<D;t++)g.norm[i]+=g.s[i][t]*g.s[i][t];}return g;}
+bool lll(B&b,unsigned&steps,Clock::time_point started){int k=1;GS g=gram(b);while(k<D&&steps<lll_limit){if(std::chrono::duration<double>(Clock::now()-started).count()>65)return false;steps++;for(int j=k-1;j>=0;j--){I z=nearest(g.mu[k][j]);if(z!=0){for(int t=0;t<D;t++)b[k][t]-=z*b[j][t];g=gram(b);}}if(g.norm[k]>=(Q(3,4)-g.mu[k][k-1]*g.mu[k][k-1])*g.norm[k-1])k++;else{std::swap(b[k],b[k-1]);g=gram(b);k=std::max(k-1,1);}}return k==D;}
+I qe(const I&a,const I&b,const I&c,const I&s){return a*s*s+b*s+c;}
+std::pair<I,I> quadratic(const I&a,const I&b,const I&c,const I&A){I low=qe(a,b,c,0),high=low;auto take=[&](I x){if(x<0||x>A)return;I y=qe(a,b,c,x);if(y<low)low=y;if(y>high)high=y;};take(A);if(a!=0){I k=fd(I(-b),I(2*a));take(k);take(I(k+1));}return{low,high};}
+std::pair<I,I> curved(const std::array<I,7>&v,const I&cc,const I&M,const I&u){I a=v[0],b=-2*v[0]*u*u-v[1]*u+v[3],c=v[0]*u*u*u*u+v[1]*u*u*u+v[2]*u*u+v[4]*u+cc;auto r=quadratic(a,b,c,I(3*M));for(auto q:{I(-v[5]*3*M*M),I(-v[6]*M*M*M)}){if(q<0)r.first+=q;else r.second+=q;}return r;}
+using V7=std::array<I,7>;
+void arr(std::ostream&o,const V7&v){o<<'[';for(int i=0;i<7;i++){if(i)o<<',';o<<'"'<<v[i]<<'"';}o<<']';}
+void arr5(std::ostream&o,const V&v){o<<'[';for(int i=0;i<5;i++){if(i)o<<',';o<<'"'<<v[i]<<'"';}o<<']';}
+struct Input{std::string id;I p,M,H;std::array<I,6>a,b;};
+int main(int argc,char**argv){auto start=Clock::now();try{need(argc==2||(argc==3&&std::string(argv[2])=="cap0"),"input path");if(argc==3)lll_limit=0;std::ifstream in(argv[1]);need(bool(in),"input");std::vector<Input>inputs;unsigned long declared=0;Input d;while(in>>d.id>>d.p>>d.M>>d.H){for(auto&x:d.a)in>>x;for(auto&x:d.b)in>>x;need(bool(in)&&d.p>2&&d.M>=0&&d.H>=0&&d.H<=63,"bounded input");declared+=25*(d.H.get_ui()+1);need(declared<=30000&&inputs.size()<5,"preflight state cap");inputs.push_back(d);}need(inputs.size()==5,"five declared blocks");unsigned long used=0;std::ostringstream output;output<<'[';bool comma=false;
+for(const auto&inp:inputs){auto id=inp.id;I p=inp.p,M=inp.M,H=inp.H;auto a=inp.a,b=inp.b;I pivot=H/2,A=3*M,hm=H*H,wm=A>hm?A:hm;
+V weights{I(A*A+2*A*H*H),I(A*H),A,I(3*M*M),I(M*M*M)};for(auto&w:weights)if(w<1)w=1;
+B basis{};basis[0][0]=p;basis[1][1]=p;basis[2][2]=p;basis[3]={center(a[0],p),center(a[1],p),center(a[3],p),1,0};basis[4]={center(b[0],p),center(b[1],p),center(b[3],p),0,1};
+for(auto&row:basis)for(int j=0;j<5;j++)row[j]*=weights[j];unsigned steps=0;bool reduced=lll(basis,steps,start);std::vector<V>seeds;
+for(auto row:basis){for(int j=0;j<5;j++){need(row[j]%weights[j]==0,"exact unscale");row[j]/=weights[j];}seeds.push_back(row);}
+for(int i=0;i<5;i++)for(int j=i+1;j<5;j++)for(int sg:{-1,1}){V v;for(int k=0;k<5;k++)v[k]=seeds[i][k]+sg*seeds[j][k];seeds.push_back(v);}need(seeds.size()==25,"full seed pool");
+V7 lo{0,I(-A*H),0,0,0,0,0},hi{I(wm*wm),I(H*H*H),hm,A,H,I(3*M*M),I(M*M*M)};
+bool coarseclosed=false;std::string mask(H.get_ui()+1,'0');std::ostringstream records;
+for(unsigned ri=0;ri<seeds.size();ri++){const auto&s=seeds[ri];for(int j=0;j<3;j++){int k=(j==2?3:j);need(mod(I(s[j]-s[3]*a[k]-s[4]*b[k]),p)==0,"seed dual membership");}
+V7 v{};v[0]=s[0];v[1]=s[1];v[3]=s[2];v[5]=center(s[3],p);v[6]=center(s[4],p);v[2]=center(I(v[5]*a[2]+v[6]*b[2]),p);v[4]=center(I(v[5]*a[4]+v[6]*b[4]),p);
+I cc=center(I(v[5]*a[5]+v[6]*b[5]),p),L=cc,R=cc;for(int j=0;j<5;j++)need(mod(I(v[j]-v[5]*a[j]-v[6]*b[j]),p)==0,"lift membership");
+for(int j=0;j<7;j++){I z=j<5?v[j]:I(-v[j]),x=z*lo[j],y=z*hi[j];L+=(x<y?x:y);R+=(x>y?x:y);}bool coarse=cd(L,p)>fd(R,p);coarseclosed|=coarse;
+std::string cmask(H.get_ui()+1,'0');I sum=0,max=0;unsigned tighter=0;std::ostringstream phases;phases<<'[';
+for(unsigned long ui=0;ui<=H.get_ui();ui++){need(++used<=30000,"work cap");I phase=center(I(v[0]*I(ui)*I(ui)*I(ui)*I(ui)+v[1]*I(ui)*I(ui)*I(ui)+v[2]*I(ui)*I(ui)+v[4]*I(ui)+cc),p);if(ui)phases<<',';phases<<'"'<<phase<<'"';auto cr=curved(v,cc,M,I(ui));I width=cr.second-cr.first;need(width<=R-L,"curved inside coarse");sum+=width;if(width>max)max=width;tighter+=width<R-L;if(cd(cr.first,p)>fd(cr.second,p)){cmask[ui]='1';mask[ui]='1';}}
+phases<<']';if(ri)records<<',';records<<"{\"seed\":";arr5(records,s);records<<",\"vector\":";arr(records,v);records<<",\"constant\":\""<<cc<<"\",\"L\":\""<<L<<"\",\"R\":\""<<R<<"\",\"coarse\":"<<(coarse?"true":"false")<<",\"curved_mask\":\""<<cmask<<"\",\"curved_width_sum\":\""<<sum<<"\",\"curved_max_width\":\""<<max<<"\",\"tighter_u\":"<<tighter<<",\"phases\":"<<phases.str()<<'}';}
+bool closed=mask.find('0')==std::string::npos;need(!coarseclosed||closed,"coarse implies curved closure");if(comma)output<<',';comma=true;output<<"{\"id\":\""<<id<<"\",\"pivot\":\""<<pivot<<"\",\"seed_weights\":";arr5(output,weights);output<<",\"coarse_closed\":"<<(coarseclosed?"true":"false")<<",\"curved_closed\":"<<(closed?"true":"false")<<",\"curved_mask\":\""<<mask<<"\",\"lll_complete\":"<<(reduced?"true":"false")<<",\"steps\":"<<steps<<",\"candidates\":["<<records.str()<<"]}";
+}need(used==declared,"complete work");output<<']';auto text=output.str();need(std::chrono::duration<double>(Clock::now()-start).count()<78,"native serialization deadline");std::cout<<text<<'\n';}catch(std::exception&e){std::cerr<<e.what()<<'\n';return 2;}}

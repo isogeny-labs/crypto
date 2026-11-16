@@ -1,0 +1,11 @@
+name = "walk_character_audit"
+version = "0.1.0"
+defaultTargets = ["WalkCharacterAudit"]
+
+[[require]]
+name = "weighted_cycle_coupling_audit"
+path = "../../weighted_cycle_coupling_audit_20261114/lean"
+
+[[lean_lib]]
+name = "WalkCharacterAudit"
+roots = ["ComplexExpectation", "CharacterWalk", "PhaseVariance", "SpectralContraction", "CharacterCertificate"]

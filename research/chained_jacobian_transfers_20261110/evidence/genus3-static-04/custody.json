@@ -1,0 +1,47 @@
+{
+  "original_tree": "/workspace/scratch/ct55-g3-static-04",
+  "native_exit": 0,
+  "guard_exit": 0,
+  "guards": {
+    "count": 808,
+    "changed": []
+  },
+  "plan": {
+    "protocol": "394e14 published de0b472 BEFORE implementation",
+    "phase": "static",
+    "command": [
+      "cargo",
+      "clippy",
+      "--all-targets",
+      "--offline",
+      "--locked",
+      "--manifest-path",
+      "research/chained_jacobian_transfers_20261110/genus3-prime-descent/Cargo.toml",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "timeout_s": 900,
+    "old794_inputs_unchanged_before": true,
+    "guard_count": 808,
+    "compiled_source_files": 118,
+    "native_cache": "/workspace/scratch/ct55-g3-static-04-build-cache",
+    "cache_outside_raw": true,
+    "prediction": "static strict warnings0",
+    "falsification": "any original nonzero native exit or changed guard;preserve and diagnose;no relaxation",
+    "scope": "local correctness build/test only,no benchmark/timing ratio/IC/paid experiment"
+  },
+  "start": "2026-11-13T05:38:58Z",
+  "finish": "2026-11-13T05:39:07Z",
+  "files": 136,
+  "raw_bytes": 3031040,
+  "raw_sha256": "c11147d6f54f6b13118c0791c3b432d35a4a60147502e090ba6d5dd770dd2e21",
+  "archive_path": "/workspace/scratch/ct55-g3-static-04-whole-raw.tar.xz",
+  "archive_bytes": 462668,
+  "archive_sha256": "7623881efd3a042f0c2a52f13f0a5fd031e52f7dae45b117ad2d43cb5ae399a8",
+  "every_member_hash": true,
+  "exact_standard_tar_xz_roundtrip": true,
+  "native_cache_outside_raw": true,
+  "remote_availability": "PENDING actual trusted-base publication if required;not inferred from custody",
+  "standing": "unsigned original local command and byte-custody observation,not signed execution/mathematical verdict"
+}

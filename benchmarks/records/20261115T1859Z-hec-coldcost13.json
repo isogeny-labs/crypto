@@ -1,0 +1,105 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-15T19:14:47+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Users/adamburan/pq-work/hec-coldcost13-target/release/coldcost13-collector",
+        "/Users/adamburan/pq-work/hec-coldcost13-target/release/coldcost13-worker",
+        "/Users/adamburan/pq-work/hec-followups/research/hec_coldbuild13_20261115/PUBLIC.txt",
+        "/Users/adamburan/pq-work/hec-followups/research/hec_coldcost13_20261115/run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T19:00:05+00:00",
+      "wall_s": 9.42
+    }
+  ],
+  "commit": "edf84d571f5b67823c5e90b6042e83ce71036a8e",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T18:59:29+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-coldcost13"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Adams-MacBook-Pro-4.local",
+    "isolation": "L0-unisolated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261115T1859Z-hec-coldcost13",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "best_native_over_cold",
+      "note": "Derived ratio of medians; numerical threshold10 fails; repeated same instance, not independent curves",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.00044760096615589
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "cold_core_median",
+      "note": "Full construction/map/solve/verification; fixed input; L0 producer unvalidated",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.706933666,
+        1.938462791
+      ],
+      "unit": "wall_s",
+      "value": 1.780974708
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "compact_core_median",
+      "note": "Best of three preregistered native controls; same target; L0 producer unvalidated",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.000434917,
+        0.001196125
+      ],
+      "unit": "wall_s",
+      "value": 0.000797166
+    }
+  ],
+  "problem": "kernel:hec-genus3-complete-cold",
+  "raw": [
+    {
+      "bytes": 38953,
+      "path": "research/hec_coldcost13_20261115/raw-coldcost.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fc/fce76687a443082c06b28f2986e5cf2634fe1c1971a4e1c956b05724e3ad7e07",
+      "sha256": "fce76687a443082c06b28f2986e5cf2634fe1c1971a4e1c956b05724e3ad7e07",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/hec_coldcost13_20261115/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-hec-coldcost13/COST.png",
+      "benchmarks/20261115-hec-coldcost13/PHASES.png"
+    ],
+    "svg": [
+      "research/hec_coldcost13_20261115/COST.svg",
+      "research/hec_coldcost13_20261115/PHASES.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-coldcost13",
+  "status": "measured",
+  "summary": "All20same-target cells verify183049; completecold median1.780975s versus bestCompact0.797166ms, best/cold0.000447601:10xgatefails. Local ARM L0 producer unvalidated; all setup/maps/solve/verification charged.",
+  "validation": null
+}

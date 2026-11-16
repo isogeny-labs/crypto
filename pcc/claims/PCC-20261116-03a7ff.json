@@ -1,0 +1,76 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T08:48:26Z",
+ "id": "PCC-20261116-03a7ff",
+ "kind": "theorem",
+ "producer": {
+  "commit": "fa30a9f381d8add5f05f2710deec15c772c80a39",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "9519be120b86a5cc6537e9e9daa6c4d0c385d2c0face527a00f7d00964ffb9ba",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-trace-v1",
+   "theorem": "Curve25519TraceDegree.actual_trace_degree"
+  },
+  {
+   "decl_sha256": "8e8210eac015714e996cf6d91da627b1d52ab8f43f5b49eb55e3afb4b1c351c2",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-trace-v1",
+   "theorem": "Curve25519TraceDegree.actual_lift_u_degree"
+  },
+  {
+   "decl_sha256": "a0d6d9b2dbb4d83c9dc95a97757247b6c62e5374674089928380c7fa54c2481e",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-trace-v1",
+   "theorem": "Curve25519TraceDegree.actual_derivative_identity"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-trace-v1/TraceDegree.lean",
+    "sha256": "db2903befe923df65e6bf0c1668fd963fab6186e245153aa204211e188d08c6e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-trace-v1/PROOF_MAP.md",
+    "sha256": "6d8ae6999bd5eb52544d8d9e790e0adfc87c25272d5c146e88bf540ff95bfb10"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-trace-v1/lakefile.toml",
+    "sha256": "a0b6437257dba48c4357df9477c82b6dad6251a900e8bd925dbb157a1a3dbcb9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-trace-v1/lake-manifest.json",
+    "sha256": "434f6ca2bd398320b66eff450c062ba4cff89d1392760b9139125dc5695b64aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-trace-v1/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/trace-lift-v1/development/lean-gate-final.log",
+    "sha256": "ebb3c564c96357fb1659a96d92710f4a1c0b2f59b8750643eedd0aec55b6b8fa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/lean-trace-v1",
+ "statement": "Three fixed-index endpoints apply existing Mathlib Chebyshev laws at q213156431: T has degree213156431 and U_(q-1) degree213156430 over any coefficient field with2 nonzero; the formal derivative is q times U_(q-1) over any commutative ring. Focused gate audits three named theorems with zero trusted-native exceptions. No native AD, coordinate-lift/Pell, splitting, actual prime-field/group/compiler or solver-cost theorem is established by these endpoints. All signed standing remains unverified."
+}

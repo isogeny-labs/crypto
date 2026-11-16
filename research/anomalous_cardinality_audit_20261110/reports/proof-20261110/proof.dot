@@ -1,0 +1,18 @@
+digraph {
+ graph [rankdir=TB,bgcolor="white",pad=.2,nodesep=.3,ranksep=.34];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf1fa",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#46566b"];
+ order [label="Frozen actual-point certificate\np prime; order(G) = p"];
+ finite [label="Actual point set is finite\nand contains infinity"];
+ divide [label="Lagrange\np divides N and N > 0"];
+ euler [label="Closed kernel certificate\nb^(p/2) = -1; b nonzero"];
+ gap [label="Euler criterion\nNo rational point with x = 0"];
+ fiber [label="At most two y values per remaining x\nActual point-set injection + infinity"];
+ upper [label="Elementary strict bound\nN < 2p"];
+ result [label="Actual corrected 160-bit curve\nN = #E(Fp) = p",fillcolor="#d9efe1"];
+ control [label="Actual F5 negative control\n#E = 10 with an order-5 point\nOrder alone does not imply N = p",fillcolor="#f7eedb"];
+ order->divide;finite->divide;
+ euler->gap->fiber->upper;
+ divide->result;upper->result;
+ {rank=same;result;control;}
+}

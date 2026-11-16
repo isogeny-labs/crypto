@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T10:22:39Z",
+ "id": "PCC-20261116-5cb553",
+ "kind": "statement",
+ "producer": {
+  "commit": "764a3985f569ccd0c47332252256151820daf8d2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-first-compile-failure-01/entire.stdout",
+    "sha256": "acde607c8854630329994c71224f15e0cf282b316c7a3f225a2281243af8e0e6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-first-compile-failure-01/entire.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-first-compile-failure-01/entire-source.lean.txt",
+    "sha256": "ec31d26ac6a10b2e21c06c182d292597e94e4824a4f347caae6558c79bec3873"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-first-compile-failure-01/actual.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "First additive cubic UInt64 coefficient bridge Lean4.35 compile exits1: omega cannot close first/second coordinate equalities after all nested2^64/223 remainders are expanded. Complete source/stdout/stderr/exit retained; erroneous declarations print sorryAx and are not accepted proofs. Existing immutable cubic norm12 statements remain unchanged. Positive word-square4 control/kernel and canonical product bound compile, but no combined source qualification follows. Next prove explicit bounded modulo2^64 elimination before the final coordinate simplification; do not use solver failure as a mathematical counterexample, enumerate223cubed, add trusted native_decide/axioms or weaken canonical inputs."
+}
