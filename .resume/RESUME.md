@@ -1,3 +1,18 @@
+# Prior Root PR merged externally during source preparation
+
+## What was done
+pcc/claims/PCC-20261116-77ebba.json: local source6e77 has complete source governance531e88, but publisher lookup finds the old head absent and attempts no push. PR4366 was externally merged at02:28:20, after empty refresh8fa. Genuine merge966648 is fetched and its tree equals oldd3 exactly. Every failed publication byte is preserved. [pcc:unverified]
+
+## Decisions made
+Use a new owned successor branch and ordinarily merge genuine966648, preserving all local/source/ledger history. Parent branch now genuinely advanced to966648; do not call its mutable ref exactc019. Publish a fresh exact source tag and ready PR against that immediate parent after original governance. No force, rechain, old-branch resurrection or empty rerun. [pcc:unverified]
+
+## Open threads
+Root successor publication/required CI; Consumerc045 historical native unit CI reports success and whole artifact is being collected. Full historical LP/EKS/scientificNEW28 remain open. [pcc:unverified]
+
+## Errors
+Normal publisher error was an empty expected-head response after legitimate external branch deletion. No actual push occurred. The old PR's external merge is not attributed to this session or treated as a successful current-source PCC repair. [pcc:unverified]
+
+---
 # Exact archive hydration and historical workflow data address
 
 ## What was done
