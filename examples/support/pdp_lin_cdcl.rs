@@ -63,6 +63,15 @@ pub struct Stats {
     pub gate_linearisations: u64,
     pub learnt_clauses: u64,
     pub learnt_lits: u64,
+    /// Conflicts raised while the `stage_block` (the chain's `t`) was fully assigned
+    /// (the `x₃` stage) versus not (the `t` stage).
+    pub conflicts_stage_assigned: u64,
+    pub conflicts_stage_open: u64,
+    pub forgotten_clauses: u64,
+    /// Wall nanoseconds inside the XOR engine, the clause propagation loop and conflict analysis.
+    pub ns_gje: u64,
+    pub ns_clause_prop: u64,
+    pub ns_analyze: u64,
     /// Histogram of learnt-clause literals that fall in the "priority" (summand) blocks:
     /// index = count of priority literals, value = clauses. Width `< 2ℓ` means the clause
     /// excludes more than one pair.
@@ -100,6 +109,11 @@ pub struct LinCdcl {
     pub conflict_budget: u64,
     pub stats: Stats,
     pub restarts: bool,
+    /// Literals decided first, one per level, before any search decision (incremental use).
+    /// A refutation under assumptions returns `Unsat` without marking the solver inconsistent.
+    pub assumptions: Vec<i32>,
+    /// Block whose assignment state classifies a conflict (see `Stats`).
+    pub stage_block: Vec<u32>,
     ok: bool,
 }
 
@@ -134,6 +148,8 @@ impl LinCdcl {
             conflict_budget: u64::MAX,
             stats: Stats::default(),
             restarts: false,
+            assumptions: Vec::new(),
+            stage_block: Vec::new(),
             ok: true,
         }
     }
@@ -337,6 +353,7 @@ impl LinCdcl {
     fn propagate(&mut self) -> Option<Vec<i32>> {
         loop {
             // 1. clause propagation (two watched literals)
+            let t_cp = std::time::Instant::now();
             while self.qhead < self.trail.len() {
                 let l = self.trail[self.qhead];
                 self.qhead += 1;
@@ -386,9 +403,11 @@ impl LinCdcl {
                 }
                 self.watches[code] = keep;
                 if let Some(c) = conflict {
+                    self.stats.ns_clause_prop += t_cp.elapsed().as_nanos() as u64;
                     return Some(c);
                 }
             }
+            self.stats.ns_clause_prop += t_cp.elapsed().as_nanos() as u64;
             // 2. gate linearisation
             let mut added = false;
             for gi in 0..self.gates.len() {
@@ -450,6 +469,13 @@ impl LinCdcl {
     }
 
     fn gje(&mut self) -> GjeOutcome {
+        let t0 = std::time::Instant::now();
+        let r = self.gje_inner();
+        self.stats.ns_gje += t0.elapsed().as_nanos() as u64;
+        r
+    }
+
+    fn gje_inner(&mut self) -> GjeOutcome {
         self.stats.gje_calls += 1;
         let nv = self.n_vars + 1;
         let vw = nv.div_ceil(64);
@@ -714,21 +740,32 @@ impl LinCdcl {
         if !self.ok {
             return Result::Unsat;
         }
+        self.backtrack(0);
         if self.propagate().is_some() {
             self.ok = false;
             return Result::Unsat;
         }
+        let budget_end = self.stats.conflicts.saturating_add(self.conflict_budget);
         let mut conflicts_since_restart = 0u64;
         let mut restart_limit = 100u64;
         loop {
             if let Some(confl) = self.propagate() {
                 self.stats.conflicts += 1;
                 conflicts_since_restart += 1;
+                if !self.stage_block.is_empty() {
+                    if self.block_value(&self.stage_block).is_some() {
+                        self.stats.conflicts_stage_assigned += 1;
+                    } else {
+                        self.stats.conflicts_stage_open += 1;
+                    }
+                }
                 if self.decision_level() == 0 {
                     self.ok = false;
                     return Result::Unsat;
                 }
+                let t_an = std::time::Instant::now();
                 let (learnt, bt) = self.analyze(confl);
+                self.stats.ns_analyze += t_an.elapsed().as_nanos() as u64;
                 self.backtrack(bt);
                 let pw = learnt
                     .iter()
@@ -751,7 +788,7 @@ impl LinCdcl {
                     self.enqueue(assert_lit, Reason::Clause(idx));
                 }
                 self.var_inc *= 1.0 / 0.95;
-                if self.stats.conflicts >= self.conflict_budget {
+                if self.stats.conflicts >= budget_end {
                     return Result::Unknown;
                 }
             } else {
@@ -759,6 +796,24 @@ impl LinCdcl {
                     conflicts_since_restart = 0;
                     restart_limit = restart_limit * 3 / 2;
                     self.backtrack(0);
+                    continue;
+                }
+                // assumptions first, one level each
+                let mut next_assumption: Option<i32> = None;
+                while (self.decision_level() as usize) < self.assumptions.len() {
+                    let p = self.assumptions[self.decision_level() as usize];
+                    match self.value(p) {
+                        Val::True => self.trail_lim.push(self.trail.len()),
+                        Val::False => return Result::Unsat,
+                        Val::Undef => {
+                            next_assumption = Some(p);
+                            break;
+                        }
+                    }
+                }
+                if let Some(p) = next_assumption {
+                    self.trail_lim.push(self.trail.len());
+                    self.enqueue(p, Reason::None);
                     continue;
                 }
                 match self.pick_branch() {
@@ -771,6 +826,58 @@ impl LinCdcl {
                 }
             }
         }
+    }
+
+    /// Backtrack to level 0 (public reset between incremental solves).
+    pub fn reset(&mut self) {
+        self.backtrack(0);
+    }
+
+    /// Drop learnt clauses that mention any variable of `block` (e.g. the target block, whose
+    /// clauses are specific to one target) and rebuild the watch lists. Clauses that are the
+    /// reason of a current assignment are kept. Returns the number dropped.
+    pub fn forget_learnts_mentioning(&mut self, block: &[u32]) -> usize {
+        let set: std::collections::HashSet<u32> = block.iter().copied().collect();
+        let locked: std::collections::HashSet<usize> = self
+            .trail
+            .iter()
+            .filter_map(|&t| match self.reason[t.unsigned_abs() as usize] {
+                Reason::Clause(c) => Some(c),
+                _ => None,
+            })
+            .collect();
+        let mut removed = 0;
+        for ci in self.n_original_clauses..self.clauses.len() {
+            if self.clauses[ci].is_empty() || locked.contains(&ci) {
+                continue;
+            }
+            if self.clauses[ci]
+                .iter()
+                .any(|l| set.contains(&l.unsigned_abs()))
+            {
+                self.clauses[ci].clear();
+                removed += 1;
+            }
+        }
+        for w in &mut self.watches {
+            w.clear();
+        }
+        for ci in 0..self.clauses.len() {
+            if self.clauses[ci].len() >= 2 {
+                let (a, b) = (self.clauses[ci][0], self.clauses[ci][1]);
+                self.watches[lit_code(a)].push(ci);
+                self.watches[lit_code(b)].push(ci);
+            }
+        }
+        self.stats.forgotten_clauses += removed as u64;
+        removed
+    }
+
+    pub fn live_learnts(&self) -> usize {
+        self.clauses[self.n_original_clauses..]
+            .iter()
+            .filter(|c| !c.is_empty())
+            .count()
     }
 
     pub fn model_block(&self, block: &[u32]) -> u64 {
@@ -794,10 +901,53 @@ pub struct ChainInstance {
     pub x2: Vec<u32>,
     pub x3: Vec<u32>,
     pub t: Vec<u32>,
+    /// Present when `x_R` is a variable block set per target through assumptions.
+    pub xr: Option<Vec<u32>>,
 }
 
 impl ChainInstance {
+    /// Fixed target: `x_R` folded into the constants (one solver per target).
     pub fn build(n: u32, l: u32, irr: u64, x_r: u64, b: u64, lex_pairs: bool) -> ChainInstance {
+        Self::build_inner(n, l, irr, Some(x_r), b, lex_pairs)
+    }
+
+    /// Parametrised target: `x_R` is a block fixed per solve by `set_target` (assumptions), so one
+    /// solver and its learnt clauses serve many targets of the same factor base.
+    pub fn build_param(n: u32, l: u32, irr: u64, b: u64, lex_pairs: bool) -> ChainInstance {
+        Self::build_inner(n, l, irr, None, b, lex_pairs)
+    }
+
+    /// Fix the target for the next solve. With `forget`, learnt clauses that mention the
+    /// `x_R` block (specific to the previous target) are dropped first; the rest, the learnt
+    /// table of root-less pairs, is kept.
+    pub fn set_target(&mut self, x_r: u64, forget: bool) {
+        let xr = self.xr.as_ref().expect("parametrised instance").clone();
+        if forget {
+            self.solver.reset();
+            self.solver.forget_learnts_mentioning(&xr);
+        }
+        let xr = self.xr.as_ref().expect("parametrised instance");
+        self.solver.assumptions = xr
+            .iter()
+            .enumerate()
+            .map(|(j, &v)| {
+                if (x_r >> j) & 1 == 1 {
+                    v as i32
+                } else {
+                    -(v as i32)
+                }
+            })
+            .collect();
+    }
+
+    fn build_inner(
+        n: u32,
+        l: u32,
+        irr: u64,
+        x_r: Option<u64>,
+        b: u64,
+        lex_pairs: bool,
+    ) -> ChainInstance {
         let nn = n as usize;
         let mut next = 1u32;
         let mut block = || {
@@ -816,10 +966,16 @@ impl ChainInstance {
             block(),
             block(),
         );
+        // parametrised target: blocks xr, b2 = t·xr, c = x3·xr, e = a·xr
+        let param = if x_r.is_none() {
+            Some((block(), block(), block(), block()))
+        } else {
+            None
+        };
         let n_vars = (next - 1) as usize + if lex_pairs { nn } else { 0 };
         let mut s = LinCdcl::new(n_vars, n, irr);
         let sq = s.sq_matrix();
-        let mr = s.mul_matrix(x_r);
+        let mr = s.mul_matrix(x_r.unwrap_or(0));
         // domain: summand bits ≥ ℓ are zero
         for blk in [&x1, &x2, &x3] {
             for j in l as usize..nn {
@@ -846,25 +1002,43 @@ impl ChainInstance {
             }
             s.add_xor(vars, (b >> k) & 1 == 1);
         }
-        // S3b: sq(a ⊕ Mr t ⊕ Mr x3) ⊕ Mr a ⊕ b = 0
-        // inner_j = a_j ⊕ Σ_i Mr_ji t_i ⊕ Σ_i Mr_ji x3_i ; row k: Σ_j sq_kj inner_j ⊕ Σ_j Mr_kj a_j = b_k
-        for k in 0..nn {
-            let mut vars = Vec::new();
-            for j in 0..nn {
-                if (sq[j] >> k) & 1 == 1 {
-                    vars.push(a[j]);
-                    for i in 0..nn {
-                        if (mr[i] >> j) & 1 == 1 {
-                            vars.push(t[i]);
-                            vars.push(x3[i]);
-                        }
+        if let Some((xr, b2, c, e)) = &param {
+            // S3b with x_R a block: sq(a ⊕ b2 ⊕ c) ⊕ e ⊕ b = 0, gates b2 = t·xr, c = x3·xr, e = a·xr
+            s.add_gate(t.clone(), xr.clone(), b2.clone());
+            s.add_gate(x3.clone(), xr.clone(), c.clone());
+            s.add_gate(a.clone(), xr.clone(), e.clone());
+            for k in 0..nn {
+                let mut vars = vec![e[k]];
+                for j in 0..nn {
+                    if (sq[j] >> k) & 1 == 1 {
+                        vars.push(a[j]);
+                        vars.push(b2[j]);
+                        vars.push(c[j]);
                     }
                 }
-                if (mr[j] >> k) & 1 == 1 {
-                    vars.push(a[j]);
-                }
+                s.add_xor(vars, (b >> k) & 1 == 1);
             }
-            s.add_xor(vars, (b >> k) & 1 == 1);
+        } else {
+            // S3b: sq(a ⊕ Mr t ⊕ Mr x3) ⊕ Mr a ⊕ b = 0
+            // inner_j = a_j ⊕ Σ_i Mr_ji t_i ⊕ Σ_i Mr_ji x3_i ; row k: Σ_j sq_kj inner_j ⊕ Σ_j Mr_kj a_j = b_k
+            for k in 0..nn {
+                let mut vars = Vec::new();
+                for j in 0..nn {
+                    if (sq[j] >> k) & 1 == 1 {
+                        vars.push(a[j]);
+                        for i in 0..nn {
+                            if (mr[i] >> j) & 1 == 1 {
+                                vars.push(t[i]);
+                                vars.push(x3[i]);
+                            }
+                        }
+                    }
+                    if (mr[j] >> k) & 1 == 1 {
+                        vars.push(a[j]);
+                    }
+                }
+                s.add_xor(vars, (b >> k) & 1 == 1);
+            }
         }
         // optional lex ordering x1 ≤ x2 on the ℓ low bits (high bit most significant),
         // via a standard comparator chain with aux "equal-so-far" variables e_j.
@@ -902,12 +1076,14 @@ impl ChainInstance {
         let mut prio: Vec<u32> = x1[..l as usize].to_vec();
         prio.extend_from_slice(&x2[..l as usize]);
         s.set_priority(&prio);
+        s.stage_block = t.clone();
         ChainInstance {
             solver: s,
             x1,
             x2,
             x3,
             t,
+            xr: param.map(|p| p.0),
         }
     }
 }
