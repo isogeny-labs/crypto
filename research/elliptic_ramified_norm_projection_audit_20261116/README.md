@@ -64,3 +64,5 @@ reciprocity, arbitrary divisor representatives/isogeny comparison/general
 geometric descent/canonical Tate/general MOV-FR and full fourteen-item closure
 remain open. Normalized ramified rational finite fixed points are closed at
 the stated actual nonsingularity/fixedpoint guard. [pcc:unverified]
+
+Publication: ready [PR #4389](https://github.com/isogeny-labs/crypto/pull/4389), new follow-up stacked on #3739 after external merge #4384. Remote proof `5d3ec0dd9f437db18f4a37939a1fef32cf98dc55` and local receipt `a7cc8eff5c759732d0693118629438f3ae4b1100` share tree `4ad22946486d927626e3cb576f1193f44c5467a3`. Anonymous fetch completed; fresh exact head/body/title/open/ready matched. Body has4406characters. All40pinsets4061entries/79scope links match;633nonemptyledgerprefix preserved through634. Current-head CI/review/signing pending. [pcc:unverified]
