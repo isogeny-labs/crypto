@@ -7,7 +7,7 @@
 //!
 //! cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle
 //! cargo +1.100.0 run  --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle
-use prime31_algebraic_ic::{check_curve, Arithmetic, Point, PRIME31};
+use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use serde_json::json;
 use std::collections::{hash_map::Entry, HashMap, HashSet};
 use std::time::Instant;
@@ -196,12 +196,10 @@ fn describe(ar: &mut Arithmetic, half: &FourSet, pts: &[Point], q: Point,
     })
 }
 
-fn main() {
-    let mut ar = Arithmetic::default();
-    check_curve(PRIME31, &mut ar).expect("valid ordinary prime31 group");
-    let base = first_rational_points(&mut ar, B31);
-    let pts = tokens(&ar, &base);
-    let half = FourSet::build(&mut ar, &pts);
+fn run_panel(ar: &mut Arithmetic, base: Vec<(u64, u64)>, base_kind: &str) -> serde_json::Value {
+    assert_eq!(base.len(), B31, "exact 31-point x factor base");
+    let pts = tokens(ar, &base);
+    let half = FourSet::build(ar, &pts);
     assert_eq!(half.integer_signatures, 618_885);
     let mut rows = Vec::new();
     let mut natural_seed = NATURAL_SEED;
@@ -213,7 +211,7 @@ fn main() {
             if seen.insert(candidate) { break candidate; }
         };
         let q = ar.scalar(PRIME31, k, Some(PRIME31.g));
-        let record = describe(&mut ar, &half, &pts, q, "natural_unknown_k_for_oracle", case, Some(k));
+        let record = describe(ar, &half, &pts, q, "natural_unknown_k_for_oracle", case, Some(k));
         natural_hits += u64::from(record["found"].as_bool().unwrap());
         rows.push(record);
     }
@@ -221,21 +219,20 @@ fn main() {
     for case in 0..16 {
         let mut word = [0_u8; 8];
         for t in &mut word { *t = (splitmix64(&mut planted_seed) % pts.len() as u64) as u8; }
-        let q = evaluate(&mut ar, &pts, &word);
-        let record = describe(&mut ar, &half, &pts, q, "planted_blinded_eight_sum", case, None);
+        let q = evaluate(ar, &pts, &word);
+        let record = describe(ar, &half, &pts, q, "planted_blinded_eight_sum", case, None);
         assert_eq!(record["found"], true, "planted positive missed");
         rows.push(record);
     }
     let identity_word = [0_u8, 1, 0, 1, 0, 1, 0, 1];
-    assert_eq!(evaluate(&mut ar, &pts, &identity_word), None);
-    let identity = describe(&mut ar, &half, &pts, None, "identity_cancellation", 0, None);
+    assert_eq!(evaluate(ar, &pts, &identity_word), None);
+    let identity = describe(ar, &half, &pts, None, "identity_cancellation", 0, None);
     assert_eq!(identity["found"], true);
     rows.push(identity);
-    println!("{}", json!({
-        "schema":"prime31.s9.b31_four_plus_four_oracle.v1",
-        "curve":PRIME31, "base_size":B31,
-        "first_rational_x_base":base,
-        "algorithm":"generic group-law signed 4A+4A MITM; exact 8A membership oracle, not S9 polynomial elimination or ECDLP solver",
+    json!({
+        "base_kind":base_kind,
+        "first_rational_x_base_or_special_fibre":base,
+        "base_size":B31,
         "signed_four_word_multisets":half.words,
         "signed_four_net_integer_signatures":half.integer_signatures,
         "distinct_four_leaf_group_points":half.index.len(),
@@ -245,11 +242,32 @@ fn main() {
         "four_set_build_group_additions":half.build_additions,
         "natural_seed":format!("{NATURAL_SEED:#x}"),
         "planted_seed":format!("{PLANTED_SEED:#x}"),
-        "natural_cases":24,
-        "natural_eight_leaf_hits":natural_hits,
+        "natural_cases":24, "natural_eight_leaf_hits":natural_hits,
         "planted_cases":16, "planted_hits":16,
         "identity_control_hits":1,
-        "per_target":rows,
+        "per_target":rows
+    })
+}
+
+fn main() {
+    let mut ar = Arithmetic::default();
+    check_curve(PRIME31, &mut ar).expect("valid ordinary prime31 group");
+    let first_base = first_rational_points(&mut ar, B31);
+    let first_x = run_panel(&mut ar, first_base, "first31_rational_x_control");
+
+    // The actual K961/S5 bridge uses the 31 liftable points in Base depth six.
+    // Do not confuse coverage on an arbitrary first-x base with this special
+    // algebraic factor base.
+    let dickson = Base::build(PRIME31, 6, &mut ar).expect("special depth-six factor base");
+    assert_eq!(dickson.points.len(), B31);
+    let special = run_panel(&mut ar, dickson.points, "actual_dickson_depth6_31_algebraic_base");
+
+    println!("{}", json!({
+        "schema":"prime31.s9.b31_four_plus_four_oracle.v2",
+        "curve":PRIME31,
+        "algorithm":"generic group-law signed 4A+4A MITM; exact 8A membership oracle, not S9 polynomial elimination or ECDLP solver",
+        "natural_and_planted_public_Q_seeds_match_across_bases":true,
+        "panels":[first_x,special],
         "cold_timing_comparable_to_APS_or_rho":false,
         "independent_signed_pcc":false,
         "status":"development producer [pcc:unverified]"
