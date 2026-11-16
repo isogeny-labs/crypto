@@ -14,17 +14,21 @@
 //!      not imply itself (decisions, clause propagations, level-0 facts). A variable is implied
 //!      exactly when its pivot row has no other variable. The original substituted assigned
 //!      values while rebuilding.
-//!  C3  bit-packed rows: vw words of variables, 1 word "which unit rows entered the
-//!      derivation" (unit slots, bit 63 = slot overflow), 1 word "which gates' rows entered".
-//!      Both mask words are combined by OR, so a mask is a superset of the derivation, which
-//!      is sound for a reason. A row operation XORs only the word range where the source row
-//!      is non-zero. The original tracked an exact combination bitset over all original rows.
-//!  C4  lazy explanation. A propagated literal stores only its row's two mask words; literals
-//!      are produced inside conflict analysis, and a unit slot or a gate guard is expanded at
-//!      most once per analysis. Reason of an implied literal = the unit literals in its mask
-//!      plus the operand literals (guard) of every gate in its mask. The original's reason was
-//!      every assigned literal occurring in the rows of the combination plus guards, built
-//!      eagerly at every propagation.
+//!  C3  bit-packed rows: vw words of variables plus 1 mask word; a row operation XORs only the
+//!      word range where the source row is non-zero. A column index (for each variable, the
+//!      bitset of rows containing it) is kept by column operations, so eliminating a new pivot
+//!      visits only the rows that contain it.
+//!  C4  explanations are cut at unit literals and built lazily. Each literal that enters as a
+//!      unit row above level 0 gets a slot (bit) in the mask word; bit 63 means "more than 63
+//!      slots: every earlier non-implied literal". Row masks are combined by OR, and a gate
+//!      row's mask is the OR of the masks of every assigned operand bit it used. So the mask
+//!      of an implied literal is a superset of the decisions and clause-propagated literals
+//!      that support it, which is a sound reason. The literal list is produced only inside
+//!      conflict analysis, each slot at most once per analysis. The original's reason was
+//!      every assigned literal occurring in the rows of an exact row combination plus the
+//!      gate guards, built eagerly at every propagation; its learnt clauses therefore also
+//!      contain implied literals of lower levels, where these contain decisions and
+//!      clause-propagated literals only.
 //!  C5  the level-0 matrix (static rows, independent of x1) is eliminated once and inherited
 //!      by every level through the copies.
 //!  C6  gate linearisation folds values. With known operand a of z = a * y:
@@ -32,15 +36,14 @@
 //!      (ii) a != 0 and z fully assigned: y = z / a by one field inversion and multiplication,
 //!           n unit rows (the same row space as the n gate rows reduced by z's unit rows);
 //!      (iii) otherwise the n rows z_k + sum_j M(a)_kj y_j with the assigned y_j substituted.
-//!      In (i)-(iii) the row masks are the gate bit plus the masks of every assigned bit of the
-//!      block that was substituted (a superset, see C3). The original always injected the n
-//!      rows of (iii) unsubstituted and left the rest to the re-elimination.
-//!  C7  pivot elimination scans only rows with at least two variables, and is skipped when the
-//!      pivot variable has not occurred in any row of this matrix yet.
+//!      The original always injected the n unsubstituted rows and re-eliminated.
+//!  C7  pivot of a new row: its highest-index variable (`pivot_high`, default) instead of the
+//!      original's lowest-index order.
 //!  C8  add_clause only runs clause propagation at build time; the XOR engine starts in solve().
-//! NOT changed: clause learning, backjumping, branching rule, phase saving, gate semantics,
-//! verdict semantics. Not implemented from the candidate list: Gray-code order over x1 and a
-//! learning-free leaf (both would change the search, not only the engine).
+//!  C9  watch lists are compacted in place (no allocation per visited literal).
+//! NOT changed: clause learning scheme (first UIP, all clauses kept), backjumping, branching
+//! rule, phase saving, gate semantics, verdict semantics. Not implemented from the candidate
+//! list: Gray-code order over x1 and a learning-free leaf (both change the search itself).
 
 #![allow(dead_code)]
 
@@ -57,7 +60,7 @@ pub enum Val {
 enum Reason {
     None,
     Clause(usize),
-    /// Implied by the XOR engine; masks are in `fact`.
+    /// Implied by the XOR engine; the mask is in `fact`.
     Xor,
 }
 
@@ -72,8 +75,6 @@ pub struct Gate {
     pub y: Vec<u32>,
     pub z: Vec<u32>,
     linearised_at: Option<u32>,
-    /// 0: x was the known operand (guard = x literals); 1: y.
-    side: u8,
     x_run: bool,
     y_run: bool,
 }
@@ -96,9 +97,12 @@ pub struct Stats {
     pub learnt_lits: u64,
     pub learnt_priority_width: Vec<u64>,
     pub row_inserts: u64,
+    /// row operations (row ^= row) and the words they touched (variable range + mask word)
     pub row_xors: u64,
     pub row_xor_words: u64,
-    pub scan_tests: u64,
+    /// column-index operations (col ^= col) and their words
+    pub col_xors: u64,
+    pub col_xor_words: u64,
     pub mat_copies: u64,
     pub mat_copy_words: u64,
     pub unit_overflows: u64,
@@ -114,19 +118,17 @@ pub enum Result {
 
 const OVERFLOW: u64 = 1u64 << 63;
 const NONE: u32 = u32::MAX;
-/// [unit slots (bit 63 = overflow), gates]
-type Mask = [u64; 2];
 
 enum Confl {
     /// literals, all false
     Clause(Vec<i32>),
-    /// derivation masks, plus an optional TRUE literal that the derived row contradicts
-    Xor(Mask, Option<i32>),
+    /// derivation mask, plus an optional TRUE literal that the derived row contradicts
+    Xor(u64, Option<i32>),
 }
 
 #[derive(Clone, Default)]
 struct Mat {
-    /// nrows * (vw + 2) words
+    /// nrows * (vw + 1) words: variables, then the mask word
     rows: Vec<u64>,
     rhs: Vec<bool>,
     /// non-zero word range [lo, hi) of the variable part of each row
@@ -136,13 +138,13 @@ struct Mat {
     piv_of_var: Vec<u32>,
     piv_var: Vec<u32>,
     pivmask: Vec<u64>,
-    touched: Vec<u64>,
-    active: Vec<u32>,
+    /// nv * vw words: for each variable, the rows that contain it
+    cols: Vec<u64>,
 }
 
 enum Ins {
     Redundant,
-    Conflict(Mask),
+    Conflict(u64),
     Added,
 }
 
@@ -157,8 +159,7 @@ impl Mat {
             piv_of_var: vec![NONE; nv],
             piv_var: Vec::new(),
             pivmask: vec![0; vw],
-            touched: vec![0; vw],
-            active: Vec::new(),
+            cols: vec![0; nv * vw],
         }
     }
     fn copy_from(&mut self, src: &Mat) {
@@ -171,37 +172,38 @@ impl Mat {
         self.single.clear();
         self.single.extend_from_slice(&src.single);
         self.nrows = src.nrows;
-        self.piv_of_var.clear();
-        self.piv_of_var.extend_from_slice(&src.piv_of_var);
+        self.piv_of_var.copy_from_slice(&src.piv_of_var);
         self.piv_var.clear();
         self.piv_var.extend_from_slice(&src.piv_var);
-        self.pivmask.clear();
-        self.pivmask.extend_from_slice(&src.pivmask);
-        self.touched.clear();
-        self.touched.extend_from_slice(&src.touched);
-        self.active.clear();
-        self.active.extend_from_slice(&src.active);
+        self.pivmask.copy_from_slice(&src.pivmask);
+        self.cols.copy_from_slice(&src.cols);
+    }
+    fn words(&self) -> usize {
+        self.rows.len() + self.cols.len()
     }
 }
 
-/// dst ^= src on the variable words [lo, hi); the two mask words are OR-ed.
+/// dst ^= src on the variable words [lo, hi); the mask word is OR-ed.
 #[inline(always)]
 fn xor_row(dst: &mut [u64], src: &[u64], lo: usize, hi: usize, vw: usize) {
-    let (d, s) = (&mut dst[..vw + 2], &src[..vw + 2]);
+    let (d, s) = (&mut dst[..vw + 1], &src[..vw + 1]);
     for (a, b) in d[lo..hi].iter_mut().zip(&s[lo..hi]) {
         *a ^= *b;
     }
     d[vw] |= s[vw];
-    d[vw + 1] |= s[vw + 1];
 }
 
 #[inline(always)]
 fn is_single(row: &[u64], lo: usize, hi: usize) -> bool {
-    let mut c = 0;
+    // exactly one bit set in the range (no popcount: the default x86-64 target has none)
+    let (mut one, mut more) = (0u64, false);
     for &w in &row[lo..hi] {
-        c += w.count_ones();
+        if w != 0 {
+            more |= one != 0;
+            one = w;
+        }
     }
-    c == 1
+    !more && one != 0 && one & (one - 1) == 0
 }
 
 pub struct FastCdcl {
@@ -211,8 +213,8 @@ pub struct FastCdcl {
     assigns: Vec<Val>,
     level: Vec<u32>,
     reason: Vec<Reason>,
-    /// derivation mask of each assigned variable (its row's masks, or its own unit slot)
-    fact: Vec<Mask>,
+    /// derivation mask of each assigned variable (its row's mask, or its own unit slot)
+    fact: Vec<u64>,
     trail: Vec<i32>,
     trail_lim: Vec<usize>,
     qhead: usize,
@@ -230,6 +232,9 @@ pub struct FastCdcl {
     pub conflict_budget: u64,
     pub stats: Stats,
     pub restarts: bool,
+    /// C7: pivot = highest-index variable of the reduced row (false: lowest)
+    pub pivot_high: bool,
+    pub pivot_high_static: bool,
     ok: bool,
     // XOR engine
     vw: usize,
@@ -237,6 +242,7 @@ pub struct FastCdcl {
     mats: Vec<Mat>,
     tmp: Vec<u64>,
     tmp_rhs: bool,
+    colbuf: Vec<u64>,
     units_out: Vec<u32>,
     unit_lits: Vec<i32>,
     unit_lim: Vec<usize>,
@@ -270,7 +276,7 @@ impl FastCdcl {
             assigns: vec![Val::Undef; nv],
             level: vec![0; nv],
             reason: vec![Reason::None; nv],
-            fact: vec![[0; 2]; nv],
+            fact: vec![0; nv],
             trail: Vec::new(),
             trail_lim: Vec::new(),
             qhead: 0,
@@ -288,12 +294,15 @@ impl FastCdcl {
             conflict_budget: u64::MAX,
             stats: Stats::default(),
             restarts: false,
+            pivot_high: true,
+            pivot_high_static: true,
             ok: true,
             vw,
-            rw: vw + 2,
+            rw: vw + 1,
             mats: vec![Mat::new(nv, vw)],
-            tmp: vec![0; vw + 2],
+            tmp: vec![0; vw + 1],
             tmp_rhs: false,
+            colbuf: vec![0; vw],
             units_out: Vec::new(),
             unit_lits: Vec::new(),
             unit_lim: Vec::new(),
@@ -431,9 +440,8 @@ impl FastCdcl {
     }
 
     pub fn add_gate(&mut self, x: Vec<u32>, y: Vec<u32>, z: Vec<u32>) {
-        assert!(self.gates.len() < 64, "at most 64 gates");
         let (x_run, y_run) = (is_run(&x), is_run(&y));
-        self.gates.push(Gate { x, y, z, linearised_at: None, side: 0, x_run, y_run });
+        self.gates.push(Gate { x, y, z, linearised_at: None, x_run, y_run });
     }
 
     // ---- assignment ----
@@ -498,23 +506,19 @@ impl FastCdcl {
             if self.watches[code].is_empty() {
                 continue;
             }
-            let ws = std::mem::take(&mut self.watches[code]);
-            let mut keep = Vec::with_capacity(ws.len());
+            let mut ws = std::mem::take(&mut self.watches[code]);
             let mut conflict: Option<Vec<i32>> = None;
-            let mut i = 0;
+            let (mut i, mut j) = (0, 0);
             while i < ws.len() {
                 let ci = ws[i];
                 i += 1;
-                if conflict.is_some() {
-                    keep.push(ci);
-                    continue;
-                }
                 if self.clauses[ci][0] == false_lit {
                     self.clauses[ci].swap(0, 1);
                 }
                 let first = self.clauses[ci][0];
                 if self.value(first) == Val::True {
-                    keep.push(ci);
+                    ws[j] = ci;
+                    j += 1;
                     continue;
                 }
                 let mut found = false;
@@ -530,14 +534,21 @@ impl FastCdcl {
                 if found {
                     continue;
                 }
-                keep.push(ci);
+                ws[j] = ci;
+                j += 1;
                 if self.value(first) == Val::False {
                     conflict = Some(self.clauses[ci].clone());
+                    while i < ws.len() {
+                        ws[j] = ws[i];
+                        j += 1;
+                        i += 1;
+                    }
                 } else {
                     self.enqueue(first, Reason::Clause(ci));
                 }
             }
-            self.watches[code] = keep;
+            ws.truncate(j);
+            self.watches[code] = ws;
             if let Some(c) = conflict {
                 return Some(c);
             }
@@ -565,17 +576,17 @@ impl FastCdcl {
                 xor_row(tmp, &m.rows[r * rw..(r + 1) * rw], lo as usize, hi as usize, vw);
                 rhs ^= m.rhs[r];
                 self.stats.row_xors += 1;
-                self.stats.row_xor_words += (hi - lo) as u64 + 2;
+                self.stats.row_xor_words += (hi - lo) as u64 + 1;
             }
         }
-        // non-zero range and leading variable
+        // non-zero range and pivot
         let mut lo = 0;
         while lo < vw && tmp[lo] == 0 {
             lo += 1;
         }
         if lo == vw {
             if rhs {
-                return Ins::Conflict([tmp[vw], tmp[vw + 1]]);
+                return Ins::Conflict(tmp[vw]);
             }
             return Ins::Redundant;
         }
@@ -583,49 +594,85 @@ impl FastCdcl {
         while tmp[hi - 1] == 0 {
             hi -= 1;
         }
-        let p = lo * 64 + tmp[lo].trailing_zeros() as usize;
-        let (pw, pb) = (lo, 1u64 << (p % 64));
-        if m.touched[pw] & pb != 0 {
-            let mut i = 0;
-            self.stats.scan_tests += m.active.len() as u64;
-            while i < m.active.len() {
-                let r = m.active[i] as usize;
-                let row = &mut m.rows[r * rw..(r + 1) * rw];
-                if row[pw] & pb != 0 {
+        let p = if (lvl > 0 && self.pivot_high) || (lvl == 0 && self.pivot_high_static) {
+            (hi - 1) * 64 + 63 - tmp[hi - 1].leading_zeros() as usize
+        } else {
+            lo * 64 + tmp[lo].trailing_zeros() as usize
+        };
+        // eliminate p from the rows that contain it (column index)
+        let cw = vw;
+        let (mut klo, mut khi) = (cw, 0);
+        for k in 0..cw {
+            let c = m.cols[p * cw + k];
+            self.colbuf[k] = c;
+            if c != 0 {
+                if klo == cw {
+                    klo = k;
+                }
+                khi = k + 1;
+            }
+        }
+        if klo < khi {
+            for k in klo..khi {
+                m.cols[p * cw + k] = 0;
+            }
+            for w in lo..hi {
+                let mut b = tmp[w];
+                while b != 0 {
+                    let v = w * 64 + b.trailing_zeros() as usize;
+                    b &= b - 1;
+                    if v != p {
+                        let col = &mut m.cols[v * cw..(v + 1) * cw];
+                        for (a, c) in col[klo..khi].iter_mut().zip(&self.colbuf[klo..khi]) {
+                            *a ^= *c;
+                        }
+                        self.stats.col_xors += 1;
+                        self.stats.col_xor_words += (khi - klo) as u64;
+                    }
+                }
+            }
+            for k in klo..khi {
+                let mut b = self.colbuf[k];
+                while b != 0 {
+                    let r = k * 64 + b.trailing_zeros() as usize;
+                    b &= b - 1;
+                    let row = &mut m.rows[r * rw..(r + 1) * rw];
                     xor_row(row, tmp, lo, hi, vw);
                     m.rhs[r] ^= rhs;
                     let (rl, rh) = m.rng[r];
                     let (nl, nh) = ((rl as usize).min(lo), (rh as usize).max(hi));
                     m.rng[r] = (nl as u16, nh as u16);
                     self.stats.row_xors += 1;
-                    self.stats.row_xor_words += (hi - lo) as u64 + 2;
+                    self.stats.row_xor_words += (hi - lo) as u64 + 1;
                     if is_single(row, nl, nh) {
                         m.single[r] = true;
                         self.units_out.push(r as u32);
-                        m.active.swap_remove(i);
-                        continue;
                     }
                 }
-                i += 1;
             }
         }
-        for w in lo..hi {
-            m.touched[w] |= tmp[w];
-        }
         let r = m.nrows;
+        let (rk, rb) = (r / 64, 1u64 << (r % 64));
+        for w in lo..hi {
+            let mut b = tmp[w];
+            while b != 0 {
+                let v = w * 64 + b.trailing_zeros() as usize;
+                b &= b - 1;
+                m.cols[v * cw + rk] |= rb;
+            }
+        }
         m.rows.extend_from_slice(tmp);
         m.rhs.push(rhs);
         m.rng.push((lo as u16, hi as u16));
         m.nrows += 1;
         m.piv_var.push(p as u32);
         m.piv_of_var[p] = r as u32;
-        m.pivmask[pw] |= pb;
+        m.pivmask[p / 64] |= 1u64 << (p % 64);
         if is_single(tmp, lo, hi) {
             m.single.push(true);
             self.units_out.push(r as u32);
         } else {
             m.single.push(false);
-            m.active.push(r as u32);
         }
         Ins::Added
     }
@@ -640,7 +687,7 @@ impl FastCdcl {
             let m = &self.mats[lvl];
             let v = m.piv_var[r] as usize;
             let val = m.rhs[r];
-            let mk = [m.rows[r * rw + vw], m.rows[r * rw + vw + 1]];
+            let mk = m.rows[r * rw + vw];
             let lit = if val { v as i32 } else { -(v as i32) };
             match self.assigns[v] {
                 Val::Undef => {
@@ -672,7 +719,7 @@ impl FastCdcl {
     }
 
     /// Insert the unit row `v = val` with derivation mask `mk`.
-    fn insert_single(&mut self, v: usize, val: bool, mk: Mask) -> Option<Confl> {
+    fn insert_single(&mut self, v: usize, val: bool, mk: u64) -> Option<Confl> {
         let (vw, rw) = (self.vw, self.rw);
         let lvl = self.trail_lim.len();
         let (w, b) = (v / 64, 1u64 << (v % 64));
@@ -684,18 +731,16 @@ impl FastCdcl {
             if m.rhs[r] == val {
                 return None;
             }
-            let rm = [m.rows[r * rw + vw] | mk[0], m.rows[r * rw + vw + 1] | mk[1]];
-            return Some(Confl::Xor(rm, None));
+            return Some(Confl::Xor(m.rows[r * rw + vw] | mk, None));
         }
-        if r == NONE && m.touched[w] & b == 0 {
-            // fresh variable: append the unit row directly
+        if r == NONE && m.cols[v * vw..(v + 1) * vw].iter().all(|&c| c == 0) {
+            // variable in no row: append the unit row directly
             self.stats.row_inserts += 1;
             let r = m.nrows;
             let base = m.rows.len();
             m.rows.resize(base + rw, 0);
             m.rows[base + w] = b;
-            m.rows[base + vw] = mk[0];
-            m.rows[base + vw + 1] = mk[1];
+            m.rows[base + vw] = mk;
             m.rhs.push(val);
             m.rng.push((w as u16, w as u16 + 1));
             m.single.push(true);
@@ -703,7 +748,7 @@ impl FastCdcl {
             m.piv_var.push(v as u32);
             m.piv_of_var[v] = r as u32;
             m.pivmask[w] |= b;
-            m.touched[w] |= b;
+            m.cols[v * vw + r / 64] |= 1u64 << (r % 64);
             self.units_out.push(r as u32);
             return self.drain_units();
         }
@@ -711,8 +756,7 @@ impl FastCdcl {
             self.tmp[k] = 0;
         }
         self.tmp[w] = b;
-        self.tmp[vw] = mk[0];
-        self.tmp[vw + 1] = mk[1];
+        self.tmp[vw] = mk;
         self.tmp_rhs = val;
         self.insert_and_drain()
     }
@@ -736,12 +780,11 @@ impl FastCdcl {
     }
 
     /// OR of the derivation masks of the assigned variables of a block.
-    fn block_fact(&self, block: &[u32]) -> Mask {
-        let mut mk = [0u64; 2];
+    fn block_fact(&self, block: &[u32]) -> u64 {
+        let mut mk = 0u64;
         for &v in block {
             if self.assigns[v as usize] != Val::Undef {
-                mk[0] |= self.fact[v as usize][0];
-                mk[1] |= self.fact[v as usize][1];
+                mk |= self.fact[v as usize];
             }
         }
         mk
@@ -750,18 +793,18 @@ impl FastCdcl {
     fn linearise(&mut self, gi: usize, known: u64, side: u8) -> Option<Confl> {
         let n = self.field_n as usize;
         self.gates[gi].linearised_at = Some(self.decision_level());
-        self.gates[gi].side = side;
         self.stats.gate_linearisations += 1;
-        let other: Vec<u32> = if side == 0 { self.gates[gi].y.clone() } else { self.gates[gi].x.clone() };
-        let run = if side == 0 { self.gates[gi].y_run } else { self.gates[gi].x_run };
+        let (kn, other, run) = {
+            let g = &self.gates[gi];
+            if side == 0 { (g.x.clone(), g.y.clone(), g.y_run) } else { (g.y.clone(), g.x.clone(), g.x_run) }
+        };
         let z: Vec<u32> = self.gates[gi].z.clone();
-        let gbit = 1u64 << gi;
+        let guard = self.block_fact(&kn);
         // (i) forward product
         if let Some(yv) = self.block_value(&other) {
             self.stats.gate_forward += 1;
             let zv = self.gf_mul(known, yv);
-            let mut mk = self.block_fact(&other);
-            mk[1] |= gbit;
+            let mk = guard | self.block_fact(&other);
             for k in 0..n {
                 if let Some(c) = self.insert_single(z[k] as usize, (zv >> k) & 1 == 1, mk) {
                     return Some(c);
@@ -774,8 +817,7 @@ impl FastCdcl {
             if let Some(zv) = self.block_value(&z) {
                 self.stats.gate_divide += 1;
                 let yv = self.gf_mul(zv, self.gf_inv(known));
-                let mut mk = self.block_fact(&z);
-                mk[1] |= gbit;
+                let mk = guard | self.block_fact(&z);
                 for j in 0..n {
                     if let Some(c) = self.insert_single(other[j] as usize, (yv >> j) & 1 == 1, mk) {
                         return Some(c);
@@ -814,8 +856,7 @@ impl FastCdcl {
                 Val::False => am |= 1u64 << j,
             }
         }
-        let mut mk = self.block_fact(&other);
-        mk[1] |= gbit;
+        let mk = guard | self.block_fact(&other);
         let (vw, rw) = (self.vw, self.rw);
         for k in 0..n {
             for w in 0..rw {
@@ -839,8 +880,7 @@ impl FastCdcl {
             }
             let zv = z[k] as usize;
             self.tmp[zv / 64] ^= 1u64 << (zv % 64);
-            self.tmp[vw] = mk[0];
-            self.tmp[vw + 1] = mk[1];
+            self.tmp[vw] = mk;
             self.tmp_rhs = (self.rb[k] & av).count_ones() & 1 == 1;
             if let Some(c) = self.insert_and_drain() {
                 return Some(c);
@@ -866,14 +906,14 @@ impl FastCdcl {
                 if matches!(self.reason[v], Reason::Xor) {
                     continue;
                 }
-                let mut mk = [0u64; 2];
+                let mut mk = 0u64;
                 if self.level[v] > 0 {
                     let slot = self.unit_lits.len();
                     self.unit_lits.push(lit);
                     if slot < 63 {
-                        mk[0] = 1u64 << slot;
+                        mk = 1u64 << slot;
                     } else {
-                        mk[0] = OVERFLOW;
+                        mk = OVERFLOW;
                         self.stats.unit_overflows += 1;
                     }
                 }
@@ -907,7 +947,7 @@ impl FastCdcl {
                     return Some(c);
                 }
                 if self.qhead < self.trail.len() {
-                    // let clause propagation and the unit rows catch up first
+                    // let clause propagation catch up first
                     break;
                 }
             }
@@ -989,40 +1029,27 @@ impl FastCdcl {
         }
     }
 
-    /// Visit the literals of a derivation: unit literals and gate guards not expanded yet in
-    /// this analysis. `before` is the trail position of the implied literal (overflow case).
+    /// Visit the unit literals of a derivation mask that were not expanded yet in this
+    /// analysis. `before` is the trail position of the implied literal (overflow case).
     fn visit_mask(
         &mut self,
-        mk: &Mask,
+        mk: u64,
         before: usize,
-        done: &mut Mask,
+        done: &mut u64,
         ovf_upto: &mut usize,
         cur_level: u32,
         path: &mut usize,
         learnt: &mut Vec<i32>,
     ) {
-        let mut b = mk[0] & !done[0] & !OVERFLOW;
-        done[0] |= mk[0] & !OVERFLOW;
+        let mut b = mk & !*done & !OVERFLOW;
+        *done |= b;
         while b != 0 {
             let slot = b.trailing_zeros() as usize;
             b &= b - 1;
             let lit = self.unit_lits[slot];
             self.visit(-lit, cur_level, path, learnt);
         }
-        let mut b = mk[1] & !done[1];
-        done[1] |= mk[1];
-        while b != 0 {
-            let gi = b.trailing_zeros() as usize;
-            b &= b - 1;
-            let n = self.field_n as usize;
-            for j in 0..n {
-                let v = if self.gates[gi].side == 0 { self.gates[gi].x[j] } else { self.gates[gi].y[j] } as usize;
-                let lit = if self.assigns[v] == Val::True { v as i32 } else { -(v as i32) };
-                debug_assert!(self.assigns[v] != Val::Undef);
-                self.visit(-lit, cur_level, path, learnt);
-            }
-        }
-        if mk[0] & OVERFLOW != 0 && before > *ovf_upto {
+        if mk & OVERFLOW != 0 && before > *ovf_upto {
             // sound fallback: every earlier literal the XOR engine did not imply itself
             for i in *ovf_upto..before {
                 let lit = self.trail[i];
@@ -1040,7 +1067,7 @@ impl FastCdcl {
         let mut path = 0usize;
         let mut idx = self.trail.len();
         let cur_level = self.decision_level();
-        let mut done: Mask = [0; 2];
+        let mut done = 0u64;
         let mut ovf_upto = 0usize;
         match confl {
             Confl::Clause(c) => {
@@ -1050,7 +1077,7 @@ impl FastCdcl {
             }
             Confl::Xor(mk, extra) => {
                 let end = self.trail.len();
-                self.visit_mask(&mk, end, &mut done, &mut ovf_upto, cur_level, &mut path, &mut learnt);
+                self.visit_mask(mk, end, &mut done, &mut ovf_upto, cur_level, &mut path, &mut learnt);
                 if let Some(t) = extra {
                     self.visit(-t, cur_level, &mut path, &mut learnt);
                 }
@@ -1083,7 +1110,7 @@ impl FastCdcl {
                 }
                 Reason::Xor => {
                     let mk = self.fact[v];
-                    self.visit_mask(&mk, idx, &mut done, &mut ovf_upto, cur_level, &mut path, &mut learnt);
+                    self.visit_mask(mk, idx, &mut done, &mut ovf_upto, cur_level, &mut path, &mut learnt);
                 }
                 Reason::None => unreachable!("decision on the implication path"),
             }
@@ -1173,7 +1200,7 @@ impl FastCdcl {
                         let (lo, hi) = self.mats.split_at_mut(lvl + 1);
                         hi[0].copy_from(&lo[lvl]);
                         self.stats.mat_copies += 1;
-                        self.stats.mat_copy_words += (lo[lvl].nrows * self.rw) as u64;
+                        self.stats.mat_copy_words += lo[lvl].words() as u64;
                         self.stats.prof_ns[6] += t0.elapsed().as_nanos() as u64;
                         self.trail_lim.push(self.trail.len());
                         self.unit_lim.push(self.unit_lits.len());

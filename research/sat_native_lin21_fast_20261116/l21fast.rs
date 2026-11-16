@@ -103,6 +103,11 @@ struct ArmOut {
 fn run_fast(n: u32, l: u32, irr: u64, x_r: u64, b: u64) -> ArmOut {
     let t0 = Instant::now();
     let (mut sv, x1, s, zz) = lin21_build!(fastcdcl::FastCdcl, n, l, irr, x_r, b);
+    // tuning knob (step 2, non-measured seeds only): FAST_PIVOT=<static><dynamic>, h or l each
+    if let Ok(pv) = std::env::var("FAST_PIVOT") {
+        sv.pivot_high_static = pv.as_bytes()[0] == b'h';
+        sv.pivot_high = pv.as_bytes()[1] == b'h';
+    }
     let build_ms = t0.elapsed().as_secs_f64() * 1e3;
     let t1 = Instant::now();
     let r = sv.solve();
@@ -119,10 +124,10 @@ fn run_fast(n: u32, l: u32, irr: u64, x_r: u64, b: u64) -> ArmOut {
     let st = &sv.stats;
     let rw = sv.row_words();
     let json = format!(
-        "\"conflicts\":{},\"decisions\":{},\"propagations\":{},\"xor_propagations\":{},\"gate_linearisations\":{},\"gate_fwd_div_mixed\":{:?},\"learnt_clauses\":{},\"learnt_lits\":{},\"learnt_priority_width\":{:?},\"row_inserts\":{},\"row_xors\":{},\"row_words\":{},\"gauss_words\":{},\"scan_tests\":{},\"mat_copies\":{},\"mat_copy_words\":{},\"unit_overflows\":{},\"prof_names\":{:?},\"prof_ns\":{:?},\"n_vars\":{},\"build_ms\":{:.4},\"wall_ms\":{:.4}",
+        "\"conflicts\":{},\"decisions\":{},\"propagations\":{},\"xor_propagations\":{},\"gate_linearisations\":{},\"gate_fwd_div_mixed\":{:?},\"learnt_clauses\":{},\"learnt_lits\":{},\"learnt_priority_width\":{:?},\"row_inserts\":{},\"row_xors\":{},\"row_words\":{},\"gauss_words\":{},\"col_xors\":{},\"col_xor_words\":{},\"mat_copies\":{},\"mat_copy_words\":{},\"unit_overflows\":{},\"prof_names\":{:?},\"prof_ns\":{:?},\"n_vars\":{},\"build_ms\":{:.4},\"wall_ms\":{:.4}",
         st.conflicts, st.decisions, st.propagations, st.xor_propagations, st.gate_linearisations, [st.gate_forward, st.gate_divide, st.gate_mixed],
         st.learnt_clauses, st.learnt_lits, st.learnt_priority_width, st.row_inserts, st.row_xors, rw,
-        st.row_xor_words, st.scan_tests, st.mat_copies, st.mat_copy_words, st.unit_overflows,
+        st.row_xor_words, st.col_xors, st.col_xor_words, st.mat_copies, st.mat_copy_words, st.unit_overflows,
         fastcdcl::PROF_NAMES, st.prof_ns, sv.n_vars, build_ms, wall_ms
     );
     ArmOut { status, xs, conflicts: st.conflicts, json }

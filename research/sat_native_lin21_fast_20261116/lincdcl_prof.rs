@@ -396,8 +396,8 @@ impl LinCdcl {
                     }
                 }
                 self.watches[code] = keep;
-                self.stats.prof_ns[0] += t_prof.elapsed().as_nanos() as u64;
                 if let Some(c) = conflict {
+                self.stats.prof_ns[0] += t_prof.elapsed().as_nanos() as u64;
                     return Some(c);
                 }
             }

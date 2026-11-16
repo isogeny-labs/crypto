@@ -12,7 +12,7 @@
     pub explain_lits: u64,
 339a\
             let t_prof = std::time::Instant::now();
-388i\
+389i\
                 self.stats.prof_ns[0] += t_prof.elapsed().as_nanos() as u64;
 391a\
             self.stats.prof_ns[0] += t_prof.elapsed().as_nanos() as u64;\
