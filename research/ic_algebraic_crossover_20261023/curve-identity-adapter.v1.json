@@ -1,0 +1,1703 @@
+{
+  "schema": "ic-algebraic-curve-identity-adapter/v1",
+  "scope": "Metadata-only adapter for 18 reference/twist models, four qualified-query models and three wide-core models; source records, targets and measurement labels unchanged.",
+  "warning": "Producer EC1-shaped labels use different preimages from tools/curve_identity.py. They are preserved as provisional/source labels, never silently treated as canonical global aliases. The versioned canonical manifests below supply full UIDs; registry admission and mathematical equivalence are separate.",
+  "shared_reference": "tools/curve_identity.py",
+  "records": [
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N10Cbinh9d630335ee0f",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N10Cbinhb7959a165f1b",
+        "curve_sha256": "b7959a165f1babc7a947c4f4f6f8fcf239a872b68cb99d0ea9f7c1c96ea6c23d",
+        "curve_uid": "urn:ec-record:1:sha256:b7959a165f1babc7a947c4f4f6f8fcf239a872b68cb99d0ea9f7c1c96ea6c23d",
+        "field_sha256": "c7f8e55d5c8d0186f9668d9bae5f2b523623fe60b2991d7352c1ef2451895c5b"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 10,
+          "representation": "polynomial",
+          "modulus": 1033,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 128,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 1082,
+          "subgroup_order": 541,
+          "cofactor": 2,
+          "generator": [
+            682,
+            122
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N10Cbinhb7959a165f1b"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "9d630335ee0f31dc8965d1439edf551ce355e40027dc2e2575e124ca7ecb4039",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 1033,
+          "n": 10,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 128,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 2,
+          "generator": [
+            682,
+            122
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 1082,
+          "r": 541,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -57
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N10Cbinhbea085120004",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N10Cbinhf76f5a9d2518",
+        "curve_sha256": "f76f5a9d2518b7edc86dea656fd1bce1b2d924c8857d8df36c98c00501200a01",
+        "curve_uid": "urn:ec-record:1:sha256:f76f5a9d2518b7edc86dea656fd1bce1b2d924c8857d8df36c98c00501200a01",
+        "field_sha256": "c7f8e55d5c8d0186f9668d9bae5f2b523623fe60b2991d7352c1ef2451895c5b"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 10,
+          "representation": "polynomial",
+          "modulus": 1033,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 968,
+          "subgroup_order": 11,
+          "cofactor": 88,
+          "generator": [
+            289,
+            344
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N10Cbinhf76f5a9d2518"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "bea085120004a15c19d4f83fc2320f853d506fdfb4872fab54c3fa9b1b353093",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 1033,
+          "n": 10,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 88,
+          "generator": [
+            289,
+            344
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 968,
+          "r": 11,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 57
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N15Cbinh73c794dfec6c",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N15Cbinh4ae2bb81a4f6",
+        "curve_sha256": "4ae2bb81a4f62c3ee76d3f141db67adf326a881816f1427ebaea3099390c66e9",
+        "curve_uid": "urn:ec-record:1:sha256:4ae2bb81a4f62c3ee76d3f141db67adf326a881816f1427ebaea3099390c66e9",
+        "field_sha256": "c09c983b5c8094b0799e69e053dadb57eadc613cee5e47f44a8e6cc5c0221cc1"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 15,
+          "representation": "polynomial",
+          "modulus": 32771,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 33044,
+          "subgroup_order": 751,
+          "cofactor": 44,
+          "generator": [
+            28320,
+            11621
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N15Cbinh4ae2bb81a4f6"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "73c794dfec6c0036b07402f08fc4121d7c77f24da935ac1c396441eff709888e",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 32771,
+          "n": 15,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 44,
+          "generator": [
+            28320,
+            11621
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 33044,
+          "r": 751,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -275
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N15Cbinhd77d0a5d6cf9",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N15Cbinh7da0ee040129",
+        "curve_sha256": "7da0ee040129f4067d34de7515db40f9b73664666781157b2197561a5770e507",
+        "curve_uid": "urn:ec-record:1:sha256:7da0ee040129f4067d34de7515db40f9b73664666781157b2197561a5770e507",
+        "field_sha256": "c09c983b5c8094b0799e69e053dadb57eadc613cee5e47f44a8e6cc5c0221cc1"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 15,
+          "representation": "polynomial",
+          "modulus": 32771,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 1,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 32494,
+          "subgroup_order": 211,
+          "cofactor": 154,
+          "generator": [
+            15115,
+            1293
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N15Cbinh7da0ee040129"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "d77d0a5d6cf964d7b3f47ae408fe37b9f5749099781dbd1e771a7711d44062e5",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 32771,
+          "n": 15,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 1,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 154,
+          "generator": [
+            15115,
+            1293
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 32494,
+          "r": 211,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 275
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N17Cbinh9d80dba71089",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N17Cbinhae9d693e6138",
+        "curve_sha256": "ae9d693e61380d4baf9b32b52f49cd0440798e144913f5ed925a0ee0de8566ad",
+        "curve_uid": "urn:ec-record:1:sha256:ae9d693e61380d4baf9b32b52f49cd0440798e144913f5ed925a0ee0de8566ad",
+        "field_sha256": "469899cc693199d70114ff20df4a0605ad043486462771246ebe89a2ec89a623"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 17,
+          "representation": "polynomial",
+          "modulus": 131081,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 130972,
+          "subgroup_order": 239,
+          "cofactor": 548,
+          "generator": [
+            76330,
+            69103
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N17Cbinhae9d693e6138"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "9d80dba71089ab92202bf6223704295a9d426168f4c9837fbbb1876c32ee2e17",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 131081,
+          "n": 17,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 548,
+          "generator": [
+            76330,
+            69103
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 130972,
+          "r": 239,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 101
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N17Cbinhe9ff6cc3d323",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N17Cbinh98df5625cef0",
+        "curve_sha256": "98df5625cef03ad74a2eb90e62e746d9e9c50d7f92fbeecf5d29388b070b89d3",
+        "curve_uid": "urn:ec-record:1:sha256:98df5625cef03ad74a2eb90e62e746d9e9c50d7f92fbeecf5d29388b070b89d3",
+        "field_sha256": "469899cc693199d70114ff20df4a0605ad043486462771246ebe89a2ec89a623"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 17,
+          "representation": "polynomial",
+          "modulus": 131081,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 1,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 131174,
+          "subgroup_order": 65587,
+          "cofactor": 2,
+          "generator": [
+            43693,
+            23339
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N17Cbinh98df5625cef0"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "e9ff6cc3d32310f95c837ce9ff3f87e3da05e774f5573130687e2422f2e55ecf",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 131081,
+          "n": 17,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 1,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 2,
+          "generator": [
+            43693,
+            23339
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 131174,
+          "r": 65587,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -101
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N18Cbinhbdf069f1292c",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N18Cbinhe5f218562bf7",
+        "curve_sha256": "e5f218562bf790b43ee9862d47bf4ed851a375df87cd3e9cf1dc2839d54971d0",
+        "curve_uid": "urn:ec-record:1:sha256:e5f218562bf790b43ee9862d47bf4ed851a375df87cd3e9cf1dc2839d54971d0",
+        "field_sha256": "25ab6641dbc245a1862be98aff0e746869076fd6fe1dfca3c45cd22291c1a1e8"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 18,
+          "representation": "polynomial",
+          "modulus": 262153,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 32768,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 261146,
+          "subgroup_order": 3529,
+          "cofactor": 74,
+          "generator": [
+            50377,
+            115937
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N18Cbinhe5f218562bf7"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "bdf069f1292c2a5a2615bfc6ba8ecc7a43f0e36b7e10a517058f5862cd9d9de9",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 262153,
+          "n": 18,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 32768,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 74,
+          "generator": [
+            50377,
+            115937
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 261146,
+          "r": 3529,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 999
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N18Cbinhf41c0ac67f2c",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N18Cbinh6214b7e2d7bc",
+        "curve_sha256": "6214b7e2d7bc58ec8fbb9f95eed3accecb38083d33fb7adffc9df7984f887401",
+        "curve_uid": "urn:ec-record:1:sha256:6214b7e2d7bc58ec8fbb9f95eed3accecb38083d33fb7adffc9df7984f887401",
+        "field_sha256": "25ab6641dbc245a1862be98aff0e746869076fd6fe1dfca3c45cd22291c1a1e8"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 18,
+          "representation": "polynomial",
+          "modulus": 262153,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 263144,
+          "subgroup_order": 127,
+          "cofactor": 2072,
+          "generator": [
+            215660,
+            79310
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N18Cbinh6214b7e2d7bc"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "f41c0ac67f2c1c9a1802512abd1dd1efc1ba50eff4b7cfaf5fb8caea5ab43e5c",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 262153,
+          "n": 18,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 2072,
+          "generator": [
+            215660,
+            79310
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 263144,
+          "r": 127,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -999
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N22Cbinhb2ede1d9f7d4",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N22Cbinhc99a8f28c65a",
+        "curve_sha256": "c99a8f28c65a8792e3ba111104f970d0e1dc98ee4db91e721f37eb7436930496",
+        "curve_uid": "urn:ec-record:1:sha256:c99a8f28c65a8792e3ba111104f970d0e1dc98ee4db91e721f37eb7436930496",
+        "field_sha256": "4783eab9f6f86906369e8c35f616d6375e4775c464fe5c796d694e4d1c3fdc7b"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 22,
+          "representation": "polynomial",
+          "modulus": 4194307,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 2097152,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 4194698,
+          "subgroup_order": 2097349,
+          "cofactor": 2,
+          "generator": [
+            3145733,
+            1323567
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N22Cbinhc99a8f28c65a"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "b2ede1d9f7d48ecbae3be5aaf008bfe31c10fc13bfee04b1473c18d072b30aaa",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 4194307,
+          "n": 22,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 2097152,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 2,
+          "generator": [
+            3145733,
+            1323567
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 4194698,
+          "r": 2097349,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -393
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N22Cbinhd39a9df391db",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N22Cbinh06492e1d5f78",
+        "curve_sha256": "06492e1d5f7804d094f08cca9ac9362a0443c590c1a5bc69ddcd08a8b50f5c69",
+        "curve_uid": "urn:ec-record:1:sha256:06492e1d5f7804d094f08cca9ac9362a0443c590c1a5bc69ddcd08a8b50f5c69",
+        "field_sha256": "4783eab9f6f86906369e8c35f616d6375e4775c464fe5c796d694e4d1c3fdc7b"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 22,
+          "representation": "polynomial",
+          "modulus": 4194307,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 4193912,
+          "subgroup_order": 991,
+          "cofactor": 4232,
+          "generator": [
+            97814,
+            2630359
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N22Cbinh06492e1d5f78"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "d39a9df391db2f82b04c5160dba856fb5404859caca6087b9be4d14f30ac42dd",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 4194307,
+          "n": 22,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 4232,
+          "generator": [
+            97814,
+            2630359
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 4193912,
+          "r": 991,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 393
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N25Cbinh20af341095af",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N25Cbinh793054fad443",
+        "curve_sha256": "793054fad4434771a26effce6610f0303f0e3e0e1f16d84332f08da4f4ae6596",
+        "curve_uid": "urn:ec-record:1:sha256:793054fad4434771a26effce6610f0303f0e3e0e1f16d84332f08da4f4ae6596",
+        "field_sha256": "6244bca0da8c4078b97d4801d96664d87bdba74733d6d39fc1c5d1a8af43b678"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 25,
+          "representation": "polynomial",
+          "modulus": 33554441,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 33558844,
+          "subgroup_order": 5051,
+          "cofactor": 6644,
+          "generator": [
+            25219840,
+            8822173
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N25Cbinh793054fad443"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "20af341095af9907048c72cd88facc282e310b0fcd03e05941383e538dd03947",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 33554441,
+          "n": 25,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 6644,
+          "generator": [
+            25219840,
+            8822173
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 33558844,
+          "r": 5051,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -4411
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N25Cbinh878d1e401ef7",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N25Cbinha9bc7e07c091",
+        "curve_sha256": "a9bc7e07c09102386ff935111821177626730f66fbb070ae6bbf08cc9d21431d",
+        "curve_uid": "urn:ec-record:1:sha256:a9bc7e07c09102386ff935111821177626730f66fbb070ae6bbf08cc9d21431d",
+        "field_sha256": "6244bca0da8c4078b97d4801d96664d87bdba74733d6d39fc1c5d1a8af43b678"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 25,
+          "representation": "polynomial",
+          "modulus": 33554441,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 1,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 33550022,
+          "subgroup_order": 1451,
+          "cofactor": 23122,
+          "generator": [
+            15306981,
+            1804197
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N25Cbinha9bc7e07c091"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "878d1e401ef78d85362584534a2f6c6ae92e15bd31c2b3063986e9ebcdf87c93",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 33554441,
+          "n": 25,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 1,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 23122,
+          "generator": [
+            15306981,
+            1804197
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 33550022,
+          "r": 1451,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 4411
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N34Cbinh330bdee32388",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N34Cbinhf51daca1f1cd",
+        "curve_sha256": "f51daca1f1cde3c958211062c1fb2b73f9c083e371458b93927a1bfad8c79767",
+        "curve_uid": "urn:ec-record:1:sha256:f51daca1f1cde3c958211062c1fb2b73f9c083e371458b93927a1bfad8c79767",
+        "field_sha256": "39db11124dd788a5b3583b7e5b01b9bdb1a8d43466fedae13166f16ef4c07b27"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 34,
+          "representation": "polynomial",
+          "modulus": 17179869211,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 2147483648,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 17179617242,
+          "subgroup_order": 62699333,
+          "cofactor": 274,
+          "generator": [
+            4278432358,
+            10774770787
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N34Cbinhf51daca1f1cd"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "330bdee32388cb295044749e47b97c242af2263064032e7a23394974879a6d23",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 17179869211,
+          "n": 34,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 2147483648,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 274,
+          "generator": [
+            4278432358,
+            10774770787
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 17179617242,
+          "r": 62699333,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 251943
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N34Cbinh756ec6563d7c",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N34Cbinha5f88e8dd988",
+        "curve_sha256": "a5f88e8dd988b50b13cca2caba2c106b02f5f360692eec89fac941672fb14326",
+        "curve_uid": "urn:ec-record:1:sha256:a5f88e8dd988b50b13cca2caba2c106b02f5f360692eec89fac941672fb14326",
+        "field_sha256": "39db11124dd788a5b3583b7e5b01b9bdb1a8d43466fedae13166f16ef4c07b27"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 34,
+          "representation": "polynomial",
+          "modulus": 17179869211,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 17180121128,
+          "subgroup_order": 65587,
+          "cofactor": 261944,
+          "generator": [
+            16423997708,
+            8810728090
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N34Cbinha5f88e8dd988"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "756ec6563d7c592b091713cadd24a3a8ee56bfc8debee24bdb6892231f1ad95f",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 17179869211,
+          "n": 34,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 261944,
+          "generator": [
+            16423997708,
+            8810728090
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 17180121128,
+          "r": 65587,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -251943
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N36Cbinhb17a9853e0be",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N36Cbinh570c8568b721",
+        "curve_sha256": "570c8568b7219e0d0115ed411d1dc0d56048409d62d46b8c7854c39726170ccb",
+        "curve_uid": "urn:ec-record:1:sha256:570c8568b7219e0d0115ed411d1dc0d56048409d62d46b8c7854c39726170ccb",
+        "field_sha256": "59f22b543386a966a5b6a9bd03f9f7e4f8a1eaf349b881876a9af67ce2531c54"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 36,
+          "representation": "polynomial",
+          "modulus": 68719476789,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 68719003024,
+          "subgroup_order": 3529,
+          "cofactor": 19472656,
+          "generator": [
+            17628267748,
+            32289511939
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N36Cbinh570c8568b721"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "b17a9853e0be59ff4e978723287c8d099a3205d9fb46e4d52d2d69c859cf212a",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 68719476789,
+          "n": 36,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 19472656,
+          "generator": [
+            17628267748,
+            32289511939
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 68719003024,
+          "r": 3529,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 473713
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N36Cbinhfa2f37464606",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N36Cbinh9c632d8ac5dd",
+        "curve_sha256": "9c632d8ac5ddde16941d1a58f5729f7a8a3333e1f6afade10ba4b12b80b1ca05",
+        "curve_uid": "urn:ec-record:1:sha256:9c632d8ac5ddde16941d1a58f5729f7a8a3333e1f6afade10ba4b12b80b1ca05",
+        "field_sha256": "59f22b543386a966a5b6a9bd03f9f7e4f8a1eaf349b881876a9af67ce2531c54"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 36,
+          "representation": "polynomial",
+          "modulus": 68719476789,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 2147483648,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 68719950450,
+          "subgroup_order": 1885321,
+          "cofactor": 36450,
+          "generator": [
+            15126230155,
+            67584194319
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N36Cbinh9c632d8ac5dd"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "fa2f374646063ee128b029859a73ea902ce69fd5b73ac7a59cf2f419ba24fd55",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 68719476789,
+          "n": 36,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 2147483648,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 36450,
+          "generator": [
+            15126230155,
+            67584194319
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 68719950450,
+          "r": 1885321,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -473713
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N38Cbinh389fa59b0ac6",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N38Cbinhc235ec1ccb09",
+        "curve_sha256": "c235ec1ccb09ec9f4baa1252c7437d1f14feb64d699ce525c512a3051cbd86be",
+        "curve_uid": "urn:ec-record:1:sha256:c235ec1ccb09ec9f4baa1252c7437d1f14feb64d699ce525c512a3051cbd86be",
+        "field_sha256": "3d52a40f78a67c25baf644dff33206d55062ae7788fd571049aa0ebb2058ee1c"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 38,
+          "representation": "polynomial",
+          "modulus": 274877907043,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 274878320312,
+          "subgroup_order": 262543,
+          "cofactor": 1046984,
+          "generator": [
+            214904534081,
+            231506972265
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N38Cbinhc235ec1ccb09"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "389fa59b0ac613f93a1206c4974b7ac7173b4dd3efb0d7853b60920bf7cb6ad0",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 274877907043,
+          "n": 38,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 1046984,
+          "generator": [
+            214904534081,
+            231506972265
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 274878320312,
+          "r": 262543,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": -413367
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json",
+      "source_sha256": "087d7170145584c13c3b440e119c41a5449b5d6c92012419d95d197bf9e7ddd0",
+      "producer_label": "EC1N38Cbinhd9f8a2466853",
+      "producer_preimage_kind": "native-field-p-n-basis-curve-r/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N38Cbinh29aeef5a9c6e",
+        "curve_sha256": "29aeef5a9c6e5247914caa52321f4260e2cc95a1b35e2b2786f4c531b940b9b0",
+        "curve_uid": "urn:ec-record:1:sha256:29aeef5a9c6e5247914caa52321f4260e2cc95a1b35e2b2786f4c531b940b9b0",
+        "field_sha256": "3d52a40f78a67c25baf644dff33206d55062ae7788fd571049aa0ebb2058ee1c"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 38,
+          "representation": "polynomial",
+          "modulus": 274877907043,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 8589934592,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "group_order": 274877493578,
+          "subgroup_order": 64555541,
+          "cofactor": 4258,
+          "generator": [
+            82746784606,
+            199548455636
+          ],
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N38Cbinh29aeef5a9c6e"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "d9f8a24668536df358a38d9f000947f48cf8ebda59cdcb21278114c97841e41a",
+      "producer_preimage": {
+        "field": {
+          "basis": "polynomial",
+          "element_encoding": "unsigned-integer-polynomial-bits",
+          "modulus": 274877907043,
+          "n": 38,
+          "p": 2
+        },
+        "curve": {
+          "coefficients": {
+            "a1": 1,
+            "a2": 8589934592,
+            "a3": 0,
+            "a4": 0,
+            "a6": 1
+          },
+          "cofactor": 4258,
+          "generator": [
+            82746784606,
+            199548455636
+          ],
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "order": 274877493578,
+          "r": 64555541,
+          "tag": "bin",
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "trace": 413367
+        }
+      }
+    },
+    {
+      "source": "pipeline-receipts/qualified-queries-20261025/summary.json",
+      "source_sha256": "7cb599441ee300e9bff64d67e85ecba3631ce244eef982dfc529abbe552df2e7",
+      "producer_label": "EC1N22Cbinh3b5cda776f80",
+      "producer_preimage_kind": "flat-ic-qualified-curve/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N22Cbinhe27b257841d7",
+        "curve_sha256": "e27b257841d772d02187005e6f53792c40bdea2e2deb54d26d372d7356e798ca",
+        "curve_uid": "urn:ec-record:1:sha256:e27b257841d772d02187005e6f53792c40bdea2e2deb54d26d372d7356e798ca",
+        "field_sha256": "4783eab9f6f86906369e8c35f616d6375e4775c464fe5c796d694e4d1c3fdc7b"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 22,
+          "representation": "polynomial",
+          "modulus": 4194307,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 3159430
+          },
+          "group_order": 4192252,
+          "subgroup_order": 1048063,
+          "cofactor": 4,
+          "generator": {
+            "x": 38476,
+            "y": 1026572
+          },
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N22Cbinhe27b257841d7"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "3b5cda776f80301b2300d7162df450c8ac55ae394d16c5fd0acda6ad2a0571e5",
+      "producer_preimage": {
+        "a": 0,
+        "b": 3159430,
+        "cofactor": 4,
+        "field_modulus": 4194307,
+        "full_degree_b": true,
+        "generator": {
+          "x": 38476,
+          "y": 1026572
+        },
+        "group_order": 4192252,
+        "icv1": "icv1-f2m22-t2053-0f12d6dc",
+        "n": 22,
+        "polynomial_low_terms": [
+          0,
+          1
+        ],
+        "r": 1048063,
+        "registry_status": "unregistered-research-model",
+        "schema": "ic-qualified-curve/v1",
+        "subgroup": "prime-order-subgroup-generated-by-G"
+      },
+      "icv1_slug": "icv1-f2m22-t2053-0f12d6dc"
+    },
+    {
+      "source": "pipeline-receipts/qualified-queries-20261025/summary.json",
+      "source_sha256": "7cb599441ee300e9bff64d67e85ecba3631ce244eef982dfc529abbe552df2e7",
+      "producer_label": "EC1N25Cbinh7424792732c8",
+      "producer_preimage_kind": "flat-ic-qualified-curve/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N25Cbinh24089e81aa25",
+        "curve_sha256": "24089e81aa250573a3394513375520c87526f473a66da67c67be043b72670d12",
+        "curve_uid": "urn:ec-record:1:sha256:24089e81aa250573a3394513375520c87526f473a66da67c67be043b72670d12",
+        "field_sha256": "6244bca0da8c4078b97d4801d96664d87bdba74733d6d39fc1c5d1a8af43b678"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 25,
+          "representation": "polynomial",
+          "modulus": 33554441,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 23461422
+          },
+          "group_order": 33548176,
+          "subgroup_order": 2096761,
+          "cofactor": 16,
+          "generator": {
+            "x": 12359898,
+            "y": 18986410
+          },
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N25Cbinh24089e81aa25"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "7424792732c828dc1d727430a0686b0c0b5af392be75e2b5c9a1e7c1b972f47c",
+      "producer_preimage": {
+        "a": 0,
+        "b": 23461422,
+        "cofactor": 16,
+        "field_modulus": 33554441,
+        "full_degree_b": true,
+        "generator": {
+          "x": 12359898,
+          "y": 18986410
+        },
+        "group_order": 33548176,
+        "icv1": "icv1-f2m25-t6257-38a6a0a7",
+        "n": 25,
+        "polynomial_low_terms": [
+          0,
+          3
+        ],
+        "r": 2096761,
+        "registry_status": "unregistered-research-model",
+        "schema": "ic-qualified-curve/v1",
+        "subgroup": "prime-order-subgroup-generated-by-G"
+      },
+      "icv1_slug": "icv1-f2m25-t6257-38a6a0a7"
+    },
+    {
+      "source": "pipeline-receipts/qualified-queries-20261025/summary.json",
+      "source_sha256": "7cb599441ee300e9bff64d67e85ecba3631ce244eef982dfc529abbe552df2e7",
+      "producer_label": "EC1N17Cbinh708752c13bf5",
+      "producer_preimage_kind": "flat-ic-qualified-curve/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N17Cbinh1afde7a6b4cb",
+        "curve_sha256": "1afde7a6b4cb392ac4bccf36459bef838c6adc9a0eb8fd161cbf6fcb6de2a635",
+        "curve_uid": "urn:ec-record:1:sha256:1afde7a6b4cb392ac4bccf36459bef838c6adc9a0eb8fd161cbf6fcb6de2a635",
+        "field_sha256": "469899cc693199d70114ff20df4a0605ad043486462771246ebe89a2ec89a623"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 17,
+          "representation": "polynomial",
+          "modulus": 131081,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 96838
+          },
+          "group_order": 131416,
+          "subgroup_order": 16427,
+          "cofactor": 8,
+          "generator": {
+            "x": 40386,
+            "y": 124501
+          },
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N17Cbinh1afde7a6b4cb"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "708752c13bf5b079f00548ce9d7235c4841e7701a517411db1d329a7a12051b9",
+      "producer_preimage": {
+        "a": 0,
+        "b": 96838,
+        "cofactor": 8,
+        "field_modulus": 131081,
+        "full_degree_b": true,
+        "generator": {
+          "x": 40386,
+          "y": 124501
+        },
+        "group_order": 131416,
+        "icv1": "icv1-f2m17-tm343-01d6c60d",
+        "n": 17,
+        "polynomial_low_terms": [
+          0,
+          3
+        ],
+        "r": 16427,
+        "registry_status": "unregistered-research-model",
+        "schema": "ic-qualified-curve/v1",
+        "subgroup": "prime-order-subgroup-generated-by-G"
+      },
+      "icv1_slug": "icv1-f2m17-tm343-01d6c60d"
+    },
+    {
+      "source": "pipeline-receipts/qualified-queries-20261025/summary.json",
+      "source_sha256": "7cb599441ee300e9bff64d67e85ecba3631ce244eef982dfc529abbe552df2e7",
+      "producer_label": "EC1N18Cbinha8f63491e295",
+      "producer_preimage_kind": "flat-ic-qualified-curve/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N18Cbinh8be369208e40",
+        "curve_sha256": "8be369208e403a2bf420525dabc7ef80d63167cc70e4ddab977b0846f6e5890e",
+        "curve_uid": "urn:ec-record:1:sha256:8be369208e403a2bf420525dabc7ef80d63167cc70e4ddab977b0846f6e5890e",
+        "field_sha256": "25ab6641dbc245a1862be98aff0e746869076fd6fe1dfca3c45cd22291c1a1e8"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 18,
+          "representation": "polynomial",
+          "modulus": 262153,
+          "element_encoding": "unsigned-integer-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": 1,
+            "a2": 0,
+            "a3": 0,
+            "a4": 0,
+            "a6": 102702
+          },
+          "group_order": 261852,
+          "subgroup_order": 21821,
+          "cofactor": 12,
+          "generator": {
+            "x": 203067,
+            "y": 159333
+          },
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N18Cbinh8be369208e40"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "producer_preimage_sha256": "a8f63491e295167854925d84e20e2d2c7d1f2d248e5db6b864d60e9dddd17634",
+      "producer_preimage": {
+        "a": 0,
+        "b": 102702,
+        "cofactor": 12,
+        "field_modulus": 262153,
+        "full_degree_b": true,
+        "generator": {
+          "x": 203067,
+          "y": 159333
+        },
+        "group_order": 261852,
+        "icv1": "icv1-f2m18-t293-47e0824d",
+        "n": 18,
+        "polynomial_low_terms": [
+          0,
+          3
+        ],
+        "r": 21821,
+        "registry_status": "unregistered-research-model",
+        "schema": "ic-qualified-curve/v1",
+        "subgroup": "prime-order-subgroup-generated-by-G"
+      },
+      "icv1_slug": "icv1-f2m18-t293-47e0824d"
+    },
+    {
+      "source": "pipeline-receipts/wide-core-audit-20261025/m16/output.json",
+      "source_sha256": "76aea8d8a9cd10bfb175fe257edc6bc243d0ca0687083a1fb14ca708c52bf0e8",
+      "producer_label": "icv1-f2m64-tm2716223891-2b2a8430",
+      "producer_preimage_kind": "native-icv1-wide-core/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N64Cbinh6ed84da60516",
+        "curve_sha256": "6ed84da60516725b9bcdaaaf18f45cbd9194e62d39922b0bb361a9a213fede56",
+        "curve_uid": "urn:ec-record:1:sha256:6ed84da60516725b9bcdaaaf18f45cbd9194e62d39922b0bb361a9a213fede56",
+        "field_sha256": "889188f85e7cebcfc6c1f4664b1e2a05934e9de82bea21ff09cf48cc21358865"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 64,
+          "representation": "polynomial",
+          "modulus": "0x10000110110101cbd",
+          "element_encoding": "hex-string-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": "0x1",
+            "a2": "0xfbfd8b8d426b6ef8",
+            "a3": "0x0",
+            "a4": "0x0",
+            "a6": "0x38f7b7317f61b303"
+          },
+          "group_order": "18446744076425775508",
+          "subgroup_order": "4611686019106443877",
+          "cofactor": "4",
+          "order_encoding": "decimal-string",
+          "generator": {
+            "x": "0xb7c0ac005751a785",
+            "y": "0x183deb994344a448"
+          },
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N64Cbinh6ed84da60516"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "icv1": "ICV1:f2m-64-0c6c295f:-2716223891:18446744076425775508:0x54ab4ec84d4937b5:unk:unk:r:2b2a84308a96",
+      "icv1_slug": "icv1-f2m64-tm2716223891-2b2a8430"
+    },
+    {
+      "source": "pipeline-receipts/wide-core-audit-20261025/m17/output.json",
+      "source_sha256": "c24b7b50ed44d17162304125cccdcabc403265d8143206eb2cdfa0675be2a374",
+      "producer_label": "icv1-f2m68-tm16763731575-8ae81c3a",
+      "producer_preimage_kind": "native-icv1-wide-core/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N68Cbinhc08191d264f1",
+        "curve_sha256": "c08191d264f11ce2e605f5367c84d353cb1b34ca0e3e4f467471ad43b6612558",
+        "curve_uid": "urn:ec-record:1:sha256:c08191d264f11ce2e605f5367c84d353cb1b34ca0e3e4f467471ad43b6612558",
+        "field_sha256": "41080e9d4e3e93c5b023f797143bd0c38df881867805dbda062421ff62c91f0f"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 68,
+          "representation": "polynomial",
+          "modulus": "0x100040000000121249",
+          "element_encoding": "hex-string-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": "0x1",
+            "a2": "0x6e2934f06c2c4d54e",
+            "a3": "0x0",
+            "a4": "0x0",
+            "a6": "0xd45171b7e70db75bf"
+          },
+          "group_order": "295147905196116557432",
+          "subgroup_order": "36893488149514569679",
+          "cofactor": "8",
+          "order_encoding": "decimal-string",
+          "generator": {
+            "x": "0x116e3ddd17d25aecd",
+            "y": "0x2516fde0ccae9f29c"
+          },
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N68Cbinhc08191d264f1"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "icv1": "ICV1:f2m-68-05a5d9c0:-16763731575:295147905196116557432:0x6c67fd979548facc2:unk:unk:r:8ae81c3a06e3",
+      "icv1_slug": "icv1-f2m68-tm16763731575-8ae81c3a"
+    },
+    {
+      "source": "pipeline-receipts/wide-core-audit-20261025/m18/output.json",
+      "source_sha256": "ee9933c1ae2607d75344744f66a15539dd28950a5216bb92959f4030d008f816",
+      "producer_label": "icv1-f2m72-tm128296031097-38af8562",
+      "producer_preimage_kind": "native-icv1-wide-core/v1",
+      "producer_alias_global_compatibility": "requires_this_versioned_adapter",
+      "canonical_identity": {
+        "curve_id": "EC1N72Cbinhe74fdd10014b",
+        "curve_sha256": "e74fdd10014beaf3e802f674aa1815e5576c2e00bca33f25d36f729cb1fc9128",
+        "curve_uid": "urn:ec-record:1:sha256:e74fdd10014beaf3e802f674aa1815e5576c2e00bca33f25d36f729cb1fc9128",
+        "field_sha256": "4f7e211dc5dfc53ba1ee82a44ae6d7bd44065cee3faca2d9df271fa6dd0495a3"
+      },
+      "canonical_manifest": {
+        "field": {
+          "characteristic": 2,
+          "degree": 72,
+          "representation": "polynomial",
+          "modulus": "0x14401450cb1bc48b1a7",
+          "element_encoding": "hex-string-polynomial-bits"
+        },
+        "curve": {
+          "model": "y^2+x*y=x^3+a2*x^2+a6",
+          "coefficients": {
+            "a1": "0x1",
+            "a2": "0x4153bdcb42a645df4f",
+            "a3": "0x0",
+            "a4": "0x0",
+            "a6": "0x3fbfa971aa4a38caea"
+          },
+          "group_order": "4722366482997941244794",
+          "subgroup_order": "2361183241498970622397",
+          "cofactor": "2",
+          "order_encoding": "decimal-string",
+          "generator": {
+            "x": "0xd6b5176e404a9c61d1",
+            "y": "0x4c02ce04352d3982ca"
+          },
+          "target_group": "prime-order-subgroup-generated-by-G",
+          "curve_id": "EC1N72Cbinhe74fdd10014b"
+        }
+      },
+      "registry_status": "unregistered_research_model",
+      "icv1": "ICV1:f2m-72-d789ff57:-128296031097:4722366482997941244794:0xc22b4da88e61fd1412:unk:unk:r:38af85621ca9",
+      "icv1_slug": "icv1-f2m72-tm128296031097-38af8562"
+    }
+  ]
+}

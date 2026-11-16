@@ -1,0 +1,29 @@
+import CryptoLean.Group.SubsetFourier
+import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+open scoped BigOperators
+set_option autoImplicit false
+
+-- Generic endpoint: actual finite subsets with explicit spectral input.
+example {G : Type*} [AddCommGroup G] [Fintype G] (S : Finset G)
+    (M : ℝ) (hM : 0 ≤ M)
+    (hflat : ∀ ψ : AddChar G ℂ, ψ ≠ 1 → ‖CryptoLean.SubsetFourier.charSum S ψ‖ ≤ M) :
+    |(CryptoLean.SubsetFourier.returnCount S : ℝ) -
+      (S.card : ℝ)^3/(Fintype.card G : ℝ)| ≤ M*(S.card : ℝ) :=
+  CryptoLean.SubsetFourier.triple_deviation S M hM hflat
+
+-- The same endpoint on Mathlib's existing affine point group. Finiteness
+-- and spectral input are explicit; this does not prove the analytic bound.
+example {F : Type*} [Field F] [DecidableEq F]
+    (W : WeierstrassCurve.Affine F) [Fintype W.Point] (S : Finset W.Point)
+    (M : ℝ) (hM : 0 ≤ M)
+    (hflat : ∀ ψ : AddChar W.Point ℂ, ψ ≠ 1 → ‖CryptoLean.SubsetFourier.charSum S ψ‖ ≤ M) :
+    |(CryptoLean.SubsetFourier.returnCount S : ℝ) -
+      (S.card : ℝ)^3/(Fintype.card W.Point : ℝ)| ≤ M*(S.card : ℝ) :=
+  CryptoLean.SubsetFourier.triple_deviation S M hM hflat
+
+#print axioms CryptoLean.SubsetFourier.charSum_trivial
+#print axioms CryptoLean.SubsetFourier.energy
+#print axioms CryptoLean.SubsetFourier.parseval
+#print axioms CryptoLean.SubsetFourier.triple_identity
+#print axioms CryptoLean.SubsetFourier.triple_deviation_scaled
+#print axioms CryptoLean.SubsetFourier.triple_deviation

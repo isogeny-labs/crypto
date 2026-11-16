@@ -1,0 +1,57 @@
+    Checking typenum v1.20.1
+    Checking serde_core v1.0.229
+    Checking zmij v1.0.23
+    Checking memchr v2.8.3
+    Checking itoa v1.0.18
+    Checking cpufeatures v0.2.17
+    Checking cfg-if v1.0.5
+    Checking hex v0.4.3
+    Checking generic-array v0.14.7
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking serde_json v1.0.151
+    Checking serde v1.0.229
+    Checking ic-three-lead-certificates v0.1.0 (<repository>/research/ic_algebraic_crossover_20261023/followons_20261029)
+error: the variable `r` is used as a loop counter
+  --> src/quotient.rs:70:5
+   |
+70 |     for col in 0..3 {
+   |     ^^^^^^^^^^^^^^^ help: consider using: `for (r, col) in (0..3).enumerate()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#explicit_counter_loop
+   = note: `-D clippy::explicit-counter-loop` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::explicit_counter_loop)]`
+
+error: the loop variable `j` is only used to index `rows`
+  --> src/quotient.rs:76:18
+   |
+76 |         for j in col..4 {
+   |                  ^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+   = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+   |
+76 -         for j in col..4 {
+76 +         for <item> in rows.iter_mut().take(4).skip(col) {
+   |
+
+error: the loop variable `j` is only used to index `rows`
+  --> src/quotient.rs:82:26
+   |
+82 |                 for j in col..4 {
+   |                          ^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+help: consider using an iterator
+   |
+82 -                 for j in col..4 {
+82 +                 for <item> in rows.iter_mut().take(4).skip(col) {
+   |
+
+error: could not compile `ic-three-lead-certificates` (lib) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `ic-three-lead-certificates` (lib test) due to 3 previous errors

@@ -79,7 +79,7 @@ fn every_representation_holds_at_a_planted_relation() {
         for m in 2..=4 {
             let mut rng = Rng(100 + m as u64 + a);
             let p = plant(&c, 4, m, &mut rng);
-            for rep in Rep::ALL {
+            for rep in Rep::ALL.into_iter().chain([Rep::ChainTrace]) {
                 let b = build(&c, rep, &p);
                 assert!(holds(&b), "{rep:?} m = {m} a = {a}");
             }
@@ -148,4 +148,42 @@ fn power_sum_positive_control_in_three_variables() {
     // and one that needs a p1 denominator: p1^-1 (p3 + p1^3) * p1^2 = p1 (p3 + p1^3)
     let u = r.mul(&p1, &r.add(&p3, &r.pow(&p1, 3)));
     assert_eq!(powersum::min_j(&r, &u, 2), Some(0));
+}
+
+#[test]
+fn decomposability_is_exact_on_planted_and_detects_absence() {
+    use crate::systems::{decomposable, factor_base_points};
+    let f = field(11);
+    let c = Curve { f, a: 0, b: 1 };
+    let mut rng = Rng(21);
+    for _ in 0..20 {
+        let p = plant(&c, 3, 3, &mut rng);
+        assert!(decomposable(&c, &p.basis, 3, *p.sums.last().unwrap()));
+    }
+    // T = (0, sqrt b) is on the curve and in every factor base
+    let fb = factor_base_points(&c, &[1, 2, 4]);
+    assert!(c.on(fb[0]) && matches!(fb[0], Pt::A(0, _)));
+    // with m = 1 only factor-base points themselves are decomposable
+    let mut seen_no = 0;
+    for _ in 0..200 {
+        let r = c.random_point(&mut rng);
+        let d = decomposable(&c, &[1, 2, 4], 1, r);
+        assert_eq!(d, fb.contains(&r));
+        seen_no += (!d) as u32;
+    }
+    assert!(seen_no > 0);
+}
+
+#[test]
+fn trace_equation_holds_on_planted_chains_and_is_linear() {
+    let f = field(13);
+    for a in [0, 1] {
+        let c = Curve { f, a, b: 1 };
+        let mut rng = Rng(31 + a);
+        let p = plant(&c, 4, 4, &mut rng);
+        let b = build(&c, Rep::ChainTrace, &p);
+        assert!(holds(&b));
+        assert_eq!(b.bool_eqs.len(), 3);
+        assert!(b.bool_eqs.iter().all(|e| e.degree() <= 1));
+    }
 }

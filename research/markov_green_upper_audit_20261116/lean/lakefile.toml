@@ -1,0 +1,11 @@
+name = "markov_green_upper_audit"
+version = "0.1.0"
+defaultTargets = ["MarkovGreenUpperAudit"]
+
+[[require]]
+name = "markov_green_bound_audit"
+path = "../../markov_green_bound_audit_20261116/lean"
+
+[[lean_lib]]
+name = "MarkovGreenUpperAudit"
+roots = ["WeightedGeometric", "GreenEnvelope", "GreenAsymptotic", "UpperCertificate"]

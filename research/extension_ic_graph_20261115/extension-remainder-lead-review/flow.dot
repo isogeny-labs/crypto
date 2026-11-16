@@ -1,0 +1,21 @@
+digraph remainder_review {
+  graph [rankdir=LR, bgcolor="white", dpi=150, nodesep=0.28, ranksep=0.38];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, color="#526675", fillcolor="#edf3f7"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#526675"];
+  hit [label="Verified line hit\nRemove seven small Fp roots"];
+  rest [label="Quadratic remainder U"];
+  split [label="Current path\nRequire two Fp roots"];
+  drop [label="Nonsplit U is refused",fillcolor="#f9eded"];
+  keep [label="Unselected candidate\nD=(U,V) over Fp²\nV = -A/C mod U",fillcolor="#fbf3dd"];
+  key [label="Canonical D or -D\nSigned remainder vertex",fillcolor="#fbf3dd"];
+  rows [label="Repeated vertex\nCancel D between rows",fillcolor="#fbf3dd"];
+  proof [label="Certificates + rank\nAffine target + elliptic replay"];
+  hit -> rest;
+  rest -> split;
+  split -> drop [label="irreducible over Fp"];
+  split -> proof [label="full Fp relation"];
+  rest -> keep [label="proposed branch"];
+  keep -> key [label="norm/coprime/validity\nchecks still required"];
+  key -> rows;
+  rows -> proof;
+}
