@@ -1,0 +1,48 @@
+import ReturnAfterFinds
+import SizeComposition
+set_option autoImplicit false
+namespace EdgeDispatch
+open SignedWord
+variable {n : Nat}
+structure Output (n : Nat) where
+ state : UnionState n
+ sizes : UnionSize.Sizes n
+ result : GraphSameRoot.Result UInt64
+def run (r : UInt64) (s : UnionState n) (w : State n) (sizes : UnionSize.Sizes n)
+ (ru rv : Fin n) (pu pv : Pot) (su sv : Int8) (a b : UInt64) : Output n :=
+ if ru=rv then
+   let same:=after r ⟨s.graph,s.fixed⟩ w ru pu pv su sv a b
+   ⟨⟨same.1.graph,same.1.fixed⟩,sizes,same.2⟩
+ else
+   let forward:=UnionSize.forward sizes ru rv
+   let pot:=reducedUnionPot r pu pv su sv a b
+   ⟨branchWord r ⟨w,s.fixed⟩ ru rv pot forward,
+    UnionSize.update sizes (UnionSize.child sizes ru rv) (UnionSize.parent sizes ru rv),
+    UnionReturn.branch r ⟨w,s.fixed⟩ ru rv pot forward⟩
+theorem after_finds_contract (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (t w : State n) (sizes : UnionSize.Sizes n)
+ (u v ru rv : Fin n) (pu pv : Pot) (rank : Fin n→Nat) (value : Fin n→F r)
+ (su sv : Int8) (a b : UInt64) (k : F r)
+ (hp : 2<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s.graph) (hgf : FixedGood r s)
+ (hf : GraphFind.Forest (decode r s.graph) rank) (hv : GraphUnion.Valid (unionDecode r s) value k)
+ (h1 : Run r s.graph u t ru pu) (h2 : Run r t v w rv pv)
+ (hs : Sign su) (ht : Sign sv) (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat)
+ (he : sd r su*value u+sd r sv*value v=wd r a+wd r b*k) :
+ let out:=run r s w sizes ru rv pu pv su sv a b
+ Good r out.state.graph ∧ FixedGood r out.state ∧
+ GraphSameRoot.Safe (outDecode r out.result) k ∧
+ ∃ rank',GraphFind.Forest (unionDecode r out.state).graph rank' ∧ GraphUnion.Valid (unionDecode r out.state) value k := by
+ by_cases hd:ru=rv
+ · subst rv
+   have hga : GoodA r (⟨s.graph,s.fixed⟩:Anchored n) := ⟨hg,fun i x y h=>hgf i (x,y) h⟩
+   have hh:=after_two_word_finds r (⟨s.graph,s.fixed⟩:Anchored n) t w u v ru pu pv rank value su sv a b k hp hr hga hf hv h1 h2 hs ht ha hb he
+   obtain ⟨hgood,hforest,hvalid,hsafe⟩:=hh
+   refine ⟨hgood.1,?_,hsafe,rank,?_,?_⟩
+   · intro i ab h
+     exact hgood.2 i ab.1 ab.2 h
+   · exact hforest
+   · exact hvalid
+ · have hu:=size_selected_union_preserves r s t w u v ru rv pu pv rank value su sv a b k (by omega) hr hg hgf hf hv h1 h2 hd hs ht ha hb he sizes
+   have hsafety:=UnionReturn.after_two_finds_safe r s t w u v ru rv pu pv rank value su sv a b k (by omega) hr hg hgf hf hv h1 h2 hs ht ha hb he (UnionSize.forward sizes ru rv)
+   simpa only [run,if_neg hd] using And.intro hu.1 (And.intro hu.2.1 (And.intro hsafety hu.2.2))
+end EdgeDispatch

@@ -1,0 +1,66 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Koblitz E0 n=23 pair-claw frontier, target block 1/2",
+  "description": "The accounting-v2 pair-table claw against both strong-rho references. This prospectively selected target block has four public targets, one warmup and six balanced measured rounds. Per-child censoring is fixed so the sum of child timeout ceilings is at most 2400s inside the 3,600-second EKS deadline; timeouts are retained and never retried.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 23
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 202610340230,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong-v2",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-escape",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong_escape"
+      }
+    },
+    {
+      "name": "rho-strong-v2-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_v2"
+      }
+    },
+    {
+      "name": "rho-strong-escape-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong_escape"
+      }
+    },
+    {
+      "name": "claw-v2",
+      "role": "candidate",
+      "method": {
+        "id": "claw.pair_table_v2",
+        "params": {
+          "base_scale": "4.0",
+          "table_scale": "1.0"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202610353230,
+    "isolation_required": "L2",
+    "timeout_seconds": 17
+  }
+}

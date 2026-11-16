@@ -1,0 +1,35 @@
+        if p.inf {
+            return Divisor::O;
+        }
+        let f = &self.e.f;
+        let i = self.p;
+        let a = geometry_events::initialized(vec![i, f.add(1, i)]);
+        let b = geometry_events::initialized(vec![f.neg(i), f.sub(1, i)]);
+        let u = pmonic(
+            f,
+            &psub(f, &pmul(f, &a, &a), &pscale(f, &pmul(f, &b, &b), p.x)),
+        );
+        let v = prem(f, &pscale(f, &ppow(f, &b, 3), p.y), &u);
+        let d = Divisor::from(&u, &v);
+        assert!(self.j2.valid(d));
+        let mut conjugate = d;
+        for x in &mut conjugate.u {
+            geometry_events::record(1, 0, 0, 0);
+            *x = f.conjugate(*x);
+        }
+        for x in &mut conjugate.v {
+            geometry_events::record(1, 0, 0, 0);
+            *x = f.conjugate(*x);
+        }
+        let out = self.j2.add(d, conjugate);
+        assert!(out.u.iter().chain(&out.v).all(|&x| {
+            geometry_events::record(1, 0, 0, 1);
+            x < self.p
+        }));
+        assert!(self.j.valid(out));
+        out
+    }
+    pub fn cover(&self, t: u64, y: u64) -> Point {
+        let f = &self.e.f;
+        let i = self.p;
+        let a = f.add(f.mul(f.add(1, i), t), i);

@@ -1,0 +1,42 @@
+{
+  "schema": "experiment.protocol/v1",
+  "study": "ct_dynamic_audit_20261102",
+  "narrative": "research/ct_dynamic_audit_20261102/PROTOCOL.md",
+  "frozen": {"commit": "recorded in the PR (protocol commit precedes the data commit)", "checker": "experiment_protocol.py unavailable in this workspace (crypto-autoresearcher not checked out); hash not computed by the canonical tool"},
+  "question": "Do the crypto crate's secret-handling paths branch on, index memory by, or vary their instruction count with the secret?",
+  "claims": [
+    {"id": "taint-site", "text": "target T executed a secret-dependent branch/address at site S", "class": "exact_computation"},
+    {"id": "ir-depends", "text": "target T's instruction count depends on the secret", "class": "exact_computation"},
+    {"id": "taint-none", "text": "no secret-dependent branch or address was reported for T (these inputs, this build)", "class": "comparative"},
+    {"id": "ir-none", "text": "no Ir variation observed for T across 80 inputs in 4 classes", "class": "comparative"},
+    {"id": "ct", "text": "T is constant-time / timing-safe", "class": "out_of_scope"}
+  ],
+  "targets": ["x25519", "smul_p256", "smul_secp256k1", "smul_sm2_generic", "inv_prime_ct", "inv_euclid", "ed25519_sign", "ecdsa_p256_sign", "sm2_sign"],
+  "controls": {
+    "positive": {"arm": "ctrl_pos_branch", "expected": "taint sites >= 1 and Ir varies across random secrets", "same_instrument_as": "targets"},
+    "negative": {"arm": "ctrl_neg_masked", "expected": "taint sites == 0 and constant Ir", "same_instrument_as": "targets"},
+    "aa": {"arm": "aa class (one fixed secret x16 per target)", "measures": "determinism (Ir is exact), not variance"}
+  },
+  "null_population": {"arm": "random class", "n": 32, "sampling": "StdRng seeded by FNV-1a(target/class) xor 0x5ca1ab1ec7d11102", "matched_on": ["target", "process", "build", "warm-up", "message"]},
+  "variables": [
+    {"factor": "instrument (commit, rustc, profile, binary sha256, valgrind version)", "treatment": "fixed", "recorded_in": "raw/ENV.txt"},
+    {"factor": "host", "treatment": "measured", "note": "metrics are instruction-stream properties under Valgrind; host-independent"},
+    {"factor": "memory layout / ASLR", "treatment": "fixed per process", "note": "affects neither branch definedness nor Ir of the measured call"},
+    {"factor": "order and warm-up", "treatment": "fixed", "note": "one uncollected warm-up call per process; classes in fixed order; Ir unaffected by cache state"},
+    {"factor": "secret", "treatment": "randomized", "note": "the variable under test"},
+    {"factor": "internal randomness (OsRng blinding, SM2 nonce)", "treatment": "measured", "note": "detected by the A/A arm; makes the Ir test not applicable for that target"}
+  ],
+  "comparisons": [
+    {"name": "Ir across classes per target", "design": "one_factor", "factor": "secret"},
+    {"name": "A/A per target", "design": "aa"}
+  ],
+  "metrics": [
+    {"name": "taint_sites", "unit": "distinct first in-crate frame:line", "instrument": "valgrind memcheck --xml", "resolution": "exact"},
+    {"name": "ir", "unit": "instructions per call", "instrument": "valgrind callgrind, toggle-collect + dump per call", "resolution": "exact"}
+  ],
+  "decision_rule": "PROTOCOL.md section 6",
+  "multiple_comparisons": "none: verdicts are exact witnesses or their absence",
+  "stopping_rule": "fixed sizes: taint 4 calls; Ir aa 16, random 32, short 16, lowhw 16",
+  "execution": {"backend": "session container (EKS route unavailable: no AWS identity)", "checkpoint": "scripts/checkpoint.sh before the run", "script": "research/ct_dynamic_audit_20261102/run.sh", "analysis": "ct_dynamic_audit analyze (same binary)"},
+  "does_not_count": "changing targets, classes, sizes, seeds, Valgrind options or the decision rule after data, without a dated amendment"
+}

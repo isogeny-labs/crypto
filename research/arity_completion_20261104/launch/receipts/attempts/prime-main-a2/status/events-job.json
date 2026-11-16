@@ -1,0 +1,40 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-04T16:59:45Z",
+            "involvedObject": {
+                "apiVersion": "batch/v1",
+                "kind": "Job",
+                "name": "arity-prime-m5-main-20261104-a2",
+                "namespace": "isolab",
+                "resourceVersion": "9875957",
+                "uid": "7f74ee40-0b3e-4670-a3e8-b75e99e6c8d6"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-04T16:59:45Z",
+            "message": "Job has reached the specified backoff limit",
+            "metadata": {
+                "creationTimestamp": "2026-11-04T16:59:45Z",
+                "name": "arity-prime-m5-main-20261104-a2.18e4e622056f852c",
+                "namespace": "isolab",
+                "resourceVersion": "9875960",
+                "uid": "cc766bcf-5ddf-4228-96a6-d2f7f3320a48"
+            },
+            "reason": "BackoffLimitExceeded",
+            "reportingComponent": "job-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "job-controller"
+            },
+            "type": "Warning"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T07:30:39Z",
+ "id": "PCC-20261112-bfd777",
+ "kind": "statement",
+ "producer": {
+  "commit": "8487859d7aa48d13b0defe7928d915d67352c01f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-root-complete-29.txt",
+    "sha256": "658cd0c655698b4dd3ec4d1a130d3616091bf63d3ad35ff4eca0a5a40e440093"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-root-source-guards-29.txt",
+    "sha256": "925cea9dbf90b4595495f8ef10808f3064d31b449cbfde92ce4aaf0024c6f6dc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-28/clippy.txt",
+    "sha256": "9ec93a9a7ae62334024c095120c5d044549c5df34ca90e8386e8133adb4a7a7e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-independent-28/source.rs",
+    "sha256": "c89e1ce672e1347a189613e08cc73c2ebf1806d7c62622328626eb7404621f53"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned changed root standalone29 full suite passes19tests,all old17 retained plus two T2 independent certificates;strictClippy28 and unchanged reference/legacy digest guards/fmt pass. Existing flat-field checker parameterization keeps original T1 cases and all complete-domain/pole controls;T2E109 degree4 geometric pole field explicit. Written helper census136/25modules unchanged. No blanket root library,whole-map independent replay,signed standing or timing claim."
+}

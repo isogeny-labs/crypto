@@ -1,0 +1,99 @@
+{
+  "schema": "branch-direct-polynomial-replay/v1",
+  "status": "prospective_unreleased",
+  "files": {
+    "DirectBranchCoefficientMultiplicity.lean.txt": "5b625d3a2391fb6b8f073205bab30fe911e053cc70c290069bfed8efdc4b72ae",
+    "DirectBranchControls.lean.txt": "3c342a818c7197eae56d131e452ec5ee2198ea81d61681a0a241c386aa677223",
+    "ExpectedFailure.lean.txt": "2b38b890211fe8cdab9a483cea9ab615569b8e19ac0cd5e620c6ddf6d07df99e",
+    "PLAN.md": "225ee57507780bd412cc7844aaa4ac5352ca43342f0478a58b045ef6217a21fa",
+    "Readback.lean.txt": "e6958a7547ed65dc5cd72d91a3380d9820b846b0a3beffc9bc7113b6738c8245",
+    "SESSION.md": "248e2158b6d98834eaa76dc1da2a30ccdab78427fa5d592a9c03a5f4b5845933",
+    "commands.json": "cf96411919a787957c6edbb5fd23cedd853dd79efbd1dad25b74841eb23fbf87",
+    "launch.py": "d6153c71b69bb6828fc25b019add482df0ec0ca281269854f83e3b4e8efdc890",
+    "launch.py.patch": "cc8f9a1797753d308dd60c78fbde964964b2967825576a4beeb4fddd9d0d968f",
+    "names.json": "36c810836887656b95e558092562ec691fd3a6d44b1eb0e66ab9d1624d99a30d",
+    "prior-bindings.json": "b816d786da797cccb1e9bd726d2087dc14e0ee0be14c77cca314a8a8de3f247e",
+    "release-template.json": "4372d97015923d47fb9f5092c68cbc95594983cfd5cf46b2eb40c6737eb7f5b0",
+    "replay.py": "673d88491f04202978906d0464f2822d67474f9fcdc677e71a977bb3d2c532e0",
+    "replay.py.patch": "e3dc3d749f126c4a74094f1983963cf207d7319dfa496a9b15c99dbe0fa69f04",
+    "retained-imports.json": "2c05d6aa6cc74eb47a086b6a0f4bb7b0d9462b92fe0faba3088971f41f8eabee",
+    "runtime-pins.json": "5e3bb64e91e80b500b5f34fb0cca602c07d44b8163d3d4a3c440e29eab53cf86"
+  },
+  "closure": {
+    "path": "/var/tmp/pencil-norm-recovery-20261109/closure.json",
+    "sha256": "6c164aea372b13ba53638675e22f87aba7c138a51cbfd24e3700f087f6f552c8"
+  },
+  "baseline": {
+    "path": "/var/tmp/pencil-norm-recovery-20261109/baseline.json",
+    "sha256": "a77aa5f69a670f50860ea75a74d62f06caf42a35907e5353595933ce22679b3b"
+  },
+  "runtime": {
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/libInit_shared.so": "07f8c1156271ab6ec36c14c3031b5572329325d5f73dde3e89a1615d88f4e5cb",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/libleanshared.so": "6b30cc963d065fc9d2f87f7e9cbe0682b23000ae5425bccd769c5d477fa74f13",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/libleanshared_1.so": "69e900c025f40bf05c14f5b9ec48071b3130e34c96a7c45ee2eb5b6f307e19e6",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/libleanshared_2.so": "38d0a03750b2e8d51161885ad597a8b4f6d3b85215c5a52aecd2b3753273cf3f",
+    "/lib64/libc.so.6": "fdf84d7d72db18bb3996a7b24f3eb473e7efbc8f994af7b159f76d61d1b4c978",
+    "/lib64/libpthread.so.0": "2d59f889bc4d02d2813b0de08dbe8e69dc6fa23147390fe38ad3aa1676c8ae3a",
+    "/lib64/libdl.so.2": "0c1cd7c6fd94fab00a1b87d7b1ec66d1505355abf5173cdf52a51d62c20763fd",
+    "/lib64/libm.so.6": "f7cb1097b97353d994fe191e5fafc81f0171935792311a157c3082213fc704e0",
+    "/lib64/librt.so.1": "7072187d8d72f88889aa1eabb6eebc69a897aa2dcb8a1f8e3a251fdf4c593bc9",
+    "/lib64/ld-linux-x86-64.so.2": "5022436ff15df9e54e79ee0a0ca8b3422a0dcb0c11920d9901ded30eccbf8638"
+  },
+  "lean_roots": [
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/LeanSearchClient/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/Qq/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/aesop/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/batteries/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/importGraph/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/plausible/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/proofwidgets/.lake/build/lib/lean"
+  ],
+  "lean": "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean",
+  "extra_imports_already_bound": {
+    "Mathlib.Algebra.Polynomial.FieldDivision": {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Algebra/Polynomial/FieldDivision.olean",
+      "sha256": "d57159b843ec2cfa2a07fddffeb43117e8568683428abb30c712363160329e77"
+    },
+    "Mathlib.Algebra.Polynomial.RingDivision": {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Algebra/Polynomial/RingDivision.olean",
+      "sha256": "2d5a9db4904638cca19b04f58ffc34dd2622d963552a817b5cc1940845c9704f"
+    },
+    "Mathlib.Tactic.Ring": {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/Ring.olean",
+      "sha256": "301e95fbad73634f1e47fe918723c2d5443cec154d15622c3475e766e9405077"
+    },
+    "Mathlib.Tactic.NormNum": {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/NormNum.olean",
+      "sha256": "325bbf27940bd90c94aafe405e154131ffec26fccef767b5d1206148c8c239f9"
+    },
+    "Lean.Elab.Tactic.Omega": {
+      "path": "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/Lean/Elab/Tactic/Omega.olean",
+      "sha256": "7f58793e49ecdb4e6406a4f1579f508f115cbfb7d339600277716fa4127e64e0"
+    }
+  },
+  "phase_seconds": {
+    "pre": 900,
+    "compiler": 600,
+    "post": 900
+  },
+  "cumulative_seconds": 2400,
+  "retry_limit": 0,
+  "as_bytes": 8589934592,
+  "absolute_deadline": "2026-11-10T05:11:39Z",
+  "workspace": "/home/ec2-user/pencil-native-branch-direct-20261109",
+  "campaign_total_seconds": 43200,
+  "prior_attempt_conservative_debit_seconds": null,
+  "remaining_before_attempt_seconds": null,
+  "new_plan_attempt_limit": 1,
+  "materializer_conservative_debit_seconds": 900,
+  "current_boot_id": "31b37cfb156242ff8b0ffadc5cec5a12",
+  "modules": [
+    "DirectBranchCoefficientMultiplicity",
+    "DirectBranchControls",
+    "Readback",
+    "ExpectedFailure"
+  ]
+}

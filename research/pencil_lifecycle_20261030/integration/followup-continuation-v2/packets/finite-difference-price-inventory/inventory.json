@@ -1,0 +1,152 @@
+{
+  "schema": "pencil.finite-difference-primitive-inventory/v1-draft",
+  "status": "proposed_interpretation_independent_review_required",
+  "source_bindings": [
+    {
+      "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+      "sha256": "061f4f9f45d261b61af3482509ca5f09e03964abc670765852922d20f946bbd1",
+      "bytes": 74301
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/meter.rs",
+      "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+      "bytes": 8345
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+      "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+      "bytes": 33938
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/src/scalar_ledger.rs",
+      "sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba",
+      "bytes": 2862
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/kernel-primitive-registry.json",
+      "sha256": "a973bf6222125f37a5d37fa25dbaac434ea3c418fae7bbf8abbda67036c15e2f",
+      "bytes": 1899
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/accounting/COST_BOUNDARY.md",
+      "sha256": "186ebceb5281612f62442a3e005fa92b019f80f8309afe2fe5245ef9c0f4d402",
+      "bytes": 3659
+    },
+    {
+      "path": "research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/coverage-review.json",
+      "sha256": "8936f5d99b49538a35d78729f2450a326801ff9df720ec1f5966166756cfa252",
+      "bytes": 37905
+    }
+  ],
+  "inventory": [
+    {
+      "site": "native_solver.rs:957-968",
+      "primitive": "Read active u/v coefficients once",
+      "classification": "collection_entry_visits",
+      "count": "k = 2*d+1",
+      "category": "collection_graph_elimination",
+      "reason": "Failed optional access has no consumed coefficient; inactive tails ignored."
+    },
+    {
+      "site": "native_solver.rs:964-967",
+      "primitive": "get/first Option and bounds decisions",
+      "classification": "proposed exclusion: API/control machinery",
+      "count": "four optional-access expressions; no added comparison event",
+      "category": "collection_graph_elimination",
+      "reason": "Existing registry excludes API surcharges and an instruction census; requires independent explicit classification."
+    },
+    {
+      "site": "native_solver.rs:963-979",
+      "primitive": "Local scalar Copy, constant padding and assignments",
+      "classification": "proposed exclusion: local scalar moves",
+      "count": "no collection clone/init event",
+      "category": "collection_graph_elimination",
+      "reason": "Baseline peval copies &c into arithmetic but prices consumed entry only; no container element is created by local scalar state."
+    },
+    {
+      "site": "native_solver.rs:970-971",
+      "primitive": "Initialize first/second differences",
+      "classification": "arithmetic.base_adds",
+      "count": "2",
+      "category": "field_arithmetic",
+      "reason": "Both native add calls charge base domain and modulo result; no extra modular-reduction surcharge."
+    },
+    {
+      "site": "native_solver.rs:977-979",
+      "primitive": "Advance u,delta,v every iteration",
+      "classification": "arithmetic.base_adds",
+      "count": "3*p",
+      "category": "field_arithmetic",
+      "reason": "Includes final unused update and executes before continues."
+    },
+    {
+      "site": "native_solver.rs:980 onward",
+      "primitive": "Existing predicates, exceptional branches and bucket work",
+      "classification": "unchanged selected primitive sites",
+      "count": "unchanged on identical ordered values",
+      "category": "collection_graph_elimination",
+      "reason": "No extra charge for control/diagnostic aggregates; native component checks cover actual recorded fields."
+    },
+    {
+      "site": "analyzer.rs:220-247",
+      "primitive": "Map arithmetic and collection counters",
+      "classification": "existing base_muls/base_adds/collection_entry_visits mapping",
+      "count": "same36-cell policy; no new result",
+      "category": "field_arithmetic and collection_graph_elimination",
+      "reason": "Reduced multiplies are non-inverse; scalar normalization and other source categories unaffected by recurrence."
+    }
+  ],
+  "low_degree_delta_new_minus_original": [
+    {
+      "degree": 0,
+      "active_reads": 1,
+      "delta_base_muls": "-p",
+      "delta_base_adds": "2*p+2",
+      "delta_visits": "-(p-1)"
+    },
+    {
+      "degree": 1,
+      "active_reads": 3,
+      "delta_base_muls": "-3*p",
+      "delta_base_adds": "2",
+      "delta_visits": "-3*(p-1)"
+    },
+    {
+      "degree": 2,
+      "active_reads": 5,
+      "delta_base_muls": "-5*p",
+      "delta_base_adds": "2-2*p",
+      "delta_visits": "-5*(p-1)"
+    }
+  ],
+  "assumptions": [
+    "active degree0..2",
+    "canonical active coefficients",
+    "0<p<=2^63 for addition refinement",
+    "full sieve retains original prime/complement preconditions",
+    "native caller uses degree2; degree0/1 are component control scope"
+  ],
+  "unchanged_categories": [
+    "scalar_arithmetic",
+    "outer_and_constructor_validation",
+    "setup_transfer",
+    "hash_rng",
+    "source_verification",
+    "metadata_clone",
+    "calibration"
+  ],
+  "changed_categories": [
+    "field_arithmetic",
+    "collection_graph_elimination"
+  ],
+  "review_required": [
+    "Independent reviewer must classify Option/bounds machinery and local scalar copies consistently with baseline, not treat existing successful counter checks as policy admission.",
+    "Confirm source and runtime base-domain preconditions, phase ownership and cold-setup treatment in integrated actual route.",
+    "Rebind nine-category review to final source/mapper/protocol/candidate/reference binaries; retain source coverage for unchanged files only where justified."
+  ],
+  "scientific_admission": false,
+  "numerical_prices_or_ratios": null,
+  "historical_prices_modified": false,
+  "fresh_candidate_targets": 1260,
+  "validation_in_this_packet": "source reading only; no tests/compiler/scientific run"
+}

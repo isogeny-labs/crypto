@@ -1,0 +1,79 @@
+import QuotientWrite
+set_option autoImplicit false
+namespace NativeDivision
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest
+noncomputable def qloop (p:UInt64) (b:List UInt64) (fuel:Nat)
+ (q:(ZMod p.toNat)[X]) (r:List UInt64) : Option ((ZMod p.toNat)[X]×List UInt64) :=
+ if hr:r=[] then some (q,r) else
+ if hl:b.length≤r.length then
+  match fuel with
+  | 0=>none
+  | k+1=>qloop p b k (writeCoeff q (r.length-b.length) ((r.getLast hr).toNat:ZMod p.toNat))
+    (selected p b r hr hl)
+ else some (q,r)
+termination_by structural fuel
+
+theorem success_correct (p:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (hm:b.getLast?=some 1)
+ (fuel:Nat) (q qo:(ZMod p.toNat)[X]) (r out:List UInt64)
+ (hc:Canon p r) (hf:Fresh b r q) (ho:qloop p b fuel q r=some (qo,out)) :
+ Canon p out ∧ Fresh b out qo ∧
+ qo*wordsPoly p b+wordsPoly p out=q*wordsPoly p b+wordsPoly p r ∧
+ (out=[] ∨ out.length<b.length) := by
+ induction fuel generalizing q qo r out with
+ | zero =>
+   rw [qloop] at ho
+   split_ifs at ho with hr hl
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inl hr⟩
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inr (by omega)⟩
+ | succ fuel ih =>
+   rw [qloop] at ho
+   split_ifs at ho with hr hl
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inl hr⟩
+   · have hs:=selected_correct p b r hr hl hp hb hbs hc
+     have hd:=selected_shorter p b r hr hl hp hb hbs hc hm
+     have hfr:=next_fresh b r (selected p b r hr hl) q ((r.getLast hr).toNat:ZMod p.toNat) hl hd hf
+     obtain ⟨hco,hfo,he,ht⟩:=ih _ qo _ out hs.1 hfr ho
+     exact ⟨hco,hfo,he.trans (quotient_step p b r q hr hl hp hb hbs hc hf),ht⟩
+   · have he:=Option.some.inj ho
+     cases he
+     exact ⟨hc,hf,rfl,Or.inr (by omega)⟩
+
+theorem success_exists (p:UInt64) [Fact p.toNat.Prime] (b:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (hm:b.getLast?=some 1)
+ (fuel:Nat) (q:(ZMod p.toNat)[X]) (r:List UInt64) (hc:Canon p r) (hlen:r.length≤fuel) :
+ ∃qo out,qloop p b fuel q r=some (qo,out) := by
+ induction fuel generalizing q r with
+ | zero =>
+   have he:r=[]:=List.length_eq_zero_iff.mp (by omega)
+   subst r
+   exact ⟨q,[],by simp [qloop]⟩
+ | succ fuel ih =>
+   rw [qloop]
+   split_ifs with hr hl
+   · exact ⟨q,r,rfl⟩
+   · have hs:=selected_correct p b r hr hl hp hb hbs hc
+     have hd:=selected_shorter p b r hr hl hp hb hbs hc hm
+     exact ih _ _ hs.1 (by omega)
+   · exact ⟨q,r,rfl⟩
+
+theorem remainder_projection (p:UInt64) (b:List UInt64) (fuel:Nat)
+ (q:(ZMod p.toNat)[X]) (r:List UInt64) :
+ (qloop p b fuel q r).map Prod.snd=MonicRemainder.loop p b fuel r := by
+ induction fuel generalizing q r with
+ | zero =>
+   rw [qloop,MonicRemainder.loop]
+   split_ifs <;> rfl
+ | succ fuel ih =>
+   rw [qloop,MonicRemainder.loop]
+   split_ifs
+   · rfl
+   · exact ih _ _
+   · rfl
+end NativeDivision

@@ -1,0 +1,196 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h3cc9d6be09df",
+  "resample_seed": 20261101,
+  "a": {
+    "session_id": "ECBS1h58aad2bac5e8",
+    "arm": "matrix-f4",
+    "method_id": "ECM1hccfbd05aaed3",
+    "method": "ic.pipeline",
+    "measured": 4,
+    "verified": 3,
+    "statuses": {
+      "timeout": 1,
+      "verified": 3
+    },
+    "mean_s": 17.58041405379444,
+    "mean_ratio_to_floor": 19.83737296721481,
+    "lower_bound": true,
+    "deterministic": false,
+    "censored": 1,
+    "tail": {
+      "runs": 3,
+      "median_s": 17.391086517830498,
+      "max_s": 19.52778299513782,
+      "max_over_median": 1.1228615863141522,
+      "top_run_share": 0.3702564102564102,
+      "top_run_id": "ECM1hccfbd05aaed3W99737ebf5f72R5",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "as_solves_uncharged": 96,
+      "frobenius_maps_uncharged": 93,
+      "row_ops_uncharged": 703,
+      "solver_word_XORs_(elimination,_specialisation_and_linear_elimination_only)_uncharged": 2876759530,
+      "target_guard_probes_uncharged": 60
+    }
+  },
+  "b": {
+    "session_id": "ECBS1h58aad2bac5e8",
+    "arm": "matrix-f5",
+    "method_id": "ECM1hd3c6f3422002",
+    "method": "ic.pipeline",
+    "measured": 4,
+    "verified": 4,
+    "statuses": {
+      "verified": 4
+    },
+    "mean_s": 18.19572854567724,
+    "mean_ratio_to_floor": 20.531681021067328,
+    "lower_bound": true,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 4,
+      "median_s": 18.459434756484157,
+      "max_s": 20.04167202132566,
+      "max_over_median": 1.0857142857142859,
+      "top_run_share": 0.27536231884057977,
+      "top_run_id": "ECM1hd3c6f3422002W99737ebf5f72R4",
+      "heavy_tail": true
+    },
+    "unpriced_counts": {
+      "as_solves_uncharged": 128,
+      "frobenius_maps_uncharged": 124,
+      "row_ops_uncharged": 1050,
+      "solver_word_XORs_(elimination,_specialisation_and_linear_elimination_only)_uncharged": 3308376025,
+      "target_guard_probes_uncharged": 96
+    }
+  },
+  "workloads": [
+    {
+      "workload_id": "W99737ebf5f72",
+      "slug": "icv1-f2m13-tm9-6863a838",
+      "r": 1367,
+      "floor_s": 0.8862269254527579,
+      "pairs": 4,
+      "a_mean_s": 20.715455938610546,
+      "b_mean_s": 18.19572854567724,
+      "ratio_b_over_a": 0.8783648595328811,
+      "censored_pairs": 1
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m13-tm9-6863a838",
+      "log2_r": 10.41679752760606,
+      "workloads": 1,
+      "pairs": 4,
+      "ratio_b_over_a": 0.8783648595328811,
+      "ci95": [
+        0.6040798064359746,
+        1.2771902292416568
+      ],
+      "ci_method": "within_t",
+      "indicative": true,
+      "censored_pairs": 1,
+      "bound": "upper",
+      "ci95_bootstrap": [
+        0.7193880814894236,
+        1.0
+      ]
+    }
+  ],
+  "ops": {
+    "status": "incomplete",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 0.8783648595328811,
+    "ci95": [
+      0.6040798064359746,
+      1.2771902292416568
+    ],
+    "ci_method": "within_t",
+    "pairs": 4,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 10000,
+    "workloads": 1,
+    "dof": 3.0,
+    "indicative": true,
+    "interval_scope": "within_workload",
+    "ci95_bootstrap": [
+      0.7193880814894236,
+      1.0
+    ],
+    "ci_bootstrap_method": "within",
+    "censored_pairs": 1,
+    "bound": "upper",
+    "verified_only_ratio": 1.0,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        1.0,
+        0.6367082986744725,
+        0.6367060823742015
+      ],
+      "order": "unresolved inside the band",
+      "pairs": 3,
+      "note": "point ratios of totals; rank only where the order holds at every weight; over the 3 verified pair(s), 1 censored pair(s) excluded"
+    }
+  },
+  "wall": {
+    "status": "descriptive",
+    "reasons": [
+      "3 admitted pairs; at least 5 are needed"
+    ],
+    "required_level": "L0",
+    "pairs": 3,
+    "pairs_below_level": 0,
+    "median_ratio": 0.8055620075318768,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "ratio_b_over_a": 0.8105038437081117,
+    "ns_per_gae_a": 13656016.537435897,
+    "ns_per_gae_b": 11068253.893333333,
+    "ns_per_gae_upper_bound_arms": [
+      "matrix-f4",
+      "matrix-f5"
+    ],
+    "self_aa": false
+  },
+  "quality": {
+    "score": 0,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 4,
+    "verified_pairs": 3,
+    "admitted_pairs": 0,
+    "levels": {
+      "L0": 3,
+      "unverified": 1
+    },
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": 0.05794805801142694,
+    "contention_observed_runs": 0,
+    "notes": [
+      "A/A bonus unavailable: the spec permits wall runs below L2",
+      "contention telemetry is incomplete"
+    ]
+  },
+  "verdict": "ops (incomplete): matrix-f5 / matrix-f4 = 0.8784 [0.604, 1.277] (within_t, df 3) over 4 pairs on 1 workloads, 1 curve(s), INDICATIVE: one workload, the interval does not generalise to other targets, BOUND: 1 censored pair(s) (timeout or exhausted) entered at their spent cost, so the ratio is a upper bound on B/A; verified pairs only 1.0000, diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 0.6367, w=1: 0.6367): unresolved inside the band, NOT admissible: a measured run did not verify; heavy tail in matrix-f4: top run is 37% of the arm's total S (max/median 1.1); more runs needed; heavy tail in matrix-f5: top run is 28% of the arm's total S (max/median 1.1); more runs needed; wall: descriptive (ns/GAE 0.8105, not a result: 3 admitted pairs; at least 5 are needed); ns/GAE of matrix-f4, matrix-f5 is an upper bound on its cost per operation (GAE is a lower bound)",
+  "legacy_comparison_id": "ECC1he1ddab60d9c6",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

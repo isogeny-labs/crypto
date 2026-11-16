@@ -1,0 +1,989 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-trace-fiber-full-20261115",
+  "version": 2,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/full-20261115",
+  "authors": [
+    "producer"
+  ],
+  "question": "Does the quartic candidate exactly cover every trace fiber for all nineteen supplied subgroup queries, including identity and tangent branches, under independent native replay?",
+  "claims": [
+    {
+      "id": "finite-coverage",
+      "text": "Complete actual finite trace-fiber and inverse-twist coverage on the declared bundle",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-yield-degree",
+      "text": "Useful projected-rank, solving degree, scalar recovery and speed are outside this geometry protocol",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "produce-A",
+      "role": "candidate",
+      "description": "produce-A in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "audit-A",
+      "role": "reference",
+      "description": "audit-A in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "produce-B",
+      "role": "control_aa",
+      "description": "produce-B in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "audit-B",
+      "role": "control_aa",
+      "description": "audit-B in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "audit-positive",
+      "role": "control_positive",
+      "description": "audit-positive in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "mutate-wrong-d",
+      "role": "control_negative",
+      "description": "mutate-wrong-d in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-wrong-d",
+      "role": "control_negative",
+      "description": "reject-wrong-d in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-wrong-target",
+      "role": "control_negative",
+      "description": "mutate-wrong-target in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-wrong-target",
+      "role": "control_negative",
+      "description": "reject-wrong-target in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-missing-tangent",
+      "role": "control_negative",
+      "description": "mutate-missing-tangent in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-tangent",
+      "role": "control_negative",
+      "description": "reject-missing-tangent in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-duplicate-record",
+      "role": "control_negative",
+      "description": "mutate-duplicate-record in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-duplicate-record",
+      "role": "control_negative",
+      "description": "reject-duplicate-record in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-wrong-inverse",
+      "role": "control_negative",
+      "description": "mutate-wrong-inverse in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-wrong-inverse",
+      "role": "control_negative",
+      "description": "reject-wrong-inverse in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-missing-attempt",
+      "role": "control_negative",
+      "description": "mutate-missing-attempt in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-attempt",
+      "role": "control_negative",
+      "description": "reject-missing-attempt in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-false-root",
+      "role": "control_negative",
+      "description": "mutate-false-root in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-false-root",
+      "role": "control_negative",
+      "description": "reject-false-root in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-missing-case",
+      "role": "control_negative",
+      "description": "mutate-missing-case in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-missing-case",
+      "role": "control_negative",
+      "description": "reject-missing-case in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-source-pin",
+      "role": "control_negative",
+      "description": "mutate-source-pin in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-source-pin",
+      "role": "control_negative",
+      "description": "reject-source-pin in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "mutate-spurious-infinity",
+      "role": "control_negative",
+      "description": "mutate-spurious-infinity in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "producer"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-spurious-infinity",
+      "role": "control_negative",
+      "description": "reject-spurious-infinity in the exact full bundle; mutation generation and rejection are separate actual processes",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+        "build": null,
+        "binary_sha256": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779",
+        "threads": 1,
+        "flags": {
+          "scope": "full",
+          "binary": "auditor"
+        }
+      },
+      "parameters": {
+        "scope": "full",
+        "nested_queries": 19,
+        "expected_exit": 101
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "audit-positive",
+      "expected_detection": "Fresh full auditor accepts complete identity-containing bundle with its actual infinity/identity/tangent points",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-wrong-d",
+      "null_population": {
+        "description": "All ten frozen semantic corruption modes, each changes and rehashes a complete actual result payload",
+        "generator": "Unchanged Rust mutate mode in original frozen order; each has a separate generating and rejecting process",
+        "n": 10,
+        "why_n": "Complete declared corruption-mode set, not a statistical null estimate",
+        "matched_on": [
+          "original dataset",
+          "source pins except targeted source mutation",
+          "all fields except targeted mutation",
+          "rehashing rule"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "quartic candidate",
+          "independent exhaustive group reference"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "fixture",
+        "treatment": "fixed",
+        "value": "F37 E7,19 d35 T28,33 P1,8 r19 h10",
+        "how": "Exact existing native constants and strict equality"
+      },
+      {
+        "name": "coverage",
+        "treatment": "fixed",
+        "value": "O then all18 nonidentity queries",
+        "how": "Independent subgroup construction; same full bundle in every arm before mutation"
+      },
+      {
+        "name": "binaries",
+        "treatment": "fixed",
+        "value": {
+          "producer": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+          "auditor": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779"
+        },
+        "how": "SHA256 guards before run"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "A",
+          "B"
+        ],
+        "how": "Fresh sequential execution, no answer cache"
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "value": "existing local managed runtime",
+        "how": "No clock metric; isolation not claimed"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "produce-A",
+          "audit-A",
+          "produce-B",
+          "audit-B",
+          "audit-positive",
+          "mutate-wrong-d",
+          "reject-wrong-d",
+          "mutate-wrong-target",
+          "reject-wrong-target",
+          "mutate-missing-tangent",
+          "reject-missing-tangent",
+          "mutate-duplicate-record",
+          "reject-duplicate-record",
+          "mutate-wrong-inverse",
+          "reject-wrong-inverse",
+          "mutate-missing-attempt",
+          "reject-missing-attempt",
+          "mutate-false-root",
+          "reject-false-root",
+          "mutate-missing-case",
+          "reject-missing-case",
+          "mutate-source-pin",
+          "reject-source-pin",
+          "mutate-spurious-infinity",
+          "reject-spurious-infinity"
+        ],
+        "how": "Fixed dependency order; no timing comparison"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded producer",
+        "how": "Exact finite equality, not confirmatory statistics"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "audit-A",
+          "audit-B",
+          "audit-positive",
+          "reject-wrong-d",
+          "reject-wrong-target",
+          "reject-missing-tangent",
+          "reject-duplicate-record",
+          "reject-wrong-inverse",
+          "reject-missing-attempt",
+          "reject-false-root",
+          "reject-missing-case",
+          "reject-source-pin",
+          "reject-spurious-infinity"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All complete positive audits exit0, all changed/rehashed false payload audits exit101 without receipt; no missing/extra full records"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "produce-A",
+          "produce-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "domain": "supplied actual odd source subgroup only",
+        "check": "Every extension point trace and actual inverse-twist coordinate is reconstructed; no original scalar recovery in this protocol"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exhaustive declared finite domain, not a sampling-significance claim. Fixed P engineering data were seen for calibration; remaining queries and identity are new scope."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": 0.008000106,
+      "threads": 1,
+      "estimated_total_seconds": 120,
+      "measured_on": "Fixed engineering audit-A command-to-exit file mtime interval0.008000106s; producer0.002312373s; resource estimate only, not performance measurement. Conservative120s full plan under600s stages."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "queries",
+        "name": "Audited queries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Audited queries; no timing or pricing inference",
+        "source": "*.receipt.json queries",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "fiber_points",
+        "name": "Audited fiber points",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Audited fiber points; no timing or pricing inference",
+        "source": "*.receipt.json fiber_points",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "extension_curve_points",
+        "name": "Reference extension population",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Reference extension population; no timing or pricing inference",
+        "source": "*.receipt.json extension_curve_points",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "queries",
+      "fiber_points",
+      "extension_curve_points",
+      "scalar_recoveries"
+    ],
+    "record": [
+      "actual source commit",
+      "binary hashes",
+      "commands",
+      "all exits/logs/raw/false payloads",
+      "checkpoint head",
+      "declared caps"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "placement": {
+      "outer_seconds": 3600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Complete exactly25 declared native processes or stop on first unexpected exit/inapplicable control/mismatch",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Accept only complete exact finite coverage and A/A equality plus all changed-payload control rejections; otherwise invalid or incomplete",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "Zero missing or extra points/records/cases; rejection101/no receipt on all ten controls",
+    "statistic": "Exact set/ordered JSON equality and process exit status",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact defects, no statistical effect size",
+    "verdict_vocabulary": [
+      "coverage_replayed_unsigned",
+      "invalid",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../auditor.cpp",
+      "sha256": "e0d43c621bff63e636a51668adee800f810228fb7abc6da659b3da3d20c2e32b"
+    },
+    "inputs": [
+      "A.json",
+      "B.json",
+      "all ten false payloads",
+      "ENGINEERING_INPUTS.json"
+    ],
+    "outputs": [
+      "A.receipt.json",
+      "B.receipt.json",
+      "positive.receipt.json",
+      "all rejection logs/exits"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "audited points per run and source query"
+    ],
+    "report_dir": "../reports/full-github-20261115"
+  },
+  "inadmissible": [
+    "Use saved reference points to feed candidate extraction",
+    "Hide any identity/tangent/sign branch or failed candidate",
+    "Treat witnesses as useful projected rank",
+    "Use known target labels as recovery input",
+    "Relax full scope after a failure",
+    "Call unsigned producer output signed verification",
+    "Interpret file mtimes or counters as calibrated speed",
+    "Upload raw archives while approval review remains unresolved"
+  ],
+  "literature": [
+    {
+      "ref": "../auxiliary-20261113/README.md and existing trace-fiber instruments",
+      "provenance": "internal",
+      "claim": "Source/domain and explicit branch obligations"
+    },
+    {
+      "ref": "https://arxiv.org/html/1405.1059 section2.2",
+      "provenance": "retrieved",
+      "claim": "Trace/Frobenius only; no n2 speed transfer"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "connected-github-ref",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": true,
+      "reason": "Shell GitHub fetch/ls-remote authentication is unavailable while the connected GitHub API works; preserve the exact published-head condition through a fresh connector receipt instead. No native full data have run.",
+      "changes": [
+        "Only checkpoint head acquisition changes; connector receipt freshness60seconds, actual head equality, open PR and auto-merge off required",
+        "Native sources/binaries, fixture, full coverage, process order and all numerical/control predicates unchanged"
+      ],
+      "supersedes_fields": [
+        "extensions.checkpoint"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "987af9f80ba9a3e4b9dd37f1d5a2716627488dd90f6726b74895534b1f43191c",
+    "commit": "184cb1c3887d54e785cacd162708131311535550",
+    "frozen_at": "2026-11-15T04:46:39Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "checkpoint": "User-selected exact GitHub head read via connected API; receipt freshness<=60sec, exact local head equality, clean committed source; no S3 or shell Git authentication fallback",
+    "canonical_tool_commit": "0ca36c9d5b49f2fcba56f79a51456a715b7aae5e",
+    "canonical_current_main": "VLT1-encrypted; last public pre-encryption checker pinned explicitly",
+    "engineering_calibration_commit": "aa66bd7e8aab994e53598072d3bd1582b64f93d5",
+    "engineering_data_seen": "One fixed point, two runs and ten controls; full data not executed",
+    "native_source_pins": {
+      "schema": "twist.trace-fiber-engineering-pins/v1",
+      "repository_files": {
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/producer/src/main.rs": "43c4d41c252a41ee709234496cecfa0e6623e8a40b61f5782a911c1121c93b55",
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/auditor.cpp": "e0d43c621bff63e636a51668adee800f810228fb7abc6da659b3da3d20c2e32b",
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/CONTRACT.json": "faa94f83f0f50e3c90ce02a4b5887f17c0a6b5ab7a5ce8a29df2fe11982eea2a",
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/producer/Cargo.toml": "f439090f9d8607c54a7f42304c0098efd7e9c43875a579e8a35cd92b5be021b4",
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/producer/Cargo.lock": "52e3f70f603e44e8c8f3ad4ad83a7625efce313c984dca2d0f6bc1df70b8186f",
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/run-fixed.sh": "d7b7290642dd2f82168e676695d7a8f27bb1c896c2c40bec4e408314cda1a99e",
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/ENGINEERING_INPUTS.json": "77ec8936a6ef504ddd5dc1d3c82a4ae6853aa1a927079e24efc9e4f029a0afb8",
+        "research/quadratic_twist_chord_proof_20261105/native-preflight-20261113/ENGINEERING_PROTOCOL.md": "0d1dd79350f902c22352ae9ec5a545e08dd53e7deefbcb72407ec6a9b81d0d75"
+      },
+      "binaries": {
+        "producer": "7f83e7b0170da8c74655f8a28a995f570e7fcf8814d410974185858f07e44a39",
+        "auditor": "59471bb4ac08b526bb2d9293acace73afa895e171cc908980b742a9a6ce58779"
+      },
+      "scientific_execution_before_freeze": false,
+      "scope": "fixed",
+      "native_stage_cap_seconds": 600,
+      "outer_cap_seconds": 3600
+    },
+    "modes": [
+      "wrong-d",
+      "wrong-target",
+      "missing-tangent",
+      "duplicate-record",
+      "wrong-inverse",
+      "missing-attempt",
+      "false-root",
+      "missing-case",
+      "source-pin",
+      "spurious-infinity"
+    ],
+    "original_source_target_count": 18
+  }
+}

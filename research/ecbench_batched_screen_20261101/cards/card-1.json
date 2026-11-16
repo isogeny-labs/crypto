@@ -1,0 +1,1194 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-ecbench-batched-screen-20261101-1",
+  "experiment_id": "ecbench_batched_screen_20261101",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "receipt": "research/ecbench_batched_screen_20261101/cards/card-1.receipt.json",
+  "binds": [
+    {
+      "path": "research/ecbench_batched_screen_20261101/PROTOCOL.md",
+      "sha256": "8ebef70f8d11937cc1b46360c8ddd12bead7109cff7c6d8bc81ec0dcdb42eae7"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/run.sh",
+      "sha256": "f51785fff046ba4cd7ef13e599cedbc623335e93f412f93128a1fc0380934721"
+    },
+    {
+      "path": "scripts/checkpoint.sh",
+      "sha256": "6fc6b9311461111ecf55cdb70ae4dd52a408d0b0bf6b44fbe1177788756c12e8"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/specs/n13a0.json",
+      "sha256": "6aead47e62927837a60ee048558f87608afdcde3382128c401bc0ac05d7483c4"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/specs/n17a1.json",
+      "sha256": "6fd12efde32a191d1cd9c8da3d4223630317c47aa05a61ae6bda00dde87bcb61"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/specs/n19a0.json",
+      "sha256": "5e8e647b97779f40d8636cfd134e62dfa5ea048aa5805f6ddd77ac924d0c554f"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/specs/n23a0.json",
+      "sha256": "37504b151ae9aca2bea74cfdc733ef135559929d569a99c971cd4f7a9c562e94"
+    },
+    {
+      "path": "./target/release/ecbench",
+      "sha256": "447a6d3c4842b5dadb5c1601e9648cda5cc08c41668bfd87741e6fc369bc24c0"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+      "sha256": "291636a40d601d13c28f039e7329850a9476f1d0262d4ccbb766e9df3200d8eb"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+      "sha256": "1f3a5436d7af66748fbd55b59618416cbaab4493faf145f78ffeb40aa96b092f"
+    },
+    {
+      "path": "research/ecbench_batched_screen_20261101/cards/list_outputs.py",
+      "sha256": "5aab408e665a5a4c237b78928951ade41d198d69f7e5908065100cb1ee289fce"
+    }
+  ],
+  "must_not_exist": [
+    "research/ecbench_batched_screen_20261101/sessions",
+    "research/ecbench_batched_screen_20261101/audits",
+    "research/ecbench_batched_screen_20261101/tables",
+    "research/ecbench_batched_screen_20261101/comparisons"
+  ],
+  "commands": [
+    {
+      "id": "checkpoint-gate",
+      "argv": [
+        "bash",
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/cards/card-1.checkpoint-gate.stdout",
+      "stderr": "research/ecbench_batched_screen_20261101/cards/card-1.checkpoint-gate.stderr"
+    },
+    {
+      "id": "record-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/cards/card-1.head.stdout"
+    },
+    {
+      "id": "record-status",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/cards/card-1.git-status.stdout"
+    },
+    {
+      "id": "record-disk-start",
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/cards/card-1.disk-start.stdout"
+    },
+    {
+      "id": "record-host",
+      "argv": [
+        "./target/release/ecbench",
+        "host"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/cards/card-1.host.stdout"
+    },
+    {
+      "id": "run-n13a0",
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n13a0.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/sessions/n13a0.run.stdout",
+      "stderr": "research/ecbench_batched_screen_20261101/sessions/n13a0.run.stderr",
+      "outputs": [
+        "research/ecbench_batched_screen_20261101/sessions/n13a0/session.json",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0/records.jsonl"
+      ]
+    },
+    {
+      "id": "verify-n13a0",
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--replay-all"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n13a0.verify.txt",
+      "stderr": "research/ecbench_batched_screen_20261101/audits/n13a0.verify.stderr.txt"
+    },
+    {
+      "id": "audit-gate-n13a0",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n13a0.verify.txt"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n13a0.gate.txt"
+    },
+    {
+      "id": "table-n13a0",
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/tables/n13a0.table.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b1",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b1.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b2",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b2.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b4",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b4.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b8",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b8.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b16",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b16.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b32",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b32.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b128",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b128.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b256",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b256.txt"
+    },
+    {
+      "id": "compare-n13a0-ic-b64-aa",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/ic-b64-aa.txt"
+    },
+    {
+      "id": "aa-gate-n13a0",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n13a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n13a0/aa-gate.txt"
+    },
+    {
+      "id": "run-n17a1",
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n17a1.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/sessions/n17a1.run.stdout",
+      "stderr": "research/ecbench_batched_screen_20261101/sessions/n17a1.run.stderr",
+      "outputs": [
+        "research/ecbench_batched_screen_20261101/sessions/n17a1/session.json",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1/records.jsonl"
+      ]
+    },
+    {
+      "id": "verify-n17a1",
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--replay-all"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n17a1.verify.txt",
+      "stderr": "research/ecbench_batched_screen_20261101/audits/n17a1.verify.stderr.txt"
+    },
+    {
+      "id": "audit-gate-n17a1",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n17a1.verify.txt"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n17a1.gate.txt"
+    },
+    {
+      "id": "table-n17a1",
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/tables/n17a1.table.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b1",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b1.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b2",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b2.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b4",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b4.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b8",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b8.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b16",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b16.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b32",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b32.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b128",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b128.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b256",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b256.txt"
+    },
+    {
+      "id": "compare-n17a1-ic-b64-aa",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/ic-b64-aa.txt"
+    },
+    {
+      "id": "aa-gate-n17a1",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n17a1/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n17a1/aa-gate.txt"
+    },
+    {
+      "id": "run-n19a0",
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n19a0.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/sessions/n19a0.run.stdout",
+      "stderr": "research/ecbench_batched_screen_20261101/sessions/n19a0.run.stderr",
+      "outputs": [
+        "research/ecbench_batched_screen_20261101/sessions/n19a0/session.json",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0/records.jsonl"
+      ]
+    },
+    {
+      "id": "verify-n19a0",
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--replay-all"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n19a0.verify.txt",
+      "stderr": "research/ecbench_batched_screen_20261101/audits/n19a0.verify.stderr.txt"
+    },
+    {
+      "id": "audit-gate-n19a0",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n19a0.verify.txt"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n19a0.gate.txt"
+    },
+    {
+      "id": "table-n19a0",
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/tables/n19a0.table.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b1",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b1.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b2",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b2.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b4",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b4.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b8",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b8.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b16",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b16.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b32",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b32.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b128",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b128.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b256",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b256.txt"
+    },
+    {
+      "id": "compare-n19a0-ic-b64-aa",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/ic-b64-aa.txt"
+    },
+    {
+      "id": "aa-gate-n19a0",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n19a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n19a0/aa-gate.txt"
+    },
+    {
+      "id": "run-n23a0",
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_batched_screen_20261101/specs/n23a0.json",
+        "--out",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--settle",
+        "1",
+        "--quiet"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/sessions/n23a0.run.stdout",
+      "stderr": "research/ecbench_batched_screen_20261101/sessions/n23a0.run.stderr",
+      "outputs": [
+        "research/ecbench_batched_screen_20261101/sessions/n23a0/session.json",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0/records.jsonl"
+      ]
+    },
+    {
+      "id": "verify-n23a0",
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--replay-all"
+      ],
+      "timeout_seconds": 21600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n23a0.verify.txt",
+      "stderr": "research/ecbench_batched_screen_20261101/audits/n23a0.verify.stderr.txt"
+    },
+    {
+      "id": "audit-gate-n23a0",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/audit_gate.py",
+        "research/ecbench_batched_screen_20261101/audits/n23a0.verify.txt"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/audits/n23a0.gate.txt"
+    },
+    {
+      "id": "table-n23a0",
+      "argv": [
+        "./target/release/ecbench",
+        "table",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/tables/n23a0.table.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b1",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b1",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b1.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b2",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b2",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b2.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b4",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b4",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b4.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b8",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b8",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b8.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b16",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b16",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b16.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b32",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b32",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b32.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b128",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b128",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b128.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b256",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b256",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b256.txt"
+    },
+    {
+      "id": "compare-n23a0-ic-b64-aa",
+      "argv": [
+        "./target/release/ecbench",
+        "compare",
+        "--dir",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0",
+        "--a",
+        "ic-b64",
+        "--b",
+        "ic-b64-aa",
+        "--save"
+      ],
+      "timeout_seconds": 600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/ic-b64-aa.txt"
+    },
+    {
+      "id": "aa-gate-n23a0",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/aa_gate.py",
+        "research/ecbench_batched_screen_20261101/sessions/n23a0/comparisons/ic-b64__ic-b64-aa.json"
+      ],
+      "timeout_seconds": 120,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/comparisons/n23a0/aa-gate.txt"
+    },
+    {
+      "id": "record-disk-end",
+      "argv": [
+        "df",
+        "-h",
+        "/"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/cards/card-1.disk-end.stdout"
+    },
+    {
+      "id": "list-outputs",
+      "argv": [
+        "python3",
+        "research/ecbench_batched_screen_20261101/cards/list_outputs.py",
+        "research/ecbench_batched_screen_20261101",
+        "n13a0",
+        "n17a1",
+        "n19a0",
+        "n23a0"
+      ],
+      "timeout_seconds": 300,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/ecbench_batched_screen_20261101/cards/card-1.final-listing.stdout"
+    }
+  ],
+  "bus_address": "executor-mechanical-ecbench-batched-screen-1",
+  "background": true,
+  "write_scope": [
+    "research/ecbench_batched_screen_20261101/sessions/",
+    "research/ecbench_batched_screen_20261101/audits/",
+    "research/ecbench_batched_screen_20261101/tables/",
+    "research/ecbench_batched_screen_20261101/comparisons/",
+    "research/ecbench_batched_screen_20261101/cards/"
+  ],
+  "stop_when": [
+    "Any command in the card exits with a status other than 0, or times out.",
+    "The checkpoint-gate command (bash scripts/checkpoint.sh gate) exits with a status other than 0; nothing after it runs.",
+    "A verify command (ecbench verify --replay-all) exits with a status other than 0, meaning the session did not verify.",
+    "An audit-gate command prints the line AUDIT-GATE FAILED, meaning a record is not VERIFIED, a replay did not reproduce, or the session status is not complete.",
+    "An aa-gate command prints the line AA-GATE FAILED, meaning the A/A ratio of ic-b64-aa to ic-b64 in counted GAE is outside 0.999 to 1.001.",
+    "The tool refuses to start because a must_not_exist path already exists, a bound file digest differs, or a receipt already exists.",
+    "On any stop: report the printed text verbatim, retry nothing, rerun nothing, delete nothing and edit nothing."
+  ],
+  "notes": "Local L0 counted-unit development screen under research/ecbench_batched_screen_20261101/PROTOCOL.md. The tool runs the commands; you run none of them yourself."
+}

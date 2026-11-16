@@ -1,0 +1,145 @@
+{
+  "schema": "crypto.ic-line-layout-terminal-observation/v1",
+  "recorded_utc": "2026-11-01T01:51:15Z",
+  "claim_status": "inconclusive",
+  "speedup_established": false,
+  "source": {
+    "implementation_pr": "https://github.com/isogeny-labs/crypto/pull/3116",
+    "implementation_head": "2542abc3a4dd371f2a40ccda1540d15325586827",
+    "merge_commit": "b4d751706eb2244314ebc9b84ba9545485ba4ac7",
+    "ecbench_sha256": "0784fe47212d64dd2ee81510d3c28d2f604782086500135a3114c61738f854b7",
+    "protocol_sha256": "a770471ff7aeac2c69f0292934a1d85fdf00ed66bc752741c2d2cb6a4b9895e6",
+    "analysis_sha256": "1856d6285f8b5949247dc34ffb222bb00335dbfb728eaca4a95458abef9ffe2d"
+  },
+  "admitted_trials": [
+    {
+      "workflow_run": 41260778029,
+      "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/41260778029",
+      "workflow_conclusion": "failure",
+      "contracts": "success",
+      "build": "success",
+      "experiment": "failure",
+      "job_name": "gh-41260778029-1",
+      "job_uid": "09392132-5307-4557-bf4c-4cda79e9aaa5",
+      "launcher_id": "ceff664e-b91d-4cd8-8a86-cbe8faa98083",
+      "request_sha256": "3732f132b4b04e600270af891435633872358cc3c77890f7aa7729855dd53bcc",
+      "image_digest": "sha256:e6513c540b963718cfcac112da17d4b318518e2c8e84a451279ba06a18def945",
+      "remote_result_exit_code": 23,
+      "github_step_exit_code": 26,
+      "launcher_state": "failed",
+      "pod_uid": null,
+      "results_uri": null,
+      "receipt_scope": "GitHub log exposes the terminal launcher receipt; detailed status, pod logs and object inventory remain in the private launcher prefix"
+    },
+    {
+      "workflow_run": 41260778856,
+      "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/41260778856",
+      "workflow_conclusion": "failure",
+      "contracts": "success",
+      "build": "success",
+      "experiment": "failure",
+      "job_name": "gh-41260778856-1",
+      "job_uid": "f786770c-3cc3-4cb2-9b0c-e486d621ab95",
+      "launcher_id": "47bce409-b8ea-4c00-8660-c0bc989ecb02",
+      "request_sha256": "0fc352b643f362f84fdc69c7d1062a1502dd228ae25b435ad72879c6b254ef55",
+      "image_digest": "sha256:41f07ec4523fb3de3c9a0d72b2f6290d977fcc002cddf046736fb2b6170e6f53",
+      "remote_result_exit_code": 23,
+      "github_step_exit_code": 26,
+      "launcher_state": "failed",
+      "pod_uid": null,
+      "results_uri": null,
+      "receipt_scope": "GitHub log exposes the terminal launcher receipt; detailed status, pod logs and object inventory remain in the private launcher prefix"
+    }
+  ],
+  "stopping_rule": {
+    "planned_trials": 2,
+    "completed_terminal_trials": 2,
+    "scientific_retries": 0,
+    "additional_trials_authorized": false,
+    "outcome": "The preregistered evidence version is inconclusive; no retry or alternate candidate was launched after observing failure."
+  },
+  "diagnostic_retrieval": {
+    "workflow": ".github/workflows/isolab-failure-diagnosis.yml",
+    "status": "classified_status_only",
+    "attempts": [
+      {
+        "workflow_run": 41266993333,
+        "workflow_source_merge": "0b915934de7f57b814507bfe32208175b4fd3a94",
+        "workflow_conclusion": "failure",
+        "diagnosis_artifacts_published": false,
+        "observed_access_boundary": "The main-branch OIDC role read the four fixed launcher receipts but payload-object reads returned 403 for both trials.",
+        "reader_fault": "A failed payload copy was incorrectly treated as success, leading to verification of a nonexistent SHA256SUMS file."
+      },
+      {
+        "workflow_run": 41267915424,
+        "workflow_source_merge": "15b58954b965a44b24a80f8b493e945d91076803",
+        "workflow_conclusion": "success",
+        "diagnosis_artifacts_published": true,
+        "artifact_ids": [
+          13068226703,
+          13067928403
+        ]
+      }
+    ],
+    "observed_access_boundary": "The main-branch OIDC role read the four fixed launcher receipts but payload-object reads returned 403 for both trials.",
+    "evidence_level": "Identity-checked Kubernetes status; payload objects were unreadable and their manifests were not verified.",
+    "diagnoses": [
+      {
+        "workflow_run": 41260778029,
+        "artifact_id": 13068226703,
+        "diagnosis_sha256": "b7ad66afe068cf639c89072d7544f65247a3ae0bee79b5f6a2cedbbd378a549c",
+        "object_count": 19,
+        "pod_uid": "458712fd-1251-4d62-b943-b35f44a51e44",
+        "classification": "l2_isolation_gate",
+        "exit_code": 42,
+        "exit_source": "kubernetes_status",
+        "artifact_access": "payload_read_unavailable",
+        "manifest_verified": false
+      },
+      {
+        "workflow_run": 41260778856,
+        "artifact_id": 13067928403,
+        "diagnosis_sha256": "9b20277fbfc01f6b7e6e089dc98f84e9452e5a70df3015360282241b4fb49d01",
+        "object_count": 19,
+        "pod_uid": "bfe971ea-45d0-4f50-a851-8afbd61f61f6",
+        "classification": "l2_isolation_gate",
+        "exit_code": 42,
+        "exit_source": "kubernetes_status",
+        "artifact_access": "payload_read_unavailable",
+        "manifest_verified": false
+      }
+    ],
+    "fixed_workflow_runs": [
+      41260778029,
+      41260778856
+    ],
+    "experiment_retry": false,
+    "raw_measurements_published": false,
+    "required_checks": [
+      "launcher request/result identity",
+      "source and native binary identity",
+      "per-file SHA256SUMS when payload objects are readable",
+      "allowlisted diagnosis only"
+    ]
+  },
+  "excluded_local_diagnostic": {
+    "admitted": false,
+    "reason": "The workspace lacks PSI evidence and every execution graded L0; --allow-busy was used only to exercise deterministic correctness.",
+    "binary_source": "GitHub Actions artifact 13064949140 from workflow run 41260778856",
+    "binary_sha256_verified": true,
+    "session_id": "ECBS1hc54caaca2652",
+    "planned_executions": 360,
+    "verified_executions": 360,
+    "audit_ok": true,
+    "replay_candidates": 320,
+    "replays_reproduced": 320,
+    "aa_ops_ratio": 1.0,
+    "candidate_ops_ratio": 1.0,
+    "candidate_wall_status": "descriptive",
+    "candidate_wall_ratio": 1.1344577199969281,
+    "candidate_wall_median_ratio": 1.0495412326452398,
+    "interpretation": "Correctness and replay passed. L0 wall observations are not performance evidence and do not establish a regression or speedup."
+  },
+  "required_followup": "An authorized operator must provide narrowly scoped access to the retained SHA256SUMS and l2-gate.json files, or independently qualify the L2 infrastructure, to identify the exact failed L2 predicate. A new evidence version and new preregistration are required before any further scientific trials.",
+  "claim_boundary": "Relation-yield pruning instrumentation from PR #3091 is merged separately. Neither PR #3091 nor this terminal observation establishes an end-to-end ECDLP index-calculus speedup."
+}

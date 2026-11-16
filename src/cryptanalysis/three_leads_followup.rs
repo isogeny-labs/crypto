@@ -196,6 +196,20 @@ pub fn solve_genus2_target_rank(
     solve_genus2_with_chart(inst, target, seed, candidate_cap, true, true)
 }
 
+/// Fallible diagnostic observer. Values are source observations, not independently
+/// verified geometric relations or authenticated source/custody records.
+pub type SignedObserver<'a> = dyn FnMut(serde_json::Value) -> Result<(), String> + 'a;
+
+fn observe_signed(
+    observer: &mut Option<&mut SignedObserver<'_>>,
+    event: impl FnOnce() -> serde_json::Value,
+) -> Result<(), String> {
+    if let Some(sink) = observer.as_deref_mut() {
+        sink(event())?;
+    }
+    Ok(())
+}
+
 fn solve_genus2_with_chart(
     inst: &StudyInstance,
     target: Point,
@@ -204,6 +218,31 @@ fn solve_genus2_with_chart(
     projective: bool,
     rank_policy: bool,
 ) -> Outcome {
+    solve_genus2_observed(
+        inst,
+        target,
+        seed,
+        candidate_cap,
+        projective,
+        rank_policy,
+        None,
+    )
+    .expect("absent observer cannot fail")
+}
+
+/// Diagnostic entry point for the existing two-choice collector. No offline rank
+/// work is performed here. Callback allocation/serialization is unpriced; this
+/// interface is not a matched-cost performance observation. A callback error
+/// returns immediately; any retained stream is incomplete.
+pub fn solve_genus2_observed(
+    inst: &StudyInstance,
+    target: Point,
+    seed: u64,
+    candidate_cap: u64,
+    projective: bool,
+    rank_policy: bool,
+    mut observer: Option<&mut SignedObserver<'_>>,
+) -> Result<Outcome, String> {
     assert_eq!(inst.family, "scholten");
     assert!(inst.curve.valid(target));
     let s = Scholten::new(inst.curve.f.p);
@@ -218,6 +257,18 @@ fn solve_genus2_with_chart(
     let q = s.tau(s.from_short(target));
     assert_ne!(p, Divisor::O);
     assert_ne!(q, Divisor::O);
+    observe_signed(&mut observer, || {
+        json!({
+            "kind":"header", "schema":"signed-collector-events/v1",
+            "convention":"su_xu_plus_sv_xv_eq_a_plus_bk", "zero_node":0,
+            "p":inst.curve.f.p,"r":inst.r,"order":inst.order,"cofactor":inst.h,
+            "source_field":inst.curve.f,"source_binary":inst.curve.binary,
+            "source_coefficients":inst.curve.c,"generator":inst.generator,"target":target,
+            "transferred_generator":p,"transferred_target":q,"polynomial":s.j.polynomial,
+            "seed":seed,"candidate_cap":candidate_cap,"projective":projective,"rank_policy":rank_policy,
+            "geometric_relations_independently_verified":false
+        })
+    })?;
     phases.push(NativePhase {
         name: "transfer".into(),
         counts: counts() - previous,
@@ -260,6 +311,7 @@ fn solve_genus2_with_chart(
     components.node();
     let mut nodes = BTreeMap::new();
     let mut seen = BTreeSet::new();
+    let mut first_events = observer.is_some().then(BTreeMap::new);
     let mut walk_seen = HashSet::new();
     let (mut attempts, mut continuations, mut split, mut duplicates, mut probes, mut restarts) =
         (0, 0, 0, 0, 0, 0);
@@ -277,6 +329,10 @@ fn solve_genus2_with_chart(
             a = uniform(&mut rng, inst.r, &mut draws);
             b = uniform(&mut rng, inst.r, &mut draws);
             d = add(mul(p, a), mul(q, b));
+            observe_signed(
+                &mut observer,
+                || json!({"kind":"restart","reason":"walk_duplicate","continuation":continuations,"after_attempt":attempts,"divisor":d,"a":a,"b":b}),
+            )?;
         }
         max_walk_capacity = max_walk_capacity.max(walk_seen.capacity());
         let key =
@@ -296,13 +352,25 @@ fn solve_genus2_with_chart(
             let nd = add(d, jump.0);
             let na = ring.add(a, jump.1);
             let nb = ring.add(b, jump.2);
+            observe_signed(
+                &mut observer,
+                || json!({"kind":"candidate","attempt":attempts,"continuation":continuations,"jump_index":index,"divisor":nd,"a":na,"b":nb}),
+            )?;
             let mut priority = (false, 0usize);
             let mut repeated = false;
             if nd.degree == 0 {
                 if nb != 0 {
                     recovered = Some(ring.mul(ring.neg(na), ring.inv(nb)));
+                    observe_signed(
+                        &mut observer,
+                        || json!({"kind":"identity","attempt":attempts,"recovered":recovered}),
+                    )?;
                     break 'walk;
                 }
+                observe_signed(
+                    &mut observer,
+                    || json!({"kind":"identity","attempt":attempts,"recovered":null}),
+                )?;
             } else {
                 let f = &s.j.f;
                 let roots = if nd.degree == 1 {
@@ -323,18 +391,32 @@ fn solve_genus2_with_chart(
                     if !seen.insert(canonical) {
                         duplicates += 1;
                         repeated = true;
+                        observe_signed(
+                            &mut observer,
+                            || json!({"kind":"duplicate","attempt":attempts,"canonical":canonical,"first_attempt":first_events.as_ref().and_then(|m| m.get(&canonical)).copied()}),
+                        )?;
                     } else {
+                        if let Some(first) = &mut first_events {
+                            first.insert(canonical, attempts);
+                        }
                         let mut edge = vec![];
                         for x in roots {
                             let y = evaluate(f, &nd.v[..nd.degree], x);
                             assert_eq!(f.sq(y), evaluate(f, &s.j.polynomial, x));
                             probes += 1;
+                            let new_node = observer.is_some() && !nodes.contains_key(&x);
                             let node = *nodes.entry(x).or_insert_with(|| {
                                 if !rank_policy {
                                     components.node();
                                 }
                                 graph.node()
                             });
+                            if new_node {
+                                observe_signed(
+                                    &mut observer,
+                                    || json!({"kind":"node","attempt":attempts,"x":x,"node":node}),
+                                )?;
+                            }
                             edge.push((node, if y <= f.p / 2 { 1 } else { -1 }));
                         }
                         if edge.len() == 1 {
@@ -352,6 +434,10 @@ fn solve_genus2_with_chart(
                         }
                         let cycles = graph.cycles;
                         recovered = graph.edge(edge[0].0, edge[0].1, edge[1].0, edge[1].1, na, nb);
+                        observe_signed(
+                            &mut observer,
+                            || json!({"kind":"edge","attempt":attempts,"nodes":[edge[0].0,edge[1].0],"signs":[edge[0].1,edge[1].1],"a":na,"b":nb,"canonical":canonical,"node_count":graph.nodes(),"rank_score":if rank_policy {Some(priority.1)} else {None},"recovered":recovered,"cycles":graph.cycles,"negative_cycles":graph.negative_cycles,"zero_coefficient":graph.zero_coefficient}),
+                        )?;
                         if !rank_policy {
                             components.join(edge[0].0, edge[1].0);
                         }
@@ -362,16 +448,25 @@ fn solve_genus2_with_chart(
                             break 'walk;
                         }
                     }
+                } else {
+                    observe_signed(
+                        &mut observer,
+                        || json!({"kind":"nonsplit","attempt":attempts}),
+                    )?;
                 }
             }
             if best
                 .as_ref()
-                .is_none_or(|(score, _, _, _, _)| priority > *score)
+                .is_none_or(|(score, _, _, _, _, _)| priority > *score)
             {
-                best = Some((priority, nd, na, nb, repeated));
+                best = Some((priority, nd, na, nb, repeated, attempts));
             }
         }
-        if let Some((_, next, na, nb, repeated)) = best {
+        if let Some((_, next, na, nb, repeated, selected_attempt)) = best {
+            observe_signed(
+                &mut observer,
+                || json!({"kind":"choice","continuation":continuations,"selected_attempt":selected_attempt,"repeated":repeated}),
+            )?;
             d = next;
             a = na;
             b = nb;
@@ -381,6 +476,10 @@ fn solve_genus2_with_chart(
                 a = uniform(&mut rng, inst.r, &mut draws);
                 b = uniform(&mut rng, inst.r, &mut draws);
                 d = add(mul(p, a), mul(q, b));
+                observe_signed(
+                    &mut observer,
+                    || json!({"kind":"restart","reason":"chosen_duplicate","continuation":continuations,"after_attempt":attempts,"divisor":d,"a":a,"b":b}),
+                )?;
             }
         }
     }
@@ -444,14 +543,18 @@ fn solve_genus2_with_chart(
         detail["rank_score_definition"] =
             json!("0=target_free,1=target_bearing_merge,2=target_bearing_anchor,3=target_equation");
     }
-    Outcome {
+    observe_signed(
+        &mut observer,
+        || json!({"kind":"terminal","attempts":attempts,"continuations":continuations,"split_relations":split,"duplicates":duplicates,"node_count":graph.nodes(),"recovered":recovered,"exhausted":recovered.is_none(),"source_verified":false}),
+    )?;
+    Ok(Outcome {
         recovered,
         exhausted: recovered.is_none(),
         phases,
         counts: counts(),
         native,
         detail,
-    }
+    })
 }
 
 #[cfg(test)]

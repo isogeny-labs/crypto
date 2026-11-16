@@ -1,0 +1,732 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "CRYPTO-ic-lead-queue-B1-prime-ic-n-ext-20261114",
+  "version": 1,
+  "created": "2026-11-14",
+  "repository": "crypto",
+  "study_dir": "research/ic_lead_queue_20261114/B_sweep_followups/B1",
+  "authors": [
+    "Track B sweep follow-ups (desk and design)"
+  ],
+  "links": {
+    "lead": "crypto-autoresearcher:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-prime-ic-constant-engineering.yaml",
+    "narrative": "research/ic_lead_queue_20261114/B_sweep_followups/B1/PROTOCOL.md",
+    "prior": "research/prime_base_oracle_tuning_20261029"
+  },
+  "question": "On two fresh 20-bit prime-order curves, does any factor-base size N in {56, 64, 80, 91} give a lower charged S than N = 45 for the pair-table IC oracle at all three section 5a weights (w = 0, 0.1, 1)?",
+  "claims": [
+    {
+      "id": "K1",
+      "text": "Every counted run recovers its planted or public target and replays identically.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "K2",
+      "text": "For at least one N in {56, 64, 80, 91}, S(N) / S(45) has an upper 95% interval end below 1 at w = 0, 0.1 and 1 and a per-curve ratio below 1 on both curves.",
+      "class": "comparative",
+      "decided_by": [
+        "C-NEXT"
+      ],
+      "if_supported": "a gain candidate for the 20-bit baseline, to be re-measured on further fresh curves and replayed on a second host before any gain claim",
+      "if_not_supported": "relabelling or null: N = 45 stays the 20-bit baseline"
+    },
+    {
+      "id": "K3",
+      "text": "Every IC arm is above matched rho (the distance remaining).",
+      "class": "comparative",
+      "decided_by": [
+        "C-GAP"
+      ],
+      "if_supported": "reported as the distance remaining, not as a gate",
+      "if_not_supported": "a parity crossing would be escalated to the breakthrough reviewers"
+    },
+    {
+      "id": "K4",
+      "text": "Nothing here is a security statement about any curve or about ECDLP at cryptographic sizes.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "At least one N in {56, 64, 80, 91} is cheaper than N = 45 in S at every band weight on both fresh curves (rule gain).",
+      "mechanism": "a larger base lowers the trials per relation but adds table work; the optimum depends on the weight of native operations",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "s",
+          "direction": "lower",
+          "minimum_effect": "none predicted: H0 expected. On the train curve S(64)/S(45) = 1.048, 1.015, 0.881 at w = 0, 0.1, 1 (derived from select/band-train-P20.md); the order flips across the band, verdict relabelling for N = 64.",
+          "provenance": {
+            "written_at": "2026-11-14",
+            "first_recorded_in": "research/ic_lead_queue_20261114/B_sweep_followups/B1/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/prime_base_oracle_tuning_20261029/select/band-train-P20.md",
+                "measured": "mitm2 n45 S 10.036 / 11.243 / 22.103 and n64 S 10.519 / 11.413 / 19.464 at w = 0 / 0.1 / 1, one train curve, 8 targets, pre-2026-11-08 pricing"
+              },
+              {
+                "path": "research/prime_base_oracle_tuning_20261029/README.md",
+                "measured": "holdout n45/n32 0.818 [0.773, 0.866], 0.798 [0.752, 0.847], 0.726 [0.677, 0.778] at w = 0, 0.1, 1"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-AA",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "inc-n32",
+      "expected_detection": "S(n45)/S(inc-n32) under --no-price-table-work inside [0.73, 0.90] at w = 0, [0.70, 0.89] at w = 0.1, [0.63, 0.82] at w = 1 with the upper end below 1 (earlier holdout 0.818, 0.798, 0.726)",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "n45-aa",
+      "null_population": {
+        "description": "the same method under its own arm identity (n45-aa against n45, rho-neg-aa against rho-neg): the expected effect is exactly nothing",
+        "generator": "same workloads and algorithm seeds as the paired arm",
+        "n": 1152,
+        "why_n": "one pair per measured workload-round, the same units as the test",
+        "matched_on": [
+          "curves",
+          "targets",
+          "seeds",
+          "session",
+          "pricing"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation on every workload, the matched rho",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "A/A of rho-neg",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "inc-n32",
+      "role": "control_positive",
+      "description": "positive control: the earlier baseline size",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "n45",
+      "role": "baseline",
+      "description": "the validated 20-bit baseline size",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=45",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "n45-aa",
+      "role": "control_negative",
+      "description": "negative control and A/A of n45",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=45",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "n56",
+      "role": "candidate",
+      "description": "size 56",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=56",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "n64",
+      "role": "candidate",
+      "description": "size 64",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=64",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "n80",
+      "role": "candidate",
+      "description": "size 80",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=80",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "n91",
+      "role": "candidate",
+      "description": "size 91",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=91",
+        "oracle": "mitm:negation_folded=1",
+        "max_trials": "1410236"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "analysis_plan": {
+    "script": {
+      "path": "research/ic_lead_queue_20261114/B_sweep_followups/B1/analysis.sh",
+      "sha256": "69628afa6d8efed12cb6ef713344ef0a1cfe1f9b6b59801011ea076e158e4a29"
+    },
+    "inputs": [
+      "session/records.jsonl",
+      "spec.json",
+      "seeds.json"
+    ],
+    "outputs": [
+      "analysis/cmp-*.json",
+      "analysis/g2-*.json",
+      "analysis/g3-*.json",
+      "analysis/band-priced.json",
+      "analysis/band-unpriced.json",
+      "analysis/table.md"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "decision_rule": {
+    "text": "Gates: G1 verify --replay-all with 0 problems; G2 A/A paired counts identical; G3 positive control n45/inc-n32 in range under --no-price-table-work; G4 at least 90% complete pairs, no arm with censored share above 1%. Per N, primary pricing --price-table-work, pooled: gain if the upper 95% end of S(N)/S(n45) is below 1 at w = 0, 0.1, 1 and the per-curve ratio of means is below 1 at all three on both curves; relabelling if some weight has upper end below 1 and some weight has lower end above 1; else null. Overall gain over relabelling over null; any gate failure is inconclusive. See PROTOCOL.md section 9.",
+    "comparison_ids": [
+      "C-NEXT"
+    ],
+    "threshold": "95% interval ends at 1; 4 candidates tested, so a gain is a candidate only",
+    "statistic": "ratio of total cost S(N)/S(n45) over pooled paired workloads, charged at w = 0, 0.1, 1",
+    "interval": "ecbench compare workload-cluster bootstrap, 4,000 resamples, seed 171294647853004",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "ratio and 1 - ratio in percent at each weight; distance to matched rho",
+    "verdict_vocabulary": [
+      "gain",
+      "relabelling",
+      "null",
+      "inconclusive"
+    ]
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab (cpu-l2-spot)",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true,
+      "memory": "4Gi",
+      "job_seconds": 3600
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "extensions": {
+    "crypto": {
+      "spec_sha256": {
+        "B1/spec.json": "d852992e25b5169936d6b0452c1ba531b2631e6424d528e0809866c1dc0ac303"
+      },
+      "seeds_sha256": {
+        "B1/seeds.json": "8a301cb14ebf1c1d619ac0a4e27d4f47d40d8c2fbc962047179571ed8d4ba57e"
+      },
+      "protocol_md_sha256": {
+        "B1/PROTOCOL.md": {
+          "sha256": "d536b92fc5072ba2de4e8f421afeb6b9a1ae2aa696cbcce7e5eb1fcc84af02d8",
+          "bytes": 19533,
+          "note": "the file as it stood before the freeze entry under Amendments was appended; check with head -c bytes"
+        }
+      },
+      "source_revision": "0c2cc1b408e33a43e55ee31cb75307e90df9d619",
+      "image": "publish_only build of source_revision; its digest and the ecbench sha256 are recorded at launch from the build receipt",
+      "bench_record": "benchmarks/records/20261114T1957Z-b1-prime-ic-n-ext-fp20.json",
+      "plan_spec_id": "ECS1h8f29f99dcec4",
+      "curves": "icv1-fp20-t691-5e9cb4d2 and icv1-fp20-tm155-ce03b9ba, drawn by prime_search seeds in seeds.json; registration staged in docs/curves/sources/{specs.txt,generated.json}"
+    }
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "a18877e5c32cfd837001eff8df322721465ec2a58e757811eafee9832d8a9be3",
+    "commit": "a9f62b745f3d2c69fc833d292c440c623832762c",
+    "frozen_at": "2026-11-14T20:00:39Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "changing curves, targets, seeds, the grid, the weights, the pricing readings or the gates after data",
+    "re-running a session because of its result; dropping a curve or workload outside the invalidation rules",
+    "reading a gain without the confirmation on fresh curves and a second-host replay",
+    "any timing claim; any security statement"
+  ],
+  "invalidation_rules": [
+    "a run not verified or not matching its target is excluded and counted per arm; a gate failure voids the reading",
+    "an interrupted session is incomplete and rerun once; wall-clock values are descriptive only"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:research/prime_base_oracle_tuning_20261029/README.md",
+      "provenance": "internal",
+      "claim": "20-bit holdout N 32 to 45 gain 0.818 [0.773, 0.866]; 24 and 28 bits relabelling",
+      "verified_by": "read 2026-11-14"
+    },
+    {
+      "ref": "crypto:docs/ecbench/README.md (table-work pricing)",
+      "provenance": "internal",
+      "claim": "the default since 2026-11-08 prices counted table inserts",
+      "verified_by": "read 2026-11-14"
+    }
+  ],
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "cost.total_gae",
+      "cost.unpriced",
+      "counters.relations_found",
+      "counters.targets_tried",
+      "phases[].native",
+      "work_native.table_insert_attempts"
+    ],
+    "record": [
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "cpu_model",
+      "kernel_release",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "s",
+        "name": "charged S at weight w",
+        "unit": "GAE / sqrt(r)",
+        "kind": "counted",
+        "definition": "(cost.total_gae + w * priced native operations) / sqrt(r), table work priced by default",
+        "source": "records.jsonl cost, work_native",
+        "formula": "ratio of total cost over pooled paired workloads",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "s_unpriced",
+        "name": "S under --no-price-table-work",
+        "unit": "GAE / sqrt(r)",
+        "kind": "counted",
+        "definition": "the pre-2026-11-08 reading",
+        "source": "records.jsonl",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE / sqrt(r)",
+        "uncertainty": "bootstrap_ci95"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        211747386521066,
+        145169970934094,
+        242005234523932,
+        270048475138877,
+        171294647853004
+      ],
+      "nonce": null,
+      "note": "seeds.json: seed(tag) = int(SHA-256(prefix + tag)[0:12 hex], 16), prefix ic_lead_queue_20261114/B1/v1/"
+    },
+    "instance_sampling": {
+      "rule": "two prime_search curves of 20 bits drawn from fixed seeds; 96 public targets per curve",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "counted units, fixed commands, no free analysis parameter",
+      "unmasked_at": null
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "ratio S(N)/S(45) by weight with 95% interval and per-curve points",
+      "distance to matched rho per arm across the band"
+    ],
+    "report_dir": "research/ic_lead_queue_20261114/B_sweep_followups/B1/report"
+  },
+  "sample_size": {
+    "instances": 192,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 4,
+      "correction": "none",
+      "rank_test_n": 4000,
+      "min_attainable_two_sided_p": 0.0005,
+      "passes": true,
+      "note": "precision argument in PROTOCOL.md section 8: about 3% half-width at 192 workloads, scaled from the earlier holdout (48 workloads, 5.7%)"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 300,
+      "per_sample_seconds": 0.005,
+      "threads": 1,
+      "estimated_total_seconds": 360,
+      "measured_on": "development check: 36 records in 3.2 s locally; earlier 20-bit medians 1.7 to 2.5 ms"
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design: one session of spec.json, then the analysis",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "budget: USD 5 including one rerun",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "an interrupted or failed-admission session is kept and rerun once; a second failure stops and is reported",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "factor-base size",
+        "levels": [
+          32,
+          45,
+          56,
+          64,
+          80,
+          91
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "ic.pipeline",
+          "rho.negation"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "ecbench from the publish_only image of 0c2cc1b408",
+        "how": "one binary for every arm"
+      },
+      {
+        "name": "curve",
+        "treatment": "randomized",
+        "how": "two seeds fixed by tag strings"
+      },
+      {
+        "name": "target",
+        "treatment": "randomized",
+        "how": "one target seed"
+      },
+      {
+        "name": "algorithm seed",
+        "treatment": "randomized",
+        "how": "one per workload-round, shared by every arm"
+      },
+      {
+        "name": "arm order",
+        "treatment": "randomized",
+        "value": "alternate",
+        "how": "balanced over six rounds"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "L2 per record; counts do not depend on the host"
+      },
+      {
+        "name": "spot preemption",
+        "treatment": "measured",
+        "how": "an interrupted session is incomplete and rerun once"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "analysis.sh, commands frozen"
+      },
+      {
+        "name": "pricing",
+        "treatment": "crossed",
+        "how": "w = 0, 0.1, 1 and the two table-work readings; primary fixed to --price-table-work"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-NEXT",
+        "arms": [
+          "n56",
+          "n45"
+        ],
+        "differs_in": [
+          "factor-base size"
+        ],
+        "design": "one_factor",
+        "reason": "size is the factor under test; the same comparison is made for n64, n80 and n91 against n45"
+      },
+      {
+        "id": "C-AA",
+        "arms": [
+          "n45-aa",
+          "n45"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "A/A: identical method, expected effect exactly nothing"
+      },
+      {
+        "id": "C-GAP",
+        "arms": [
+          "n45",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "reason": "the distance remaining to matched rho"
+      }
+    ],
+    "crosses_map": true
+  },
+  "amendments": []
+}

@@ -1,0 +1,18 @@
+[package]
+name = "pf-validator"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Independent native validator of XP-20261029-packed-filter (TASK-20261029-654f73); a port of validation/code/*.py that links neither ecbench nor the crypto library"
+
+# Standalone: not a member of the repository's workspace.
+[workspace]
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+sha2 = "0.10"
+
+[profile.release]
+opt-level = 2
+debug = false
+codegen-units = 4

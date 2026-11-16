@@ -1,0 +1,10 @@
+#table(columns: (auto, auto, auto, auto, auto, auto),
+  stroke: 0.4pt, inset: 3pt, align: right,
+  [n], [first solve], [FRESH median], [warm median (orders 1-9)], [warm censored], [distinct x_Q of 10 targets / (r-1)/2],
+  [4], [14679], [11393.5], [0], [0], [7 / 9],
+  [5], [24724], [9856.0], [25], [0], [7 / 14],
+  [6], [351983], [250058.5], [1064], [0], [10 / 35],
+  [7], [301358], [296736.0], [1021], [0], [9 / 65],
+  [8], [4000001 c], [cens], [1033], [0], [10 / 128],
+  [9], [4000000 c], [cens], [640356], [2], [10 / 239],
+)

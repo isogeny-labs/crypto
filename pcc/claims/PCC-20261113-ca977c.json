@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:13:33Z",
+ "id": "PCC-20261113-ca977c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "2650df0cd2dc5fd0769f5ae2324398d6611ab04b82645fde7781028ff45307b5",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+   "theorem": "G3PrimeDescent.conditional_dlp_scalar_transfer"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem conditional_dlp_scalar_transfer {E J : Type} [IntModule E] [IntModule J] (phi : E \u2192 J) (zero : phi 0=0) (addition : \u2200 x y, phi (x+y)=phi x+phi y) (x : E) (k : Nat) : phi (repeatAdd x k)=repeatAdd (phi x) k"
+}
