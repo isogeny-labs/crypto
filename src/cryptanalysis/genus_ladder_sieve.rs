@@ -213,6 +213,9 @@ struct Cand {
     hits: Vec<(u32, i8, u64)>,
     /// `(x, ε)` of the large primes (2-torsion roots dropped).
     lps: Vec<(u32, i8)>,
+    /// Roots whose point has `y = 0` (order 2): their log is 0 modulo the
+    /// odd `r`, so they are left out of the row (kept for the exact check).
+    tors: Vec<u32>,
 }
 
 struct Tables {
@@ -327,8 +330,13 @@ impl Tables {
             i = r.next;
         }
         let mut lps = Vec::new();
+        let mut tors = Vec::new();
         if nl == 0 {
-            return Some(Cand { hits, lps });
+            return Some(Cand {
+                hits,
+                lps,
+                tors: Vec::new(),
+            });
         }
         let tt = pm(p, t, t, n);
         let e1 = ps(p, tt, fam.qg, n);
@@ -367,12 +375,13 @@ impl Tables {
             let ux = horner(p, &fam.u, x, n);
             let y = pa(p, vx, pm(p, t, ux, n), n);
             if y == 0 {
+                tors.push(x as u32);
                 continue; // 2-torsion: log 0 in the odd-order part
             }
             let eps = if y > (p - 1) / 2 { -1i8 } else { 1 };
             lps.push((x as u32, eps));
         }
-        Some(Cand { hits, lps })
+        Some(Cand { hits, lps, tors })
     }
 
     /// The family through `g` base points `(x_i, s_i y_i)`.
@@ -679,6 +688,9 @@ impl<'a> Solver<'a> {
                         continue;
                     }
                     pts.push((u64::from(x), if e > 0 { y } else { p - y }));
+                }
+                for &x in &c.tors {
+                    pts.push((u64::from(x), 0));
                 }
                 let good = ok && self.uncounted(|i| sum_is_identity(i, JDiv::IDENTITY, &pts));
                 if !good {
