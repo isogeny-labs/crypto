@@ -1,0 +1,25 @@
+CMake Warning at CMakeLists.txt:686 (message):
+  Testing is disabled
+
+
+In file included from /tmp/n83-k600-solver.0B0Zg7K6/solver-source/src/signalcode.cpp:25:
+/tmp/n83-k600-solver.0B0Zg7K6/solver-source/src/cryptominisat.h:218:33: warning: declaration of 'wallclock_time_started' shadows a global declaration [-Wshadow]
+  218 |         void print_stats(double wallclock_time_started = 0) const; //print solving stats. Call after solve()/simplify()
+      |                          ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /tmp/n83-k600-solver.0B0Zg7K6/solver-source/src/signalcode.cpp:23:
+/tmp/n83-k600-solver.0B0Zg7K6/solver-source/src/signalcode.h:34:30: note: shadowed declaration is here
+   34 |     extern DLL_PUBLIC double wallclock_time_started;
+      |                              ^~~~~~~~~~~~~~~~~~~~~~
+In file included from /tmp/n83-k600-solver.0B0Zg7K6/solver-source/src/oracle/assump_fuzz_oracle.cpp:15:
+/tmp/n83-k600-solver.0B0Zg7K6/cadical-source/src/cadical.hpp:1314:41: warning: extra ';' after in-class function definition [-Wextra-semi]
+ 1314 |   virtual int cb_decide () { return 0; };
+      |                                         ^
+      |                                         -
+/tmp/n83-k600-solver.0B0Zg7K6/cadical-source/src/cadical.hpp:1323:44: warning: extra ';' after in-class function definition [-Wextra-semi]
+ 1323 |   virtual int cb_propagate () { return 0; };
+      |                                            ^
+      |                                            -
+/tmp/n83-k600-solver.0B0Zg7K6/cadical-source/src/cadical.hpp:1337:4: warning: extra ';' after in-class function definition [-Wextra-semi]
+ 1337 |   };
+      |    ^
+      |    -

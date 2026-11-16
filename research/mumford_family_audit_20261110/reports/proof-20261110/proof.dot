@@ -1,0 +1,17 @@
+digraph GrowingFamily {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", nodesep=0.25, ranksep=0.25];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, fillcolor="#eef3fa", color="#2d4262", margin="0.14,0.09"];
+  edge [color="#53657e", arrowsize=0.7];
+  curve [label="Every t: F3, g=12t+2, n=24t+5, f=X^n+1\nActual monicity, degree 2g+1 and separability"];
+  universe [label="All valid reduced polynomial pairs\nFinite via injective coefficient encoding"];
+  powers [label="Identity plus (X^d, ±1), 1≤d≤g\nn distinct pairs, all smooth", fillcolor="#e6f3e9"];
+  bad [label="Uniform valid nonsmooth pair\n(X²+X+2, X), outside the cycle", fillcolor="#fff2d9"];
+  arithmetic [label="Full gcd / Bézout / composition / remainder certificates\nFive phases of addition by (X,1), at most one reduction\nUnique normalized polynomial output"];
+  cycle [label="Actual step defined by its unique output\nConjugate to increment modulo n\nReturn after j steps iff n divides j", fillcolor="#e6f3e9"];
+  fractions [label="Every t: cycle smooth fraction 1, ambient fraction < 1\nDirect universal cycle-equality negation\nUnbounded genus and exact period", fillcolor="#e6f3e9"];
+  scope [label="91 declarations pass, 0 failing / 0 trusted-native\nAll-pair ambient group law and geometric Picard bridge open\nKnown torsion family; no typical-subgroup asymptotic claim\nLocal proof checking; signed standing unverified", fillcolor="#fce7e7"];
+  curve -> universe; curve -> powers; curve -> bad;
+  powers -> arithmetic; arithmetic -> cycle;
+  universe -> fractions; bad -> fractions; cycle -> fractions;
+  fractions -> scope;
+}

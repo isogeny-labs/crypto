@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T15:03:37Z",
+ "id": "PCC-20261116-ddf303",
+ "kind": "statement",
+ "producer": {
+  "commit": "88bc2ae5439de484d827698858d7444a815a6f10",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/4.34.1.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/4.34.1.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/4.34.1.stdout",
+    "sha256": "c8c9f1e7ae79a8fd0eaf759828dd14428228050e2734cc11985201afda87e297"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/4.35.0.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/4.35.0.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/4.35.0.stdout",
+    "sha256": "c8c9f1e7ae79a8fd0eaf759828dd14428228050e2734cc11985201afda87e297"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/actual-command-and-scope.json",
+    "sha256": "a8c2aecd486eeb0b54fb5d25783089928251b5d69af7a430d8c75a78b039533f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-isolated-shared-power-10/actual-embedding.lean",
+    "sha256": "cbafb9ade68fbee4be54823da534da7d89df025bfbf3424d89debccdd50b7b70"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Isolated canonical coefficient embedding/add/mul/power proof compiles0 on both original Lean4.35/4.34 under20s/j1/default memory, exact shared induction now explicitly rewrites abstract pow_zero then natCast_one and successor laws. Both print only propext/Quot.sound for embed_pow. Whole isolated source/outputs/exits retained. Diagnostic scope only; full new02 dual gates still required, earlier toolchain/zero-case failures unchanged and unaccepted. Next changed whole proof rerun retains all original statements/hypotheses/resources/verifiers."
+}

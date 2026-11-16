@@ -58,7 +58,21 @@ for prime fields each route ends at a named obstruction:
 | multiplicative transports: pairings, self-pairings, distortion maps | `LEAD-TRF-mov-small-embedding-degree` (closed, known), `LEAD-ICP-self-pairing-prime-order`, `LEAD-TRF-one-point-self-pairing` (closed) | a homomorphic image in a multiplicative group factors through the embedding degree `k = ord_r(p)`; no nondegenerate self-pairing on a prime-order subgroup |
 | covers and Jacobians over the same field | `LEAD-TRF-same-field-genus-g-embedding` (closed) | index calculus in a genus-`g` Jacobian over `F_p` costs `p^{2−2/g} ≥ p` for `g ≥ 2` against rho's `p^{1/2}`; the small-genus regime never reaches `L(1/2)` |
 | the isogeny class, volcanoes, endomorphisms | `LEAD-STR-isogeny-class-generic-invariance`, `LEAD-STR-small-cm-disc-nonunit-endo`, `LEAD-STR-endo-scalar-action-generic` (closed) | generic cost is an isogeny-class invariant; automorphisms give `√|Aut|` and nothing beyond |
-| global lifts: xedni, number fields, function fields | `LEAD-ICP-char0-lifting-xedni-smoothness`, `LEAD-TRF-global-lift-small-height` (closed, known); `LEAD-EXO-global-lift-height` (open) | the Q-lift variant is closed by the literature (xedni exponent 3 for the named family); the function-field section timing is the open next step |
+| global lifts: xedni, number fields, function fields | `LEAD-ICP-char0-lifting-xedni-smoothness`, `LEAD-TRF-global-lift-small-height` (closed, known; *superseded 2026-11-11: both are `open_next_step`, see note below*); `LEAD-EXO-global-lift-height` (open) | the Q-lift variant is closed by the literature (xedni exponent 3 for the named family); the function-field section timing is the open next step. *Superseded 2026-11-11: the Q-lift closure is conditional (JKSST audit, header); see note below.* |
+
+> **Status note, 2026-11-11 (rows "global lifts" and candidate 6).** The
+> "closed, known" labels for `LEAD-TRF-global-lift-small-height` and
+> `LEAD-ICP-char0-lifting-xedni-smoothness`, and the sentence "the Q-lift
+> variant is closed by the literature", are the 2026-11-01 snapshot and are
+> left as written. Both leads are now `open_next_step` with
+> `disposition_20261101: closed_known` recorded alongside
+> (`research/prime_field_lead_assessment_20261107/atlas_survey.md` §A1
+> item 11; `research/lead_sweep_20261110/leads.json`), because the JKSST
+> obstruction is conditional (`research/jksst_xedni_audit_20261101/`). The
+> treatise agrees: `papers/ecdlp-index-calculus-treatise/sections/transfer_ext.tex`
+> § `sec:tp-global` and `survey/transfer.md` § 12. `REPORT.typ` and
+> `REPORT.pdf` carry the same superseded sentence and are not regenerated.
+> Every status here is [pcc:unverified]: no pcc claim records it.
 
 Nothing in this table is new; it is the atlas read in one direction. The
 point of writing it down is that the "exotic" candidates below are
@@ -77,7 +91,7 @@ hit, its disposition and the reading (raw output: `data/candidate_matches.json`)
 | 3 | Tate-curve / multiplicative uniformisation transport | `LEAD-TRF-padic-canonical-section` | closed, obstructed | a multiplicative image of the prime-order subgroup factors through the embedding degree; the `p`-adic side lifts torsion to torsion |
 | 4 | quadratic-twist trace map `E(F_p²) → E(F_p)` as a decomposition | `LEAD-TRF-cover-catalog-jacobian-transfer` | open, blocked | the trace map splits `E(F_p²) ≅ E(F_p) ⊕ E'(F_p)` when the orders are coprime; the `F_p` part is the original problem; the catalogued pullbacks are the executable form and are blocked on their constructors |
 | 5 | sum–product / additive-combinatorics structure of `x`-coordinate sets | `LEAD-EXO-dl-character-sum-pseudorandom` | exhausted at scale | character bias on structured bases read as chance at the reachable scale |
-| 6 | special-form primes (Solinas, Mersenne) as algorithmic structure | `LEAD-ICB-nonlinear-frob-stable-bases` | open, next step | a weak match: the form of `p` speeds field arithmetic (engineering) and gives the group no algebraic structure; the SNFS-style lift is `LEAD-TRF-global-lift-small-height` (closed, known) |
+| 6 | special-form primes (Solinas, Mersenne) as algorithmic structure | `LEAD-ICB-nonlinear-frob-stable-bases` | open, next step | a weak match: the form of `p` speeds field arithmetic (engineering) and gives the group no algebraic structure; the SNFS-style lift is `LEAD-TRF-global-lift-small-height` (closed, known; *superseded 2026-11-11: `open_next_step`, see the status note after the routes table in §1*) |
 | 7 | Weil restriction of `E/F_p²` to an abelian surface over `F_p` | `LEAD-ICP-extension-field-embedding` | closed, obstructed | embedding `E(F_p)` into `E(F_{p^n})` buys a subfield factor base for a larger group, not for the original one |
 | 8 | `x`-only Montgomery-ladder walks | `LEAD-EXO-curve-model-representation` | closed, obstructed | models and representations change constants only |
 | 9 | SIMD / vectorised field arithmetic and batched inversion | `LEAD-ICP-prime-ic-constant-engineering` | open, next step | engineering; this session's C-library step change (cryptanalysis PR, `experiments/rho-ec-step-20261101`) is in this lane |

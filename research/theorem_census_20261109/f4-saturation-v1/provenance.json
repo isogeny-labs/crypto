@@ -1,0 +1,44 @@
+{
+  "schema": "f4-saturation-provenance/v1",
+  "created": "2026-11-10T07:18:42.338322+00:00",
+  "msolve_source_commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+  "msolve_binary": {
+    "path": "/workspace/msolve-deps/build/msolve",
+    "sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708"
+  },
+  "reused_build_provenance": {
+    "path": "../../solver_multiplicity_audit_20261109/provenance.json",
+    "sha256": "d741580690ca661dcc4d639c8657e7a28b69ff8b0f7994936f052a7c7c6de6a1"
+  },
+  "analyzer": {
+    "source": "native/analyze.cpp",
+    "source_sha256": "7f670b97d0b4db3df56f7f133410228ab29db3f15dd2576c92e040bf5e9b044b",
+    "import": "../../solver_multiplicity_audit_20261109/native/analyze.cpp",
+    "import_sha256": "5c809337803de22ec66939d6838df18a722db4181c67a8fc8fe96d9a6af7e6d2",
+    "binary_sha256": "b5009874cbbdada2980fa3925962413a5b8f3c0bfcc139f21d7cf01220a38ddf",
+    "build": [
+      "g++",
+      "-std=c++17",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "native/analyze.cpp",
+      "-o",
+      "/workspace/scratch/f4-saturation-analyze"
+    ]
+  },
+  "host": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "hostname": "762f5fc120c9",
+    "isolation": "none; shared local host"
+  },
+  "protocol_tool": {
+    "repository": "aburan28/crypto-autoresearcher",
+    "commit": "005a7d7758844f97980b90c7ccd41b5cdcf9e048",
+    "path": "tools/experiment_protocol.py",
+    "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4"
+  },
+  "paid_spend": 0,
+  "standing": "producer-local only; no independent host or signed execution backend"
+}

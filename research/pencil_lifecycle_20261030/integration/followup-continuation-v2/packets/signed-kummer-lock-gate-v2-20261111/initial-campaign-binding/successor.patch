@@ -1,0 +1,172 @@
+--- a/commands.json
++++ b/commands.json
+@@ -2,7 +2,7 @@
+   "prospective_argv": [
+     "sudo",
+     "systemd-run",
+-    "--unit=pencil-kummer-lock-20261109",
++    "--unit=pencil-kummer-lock-v2-20261111",
+     "--property=User=ec2-user",
+     "--property=CPUQuota=100%",
+     "--property=MemoryMax=2G",
+@@ -13,14 +13,14 @@
+     "--property=KillMode=control-group",
+     "--property=PrivateNetwork=yes",
+     "--property=ProtectSystem=strict",
+-    "--property=ReadWritePaths=/var/tmp/pencil-kummer-lock-20261109",
++    "--property=ReadWritePaths=/var/tmp/pencil-kummer-lock-v2-20261111",
+     "--property=LimitFSIZE=16777216",
+-    "--property=StandardOutput=append:/var/tmp/pencil-kummer-lock-20261109/unit.stdout",
+-    "--property=StandardError=append:/var/tmp/pencil-kummer-lock-20261109/unit.stderr",
++    "--property=StandardOutput=append:/var/tmp/pencil-kummer-lock-v2-20261111/unit.stdout",
++    "--property=StandardError=append:/var/tmp/pencil-kummer-lock-v2-20261111/unit.stderr",
+     "--property=Type=exec",
+     "--property=RemainAfterExit=yes",
+     "/usr/bin/python3",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-amendment-20261109/generate_lock.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v2-20261111/generate_lock.py"
+   ],
+   "status": "not_released",
+   "note": "Concrete launch.py captures ownership, terminal and cgroup cleanup. Native50+5 seconds stays inside60second reservation; caller stops at52 seconds.",
+@@ -30,6 +30,6 @@
+     "--kill-after=1",
+     "59",
+     "/usr/bin/python3",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-amendment-20261109/launch.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v2-20261111/launch.py"
+   ]
+ }
+--- a/generate_lock.py
++++ b/generate_lock.py
+@@ -2,11 +2,11 @@
+ """Prospective, one-shot offline resolution only; no compiler, payload or tests."""
+ import hashlib,json,os,pathlib,subprocess,sys,time,datetime
+ P=pathlib.Path(__file__).resolve().parent
+-W=pathlib.Path('/var/tmp/pencil-kummer-lock-20261109')
++W=pathlib.Path('/var/tmp/pencil-kummer-lock-v2-20261111')
+ start=time.monotonic(); end=start+45
+ sha=lambda b:hashlib.sha256(b).hexdigest()
+ def check():
+- if time.monotonic()>=end:raise TimeoutError('55-second worker deadline')
++ if time.monotonic()>=end:raise TimeoutError('45-second shared resolver deadline')
+ def verified(path,digest):
+  check();p=pathlib.Path(path)
+  if p.is_symlink():raise ValueError('symlink input')
+@@ -16,12 +16,12 @@
+ release=json.loads((P/'release.json').read_text())
+ assert release['released'] is True and release['publication_commit'] and release['publication_readback_sha256']
+ assert release['reserved_worker_seconds']==60 and release['serial_owner_confirmed'] is True
+-assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat('2026-11-10T05:11:39+00:00')-datetime.timedelta(seconds=60)
++assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat(release['absolute_deadline'])-datetime.timedelta(seconds=60)
+ inputs=json.loads(verified(P/'lock-inputs.json',release['inputs_sha256']))
+ verified(__file__,release['worker_sha256'])
+-assert json.loads((W/'caller-owner.json').read_text())['unit']=='pencil-kummer-lock-20261109.service'
++assert json.loads((W/'caller-owner.json').read_text())['unit']=='pencil-kummer-lock-v2-20261111.service'
+ assert set(p.name for p in W.iterdir()) <= {'caller-owner.json','unit.stdout','unit.stderr','launch.stdout','launch.stderr','owner.json'}
+-result={'status':'failed','compile_invoked':False,'network_allowed':False,'lock':None}
++result={'status':'failed','compile_invoked':False,'network_allowed':False,'locks':{},'resolutions':[]}
+ try:
+  immutable=json.loads(verified(inputs['immutable_manifest'],inputs['immutable_manifest_sha256']))['immutable']
+  vendor=pathlib.Path(inputs['registry_vendor']); expected={k:v for k,v in immutable.items() if k.startswith(str(vendor)+'/')}
+@@ -43,16 +43,28 @@
+   dst.write_bytes(verified(row['source'],row['sha256']))
+  home=W/'cargo-home';home.mkdir();(home/'config.toml').write_text('[source.crates-io]\nreplace-with="vendored-sources"\n[source.vendored-sources]\ndirectory='+json.dumps(str(vendor))+'\n[net]\noffline=true\n')
+  env={'PATH':'/usr/bin:/bin','CARGO_HOME':str(home),'CARGO_NET_OFFLINE':'true','RUSTC':str(proxy),'RUSTDOC':'/bin/false','HOME':str(W),'LANG':'C.UTF-8'}
+- argv=[cargo,'generate-lockfile','--offline','--manifest-path',str(W/'source'/inputs['crate']/'Cargo.toml')]
+- result['argv']=argv
+- with (W/'stdout').open('xb') as out,(W/'stderr').open('xb') as err:
+-  run=subprocess.run(argv,env=env,cwd=W,stdout=out,stderr=err,timeout=max(.01,end-time.monotonic()),check=False)
+- result['exit_code']=run.returncode
+- lock=W/'source'/inputs['crate']/'Cargo.lock'
+- if lock.exists():
+-  b=lock.read_bytes();(W/'Cargo.lock').write_bytes(b);result['lock']={'sha256':sha(b),'bytes':len(b),'path':str(W/'Cargo.lock')}
+- if run.returncode!=0:raise RuntimeError('offline resolution failed; retained stderr')
+- assert result['lock'];check();result['status']='generated_pending_publication'
++ assert set(inputs['workspaces'])=={'driver','adapter'}
++ for name in ['driver','adapter']:
++  check()
++  argv=[cargo,'generate-lockfile','--offline','--manifest-path',str(W/'source'/inputs['workspaces'][name]/'Cargo.toml')]
++  step={'workspace':name,'argv':argv};result['resolutions'].append(step)
++  lock=W/'source'/inputs['workspaces'][name]/'Cargo.lock'
++  assert not lock.exists(),'unexpected prior lock'
++  try:
++   with (W/(name+'.stdout')).open('xb') as out,(W/(name+'.stderr')).open('xb') as err:
++    remaining=end-time.monotonic()
++    if remaining<=0:raise TimeoutError('shared resolver budget exhausted')
++    run=subprocess.run(argv,env=env,cwd=W,stdout=out,stderr=err,timeout=remaining,check=False)
++   step['exit_code']=run.returncode
++  finally:
++   if lock.exists():
++    b=lock.read_bytes();saved=W/(name+'.Cargo.lock');saved.write_bytes(b)
++    result['locks'][name]={'sha256':sha(b),'bytes':len(b),'path':str(saved)}
++  if run.returncode!=0:raise RuntimeError('offline resolution failed: '+name)
++  assert name in result['locks'];check()
++ assert set(result['locks'])=={'driver','adapter'}
++ result['status']='generated_pending_publication'
++
+ except BaseException as e:
+  result['error']=type(e).__name__+': '+str(e)
+ finally:
+--- a/launch.py
++++ b/launch.py
+@@ -1,9 +1,10 @@
+ #!/usr/bin/env python3
+-import pathlib,subprocess,json,time,os,hashlib,sys
++import pathlib,subprocess,json,time,os,hashlib,sys,datetime
+ P=pathlib.Path(__file__).resolve().parent
+-W=pathlib.Path('/var/tmp/pencil-kummer-lock-20261109');U='pencil-kummer-lock-20261109.service'
++W=pathlib.Path('/var/tmp/pencil-kummer-lock-v2-20261111');U='pencil-kummer-lock-v2-20261111.service'
+ r=json.loads((P/'release.json').read_text());assert r['released'] is True and r['serial_owner_confirmed'] is True
+ assert r['launcher_sha256']==hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
++assert datetime.datetime.now(datetime.timezone.utc)+datetime.timedelta(seconds=60)<datetime.datetime.fromisoformat(r['absolute_deadline'])
+ W.mkdir(exist_ok=False);(W/'caller-owner.json').write_text(json.dumps({'unit':U,'pid':os.getpid(),'release_sha256':hashlib.sha256((P/'release.json').read_bytes()).hexdigest()}))
+ for name in ['unit.stdout','unit.stderr']:
+  fd=os.open(str(W/name),os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600);os.close(fd)
+@@ -41,4 +42,4 @@
+   if not empty:raise RuntimeError('owned cleanup not verified; no retry')
+ result=json.loads((W/'result.json').read_text())
+ pre=json.loads((W/'pre-stop.json').read_text())
+-sys.exit(0 if result['status']=='generated_pending_publication' and pre.get('Result')=='success' and pre.get('ExecMainStatus')=='0' and pre.get('MainPID')=='0' and terminal.get('owned_cgroup_empty') else 1)
++sys.exit(0 if result['status']=='generated_pending_publication' and set(result['locks'])=={'driver','adapter'} and pre.get('Result')=='success' and pre.get('ExecMainStatus')=='0' and pre.get('MainPID')=='0' and terminal.get('owned_cgroup_empty') else 1)
+--- a/lock-inputs.json
++++ b/lock-inputs.json
+@@ -295,10 +295,20 @@
+       "destination": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/fixture.json",
+       "sha256": "607f7278c579d5b79c3c3a28d0067d5e4a9c6915800eb09bdfe30e9b3e8ef14f",
+       "bytes": 68470
++    },
++    {
++      "source": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-signed-driver-20261109/driver-controls.rs",
++      "destination": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/driver-controls.rs",
++      "sha256": "854c8219f8aaef926b026d3ca101bca6992414b3a666f7a17f505105611b2f9b",
++      "bytes": 9086
+     }
+   ],
+   "original_driver_lock": "absent",
+   "registry_vendor": "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/vendor",
+   "immutable_manifest": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+-  "immutable_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2"
++  "immutable_manifest_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
++  "workspaces": {
++    "driver": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter",
++    "adapter": "research/pencil_large_prime_20261029"
++  }
+ }
+--- a/release-draft.json
++++ b/release-draft.json
+@@ -4,10 +4,11 @@
+   "serial_owner_confirmed": false,
+   "publication_commit": null,
+   "publication_readback_sha256": null,
+-  "inputs_sha256": "b1aff1db9f2433ee4b67c7b6c884bf95fa21b562f7eee1d88680c254cba4abe5",
+-  "worker_sha256": "ae17b73dd2b3cb3b8c18b0c50fa33add57d26cdceeba01571bdebcf497bd802e",
++  "inputs_sha256": "f16a0ffc365bf63ee5b931a157d0ec77eb497ddf0b5f2fbebefdc9a11a96a172",
++  "worker_sha256": "a380b70b8c1b5263477d8c188b40221282c9784e11e0d738a55d4d942c8b5902",
+   "review_sha256": null,
+   "current_ledger_sha256": null,
+-  "launcher_sha256": "c1623b8ab38a97f096a8dee20ae6aaedc67dd1bf6bb8e96e2b4b1ec340ad7c77",
+-  "rustc_proxy_sha256": "3a358ba4a695e85b093472b3cc6b7baf3c2c48edc5b87a1ce565d89390e8747e"
++  "launcher_sha256": "ec748e3234441739e032a9e5451d7a7f0565728293d29b259f5799ec1b952a00",
++  "rustc_proxy_sha256": "3a358ba4a695e85b093472b3cc6b7baf3c2c48edc5b87a1ce565d89390e8747e",
++  "absolute_deadline": null
+ }

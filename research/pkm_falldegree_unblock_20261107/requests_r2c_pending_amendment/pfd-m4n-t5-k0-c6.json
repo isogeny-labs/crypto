@@ -1,0 +1,24 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "pfd-m4n-t5-k0-c6-20261108",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0d6b2ecd6df3f5f092fe4b6179986b041eb7d6be3b94e52d92809bdab2ff3ae8",
+    "command": [
+      "/usr/local/bin/entry_r2.sh",
+      "m4n:5:0:6:13958643712:4000000"
+    ],
+    "cpu": 12,
+    "memory": "112Gi",
+    "seconds": 176400,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "prime_fall_degree",
+    "protocol_sha256": "63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8",
+    "note": "REQUIRES AMENDMENT FREEZE (AMENDMENT_R2_B_m4_null.md): shape-matched null, Kummer m=4 t=5 draw 0 hky-cmax 6, --controls null --null-chain. Run after G3 (pfd-a) and after its Kummer counterpart pfd-m4-t5-k0-c6. Do not launch before the amendment is frozen in PREREGISTRATION.md. Amendment R2-C (AMENDMENT_R2_C_cpu12.md, REQUIRES AMENDMENT FREEZE before launch): cpu 14->12 because a 14-vCPU pod cannot be scheduled on cpu-spot (14180m > 14000m allocatable); RAYON_NUM_THREADS=12 from the pod env; every wall budget and seconds unchanged."
+  }
+}

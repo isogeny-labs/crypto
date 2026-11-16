@@ -815,12 +815,15 @@ validation file.
 $n=83$ refutation is void. Forty-one study directories were added from
 24 October to 1 November. None of them admits a new IC/rho ratio, and none
 is a leaderboard or \texttt{benchmarks/} row. They fall into eight groups
-(Table~\ref{tab:n83l-groups}), which this chapter takes in four parts:
+(Table~\ref{tab:n83l-groups}), which this chapter takes in four parts; a fifth adds the solver gates of 14
+November on the primary curve:
 \begin{itemize}
 \item factor-base selection, index capacity and controls on the pipeline
   curve (\S\ref{sec:n83l-pipeline});
 \item decomposition at $n=83$ after the correction
   (\S\ref{sec:n83l-sat});
+\item bounded solver gates on the primary curve, 14 November
+  (\S\ref{sec:n83l-gates});
 \item certified degree bounds for the descended systems
   (\S\ref{sec:n83l-degree});
 \item the genus-3 image transfer (\S\ref{sec:n83l-genus3}).
@@ -1023,7 +1026,12 @@ Spot instances, a \$4.20 cap) moved from \texttt{us-east-1d}, which failed
 its placement-score gate, to \texttt{us-west-2c}; the README still records
 that the panel has not dispatched or selected a winner
 (\art{research/n83_crossfamily_current_20261025/README.md},
-\art{research/n83_crossfamily_current_20261025/AWS_WEST2_ADDENDUM.md}).
+\art{research/n83_crossfamily_current_20261025/AWS_WEST2_ADDENDUM.md}). On 14 November the owner approved
+moving the native panel to \texttt{us-east-1a} with a replacement security
+group. That day's read-only provider check scored the zone 9 for two units
+but quoted \$0.3968 per instance-hour, above the frozen \$0.27 bid, so no
+allocation was admitted and the panel has still not dispatched
+(\art{research/n83_crossfamily_current_20261025/native/AWS_EAST1A_AMENDMENT_20261114.md}).
 
 \paragraph{The control that did run.} The matched precomputed-rho
 reproduction of 28 October on K1107/root11 found rho faster online in all
@@ -1115,6 +1123,78 @@ decided within the cap. Decomposition stage only, L0 four-vCPU host. Data:
 \art{figures/make_fig_bin_n83chain.py}.}
 \label{fig:bin-n83chain}
 \end{figure}
+
+\section{Solver gates on the primary curve, 14 November}\label{sec:n83l-gates}
+
+On 14 November the factor-base sweep on the primary $a=0$ curve
+(\texttt{icv1-f2m83-tm6151469093347-debefd74}) ran a sequence of bounded
+solver gates on two retained bases: the full D18 direct-subgroup base
+(5{,}418{,}738 points, 32{,}643 folded columns, four summands) and the K2048
+base (339{,}968 points, 2{,}048 signed-Frobenius columns, five summands),
+each in the shared-root chained-$\Sem3$ XCNF encoding. Each gate froze its
+formula hashes before the solver call and ran a constructed positive
+control before any public natural query. All ran CryptoMiniSat 5.14.7 on one
+Darwin arm64 thread of a shared host, seed 20261114, with a host-load gate;
+the times are process-wall observations, not a timing tier
+(Table~\ref{tab:n83l-gates}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.28\linewidth}>{\raggedright}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Gate & Constructed positive & First public natural query \\
+\midrule
+D18, free first pair, cadence 1 & \textsc{indeterminate} at $10^6$ conflicts, $420.708$\,s & withheld by the positive gate \\
+D18, ordered first pair, cadence 32, five Gaussian matrices & \textsc{indeterminate} at $10^6$, $431.66$\,s & withheld \\
+same formula, all Gaussian matrices & SAT, 3{,}879 conflicts, $2.0425$\,s; replay passes & \textsc{indeterminate} at $10^6$, $424.60$\,s \\
+same, VSIDS branching & SAT, 3{,}879 conflicts, $2.037$\,s; replay passes & \textsc{indeterminate} at $10^6$, $428.574$\,s \\
+D18 native worker, cadence 32 (attempt 7) & passes, $50.414$\,s; group and row replay & search cap at $10^5$ conflicts, $161.878$\,s, no relation \\
+K2048, five summands & SAT, 839 conflicts, $0.424$\,s; replay passes & \textsc{indeterminate} at $10^6$, $137.753$\,s \\
+K2048, wide XOR (25{,}000 columns) & SAT, 839 conflicts, $0.311$\,s (second attempt) & \textsc{indeterminate} at $10^6$, $151.862$\,s \\
+K2048, witness pins removed & known model satisfies the formula; search \textsc{indeterminate} at $10^6$, $153.815$\,s & --- \\
+K2048, all summands sorted, pins removed & pinned control SAT, $0.357$\,s; unpinned search \textsc{indeterminate} at $10^6$, $283.605$\,s & gated off \\
+\bottomrule
+\end{tabularx}
+\caption[]{Bounded CryptoMiniSat gates on the primary $n=83$ curve, 14
+November; process wall on a shared Darwin arm64 host. ``Replay passes'':
+the model satisfies every original clause and XOR row and its summands
+re-add to the target in the group. A same-point pair on public fixture 1
+(D18 ordered four-summand against K2048 wide five-summand) ended
+\textsc{indeterminate} at $10^6$ conflicts in both arms ($427.082$ and
+$156.853$\,s). pcc claims, all of standing unverified:
+\texttt{PCC-20261114-bea135}, \texttt{-39d251}, \texttt{-2bd98e},
+\texttt{-d174b0}, \texttt{-edf4a4}, \texttt{-c3815c}, \texttt{-0e5133};
+\texttt{PCC-20261114-27045d} is \texttt{not\_covered}. Sources: the
+\texttt{RESULT.md} files under
+\art{research/koblitz_n83_factor_base_sweep_20261008/verification/}
+(\art{d18-full-orbit-20261025/external-cms-20261114},
+\art{ordered-cms-20261114}, \art{ordered-cms-fullgauss-20261114},
+\art{ordered-cms-vsids-20261114},
+\art{native-cadence-replay-20261026/attempt-7},
+\art{k2048-m5-xcnf-20261114}, \art{k2048-m5-wide-xcnf-20261114},
+\art{k2048-unpinned-positive-20261114},
+\art{k2048-sorted-unpinned-20261114},
+\art{a0-matched-public-solver-20261114}).}
+\label{tab:n83l-gates}
+\end{table}
+
+Enabling every recovered Gaussian matrix turned the ordered D18 positive
+from a $10^6$-conflict cap into a solve in 3{,}879 conflicts, on the same
+formula. The free-first-pair export is a different formula (329{,}726
+variables against 329{,}808, a different first-pair order and cadence), and
+its correction note forbids a backend-only ratio against attempt~7
+(\art{research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/external-cms-20261114/ENCODING_CORRECTION.md}).
+The K2048 positive pins 747 witness coordinates. With the pins removed the
+constructed target still has its archived model, and the solver does not
+find it within $10^6$ conflicts. Every natural query in the table is a
+censored cell with zero checked relations, so none estimates relation yield,
+and no base is selected. A full-base six-summand gate on the K600 base was
+frozen the same day and has not run
+(\art{research/koblitz_n83_factor_base_sweep_20261008/verification/k600-full-smooth-m6-20261114/PROTOCOL.md}).
+The sweep's v5 design appends every subset of five symmetry switches to the
+v4 grid, $143{,}736{,}975{,}360$ addressable recipes; the new cases have no
+verified execution adapter, and the selected base remains null
+(\art{research/koblitz_n83_factor_base_sweep_20261008/README.md}).
 
 \section{Certified degree bounds}\label{sec:n83l-degree}
 
@@ -1610,7 +1690,9 @@ do not have:
 \item quasi-subfield polynomials at $n=131$ (\S\ref{sec:bt-qsp});
 \item composite-degree curves (\S\ref{sec:bt-composite});
 \item binary GHS and Weil-restriction screens outside the late-October cubic
-  catalogue (\S\ref{sec:bt-ghs}).
+  catalogue (\S\ref{sec:bt-ghs});
+\item the 14 November sweep of seven items the owner believed open
+  (\S\ref{sec:bt-open7}).
 \end{itemize}
 The \texttt{cryptanalysis} sources are read at the head of the branch
 \texttt{claude/cryptanalysis-repo-setup-p59kek} (22 October), not a
@@ -1746,6 +1828,257 @@ the matched null at $(22,7)$, ran on 28 October (\S\ref{sec:bd-guess}). It
 quotes the unconverted distances $+7.62$ bits ($m=4$, degree 4), $+10.32$
 (degree 5) and a free-oracle floor of $2^{56.46}$, and no lead moves a priced
 row below rho.
+
+\section{Seven items believed open, 14 November}\label{sec:bt-open7}
+
+On 14 November the owner listed seven items they believed open for index
+calculus on binary Koblitz curves of the ECC2K-130 type, and each went to
+one lane (L1--L7). Every lane first audited prior work in this repository
+and in \texttt{cryptanalysis}, then either measured the residual question
+under a protocol frozen before data or declared the item closed by prior
+work (\art{research/ecc2k130_open7_20261114/README.md},
+\art{research/ecc2k130_open7_20261114/COMMON.md}). The lanes ran at toy
+scale on one 4-vCPU machine shared by all seven, so counted operations
+decide every verdict and wall time is not used. Every claim is
+\texttt{[pcc:unverified]}: no signed claim, no independent replay and no
+EKS run. The knowledge base and the lead atlas were unavailable to the
+lanes, so none claims novelty. Table~\ref{tab:bt-open7} gives the
+verdicts.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}p{0.2\linewidth}>{\raggedright}p{0.17\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Lane & Item & Verdict & Finding \\
+\midrule
+L1 & Frobenius- and negation-closed non-linear base & closed by prior work & built and measured end to end before; $2n$ fewer columns at the same yield per point; $1.6$--$18\times$ above signed-Frobenius rho on 8 curves, slope $0.165$ $[0.117,0.213]$ per $\ln r$ \\
+L2 & UNSAT share; pre-solve filters & no change (measured) & no polynomial of degree $\le3$ in the bits of $x(R)$ beats the random-subset null (24 cells); linearisation to $D=4$ refutes 0 of 694 $m=3$ UNSAT targets \\
+L3 & incremental SAT across targets & no change (measured) & persistent/cold conflicts $1.02$ $[0.93,1.12]$, propagations $2.23$ $[2.04,2.46]$ on the deciding cell \\
+L4 & missing baselines & (a) negative (measured); (b), (c) closed by prior work & $\gcd$ with $L_V$ costs $7$--$14\times$ ($m=2$) and $300$--$1500\times$ ($m=3$) the pair-table oracle \\
+L5 & function-field Coppersmith & inconclusive by the frozen rule; gap measured & reach $\ell=22$ against existence at $\ell\approx66$, $n=131$ \\
+L6 & Gr\"obner-free splitting, dissection & closed by prior work & shared $2+2$ pair-table meet is the incumbent; dissection cuts memory, not operations \\
+L7 & end-to-end units against rho & closed by prior work (method) & 147 rows; every prime-degree Koblitz arm moves away from rho as $r$ grows \\
+\bottomrule
+\end{tabularx}
+\caption[]{The seven lanes of the 14 November sweep. Verdicts are each
+lane's frozen decision rule; ``closed by prior work'' means the lane found
+the item already built and measured and ran nothing. All
+\texttt{[pcc:unverified]}. Source: the lane \texttt{SUMMARY.md} files under
+\art{research/ecc2k130_open7_20261114/}.}
+\label{tab:bt-open7}
+\end{table}
+
+\paragraph{L1 and L7: the scaling is the obstacle.} The closed non-linear
+base already exists as \texttt{compact-orbit-scan}, the Hamming-weight base
+\texttt{onb-weight} and the \texttt{goal22} decomposer
+(\S\ref{sec:kc-nonlinear}). In the meet-in-the-middle pipeline it saves the
+orbit factor on columns at the same table cost per trial (47{,}565 table
+additions in both arms); under SAT the frozen paired $n=13$ run
+needed $1.38$--$1.61\times$ more CPU per new independent relation, from a
+legacy Python harness and so provisional. Fully priced against signed-Frobenius
+rho the orbit base remains $18.16\times$ $[15.67,21.55]$ above at $n=41$ and
+$3.85\times$ $[3.04,4.82]$ at $n=23$
+(\art{research/ecc2k130_open7_20261114/L1-frobenius-base/SUMMARY.md}). L7
+re-read 147 complete committed rows against matched rho, excluding 8 with
+reasons (among them a pair claw that is a baby-step giant-step, not index
+calculus), and fitted the slope of $\log_2(\text{IC}/\text{rho})$ per bit
+of $r$ within each source (Table~\ref{tab:bt-open7-slope}). The two-variable
+fit on $n$ and $\log_2r$ gives an $n$ coefficient near 0 and an $r$
+coefficient of $+0.09$ to $+0.16$; it predicts $460\times$ to
+$2\cdot10^4\times$ at $(n,\log_2r)=(131,129)$, with leverage 22--88 from
+4--8 sizes below 47 bits, so the direction is firm and the size is not.
+Relation search is 50--92\% of $S$, table or oracle build 5--45\% and linear
+algebra at most $1.2$\%. In the double-large-prime rows (DT) the order
+against the base never holds across the band ($1.001$, $0.985$, $1.183$ and
+$1.095$ at $w=0$, $n=37$--47). The only rows below 1 are the composite-degree
+Gaudry $k=4$ rows ($m=17$--18), which depend on the subfield, use one target
+against theoretical rho and were never replayed
+(\art{research/ecc2k130_open7_20261114/L7-e2e-units/SUMMARY.md}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Series & Slope [95\%] & At $\log_2r=129$ \\
+\midrule
+FC \texttt{ic-compact}, $w=0$ & $0.047$ $[0.006,0.088]$ & $190$ (8--4{,}027); 4\% of draws cross \\
+LB-A (Table~A, rule v9, validated) & $0.113$ $[0.056,0.169]$ & $5.9\cdot10^3$; 0.1\% cross \\
+LZ lazy orbit & $0.115$ $[0.080,0.151]$ & $1.6\cdot10^4$ \\
+PX pipeline & $0.107$ $[0.066,0.148]$ & $1.1\cdot10^4$ \\
+DT two large primes & $0.150$ $[0.09,0.21]$ & --- \\
+GK $k=4$, composite degree & $-0.246$ & crosses near $\log_2r\approx66$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Slope of $\log_2(\text{IC}/\text{rho})$ per bit of $r$ within
+each source, and the ratio extrapolated to ECC2K-130's $\log_2r=129$, as L7
+states them. A positive slope is a gap that widens. The LB-A slope is the
+rule v9 fit of \S\ref{sec:tablea}. Source:
+\art{research/ecc2k130_open7_20261114/L7-e2e-units/SUMMARY.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:bt-open7-slope}
+\end{table}
+
+\paragraph{L2: UNSAT dominates only undersized bases.} Exhaustively over
+all targets in $\langle G\rangle$ on $y^2+xy=x^3+ax^2+1$ at $n=11$, 13 and
+19, the UNSAT fraction is $0.75$--$0.92$ at base dimension
+$d=\lceil n/m\rceil-1$, $0.31$--$0.52$ at $d=\lceil n/m\rceil$ and
+$0.001$--$0.03$ at $d=\lceil n/m\rceil+1$, and
+$\exp(-\binom{\abs F+m-1}{m}/\#E)$ predicts every $m\ge2$ cell within
+$0.05$. The space of filters of degree $\le3$ in the bits of $x(R)$, which
+contains every trace condition, was computed exactly: its dimension equals
+the random-subset null in all 24 cells with $m\ge2$, and both positive
+controls (the $m=1$ subspace condition and the Kosters--Yeo trace filter on
+all of $E$) are detected. Macaulay linearisation of the $m=3$ split chain
+refutes 0 of 694 UNSAT targets at $D=2$, 3, 4. At $m=2$, $D=4$ refutes
+97--100\% of UNSAT targets (0\% at $n=19$, $d=10$) at $3\cdot10^3$ to
+$7\cdot10^7$ word operations per target against one probe of the
+root-finding oracle; it loses at $0.1$ and 1 GAE per word operation, and
+breaks even at $2.6\cdot10^{-8}$ to $1.3\cdot10^{-3}$ GAE per word
+operation, a price not measured at $n=131$
+(\art{research/ecc2k130_open7_20261114/L2-refutation-filters/SUMMARY.md}).
+This turns the statistical AUC $\approx0.5$ of the earlier learned-predictor
+ceiling (\S\ref{sec:bd-sat}) into an exact negative at toy $n$.
+
+\paragraph{L3: what incremental SAT reuses.} CaDiCaL~3.0.1 in Rust, on the
+Koblitz curve $y^2+xy=x^3+1$ in a type-II normal basis with the weight base
+$\mathrm{HW}(x)\le w$ and chained $\Sem3$ links; every one of 812 target
+rows was enumerated to completion and matched brute force
+(Table~\ref{tab:bt-open7-sat}). On the deciding cell ($m=23$, all 39
+targets non-decomposable) one persistent solver with the target as
+assumptions costs the conflicts of a cold solve with the target folded in as
+constants, and $2.23\times$ its propagations. Holding the target as
+assumptions costs $2.07$--$4.09\times$ the conflicts, and reuse wins back
+about that much. Of $3.05$ million learnt clauses at $m=23$, $93.9$\% mention
+target bits; keeping only the target-free ones gives $0.76$ of the
+assumption-encoded cold solve, keeping all learnt clauses $0.69$ and keeping
+the whole solver $0.46$, so most of the gain is warm heuristic state. At
+$0.1$ and 1 GAE per propagation the persistent solver never ranks ahead.
+$m=23$ replaced the planned $m=29$, where the smoke run hit its conflict
+budget on the first target, and 2 is not primitive modulo 23
+(\art{research/ecc2k130_open7_20261114/L3-incremental-sat/SUMMARY.md}). The
+REUSE arm of the ladder-inversion study (Table~\ref{tab:bo-satladder})
+keeps a solver in the same way; L3 names a cold solve with warm phases and
+scores as the untested variant.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Cell & Persistent/cold & A/A & Assumptions/constants & Persistent/assumptions \\
+\midrule
+$m=11$, $k=2$, $w=2$ & $0.88$ $[0.84,0.93]$ & $1.02$ & $2.07$ & $0.43$ \\
+$m=11$, $k=3$, $w=2$ (cut) & $0.90$ $[0.66,1.24]$ & $0.98$ & $4.09$ & $0.22$ \\
+$m=23$, $k=2$, $w=2$ & $1.02$ $[0.93,1.12]$ & $1.00$ & $2.21$ & $0.46$ \\
+\bottomrule
+\end{tabular}
+\caption[]{L3, paired geometric-mean conflict ratios [95\%] over a 40-target
+stream plus a 5-target repeat block. $m$: extension degree; $k$: summands.
+The $m=23$ cell decides; its propagation ratio is $2.23$ $[2.04,2.46]$. The
+$m=11$, $k=3$ cell was cut to 4 arms and 20 targets during its run.
+Source: \art{research/ecc2k130_open7_20261114/L3-incremental-sat/SUMMARY.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:bt-open7-sat}
+\end{table}
+
+\paragraph{L4: three baselines.} Item 4 named three. Libfes-style Gray-code
+search was already compared head to head with \texttt{inherited-f4} on the
+same seeded targets (\art{research/inherited_f4_next_20261112/},
+\art{research/fes_then_batched_20261112/}), and the Dinur and LPTWY
+polynomial-method solvers already have a counted model that puts their
+crossover with exhaustive search at $N=80$ (Dinur, $2^{71}$ bits of memory)
+and $N=128$ (LPTWY), with none under a realistic memory cap; that study's
+verdict was inconclusive on a sensitivity control
+(\art{research/blindspots_20261018/03-polynomial-method/}). The third, fixing $m-1$
+base points and taking $\gcd(f,L_V\bmod f)$, existed in
+\texttt{semaev\_decomp.rs} but had never been counted against the descent
+engines. Counted on exactly the 136 targets that \texttt{ic descent} drew
+and solved (13 cells, $n=11$--29, $m=2$ and 3), its solution sets agree
+with every engine and with brute force, and a wrong-subspace control
+differs on 45 targets. Priced at mul~4, sqr~3, add~1 word operations: at
+$m=2$ it is below exhaustive search at all three prices from $\ell=10$
+($231\times$ below at $\ell=15$), level in exponent with \texttt{inherited-f4} (log$_2$ slope
+$1.11$ against $1.10$ per unit of $\ell$) at a flat factor $2.2$--$2.6$
+whose sign flips inside the pricing band, and up to $1000\times$ dearer than
+\texttt{inherited-f4} on overdetermined cells; at $m=3$, $\ell=5$ it is
+$27\times$ cheaper than \texttt{inherited-f4}, which did not finish at
+$\ell=6$ in 120\,s. Against the pair-table oracle that the baseline rows use
+it is $7$--$14\times$ ($m=2$) and $300$--$1500\times$ ($m=3$) dearer. The
+frozen rule is ambiguous between a stage result against
+\texttt{inherited-f4} and a negative result against the incumbent oracle;
+on either reading the index-calculus baseline does not move
+(\art{research/ecc2k130_open7_20261114/L4-baselines/SUMMARY.md}).
+
+\paragraph{L5: the function-field Coppersmith gap.} The idea, proposed as
+MP-lattices-5 in the 31 October mega-pass and never run, is the first
+binary $\FF_2[t]$ measurement here: an exact weak-Popov lattice on
+$\Sem3$ up to $n=131$ with the Certicom field polynomial, seed 20261114.
+Table~\ref{tab:bt-open7-ffc} compares the largest $\ell$ at which planted
+roots are recovered with the $\ell$ at which decompositions exist. The
+existence threshold is measured to $n=53$; at $n=61$ and 131 it uses the
+median of $1-\exp(-2^{2\ell-n-1})$, whose count matches measurement within
+$0.93$--$1.02$ at $n\le37$ wherever the expectation is at least 2. Reach
+grows with the lattice multiplicity $k$ only to $\ell=22$ at $k=8$
+($\ell_{\mathrm{rec}}-1=21=0.160n$, below $n/6$). Frobenius-conjugate equations equal $g^2\bmod
+f$ coefficientwise and leave the lattice unchanged in 72 of 72 cells, and a
+Frobenius-orbit pair base lowers the reach (13 against 21--22 at $n=131$).
+The reach over a generic polynomial comes from the $X_1\leftrightarrow X_2$
+symmetry, not from Koblitz structure. At the reach ($n=131$, $\ell=21$) one
+lattice costs on average $8.12\cdot10^4$ simple transformations and $1.29\cdot10^7$
+64-bit word XORs at $k=4$. The verdict is inconclusive only because one
+degenerate positive control ($n=29$, $k=4$, $\ell=3$) recovered 7 of 10
+against the required 8; every criterion of the negative verdict holds at
+$n\ge53$, and the distance to rho is at least 49 bits at every price
+(\art{research/ecc2k130_open7_20261114/L5-ff-coppersmith/SUMMARY.md}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rlllll@{}}
+\toprule
+$n$ & $\ell_{\mathrm{ex}}$ & $\ell_{\mathrm{rec}}$ ($k$) & $\ell_{\mathrm{ex}}-\ell_{\mathrm{rec}}$ & $(\ell_{\mathrm{ex}}-1)/(\ell_{\mathrm{rec}}-1)$ & $(\ell_{\mathrm{rec}}-1)/n$ \\
+\midrule
+13 & 7 (measured, $N=500$) & 3 & 4 & 3.00 & 0.154 \\
+19 & 10 ($N=300$) & 4 & 6 & 3.00 & 0.158 \\
+29 & 15 ($N=200$) & 5 & 10 & 3.50 & 0.138 \\
+37 & 19.5 ($N=60$) & 6 & 13.5 & 3.70 & 0.135 \\
+53 & 28 ($N=10$) & 9 ($k=4$) & 19 & 3.38 & 0.151 \\
+61 & 31 (heuristic) & 10 ($k\ge2$) & 21 & 3.33 & 0.148 \\
+131 & 66 (heuristic) & 22 ($k=8$) & 44 & 3.10 & 0.160 \\
+\bottomrule
+\end{tabular}
+\caption[]{L5: the existence threshold $\ell_{\mathrm{ex}}$ (median smallest
+$\ell$ at which a random $R$ has an ordered decomposition) against the
+lattice reach $\ell_{\mathrm{rec}}$ (largest $\ell$ with recovery, symmetric
+$\Sem3$ arm, best $k\le8$; $N=10$ trials for $k\le5$, 3 for $k=6$--8).
+Source: \art{research/ecc2k130_open7_20261114/L5-ff-coppersmith/SUMMARY.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:bt-open7-ffc}
+\end{table}
+
+\paragraph{L6: dissection.} The $m=4$ $2+2$ pair-table meet with the table
+shared across targets is the incumbent, already stored one entry per
+$\langle\sigma,-1\rangle$ orbit, with planted exponent about $0.41$ and
+uniform targets dominated by the rarity $B^4/p$
+(\art{research/ic_m4_mitm_scaling_20261031/README.md}). Schroeppel--Shamir
+and dissection cut the table from $\abs F^2$ to about $\abs F$ at about
+$\abs F^2$ time per target, so they lower memory only; a change that only
+lowers memory is not an improvement in the counted metric, and the lane ran
+nothing
+(\art{research/ecc2k130_open7_20261114/L6-dissection/SUMMARY.md}).
+
+\paragraph{Reading.} Items 1, 6 and 7 and two of item 4's baselines were
+already built and measured; the open list underestimated the programme's
+own prior work. Item 2's premise holds only for undersized bases, item 3's
+amortisation is absent in counted units, and item 5's gap holds at
+$n=131$ with Koblitz structure not narrowing it. L7's shares and slopes
+locate the binding constraint: relation search scales away from rho by
+$0.05$--$0.15$ bits per bit of $r$, so a constant-factor gain (L1, L4(a),
+dissection) cannot close the gap; a win must lower cost per trial or trials
+per relation by a factor that grows with $r$. The sweep's open threads are
+a validated Koblitz row in counted GAE with a real §5a band, a complete
+$m=83$ counted row against matched rho, a GF$(2^n)$ $w_{\mathrm{cal}}$
+instrument (ecbench's covers prime fields only), and the $\gcd$ arm inside
+\texttt{ic\_framework} so that it shares one tally with
+\texttt{inherited-f4}.
 
 \section{ECC2-131}\label{sec:bt-ecc2-131}
 
