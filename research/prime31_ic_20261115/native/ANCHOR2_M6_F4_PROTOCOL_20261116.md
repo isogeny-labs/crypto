@@ -46,3 +46,8 @@ With six remaining signed summands and unrestricted repetitions there are `(2*31
 ## Code and reproducibility
 
 Extend the inherited `native/examples/prime31_m8_balanced_f4_input.rs` using its existing `six_ring`, `six_input`, `s3`, `s4`, `capped_f4`, `Arithmetic` and `Base` — no replicated cryptographic implementation — with `--anchor2-m6-f4`. Keep the existing example's behavior unchanged. Record source-specific CI stdout separately after any run.
+
+
+## Separate predeclared generic **validator**, not an IC oracle
+
+The original m8 split-control count does **not** determine how many of the frozen public R have an anchored m6 signed witness. A separate Rust-only ground-truth witness-count audit shall enumerate exactly the 62^3 labelled signed three-sums (including repeated indices and the identity) into a hash multiset, then for each of the 16 immutable public R' points sum the multiplicities of triple complements. Charge build/probe EC group work and retain counts per mask. Run the same count on the distinct public known-positive six-leaf target. Report exact number of ordered signed six-summand witnesses and whether zero occurs. This computation is **generic exhaustive MITM** and must be kept entirely outside algebraic F4 discovery; it may only classify whether a censored algebraic query had at least one full-point solution. No generic fallback, rank, log, benchmark advantage or scientific novelty follows from this diagnostic.
