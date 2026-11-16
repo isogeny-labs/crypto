@@ -17,7 +17,7 @@ and `CARGO_TARGET_DIR` and `TMPDIR` are under `/Volumes/SSD990/tmp/`.
 | 8 | Repository `cargo test --release --example n83_k600_m6_budget --locked --offline -j 1` with explicit Rust 1.99.1 and boot guard | Exit 0 after 11m 01s; all six example tests passed. The library emitted 57 pre-existing warnings, and macOS `rust-objcopy` warned about missing `libLLVM.dylib` while stripping; the executable test binary ran successfully. No boot-stop marker was created. |
 | 9 | Repository `cargo test --release --lib --locked --offline -j 1` in the sparse checkout | Stopped with exit 130 before a test verdict after the compiler reported 45 missing tracked `include_str!` research fixtures. `git sparse-checkout add research` then materialized those files, including `research/efd_coordinate_charts_20261108/Charts.lean`. The stop preserved boot margin and the partial target. |
 | 10 | Same full library command after adding `research` | Stopped with exit 130 before a test verdict after five further missing tracked `include_str!` fixtures appeared under `docs/units`, `docs/identity-certificates`, and `tests/fixtures`. The full tracked `docs` and `tests` directories were materialized, and all five paths were checked before retry. |
-| 11 | Repository `cargo test --release --lib --locked --offline -j 1` after materializing tracked `research`, `docs`, and `tests` | Exit 101 after 538.86 test seconds: 6,340 passed, 25 failed, 138 ignored. The [compressed raw log](repo-lib-attempt-3.log.gz) is retained here; this is a failed macOS suite, not a passing gate. Five failures require tracked `gpu/certicom` files omitted by this sparse checkout; five require an ignored 2,293,097-byte targetwalk record that is archived in S3; twelve require Linux `/proc`; one wide-prime test reached its deadline; and two wide-prime tests reported missing files. None of those modules or fixtures is changed by this controller patch. |
+| 11 | Repository `cargo test --release --lib --locked --offline -j 1` after materializing tracked `research`, `docs`, and `tests` | Exit 101 after 538.86 test seconds: 6,340 passed, 25 failed, 138 ignored. The compressed raw log is retained in the [artifact manifest](.artifacts.json); this is a failed macOS suite, not a passing gate. Five failures require tracked `gpu/certicom` files omitted by this sparse checkout; five require an ignored 2,293,097-byte targetwalk record that is archived in S3; twelve require Linux `/proc`; one wide-prime test reached its deadline; and two wide-prime tests reported missing files. None of those modules or fixtures is changed by this controller patch. |
 
 `rustfmt --edition 2021` and `git diff --check` passed on the source before
 attempt 6. The missing paths were materialized from the pinned commit using
@@ -40,8 +40,15 @@ The attempt-11 raw log is 617,713 bytes, SHA-256
 `84659ddd4fb4eee71a318776f3c745dbf164d3089a1be78abd32bddef3dcd7f2`.
 Its deterministic `gzip -n` copy is 118,476 bytes, SHA-256
 `105fe96e6339fa34d3044ba96e9dbd2424d9bb48081f2f1a08ff6ba5d02e4a7b`;
-decompression reproduced the raw hash. The linked compressed copy is the
-retained record.
+decompression reproduced the raw hash. Artifact migration commit
+`2378a90aef5f` replaced the Git blob with the [manifest](.artifacts.json).
+The durable object is
+`s3://setec-astronomy-artifacts/store/sha256/10/105fe96e6339fa34d3044ba96e9dbd2424d9bb48081f2f1a08ff6ba5d02e4a7b`.
+A fresh `GetObject` through profile `ecc-challenges-new` returned 118,476
+bytes with the expected compressed SHA-256; decompression reproduced the raw
+SHA-256 above. Retrieve with `aws s3 cp` from that exact object key to a new
+local file, then check its SHA-256 before decompressing. This custody check
+does not change the failed validation result.
 
 Next gate: review the exact diff and carry this validation status into the PR.
 Run a clean full-fixture Linux suite on the new head when host resources permit;
