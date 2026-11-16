@@ -1,6 +1,27 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (02:50Z, 16 November)
+## Current checkpoint (02:55Z, 16 November)
+
+STAGE16FINISHED: sourcef33d904b7b7b61250152559caac37b7ce62694fdpublished
+samePR4288beforecall. /workspace/ic-local-runs/local-pseudo-pair-20261116-16
+exit0,15.151s,540starts/completions(90warm/450measure),allscalar/pairedstream
+controls,globalproblems[],noinflight/unattempted/retries. Nativeanalysis7/9direct
+eligible,3upperCIbelow1:p523s139=.856082(CI.807806–.910758),p523s151=.915386
+(CI.902050–.928918),p1039s151=.789050(CI.762706–.827729).4eligibleinconclusive,
+2directAArejected.16/18individualstrataeligible. Nolocalparityflag;candidate
+p1039rho2.389/27.847/9.369(s139/149/151). All9diagnostictargetsfinishatfirst
+repeateddecomposablex,consistentgenericcoalescence,notnewdensity/exponentproof.
+
+Nativefullsummary31523Bcopiedbyte-exactto study/local-pseudo-pair-20261116-16;
+flow/source/rawcustody/hash/prepostchecked,3pagePDFcompiledandALLpagesinspected,
+exactbenchPDF/SVG+150dpiPNGplotandreportcopies/hashescompleted. Finishedevidence
+currentlyUNCOMMITTED. Needjournalfinishentry,commit/push/updatePRactualresults
+(bodycurrentlysourcepublishedtrialrunning). No jobsactive. Do NOTrepeatunchanged
+trialtoimprovecontrols. Nexttechnicalreview:guardeddelayed/narrowarithmeticin
+tinydegree<=4polynomialworkspace, followingmeasuredKrylovkerneltechnique;NO
+newleadcodeorplanimplemented. Primary/KBreceiptbeforeselection. GoalACTIVE.
+
+## Source validation checkpoint (02:50Z, superseded pending states)
 
 Merged-source validation ALL DONE and published as7bab7eefe on samePR4288:
 43cubicrelease tests, packed-liftcached/uncachedregression,5S4exampletests,

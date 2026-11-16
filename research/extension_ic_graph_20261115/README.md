@@ -243,7 +243,10 @@ no standard lab admission or canonical export validation is asserted.
 - [Pseudo-remainder S3](AMENDMENT_11_PSEUDO_REMAINDERS.md): explicit Rust
   `--oracles prepared-pair,pseudo-pair`, preserving the original default.
   [Frozen paired plan](pseudo-pair-plan.json) uses fresh public targets;
-  Rust validation passes and no pseudo-remainder timing has started.
+  [Full cold results](local-pseudo-pair-20261116-16/report.pdf) retain540
+  completed executions, all scalar/stream checks, seven controlled direct
+  comparisons, three gains, four inconclusive cases and two rejected direct
+  comparisons. All outcomes remain visible. [pcc:unverified]
 
 Native summaries, every local stratum, flow and raw custody hashes accompany
 each PDF. The local scalar and timing checks are producer observations;
