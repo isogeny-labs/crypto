@@ -4327,3 +4327,54 @@ Original current-source CI/whole replay/final-head gates/reviews/guard/normal me
 
 ## Errors
 No new scientific/CI/signed/native/paid promotion, no raw deletion or original criterion change. Earlier failed source/metadata/storage/closure interpretations remain retained/corrected. [pcc:unverified]
+
+---
+
+2026-11-16T18:54:17.566142+00:00
+# Retain metadata-only GitHub state tag
+
+## What was done
+pcc/claims/PCC-20261116-4215cf.json: normal new metadata tag sourcedc58b0044a2f0b95184474a9aafa1f6252c97185/exact readback0; whole publication/ready/queue/correction records now committed and tagged. Publisher writes only a new tag, never active PR source refs. [pcc:unverified]
+
+## Decisions made
+Scheduled Root19:20/Consumer19:30 observations discover actual then-current heads; no live-head/CI result inferred from tag. Continue unblocked native cofactor review with original code/workload/budget rules. [pcc:unverified]
+
+## Open threads
+Current ownCI/authenticated store/startup/full replay/final gates/normal merges and all original full scientific/native/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+No data/prune/reset/rechain/source/gate change, no signed/native/paid promotion. [pcc:unverified]
+
+---
+
+2026-11-16T18:55:50.194469+00:00
+# Preregister native cubic cofactor inverse and original counter diagnostics
+
+## What was done
+pcc/claims/PCC-20261116-3eafa4.json: exact original common/full04/WordBridge and official Arkworksv0.5.0 inverse/Fp3/licenses read/pinned. Established cofactor, no novelty claim; original literal norm charges5 for four explicit multiplication expressions and omits additions. Fifteen public fixtures/all parity/control/counter predictions frozen before code. KBfivequeries/conductor127/locked atlas, no absence inference. [pcc:unverified]
+
+## Decisions made
+Separate native06 implementation compiles exact original as frozen path dependency; same norm block/Fp inverse/scalar path, one-thread Rust1.99.1/j1/offline/120s development units only. Counter23-to16 is a declared-unit prediction, not runtime/physical/full-pipeline gain; original calibration unchanged. Preserve all source/negative/output/report/CI and attempt faithful word proof where feasible. [pcc:unverified]
+
+## Open threads
+Native implementation/meaningful units/word bridge/report/CI/continuous commit, Root19:20/Consumer19:30 ownCI/final gates/normal merges, original full science/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+No native attempt yet. Original norm counter discrepancy/unpriced work preserved; no local LP substitute, paid run, source rewrite, signed/performance promotion. [pcc:unverified]
+
+---
+
+2026-11-16T18:59:33.241228+00:00
+# Freeze native cofactor protocol before implementation
+
+## What was done
+pcc/claims/PCC-20261116-4dd1ec.json: prospective3eafa4 protocol/all15 public fixtures/exact original and Arkworks/licensed primary sources, parent prefix/artifact policy/prose/cached0. No candidate source or native execution exists yet. [pcc:unverified]
+
+## Decisions made
+Normal local child/new immutable protocol tag before code; original declared norm accounting retained, runtime/physical/ECDLP cost unknown. Active PR refs stay with scheduled Root19:20/Consumer19:30 observations. [pcc:unverified]
+
+## Open threads
+Implement candidate and frozen-reference units/controls, faithful word bridge where feasible/report/CI; original full science/runtime/admission/matched costs. [pcc:unverified]
+
+## Errors
+No native result yet, no original source/policy/verifier/gate change or paid/signed promotion. [pcc:unverified]
