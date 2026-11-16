@@ -247,6 +247,12 @@ no standard lab admission or canonical export validation is asserted.
   completed executions, all scalar/stream checks, seven controlled direct
   comparisons, three gains, four inconclusive cases and two rejected direct
   comparisons. All outcomes remain visible. [pcc:unverified]
+- [Guarded polynomial accumulation](AMENDMENT_12_DELAYED_POLYNOMIALS.md):
+  [810-execution cold comparison](local-delayed-pseudo-pair-20261116-17/report.pdf)
+  preserves relation streams and pseudo/delayed semantic products. All eight
+  controlled combined comparisons improve over prepared S3; the isolated
+  convolution ablation has two gains and six inconclusive cases. One delayed
+  timing rejection remains visible. [pcc:unverified]
 
 Native summaries, every local stratum, flow and raw custody hashes accompany
 each PDF. The local scalar and timing checks are producer observations;

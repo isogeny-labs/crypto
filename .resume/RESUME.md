@@ -1,6 +1,37 @@
 # Resume: native Rust graph IC toward rho parity
 
-## Current checkpoint (03:24Z, 16 November)
+## Current checkpoint (03:31Z, 16 November)
+
+STAGE17FINISHED onpublished73efa9eb5beforecall. Authorizedlocaldir
+/workspace/ic-local-runs/local-delayed-pseudo-pair-20261116-17exit0,19.901s,
+810starts/completions(135warm675measure),allscalar/stream/group/residualand
+pseudo/delayedsemantic-productchecksPASS,globalproblems[],noflight/retries.
+26/27strataeligible;onlydelayedp127s163AAfails. Threepairedcomparisonsallretained:
+- delayed/prepared:8eligible,all8upperCI<1,cost.813273–.931118,1rejected.
+- delayed/pseudo:8eligible,2gains(p523s157.925107CI.862710–.982982;
+  p1039s167.844276CI.653159–.981533),6inconclusive,1rejected.
+- pseudo/prepared:9eligible,5gains,4inconclusive.
+Nolocalparityflag;largestdelayed/rho3.166/4.523/3.606(s157/163/167). All9
+mechanismdiagnosticsfirstrepeateddecomposablex;noindependentdensityproof.
+
+Final6pagePDFALLpagesinspected;originalplotlabeloverlapfixedbyshorterRustlabel
+"Delayed pair"(singlepost-callsourceconstantchange), nativeanalyzerrebuiltand
+fullnumericalsummaryBYTE-IDENTICAL49826B. Originalcopiedanalyzer+originalfigures
+localunchanged. Oldfrozen44filemanifestMUSTremain73efa9eb5bytes;currentplotlabel
+differsintentionally,DO NOTrewriteoldhashes. Local-evidence.jsonrecordsold/new
+summary/analyzer/codehashesandpost-callpresentation-onlyscope. ExactbenchPDF/SVG/
+150dpiPNGcopies/hashesdone,copiesalsoinlocalrunoutsideGit.Allraw/preposthashespass.
+
+FINISHEDEVIDENCEcurrentlyUNCOMMITTED;needcommit/pushsamePR4288/updateactualbody
+(currentlybodycovers16). No jobsactive. Source73efchecks:46cubicrelease+5S4+
+12analysis,actualbinaries/ClippyallPASS. No whole-parentpassorsignedindependent
+verdict. Review/threads03:30bothEMPTY,nextnotbefore04:20. Status/checkrun03:16
+on9db:migrate/reviewappcheckssuccess;no gate/size/artifactsconfirmation,next
+statusnotbefore04:06absentevent. No merge/bypass. GoalACTIVE. Afterpublication,
+primary/KB/source-reviewnextcheaperS4relationgeneration/trace-reuselead;NOnew
+mechanism/protocol/codechosenyet. Localbackendworking,noexternalblocker.
+
+## Source validation checkpoint (03:24Z, superseded pending states)
 
 STAGE17IMPLEMENTED,NOTTIMED. ExplicitDelayedPseudoRemainderPairOnly/CLI
 delayed-pseudo-pairdoesguardedPoly5convolution inu64sum<2^43,p<2^20,
